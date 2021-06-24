@@ -57,7 +57,7 @@ dependencies {
 
         androidTestImplementation(project(":compose:test-utils"))
         androidTestImplementation(project(":compose:ui:ui-test-font"))
-        androidTestImplementation(project(":test-screenshot"))
+        androidTestImplementation(project(":test:screenshot:test-screenshot"))
         androidTestImplementation(libs.testUiautomator)
         androidTestImplementation(libs.testRules)
         androidTestImplementation(libs.testRunner)
@@ -118,7 +118,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             androidAndroidTest.dependencies {
                 implementation(project(":compose:test-utils"))
                 implementation(project(":compose:ui:ui-test-font"))
-                implementation(project(":test-screenshot"))
+                implementation(project(":test:screenshot:test-screenshot"))
                 implementation(project(":activity:activity-compose"))
 
                 implementation(libs.testUiautomator)
