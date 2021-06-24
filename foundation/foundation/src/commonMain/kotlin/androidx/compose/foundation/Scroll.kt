@@ -282,9 +282,9 @@ private fun Modifier.scroll(
                     action = { x: Float, y: Float ->
                         coroutineScope.launch {
                             if (isVertical) {
-                                (state as ScrollableState).scrollBy(y)
+                                (state as ScrollableState).animateScrollBy(y)
                             } else {
-                                (state as ScrollableState).scrollBy(x)
+                                (state as ScrollableState).animateScrollBy(x)
                             }
                         }
                         return@scrollBy true

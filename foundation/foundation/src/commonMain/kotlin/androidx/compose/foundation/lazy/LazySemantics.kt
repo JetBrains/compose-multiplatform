@@ -17,6 +17,7 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
@@ -68,7 +69,7 @@ internal fun Modifier.lazyListSemantics(
         scrollBy { x, y ->
             val delta = if (isVertical) { y } else { x }
             coroutineScope.launch {
-                (state as ScrollableState).scrollBy(delta)
+                (state as ScrollableState).animateScrollBy(delta)
             }
             // TODO(aelias): is it important to return false if we know in advance we cannot scroll?
             true

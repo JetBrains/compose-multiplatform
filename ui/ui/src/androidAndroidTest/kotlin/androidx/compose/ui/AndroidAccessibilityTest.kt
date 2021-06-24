@@ -460,6 +460,8 @@ class AndroidAccessibilityTest {
 
     @Test
     fun testPerformAction_showOnScreen() {
+        rule.mainClock.autoAdvance = false
+
         val scrollState = ScrollState(initial = 0)
         val target1Tag = "target1"
         val target2Tag = "target2"
@@ -485,6 +487,7 @@ class AndroidAccessibilityTest {
         rule.runOnUiThread {
             assertTrue(provider.performAction(targetNode1.id, showOnScreen, null))
         }
+        rule.mainClock.advanceTimeBy(5000)
         with(rule.density) {
             assertThat(scrollState.value).isGreaterThan(99.dp.toPx().toInt())
         }
@@ -494,11 +497,14 @@ class AndroidAccessibilityTest {
         rule.runOnUiThread {
             assertTrue(provider.performAction(targetNode2.id, showOnScreen, null))
         }
+        rule.mainClock.advanceTimeBy(5000)
         assertThat(scrollState.value).isEqualTo(0)
     }
 
     @Test
     fun testPerformAction_showOnScreen_lazy() {
+        rule.mainClock.autoAdvance = false
+
         val lazyState = LazyListState()
         val target1Tag = "target1"
         val target2Tag = "target2"
@@ -527,6 +533,7 @@ class AndroidAccessibilityTest {
         rule.runOnUiThread {
             assertTrue(provider.performAction(targetNode1.id, showOnScreen, null))
         }
+        rule.mainClock.advanceTimeBy(5000)
         with(rule.density) {
             assertThat(lazyState.firstVisibleItemIndex).isEqualTo(0)
             assertThat(lazyState.firstVisibleItemScrollOffset).isGreaterThan(99.dp.toPx().toInt())
@@ -537,6 +544,7 @@ class AndroidAccessibilityTest {
         rule.runOnUiThread {
             assertTrue(provider.performAction(targetNode2.id, showOnScreen, null))
         }
+        rule.mainClock.advanceTimeBy(5000)
         assertThat(lazyState.firstVisibleItemIndex).isEqualTo(0)
         assertThat(lazyState.firstVisibleItemScrollOffset).isEqualTo(0)
     }
@@ -583,6 +591,7 @@ class AndroidAccessibilityTest {
         rule.runOnUiThread {
             assertTrue(provider.performAction(targetNode1.id, showOnScreen, null))
         }
+        rule.mainClock.advanceTimeBy(5000)
         with(rule.density) {
             assertThat(lazyState.firstVisibleItemIndex).isEqualTo(0)
             assertThat(lazyState.firstVisibleItemScrollOffset).isGreaterThan(99.dp.toPx().toInt())
@@ -594,6 +603,7 @@ class AndroidAccessibilityTest {
         rule.runOnUiThread {
             assertTrue(provider.performAction(targetNode2.id, showOnScreen, null))
         }
+        rule.mainClock.advanceTimeBy(5000)
         assertThat(lazyState.firstVisibleItemIndex).isEqualTo(0)
         assertThat(lazyState.firstVisibleItemScrollOffset).isEqualTo(0)
         assertThat(parentLazyState.firstVisibleItemScrollOffset).isEqualTo(0)

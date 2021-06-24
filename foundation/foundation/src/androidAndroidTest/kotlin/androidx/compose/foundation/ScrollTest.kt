@@ -52,6 +52,7 @@ import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.GestureScope
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
@@ -65,6 +66,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
@@ -682,6 +684,36 @@ class ScrollTest {
             .awaitScrollAnimation(scrollState)
 
         assertThat(scrollState.value).isLessThan(scrolledValue)
+    }
+
+    @Test
+    fun scroller_semanticsScroll_isAnimated() {
+        rule.mainClock.autoAdvance = false
+        val scrollState = ScrollState(initial = 0)
+
+        createScrollableContent(isVertical = true, scrollState = scrollState)
+
+        rule.waitForIdle()
+        assertThat(scrollState.value).isEqualTo(0)
+        assertThat(scrollState.maxValue).isGreaterThan(100) // If this fails, just add more items
+
+        rule.onNodeWithTag(scrollerTag).performSemanticsAction(SemanticsActions.ScrollBy) {
+            it(0f, 100f)
+        }
+
+        // We haven't advanced time yet, make sure it's still zero
+        assertThat(scrollState.value).isEqualTo(0)
+
+        // Advance and make sure we're partway through
+        // Note that we need two frames for the animation to actually happen
+        rule.mainClock.advanceTimeByFrame()
+        rule.mainClock.advanceTimeByFrame()
+        assertThat(scrollState.value).isGreaterThan(0)
+        assertThat(scrollState.value).isLessThan(100)
+
+        // Finish the scroll, make sure we're at the target
+        rule.mainClock.advanceTimeBy(5000)
+        assertThat(scrollState.value).isEqualTo(100)
     }
 
     private fun composeVerticalScroller(
