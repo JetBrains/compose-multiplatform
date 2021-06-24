@@ -5,6 +5,9 @@
 
 package org.jetbrains.compose.desktop.ui.tooling.preview.rpc
 
+import java.net.URLDecoder
+import java.net.URLEncoder
+
 internal fun RemoteConnection.sendAttach() {
     sendCommand(Command.Type.ATTACH)
 }
@@ -35,7 +38,7 @@ fun RemoteConnection.sendConfigFromGradle(
     previewClasspath: String,
     previewFqName: String
 ) {
-    sendCommand(Command.Type.PREVIEW_CONFIG, config.javaExecutable)
+    sendCommand(Command.Type.PREVIEW_CONFIG, URLEncoder.encode(config.javaExecutable, Charsets.UTF_8))
     sendUtf8StringData(config.hostClasspath)
     sendCommand(Command.Type.PREVIEW_CLASSPATH)
     sendUtf8StringData(previewClasspath)
@@ -55,7 +58,7 @@ internal fun RemoteConnection.receiveConfigFromGradle(
             Command.Type.PREVIEW_FQ_NAME ->
                 receiveUtf8StringData { onPreviewFqName(it) }
             Command.Type.PREVIEW_CONFIG -> {
-                val javaExecutable = args[0]
+                val javaExecutable = URLDecoder.decode(args[0], Charsets.UTF_8)
                 receiveUtf8StringData { hostClasspath ->
                     val config = PreviewHostConfig(javaExecutable = javaExecutable, hostClasspath = hostClasspath)
                     onPreviewHostConfig(config)
