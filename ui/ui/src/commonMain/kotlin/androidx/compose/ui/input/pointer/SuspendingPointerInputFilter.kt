@@ -367,6 +367,7 @@ internal class SuspendingPointerInputFilter(
 
         val cancelEvent = PointerEvent(newChanges)
 
+        currentEvent = cancelEvent
         // Dispatch the synthetic cancel for all three passes
         dispatchPointerEvent(cancelEvent, PointerEventPass.Initial)
         dispatchPointerEvent(cancelEvent, PointerEventPass.Main)
