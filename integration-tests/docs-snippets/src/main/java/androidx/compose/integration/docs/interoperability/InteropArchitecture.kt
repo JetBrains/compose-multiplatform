@@ -96,7 +96,7 @@ private object InteropArchitectureSnippet1 {
 
     class GreetingViewModelFactory(private val userId: String) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return GreetingViewModel(userId) as T
         }
     }
@@ -211,7 +211,7 @@ private class GreetingViewModel(userId: String) : ViewModel() {
 }
 private class GreetingViewModelFactory(private val userId: String) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return GreetingViewModel(userId) as T
     }
 }
