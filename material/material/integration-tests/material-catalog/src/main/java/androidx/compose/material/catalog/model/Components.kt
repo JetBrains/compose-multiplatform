@@ -72,6 +72,20 @@ private val Backdrop = Component(
     examples = BackdropExamples
 )
 
+private val Badge = Component(
+    id = 22,
+    name = "Badge",
+    description = "A badge can contain dynamic information, such as the presence of a new " +
+        "notification or a number of pending requests. Badges can be icon only or contain " +
+        "a short text.",
+    // No badge icon
+    tintIcon = true,
+    guidelinesUrl = "$ComponentGuidelinesUrl/bottom-navigation#behavior",
+    docsUrl = "$DocsUrl#badgebox",
+    sourceUrl = "$MaterialSourceUrl/Badge.kt",
+    examples = BadgeExamples
+)
+
 private val BottomNavigation = Component(
     id = 4,
     name = "Bottom navigation",
@@ -281,6 +295,7 @@ val Components = listOf(
     AppBarsBottom,
     AppBarsTop,
     Backdrop,
+    Badge,
     BottomNavigation,
     Buttons,
     ButtonsFloatingActionButton,
