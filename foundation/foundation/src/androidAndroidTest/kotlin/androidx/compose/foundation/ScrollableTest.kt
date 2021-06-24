@@ -654,16 +654,29 @@ class ScrollableTest {
     }
 
     @Test
-    fun scrollable_nestedScrollAbove_proxiesPostFling() {
+    fun scrollable_nestedScrollAbove_proxiesPostCycles() {
         var value = 0f
+        var expectedLeft = 0f
         val velocityFlung = 5000f
         val controller = ScrollableState(
             consumeScrollDelta = {
-                value += it
-                it
+                val toConsume = it * 0.345f
+                value += toConsume
+                expectedLeft = it - toConsume
+                toConsume
             }
         )
         val parent = object : NestedScrollConnection {
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset {
+                // we should get in post scroll as much as left in controller callback
+                assertThat(available.x).isEqualTo(expectedLeft)
+                return available
+            }
+
             override suspend fun onPostFling(
                 consumed: Velocity,
                 available: Velocity
@@ -708,65 +721,7 @@ class ScrollableTest {
     }
 
     @Test
-    fun scrollable_nestedScrollAbove_proxiesPostScroll() {
-        var value = 0f
-        var expectedLeft = 0f
-        val velocityFlung = 5000f
-        val controller = ScrollableState(
-            consumeScrollDelta = {
-                val toConsume = it * 0.345f
-                value += toConsume
-                expectedLeft = it - toConsume
-                toConsume
-            }
-        )
-        val parent = object : NestedScrollConnection {
-            override fun onPostScroll(
-                consumed: Offset,
-                available: Offset,
-                source: NestedScrollSource
-            ): Offset {
-                // we should get in post scroll as much as left in controller callback
-                assertThat(available.x).isEqualTo(expectedLeft)
-                return available
-            }
-        }
-
-        rule.setContentAndGetScope {
-            Box {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .size(300.dp)
-                        .nestedScroll(parent)
-                ) {
-                    Box(
-                        modifier = Modifier.size(300.dp)
-                            .testTag(scrollableBoxTag)
-                            .scrollable(
-                                state = controller,
-                                orientation = Orientation.Horizontal
-                            )
-                    )
-                }
-            }
-        }
-
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
-            this.swipeWithVelocity(
-                start = this.center,
-                end = Offset(this.center.x + 500f, this.center.y),
-                durationMillis = 300,
-                endVelocity = velocityFlung
-            )
-        }
-
-        // all assertions in callback above
-        rule.waitForIdle()
-    }
-
-    @Test
-    fun scrollable_nestedScrollAbove_reversed_proxiesPostScroll() {
+    fun scrollable_nestedScrollAbove_reversed_proxiesPostCycles() {
         var value = 0f
         var expectedLeft = 0f
         val velocityFlung = 5000f
@@ -788,53 +743,7 @@ class ScrollableTest {
                 assertThat(available.x).isEqualTo(-expectedLeft)
                 return available
             }
-        }
 
-        rule.setContentAndGetScope {
-            Box {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .size(300.dp)
-                        .nestedScroll(parent)
-                ) {
-                    Box(
-                        modifier = Modifier.size(300.dp)
-                            .testTag(scrollableBoxTag)
-                            .scrollable(
-                                state = controller,
-                                reverseDirection = true,
-                                orientation = Orientation.Horizontal
-                            )
-                    )
-                }
-            }
-        }
-
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
-            this.swipeWithVelocity(
-                start = this.center,
-                end = Offset(this.center.x + 500f, this.center.y),
-                durationMillis = 300,
-                endVelocity = velocityFlung
-            )
-        }
-
-        // all assertions in callback above
-        rule.waitForIdle()
-    }
-
-    @Test
-    fun scrollable_nestedScrollAbove_reversed_proxiesPostFling() {
-        var value = 0f
-        val velocityFlung = 5000f
-        val controller = ScrollableState(
-            consumeScrollDelta = {
-                value += it
-                it
-            }
-        )
-        val parent = object : NestedScrollConnection {
             override suspend fun onPostFling(
                 consumed: Velocity,
                 available: Velocity
@@ -861,66 +770,6 @@ class ScrollableTest {
                                 state = controller,
                                 reverseDirection = true,
                                 orientation = Orientation.Horizontal
-                            )
-                    )
-                }
-            }
-        }
-
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
-            this.swipeWithVelocity(
-                start = this.center,
-                end = Offset(this.center.x + 500f, this.center.y),
-                durationMillis = 300,
-                endVelocity = velocityFlung
-            )
-        }
-
-        // all assertions in callback above
-        rule.waitForIdle()
-    }
-
-    @Test
-    fun scrollable_nestedScrollAbove_velocityAccountsForPreConsumption() {
-        var value = 0f
-        val velocityFlung = 5000f
-        val controller = ScrollableState(
-            consumeScrollDelta = {
-                value += it
-                it
-            }
-        )
-        val parent = object : NestedScrollConnection {
-
-            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                // consume everything
-                return available
-            }
-        }
-        val assertionFlingBehavior = object : FlingBehavior {
-            override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
-                // velocity should be zero (or almost) as we consumed everything in the pre
-                // cycle
-                assertThat(abs(initialVelocity)).isLessThan(1f)
-                return 0f
-            }
-        }
-
-        rule.setContentAndGetScope {
-            Box {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .size(300.dp)
-                        .nestedScroll(parent)
-                ) {
-                    Box(
-                        modifier = Modifier.size(300.dp)
-                            .testTag(scrollableBoxTag)
-                            .scrollable(
-                                state = controller,
-                                orientation = Orientation.Horizontal,
-                                flingBehavior = assertionFlingBehavior
                             )
                     )
                 }
