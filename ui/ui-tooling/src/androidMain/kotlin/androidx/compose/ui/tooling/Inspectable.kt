@@ -72,6 +72,8 @@ internal fun Inspectable(
  * A wrapper for inspection-mode-only behavior. The children of this component will only be included
  * in the composition when the composition is in inspection mode.
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
+@Deprecated("This method should not be used in application code and will be removed soon.")
 @Composable
 fun InInspectionModeOnly(content: @Composable () -> Unit) {
     if (LocalInspectionMode.current) {
