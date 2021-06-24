@@ -40,5 +40,8 @@
     <string name="view_developer_docs">View developer docs</string>
     <string name="view_source_code">View source code</string>
     <string name="report_an_issue">Report an issue</string>
+    <string name="terms_of_service">Terms of service</string>
+    <string name="privacy_policy">Privacy policy</string>
+    <string name="open_source_licenses">Open source licenses</string>
 
 </resources>

@@ -39,3 +39,7 @@ const val SampleSourceUrl = "https://cs.android.com/androidx/platform/frameworks
     "androidx-main:compose/material/" +
     "material/samples/src/main/java/androidx/compose/material/samples"
 const val IssueUrl = "https://issuetracker.google.com/issues/new?component=742043"
+const val TermsUrl = "https://policies.google.com/terms"
+const val PrivacyUrl = "https://policies.google.com/privacy"
+const val LicensesUrl = "https://cs.android.com/androidx/platform/frameworks/support/+/" +
+    "androidx-main:LICENSE.txt"

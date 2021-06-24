@@ -25,8 +25,11 @@ import androidx.compose.material.catalog.model.Theme
 import androidx.compose.material.catalog.ui.theme.ThemePicker
 import androidx.compose.material.catalog.util.GuidelinesUrl
 import androidx.compose.material.catalog.util.IssueUrl
+import androidx.compose.material.catalog.util.LicensesUrl
+import androidx.compose.material.catalog.util.PrivacyUrl
 import androidx.compose.material.catalog.util.ReleasesUrl
 import androidx.compose.material.catalog.util.SourceUrl
+import androidx.compose.material.catalog.util.TermsUrl
 import androidx.compose.material.catalog.util.openUrl
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -45,6 +48,9 @@ fun CatalogScaffold(
     docsUrl: String = ReleasesUrl,
     sourceUrl: String = SourceUrl,
     issueUrl: String = IssueUrl,
+    termsUrl: String = TermsUrl,
+    privacyUrl: String = PrivacyUrl,
+    licensesUrl: String = LicensesUrl,
     onThemeChange: (theme: Theme) -> Unit,
     onBackClick: () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
@@ -79,7 +85,10 @@ fun CatalogScaffold(
                     onGuidelinesClick = { context.openUrl(guidelinesUrl) },
                     onDocsClick = { context.openUrl(docsUrl) },
                     onSourceClick = { context.openUrl(sourceUrl) },
-                    onIssueClick = { context.openUrl(issueUrl) }
+                    onIssueClick = { context.openUrl(issueUrl) },
+                    onTermsClick = { context.openUrl(termsUrl) },
+                    onPrivacyClick = { context.openUrl(privacyUrl) },
+                    onLicensesClick = { context.openUrl(licensesUrl) }
                 )
             },
             content = content
