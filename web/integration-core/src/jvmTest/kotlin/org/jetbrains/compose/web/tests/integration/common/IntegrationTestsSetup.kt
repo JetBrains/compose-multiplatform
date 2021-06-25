@@ -3,7 +3,7 @@ package org.jetbrains.compose.web.tests.integration.common
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.ExtensionContext
 
-class StaticServerSetupExtension :
+class IntegrationTestsSetup:
     BeforeAllCallback,
     ExtensionContext.Store.CloseableResource {
 
@@ -22,5 +22,6 @@ class StaticServerSetupExtension :
 
     override fun close() {
         ServerLauncher.stopServer(this)
+        Drivers.dispose()
     }
 }

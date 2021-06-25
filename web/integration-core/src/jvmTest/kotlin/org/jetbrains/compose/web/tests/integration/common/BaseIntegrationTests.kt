@@ -26,7 +26,7 @@ fun WebDriver.waitTextToBe(textId: String = "txt", value: String) {
     WebDriverWait(this, 1).until(ExpectedConditions.textToBe(By.id(textId), value))
 }
 
-object Drivers {
+internal object Drivers {
     val Chrome by lazy {
         object : ChromeDriver(
             ChromeOptions().apply {
@@ -54,6 +54,22 @@ object Drivers {
        }
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
+    val activatedDrivers: Array<Array<WebDriver>> = buildList<Array<WebDriver>> {
+        add(arrayOf(Chrome))
+        if (System.getProperty("compose.web.tests.integration.withFirefox") == "true") {
+            add(arrayOf(Firefox))
+        }
+    }.toTypedArray()
+
+    fun dispose() {
+        activatedDrivers.forEach {
+            val webDriver = it.first()
+            println("Closing web driver: ${webDriver}")
+            webDriver.quit()
+        }
+    }
+
 }
 
 @Target(AnnotationTarget.FUNCTION)
@@ -63,18 +79,10 @@ annotation class ResolveDrivers
 
 
 @DisplayNameGeneration(DisplayNameSimplifier::class)
-@ExtendWith(value = [StaticServerSetupExtension::class])
+@ExtendWith(value = [IntegrationTestsSetup::class])
 abstract class BaseIntegrationTests() {
     companion object {
-        @OptIn(ExperimentalStdlibApi::class)
-        private val drivers: Array<Array<WebDriver>> = buildList<Array<WebDriver>> {
-            add(arrayOf(Drivers.Chrome))
-            if (System.getProperty("compose.web.tests.integration.withFirefox") == "true") {
-                add(arrayOf(Drivers.Firefox))
-            }
-        }.toTypedArray()
-
         @JvmStatic
-        fun resolveDrivers() = drivers
+        fun resolveDrivers() = Drivers.activatedDrivers
     }
 }
