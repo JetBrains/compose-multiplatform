@@ -182,9 +182,13 @@ fun SemanticsNodeInteraction.performScrollToKey(key: Any): SemanticsNodeInteract
 
 /**
  * Executes the (partial) gesture specified in the given [block]. The gesture doesn't need to be
- * complete and can be resumed in a later invocation of [performGesture]. It is the
- * responsibility of the caller to make sure partial gestures don't leave the test in an
- * inconsistent state.
+ * complete and can be resumed in a later invocation of [performGesture]. If there was a previous
+ * invocation of [performGesture], the first event time of the current invocation is equal to the
+ * last event time of the previous gesture plus the elapsed time in between on the [MainTestClock].
+ *
+ * Be aware that if you split a gesture over two invocations of [performGesture], everything that
+ * happens in between will run as if the gesture is still ongoing (imagine a finger still
+ * touching the screen).
  *
  * All events that are injected from the [block] are batched together and sent after [block] is
  * complete. This method blocks until all those events have been injected, which normally takes
@@ -196,16 +200,22 @@ fun SemanticsNodeInteraction.performScrollToKey(key: Any): SemanticsNodeInteract
  *
  * Example usage:
  * ```
- * onNodeWithTag("myWidget")
+ * testRule.onNodeWithTag("myWidget")
  *     .performGesture { swipeUp() }
  *
- * onNodeWithTag("myWidget")
+ * testRule.onNodeWithTag("myWidget")
  *     .performGesture { click(center) }
  *
- * onNodeWithTag("myWidget")
+ * testRule.onNodeWithTag("myWidget")
  *     .performGesture { down(topLeft) }
  *     .assertHasClickAction()
  *     .performGesture { up(topLeft) }
+ *
+ * testRule.onNodeWithTag("myWidget")
+ *     .performGesture { click() }
+ * testRule.mainClock.advanceTimeBy(100)
+ * testRule.onNodeWithTag("myWidget")
+ *     .performGesture(true) { swipeUp() }
  * ```
  */
 fun SemanticsNodeInteraction.performGesture(

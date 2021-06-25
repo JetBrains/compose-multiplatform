@@ -129,6 +129,7 @@ package androidx.compose.ui.test {
   }
 
   public final class GestureScopeKt {
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void advanceEventTime(androidx.compose.ui.test.GestureScope, long durationMillis);
     method public static void cancel(androidx.compose.ui.test.GestureScope);
     method public static void click(androidx.compose.ui.test.GestureScope, optional long position);
     method public static void doubleClick(androidx.compose.ui.test.GestureScope, optional long position, optional long delayMillis);
