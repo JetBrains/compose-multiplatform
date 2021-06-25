@@ -76,7 +76,7 @@ object LibraryVersions {
     val INTERPOLATOR = Version("1.1.0-alpha01")
     val JETIFIER = Version("1.0.0-beta11")
     val LEANBACK = Version("1.2.0-alpha01")
-    val LEANBACK_PAGING = Version("1.1.0-beta01")
+    val LEANBACK_PAGING = Version("1.1.0-alpha08")
     val LEANBACK_PREFERENCE = Version("1.2.0-alpha01")
     val LEANBACK_TAB = Version("1.1.0-beta01")
     val LEGACY = Version("1.1.0-alpha01")
