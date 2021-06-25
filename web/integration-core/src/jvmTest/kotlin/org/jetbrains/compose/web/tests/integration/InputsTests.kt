@@ -1,76 +1,77 @@
 package org.jetbrains.compose.web.tests.integration
 
 import org.jetbrains.compose.web.tests.integration.common.BaseIntegrationTests
+import org.jetbrains.compose.web.tests.integration.common.ResolveDrivers
 import org.jetbrains.compose.web.tests.integration.common.openTestPage
 import org.jetbrains.compose.web.tests.integration.common.waitTextToBe
-import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
 import org.openqa.selenium.Keys
+import org.openqa.selenium.WebDriver
 import org.openqa.selenium.interactions.Actions
 
 class InputsTests : BaseIntegrationTests() {
 
-    @Test
-    fun `text area input gets printed`() {
-        openTestPage("textAreaInputGetsPrinted")
+    @ResolveDrivers
+    fun `text area input gets printed`(driver: WebDriver) {
+        driver.openTestPage("textAreaInputGetsPrinted")
 
         val input = driver.findElement(By.id("input"))
         input.sendKeys("Hello textArea!")
 
-        waitTextToBe(textId = "txt", value = "Hello textArea!")
+        driver.waitTextToBe(textId = "txt", value = "Hello textArea!")
     }
 
-    @Test
-    fun `text input gets printed`() {
-        openTestPage("textInputGetsPrinted")
+    @ResolveDrivers
+    fun `text input gets printed`(driver: WebDriver) {
+        driver.openTestPage("textInputGetsPrinted")
 
         val input = driver.findElement(By.id("input"))
         input.sendKeys("Hello World!")
 
-        waitTextToBe(textId = "txt", value = "Hello World!")
+        driver.waitTextToBe(textId = "txt", value = "Hello World!")
     }
 
-    @Test
-    fun `checkbox changes the text`() {
-        openTestPage("checkBoxChangesText")
+    @ResolveDrivers
+    fun `checkbox changes the text`(driver: WebDriver) {
+        driver.openTestPage("checkBoxChangesText")
 
-        waitTextToBe(textId = "txt", value = "not checked")
+        driver.waitTextToBe(textId = "txt", value = "not checked")
 
         val checkbox = driver.findElement(By.id("checkbox"))
 
         checkbox.click()
-        waitTextToBe(textId = "txt", value = "checked")
+        driver.waitTextToBe(textId = "txt", value = "checked")
 
         checkbox.click()
-        waitTextToBe(textId = "txt", value = "not checked")
+        driver.waitTextToBe(textId = "txt", value = "not checked")
     }
 
-    @Test
-    fun `radio buttons change the text`() {
-        openTestPage("radioButtonsChangeText")
+    @ResolveDrivers
+    fun `radio buttons change the text`(driver: WebDriver) {
+        driver.openTestPage("radioButtonsChangeText")
 
-        waitTextToBe(textId = "txt", value = "-")
+        driver.waitTextToBe(textId = "txt", value = "-")
 
         val r1 = driver.findElement(By.id("r1"))
         val r2 = driver.findElement(By.id("r2"))
 
         r1.click()
-        waitTextToBe(textId = "txt", "r1")
+        driver.waitTextToBe(textId = "txt", "r1")
 
         r2.click()
-        waitTextToBe(textId = "txt", "r2")
+        driver.waitTextToBe(textId = "txt", "r2")
 
         r1.click()
-        waitTextToBe(textId = "txt", "r1")
+        driver.waitTextToBe(textId = "txt", "r1")
 
         r2.click()
-        waitTextToBe(textId = "txt", "r2")
+        driver.waitTextToBe(textId = "txt", "r2")
     }
 
-    @Test
-    fun `range updates the text`() {
-        openTestPage("rangeInputChangesText")
-        waitTextToBe(value = "0")
+    @ResolveDrivers
+    fun `range updates the text`(driver: WebDriver) {
+        driver.openTestPage("rangeInputChangesText")
+        driver.waitTextToBe(value = "0")
 
         val slider = driver.findElement(By.id("slider"))
 
@@ -82,22 +83,22 @@ class InputsTests : BaseIntegrationTests() {
             .sendKeys(Keys.RIGHT, Keys.RIGHT)
             .perform()
 
-        waitTextToBe(value = "10")
+        driver.waitTextToBe(value = "10")
     }
 
-    @Test
-    fun `time input updates the text`() {
-        openTestPage("timeInputChangesText")
+    @ResolveDrivers
+    fun `time input updates the text`(driver: WebDriver) {
+        driver.openTestPage("timeInputChangesText")
 
-        waitTextToBe(value = "")
+        driver.waitTextToBe(value = "")
 
         val timeInput = driver.findElement(By.id("time"))
 
         timeInput.sendKeys("15:00")
-        waitTextToBe(value = "15:00")
+        driver.waitTextToBe(value = "15:00")
     }
 
-//    @Test
+//    @_root_ide_package_.org.jetbrains.compose.web.tests.integration.common.ResolveDrivers
 //    fun `date input updates the text`() {
 //        openTestPage("dateInputChangesText")
 //
@@ -109,7 +110,7 @@ class InputsTests : BaseIntegrationTests() {
 //        waitTextToBe(value = "2021-10-12")
 //    }
 
-//    @Test
+//    @_root_ide_package_.org.jetbrains.compose.web.tests.integration.common.ResolveDrivers
 //    fun `dateTimeLocal input updates the text`() { // WARNING: It's not supported in Firefox
 //        openTestPage("dateTimeLocalInputChangesText")
 //
@@ -121,16 +122,16 @@ class InputsTests : BaseIntegrationTests() {
 //        waitTextToBe(value = "2021-10-12T09:25")
 //    }
 
-    @Test
-    fun `file input updates the text`() {
-        openTestPage("fileInputChangesText")
-        waitTextToBe(value = "")
+    @ResolveDrivers
+    fun `file input updates the text`(driver: WebDriver) {
+        driver.openTestPage("fileInputChangesText")
+        driver.waitTextToBe(value = "")
 
         val fileInput = driver.findElement(By.id("file"))
 
         val homePath = System.getProperty("COMPOSE_WEB_INTEGRATION_TESTS_DISTRIBUTION")
         fileInput.sendKeys("$homePath/index.html")
 
-        waitTextToBe(value = "C:\\fakepath\\index.html")
+        driver.waitTextToBe(value = "C:\\fakepath\\index.html")
     }
 }
