@@ -24,6 +24,8 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import java.io.File
 import java.util.*
 
+private val defaultJvmArgs = listOf("-Dcompose.application.configure.swing.globals=true")
+
 // todo: multiple launchers
 // todo: file associations
 // todo: use workers
@@ -205,7 +207,7 @@ internal fun AbstractJPackageTask.configurePackagingTask(
     }
 
     launcherMainClass.set(provider { app.mainClass })
-    launcherJvmArgs.set(provider { app.jvmArgs })
+    launcherJvmArgs.set(provider { defaultJvmArgs + app.jvmArgs })
     launcherArgs.set(provider { app.args })
 }
 
@@ -284,7 +286,7 @@ internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
 private fun JavaExec.configureRunTask(app: Application) {
     mainClass.set(provider { app.mainClass })
     executable(javaExecutable(app.javaHomeOrDefault()))
-    jvmArgs = app.jvmArgs
+    jvmArgs = defaultJvmArgs + app.jvmArgs
     args = app.args
 
     val cp = project.objects.fileCollection()
