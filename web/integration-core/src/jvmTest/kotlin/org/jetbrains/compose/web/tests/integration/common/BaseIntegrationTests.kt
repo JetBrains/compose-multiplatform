@@ -56,8 +56,6 @@ object Drivers {
 
 }
 
-fun WebDriver.toString() = "CHROME"
-
 @Target(AnnotationTarget.FUNCTION)
 @ParameterizedTest(name = "{displayName} [{0}]")
 @MethodSource("resolveDrivers")
@@ -70,8 +68,7 @@ abstract class BaseIntegrationTests() {
         @JvmStatic
         fun resolveDrivers(): Array<Array<Any>> {
             return arrayOf(
-                arrayOf(Drivers.Chrome),
-                arrayOf(Drivers.Firefox)
+                arrayOf(Drivers.Chrome)
             )
         }
     }
