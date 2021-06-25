@@ -41,7 +41,7 @@ internal fun setCollectionInfo(node: SemanticsNode, info: AccessibilityNodeInfoC
     val groupedChildren = mutableListOf<SemanticsNode>()
 
     if (node.config.getOrNull(SemanticsProperties.SelectableGroup) != null) {
-        node.children.fastForEach { childNode ->
+        node.replacedChildren.fastForEach { childNode ->
             // we assume that Tabs and RadioButtons are not mixed under a single group
             if (childNode.config.contains(SemanticsProperties.Selected)) {
                 groupedChildren.add(childNode)
@@ -84,7 +84,7 @@ internal fun setCollectionItemInfo(node: SemanticsNode, info: AccessibilityNodeI
         val groupedChildren = mutableListOf<SemanticsNode>()
 
         // find all siblings to calculate the index
-        parentNode.children.fastForEach { childNode ->
+        parentNode.replacedChildren.fastForEach { childNode ->
             if (childNode.config.contains(SemanticsProperties.Selected)) {
                 groupedChildren.add(childNode)
             }
