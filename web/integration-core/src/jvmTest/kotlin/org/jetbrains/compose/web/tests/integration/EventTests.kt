@@ -6,18 +6,19 @@
 package org.jetbrains.compose.web.tests.integration
 
 import org.jetbrains.compose.web.tests.integration.common.BaseIntegrationTests
+import org.jetbrains.compose.web.tests.integration.common.ResolveDrivers
 import org.jetbrains.compose.web.tests.integration.common.openTestPage
 import org.jetbrains.compose.web.tests.integration.common.waitTextToBe
-import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
 import org.openqa.selenium.Keys
 import org.openqa.selenium.interactions.Actions
+import org.openqa.selenium.WebDriver
 
 class EventTests : BaseIntegrationTests() {
 
-    @Test
-    fun `double click updates text`() {
-        openTestPage("doubleClickUpdatesText")
+    @ResolveDrivers
+    fun `double click updates text`(driver: WebDriver) {
+        driver.openTestPage("doubleClickUpdatesText")
 
         val box = driver.findElement(By.id("box"))
 
@@ -27,14 +28,14 @@ class EventTests : BaseIntegrationTests() {
             .doubleClick(box)
             .perform()
 
-        waitTextToBe(value = "Double Click Works!", textId = "txt")
+        driver.waitTextToBe(value = "Double Click Works!", textId = "txt")
     }
 
-    @Test
-    fun `focusin and focusout update the text`() {
-        openTestPage("focusInAndFocusOutUpdateTheText")
+    @ResolveDrivers
+    fun `focusin and focusout update the text`(driver: WebDriver) {
+        driver.openTestPage("focusInAndFocusOutUpdateTheText")
 
-        waitTextToBe(value = "", textId = "txt")
+        driver.waitTextToBe(value = "", textId = "txt")
 
         val input = driver.findElement(By.id("focusableInput"))
 
@@ -44,7 +45,7 @@ class EventTests : BaseIntegrationTests() {
             .click()
             .perform()
 
-        waitTextToBe(value = "focused", textId = "txt")
+        driver.waitTextToBe(value = "focused", textId = "txt")
 
         val actions2 = Actions(driver)
 
@@ -52,14 +53,14 @@ class EventTests : BaseIntegrationTests() {
             .click()
             .perform()
 
-        waitTextToBe(value = "not focused", textId = "txt")
+        driver.waitTextToBe(value = "not focused", textId = "txt")
     }
 
-    @Test
-    fun `focus and blur update the text`() {
-        openTestPage("focusAndBlurUpdateTheText")
+    @ResolveDrivers
+    fun `focus and blur update the text`(driver: WebDriver) {
+        driver.openTestPage("focusAndBlurUpdateTheText")
 
-        waitTextToBe(value = "", textId = "txt")
+        driver.waitTextToBe(value = "", textId = "txt")
 
         val input = driver.findElement(By.id("focusableInput"))
 
@@ -69,7 +70,7 @@ class EventTests : BaseIntegrationTests() {
             .click()
             .perform()
 
-        waitTextToBe(value = "focused", textId = "txt")
+        driver.waitTextToBe(value = "focused", textId = "txt")
 
         val actions2 = Actions(driver)
 
@@ -77,14 +78,14 @@ class EventTests : BaseIntegrationTests() {
             .click()
             .perform()
 
-        waitTextToBe(value = "blured", textId = "txt")
+        driver.waitTextToBe(value = "blured", textId = "txt")
     }
 
-    @Test
-    fun `scroll updates the text`() {
-        openTestPage("scrollUpdatesText")
+    @ResolveDrivers
+    fun `scroll updates the text`(driver: WebDriver) {
+        driver.openTestPage("scrollUpdatesText")
 
-        waitTextToBe(value = "", textId = "txt")
+        driver.waitTextToBe(value = "", textId = "txt")
 
         val box = driver.findElement(By.id("box"))
 
@@ -94,13 +95,13 @@ class EventTests : BaseIntegrationTests() {
             .sendKeys(Keys.ARROW_DOWN)
             .perform()
 
-        waitTextToBe(value = "Scrolled", textId = "txt")
+        driver.waitTextToBe(value = "Scrolled", textId = "txt")
     }
 
-    @Test
-    fun `select event update the txt`() {
-        openTestPage("selectEventUpdatesText")
-        waitTextToBe(value = "None")
+    @ResolveDrivers
+    fun `select event update the txt`(driver: WebDriver) {
+        driver.openTestPage("selectEventUpdatesText")
+        driver.waitTextToBe(value = "None")
 
         val selectableText = driver.findElement(By.id("selectableText"))
 
@@ -113,61 +114,61 @@ class EventTests : BaseIntegrationTests() {
             .build()
             .perform()
 
-        waitTextToBe(value = "Text Selected")
+        driver.waitTextToBe(value = "Text Selected")
     }
 
-    @Test
-    fun `stopImmediatePropagation prevents consequent listeners from being called`() {
-        openTestPage("stopOnInputImmediatePropagationWorks")
-        waitTextToBe(value = "None")
+    @ResolveDrivers
+    fun `stopImmediatePropagation prevents consequent listeners from being called`(driver: WebDriver) {
+        driver.openTestPage("stopOnInputImmediatePropagationWorks")
+        driver.waitTextToBe(value = "None")
 
         val checkBox = driver.findElement(By.id("checkbox"))
         val radioButtonToStopImmediatePropagation = driver.findElement(By.id("radioBtn"))
 
         checkBox.click()
-        waitTextToBe(value = "onInput2")
+        driver.waitTextToBe(value = "onInput2")
 
         radioButtonToStopImmediatePropagation.click()
-        waitTextToBe(value = "None")
+        driver.waitTextToBe(value = "None")
 
         checkBox.click()
-        waitTextToBe(value = "onInput1")
+        driver.waitTextToBe(value = "onInput1")
     }
 
-    @Test
-    fun `preventDefault works as expected`() {
-        openTestPage("preventDefaultWorks")
+    @ResolveDrivers
+    fun `preventDefault works as expected`(driver: WebDriver) {
+        driver.openTestPage("preventDefaultWorks")
 
-        waitTextToBe(value = "None")
-        waitTextToBe(textId = "txt2", value = "None")
+        driver.waitTextToBe(value = "None")
+        driver.waitTextToBe(textId = "txt2", value = "None")
 
         val checkBox = driver.findElement(By.id("checkbox"))
         checkBox.click()
 
-        waitTextToBe(value = "Clicked but check should be prevented")
-        waitTextToBe(textId = "txt2", value = "None")
+        driver.waitTextToBe(value = "Clicked but check should be prevented")
+        driver.waitTextToBe(textId = "txt2", value = "None")
     }
 
-    @Test
-    fun `stopPropagation works as expected`() {
-        openTestPage("stopPropagationWorks")
+    @ResolveDrivers
+    fun `stopPropagation works as expected`(driver: WebDriver) {
+        driver.openTestPage("stopPropagationWorks")
 
-        waitTextToBe(value = "None")
-        waitTextToBe(textId = "txt2", value = "None")
+        driver.waitTextToBe(value = "None")
+        driver.waitTextToBe(textId = "txt2", value = "None")
 
         val checkBox = driver.findElement(By.id("checkbox"))
         val radioButtonToStopImmediatePropagation = driver.findElement(By.id("radioBtn"))
 
         checkBox.click()
-        waitTextToBe(value = "childInput")
-        waitTextToBe(textId = "txt2", value = "div caught an input")
+        driver.waitTextToBe(value = "childInput")
+        driver.waitTextToBe(textId = "txt2", value = "div caught an input")
 
         radioButtonToStopImmediatePropagation.click()
-        waitTextToBe(value = "None")
-        waitTextToBe(textId = "txt2", value = "None")
+        driver.waitTextToBe(value = "None")
+        driver.waitTextToBe(textId = "txt2", value = "None")
 
         checkBox.click()
-        waitTextToBe(value = "childInput")
-        waitTextToBe(textId = "txt2", value = "None")
+        driver.waitTextToBe(value = "childInput")
+        driver.waitTextToBe(textId = "txt2", value = "None")
     }
 }
