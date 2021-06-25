@@ -56,7 +56,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.R
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.inspection.rules.show
 import androidx.compose.ui.inspection.testdata.TestActivity
 import androidx.compose.ui.layout.GraphicLayerInfo
 import androidx.compose.ui.platform.LocalDensity
@@ -65,6 +64,7 @@ import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.text
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
@@ -79,7 +79,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Popup
-import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
@@ -107,11 +106,11 @@ class LayoutInspectorTreeTest {
     private lateinit var density: Density
 
     @get:Rule
-    val activityScenario = ActivityScenarioRule(TestActivity::class.java)
+    val composeTestRule = createAndroidComposeRule<TestActivity>()
 
     @Before
     fun before() {
-        activityScenario.scenario.onActivity {
+        composeTestRule.activityRule.scenario.onActivity {
             density = Density(it)
         }
         isDebugInspectorInfoEnabled = true
@@ -915,6 +914,8 @@ class LayoutInspectorTreeTest {
     private fun flatten(node: InspectorNode): List<InspectorNode> =
         listOf(node).plus(node.children.flatMap { flatten(it) })
 
+    fun show(composable: @Composable () -> Unit) = composeTestRule.setContent(composable)
+
     // region DEBUG print methods
     private fun dumpNodes(nodes: List<InspectorNode>, view: View, builder: LayoutInspectorTree) {
         @Suppress("ConstantConditionIf")
@@ -1040,8 +1041,6 @@ class LayoutInspectorTreeTest {
     private fun round(dp: Dp): Dp = Dp((dp.value * 10.0f).roundToInt() / 10.0f)
 
     //endregion
-
-    fun show(composable: @Composable () -> Unit) = activityScenario.scenario.show(composable)
 }
 
 /**
