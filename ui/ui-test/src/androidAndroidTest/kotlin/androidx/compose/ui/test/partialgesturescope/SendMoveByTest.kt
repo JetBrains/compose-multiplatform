@@ -28,7 +28,6 @@ import androidx.compose.ui.test.movePointerBy
 import androidx.compose.ui.test.partialgesturescope.Common.partialGesture
 import androidx.compose.ui.test.up
 import androidx.compose.ui.test.util.ClickableTestBox
-import androidx.compose.ui.test.util.InputDispatcherTestRule
 import androidx.compose.ui.test.util.MultiPointerInputRecorder
 import androidx.compose.ui.test.util.assertTimestampsAreIncreasing
 import androidx.compose.ui.test.util.verify
@@ -37,7 +36,6 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TestRule
 
 /**
  * Tests if [moveBy] and [movePointerBy] work
@@ -53,9 +51,6 @@ class SendMoveByTest {
 
     @get:Rule
     val rule = createComposeRule()
-
-    @get:Rule
-    val inputDispatcherRule: TestRule = InputDispatcherTestRule()
 
     private val recorder = MultiPointerInputRecorder()
 

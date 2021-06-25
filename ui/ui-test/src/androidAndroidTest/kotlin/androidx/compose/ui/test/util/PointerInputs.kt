@@ -37,6 +37,14 @@ data class DataPoint(
     val y get() = position.y
 }
 
+/**
+ * A [PointerInputModifier] that records all [PointerEvent]s as they pass through the
+ * [PointerEventPass.Initial] phase, without consuming anything. This modifier is supposed to be
+ * completely transparent to the rest of the system.
+ *
+ * Does not support multiple pointers: all [PointerInputChange]s are flattened in the recorded
+ * list.
+ */
 class SinglePointerInputRecorder : PointerInputModifier {
     private val _events = mutableListOf<DataPoint>()
     val events get() = _events as List<DataPoint>
@@ -52,6 +60,14 @@ class SinglePointerInputRecorder : PointerInputModifier {
     }
 }
 
+/**
+ * A [PointerInputModifier] that records all [PointerEvent]s as they pass through the
+ * [PointerEventPass.Initial] phase, without consuming anything. This modifier is supposed to be
+ * completely transparent to the rest of the system.
+ *
+ * Supports multiple pointers: the set of [PointerInputChange]s from each event is kept together
+ * in the recorded list.
+ */
 class MultiPointerInputRecorder : PointerInputModifier {
     data class Event(val pointers: List<DataPoint>) {
         val pointerCount: Int get() = pointers.size
@@ -72,6 +88,11 @@ class MultiPointerInputRecorder : PointerInputModifier {
     }
 }
 
+/**
+ * A [PointerInputFilter] that [record]s each [PointerEvent][onPointerEvent] during the
+ * [PointerEventPass.Initial] pass. Does not consume anything itself, although implementation can
+ * (but really shouldn't).
+ */
 class RecordingFilter(
     private val record: (List<PointerInputChange>) -> Unit
 ) : PointerInputFilter() {
