@@ -5,8 +5,9 @@ import org.jetbrains.compose.web.attributes.WrappedEventListener
 import org.jetbrains.compose.web.css.StyleHolder
 import org.jetbrains.compose.web.dom.setProperty
 import org.jetbrains.compose.web.dom.setVariable
-import kotlinx.browser.document
 import kotlinx.dom.clear
+import org.jetbrains.compose.web.attributes.Options
+import org.jetbrains.compose.web.css.jsObject
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
@@ -36,6 +37,12 @@ class DomApplier(
         // or current.node.clear()?; in all examples it calls 'clear' on the root
         root.node.clear()
     }
+}
+
+external interface EventListenerOptions {
+    var once: Boolean
+    var passive: Boolean
+    var capture: Boolean
 }
 
 open class DomNodeWrapper(open val node: Node) {

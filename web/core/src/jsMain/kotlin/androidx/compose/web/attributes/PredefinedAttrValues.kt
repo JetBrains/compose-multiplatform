@@ -1,26 +1,55 @@
 package org.jetbrains.compose.web.attributes
 
-sealed class InputType(val typeStr: String) {
-    object Button : InputType("button")
-    object Checkbox : InputType("checkbox")
-    object Color : InputType("color")
-    object Date : InputType("date")
-    object DateTimeLocal : InputType("datetime-local")
-    object Email : InputType("email")
-    object File : InputType("file")
-    object Hidden : InputType("hidden")
-    object Month : InputType("month")
-    object Number : InputType("number")
-    object Password : InputType("password")
-    object Radio : InputType("radio")
-    object Range : InputType("range")
-    object Search : InputType("search")
-    object Submit : InputType("submit")
-    object Tel : InputType("tel")
-    object Text : InputType("text")
-    object Time : InputType("time")
-    object Url : InputType("url")
-    object Week : InputType("week")
+import org.w3c.dom.events.Event
+
+sealed class InputType<T>(val typeStr: String) {
+
+    object Button : InputTypeWithUnitValue("button")
+    object Checkbox : InputTypeCheckedValue("checkbox")
+    object Color : InputTypeWithStringValue("color")
+    object Date : InputTypeWithStringValue("date")
+    object DateTimeLocal : InputTypeWithStringValue("datetime-local")
+    object Email : InputTypeWithStringValue("email")
+    object File : InputTypeWithStringValue("file")
+    object Hidden : InputTypeWithStringValue("hidden")
+    object Month : InputTypeWithStringValue("month")
+    object Number : InputTypeNumberValue("number")
+    object Password : InputTypeWithStringValue("password")
+    object Radio : InputTypeCheckedValue("radio")
+    object Range : InputTypeNumberValue("range")
+    object Search : InputTypeWithStringValue("search")
+    object Submit : InputTypeWithUnitValue("submit")
+    object Tel : InputTypeWithStringValue("tel")
+    object Text : InputTypeWithStringValue("text")
+    object Time : InputTypeWithStringValue("time")
+    object Url : InputTypeWithStringValue("url")
+    object Week : InputTypeWithStringValue("week")
+
+    open class InputTypeWithStringValue(name: String) : InputType<String>(name) {
+        override fun inputValue(event: Event) = Week.valueAsString(event)
+    }
+
+    open class InputTypeWithUnitValue(name: String) : InputType<Unit>(name) {
+        override fun inputValue(event: Event) = Unit
+    }
+
+    open class InputTypeCheckedValue(name: String) : InputType<Boolean>(name) {
+        override fun inputValue(event: Event): Boolean {
+            return event.target?.asDynamic()?.checked?.unsafeCast<Boolean>() ?: false
+        }
+    }
+
+    open class InputTypeNumberValue(name: String) : InputType<kotlin.Number?>(name) {
+        override fun inputValue(event: Event): kotlin.Number? {
+            return event.target?.asDynamic()?.valueAsNumber ?: null
+        }
+    }
+
+    abstract fun inputValue(event: Event): T
+
+    protected fun valueAsString(event: Event): String {
+        return event.target?.asDynamic()?.value?.unsafeCast<String>() ?: ""
+    }
 }
 
 sealed class DirType(val dirStr: String) {

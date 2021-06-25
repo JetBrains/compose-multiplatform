@@ -44,7 +44,7 @@ class EventTests {
             Input(
                 type = InputType.Checkbox,
                 attrs = {
-                    onCheckboxInput { handeled = true }
+                    onInput { handeled = true }
                 }
             )
         }
@@ -63,7 +63,7 @@ class EventTests {
             Input(
                 type = InputType.Radio,
                 attrs = {
-                    onRadioInput { handeled = true }
+                    onInput { handeled = true }
                 }
             )
         }
@@ -82,7 +82,7 @@ class EventTests {
         composition {
             TextArea(
                 {
-                    onTextInput { handeled = true }
+                    onInput { handeled = true }
                 },
                 value = ""
             )

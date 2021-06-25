@@ -7,8 +7,8 @@ import org.jetbrains.compose.web.css.StyleBuilderImpl
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 
-class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
-    private val attributesMap = mutableMapOf<String, String>()
+open class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
+    internal val attributesMap = mutableMapOf<String, String>()
     val styleBuilder = StyleBuilderImpl()
 
     val propertyUpdates = mutableListOf<Pair<(Element, Any) -> Unit, Any>>()
@@ -46,6 +46,16 @@ class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
 
     fun collect(): Map<String, String> {
         return attributesMap
+    }
+
+    internal fun copyFrom(attrsBuilder: AttrsBuilder<TElement>) {
+        refEffect = attrsBuilder.refEffect
+        styleBuilder.copyFrom(attrsBuilder.styleBuilder)
+
+        attributesMap.putAll(attrsBuilder.attributesMap)
+        propertyUpdates.addAll(attrsBuilder.propertyUpdates)
+
+        copyListenersFrom(attrsBuilder)
     }
 
     companion object {

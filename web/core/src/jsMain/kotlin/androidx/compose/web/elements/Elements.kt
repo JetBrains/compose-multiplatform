@@ -2,19 +2,12 @@ package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
+import androidx.compose.web.attributes.InputAttrsBuilder
+import androidx.compose.web.attributes.TextAreaAttrsBuilder
 import org.jetbrains.compose.web.DomApplier
 import org.jetbrains.compose.web.DomNodeWrapper
-import org.jetbrains.compose.web.attributes.AttrsBuilder
-import org.jetbrains.compose.web.attributes.InputType
-import org.jetbrains.compose.web.attributes.action
-import org.jetbrains.compose.web.attributes.alt
-import org.jetbrains.compose.web.attributes.forId
-import org.jetbrains.compose.web.attributes.href
-import org.jetbrains.compose.web.attributes.label
-import org.jetbrains.compose.web.attributes.src
-import org.jetbrains.compose.web.attributes.type
-import org.jetbrains.compose.web.attributes.value
 import kotlinx.browser.document
+import org.jetbrains.compose.web.attributes.*
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLAreaElement
 import org.w3c.dom.HTMLAudioElement
@@ -30,7 +23,6 @@ import org.w3c.dom.HTMLHeadingElement
 import org.w3c.dom.HTMLHRElement
 import org.w3c.dom.HTMLIFrameElement
 import org.w3c.dom.HTMLImageElement
-import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLLIElement
 import org.w3c.dom.HTMLLabelElement
 import org.w3c.dom.HTMLLegendElement
@@ -55,7 +47,6 @@ import org.w3c.dom.HTMLTableColElement
 import org.w3c.dom.HTMLTableElement
 import org.w3c.dom.HTMLTableRowElement
 import org.w3c.dom.HTMLTableSectionElement
-import org.w3c.dom.HTMLTextAreaElement
 import org.w3c.dom.HTMLTrackElement
 import org.w3c.dom.HTMLUListElement
 import org.w3c.dom.HTMLVideoElement
@@ -359,25 +350,6 @@ fun A(
 }
 
 @Composable
-fun Input(
-    type: InputType = InputType.Text,
-    value: String = "",
-    attrs: AttrBuilderContext<HTMLInputElement>? = null
-) {
-    TagElement(
-        elementBuilder = ElementBuilder.Input,
-        applyAttrs = {
-            type(type)
-            value(value)
-            if (attrs != null) {
-                attrs()
-            }
-        },
-        content = null
-    )
-}
-
-@Composable
 fun Button(
     attrs: AttrBuilderContext<HTMLButtonElement>? = null,
     content: ContentBuilder<HTMLButtonElement>? = null
@@ -569,15 +541,17 @@ fun Section(
 
 @Composable
 fun TextArea(
-    attrs: AttrBuilderContext<HTMLTextAreaElement>? = null,
+    attrs: (TextAreaAttrsBuilder.() -> Unit)? = null,
     value: String
 ) = TagElement(
     elementBuilder = ElementBuilder.TextArea,
     applyAttrs = {
-        value(value)
+        val  taab = TextAreaAttrsBuilder()
         if (attrs != null) {
-            attrs()
+            taab.attrs()
         }
+        taab.value(value)
+        this.copyFrom(taab)
     }
 ) {
     Text(value)

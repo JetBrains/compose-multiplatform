@@ -4,11 +4,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import org.jetbrains.compose.web.attributes.InputType
-import org.jetbrains.compose.web.attributes.checked
-import org.jetbrains.compose.web.attributes.name
-import org.jetbrains.compose.web.dom.Input
-import org.jetbrains.compose.web.dom.TextArea
+import org.jetbrains.compose.web.attributes.*
+import org.jetbrains.compose.web.dom.*
 
 class InputsTests {
     val textAreaInputGetsPrinted by testCase {
@@ -20,7 +17,7 @@ class InputsTests {
             value = state,
             attrs = {
                 id("input")
-                onTextInput { state = it.inputValue }
+                onInput { state = it.value }
             }
         )
     }
@@ -32,10 +29,10 @@ class InputsTests {
 
         Input(
             type = InputType.Text,
-            value = state,
             attrs = {
+                value(state)
                 id("input")
-                onTextInput { state = it.inputValue }
+                onInput { state = it.value }
             }
         )
     }
@@ -52,9 +49,7 @@ class InputsTests {
                 if (checked) {
                     checked()
                 }
-                onCheckboxInput {
-                    checked = !checked
-                }
+                onInput { checked = !checked }
             }
         )
     }
@@ -70,9 +65,7 @@ class InputsTests {
                 id("r1")
                 name("f1")
 
-                onRadioInput {
-                    text = "r1"
-                }
+                onInput { text = "r1" }
             }
         )
 
@@ -82,9 +75,7 @@ class InputsTests {
                 id("r2")
                 name("f1")
 
-                onRadioInput {
-                    text = "r2"
-                }
+                onInput { text = "r2" }
             }
         )
     }
@@ -102,9 +93,8 @@ class InputsTests {
                 attr("max", "100")
                 attr("step", "5")
 
-                onRangeInput {
-                    val value: String = it.nativeEvent.target.asDynamic().value
-                    rangeState = value.toInt()
+                onInput {
+                    rangeState = it.value?.toInt() ?: 0
                 }
             }
         )
@@ -119,9 +109,8 @@ class InputsTests {
             type = InputType.Time,
             attrs = {
                 id("time")
-                onGenericInput {
-                    val value: String = it.nativeEvent.target.asDynamic().value
-                    timeState = value
+                onInput {
+                    timeState = it.value
                 }
             }
         )
@@ -136,9 +125,8 @@ class InputsTests {
             type = InputType.Date,
             attrs = {
                 id("date")
-                onGenericInput {
-                    val value: String = it.nativeEvent.target.asDynamic().value
-                    timeState = value
+                onInput {
+                    timeState = it.value
                 }
             }
         )
@@ -153,9 +141,8 @@ class InputsTests {
             type = InputType.DateTimeLocal,
             attrs = {
                 id("dateTimeLocal")
-                onGenericInput {
-                    val value: String = it.nativeEvent.target.asDynamic().value
-                    timeState = value
+                onInput {
+                    timeState = it.value
                 }
             }
         )
@@ -170,9 +157,8 @@ class InputsTests {
             type = InputType.File,
             attrs = {
                 id("file")
-                onGenericInput {
-                    val value: String = it.nativeEvent.target.asDynamic().value
-                    filePath = value
+                onInput {
+                    filePath = it.value
                 }
             }
         )
@@ -187,11 +173,135 @@ class InputsTests {
             type = InputType.Color,
             attrs = {
                 id("color")
-                onGenericInput {
-                    val value: String = it.nativeEvent.target.asDynamic().value
-                    color = value
+                onInput {
+                    color = it.value
                 }
             }
         )
+    }
+
+    val invalidInputUpdatesText by testCase {
+        var state by remember { mutableStateOf("None") }
+
+        P { TestText(state) }
+
+        Form(attrs = {
+            action("#")
+        }) {
+            Input(type = InputType.Number, attrs = {
+                id("numberInput")
+                min("1")
+                max("5")
+
+                onInvalid {
+                    state = "INVALID VALUE ENTERED"
+                }
+
+                onInput { state = "SOMETHING ENTERED" }
+            })
+
+            Input(type = InputType.Submit, attrs = {
+                value("submit")
+                id("submitBtn")
+            })
+        }
+    }
+
+
+    val changeEventUpdatesText by testCase {
+        var state by remember { mutableStateOf("None") }
+
+        P { TestText(state) }
+
+        Div {
+            Input(type = InputType.Number, attrs = {
+                id("numberInput")
+                onChange { state = "INPUT HAS CHANGED" }
+            })
+        }
+    }
+
+    val stopOnInputImmediatePropagationWorks by testCase {
+        var state by remember { mutableStateOf("None") }
+
+        var shouldStopImmediatePropagation by remember { mutableStateOf(false) }
+
+        P { TestText(state) }
+
+        Div {
+            Input(type = InputType.Radio, attrs = {
+                id("radioBtn")
+                onInput {
+                    shouldStopImmediatePropagation = true
+                    state = "None"
+                }
+            })
+
+            Input(type = InputType.Checkbox, attrs = {
+                id("checkbox")
+                onInput {
+                    if (shouldStopImmediatePropagation) it.stopImmediatePropagation()
+                    state = "onInput1"
+                }
+                onInput { state = "onInput2" }
+            })
+        }
+    }
+
+    val preventDefaultWorks by testCase {
+        var state by remember { mutableStateOf("None") }
+        var state2 by remember { mutableStateOf("None") }
+
+        P { TestText(state) }
+        P { TestText(state2, id = "txt2") }
+
+        Input(
+            type = InputType.Checkbox,
+            attrs = {
+                id("checkbox")
+                onClick {
+                    state = "Clicked but check should be prevented"
+                    it.nativeEvent.preventDefault()
+                }
+                onInput {
+                    state2 = "This text should never be displayed as onClick calls preventDefault()"
+                }
+            }
+        )
+    }
+
+    val stopPropagationWorks by testCase {
+        var state by remember { mutableStateOf("None") }
+        var state2 by remember { mutableStateOf("None") }
+
+        var shouldStopPropagation by remember { mutableStateOf(false) }
+
+        P { TestText(state) }
+        P { TestText(state2, id = "txt2") }
+
+        Div {
+            Input(type = InputType.Radio, attrs = {
+                id("radioBtn")
+                onInput {
+                    shouldStopPropagation = true
+                    state = "None"
+                    state2 = "None"
+                }
+            })
+
+            Div(attrs = {
+                addEventListener(EventsListenerBuilder.INPUT) {
+                    state2 = "div caught an input"
+                }
+            }) {
+                Input(type = InputType.Checkbox, attrs = {
+                    id("checkbox")
+                    onInput {
+                        if (shouldStopPropagation) it.stopPropagation()
+                        state = "childInput"
+                    }
+                })
+            }
+        }
     }
 }

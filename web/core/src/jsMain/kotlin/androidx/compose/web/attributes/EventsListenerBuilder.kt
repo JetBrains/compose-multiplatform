@@ -16,7 +16,7 @@ import org.jetbrains.compose.web.events.GenericWrappedEvent
 
 open class EventsListenerBuilder {
 
-    private val listeners = mutableListOf<WrappedEventListener<*>>()
+    protected val listeners = mutableListOf<WrappedEventListener<*>>()
 
     fun onCopy(options: Options = Options.DEFAULT, listener: (WrappedClipboardEvent) -> Unit) {
         listeners.add(ClipboardEventListener(COPY, options, listener))
@@ -40,35 +40,6 @@ open class EventsListenerBuilder {
 
     fun onDoubleClick(options: Options = Options.DEFAULT, listener: (WrappedMouseEvent) -> Unit) {
         listeners.add(MouseEventListener(DBLCLICK, options, listener))
-    }
-
-    fun onInput(options: Options = Options.DEFAULT, listener: (WrappedInputEvent) -> Unit) {
-        listeners.add(InputEventListener(INPUT, options, listener))
-    }
-
-    fun onTextInput(options: Options = Options.DEFAULT, listener: (WrappedTextInputEvent) -> Unit) {
-        listeners.add(TextInputEventListener(options, listener))
-    }
-
-    fun onCheckboxInput(
-        options: Options = Options.DEFAULT,
-        listener: (WrappedCheckBoxInputEvent) -> Unit
-    ) {
-        listeners.add(CheckBoxInputEventListener(options, listener))
-    }
-
-    fun onRadioInput(
-        options: Options = Options.DEFAULT,
-        listener: (WrappedRadioInputEvent) -> Unit
-    ) {
-        listeners.add(RadioInputEventListener(options, listener))
-    }
-
-    fun onRangeInput(
-        options: Options = Options.DEFAULT,
-        listener: (GenericWrappedEvent<*>) -> Unit
-    ) {
-        listeners.add(WrappedEventListener(INPUT, options, listener))
     }
 
     fun onGenericInput(
@@ -222,6 +193,10 @@ open class EventsListenerBuilder {
         listener: (WrappedEvent) -> Unit
     ) {
         listeners.add(WrappedEventListener(eventName, options, listener))
+    }
+
+    internal fun copyListenersFrom(from: EventsListenerBuilder) {
+        listeners.addAll(from.listeners)
     }
 
     companion object {

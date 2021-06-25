@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import org.jetbrains.compose.common.ui.Modifier
 import org.jetbrains.compose.web.dom.Input
 import org.jetbrains.compose.web.attributes.InputType
+import org.jetbrains.compose.web.attributes.value
 
 @Composable
 actual fun SliderActual(
@@ -18,8 +19,8 @@ actual fun SliderActual(
 
     Input(
         type = InputType.Range,
-        value = value.toString(),
         attrs = {
+            value(value.toString())
             attr("min", valueRange.start.toString())
             attr("max", valueRange.endInclusive.toString())
             attr("step", step.toString())

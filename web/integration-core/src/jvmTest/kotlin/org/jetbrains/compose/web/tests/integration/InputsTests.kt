@@ -134,4 +134,33 @@ class InputsTests : BaseIntegrationTests() {
 
         driver.waitTextToBe(value = "C:\\fakepath\\index.html")
     }
+
+    @ResolveDrivers
+    fun `onInvalid updates the text`(driver: WebDriver) {
+        driver.openTestPage("invalidInputUpdatesText")
+        driver.waitTextToBe(value  = "None")
+
+        val input = driver.findElement(By.id("numberInput"))
+        val submitBtn = driver.findElement(By.id("submitBtn"))
+
+        input.sendKeys("1000")
+        driver.waitTextToBe(value = "SOMETHING ENTERED")
+
+        submitBtn.click()
+        driver.waitTextToBe(value = "INVALID VALUE ENTERED")
+    }
+
+    @ResolveDrivers
+    fun `onChange updates the text`(driver: WebDriver) {
+        driver.openTestPage("changeEventUpdatesText")
+        driver.waitTextToBe(value = "None")
+
+        val input = driver.findElement(By.id("numberInput"))
+        input.sendKeys("1")
+
+        driver.waitTextToBe(value = "None")
+        driver.findElement(By.id("txt")).click() // to change the focus - triggers onChange
+
+        driver.waitTextToBe(value = "INPUT HAS CHANGED")
+    }
 }
