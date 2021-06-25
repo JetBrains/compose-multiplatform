@@ -214,7 +214,7 @@ fun main() {
             attrs = {
                 id("elementId")
                 classes("cl1", "cl2")
-                hidden(false)
+                hidden()
                 title("title")
                 draggable(Draggable.Auto)
                 dir(DirType.Auto)
