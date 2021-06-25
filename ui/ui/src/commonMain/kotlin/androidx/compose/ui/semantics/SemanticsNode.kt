@@ -31,15 +31,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastForEach
 
 /**
- * Signature for a function that is called for each [SemanticsNode].
- *
- * Return false to stop visiting nodes.
- *
- * Used by [SemanticsNode.visitChildren].
- */
-internal typealias SemanticsNodeVisitor = (node: SemanticsNode) -> Boolean
-
-/**
  * A list of key/value pairs associated with a layout node or its subtree.
  *
  * Each SemanticsNode takes its id and initial key/value list from the
@@ -208,23 +199,32 @@ class SemanticsNode internal constructor(
     // TODO(b/184376083): This is too expensive for a val (full subtree recreation every call);
     //               optimize this when the merging algorithm is improved.
     val children: List<SemanticsNode>
-        get() = getChildren(sortByBounds = false)
+        get() = getChildren(sortByBounds = false, includeReplacedSemantics = !mergingEnabled)
 
     /**
-     * Contains the children sorted by bounds: top to down, left to right(right to left in RTL
-     * mode).
+     * Contains the children in inverse hit test order (i.e. paint order).
      *
-     * Note that if mergingEnabled and mergeDescendants are both true, then there
-     * are no children (except those that are themselves mergeDescendants).
+     * Unlike [children] property that includes replaced semantics nodes in unmerged tree, here
+     * node marked as [clearAndSetSemantics] will not have children.
+     * This property is primarily used in Accessibility delegate.
+     */
+    internal val replacedChildren: List<SemanticsNode>
+        get() = getChildren(sortByBounds = false, includeReplacedSemantics = false)
+
+    /**
+     * Similar to [replacedChildren] but children are sorted by bounds: top to down, left to
+     * right(right to left in RTL mode).
      */
     // TODO(b/184376083): This is too expensive for a val (full subtree recreation every call);
     //               optimize this when the merging algorithm is improved.
-    internal val childrenSortedByBounds: List<SemanticsNode>
-        get() = getChildren(sortByBounds = true)
+    internal val replacedChildrenSortedByBounds: List<SemanticsNode>
+        get() = getChildren(sortByBounds = true, includeReplacedSemantics = false)
 
-    private fun getChildren(sortByBounds: Boolean): List<SemanticsNode> {
-        // Replacing semantics never appear to have any children in the merged tree.
-        if (mergingEnabled && unmergedConfig.isClearingSemantics) {
+    private fun getChildren(
+        sortByBounds: Boolean,
+        includeReplacedSemantics: Boolean
+    ): List<SemanticsNode> {
+        if (!includeReplacedSemantics && unmergedConfig.isClearingSemantics) {
             return listOf()
         }
 
@@ -236,34 +236,6 @@ class SemanticsNode internal constructor(
         }
 
         return unmergedChildren(sortByBounds)
-    }
-
-    /**
-     * Visits the immediate children of this node.
-     *
-     * This function calls visitor for each immediate child until visitor returns
-     * false.
-     */
-    private fun visitChildren(visitor: SemanticsNodeVisitor) {
-        children.fastForEach {
-            if (!visitor(it)) {
-                return
-            }
-        }
-    }
-
-    /**
-     * Visit all the descendants of this node.  *
-     * This function calls visitor for each descendant in a pre-order traversal
-     * until visitor returns false. Returns true if all the visitor calls
-     * returned true, otherwise returns false.
-     */
-    internal fun visitDescendants(visitor: SemanticsNodeVisitor): Boolean {
-        children.fastForEach {
-            if (!visitor(it) || !it.visitDescendants(visitor))
-                return false
-        }
-        return true
     }
 
     /**
@@ -396,15 +368,6 @@ internal inline fun LayoutNodeWrapper.nearestSemantics(
     while (wrapper != null) {
         if (wrapper is SemanticsWrapper && predicate(wrapper)) return wrapper
         wrapper = wrapper.wrapped
-    }
-    return null
-}
-
-internal fun SemanticsNode.findChildById(id: Int): SemanticsNode? {
-    if (this.id == id) return this
-    children.fastForEach {
-        val result = it.findChildById(id)
-        if (result != null) return result
     }
     return null
 }
