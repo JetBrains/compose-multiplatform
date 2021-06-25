@@ -74,4 +74,12 @@ kotlin {
 
 tasks.named<Test>("jvmTest") {
     dependsOn(tasks.named("jsBrowserDevelopmentWebpack"))
+
+    listOf(
+        "compose.web.tests.integration.withFirefox"
+    ).forEach { propName ->
+        if (project.hasProperty(propName)) {
+            systemProperty(propName, "true")
+        }
+    }
 }

@@ -61,15 +61,20 @@ object Drivers {
 @MethodSource("resolveDrivers")
 annotation class ResolveDrivers
 
+
 @DisplayNameGeneration(DisplayNameSimplifier::class)
 @ExtendWith(value = [StaticServerSetupExtension::class])
 abstract class BaseIntegrationTests() {
     companion object {
+        @OptIn(ExperimentalStdlibApi::class)
+        private val drivers: Array<Array<WebDriver>> = buildList<Array<WebDriver>> {
+            add(arrayOf(Drivers.Chrome))
+            if (System.getProperty("compose.web.tests.integration.withFirefox") == "true") {
+                add(arrayOf(Drivers.Firefox))
+            }
+        }.toTypedArray()
+
         @JvmStatic
-        fun resolveDrivers(): Array<Array<Any>> {
-            return arrayOf(
-                arrayOf(Drivers.Chrome)
-            )
-        }
+        fun resolveDrivers() = drivers
     }
 }
