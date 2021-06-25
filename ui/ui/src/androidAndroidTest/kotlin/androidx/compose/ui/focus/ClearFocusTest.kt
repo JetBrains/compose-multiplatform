@@ -140,19 +140,19 @@ class ClearFocusTest(private val forced: Boolean) {
         val modifier = FocusModifier(ActiveParent)
         val child = FocusModifier(ActiveParent)
         val grandchild = FocusModifier(ActiveParent)
-        val greatgrandchild = FocusModifier(Active)
+        val greatGrandchild = FocusModifier(Active)
         rule.setFocusableContent {
             Box(modifier = modifier) {
                 Box(modifier = child) {
                     Box(modifier = grandchild) {
-                        Box(modifier = greatgrandchild)
+                        Box(modifier = greatGrandchild)
                     }
                 }
             }
             SideEffect {
                 modifier.focusedChild = child.focusNode
                 child.focusedChild = grandchild.focusNode
-                grandchild.focusedChild = greatgrandchild.focusNode
+                grandchild.focusedChild = greatGrandchild.focusNode
             }
         }
 
@@ -170,7 +170,7 @@ class ClearFocusTest(private val forced: Boolean) {
             assertThat(modifier.focusState).isEqualTo(Inactive)
             assertThat(child.focusState).isEqualTo(Inactive)
             assertThat(grandchild.focusState).isEqualTo(Inactive)
-            assertThat(greatgrandchild.focusState).isEqualTo(Inactive)
+            assertThat(greatGrandchild.focusState).isEqualTo(Inactive)
         }
     }
 

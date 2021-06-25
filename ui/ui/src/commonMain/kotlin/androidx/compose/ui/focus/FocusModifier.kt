@@ -38,7 +38,7 @@ internal class FocusModifier(
     inspectorInfo: InspectorInfo.() -> Unit = NoInspectorInfo
 ) : Modifier.Element, InspectorValueInfo(inspectorInfo) {
 
-    // TODO(b/188684110): Move focusState and focusedChild to ModiedFocusNode and make this
+    // TODO(b/188684110): Move focusState and focusedChild to ModifiedFocusNode and make this
     //  modifier stateless.
 
     var focusState: FocusStateImpl = initialFocus

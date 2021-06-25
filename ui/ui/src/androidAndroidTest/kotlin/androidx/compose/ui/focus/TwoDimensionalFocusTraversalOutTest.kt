@@ -110,8 +110,8 @@ class TwoDimensionalFocusTraversalOutTest {
         // Arrange.
         val (parent, grandparent) = List(2) { mutableStateOf(false) }
         rule.setContentForTest {
-            FocusableBox(grandparent, 0, 0, 30, 30) {
-                FocusableBox(parent, 10, 10, 10, 10) {
+            FocusableBox(grandparent, 0, 0, 50, 50) {
+                FocusableBox(parent, 10, 10, 30, 30) {
                     FocusableBox(focusedItem, 10, 10, 10, 10, initialFocus)
                 }
             }

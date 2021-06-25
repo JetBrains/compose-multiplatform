@@ -49,7 +49,7 @@ import androidx.compose.ui.autofill.AutofillCallback
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.autofill.performAutofill
 import androidx.compose.ui.autofill.populateViewStructure
-import androidx.compose.ui.focus.FOCUS_TAG
+import androidx.compose.ui.focus.FocusTag
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusDirection.Companion.Down
 import androidx.compose.ui.focus.FocusDirection.Companion.In
@@ -364,7 +364,7 @@ internal class AndroidComposeView(context: Context) :
 
     override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
         super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
-        Log.d(FOCUS_TAG, "Owner FocusChanged($gainFocus)")
+        Log.d(FocusTag, "Owner FocusChanged($gainFocus)")
         with(_focusManager) {
             if (gainFocus) takeFocus() else releaseFocus()
         }
@@ -966,7 +966,10 @@ internal class AndroidComposeView(context: Context) :
         // If we get such a call, don't try to write to a property delegate
         // that hasn't been initialized yet.
         if (superclassInitComplete) {
-            this.layoutDirection = layoutDirectionFromInt(layoutDirection)
+            layoutDirectionFromInt(layoutDirection).let {
+                this.layoutDirection = it
+                _focusManager.layoutDirection = it
+            }
         }
     }
 
