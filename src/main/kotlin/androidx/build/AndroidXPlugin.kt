@@ -40,8 +40,11 @@ import androidx.build.testConfiguration.addToTestZips
 import androidx.build.testConfiguration.configureTestConfigGeneration
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
+import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
+import com.android.build.gradle.TestExtension
+import com.android.build.gradle.TestPlugin
 import com.android.build.gradle.TestedExtension
 import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion.VERSION_1_8
@@ -88,6 +91,7 @@ class AndroidXPlugin : Plugin<Project> {
                 is JavaPlugin -> configureWithJavaPlugin(project, extension)
                 is LibraryPlugin -> configureWithLibraryPlugin(project, extension)
                 is AppPlugin -> configureWithAppPlugin(project, extension)
+                is TestPlugin -> configureWithTestPlugin(project, extension)
                 is KotlinBasePluginWrapper -> configureWithKotlinPlugin(project, extension, plugin)
             }
         }
@@ -234,7 +238,7 @@ class AndroidXPlugin : Plugin<Project> {
     @Suppress("UnstableApiUsage") // AGP DSL APIs
     private fun configureWithAppPlugin(project: Project, androidXExtension: AndroidXExtension) {
         val appExtension = project.extensions.getByType<AppExtension>().apply {
-            configureAndroidCommonOptions(project, androidXExtension)
+            configureAndroidBaseOptions(project, androidXExtension)
             configureAndroidApplicationOptions(project)
         }
 
@@ -255,13 +259,26 @@ class AndroidXPlugin : Plugin<Project> {
         project.configureAndroidProjectForLint(appExtension.lintOptions, androidXExtension)
     }
 
+    private fun configureWithTestPlugin(
+        project: Project,
+        androidXExtension: AndroidXExtension
+    ) {
+        project.extensions.getByType<TestExtension>().apply {
+            configureAndroidBaseOptions(project, androidXExtension)
+        }
+
+        project.configureJavaCompilationWarnings(androidXExtension)
+
+        project.addToProjectMap(androidXExtension)
+    }
+
     @Suppress("UnstableApiUsage") // AGP DSL APIs
     private fun configureWithLibraryPlugin(
         project: Project,
         androidXExtension: AndroidXExtension
     ) {
         val libraryExtension = project.extensions.getByType<LibraryExtension>().apply {
-            configureAndroidCommonOptions(project, androidXExtension)
+            configureAndroidBaseOptions(project, androidXExtension)
             configureAndroidLibraryOptions(project, androidXExtension)
         }
 
@@ -396,7 +413,7 @@ class AndroidXPlugin : Plugin<Project> {
         }
     }
 
-    private fun TestedExtension.configureAndroidCommonOptions(
+    private fun BaseExtension.configureAndroidBaseOptions(
         project: Project,
         androidXExtension: AndroidXExtension
     ) {
@@ -478,7 +495,12 @@ class AndroidXPlugin : Plugin<Project> {
         project.configureTestConfigGeneration(this)
 
         val buildTestApksTask = project.rootProject.tasks.named(BUILD_TEST_APKS_TASK)
-        testVariants.all { variant ->
+        when (this) {
+            is TestedExtension -> testVariants
+            // app module defines variants for test module
+            is TestExtension -> applicationVariants
+            else -> throw IllegalStateException("Unsupported plugin type")
+        }.all { variant ->
             buildTestApksTask.configure {
                 it.dependsOn(variant.assembleProvider)
             }
@@ -832,9 +854,18 @@ fun <T : Task> Project.addToCheckTask(task: TaskProvider<T>) {
  * Expected to be called in afterEvaluate when all extensions are available
  */
 internal fun Project.hasAndroidTestSourceCode(): Boolean {
+    // assume test modules are non-empty
+    if (this.extensions.findByType(TestExtension::class.java) != null) {
+        // for some reason, sourceSets.findByName("main").java.getSourceFiles().isEmpty always
+        // returns true
+        return true
+    }
+
     // check Java androidTest source set
-    this.extensions.findByType(TestedExtension::class.java)!!.sourceSets
-        .findByName("androidTest")?.let { sourceSet ->
+    this.extensions.findByType(TestedExtension::class.java)
+        ?.sourceSets
+        ?.findByName("androidTest")
+        ?.let { sourceSet ->
             // using getSourceFiles() instead of sourceFiles due to b/150800094
             if (!sourceSet.java.getSourceFiles().isEmpty) return true
         }
