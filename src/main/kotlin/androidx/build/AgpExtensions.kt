@@ -19,6 +19,7 @@ package androidx.build
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.TestExtension
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Project
 
@@ -28,6 +29,7 @@ val BaseExtension.variants: DomainObjectSet<
     get() = when (this) {
         is AppExtension -> applicationVariants
         is LibraryExtension -> libraryVariants
+        is TestExtension -> applicationVariants
         else -> error("Unhandled plugin ${this::class.java}")
     }
 
