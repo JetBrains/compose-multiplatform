@@ -2009,6 +2009,9 @@ package androidx.compose.ui.platform {
     property public Object? valueOverride;
   }
 
+  public final class InvertMatrixKt {
+  }
+
   public final class JvmActuals_jvmKt {
   }
 
