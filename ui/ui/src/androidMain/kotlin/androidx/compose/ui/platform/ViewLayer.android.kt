@@ -27,12 +27,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
-import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.graphics.setFrom
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
@@ -66,7 +64,7 @@ internal class ViewLayer(
     private var drawnWithZ = false
     private val canvasHolder = CanvasHolder()
 
-    private val matrixCache = ViewLayerMatrixCache()
+    private val matrixCache = LayerMatrixCache(getMatrix)
 
     /**
      * Local copy of the transform origin as GraphicsLayerModifier can be implemented
@@ -292,21 +290,31 @@ internal class ViewLayer(
 
     override fun mapOffset(point: Offset, inverse: Boolean): Offset {
         return if (inverse) {
-            matrixCache.getInverseMatrix(this).map(point)
+            matrixCache.calculateInverseMatrix(this)?.map(point) ?: Offset.Infinite
         } else {
-            matrixCache.getMatrix(this).map(point)
+            matrixCache.calculateMatrix(this).map(point)
         }
     }
 
     override fun mapBounds(rect: MutableRect, inverse: Boolean) {
         if (inverse) {
-            matrixCache.getInverseMatrix(this).map(rect)
+            val matrix = matrixCache.calculateInverseMatrix(this)
+            if (matrix != null) {
+                matrix.map(rect)
+            } else {
+                rect.set(0f, 0f, 0f, 0f)
+            }
         } else {
-            matrixCache.getMatrix(this).map(rect)
+            matrixCache.calculateMatrix(this).map(rect)
         }
     }
 
     companion object {
+        private val getMatrix: (View, android.graphics.Matrix) -> Unit = { view, matrix ->
+            val newMatrix = view.matrix
+            matrix.set(newMatrix)
+        }
+
         val OutlineProvider = object : ViewOutlineProvider() {
             override fun getOutline(view: View, outline: android.graphics.Outline) {
                 view as ViewLayer
@@ -359,87 +367,5 @@ internal class ViewLayer(
                 shouldUseDispatchDraw = true
             }
         }
-    }
-}
-
-/**
- * Helper class to cache a [Matrix] and inverse [Matrix], allowing the instance to be reused until
- * the [RenderNodeLayer]'s properties have changed, causing it to call [invalidate].
- *
- * This allows us to avoid repeated calls to [android.graphics.Matrix.getValues], which calls
- * an expensive native method (nGetValues). If we know the matrix hasn't changed, we can just
- * re-use it without needing to read and update values.
- */
-private class ViewLayerMatrixCache {
-    private var androidMatrixCache: android.graphics.Matrix? = null
-    private var inverseAndroidMatrixCache: android.graphics.Matrix? = null
-    private var matrixCache: Matrix? = null
-    private var inverseMatrixCache: Matrix? = null
-
-    private var isDirty = true
-    private var isInverseDirty = true
-
-    /**
-     * Ensures that the internal matrix will be updated next time [getMatrix] or [getInverseMatrix]
-     * is called - this should be called when something that will change the matrix calculation
-     * has happened.
-     */
-    fun invalidate() {
-        isDirty = true
-        isInverseDirty = true
-    }
-
-    /**
-     * Returns the cached [Matrix], updating it if required (if [invalidate] was previously called).
-     */
-    fun getMatrix(view: View): Matrix {
-        val matrix = matrixCache ?: Matrix().also {
-            matrixCache = it
-        }
-        if (!isDirty) {
-            return matrix
-        }
-
-        val new = view.matrix
-
-        if (androidMatrixCache != new) {
-            // Update the Compose matrix if the underlying Android matrix has changed
-            matrix.setFrom(new)
-            if (androidMatrixCache == null) {
-                androidMatrixCache = android.graphics.Matrix(new)
-            } else {
-                androidMatrixCache!!.set(new)
-            }
-        }
-        isDirty = false
-        return matrix
-    }
-
-    /**
-     * Returns the cached inverse [Matrix], updating it if required (if [invalidate] was previously
-     * called).
-     */
-    fun getInverseMatrix(view: View): Matrix {
-        val matrix = inverseMatrixCache ?: Matrix().also {
-            inverseMatrixCache = it
-        }
-        if (!isInverseDirty) {
-            return matrix
-        }
-
-        val new = view.matrix
-
-        if (inverseAndroidMatrixCache != new) {
-            // Update the Compose matrix if the underlying Android matrix has changed
-            matrix.setFrom(new)
-            matrix.invert()
-            if (inverseAndroidMatrixCache == null) {
-                inverseAndroidMatrixCache = android.graphics.Matrix(new)
-            } else {
-                inverseAndroidMatrixCache!!.set(new)
-            }
-        }
-        isInverseDirty = false
-        return matrix
     }
 }

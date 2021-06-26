@@ -23,6 +23,7 @@ import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.isFinite
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.GraphicsLayerScope
@@ -597,6 +598,9 @@ internal abstract class LayoutNodeWrapper(
     }
 
     protected fun withinLayerBounds(pointerPosition: Offset): Boolean {
+        if (!pointerPosition.isFinite) {
+            return false
+        }
         val layer = layer
         if (layer != null && isClipping) {
             return layer.isInLayer(pointerPosition)
