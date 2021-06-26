@@ -69,11 +69,7 @@ private val composeListComponentWrapper = functionalComponent<ListProps> { props
     }
 
     // This div will be a root for the Composition managed by Compose
-    div {
-        attrs {
-            ref { containerRef.current = it }
-        }
-    }
+    div { ref { containerRef.current = it } }
 }
 
 private val column = functionalComponent<RProps> {
