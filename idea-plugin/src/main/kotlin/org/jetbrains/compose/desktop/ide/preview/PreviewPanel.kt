@@ -6,29 +6,33 @@
 package org.jetbrains.compose.desktop.ide.preview
 
 import java.awt.Color
+import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.image.BufferedImage
 import javax.swing.JPanel
 
 internal class PreviewPanel : JPanel() {
     private var image: BufferedImage? = null
+    private var imageDimension: Dimension? = null
 
     override fun paintComponent(g: Graphics) {
         super.paintComponent(g)
 
         synchronized(this) {
             image?.let { image ->
+                val w = imageDimension!!.width
+                val h = imageDimension!!.height
                 g.color = Color.WHITE
-                g.fillRect(0, 0, image.width , image.height)
-                g.drawImage(image, 0, 0, image.width, image.height, null)
+                g.fillRect(0, 0, w, h)
+                g.drawImage(image, 0, 0, w, h, null)
             }
         }
     }
 
-    @Synchronized
-    fun previewImage(newImage: BufferedImage) {
+    fun previewImage(image: BufferedImage, imageDimension: Dimension) {
         synchronized(this) {
-            image = newImage
+            this.image = image
+            this.imageDimension = imageDimension
         }
 
         repaint()

@@ -6,11 +6,17 @@
 package org.jetbrains.compose.desktop.ui.tooling.preview.rpc
 
 import java.io.File
+import java.lang.RuntimeException
+import java.lang.reflect.Method
 import java.net.SocketTimeoutException
 import java.net.URLClassLoader
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.thread
 import kotlin.system.exitProcess
+import kotlin.system.measureTimeMillis
+import kotlin.time.DurationUnit
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
 
 val PREVIEW_HOST_CLASS_NAME: String
     get() = PreviewHost::class.java.canonicalName
@@ -42,7 +48,7 @@ private class PreviewClassloaderProvider {
     }
 }
 
-internal class PreviewHost(connection: RemoteConnection) {
+internal class PreviewHost(private val log: PreviewLogger, connection: RemoteConnection) {
     private val previewClasspath = AtomicReference<String>(null)
     private val previewRequest = AtomicReference<FrameRequest>(null)
     private val classloaderProvider = PreviewClassloaderProvider()
@@ -58,7 +64,9 @@ internal class PreviewHost(connection: RemoteConnection) {
                 val request = previewRequest.get()
                 if (classpath != null && request != null) {
                     if (previewRequest.compareAndSet(request, null)) {
-                        val frame = renderFrame(classpath, request)
+                        val bytes = renderFrame(classpath, request)
+                        val config = request.frameConfig
+                        val frame = RenderedFrame(bytes, width = config.width, height = config.height)
                         connection.sendFrame(frame)
                     }
                 }
@@ -104,9 +112,31 @@ internal class PreviewHost(connection: RemoteConnection) {
     ): ByteArray {
         val classloader = classloaderProvider.getClassloader(classpath)
         val previewFacade = classloader.loadClass(PREVIEW_FACADE_CLASS_NAME)
-        val render = previewFacade.getMethod("render", String::class.java, Int::class.java, Int::class.java)
-        val (fqName, w, h) = request
-        return render.invoke(previewFacade, fqName, w, h) as ByteArray
+        val renderArgsClasses = arrayOf(
+            String::class.java,
+            Int::class.java,
+            Int::class.java,
+            java.lang.Double::class.java
+        )
+        val render = try {
+            previewFacade.getMethod("render", *renderArgsClasses)
+        } catch (e: NoSuchMethodException) {
+            val signature =
+                "${previewFacade.canonicalName}#render(${renderArgsClasses.joinToString(", ") { it.simpleName }})"
+            val possibleCandidates = previewFacade.methods.filter { it.name == "render" }
+            throw RuntimeException("Could not find method '$signature'. Possible candidates: \n${possibleCandidates.joinToString("\n") { "* ${it}" }}", e)
+        }
+        val (fqName, frameConfig) = request
+        val scaledWidth = frameConfig.scaledWidth
+        val scaledHeight = frameConfig.scaledHeight
+        val scale = frameConfig.scale
+        log { "RENDERING '$fqName' ${scaledWidth}x$scaledHeight@${scale ?: 1f}" }
+        var bytes: ByteArray
+        val ms = measureTimeMillis {
+            bytes = render.invoke(previewFacade, fqName, scaledWidth, scaledHeight, scale) as ByteArray
+        }
+        log { "RENDERED [${bytes.size}] in $ms ms" }
+        return bytes
     }
 
     companion object {
@@ -116,14 +146,11 @@ internal class PreviewHost(connection: RemoteConnection) {
         @JvmStatic
         fun main(args: Array<String>) {
             val port = args[0].toInt()
-            val connection =
-                getLocalConnectionOrNull(
-                    port,
-                    logger = PrintStreamLogger("PREVIEW_HOST"),
-                    onClose = { exitProcess(ExitCodes.OK) }
-                )
+            val logger = PrintStreamLogger("PREVIEW_HOST")
+            val onClose = { exitProcess(ExitCodes.OK) }
+            val connection = getLocalConnectionOrNull(port, logger, onClose = onClose)
             if (connection != null) {
-                PreviewHost(connection).join()
+                PreviewHost(logger, connection).join()
             } else {
                 exitProcess(ExitCodes.COULD_NOT_CONNECT_TO_PREVIEW_MANAGER)
             }

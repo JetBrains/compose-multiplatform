@@ -5,7 +5,6 @@
 
 package org.jetbrains.compose.desktop.ui.tooling.preview.rpc
 
-import java.awt.Dimension
 import java.io.IOException
 import java.net.ServerSocket
 import java.net.SocketTimeoutException
@@ -21,15 +20,22 @@ data class PreviewHostConfig(
     val hostClasspath: String
 )
 
+data class FrameConfig(val width: Int, val height: Int, val scale: Double?) {
+    val scaledWidth: Int get() = scaledValue(width)
+    val scaledHeight: Int get() = scaledValue(height)
+
+    private fun scaledValue(value: Int): Int =
+        if (scale != null) (value.toDouble() * scale).toInt() else value
+}
+
 data class FrameRequest(
     val composableFqName: String,
-    val width: Int,
-    val height: Int
+    val frameConfig: FrameConfig
 )
 
 interface PreviewManager {
     val gradleCallbackPort: Int
-    fun updateFrameSize(width: Int, height: Int)
+    fun updateFrameConfig(frameConfig: FrameConfig)
     fun close()
 }
 
@@ -41,7 +47,7 @@ private data class RunningPreview(
         get() = connection.isAlive && process.isAlive
 }
 
-class PreviewManagerImpl(private val onNewFrame: (ByteArray) -> Unit) : PreviewManager {
+class PreviewManagerImpl(private val onNewFrame: (RenderedFrame) -> Unit) : PreviewManager {
     private val log = PrintStreamLogger("SERVER")
     private val previewSocket = newServerSocket()
     private val gradleCallbackSocket = newServerSocket()
@@ -52,7 +58,7 @@ class PreviewManagerImpl(private val onNewFrame: (ByteArray) -> Unit) : PreviewM
     private val previewHostConfig = AtomicReference<PreviewHostConfig>(null)
     private val previewClasspath = AtomicReference<String>(null)
     private val previewFqName = AtomicReference<String>(null)
-    private val previewFrameSize = AtomicReference<Dimension>(null)
+    private val previewFrameConfig = AtomicReference<FrameConfig>(null)
     private val frameRequest = AtomicReference<FrameRequest>(null)
     private val shouldRequestFrame = AtomicBoolean(false)
     private val runningPreview = AtomicReference<RunningPreview>(null)
@@ -88,10 +94,10 @@ class PreviewManagerImpl(private val onNewFrame: (ByteArray) -> Unit) : PreviewM
         withLivePreviewConnection {
             val classpath = previewClasspath.get()
             val fqName = previewFqName.get()
-            val frameSize = previewFrameSize.get()
+            val frameConfig = previewFrameConfig.get()
 
-            if (classpath != null && frameSize != null && fqName != null) {
-                val request = FrameRequest(fqName, frameSize.width, frameSize.height)
+            if (classpath != null && frameConfig != null && fqName != null) {
+                val request = FrameRequest(fqName, frameConfig)
                 if (shouldRequestFrame.get() && frameRequest.get() == null) {
                     if (shouldRequestFrame.compareAndSet(true, false)) {
                         if (frameRequest.compareAndSet(null, request)) {
@@ -107,11 +113,11 @@ class PreviewManagerImpl(private val onNewFrame: (ByteArray) -> Unit) : PreviewM
 
     private val receivePreviewResponseThread = repeatWhileAliveThread("receivePreviewResponse") {
         withLivePreviewConnection {
-            receiveFrame { bytes ->
+            receiveFrame { renderedFrame ->
                 frameRequest.get()?.let { request ->
                     frameRequest.compareAndSet(request, null)
                 }
-                onNewFrame(bytes)
+                onNewFrame(renderedFrame)
             }
         }
     }
@@ -183,8 +189,8 @@ class PreviewManagerImpl(private val onNewFrame: (ByteArray) -> Unit) : PreviewM
         }
     }
 
-    override fun updateFrameSize(width: Int, height: Int) {
-        previewFrameSize.set(Dimension(width, height))
+    override fun updateFrameConfig(frameConfig: FrameConfig) {
+        previewFrameConfig.set(frameConfig)
         shouldRequestFrame.set(true)
         sendPreviewRequestThread.interrupt()
     }
