@@ -49,6 +49,8 @@ internal fun KtNamedFunction.isValidComposePreview() =
  *
  */
 internal fun KtNamedFunction.isValidPreviewLocation(): Boolean {
+    if (valueParameters.size > 0) return false
+
     if (isTopLevel) return true
 
     if (parentOfType<KtNamedFunction>() == null) {
