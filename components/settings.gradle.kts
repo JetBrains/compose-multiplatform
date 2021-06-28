@@ -1,4 +1,4 @@
-include(":VideoPlayer:common")
-include(":VideoPlayer:desktop")
-include(":SplitPane:common")
-include(":SplitPane:desktop")
+include(":VideoPlayer:library")
+include(":VideoPlayer:demo")
+include(":SplitPane:library")
+include(":SplitPane:demo")

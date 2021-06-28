@@ -6,16 +6,19 @@ plugins {
 }
 
 kotlin {
-    jvm {
-        withJava()
-    }
+    jvm {}
     sourceSets {
         named("jvmMain") {
             dependencies {
                 implementation(compose.desktop.currentOs)
-                implementation(project("common"))
+                implementation(project(":VideoPlayer:library"))
             }
         }
     }
 }
 
+compose.desktop {
+    application {
+        mainClass = "org.jetbrains.compose.videoplayer.demo.MainKt"
+    }
+}

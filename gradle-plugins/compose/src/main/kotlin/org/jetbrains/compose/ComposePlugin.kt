@@ -122,6 +122,8 @@ class ComposePlugin : Plugin<Project> {
     }
 
     object DesktopDependencies {
+        val components = DesktopComponentsDependencies
+
         val common = composeDependency("org.jetbrains.compose.desktop:desktop")
         val linux_x64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-linux-x64")
         val windows_x64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-windows-x64")
@@ -147,6 +149,10 @@ class ComposePlugin : Plugin<Project> {
         val currentOs by lazy {
             composeDependency("org.jetbrains.compose.desktop:desktop-jvm-${currentTarget.id}")
         }
+    }
+
+    object DesktopComponentsDependencies {
+        val splitPane = composeDependency("org.jetbrains.compose.components:components-splitpane")
     }
 
     object WebDependencies {
