@@ -24,12 +24,12 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.gradle.kotlin.dsl.getPlugin
+import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import java.io.PrintWriter
 
@@ -123,8 +123,8 @@ abstract class SdkResourceGenerator : DefaultTask() {
             project.tasks.named("compileTestJava").configure { it.dependsOn(provider) }
             project.tasks.named("processTestResources").configure { it.dependsOn(provider) }
 
-            val convention = project.convention.getPlugin<JavaPluginConvention>()
-            val resources = convention.sourceSets.getByName("test").resources
+            val extension = project.extensions.getByType<JavaPluginExtension>()
+            val resources = extension.sourceSets.getByName("test").resources
             resources.srcDirs(setOf(resources.srcDirs, generatedDirectory))
         }
     }
