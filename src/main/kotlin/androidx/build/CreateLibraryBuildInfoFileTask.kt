@@ -22,11 +22,14 @@ import androidx.build.gitclient.GitCommitRange
 import androidx.build.jetpad.LibraryBuildInfoFile
 import com.google.gson.GsonBuilder
 import org.gradle.api.DefaultTask
+import org.gradle.api.Project
 import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskProvider
 import java.io.File
 import java.util.ArrayList
 
@@ -35,14 +38,38 @@ import java.util.ArrayList
  * version of public androidx dependencies and release checklist of the library for consumption
  * by the Jetpack Release Service (JetPad).
  */
-open class CreateLibraryBuildInfoFileTask : DefaultTask() {
+abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
     init {
         group = "Help"
         description = "Generates a file containing library build information serialized to json"
     }
 
-    @OutputFile
-    val outputFile: Property<File> = project.objects.property(File::class.java)
+    @get:OutputFile
+    abstract val outputFile: Property<File>
+
+    @get:Input
+    abstract val artifactId: Property<String>
+
+    @get:Input
+    abstract val groupId: Property<String>
+
+    @get:Input
+    abstract val version: Property<String>
+
+    @get:Input
+    abstract val projectDir: Property<String>
+
+    @get:Input
+    abstract val commit: Property<String>
+
+    @get:Input
+    abstract val groupIdRequiresSameVersion: Property<Boolean>
+
+    @get:Input
+    abstract val groupZipPath: Property<String>
+
+    @get:Input
+    abstract val projectZipPath: Property<String>
 
     /**
      * Returns the local project directory without the full framework/support root directory path
@@ -65,36 +92,17 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
         return library?.mavenGroup?.requireSameVersion ?: false
     }
 
-    /* For androidx release notes, the most common use case is to track and publish the last sha
-     * of the build that is released.  Thus, we use frameworks/support to get the sha
-     */
-    private fun getFrameworksSupportCommitShaAtHead(): String {
-        val commitList: List<Commit> = GitClientImpl(project.getSupportRootFolder(), logger)
-            .getGitLog(
-                GitCommitRange(
-                    fromExclusive = "",
-                    untilInclusive = "HEAD",
-                    n = 1
-                ),
-                keepMerges = true,
-                fullProjectDir = project.getSupportRootFolder()
-            )
-        if (commitList.isEmpty()) {
-            throw RuntimeException("Failed to find git commit for HEAD!")
-        }
-        return commitList.first().sha
-    }
-
     private fun writeJsonToFile(info: LibraryBuildInfoFile) {
-        if (!project.getBuildInfoDirectory().exists()) {
-            if (!project.getBuildInfoDirectory().mkdirs()) {
+        val resolvedOutputFile: File = outputFile.get()
+        val outputDir = resolvedOutputFile.parentFile
+        if (!outputDir.exists()) {
+            if (!outputDir.mkdirs()) {
                 throw RuntimeException(
                     "Failed to create " +
                         "output directory: ${project.getBuildInfoDirectory()}"
                 )
             }
         }
-        val resolvedOutputFile: File = outputFile.get()
         if (!resolvedOutputFile.exists()) {
             if (!resolvedOutputFile.createNewFile()) {
                 throw RuntimeException(
@@ -111,14 +119,14 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
 
     private fun resolveAndCollectDependencies(): LibraryBuildInfoFile {
         val libraryBuildInfoFile = LibraryBuildInfoFile()
-        libraryBuildInfoFile.artifactId = project.name.toString()
-        libraryBuildInfoFile.groupId = project.group.toString()
-        libraryBuildInfoFile.version = project.version.toString()
-        libraryBuildInfoFile.path = getProjectSpecificDirectory()
-        libraryBuildInfoFile.sha = getFrameworksSupportCommitShaAtHead()
-        libraryBuildInfoFile.groupIdRequiresSameVersion = requiresSameVersion()
-        libraryBuildInfoFile.groupZipPath = project.getGroupZipPath()
-        libraryBuildInfoFile.projectZipPath = project.getProjectZipPath()
+        libraryBuildInfoFile.artifactId = artifactId.get()
+        libraryBuildInfoFile.groupId = groupId.get()
+        libraryBuildInfoFile.version = version.get()
+        libraryBuildInfoFile.path = projectDir.get()
+        libraryBuildInfoFile.sha = commit.get()
+        libraryBuildInfoFile.groupIdRequiresSameVersion = groupIdRequiresSameVersion.get()
+        libraryBuildInfoFile.groupZipPath = groupZipPath.get()
+        libraryBuildInfoFile.projectZipPath = projectZipPath.get()
         val libraryDependencies = ArrayList<LibraryBuildInfoFile.Dependency>()
         val checks = ArrayList<LibraryBuildInfoFile.Check>()
         libraryBuildInfoFile.checks = checks
@@ -187,5 +195,62 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
     fun createLibraryBuildInfoFile() {
         val resolvedArtifact = resolveAndCollectDependencies()
         writeJsonToFile(resolvedArtifact)
+    }
+
+    companion object {
+        const val TASK_NAME = "createLibraryBuildInfoFiles"
+
+        fun setup(project: Project, extension: AndroidXExtension):
+            TaskProvider<CreateLibraryBuildInfoFileTask> {
+                return project.tasks.register(
+                    TASK_NAME,
+                    CreateLibraryBuildInfoFileTask::class.java
+                ) {
+                    val group = project.group.toString()
+                    val name = project.name.toString()
+                    it.outputFile.set(
+                        File(
+                            project.getBuildInfoDirectory(),
+                            "${group}_${name}_build_info.txt"
+                        )
+                    )
+                    it.artifactId.set(name)
+                    it.groupId.set(group)
+                    it.version.set(project.version.toString())
+                    it.projectDir.set(
+                        project.projectDir.absolutePath.removePrefix(
+                            project.getSupportRootFolder().absolutePath
+                        )
+                    )
+                    it.commit.set(
+                        project.provider({
+                            project.getFrameworksSupportCommitShaAtHead()
+                        })
+                    )
+                    it.groupIdRequiresSameVersion.set(extension.mavenGroup?.requireSameVersion)
+                    it.groupZipPath.set(project.getGroupZipPath())
+                    it.projectZipPath.set(project.getProjectZipPath())
+                }
+            }
+
+        /* For androidx release notes, the most common use case is to track and publish the last sha
+         * of the build that is released.  Thus, we use frameworks/support to get the sha
+         */
+        private fun Project.getFrameworksSupportCommitShaAtHead(): String {
+            val commitList: List<Commit> = GitClientImpl(project.getSupportRootFolder(), logger)
+                .getGitLog(
+                    GitCommitRange(
+                        fromExclusive = "",
+                        untilInclusive = "HEAD",
+                        n = 1
+                    ),
+                    keepMerges = true,
+                    fullProjectDir = getSupportRootFolder()
+                )
+            if (commitList.isEmpty()) {
+                throw RuntimeException("Failed to find git commit for HEAD!")
+            }
+            return commitList.first().sha
+        }
     }
 }

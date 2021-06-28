@@ -648,18 +648,9 @@ class AndroidXPlugin : Plugin<Project> {
         afterEvaluate {
             if (extension.publish.shouldRelease()) {
                 // Only generate build info files for published libraries.
-                val task = tasks.register(
-                    CREATE_LIBRARY_BUILD_INFO_FILES_TASK,
-                    CreateLibraryBuildInfoFileTask::class.java
-                ) {
-                    it.outputFile.set(
-                        File(
-                            project.getBuildInfoDirectory(),
-                            "${group}_${name}_build_info.txt"
-                        )
-                    )
-                }
-                rootProject.tasks.named(CREATE_LIBRARY_BUILD_INFO_FILES_TASK).configure {
+                val task = CreateLibraryBuildInfoFileTask.setup(project, extension)
+
+                rootProject.tasks.named(CreateLibraryBuildInfoFileTask.TASK_NAME).configure {
                     it.dependsOn(task)
                 }
                 addTaskToAggregateBuildInfoFileTask(task)
