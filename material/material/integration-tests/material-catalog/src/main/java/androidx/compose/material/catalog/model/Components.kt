@@ -86,6 +86,18 @@ private val Badge = Component(
     examples = BadgeExamples
 )
 
+private val NavigationRail = Component(
+    id = 23,
+    name = "Navigation Rail",
+    description = "Navigation rails side navigation components allow movement between primary " +
+        "destinations in an app.",
+    icon = R.drawable.ic_navigation_rail,
+    guidelinesUrl = "$ComponentGuidelinesUrl/navigation-rail",
+    docsUrl = "$DocsUrl#navigationrail",
+    sourceUrl = "$MaterialSourceUrl/NavigationRail.kt",
+    examples = NavigationRailExamples
+)
+
 private val BottomNavigation = Component(
     id = 4,
     name = "Bottom navigation",
@@ -291,12 +303,15 @@ private val TextFields = Component(
     examples = TextFieldsExamples
 )
 
+// Next id = 24
+
 val Components = listOf(
     AppBarsBottom,
     AppBarsTop,
     Backdrop,
     Badge,
     BottomNavigation,
+    NavigationRail,
     Buttons,
     ButtonsFloatingActionButton,
     Cards,
