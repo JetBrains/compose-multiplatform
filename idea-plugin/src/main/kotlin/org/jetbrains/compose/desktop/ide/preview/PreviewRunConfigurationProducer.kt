@@ -82,7 +82,7 @@ class PreviewRunConfigurationProducer : LazyRunConfigurationProducer<GradleRunCo
 private val configureDesktopPreviewTaskName = "configureDesktopPreview"
 
 private fun runConfigurationNameFor(function: KtNamedFunction): String =
-    "Configure Desktop Preview: ${function.name!!}"
+    "Compose Preview: ${function.name!!}"
 
 private fun runConfigurationScriptParameters(target: String, idePort: Int): List<String> =
     listOf(
