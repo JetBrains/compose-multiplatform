@@ -172,6 +172,18 @@ private fun StateSnippet6() {
 }
 
 private object StateSnippet7 {
+    @Parcelize
+    data class City(val name: String, val country: String) : Parcelable
+
+    @Composable
+    fun CityScreen() {
+        var selectedCity = rememberSaveable {
+            mutableStateOf(City("Madrid", "Spain"))
+        }
+    }
+}
+
+private object StateSnippet8 {
     data class City(val name: String, val country: String)
 
     val CitySaver = run {
@@ -192,7 +204,7 @@ private object StateSnippet7 {
 }
 
 @Composable
-private fun StateSnippets8() {
+private fun StateSnippets9() {
     data class City(val name: String, val country: String)
 
     val CitySaver = listSaver<City, Any>(
@@ -237,3 +249,10 @@ private class HelloViewModel : ViewModel() {
         _name.value = newName
     }
 }
+
+/**
+ * Add fake Parcelize and Parcelable to avoid adding AndroidX wide dependency on
+ * kotlin-parcelize just for snippets
+ */
+annotation class Parcelize
+interface Parcelable
