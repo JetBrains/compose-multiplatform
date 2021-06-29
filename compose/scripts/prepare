@@ -1,0 +1,9 @@
+#!/bin/bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+export ALLOW_PUBLIC_REPOS=1
+export JAVA_TOOLS_JAR=$SCRIPT_DIR/../external/tools.jar
+export ANDROIDX_PROJECTS=COMPOSE
+export COMPOSE_CUSTOM_GROUP=org.jetbrains.compose
+export COMPOSE_DEFAULT_GRADLE_ARGS="-Pandroidx.compose.multiplatformEnabled=true -Pandroidx.versionExtraCheckEnabled=false -Pandroidx.alternativeProjectUrl=https://github.com/JetBrains/compose-jb -Pandroidx.compose.jsCompilerTestsEnabled=true"

@@ -11,6 +11,7 @@ at https://android.googlesource.com/platform/frameworks/support.
 
    * [artwork](artwork) - design artifacts
    * [benchmarks](benchmarks) - collection of benchmarks
+   * [compose](compose) - composite build of [Compose-jb sources](https://github.com/JetBrains/androidx)
    * [ci](ci) - Continuous Integration helpers
    * [cef](cef) - CEF integration in Jetpack Compose
    * [examples](examples) - examples of multiplatform Compose applications for Desktop and Android
