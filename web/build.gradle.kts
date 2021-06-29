@@ -3,6 +3,8 @@ val COMPOSE_REPO_USERNAME: String? by project
 val COMPOSE_REPO_KEY: String? by project
 val COMPOSE_WEB_BUILD_WITH_EXAMPLES = project.property("COMPOSE_WEB_BUILD_WITH_EXAMPLES")!!.toString()?.toBoolean()
 
+apply<jetbrains.compose.web.gradle.SeleniumDriverPlugin>()
+
 subprojects {
     apply(plugin = "maven-publish")
 

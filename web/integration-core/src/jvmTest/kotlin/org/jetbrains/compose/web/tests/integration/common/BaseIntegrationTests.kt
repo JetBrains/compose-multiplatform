@@ -41,6 +41,8 @@ internal object Drivers {
     val Firefox by lazy {
         object : FirefoxDriver(
             FirefoxOptions().apply {
+//                System.setProperty("webdriver.gecko.driver","G:\\Selenium\\Firefox driver\\geckodriver.exe");
+                System.setProperty("webdriver.gecko.driver","C:\\Users\\Shagen\\.gradle\\selenium\\gecko\\geckodriver.exe");
                 setHeadless(true)
             }
         ) {

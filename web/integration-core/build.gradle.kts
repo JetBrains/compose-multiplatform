@@ -3,7 +3,6 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-
 kotlin {
     jvm {
         tasks.named<Test>("jvmTest") {
@@ -74,6 +73,16 @@ kotlin {
 
 tasks.named<Test>("jvmTest") {
     dependsOn(tasks.named("jsBrowserDevelopmentWebpack"))
+
+    listOf(
+        "webdriver.chrome.driver",
+        "webdriver.gecko.driver",
+    ).forEach {
+        if (rootProject.hasProperty(it)) {
+            println("${it} => ${rootProject.extensions.getByName(it)}")
+            systemProperty(it, rootProject.extensions.getByName(it))
+        }
+    }
 
     listOf(
         "compose.web.tests.integration.withFirefox"
