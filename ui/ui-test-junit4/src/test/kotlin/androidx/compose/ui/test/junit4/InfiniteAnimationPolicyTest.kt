@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-package androidx.compose.animation.core
+package androidx.compose.ui.test.junit4
 
+import androidx.compose.animation.core.withInfiniteAnimationFrameNanos
+import androidx.compose.animation.core.withInfiniteAnimationFrameMillis
+import androidx.compose.ui.platform.InfiniteAnimationPolicy
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
