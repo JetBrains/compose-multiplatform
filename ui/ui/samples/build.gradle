@@ -31,6 +31,7 @@ dependencies {
 
     compileOnly(project(":annotation:annotation-sampled"))
 
+    implementation(project(":compose:animation:animation-core"))
     implementation(project(":compose:foundation:foundation-layout"))
     implementation(project(":compose:material:material"))
     implementation(project(":compose:runtime:runtime"))

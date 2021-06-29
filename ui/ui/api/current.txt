@@ -1958,6 +1958,16 @@ package androidx.compose.ui.platform {
   public final class DisposableSaveableStateRegistry_androidKt {
   }
 
+  public interface InfiniteAnimationPolicy extends kotlin.coroutines.CoroutineContext.Element {
+    method public default kotlin.coroutines.CoroutineContext.Key<?> getKey();
+    method public suspend <R> Object? onInfiniteOperation(kotlin.jvm.functions.Function1<? super kotlin.coroutines.Continuation<? super R>,?> block, kotlin.coroutines.Continuation<? super R> p);
+    property public default kotlin.coroutines.CoroutineContext.Key<?> key;
+    field public static final androidx.compose.ui.platform.InfiniteAnimationPolicy.Key Key;
+  }
+
+  public static final class InfiniteAnimationPolicy.Key implements kotlin.coroutines.CoroutineContext.Key<androidx.compose.ui.platform.InfiniteAnimationPolicy> {
+  }
+
   public interface InspectableValue {
     method public default kotlin.sequences.Sequence<androidx.compose.ui.platform.ValueElement> getInspectableElements();
     method public default String? getNameFallback();

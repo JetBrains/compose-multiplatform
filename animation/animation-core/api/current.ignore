@@ -1,13 +1,3 @@
 // Baseline format: 1.0
-ChangedClass: androidx.compose.animation.core.Transition.Segment:
-    Class androidx.compose.animation.core.Transition.Segment changed class/interface declaration
-
-
-RemovedClass: androidx.compose.animation.core.ManualFrameClock:
-    Removed class androidx.compose.animation.core.ManualFrameClock
-RemovedClass: androidx.compose.animation.core.ManualFrameClockKt:
-    Removed class androidx.compose.animation.core.ManualFrameClockKt
-
-
-RemovedMethod: androidx.compose.animation.core.Transition.Segment#Segment(S, S):
-    Removed constructor androidx.compose.animation.core.Transition.Segment(S,S)
+RemovedInterface: androidx.compose.animation.core.InfiniteAnimationPolicy:
+    Removed class androidx.compose.animation.core.InfiniteAnimationPolicy
