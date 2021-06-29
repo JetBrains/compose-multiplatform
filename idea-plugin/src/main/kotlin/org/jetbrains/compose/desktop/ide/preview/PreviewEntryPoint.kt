@@ -20,12 +20,9 @@ import com.intellij.codeInspection.reference.EntryPoint
 import com.intellij.codeInspection.reference.RefElement
 import com.intellij.configurationStore.deserializeInto
 import com.intellij.configurationStore.serializeObjectInto
-import com.intellij.openapi.util.InvalidDataException
-import com.intellij.openapi.util.WriteExternalException
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
 import org.jdom.Element
-import org.jetbrains.annotations.Nls
 
 /**
  * [EntryPoint] implementation to mark `@Preview` functions as entry points and avoid them being flagged as unused.

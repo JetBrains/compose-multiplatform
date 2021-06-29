@@ -16,6 +16,10 @@ repositories {
     mavenCentral()
 }
 
+dependencies {
+    implementation("org.jetbrains.compose:preview-rpc")
+}
+
 intellij {
     pluginName = "Compose Multiplatform IDE Support"
     type = properties("platform.type")

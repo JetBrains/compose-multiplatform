@@ -27,7 +27,7 @@ import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
 
-internal const val DESKTOP_PREVIEW_ANNOTATION_FQN = "androidx.compose.ui.tooling.desktop.preview.Preview"
+internal const val DESKTOP_PREVIEW_ANNOTATION_FQN = "androidx.compose.desktop.ui.tooling.preview.Preview"
 
 /**
  * Utils based on functions from AOSP, taken from
@@ -49,6 +49,8 @@ internal fun KtNamedFunction.isValidComposePreview() =
  *
  */
 internal fun KtNamedFunction.isValidPreviewLocation(): Boolean {
+    if (valueParameters.size > 0) return false
+
     if (isTopLevel) return true
 
     if (parentOfType<KtNamedFunction>() == null) {

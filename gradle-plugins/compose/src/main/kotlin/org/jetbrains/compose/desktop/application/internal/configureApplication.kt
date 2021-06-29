@@ -17,8 +17,8 @@ import org.jetbrains.compose.desktop.application.dsl.Application
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.validation.validatePackageVersions
 import org.jetbrains.compose.desktop.application.tasks.*
-import org.jetbrains.compose.desktop.preview.internal.configureRunPreviewTask
-import org.jetbrains.compose.desktop.preview.tasks.AbstractRunComposePreviewTask
+import org.jetbrains.compose.desktop.preview.internal.configureConfigureDesktopPreviewTask
+import org.jetbrains.compose.desktop.preview.tasks.AbstractConfigureDesktopPreviewTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import java.io.File
@@ -158,8 +158,8 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
             configureRunTask(app)
         }
 
-        val runPreview = project.tasks.composeTask<AbstractRunComposePreviewTask>("runComposeDesktopPreview") {
-            configureRunPreviewTask(app)
+        val configureDesktopPreviewTask = project.tasks.composeTask<AbstractConfigureDesktopPreviewTask>("configureDesktopPreview") {
+            configureConfigureDesktopPreviewTask(app)
         }
     }
 }

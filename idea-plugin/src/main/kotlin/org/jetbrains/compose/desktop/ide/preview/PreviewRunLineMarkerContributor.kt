@@ -36,11 +36,10 @@ class PreviewRunLineMarkerContributor : RunLineMarkerContributor() {
 
         val parent = element.parent
         return when {
-            parent is KtNamedFunction && parent.isValidComposePreview() ->
-                Info(
-                    PreviewIcons.COMPOSE,
-                    arrayOf(ExecutorAction.getActions(0).first())
-                ) { PreviewMessages.runPreview(parent.name!!) }
+            parent is KtNamedFunction && parent.isValidComposePreview() -> {
+                val actions = arrayOf(ExecutorAction.getActions(0).first())
+                Info(PreviewIcons.COMPOSE, actions) { PreviewMessages.runPreview(parent.name!!) }
+            }
             else -> null
         }
     }

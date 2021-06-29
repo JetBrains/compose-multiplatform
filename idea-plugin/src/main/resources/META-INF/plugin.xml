@@ -34,5 +34,9 @@
         <runConfigurationProducer
                 implementation="org.jetbrains.compose.web.ide.run.WebRunConfigurationProducer"/>
 
+        <toolWindow
+                factoryClass="org.jetbrains.compose.desktop.ide.preview.PreviewToolWindow"
+                id="Desktop Preview" doNotActivateOnStart="true"
+                anchor="right" />
     </extensions>
 </idea-plugin>
