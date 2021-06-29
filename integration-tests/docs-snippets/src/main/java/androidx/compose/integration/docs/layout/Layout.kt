@@ -50,8 +50,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasurePolicy
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -553,6 +561,64 @@ private object LayoutSnippet28and29 {
         }
     }
 }
+
+private object LayoutSnippet30 {
+    @Composable
+    fun MyCustomComposable(
+        modifier: Modifier = Modifier,
+        content: @Composable () -> Unit
+    ) {
+        Layout(
+            content = content,
+            modifier = modifier,
+            measurePolicy = object : MeasurePolicy {
+                override fun MeasureScope.measure(
+                    measurables: List<Measurable>,
+                    constraints: Constraints
+                ): MeasureResult {
+                    // Measure and layout here
+                    TODO() // NOTE: Omit in the code snippets
+                }
+
+                override fun IntrinsicMeasureScope.minIntrinsicWidth(
+                    measurables: List<IntrinsicMeasurable>,
+                    height: Int
+                ): Int {
+                    // Logic here
+                    TODO() // NOTE: Omit in the code snippets
+                }
+
+                // Other intrinsics related methods have a default value,
+                // you can override only the methods that you need.
+            }
+        )
+    }
+}
+
+private object LayoutSnippet31 {
+    fun Modifier.myCustomModifier(/* ... */) = this then object : LayoutModifier {
+
+        override fun MeasureScope.measure(
+            measurable: Measurable,
+            constraints: Constraints
+        ): MeasureResult {
+            // Measure and layout here
+            TODO() // NOTE: Omit in the code snippets
+        }
+
+        override fun IntrinsicMeasureScope.minIntrinsicWidth(
+            measurable: IntrinsicMeasurable,
+            height: Int
+        ): Int {
+            // Logic here
+            TODO() // NOTE: Omit in the code snippets
+        }
+
+        // Other intrinsics related methods have a default value,
+        // you can override only the methods that you need.
+    }
+}
+
 /*
 Fakes needed for snippets to build:
  */
