@@ -21,11 +21,11 @@ import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.VisibleForTesting
-import androidx.compose.animation.core.InfiniteAnimationPolicy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.node.RootForTest
+import androidx.compose.ui.platform.InfiniteAnimationPolicy
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.WindowRecomposerPolicy
 import androidx.compose.ui.platform.textInputServiceFactory
