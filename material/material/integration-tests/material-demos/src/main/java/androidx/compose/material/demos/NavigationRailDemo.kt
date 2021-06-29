@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Checkbox
 import androidx.compose.material.ContentAlpha
@@ -137,9 +138,9 @@ private fun CompactNavRailConfig(compactNavRailState: MutableState<Boolean>) {
             .fillMaxWidth()
             .padding(start = 16.dp)
             .height(56.dp)
-            .selectable(
-                selected = compactNavRailState.value,
-                onClick = { compactNavRailState.value = !compactNavRailState.value }
+            .toggleable(
+                value = compactNavRailState.value,
+                onValueChange = { compactNavRailState.value = !compactNavRailState.value }
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
