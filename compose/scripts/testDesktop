@@ -4,5 +4,5 @@ cd "$(dirname "$0")"
 . ./prepare
 
 pushd ..
-./gradlew testComposeJbDeskto $COMPOSE_DEFAULT_GRADLE_ARGS "$@" || exit 1
+./gradlew testComposeJbDesktop $COMPOSE_DEFAULT_GRADLE_ARGS "$@" || exit 1
 popd
