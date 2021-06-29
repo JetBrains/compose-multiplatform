@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.window
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.AppWindow
 import androidx.compose.desktop.ComposePanel
@@ -144,7 +143,7 @@ fun CoroutineScope.launchApplication(
  * [LaunchedEffect]) or that have child composition created inside [Window], [Dialog], or [Tray].
  *
  * Don't use any animation in this function
- * (for example, [withFrameNanos] or [animateFloatAsState]),
+ * (for example, [withFrameNanos] or [androidx.compose.animation.core.animateFloatAsState]),
  * because underlying [MonotonicFrameClock] hasn't synchronized with any display, and produces
  * frames as fast as possible.
  *

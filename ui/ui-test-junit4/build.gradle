@@ -43,7 +43,6 @@ dependencies {
         api(libs.kotlinStdlib)
         api(libs.kotlinStdlibCommon)
 
-        implementation(project(":compose:animation:animation-core"))
         implementation(project(":compose:runtime:runtime-saveable"))
         implementation(project(":activity:activity-compose"))
         implementation("androidx.annotation:annotation:1.1.0")
@@ -56,6 +55,7 @@ dependencies {
         implementation(libs.kotlinCoroutinesCore)
         implementation(libs.kotlinCoroutinesTest)
 
+        testImplementation(project(":compose:animation:animation-core"))
         testImplementation(project(":compose:material:material"))
         testImplementation(project(":compose:test-utils"))
         testImplementation(libs.truth)
@@ -100,7 +100,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation project(":activity:activity-compose")
                 api("androidx.test.ext:junit:1.1.2")
 
-                implementation(project(":compose:animation:animation-core"))
                 implementation(project(":compose:runtime:runtime-saveable"))
                 implementation("androidx.lifecycle:lifecycle-common:2.3.0")
                 implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
@@ -111,6 +110,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             }
 
             test.dependencies {
+                implementation(project(":compose:animation:animation-core"))
                 implementation(project(":compose:material:material"))
                 implementation(project(":compose:test-utils"))
                 implementation(libs.truth)

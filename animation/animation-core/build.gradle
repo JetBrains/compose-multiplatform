@@ -40,6 +40,7 @@ dependencies {
         api("androidx.annotation:annotation:1.1.0")
 
         implementation(project(":compose:runtime:runtime"))
+        implementation(project(":compose:ui:ui"))
         implementation(project(":compose:ui:ui-unit"))
         implementation(project(":compose:ui:ui-util"))
         implementation(libs.kotlinStdlib)
@@ -83,6 +84,7 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
             commonMain.dependencies {
                 implementation(project(":compose:runtime:runtime"))
+                implementation(project(":compose:ui:ui"))
                 implementation(project(":compose:ui:ui-unit"))
                 implementation(project(":compose:ui:ui-util"))
                 implementation(libs.kotlinStdlibCommon)

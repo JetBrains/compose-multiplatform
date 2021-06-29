@@ -328,16 +328,6 @@ package androidx.compose.animation.core {
     property public final int duration;
   }
 
-  public interface InfiniteAnimationPolicy extends kotlin.coroutines.CoroutineContext.Element {
-    method public default kotlin.coroutines.CoroutineContext.Key<?> getKey();
-    method public suspend <R> Object? onInfiniteOperation(kotlin.jvm.functions.Function1<? super kotlin.coroutines.Continuation<? super R>,?> block, kotlin.coroutines.Continuation<? super R> p);
-    property public default kotlin.coroutines.CoroutineContext.Key<?> key;
-    field public static final androidx.compose.animation.core.InfiniteAnimationPolicy.Key Key;
-  }
-
-  public static final class InfiniteAnimationPolicy.Key implements kotlin.coroutines.CoroutineContext.Key<androidx.compose.animation.core.InfiniteAnimationPolicy> {
-  }
-
   public final class InfiniteAnimationPolicyKt {
     method public static suspend inline <R> Object? withInfiniteAnimationFrameMillis(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
     method public static suspend <R> Object? withInfiniteAnimationFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);

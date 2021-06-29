@@ -40,9 +40,6 @@ dependencies {
         implementation(libs.kotlinStdlibCommon)
         implementation(libs.kotlinCoroutinesCore)
 
-        // TODO: b/160602714 create a lower level module to avoid this dependency on the
-        // animation group
-        api(project(":compose:animation:animation-core"))
         api(project(":compose:runtime:runtime-saveable"))
         api(project(":compose:ui:ui-geometry"))
         api(project(":compose:ui:ui-graphics"))
@@ -89,6 +86,7 @@ dependencies {
         androidTestImplementation(libs.mockitoCore)
         androidTestImplementation(libs.truth)
         androidTestImplementation(libs.mockitoKotlin)
+        androidTestImplementation(project(":compose:animation:animation-core"))
         androidTestImplementation(project(":compose:foundation:foundation"))
         androidTestImplementation(project(":compose:foundation:foundation-layout"))
         androidTestImplementation(project(":compose:test-utils"))
@@ -122,9 +120,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.kotlinStdlibCommon)
                 implementation(libs.kotlinCoroutinesCore)
 
-                // TODO: b/160602714 create a lower level module to avoid this dependency on the
-                // animation group
-                api project(":compose:animation:animation-core")
                 api project(":compose:runtime:runtime-saveable")
                 api project(":compose:ui:ui-geometry")
                 api project(":compose:ui:ui-graphics")
@@ -189,6 +184,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.mockitoCore)
                 implementation(libs.truth)
                 implementation(libs.mockitoKotlin)
+                implementation(project(":compose:animation:animation-core"))
                 implementation(project(":compose:foundation:foundation"))
                 implementation(project(":compose:foundation:foundation-layout"))
                 implementation(project(":compose:test-utils"))
