@@ -50,16 +50,16 @@ fun cloneTemplate(template: String, index: Int, content: String): File {
   return tempDir
 }
 
-fun checkDirs(dirs: List<String>, template: String) {
+fun checkDirs(dirs: List<String>, template: String, buildCmd: String = "build") {
   val snippets = findSnippets(dirs)
   snippets.forEachIndexed { index, snippet ->
     println("process snippet $index at ${snippet.file}:${snippet.lineNumber} with $template")
     snippet.tempDir = cloneTemplate(template, index, snippet.content)
     val isWin = System.getProperty("os.name").startsWith("Win")
     val procBuilder = if (isWin) {
-        ProcessBuilder("gradlew.bat", "build")
+        ProcessBuilder("gradlew.bat",  "$buildCmd")
     } else {
-        ProcessBuilder("bash", "./gradlew", "build")
+        ProcessBuilder("bash", "./gradlew", "$buildCmd")
     }
     val proc = procBuilder
       .directory(snippet.tempDir)
@@ -78,18 +78,48 @@ fun checkDirs(dirs: List<String>, template: String) {
 // NOTICE: currently we use a bit hacky approach, when "```kotlin" marks code that shall be checked, while "``` kotlin"
 // with whitespace marks code that shall not be checked.
 tasks.register("check") {
+  val checks = CheckSpec.createCheckSpecs(
+    checkTargets = (project.property("CHECK_TARGET")?.toString() ?: "all").toLowerCase()
+  )
+
   doLast {
-    for (dir in listOf(".", "Web")) {
+    for (check in checks) {
       val subdirs = project
         .projectDir
         .parentFile
-        .resolve(dir)
+        .resolve(check.dir)
         .listFiles()
         .filter {
           it.isDirectory && it.name[0].isUpperCase()
         }
         .map { it.name }
-      checkDirs(subdirs.map { "$dir/$it" }, if (dir == ".") "desktop-template" else "web-template")
+
+      checkDirs(
+        dirs = subdirs.map { "${check.dir}/$it" },
+        template = check.template,
+        buildCmd = check.gradleCmd
+      )
+    }
+  }
+}
+
+data class CheckSpec(
+  val gradleCmd: String,
+  val dir: String,
+  val template: String
+) {
+
+  companion object {
+    fun desktop() = CheckSpec(gradleCmd = "build", dir = ".", template = "desktop-template")
+    fun web() = CheckSpec(gradleCmd = "compileKotlinJs", dir = "Web", template = "web-template")
+    fun all() = listOf(desktop(), web())
+
+    fun createCheckSpecs(checkTargets: String = "all"): List<CheckSpec> {
+      return when (checkTargets) {
+        "web" -> listOf(web())
+        "desktop" -> listOf(desktop())
+        else -> all()
+      }
     }
   }
 }
