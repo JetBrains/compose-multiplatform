@@ -1,4 +1,5 @@
 import org.jetbrains.compose.compose
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("multiplatform")
@@ -11,7 +12,7 @@ kotlin {
         named("jvmMain") {
             dependencies {
                 implementation(compose.desktop.currentOs)
-                implementation(project(":VideoPlayer:common"))
+                implementation(project(":SplitPane:library"))
             }
         }
     }
@@ -19,6 +20,10 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "org.jetbrains.compose.videoplayer.demo.MainKt"
+        mainClass = "org.jetbrains.compose.splitpane.demo.MainKt"
     }
+}
+
+tasks.withType<KotlinCompile>().configureEach {
+    kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
 }
