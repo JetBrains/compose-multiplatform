@@ -24,7 +24,7 @@ import java.io.File
 object SupportConfig {
     const val DEFAULT_MIN_SDK_VERSION = 14
     const val INSTRUMENTATION_RUNNER = "androidx.test.runner.AndroidJUnitRunner"
-    const val BUILD_TOOLS_VERSION = "30.0.2"
+    const val BUILD_TOOLS_VERSION = "30.0.3"
     val NDK_VERSION by lazy {
         // TODO(aurimas) b/173737578 remove when we no longer have divergent versions
         when (getOperatingSystem()) {
