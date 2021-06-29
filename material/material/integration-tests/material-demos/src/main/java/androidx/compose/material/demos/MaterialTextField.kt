@@ -293,7 +293,7 @@ fun MaterialTextFieldDemo() {
                 ) {
                     RadioButton(
                         selected = (text == selectedOption.name),
-                        onClick = { selectedOption = Option.valueOf(text) }
+                        onClick = null
                     )
                     Text(
                         text = text,
