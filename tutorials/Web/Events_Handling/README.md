@@ -27,9 +27,8 @@ val text = remember { mutableStateOf("") }
 TextArea(
     value = text.value,
     attrs = {
-        onTextInput { wrappedTextInputEvent ->
-            // wrappedTextInputEvent is of `WrappedTextInputEvent` type
-            text.value = wrappedTextInputEvent.inputValue
+        onInput {
+            text.value = it.value
         }
     }
 )
@@ -84,9 +83,8 @@ fun main() {
         TextArea(
             value = text.value,
             attrs = {
-                onTextInput { wrappedTextInputEvent ->
-                    // wrappedTextInputEvent is of `WrappedTextInputEvent` type
-                    text.value = wrappedTextInputEvent.inputValue
+                onInput {
+                    text.value = it.value
                 }
             }
         )

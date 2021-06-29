@@ -26,9 +26,9 @@ Let's have a look at the Composable for a `Div` tag (most other tags have the sa
 Div(
     attrs = {
         // specify attributes here
-    },
-    style = {
-        // specify inline style here
+        style {
+            // specify inline style here
+        }
     }
 ) {
     // div content goes here
@@ -40,9 +40,7 @@ For convenience, some tags like `Input`, `A`, `Form`, or `Img` allow you to spec
 ``` kotlin
 Input(
     type = InputType.Text, // All InputTypes supported
-    value = "", // sets the input value
-    attrs = {},
-    style = {}
+    attrs = {}
 )
 ```
 
@@ -64,7 +62,7 @@ If you want to apply styles to text, it needs to be wrapped in a container with 
 
 ``` kotlin
 Span(
-    style = { color("red") } // inline style
+    attrs = { style { color("red") } } // inline style
 ) {
     Text("Red text")
 }
@@ -160,12 +158,14 @@ You can declare inline styles via the `style` block of a component:
 
 ``` kotlin
 Div(
-    style = {
-        display(DisplayStyle.Flex)
-        padding(20.px)
-        
-        // custom property
-        property("font-family", "Arial, Helvetica, sans-serif")
+    attrs = {
+        style {
+            display(DisplayStyle.Flex)
+            padding(20.px)
+            
+            // custom property
+            property("font-family", "Arial, Helvetica, sans-serif")
+        }
     }
 ) { /* content goes here */ }
 ```
@@ -196,11 +196,8 @@ fun main() {
 
         Input(
             type = InputType.Text, // All InputTypes supported
-            value = "", // sets the input value
             attrs = {}
         )
-
-        Input(attrs = { type(InputType.Text) })
 
         Text("Arbitrary text")
 
