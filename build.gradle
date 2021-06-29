@@ -75,6 +75,7 @@ dependencies {
     cacheableRuntimeOnly(libs.hiltAndroidGradlePlugin)
     // room kotlintestapp uses the ksp plugin but it does not publish a plugin marker yet
     cacheableApi(libs.kspGradlePlugin)
+    cacheableApi(libs.japicmpPlugin)
     // dependencies whose resolutions we don't need to cache
     compileOnly(findGradleKotlinDsl()) // Only one file in this configuration, no need to cache it
     implementation(project("jetpad-integration")) // Doesn't have a .pom, so not slow to load
