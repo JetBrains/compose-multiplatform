@@ -32,13 +32,8 @@ import androidx.compose.material.Typography
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.animatedVectorResource
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -125,21 +120,6 @@ private fun ResourcesSnippet6() {
     // In your Compose code
     Icon(
         painter = painterResource(id = R.drawable.ic_logo),
-        contentDescription = null // decorative element
-    )
-}
-
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-private fun ResourcesSnippet7() {
-    // Files in res/drawable folders. For example:
-    // - res/drawable/animated_vector.xml
-
-    // In your Compose code
-    val image = animatedVectorResource(id = R.drawable.animated_vector)
-    val atEnd by remember { mutableStateOf(false) }
-    Icon(
-        painter = image.painterFor(atEnd = atEnd),
         contentDescription = null // decorative element
     )
 }
