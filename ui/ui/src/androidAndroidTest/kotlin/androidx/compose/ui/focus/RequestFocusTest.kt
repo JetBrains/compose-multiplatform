@@ -32,7 +32,7 @@ import org.junit.runners.Parameterized
 
 @SmallTest
 @RunWith(Parameterized::class)
-class RequestFocusTest(val propagateFocus: Boolean) {
+class RequestFocusTest(private val propagateFocus: Boolean) {
     @get:Rule
     val rule = createComposeRule()
 
@@ -202,7 +202,7 @@ class RequestFocusTest(val propagateFocus: Boolean) {
     }
 
     @Test
-    fun inactiveNonRootWithChilcren() {
+    fun inactiveNonRootWithChildren() {
         // Arrange.
         val parentFocusModifier = FocusModifier(Active)
         val focusModifier = FocusModifier(Inactive)

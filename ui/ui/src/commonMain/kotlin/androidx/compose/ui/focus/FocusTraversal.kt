@@ -25,7 +25,6 @@ import androidx.compose.ui.focus.FocusDirection.Companion.Out
 import androidx.compose.ui.focus.FocusDirection.Companion.Previous
 import androidx.compose.ui.focus.FocusDirection.Companion.Right
 import androidx.compose.ui.focus.FocusDirection.Companion.Up
-import androidx.compose.ui.focus.FocusRequester.Companion.Default
 import androidx.compose.ui.focus.FocusStateImpl.Active
 import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
 import androidx.compose.ui.focus.FocusStateImpl.Captured
@@ -65,63 +64,63 @@ inline class FocusDirection internal constructor(@Suppress("unused") private val
 
     companion object {
         /**
-         *  Direction used in [moveFocus] to indicate that you are searching for the next
-         *  focusable item.
+         *  Direction used in [FocusManager.moveFocus] to indicate that you are searching for the
+         *  next focusable item.
          *
          *  @sample androidx.compose.ui.samples.MoveFocusSample
          */
         val Next: FocusDirection = FocusDirection(1)
 
         /**
-         *  Direction used in [moveFocus] to indicate that you are searching for the previous
-         *  focusable item.
+         *  Direction used in [FocusManager.moveFocus] to indicate that you are searching for the
+         *  previous focusable item.
          *
          *  @sample androidx.compose.ui.samples.MoveFocusSample
          */
         val Previous: FocusDirection = FocusDirection(2)
 
         /**
-         *  Direction used in [moveFocus] to indicate that you are searching for the next
-         *  focusable item to the left of the currently focused item.
+         *  Direction used in [FocusManager.moveFocus] to indicate that you are searching for the
+         *  next focusable item to the left of the currently focused item.
          *
          *  @sample androidx.compose.ui.samples.MoveFocusSample
          */
         val Left: FocusDirection = FocusDirection(3)
 
         /**
-         *  Direction used in [moveFocus] to indicate that you are searching for the next
-         *  focusable item to the right of the currently focused item.
+         *  Direction used in [FocusManager.moveFocus] to indicate that you are searching for the
+         *  next focusable item to the right of the currently focused item.
          *
          *  @sample androidx.compose.ui.samples.MoveFocusSample
          */
         val Right: FocusDirection = FocusDirection(4)
 
         /**
-         *  Direction used in [moveFocus] to indicate that you are searching for the next
-         *  focusable item that is above the currently focused item.
+         *  Direction used in [FocusManager.moveFocus] to indicate that you are searching for the
+         *  next focusable item that is above the currently focused item.
          *
          *  @sample androidx.compose.ui.samples.MoveFocusSample
          */
         val Up: FocusDirection = FocusDirection(5)
 
         /**
-         *  Direction used in [moveFocus] to indicate that you are searching for the next
-         *  focusable item that is below the currently focused item.
+         *  Direction used in [FocusManager.moveFocus] to indicate that you are searching for the
+         *  next focusable item that is below the currently focused item.
          *
          *  @sample androidx.compose.ui.samples.MoveFocusSample
          */
         val Down: FocusDirection = FocusDirection(6)
 
         /**
-         *  Direction used in [moveFocus] to indicate that you are searching for the next
-         *  focusable item that is a child of the currently focused item.
+         *  Direction used in [FocusManager.moveFocus] to indicate that you are searching for the
+         *  next focusable item that is a child of the currently focused item.
          */
         @ExperimentalComposeUiApi
         val In: FocusDirection = FocusDirection(7)
 
         /**
-         *  Direction used in [moveFocus] to indicate that you want to move focus to the parent
-         *  of the currently focused item.
+         *  Direction used in [FocusManager.moveFocus] to indicate that you want to move focus to
+         *  the parent of the currently focused item.
          */
         @ExperimentalComposeUiApi
         val Out: FocusDirection = FocusDirection(8)
@@ -135,44 +134,23 @@ inline class FocusDirection internal constructor(@Suppress("unused") private val
  * @return whether a focus node was found. If a focus node was found and the focus request was
  * not granted, this function still returns true.
  */
-internal fun ModifiedFocusNode.moveFocus(focusDirection: FocusDirection): Boolean {
-    // TODO(b/176847718): Pass the layout direction as a parameter instead of this hardcoded value.
-    val layoutDirection: LayoutDirection = Ltr
-
-    // If there is no active node in this sub-hierarchy, we can't move focus.
-    val activeNode = findActiveFocusNode() ?: return false
-
-    // TODO(b/175899779) If the direction is "Next", cache the current node so we can come back
-    //  to the same place if the user requests "Previous"
-
-    // Check if a custom focus traversal order is specified.
-    val nextFocusRequester = activeNode.customFocusSearch(focusDirection, layoutDirection)
-    if (nextFocusRequester != Default) {
-        // TODO(b/175899786): We ideally need to check if the nextFocusRequester points to something
-        //  that is visible and focusable in the current mode (Touch/Non-Touch mode).
-        nextFocusRequester.requestFocus()
-        return true
-    }
-
-    // If no custom focus traversal order is specified, perform a search for the appropriate item
-    // to move focus to.
-    val nextNode = when (focusDirection) {
+internal fun ModifiedFocusNode.focusSearch(
+    focusDirection: FocusDirection,
+    layoutDirection: LayoutDirection
+): ModifiedFocusNode? {
+    return when (focusDirection) {
         Next, Previous -> null // TODO(b/170155659): Perform one dimensional focus search.
         Left, Right, Up, Down -> twoDimensionalFocusSearch(focusDirection)
         @OptIn(ExperimentalComposeUiApi::class)
         In -> {
             // we search among the children of the active item.
             val direction = when (layoutDirection) { Rtl -> Left; Ltr -> Right }
-            activeNode.twoDimensionalFocusSearch(direction)
+            findActiveFocusNode()?.twoDimensionalFocusSearch(direction)
         }
         @OptIn(ExperimentalComposeUiApi::class)
-        Out -> activeNode.findParentFocusNode()
+        Out -> findActiveFocusNode()?.findParentFocusNode()
         else -> error(invalidFocusDirection)
-    } ?: return false
-
-    // If we found a potential next item, call requestFocus() to move focus to it.
-    nextNode.requestFocus(propagateFocus = false)
-    return true
+    }
 }
 
 internal fun ModifiedFocusNode.findActiveFocusNode(): ModifiedFocusNode? {
@@ -180,43 +158,5 @@ internal fun ModifiedFocusNode.findActiveFocusNode(): ModifiedFocusNode? {
         Active, Captured -> this
         ActiveParent -> focusedChild?.findActiveFocusNode()
         Inactive, Disabled -> null
-    }
-}
-
-/**
- * Search up the component tree for any parent/parents that have specified a custom focus order.
- * Allowing parents higher up the hierarchy to overwrite the focus order specified by their
- * children.
- */
-private fun ModifiedFocusNode.customFocusSearch(
-    focusDirection: FocusDirection,
-    layoutDirection: LayoutDirection
-): FocusRequester {
-    val focusOrder = FocusOrder()
-    wrappedBy?.populateFocusOrder(focusOrder)
-
-    return when (focusDirection) {
-        Next -> focusOrder.next
-        Previous -> focusOrder.previous
-        Up -> focusOrder.up
-        Down -> focusOrder.down
-        Left -> when (layoutDirection) {
-            Ltr -> focusOrder.start
-            Rtl -> focusOrder.end
-        }.takeUnless { it == Default } ?: focusOrder.left
-        Right -> when (layoutDirection) {
-            Ltr -> focusOrder.end
-            Rtl -> focusOrder.start
-        }.takeUnless { it == Default } ?: focusOrder.right
-        // TODO(b/183746982): add focus order API for "In" and "Out".
-        //  Developers can to specify a custom "In" to specify which child should be visited when
-        //  the user presses dPad center. (They can also redirect the "In" to some other item).
-        //  Developers can specify a custom "Out" to specify which composable should take focus
-        //  when the user presses the back button.
-        @OptIn(ExperimentalComposeUiApi::class)
-        In -> Default
-        @OptIn(ExperimentalComposeUiApi::class)
-        Out -> Default
-        else -> error(invalidFocusDirection)
     }
 }

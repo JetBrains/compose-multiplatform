@@ -22,7 +22,7 @@ import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.ModifiedFocusNode
 import androidx.compose.ui.util.fastForEach
 
-internal val FOCUS_TAG = "Compose Focus"
+internal const val FocusTag = "Compose Focus"
 
 // TODO(b/152051577): Measure the performance of findFocusableChildren().
 //  Consider caching the children.

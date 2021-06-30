@@ -22,6 +22,7 @@ import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
 import androidx.compose.ui.focus.FocusStateImpl.Captured
 import androidx.compose.ui.focus.FocusStateImpl.Disabled
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
+import androidx.compose.ui.unit.LayoutDirection
 
 interface FocusManager {
     /**
@@ -65,6 +66,8 @@ internal class FocusManagerImpl(
     val modifier: Modifier
         // TODO(b/168831247): return an empty Modifier when there are no focusable children.
         get() = focusModifier
+
+    lateinit var layoutDirection: LayoutDirection
 
     /**
      * The [Owner][androidx.compose.ui.node.Owner] calls this function when it gains focus. This
@@ -124,6 +127,24 @@ internal class FocusManagerImpl(
      * @return true if focus was moved successfully. false if the focused item is unchanged.
      */
     override fun moveFocus(focusDirection: FocusDirection): Boolean {
-        return focusModifier.focusNode.moveFocus(focusDirection)
+
+        // If there is no active node in this sub-hierarchy, we can't move focus.
+        val source = focusModifier.focusNode.findActiveFocusNode() ?: return false
+
+        // Check if a custom focus traversal order is specified.
+        val nextFocusRequester = source.customFocusSearch(focusDirection, layoutDirection)
+        if (nextFocusRequester != FocusRequester.Default) {
+            // TODO(b/175899786): We ideally need to check if the nextFocusRequester points to something
+            //  that is visible and focusable in the current mode (Touch/Non-Touch mode).
+            nextFocusRequester.requestFocus()
+            return true
+        }
+
+        val destination = focusModifier.focusNode.focusSearch(focusDirection, layoutDirection)
+            ?: return false
+
+        // If we found a potential next item, call requestFocus() to move focus to it.
+        destination.requestFocus(propagateFocus = false)
+        return true
     }
 }
