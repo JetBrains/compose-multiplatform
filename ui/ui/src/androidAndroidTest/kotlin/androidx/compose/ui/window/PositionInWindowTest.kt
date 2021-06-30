@@ -50,14 +50,16 @@ import androidx.compose.ui.test.swipe
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -116,18 +118,34 @@ class PositionInWindowTest {
     @Test
     fun positionInWindowOnScrollDecorView() {
         var coordinates: LayoutCoordinates? = null
+        var latch = CountDownLatch(1)
 
         rule.setContent {
             with(LocalDensity.current) {
-                Box(Modifier.requiredSize(10.toDp()).onGloballyPositioned { coordinates = it })
+                Box(
+                    Modifier
+                        .requiredSize(10.toDp())
+                        .onGloballyPositioned {
+                            coordinates = it
+                            latch.countDown()
+                        }
+                )
             }
         }
+
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        latch = CountDownLatch(1)
 
         var position = Offset.Zero
         rule.runOnIdle {
             position = coordinates!!.positionInWindow()
             activity.window.decorView.scrollY = -100
         }
+
+        assertTrue(
+            "OnPositioned is not called when the decorView scroll changed",
+            latch.await(1, TimeUnit.SECONDS)
+        )
 
         rule.runOnIdle {
             val newPosition = coordinates!!.positionInWindow()
@@ -215,7 +233,6 @@ class PositionInWindowTest {
         }
     }
 
-    @FlakyTest(bugId = 186669179)
     @Test
     fun positionInMovingPopup() {
         val smallBoxTag = "smallBox"
