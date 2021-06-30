@@ -115,7 +115,6 @@ class SelectionContainerFocusTest {
         }
     }
 
-    @FlakyTest(bugId = 179770443)
     @Test
     fun select_anotherContainer_cancelOld() {
         // Setup. Long press to create a selection.
