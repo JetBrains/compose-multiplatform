@@ -56,7 +56,6 @@ class AndroidXComposePlugin : Plugin<Project> {
                 }
                 is KotlinBasePluginWrapper -> {
                     val conf = project.configurations.create("kotlinPlugin")
-
                     val kotlinPlugin = conf.incoming.artifactView { view ->
                         view.attributes { attributes ->
                             attributes.attribute(
@@ -64,18 +63,18 @@ class AndroidXComposePlugin : Plugin<Project> {
                                 ArtifactTypeDefinition.JAR_TYPE
                             )
                         }
-                    }
+                    }.files
 
                     project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
                         // TODO(b/157230235): remove when this is enabled by default
                         compile.kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
-                        compile.inputs.files({ kotlinPlugin.files })
+                        compile.inputs.files({ kotlinPlugin })
                             .withPropertyName("composeCompilerExtension")
                             .withNormalizer(ClasspathNormalizer::class.java)
                         compile.doFirst {
-                            if (!conf.isEmpty) {
+                            if (!kotlinPlugin.isEmpty) {
                                 compile.kotlinOptions.freeCompilerArgs +=
-                                    "-Xplugin=${kotlinPlugin.files.first()}"
+                                    "-Xplugin=${kotlinPlugin.first()}"
                             }
                         }
                     }
@@ -88,7 +87,7 @@ class AndroidXComposePlugin : Plugin<Project> {
                                 project.tasks.withType(KotlinCompile::class.java)
                                     .configureEach { compile ->
                                         compile.doFirst {
-                                            if (!conf.isEmpty) {
+                                            if (!kotlinPlugin.isEmpty) {
                                                 compile.kotlinOptions.freeCompilerArgs +=
                                                     listOf("-P", composeSourceOption)
                                             }
