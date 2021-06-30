@@ -18,7 +18,7 @@ class EventTests : BaseIntegrationTests() {
 
     companion object {
         private val COMMAND_CROSS_PLATFORM =
-            if (System.getProperty("os.name").contains("Windows")) Keys.CONTROL else Keys.COMMAND
+            if (System.getProperty("os.name").contains("Windows")) Keys.CONTROL else Keys.META
     }
 
     @ResolveDrivers
