@@ -18,7 +18,7 @@ class GradlePluginTest : GradlePluginTestBase() {
         with(
             testProject(
                 TestProjects.jsMpp,
-                testEnvironment = defaultTestEnvironment.copy(kotlinVersion = TestKotlinVersion.V1_5_20_dev_3226)
+                testEnvironment = defaultTestEnvironment.copy(kotlinVersion = TestKotlinVersion.V1_5_20)
             )
         ) {
             gradle(":compileKotlinJs").build().checks { check ->
