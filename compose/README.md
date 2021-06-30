@@ -15,13 +15,13 @@ git config --global submodule.recurse true
 - Java 11 (should be specified in JAVA_HOME)
 - Android SDK (should be specified in ANDROID_SDK_ROOT. Can be downloaded via `./scripts/downloadAndroidSdk` on Linux/macOS)
   - Android 11
-  - Build-Tools 30.0.2
+  - Build-Tools 30.0.3
   - NDK 21.3.6528147 (in folder $androidSdk/ndk, not in $androidSdk/ndk/$version)
   - CMake 3.10.2.4988404 (in folder $androidSdk/cmake, not in $androidSdk/cmake/$version)
 
 ## Requirements to develop in IDE
 - Android Studio Arctic Fox | 2020.3.1 Canary 15
-- Custom Gradle 7.0 specified in `Settings -> Build, Execution, Deployment -> Build Tools -> Gradle` (because Android Studio will pick the wrong Gradle in the subproject instead of the Gradle in the root project)
+- Custom Gradle 7.1 specified in `Settings -> Build, Execution, Deployment -> Build Tools -> Gradle` (because Android Studio will pick the wrong Gradle in the subproject instead of the Gradle in the root project)
 - Specified Gradle JDK 11 in `... -> Build Tools -> Gradle`
 - Environment variables:
 ```
