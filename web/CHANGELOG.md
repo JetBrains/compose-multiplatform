@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.5.0-build228] - 29'June 2021
+
+[release post](https://github.com/JetBrains/compose-jb/releases/tag/v0.5.0-build228-web)
+
 ## [0.5.0-build226] - 24'June 2021
 
 [release post](https://github.com/JetBrains/compose-jb/releases/tag/0.5.0-build226-web)

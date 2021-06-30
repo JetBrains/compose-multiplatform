@@ -13,6 +13,7 @@ import org.jetbrains.compose.web.dom.Input
 import org.jetbrains.compose.web.dom.Label
 import org.jetbrains.compose.web.dom.Text
 import com.sample.style.AppStylesheet
+import org.jetbrains.compose.web.attributes.value
 
 private object SwitcherVariables : CSSVariables {
     val labelWidth by variable<CSSpxValue>()
@@ -20,7 +21,6 @@ private object SwitcherVariables : CSSVariables {
 }
 
 object SwitcherStylesheet : StyleSheet(AppStylesheet) {
-
     val boxed by style {
 
         media(maxWidth(640.px)) {
@@ -77,8 +77,9 @@ fun CodeSampleSwitcher(count: Int, current: Int, onSelect: (Int) -> Unit) {
         classes(SwitcherStylesheet.boxed)
     }) {
         repeat(count) { ix ->
-            Input(type = InputType.Radio, value = "snippet$ix", attrs = {
+            Input(type = InputType.Radio, attrs = {
                 name("code-snippet")
+                value("snippet$ix")
                 id("snippet$ix")
                 if (current == ix) checked()
                 onRadioInput { onSelect(ix) }
