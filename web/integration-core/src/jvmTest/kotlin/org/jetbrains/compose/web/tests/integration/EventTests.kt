@@ -16,6 +16,11 @@ import org.openqa.selenium.WebDriver
 
 class EventTests : BaseIntegrationTests() {
 
+    companion object {
+        private val COMMAND_CROSS_PLATFORM =
+            if (System.getProperty("os.name").contains("Windows")) Keys.CONTROL else Keys.COMMAND
+    }
+
     @ResolveDrivers
     fun `double click updates text`(driver: WebDriver) {
         driver.openTestPage("doubleClickUpdatesText")
@@ -105,14 +110,8 @@ class EventTests : BaseIntegrationTests() {
 
         val selectableText = driver.findElement(By.id("selectableText"))
 
-        val action = Actions(driver)
-
-        action.moveToElement(selectableText,3,3)
-            .click().keyDown(Keys.SHIFT)
-            .moveToElement(selectableText,200, 0)
-            .click().keyUp(Keys.SHIFT)
-            .build()
-            .perform()
+        val selectAll = Keys.chord(COMMAND_CROSS_PLATFORM, "a")
+        selectableText.sendKeys(selectAll)
 
         driver.waitTextToBe(value = "Text Selected")
     }
