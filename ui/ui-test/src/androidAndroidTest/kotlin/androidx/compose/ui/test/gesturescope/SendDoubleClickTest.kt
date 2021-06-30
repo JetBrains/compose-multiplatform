@@ -28,14 +28,12 @@ import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.util.ClickableTestBox
 import androidx.compose.ui.test.util.ClickableTestBox.defaultSize
 import androidx.compose.ui.test.util.ClickableTestBox.defaultTag
-import androidx.compose.ui.test.util.InputDispatcherTestRule
 import androidx.compose.ui.test.util.SinglePointerInputRecorder
 import androidx.compose.ui.test.util.recordedDurationMillis
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TestRule
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
@@ -63,9 +61,6 @@ class SendDoubleClickTest(private val config: TestConfig) {
 
     @get:Rule
     val rule = createComposeRule()
-
-    @get:Rule
-    val inputDispatcherRule: TestRule = InputDispatcherTestRule()
 
     private val recordedDoubleClicks = mutableListOf<Offset>()
     private val expectedClickPosition =

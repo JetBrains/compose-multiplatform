@@ -18,19 +18,17 @@ package androidx.compose.ui.test.partialgesturescope
 
 import androidx.compose.testutils.expectError
 import androidx.compose.ui.geometry.Offset
-import androidx.test.filters.MediumTest
 import androidx.compose.ui.test.cancel
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.down
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.move
 import androidx.compose.ui.test.partialgesturescope.Common.partialGesture
 import androidx.compose.ui.test.up
 import androidx.compose.ui.test.util.ClickableTestBox
-import androidx.compose.ui.test.util.InputDispatcherTestRule
+import androidx.test.filters.MediumTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TestRule
 
 /**
  * Tests the error states of [move] that are not tested in [SendMoveToTest] and [SendMoveByTest]
@@ -43,9 +41,6 @@ class SendMoveTest() {
 
     @get:Rule
     val rule = createComposeRule()
-
-    @get:Rule
-    val inputDispatcherRule: TestRule = InputDispatcherTestRule()
 
     @Before
     fun setUp() {
