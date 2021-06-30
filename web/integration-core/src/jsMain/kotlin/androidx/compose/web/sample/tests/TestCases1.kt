@@ -61,9 +61,7 @@ class TestCases1 {
             id("span1")
             classes(AppStyleSheet.textClass)
         }) {
-            Span {
-                Text("This a colored text")
-            }
+            Text("This a colored text")
         }
     }
 }
@@ -73,7 +71,7 @@ private object AppStyleSheet : StyleSheet() {
         color("rgba(0, 200, 0, 0.85)")
         media(maxWidth(400.px)) {
             self style {
-                color("rgba(120, 200, 0, 0.75)")
+                color("rgba(255, 0, 0, 0.75)")
             }
         }
     }

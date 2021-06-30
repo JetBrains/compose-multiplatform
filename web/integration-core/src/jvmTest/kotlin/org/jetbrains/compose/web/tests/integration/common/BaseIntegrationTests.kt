@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.openqa.selenium.By
+import org.openqa.selenium.Dimension
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
@@ -28,7 +29,7 @@ internal object Drivers {
     val Chrome by lazy {
         object : ChromeDriver(
             ChromeOptions().apply {
-                setHeadless(true)
+//                setHeadless(true)
                 addArguments("--no-sandbox")
             }
         ) {
@@ -39,10 +40,10 @@ internal object Drivers {
     val Firefox by lazy {
         object : FirefoxDriver(
             FirefoxOptions().apply {
-                setHeadless(true)
+               // setHeadless(true)
             }
         ) {
-            override fun toString(): String = "firefox"
+                override fun toString(): String = "firefox"
         }
     }
 
