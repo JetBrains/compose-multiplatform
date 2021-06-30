@@ -51,7 +51,6 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
@@ -60,7 +59,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -290,7 +288,6 @@ class OnGloballyPositionedTest {
         }
     }
 
-    @FlakyTest(bugId = 180508644)
     @Test
     fun onPositionedIsCalledWhenComposeContainerIsScrolled() {
         var positionedLatch = CountDownLatch(1)
@@ -315,10 +312,14 @@ class OnGloballyPositionedTest {
                 }
             }
         }
+
+        rule.waitForIdle()
+
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
         positionedLatch = CountDownLatch(1)
 
-        rule.runOnUiThread {
+        rule.runOnIdle {
+            coordinates = null
             scrollView!!.scrollBy(0, 50)
         }
 
@@ -326,10 +327,10 @@ class OnGloballyPositionedTest {
             "OnPositioned is not called when the container scrolled",
             positionedLatch.await(1, TimeUnit.SECONDS)
         )
-        val position = rule.runOnUiThread {
-            view.getYInWindow()
+
+        rule.runOnIdle {
+            assertEquals(view.getYInWindow(), coordinates!!.positionInWindow().y)
         }
-        assertEquals(position, coordinates!!.positionInWindow().y)
     }
 
     private fun View.getYInWindow(): Float {
@@ -343,7 +344,6 @@ class OnGloballyPositionedTest {
         return offset
     }
 
-    @FlakyTest(bugId = 180508644)
     @Test
     fun onPositionedIsCalledWhenComposeContainerPositionChanged() {
         var positionedLatch = CountDownLatch(1)
@@ -370,11 +370,14 @@ class OnGloballyPositionedTest {
                 }
             }
         }
+
+        rule.waitForIdle()
+
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
         val startY = coordinates!!.positionInWindow().y
         positionedLatch = CountDownLatch(1)
 
-        rule.runOnUiThread {
+        rule.runOnIdle {
             topView!!.visibility = View.GONE
         }
 
@@ -382,7 +385,10 @@ class OnGloballyPositionedTest {
             "OnPositioned is not called when the container moved",
             positionedLatch.await(1, TimeUnit.SECONDS)
         )
-        assertEquals(startY - 100f, coordinates!!.positionInWindow().y)
+
+        rule.runOnIdle {
+            assertEquals(startY - 100f, coordinates!!.positionInWindow().y)
+        }
     }
 
     @Test
@@ -499,11 +505,10 @@ class OnGloballyPositionedTest {
         assertThat(childCoordinates!!.positionInParent().x).isEqualTo(thirdPaddingPx)
     }
 
-    @Ignore("Disable Broken test: b/187962859")
     @Test
     fun globalCoordinatesAreInActivityCoordinates() {
         val padding = 30
-        val localPosition = androidx.compose.ui.geometry.Offset.Zero
+        val localPosition = Offset.Zero
         val framePadding = Offset(padding.toFloat(), padding.toFloat())
         var realGlobalPosition: Offset? = null
         var realLocalPosition: Offset? = null
@@ -531,10 +536,15 @@ class OnGloballyPositionedTest {
                 )
             }
         }
+
+        rule.waitForIdle()
+
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
 
-        assertThat(realGlobalPosition).isEqualTo(frameGlobalPosition!! + framePadding)
-        assertThat(realLocalPosition).isEqualTo(localPosition)
+        rule.runOnIdle {
+            assertThat(realGlobalPosition).isEqualTo(frameGlobalPosition!! + framePadding)
+            assertThat(realLocalPosition).isEqualTo(localPosition)
+        }
     }
 
     @Test
