@@ -8,6 +8,7 @@ import org.openqa.selenium.By
 import org.openqa.selenium.Keys
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.interactions.Actions
+import java.io.File
 
 class InputsTests : BaseIntegrationTests() {
 
@@ -130,7 +131,9 @@ class InputsTests : BaseIntegrationTests() {
         val fileInput = driver.findElement(By.id("file"))
 
         val homePath = System.getProperty("COMPOSE_WEB_INTEGRATION_TESTS_DISTRIBUTION")
-        fileInput.sendKeys("$homePath/index.html")
+        fileInput.sendKeys(
+            File(homePath).resolve("index.html").absolutePath
+        )
 
         driver.waitTextToBe(value = "C:\\fakepath\\index.html")
     }
