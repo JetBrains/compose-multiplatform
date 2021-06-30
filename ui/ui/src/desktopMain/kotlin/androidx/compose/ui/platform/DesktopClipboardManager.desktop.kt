@@ -20,6 +20,7 @@ import androidx.compose.ui.text.AnnotatedString
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
+import java.awt.datatransfer.UnsupportedFlavorException
 
 internal class DesktopClipboardManager : ClipboardManager {
     internal val systemClipboard = try {
@@ -28,7 +29,11 @@ internal class DesktopClipboardManager : ClipboardManager {
 
     override fun getText(): AnnotatedString? {
         return systemClipboard?.let {
-            AnnotatedString(it.getData(DataFlavor.stringFlavor) as String)
+            try {
+                AnnotatedString(it.getData(DataFlavor.stringFlavor) as String)
+            } catch (_: UnsupportedFlavorException) {
+                null
+            }
         }
     }
 
