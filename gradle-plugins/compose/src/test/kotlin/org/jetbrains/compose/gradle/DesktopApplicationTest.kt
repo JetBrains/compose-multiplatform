@@ -244,6 +244,44 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun testDefaultArgs() {
+        with(testProject(TestProjects.defaultArgs)) {
+            fun testRunTask(runTask: String) {
+                gradle(runTask).build().checks { check ->
+                    check.taskOutcome(runTask, TaskOutcome.SUCCESS)
+                    check.logContains("compose.application.configure.swing.globals=true")
+                }
+            }
+
+            testRunTask(":runDistributable")
+            testRunTask(":run")
+
+            gradle(":package").build().checks { check ->
+                check.taskOutcome(":package", TaskOutcome.SUCCESS)
+            }
+        }
+    }
+
+    @Test
+    fun testDefaultArgsOverride() {
+        with(testProject(TestProjects.defaultArgsOverride)) {
+            fun testRunTask(runTask: String) {
+                gradle(runTask).build().checks { check ->
+                    check.taskOutcome(runTask, TaskOutcome.SUCCESS)
+                    check.logContains("compose.application.configure.swing.globals=false")
+                }
+            }
+
+            testRunTask(":runDistributable")
+            testRunTask(":run")
+
+            gradle(":package").build().checks { check ->
+                check.taskOutcome(":package", TaskOutcome.SUCCESS)
+            }
+        }
+    }
+
+    @Test
     fun testSuggestModules() {
         with(testProject(TestProjects.jvm)) {
             gradle(":suggestRuntimeModules").build().checks { check ->
