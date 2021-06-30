@@ -63,12 +63,12 @@ class IntegrationTests : BaseIntegrationTests() {
             driver.waitTextToBe(textId = "span1", "This a colored text")
             driver.manage().window().size = Dimension(1000, 1000)
 
-            assertEquals("rgba(0, 0, 0, 1)", span.getCssValue("color"))
+            assertEquals("rgba(0, 0, 0, 1)", span.getCssValue("color"), "before resize")
 
             driver.manage().window().size = Dimension(300, 300)
             driver.waitTextToBe(textId = "span1", "This a colored text")
 
-            assertEquals("rgba(255, 0, 0, 1)", span.getCssValue("color"))
+            assertEquals("rgba(255, 0, 0, 1)", span.getCssValue("color"), "after resize")
         } finally {
             driver.manage().window().size = initialWindowSize
         }
