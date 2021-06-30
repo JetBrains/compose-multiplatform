@@ -61,17 +61,19 @@ class TestCases1 {
             id("span1")
             classes(AppStyleSheet.textClass)
         }) {
-            Text("This a colored text")
+            Span {
+                Text("This a colored text")
+            }
         }
     }
 }
 
 private object AppStyleSheet : StyleSheet() {
     val textClass by style {
-        color("black")
+        color("rgba(0, 200, 0, 0.85)")
         media(maxWidth(400.px)) {
             self style {
-                color("red")
+                color("rgba(120, 200, 0, 0.75)")
             }
         }
     }
