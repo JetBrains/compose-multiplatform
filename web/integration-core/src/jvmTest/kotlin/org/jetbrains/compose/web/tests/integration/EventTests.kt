@@ -17,8 +17,12 @@ import org.openqa.selenium.WebDriver
 class EventTests : BaseIntegrationTests() {
 
     companion object {
-        private val COMMAND_CROSS_PLATFORM =
-            if (System.getProperty("os.name").contains("Windows")) Keys.CONTROL else Keys.META
+        private val COMMAND_CROSS_PLATFORM = System.getProperty("os.name").lowercase().let { osName ->
+            when {
+                osName.contains("mac os") -> Keys.COMMAND
+                else -> Keys.CONTROL
+            }
+        }
     }
 
     @ResolveDrivers
