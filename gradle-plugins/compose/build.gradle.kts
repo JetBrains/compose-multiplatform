@@ -3,11 +3,10 @@ import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.getCurr
 
 plugins {
     kotlin("jvm")
-    id("de.fuerstenau.buildconfig")
     id("com.gradle.plugin-publish")
     id("java-gradle-plugin")
     id("maven-publish")
-    id("com.github.johnrengelman.shadow") version "6.1.0"
+    id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
 gradlePluginConfig {
@@ -21,11 +20,19 @@ mavenPublicationConfig {
     artifactId = "compose-gradle-plugin"
 }
 
-buildConfig {
-    packageName = "org.jetbrains.compose"
-    clsName = "ComposeBuildConfig"
-    buildConfigField("String", "composeVersion", BuildProperties.composeVersion(project))
-    buildConfigField("Boolean", "isComposeWithWeb", BuildProperties.isComposeWithWeb(project).toString())
+val buildConfigDir
+    get() = project.layout.buildDirectory.dir("generated/buildconfig")
+val buildConfig = tasks.register("buildConfig", GenerateBuildConfig::class.java) {
+    classFqName.set("org.jetbrains.compose.ComposeBuildConfig")
+    generatedOutputDir.set(buildConfigDir)
+    fieldsToGenerate.put("composeVersion", BuildProperties.composeVersion(project))
+    fieldsToGenerate.put("isComposeWithWeb", BuildProperties.isComposeWithWeb(project))
+}
+tasks.named("compileKotlin") {
+    dependsOn(buildConfig)
+}
+sourceSets.main.configure {
+    java.srcDir(buildConfigDir)
 }
 
 val embedded by configurations.creating
@@ -67,7 +74,7 @@ val jar = tasks.named<Jar>("jar") {
 // __SUPPORTED_GRADLE_VERSIONS__
 testGradleVersion("6.4")
 testGradleVersion("6.8.3")
-testGradleVersion("7.0-milestone-3")
+testGradleVersion("7.1")
 
 val javaHomeForTests: String? = when {
     // __COMPOSE_NATIVE_DISTRIBUTIONS_MIN_JAVA_VERSION__
@@ -92,7 +99,6 @@ fun testGradleVersion(gradleVersion: String) {
         filter {
             includeTestsMatching(gradleTestsPattern)
         }
-        dependsOn("validateTaskProperties")
     }
     tasks.named("check") {
         dependsOn(taskProvider)
@@ -104,7 +110,7 @@ configureJUnit()
 tasks.withType<Test>().configureEach {
     configureJavaForComposeTest()
 
-    dependsOn("publishToMavenLocal")
+    dependsOn(":publishToMavenLocal")
     systemProperty("compose.plugin.version", BuildProperties.deployVersion(project))
 }
 

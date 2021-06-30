@@ -37,7 +37,7 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
 
     @get:InputFiles
     internal val hostClasspath = project.configurations.detachedConfiguration(
-        project.dependencies.create("org.jetbrains.compose:preview-rpc:${ComposeBuildConfig.VERSION}")
+        project.dependencies.create("org.jetbrains.compose:preview-rpc:${ComposeBuildConfig.composeVersion}")
     )
 
     @TaskAction

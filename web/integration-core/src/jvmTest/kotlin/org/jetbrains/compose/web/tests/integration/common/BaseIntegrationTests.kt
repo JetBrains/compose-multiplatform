@@ -10,11 +10,9 @@ import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.firefox.FirefoxOptions
-import org.openqa.selenium.remote.RemoteWebDriver
 import org.openqa.selenium.safari.SafariDriver
 import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.WebDriverWait
-
 
 private val PATH = "http://localhost:${ServerLauncher.port}"
 
@@ -41,8 +39,6 @@ internal object Drivers {
     val Firefox by lazy {
         object : FirefoxDriver(
             FirefoxOptions().apply {
-//                System.setProperty("webdriver.gecko.driver","G:\\Selenium\\Firefox driver\\geckodriver.exe");
-                System.setProperty("webdriver.gecko.driver","C:\\Users\\Shagen\\.gradle\\selenium\\gecko\\geckodriver.exe");
                 setHeadless(true)
             }
         ) {
