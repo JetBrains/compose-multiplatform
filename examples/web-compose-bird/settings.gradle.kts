@@ -4,5 +4,5 @@ pluginManagement {
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
-rootProject.name = "compose-bird"
+rootProject.name = "web-compose-bird"
 
