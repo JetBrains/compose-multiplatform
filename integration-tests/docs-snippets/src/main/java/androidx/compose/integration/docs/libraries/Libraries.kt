@@ -26,17 +26,21 @@ package androidx.compose.integration.docs.libraries
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntSize
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -159,17 +163,24 @@ private object LibrariesSnippet7 {
 private object LibrariesSnippet8 {
     @Composable
     fun MyExample() {
-        CoilImage(
-            data = "https://picsum.photos/300/300",
-            loading = {
-                Box(Modifier.fillMaxSize()) {
+        val painter = rememberCoilPainter("https://picsum.photos/300/300")
+
+        Box {
+            Image(
+                painter = painter,
+                contentDescription = stringResource(R.string.image_content_desc),
+            )
+
+            when (painter.loadState) {
+                is ImageLoadState.Loading -> {
+                    // Display a circular progress indicator whilst loading
                     CircularProgressIndicator(Modifier.align(Alignment.Center))
                 }
-            },
-            error = {
-                Image(painterResource(R.drawable.ic_error), contentDescription = "Error")
+                is ImageLoadState.Error -> {
+                    // If you wish to display some content if the request fails
+                }
             }
-        )
+        }
     }
 }
 
@@ -180,6 +191,9 @@ Fakes needed for snippets to build:
 private object R {
     object drawable {
         const val ic_error = 1
+    }
+    object string {
+        const val image_content_desc = 2
     }
 }
 
@@ -226,15 +240,6 @@ private fun ExampleWithRouteScreen(vm: ParentViewModel) {
     TODO()
 }
 
-@Composable
-private fun CoilImage(
-    data: String,
-    error: @Composable () -> Unit,
-    loading: @Composable () -> Unit
-) {
-    TODO()
-}
-
 private val navController: NavHostController = TODO()
 private val innerStartRoute: String = TODO()
 private val startRoute: String = TODO()
@@ -242,3 +247,18 @@ private val startRoute: String = TODO()
 private class PagingData<T>
 
 private fun Flow<PagingData<String>>.collectAsLazyPagingItems() = listOf("")
+
+// Accompanist
+@Composable
+fun rememberCoilPainter(request: Any?): LoadPainter { TODO() }
+fun interface Loader<R> {
+    fun load(request: R, size: IntSize): Flow<ImageLoadState>
+}
+abstract class LoadPainter : Painter() {
+    var loadState: ImageLoadState by mutableStateOf(ImageLoadState.Loading)
+        private set
+}
+sealed class ImageLoadState {
+    object Loading : ImageLoadState()
+    object Error : ImageLoadState()
+}
