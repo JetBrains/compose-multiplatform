@@ -26,20 +26,23 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.RelocationRequester
 import androidx.compose.ui.layout.relocationRequester
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun RequestRectangleOnScreenDemo() {
     val relocationRequester = remember { RelocationRequester() }
+    val coroutineScope = rememberCoroutineScope()
     Column {
         TextField(value = "Click here to bring up the soft keyboard", onValueChange = {})
-        Button(onClick = { relocationRequester.bringIntoView() }) {
+        Button(onClick = { coroutineScope.launch { relocationRequester.bringIntoView() } }) {
             Text("Bring blue rectangle into view")
         }
         Spacer(Modifier.weight(weight = 1f, fill = true))

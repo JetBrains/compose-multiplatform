@@ -24,7 +24,6 @@ import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.key.KeyEvent
@@ -3093,10 +3092,6 @@ private class TestOwner : Owner {
     }
 
     override fun getFocusDirection(keyEvent: KeyEvent): FocusDirection? {
-        TODO("Not yet implemented")
-    }
-
-    override fun requestRectangleOnScreen(rect: Rect) {
         TODO("Not yet implemented")
     }
 

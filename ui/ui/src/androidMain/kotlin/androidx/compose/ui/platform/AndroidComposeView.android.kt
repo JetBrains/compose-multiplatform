@@ -62,13 +62,12 @@ import androidx.compose.ui.focus.FocusDirection.Companion.Up
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusManagerImpl
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect as ComposeRect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.setFrom
-import androidx.compose.ui.hapticfeedback.PlatformHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.hapticfeedback.PlatformHapticFeedback
 import androidx.compose.ui.input.key.Key.Companion.Back
 import androidx.compose.ui.input.key.Key.Companion.DirectionCenter
 import androidx.compose.ui.input.key.Key.Companion.DirectionDown
@@ -87,6 +86,7 @@ import androidx.compose.ui.input.pointer.PointerInputEventProcessor
 import androidx.compose.ui.input.pointer.PositionCalculator
 import androidx.compose.ui.input.pointer.ProcessResult
 import androidx.compose.ui.layout.RootMeasurePolicy
+import androidx.compose.ui.layout.onRelocationRequest
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.UsageByParent
@@ -121,6 +121,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import java.lang.reflect.Method
 import android.view.KeyEvent as AndroidKeyEvent
+import androidx.compose.ui.geometry.Rect as ComposeRect
 
 @SuppressLint("ViewConstructor", "VisibleForTests")
 @OptIn(ExperimentalComposeUiApi::class)
@@ -171,11 +172,17 @@ internal class AndroidComposeView(context: Context) :
         onPreviewKeyEvent = null
     )
 
+    private val relocationModifier = Modifier.onRelocationRequest(
+        onProvideDestination = { _, _ -> ComposeRect.Zero },
+        onPerformRelocation = { rect, _ -> requestRectangleOnScreen(rect.toRect(), false) }
+    )
+
     private val canvasHolder = CanvasHolder()
 
     override val root = LayoutNode().also {
         it.measurePolicy = RootMeasurePolicy
         it.modifier = Modifier
+            .then(relocationModifier)
             .then(semanticsModifier)
             .then(_focusManager.modifier)
             .then(keyInputModifier)
@@ -653,10 +660,6 @@ internal class AndroidComposeView(context: Context) :
             Back -> Out
             else -> null
         }
-    }
-
-    override fun requestRectangleOnScreen(rect: ComposeRect) {
-        requestRectangleOnScreen(rect.toRect())
     }
 
     override fun dispatchDraw(canvas: android.graphics.Canvas) {
