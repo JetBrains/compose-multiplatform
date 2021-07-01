@@ -20,6 +20,7 @@ package androidx.compose.ui.node
 
 import androidx.compose.ui.focus.FocusOrder
 import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.findFocusableChildren
 import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -48,6 +49,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.minus
 import androidx.compose.ui.unit.plus
+import androidx.compose.ui.util.fastForEach
 
 /**
  * Measurable and Placeable type that has a position.
@@ -825,6 +827,23 @@ internal abstract class LayoutNodeWrapper(
             ancestor1 === other.layoutNode -> other
             else -> ancestor1.innerLayoutNodeWrapper
         }
+    }
+
+    // TODO(b/152051577): Measure the performance of focusableChildren.
+    //  Consider caching the children.
+    fun focusableChildren(): List<ModifiedFocusNode> {
+        // Check the modifier chain that this focus node is part of. If it has a focus modifier,
+        // that means you have found the only focusable child for this node.
+        val focusableChild = wrapped?.findNextFocusWrapper()
+        // findChildFocusNodeInWrapperChain()
+        if (focusableChild != null) {
+            return listOf(focusableChild)
+        }
+
+        // Go through all your children and find the first focusable node from each child.
+        val focusableChildren = mutableListOf<ModifiedFocusNode>()
+        layoutNode.children.fastForEach { it.findFocusableChildren(focusableChildren) }
+        return focusableChildren
     }
 
     internal companion object {

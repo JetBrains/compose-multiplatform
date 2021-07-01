@@ -77,13 +77,13 @@ internal enum class FocusStateImpl : FocusState {
     override val isFocused: Boolean
         get() = when (this) {
             Captured, Active -> true
-            ActiveParent, Inactive, Disabled -> false
+            ActiveParent, Disabled, Inactive -> false
         }
 
     override val hasFocus: Boolean
         get() = when (this) {
-            ActiveParent -> true
-            Active, Captured, Disabled, Inactive -> false
+            Active, ActiveParent, Captured -> true
+            Disabled, Inactive -> false
         }
 
     override val isCaptured: Boolean
