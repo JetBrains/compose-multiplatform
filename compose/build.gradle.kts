@@ -15,6 +15,7 @@ tasks.register("publishComposeJb") {
     dependsOnComposeTask(":compose:desktop:desktop:publishKotlinMultiplatformPublicationToMavenRepository")
     dependsOnComposeTask(":compose:desktop:desktop:publishJvmPublicationToMavenRepository")
     dependsOnComposeTask(":compose:desktop:desktop:publishJvmlinux-x64PublicationToMavenRepository")
+    dependsOnComposeTask(":compose:desktop:desktop:publishJvmlinux-arm64PublicationToMavenRepository")
     dependsOnComposeTask(":compose:desktop:desktop:publishJvmmacos-x64PublicationToMavenRepository")
     dependsOnComposeTask(":compose:desktop:desktop:publishJvmmacos-arm64PublicationToMavenRepository")
     dependsOnComposeTask(":compose:desktop:desktop:publishJvmwindows-x64PublicationToMavenRepository")

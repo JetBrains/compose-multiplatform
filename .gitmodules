@@ -7,3 +7,6 @@
 [submodule "compose/external/doclava"]
 	path = compose/external/doclava
 	url = https://android.googlesource.com/platform/external/doclava
+[submodule "compose/prebuilts/androidx/internal"]
+	path = compose/prebuilts/androidx/internal
+	url = https://android.googlesource.com/platform/prebuilts/androidx/internal

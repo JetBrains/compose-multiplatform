@@ -1,12 +1,10 @@
 package org.jetbrains.compose.web.tests.integration
 
 import org.jetbrains.compose.web.tests.integration.common.BaseIntegrationTests
-import org.jetbrains.compose.web.tests.integration.common.Drivers
 import org.jetbrains.compose.web.tests.integration.common.ResolveDrivers
 import org.jetbrains.compose.web.tests.integration.common.openTestPage
 import org.jetbrains.compose.web.tests.integration.common.waitTextToBe
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 import org.openqa.selenium.By
 import org.openqa.selenium.Dimension
 import org.openqa.selenium.WebDriver
@@ -60,17 +58,15 @@ class IntegrationTests : BaseIntegrationTests() {
         val initialWindowSize = driver.manage().window().size
         try {
             val span = driver.findElement(By.id("span1"))
-            driver.waitTextToBe(textId = "span1", "This a colored text")
+            driver.waitTextToBe(textId = "span1", "This a colored text [expanded]")
             driver.manage().window().size = Dimension(1000, 1000)
 
-            assertEquals("rgba(0, 200, 0, 0.85)", span.getCssValue("color"), "before resize")
-            Thread.sleep(10000)
+            assertEquals("rgba(0, 200, 0, 0.92)", span.getCssValue("color"), "size 1000 x 1000")
 
             driver.manage().window().size = Dimension(300, 300)
-            Thread.sleep(10000)
             driver.waitTextToBe(textId = "span1", "This a colored text")
 
-            assertEquals("rgba(255, 0, 0, 0.75)", span.getCssValue("color"), "after resize")
+            assertEquals("rgba(255, 200, 0, 0.99)", span.getCssValue("color"), "size 300 x 300")
         } finally {
             driver.manage().window().size = initialWindowSize
         }

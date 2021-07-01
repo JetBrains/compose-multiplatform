@@ -14,6 +14,8 @@ object TestProjects {
     const val macOptions = "application/macOptions"
     const val macSign = "application/macSign"
     const val optionsWithSpaces = "application/optionsWithSpaces"
+    const val defaultArgs = "application/defaultArgs"
+    const val defaultArgsOverride = "application/defaultArgsOverride"
     const val unpackSkiko = "application/unpackSkiko"
     const val jsMpp = "misc/jsMpp"
 }
