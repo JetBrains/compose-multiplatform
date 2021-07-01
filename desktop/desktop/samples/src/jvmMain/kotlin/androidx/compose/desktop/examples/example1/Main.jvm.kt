@@ -21,10 +21,12 @@ import androidx.compose.desktop.AppWindow
 import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.desktop.Window
+import androidx.compose.foundation.ExperimentalDesktopApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.VerticalScrollbar
+import androidx.compose.foundation.mouseClickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -82,10 +84,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.plus
 import androidx.compose.ui.input.key.shortcuts
-import androidx.compose.ui.input.pointer.PointerEvent
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.PointerInputFilter
-import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.imageResource
@@ -107,7 +105,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import java.awt.event.MouseEvent
 
 private const val title = "Desktop Compose Elements"
 
@@ -186,7 +183,10 @@ private fun LeftColumn(modifier: Modifier) = Box(modifier.fillMaxSize()) {
     )
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(
+    ExperimentalComposeUiApi::class,
+    ExperimentalDesktopApi::class
+)
 @Composable
 private fun ScrollableContent(scrollState: ScrollState) {
     val amount = remember { mutableStateOf(0f) }
@@ -351,7 +351,6 @@ private fun ScrollableContent(scrollState: ScrollState) {
         }
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            var lastEvent by remember { mutableStateOf<MouseEvent?>(null) }
             Button(
                 modifier = Modifier.padding(4.dp),
                 onClick = {
@@ -361,22 +360,27 @@ private fun ScrollableContent(scrollState: ScrollState) {
                 Text("Base")
             }
 
-            Text(
-                modifier = object : PointerInputModifier {
-                    override val pointerInputFilter = object : PointerInputFilter() {
-                        override fun onPointerEvent(
-                            pointerEvent: PointerEvent,
-                            pass: PointerEventPass,
-                            bounds: IntSize
-                        ) {
-                            lastEvent = pointerEvent.mouseEvent
-                        }
+            var clickableText by remember { mutableStateOf("Click me!") }
 
-                        override fun onCancel() {
+            Text(
+                modifier = Modifier.mouseClickable(
+                    onClick = {
+                        clickableText = buildString {
+                            append("Buttons pressed:\n")
+                            append("primary: ${buttons.isPrimaryPressed}\t")
+                            append("secondary: ${buttons.isSecondaryPressed}\t")
+                            append("tertiary: ${buttons.isTertiaryPressed}\t")
+
+                            append("\n\nKeyboard modifiers pressed:\n")
+
+                            append("alt: ${keyboardModifiers.isAltPressed}\t")
+                            append("ctrl: ${keyboardModifiers.isCtrlPressed}\t")
+                            append("meta: ${keyboardModifiers.isMetaPressed}\t")
+                            append("shift: ${keyboardModifiers.isShiftPressed}\t")
                         }
                     }
-                },
-                text = "Custom mouse event button: ${lastEvent?.button}"
+                ),
+                text = clickableText
             )
         }
 
