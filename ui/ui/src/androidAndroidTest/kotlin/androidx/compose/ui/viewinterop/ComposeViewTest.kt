@@ -17,6 +17,7 @@
 package androidx.compose.ui.viewinterop
 
 import android.content.Context
+import android.os.Build
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewGroup
@@ -79,6 +80,12 @@ class ComposeViewTest {
             .check { view, _ ->
                 view as ViewGroup
                 assertTrue("has children", view.childCount > 0)
+                if (Build.VERSION.SDK_INT >= 23) {
+                    assertEquals(
+                        "androidx.compose.ui.platform.ComposeView",
+                        view.getAccessibilityClassName()
+                    )
+                }
             }
 
         rule.onNodeWithTag("text").assertTextEquals("Hello, World!")
