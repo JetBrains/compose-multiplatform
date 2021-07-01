@@ -27,6 +27,9 @@ class MediaQueryTests {
 
             media(minWidth(300.px), maxWidth(500.px)) {
             }
+
+            media(CSSMediaQuery.MediaType(CSSMediaQuery.MediaType.Enum.screen).and(minWidth(300.px))) {
+            }
         }
     }
 
@@ -74,6 +77,12 @@ class MediaQueryTests {
             "@media (min-width: 300px), (max-width: 500px)",
             (CombinedMediaQueries.cssRules[2] as CSSMediaRuleDeclaration).header
         )
+
+        assertEquals(
+            "@media screen and (min-width: 300px)",
+            (CombinedMediaQueries.cssRules[3] as CSSMediaRuleDeclaration).header
+        )
+
     }
 
 }

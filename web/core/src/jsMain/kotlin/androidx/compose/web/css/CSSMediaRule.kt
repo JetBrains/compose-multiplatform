@@ -11,7 +11,7 @@ interface CSSMediaQuery {
     }
     data class MediaType(val type: Enum) : Atomic {
         enum class Enum {
-            All, Print, Screen, Speech
+            all, print, screen, speech
         }
 
         override fun toString() = type.name
