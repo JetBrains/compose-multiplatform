@@ -116,7 +116,7 @@ const val VERIFY_UP_TO_DATE = "androidx.verifyUpToDate"
  * If true, we are building in GitHub and should enable build features related to KMP.
  * If false, we are in AOSP, where not all KMP features are enabled.
  */
-const val KMP_GITHUB_BUILD = "androidx.kmp.github.build"
+const val KMP_GITHUB_BUILD = "androidx.github.build"
 
 val ALL_ANDROIDX_PROPERTIES = setOf(
     ALL_WARNINGS_AS_ERRORS,
