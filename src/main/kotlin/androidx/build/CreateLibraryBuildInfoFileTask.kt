@@ -23,7 +23,6 @@ import androidx.build.jetpad.LibraryBuildInfoFile
 import com.google.gson.GsonBuilder
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
-import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -130,15 +129,8 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
         val libraryDependencies = ArrayList<LibraryBuildInfoFile.Dependency>()
         val checks = ArrayList<LibraryBuildInfoFile.Check>()
         libraryBuildInfoFile.checks = checks
-        val publishedProjects = project.getProjectsMap()
         project.configurations.filter {
-            /* Ignore test configuration dependencies */
-            !it.name.contains("test", ignoreCase = true) &&
-                /* Ignore annotation processors */
-                !it.name.contains("annotationProcessor", ignoreCase = true) &&
-                /* Ignore compile configuration dependencies */
-                !it.name.contains("compileClasspath", ignoreCase = true) &&
-                !it.name.contains("compileOnly", ignoreCase = true)
+            it.name == "releaseRuntimeElements"
         }.forEach { configuration ->
             configuration.allDependencies.forEach { dep ->
                 // Only consider androidx dependencies
@@ -146,22 +138,15 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
                     dep.group.toString().startsWith("androidx.") &&
                     !dep.group.toString().startsWith("androidx.test")
                 ) {
-                    if ((
-                        dep is ExternalModuleDependency ||
-                            dep is ProjectDependency && publishedProjects
-                            .containsKey("${dep.group}:${dep.name}")
-                        )
-                    ) {
-                        val androidXPublishedDependency = LibraryBuildInfoFile().Dependency()
-                        androidXPublishedDependency.artifactId = dep.name.toString()
-                        androidXPublishedDependency.groupId = dep.group.toString()
-                        androidXPublishedDependency.version = dep.version.toString()
-                        androidXPublishedDependency.isTipOfTree = dep is ProjectDependency
-                        addDependencyToListIfNotAlreadyAdded(
-                            libraryDependencies,
-                            androidXPublishedDependency
-                        )
-                    }
+                    val androidXPublishedDependency = LibraryBuildInfoFile().Dependency()
+                    androidXPublishedDependency.artifactId = dep.name.toString()
+                    androidXPublishedDependency.groupId = dep.group.toString()
+                    androidXPublishedDependency.version = dep.version.toString()
+                    androidXPublishedDependency.isTipOfTree = dep is ProjectDependency
+                    addDependencyToListIfNotAlreadyAdded(
+                        libraryDependencies,
+                        androidXPublishedDependency
+                    )
                 }
             }
         }
