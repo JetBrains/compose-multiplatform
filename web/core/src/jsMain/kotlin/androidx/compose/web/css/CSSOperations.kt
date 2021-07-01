@@ -21,21 +21,21 @@ data class CSSCalcValue<T : CSSUnit>(
     override fun toString(): String = "calc$op"
 }
 
-data class CSSPlus<T : CSSUnit>(
+private data class CSSPlus<T : CSSUnit>(
     var l: CSSNumericValue<out T>,
     var r: CSSNumericValue<out T>
 ) : CSSCalcOperation<T> {
     override fun toString(): String = "($l + $r)"
 }
 
-data class CSSMinus<T : CSSUnit>(
+private data class CSSMinus<T : CSSUnit>(
     var l: CSSNumericValue<out T>,
     var r: CSSNumericValue<out T>
 ) : CSSCalcOperation<T> {
     override fun toString(): String = "($l - $r)"
 }
 
-data class CSSTimes<T : CSSUnit>(
+private data class CSSTimes<T : CSSUnit>(
     var l: CSSNumericValue<out T>,
     var r: Number,
     val left: Boolean = true
@@ -43,7 +43,7 @@ data class CSSTimes<T : CSSUnit>(
     override fun toString(): String = if (left) "($l * $r)" else "($r * $l)"
 }
 
-data class CSSDiv<T : CSSUnit>(
+private data class CSSDiv<T : CSSUnit>(
     var l: CSSNumericValue<out T>,
     var r: Number
 ) : CSSCalcOperation<T> {
