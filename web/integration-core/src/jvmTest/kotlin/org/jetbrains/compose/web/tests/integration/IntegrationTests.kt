@@ -60,15 +60,15 @@ class IntegrationTests : BaseIntegrationTests() {
         val initialWindowSize = driver.manage().window().size
         try {
             val span = driver.findElement(By.id("span1"))
-            driver.waitTextToBe(textId = "span1", "This a colored text")
+            driver.waitTextToBe(textId = "span1", "This a colored text [expanded]")
             driver.manage().window().size = Dimension(1000, 1000)
 
-            assertEquals("rgba(0, 0, 0, 1)", span.getCssValue("color"))
+            assertEquals("rgba(0, 200, 0, 0.92)", span.getCssValue("color"), "size 1000 x 1000")
 
             driver.manage().window().size = Dimension(300, 300)
             driver.waitTextToBe(textId = "span1", "This a colored text")
 
-            assertEquals("rgba(255, 0, 0, 1)", span.getCssValue("color"))
+            assertEquals("rgba(255, 200, 0, 0.99)", span.getCssValue("color"), "size 300 x 300")
         } finally {
             driver.manage().window().size = initialWindowSize
         }

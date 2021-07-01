@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.selectors.CSSSelector
 import org.jetbrains.compose.web.dom.*
 
 class TestCases1 {
@@ -62,16 +63,21 @@ class TestCases1 {
             classes(AppStyleSheet.textClass)
         }) {
             Text("This a colored text")
+            Span { Text(" [expanded]") }
         }
     }
 }
 
 private object AppStyleSheet : StyleSheet() {
     val textClass by style {
-        color("black")
+        color("rgba(0, 200, 0, 0.92)")
         media(maxWidth(400.px)) {
             self style {
-                color("red")
+                color("rgba(255, 200, 0, 0.99)")
+            }
+
+            CSSSelector.Child(self, CSSSelector.Type("span")) style {
+                display(DisplayStyle.None)
             }
         }
     }
