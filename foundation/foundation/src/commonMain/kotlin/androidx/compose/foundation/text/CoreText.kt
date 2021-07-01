@@ -33,6 +33,7 @@ import androidx.compose.runtime.DisposableEffectResult
 import androidx.compose.runtime.DisposableEffectScope
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -127,9 +128,12 @@ internal fun CoreText(
     // When text is updated, the selection on this CoreText becomes invalid. It can be treated
     // as a brand new CoreText.
     // When SelectionRegistrar is updated, CoreText have to request a new ID to avoid ID collision.
-    val selectableId = rememberSaveable(text, selectionRegistrar) {
-        selectionRegistrar?.nextSelectableId() ?: SelectionRegistrar.InvalidSelectableId
-    }
+
+    val selectableId =
+        rememberSaveable(text, selectionRegistrar, saver = selectionIdSaver(selectionRegistrar)) {
+            selectionRegistrar?.nextSelectableId() ?: SelectionRegistrar.InvalidSelectableId
+        }
+
     val state = remember {
         TextState(
             TextDelegate(
@@ -639,3 +643,11 @@ private fun resolveInlineContent(
     }
     return Pair(placeholders, inlineComposables)
 }
+
+/**
+ * A custom saver that won't save if no selection is active.
+ */
+private fun selectionIdSaver(selectionRegistrar: SelectionRegistrar?) = Saver<Long, Long>(
+    save = { if (selectionRegistrar.hasSelection(it)) it else null },
+    restore = { it }
+)
