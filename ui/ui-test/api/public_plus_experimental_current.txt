@@ -180,6 +180,9 @@ package androidx.compose.ui.test {
     property public abstract boolean isIdleNow;
   }
 
+  public final class InputDispatcherKt {
+  }
+
   @kotlin.RequiresOptIn(message="This is internal API for Compose modules that may change frequently and without warning.") public @interface InternalTestApi {
   }
 
