@@ -35,7 +35,7 @@ internal actual fun createInputDispatcher(
     root: RootForTest
 ): InputDispatcher {
     require(root is ViewRootForTest) {
-        "InputDispatcher currently only supports dispatching to ViewRootForTest, not to " +
+        "InputDispatcher only supports dispatching to ViewRootForTest, not to " +
             root::class.java.simpleName
     }
     val view = root.view
@@ -49,12 +49,9 @@ internal class AndroidInputDispatcher(
 ) : InputDispatcher(testContext, root) {
 
     private val batchLock = Any()
-    // Batched events are generated just-in-time, given the "lateness" of the dispatching (see
-    // sendAllSynchronous), so enqueue generators rather than instantiated events
     private var batchedEvents = mutableListOf<MotionEvent>()
     private var acceptEvents = true
-    private var firstEventTime = Long.MAX_VALUE
-    private val previousLastEventTime = partialGesture?.lastEventTime
+    private var lastEventTime = currentTime
 
     override val now: Long get() = SystemClock.uptimeMillis()
 
@@ -91,7 +88,7 @@ internal class AndroidInputDispatcher(
         val entries = lastPositions.entries.sortedBy { it.key }
         batchMotionEvent(
             downTime,
-            lastEventTime,
+            currentTime,
             action,
             actionIndex,
             List(entries.size) { entries[it].value },
@@ -121,8 +118,8 @@ internal class AndroidInputDispatcher(
                     "coordinates=$coordinates" +
                     "), events have already been (or are being) dispatched or disposed"
             }
-            if (firstEventTime == Long.MAX_VALUE) {
-                firstEventTime = eventTime
+            if (lastEventTime == TimeNotSet) {
+                lastEventTime = eventTime
             }
             val positionInScreen = if (root != null) {
                 val array = intArrayOf(0, 0)
@@ -167,13 +164,12 @@ internal class AndroidInputDispatcher(
         testContext.testOwner.runOnUiThread {
             checkAndStopAcceptingEvents()
 
-            var lastEventTime = (previousLastEventTime ?: firstEventTime)
+            var currentEventTime = lastEventTime
             batchedEvents.forEach { event ->
                 // Before injecting the next event, pump the clock
                 // by the difference between this and the last event
-                pumpClock(
-                    event.eventTime - lastEventTime.also { lastEventTime = event.eventTime }
-                )
+                pumpClock(event.eventTime - currentEventTime)
+                currentEventTime = event.eventTime
                 sendAndRecycleEvent(event)
             }
         }
