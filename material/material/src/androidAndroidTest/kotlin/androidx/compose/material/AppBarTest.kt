@@ -164,6 +164,53 @@ class AppBarTest {
     }
 
     @Test
+    fun topAppBar_contentAlpha() {
+        var titleAlpha: Float? = null
+        var navigationIconAlpha: Float? = null
+        var actionAlpha: Float? = null
+        var high: Float? = null
+        var medium: Float? = null
+        rule.setMaterialContent {
+            Box {
+                TopAppBar(
+                    title = {
+                        titleAlpha = LocalContentAlpha.current
+                        high = ContentAlpha.high
+                        medium = ContentAlpha.medium
+                    },
+                    navigationIcon = { navigationIconAlpha = LocalContentAlpha.current },
+                    actions = { actionAlpha = LocalContentAlpha.current }
+                )
+            }
+        }
+        assertThat(titleAlpha).isNotNull()
+        assertThat(navigationIconAlpha).isNotNull()
+        assertThat(actionAlpha).isNotNull()
+        assertThat(high).isNotNull()
+        assertThat(medium).isNotNull()
+        assertThat(titleAlpha).isEqualTo(high)
+        assertThat(navigationIconAlpha).isEqualTo(high)
+        assertThat(actionAlpha).isEqualTo(medium)
+    }
+
+    @Test
+    fun topAppBar_genericContent_contentAlpha() {
+        var alpha: Float? = null
+        var medium: Float? = null
+        rule.setMaterialContent {
+            Box {
+                TopAppBar {
+                    alpha = LocalContentAlpha.current
+                    medium = ContentAlpha.medium
+                }
+            }
+        }
+        assertThat(alpha).isNotNull()
+        assertThat(medium).isNotNull()
+        assertThat(alpha).isEqualTo(medium)
+    }
+
+    @Test
     fun bottomAppBar_expandsToScreen() {
         rule
             .setMaterialContentForSizeAssertions {
@@ -191,6 +238,23 @@ class AppBarTest {
             .assertTopPositionInRootIsEqualTo(
                 appBarBottomEdgeY - AppBarStartAndEndPadding - FakeIconSize
             )
+    }
+
+    @Test
+    fun bottomAppBar_contentAlpha() {
+        var alpha: Float? = null
+        var medium: Float? = null
+        rule.setMaterialContent {
+            Box {
+                BottomAppBar {
+                    alpha = LocalContentAlpha.current
+                    medium = ContentAlpha.medium
+                }
+            }
+        }
+        assertThat(alpha).isNotNull()
+        assertThat(medium).isNotNull()
+        assertThat(alpha).isEqualTo(medium)
     }
 
     /**
