@@ -51,18 +51,19 @@ class TwoDimensionalFocusTraversalOutTest {
      *     |_______________|
      */
     @Test
-    fun focusOut_noParent_clearsFocus() {
+    fun focusOut_noParent_focusStateUnchanged() {
         // Arrange.
         rule.setContentForTest {
             FocusableBox(focusedItem, 0, 0, 10, 10, initialFocus)
         }
 
         // Act.
-        focusManager.moveFocus(Out)
+        val movedFocusSuccessfully = focusManager.moveFocus(Out)
 
         // Assert.
         rule.runOnIdle {
-            assertThat(focusedItem.value).isFalse()
+            assertThat(movedFocusSuccessfully).isFalse()
+            assertThat(focusedItem.value).isTrue()
         }
     }
 
@@ -85,10 +86,11 @@ class TwoDimensionalFocusTraversalOutTest {
         }
 
         // Act.
-        focusManager.moveFocus(Out)
+        val movedFocusSuccessfully = focusManager.moveFocus(Out)
 
         // Assert.
         rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
             assertThat(focusedItem.value).isFalse()
             assertThat(parent.value).isTrue()
         }
@@ -118,10 +120,11 @@ class TwoDimensionalFocusTraversalOutTest {
         }
 
         // Act.
-        focusManager.moveFocus(Out)
+        val movedFocusSuccessfully = focusManager.moveFocus(Out)
 
         // Assert.
         rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
             assertThat(focusedItem.value).isFalse()
             assertThat(parent.value).isTrue()
             assertThat(grandparent.value).isFalse()
@@ -148,10 +151,11 @@ class TwoDimensionalFocusTraversalOutTest {
         }
 
         // Act.
-        focusManager.moveFocus(Right)
+        val movedFocusSuccessfully = focusManager.moveFocus(Right)
 
         // Assert.
         rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
             assertThat(focusedItem.value).isFalse()
             assertThat(parent.value).isFalse()
             assertThat(nextItem.value).isTrue()
@@ -183,10 +187,11 @@ class TwoDimensionalFocusTraversalOutTest {
         }
 
         // Act.
-        focusManager.moveFocus(Right)
+        val movedFocusSuccessfully = focusManager.moveFocus(Right)
 
         // Assert.
         rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
             assertThat(focusedItem.value).isFalse()
             assertThat(grandparent.value).isFalse()
             assertThat(parent.value).isFalse()
@@ -225,10 +230,11 @@ class TwoDimensionalFocusTraversalOutTest {
         }
 
         // Act.
-        focusManager.moveFocus(Left)
+        val movedFocusSuccessfully = focusManager.moveFocus(Left)
 
         // Assert.
         rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
             assertThat(focusedItem.value).isFalse()
             assertThat(parent.value).isFalse()
             assertThat(item1.value).isTrue()
@@ -270,10 +276,11 @@ class TwoDimensionalFocusTraversalOutTest {
         }
 
         // Act.
-        focusManager.moveFocus(Right)
+        val movedFocusSuccessfully = focusManager.moveFocus(Right)
 
         // Assert.
         rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
             assertThat(focusedItem.value).isFalse()
             assertThat(parent.value).isFalse()
             assertThat(item1.value).isFalse()
@@ -312,10 +319,11 @@ class TwoDimensionalFocusTraversalOutTest {
         }
 
         // Act.
-        focusManager.moveFocus(Up)
+        val movedFocusSuccessfully = focusManager.moveFocus(Up)
 
         // Assert.
         rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
             assertThat(focusedItem.value).isFalse()
             assertThat(parent.value).isFalse()
             assertThat(item1.value).isTrue()
@@ -354,10 +362,11 @@ class TwoDimensionalFocusTraversalOutTest {
         }
 
         // Act.
-        focusManager.moveFocus(Down)
+        val movedFocusSuccessfully = focusManager.moveFocus(Down)
 
         // Assert.
         rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
             assertThat(focusedItem.value).isFalse()
             assertThat(parent.value).isFalse()
             assertThat(item1.value).isFalse()

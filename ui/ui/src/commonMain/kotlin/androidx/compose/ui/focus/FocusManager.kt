@@ -16,7 +16,11 @@
 
 package androidx.compose.ui.focus
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection.Companion.Next
+import androidx.compose.ui.focus.FocusDirection.Companion.Out
+import androidx.compose.ui.focus.FocusDirection.Companion.Previous
 import androidx.compose.ui.focus.FocusStateImpl.Active
 import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
 import androidx.compose.ui.focus.FocusStateImpl.Captured
@@ -142,6 +146,23 @@ internal class FocusManagerImpl(
 
         val destination = focusModifier.focusNode.focusSearch(focusDirection, layoutDirection)
             ?: return false
+
+        // We don't want moveFocus to set focus to the root, as this would essentially clear focus.
+        if (destination.findParentFocusNode() == null) {
+            when (focusDirection) {
+                // Skip the root and proceed to the next/previous item from the root's perspective.
+                // TODO(b/170155659): Add tests after implementing one dimensional focus search.
+                Next, Previous -> moveFocus(focusDirection)
+
+                // Instead of moving out to the root, we return false.
+                // When we return false the key event will not be consumed, but it will bubble
+                // up to the owner. (In the case of Android, the back key will be sent to the
+                // activity, where it can be handled appropriately).
+                @OptIn(ExperimentalComposeUiApi::class)
+                Out -> return false
+                else -> error("Move focus landed at the root through an unknown path.")
+            }
+        }
 
         // If we found a potential next item, call requestFocus() to move focus to it.
         destination.requestFocus(propagateFocus = false)
