@@ -22,6 +22,8 @@ import android.view.MotionEvent.ACTION_UP
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.AndroidInputDispatcher
 import androidx.compose.ui.test.InputDispatcher
+import androidx.compose.ui.test.util.Finger
+import androidx.compose.ui.test.util.Touchscreen
 import androidx.compose.ui.test.util.assertHasValidEventTimes
 import androidx.compose.ui.test.util.verify
 import androidx.test.filters.SmallTest
@@ -102,11 +104,11 @@ class SendSwipeWithDurationTest(private val config: TestConfig) : InputDispatche
 
             val durationMs = config.durationMillis
             // First is down, last is up
-            first().verify(curve, ACTION_DOWN, expectedRelativeTime = 0)
-            last().verify(curve, ACTION_UP, expectedRelativeTime = durationMs)
+            first().verify(curve, ACTION_DOWN, 0, Touchscreen, Finger)
+            last().verify(curve, ACTION_UP, durationMs, Touchscreen, Finger)
             // In between are all move events with the expected timestamps
             drop(1).zip(config.expectedTimestamps).forEach { (event, expectedTimestamp) ->
-                event.verify(curve, ACTION_MOVE, expectedRelativeTime = expectedTimestamp)
+                event.verify(curve, ACTION_MOVE, expectedTimestamp, Touchscreen, Finger)
             }
         }
     }
