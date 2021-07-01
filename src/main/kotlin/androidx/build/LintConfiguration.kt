@@ -17,7 +17,6 @@
 package androidx.build
 
 import androidx.build.dependencyTracker.AffectedModuleDetector
-import androidx.build.gradle.getByType
 import com.android.build.gradle.internal.dsl.LintOptions
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -25,6 +24,7 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.TaskAction
+import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import java.util.Locale
 

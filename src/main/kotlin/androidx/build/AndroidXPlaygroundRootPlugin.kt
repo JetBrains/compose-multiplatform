@@ -17,7 +17,6 @@
 package androidx.build
 
 import androidx.build.AndroidXRootPlugin.Companion.PROJECT_OR_ARTIFACT_EXT_NAME
-import androidx.build.gradle.getByType
 import androidx.build.gradle.isRoot
 import androidx.build.playground.FindAffectedModulesTask
 import com.android.build.gradle.LibraryExtension
@@ -31,6 +30,7 @@ import org.gradle.api.artifacts.component.ModuleComponentSelector
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.kotlin.dsl.KotlinClosure1
 import org.gradle.kotlin.dsl.extra
+import org.gradle.kotlin.dsl.getByType
 import java.net.URI
 import java.net.URL
 
