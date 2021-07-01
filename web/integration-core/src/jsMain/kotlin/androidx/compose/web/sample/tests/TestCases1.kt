@@ -71,7 +71,7 @@ class TestCases1 {
 private object AppStyleSheet : StyleSheet() {
     val textClass by style {
         color("rgba(0, 200, 0, 0.92)")
-        media(maxWidth(400.px)) {
+        media(maxWidth(600.px)) {
             self style {
                 color("rgba(255, 200, 0, 0.99)")
             }
