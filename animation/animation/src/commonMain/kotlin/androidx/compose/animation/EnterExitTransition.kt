@@ -818,7 +818,8 @@ internal data class TransitionData(
 @Composable
 internal fun Transition<EnterExitState>.createModifier(
     enter: EnterTransition,
-    exit: ExitTransition
+    exit: ExitTransition,
+    label: String
 ): Modifier {
 
     // Generates up to 3 modifiers, one for each type of enter/exit transition in the order:
@@ -828,11 +829,13 @@ internal fun Transition<EnterExitState>.createModifier(
     modifier = modifier.slideInOut(
         this,
         rememberUpdatedState(enter.data.slide),
-        rememberUpdatedState(exit.data.slide)
+        rememberUpdatedState(exit.data.slide),
+        label
     ).shrinkExpand(
         this,
         rememberUpdatedState(enter.data.changeSize),
-        rememberUpdatedState(exit.data.changeSize)
+        rememberUpdatedState(exit.data.changeSize),
+        label
     )
 
     // Fade - it's important to put fade in the end. Otherwise fade will clip slide.
@@ -840,7 +843,7 @@ internal fun Transition<EnterExitState>.createModifier(
     // would ensure the removal of fadeIn/Out amid a fade animation doesn't result in a jump.
     var shouldAnimateAlpha by remember(this) { mutableStateOf(false) }
     var shouldAnimateScale by remember(this) { mutableStateOf(false) }
-    if (currentState == targetState) {
+    if (currentState == targetState && !isSeeking) {
         shouldAnimateAlpha = false
         shouldAnimateScale = false
     } else {
@@ -863,7 +866,7 @@ internal fun Transition<EnterExitState>.createModifier(
                     else -> DefaultAlphaAndScaleSpring
                 }
             },
-            label = "alpha"
+            label = remember { "$label alpha" }
         ) {
             when (it) {
                 EnterExitState.Visible -> 1f
@@ -886,7 +889,7 @@ internal fun Transition<EnterExitState>.createModifier(
                     else -> DefaultAlphaAndScaleSpring
                 }
             },
-            label = "scale"
+            label = remember { "$label scale" }
         ) {
             when (it) {
                 EnterExitState.Visible -> 1f
@@ -941,12 +944,13 @@ private val DefaultAlphaAndScaleSpring = spring<Float>(stiffness = Spring.Stiffn
 private fun Modifier.slideInOut(
     transition: Transition<EnterExitState>,
     slideIn: State<Slide?>,
-    slideOut: State<Slide?>
+    slideOut: State<Slide?>,
+    labelPrefix: String
 ): Modifier = composed {
     // We'll animate if at any point during the transition slideIn/slideOut becomes non-null. This
     // would ensure the removal of slideIn/Out amid a slide animation doesn't result in a jump.
     var shouldAnimate by remember(transition) { mutableStateOf(false) }
-    if (transition.currentState == transition.targetState) {
+    if (transition.currentState == transition.targetState && !transition.isSeeking) {
         shouldAnimate = false
     } else {
         if (slideIn.value != null || slideOut.value != null) {
@@ -955,7 +959,10 @@ private fun Modifier.slideInOut(
     }
 
     if (shouldAnimate) {
-        val animation = transition.createDeferredAnimation(IntOffset.VectorConverter, "slide")
+        val animation = transition.createDeferredAnimation(
+            IntOffset.VectorConverter,
+            remember { "$labelPrefix slide" }
+        )
         val modifier = remember(transition) {
             SlideModifier(animation, slideIn, slideOut)
         }
@@ -1019,13 +1026,14 @@ private class SlideModifier(
 private fun Modifier.shrinkExpand(
     transition: Transition<EnterExitState>,
     expand: State<ChangeSize?>,
-    shrink: State<ChangeSize?>
+    shrink: State<ChangeSize?>,
+    labelPrefix: String
 ): Modifier = composed {
     // We'll animate if at any point during the transition shrink/expand becomes non-null. This
     // would ensure the removal of shrink/expand amid a size change animation doesn't result in a
     // jump.
     var shouldAnimate by remember(transition) { mutableStateOf(false) }
-    if (transition.currentState == transition.targetState) {
+    if (transition.currentState == transition.targetState && !transition.isSeeking) {
         shouldAnimate = false
     } else {
         if (expand.value != null || shrink.value != null) {
@@ -1047,12 +1055,12 @@ private fun Modifier.shrinkExpand(
         )
         val sizeAnimation = transition.createDeferredAnimation(
             IntSize.VectorConverter,
-            "shrink/expand"
+            remember { "$labelPrefix shrink/expand" }
         )
         val offsetAnimation = key(transition.currentState == transition.targetState) {
             transition.createDeferredAnimation(
                 IntOffset.VectorConverter,
-                "InterruptionHandlingOffset"
+                remember { "$labelPrefix InterruptionHandlingOffset" }
             )
         }
 

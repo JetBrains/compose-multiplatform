@@ -236,23 +236,36 @@ class Transition<S> @PublishedApi internal constructor(
     internal var updateChildrenNeeded: Boolean by mutableStateOf(true)
 
     private val _animations = mutableVectorOf<TransitionAnimationState<*, *>>()
-
-    // TODO: Support this in animation tooling
     private val _transitions = mutableVectorOf<Transition<*>>()
+
+    /** @suppress **/
+    @InternalAnimationApi
+    val transitions: List<Transition<*>> = _transitions.asMutableList()
 
     /** @suppress **/
     @InternalAnimationApi
     val animations: List<TransitionAnimationState<*, *>> = _animations.asMutableList()
 
     // Seeking related
-    @PublishedApi
-    internal var isSeeking: Boolean by mutableStateOf(false)
-    private var lastSeekedTimeNanos: Long = 0L
-
     /** @suppress **/
     @InternalAnimationApi
-    var totalDurationNanos: Long by mutableStateOf(0L)
-        private set
+    var isSeeking: Boolean by mutableStateOf(false)
+        internal set
+    internal var lastSeekedTimeNanos: Long = 0L
+
+    @get:InternalAnimationApi
+    val totalDurationNanos: Long
+        /** @suppress **/
+        get() {
+            var maxDurationNanos = 0L
+            _animations.forEach {
+                maxDurationNanos = max(maxDurationNanos, it.durationNanos)
+            }
+            _transitions.forEach {
+                maxDurationNanos = max(maxDurationNanos, it.totalDurationNanos)
+            }
+            return maxDurationNanos
+        }
 
     internal fun onFrame(frameTimeNanos: Long) {
         if (startTimeNanos == AnimationConstants.UnspecifiedTime) {
@@ -317,13 +330,19 @@ class Transition<S> @PublishedApi internal constructor(
             segment = SegmentImpl(initialState, targetState)
         }
 
-        if (playTimeNanos != lastSeekedTimeNanos) {
-            // Only pulse all children when the play time or any child has changed.
-            _animations.forEach {
-                it.seekTo(playTimeNanos)
+        _transitions.forEach {
+            @Suppress("UNCHECKED_CAST")
+            (it as Transition<Any>).let {
+                if (it.isSeeking) {
+                    it.seek(it.currentState, it.targetState, playTimeNanos)
+                }
             }
-            lastSeekedTimeNanos = playTimeNanos
         }
+
+        _animations.forEach {
+            it.seekTo(playTimeNanos)
+        }
+        lastSeekedTimeNanos = playTimeNanos
     }
 
     internal fun addTransition(transition: Transition<*>) = _transitions.add(transition)
@@ -377,7 +396,12 @@ class Transition<S> @PublishedApi internal constructor(
                 LaunchedEffect(this) {
                     while (true) {
                         withFrameNanos {
-                            onFrame(it / AnimationDebugDurationScale)
+                            // This check is very important, as isSeeking may be changed off-band
+                            // between the last check in composition and this callback which
+                            // happens in the animation callback the next frame.
+                            if (!isSeeking) {
+                                onFrame(it / AnimationDebugDurationScale)
+                            }
                         }
                     }
                 }
@@ -394,7 +418,6 @@ class Transition<S> @PublishedApi internal constructor(
                 maxDurationNanos = max(maxDurationNanos, it.durationNanos)
                 it.seekTo(lastSeekedTimeNanos)
             }
-            totalDurationNanos = maxDurationNanos
             // TODO: Is update duration the only thing that needs to be done during seeking to
             //  accommodate update children?
             updateChildrenNeeded = false
@@ -504,8 +527,11 @@ class Transition<S> @PublishedApi internal constructor(
         ) {
             this.targetValue = targetValue
             this.animationSpec = animationSpec
-            if (animation.initialValue == initialValue && animation.targetValue == targetValue) {
-                // TODO(b/178811102): we should be able to return early here.
+            if (
+                animation.initialValue == initialValue &&
+                animation.targetValue == targetValue
+            ) {
+                return
             }
             updateAnimation(initialValue)
         }
@@ -572,12 +598,23 @@ class Transition<S> @PublishedApi internal constructor(
             var transitionSpec: Segment<S>.() -> FiniteAnimationSpec<T>,
             var targetValueByState: (state: S) -> T,
         ) : State<T> {
-            override val value: T
-                get() {
-                    animation.updateTargetValue(
-                        targetValueByState(targetState),
+            fun updateAnimationStates(segment: Segment<S>) {
+                val targetValue = targetValueByState(segment.targetState)
+                if (isSeeking) {
+                    val initialValue = targetValueByState(segment.initialState)
+                    // In the case of seeking, we also need to update initial value as needed
+                    animation.updateInitialAndTargetValue(
+                        initialValue,
+                        targetValue,
                         segment.transitionSpec()
                     )
+                } else {
+                    animation.updateTargetValue(targetValue, segment.transitionSpec())
+                }
+            }
+            override val value: T
+                get() {
+                    updateAnimationStates(segment)
                     return animation.value
                 }
         }
@@ -611,10 +648,7 @@ class Transition<S> @PublishedApi internal constructor(
                 this.targetValueByState = targetValueByState
                 this.transitionSpec = transitionSpec
 
-                animation.updateTargetValue(
-                    targetValueByState(targetState),
-                    segment.transitionSpec()
-                )
+                updateAnimationStates(segment)
             }
         }
 
@@ -688,7 +722,7 @@ inline fun <S, T> Transition<S>.createChildTransition(
     transformToChildState: @Composable (parentState: S) -> T,
 ): Transition<T> {
     val initialParentState = remember(this) { this.currentState }
-    val initialState = transformToChildState(initialParentState)
+    val initialState = transformToChildState(if (isSeeking) currentState else initialParentState)
     val targetState = transformToChildState(this.targetState)
     return createChildTransitionInternal(initialState, targetState, label)
 }
@@ -698,10 +732,10 @@ inline fun <S, T> Transition<S>.createChildTransition(
 internal fun <S, T> Transition<S>.createChildTransitionInternal(
     initialState: T,
     targetState: T,
-    label: String,
+    childLabel: String,
 ): Transition<T> {
     val transition = remember(this) {
-        Transition(MutableTransitionState(initialState), label)
+        Transition(MutableTransitionState(initialState), "${this.label} > $childLabel")
     }
 
     DisposableEffect(transition) {
@@ -711,7 +745,12 @@ internal fun <S, T> Transition<S>.createChildTransitionInternal(
         }
     }
 
-    transition.updateTarget(targetState)
+    if (isSeeking) {
+        transition.seek(initialState, targetState, this.lastSeekedTimeNanos)
+    } else {
+        transition.updateTarget(targetState)
+        transition.isSeeking = false
+    }
     return transition
 }
 

@@ -21,8 +21,10 @@ import androidx.compose.animation.EnterExitState.Visible
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.InternalAnimationApi
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
@@ -353,7 +355,7 @@ class AnimatedVisibilityTest {
                         withFrameNanos {
                             if (enterExit.targetState == Visible) {
                                 alpha = enterExit.animations.firstOrNull {
-                                    it.label == "alpha"
+                                    it.label.contains("alpha", true)
                                 }?.value as Float
                                 val fraction =
                                     (enterExit.playTimeNanos / 1_000_000) / 500f
@@ -367,7 +369,7 @@ class AnimatedVisibilityTest {
                                 }
                             } else if (enterExit.targetState == PostExit) {
                                 alpha = enterExit.animations.firstOrNull {
-                                    it.label == "alpha"
+                                    it.label.contains("alpha", true)
                                 }?.value as Float
                                 val fraction =
                                     (enterExit.playTimeNanos / 1_000_000) / 300f
@@ -428,7 +430,7 @@ class AnimatedVisibilityTest {
                         withFrameNanos {
                             if (enterExit.targetState == Visible) {
                                 scale = enterExit.animations.firstOrNull {
-                                    it.label == "scale"
+                                    it.label.contains("scale", true)
                                 }?.value as Float
                                 val fraction =
                                     (enterExit.playTimeNanos / 1_000_000) / 500f
@@ -442,7 +444,7 @@ class AnimatedVisibilityTest {
                                 }
                             } else if (enterExit.targetState == PostExit) {
                                 scale = enterExit.animations.firstOrNull {
-                                    it.label == "scale"
+                                    it.label.contains("scale", true)
                                 }?.value as Float
                                 val fraction =
                                     (enterExit.playTimeNanos / 1_000_000) / 300f
@@ -581,6 +583,81 @@ class AnimatedVisibilityTest {
             assertEquals(0, testModifier.width)
             assertEquals(0, testModifier.height)
             assertTrue(disposed)
+        }
+    }
+
+    @OptIn(ExperimentalAnimationApi::class)
+    @Test
+    fun testSeekingAnimatedVisibility() {
+        fun <T> spec() = tween<T>(200, easing = LinearEasing)
+        var rootTransition: Transition<Boolean>? = null
+        rule.setContent {
+            CompositionLocalProvider(LocalDensity provides Density(1f)) {
+                updateTransition(false, label = "test").apply {
+                    rootTransition = this
+                }.AnimatedVisibility(
+                    { it },
+                    enter = fadeIn(animationSpec = spec()) +
+                        slideInVertically({ 200 }, animationSpec = spec()),
+                    exit = scaleOut(animationSpec = spec()) +
+                        shrinkHorizontally(animationSpec = spec())
+                ) {
+                    Box(Modifier.size(200.dp))
+                }
+            }
+        }
+        rule.waitForIdle()
+
+        val transition = rootTransition!!
+        var playTimeMs = 0
+        while (true) {
+            // Seeking the enter transition, and check alpha & slide
+            transition.seek(false, true, playTimeMs * 1_000_000L)
+            rule.waitForIdle()
+            assertEquals(200_000_000L, transition.totalDurationNanos)
+
+            val alpha = transition.transitions[0].animations.firstOrNull {
+                it.label.contains("alpha")
+            }?.value
+            val slide = transition.transitions[0].animations.firstOrNull {
+                it.label.contains("slide")
+            }?.value
+            if (playTimeMs * 1_000_000L > transition.totalDurationNanos) {
+                // Finished. Check some end condition
+                assertEquals(1f, alpha)
+                assertEquals(IntOffset(0, 0), slide)
+                break
+            } else {
+                assertEquals(playTimeMs / 200f, alpha as Float, 0.01f)
+                assertEquals(IntOffset(0, 200 - playTimeMs), slide)
+            }
+            playTimeMs += 20
+        }
+
+        playTimeMs = 0
+
+        while (true) {
+            // Seeking the exit transition, and check scale & shrink
+            transition.seek(true, false, playTimeMs * 1_000_000L)
+            rule.waitForIdle()
+            assertEquals(200_000_000L, transition.totalDurationNanos)
+
+            val scale = transition.transitions[0].animations.firstOrNull {
+                it.label.contains("scale")
+            }?.value
+            val shrink = transition.transitions[0].animations.firstOrNull {
+                it.label.contains("shrink")
+            }?.value
+            if (playTimeMs * 1_000_000L > transition.totalDurationNanos) {
+                // Finished. Check some end condition
+                assertEquals(0f, scale)
+                assertEquals(IntSize(0, 200), shrink)
+                break
+            } else {
+                assertEquals(1f - playTimeMs / 200f, scale as Float, 0.01f)
+                assertEquals(IntSize(200 - playTimeMs, 200), shrink)
+            }
+            playTimeMs += 20
         }
     }
 }
