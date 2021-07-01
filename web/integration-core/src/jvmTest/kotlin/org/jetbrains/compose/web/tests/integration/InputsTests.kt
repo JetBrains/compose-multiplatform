@@ -78,13 +78,12 @@ class InputsTests : BaseIntegrationTests() {
 
         val actions = Actions(driver)
 
-        actions.moveToElement(slider)
-            .moveByOffset(-(slider.size.width / 2), 0)
-            .click()
-            .sendKeys(Keys.RIGHT, Keys.RIGHT)
+        actions
+            .clickAndHold(slider)
+            .sendKeys(Keys.RIGHT)
             .perform()
 
-        driver.waitTextToBe(value = "10")
+        driver.waitTextToBe(value = "55")
     }
 
     @ResolveDrivers
