@@ -384,6 +384,10 @@ class ComposeView @JvmOverloads constructor(
         content.value?.invoke()
     }
 
+    override fun getAccessibilityClassName(): CharSequence {
+        return javaClass.name
+    }
+
     /**
      * Set the Jetpack Compose UI content for this view.
      * Initial composition will occur when the view becomes attached to a window or when
