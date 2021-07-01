@@ -7,6 +7,7 @@ package org.jetbrains.compose.web.core.tests
 
 import org.jetbrains.compose.web.css.CSSMediaQuery
 import org.jetbrains.compose.web.css.CSSMediaRuleDeclaration
+import org.jetbrains.compose.web.css.MediaType
 import org.jetbrains.compose.web.css.StyleSheet
 import org.jetbrains.compose.web.css.and
 import org.jetbrains.compose.web.css.maxHeight
@@ -28,7 +29,7 @@ class MediaQueryTests {
             media(minWidth(300.px), maxWidth(500.px)) {
             }
 
-            media(CSSMediaQuery.MediaType(CSSMediaQuery.MediaType.Enum.screen).and(minWidth(300.px))) {
+            media(MediaType.screen.and(minWidth(300.px))) {
             }
         }
     }

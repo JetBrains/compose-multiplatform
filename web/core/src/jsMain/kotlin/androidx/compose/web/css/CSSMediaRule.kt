@@ -2,19 +2,21 @@
 
 package org.jetbrains.compose.web.css
 
+sealed class MediaType(val value: String) : CSSMediaQuery.Atomic {
+    object all: MediaType("all")
+    object print: MediaType("print")
+    object screen: MediaType("screen")
+    object speech: MediaType("speech")
+
+    override fun toString() = value
+}
+
 interface CSSMediaQuery {
     interface Invertible : CSSMediaQuery
     interface Combinable : CSSMediaQuery
     interface Atomic : Invertible, Combinable
     data class Raw(val string: String) : Atomic {
         override fun toString() = string
-    }
-    data class MediaType(val type: Enum) : Atomic {
-        enum class Enum {
-            all, print, screen, speech
-        }
-
-        override fun toString() = type.name
     }
 
     @Suppress("EqualsOrHashCode")
