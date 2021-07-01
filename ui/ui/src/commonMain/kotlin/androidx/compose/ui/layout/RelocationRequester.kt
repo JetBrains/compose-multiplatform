@@ -19,6 +19,8 @@ package androidx.compose.ui.layout
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.unit.toSize
 
 /**
  * This class can be used to send relocation requests. Pass it as a parameter to
@@ -36,8 +38,14 @@ class RelocationRequester {
 
     /**
      * Bring this item into bounds by making all the scrollable parents scroll appropriately.
+     *
+     * @sample androidx.compose.ui.samples.BringIntoViewSample
      */
-    fun bringIntoView() {
-        modifiers.forEach { it.bringIntoView() }
+    suspend fun bringIntoView() {
+        modifiers.forEach {
+            with(it.relocationRequesterNode.size.toSize()) {
+                it.bringRectIntoView(Rect(0f, 0f, width, height))
+            }
+        }
     }
 }

@@ -250,6 +250,7 @@ internal abstract class LayoutNodeWrapper(
     protected abstract fun performDraw(canvas: Canvas)
 
     // implementation of draw block passed to the OwnedLayer
+    @Suppress("LiftReturnOrAssignment")
     override fun invoke(canvas: Canvas) {
         if (layoutNode.isPlaced) {
             snapshotObserver.observeReads(this, onCommitAffectingLayer) {
@@ -480,11 +481,7 @@ internal abstract class LayoutNodeWrapper(
      */
     open fun toParentPosition(position: Offset): Offset {
         val layer = layer
-        val targetPosition = if (layer == null) {
-            position
-        } else {
-            layer.mapOffset(position, inverse = false)
-        }
+        val targetPosition = layer?.mapOffset(position, inverse = false) ?: position
         return targetPosition + this.position
     }
 
@@ -495,11 +492,8 @@ internal abstract class LayoutNodeWrapper(
     open fun fromParentPosition(position: Offset): Offset {
         val relativeToWrapperPosition = position - this.position
         val layer = layer
-        return if (layer == null) {
-            relativeToWrapperPosition
-        } else {
-            layer.mapOffset(relativeToWrapperPosition, inverse = true)
-        }
+        return layer?.mapOffset(relativeToWrapperPosition, inverse = true)
+            ?: relativeToWrapperPosition
     }
 
     protected fun drawBorder(canvas: Canvas, paint: Paint) {
@@ -693,6 +687,24 @@ internal abstract class LayoutNodeWrapper(
      */
     open fun populateFocusOrder(focusOrder: FocusOrder) {
         wrappedBy?.populateFocusOrder(focusOrder)
+    }
+
+    /**
+     * Send a request to bring a portion of this item into view. The portion that has to be
+     * brought into view is specified as a rectangle where the coordinates are in the local
+     * coordinates of that layoutNodeWrapper. This request is sent up the hierarchy to all parents
+     * that have a [RelocationModifier][androidx.compose.ui.layout.RelocationModifier].
+     */
+    open suspend fun propagateRelocationRequest(rect: Rect) {
+        val parent = wrappedBy ?: return
+
+        // Translate this layoutNodeWrapper to the coordinate system of the parent.
+        val boundingBoxInParentCoordinates = parent.localBoundingBoxOf(this, false)
+
+        // Translate the rect to parent coordinates
+        val rectInParentBounds = rect.translate(boundingBoxInParentCoordinates.topLeft)
+
+        parent.propagateRelocationRequest(rectInParentBounds)
     }
 
     /**

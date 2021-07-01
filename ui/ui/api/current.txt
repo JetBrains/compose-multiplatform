@@ -1740,6 +1740,9 @@ package androidx.compose.ui.layout {
   public final class PlaceableKt {
   }
 
+  public final class RelocationModifierKt {
+  }
+
   public final class RelocationRequesterModifierKt {
   }
 

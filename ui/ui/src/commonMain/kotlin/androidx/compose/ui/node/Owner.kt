@@ -21,7 +21,6 @@ import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.key.KeyEvent
@@ -184,12 +183,6 @@ internal interface Owner {
      * The [FocusDirection] represented by the specified keyEvent.
      */
     fun getFocusDirection(keyEvent: KeyEvent): FocusDirection?
-
-    /**
-     * Request that a rectangle of this owner be visible on the screen, scrolling if necessary just
-     * enough.
-     */
-    fun requestRectangleOnScreen(rect: Rect)
 
     val measureIteration: Long
 
