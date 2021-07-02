@@ -879,13 +879,15 @@ fun Tfoot(
  */
 @Composable
 fun Style(
-    applyAttrs: AttrsBuilder<HTMLStyleElement>.() -> Unit = {},
+    applyAttrs: (AttrsBuilder<HTMLStyleElement>.() -> Unit)? = null,
     cssRules: CSSRuleDeclarationList
 ) {
     TagElement(
         elementBuilder = Style,
         applyAttrs = {
-            applyAttrs()
+            if (applyAttrs != null) {
+                applyAttrs()
+            }
         },
     ) {
         DomSideEffect(cssRules) { style ->
@@ -906,7 +908,7 @@ fun Style(
  */
 @Composable
 fun Style(
-    applyAttrs: AttrsBuilder<HTMLStyleElement>.() -> Unit = {},
+    applyAttrs: (AttrsBuilder<HTMLStyleElement>.() -> Unit)? = null,
     rulesBuild: StyleSheetBuilder.() -> Unit
 ) {
     val builder = StyleSheetBuilderImpl()
