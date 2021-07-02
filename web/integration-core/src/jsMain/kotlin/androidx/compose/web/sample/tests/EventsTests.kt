@@ -6,9 +6,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.css.selectors.attr
 import org.jetbrains.compose.web.dom.*
-import org.jetbrains.compose.web.dom.ElementBuilder.Companion.Div
 
 class EventsTests {
 
