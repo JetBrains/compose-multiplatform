@@ -22,7 +22,6 @@ apply from: "out.gradle"
 init.chooseOutDir()
 
 ext.supportRootFolder = project.projectDir.getParentFile()
-apply from: "local_dokka.gradle"
 apply from: "repos.gradle"
 apply plugin: "kotlin"
 apply from: "kotlin-dsl-dependency.gradle"

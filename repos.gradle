@@ -56,25 +56,11 @@ def addMavenRepositories(RepositoryHandler handler) {
             includeGroup("")
         }
     }
-    def buildDokka = System.getenv("BUILD_DOKKA") != null
     handler.maven {
         url("${repos.prebuiltsRoot}/androidx/external")
         metadataSources {
             mavenPom()
             artifact()
-        }
-        if (buildDokka) {
-            content {
-                excludeGroup "org.jetbrains.dokka"
-            }
-        }
-    }
-    if (buildDokka) {
-        handler.maven {
-            url("${repos.checkoutRoot}/external/dokka/build/dist-maven")
-            content {
-                includeGroup("org.jetbrains.dokka")
-            }
         }
     }
     if (System.getenv("ALLOW_PUBLIC_REPOS") != null) {
