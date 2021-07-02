@@ -30,7 +30,6 @@ import androidx.build.getBuildId
 import androidx.build.getCheckoutRoot
 import androidx.build.getDistributionDirectory
 import androidx.build.getKeystore
-import androidx.build.gradle.getByType
 import com.android.build.api.attributes.BuildTypeAttr
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
@@ -52,6 +51,7 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.all
+import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.named
 import org.jetbrains.dokka.gradle.DokkaAndroidTask
 import org.jetbrains.dokka.gradle.PackageOptions

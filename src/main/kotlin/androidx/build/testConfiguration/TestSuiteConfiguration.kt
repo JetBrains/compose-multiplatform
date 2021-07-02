@@ -27,7 +27,6 @@ import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.getConstrainedTestConfigDirectory
 import androidx.build.getSupportRootFolder
 import androidx.build.getTestConfigDirectory
-import androidx.build.gradle.getByType
 import androidx.build.hasAndroidTestSourceCode
 import androidx.build.hasBenchmarkPlugin
 import androidx.build.renameApkForTesting
@@ -41,6 +40,7 @@ import org.gradle.api.Project
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Zip
+import org.gradle.kotlin.dsl.getByType
 import java.io.File
 
 /**
@@ -352,9 +352,9 @@ private fun Project.configureMacrobenchmarkConfigTask(
 fun Project.configureTestConfigGeneration(baseExtension: BaseExtension) {
     // TODO(aurimas): migrate away from this when upgrading to AGP 7.1.0-alpha03 or newer
     @Suppress("DEPRECATION")
-    extensions.getByType<
-        com.android.build.api.extension.AndroidComponentsExtension<*, *, *>
-        >().apply {
+    extensions.getByType(
+        com.android.build.api.extension.AndroidComponentsExtension::class.java
+    ).apply {
         onVariants { variant ->
             val androidTest = when (variant) {
                 is ApplicationVariant -> variant.androidTest
