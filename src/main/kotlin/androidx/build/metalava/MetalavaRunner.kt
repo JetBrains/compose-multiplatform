@@ -147,7 +147,8 @@ fun getApiLintArgs(targetsJavaConsumers: Boolean): List<String> {
             "CallbackMethodName",
             "StaticFinalBuilder",
             "MissingGetterMatchingBuilder",
-            "HiddenSuperclass"
+            "HiddenSuperclass",
+            "KotlinOperator"
         ).joinToString()
     )
     if (targetsJavaConsumers) {
