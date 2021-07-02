@@ -957,6 +957,20 @@ class AndroidAccessibilityTest {
                     }
                 )
             )
+            // Temporary(b/192295060) fix, sending CONTENT_CHANGE_TYPE_UNDEFINED to
+            // force ViewRootImpl to update its accessibility-focused virtual-node.
+            // If we have an androidx fix, we can remove this event.
+            verify(container, times(1)).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        getAccessibilityEventSourceSemanticsNodeId(it) == node.id &&
+                            it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                            it.contentChangeTypes ==
+                            AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
+                    }
+                )
+            )
         }
     }
 
