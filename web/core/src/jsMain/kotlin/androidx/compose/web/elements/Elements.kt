@@ -149,7 +149,7 @@ private val Tfoot: ElementBuilder<HTMLTableSectionElement> = ElementBuilderImple
 
 val Style: ElementBuilder<HTMLStyleElement> = ElementBuilderImplementation("style")
 
-interface ElementBuilder<TElement : Element> {
+fun interface ElementBuilder<TElement : Element> {
     fun create(): TElement
 
     companion object {
