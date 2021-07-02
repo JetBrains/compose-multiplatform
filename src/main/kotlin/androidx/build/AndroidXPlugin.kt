@@ -836,15 +836,22 @@ fun <T : Task> Project.addToCheckTask(task: TaskProvider<T>) {
  * Expected to be called in afterEvaluate when all extensions are available
  */
 internal fun Project.hasAndroidTestSourceCode(): Boolean {
-    // assume test modules are non-empty
-    if (this.extensions.findByType(TestExtension::class.java) != null) {
-        // for some reason, sourceSets.findByName("main").java.getSourceFiles().isEmpty always
-        // returns true
-        return true
+    // com.android.test modules keep test code in main sourceset
+    extensions.findByType(TestExtension::class.java)?.let { extension ->
+        extension.sourceSets.findByName("main")?.let { sourceSet ->
+            if (!sourceSet.java.getSourceFiles().isEmpty) return true
+        }
+        // check kotlin-android main source set
+        extensions.findByType(KotlinAndroidProjectExtension::class.java)
+            ?.sourceSets?.findByName("main")?.let {
+                if (it.kotlin.files.isNotEmpty()) return true
+            }
+        // Note, don't have to check for kotlin-multiplatform as it is not compatible with
+        // com.android.test modules
     }
 
     // check Java androidTest source set
-    this.extensions.findByType(TestedExtension::class.java)
+    extensions.findByType(TestedExtension::class.java)
         ?.sourceSets
         ?.findByName("androidTest")
         ?.let { sourceSet ->
@@ -853,13 +860,13 @@ internal fun Project.hasAndroidTestSourceCode(): Boolean {
         }
 
     // check kotlin-android androidTest source set
-    this.extensions.findByType(KotlinAndroidProjectExtension::class.java)
+    extensions.findByType(KotlinAndroidProjectExtension::class.java)
         ?.sourceSets?.findByName("androidTest")?.let {
             if (it.kotlin.files.isNotEmpty()) return true
         }
 
     // check kotlin-multiplatform androidAndroidTest source set
-    this.multiplatformExtension?.apply {
+    multiplatformExtension?.apply {
         sourceSets.findByName("androidAndroidTest")?.let {
             if (it.kotlin.files.isNotEmpty()) return true
         }
