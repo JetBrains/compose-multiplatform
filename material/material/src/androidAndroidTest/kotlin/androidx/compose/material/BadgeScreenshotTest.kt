@@ -60,7 +60,7 @@ class BadgeScreenshotTest {
                     Modifier.size(56.dp).semantics(mergeDescendants = true) {}.testTag(TestTag),
                     contentAlignment = Alignment.Center
                 ) {
-                    BadgeBox(badgeContent = { Text("8") }) {
+                    BadgedBox(badge = { Badge { Text("8") } }) {
                         Icon(Icons.Filled.Favorite, null)
                     }
                 }
@@ -81,7 +81,7 @@ class BadgeScreenshotTest {
                 ) {
                     BottomNavigationItem(
                         icon = {
-                            BadgeBox {
+                            BadgedBox(badge = { Badge() }) {
                                 Icon(Icons.Filled.Favorite, null)
                             }
                         },
@@ -106,12 +106,14 @@ class BadgeScreenshotTest {
                 ) {
                     BottomNavigationItem(
                         icon = {
-                            BadgeBox(
-                                badgeContent = {
-                                    Text(
-                                        "8",
-                                        textAlign = TextAlign.Center
-                                    )
+                            BadgedBox(
+                                badge = {
+                                    Badge {
+                                        Text(
+                                            "8",
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
                                 }
                             ) {
                                 Icon(Icons.Filled.Favorite, null)
@@ -138,12 +140,14 @@ class BadgeScreenshotTest {
                 ) {
                     BottomNavigationItem(
                         icon = {
-                            BadgeBox(
-                                badgeContent = {
-                                    Text(
-                                        "99+",
-                                        textAlign = TextAlign.Center
-                                    )
+                            BadgedBox(
+                                badge = {
+                                    Badge {
+                                        Text(
+                                            "99+",
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
                                 }
                             ) {
                                 Icon(Icons.Filled.Favorite, null)
@@ -167,7 +171,7 @@ class BadgeScreenshotTest {
             MaterialTheme(lightColors()) {
                 Tab(
                     text = {
-                        BadgeBox {
+                        BadgedBox(badge = { Badge() }) {
                             Text("TAB")
                         }
                     },
@@ -190,12 +194,14 @@ class BadgeScreenshotTest {
                 // A round badge with the text `8` attached to a tab.
                 Tab(
                     text = {
-                        BadgeBox(
-                            badgeContent = {
-                                Text(
-                                    "8",
-                                    textAlign = TextAlign.Center
-                                )
+                        BadgedBox(
+                            badge = {
+                                Badge {
+                                    Text(
+                                        "8",
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
                             }
                         ) {
                             Text("TAB")
@@ -220,12 +226,14 @@ class BadgeScreenshotTest {
                 // Tab with a pilled shape badge with the text `99+`.
                 Tab(
                     text = {
-                        BadgeBox(
-                            badgeContent = {
-                                Text(
-                                    "99+",
-                                    textAlign = TextAlign.Center
-                                )
+                        BadgedBox(
+                            badge = {
+                                Badge {
+                                    Text(
+                                        "99+",
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
                             }
                         ) {
                             Text("TAB")
@@ -250,12 +258,14 @@ class BadgeScreenshotTest {
                 // A round badge with the text `8` attached to a leading icon tab.
                 LeadingIconTab(
                     icon = {
-                        BadgeBox(
-                            badgeContent = {
-                                Text(
-                                    "8",
-                                    textAlign = TextAlign.Center
-                                )
+                        BadgedBox(
+                            badge = {
+                                Badge {
+                                    Text(
+                                        "8",
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
                             }
                         ) {
                             Icon(Icons.Filled.Favorite, null)
