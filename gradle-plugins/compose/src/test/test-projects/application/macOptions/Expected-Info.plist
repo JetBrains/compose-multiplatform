@@ -32,5 +32,17 @@
   <string>true</string>
   <key>NSHighResolutionCapable</key>
   <string>true</string>
+
+  <key>CFBundleURLTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleURLName</key>
+      <string>Exameple URL</string>
+      <key>CFBundleURLSchemes</key>
+      <array>
+        <string>exampleUrl</string>
+      </array>
+    </dict>
+  </array>
  </dict>
 </plist>
