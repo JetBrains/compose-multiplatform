@@ -57,10 +57,11 @@ class TwoDimensionalFocusTraversalInTest {
         }
 
         // Act.
-        focusManager.moveFocus(In)
+        val movedFocusSuccessfully = focusManager.moveFocus(In)
 
         // Assert.
         rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isFalse()
             assertThat(focusedItem.value).isTrue()
             assertThat(otherItem.value).isFalse()
         }
@@ -85,10 +86,11 @@ class TwoDimensionalFocusTraversalInTest {
         }
 
         // Act.
-        focusManager.moveFocus(In)
+        val movedFocusSuccessfully = focusManager.moveFocus(In)
 
         // Assert.
         rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
             assertThat(focusedItem.value).isFalse()
             assertThat(child.value).isTrue()
         }
@@ -118,10 +120,11 @@ class TwoDimensionalFocusTraversalInTest {
         }
 
         // Act.
-        focusManager.moveFocus(In)
+        val movedFocusSuccessfully = focusManager.moveFocus(In)
 
         // Assert.
         rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
             assertThat(focusedItem.value).isFalse()
             assertThat(child.value).isTrue()
             assertThat(grandchild.value).isFalse()
@@ -157,10 +160,11 @@ class TwoDimensionalFocusTraversalInTest {
         }
 
         // Act.
-        focusManager.moveFocus(In)
+        val movedFocusSuccessfully = focusManager.moveFocus(In)
 
         // Assert.
         rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
             assertThat(focusedItem.value).isFalse()
             assertThat(children.values).containsExactly(true, false, false, false, false, false)
         }
