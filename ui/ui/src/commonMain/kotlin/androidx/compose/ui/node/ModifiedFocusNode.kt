@@ -27,7 +27,7 @@ import androidx.compose.ui.focus.FocusStateImpl.Disabled
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.focus.searchChildrenForFocusNode
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.findRoot
 
 internal class ModifiedFocusNode(
     wrapped: LayoutNodeWrapper,
@@ -53,7 +53,7 @@ internal class ModifiedFocusNode(
 
     // TODO(b/175900268): Add API to allow a parent to extends the bounds of the focus Modifier.
     //  For now we just use the bounds of this node.
-    fun focusRect(): Rect = boundsInRoot()
+    fun focusRect(): Rect = findRoot().localBoundingBoxOf(this, clipBounds = false)
 
     fun sendOnFocusEvent(focusState: FocusState) {
         wrappedBy?.propagateFocusEvent(focusState)
