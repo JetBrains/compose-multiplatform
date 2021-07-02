@@ -94,7 +94,7 @@ import java.util.Collections
 import java.util.WeakHashMap
 import kotlin.math.roundToInt
 
-private const val DEBUG = true
+private const val DEBUG = false
 private const val ROOT_ID = 3L
 private const val MAX_RECURSIONS = 2
 private const val MAX_ITERABLE_SIZE = 5
@@ -147,6 +147,11 @@ class LayoutInspectorTreeTest {
     @After
     fun after() {
         isDebugInspectorInfoEnabled = false
+    }
+
+    @Test
+    fun doNotCommitWithDebugSetToTrue() {
+        assertThat(DEBUG).isFalse()
     }
 
     @Test
@@ -499,6 +504,7 @@ class LayoutInspectorTreeTest {
         val builder = LayoutInspectorTree()
 
         val appNodes = builder.convert(appView)
+        dumpSlotTableSet(slotTableRecord)
         dumpNodes(appNodes, appView, builder)
 
         // Verify that the main app does not contain the Popup
@@ -520,7 +526,7 @@ class LayoutInspectorTreeTest {
         dumpNodes(dialogNodes, dialogView, builder)
 
         // Verify that the AlertDialog is captured with content
-        validate(dialogNodes, builder, ignoreElementsFromShow = false) {
+        validate(dialogNodes, builder) {
             node(
                 name = "AlertDialog",
                 fileName = "LayoutInspectorTreeTest.kt",
@@ -568,6 +574,7 @@ class LayoutInspectorTreeTest {
         validate(appNodes, builder) {
             node(
                 name = "Column",
+                isRenderNode = true,
                 fileName = "LayoutInspectorTreeTest.kt",
                 children = listOf("Text")
             )
@@ -583,7 +590,7 @@ class LayoutInspectorTreeTest {
         dumpNodes(popupNodes, popupView, builder)
 
         // Verify that the Popup is captured with content
-        validate(popupNodes, builder, ignoreElementsFromShow = false) {
+        validate(popupNodes, builder) {
             node(
                 name = "Popup",
                 fileName = "LayoutInspectorTreeTest.kt",
@@ -621,7 +628,7 @@ class LayoutInspectorTreeTest {
         dumpNodes(nodes, composeView, builder)
         val androidView = nodes.flatMap { flatten(it) }.single { it.name == "AndroidView" }
 
-        validate(listOf(androidView), builder, ignoreElementsFromShow = false) {
+        validate(listOf(androidView), builder) {
             node(
                 name = "AndroidView",
                 fileName = "LayoutInspectorTreeTest.kt",
@@ -827,16 +834,12 @@ class LayoutInspectorTreeTest {
         checkSemantics: Boolean = false,
         checkLineNumbers: Boolean = false,
         checkRenderNodes: Boolean = true,
-        ignoreElementsFromShow: Boolean = true,
         block: TreeValidationReceiver.() -> Unit = {}
     ) {
         if (DEBUG) {
             return
         }
         val nodes = result.flatMap { flatten(it) }.listIterator()
-        if (ignoreElementsFromShow) {
-            ignoreStart(nodes, "Box")
-        }
         val tree = TreeValidationReceiver(
             nodes,
             density,
@@ -847,12 +850,6 @@ class LayoutInspectorTreeTest {
             builder
         )
         tree.block()
-    }
-
-    private fun ignoreStart(nodes: ListIterator<InspectorNode>, vararg names: String) {
-        for (name in names) {
-            assertThat(nodes.next().name).isEqualTo(name)
-        }
     }
 
     private class TreeValidationReceiver(
@@ -1074,12 +1071,14 @@ class LayoutInspectorTreeTest {
     }
 
     private fun dumpGroup(group: Group, indent: Int) {
+        val location = group.location
         val position = group.position?.let { "\"$it\"" } ?: "null"
         val box = group.box
         val id = group.modifierInfo.mapNotNull { (it.extra as? GraphicLayerInfo)?.layerId }
             .singleOrNull() ?: 0
         println(
             "\"${"  ".repeat(indent)}\", ${group.javaClass.simpleName}, \"${group.name}\", " +
+                "file: ${location?.sourceFile}  hash: ${location?.packageHash}, " +
                 "params: ${group.parameters.size}, children: ${group.children.size}, " +
                 "$id, $position, " +
                 "${box.left}, ${box.right}, ${box.right - box.left}, ${box.bottom - box.top}"

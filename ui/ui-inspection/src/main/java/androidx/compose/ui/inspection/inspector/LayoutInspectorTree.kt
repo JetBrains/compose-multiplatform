@@ -57,6 +57,7 @@ val systemPackages = setOf(
     packageNameHash("androidx.compose.material"),
     packageNameHash("androidx.compose.material.ripple"),
     packageNameHash("androidx.compose.runtime"),
+    packageNameHash("androidx.compose.runtime.saveable"),
     packageNameHash("androidx.compose.ui"),
     packageNameHash("androidx.compose.ui.graphics.vector"),
     packageNameHash("androidx.compose.ui.layout"),
