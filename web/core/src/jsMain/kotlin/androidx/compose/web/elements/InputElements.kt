@@ -160,33 +160,3 @@ fun UrlInput(value: String = "", attrsBuilder: InputAttrsBuilder<String>.() -> U
 fun WeekInput(value: String = "", attrsBuilder: InputAttrsBuilder<String>.() -> Unit = {}) {
     Input(type = InputType.Week, attrs = { applyAttrsWithStringValue(value, attrsBuilder) })
 }
-
-@Composable
-fun <K> Input(
-    type: InputType<K>,
-    attrs: InputAttrsBuilder<K>.() -> Unit
-) {
-    TagElement(
-        elementBuilder = ElementBuilder.Input,
-        applyAttrs = {
-            val inputAttrsBuilder = InputAttrsBuilder(type)
-            inputAttrsBuilder.type(type)
-            inputAttrsBuilder.attrs()
-            this.copyFrom(inputAttrsBuilder)
-        },
-        content = null
-    )
-}
-
-@Composable
-fun <K> Input(type: InputType<K>) {
-    TagElement(
-        elementBuilder = ElementBuilder.Input,
-        applyAttrs = {
-            val inputAttrsBuilder = InputAttrsBuilder(type)
-            inputAttrsBuilder.type(type)
-            this.copyFrom(inputAttrsBuilder)
-        },
-        content = null
-    )
-}
