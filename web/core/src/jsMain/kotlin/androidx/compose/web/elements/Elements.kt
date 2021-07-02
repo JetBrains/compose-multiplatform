@@ -9,6 +9,8 @@ import org.jetbrains.compose.web.DomNodeWrapper
 import kotlinx.browser.document
 import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.css.CSSRuleDeclarationList
+import org.jetbrains.compose.web.css.StyleSheetBuilder
+import org.jetbrains.compose.web.css.StyleSheetBuilderImpl
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLAreaElement
@@ -876,8 +878,8 @@ fun Tfoot(
  * Usually, it's [androidx.compose.web.css.StyleSheet] instance
  */
 @Composable
-inline fun Style(
-    crossinline applyAttrs: AttrsBuilder<HTMLStyleElement>.() -> Unit = {},
+fun Style(
+    applyAttrs: AttrsBuilder<HTMLStyleElement>.() -> Unit = {},
     cssRules: CSSRuleDeclarationList
 ) {
     TagElement(
@@ -895,6 +897,21 @@ inline fun Style(
             }
         }
     }
+}
+
+/**
+ * Use this function to mount the <style> tag into the DOM tree.
+ *
+ * @param rulesBuild allows to define the style rules using [StyleSheetBuilder]
+ */
+@Composable
+fun Style(
+    applyAttrs: AttrsBuilder<HTMLStyleElement>.() -> Unit = {},
+    rulesBuild: StyleSheetBuilder.() -> Unit
+) {
+    val builder = StyleSheetBuilderImpl()
+    builder.rulesBuild()
+    Style(applyAttrs, builder.cssRules)
 }
 
 @Composable

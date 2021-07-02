@@ -1,30 +1,11 @@
 package org.jetbrains.compose.web.dom
 
-import androidx.compose.runtime.Composable
-import org.jetbrains.compose.web.attributes.AttrsBuilder
-import org.w3c.dom.HTMLStyleElement
 import org.w3c.dom.css.CSSGroupingRule
 import org.w3c.dom.css.CSSRule
 import org.w3c.dom.css.CSSStyleDeclaration
 import org.w3c.dom.css.CSSStyleRule
-import org.w3c.dom.css.StyleSheet
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.css.CSSStyleSheet
-
-/**
- * Use this function to mount the <style> tag into the DOM tree.
- *
- * @param rulesBuild allows to define the style rules using [StyleSheetBuilder]
- */
-@Composable
-inline fun Style(
-    crossinline applyAttrs: AttrsBuilder<HTMLStyleElement>.() -> Unit = {},
-    rulesBuild: StyleSheetBuilder.() -> Unit
-) {
-    val builder = StyleSheetBuilderImpl()
-    builder.rulesBuild()
-    Style(applyAttrs, builder.cssRules)
-}
 
 fun clearCSSRules(sheet: CSSStyleSheet) {
     repeat(sheet.cssRules.length) {
