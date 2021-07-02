@@ -10,7 +10,7 @@ package androidx.compose.runtime {
     method protected final void move(java.util.List<T>, int from, int to, int count);
     method protected abstract void onClear();
     method protected final void remove(java.util.List<T>, int index, int count);
-    method protected void setCurrent(T! p);
+    method protected void setCurrent(T! current);
     method public void up();
     property public T! current;
     property public final T! root;
@@ -224,7 +224,7 @@ package androidx.compose.runtime {
   @androidx.compose.runtime.Stable public interface MutableState<T> extends androidx.compose.runtime.State<T> {
     method public operator T! component1();
     method public operator kotlin.jvm.functions.Function1<T,kotlin.Unit> component2();
-    method public void setValue(T! p);
+    method public void setValue(T! value);
     property public abstract T! value;
   }
 
@@ -320,12 +320,6 @@ package androidx.compose.runtime {
 
   public final inline class SkippableUpdater<T> {
     ctor public SkippableUpdater();
-    method public static androidx.compose.runtime.Composer! constructor-impl(androidx.compose.runtime.Composer composer);
-    method public static inline boolean equals-impl(androidx.compose.runtime.Composer! p, Object? p1);
-    method public static boolean equals-impl0(androidx.compose.runtime.Composer p1, androidx.compose.runtime.Composer p2);
-    method public static inline int hashCode-impl(androidx.compose.runtime.Composer! p);
-    method public static inline String! toString-impl(androidx.compose.runtime.Composer! p);
-    method public static inline void update-impl(androidx.compose.runtime.Composer $this, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,kotlin.Unit> block);
   }
 
   public final class SlotTableKt {
@@ -377,17 +371,6 @@ package androidx.compose.runtime {
 
   public final inline class Updater<T> {
     ctor public Updater();
-    method public static androidx.compose.runtime.Composer! constructor-impl(androidx.compose.runtime.Composer composer);
-    method public static inline boolean equals-impl(androidx.compose.runtime.Composer! p, Object? p1);
-    method public static boolean equals-impl0(androidx.compose.runtime.Composer p1, androidx.compose.runtime.Composer p2);
-    method public static inline int hashCode-impl(androidx.compose.runtime.Composer! p);
-    method public static void init-impl(androidx.compose.runtime.Composer $this, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
-    method public static void reconcile-impl(androidx.compose.runtime.Composer $this, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
-    method public static inline void set-impl(androidx.compose.runtime.Composer $this, int value, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,kotlin.Unit> block);
-    method public static <V> void set-impl(androidx.compose.runtime.Composer? $this, V value, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block);
-    method public static inline String! toString-impl(androidx.compose.runtime.Composer! p);
-    method public static inline void update-impl(androidx.compose.runtime.Composer $this, int value, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,kotlin.Unit> block);
-    method public static <V> void update-impl(androidx.compose.runtime.Composer? $this, V value, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block);
   }
 
 }
@@ -498,16 +481,16 @@ package androidx.compose.runtime.snapshots {
     method public androidx.compose.runtime.snapshots.SnapshotApplyResult apply();
     method public void close$metalava_module();
     method public java.util.Set<androidx.compose.runtime.snapshots.StateObject>? getModified$metalava_module();
-    method public kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? getReadObserver$metalava_module();
+    method public kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? getReadObserver();
     method public boolean getReadOnly();
     method public androidx.compose.runtime.snapshots.Snapshot getRoot();
-    method public kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? getWriteObserver$metalava_module();
+    method public kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? getWriteObserver();
     method public boolean hasPendingChanges();
     method public void nestedActivated$metalava_module(androidx.compose.runtime.snapshots.Snapshot snapshot);
     method public void nestedDeactivated$metalava_module(androidx.compose.runtime.snapshots.Snapshot snapshot);
     method public void notifyObjectsInitialized$metalava_module();
     method public void recordModified$metalava_module(androidx.compose.runtime.snapshots.StateObject state);
-    method public void setModified(java.util.Set<androidx.compose.runtime.snapshots.StateObject>? p);
+    method public void setModified$metalava_module(java.util.Set<androidx.compose.runtime.snapshots.StateObject>? modified);
     method public androidx.compose.runtime.snapshots.MutableSnapshot takeNestedMutableSnapshot(optional kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver, optional kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? writeObserver);
     method public androidx.compose.runtime.snapshots.Snapshot takeNestedSnapshot(kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver);
     property public java.util.Set<androidx.compose.runtime.snapshots.StateObject>? modified;
@@ -538,7 +521,7 @@ package androidx.compose.runtime.snapshots {
   }
 
   public static final class Snapshot.Companion {
-    method public androidx.compose.runtime.snapshots.Snapshot! getCurrent();
+    method public androidx.compose.runtime.snapshots.Snapshot getCurrent();
     method public inline <T> T! global(kotlin.jvm.functions.Function0<? extends T> block);
     method public void notifyObjectsInitialized();
     method public <T> T! observe(optional kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver, optional kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? writeObserver, kotlin.jvm.functions.Function0<? extends T> block);
@@ -550,7 +533,7 @@ package androidx.compose.runtime.snapshots {
     method public androidx.compose.runtime.snapshots.MutableSnapshot takeMutableSnapshot(optional kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver, optional kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? writeObserver);
     method public androidx.compose.runtime.snapshots.Snapshot takeSnapshot(optional kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver);
     method public inline <R> R! withMutableSnapshot(kotlin.jvm.functions.Function0<? extends R> block);
-    property public final androidx.compose.runtime.snapshots.Snapshot! current;
+    property public final androidx.compose.runtime.snapshots.Snapshot current;
   }
 
   public final class SnapshotApplyConflictException extends java.lang.Exception {
@@ -610,23 +593,23 @@ package androidx.compose.runtime.snapshots {
     method public boolean addAll(int index, java.util.Collection<? extends T> elements);
     method public boolean addAll(java.util.Collection<? extends T> elements);
     method public void clear();
-    method public boolean contains(Object? element);
-    method public boolean containsAll(java.util.Collection<?> elements);
+    method public boolean contains(T? element);
+    method public boolean containsAll(java.util.Collection<E!> elements);
     method public T! get(int index);
     method public androidx.compose.runtime.snapshots.StateRecord getFirstStateRecord();
     method public int getSize();
-    method public int indexOf(Object? element);
+    method public int indexOf(T? element);
     method public boolean isEmpty();
     method public java.util.Iterator<T> iterator();
-    method public int lastIndexOf(Object? element);
+    method public int lastIndexOf(T? element);
     method public java.util.ListIterator<T> listIterator();
     method public java.util.ListIterator<T> listIterator(int index);
     method public void prependStateRecord(androidx.compose.runtime.snapshots.StateRecord value);
-    method public boolean remove(Object? element);
-    method public boolean removeAll(java.util.Collection<?> elements);
+    method public boolean remove(T? element);
+    method public boolean removeAll(java.util.Collection<E!> elements);
     method public T! removeAt(int index);
     method public void removeRange(int fromIndex, int toIndex);
-    method public boolean retainAll(java.util.Collection<?> elements);
+    method public boolean retainAll(java.util.Collection<E!> elements);
     method public T! set(int index, T? element);
     method public java.util.List<T> subList(int fromIndex, int toIndex);
     property public androidx.compose.runtime.snapshots.StateRecord firstStateRecord;
@@ -639,8 +622,8 @@ package androidx.compose.runtime.snapshots {
   @androidx.compose.runtime.Stable public final class SnapshotStateMap<K, V> implements kotlin.jvm.internal.markers.KMutableMap java.util.Map<K,V> androidx.compose.runtime.snapshots.StateObject {
     ctor public SnapshotStateMap();
     method public void clear();
-    method public boolean containsKey(Object? key);
-    method public boolean containsValue(Object? value);
+    method public boolean containsKey(K? key);
+    method public boolean containsValue(V? value);
     method public V? get(Object? key);
     method public java.util.Set<java.util.Map.Entry<K,V>> getEntries();
     method public androidx.compose.runtime.snapshots.StateRecord getFirstStateRecord();

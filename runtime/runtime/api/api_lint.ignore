@@ -9,26 +9,10 @@ DocumentExceptions: androidx.compose.runtime.snapshots.SnapshotApplyResult.Failu
     Method Failure.check appears to be throwing androidx.compose.runtime.snapshots.SnapshotApplyConflictException; this should be recorded with a @Throws annotation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
 
 
-MissingNullability: androidx.compose.runtime.SkippableUpdater#constructor-impl(androidx.compose.runtime.Composer):
-    Missing nullability on method `constructor-impl` return
-MissingNullability: androidx.compose.runtime.SkippableUpdater#equals-impl(androidx.compose.runtime.Composer, Object) parameter #0:
-    Missing nullability on parameter `p` in method `equals-impl`
-MissingNullability: androidx.compose.runtime.SkippableUpdater#hashCode-impl(androidx.compose.runtime.Composer) parameter #0:
-    Missing nullability on parameter `p` in method `hashCode-impl`
-MissingNullability: androidx.compose.runtime.SkippableUpdater#toString-impl(androidx.compose.runtime.Composer):
-    Missing nullability on method `toString-impl` return
-MissingNullability: androidx.compose.runtime.SkippableUpdater#toString-impl(androidx.compose.runtime.Composer) parameter #0:
-    Missing nullability on parameter `p` in method `toString-impl`
-MissingNullability: androidx.compose.runtime.Updater#constructor-impl(androidx.compose.runtime.Composer):
-    Missing nullability on method `constructor-impl` return
-MissingNullability: androidx.compose.runtime.Updater#equals-impl(androidx.compose.runtime.Composer, Object) parameter #0:
-    Missing nullability on parameter `p` in method `equals-impl`
-MissingNullability: androidx.compose.runtime.Updater#hashCode-impl(androidx.compose.runtime.Composer) parameter #0:
-    Missing nullability on parameter `p` in method `hashCode-impl`
-MissingNullability: androidx.compose.runtime.Updater#toString-impl(androidx.compose.runtime.Composer):
-    Missing nullability on method `toString-impl` return
-MissingNullability: androidx.compose.runtime.Updater#toString-impl(androidx.compose.runtime.Composer) parameter #0:
-    Missing nullability on parameter `p` in method `toString-impl`
+KotlinOperator: androidx.compose.runtime.snapshots.SnapshotStateList#contains(T):
+    Note that adding the `operator` keyword would allow calling this method using operator syntax
+
+
 MissingNullability: androidx.compose.runtime.collection.MutableVector#mapIndexedNotNull(kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,? extends R>):
     Missing nullability on method `mapIndexedNotNull` return
 MissingNullability: androidx.compose.runtime.collection.MutableVector#mapNotNull(kotlin.jvm.functions.Function1<? super T,? extends R>):
@@ -41,8 +25,6 @@ MissingNullability: androidx.compose.runtime.collection.MutableVectorKt#mutableV
     Missing nullability on method `mutableVectorOf` return
 MissingNullability: androidx.compose.runtime.collection.MutableVectorKt#mutableVectorOf(T):
     Missing nullability on method `mutableVectorOf` return
-MissingNullability: androidx.compose.runtime.snapshots.Snapshot.Companion#getCurrent():
-    Missing nullability on method `getCurrent` return
 
 
 NoByteOrShort: androidx.compose.runtime.Composer#changed(byte) parameter #0:

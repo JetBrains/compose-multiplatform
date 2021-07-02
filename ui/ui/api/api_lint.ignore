@@ -7,19 +7,3 @@ GetterSetterNames: androidx.compose.ui.input.pointer.ConsumedData#getPositionCha
     Symmetric method for `setPositionChange` must be named `isPositionChange`; was `getPositionChange`
 GetterSetterNames: androidx.compose.ui.platform.AbstractComposeView#getShowLayoutBounds():
     Symmetric method for `setShowLayoutBounds` must be named `isShowLayoutBounds`; was `getShowLayoutBounds`
-
-
-MissingNullability: androidx.compose.ui.graphics.TransformOrigin#toString-impl(long):
-    Missing nullability on method `toString-impl` return
-MissingNullability: androidx.compose.ui.input.key.KeyEvent#constructor-impl(android.view.KeyEvent):
-    Missing nullability on method `constructor-impl` return
-MissingNullability: androidx.compose.ui.input.key.KeyEvent#equals-impl(android.view.KeyEvent, Object) parameter #0:
-    Missing nullability on parameter `p` in method `equals-impl`
-MissingNullability: androidx.compose.ui.input.key.KeyEvent#hashCode-impl(android.view.KeyEvent) parameter #0:
-    Missing nullability on parameter `p` in method `hashCode-impl`
-MissingNullability: androidx.compose.ui.input.key.KeyEvent#toString-impl(android.view.KeyEvent):
-    Missing nullability on method `toString-impl` return
-MissingNullability: androidx.compose.ui.input.key.KeyEvent#toString-impl(android.view.KeyEvent) parameter #0:
-    Missing nullability on parameter `p` in method `toString-impl`
-MissingNullability: androidx.compose.ui.input.pointer.PointerId#toString-impl(long):
-    Missing nullability on method `toString-impl` return
