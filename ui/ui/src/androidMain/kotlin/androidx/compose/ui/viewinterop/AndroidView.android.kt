@@ -135,7 +135,7 @@ internal class ViewFactoryHolder<T : View>(
 
     internal var typedView: T? = null
 
-    override val viewRoot: View? get() = parent as? View
+    override val viewRoot: View get() = this
 
     var factory: ((Context) -> T)? = null
         set(value) {
