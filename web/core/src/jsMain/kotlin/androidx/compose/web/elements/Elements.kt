@@ -8,6 +8,7 @@ import org.jetbrains.compose.web.DomApplier
 import org.jetbrains.compose.web.DomNodeWrapper
 import kotlinx.browser.document
 import org.jetbrains.compose.web.attributes.*
+import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLAreaElement
 import org.w3c.dom.HTMLAudioElement
@@ -41,6 +42,7 @@ import org.w3c.dom.HTMLProgressElement
 import org.w3c.dom.HTMLSelectElement
 import org.w3c.dom.HTMLSourceElement
 import org.w3c.dom.HTMLSpanElement
+import org.w3c.dom.HTMLStyleElement
 import org.w3c.dom.HTMLTableCaptionElement
 import org.w3c.dom.HTMLTableCellElement
 import org.w3c.dom.HTMLTableColElement
@@ -51,6 +53,7 @@ import org.w3c.dom.HTMLTrackElement
 import org.w3c.dom.HTMLUListElement
 import org.w3c.dom.HTMLVideoElement
 import org.w3c.dom.Text
+import org.w3c.dom.css.CSSStyleSheet
 
 typealias AttrBuilderContext<T> = AttrsBuilder<T>.() -> Unit
 typealias ContentBuilder<T> = @Composable ElementScope<T>.() -> Unit
@@ -763,4 +766,32 @@ fun Tfoot(
         applyAttrs = attrs,
         content = content
     )
+}
+
+/**
+ * Use this function to mount the <style> tag into the DOM tree.
+ *
+ * @param cssRules - is a list of style rules.
+ * Usually, it's [androidx.compose.web.css.StyleSheet] instance
+ */
+@Composable
+inline fun Style(
+    crossinline applyAttrs: AttrsBuilder<HTMLStyleElement>.() -> Unit = {},
+    cssRules: CSSRuleDeclarationList
+) {
+    TagElement(
+        elementBuilder = ElementBuilder.Style,
+        applyAttrs = {
+            applyAttrs()
+        },
+    ) {
+        DomSideEffect(cssRules) { style ->
+            (style.sheet as? CSSStyleSheet)?.let { cssStylesheet ->
+                setCSSRules(cssStylesheet, cssRules)
+                onDispose {
+                    clearCSSRules(cssStylesheet)
+                }
+            }
+        }
+    }
 }

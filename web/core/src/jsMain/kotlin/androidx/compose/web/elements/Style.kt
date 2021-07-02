@@ -26,34 +26,6 @@ inline fun Style(
     Style(applyAttrs, builder.cssRules)
 }
 
-/**
- * Use this function to mount the <style> tag into the DOM tree.
- *
- * @param cssRules - is a list of style rules.
- * Usually, it's [androidx.compose.web.css.StyleSheet] instance
- */
-@Composable
-inline fun Style(
-    crossinline applyAttrs: AttrsBuilder<HTMLStyleElement>.() -> Unit = {},
-    cssRules: CSSRuleDeclarationList
-) {
-    TagElement(
-        elementBuilder = ElementBuilder.Style,
-        applyAttrs = {
-            applyAttrs()
-        },
-    ) {
-        DomSideEffect(cssRules) { style ->
-            (style.sheet as? CSSStyleSheet)?.let { cssStylesheet ->
-                setCSSRules(cssStylesheet, cssRules)
-                onDispose {
-                    clearCSSRules(cssStylesheet)
-                }
-            }
-        }
-    }
-}
-
 fun clearCSSRules(sheet: CSSStyleSheet) {
     repeat(sheet.cssRules.length) {
         sheet.deleteRule(0)
