@@ -86,6 +86,7 @@ import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.textSelectionRange
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.TestActivity
@@ -96,6 +97,7 @@ import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.assertValueEquals
 import androidx.compose.ui.test.isEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -810,6 +812,58 @@ class AndroidAccessibilityTest {
     }
 
     @Test
+    fun sendStateChangeEvent_whenStateChange() {
+        var state by mutableStateOf("state one")
+        val tag = "State"
+        container.setContent {
+            Box(
+                Modifier
+                    .semantics { stateDescription = state }
+                    .testTag(tag)
+            ) {
+                BasicText("Text")
+            }
+        }
+
+        rule.onNodeWithTag(tag)
+            .assertValueEquals("state one")
+
+        waitForSubtreeEventToSend()
+        state = "state two"
+
+        val node = rule.onNodeWithTag(tag)
+            .fetchSemanticsNode("couldn't find node with tag $tag")
+
+        rule.runOnIdle {
+            verify(container, times(1)).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        getAccessibilityEventSourceSemanticsNodeId(it) == node.id &&
+                            it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                            it.contentChangeTypes ==
+                            AccessibilityEvent.CONTENT_CHANGE_TYPE_STATE_DESCRIPTION
+                    }
+                )
+            )
+            // Temporary(b/192295060) fix, sending CONTENT_CHANGE_TYPE_UNDEFINED to
+            // force ViewRootImpl to update its accessibility-focused virtual-node.
+            // If we have an androidx fix, we can remove this event.
+            verify(container, times(1)).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        getAccessibilityEventSourceSemanticsNodeId(it) == node.id &&
+                            it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                            it.contentChangeTypes ==
+                            AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
+                    }
+                )
+            )
+        }
+    }
+
+    @Test
     fun sendStateChangeEvent_whenClickToggleable() {
         val tag = "Toggleable"
         container.setContent {
@@ -844,6 +898,20 @@ class AndroidAccessibilityTest {
                             it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
                             it.contentChangeTypes ==
                             AccessibilityEvent.CONTENT_CHANGE_TYPE_STATE_DESCRIPTION
+                    }
+                )
+            )
+            // Temporary(b/192295060) fix, sending CONTENT_CHANGE_TYPE_UNDEFINED to
+            // force ViewRootImpl to update its accessibility-focused virtual-node.
+            // If we have an androidx fix, we can remove this event.
+            verify(container, times(1)).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        getAccessibilityEventSourceSemanticsNodeId(it) == toggleableNode.id &&
+                            it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                            it.contentChangeTypes ==
+                            AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
                     }
                 )
             )
@@ -884,6 +952,20 @@ class AndroidAccessibilityTest {
                             it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
                             it.contentChangeTypes ==
                             AccessibilityEvent.CONTENT_CHANGE_TYPE_STATE_DESCRIPTION
+                    }
+                )
+            )
+            // Temporary(b/192295060) fix, sending CONTENT_CHANGE_TYPE_UNDEFINED to
+            // force ViewRootImpl to update its accessibility-focused virtual-node.
+            // If we have an androidx fix, we can remove this event.
+            verify(container, times(1)).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        getAccessibilityEventSourceSemanticsNodeId(it) == node.id &&
+                            it.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED &&
+                            it.contentChangeTypes ==
+                            AccessibilityEvent.CONTENT_CHANGE_TYPE_UNDEFINED
                     }
                 )
             )
