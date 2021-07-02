@@ -25,11 +25,9 @@ import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
 import androidx.compose.ui.focus.FocusStateImpl.Captured
 import androidx.compose.ui.focus.FocusStateImpl.Disabled
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
-import androidx.compose.ui.focus.findFocusableChildren
 import androidx.compose.ui.focus.searchChildrenForFocusNode
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInRoot
-import androidx.compose.ui.util.fastForEach
 
 internal class ModifiedFocusNode(
     wrapped: LayoutNodeWrapper,
@@ -56,23 +54,6 @@ internal class ModifiedFocusNode(
     // TODO(b/175900268): Add API to allow a parent to extends the bounds of the focus Modifier.
     //  For now we just use the bounds of this node.
     fun focusRect(): Rect = boundsInRoot()
-
-    // TODO(b/152051577): Measure the performance of focusableChildren.
-    //  Consider caching the children.
-    fun focusableChildren(): List<ModifiedFocusNode> {
-        // Check the modifier chain that this focus node is part of. If it has a focus modifier,
-        // that means you have found the only focusable child for this node.
-        val focusableChild = wrapped.findNextFocusWrapper()
-        // findChildFocusNodeInWrapperChain()
-        if (focusableChild != null) {
-            return listOf(focusableChild)
-        }
-
-        // Go through all your children and find the first focusable node from each child.
-        val focusableChildren = mutableListOf<ModifiedFocusNode>()
-        layoutNode.children.fastForEach { it.findFocusableChildren(focusableChildren) }
-        return focusableChildren
-    }
 
     fun sendOnFocusEvent(focusState: FocusState) {
         wrappedBy?.propagateFocusEvent(focusState)

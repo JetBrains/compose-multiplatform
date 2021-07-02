@@ -16,6 +16,12 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.FocusStateImpl.Active
+import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
+import androidx.compose.ui.focus.FocusStateImpl.Captured
+import androidx.compose.ui.focus.FocusStateImpl.Disabled
+import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
@@ -31,6 +37,7 @@ import androidx.compose.ui.semantics.SemanticsWrapper
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.util.fastForEach
 
 internal class InnerPlaceable(
     layoutNode: LayoutNode
@@ -54,6 +61,27 @@ internal class InnerPlaceable(
     override fun findNextFocusWrapper(): ModifiedFocusNode? = null
 
     override fun findLastFocusWrapper(): ModifiedFocusNode? = findPreviousFocusWrapper()
+
+    // For non-focusable parents, we don't propagate the focus state sent by the child.
+    // Instead we aggregate the focus state of all children.
+    override fun propagateFocusEvent(focusState: FocusState) {
+
+        var focusedChild: ModifiedFocusNode? = null
+        var allChildrenDisabled: Boolean? = null
+        // TODO(b/192681045): Create a utility like fun LayoutNodeWrapper.forEachFocusableChild{...}
+        //  that does not allocate, but just iterates over all the focusable children.
+        focusableChildren().fastForEach {
+            when (it.focusState) {
+                Active, ActiveParent, Captured -> { focusedChild = it; allChildrenDisabled = false }
+                Disabled -> if (allChildrenDisabled == null) { allChildrenDisabled = true }
+                Inactive -> allChildrenDisabled = false
+            }
+        }
+
+        super.propagateFocusEvent(
+            focusedChild?.focusState ?: if (allChildrenDisabled == true) Disabled else Inactive
+        )
+    }
 
     override fun findPreviousKeyInputWrapper() = wrappedBy?.findPreviousKeyInputWrapper()
 
