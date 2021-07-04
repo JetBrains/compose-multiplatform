@@ -7,8 +7,11 @@ import data.GameFrame
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.delay
-import org.jetbrains.compose.web.attributes.*
-import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.attributes.InputType
+import org.jetbrains.compose.web.attributes.checked
+import org.jetbrains.compose.web.attributes.disabled
+import org.jetbrains.compose.web.css.marginTop
+import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.*
 import org.jetbrains.compose.web.renderComposable
 import org.w3c.dom.HTMLElement
@@ -31,20 +34,12 @@ fun main() {
         }
     })
 
-    body.onclick = {
-        game.moveBirdUp()
-    }
-
     renderComposable(rootElementId = "root") {
 
         Div(
             attrs = {
                 style {
-                    display(DisplayStyle.Flex)
-                    justifyContent(JustifyContent.Center)
-                }
-                onClick {
-                    game.moveBirdUp()
+                    property("text-align", "center")
                 }
             }
         ) {
@@ -60,29 +55,19 @@ fun main() {
                 }
             }
 
-            Div {
+            Header(gameFrame)
 
-                // Title
-                GameTitle()
-                Score(gameFrame)
-                Br()
-
-                if (gameFrame.isGameOver || gameFrame.isGameWon) {
-                    Div(
-                        attrs = {
-                            style {
-                                display(DisplayStyle.Flex)
-                                flexDirection(FlexDirection.Column)
-                                justifyContent(JustifyContent.Center)
-                            }
-                        }
-                    ) {
-                        GameStatus(gameFrame)
-                        TryAgain()
+            Div(
+                attrs = {
+                    style {
+                        marginTop(30.px)
                     }
-
-
+                }
+            ) {
+                if (gameFrame.isGameOver || gameFrame.isGameWon) {
+                    GameResult(gameFrame)
                 } else {
+                    // Play area
                     repeat(ComposeBirdGame.ROWS) { rowIndex ->
                         Div {
                             repeat(ComposeBirdGame.COLUMNS) { columnIndex ->
@@ -90,12 +75,6 @@ fun main() {
                                     InputType.Radio,
 
                                     attrs = {
-
-                                        style {
-                                            width(25.px)
-                                            height(25.px)
-                                        }
-
                                         val tube = gameFrame.tubes.find { it.position == columnIndex }
                                         val isTube = tube?.coordinates?.get(rowIndex) ?: false
                                         val isBird =
@@ -126,7 +105,29 @@ fun main() {
 }
 
 @Composable
-private fun TryAgain() {
+private fun Header(gameFrame: GameFrame) {
+    // Game title
+    H1 {
+        Text(value = "🐦 Compose Bird!")
+    }
+
+    // Game score
+    Text(value = "Your Score: ${gameFrame.score} || Top Score: ${ComposeBirdGame.TOTAL_TUBES}")
+}
+
+@Composable
+private fun GameResult(gameFrame: GameFrame) {
+    // Game Status
+    H2 {
+        if (gameFrame.isGameWon) {
+            Text("🚀 Won the game! 🚀")
+        } else {
+            // core.Game over
+            Text("💀 Game Over 💀")
+        }
+    }
+
+    // Try Again
     Button(
         attrs = {
             onClick {
@@ -135,51 +136,5 @@ private fun TryAgain() {
         }
     ) {
         Text("Try Again!")
-    }
-}
-
-@Composable
-private fun GameStatus(gameFrame: GameFrame) {
-    H2(
-        attrs = {
-            style {
-                alignSelf(AlignSelf.Center)
-            }
-        }
-    ) {
-        if (gameFrame.isGameWon) {
-            Text("🚀 Won the game! 🚀")
-        } else {
-            // core.Game over
-            Text("💀 Game Over 💀")
-        }
-    }
-}
-
-@Composable
-private fun Score(gameFrame: GameFrame) {
-    Div(
-        attrs = {
-            style {
-                display(DisplayStyle.Flex)
-                justifyContent(JustifyContent.Center)
-            }
-        }
-    ) {
-        Text("Your Score: ${gameFrame.score} || Top Score: ${ComposeBirdGame.TOTAL_TUBES}")
-    }
-}
-
-@Composable
-private fun GameTitle() {
-    H1(
-        attrs = {
-            style {
-                display(DisplayStyle.Flex)
-                justifyContent(JustifyContent.Center)
-            }
-        }
-    ) {
-        Text("🐦 Compose Bird!")
     }
 }
