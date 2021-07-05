@@ -14,9 +14,10 @@ import com.intellij.openapi.externalSystem.service.execution.ProgressExecutionMo
 import com.intellij.openapi.externalSystem.task.TaskCallback
 import com.intellij.openapi.externalSystem.util.ExternalSystemUtil.runTask
 import com.intellij.openapi.util.UserDataHolderBase
+import com.intellij.openapi.wm.ToolWindowManager
 import org.jetbrains.plugins.gradle.settings.GradleSettings
 import org.jetbrains.plugins.gradle.util.GradleConstants
-import java.util.concurrent.CompletableFuture
+import javax.swing.SwingUtilities
 
 class RunPreviewAction(
     private val fqName: String,
@@ -24,6 +25,9 @@ class RunPreviewAction(
 ) : AnAction({ "Show non-interactive preview" }, PreviewIcons.RUN_PREVIEW) {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project!!
+        val previewToolWindow = ToolWindowManager.getInstance(project).getToolWindow("Desktop Preview")
+        previewToolWindow?.setAvailable(true)
+
         val gradleVmOptions = GradleSettings.getInstance(project).gradleVmOptions
         val settings = ExternalSystemTaskExecutionSettings()
         settings.executionName = "Preview: $fqName"
@@ -37,7 +41,6 @@ class RunPreviewAction(
                 "-Pcompose.desktop.preview.target=$fqName",
                 "-Pcompose.desktop.preview.ide.port=$gradleCallbackPort"
             ).joinToString(" ")
-        val future = CompletableFuture<Nothing>()
         runTask(
             settings,
             DefaultRunExecutor.EXECUTOR_ID,
@@ -45,10 +48,11 @@ class RunPreviewAction(
             GradleConstants.SYSTEM_ID,
             object : TaskCallback {
                 override fun onSuccess() {
-                    future.complete(null)
+                    SwingUtilities.invokeLater {
+                        ToolWindowManager.getInstance(project).getToolWindow("Desktop Preview")?.activate {  }
+                    }
                 }
                 override fun onFailure() {
-                    future.completeExceptionally(RuntimeException("Preview for $fqName failed"))
                 }
             },
             ProgressExecutionMode.IN_BACKGROUND_ASYNC,
