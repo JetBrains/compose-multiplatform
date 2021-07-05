@@ -6,7 +6,7 @@ plugins {
     // __KOTLIN_COMPOSE_VERSION__
     kotlin("jvm") version "1.5.10"
     // __LATEST_COMPOSE_RELEASE_VERSION__
-    id("org.jetbrains.compose") version "0.4.0"
+    id("org.jetbrains.compose") version "0.5.0-build229"
 }
 
 group = "me.user"
@@ -19,6 +19,7 @@ repositories {
 
 dependencies {
     implementation(compose.desktop.currentOs)
+    implementation(compose.uiTooling)
 }
 
 tasks.withType<KotlinCompile>() {

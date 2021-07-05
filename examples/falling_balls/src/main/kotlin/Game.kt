@@ -1,5 +1,6 @@
 package org.jetbrains.compose.demo.falling
 
+import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Slider
@@ -72,6 +73,7 @@ class Game {
 }
 
 @Composable
+@Preview
 fun FallingBallsGame() {
     val game = remember { Game() }
     val density = LocalDensity.current
