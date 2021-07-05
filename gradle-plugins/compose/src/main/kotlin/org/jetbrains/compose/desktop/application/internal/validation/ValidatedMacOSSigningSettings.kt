@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.desktop.application.internal.validation
 
+import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.jetbrains.compose.desktop.application.dsl.MacOSSigningSettings
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
@@ -31,7 +32,8 @@ internal data class ValidatedMacOSSigningSettings(
 }
 
 internal fun MacOSSigningSettings.validate(
-    bundleIDProvider: Provider<String?>
+    bundleIDProvider: Provider<String?>,
+    project: Project
 ): ValidatedMacOSSigningSettings {
     check(currentOS == OS.MacOS) { ERR_WRONG_OS }
 
@@ -41,10 +43,13 @@ internal fun MacOSSigningSettings.validate(
         ?: error(ERR_UNKNOWN_PREFIX)
     val signIdentity = this.identity.orNull
         ?: error(ERR_UNKNOWN_SIGN_ID)
-    val keychainFile = this.keychain.orNull?.let { File(it) }
-    if (keychainFile != null) {
-        check(keychainFile.exists()) {
-            "$ERR_PREFIX keychain is not an existing file: ${keychainFile.absolutePath}"
+    val keychainPath = this.keychain.orNull
+    val keychainFile =
+        listOf(project.file(keychainPath), project.rootProject.file(keychainPath))
+            .firstOrNull { it.exists() }
+    if (keychainPath != null) {
+        check(keychainFile != null && keychainFile.exists()) {
+            "$ERR_PREFIX could not find the specified keychain: $keychainPath"
         }
     }
 

@@ -29,7 +29,7 @@ compose.desktop {
                 signing {
                     sign.set(true)
                     identity.set("Compose Test")
-                    keychain.set(project.file("compose.test.keychain").absolutePath)
+                    keychain.set("compose.test.keychain")
                 }
             }
         }
