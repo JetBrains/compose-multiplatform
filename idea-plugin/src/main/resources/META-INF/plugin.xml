@@ -24,8 +24,6 @@
         <runLineMarkerContributor
                 language="kotlin"
                 implementationClass="org.jetbrains.compose.desktop.ide.preview.PreviewRunLineMarkerContributor"/>
-        <runConfigurationProducer
-                implementation="org.jetbrains.compose.desktop.ide.preview.PreviewRunConfigurationProducer"/>
         <deadCode implementation="org.jetbrains.compose.desktop.ide.preview.PreviewEntryPoint" />
 
         <runLineMarkerContributor

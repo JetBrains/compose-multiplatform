@@ -11,4 +11,5 @@ object PreviewIcons {
     private fun load(path: String) = IconLoader.getIcon(path, PreviewIcons::class.java)
 
     val COMPOSE = load("/icons/compose/compose.svg")
+    val RUN_PREVIEW = load("/icons/compose/runPreview.svg")
 }

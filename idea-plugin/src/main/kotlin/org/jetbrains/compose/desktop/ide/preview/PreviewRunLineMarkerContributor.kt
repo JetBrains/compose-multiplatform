@@ -16,10 +16,11 @@
 
 package org.jetbrains.compose.desktop.ide.preview
 
-import com.intellij.execution.lineMarker.ExecutorAction
 import com.intellij.execution.lineMarker.RunLineMarkerContributor
+import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
+import org.jetbrains.kotlin.idea.util.projectStructure.module
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtNamedFunction
 
@@ -37,11 +38,13 @@ class PreviewRunLineMarkerContributor : RunLineMarkerContributor() {
         val parent = element.parent
         return when {
             parent is KtNamedFunction && parent.isValidComposePreview() -> {
-                val actions = arrayOf(ExecutorAction.getActions(0).first())
+                val fqName = parent.composePreviewFunctionFqn()
+                val module = parent.module?.let { ExternalSystemApiUtil.getExternalProjectPath(it) }
+                    ?: error("Could not determine module for $parent")
+                val actions = arrayOf(RunPreviewAction(fqName, module))
                 Info(PreviewIcons.COMPOSE, actions) { PreviewMessages.runPreview(parent.name!!) }
             }
             else -> null
         }
     }
 }
-
