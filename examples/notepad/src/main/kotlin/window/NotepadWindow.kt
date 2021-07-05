@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Notification
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowScope
 import common.LocalAppResources
 import kotlinx.coroutines.flow.collect
@@ -118,7 +119,7 @@ private fun WindowScope.WindowMenuBar(state: NotepadWindowState) = MenuBar {
             onClick = state.settings::toggleTray
         )
         Item(
-            if (state.window.isFullscreen) "Exit fullscreen" else "Enter fullscreen",
+            if (state.window.placement == WindowPlacement.Fullscreen) "Exit fullscreen" else "Enter fullscreen",
             onClick = state::toggleFullscreen
         )
     }
