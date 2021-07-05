@@ -23,4 +23,8 @@ class PreviewToolWindow : ToolWindowFactory, DumbAware {
             project.service<PreviewStateService>().registerPreviewPanel(panel)
         }
     }
+
+    // don't show the toolwindow until a preview is requested
+    override fun shouldBeAvailable(project: Project): Boolean =
+        false
 }

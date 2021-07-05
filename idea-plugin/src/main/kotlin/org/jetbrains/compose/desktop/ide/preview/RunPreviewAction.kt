@@ -25,6 +25,9 @@ class RunPreviewAction(
 ) : AnAction({ "Show non-interactive preview" }, PreviewIcons.RUN_PREVIEW) {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project!!
+        val previewToolWindow = ToolWindowManager.getInstance(project).getToolWindow("Desktop Preview")
+        previewToolWindow?.setAvailable(true)
+
         val gradleVmOptions = GradleSettings.getInstance(project).gradleVmOptions
         val settings = ExternalSystemTaskExecutionSettings()
         settings.executionName = "Preview: $fqName"
