@@ -44,8 +44,23 @@ object MyCSSVariables : CSSVariables {
 }
 
 object AppStyleSheet : StyleSheet() {
+    val bounce by keyframes {
+        from {
+            property("transform", "translateX(50%)")
+        }
+
+        to {
+            property("transform", "translateX(-50%)")
+        }
+    }
+
     val myClass by style {
         color("green")
+        animation(bounce) {
+            duration(2.s)
+            timingFunction(AnimationTimingFunction.EaseIn)
+            direction(AnimationDirection.Alternate)
+        }
     }
 
     val classWithNested by style {

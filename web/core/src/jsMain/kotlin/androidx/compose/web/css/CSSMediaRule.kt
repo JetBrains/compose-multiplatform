@@ -18,7 +18,7 @@ interface CSSMediaQuery {
     }
 
     @Suppress("EqualsOrHashCode")
-    data class MediaFeature(
+    class MediaFeature(
         val name: String,
         val value: StylePropertyValue? = null
     ) : CSSMediaQuery, Atomic {
@@ -61,8 +61,8 @@ interface CSSMediaQuery {
 @Suppress("EqualsOrHashCode")
 class CSSMediaRuleDeclaration(
     val query: CSSMediaQuery,
-    rules: CSSRuleDeclarationList
-) : CSSGroupingRuleDeclaration(rules) {
+    override val rules: CSSRuleDeclarationList
+) : CSSGroupingRuleDeclaration {
     override val header: String
         get() = "@media $query"
 

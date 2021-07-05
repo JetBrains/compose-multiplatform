@@ -24,6 +24,11 @@ private fun CSSStyleSheet.addRule(cssRule: String): CSSRule? {
     return this.cssRules.item(cssRuleIndex)
 }
 
+private fun CSSKeyframesRule.addRule(cssRule: String): CSSRule? {
+    appendRule(cssRule)
+    return this.cssRules.item(this.cssRules.length - 1)
+}
+
 private fun CSSStyleSheet.addRule(cssRuleDeclaration: CSSRuleDeclaration) {
     addRule("${cssRuleDeclaration.header} {}")?.let { cssRule ->
         fillRule(cssRuleDeclaration, cssRule)
@@ -41,12 +46,18 @@ private fun CSSGroupingRule.addRule(cssRuleDeclaration: CSSRuleDeclaration) {
     }
 }
 
+private fun CSSKeyframesRule.addRule(cssRuleDeclaration: CSSKeyframeRuleDeclaration) {
+    addRule("${cssRuleDeclaration.header} {}")?.let { cssRule ->
+        fillRule(cssRuleDeclaration, cssRule)
+    }
+}
+
 private fun fillRule(
     cssRuleDeclaration: CSSRuleDeclaration,
     cssRule: CSSRule
 ) {
     when (cssRuleDeclaration) {
-        is CSSStyleRuleDeclaration -> {
+        is CSSStyledRuleDeclaration -> {
             val cssStyleRule = cssRule.unsafeCast<CSSStyleRule>()
             cssRuleDeclaration.style.properties.forEach { (name, value) ->
                 setProperty(cssStyleRule.style, name, value)
@@ -58,6 +69,12 @@ private fun fillRule(
         is CSSGroupingRuleDeclaration -> {
             val cssGroupingRule = cssRule.unsafeCast<CSSGroupingRule>()
             cssRuleDeclaration.rules.forEach { childRuleDeclaration ->
+                cssGroupingRule.addRule(childRuleDeclaration)
+            }
+        }
+        is CSSKeyframesRuleDeclaration -> {
+            val cssGroupingRule = cssRule.unsafeCast<CSSKeyframesRule>()
+            cssRuleDeclaration.keys.forEach { childRuleDeclaration ->
                 cssGroupingRule.addRule(childRuleDeclaration)
             }
         }

@@ -6,23 +6,28 @@ interface CSSStyleRuleBuilder : StyleBuilder
 
 open class CSSRuleBuilderImpl : CSSStyleRuleBuilder, StyleBuilderImpl()
 
-abstract class CSSRuleDeclaration {
-    abstract val header: String
+@Suppress("EqualsOrHashCode")
+interface CSSRuleDeclaration {
+    val header: String
 
-    abstract override fun equals(other: Any?): Boolean
+    override fun equals(other: Any?): Boolean
+}
+
+interface CSSStyledRuleDeclaration {
+    val style: StyleHolder
 }
 
 data class CSSStyleRuleDeclaration(
     val selector: CSSSelector,
-    val style: StyleHolder
-) : CSSRuleDeclaration() {
+    override val style: StyleHolder
+) : CSSRuleDeclaration, CSSStyledRuleDeclaration {
     override val header
         get() = selector.toString()
 }
 
-abstract class CSSGroupingRuleDeclaration(
+interface CSSGroupingRuleDeclaration: CSSRuleDeclaration {
     val rules: CSSRuleDeclarationList
-) : CSSRuleDeclaration()
+}
 
 typealias CSSRuleDeclarationList = List<CSSRuleDeclaration>
 typealias MutableCSSRuleDeclarationList = MutableList<CSSRuleDeclaration>
