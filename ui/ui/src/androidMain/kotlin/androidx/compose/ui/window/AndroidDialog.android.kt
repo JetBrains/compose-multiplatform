@@ -79,7 +79,7 @@ class DialogProperties @ExperimentalComposeUiApi constructor(
     val dismissOnClickOutside: Boolean = true,
     val securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit,
     @get:ExperimentalComposeUiApi
-    val usePlatformDefaultWidth: Boolean = false
+    val usePlatformDefaultWidth: Boolean = true
 ) {
     @OptIn(ExperimentalComposeUiApi::class)
     constructor(
@@ -90,7 +90,7 @@ class DialogProperties @ExperimentalComposeUiApi constructor(
         dismissOnBackPress = dismissOnBackPress,
         dismissOnClickOutside = dismissOnClickOutside,
         securePolicy = securePolicy,
-        usePlatformDefaultWidth = false
+        usePlatformDefaultWidth = true
     )
 
     @OptIn(ExperimentalComposeUiApi::class)
