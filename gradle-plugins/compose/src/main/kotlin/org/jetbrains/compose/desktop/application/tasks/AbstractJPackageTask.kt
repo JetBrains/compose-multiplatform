@@ -15,6 +15,7 @@ import org.gradle.api.tasks.Optional
 import org.gradle.process.ExecResult
 import org.gradle.work.ChangeType
 import org.gradle.work.InputChanges
+import org.jetbrains.compose.desktop.application.dsl.InfoPlistSettings
 import org.jetbrains.compose.desktop.application.dsl.MacOSSigningSettings
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.*
@@ -168,6 +169,10 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Input
     @get:Optional
     internal val nonValidatedMacBundleID: Property<String?> = objects.nullableProperty()
+
+    @get:Input
+    @get:Optional
+    internal val macExtraPlistKeysRawXml: Property<String?> = objects.nullableProperty()
 
     @get:Optional
     @get:Nested
@@ -361,7 +366,7 @@ abstract class AbstractJPackageTask @Inject constructor(
         fileOperations.delete(resourcesDir)
         fileOperations.mkdir(resourcesDir)
         if (currentOS == OS.MacOS) {
-            InfoPlistBuilder()
+            InfoPlistBuilder(macExtraPlistKeysRawXml.orNull)
                 .also { setInfoPlistValues(it) }
                 .writeToFile(resourcesDir.ioFile.resolve("Info.plist"))
         }

@@ -370,6 +370,7 @@ The following platform-specific options are available
       (see the section `Specifying package version` for details);
     * `pkgPackageVersion = "PKG_VERSION"` — a pkg-specific package version
       (see the section `Specifying package version` for details);
+    * `infoPlist` — see the section `Customizing Info.plist on macOS` for details;
 * Windows:
     * `console = true` adds a console launcher for the application;
     * `dirChooser = true` enables customizing the installation path during installation;
@@ -383,7 +384,7 @@ The following platform-specific options are available
           (see the section `Specifying package version` for details);
     * `exePackageVersion = "EXE_VERSION"` — a pkg-specific package version
     (see the section `Specifying package version` for details);
-    
+
 ## App icon
 
 The app icon needs to be provided in OS-specific formats:
@@ -408,3 +409,79 @@ compose.desktop {
     }
 }
 ```
+
+## Customizing Info.plist on macOS
+
+We aim to support important platform-specific customization use-cases via declarative DSL.
+However, the provided DSL is not enough sometimes. If you need to specify `Info.plist`
+values, that are not modeled in the DSL, you can work around by specifying a piece
+of raw XML, that will be appended to the application's `Info.plist`.
+
+### Example: deep linking into macOS apps
+
+1. Specify a custom URL scheme:
+``` kotlin
+// build.gradle.kts
+compose.desktop {
+    application {
+        mainClass = "MainKt"
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg)
+            packageName = "Deep Linking Example App"
+            macOS {
+                bundleID = "org.jetbrains.compose.examples.deeplinking"
+                infoPlist {
+                    extraKeysRawXml = macExtraPlistKeys
+                }
+            }
+        }
+    }
+}
+
+val macExtraPlistKeys: String
+    get() = """
+      <key>CFBundleURLTypes</key>
+      <array>
+        <dict>
+          <key>CFBundleURLName</key>
+          <string>Example deep link</string>
+          <key>CFBundleURLSchemes</key>
+          <array>
+            <string>compose</string>
+          </array>
+        </dict>
+      </array>
+    """
+"""
+```
+
+2. Use `java.awt.Desktop` to set up a URI handler:
+``` kotlin 
+// src/main/main.kt
+
+import androidx.compose.desktop.Window
+import androidx.compose.material.Text
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import java.awt.Desktop
+
+fun main() {
+    val text = mutableStateOf("Hello, World!")
+
+    Desktop.getDesktop().setOpenURIHandler { event ->
+        text.value = "Open URI: " + event.uri
+    }
+
+    Window {
+        var text by remember { text }
+        MaterialTheme {
+            Text(text)
+        }
+    }
+}
+```
+3. Run `./gradlew runDistributable`.
+4. Links like `compose://foo/bar` are now redirected from a browser to your application.

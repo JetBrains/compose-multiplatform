@@ -5,10 +5,11 @@
 
 package org.jetbrains.compose.desktop.application.internal
 
+import org.jetbrains.compose.desktop.application.dsl.InfoPlistSettings
 import java.io.File
 import kotlin.reflect.KProperty
 
-internal class InfoPlistBuilder {
+internal class InfoPlistBuilder(private val extraPlistKeysRawXml: String?) {
     private val values = LinkedHashMap<InfoPlistKey, String>()
 
     operator fun get(key: InfoPlistKey): String? = values[key]
@@ -27,6 +28,7 @@ internal class InfoPlistBuilder {
                     appendLine("  <key>${k.name}</key>")
                     appendLine("  <string>$v</string>")
                 }
+                extraPlistKeysRawXml?.let { appendLine(it) }
                 appendLine(" </dict>")
                 appendLine("</plist>")
             }
