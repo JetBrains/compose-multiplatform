@@ -18,12 +18,12 @@ class EventTests {
 
     @Test
     fun buttonClickHandled() = runTest {
-        var handeled = false
+        var handled = false
 
         composition {
             Button(
                 {
-                    onClick { handeled = true }
+                    onClick { handled = true }
                 }
             ) {}
         }
@@ -33,18 +33,18 @@ class EventTests {
         val btn = root.firstChild as HTMLElement
         btn.dispatchEvent(MouseEvent("click"))
 
-        assertTrue(handeled)
+        assertTrue(handled)
     }
 
     @Test
     fun checkboxInputHandled() = runTest {
-        var handeled = false
+        var handled = false
 
         composition {
             Input(
                 type = InputType.Checkbox,
                 attrs = {
-                    onInput { handeled = true }
+                    onInput { handled = true }
                 }
             )
         }
@@ -52,18 +52,18 @@ class EventTests {
         val checkbox = root.firstChild as HTMLInputElement
         checkbox.dispatchEvent(Event("input"))
 
-        assertTrue(handeled)
+        assertTrue(handled)
     }
 
     @Test
     fun radioButtonInputHandled() = runTest {
-        var handeled = false
+        var handled = false
 
         composition {
             Input(
                 type = InputType.Radio,
                 attrs = {
-                    onInput { handeled = true }
+                    onInput { handled = true }
                 }
             )
         }
@@ -72,17 +72,17 @@ class EventTests {
         radio.dispatchEvent(Event("input"))
         assertEquals(false, radio.checked)
 
-        assertTrue(handeled)
+        assertTrue(handled)
     }
 
     @Test
     fun textAreaInputHandled() = runTest {
-        var handeled = false
+        var handled = false
 
         composition {
             TextArea(
                 {
-                    onInput { handeled = true }
+                    onInput { handled = true }
                 },
                 value = ""
             )
@@ -93,6 +93,6 @@ class EventTests {
 
         assertEquals("", radio.value)
 
-        assertTrue(handeled)
+        assertTrue(handled)
     }
 }
