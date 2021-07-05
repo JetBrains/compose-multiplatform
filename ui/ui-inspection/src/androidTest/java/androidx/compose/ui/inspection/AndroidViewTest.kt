@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.inspection
 
+import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.inspection.rules.ComposeInspectionRule
 import androidx.compose.ui.inspection.rules.sendCommand
@@ -44,7 +45,11 @@ class AndroidViewTest {
             it.viewId != 0L
         }.single()
         assertThat(strings[composeNode.name]).isEqualTo("ComposeNode")
-        val viewHolder = (rule.rootsForTest.single() as ViewGroup).getChildAt(0)
-        assertThat(composeNode.viewId).isEqualTo(viewHolder.uniqueDrawingId)
+        val androidViewsHandler = rule.rootsForTest.single().view.childAt(0)
+        val viewFactoryHolder = androidViewsHandler.childAt(0)
+        assertThat(composeNode.viewId).isEqualTo(viewFactoryHolder.uniqueDrawingId)
     }
+
+    private fun View.childAt(index: Int): View =
+        (this as ViewGroup).getChildAt(index)
 }
