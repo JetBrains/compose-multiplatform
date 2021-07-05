@@ -286,13 +286,13 @@ class DialogTest {
         var box1Width = 0
         var box2Width = 0
         rule.setContent {
-            Dialog(onDismissRequest = {}) {
-                Box(Modifier.fillMaxSize().onSizeChanged { box1Width = it.width })
-            }
             Dialog(
                 onDismissRequest = {},
-                properties = DialogProperties(usePlatformDefaultWidth = true)
+                properties = DialogProperties(usePlatformDefaultWidth = false)
             ) {
+                Box(Modifier.fillMaxSize().onSizeChanged { box1Width = it.width })
+            }
+            Dialog(onDismissRequest = {}) {
                 Box(Modifier.fillMaxSize().onSizeChanged { box2Width = it.width })
             }
         }
