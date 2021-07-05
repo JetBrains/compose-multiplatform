@@ -16,6 +16,10 @@ class PreviewToolWindow : ToolWindowFactory, DumbAware {
         return true
     }
 
+    override fun init(toolWindow: ToolWindow) {
+        toolWindow.setIcon(PreviewIcons.COMPOSE)
+    }
+
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         toolWindow.contentManager.let { content ->
             val panel = PreviewPanel()
