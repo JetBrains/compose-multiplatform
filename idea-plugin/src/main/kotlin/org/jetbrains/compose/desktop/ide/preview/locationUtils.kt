@@ -109,4 +109,6 @@ private fun KtAnnotationEntry.fqNameMatches(fqName: String): Boolean {
 private fun KtAnnotationEntry.getQualifiedName(): String? =
     analyze(BodyResolveMode.PARTIAL).get(BindingContext.ANNOTATION, this)?.fqName?.asString()
 
+internal fun KtNamedFunction.composePreviewFunctionFqn() = "${getClassName()}.${name}"
+
 
