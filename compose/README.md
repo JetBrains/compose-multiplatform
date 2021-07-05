@@ -4,7 +4,7 @@ Composite build of [Compose-jb sources](https://github.com/JetBrains/androidx)
 
 ## Download submodules after downloading the main project:
 ```
-git submodule update --init
+git submodule update --init --recursive
 ```
 Set this property to always update submodules on git checkout/pull/reset:
 ```
