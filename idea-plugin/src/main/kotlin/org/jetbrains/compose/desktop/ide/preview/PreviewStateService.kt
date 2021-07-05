@@ -34,7 +34,7 @@ class PreviewStateService : Disposable {
             val frameConfig = FrameConfig(
                 width = c.width,
                 height = c.height,
-                scale = null
+                scale = c.graphicsConfiguration.defaultTransform.scaleX
             )
             previewManager.updateFrameConfig(frameConfig)
         }
