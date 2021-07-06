@@ -19,6 +19,7 @@ import org.jetbrains.compose.desktop.preview.internal.initializePreview
 import org.jetbrains.compose.web.internal.initializeWeb
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 
 internal val composeVersion get() = ComposeBuildConfig.composeVersion
 
@@ -106,6 +107,10 @@ class ComposePlugin : Plugin<Project> {
                 useIR = true
             }
         }
+
+        if (project.shouldFixKotlinxSerializationAndComposeOrderForJsTarget()) {
+            project.applyFixForKoltinxSerializationAndComposeOrder()
+        }
     }
 
     object Dependencies {
@@ -175,3 +180,33 @@ fun DependencyHandler.compose(groupWithArtifact: String) = composeDependency(gro
 val DependencyHandler.compose get() = ComposePlugin.Dependencies
 
 private fun composeDependency(groupWithArtifact: String) = "$groupWithArtifact:$composeVersion"
+
+internal fun Project.shouldFixKotlinxSerializationAndComposeOrderForJsTarget(): Boolean {
+    return project.findProperty(
+        "FIX_KOTLINX_SERIALIZATION_COMPOSE_ORDER_IN_JS"
+    )?.toString()?.toBoolean() ?: false
+}
+
+private fun Project.applyFixForKoltinxSerializationAndComposeOrder() {
+    afterEvaluate {
+        project.dependencies.add(
+            "jsCompileOnly",
+            ComposeCompilerKotlinSupportPlugin().getPluginArtifact().let {
+                "${it.groupId}:${it.artifactId}:${it.version}"
+            })
+    }
+
+    project.tasks.withType(KotlinJsCompile::class.java).configureEach {
+        val plugin = ComposeCompilerKotlinSupportPlugin()
+        val pluginArtifact = plugin.getPluginArtifact()
+
+        val pluginPath = it.project.configurations.getByName("jsCompileOnly").find {
+            it.absolutePath.contains(pluginArtifact.groupId)
+        }?.absolutePath ?: error("${pluginArtifact.groupId} was not found")
+
+        it.kotlinOptions.freeCompilerArgs += "-Xplugin=$pluginPath"
+        it.kotlinOptions.freeCompilerArgs += listOf(
+            "-P", "plugin:${plugin.getCompilerPluginId()}:generateDecoys=true"
+        )
+    }
+}

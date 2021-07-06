@@ -39,6 +39,10 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
         if (kotlinTarget !is KotlinJsIrTarget) return false
 
         val project = kotlinTarget.project
+        if (project.shouldFixKotlinxSerializationAndComposeOrderForJsTarget()) {
+            return false
+        }
+
         val webExt = project.webExt ?: return false
 
         return kotlinTarget in webExt.targetsToConfigure(project)
