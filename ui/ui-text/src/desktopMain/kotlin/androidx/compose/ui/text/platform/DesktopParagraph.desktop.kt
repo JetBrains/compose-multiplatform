@@ -123,19 +123,21 @@ internal class DesktopParagraph(
     override val width: Float
 ) : Paragraph {
 
-    val paragraphIntrinsics = intrinsics as DesktopParagraphIntrinsics
+    private val ellipsisChar = if (ellipsis) "\u2026" else ""
+
+    private val paragraphIntrinsics = intrinsics as DesktopParagraphIntrinsics
 
     /**
      * Paragraph isn't always immutable, it could be changed via [paint] method without
      * rerunning layout
      */
-    val para: SkParagraph
-        get() = paragraphIntrinsics.para
+    private var para = paragraphIntrinsics.layoutParagraph(
+        width = width,
+        maxLines = maxLines,
+        ellipsis = ellipsisChar
+    )
 
     init {
-        if (resetMaxLinesIfNeeded()) {
-            rebuildParagraph()
-        }
         para.layout(width)
     }
 
@@ -288,7 +290,7 @@ internal class DesktopParagraph(
     // workaround for https://bugs.chromium.org/p/skia/issues/detail?id=11321 :(
     private val lineMetrics: Array<LineMetrics>
         get() = if (text == "") {
-            val height = paragraphIntrinsics.builder.defaultHeight.toDouble()
+            val height = paragraphIntrinsics.defaultHeight.toDouble()
             arrayOf(
                 LineMetrics(
                     0, 0, 0, 0, true,
@@ -372,54 +374,16 @@ internal class DesktopParagraph(
         shadow: Shadow?,
         textDecoration: TextDecoration?
     ) {
-        var toRebuild = false
-        var currentColor = paragraphIntrinsics.builder.textStyle.color
-        var currentShadow = paragraphIntrinsics.builder.textStyle.shadow
-        var currentTextDecoration = paragraphIntrinsics.builder.textStyle.textDecoration
-        if (color.isSpecified && color != currentColor) {
-            toRebuild = true
-            currentColor = color
-        }
+        para = paragraphIntrinsics.layoutParagraph(
+            width = width,
+            maxLines = maxLines,
+            ellipsis = ellipsisChar,
+            color = color,
+            shadow = shadow,
+            textDecoration = textDecoration
+        )
 
-        if (shadow != currentShadow) {
-            toRebuild = true
-            currentShadow = shadow
-        }
-
-        if (textDecoration != currentTextDecoration) {
-            toRebuild = true
-            currentTextDecoration = textDecoration
-        }
-
-        if (resetMaxLinesIfNeeded()) {
-            toRebuild = true
-        }
-
-        if (toRebuild) {
-            paragraphIntrinsics.builder.textStyle =
-                paragraphIntrinsics.builder.textStyle.copy(
-                    color = currentColor,
-                    shadow = currentShadow,
-                    textDecoration = currentTextDecoration
-                )
-            rebuildParagraph()
-            para.layout(width)
-        }
         para.paint(canvas.nativeCanvas, 0.0f, 0.0f)
-    }
-
-    fun resetMaxLinesIfNeeded(): Boolean {
-        if (maxLines != paragraphIntrinsics.builder.maxLines) {
-            paragraphIntrinsics.builder.maxLines = maxLines
-            paragraphIntrinsics.builder.ellipsis = if (ellipsis) "\u2026" else ""
-            return true
-        } else {
-            return false
-        }
-    }
-
-    fun rebuildParagraph() {
-        paragraphIntrinsics.para = paragraphIntrinsics.builder.build()
     }
 }
 

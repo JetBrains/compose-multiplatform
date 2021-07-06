@@ -15,14 +15,17 @@
  */
 package androidx.compose.ui.text.platform
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.text.AnnotatedString.Range
 import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.resolveTextDirection
 import androidx.compose.ui.text.style.ResolvedTextDirection
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.Density
 import org.jetbrains.skija.paragraph.Paragraph
@@ -54,27 +57,59 @@ internal class DesktopParagraphIntrinsics(
     resourceLoader: Font.ResourceLoader
 ) : ParagraphIntrinsics {
 
-    val fontLoader = resourceLoader as FontLoader
+    private val fontLoader = resourceLoader as FontLoader
     val textDirection = resolveTextDirection(style.textDirection)
-    val builder: ParagraphBuilder
-    var para: Paragraph
-    init {
-        builder = ParagraphBuilder(
-            fontLoader = fontLoader,
-            text = text,
-            textStyle = style,
-            spanStyles = spanStyles,
-            placeholders = placeholders,
-            density = density,
-            textDirection = textDirection
-        )
-        para = builder.build()
+    val defaultHeight get() = builder.defaultHeight
+    private val builder = ParagraphBuilder(
+        fontLoader = fontLoader,
+        text = text,
+        textStyle = style,
+        spanStyles = spanStyles,
+        placeholders = placeholders,
+        density = density,
+        textDirection = textDirection
+    )
+    private var para = builder.build()
+    private var width = Float.POSITIVE_INFINITY
 
-        para.layout(Float.POSITIVE_INFINITY)
+    init {
+        para.layout(width)
     }
 
-    override val minIntrinsicWidth = ceil(para.getMinIntrinsicWidth())
-    override val maxIntrinsicWidth = ceil(para.getMaxIntrinsicWidth())
+    fun layoutParagraph(
+        width: Float = this.width,
+        maxLines: Int = builder.maxLines,
+        ellipsis: String = builder.ellipsis,
+        color: Color = builder.textStyle.color,
+        shadow: Shadow? = builder.textStyle.shadow,
+        textDecoration: TextDecoration? = builder.textStyle.textDecoration,
+    ): Paragraph {
+        if (
+            builder.maxLines != maxLines ||
+            builder.ellipsis != ellipsis ||
+            (builder.textStyle.color != color && color.isSpecified) ||
+            builder.textStyle.shadow != shadow ||
+            builder.textStyle.textDecoration != textDecoration
+        ) {
+            this.width = width
+            builder.maxLines = maxLines
+            builder.ellipsis = ellipsis
+            builder.textStyle = builder.textStyle.copy(
+                color = color,
+                shadow = shadow,
+                textDecoration = textDecoration
+            )
+            para = builder.build()
+            para.layout(width)
+        } else if (this.width != width) {
+            this.width = width
+            para.layout(width)
+        }
+        return para
+    }
+
+    override val minIntrinsicWidth = ceil(para.minIntrinsicWidth)
+    override val maxIntrinsicWidth = ceil(para.maxIntrinsicWidth)
 
     private fun resolveTextDirection(direction: TextDirection?): ResolvedTextDirection {
         return when (direction) {
