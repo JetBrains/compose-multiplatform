@@ -77,8 +77,8 @@ fun AttrsBuilder<HTMLFormElement>.action(value: String) =
 fun AttrsBuilder<HTMLFormElement>.acceptCharset(value: String) =
     attr("accept-charset", value)
 
-fun AttrsBuilder<HTMLFormElement>.autoComplete() =
-    attr("autocomplete", "")
+fun AttrsBuilder<HTMLFormElement>.autoComplete(value: String) =
+    attr("autocomplete", value)
 
 fun AttrsBuilder<HTMLFormElement>.encType(value: FormEncType) =
     attr("enctype", value.typeStr)
