@@ -189,9 +189,9 @@ class LazyNestedScrollingTest {
             }
         }
 
-        // scroll forward
+        // scroll till the end
         rule.onNodeWithTag(LazyTag)
-            .scrollBy(y = 50.dp, density = rule.density)
+            .scrollBy(y = 55.dp, density = rule.density)
 
         rule.onNodeWithTag(LazyTag)
             .performGesture {
@@ -352,9 +352,9 @@ class LazyNestedScrollingTest {
             }
         }
 
-        // scroll forward
+        // scroll till the end
         rule.onNodeWithTag(LazyTag)
-            .scrollBy(x = 50.dp, density = rule.density)
+            .scrollBy(x = 55.dp, density = rule.density)
 
         rule.onNodeWithTag(LazyTag)
             .performGesture {
