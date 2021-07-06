@@ -20,7 +20,8 @@ import androidx.compose.material.Slider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.assertValueEquals
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.test.assertRangeInfoEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import org.junit.Rule
@@ -49,10 +50,10 @@ class InputsTest {
         rule.runOnIdle {
             state.value = 2f
         }
-        rule.onNodeWithTag(tag).assertValueEquals("100 percent")
+        rule.onNodeWithTag(tag).assertRangeInfoEquals(ProgressBarRangeInfo(1f, 0f..1f, 0))
         rule.runOnIdle {
             state.value = -123145f
         }
-        rule.onNodeWithTag(tag).assertValueEquals("0 percent")
+        rule.onNodeWithTag(tag).assertRangeInfoEquals(ProgressBarRangeInfo(0f, 0f..1f, 0))
     }
 }
