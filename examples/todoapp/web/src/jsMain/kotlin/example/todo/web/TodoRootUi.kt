@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import example.todo.common.root.TodoRoot
 import org.jetbrains.compose.web.css.Position
-import org.jetbrains.compose.web.css.auto
+import org.jetbrains.compose.web.css.keywords.auto
 import org.jetbrains.compose.web.css.bottom
 import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.left

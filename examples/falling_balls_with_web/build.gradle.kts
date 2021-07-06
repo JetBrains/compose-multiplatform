@@ -3,7 +3,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     kotlin("multiplatform") version "1.5.10"
-    id("org.jetbrains.compose") version "0.5.0-build228"
+    id("org.jetbrains.compose") version "0.5.0-build235"
 }
 
 version = "1.0-SNAPSHOT"
@@ -53,7 +53,7 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "ImageViewer"
             packageVersion = "1.0.0"
-            
+
             modules("jdk.crypto.ec")
 
             val iconsRoot = project.file("../common/src/desktopMain/resources/images")
