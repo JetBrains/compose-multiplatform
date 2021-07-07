@@ -33,14 +33,6 @@ fun StyleBuilder.color(value: CSSColorValue) {
     property("color", value)
 }
 
-fun StyleBuilder.backgroundColor(value: CSSColorValue) {
-    property("background-color", value)
-}
-
-fun StyleBuilder.backgroundColor(value: String) {
-    property("background-color", value)
-}
-
 @Suppress("EqualsOrHashCode")
 class CSSBorder : CSSStyleValue {
     var width: CSSNumeric? = null
