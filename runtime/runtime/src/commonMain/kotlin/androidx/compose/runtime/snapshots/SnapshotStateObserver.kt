@@ -113,8 +113,10 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
         if (!isObserving) {
             isObserving = true
             try {
-                applyMap.map.removeValueIf {
-                    it === scope
+                synchronized(applyMaps) {
+                    applyMap.map.removeValueIf {
+                        it === scope
+                    }
                 }
                 Snapshot.observe(readObserver, null, block)
             } finally {
