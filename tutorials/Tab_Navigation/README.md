@@ -2,9 +2,16 @@
 
 ## What is covered
 
-In this tutorial, we will show you how to use tabbing navigation between components via keyboard shortcuts `tab` and `shift+tab`.
+In this tutorial, we will show you how to use tabbing navigation between components via keyboard shortcuts `tab` and `shift + tab`.
 
 ## Simple example
+
+To move focus between UI components using keyboard shortcuts in a composition, you need to create a `FocusRequester` link and apply the `Modifier.focusOrder` modifier to each component you want to navigate.
+
+- `FocusRequester` sends requests to change focus.
+- `Modifier.focusOrder` is used to specify a custom focus traversal order.
+
+In the example below, we simply create a `FocusRequester` list and create text fields for each `FocusRequester` in the list. Each text field sends a focus request to the previous and next text field in the list when using the `shift + tab` or `tab` keyboard shortcut. 
 
 ```kotlin
 import androidx.compose.desktop.Window
@@ -15,10 +22,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusOrder
@@ -69,10 +74,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusOrder
