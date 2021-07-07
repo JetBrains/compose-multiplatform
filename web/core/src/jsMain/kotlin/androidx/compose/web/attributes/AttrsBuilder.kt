@@ -12,7 +12,7 @@ open class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
     val styleBuilder = StyleBuilderImpl()
 
     val propertyUpdates = mutableListOf<Pair<(Element, Any) -> Unit, Any>>()
-    var refEffect: (DisposableEffectScope.(Element) -> DisposableEffectResult)? = null
+    var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
 
     fun style(builder: StyleBuilder.() -> Unit) {
         styleBuilder.apply(builder)
@@ -30,7 +30,7 @@ open class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
     fun tabIndex(value: Int) = attr(TAB_INDEX, value.toString())
     fun spellCheck(value: Boolean) = attr(SPELLCHECK, value.toString())
 
-    fun ref(effect: DisposableEffectScope.(Element) -> DisposableEffectResult) {
+    fun ref(effect: DisposableEffectScope.(TElement) -> DisposableEffectResult) {
         this.refEffect = effect
     }
 

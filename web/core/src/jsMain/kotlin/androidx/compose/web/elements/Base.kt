@@ -89,8 +89,8 @@ inline fun <TScope, T, reified E : Applier<*>> ComposeDomNode(
     currentComposer.endNode()
 }
 
-class DisposableEffectHolder(
-    var effect: (DisposableEffectScope.(Element) -> DisposableEffectResult)? = null
+class DisposableEffectHolder<TElement: Element>(
+    var effect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
 )
 
 @Composable
@@ -100,7 +100,7 @@ fun <TElement : Element> TagElement(
     content: (@Composable ElementScope<TElement>.() -> Unit)?
 ) {
     val scope = remember { ElementScopeImpl<TElement>() }
-    val refEffect = remember { DisposableEffectHolder() }
+    val refEffect = remember { DisposableEffectHolder<TElement>() }
 
     ComposeDomNode<ElementScope<TElement>, DomElementWrapper, DomApplier>(
         factory = {
