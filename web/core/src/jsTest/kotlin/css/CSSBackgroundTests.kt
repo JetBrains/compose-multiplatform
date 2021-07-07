@@ -10,6 +10,7 @@ import org.jetbrains.compose.web.core.tests.runTest
 import org.jetbrains.compose.web.css.backgroundAttachment
 import org.jetbrains.compose.web.css.backgroundColor
 import org.jetbrains.compose.web.css.backgroundImage
+import org.jetbrains.compose.web.css.backgroundPosition
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
@@ -70,5 +71,26 @@ class CSSBackgroundTests {
         assertEquals("linear-gradient(rgba(0, 0, 255, 0.5), rgba(255, 255, 0, 0.5))", window.getComputedStyle(root.children[2] as HTMLElement).backgroundImage)
     }
 
+    @Test
+    fun backgroundPosition() = runTest {
+        composition {
+            Div({style {
+                backgroundPosition("top")
+            }})
+            Div({style {
+                backgroundPosition("left")
+            }})
+            Div({style {
+                backgroundPosition("center")
+            }})
+            Div({style {
+                backgroundPosition("25% 75%")
+            }})
+        }
 
+        assertEquals("50% 0%", window.getComputedStyle(root.children[0] as HTMLElement).backgroundPosition)
+        assertEquals("0% 50%", window.getComputedStyle(root.children[1] as HTMLElement).backgroundPosition)
+        assertEquals("50% 50%", window.getComputedStyle(root.children[2] as HTMLElement).backgroundPosition)
+        assertEquals("25% 75%", window.getComputedStyle(root.children[3] as HTMLElement).backgroundPosition)
+    }
 }
