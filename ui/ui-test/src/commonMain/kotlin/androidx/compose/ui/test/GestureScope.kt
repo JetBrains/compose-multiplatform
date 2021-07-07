@@ -17,8 +17,8 @@
 package androidx.compose.ui.test
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.lerp
-import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.unit.IntSize
@@ -119,12 +119,18 @@ class GestureScope(node: SemanticsNode, testContext: TestContext) {
         }
 
     /**
+     * Returns and stores the visible bounds of the [semanticsNode] we're interacting with. This
+     * applies clipping, which is almost always the correct thing to do when injecting gestures,
+     * as gestures operate on visible UI.
+     */
+    internal val boundsInRoot: Rect by lazy { semanticsNode.boundsInRoot }
+
+    /**
      * Returns the size of the visible part of the node we're interacting with. This is contrary
      * to [SemanticsNode.size], which returns the unclipped size of the node.
      */
     val visibleSize: IntSize by lazy {
-        val bounds = semanticsNode.boundsInRoot
-        IntSize(bounds.width.roundToInt(), bounds.height.roundToInt())
+        IntSize(boundsInRoot.width.roundToInt(), boundsInRoot.height.roundToInt())
     }
 
     internal fun dispose() {
@@ -289,7 +295,7 @@ fun GestureScope.percentOffset(
  * @return [position] transformed to coordinates relative to the containing root.
  */
 private fun GestureScope.localToRoot(position: Offset): Offset {
-    return position + semanticsNode.layoutInfo.coordinates.boundsInRoot().topLeft
+    return position + boundsInRoot.topLeft
 }
 
 /**
