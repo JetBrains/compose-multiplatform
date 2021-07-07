@@ -5,6 +5,10 @@
 
 package org.jetbrains.compose.web.css
 
+fun StyleBuilder.backgroundColor(value: String) {
+    property("background-color", value)
+}
+
 fun StyleBuilder.backgroundColor(value: CSSColorValue) {
     property("background-color", value)
 }
