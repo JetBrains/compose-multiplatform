@@ -21,6 +21,7 @@ import androidx.build.addToBuildOnServer
 import androidx.build.addToCheckTask
 import androidx.build.checkapi.ApiLocation
 import androidx.build.checkapi.getRequiredCompatibilityApiLocation
+import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.metalava.UpdateApiTask
 import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import org.gradle.api.Project
@@ -58,6 +59,7 @@ object ResourceTasks {
             task.description = "Generates resource API files from source"
             task.builtApi.set(builtApiFile)
             task.apiLocation.set(builtApiLocation)
+            AffectedModuleDetector.configureTaskGuard(task)
         }
 
         // Policy: If the artifact has previously been released, e.g. has a beta or later API file
@@ -75,6 +77,7 @@ object ResourceTasks {
                 // Since apiLocation isn't a File, we have to manually set up the dependency.
                 task.dependsOn(generateResourceApi)
                 task.cacheEvenIfNoOutputs()
+                AffectedModuleDetector.configureTaskGuard(task)
             }
         }
 
@@ -97,6 +100,7 @@ object ResourceTasks {
             checkResourceApiRelease?.let {
                 task.dependsOn(it)
             }
+            AffectedModuleDetector.configureTaskGuard(task)
         }
 
         @Suppress("UnstableApiUsage") // flatMap
@@ -119,6 +123,7 @@ object ResourceTasks {
                 // compatible
                 task.dependsOn(it)
             }
+            AffectedModuleDetector.configureTaskGuard(task)
         }
 
         // Ensure that this task runs as part of "updateApi" task from MetalavaTasks.
