@@ -24,9 +24,8 @@ actual fun SliderActual(
             attr("min", valueRange.start.toString())
             attr("max", valueRange.endInclusive.toString())
             attr("step", step.toString())
-            onRangeInput {
-                val value: String = it.nativeEvent.target.asDynamic().value
-                onValueChange(value.toFloat())
+            onInput {
+                onValueChange(it.value?.toFloat() ?: 0f)
             }
         }
     )

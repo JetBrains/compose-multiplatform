@@ -33,7 +33,7 @@ fun KotlinCodeSnippets() {
             type = InputType.Radio,
             attrs = {
                 name("code-snippet")
-                onRadioInput {
+                onInput {
                     currentSnippet.value = """
                         /* Adds two integers */
                         fun add(i: Int, j: Int): Int {
@@ -47,7 +47,7 @@ fun KotlinCodeSnippets() {
             type = InputType.Radio,
             attrs = {
                 name("code-snippet")
-                onRadioInput {
+                onInput {
                     currentSnippet.value = """
                         /* Does some calculations */
                         fun calculate(i: Int, j: Int): Int {
