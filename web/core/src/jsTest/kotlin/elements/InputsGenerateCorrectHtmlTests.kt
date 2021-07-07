@@ -1,5 +1,6 @@
 package org.jetbrains.compose.web.core.tests.elements
 
+import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.core.tests.runTest
 import org.jetbrains.compose.web.dom.*
 import org.w3c.dom.HTMLInputElement
@@ -384,5 +385,15 @@ class InputsGenerateCorrectHtmlTests {
         assertEquals("week", textInput.getAttribute("type"))
         assertEquals(null, textInput.getAttribute("id"))
         assertEquals("", textInput.value)
+    }
+
+    @Test
+    fun textInputWithAutoComplete() = runTest {
+        composition {
+            TextInput {
+                autoComplete(AutoComplete.Name)
+            }
+        }
+        assertEquals("""<input type="text" autocomplete="name">""", root.innerHTML)
     }
 }
