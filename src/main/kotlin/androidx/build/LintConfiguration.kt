@@ -47,6 +47,15 @@ fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
     lintTask.configure { task ->
         AffectedModuleDetector.configureTaskGuard(task)
     }
+    afterEvaluate {
+        tasks.named("lintAnalyze").configure { task ->
+            AffectedModuleDetector.configureTaskGuard(task)
+        }
+        /* TODO: uncomment when we upgrade to AGP 7.1.0-alpha04
+        tasks.named("lintReport").configure { task ->
+            AffectedModuleDetector.configureTaskGuard(task)
+        }*/
+    }
     tasks.register("lintDebug") {
         it.dependsOn(lintTask)
         it.enabled = false
@@ -84,6 +93,13 @@ fun Project.configureAndroidProjectForLint(lintOptions: LintOptions, extension: 
             tasks.named("lint${variant.name.capitalize(Locale.US)}").configure { task ->
                 AffectedModuleDetector.configureTaskGuard(task)
             }
+            tasks.named("lintAnalyze${variant.name.capitalize(Locale.US)}").configure { task ->
+                AffectedModuleDetector.configureTaskGuard(task)
+            }
+            /* TODO: uncomment when we upgrade to AGP 7.1.0-alpha04
+            tasks.named("lintReport${variant.name.capitalize(Locale.US)}").configure { task ->
+                AffectedModuleDetector.configureTaskGuard(task)
+            }*/
         }
     }
 }
