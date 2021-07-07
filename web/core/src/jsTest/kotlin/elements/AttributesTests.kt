@@ -241,4 +241,94 @@ class AttributesTests {
         waitChanges()
         assertEquals("<div b=\"pp\" c=\"cc\"></div>", root.innerHTML)
     }
+
+    @Test
+    fun canAccessRef() = runTest {
+        var flag by mutableStateOf(true)
+
+        composition {
+            if (flag) {
+                Div(attrs = {
+                    ref { div ->
+                        (div as HTMLDivElement).innerText = "Text set using ref {}"
+                        onDispose {
+                            div.innerText = ""
+                        }
+                    }
+                })
+            }
+        }
+
+        assertEquals("<div>Text set using ref {}</div>", root.innerHTML)
+
+        flag = false
+        waitChanges()
+
+        assertEquals("", root.innerHTML)
+    }
+
+    @Test
+    fun refDisposed() = runTest {
+        var flag by mutableStateOf(true)
+
+        var disposed = false
+
+        composition {
+            if (flag) {
+                Div(attrs = {
+                    ref {
+                        onDispose {
+                            disposed = true
+                        }
+                    }
+                })
+            }
+        }
+
+        assertEquals("<div></div>", root.innerHTML)
+        assertEquals(false, disposed)
+
+        flag = false
+        waitChanges()
+
+        assertEquals("", root.innerHTML)
+        assertEquals(true, disposed)
+    }
+
+    @Test
+    fun refInitializedOnlyOnce() = runTest {
+        var counter by mutableStateOf(1)
+
+        var refInitCounter = 0
+        var refDisposeCounter = 0
+        var attrsCallCounter = 0
+
+        composition {
+            val useCounterWithinRootRecomposeScope = counter
+            Text("$useCounterWithinRootRecomposeScope")
+
+            Div(attrs = {
+                attrsCallCounter += 1
+                ref { div ->
+                    refInitCounter += 1
+                    onDispose {
+                        refDisposeCounter += 1
+                    }
+                }
+            })
+        }
+
+        assertEquals("1<div></div>", root.innerHTML)
+        assertEquals(1, refInitCounter)
+        assertEquals(1, attrsCallCounter)
+        assertEquals(0, refDisposeCounter)
+
+        counter++
+        waitChanges()
+
+        assertEquals("2<div></div>", root.innerHTML)
+        assertEquals(1, refInitCounter)
+        assertEquals(2, attrsCallCounter)
+        assertEquals(0, refDisposeCounter)
+    }
 }
