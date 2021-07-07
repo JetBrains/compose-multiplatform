@@ -17,3 +17,8 @@ fun StyleBuilder.backgroundColor(value: CSSColorValue) {
 fun StyleBuilder.backgroundAttachment(value: String) {
     property("background-attachment", value)
 }
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/background-image
+fun StyleBuilder.backgroundImage(value: String) {
+    property("background-image", value)
+}
