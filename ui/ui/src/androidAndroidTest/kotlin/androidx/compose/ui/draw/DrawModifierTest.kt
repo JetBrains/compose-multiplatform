@@ -52,7 +52,6 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
@@ -278,10 +277,8 @@ class DrawModifierTest {
         }
     }
 
-    @FlakyTest(bugId = 182512695)
     @Test
     fun testCacheInvalidatedAfterLayoutDirectionChange() {
-        var cacheBuildCount = 0
         var layoutDirection by mutableStateOf(LayoutDirection.Ltr)
         var realLayoutDirection: LayoutDirection? = null
         rule.setContent {
@@ -290,7 +287,6 @@ class DrawModifierTest {
                     size = 10,
                     modifier = Modifier.drawWithCache {
                         realLayoutDirection = layoutDirection
-                        cacheBuildCount++
                         onDrawBehind {}
                     }
                 ) { }
@@ -298,13 +294,11 @@ class DrawModifierTest {
         }
 
         rule.runOnIdle {
-            assertEquals(1, cacheBuildCount)
             assertEquals(LayoutDirection.Ltr, realLayoutDirection)
             layoutDirection = LayoutDirection.Rtl
         }
 
         rule.runOnIdle {
-            assertEquals(2, cacheBuildCount)
             assertEquals(LayoutDirection.Rtl, realLayoutDirection)
         }
     }
