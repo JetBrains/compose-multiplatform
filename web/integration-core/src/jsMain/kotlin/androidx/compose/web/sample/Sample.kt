@@ -272,8 +272,8 @@ fun MyInputComponent(text: State<String>, onChange: (String) -> Unit) {
                 onKeyDown {
                     println("On keyDown key = : ${it.getNormalizedKey()}")
                 }
-                onTextInput {
-                    onChange(it.inputValue)
+                onInput {
+                    onChange(it.value)
                 }
                 onKeyUp {
                     println("On keyUp key = : ${it.getNormalizedKey()}")
@@ -283,8 +283,8 @@ fun MyInputComponent(text: State<String>, onChange: (String) -> Unit) {
     }
     Div {
         Input(type = InputType.Checkbox, attrs = {
-            onCheckboxInput {
-                println("From div - Checked: " + it.checked)
+            onInput {
+                println("From div - Checked: " + it.value)
             }
         })
         Input(type = InputType.Text, attrs = {
@@ -295,8 +295,8 @@ fun MyInputComponent(text: State<String>, onChange: (String) -> Unit) {
         Input(
             type = InputType.Radio,
             attrs = {
-                onRadioInput {
-                    println("Radio 1 - Checked: " + it.checked)
+                onInput {
+                    println("Radio 1 - Checked: " + it.value)
                 }
                 name("f1")
             }
@@ -304,8 +304,8 @@ fun MyInputComponent(text: State<String>, onChange: (String) -> Unit) {
         Input(
             type = InputType.Radio,
             attrs = {
-                onRadioInput {
-                    println("Radio 2 - Checked: " + it.checked)
+                onInput {
+                    println("Radio 2 - Checked: " + it.value)
                 }
                 name("f1")
             }
