@@ -310,6 +310,7 @@ class AndroidXDocsPlugin : Plugin<Project> {
 
                 dackkaClasspath.from(project.files(dackkaConfiguration))
                 destinationDir = generatedDocsDir
+                frameworkSamplesDir = File(project.rootDir, "samples")
                 samplesDir = unzippedSamplesSources
                 sourcesDir = unzippedDocsSources
                 docsProjectDir = File(project.rootDir, "docs-public")
@@ -590,8 +591,8 @@ private val dackkaDirsToProcess = listOf(
     "androidx/documentfile/**",
     "androidx/drawerlayout/**",
     "androidx/dynamicanimation/**",
-//    "androidx/emoji/**",
-//    "androidx/emoji2/**",
+    "androidx/emoji/**",
+    "androidx/emoji2/**",
     "androidx/enterprise/**",
     "androidx/exifinterface/**",
 //    "androidx/fragment/**",
@@ -601,7 +602,7 @@ private val dackkaDirsToProcess = listOf(
 //    "androidx/hilt/**",
     "androidx/interpolator/**",
 //    "androidx/leanback/**",
-//    "androidx/legacy/**",
+    "androidx/legacy/**",
     "androidx/lifecycle/**",
     "androidx/loader/**",
     "androidx/localbroadcastmanager/**",
@@ -622,7 +623,7 @@ private val dackkaDirsToProcess = listOf(
     "androidx/savedstate/**",
     "androidx/security/**",
     "androidx/sharetarget/**",
-//    "androidx/slice/**",
+    "androidx/slice/**",
     "androidx/slidingpanelayout/**",
     "androidx/sqlite/**",
     "androidx/startup/**",
