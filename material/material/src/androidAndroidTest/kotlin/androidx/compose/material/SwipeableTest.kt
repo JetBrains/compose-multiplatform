@@ -1511,6 +1511,38 @@ class SwipeableTest {
     }
 
     /**
+     * Tests that the new [SwipeableState] `onValueChange` is set up if the anchors didn't change
+     */
+    @Test
+    fun swipeable_newStateIsInitialized_afterRecomposingWithOldAnchors() {
+        lateinit var swipeableState: MutableState<SwipeableState<String>>
+        val anchors = mapOf(0f to "A")
+        setSwipeableContent {
+            swipeableState = remember { mutableStateOf(SwipeableState("A")) }
+            Modifier.swipeable(
+                state = swipeableState.value,
+                anchors = anchors,
+                thresholds = { _, _ -> FractionalThreshold(0.5f) },
+                orientation = Orientation.Horizontal
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(swipeableState.value.currentValue).isEqualTo("A")
+            assertThat(swipeableState.value.offset.value).isEqualTo(0f)
+            assertThat(swipeableState.value.anchors).isEqualTo(anchors)
+        }
+
+        swipeableState.value = SwipeableState("A")
+
+        rule.runOnIdle {
+            assertThat(swipeableState.value.currentValue).isEqualTo("A")
+            assertThat(swipeableState.value.offset.value).isEqualTo(0f)
+            assertThat(swipeableState.value.anchors).isEqualTo(anchors)
+        }
+    }
+
+    /**
      * Tests that the [SwipeableState] is updated if the anchors change.
      */
     @Test

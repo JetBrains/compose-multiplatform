@@ -592,7 +592,7 @@ fun <T> Modifier.swipeable(
     }
     val density = LocalDensity.current
     state.ensureInit(anchors)
-    LaunchedEffect(anchors) {
+    LaunchedEffect(anchors, state) {
         val oldAnchors = state.anchors
         state.anchors = anchors
         state.resistance = resistance
