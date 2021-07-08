@@ -17,7 +17,6 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Density
@@ -36,11 +35,10 @@ import kotlin.coroutines.CoroutineContext
 internal fun renderingTest(
     width: Int,
     height: Int,
-    platform: DesktopPlatform = DesktopPlatform.Linux,
     context: CoroutineContext = Dispatchers.Swing,
     block: suspend RenderingTestScope.() -> Unit
 ) = runBlocking(context) {
-    val scope = RenderingTestScope(width, height, platform, context)
+    val scope = RenderingTestScope(width, height, context)
     try {
         scope.block()
     } finally {
@@ -49,9 +47,8 @@ internal fun renderingTest(
 }
 
 internal class RenderingTestScope(
-    private val width: Int,
-    private val height: Int,
-    private val platform: DesktopPlatform,
+    val width: Int,
+    val height: Int,
     coroutineContext: CoroutineContext
 ) {
     var currentTimeMillis = 0L
@@ -87,9 +84,7 @@ internal class RenderingTestScope(
         owner?.dispose()
         val owner = DesktopOwner(owners)
         owner.setContent {
-            CompositionLocalProvider(LocalDesktopPlatform provides platform) {
-                content()
-            }
+            content()
         }
         this.owner = owner
     }

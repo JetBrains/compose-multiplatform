@@ -17,7 +17,6 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.mouse.MouseScrollEvent
@@ -48,7 +47,6 @@ class TestComposeWindow(
     val width: Int,
     val height: Int,
     val density: Density = Density(1f, 1f),
-    private val desktopPlatform: DesktopPlatform = DesktopPlatform.Linux,
     private val nanoTime: () -> Long = System::nanoTime,
     coroutineContext: CoroutineContext = emptyDispatcher
 ) {
@@ -104,11 +102,7 @@ class TestComposeWindow(
 
         val owner = DesktopOwner(owners, density)
         owner.setContent {
-            CompositionLocalProvider(
-                LocalDesktopPlatform provides desktopPlatform
-            ) {
-                content()
-            }
+            content()
         }
         owner.setSize(width, height)
         owner.measureAndLayout()

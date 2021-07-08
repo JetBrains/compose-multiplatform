@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
@@ -54,9 +55,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.keyEvent
-import androidx.compose.ui.input.mouse.MouseScrollEvent
-import androidx.compose.ui.input.mouse.MouseScrollOrientation
-import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -297,17 +295,19 @@ class DesktopOwnerTest {
     @Test(timeout = 5000)
     fun `rendering of LazyColumn`() = renderingTest(
         width = 40,
-        height = 40,
-        platform = DesktopPlatform.Windows // scrolling behave differently on different platforms
+        height = 40
     ) {
-        var height by mutableStateOf(10.dp)
+        var itemHeight by mutableStateOf(10.dp)
+        val padding = 10
+        val columnHeight = this.height - padding * 2
+        val state = LazyListState()
         setContent {
-            Box(Modifier.padding(10.dp)) {
-                LazyColumn {
+            Box(Modifier.padding(padding.dp)) {
+                LazyColumn(state = state) {
                     items(
                         listOf(Color.Red, Color.Green, Color.Blue, Color.Black, Color.Gray)
                     ) { color ->
-                        Box(Modifier.size(width = 30.dp, height = height).background(color))
+                        Box(Modifier.size(width = 30.dp, height = itemHeight).background(color))
                     }
                 }
             }
@@ -317,25 +317,21 @@ class DesktopOwnerTest {
         screenshotRule.snap(surface, "frame1_initial")
         assertFalse(hasRenders())
 
-        owners.onMouseScroll(
-            10,
-            10,
-            MouseScrollEvent(MouseScrollUnit.Page(1f), MouseScrollOrientation.Vertical)
-        )
+        state.scroll {
+            scrollBy(columnHeight.toFloat())
+        }
         awaitNextRender()
         screenshotRule.snap(surface, "frame2_onMouseScroll")
         assertFalse(hasRenders())
 
-        owners.onMouseScroll(
-            10,
-            10,
-            MouseScrollEvent(MouseScrollUnit.Page(10f), MouseScrollOrientation.Vertical)
-        )
+        state.scroll {
+            scrollBy(10 * columnHeight.toFloat())
+        }
         awaitNextRender()
         screenshotRule.snap(surface, "frame3_onMouseScroll")
         assertFalse(hasRenders())
 
-        height = 5.dp
+        itemHeight = 5.dp
         awaitNextRender()
         screenshotRule.snap(surface, "frame4_change_height")
         assertFalse(hasRenders())
