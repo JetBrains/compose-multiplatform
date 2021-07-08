@@ -168,22 +168,19 @@ fun ExtendedFloatingActionButton(
         contentColor = contentColor,
         elevation = elevation
     ) {
-        Box(
+        val startPadding = if (icon == null) ExtendedFabTextPadding else ExtendedFabIconPadding
+        Row(
             modifier = Modifier.padding(
-                start = ExtendedFabTextPadding,
+                start = startPadding,
                 end = ExtendedFabTextPadding
             ),
-            contentAlignment = Alignment.Center
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            if (icon == null) {
-                text()
-            } else {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    icon()
-                    Spacer(Modifier.width(ExtendedFabIconPadding))
-                    text()
-                }
+            if (icon != null) {
+                icon()
+                Spacer(Modifier.width(ExtendedFabIconPadding))
             }
+            text()
         }
     }
 }
