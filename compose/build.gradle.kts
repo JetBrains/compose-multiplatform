@@ -82,3 +82,11 @@ tasks.register("testComposeJbWeb") {
     dependsOnComposeTask(":compose:runtime:runtime:jsTest")
     dependsOnComposeTask(":compose:runtime:runtime:test")
 }
+
+tasks.register("buildNativeDemo") {
+    dependsOnComposeTask(":compose:native:demo:assemble")
+}
+
+tasks.register("testRuntimeNative") {
+    dependsOnComposeTask(":compose:runtime:runtime:macosX64Test")
+}
