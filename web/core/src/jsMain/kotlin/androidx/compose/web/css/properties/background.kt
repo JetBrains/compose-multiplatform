@@ -27,3 +27,8 @@ fun StyleBuilder.backgroundImage(value: String) {
 fun StyleBuilder.backgroundPosition(value: String) {
     property("background-position", value)
 }
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat
+fun StyleBuilder.backgroundRepeat(value: String) {
+    property("background-repeat", value)
+}

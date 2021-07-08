@@ -7,10 +7,7 @@ package org.jetbrains.compose.web.core.tests.css
 
 import kotlinx.browser.window
 import org.jetbrains.compose.web.core.tests.runTest
-import org.jetbrains.compose.web.css.backgroundAttachment
-import org.jetbrains.compose.web.css.backgroundColor
-import org.jetbrains.compose.web.css.backgroundImage
-import org.jetbrains.compose.web.css.backgroundPosition
+import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
@@ -93,4 +90,19 @@ class CSSBackgroundTests {
         assertEquals("50% 50%", window.getComputedStyle(root.children[2] as HTMLElement).backgroundPosition)
         assertEquals("25% 75%", window.getComputedStyle(root.children[3] as HTMLElement).backgroundPosition)
     }
+
+    @Test
+    fun backgroudRepeat() = runTest {
+        composition {
+            Div({style {
+                backgroundRepeat("space repeat")
+            }})
+            Div({style {
+                backgroundRepeat("space repeat")
+            }})
+        }
+
+        assertEquals("space repeat", window.getComputedStyle(root.children[0] as HTMLElement).backgroundRepeat)
+    }
+
 }
