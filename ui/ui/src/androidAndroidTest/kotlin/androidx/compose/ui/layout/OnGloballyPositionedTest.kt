@@ -520,17 +520,18 @@ class OnGloballyPositionedTest {
             composeView.setPadding(padding, padding, padding, padding)
             rule.activity.setContentView(composeView)
 
-            val position = IntArray(2)
-            composeView.getLocationInWindow(position)
-            frameGlobalPosition = Offset(position[0].toFloat(), position[1].toFloat())
-
             composeView.setContent {
                 Box(
                     Modifier.fillMaxSize().onGloballyPositioned {
+                        val position = IntArray(2)
+                        composeView.getLocationInWindow(position)
+                        frameGlobalPosition = Offset(position[0].toFloat(), position[1].toFloat())
+
                         realGlobalPosition = it.localToWindow(localPosition)
                         realLocalPosition = it.windowToLocal(
                             framePadding + frameGlobalPosition!!
                         )
+
                         positionedLatch.countDown()
                     }
                 )
