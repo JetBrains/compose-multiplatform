@@ -44,6 +44,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.up
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -81,8 +82,9 @@ class TextFieldScreenshotTest {
     fun textField_withInput() {
         rule.setMaterialContent {
             Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
+                val text = "Text"
                 TextField(
-                    value = "Text",
+                    value = TextFieldValue(text = text, selection = TextRange(text.length)),
                     onValueChange = {},
                     label = { Text("Label") },
                     modifier = Modifier.requiredWidth(280.dp)
@@ -150,8 +152,9 @@ class TextFieldScreenshotTest {
     @Test
     fun textField_error_focused() {
         rule.setMaterialContent {
+            val text = "Input"
             TextField(
-                value = "Input",
+                value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 label = { Text("Label") },
                 isError = true,
@@ -183,8 +186,9 @@ class TextFieldScreenshotTest {
     fun textField_textColor_fallbackToContentColor() {
         rule.setMaterialContent {
             CompositionLocalProvider(LocalContentColor provides Color.Green) {
+                val text = "Hello, world!"
                 TextField(
-                    value = "Hello, world!",
+                    value = TextFieldValue(text = text, selection = TextRange(text.length)),
                     onValueChange = {},
                     modifier = Modifier.requiredWidth(280.dp).testTag(TextFieldTag)
                 )
@@ -197,8 +201,9 @@ class TextFieldScreenshotTest {
     @Test
     fun textField_multiLine_withLabel_textAlignedToTop() {
         rule.setMaterialContent {
+            val text = "Text"
             TextField(
-                value = "Text",
+                value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 label = { Text("Label") },
                 modifier = Modifier.requiredHeight(300.dp)
@@ -213,8 +218,9 @@ class TextFieldScreenshotTest {
     @Test
     fun textField_multiLine_withoutLabel_textAlignedToTop() {
         rule.setMaterialContent {
+            val text = "Text"
             TextField(
-                value = "Text",
+                value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 modifier = Modifier.requiredHeight(300.dp)
                     .requiredWidth(280.dp)
@@ -281,8 +287,9 @@ class TextFieldScreenshotTest {
     @Test
     fun textField_singleLine_withLabel_textAlignedToTop() {
         rule.setMaterialContent {
+            val text = "Text"
             TextField(
-                value = "Text",
+                value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 singleLine = true,
                 label = { Text("Label") },
@@ -296,8 +303,9 @@ class TextFieldScreenshotTest {
     @Test
     fun textField_singleLine_withoutLabel_textCenteredVertically() {
         rule.setMaterialContent {
+            val text = "Text"
             TextField(
-                value = "Text",
+                value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 singleLine = true,
                 modifier = Modifier.requiredWidth(280.dp).testTag(TextFieldTag)
@@ -472,8 +480,9 @@ class TextFieldScreenshotTest {
     @Test
     fun textField_textCenterAligned() {
         rule.setMaterialContent {
+            val text = "Hello world"
             TextField(
-                value = "Hello world",
+                value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 modifier = Modifier.width(300.dp).testTag(TextFieldTag),
                 textStyle = TextStyle(textAlign = TextAlign.Center),
@@ -487,8 +496,9 @@ class TextFieldScreenshotTest {
     @Test
     fun textField_textAlignedToEnd() {
         rule.setMaterialContent {
+            val text = "Hello world"
             TextField(
-                value = "Hello world",
+                value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 modifier = Modifier.fillMaxWidth().testTag(TextFieldTag),
                 textStyle = TextStyle(textAlign = TextAlign.End),

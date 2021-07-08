@@ -44,6 +44,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.up
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -82,8 +83,9 @@ class OutlinedTextFieldScreenshotTest {
     fun outlinedTextField_withInput() {
         rule.setMaterialContent {
             Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
+                val text = "Text"
                 OutlinedTextField(
-                    value = "Text",
+                    value = TextFieldValue(text = text, selection = TextRange(text.length)),
                     onValueChange = {},
                     label = { Text("Label") },
                     modifier = Modifier.requiredWidth(280.dp)
@@ -152,8 +154,9 @@ class OutlinedTextFieldScreenshotTest {
     fun outlinedTextField_error_focused() {
         rule.setMaterialContent {
             Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
+                val text = "Input"
                 OutlinedTextField(
-                    value = "Input",
+                    value = TextFieldValue(text = text, selection = TextRange(text.length)),
                     onValueChange = {},
                     label = { Text("Label") },
                     isError = true,
@@ -188,8 +191,9 @@ class OutlinedTextFieldScreenshotTest {
     fun outlinedTextField_textColor_fallbackToContentColor() {
         rule.setMaterialContent {
             CompositionLocalProvider(LocalContentColor provides Color.Magenta) {
+                val text = "Hello, world!"
                 OutlinedTextField(
-                    value = "Hello, world!",
+                    value = TextFieldValue(text = text, selection = TextRange(text.length)),
                     onValueChange = {},
                     modifier = Modifier.testTag(TextFieldTag).requiredWidth(280.dp)
                 )
@@ -202,8 +206,9 @@ class OutlinedTextFieldScreenshotTest {
     @Test
     fun outlinedTextField_multiLine_withLabel_textAlignedToTop() {
         rule.setMaterialContent {
+            val text = "Text"
             OutlinedTextField(
-                value = "Text",
+                value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 label = { Text("Label") },
                 modifier = Modifier.requiredHeight(300.dp)
@@ -218,8 +223,9 @@ class OutlinedTextFieldScreenshotTest {
     @Test
     fun outlinedTextField_multiLine_withoutLabel_textAlignedToTop() {
         rule.setMaterialContent {
+            val text = "Text"
             OutlinedTextField(
-                value = "Text",
+                value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 modifier = Modifier.requiredHeight(300.dp)
                     .requiredWidth(280.dp)
@@ -286,8 +292,9 @@ class OutlinedTextFieldScreenshotTest {
     @Test
     fun outlinedTextField_singleLine_withLabel_textAlignedToTop() {
         rule.setMaterialContent {
+            val text = "Text"
             OutlinedTextField(
-                value = "Text",
+                value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 singleLine = true,
                 label = { Text("Label") },
@@ -301,8 +308,9 @@ class OutlinedTextFieldScreenshotTest {
     @Test
     fun outlinedTextField_singleLine_withoutLabel_textCenteredVertically() {
         rule.setMaterialContent {
+            val text = "Text"
             OutlinedTextField(
-                value = "Text",
+                value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 singleLine = true,
                 modifier = Modifier.testTag(TextFieldTag).requiredWidth(280.dp)
@@ -484,8 +492,9 @@ class OutlinedTextFieldScreenshotTest {
     @Test
     fun outlinedTextField_textCenterAligned() {
         rule.setMaterialContent {
+            val text = "Hello world"
             OutlinedTextField(
-                value = "Hello world",
+                value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 modifier = Modifier.width(300.dp).testTag(TextFieldTag),
                 textStyle = TextStyle(textAlign = TextAlign.Center),
@@ -499,8 +508,9 @@ class OutlinedTextFieldScreenshotTest {
     @Test
     fun outlinedTextField_textAlignedToEnd() {
         rule.setMaterialContent {
+            val text = "Hello world"
             OutlinedTextField(
-                value = "Hello world",
+                value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 modifier = Modifier.fillMaxWidth().testTag(TextFieldTag),
                 textStyle = TextStyle(textAlign = TextAlign.End),
