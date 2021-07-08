@@ -77,8 +77,8 @@ fun AttrsBuilder<HTMLFormElement>.action(value: String) =
 fun AttrsBuilder<HTMLFormElement>.acceptCharset(value: String) =
     attr("accept-charset", value)
 
-fun AttrsBuilder<HTMLFormElement>.autoComplete() =
-    attr("autocomplete", "")
+fun AttrsBuilder<HTMLFormElement>.autoComplete(value: Boolean = true) =
+    attr("autocomplete", if(value) "on" else "off")
 
 fun AttrsBuilder<HTMLFormElement>.encType(value: FormEncType) =
     attr("enctype", value.typeStr)
@@ -103,8 +103,8 @@ fun AttrsBuilder<HTMLInputElement>.accept(value: String) =
 fun AttrsBuilder<HTMLInputElement>.alt(value: String) =
     attr("alt", value) // type: image only
 
-fun AttrsBuilder<HTMLInputElement>.autoComplete() =
-    attr("autocomplete", "")
+fun AttrsBuilder<HTMLInputElement>.autoComplete(value: AutoComplete) =
+    attr("autocomplete", value.unsafeCast<String>())
 
 fun AttrsBuilder<HTMLInputElement>.autoFocus() =
     attr("autofocus", "")
@@ -211,8 +211,8 @@ fun AttrsBuilder<HTMLOptionElement>.label(value: String) =
 
 /* Select attributes */
 
-fun AttrsBuilder<HTMLSelectElement>.autocomplete(value: String) =
-    attr("autocomplete", value)
+fun AttrsBuilder<HTMLSelectElement>.autocomplete(value: AutoComplete) =
+    attr("autocomplete", value.unsafeCast<String>())
 
 fun AttrsBuilder<HTMLSelectElement>.autofocus() =
     attr("autofocus", "")
@@ -245,8 +245,8 @@ fun AttrsBuilder<HTMLOptGroupElement>.disabled() =
 
 /* TextArea attributes */
 
-fun AttrsBuilder<HTMLTextAreaElement>.autoComplete(value: Boolean = true) =
-    attr("autocomplete", if (value) "on" else "off")
+fun AttrsBuilder<HTMLTextAreaElement>.autoComplete(value: AutoComplete) =
+    attr("autocomplete", value.unsafeCast<String>())
 
 fun AttrsBuilder<HTMLTextAreaElement>.autoFocus() =
     attr("autofocus", "")
