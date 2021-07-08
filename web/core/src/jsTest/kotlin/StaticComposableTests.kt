@@ -258,24 +258,6 @@ class StaticComposableTests {
     }
 
     @Test
-    fun stylesWidth() {
-        val root = "div".asHtmlElement()
-        renderComposable(
-            root = root
-        ) {
-            Div(
-                {
-                    style {
-                        width(100.px)
-                    }
-                }
-            )
-        }
-
-        assertEquals("width: 100px;", (root.children[0] as HTMLElement).style.cssText)
-    }
-
-    @Test
     fun stylesBorderRadius() {
         val root = "div".asHtmlElement()
         renderComposable(
@@ -422,24 +404,6 @@ class StaticComposableTests {
 
         assertEquals("right: 100px;", (root.children[0] as HTMLElement).style.cssText)
         assertEquals("right: 100%;", (root.children[1] as HTMLElement).style.cssText)
-    }
-
-    @Test
-    fun stylesHeight() {
-        val root = "div".asHtmlElement()
-        renderComposable(
-            root = root
-        ) {
-            Div(
-                {
-                    style {
-                        height(100.px)
-                    }
-                }
-            )
-        }
-
-        assertEquals("height: 100px;", (root.children[0] as HTMLElement).style.cssText)
     }
 
     @Test
