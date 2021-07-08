@@ -1,5 +1,8 @@
 package org.jetbrains.compose.web.core.tests.elements
 
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
 import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.core.tests.runTest
 import org.jetbrains.compose.web.dom.*
@@ -391,9 +394,47 @@ class InputsGenerateCorrectHtmlTests {
     fun textInputWithAutoComplete() = runTest {
         composition {
             TextInput {
-                autoComplete(AutoComplete.Name)
+                autoComplete(AutoComplete.name)
             }
         }
         assertEquals("""<input type="text" autocomplete="name">""", root.innerHTML)
+    }
+
+    @Test
+    fun textAreaWithAutoComplete() = runTest {
+        composition {
+            TextArea({
+                autoComplete(AutoComplete.email)
+            }, value = "")
+        }
+        assertEquals("""<textarea autocomplete="email"></textarea>""", root.innerHTML)
+    }
+
+    @Test
+    fun formWithAutoComplete() = runTest {
+        var autoCompleteEnabled by mutableStateOf(true)
+
+        composition {
+            Form(attrs = {
+                autoComplete(autoCompleteEnabled)
+            })
+        }
+
+        assertEquals("""<form autocomplete="on"></form>""", root.innerHTML)
+
+        autoCompleteEnabled = false
+        waitChanges()
+
+        assertEquals("""<form autocomplete="off"></form>""", root.innerHTML)
+    }
+
+    @Test
+    fun selectWithAutoComplete() = runTest {
+        composition {
+            Select({
+                autoComplete(AutoComplete.tel)
+            })
+        }
+        assertEquals("""<select autocomplete="tel"></select>""", root.innerHTML)
     }
 }

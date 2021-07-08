@@ -211,7 +211,7 @@ fun AttrsBuilder<HTMLOptionElement>.label(value: String) =
 
 /* Select attributes */
 
-fun AttrsBuilder<HTMLSelectElement>.autocomplete(value: AutoComplete) =
+fun AttrsBuilder<HTMLSelectElement>.autoComplete(value: AutoComplete) =
     attr("autocomplete", value.unsafeCast<String>())
 
 fun AttrsBuilder<HTMLSelectElement>.autofocus() =

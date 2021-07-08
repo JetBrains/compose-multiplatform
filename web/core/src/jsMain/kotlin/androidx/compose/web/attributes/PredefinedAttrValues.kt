@@ -1,5 +1,3 @@
-@file:Suppress("Unused", "NOTHING_TO_INLINE", "NESTED_CLASS_IN_EXTERNAL_INTERFACE", "INLINE_EXTERNAL_DECLARATION", "WRONG_BODY_OF_EXTERNAL_DECLARATION", "NESTED_EXTERNAL_DECLARATION", "ClassName")
-
 package org.jetbrains.compose.web.attributes
 
 import org.w3c.dom.events.Event
@@ -168,6 +166,7 @@ enum class Scope(val str: String) {
 /**
  * https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/autocomplete
  */
+@Suppress("Unused", "NOTHING_TO_INLINE", "NESTED_CLASS_IN_EXTERNAL_INTERFACE", "INLINE_EXTERNAL_DECLARATION", "WRONG_BODY_OF_EXTERNAL_DECLARATION", "NESTED_EXTERNAL_DECLARATION", "ClassName")
 external interface AutoComplete {
     external companion object {
         /**
@@ -184,7 +183,7 @@ external interface AutoComplete {
         /**
          *The field expects the value to be a person's full name. Using "name" rather than breaking the name down into its components is generally preferred because it avoids dealing with the wide diversity of human names and how they are structured; however, you can use the following autocomplete values if you do need to break the name down into its components:
          */
-        inline val Name get() = AutoComplete("name")
+        inline val name get() = AutoComplete("name")
 
         /**
          * The prefix or title, such as "Mrs.", "Mr.", "Miss", "Ms.", "Dr.", or "Mlle.".
@@ -436,4 +435,5 @@ external interface AutoComplete {
     }
 }
 
+@Suppress("NOTHING_TO_INLINE")
 inline fun AutoComplete(value: String) = value.unsafeCast<AutoComplete>()
