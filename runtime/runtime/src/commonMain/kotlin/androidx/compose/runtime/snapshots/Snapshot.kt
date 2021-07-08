@@ -1441,18 +1441,6 @@ private fun <T> advanceGlobalSnapshot(block: (invalid: SnapshotIdSet) -> T): T {
         }
     }
 
-    // Update the transparent snapshot if necessary
-    // This doesn't need to take the sync because it is updating thread local state.
-    (threadSnapshot.get() as? TransparentObserverMutableSnapshot)?.let {
-        threadSnapshot.set(
-            TransparentObserverMutableSnapshot(
-                currentGlobalSnapshot.get(),
-                it.specifiedReadObserver,
-                it.specifiedWriteObserver
-            )
-        )
-        it.dispose()
-    }
     return result
 }
 

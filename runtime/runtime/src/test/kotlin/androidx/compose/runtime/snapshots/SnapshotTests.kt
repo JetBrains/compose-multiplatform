@@ -703,6 +703,27 @@ class SnapshotTests {
         nestedChild.dispose()
     }
 
+    @Test // Regression test for b/193006595
+    fun transparentSnapshotAdvancesCorrectly() {
+        val state = Snapshot.observe({}) {
+            // In a transparent snapshot, advance the global snapshot
+            Snapshot.notifyObjectsInitialized()
+
+            // Create an apply an object in a snapshot
+            val state = atomic {
+                mutableStateOf(0)
+            }
+
+            // Ensure that the object can be accessed in the observer
+            assertEquals(0, state.value)
+
+            state
+        }
+
+        // Ensure that the object can be accessed globally.
+        assertEquals(0, state.value)
+    }
+
     private var count = 0
 
     @BeforeTest
