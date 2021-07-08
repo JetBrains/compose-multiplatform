@@ -122,4 +122,25 @@ class CSSBackgroundTests {
         assertEquals("padding-box", window.getComputedStyle(root.children[1] as HTMLElement).backgroundClip)
         assertEquals("content-box", window.getComputedStyle(root.children[2] as HTMLElement).backgroundClip)
     }
+
+    @Test
+    fun backgroundOrigin() = runTest {
+        composition {
+            Div({style {
+                backgroundOrigin("border-box")
+            }})
+            Div({style {
+                backgroundOrigin("padding-box")
+            }})
+            Div({style {
+                backgroundOrigin("content-box")
+            }})
+        }
+
+
+        assertEquals("border-box", window.getComputedStyle(root.children[0] as HTMLElement).backgroundOrigin)
+        assertEquals("padding-box", window.getComputedStyle(root.children[1] as HTMLElement).backgroundOrigin)
+        assertEquals("content-box", window.getComputedStyle(root.children[2] as HTMLElement).backgroundOrigin)
+    }
+
 }

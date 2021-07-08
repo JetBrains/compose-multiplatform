@@ -27,6 +27,11 @@ fun StyleBuilder.backgroundImage(value: String) {
     property("background-image", value)
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/background-origin
+fun StyleBuilder.backgroundOrigin(value: String) {
+    property("background-origin", value)
+}
+
 // https://developer.mozilla.org/en-US/docs/Web/CSS/background-position
 fun StyleBuilder.backgroundPosition(value: String) {
     property("background-position", value)
