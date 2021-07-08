@@ -187,25 +187,36 @@ internal fun Project.shouldFixKotlinxSerializationAndComposeOrderForJsTarget(): 
     )?.toString()?.toBoolean() ?: false
 }
 
+/**
+ * The order of compiler plugins (kotlinx.serialization with compose) needs to be altered
+ * in order to make them work together in kotlin/js targets.
+ *
+ * By default, the order is determined by the absolute paths of the plugin' jar files
+ * (at the moment, the paths are sorted in kotlin gradle plugin)
+ * The correct order is: 1) Serialization 2) Compose
+ * There is no API for setting the order explicitly so far.
+ *
+ * This function relies on using `freeCompilerArgs` which are processed after all other arguments.
+ * This ensures that compose compiler plugin will be executed after kotlinx.serialization if it's enabled via gradle plugin.
+ */
 private fun Project.applyFixForKoltinxSerializationAndComposeOrder() {
+    val plugin = ComposeCompilerKotlinSupportPlugin()
+    val pluginArtifact = plugin.getPluginArtifact()
+
     afterEvaluate {
-        project.dependencies.add(
+        it.dependencies.add(
             "jsCompileOnly",
-            ComposeCompilerKotlinSupportPlugin().getPluginArtifact().let {
-                "${it.groupId}:${it.artifactId}:${it.version}"
-            })
+            with(pluginArtifact) { "$groupId:$artifactId:$version" }
+        )
     }
 
-    project.tasks.withType(KotlinJsCompile::class.java).configureEach {
-        val plugin = ComposeCompilerKotlinSupportPlugin()
-        val pluginArtifact = plugin.getPluginArtifact()
-
-        val pluginPath = it.project.configurations.getByName("jsCompileOnly").find {
-            it.absolutePath.contains(pluginArtifact.groupId)
+    tasks.withType(KotlinJsCompile::class.java).configureEach { compile ->
+        val pluginPath = compile.project.configurations.getByName("jsCompileOnly").find { file ->
+            file.absolutePath.contains(pluginArtifact.groupId)
         }?.absolutePath ?: error("${pluginArtifact.groupId} was not found")
 
-        it.kotlinOptions.freeCompilerArgs += "-Xplugin=$pluginPath"
-        it.kotlinOptions.freeCompilerArgs += listOf(
+        compile.kotlinOptions.freeCompilerArgs += listOf(
+            "-Xplugin=$pluginPath",
             "-P", "plugin:${plugin.getCompilerPluginId()}:generateDecoys=true"
         )
     }
