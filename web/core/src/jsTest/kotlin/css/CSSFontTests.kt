@@ -124,7 +124,7 @@ class CSSFontTests {
     }
 
     @Test
-    fun fontFamily2() = runTest {
+    fun font() = runTest {
         composition {
             Div({
                 style {
