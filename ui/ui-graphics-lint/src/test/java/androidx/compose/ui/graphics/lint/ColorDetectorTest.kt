@@ -22,6 +22,7 @@ import androidx.compose.lint.test.Stubs
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -41,6 +42,7 @@ class ColorDetectorTest : LintDetectorTest() {
             ColorDetector.InvalidColorHexValue
         )
 
+    @Ignore // b/193270279
     @Test
     fun MissingColorAlphaChannel() {
         lint().files(
@@ -110,6 +112,7 @@ Fix for src/test/test.kt line 14: Add `FF` alpha channel:
             )
     }
 
+    @Ignore // b/193270279
     @Test
     fun incorrectChannels() {
         lint().files(

@@ -24,6 +24,7 @@ import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.checks.infrastructure.TestFile
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -130,6 +131,7 @@ class RememberSaveableDetectorTest : LintDetectorTest() {
         """
     )
 
+    @Ignore // b/193270279
     @Test
     fun saverPassedToVarargs() {
         lint().files(
@@ -231,6 +233,7 @@ Fix for src/test/Foo.kt line 22: Change to `stateSaver = fooSaver4`:
             )
     }
 
+    @Ignore // b/193270279
     @Test
     fun noErrors() {
         lint().files(
