@@ -143,4 +143,28 @@ class CSSBackgroundTests {
         assertEquals("content-box", window.getComputedStyle(root.children[2] as HTMLElement).backgroundOrigin)
     }
 
+
+    @Test
+    fun backgroundSize() = runTest {
+        composition {
+            Div({style {
+                backgroundSize("contain")
+            }})
+            Div({style {
+                backgroundSize("cover")
+            }})
+            Div({style {
+                backgroundSize("50%")
+            }})
+            Div({style {
+                backgroundSize("auto 50px")
+            }})
+        }
+
+        assertEquals("contain", window.getComputedStyle(root.children[0] as HTMLElement).backgroundSize)
+        assertEquals("cover", window.getComputedStyle(root.children[1] as HTMLElement).backgroundSize)
+        assertEquals("50%", window.getComputedStyle(root.children[2] as HTMLElement).backgroundSize)
+        assertEquals("auto 50px", window.getComputedStyle(root.children[3] as HTMLElement).backgroundSize)
+    }
+
 }

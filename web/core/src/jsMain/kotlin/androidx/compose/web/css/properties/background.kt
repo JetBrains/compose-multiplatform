@@ -42,3 +42,9 @@ fun StyleBuilder.backgroundRepeat(value: String) {
     property("background-repeat", value)
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/background-size
+fun StyleBuilder.backgroundSize(value: String) {
+    property("background-size", value)
+}
+
+
