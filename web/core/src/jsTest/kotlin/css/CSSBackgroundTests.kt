@@ -167,4 +167,24 @@ class CSSBackgroundTests {
         assertEquals("auto 50px", window.getComputedStyle(root.children[3] as HTMLElement).backgroundSize)
     }
 
+    @Test
+    fun background() = runTest {
+        composition {
+            Div({style {
+                background("green")
+            }})
+            Div({style {
+                background("content-box radial-gradient(crimson, skyblue)")
+            }})
+            Div({style {
+                background("no-repeat url(\"../../media/examples/lizard.png\")")
+            }})
+        }
+
+        assertEquals("rgb(0, 128, 0)", window.getComputedStyle(root.children[0] as HTMLElement).backgroundColor)
+        assertEquals("content-box", window.getComputedStyle(root.children[1] as HTMLElement).backgroundOrigin)
+        assertEquals("radial-gradient(rgb(220, 20, 60), rgb(135, 206, 235))", window.getComputedStyle(root.children[1] as HTMLElement).backgroundImage)
+        assertEquals("no-repeat", window.getComputedStyle(root.children[2] as HTMLElement).backgroundRepeat)
+    }
+
 }

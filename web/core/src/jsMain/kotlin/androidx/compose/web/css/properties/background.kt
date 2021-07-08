@@ -48,3 +48,9 @@ fun StyleBuilder.backgroundSize(value: String) {
 }
 
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/background
+fun StyleBuilder.background(value: String) {
+    property("background", value)
+}
+
+
