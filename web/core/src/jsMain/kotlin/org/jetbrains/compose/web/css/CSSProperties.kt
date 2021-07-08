@@ -164,10 +164,6 @@ fun StyleBuilder.right(value: CSSAutoKeyword) {
     property("right", value)
 }
 
-fun StyleBuilder.fontSize(value: CSSNumeric) {
-    property("font-size", value)
-}
-
 fun StyleBuilder.margin(value: CSSNumeric) {
     // marign hasn't Typed OM yet
     property("margin", value)
