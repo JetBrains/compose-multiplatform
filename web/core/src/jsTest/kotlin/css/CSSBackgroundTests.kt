@@ -92,11 +92,8 @@ class CSSBackgroundTests {
     }
 
     @Test
-    fun backgroudRepeat() = runTest {
+    fun backgroundRepeat() = runTest {
         composition {
-            Div({style {
-                backgroundRepeat("space repeat")
-            }})
             Div({style {
                 backgroundRepeat("space repeat")
             }})
@@ -105,4 +102,24 @@ class CSSBackgroundTests {
         assertEquals("space repeat", window.getComputedStyle(root.children[0] as HTMLElement).backgroundRepeat)
     }
 
+
+    @Test
+    fun backgroundClip() = runTest {
+        composition {
+            Div({style {
+                backgroundClip("border-box")
+            }})
+            Div({style {
+                backgroundClip("padding-box")
+            }})
+            Div({style {
+                backgroundClip("content-box")
+            }})
+        }
+
+
+        assertEquals("border-box", window.getComputedStyle(root.children[0] as HTMLElement).backgroundClip)
+        assertEquals("padding-box", window.getComputedStyle(root.children[1] as HTMLElement).backgroundClip)
+        assertEquals("content-box", window.getComputedStyle(root.children[2] as HTMLElement).backgroundClip)
+    }
 }
