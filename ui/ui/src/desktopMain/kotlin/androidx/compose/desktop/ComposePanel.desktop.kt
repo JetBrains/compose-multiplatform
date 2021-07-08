@@ -47,6 +47,8 @@ class ComposePanel : JLayeredPane() {
         super.setBounds(x, y, width, height)
     }
 
+    override fun getPreferredSize() = layer?.wrapped?.preferredSize
+
     /**
      * Sets Compose content of the ComposePanel.
      *
@@ -93,10 +95,11 @@ class ComposePanel : JLayeredPane() {
 
         // After [super.addNotify] is called we can safely initialize the layer and composable
         // content.
-        layer = ComposeLayer()
-        super.add(layer!!.component, Integer.valueOf(1))
-        layer?.wrapped?.setSize(width, height)
+        layer = ComposeLayer().apply {
+            wrapped.setSize(width, height)
+        }
         initContent()
+        super.add(layer!!.component, Integer.valueOf(1))
     }
 
     override fun removeNotify() {
