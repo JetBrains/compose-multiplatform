@@ -508,6 +508,10 @@ class AffectedModuleDetectorImpl constructor(
                 ":emoji2:integration-tests:init-enabled-macrobenchmark-target",
             ),
             setOf(
+                ":wear:benchmark:integration-tests:macrobenchmark",
+                ":wear:benchmark:integration-tests:macrobenchmark-target"
+            ),
+            setOf(
                 ":wear:compose:integration-tests:macrobenchmark",
                 ":wear:compose:integration-tests:macrobenchmark-target"
             ),
