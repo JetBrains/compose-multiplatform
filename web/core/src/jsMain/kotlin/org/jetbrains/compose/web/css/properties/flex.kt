@@ -47,3 +47,16 @@ fun StyleBuilder.alignContent(alignContent: AlignContent) {
     )
 }
 
+fun StyleBuilder.order(value: Int) {
+    property("order", value)
+}
+
+fun StyleBuilder.flexGrow(value: Number) {
+    property("flex-grow", value)
+}
+
+fun StyleBuilder.flexShrink(value: Number) {
+    property("flex-shrink", value)
+}
+
+
