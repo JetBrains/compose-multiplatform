@@ -5,7 +5,7 @@
 
 package org.jetbrains.compose.web.css
 
-// https://developer.mozilla.org/en-US/docs/Web/CSS/margin-bottom
+// https://developer.mozilla.org/en-US/docs/Web/CSS/margin
 fun StyleBuilder.margin(vararg value: CSSNumeric) {
     // margin hasn't Typed OM yet
     property("margin", value.joinToString(" "))

@@ -163,8 +163,3 @@ fun StyleBuilder.right(value: CSSLengthOrPercentageValue) {
 fun StyleBuilder.right(value: CSSAutoKeyword) {
     property("right", value)
 }
-
-fun StyleBuilder.padding(value: CSSNumeric) {
-    // padding hasn't Typed OM yet
-    property("padding", value)
-}
