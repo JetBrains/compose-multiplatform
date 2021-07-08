@@ -614,7 +614,10 @@ internal class AndroidComposeView(context: Context) :
         // We can't be confident that RenderNode is supported, so we try and fail over to
         // the ViewLayer implementation. We'll try even on on P devices, but it will fail
         // until ART allows things on the unsupported list on P.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && isRenderNodeCompatible) {
+        if (isHardwareAccelerated &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+            isRenderNodeCompatible
+        ) {
             try {
                 return RenderNodeLayer(
                     this,
