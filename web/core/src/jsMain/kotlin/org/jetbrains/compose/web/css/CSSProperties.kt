@@ -2,8 +2,6 @@
 
 package org.jetbrains.compose.web.css
 
-import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
-
 fun StyleBuilder.opacity(value: Number) {
     property("opacity", value)
 }
@@ -65,101 +63,4 @@ inline fun CSSBorder.color(color: CSSColorValue) {
 
 fun StyleBuilder.display(displayStyle: DisplayStyle) {
     property("display", displayStyle.value)
-}
-
-fun StyleBuilder.flexDirection(flexDirection: FlexDirection) {
-    property("flex-direction", flexDirection.value)
-}
-
-fun StyleBuilder.flexWrap(flexWrap: FlexWrap) {
-    property("flex-wrap", flexWrap.value)
-}
-
-fun StyleBuilder.flexFlow(flexDirection: FlexDirection, flexWrap: FlexWrap) {
-    property(
-        "flex-flow",
-        "${flexDirection.value} ${flexWrap.value}"
-    )
-}
-
-fun StyleBuilder.justifyContent(justifyContent: JustifyContent) {
-    property(
-        "justify-content",
-        justifyContent.value
-    )
-}
-fun StyleBuilder.alignSelf(alignSelf: AlignSelf) {
-    property(
-        "align-self",
-        alignSelf.value
-    )
-}
-
-fun StyleBuilder.alignItems(alignItems: AlignItems) {
-    property(
-        "align-items",
-        alignItems.value
-    )
-}
-
-fun StyleBuilder.alignContent(alignContent: AlignContent) {
-    property(
-        "align-content",
-        alignContent.value
-    )
-}
-
-fun StyleBuilder.position(position: Position) {
-    property(
-        "position",
-        position.value
-    )
-}
-
-fun StyleBuilder.width(value: CSSNumeric) {
-    property("width", value)
-}
-
-fun StyleBuilder.width(value: CSSAutoKeyword) {
-    property("width", value)
-}
-
-fun StyleBuilder.height(value: CSSNumeric) {
-    property("height", value)
-}
-
-fun StyleBuilder.height(value: CSSAutoKeyword) {
-    property("height", value)
-}
-
-fun StyleBuilder.top(value: CSSLengthOrPercentageValue) {
-    property("top", value)
-}
-
-fun StyleBuilder.top(value: CSSAutoKeyword) {
-    property("top", value)
-}
-
-fun StyleBuilder.bottom(value: CSSLengthOrPercentageValue) {
-    property("bottom", value)
-}
-
-fun StyleBuilder.bottom(value: CSSAutoKeyword) {
-    property("bottom", value)
-}
-
-fun StyleBuilder.left(value: CSSLengthOrPercentageValue) {
-    property("left", value)
-}
-
-fun StyleBuilder.left(value: CSSAutoKeyword) {
-    property("left", value)
-}
-
-fun StyleBuilder.right(value: CSSLengthOrPercentageValue) {
-    property("right", value)
-}
-
-fun StyleBuilder.right(value: CSSAutoKeyword) {
-    property("right", value)
 }
