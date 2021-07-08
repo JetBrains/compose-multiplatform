@@ -164,19 +164,6 @@ fun StyleBuilder.right(value: CSSAutoKeyword) {
     property("right", value)
 }
 
-fun StyleBuilder.margin(value: CSSNumeric) {
-    // marign hasn't Typed OM yet
-    property("margin", value)
-}
-
-fun StyleBuilder.marginLeft(value: CSSNumeric) {
-    property("margin-left", value)
-}
-
-fun StyleBuilder.marginTop(value: CSSNumeric) {
-    property("margin-top", value)
-}
-
 fun StyleBuilder.padding(value: CSSNumeric) {
     // padding hasn't Typed OM yet
     property("padding", value)
