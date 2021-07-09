@@ -35,6 +35,7 @@ export COMPOSE_CUSTOM_GROUP=org.jetbrains.compose
 androidx.compose.multiplatformEnabled=true
 androidx.compose.jsCompilerTestsEnabled=true
 ```
+(note that https://android.googlesource.com/platform/frameworks/support build doesn't work with androidx.compose.jsCompilerTestsEnabled)
 
 ## Scripts
 Publish artifacts to the local directory `out/androidx/build/support_repo/org/jetbrains/compose`:
