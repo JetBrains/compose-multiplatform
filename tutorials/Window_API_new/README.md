@@ -388,7 +388,9 @@ private fun onWindowRelocate(position: WindowPosition) {
 import androidx.compose.material.TextField
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
@@ -397,12 +399,11 @@ fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         onPreviewKeyEvent = {
-            when (it.key) {
-                Key.Escape -> {
-                    exitApplication()
-                    true
-                }
-                else -> false
+            if (it.type == KeyEventType.KeyDown && it.key == Key.Escape) {
+                exitApplication()
+                true
+            } else {
+                false
             }
         }
     ) {
