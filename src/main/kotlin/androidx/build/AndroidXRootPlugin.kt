@@ -25,7 +25,8 @@ import androidx.build.playground.VerifyPlaygroundGradlePropertiesTask
 import androidx.build.studio.StudioTask.Companion.registerStudioTask
 import androidx.build.testConfiguration.registerOwnersServiceTasks
 import androidx.build.uptodatedness.TaskUpToDateValidator
-import com.android.build.gradle.api.AndroidBasePlugin
+import com.android.build.gradle.AppPlugin
+import com.android.build.gradle.LibraryPlugin
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -114,10 +115,13 @@ abstract class AndroidXRootPlugin : Plugin<Project> {
                     }
                 )
             )
-            project.plugins.withType(AndroidBasePlugin::class.java) {
-                buildOnServerTask.dependsOn("${project.path}:assembleRelease")
-                if (!project.usingMaxDepVersions()) {
-                    project.afterEvaluate {
+            project.afterEvaluate {
+                if (project.plugins.hasPlugin(LibraryPlugin::class.java) ||
+                    project.plugins.hasPlugin(AppPlugin::class.java)
+                ) {
+
+                    buildOnServerTask.dependsOn("${project.path}:assembleRelease")
+                    if (!project.usingMaxDepVersions()) {
                         project.agpVariants.all { variant ->
                             // in AndroidX, release and debug variants are essentially the same,
                             // so we don't run the lintRelease task on the build server
