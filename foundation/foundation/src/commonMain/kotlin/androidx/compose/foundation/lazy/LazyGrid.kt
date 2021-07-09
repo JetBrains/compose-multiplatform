@@ -47,9 +47,6 @@ fun LazyVerticalGrid(
     contentPadding: PaddingValues = PaddingValues(0.dp),
     content: LazyGridScope.() -> Unit
 ) {
-    val scope = LazyGridScopeImpl()
-    scope.apply(content)
-
     when (cells) {
         is GridCells.Fixed ->
             FixedLazyGrid(
@@ -57,7 +54,7 @@ fun LazyVerticalGrid(
                 modifier = modifier,
                 state = state,
                 contentPadding = contentPadding,
-                scope = scope
+                content = content
             )
         is GridCells.Adaptive ->
             BoxWithConstraints(
@@ -68,7 +65,7 @@ fun LazyVerticalGrid(
                     nColumns = nColumns,
                     state = state,
                     contentPadding = contentPadding,
-                    scope = scope
+                    content = content
                 )
             }
     }
@@ -185,14 +182,17 @@ private fun FixedLazyGrid(
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    scope: LazyGridScopeImpl
+    content: LazyGridScope.() -> Unit
 ) {
-    val rows = (scope.totalSize + nColumns - 1) / nColumns
     LazyColumn(
         modifier = modifier,
         state = state,
         contentPadding = contentPadding
     ) {
+        val scope = LazyGridScopeImpl()
+        scope.apply(content)
+
+        val rows = (scope.totalSize + nColumns - 1) / nColumns
         items(rows) { rowIndex ->
             Row {
                 for (columnIndex in 0 until nColumns) {

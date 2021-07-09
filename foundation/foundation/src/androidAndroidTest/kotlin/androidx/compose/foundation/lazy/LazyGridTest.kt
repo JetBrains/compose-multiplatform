@@ -16,13 +16,19 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
@@ -34,6 +40,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import com.google.common.truth.Truth
+import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -303,5 +311,39 @@ class LazyGridTest {
         rule.onNodeWithTag("3*4")
             .assertTopPositionInRootIsEqualTo(itemSize)
             .assertLeftPositionInRootIsEqualTo(itemSize)
+    }
+
+    @Test
+    fun changeItemsCountAndScrollImmediately() {
+        lateinit var state: LazyListState
+        var count by mutableStateOf(100)
+        val composedIndexes = mutableListOf<Int>()
+        rule.setContent {
+            state = rememberLazyListState()
+            LazyVerticalGrid(
+                GridCells.Fixed(1),
+                Modifier.fillMaxWidth().height(10.dp),
+                state
+            ) {
+                items(count) { index ->
+                    composedIndexes.add(index)
+                    Box(Modifier.size(20.dp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            composedIndexes.clear()
+            count = 10
+            runBlocking(AutoTestFrameClock()) {
+                // we try to scroll to the index after 10, but we expect that the component will
+                // already be aware there is a new count and not compose items with index > 10
+                state.scrollToItem(50)
+            }
+            composedIndexes.forEach {
+                Truth.assertThat(it).isLessThan(count)
+            }
+            Truth.assertThat(state.firstVisibleItemIndex).isEqualTo(9)
+        }
     }
 }
