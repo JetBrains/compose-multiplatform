@@ -33,7 +33,12 @@ fun build(
 
     proc.waitFor(5, TimeUnit.MINUTES)
 
-    //println(proc.inputStream.bufferedReader().readText())
+    "(COMPOSE_INTEGRATION_VERSION=\\[.*\\])".toRegex().find(
+        proc.inputStream.bufferedReader().readText()
+    )?.also {
+        println(it.groupValues[1])
+    }
+
     println(proc.errorStream.bufferedReader().readText())
 
     if (proc.exitValue() != 0 && !failureExpected) {

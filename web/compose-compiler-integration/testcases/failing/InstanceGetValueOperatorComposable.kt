@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 class Router {
     @Composable
     operator fun getValue(ref: Any?, property: KProperty<*>): Router {
-        return object : Router {}
+        return Router()
     }
 }
 
