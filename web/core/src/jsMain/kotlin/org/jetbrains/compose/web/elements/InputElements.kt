@@ -9,7 +9,7 @@ private fun InputAttrsBuilder<String>.applyAttrsWithStringValue(
     value: String,
     attrsBuilder: InputAttrsBuilder<String>.() -> Unit
 ) {
-    if (value.isNotEmpty()) value(value)
+    value(value)
     attrsBuilder()
 }
 
