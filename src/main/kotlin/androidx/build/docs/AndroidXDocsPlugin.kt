@@ -599,7 +599,7 @@ private val dackkaDirsToProcess = listOf(
     "androidx/gridlayout/**",
     "androidx/health/**",
     "androidx/heifwriter/**",
-//    "androidx/hilt/**",
+    "androidx/hilt/**",
     "androidx/interpolator/**",
 //    "androidx/leanback/**",
     "androidx/legacy/**",
