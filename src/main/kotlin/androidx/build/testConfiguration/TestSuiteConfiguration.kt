@@ -119,18 +119,24 @@ fun Project.createTestConfigurationGenerationTask(
  * alternative project. Default is for the project to register the new config task to itself
  */
 fun Project.addAppApkToTestConfigGeneration(overrideProject: Project = this) {
+    if (project.isMacrobenchmarkTarget()) {
+        return
+    }
     // TODO(aurimas): migrate away from this when upgrading to AGP 7.1.0-alpha03 or newer
     @Suppress("DEPRECATION")
     extensions.getByType<
         com.android.build.api.extension.ApplicationAndroidComponentsExtension
         >().apply {
-        onVariants(selector().withBuildType("debug")) { debugVariant ->
-            overrideProject.tasks.withType(GenerateTestConfigurationTask::class.java)
-                .configureEach {
-                    it.appFolder.set(debugVariant.artifacts.get(SingleArtifact.APK))
-                    it.appLoader.set(debugVariant.artifacts.getBuiltArtifactsLoader())
-                    it.appProjectPath.set(overrideProject.path)
-                }
+        onVariants(selector().withBuildType("debug")) { appVariant ->
+            overrideProject.tasks.named(
+                "${AndroidXPlugin.GENERATE_TEST_CONFIGURATION_TASK}" +
+                    "${appVariant.name}AndroidTest"
+            ) { configTask ->
+                configTask as GenerateTestConfigurationTask
+                configTask.appFolder.set(appVariant.artifacts.get(SingleArtifact.APK))
+                configTask.appLoader.set(appVariant.artifacts.getBuiltArtifactsLoader())
+                configTask.appProjectPath.set(overrideProject.path)
+            }
         }
     }
 }
@@ -340,13 +346,20 @@ private fun Project.configureMacrobenchmarkConfigTask(
         this.rootProject.tasks.findByName(
             AndroidXPlugin.ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK
         )!!.dependsOn(configTask)
-    } else if (path.endsWith("macrobenchmark-target")) {
+    } else if (isMacrobenchmarkTarget()) {
         configTask.configure { task ->
             task.appFolder.set(artifacts.get(SingleArtifact.APK))
             task.appLoader.set(artifacts.getBuiltArtifactsLoader())
             task.appProjectPath.set(path)
         }
     }
+}
+
+/**
+ * Tells whether this project is the macrobenchmark-target project
+ */
+fun Project.isMacrobenchmarkTarget(): Boolean {
+    return path.endsWith("macrobenchmark-target")
 }
 
 fun Project.configureTestConfigGeneration(baseExtension: BaseExtension) {
@@ -381,7 +394,7 @@ fun Project.configureTestConfigGeneration(baseExtension: BaseExtension) {
                     )
                 }
                 path.endsWith("macrobenchmark") ||
-                    path.endsWith("macrobenchmark-target") -> {
+                    isMacrobenchmarkTarget() -> {
                     configureMacrobenchmarkConfigTask(
                         androidTest.name,
                         androidTest.artifacts,
