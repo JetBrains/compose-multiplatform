@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.inspection.inspector.ParameterType.DimensionDp
+import androidx.compose.ui.platform.InspectableModifier
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontListFontFamily
@@ -838,8 +839,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
         private fun createFromModifier(name: String, value: Modifier): NodeParameter? = when {
             name.isNotEmpty() -> {
                 val parameter = NodeParameter(name, ParameterType.String, "")
-                val modifiers = mutableListOf<Modifier.Element>()
-                value.foldIn(modifiers) { acc, m -> acc.apply { add(m) } }
+                val modifiers = unwrap(value)
                 when {
                     modifiers.isEmpty() -> parameter
                     !shouldRecurseDeeper() -> parameter.withChildReference(value)
@@ -856,14 +856,23 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             else -> null
         }
 
+        private fun unwrap(value: Modifier): List<Modifier.Element> {
+            val collector = ModifierCollector()
+            value.foldIn(collector) { acc, m ->
+                acc.apply {
+                    add(m)
+                }
+            }
+            return collector.modifiers
+        }
+
         private fun findFromModifier(
             name: String,
             value: Modifier,
             index: Int
         ): Pair<String, Any?>? = when {
             name.isNotEmpty() -> {
-                val modifiers = mutableListOf<Modifier.Element>()
-                value.foldIn(modifiers) { acc, m -> acc.apply { add(m) } }
+                val modifiers = unwrap(value)
                 if (index in modifiers.indices) Pair("", modifiers[index]) else null
             }
             value is InspectableValue -> findFromInspectableValue(value, index)
@@ -929,5 +938,21 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
             value.fonts.asSequence().filterIsInstance<ResourceFont>().minByOrNull {
                 abs(it.weight.weight - FontWeight.Normal.weight) + it.style.value
             }
+    }
+
+    private class ModifierCollector {
+        val modifiers = mutableListOf<Modifier.Element>()
+        private var ignoreCount = 0
+
+        fun add(element: Modifier.Element) {
+            if (ignoreCount > 0) {
+                ignoreCount--
+            } else {
+                modifiers.add(element)
+                if (element is InspectableModifier) {
+                    ignoreCount = element.wrapped.foldIn(0) { count, _ -> count + 1 }
+                }
+            }
+        }
     }
 }

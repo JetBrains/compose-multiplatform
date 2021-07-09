@@ -38,6 +38,8 @@ import com.intellij.psi.util.InheritanceUtil
 import org.jetbrains.kotlin.asJava.classes.KtLightClass
 import org.jetbrains.kotlin.asJava.elements.KtLightField
 import org.jetbrains.kotlin.asJava.elements.KtLightParameter
+import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes.VALUE_PARAMETER
 import org.jetbrains.uast.UBinaryExpression
@@ -66,8 +68,10 @@ import org.jetbrains.uast.kotlin.KotlinUSimpleReferenceExpression
 import org.jetbrains.uast.visitor.AbstractUastVisitor
 
 private const val ModifierClass = "androidx.compose.ui.Modifier"
+private const val ModifierCompanionClass = "androidx.compose.ui.Modifier.Companion"
 private const val ModifierFile = "Modifier.kt"
 private const val ComposedModifierFile = "ComposedModifier.kt"
+private const val InspectableValueFile = "InspectableValue.kt"
 private const val LambdaFunction = "kotlin.jvm.functions.Function1"
 private const val InspectorInfoClass = "androidx.compose.ui.platform.InspectorInfo"
 private const val InspectorValueInfoClass = "androidx.compose.ui.platform.InspectorValueInfo"
@@ -76,9 +80,12 @@ private const val DebugInspectorInfoFunction = "debugInspectorInfo"
 private const val ThenMethodName = "then"
 private const val ComposedMethodName = "composed"
 private const val RememberMethodName = "remember"
+private const val InspectableMethodName = "inspectable"
 private const val ComposedMethodPackage = "androidx.compose.ui"
 private const val RememberMethodPackage = "androidx.compose.runtime"
 private val DemosPackageRegEx = "androidx\\.compose\\..+\\.demos\\..+".toRegex()
+private val UiPackage = FqName("androidx.compose.ui")
+private val PlatformPackage = FqName("androidx.compose.ui.platform")
 
 /**
  * Lint [Detector] to ensure that we are creating debug information for the layout inspector on
@@ -145,8 +152,9 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
         private var methodInfo: MethodInfo? = null
 
         override fun visitMethod(node: UMethod) {
-            if (node.containingFile?.name == ModifierFile ||
-                node.containingFile?.name == ComposedModifierFile ||
+            if (node.isInFile(ModifierFile, UiPackage) ||
+                node.isInFile(ComposedModifierFile, UiPackage) ||
+                node.isInFile(InspectableValueFile, PlatformPackage) ||
                 firstParameterType(node) != ModifierClass ||
                 node.returnType?.canonicalText != ModifierClass ||
                 DemosPackageRegEx.matches(node.containingClass?.qualifiedName ?: "")
@@ -158,6 +166,11 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
             methodInfo = MethodInfo(node)
             node.uastBody?.accept(returnVisitor)
             methodInfo = null
+        }
+
+        private fun UMethod.isInFile(fileName: String, packageName: FqName): Boolean {
+            val file = containingFile as? KtFile ?: return false
+            return file.name == fileName && file.packageFqName == packageName
         }
 
         private fun firstParameterType(method: UMethod): String? =
@@ -193,6 +206,12 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
                 node.receiver == null &&
                 isModifierType(node.returnType) &&
                 methodPackageName(node) == RememberMethodPackage
+
+        private fun isInspectableModifier(node: UCallExpression): Boolean =
+            node.methodName == InspectableMethodName &&
+                node.receiverType?.canonicalText in listOf(ModifierClass, ModifierCompanionClass) &&
+                node.returnType?.canonicalText == ModifierClass &&
+                methodPackageName(node) == PlatformPackage.asString()
 
         // Return true if this is a lambda expression of the type: "InspectorInfo.() -> Unit"
         private fun isInspectorInfoLambdaType(type: PsiType?): Boolean {
@@ -482,13 +501,14 @@ class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
          */
         private inner class ModifierVisitor : UnexpectedVisitor({ wrongLambda(it) }) {
             override fun visitCallExpression(node: UCallExpression): Boolean {
-                val lastArgument = node.valueArguments.lastOrNull()
-                if (isInspectorInfoLambdaType(lastArgument?.getExpressionType())) {
-                    lastArgument!!.accept(debugInspectorVisitor)
+                val info = if (isInspectableModifier(node)) node.valueArguments.firstOrNull()
+                else node.valueArguments.lastOrNull()
+                if (isInspectorInfoLambdaType(info?.getExpressionType())) {
+                    info!!.accept(debugInspectorVisitor)
                     return true
                 }
                 if (isRememberFunctionCall(node)) {
-                    val lambda = lastArgument as? ULambdaExpression
+                    val lambda = info as? ULambdaExpression
                     val body = lambda?.body as? UBlockExpression
                     val ret = body?.expressions?.firstOrNull() as? UReturnExpression
                     val definition = ret?.returnExpression ?: return super.visitCallExpression(node)
