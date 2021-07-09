@@ -113,6 +113,12 @@ open class StyleBuilderImpl : StyleBuilder, StyleHolder {
     }
 }
 
+open class NamedProperty(private val delegate: StyleBuilder, private val name: String) : StyleBuilderImpl(), StyleBuilder by delegate{
+    fun property(value: String) {
+        property(name, value)
+    }
+}
+
 data class StylePropertyDeclaration(
     val name: String,
     val value: StylePropertyValue

@@ -16,13 +16,11 @@ import org.jetbrains.compose.web.css.border
 import org.jetbrains.compose.web.css.borderRadius
 import org.jetbrains.compose.web.css.bottom
 import org.jetbrains.compose.web.css.color
-import org.jetbrains.compose.web.css.display
 import org.jetbrains.compose.web.css.flexDirection
 import org.jetbrains.compose.web.css.flexFlow
 import org.jetbrains.compose.web.css.flexGrow
 import org.jetbrains.compose.web.css.flexShrink
 import org.jetbrains.compose.web.css.flexWrap
-import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.justifyContent
 import org.jetbrains.compose.web.css.left
 import org.jetbrains.compose.web.css.opacity
@@ -33,7 +31,6 @@ import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.right
 import org.jetbrains.compose.web.css.top
 import org.jetbrains.compose.web.css.value
-import org.jetbrains.compose.web.css.width
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
@@ -404,32 +401,6 @@ class StaticComposableTests {
 
         assertEquals("right: 100px;", (root.children[0] as HTMLElement).style.cssText)
         assertEquals("right: 100%;", (root.children[1] as HTMLElement).style.cssText)
-    }
-
-    @Test
-    fun stylesDisplay() {
-        val root = "div".asHtmlElement()
-        val enumValues = DisplayStyle.values()
-        renderComposable(
-            root = root
-        ) {
-            enumValues.forEach { displayStyle ->
-                Div(
-                    {
-                        style {
-                            display(displayStyle)
-                        }
-                    }
-                ) { }
-            }
-        }
-
-        enumValues.forEachIndexed { index, displayStyle ->
-            assertEquals(
-                "display: ${displayStyle.value};",
-                (root.children[index] as HTMLElement).style.cssText
-            )
-        }
     }
 
     @Test

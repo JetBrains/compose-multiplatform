@@ -6,7 +6,6 @@ import org.jetbrains.compose.web.css.alignItems
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.flexDirection
 import org.jetbrains.compose.web.css.FlexDirection
-import org.jetbrains.compose.web.css.display
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.left
 import org.jetbrains.compose.web.css.px
