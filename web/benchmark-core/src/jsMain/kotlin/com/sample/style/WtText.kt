@@ -1,10 +1,7 @@
 package com.sample.style
 
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.css.selectors.*
-import org.jetbrains.compose.web.attributes.*
-import org.jetbrains.compose.web.dom.*
-import org.jetbrains.compose.web.*
+import org.jetbrains.compose.web.css.selectors.hover
 
 object WtTexts : StyleSheet(AppStylesheet) {
 
@@ -12,8 +9,8 @@ object WtTexts : StyleSheet(AppStylesheet) {
         color("#27282c")
         fontSize(60.px)
         fontSize(AppCSSVariables.wtHeroFontSize.value(60.px))
-        property("letter-spacing", (-1.5).px)
-        fontWeight( 900)
+        letterSpacing((-1.5).px)
+        fontWeight(900)
         lineHeight(64.px)
         lineHeight(AppCSSVariables.wtHeroLineHeight.value(64.px))
 
@@ -34,7 +31,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
         color("#27282c")
         fontSize(28.px)
         fontSize(AppCSSVariables.wtSubtitle2FontSize.value(28.px))
-        property("letter-spacing", "normal")
+        letterSpacing("normal")
         fontWeight(300)
         lineHeight(40.px)
         lineHeight(AppCSSVariables.wtSubtitle2LineHeight.value(40.px))
@@ -55,7 +52,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
     val wtText1 by style {
         color(Color.RGBA(39, 40, 44, .7))
         fontSize(18.px)
-        property("letter-spacing", "normal")
+        letterSpacing("normal")
         fontWeight(400)
         lineHeight(28.px)
 
@@ -72,7 +69,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
     val wtText2 by style {
         color(Color.RGBA(39, 40, 44, .7))
         fontSize(15.px)
-        property("letter-spacing", "normal")
+        letterSpacing("normal")
         fontWeight(400)
         lineHeight(24.px)
 
@@ -85,8 +82,8 @@ object WtTexts : StyleSheet(AppStylesheet) {
     val wtText3 by style {
         color(Color.RGBA(39, 40, 44, .7))
         fontSize(12.px)
-        property("letter-spacing", "normal")
-        fontWeight( 400)
+        letterSpacing("normal")
+        fontWeight(400)
         lineHeight(16.px)
 
         property(
@@ -121,7 +118,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
         color("#27282c")
         fontSize(31.px)
         fontSize(AppCSSVariables.wtH2FontSize.value(31.px))
-        property("letter-spacing", (-.5).px)
+        letterSpacing((-.5).px)
         fontWeight(700)
         lineHeight(40.px)
         lineHeight(AppCSSVariables.wtH2LineHeight.value(40.px))
@@ -147,8 +144,8 @@ object WtTexts : StyleSheet(AppStylesheet) {
         color("#27282c")
         fontSize(21.px)
         fontSize(AppCSSVariables.wtH3FontSize.value(20.px))
-        property("letter-spacing", "normal")
-        fontWeight( 700)
+        letterSpacing("normal")
+        fontWeight(700)
         lineHeight(28.px)
         lineHeight(AppCSSVariables.wtH3LineHeight.value(28.px))
 

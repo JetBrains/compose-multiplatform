@@ -31,16 +31,16 @@ object AppStylesheet : StyleSheet() {
 
     val composeTitleTag by style {
         property("padding", "5px 12px")
-        property("letter-spacing", "normal")
-        property("font-weight", 400)
-        property("line-height", 24.px)
+        letterSpacing("normal")
+        fontWeight(400)
+        lineHeight(24.px)
 
         position(Position.Relative)
         top((-32).px)
         marginLeft(8.px)
         fontSize(15.px)
         backgroundColor(Color.RGBA(39, 40, 44, .05))
-        color(Color.RGBA(39,40,44,.7))
+        color(Color.RGBA(39, 40, 44, .7))
         borderRadius(4.px, 4.px, 4.px)
 
         media(maxWidth(640.px)) {
@@ -89,7 +89,7 @@ object AppStylesheet : StyleSheet() {
                 "max-width",
                 "calc(8.33333%*${AppCSSVariables.wtColCount.value()} - ${AppCSSVariables.wtHorizontalLayoutGutter.value()}*2)"
             )
-            boxSizing( "border-box")
+            boxSizing("border-box")
         }
     }
 }
