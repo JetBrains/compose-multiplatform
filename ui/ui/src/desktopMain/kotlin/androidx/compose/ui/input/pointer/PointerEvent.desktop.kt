@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.input.pointer
 
+import androidx.compose.ui.platform.DesktopPlatform
+import java.awt.event.InputEvent
 import java.awt.event.MouseEvent
 
 /**
@@ -37,8 +39,46 @@ actual data class PointerEvent internal constructor(
         internalPointerEvent: InternalPointerEvent?
     ) : this(changes, internalPointerEvent?.mouseEvent)
 
+    val buttons = PointerButtons(mouseEvent?.modifiersEx ?: 0)
+
+    val keyboardModifiers = PointerKeyboardModifiers(mouseEvent?.modifiersEx ?: 0)
+
     /**
      * @param changes The changes.
      */
     actual constructor(changes: List<PointerInputChange>) : this(changes, mouseEvent = null)
+}
+
+@Suppress("INLINE_CLASS_DEPRECATED")
+inline class PointerButtons(val value: Int) {
+    private val isMacOsCtrlClick
+        get() = (
+            DesktopPlatform.Current == DesktopPlatform.MacOS &&
+                ((value and InputEvent.BUTTON1_DOWN_MASK) != 0) &&
+                ((value and InputEvent.CTRL_DOWN_MASK) != 0)
+            )
+
+    val isPrimaryPressed
+        get() = (value and InputEvent.BUTTON1_DOWN_MASK) != 0 && !isMacOsCtrlClick
+
+    val isSecondaryPressed: Boolean
+        get() = ((value and InputEvent.BUTTON3_DOWN_MASK) != 0) || isMacOsCtrlClick
+
+    val isTertiaryPressed: Boolean
+        get() = (value and InputEvent.BUTTON2_DOWN_MASK) != 0
+}
+
+@Suppress("INLINE_CLASS_DEPRECATED")
+inline class PointerKeyboardModifiers(val value: Int) {
+    val isAltPressed
+        get() = value and InputEvent.ALT_DOWN_MASK != 0
+
+    val isCtrlPressed
+        get() = value and InputEvent.CTRL_DOWN_MASK != 0
+
+    val isMetaPressed
+        get() = value and InputEvent.META_DOWN_MASK != 0
+
+    val isShiftPressed
+        get() = value and InputEvent.SHIFT_DOWN_MASK != 0
 }
