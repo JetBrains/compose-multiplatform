@@ -106,7 +106,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
 
     val wtLink by style {
         property("border-bottom", "1px solid transparent")
-        property("text-decoration", "none")
+        textDecoration("none")
         color("#167dff")
 
         hover(self) style {
@@ -163,7 +163,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
         backgroundColor("#167dff")
         fontSize(15.px)
         display(DisplayStyle.InlineBlock)
-        property("text-decoration", "none")
+        textDecoration("none")
         borderRadius(24.px)
         padding(12.px, 32.px)
         lineHeight(24.px)
