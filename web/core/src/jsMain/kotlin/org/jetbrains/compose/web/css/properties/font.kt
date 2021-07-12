@@ -42,3 +42,12 @@ fun StyleBuilder.lineHeight(value: CSSNumeric) {
 fun StyleBuilder.font(value: String) {
     property("font", value)
 }
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/letter-spacing
+fun StyleBuilder.letterSpacing(value: String) {
+    property("letter-spacing", value)
+}
+
+fun StyleBuilder.letterSpacing(value: CSSNumeric) {
+    property("letter-spacing", value)
+}

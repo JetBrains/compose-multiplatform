@@ -105,6 +105,25 @@ class CSSFontTests {
     }
 
     @Test
+    fun letterSpacing() = runTest {
+        composition {
+            Div({
+                style {
+                    letterSpacing("normal")
+                }
+            })
+            Div({
+                style {
+                    letterSpacing(2.em)
+                }
+            })
+        }
+
+        assertEquals("normal", (root.children[0] as HTMLElement).style.letterSpacing)
+        assertEquals("2em", (root.children[1] as HTMLElement).style.letterSpacing)
+    }
+
+    @Test
     fun fontFamily() = runTest {
         composition {
             Div({
