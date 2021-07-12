@@ -560,7 +560,7 @@ abstract class SourcesVariantRule : ComponentMetadataRule {
     }
 }
 
-private const val DACKKA_DEPENDENCY = "com.google.devsite:dackka:0.0.7"
+private const val DACKKA_DEPENDENCY = "com.google.devsite:dackka:0.0.8"
 private const val DOCLAVA_DEPENDENCY = "com.android:doclava:1.0.6"
 
 // Allowlist for directories that should be processed by Dackka
@@ -582,7 +582,7 @@ private val dackkaDirsToProcess = listOf(
     "androidx/collection/**",
     "androidx/compose/**",
     "androidx/concurrent/**",
-//    "androidx/contentpager/**",
+    "androidx/contentpager/**",
     "androidx/coordinatorlayout/**",
 //    "androidx/core/**",
     "androidx/cursoradapter/**",
@@ -607,7 +607,7 @@ private val dackkaDirsToProcess = listOf(
     "androidx/loader/**",
     "androidx/localbroadcastmanager/**",
     "androidx/media/**",
-//    "androidx/media2/**",
+    "androidx/media2/**",
     "androidx/mediarouter/**",
     "androidx/navigation/**",
     "androidx/paging/**",
@@ -632,12 +632,12 @@ private val dackkaDirsToProcess = listOf(
     "androidx/tracing/**",
     "androidx/transition/**",
     "androidx/tvprovider/**",
-//    "androidx/vectordrawable/**",
+    "androidx/vectordrawable/**",
     "androidx/versionedparcelable/**",
     "androidx/viewpager/**",
     "androidx/viewpager2/**",
     "androidx/wear/**",
-//    "androidx/webkit/**",
+    "androidx/webkit/**",
     "androidx/window/**",
     "androidx/work/**"
 )
