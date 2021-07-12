@@ -39,34 +39,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 /**
- * A BadgeBox is used to decorate [content] with a badge that can contain dynamic information, such
+ * A BadgeBox is used to decorate [content] with a [badge] that can contain dynamic information,
+ * such
  * as the presence of a new notification or a number of pending requests. Badges can be icon only
  * or contain short text.
  *
- * A common use case is to display a badge in the upper right corner of bottom navigation items.
+ * A common use case is to display a badge with bottom navigation items.
  * For more information, see [Bottom Navigation](https://material.io/components/bottom-navigation#behavior)
  *
  * A simple icon with badge example looks like:
  * @sample androidx.compose.material.samples.BottomNavigationItemWithBadge
  *
+ * @param badge the badge to be displayed - typically a [Badge]
  * @param modifier optional [Modifier] for this item
- * @param backgroundColor the background color for the badge
- * @param contentColor the color of label text rendered in the badge
- * @param badgeContent optional content to be rendered inside the badge
  * @param content the anchor to which this badge will be positioned
  *
  */
 @ExperimentalMaterialApi
 @Composable
-fun BadgeBox(
+fun BadgedBox(
+    badge: @Composable BoxScope.() -> Unit,
     modifier: Modifier = Modifier,
-    backgroundColor: Color = MaterialTheme.colors.error,
-    contentColor: Color = contentColorFor(backgroundColor),
-    badgeContent: @Composable (RowScope.() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    val badgeHorizontalOffset =
-        if (badgeContent != null) BadgeWithContentHorizontalOffset else BadgeHorizontalOffset
     Layout(
         {
             Box(
@@ -74,11 +69,9 @@ fun BadgeBox(
                 contentAlignment = Alignment.Center,
                 content = content
             )
-            Badge(
+            Box(
                 modifier = Modifier.layoutId("badge"),
-                backgroundColor = backgroundColor,
-                contentColor = contentColor,
-                content = badgeContent
+                content = badge
             )
         },
         modifier = modifier
@@ -107,6 +100,12 @@ fun BadgeBox(
                 LastBaseline to lastBaseline
             )
         ) {
+            // Use the width of the badge to infer whether it has any content (based on radius used
+            // in [Badge]) and determine its horizontal offset.
+            val hasContent = badgePlaceable.width > (2 * BadgeRadius.roundToPx())
+            val badgeHorizontalOffset =
+                if (hasContent) BadgeWithContentHorizontalOffset else BadgeHorizontalOffset
+
             anchorPlaceable.placeRelative(0, 0)
             val badgeX = anchorPlaceable.width + badgeHorizontalOffset.roundToPx()
             val badgeY = -badgePlaceable.height / 2
@@ -116,18 +115,21 @@ fun BadgeBox(
 }
 
 /**
- * Internal badge implementation to help [BadgeBox].
+ * Badge is a component that can contain dynamic information, such as the presence of a new
+ * notification or a number of pending requests. Badges can be icon only or contain short text.
+ *
+ * See [BadgedBox] for a top level layout that will properly place the badge relative to content
+ * such as text or an icon.
  *
  * @param modifier optional [Modifier] for this item
  * @param backgroundColor the background color for the badge
  * @param contentColor the color of label text rendered in the badge
  * @param content optional content to be rendered inside the badge
  *
- * @see BadgeBox
  */
 @ExperimentalMaterialApi
 @Composable
-internal fun Badge(
+fun Badge(
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colors.error,
     contentColor: Color = contentColorFor(backgroundColor),
