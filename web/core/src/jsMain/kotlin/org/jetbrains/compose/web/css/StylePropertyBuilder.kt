@@ -11,24 +11,9 @@ import kotlin.properties.ReadOnlyProperty
 
 interface StylePropertyBuilder {
     fun property(propertyName: String, value: StylePropertyValue)
-    fun variable(variableName: String, value: StylePropertyValue)
 
     fun property(propertyName: String, value: String) = property(propertyName, StylePropertyValue(value))
     fun property(propertyName: String, value: Number) = property(propertyName, StylePropertyValue(value))
-    fun variable(variableName: String, value: String) = variable(variableName, StylePropertyValue(value))
-    fun variable(variableName: String, value: Number) = variable(variableName, StylePropertyValue(value))
-
-    operator fun <TValue: StylePropertyValue> CSSStyleVariable<TValue>.invoke(value: TValue) {
-        variable(name, value.toString())
-    }
-
-    operator fun CSSStyleVariable<StylePropertyString>.invoke(value: String) {
-        variable(name, value)
-    }
-
-    operator fun CSSStyleVariable<StylePropertyNumber>.invoke(value: Number) {
-        variable(name, value)
-    }
 }
 
 inline fun variableValue(variableName: String, fallback: StylePropertyValue? = null) =
@@ -87,7 +72,7 @@ interface StyleHolder {
 }
 
 @Suppress("EqualsOrHashCode")
-open class StyleBuilderImpl : StylePropertyBuilder, StyleHolder {
+open class StyleBuilderImpl : StylePropertyBuilder, CSSStyleRuleBuilder, StyleHolder {
     override val properties: MutableStylePropertyList = mutableListOf()
     override val variables: MutableStylePropertyList = mutableListOf()
 
