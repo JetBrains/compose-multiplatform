@@ -11,7 +11,7 @@ class CSSBuilderImpl(
     override val root: CSSSelector,
     override val self: CSSSelector,
     rulesHolder: CSSRulesHolder
-) : CSSRuleBuilderImpl(), CSSBuilder, CSSRulesHolder by rulesHolder {
+) : StyleBuilderImpl(), CSSBuilder, CSSRulesHolder by rulesHolder {
     override fun style(selector: CSSSelector, cssRule: CSSBuilder.() -> Unit) {
         val (style, rules) = buildCSS(root, selector, cssRule)
         rules.forEach { add(it) }

@@ -2,9 +2,6 @@ package org.jetbrains.compose.web.css
 
 import org.jetbrains.compose.web.css.selectors.CSSSelector
 
-
-open class CSSRuleBuilderImpl : StyleBuilderImpl()
-
 @Suppress("EqualsOrHashCode")
 interface CSSRuleDeclaration {
     val header: String
@@ -32,7 +29,7 @@ typealias CSSRuleDeclarationList = List<CSSRuleDeclaration>
 typealias MutableCSSRuleDeclarationList = MutableList<CSSRuleDeclaration>
 
 fun buildCSSStyleRule(cssRule: StyleBuilder.() -> Unit): StyleHolder {
-    val builder = CSSRuleBuilderImpl()
+    val builder = StyleBuilderImpl()
     builder.cssRule()
     return builder
 }
