@@ -129,7 +129,7 @@ object LibraryVersions {
     val VECTORDRAWABLE_SEEKABLE = Version("1.0.0-alpha03")
     val VERSIONED_PARCELABLE = Version("1.2.0-alpha01")
     val VIEWPAGER = Version("1.1.0-alpha01")
-    val VIEWPAGER2 = Version("1.1.0-alpha02")
+    val VIEWPAGER2 = Version("1.1.0-beta01")
     val WEAR = Version("1.2.0-alpha13")
     val WEAR_COMPLICATIONS_DATA = Version("1.0.0-alpha19")
     val WEAR_COMPLICATIONS_DATA_SOURCE = Version("1.0.0-alpha19")
