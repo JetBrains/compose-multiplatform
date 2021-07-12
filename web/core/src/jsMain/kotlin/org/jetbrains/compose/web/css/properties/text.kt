@@ -51,3 +51,8 @@ fun StyleBuilder.letterSpacing(value: String) {
 fun StyleBuilder.letterSpacing(value: CSSNumeric) {
     property("letter-spacing", value)
 }
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/text-align
+fun StyleBuilder.textAlign(value: String) {
+    property("text-align", value)
+}

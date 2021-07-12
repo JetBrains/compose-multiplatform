@@ -14,7 +14,7 @@ import org.w3c.dom.get
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class CSSFontTests {
+class CSSTextTests {
 
     @Test
     fun fontSize() = runTest {
@@ -153,6 +153,49 @@ class CSSFontTests {
         }
 
         assertEquals("italic bold 0.8em / 1.2 Arial, sans-serif", (root.children[0] as HTMLElement).style.font)
+    }
+
+    @Test
+    fun textAlign() = runTest {
+        composition {
+            Div({
+                style {
+                    textAlign("left")
+                }
+            })
+            Div({
+                style {
+                    textAlign("right")
+                }
+            })
+            Div({
+                style {
+                    textAlign("center")
+                }
+            })
+            Div({
+                style {
+                    textAlign("justify")
+                }
+            })
+            Div({
+                style {
+                    textAlign("start")
+                }
+            })
+            Div({
+                style {
+                    textAlign("end")
+                }
+            })
+        }
+
+        assertEquals("left", (root.children[0] as HTMLElement).style.textAlign)
+        assertEquals("right", (root.children[1] as HTMLElement).style.textAlign)
+        assertEquals("center", (root.children[2] as HTMLElement).style.textAlign)
+        assertEquals("justify", (root.children[3] as HTMLElement).style.textAlign)
+        assertEquals("start", (root.children[4] as HTMLElement).style.textAlign)
+        assertEquals("end", (root.children[5] as HTMLElement).style.textAlign)
     }
 
 
