@@ -20,11 +20,17 @@ import androidx.build.dependencyTracker.AffectedModuleDetector.Companion.ENABLE_
 import androidx.build.getDistributionDirectory
 import androidx.build.gitclient.GitClientImpl
 import androidx.build.gradle.isRoot
+import java.io.File
+import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.invocation.Gradle
 import org.gradle.api.logging.Logger
+import org.gradle.api.provider.Provider
+import org.gradle.api.services.BuildService
+import org.gradle.api.services.BuildServiceParameters
+import org.gradle.api.services.BuildServiceSpec
 
 /**
  * The subsets we allow the projects to be partitioned into.
@@ -72,13 +78,13 @@ abstract class AffectedModuleDetector(
     /**
      * Returns whether this project was affected by current changes.
      */
-    abstract fun shouldInclude(project: Project): Boolean
+    abstract fun shouldInclude(project: String): Boolean
 
     /**
      * Returns whether this task was affected by current changes.
      */
     fun shouldInclude(task: Task): Boolean {
-        val include = shouldInclude(task.project)
+        val include = shouldInclude(task.project.path)
         val inclusionVerb = if (include) "Including" else "Excluding"
         logger?.info(
             "$inclusionVerb task ${task.path}"
@@ -90,74 +96,97 @@ abstract class AffectedModuleDetector(
      * Returns the set that the project belongs to. The set is one of the ProjectSubset above.
      * This is used by the test config generator.
      */
-    abstract fun getSubset(project: Project): ProjectSubset
+    abstract fun getSubset(projectPath: String): ProjectSubset
+
+    fun getSubset(task: Task): ProjectSubset {
+        val taskPath = task.path
+        val lastColonIndex = taskPath.lastIndexOf(":")
+        val projectPath = taskPath.substring(0, lastColonIndex)
+        return getSubset(projectPath)
+    }
 
     companion object {
         private const val ROOT_PROP_NAME = "affectedModuleDetector"
+        private const val SERVICE_NAME = ROOT_PROP_NAME + "BuildService"
         private const val LOG_FILE_NAME = "affected_module_detector_log.txt"
         const val ENABLE_ARG = "androidx.enableAffectedModuleDetection"
         const val BASE_COMMIT_ARG = "androidx.affectedModuleDetector.baseCommit"
 
         @JvmStatic
         fun configure(gradle: Gradle, rootProject: Project) {
+            // Make an AffectedModuleDetectorWrapper that callers can save before the real
+            // AffectedModuleDetector is ready. Callers won't be able to use it until the wrapped
+            // detector has been assigned, but configureTaskGuard can still reference it in
+            // closures that will execute during task execution.
+            var instance = AffectedModuleDetectorWrapper()
+            rootProject.extensions.add(ROOT_PROP_NAME, instance)
+
             val enabled = rootProject.hasProperty(ENABLE_ARG) &&
                 rootProject.findProperty(ENABLE_ARG) != "false"
-            if (!enabled) {
-                setInstance(rootProject, AcceptAll())
-                return
-            }
+
             val distDir = rootProject.getDistributionDirectory()
             val outputFile = distDir.resolve(LOG_FILE_NAME)
+
             val logger = FileLogger(outputFile)
             logger.info("setup: enabled: $enabled")
+            if (!enabled) {
+                val provider = setupWithParams(
+                    rootProject,
+                    { spec ->
+                        val params = spec.parameters
+                        params.acceptAll = true
+                        params.log = outputFile
+                    }
+                )
+                logger.info("using AcceptAll")
+                instance.wrapped = provider
+                return
+            }
             val baseCommitOverride: String? = rootProject.findProperty(BASE_COMMIT_ARG) as String?
             if (baseCommitOverride != null) {
                 logger.info("using base commit override $baseCommitOverride")
             }
-            val gitClient = GitClientImpl(
-                workingDir = rootProject.projectDir,
-                logger = rootProject.logger
-            )
-            val changedFilesProvider: ChangedFilesProvider = {
-                val baseSha = baseCommitOverride ?: gitClient.findPreviousSubmittedChange()
-                baseSha?.let(gitClient::findChangedFilesSince)
-            }
             gradle.taskGraph.whenReady {
                 logger.lifecycle("projects evaluated")
-                AffectedModuleDetectorImpl(
-                    rootProject = rootProject,
-                    logger = logger,
-                    ignoreUnknownProjects = false,
-                    changedFilesProvider = changedFilesProvider
-                ).also {
-                    logger.info("using real detector")
-                    setInstance(rootProject, it)
-                }
+                val projectGraph = ProjectGraph(rootProject)
+                val dependencyTracker = DependencyTracker(rootProject, logger)
+                val provider = setupWithParams(
+                    rootProject,
+                    { spec ->
+                        val params = spec.parameters
+                        params.rootDir = rootProject.projectDir
+                        params.projectGraph = projectGraph
+                        params.dependencyTracker = dependencyTracker
+                        params.log = outputFile
+                        params.baseCommitOverride = baseCommitOverride
+                    }
+                )
+                logger.info("using real detector")
+                instance.wrapped = provider
             }
         }
 
-        private fun setInstance(
+        private fun setupWithParams(
             rootProject: Project,
-            detector: AffectedModuleDetector
-        ) {
+            configureAction: Action<BuildServiceSpec<AffectedModuleDetectorLoader.Parameters>>
+        ): Provider<AffectedModuleDetectorLoader> {
             if (!rootProject.isRoot) {
                 throw IllegalArgumentException("this should've been the root project")
             }
-            rootProject.extensions.add(ROOT_PROP_NAME, detector)
+            val serviceProvider = rootProject.getGradle().getSharedServices()
+                .registerIfAbsent(
+                    SERVICE_NAME,
+                    AffectedModuleDetectorLoader::class.java,
+                    configureAction
+                )
+            return serviceProvider
         }
 
-        private fun getInstance(project: Project): AffectedModuleDetector? {
+        fun getInstance(project: Project): AffectedModuleDetector {
             val extensions = project.rootProject.extensions
-            return extensions.findByName(ROOT_PROP_NAME) as? AffectedModuleDetector
-        }
-
-        private fun getOrThrow(project: Project): AffectedModuleDetector {
-            return getInstance(project) ?: throw GradleException(
-                """
-                        Tried to get affected module detector too early.
-                        You cannot access it until all projects are evaluated.
-                """.trimIndent()
-            )
+            @Suppress("UNCHECKED_CAST")
+            val detector = extensions.findByName(ROOT_PROP_NAME) as? AffectedModuleDetector
+            return detector!!
         }
 
         /**
@@ -167,22 +196,98 @@ abstract class AffectedModuleDetector(
         @Throws(GradleException::class)
         @JvmStatic
         fun configureTaskGuard(task: Task) {
+            val detector = getInstance(task.project)
             task.onlyIf {
-                getOrThrow(task.project).shouldInclude(task)
+                detector.shouldInclude(task)
             }
         }
+    }
+}
 
-        /**
-         * Call this method to obtain the [@link ProjectSubset] that the project is
-         * determined to fall within for this particular build.
-         *
-         * Note that this will fail if accessed before all projects have been
-         * evaluated, since the AMD does not get registered until then.
-         */
-        @Throws(GradleException::class)
-        @JvmStatic
-        internal fun getProjectSubset(project: Project): ProjectSubset {
-            return getOrThrow(project).getSubset(project)
+/**
+ * Wrapper for AffectedModuleDetector
+ * Callers can access this wrapper during project configuration and save it until task execution
+ * time when the wrapped detector is ready for use (after the project graph is ready)
+ */
+class AffectedModuleDetectorWrapper : AffectedModuleDetector(logger = null) {
+    // We save a provider to a build service that knows how to make an
+    // AffectedModuleDetectorImpl because:
+    // An AffectedModuleDetectorImpl saves the list of modified files and affected
+    // modules to avoid having to recompute it for each task. However, that list can
+    // change across builds and we want to recompute it in each build. This requires
+    // creating a new AffectedModuleDetectorImpl in each build.
+    // To get Gradle to create a new AffectedModuleDetectorImpl in each build, we need
+    // to pass around a provider to a build service and query it from each task.
+    // The build service gets recreated when absent and reused when present. Then the
+    // build service will return the same AffectedModuleDetectorImpl for each task in
+    // a build
+    var wrapped: Provider<AffectedModuleDetectorLoader>? = null
+
+    fun getOrThrow(): AffectedModuleDetector {
+        return wrapped?.get()?.detector ?: throw GradleException(
+            """
+                        Tried to get the affected module detector implementation too early.
+                        You cannot access it until all projects are evaluated.
+            """.trimIndent()
+        )
+    }
+    override fun getSubset(projectPath: String): ProjectSubset {
+        return getOrThrow().getSubset(projectPath)
+    }
+    override fun shouldInclude(project: String): Boolean {
+        return getOrThrow().shouldInclude(project)
+    }
+}
+
+/**
+ * Stores the parameters of an AffectedModuleDetector and creates one when needed.
+ * The parameters here may be deserialized and loaded from Gradle's configuration cache when the
+ * configuration cache is enabled.
+ */
+abstract class AffectedModuleDetectorLoader :
+    BuildService<AffectedModuleDetectorLoader.Parameters> {
+    interface Parameters : BuildServiceParameters {
+        var acceptAll: Boolean
+
+        var rootDir: File
+        var projectGraph: ProjectGraph
+        var dependencyTracker: DependencyTracker
+        var log: File
+        var cobuiltTestPaths: Set<Set<String>>?
+        var alwaysBuildIfExists: Set<String>?
+        var ignoredPaths: Set<String>?
+        var baseCommitOverride: String?
+    }
+
+    val detector: AffectedModuleDetector by lazy {
+        val logger = FileLogger(parameters.log)
+        if (parameters.acceptAll) {
+            AcceptAll(null)
+        } else {
+            val baseCommitOverride = parameters.baseCommitOverride
+            if (baseCommitOverride != null) {
+                logger.info("using base commit override $baseCommitOverride")
+            }
+            val gitClient = GitClientImpl(
+                workingDir = parameters.rootDir,
+                logger = logger
+            )
+            val changedFilesProvider: ChangedFilesProvider = {
+                val baseSha = baseCommitOverride ?: gitClient.findPreviousSubmittedChange()
+                baseSha?.let(gitClient::findChangedFilesSince)
+            }
+
+            AffectedModuleDetectorImpl(
+                projectGraph = parameters.projectGraph,
+                dependencyTracker = parameters.dependencyTracker,
+                logger = logger,
+                cobuiltTestPaths = parameters.cobuiltTestPaths
+                    ?: AffectedModuleDetectorImpl.COBUILT_TEST_PATHS,
+                alwaysBuildIfExists = parameters.alwaysBuildIfExists
+                    ?: AffectedModuleDetectorImpl.ALWAYS_BUILD_IF_EXISTS,
+                ignoredPaths = parameters.ignoredPaths ?: AffectedModuleDetectorImpl.IGNORED_PATHS,
+                changedFilesProvider = changedFilesProvider
+            )
         }
     }
 }
@@ -193,12 +298,12 @@ abstract class AffectedModuleDetector(
 private class AcceptAll(
     logger: Logger? = null
 ) : AffectedModuleDetector(logger) {
-    override fun shouldInclude(project: Project): Boolean {
-        logger?.info("[AcceptAll] wrapper.shouldInclude returning true")
+    override fun shouldInclude(project: String): Boolean {
+        logger?.info("[AcceptAll] acceptAll.shouldInclude returning true")
         return true
     }
 
-    override fun getSubset(project: Project): ProjectSubset {
+    override fun getSubset(projectPath: String): ProjectSubset {
         logger?.info("[AcceptAll] AcceptAll.getSubset returning CHANGED_PROJECTS")
         return ProjectSubset.CHANGED_PROJECTS
     }
@@ -212,26 +317,20 @@ private class AcceptAll(
  * When a file in a module is changed, all modules that depend on it are considered as changed.
  */
 class AffectedModuleDetectorImpl constructor(
-    private val rootProject: Project,
+    private val projectGraph: ProjectGraph,
+    private val dependencyTracker: DependencyTracker,
     logger: Logger?,
     // used for debugging purposes when we want to ignore non module files
     @Suppress("unused")
     private val ignoreUnknownProjects: Boolean = false,
     private val cobuiltTestPaths: Set<Set<String>> = COBUILT_TEST_PATHS,
-    private val alwaysBuildIfExistsPaths: Set<String> = ALWAYS_BUILD_IF_EXISTS,
+    private val alwaysBuildIfExists: Set<String> = ALWAYS_BUILD_IF_EXISTS,
     private val ignoredPaths: Set<String> = IGNORED_PATHS,
     private val changedFilesProvider: ChangedFilesProvider
 ) : AffectedModuleDetector(logger) {
-    private val dependencyTracker by lazy {
-        DependencyTracker(rootProject, logger)
-    }
 
     private val allProjects by lazy {
-        rootProject.subprojects.toSet()
-    }
-
-    private val projectGraph by lazy {
-        ProjectGraph(rootProject, logger)
+        projectGraph.allProjects
     }
 
     val affectedProjects by lazy {
@@ -244,6 +343,10 @@ class AffectedModuleDetectorImpl constructor(
 
     val dependentProjects by lazy {
         findDependentProjects()
+    }
+
+    val alwaysBuild by lazy {
+        alwaysBuildIfExists.filter({ path -> allProjects.contains(path) })
     }
 
     private var unknownFiles: MutableSet<String> = mutableSetOf()
@@ -259,31 +362,24 @@ class AffectedModuleDetectorImpl constructor(
         lookupProjectSetsFromPaths(cobuiltTestPaths)
     }
 
-    private val alwaysBuild by lazy {
-        // For each path in alwaysBuildIfExistsPaths, if that path doesn't exist, then the developer
-        // must have disabled a project that they weren't interested in using during this run.
-        // Otherwise, we must always build the corresponding project during full builds.
-        alwaysBuildIfExistsPaths.map { path -> rootProject.findProject(path) }.filterNotNull()
-    }
-
     private val buildContainsNonProjectFileChanges by lazy {
         unknownFiles.isNotEmpty()
     }
 
-    override fun shouldInclude(project: Project): Boolean {
-        return if (project.isRoot || buildAll) {
+    override fun shouldInclude(project: String): Boolean {
+        return if (project == ":" || buildAll) {
             true
         } else {
             affectedProjects.contains(project)
         }
     }
 
-    override fun getSubset(project: Project): ProjectSubset {
+    override fun getSubset(projectPath: String): ProjectSubset {
         return when {
-            changedProjects.contains(project) -> {
+            changedProjects.contains(projectPath) -> {
                 ProjectSubset.CHANGED_PROJECTS
             }
-            dependentProjects.contains(project) -> {
+            dependentProjects.contains(projectPath) -> {
                 ProjectSubset.DEPENDENT_PROJECTS
             }
             // projects that are only included because of buildAll
@@ -301,10 +397,10 @@ class AffectedModuleDetectorImpl constructor(
      *
      * Returns allProjects if there are no previous merge CLs, which shouldn't happen.
      */
-    private fun findChangedProjects(): Set<Project> {
+    private fun findChangedProjects(): Set<String> {
         val changedFiles = changedFilesProvider() ?: return allProjects
 
-        val changedProjects: MutableSet<Project> = alwaysBuild.toMutableSet()
+        val changedProjects: MutableSet<String> = alwaysBuild.toMutableSet()
 
         for (filePath in changedFiles) {
             if (ignoredPaths.any { filePath.startsWith(it) }) {
@@ -339,7 +435,7 @@ class AffectedModuleDetectorImpl constructor(
      * Gets all dependent projects from the set of changedProjects. This doesn't include the
      * original changedProjects. Always build is still here to ensure at least 1 thing is built
      */
-    private fun findDependentProjects(): Set<Project> {
+    private fun findDependentProjects(): Set<String> {
         val dependentProjects = changedProjects.flatMap {
             dependencyTracker.findAllDependents(it)
         }.toSet()
@@ -396,13 +492,12 @@ class AffectedModuleDetectorImpl constructor(
         }
     }
 
-    private fun lookupProjectSetsFromPaths(allSets: Set<Set<String>>): Set<Set<Project>> {
+    private fun lookupProjectSetsFromPaths(allSets: Set<Set<String>>): Set<Set<String>> {
         return allSets.map { setPaths ->
             var setExists = false
-            val projectSet = HashSet<Project>()
+            val projectSet = HashSet<String>()
             for (path in setPaths) {
-                val project = rootProject.findProject(path)
-                if (project == null) {
+                if (!allProjects.contains(path)) {
                     if (setExists) {
                         throw IllegalStateException(
                             "One of the projects in the group of projects that are required to " +
@@ -411,7 +506,7 @@ class AffectedModuleDetectorImpl constructor(
                     }
                 } else {
                     setExists = true
-                    projectSet.add(project)
+                    projectSet.add(path)
                 }
             }
             return@map projectSet
@@ -419,10 +514,10 @@ class AffectedModuleDetectorImpl constructor(
     }
 
     private fun getAffectedCobuiltProjects(
-        affectedProjects: Set<Project>,
-        allCobuiltSets: Set<Set<Project>>
-    ): Set<Project> {
-        val cobuilts = mutableSetOf<Project>()
+        affectedProjects: Set<String>,
+        allCobuiltSets: Set<Set<String>>
+    ): Set<String> {
+        val cobuilts = mutableSetOf<String>()
         affectedProjects.forEach { project ->
             allCobuiltSets.forEach { cobuiltSet ->
                 if (cobuiltSet.any { project == it }) {
@@ -433,15 +528,15 @@ class AffectedModuleDetectorImpl constructor(
         return cobuilts
     }
 
-    private fun findContainingProject(filePath: String): Project? {
-        return projectGraph.findContainingProject(filePath).also {
-            logger?.info("search result for $filePath resulted in ${it?.path}")
+    private fun findContainingProject(filePath: String): String? {
+        return projectGraph.findContainingProject(filePath, logger).also {
+            logger?.info("search result for $filePath resulted in $it")
         }
     }
 
     companion object {
         // Project paths that we always build if they exist
-        private val ALWAYS_BUILD_IF_EXISTS = setOf(
+        val ALWAYS_BUILD_IF_EXISTS = setOf(
             // placeholder test project to ensure no failure due to no instrumentation.
             // We can eventually remove if we resolve b/127819369
             ":placeholder-tests",
@@ -449,7 +544,7 @@ class AffectedModuleDetectorImpl constructor(
         )
 
         // Some tests are codependent even if their modules are not. Enable manual bundling of tests
-        private val COBUILT_TEST_PATHS = setOf(
+        val COBUILT_TEST_PATHS = setOf(
             // Install media tests together per b/128577735
             setOf(
                 // Making a change in :media:version-compat-tests makes
@@ -508,7 +603,7 @@ class AffectedModuleDetectorImpl constructor(
             ),
         )
 
-        private val IGNORED_PATHS = setOf(
+        val IGNORED_PATHS = setOf(
             "docs/",
             "development/"
         )

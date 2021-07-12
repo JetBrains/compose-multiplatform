@@ -17,6 +17,8 @@
 package androidx.build
 
 import androidx.build.AndroidXRootPlugin.Companion.PROJECT_OR_ARTIFACT_EXT_NAME
+import androidx.build.dependencyTracker.DependencyTracker
+import androidx.build.dependencyTracker.ProjectGraph
 import androidx.build.gradle.isRoot
 import androidx.build.playground.FindAffectedModulesTask
 import com.android.build.gradle.LibraryExtension
@@ -82,7 +84,13 @@ class AndroidXPlaygroundRootPlugin : Plugin<Project> {
         target.findProject(":navigation:navigation-dynamic-features-fragment")
             ?.disableInvalidFragmentVersionForActivityResultLint()
 
-        rootProject.tasks.register("findAffectedModules", FindAffectedModulesTask::class.java)
+        rootProject.tasks.register(
+            "findAffectedModules",
+            FindAffectedModulesTask::class.java
+        ) { task ->
+            task.projectGraph = ProjectGraph(rootProject)
+            task.dependencyTracker = DependencyTracker(rootProject, task.logger)
+        }
     }
 
     private fun Project.disableInvalidFragmentVersionForActivityResultLint() {

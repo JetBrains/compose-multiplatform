@@ -92,9 +92,10 @@ fun Project.createTestConfigurationGenerationTask(
         }
         task.testRunner.set(testRunner)
         task.testProjectPath.set(path)
+        val detector = AffectedModuleDetector.getInstance(project)
         task.affectedModuleDetectorSubset.set(
             project.provider {
-                AffectedModuleDetector.getProjectSubset(project)
+                detector.getSubset(task)
             }
         )
         AffectedModuleDetector.configureTaskGuard(task)
@@ -182,15 +183,17 @@ private fun getOrCreateMediaTestConfigTask(project: Project, isMedia2: Boolean):
                 GenerateMediaTestConfigurationTask::class.java
             ) { task ->
                 AffectedModuleDetector.configureTaskGuard(task)
+                val detector = AffectedModuleDetector.getInstance(project)
                 task.affectedModuleDetectorSubset.set(
                     project.provider {
-                        AffectedModuleDetector.getProjectSubset(project)
+                        detector.getSubset(task)
                     }
                 )
             }
             project.rootProject.tasks.findByName(ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
                 .dependsOn(task)
             project.rootProject.tasks.findByName(ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK)!!
+
                 .dependsOn(task)
             return task
         } else {
@@ -324,11 +327,13 @@ private fun Project.configureMacrobenchmarkConfigTask(
             task.hasBenchmarkPlugin.set(this.hasBenchmarkPlugin())
             task.testRunner.set(testRunner)
             task.testProjectPath.set(this.path)
+            val detector = AffectedModuleDetector.getInstance(project)
             task.affectedModuleDetectorSubset.set(
                 project.provider {
-                    AffectedModuleDetector.getProjectSubset(project)
+                    detector.getSubset(task)
                 }
             )
+
             AffectedModuleDetector.configureTaskGuard(task)
         }
         // Disable xml generation for projects that have no test sources
