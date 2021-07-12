@@ -6,8 +6,6 @@ import org.jetbrains.compose.web.css.StyleHolder
 import org.jetbrains.compose.web.dom.setProperty
 import org.jetbrains.compose.web.dom.setVariable
 import kotlinx.dom.clear
-import org.jetbrains.compose.web.attributes.Options
-import org.jetbrains.compose.web.css.jsObject
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
