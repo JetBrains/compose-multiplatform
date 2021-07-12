@@ -53,7 +53,9 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
      */
     private val readObserver: (Any) -> Unit = { state ->
         if (!isPaused) {
-            currentMap!!.addValue(state)
+            synchronized(applyMaps) {
+                currentMap!!.addValue(state)
+            }
         }
     }
 
