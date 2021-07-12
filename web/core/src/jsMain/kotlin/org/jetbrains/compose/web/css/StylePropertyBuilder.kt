@@ -92,7 +92,7 @@ interface StyleHolder {
 }
 
 @Suppress("EqualsOrHashCode")
-open class StyleBuilderImpl : StyleBuilder, CSSPropertyBuilder, StyleHolder {
+open class StyleBuilderImpl : StyleBuilder, StyleHolder {
     override val properties: MutableStylePropertyList = mutableListOf()
     override val variables: MutableStylePropertyList = mutableListOf()
 
