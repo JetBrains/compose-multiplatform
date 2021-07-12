@@ -36,7 +36,7 @@ The Сompose plugin version used in the wizard above may be not the last. Update
 ```
 plugins {
     kotlin("jvm") version "1.5.10"
-    id("org.jetbrains.compose") version "0.5.0-build225"
+    id("org.jetbrains.compose") version "0.5.0-build235"
 }
 ```
 
@@ -72,7 +72,7 @@ import org.jetbrains.compose.compose
 
 plugins {
     kotlin("jvm") version "1.5.10"
-    id("org.jetbrains.compose") version "0.5.0-build225"
+    id("org.jetbrains.compose") version "0.5.0-build235"
 }
 
 repositories {
