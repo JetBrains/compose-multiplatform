@@ -16,351 +16,154 @@ interface StylePropertyBuilder {
     fun property(propertyName: String, value: String) = property(propertyName, StylePropertyValue(value))
     fun property(propertyName: String, value: Number) = property(propertyName, StylePropertyValue(value))
 
-    fun opacity(value: Number) {
-        property("opacity", value)
-    }
+    fun opacity(value: Number)
+    fun opacity(value: CSSSizeValue<CSSUnit.percent>)
 
-    fun opacity(value: CSSSizeValue<CSSUnit.percent>) {
-        property("opacity", (value.value / 100))
-    }
+    fun display(displayStyle: DisplayStyle)
 
-    fun display(displayStyle: DisplayStyle) {
-        property("display", displayStyle.value)
-    }
+    fun backgroundAttachment(value: String)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/background-attachment
-    fun backgroundAttachment(value: String) {
-        property("background-attachment", value)
-    }
+    fun backgroundClip(value: String)
 
-    fun backgroundClip(value: String) {
-        property("background-clip", value)
-    }
+    fun backgroundColor(value: String)
 
-    fun backgroundColor(value: String) {
-        property("background-color", value)
-    }
+    fun backgroundColor(value: CSSColorValue)
 
-    fun backgroundColor(value: CSSColorValue) {
-        property("background-color", value)
-    }
+    fun backgroundImage(value: String)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/background-image
-    fun backgroundImage(value: String) {
-        property("background-image", value)
-    }
+    fun backgroundOrigin(value: String)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/background-origin
-    fun backgroundOrigin(value: String) {
-        property("background-origin", value)
-    }
+    fun backgroundPosition(value: String)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/background-position
-    fun backgroundPosition(value: String) {
-        property("background-position", value)
-    }
+    fun backgroundRepeat(value: String)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat
-    fun backgroundRepeat(value: String) {
-        property("background-repeat", value)
-    }
+    fun backgroundSize(value: String)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/background-size
-    fun backgroundSize(value: String) {
-        property("background-size", value)
-    }
+    fun background(value: String)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/background
-    fun background(value: String) {
-        property("background", value)
-    }
-
-    fun border(borderBuild: CSSBorder.() -> Unit) {
-        property("border", CSSBorder().apply(borderBuild))
-    }
+    fun border(borderBuild: CSSBorder.() -> Unit)
 
     fun border(
         width: CSSLengthValue? = null,
         style: LineStyle? = null,
         color: CSSColorValue? = null
-    ) {
-        border {
-            width?.let { width(it) }
-            style?.let { style(it) }
-            color?.let { color(it) }
-        }
-    }
+    )
 
-    fun borderRadius(r: CSSNumeric) {
-        property("border-radius", r)
-    }
+    fun borderRadius(r: CSSNumeric)
 
-    fun borderRadius(topLeft: CSSNumeric, bottomRight: CSSNumeric) {
-        property("border-radius", "$topLeft $bottomRight")
-    }
+    fun borderRadius(topLeft: CSSNumeric, bottomRight: CSSNumeric)
 
     fun borderRadius(
         topLeft: CSSNumeric,
         topRightAndBottomLeft: CSSNumeric,
         bottomRight: CSSNumeric
-    ) {
-        property("border-radius", "$topLeft $topRightAndBottomLeft $bottomRight")
-    }
+    )
 
     fun borderRadius(
         topLeft: CSSNumeric,
         topRight: CSSNumeric,
         bottomRight: CSSNumeric,
         bottomLeft: CSSNumeric
-    ) {
-        property(
-            "border-radius",
-            "$topLeft $topRight $bottomRight $bottomLeft"
-        )
-    }
+    )
 
-    fun color(value: String) {
-        property("color", value)
-    }
+    fun color(value: String)
 
-    fun color(value: CSSColorValue) {
-        // color hasn't Typed OM yet
-        property("color", value)
-    }
+    fun color(value: CSSColorValue)
 
-    fun flexDirection(flexDirection: FlexDirection) {
-        property("flex-direction", flexDirection.value)
-    }
+    fun flexDirection(flexDirection: FlexDirection)
 
-    fun flexWrap(flexWrap: FlexWrap) {
-        property("flex-wrap", flexWrap.value)
-    }
+    fun flexWrap(flexWrap: FlexWrap)
 
-    fun flexFlow(flexDirection: FlexDirection, flexWrap: FlexWrap) {
-        property(
-            "flex-flow",
-            "${flexDirection.value} ${flexWrap.value}"
-        )
-    }
+    fun flexFlow(flexDirection: FlexDirection, flexWrap: FlexWrap)
 
-    fun justifyContent(justifyContent: JustifyContent) {
-        property(
-            "justify-content",
-            justifyContent.value
-        )
-    }
-    fun alignSelf(alignSelf: AlignSelf) {
-        property(
-            "align-self",
-            alignSelf.value
-        )
-    }
+    fun justifyContent(justifyContent: JustifyContent)
+    fun alignSelf(alignSelf: AlignSelf)
 
-    fun alignItems(alignItems: AlignItems) {
-        property(
-            "align-items",
-            alignItems.value
-        )
-    }
+    fun alignItems(alignItems: AlignItems)
 
-    fun alignContent(alignContent: AlignContent) {
-        property(
-            "align-content",
-            alignContent.value
-        )
-    }
+    fun alignContent(alignContent: AlignContent)
 
-    fun order(value: Int) {
-        property("order", value)
-    }
+    fun order(value: Int)
 
-    fun flexGrow(value: Number) {
-        property("flex-grow", value)
-    }
+    fun flexGrow(value: Number)
 
-    fun flexShrink(value: Number) {
-        property("flex-shrink", value)
-    }
+    fun flexShrink(value: Number)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/font-family
-    fun fontFamily(vararg value: String) {
-        property("font-family", value.joinToString(", ") { if (it.contains(" ")) "\"$it\"" else it })
-    }
+    fun fontFamily(vararg value: String)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/font-size
-    fun fontSize(value: CSSNumeric) {
-        property("font-size", value)
-    }
+    fun fontSize(value: CSSNumeric)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/font-style
-    fun fontStyle(value: String) {
-        property("font-style", value)
-    }
+    fun fontStyle(value: String)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight
-    fun fontWeight(value: String) {
-        property("font-weight", value)
-    }
+    fun fontWeight(value: String)
 
-    fun fontWeight(value: Int) {
-        property("font-weight", value)
-    }
+    fun fontWeight(value: Int)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/line-height
-    fun lineHeight(value: String) {
-        property("line-height", value)
-    }
+    fun lineHeight(value: String)
 
-    fun lineHeight(value: CSSNumeric) {
-        property("line-height", value)
-    }
+    fun lineHeight(value: CSSNumeric)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/font
-    fun font(value: String) {
-        property("font", value)
-    }
+    fun font(value: String)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/list-style-image
-    fun listStyleImage(value: String) {
-        property("list-style-image", value)
-    }
+    fun listStyleImage(value: String)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/list-style-position
-    fun listStylePosition(value: String) {
-        property("list-style-position", value)
-    }
+    fun listStylePosition(value: String)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/list-style-type
-    fun listStyleType(value: String) {
-        property("list-style-type", value)
-    }
+    fun listStyleType(value: String)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/list-style
-    fun listStyle(value: String) {
-        property("list-style", value)
-    }
+    fun listStyle(value: String)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/margin
-    fun margin(vararg value: CSSNumeric) {
-        // margin hasn't Typed OM yet
-        property("margin", value.joinToString(" "))
-    }
+    fun margin(vararg value: CSSNumeric)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/margin-bottom
-    fun marginBottom(value: CSSNumeric) {
-        property("margin-bottom", value)
-    }
+    fun marginBottom(value: CSSNumeric)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/margin-left
-    fun marginLeft(value: CSSNumeric) {
-        property("margin-left", value)
-    }
+    fun marginLeft(value: CSSNumeric)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/margin-right
-    fun marginRight(value: CSSNumeric) {
-        property("margin-right", value)
-    }
+    fun marginRight(value: CSSNumeric)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/margin-top
-    fun marginTop(value: CSSNumeric) {
-        property("margin-top", value)
-    }
+    fun marginTop(value: CSSNumeric)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-x
-    fun overflowX(value: String) {
-        property("overflow-x", value)
-    }
+    fun overflowX(value: String)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-y
-    fun overflowY(value: String) {
-        property("overflow-y", value)
-    }
+    fun overflowY(value: String)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/overflow
-    fun overflow(value: String) {
-        property("overflow", value)
-    }
+    fun overflow(value: String)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/padding
-    fun padding(vararg value: CSSNumeric) {
-        // padding hasn't Typed OM yet
-        property("padding", value.joinToString(" "))
-    }
+    fun padding(vararg value: CSSNumeric)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/padding-bottom
-    fun paddingBottom(value: CSSNumeric) {
-        property("padding-bottom", value)
-    }
+    fun paddingBottom(value: CSSNumeric)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/padding-left
-    fun paddingLeft(value: CSSNumeric) {
-        property("padding-left", value)
-    }
+    fun paddingLeft(value: CSSNumeric)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/padding-right
-    fun paddingRight(value: CSSNumeric) {
-        property("padding-right", value)
-    }
+    fun paddingRight(value: CSSNumeric)
 
-    // https://developer.mozilla.org/en-US/docs/Web/CSS/padding-top
-    fun paddingTop(value: CSSNumeric) {
-        property("padding-top", value)
-    }
+    fun paddingTop(value: CSSNumeric)
 
-    fun position(position: Position) {
-        property(
-            "position",
-            position.value
-        )
-    }
+    fun position(position: Position)
 
-    fun top(value: CSSLengthOrPercentageValue) {
-        property("top", value)
-    }
+    fun top(value: CSSLengthOrPercentageValue)
 
-    fun top(value: CSSAutoKeyword) {
-        property("top", value)
-    }
+    fun top(value: CSSAutoKeyword)
 
-    fun bottom(value: CSSLengthOrPercentageValue) {
-        property("bottom", value)
-    }
+    fun bottom(value: CSSLengthOrPercentageValue)
 
-    fun bottom(value: CSSAutoKeyword) {
-        property("bottom", value)
-    }
+    fun bottom(value: CSSAutoKeyword)
 
-    fun left(value: CSSLengthOrPercentageValue) {
-        property("left", value)
-    }
+    fun left(value: CSSLengthOrPercentageValue)
 
-    fun left(value: CSSAutoKeyword) {
-        property("left", value)
-    }
+    fun left(value: CSSAutoKeyword)
 
-    fun right(value: CSSLengthOrPercentageValue) {
-        property("right", value)
-    }
+    fun right(value: CSSLengthOrPercentageValue)
 
-    fun right(value: CSSAutoKeyword) {
-        property("right", value)
-    }
+    fun right(value: CSSAutoKeyword)
 
-    fun width(value: CSSNumeric) {
-        property("width", value)
-    }
+    fun width(value: CSSNumeric)
 
-    fun width(value: CSSAutoKeyword) {
-        property("width", value)
-    }
+    fun width(value: CSSAutoKeyword)
 
-    fun height(value: CSSNumeric) {
-        property("height", value)
-    }
+    fun height(value: CSSNumeric)
 
-    fun height(value: CSSAutoKeyword) {
-        property("height", value)
-    }
+    fun height(value: CSSAutoKeyword)
 }
 
 interface StyleVariableBuilder {
@@ -462,6 +265,352 @@ open class StyleBuilderImpl : StyleBuilder, StyleHolder {
     internal fun copyFrom(sb: StyleBuilderImpl) {
         properties.addAll(sb.properties)
         variables.addAll(sb.variables)
+    }
+
+    override fun opacity(value: Number) {
+        property("opacity", value)
+    }
+
+    override fun opacity(value: CSSSizeValue<CSSUnit.percent>) {
+        property("opacity", (value.value / 100))
+    }
+
+    override fun display(displayStyle: DisplayStyle) {
+        property("display", displayStyle.value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/background-attachment
+    override fun backgroundAttachment(value: String) {
+        property("background-attachment", value)
+    }
+
+    override fun backgroundClip(value: String) {
+        property("background-clip", value)
+    }
+
+    override fun backgroundColor(value: String) {
+        property("background-color", value)
+    }
+
+    override fun backgroundColor(value: CSSColorValue) {
+        property("background-color", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/background-image
+    override fun backgroundImage(value: String) {
+        property("background-image", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/background-origin
+    override fun backgroundOrigin(value: String) {
+        property("background-origin", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/background-position
+    override fun backgroundPosition(value: String) {
+        property("background-position", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat
+    override fun backgroundRepeat(value: String) {
+        property("background-repeat", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/background-size
+    override fun backgroundSize(value: String) {
+        property("background-size", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/background
+    override fun background(value: String) {
+        property("background", value)
+    }
+
+    override fun border(borderBuild: CSSBorder.() -> Unit) {
+        property("border", CSSBorder().apply(borderBuild))
+    }
+
+    override fun border(
+        width: CSSLengthValue?,
+        style: LineStyle?,
+        color: CSSColorValue?
+    ) {
+        border {
+            width?.let { width(it) }
+            style?.let { style(it) }
+            color?.let { color(it) }
+        }
+    }
+
+    override fun borderRadius(r: CSSNumeric) {
+        property("border-radius", r)
+    }
+
+    override fun borderRadius(topLeft: CSSNumeric, bottomRight: CSSNumeric) {
+        property("border-radius", "$topLeft $bottomRight")
+    }
+
+    override fun borderRadius(
+        topLeft: CSSNumeric,
+        topRightAndBottomLeft: CSSNumeric,
+        bottomRight: CSSNumeric
+    ) {
+        property("border-radius", "$topLeft $topRightAndBottomLeft $bottomRight")
+    }
+
+    override fun borderRadius(
+        topLeft: CSSNumeric,
+        topRight: CSSNumeric,
+        bottomRight: CSSNumeric,
+        bottomLeft: CSSNumeric
+    ) {
+        property(
+            "border-radius",
+            "$topLeft $topRight $bottomRight $bottomLeft"
+        )
+    }
+
+    override fun color(value: String) {
+        property("color", value)
+    }
+
+    override fun color(value: CSSColorValue) {
+        // color hasn't Typed OM yet
+        property("color", value)
+    }
+
+    override fun flexDirection(flexDirection: FlexDirection) {
+        property("flex-direction", flexDirection.value)
+    }
+
+    override fun flexWrap(flexWrap: FlexWrap) {
+        property("flex-wrap", flexWrap.value)
+    }
+
+    override fun flexFlow(flexDirection: FlexDirection, flexWrap: FlexWrap) {
+        property(
+            "flex-flow",
+            "${flexDirection.value} ${flexWrap.value}"
+        )
+    }
+
+    override fun justifyContent(justifyContent: JustifyContent) {
+        property(
+            "justify-content",
+            justifyContent.value
+        )
+    }
+    override fun alignSelf(alignSelf: AlignSelf) {
+        property(
+            "align-self",
+            alignSelf.value
+        )
+    }
+
+    override fun alignItems(alignItems: AlignItems) {
+        property(
+            "align-items",
+            alignItems.value
+        )
+    }
+
+    override fun alignContent(alignContent: AlignContent) {
+        property(
+            "align-content",
+            alignContent.value
+        )
+    }
+
+    override fun order(value: Int) {
+        property("order", value)
+    }
+
+    override fun flexGrow(value: Number) {
+        property("flex-grow", value)
+    }
+
+    override fun flexShrink(value: Number) {
+        property("flex-shrink", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/font-family
+    override fun fontFamily(vararg value: String) {
+        property("font-family", value.joinToString(", ") { if (it.contains(" ")) "\"$it\"" else it })
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/font-size
+    override fun fontSize(value: CSSNumeric) {
+        property("font-size", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/font-style
+    override fun fontStyle(value: String) {
+        property("font-style", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight
+    override fun fontWeight(value: String) {
+        property("font-weight", value)
+    }
+
+    override fun fontWeight(value: Int) {
+        property("font-weight", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/line-height
+    override fun lineHeight(value: String) {
+        property("line-height", value)
+    }
+
+    override fun lineHeight(value: CSSNumeric) {
+        property("line-height", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/font
+    override fun font(value: String) {
+        property("font", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/list-style-image
+    override fun listStyleImage(value: String) {
+        property("list-style-image", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/list-style-position
+    override fun listStylePosition(value: String) {
+        property("list-style-position", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/list-style-type
+    override fun listStyleType(value: String) {
+        property("list-style-type", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/list-style
+    override fun listStyle(value: String) {
+        property("list-style", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/margin
+    override fun margin(vararg value: CSSNumeric) {
+        // margin hasn't Typed OM yet
+        property("margin", value.joinToString(" "))
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/margin-bottom
+    override fun marginBottom(value: CSSNumeric) {
+        property("margin-bottom", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/margin-left
+    override fun marginLeft(value: CSSNumeric) {
+        property("margin-left", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/margin-right
+    override fun marginRight(value: CSSNumeric) {
+        property("margin-right", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/margin-top
+    override fun marginTop(value: CSSNumeric) {
+        property("margin-top", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-x
+    override fun overflowX(value: String) {
+        property("overflow-x", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-y
+    override fun overflowY(value: String) {
+        property("overflow-y", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/overflow
+    override fun overflow(value: String) {
+        property("overflow", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/padding
+    override fun padding(vararg value: CSSNumeric) {
+        // padding hasn't Typed OM yet
+        property("padding", value.joinToString(" "))
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/padding-bottom
+    override fun paddingBottom(value: CSSNumeric) {
+        property("padding-bottom", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/padding-left
+    override fun paddingLeft(value: CSSNumeric) {
+        property("padding-left", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/padding-right
+    override fun paddingRight(value: CSSNumeric) {
+        property("padding-right", value)
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/padding-top
+    override fun paddingTop(value: CSSNumeric) {
+        property("padding-top", value)
+    }
+
+    override fun position(position: Position) {
+        property(
+            "position",
+            position.value
+        )
+    }
+
+    override fun top(value: CSSLengthOrPercentageValue) {
+        property("top", value)
+    }
+
+    override fun top(value: CSSAutoKeyword) {
+        property("top", value)
+    }
+
+    override fun bottom(value: CSSLengthOrPercentageValue) {
+        property("bottom", value)
+    }
+
+    override fun bottom(value: CSSAutoKeyword) {
+        property("bottom", value)
+    }
+
+    override fun left(value: CSSLengthOrPercentageValue) {
+        property("left", value)
+    }
+
+    override fun left(value: CSSAutoKeyword) {
+        property("left", value)
+    }
+
+    override fun right(value: CSSLengthOrPercentageValue) {
+        property("right", value)
+    }
+
+    override fun right(value: CSSAutoKeyword) {
+        property("right", value)
+    }
+
+    override fun width(value: CSSNumeric) {
+        property("width", value)
+    }
+
+    override fun width(value: CSSAutoKeyword) {
+        property("width", value)
+    }
+
+    override fun height(value: CSSNumeric) {
+        property("height", value)
+    }
+
+    override fun height(value: CSSAutoKeyword) {
+        property("height", value)
     }
 }
 
