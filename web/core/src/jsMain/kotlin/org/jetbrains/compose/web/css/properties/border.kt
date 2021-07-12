@@ -79,3 +79,30 @@ fun StyleBuilder.borderRadius(
     )
 }
 
+fun StyleBuilder.borderWidth(width: CSSNumeric) {
+    property("border-width", width)
+}
+
+fun StyleBuilder.borderWidth(topLeft: CSSNumeric, bottomRight: CSSNumeric) {
+    property("border-width", "$topLeft $bottomRight")
+}
+
+fun StyleBuilder.borderWidth(
+    topLeft: CSSNumeric,
+    topRightAndBottomLeft: CSSNumeric,
+    bottomRight: CSSNumeric
+) {
+    property("border-width", "$topLeft $topRightAndBottomLeft $bottomRight")
+}
+
+fun StyleBuilder.borderWidth(
+    topLeft: CSSNumeric,
+    topRight: CSSNumeric,
+    bottomRight: CSSNumeric,
+    bottomLeft: CSSNumeric
+) {
+    property(
+        "border-width",
+        "$topLeft $topRight $bottomRight $bottomLeft"
+    )
+}
