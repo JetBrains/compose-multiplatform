@@ -117,7 +117,11 @@ class AndroidPaint : Paint {
 }
 
 internal fun makeNativePaint() =
-    android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
+    android.graphics.Paint(
+        android.graphics.Paint.ANTI_ALIAS_FLAG or
+            android.graphics.Paint.DITHER_FLAG or
+            android.graphics.Paint.FILTER_BITMAP_FLAG
+    )
 
 internal fun NativePaint.setNativeBlendMode(mode: BlendMode) {
     if (Build.VERSION.SDK_INT >= 29) {

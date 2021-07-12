@@ -50,4 +50,14 @@ class PaintTest {
         paint.pathEffect = pathEffect
         assertTrue(pathEffect === paint.pathEffect)
     }
+
+    @Test
+    fun testDitheringEnabledByDefault() {
+        assertTrue(Paint().asFrameworkPaint().isDither)
+    }
+
+    @Test
+    fun testFilterBitmapEnabledByDefault() {
+        assertTrue(Paint().asFrameworkPaint().isFilterBitmap)
+    }
 }
