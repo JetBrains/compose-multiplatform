@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.center
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -49,7 +50,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.mock
@@ -78,11 +78,9 @@ class SelectionContainerFocusTest {
 
     private val hapticFeedback = mock<HapticFeedback>()
 
-    @FlakyTest(bugId = 179770443)
     @Test
-    fun click_anywhere_to_cancel() {
+    fun tap_to_cancel() {
         // Setup. Long press to create a selection.
-        // A reasonable number.
         createSelectionContainer()
         // Touch position. In this test, each character's width and height equal to fontSize.
         // Position is computed so that (position, position) is the center of the first character.
@@ -95,14 +93,9 @@ class SelectionContainerFocusTest {
             assertThat(selection1.value).isNotNull()
         }
 
-        // Touch position. In this test, each character's width and height equal to fontSize.
-        // Position is computed so that (position, position) is the center of the first character.
-        val positionInBox = with(Density(view.context)) {
-            boxSize.toPx() / 2
-        }
         // Act.
         rule.onNode(hasTestTag("box"))
-            .performGesture { click(Offset(x = positionInBox, y = positionInBox)) }
+            .performGesture { click(center) }
 
         // Assert.
         rule.runOnIdle {
@@ -118,7 +111,6 @@ class SelectionContainerFocusTest {
     @Test
     fun select_anotherContainer_cancelOld() {
         // Setup. Long press to create a selection.
-        // A reasonable number.
         createSelectionContainer()
         // Touch position. In this test, each character's width and height equal to fontSize.
         // Position is computed so that (position, position) is the center of the first character.
@@ -168,16 +160,19 @@ class SelectionContainerFocusTest {
                             selection1.value = it
                         }
                     ) {
-                        CoreText(
-                            AnnotatedString(textContent),
-                            Modifier.fillMaxWidth(),
-                            style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
-                            softWrap = true,
-                            overflow = TextOverflow.Clip,
-                            maxLines = Int.MAX_VALUE,
-                            inlineContent = mapOf(),
-                            onTextLayout = {}
-                        )
+                        Column {
+                            CoreText(
+                                AnnotatedString(textContent),
+                                Modifier.fillMaxWidth(),
+                                style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
+                                softWrap = true,
+                                overflow = TextOverflow.Clip,
+                                maxLines = Int.MAX_VALUE,
+                                inlineContent = mapOf(),
+                                onTextLayout = {}
+                            )
+                            Box(Modifier.size(boxSize, boxSize).testTag("box"))
+                        }
                     }
 
                     SelectionContainer(
@@ -200,8 +195,6 @@ class SelectionContainerFocusTest {
                             onTextLayout = {}
                         )
                     }
-
-                    Box(Modifier.size(boxSize, boxSize).testTag("box"))
                 }
             }
         }
