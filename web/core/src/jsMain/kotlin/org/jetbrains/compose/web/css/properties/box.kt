@@ -22,3 +22,8 @@ fun StyleBuilder.height(value: CSSNumeric) {
 fun StyleBuilder.height(value: CSSAutoKeyword) {
     property("height", value)
 }
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing
+fun StyleBuilder.boxSizing(value: String) {
+    property("box-sizing", value)
+}
