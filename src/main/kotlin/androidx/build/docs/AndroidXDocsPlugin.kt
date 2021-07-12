@@ -576,7 +576,7 @@ private val dackkaDirsToProcess = listOf(
     "androidx/benchmark/**",
     "androidx/biometric/**",
     "androidx/browser/**",
-//    "androidx/camera/**",
+    "androidx/camera/**",
     "androidx/car/**",
     "androidx/cardview/**",
     "androidx/collection/**",
