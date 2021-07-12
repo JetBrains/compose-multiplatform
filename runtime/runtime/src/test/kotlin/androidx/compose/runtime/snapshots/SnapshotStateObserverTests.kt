@@ -324,6 +324,44 @@ class SnapshotStateObserverTests {
         assertNull(threadException)
     }
 
+    @Test // regression test for 192677711, second case
+    fun tryToReproduceSecondRaceCondtion() {
+        var running = true
+        var threadException: Exception? = null
+        try {
+            thread {
+                try {
+                    while (running) {
+                        Snapshot.sendApplyNotifications()
+                    }
+                } catch (e: Exception) {
+                    threadException = e
+                }
+            }
+
+            for (i in 1..10000) {
+                val state1 by mutableStateOf(0)
+                var state2 by mutableStateOf(true)
+                val observer = SnapshotStateObserver({}).apply {
+                    start()
+                }
+                observer.observeReads(Unit, {}) {
+                    repeat(1000) {
+                        @Suppress("UNUSED_EXPRESSION")
+                        state1
+                        if (state2) {
+                            state2 = false
+                        }
+                    }
+                }
+                assertNull(threadException)
+            }
+        } finally {
+            running = false
+        }
+        assertNull(threadException)
+    }
+
     private fun runSimpleTest(
         block: (modelObserver: SnapshotStateObserver, data: MutableState<Int>) -> Unit
     ) {
