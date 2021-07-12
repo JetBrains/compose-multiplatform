@@ -17,7 +17,8 @@
 package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.material.BadgeBox
+import androidx.compose.material.Badge
+import androidx.compose.material.BadgedBox
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.ExperimentalMaterialApi
@@ -34,7 +35,7 @@ fun BottomNavigationItemWithBadge() {
     BottomNavigation {
         BottomNavigationItem(
             icon = {
-                BadgeBox(badgeContent = { Text("8") }) {
+                BadgedBox(badge = { Badge { Text("8") } }) {
                     Icon(
                         Icons.Filled.Favorite,
                         contentDescription = "Favorite"
