@@ -9,7 +9,7 @@ import org.jetbrains.compose.web.*
 object WtSections : StyleSheet(AppStylesheet) {
 
     val wtSection by style {
-        property("box-sizing", "border-box")
+        boxSizing( "border-box")
         property("padding-bottom", 96.px)
         property("padding-top", 1.px)
         property(

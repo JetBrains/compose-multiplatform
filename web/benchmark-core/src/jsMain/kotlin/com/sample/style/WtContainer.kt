@@ -11,7 +11,7 @@ object WtContainer : StyleSheet(AppStylesheet) {
     val wtContainer by style {
         property("margin-left", "auto")
         property("margin-right", "auto")
-        property("box-sizing", "border-box")
+        boxSizing( "border-box")
         paddingLeft(22.px)
         paddingRight(22.px)
         property("max-width", 1276.px)

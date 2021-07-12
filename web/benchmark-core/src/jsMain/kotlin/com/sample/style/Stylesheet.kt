@@ -89,7 +89,7 @@ object AppStylesheet : StyleSheet() {
                 "max-width",
                 "calc(8.33333%*${AppCSSVariables.wtColCount.value()} - ${AppCSSVariables.wtHorizontalLayoutGutter.value()}*2)"
             )
-            property("box-sizing", "border-box")
+            boxSizing( "border-box")
         }
     }
 }

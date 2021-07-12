@@ -29,7 +29,7 @@ object SwitcherStylesheet : StyleSheet(AppStylesheet) {
             property("padding", SwitcherVariables.labelPadding.value(10.px))
             property("transition", "all 0.3s")
             property("text-align", "center")
-            property("box-sizing", "border-box")
+            boxSizing("border-box")
 
             border {
                 style(LineStyle.Solid)

@@ -12,7 +12,7 @@ fun PageFooter() {
     Footer(attrs = {
         style {
             flexShrink(0)
-            property("box-sizing", "border-box")
+            boxSizing( "border-box")
         }
     }) {
         Section(attrs = {

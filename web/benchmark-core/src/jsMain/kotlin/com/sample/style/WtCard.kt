@@ -8,7 +8,7 @@ object WtCards : StyleSheet(AppStylesheet) {
         flexDirection(FlexDirection.Column)
         border(1.px, LineStyle.Solid)
         property("min-height", 0)
-        property("box-sizing", "border-box")
+        boxSizing( "border-box")
     }
 
     val wtCardThemeLight by style {
@@ -28,7 +28,7 @@ object WtCards : StyleSheet(AppStylesheet) {
         overflow( "auto")
         property("flex", "1 1 auto")
         property("min-height", 0)
-        property("box-sizing", "border-box")
+        boxSizing( "border-box")
         padding(24.px, 32.px)
 
         media(maxWidth(640.px)) {
