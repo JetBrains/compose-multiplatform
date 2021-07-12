@@ -5,6 +5,8 @@
 
 package org.jetbrains.compose.web.css
 
+import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
+
 @Suppress("EqualsOrHashCode")
 class CSSBorder : CSSStyleValue {
     var width: CSSNumeric? = null
@@ -34,48 +36,3 @@ inline fun CSSBorder.style(style: LineStyle) {
 inline fun CSSBorder.color(color: CSSColorValue) {
     this.color = color
 }
-
-inline fun StylePropertyBuilder.border(crossinline borderBuild: CSSBorder.() -> Unit) {
-    property("border", CSSBorder().apply(borderBuild))
-}
-
-fun StylePropertyBuilder.border(
-    width: CSSLengthValue? = null,
-    style: LineStyle? = null,
-    color: CSSColorValue? = null
-) {
-    border {
-        width?.let { width(it) }
-        style?.let { style(it) }
-        color?.let { color(it) }
-    }
-}
-
-fun StylePropertyBuilder.borderRadius(r: CSSNumeric) {
-    property("border-radius", r)
-}
-
-fun StylePropertyBuilder.borderRadius(topLeft: CSSNumeric, bottomRight: CSSNumeric) {
-    property("border-radius", "$topLeft $bottomRight")
-}
-
-fun StylePropertyBuilder.borderRadius(
-    topLeft: CSSNumeric,
-    topRightAndBottomLeft: CSSNumeric,
-    bottomRight: CSSNumeric
-) {
-    property("border-radius", "$topLeft $topRightAndBottomLeft $bottomRight")
-}
-
-fun StylePropertyBuilder.borderRadius(
-    topLeft: CSSNumeric,
-    topRight: CSSNumeric,
-    bottomRight: CSSNumeric,
-    bottomLeft: CSSNumeric
-) {
-    property(
-        "border-radius",
-        "$topLeft $topRight $bottomRight $bottomLeft"
-    )
-}
-
