@@ -115,7 +115,7 @@ open class StyleSheet(
         }
     }
 
-    override fun buildRules(rulesBuild: GenericStyleSheetBuilder<CSSStyleRuleBuilder>.() -> Unit) =
+    override fun buildRules(rulesBuild: GenericStyleSheetBuilder<StyleBuilder>.() -> Unit) =
         StyleSheet().apply(rulesBuild).cssRules
 }
 

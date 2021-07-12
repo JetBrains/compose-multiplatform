@@ -34,8 +34,8 @@ interface GenericStyleSheetBuilder<TBuilder> : CSSRulesHolder {
     }
 }
 
-interface StyleSheetBuilder : CSSRulesHolder, GenericStyleSheetBuilder<CSSStyleRuleBuilder> {
-    override fun style(selector: CSSSelector, cssRule: CSSStyleRuleBuilder.() -> Unit) {
+interface StyleSheetBuilder : CSSRulesHolder, GenericStyleSheetBuilder<StyleBuilder> {
+    override fun style(selector: CSSSelector, cssRule: StyleBuilder.() -> Unit) {
         add(selector, buildCSSStyleRule(cssRule))
     }
 }
@@ -47,6 +47,6 @@ open class StyleSheetBuilderImpl : StyleSheetBuilder {
         cssRules.add(cssRule)
     }
 
-    override fun buildRules(rulesBuild: GenericStyleSheetBuilder<CSSStyleRuleBuilder>.() -> Unit) =
+    override fun buildRules(rulesBuild: GenericStyleSheetBuilder<StyleBuilder>.() -> Unit) =
         StyleSheetBuilderImpl().apply(rulesBuild).cssRules
 }

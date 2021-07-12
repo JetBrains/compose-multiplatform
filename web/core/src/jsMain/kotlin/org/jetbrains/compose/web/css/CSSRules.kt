@@ -2,9 +2,8 @@ package org.jetbrains.compose.web.css
 
 import org.jetbrains.compose.web.css.selectors.CSSSelector
 
-    interface CSSStyleRuleBuilder : StylePropertyBuilder, StyleVariableBuilder
 
-open class CSSRuleBuilderImpl : CSSStyleRuleBuilder, StyleBuilderImpl()
+open class CSSRuleBuilderImpl : StyleBuilderImpl()
 
 @Suppress("EqualsOrHashCode")
 interface CSSRuleDeclaration {
@@ -32,7 +31,7 @@ interface CSSGroupingRuleDeclaration: CSSRuleDeclaration {
 typealias CSSRuleDeclarationList = List<CSSRuleDeclaration>
 typealias MutableCSSRuleDeclarationList = MutableList<CSSRuleDeclaration>
 
-fun buildCSSStyleRule(cssRule: CSSStyleRuleBuilder.() -> Unit): StyleHolder {
+fun buildCSSStyleRule(cssRule: StyleBuilder.() -> Unit): StyleHolder {
     val builder = CSSRuleBuilderImpl()
     builder.cssRule()
     return builder

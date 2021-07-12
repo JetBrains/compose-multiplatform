@@ -2,7 +2,7 @@ package org.jetbrains.compose.web.css
 
 import org.jetbrains.compose.web.css.selectors.CSSSelector
 
-interface CSSBuilder : CSSStyleRuleBuilder, GenericStyleSheetBuilder<CSSBuilder> {
+interface CSSBuilder : StyleBuilder, GenericStyleSheetBuilder<CSSBuilder> {
     val root: CSSSelector
     val self: CSSSelector
 }

@@ -50,19 +50,19 @@ class CSSKeyframesBuilder() {
     }
     val frames: MutableList<CSSKeyframeRuleDeclaration> = mutableListOf()
 
-    fun from(style: CSSStyleRuleBuilder.() -> Unit) {
+    fun from(style: StyleBuilder.() -> Unit) {
         frames += CSSKeyframeRuleDeclaration(CSSKeyframe.From, buildCSSStyleRule(style))
     }
 
-    fun to(style: CSSStyleRuleBuilder.() -> Unit) {
+    fun to(style: StyleBuilder.() -> Unit) {
         frames += CSSKeyframeRuleDeclaration(CSSKeyframe.To, buildCSSStyleRule(style))
     }
 
-    fun each(vararg keys: CSSSizeValue<CSSUnit.percent>, style: CSSStyleRuleBuilder.() -> Unit) {
+    fun each(vararg keys: CSSSizeValue<CSSUnit.percent>, style: StyleBuilder.() -> Unit) {
         frames += CSSKeyframeRuleDeclaration(CSSKeyframe.Combine(keys.toList()), buildCSSStyleRule(style))
     }
 
-    operator fun CSSSizeValue<CSSUnit.percent>.invoke(style: CSSStyleRuleBuilder.() -> Unit) {
+    operator fun CSSSizeValue<CSSUnit.percent>.invoke(style: StyleBuilder.() -> Unit) {
         frames += CSSKeyframeRuleDeclaration(CSSKeyframe.Percentage(this), buildCSSStyleRule(style))
     }
 }
