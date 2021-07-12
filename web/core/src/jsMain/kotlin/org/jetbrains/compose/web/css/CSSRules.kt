@@ -2,23 +2,7 @@ package org.jetbrains.compose.web.css
 
 import org.jetbrains.compose.web.css.selectors.CSSSelector
 
-interface CSSStyleRuleBuilder : StylePropertyBuilder {
-    fun variable(variableName: String, value: StylePropertyValue)
-    fun variable(variableName: String, value: String) = variable(variableName, StylePropertyValue(value))
-    fun variable(variableName: String, value: Number) = variable(variableName, StylePropertyValue(value))
-
-    operator fun <TValue: StylePropertyValue> CSSStyleVariable<TValue>.invoke(value: TValue) {
-        variable(name, value.toString())
-    }
-
-    operator fun CSSStyleVariable<StylePropertyString>.invoke(value: String) {
-        variable(name, value)
-    }
-
-    operator fun CSSStyleVariable<StylePropertyNumber>.invoke(value: Number) {
-        variable(name, value)
-    }
-}
+    interface CSSStyleRuleBuilder : StylePropertyBuilder, StyleVariableBuilder
 
 open class CSSRuleBuilderImpl : CSSStyleRuleBuilder, StyleBuilderImpl()
 

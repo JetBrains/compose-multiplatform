@@ -16,6 +16,25 @@ interface StylePropertyBuilder {
     fun property(propertyName: String, value: Number) = property(propertyName, StylePropertyValue(value))
 }
 
+interface StyleVariableBuilder {
+    fun variable(variableName: String, value: StylePropertyValue)
+    fun variable(variableName: String, value: String) = variable(variableName, StylePropertyValue(value))
+    fun variable(variableName: String, value: Number) = variable(variableName, StylePropertyValue(value))
+
+    operator fun <TValue: StylePropertyValue> CSSStyleVariable<TValue>.invoke(value: TValue) {
+        variable(name, value.toString())
+    }
+
+    operator fun CSSStyleVariable<StylePropertyString>.invoke(value: String) {
+        variable(name, value)
+    }
+
+    operator fun CSSStyleVariable<StylePropertyNumber>.invoke(value: Number) {
+        variable(name, value)
+    }
+}
+
+
 inline fun variableValue(variableName: String, fallback: StylePropertyValue? = null) =
     "var(--$variableName${fallback?.let { ", $it" } ?: ""})"
 
