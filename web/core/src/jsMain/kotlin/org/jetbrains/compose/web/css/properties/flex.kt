@@ -5,57 +5,57 @@
 
 package org.jetbrains.compose.web.css
 
-fun StyleBuilder.flexDirection(flexDirection: FlexDirection) {
+fun StylePropertyBuilder.flexDirection(flexDirection: FlexDirection) {
     property("flex-direction", flexDirection.value)
 }
 
-fun StyleBuilder.flexWrap(flexWrap: FlexWrap) {
+fun StylePropertyBuilder.flexWrap(flexWrap: FlexWrap) {
     property("flex-wrap", flexWrap.value)
 }
 
-fun StyleBuilder.flexFlow(flexDirection: FlexDirection, flexWrap: FlexWrap) {
+fun StylePropertyBuilder.flexFlow(flexDirection: FlexDirection, flexWrap: FlexWrap) {
     property(
         "flex-flow",
         "${flexDirection.value} ${flexWrap.value}"
     )
 }
 
-fun StyleBuilder.justifyContent(justifyContent: JustifyContent) {
+fun StylePropertyBuilder.justifyContent(justifyContent: JustifyContent) {
     property(
         "justify-content",
         justifyContent.value
     )
 }
-fun StyleBuilder.alignSelf(alignSelf: AlignSelf) {
+fun StylePropertyBuilder.alignSelf(alignSelf: AlignSelf) {
     property(
         "align-self",
         alignSelf.value
     )
 }
 
-fun StyleBuilder.alignItems(alignItems: AlignItems) {
+fun StylePropertyBuilder.alignItems(alignItems: AlignItems) {
     property(
         "align-items",
         alignItems.value
     )
 }
 
-fun StyleBuilder.alignContent(alignContent: AlignContent) {
+fun StylePropertyBuilder.alignContent(alignContent: AlignContent) {
     property(
         "align-content",
         alignContent.value
     )
 }
 
-fun StyleBuilder.order(value: Int) {
+fun StylePropertyBuilder.order(value: Int) {
     property("order", value)
 }
 
-fun StyleBuilder.flexGrow(value: Number) {
+fun StylePropertyBuilder.flexGrow(value: Number) {
     property("flex-grow", value)
 }
 
-fun StyleBuilder.flexShrink(value: Number) {
+fun StylePropertyBuilder.flexShrink(value: Number) {
     property("flex-shrink", value)
 }
 

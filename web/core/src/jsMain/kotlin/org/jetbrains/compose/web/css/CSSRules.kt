@@ -2,7 +2,7 @@ package org.jetbrains.compose.web.css
 
 import org.jetbrains.compose.web.css.selectors.CSSSelector
 
-interface CSSStyleRuleBuilder : StyleBuilder
+interface CSSStyleRuleBuilder : StylePropertyBuilder
 
 open class CSSRuleBuilderImpl : CSSStyleRuleBuilder, StyleBuilderImpl()
 

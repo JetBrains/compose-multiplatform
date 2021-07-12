@@ -6,22 +6,22 @@
 package org.jetbrains.compose.web.css
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/list-style-image
-fun StyleBuilder.listStyleImage(value: String) {
+fun StylePropertyBuilder.listStyleImage(value: String) {
     property("list-style-image", value)
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/list-style-position
-fun StyleBuilder.listStylePosition(value: String) {
+fun StylePropertyBuilder.listStylePosition(value: String) {
     property("list-style-position", value)
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/list-style-type
-fun StyleBuilder.listStyleType(value: String) {
+fun StylePropertyBuilder.listStyleType(value: String) {
     property("list-style-type", value)
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/list-style
-fun StyleBuilder.listStyle(value: String) {
+fun StylePropertyBuilder.listStyle(value: String) {
     property("list-style", value)
 }
 

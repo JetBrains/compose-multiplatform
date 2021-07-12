@@ -9,7 +9,7 @@ package org.jetbrains.compose.web.css
 
 import kotlin.properties.ReadOnlyProperty
 
-interface StyleBuilder {
+interface StylePropertyBuilder {
     fun property(propertyName: String, value: StylePropertyValue)
     fun variable(variableName: String, value: StylePropertyValue)
 
@@ -47,7 +47,7 @@ inline fun <TValue> CSSVariableValue(value: String) =
     "use property instead, will remove it soon",
     ReplaceWith("property(propertyName, value)")
 )
-fun StyleBuilder.add(
+fun StylePropertyBuilder.add(
     propertyName: String,
     value: StylePropertyValue
 ) = property(propertyName, value)
@@ -87,7 +87,7 @@ interface StyleHolder {
 }
 
 @Suppress("EqualsOrHashCode")
-open class StyleBuilderImpl : StyleBuilder, StyleHolder {
+open class StyleBuilderImpl : StylePropertyBuilder, StyleHolder {
     override val properties: MutableStylePropertyList = mutableListOf()
     override val variables: MutableStylePropertyList = mutableListOf()
 

@@ -6,28 +6,28 @@
 package org.jetbrains.compose.web.css
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/margin
-fun StyleBuilder.margin(vararg value: CSSNumeric) {
+fun StylePropertyBuilder.margin(vararg value: CSSNumeric) {
     // margin hasn't Typed OM yet
     property("margin", value.joinToString(" "))
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/margin-bottom
-fun StyleBuilder.marginBottom(value: CSSNumeric) {
+fun StylePropertyBuilder.marginBottom(value: CSSNumeric) {
     property("margin-bottom", value)
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/margin-left
-fun StyleBuilder.marginLeft(value: CSSNumeric) {
+fun StylePropertyBuilder.marginLeft(value: CSSNumeric) {
     property("margin-left", value)
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/margin-right
-fun StyleBuilder.marginRight(value: CSSNumeric) {
+fun StylePropertyBuilder.marginRight(value: CSSNumeric) {
     property("margin-right", value)
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/margin-top
-fun StyleBuilder.marginTop(value: CSSNumeric) {
+fun StylePropertyBuilder.marginTop(value: CSSNumeric) {
     property("margin-top", value)
 }
 

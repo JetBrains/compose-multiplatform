@@ -35,11 +35,11 @@ inline fun CSSBorder.color(color: CSSColorValue) {
     this.color = color
 }
 
-inline fun StyleBuilder.border(crossinline borderBuild: CSSBorder.() -> Unit) {
+inline fun StylePropertyBuilder.border(crossinline borderBuild: CSSBorder.() -> Unit) {
     property("border", CSSBorder().apply(borderBuild))
 }
 
-fun StyleBuilder.border(
+fun StylePropertyBuilder.border(
     width: CSSLengthValue? = null,
     style: LineStyle? = null,
     color: CSSColorValue? = null
@@ -51,15 +51,15 @@ fun StyleBuilder.border(
     }
 }
 
-fun StyleBuilder.borderRadius(r: CSSNumeric) {
+fun StylePropertyBuilder.borderRadius(r: CSSNumeric) {
     property("border-radius", r)
 }
 
-fun StyleBuilder.borderRadius(topLeft: CSSNumeric, bottomRight: CSSNumeric) {
+fun StylePropertyBuilder.borderRadius(topLeft: CSSNumeric, bottomRight: CSSNumeric) {
     property("border-radius", "$topLeft $bottomRight")
 }
 
-fun StyleBuilder.borderRadius(
+fun StylePropertyBuilder.borderRadius(
     topLeft: CSSNumeric,
     topRightAndBottomLeft: CSSNumeric,
     bottomRight: CSSNumeric
@@ -67,7 +67,7 @@ fun StyleBuilder.borderRadius(
     property("border-radius", "$topLeft $topRightAndBottomLeft $bottomRight")
 }
 
-fun StyleBuilder.borderRadius(
+fun StylePropertyBuilder.borderRadius(
     topLeft: CSSNumeric,
     topRight: CSSNumeric,
     bottomRight: CSSNumeric,

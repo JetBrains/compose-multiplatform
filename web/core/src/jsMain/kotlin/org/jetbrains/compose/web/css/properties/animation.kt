@@ -59,7 +59,7 @@ inline fun CSSAnimation.playState(vararg values: AnimationPlayState) {
     this.playState = values.toList()
 }
 
-fun StyleBuilder.animation(
+fun StylePropertyBuilder.animation(
     keyframesName: String,
     builder: CSSAnimation.() -> Unit
 ) {
@@ -67,7 +67,7 @@ fun StyleBuilder.animation(
     property("animation", animation)
 }
 
-inline fun StyleBuilder.animation(
+inline fun StylePropertyBuilder.animation(
     keyframes: CSSNamedKeyframes,
     noinline builder: CSSAnimation.() -> Unit
 ) = animation(keyframes.name, builder)
