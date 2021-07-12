@@ -199,4 +199,158 @@ class CSSTextTests {
     }
 
 
+    @Test
+    fun textDecorationColor() = runTest {
+        composition {
+            Div({
+                style {
+                    textDecorationColor("red")
+                }
+            })
+            Div({
+                style {
+                    textDecorationColor(Color.RGBA(0, 200, 20, 0.85))
+                }
+            })
+        }
+
+        assertEquals("red", (root.children[0] as HTMLElement).style.textDecorationColor)
+        assertEquals("rgba(0, 200, 20, 0.85)", (root.children[1] as HTMLElement).style.textDecorationColor)
+    }
+
+    @Test
+    fun textDecorationStyle() = runTest {
+        composition {
+            Div({
+                style {
+                    textDecorationStyle("solid")
+                }
+            })
+            Div({
+                style {
+                    textDecorationStyle("double")
+                }
+            })
+            Div({
+                style {
+                    textDecorationStyle("dotted")
+                }
+            })
+            Div({
+                style {
+                    textDecorationStyle("dashed")
+                }
+            })
+            Div({
+                style {
+                    textDecorationStyle("wavy")
+                }
+            })
+        }
+
+        assertEquals("solid", (root.children[0] as HTMLElement).style.textDecorationStyle)
+        assertEquals("double", (root.children[1] as HTMLElement).style.textDecorationStyle)
+        assertEquals("dotted", (root.children[2] as HTMLElement).style.textDecorationStyle)
+        assertEquals("dashed", (root.children[3] as HTMLElement).style.textDecorationStyle)
+        assertEquals("wavy", (root.children[4] as HTMLElement).style.textDecorationStyle)
+    }
+
+    @Test
+    fun textDecorationThickness() = runTest {
+        composition {
+            Div({
+                style {
+                    textDecorationThickness("auto")
+                }
+            })
+            Div({
+                style {
+                    textDecorationThickness("from-font")
+                }
+            })
+            Div({
+                style {
+                    textDecorationThickness(10.px)
+                }
+            })
+            Div({
+                style {
+                    textDecorationThickness(2.percent)
+                }
+            })
+        }
+
+        assertEquals("text-decoration-thickness: auto;", (root.children[0] as HTMLElement).style.cssText)
+        assertEquals("text-decoration-thickness: from-font;", (root.children[1] as HTMLElement).style.cssText)
+        assertEquals("text-decoration-thickness: 10px;", (root.children[2] as HTMLElement).style.cssText)
+        assertEquals("text-decoration-thickness: 2%;", (root.children[3] as HTMLElement).style.cssText)
+    }
+
+    @Test
+    fun textDecorationLine() = runTest {
+        composition {
+            Div({
+                style {
+                    textDecorationLine("none")
+                }
+            })
+            Div({
+                style {
+                    textDecorationLine("underline")
+                }
+            })
+            Div({
+                style {
+                    textDecorationLine("overline")
+                }
+            })
+            Div({
+                style {
+                    textDecorationLine("line-through")
+                }
+            })
+            Div({
+                style {
+                    textDecorationLine("blink")
+                }
+            })
+        }
+
+        assertEquals("none", (root.children[0] as HTMLElement).style.textDecorationLine)
+        assertEquals("underline", (root.children[1] as HTMLElement).style.textDecorationLine)
+        assertEquals("overline", (root.children[2] as HTMLElement).style.textDecorationLine)
+        assertEquals("line-through", (root.children[3] as HTMLElement).style.textDecorationLine)
+        assertEquals("blink", (root.children[4] as HTMLElement).style.textDecorationLine)
+    }
+
+    @Test
+    fun textDecoration() = runTest {
+        composition {
+            Div({
+                style {
+                    textDecoration("underline red")
+                }
+            })
+            Div({
+                style {
+                    textDecoration("wavy overline lime")
+                }
+            })
+            Div({
+                style {
+                    textDecoration("line-through")
+                }
+            })
+            Div({
+                style {
+                    textDecoration("dashed underline overline")
+                }
+            })
+        }
+
+        assertEquals("underline red", (root.children[0] as HTMLElement).style.textDecoration)
+        assertEquals("overline wavy lime", (root.children[1] as HTMLElement).style.textDecoration)
+        assertEquals("line-through", (root.children[2] as HTMLElement).style.textDecoration)
+        assertEquals("underline overline dashed", (root.children[3] as HTMLElement).style.textDecoration)
+    }
 }

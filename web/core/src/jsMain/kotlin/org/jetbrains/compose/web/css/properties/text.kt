@@ -56,3 +56,36 @@ fun StyleBuilder.letterSpacing(value: CSSNumeric) {
 fun StyleBuilder.textAlign(value: String) {
     property("text-align", value)
 }
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-color
+fun StyleBuilder.textDecorationColor(value: String) {
+    property("text-decoration-color", value)
+}
+
+fun StyleBuilder.textDecorationColor(value: CSSColorValue) {
+    property("text-decoration-color", value)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-style
+fun StyleBuilder.textDecorationStyle(value: String) {
+    property("text-decoration-style", value)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-thickness
+fun StyleBuilder.textDecorationThickness(value: String) {
+    property("text-decoration-thickness", value)
+}
+
+fun StyleBuilder.textDecorationThickness(value: CSSNumeric) {
+    property("text-decoration-thickness", value)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-line
+fun StyleBuilder.textDecorationLine(value: String) {
+    property("text-decoration-line", value)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration
+fun StyleBuilder.textDecoration(value: String) {
+    property("text-decoration", value)
+}
