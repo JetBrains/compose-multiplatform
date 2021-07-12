@@ -12,15 +12,15 @@ object WtContainer : StyleSheet(AppStylesheet) {
         property("margin-left", "auto")
         property("margin-right", "auto")
         property("box-sizing", "border-box")
-        property("padding-left", 22.px)
-        property("padding-right", 22.px)
+        paddingLeft(22.px)
+        paddingRight(22.px)
         property("max-width", 1276.px)
 
         media(maxWidth(640.px)) {
             self style {
                 property("max-width", 100.percent)
-                property("padding-left", 16.px)
-                property("padding-right", 16.px)
+                paddingLeft(16.px)
+                paddingRight(16.px)
             }
         }
 
@@ -35,8 +35,8 @@ object WtContainer : StyleSheet(AppStylesheet) {
         media(maxWidth(1000.px)) {
             self style {
                 property("max-width", 100.percent)
-                property("padding-left", 22.px)
-                property("padding-right", 22.px)
+                paddingLeft(22.px)
+                paddingRight(22.px)
             }
         }
     }
