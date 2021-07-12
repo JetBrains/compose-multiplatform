@@ -2,7 +2,6 @@ package org.jetbrains.compose.web.attributes
 
 import androidx.compose.runtime.DisposableEffectResult
 import androidx.compose.runtime.DisposableEffectScope
-import org.jetbrains.compose.web.css.CSSPropertyBuilder
 import org.jetbrains.compose.web.css.StylePropertyBuilder
 import org.jetbrains.compose.web.css.StyleBuilderImpl
 import org.w3c.dom.Element
@@ -15,7 +14,7 @@ open class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
     val propertyUpdates = mutableListOf<Pair<(Element, Any) -> Unit, Any>>()
     var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
 
-    fun style(builder: CSSPropertyBuilder.() -> Unit) {
+    fun style(builder: StylePropertyBuilder.() -> Unit) {
         styleBuilder.apply(builder)
     }
 
