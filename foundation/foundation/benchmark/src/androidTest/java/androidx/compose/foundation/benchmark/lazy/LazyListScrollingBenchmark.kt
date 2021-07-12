@@ -45,9 +45,9 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
-import androidx.test.filters.SdkSuppress
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assume
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -107,11 +107,11 @@ class LazyListScrollingBenchmark(
         }
     }
 
-    // this test makes sense only when run on the Android version which supports RenderNodes
-    // as this tests how efficiently we move RenderNodes.
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     @Test
     fun drawAfterScroll_noNewItems() {
+        // this test makes sense only when run on the Android version which supports RenderNodes
+        // as this tests how efficiently we move RenderNodes.
+        Assume.assumeTrue(supportsRenderNode || supportsMRenderNode)
         benchmarkRule.toggleStateBenchmarkDraw {
             ListRemeasureTestCase(
                 addNewItemOnToggle = false,
@@ -121,11 +121,11 @@ class LazyListScrollingBenchmark(
         }
     }
 
-    // this test makes sense only when run on the Android version which supports RenderNodes
-    // as this tests how efficiently we move RenderNodes.
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     @Test
     fun drawAfterScroll_newItemComposed() {
+        // this test makes sense only when run on the Android version which supports RenderNodes
+        // as this tests how efficiently we move RenderNodes.
+        Assume.assumeTrue(supportsRenderNode || supportsMRenderNode)
         benchmarkRule.toggleStateBenchmarkDraw {
             ListRemeasureTestCase(
                 addNewItemOnToggle = true,
@@ -143,6 +143,11 @@ class LazyListScrollingBenchmark(
                 LazyColumn,
                 LazyRow
             )
+
+        // Copied from AndroidComposeTestCaseRunner
+        private val supportsRenderNode = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+        private val supportsMRenderNode = Build.VERSION.SDK_INT < Build.VERSION_CODES.P &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
     }
 }
 
