@@ -18,7 +18,7 @@ fun PageFooter() {
         Section(attrs = {
             classes(WtSections.wtSectionBgGrayDark)
             style {
-                property("padding", "24px 0")
+                padding(24.px,  0.px)
             }
         }) {
             Div(attrs = { classes(WtContainer.wtContainer) }) {

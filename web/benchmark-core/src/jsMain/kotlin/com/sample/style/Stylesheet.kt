@@ -30,7 +30,7 @@ object AppStylesheet : StyleSheet() {
     }
 
     val composeTitleTag by style {
-        property("padding", "5px 12px")
+        padding(5.px, 12.px)
         letterSpacing("normal")
         fontWeight(400)
         lineHeight(24.px)

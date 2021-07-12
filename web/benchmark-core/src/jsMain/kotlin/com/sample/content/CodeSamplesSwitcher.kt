@@ -28,7 +28,7 @@ object SwitcherStylesheet : StyleSheet(AppStylesheet) {
             property("width", SwitcherVariables.labelWidth.value(56.px))
             property("padding", SwitcherVariables.labelPadding.value(10.px))
             property("transition", "all 0.3s")
-            property("text-align", "center")
+            textAlign("center")
             boxSizing("border-box")
 
             border {
