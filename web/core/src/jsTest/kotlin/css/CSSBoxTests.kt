@@ -5,13 +5,9 @@
 
 package org.jetbrains.compose.web.core.tests.css
 
-import org.jetbrains.compose.web.core.tests.asHtmlElement
 import org.jetbrains.compose.web.core.tests.runTest
-import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.px
-import org.jetbrains.compose.web.css.width
 import org.jetbrains.compose.web.dom.Div
-import org.jetbrains.compose.web.renderComposable
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
 import kotlin.test.Test

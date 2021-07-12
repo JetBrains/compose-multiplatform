@@ -4,7 +4,6 @@ import org.jetbrains.compose.web.css.CSSBuilder
 import org.jetbrains.compose.web.css.CSSUnitValue
 import org.jetbrains.compose.web.css.GenericStyleSheetBuilder
 import org.jetbrains.compose.web.css.StyleSheet
-import org.jetbrains.compose.web.css.flexGrow
 import org.jetbrains.compose.web.css.maxWidth
 import org.jetbrains.compose.web.css.media
 import org.jetbrains.compose.web.css.percent

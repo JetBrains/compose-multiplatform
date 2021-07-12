@@ -3,12 +3,13 @@ package org.jetbrains.compose.common.internal
 import org.jetbrains.compose.common.ui.Modifier
 import org.jetbrains.compose.web.css.StylePropertyBuilder
 import org.jetbrains.compose.web.attributes.AttrsBuilder
+import org.jetbrains.compose.web.css.CSSPropertyBuilder
 
 class ActualModifier : Modifier {
-    val styleHandlers = mutableListOf<StylePropertyBuilder.() -> Unit>()
+    val styleHandlers = mutableListOf<CSSPropertyBuilder.() -> Unit>()
     val attrHandlers = mutableListOf<AttrsBuilder<*>.() -> Unit>()
 
-    fun add(builder: StylePropertyBuilder.() -> Unit) {
+    fun add(builder: CSSPropertyBuilder.() -> Unit) {
         styleHandlers.add(builder)
     }
 

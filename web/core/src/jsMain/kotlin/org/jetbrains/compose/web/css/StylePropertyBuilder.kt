@@ -34,7 +34,7 @@ interface StyleVariableBuilder {
     }
 }
 
-interface StyleBuilder : StylePropertyBuilder, StyleVariableBuilder
+interface StyleBuilder : CSSPropertyBuilder, StyleVariableBuilder
 
 inline fun variableValue(variableName: String, fallback: StylePropertyValue? = null) =
     "var(--$variableName${fallback?.let { ", $it" } ?: ""})"
@@ -92,7 +92,7 @@ interface StyleHolder {
 }
 
 @Suppress("EqualsOrHashCode")
-open class StyleBuilderImpl : StyleBuilder, StyleHolder {
+open class StyleBuilderImpl : StyleBuilder, CSSPropertyBuilder, StyleHolder {
     override val properties: MutableStylePropertyList = mutableListOf()
     override val variables: MutableStylePropertyList = mutableListOf()
 
