@@ -91,6 +91,13 @@ fun AttrsBuilder<HTMLFormElement>.noValidate() =
 
 fun AttrsBuilder<HTMLFormElement>.target(value: FormTarget) =
     attr("target", value.targetStr)
+    
+fun AttrsBuilder<HTMLFormElement>.onSubmit(options: Options = Options.DEFAULT, listener: (Event) -> Unit) {
+    addEventListener("submit", options) {
+        it.nativeEvent.preventDefault()
+        listener(it.nativeEvent)
+    }
+}
 
 /* Input attributes */
 
