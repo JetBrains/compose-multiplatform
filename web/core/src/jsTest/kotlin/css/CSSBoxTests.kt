@@ -7,6 +7,7 @@ package org.jetbrains.compose.web.core.tests.css
 
 import org.jetbrains.compose.web.core.tests.asHtmlElement
 import org.jetbrains.compose.web.core.tests.runTest
+import org.jetbrains.compose.web.css.boxSizing
 import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.width
@@ -48,5 +49,29 @@ class CSSBoxTests {
 
         assertEquals("90px", (root.children[0] as HTMLElement).style.height)
     }
+
+    @Test
+    fun boxSizing() = runTest {
+        composition {
+            Div(
+                {
+                    style {
+                        boxSizing("border-box")
+                    }
+                }
+            )
+            Div(
+                {
+                    style {
+                        boxSizing("content-box")
+                    }
+                }
+            )
+        }
+
+        assertEquals("border-box", (root.children[0] as HTMLElement).style.boxSizing)
+        assertEquals("content-box", (root.children[1] as HTMLElement).style.boxSizing)
+    }
+
 
 }
