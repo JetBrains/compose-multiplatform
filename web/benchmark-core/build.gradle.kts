@@ -42,6 +42,7 @@ kotlin {
 }
 
 val printBundleSize by tasks.registering {
+    dependsOn(tasks.named("jsBrowserDistribution"))
     doLast {
         val jsFile = buildDir.resolve("distributions/web-benchmark-core.js")
         val size = jsFile.length()
