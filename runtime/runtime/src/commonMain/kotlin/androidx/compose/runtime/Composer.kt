@@ -1216,7 +1216,9 @@ internal class ComposerImpl(
         parentProvider = parentContext.getCompositionLocalScope()
         providersInvalidStack.push(providersInvalid.asInt())
         providersInvalid = changed(parentProvider)
-        collectParameterInformation = parentContext.collectingParameterInformation
+        if (!collectParameterInformation) {
+            collectParameterInformation = parentContext.collectingParameterInformation
+        }
         resolveCompositionLocal(LocalInspectionTables, parentProvider)?.let {
             it.add(slotTable)
             parentContext.recordInspectionTable(it)
