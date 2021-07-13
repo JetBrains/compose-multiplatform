@@ -239,7 +239,7 @@ private fun TitledCodeSample(title: String, code: String) {
             style {
                 backgroundColor(Color.RGBA(39, 40, 44, 0.05))
                 borderRadius(8.px, 8.px, 8.px)
-                property("padding", "12px 16px")
+                padding(12.px, 16.px)
             }
         }
     ) {
@@ -252,7 +252,7 @@ fun FormattedCodeSnippet(code: String, language: String = "kotlin") {
     Pre(attrs = {
         style {
             property("max-height", 25.em)
-            property("overflow", "auto")
+            overflow( "auto")
             height(auto)
         }
     }) {

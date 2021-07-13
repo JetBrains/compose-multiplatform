@@ -167,7 +167,7 @@ private fun IntroCodeSampleResult() {
             attrs = {
                 classes(WtTexts.wtText2)
                 style {
-                    property("margin-right", 8.px)
+                    marginRight(8.px)
                 }
             },
         ) {
