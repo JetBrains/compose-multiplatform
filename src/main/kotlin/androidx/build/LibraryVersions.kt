@@ -153,5 +153,5 @@ object LibraryVersions {
     val WINDOW = Version("1.0.0-alpha09")
     val WINDOW_EXTENSIONS = Version("1.0.0-alpha01")
     val WINDOW_SIDECAR = Version("0.1.0-alpha01")
-    val WORK = Version("2.7.0-alpha04")
+    val WORK = Version("2.7.0-alpha05")
 }
