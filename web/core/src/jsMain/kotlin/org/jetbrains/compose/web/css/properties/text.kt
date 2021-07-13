@@ -89,3 +89,8 @@ fun StyleBuilder.textDecorationLine(value: String) {
 fun StyleBuilder.textDecoration(value: String) {
     property("text-decoration", value)
 }
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/white-space
+fun StyleBuilder.whiteSpace(value: String) {
+    property("white-space", value)
+}

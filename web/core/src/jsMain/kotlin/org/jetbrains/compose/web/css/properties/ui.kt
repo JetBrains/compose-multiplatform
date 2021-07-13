@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.web.css
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
 fun StyleBuilder.cursor(vararg value: String) {
     property("cursor", value.joinToString(", "))
 }

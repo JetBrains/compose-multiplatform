@@ -353,4 +353,48 @@ class CSSTextTests {
         assertEquals("line-through", (root.children[2] as HTMLElement).style.textDecoration)
         assertEquals("underline overline dashed", (root.children[3] as HTMLElement).style.textDecoration)
     }
+
+    @Test
+    fun whiteSpace() = runTest {
+        composition {
+            Div({
+                style {
+                    whiteSpace("normal")
+                }
+            })
+            Div({
+                style {
+                    whiteSpace("nowrap")
+                }
+            })
+            Div({
+                style {
+                    whiteSpace("pre")
+                }
+            })
+            Div({
+                style {
+                    whiteSpace("pre-wrap")
+                }
+            })
+            Div({
+                style {
+                    whiteSpace("pre-line")
+                }
+            })
+            Div({
+                style {
+                    whiteSpace("break-spaces")
+                }
+            })
+        }
+
+        assertEquals("normal", (root.children[0] as HTMLElement).style.whiteSpace)
+        assertEquals("nowrap", (root.children[1] as HTMLElement).style.whiteSpace)
+        assertEquals("pre", (root.children[2] as HTMLElement).style.whiteSpace)
+        assertEquals("pre-wrap", (root.children[3] as HTMLElement).style.whiteSpace)
+        assertEquals("pre-line", (root.children[4] as HTMLElement).style.whiteSpace)
+        assertEquals("break-spaces", (root.children[5] as HTMLElement).style.whiteSpace)
+    }
+
 }
