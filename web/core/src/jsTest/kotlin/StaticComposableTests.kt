@@ -254,51 +254,6 @@ class StaticComposableTests {
     }
 
     @Test
-    fun stylesBorderRadius() {
-        val root = "div".asHtmlElement()
-        renderComposable(
-            root = root
-        ) {
-            Div(
-                {
-                    style {
-                        borderRadius(3.px)
-                    }
-                }
-            )
-            Div(
-                {
-                    style {
-                        borderRadius(3.px, 5.px)
-                    }
-                }
-            )
-            Div(
-                {
-                    style {
-                        borderRadius(3.px, 5.px, 4.px)
-                    }
-                }
-            )
-            Div(
-                {
-                    style {
-                        borderRadius(3.px, 5.px, 4.px, 1.px)
-                    }
-                }
-            )
-        }
-
-        assertEquals("border-radius: 3px;", (root.children[0] as HTMLElement).style.cssText)
-        assertEquals("border-radius: 3px 5px;", (root.children[1] as HTMLElement).style.cssText)
-        assertEquals("border-radius: 3px 5px 4px;", (root.children[2] as HTMLElement).style.cssText)
-        assertEquals(
-            "border-radius: 3px 5px 4px 1px;",
-            (root.children[3] as HTMLElement).style.cssText
-        )
-    }
-
-    @Test
     fun stylesTop() {
         val root = "div".asHtmlElement()
         renderComposable(
