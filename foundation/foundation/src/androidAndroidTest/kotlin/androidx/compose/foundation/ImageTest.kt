@@ -35,6 +35,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
@@ -43,6 +44,7 @@ import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
@@ -66,6 +68,7 @@ import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -605,6 +608,49 @@ class ImageTest {
                     painter = ColorPainter(Color.Red),
                     contentDescription = null
                 )
+            }
+        }
+    }
+
+    @Test
+    fun testImageFilterQualityNone() {
+        val sampleBitmap = ImageBitmap(2, 2)
+        val canvas = androidx.compose.ui.graphics.Canvas(sampleBitmap)
+        val samplePaint = Paint().apply {
+            color = Color.White
+        }
+
+        canvas.drawRect(0f, 0f, 2f, 2f, samplePaint)
+
+        samplePaint.color = Color.Red
+        canvas.drawRect(0f, 0f, 1f, 1f, samplePaint)
+
+        samplePaint.color = Color.Blue
+        canvas.drawRect(1f, 1f, 2f, 2f, samplePaint)
+
+        val testTag = "filterQualityTest"
+        rule.setContent {
+            val size = 20 / LocalDensity.current.density
+            Image(
+                bitmap = sampleBitmap,
+                contentDescription = "FilterQuality None test",
+                modifier = Modifier.size(size.dp).testTag(testTag),
+                filterQuality = FilterQuality.None
+            )
+        }
+
+        rule.onNodeWithTag(testTag).captureToImage().apply {
+            val pixelMap = toPixelMap()
+            for (i in 0 until width / 2) {
+                for (j in 0 until height / 2) {
+                    assertEquals("invalid color at $i, $j", Color.Red, pixelMap[i, j])
+                }
+            }
+
+            for (i in width / 2 + 1 until width) {
+                for (j in height / 2 + 1 until height) {
+                    assertEquals("invalid color at $i, $j", Color.Blue, pixelMap[i, j])
+                }
             }
         }
     }

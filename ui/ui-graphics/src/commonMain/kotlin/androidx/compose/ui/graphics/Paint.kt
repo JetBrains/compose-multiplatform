@@ -113,7 +113,7 @@ interface Paint {
     /**
      * Controls the performance vs quality trade-off to use when applying
      * when drawing images, as with [Canvas.drawImageRect]
-     * Defaults to [FilterQuality.None].
+     * Defaults to [FilterQuality.Low].
      */
     var filterQuality: FilterQuality
 
