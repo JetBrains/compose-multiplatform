@@ -12,6 +12,7 @@ import org.w3c.dom.HTMLSelectElement
 import org.w3c.dom.HTMLTableCellElement
 import org.w3c.dom.HTMLTableColElement
 import org.w3c.dom.HTMLTextAreaElement
+import org.w3c.dom.events.Event
 
 fun AttrsBuilder<HTMLAnchorElement>.href(value: String) =
     attr("href", value)
