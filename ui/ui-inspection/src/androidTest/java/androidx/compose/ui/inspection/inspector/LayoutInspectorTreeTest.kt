@@ -49,6 +49,7 @@ import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.tooling.LocalInspectionTables
 import androidx.compose.ui.Alignment
@@ -66,6 +67,8 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
@@ -763,12 +766,14 @@ class LayoutInspectorTreeTest {
     }
 
     @Composable
-    fun First() {
+    @Suppress("UNUSED_PARAMETER")
+    fun First(p1: Int) {
         Text("First")
     }
 
     @Composable
-    fun Second() {
+    @Suppress("UNUSED_PARAMETER")
+    fun Second(p2: Int) {
         Text("Second")
     }
 
@@ -778,11 +783,16 @@ class LayoutInspectorTreeTest {
 
         show {
             Inspectable(slotTableRecord) {
-                val showFirst by remember { mutableStateOf(true) }
-                Crossfade(showFirst) {
-                    when (it) {
-                        true -> First()
-                        false -> Second()
+                Column {
+                    var showFirst by remember { mutableStateOf(true) }
+                    Button(onClick = { showFirst = !showFirst }) {
+                        Text("Button")
+                    }
+                    Crossfade(showFirst) {
+                        when (it) {
+                            true -> First(p1 = 1)
+                            false -> Second(p2 = 2)
+                        }
                     }
                 }
             }
@@ -797,6 +807,17 @@ class LayoutInspectorTreeTest {
         val hash = packageNameHash(this.javaClass.name.substringBeforeLast('.'))
         assertThat(first.fileName).isEqualTo("LayoutInspectorTreeTest.kt")
         assertThat(first.packageHash).isEqualTo(hash)
+        assertThat(first.parameters.map { it.name }).contains("p1")
+
+        composeTestRule.onNodeWithText("Button").performClick()
+        composeTestRule.runOnIdle {
+            val second = builder.convert(androidComposeView)
+                .flatMap { flatten(it) }
+                .first { it.name == "Second" }
+            assertThat(second.fileName).isEqualTo("LayoutInspectorTreeTest.kt")
+            assertThat(second.packageHash).isEqualTo(hash)
+            assertThat(second.parameters.map { it.name }).contains("p2")
+        }
     }
 
     @Composable
