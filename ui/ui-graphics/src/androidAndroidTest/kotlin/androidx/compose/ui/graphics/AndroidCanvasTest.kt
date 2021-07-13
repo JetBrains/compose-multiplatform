@@ -270,21 +270,6 @@ class AndroidCanvasTest {
         assertEquals(bg, pixelMap[75, 76])
     }
 
-    /**
-     * Verify the difference in rgb channels is within the given threshold. This assumes
-     * a fully blended color within a bitmap so only RGB channels are verified
-     */
-    private fun verifyPixelWithThreshold(
-        color: Color,
-        expectedColor: Color,
-        threshold: Int
-    ): Boolean {
-        val diff = Math.abs(color.red - expectedColor.red) +
-            Math.abs(color.green - expectedColor.green) +
-            Math.abs(color.blue - expectedColor.blue)
-        return (diff * 255) <= threshold
-    }
-
     @Test
     fun testCornerPathEffect() {
         val width = 80
@@ -312,7 +297,7 @@ class AndroidCanvasTest {
             0f,
             width.toFloat(),
             height.toFloat(),
-            android.graphics.Paint().apply {
+            frameworkPaint().apply {
                 isAntiAlias = true
                 color = android.graphics.Color.BLUE
                 pathEffect = android.graphics.CornerPathEffect(radius)
@@ -322,13 +307,10 @@ class AndroidCanvasTest {
         val composePixels = imageBitmap.toPixelMap()
         for (i in 0 until width) {
             for (j in 0 until height) {
-                assertTrue(
+                assertEquals(
                     "invalid color at i: " + i + ", " + j,
-                    verifyPixelWithThreshold(
-                        composePixels[i, j],
-                        Color(androidBitmap.getPixel(i, j)),
-                        3
-                    )
+                    composePixels[i, j],
+                    Color(androidBitmap.getPixel(i, j)),
                 )
             }
         }
@@ -360,7 +342,7 @@ class AndroidCanvasTest {
             0f,
             width.toFloat(),
             height.toFloat(),
-            android.graphics.Paint().apply {
+            frameworkPaint().apply {
                 isAntiAlias = true
                 color = android.graphics.Color.BLUE
                 pathEffect = android.graphics.DashPathEffect(floatArrayOf(10f, 5f), 8f)
@@ -409,7 +391,7 @@ class AndroidCanvasTest {
             0f,
             width.toFloat(),
             height.toFloat(),
-            android.graphics.Paint().apply {
+            frameworkPaint().apply {
                 isAntiAlias = true
                 color = android.graphics.Color.BLUE
                 pathEffect =
@@ -468,7 +450,7 @@ class AndroidCanvasTest {
             0f,
             width.toFloat(),
             height.toFloat(),
-            android.graphics.Paint().apply {
+            frameworkPaint().apply {
                 isAntiAlias = true
                 color = android.graphics.Color.BLUE
                 pathEffect =
@@ -523,7 +505,7 @@ class AndroidCanvasTest {
             0f,
             width.toFloat(),
             height.toFloat(),
-            android.graphics.Paint().apply {
+            frameworkPaint().apply {
                 isAntiAlias = true
                 color = android.graphics.Color.BLUE
                 colorFilter = PorterDuffColorFilter(Color.Magenta.toArgb(), PorterDuff.Mode.SRC_IN)
@@ -568,7 +550,7 @@ class AndroidCanvasTest {
             0f,
             width.toFloat(),
             height.toFloat(),
-            android.graphics.Paint().apply {
+            frameworkPaint().apply {
                 isAntiAlias = true
                 color = android.graphics.Color.BLUE
                 colorFilter = LightingColorFilter(Color.Red.toArgb(), Color.Blue.toArgb())
@@ -615,7 +597,7 @@ class AndroidCanvasTest {
             0f,
             width.toFloat(),
             height.toFloat(),
-            android.graphics.Paint().apply {
+            frameworkPaint().apply {
                 isAntiAlias = true
                 color = android.graphics.Color.BLUE
                 colorFilter = ColorMatrixColorFilter(colorMatrix.values)
@@ -633,6 +615,13 @@ class AndroidCanvasTest {
             }
         }
     }
+
+    fun frameworkPaint(): android.graphics.Paint =
+        android.graphics.Paint(
+            android.graphics.Paint.ANTI_ALIAS_FLAG or
+                android.graphics.Paint.DITHER_FLAG or
+                android.graphics.Paint.FILTER_BITMAP_FLAG
+        )
 
     class EnableDisableZViewGroup @JvmOverloads constructor(
         val drawLatch: CountDownLatch,
