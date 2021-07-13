@@ -103,6 +103,10 @@ abstract class DackkaTask @Inject constructor(
             "-globalLinks",
             linksConfiguration,
 
+            // Set logging level to only show warnings and errors
+            "-loggingLevel",
+            "WARN",
+
             // Configuration of sources. The generated string looks like this:
             // "-sourceSet -src /path/to/src -samples /path/to/samples ..."
             "-sourceSet",
