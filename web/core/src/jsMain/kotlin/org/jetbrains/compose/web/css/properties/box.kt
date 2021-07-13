@@ -27,3 +27,55 @@ fun StyleBuilder.height(value: CSSAutoKeyword) {
 fun StyleBuilder.boxSizing(value: String) {
     property("box-sizing", value)
 }
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/outline-width
+fun StyleBuilder.outlineWidth(value: String) {
+    property("outline-width", value)
+}
+
+fun StyleBuilder.outlineWidth(value: CSSNumeric) {
+    property("outline-width", value)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/outline-color
+fun StyleBuilder.outlineColor(value: String) {
+    property("outline-color", value)
+}
+
+fun StyleBuilder.outlineColor(value: CSSColorValue) {
+    property("outline-color", value)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/outline-style
+fun StyleBuilder.outlineStyle(value: String) {
+    property("outline-style", value)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/outline
+fun StyleBuilder.outline(style: String) {
+    property("outline", style)
+}
+
+fun StyleBuilder.outline(colorOrStyle: String, styleOrWidth: String) {
+    property("outline", "$colorOrStyle $styleOrWidth")
+}
+
+fun StyleBuilder.outline(style: String, width: CSSNumeric) {
+    property("outline", "$style $width")
+}
+
+fun StyleBuilder.outline(color: CSSColorValue, style: String, width: String) {
+    property("outline", "$color $style $width")
+}
+
+fun StyleBuilder.outline(color: CSSColorValue, style: String, width: CSSNumeric) {
+    property("outline", "$color $style $width")
+}
+
+fun StyleBuilder.outline(color: String, style: String, width: String) {
+    property("outline", "$color $style $width")
+}
+
+fun StyleBuilder.outline(color: String, style: String, width: CSSNumeric) {
+    property("outline", "$color $style $width")
+}

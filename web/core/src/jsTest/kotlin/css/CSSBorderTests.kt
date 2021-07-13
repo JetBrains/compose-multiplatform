@@ -6,9 +6,7 @@
 package org.jetbrains.compose.web.core.tests.css
 
 import org.jetbrains.compose.web.core.tests.runTest
-import org.jetbrains.compose.web.css.borderRadius
-import org.jetbrains.compose.web.css.borderWidth
-import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
@@ -101,6 +99,4 @@ class CSSBorderTests {
             (root.children[3] as HTMLElement).style.borderWidth
         )
     }
-
-
 }
