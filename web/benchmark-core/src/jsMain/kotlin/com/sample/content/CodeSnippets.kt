@@ -9,7 +9,6 @@ import org.jetbrains.compose.web.dom.*
 import com.sample.HighlightJs
 import com.sample.components.ContainerInSection
 import com.sample.style.*
-import org.jetbrains.compose.web.css.keywords.auto
 import org.w3c.dom.HTMLElement
 
 private fun HTMLElement.setHighlightedCode(code: String) {
@@ -253,7 +252,7 @@ fun FormattedCodeSnippet(code: String, language: String = "kotlin") {
         style {
             property("max-height", 25.em)
             property("overflow", "auto")
-            height(auto)
+            height(CSSNumeric.Auto)
         }
     }) {
         Code(

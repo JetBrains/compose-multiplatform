@@ -252,3 +252,13 @@ external interface AnimationPlayState: StylePropertyEnum {
     }
 }
 inline fun AnimationPlayState(value: String) = value.unsafeCast<AnimationPlayState>()
+
+external interface CSSNumericValue<T : CSSUnit> : StylePropertyValue, CSSVariableValueAs<CSSNumericValue<T>> {
+    companion object {
+        inline val Auto get() = CSSNumericValue("auto")
+        inline val Inherit get() = CSSNumericValue("inherit")
+        inline val Initial get() = CSSNumericValue("initial")
+        inline val Unset get() = CSSNumericValue("unset")
+    }
+}
+inline fun CSSNumericValue(value: String) = value.unsafeCast<CSSNumericValue<Nothing>>()
