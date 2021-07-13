@@ -18,15 +18,34 @@ package androidx.build
 
 import androidx.inspection.gradle.InspectionPlugin
 import androidx.inspection.gradle.createConsumeInspectionConfiguration
+import androidx.inspection.gradle.createConsumeNonDexedInspectionConfiguration
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.Sync
 import java.io.File
 
 /**
  * Copies artifacts prepared by InspectionPlugin into $destDir/inspection
+ * and $destDir/inspection-nondexed
  */
 fun Project.publishInspectionArtifacts() {
-    val configuration = createConsumeInspectionConfiguration()
+    publishInspectionConfiguration(
+        "copyInspectionArtifacts",
+        createConsumeInspectionConfiguration(),
+        "inspection"
+    )
+    publishInspectionConfiguration(
+        "copyUndexedInspectionArtifacts",
+        createConsumeNonDexedInspectionConfiguration(),
+        "inspection-nondexed"
+    )
+}
+
+internal fun Project.publishInspectionConfiguration(
+    name: String,
+    configuration: Configuration,
+    dirName: String
+) {
     val topLevelProject = this
     subprojects { project ->
         project.afterEvaluate {
@@ -36,10 +55,10 @@ fun Project.publishInspectionArtifacts() {
         }
     }
 
-    val sync = tasks.register("copyInspectionArtifacts", Sync::class.java) {
+    val sync = tasks.register(name, Sync::class.java) {
         it.dependsOn(configuration)
         it.from(configuration)
-        it.destinationDir = File(getDistributionDirectory(), "inspection")
+        it.destinationDir = File(getDistributionDirectory(), dirName)
     }
     addToBuildOnServer(sync)
 }
