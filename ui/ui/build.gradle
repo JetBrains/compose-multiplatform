@@ -250,9 +250,9 @@ android {
 def verifyKotlinModule(String variant) {
     project.afterEvaluate {
         def capitalVariant = variant.capitalize()
+        def moduleFile = new File("${buildDir}/tmp/kotlin-classes/${variant}/META-INF/ui_${variant}.kotlin_module")
         tasks.named("compile${capitalVariant}Kotlin").configure { t ->
             t.doLast {
-                def moduleFile = project.file("${buildDir}/tmp/kotlin-classes/${variant}/META-INF/ui_${variant}.kotlin_module")
                 // This file should be large, about 3.2K. If this file is short then many symbols will fail to resolve
                 if (moduleFile.length() < 250) {
                     throw new GradleException("kotlin_module file ($moduleFile) too short! See b/188565660 for more information. File text: ${moduleFile.text}")
