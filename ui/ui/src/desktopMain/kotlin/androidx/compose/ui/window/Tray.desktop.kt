@@ -27,12 +27,13 @@ import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.asAwtImage
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
-import java.awt.Image
 import java.awt.PopupMenu
 import java.awt.SystemTray
 import java.awt.TrayIcon
@@ -40,7 +41,7 @@ import java.awt.TrayIcon
 /**
  * `true` if the platform supports tray icons in the taskbar
  */
-val isTraySupported get() = SystemTray.isSupported()
+val isTraySupported: Boolean get() = SystemTray.isSupported()
 
 // TODO(demin): add mouse click/double-click/right click listeners (can we use PointerInputEvent?)
 /**
@@ -67,8 +68,8 @@ val isTraySupported get() = SystemTray.isSupported()
 @ExperimentalComposeUiApi
 @Composable
 fun ApplicationScope.Tray(
-    icon: Image,
-    state: TrayState = TrayState(),
+    icon: Painter,
+    state: TrayState = rememberTrayState(),
     hint: String? = null,
     onAction: () -> Unit = {},
     menu: @Composable MenuScope.() -> Unit = {}
@@ -92,8 +93,18 @@ fun ApplicationScope.Tray(
 
     val currentOnAction by rememberUpdatedState(onAction)
 
+    val awtIcon = remember(icon) {
+        // We shouldn't use LocalDensity here because Tray's density doesn't equal it. It
+        // equals to the density of the screen on which it shows. Currently Swing doesn't
+        // provide us such information, it only requests an image with the desired width/height
+        // (see MultiResolutionImage.getResolutionVariant). Resources like svg/xml should look okay
+        // because they don't use absolute '.dp' values to draw, they use values which are
+        // relative to their viewport.
+        icon.asAwtImage(GlobalDensity, GlobalLayoutDirection)
+    }
+
     val tray = remember {
-        TrayIcon(icon).apply {
+        TrayIcon(awtIcon).apply {
             isImageAutoSize = true
 
             addActionListener {
@@ -105,7 +116,7 @@ fun ApplicationScope.Tray(
     val currentMenu by rememberUpdatedState(menu)
 
     SideEffect {
-        if (tray.image != icon) tray.image = icon
+        if (tray.image != awtIcon) tray.image = awtIcon
         if (tray.toolTip != hint) tray.toolTip = hint
     }
 

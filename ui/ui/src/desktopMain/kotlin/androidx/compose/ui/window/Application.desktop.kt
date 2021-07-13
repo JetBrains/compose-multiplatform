@@ -22,6 +22,7 @@ import androidx.compose.desktop.ComposePanel
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.Recomposer
@@ -32,6 +33,7 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.configureSwingGlobalsForCompose
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.platform.GlobalSnapshotManager
+import androidx.compose.ui.platform.LocalDensity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -189,7 +191,13 @@ suspend fun awaitApplication(
                 try {
                     composition.setContent {
                         if (isOpen) {
-                            applicationScope.content()
+                            CompositionLocalProvider(
+                                // Resources which are defined at the application level can use
+                                // density to calculate intrinsicSize
+                                LocalDensity provides GlobalDensity
+                            ) {
+                                applicationScope.content()
+                            }
                         }
                     }
                     recomposer.close()
