@@ -165,4 +165,20 @@ class InputsTests : BaseIntegrationTests() {
 
         driver.waitTextToBe(value = "INPUT HAS CHANGED")
     }
+
+    @ResolveDrivers
+    fun `onBeforeInput updates the text`(driver: WebDriver) {
+        driver.openTestPage("beforeInputEventUpdatesText")
+        driver.waitTextToBe(value = "None")
+
+        val input = driver.findElement(By.id("textInput"))
+
+        input.sendKeys("1")
+        driver.waitTextToBe(value = "1")
+        driver.waitTextToBe(value = "1", textId = "txt2")
+
+        input.sendKeys("2")
+        driver.waitTextToBe(value = "2")
+        driver.waitTextToBe(value = "12", textId = "txt2")
+    }
 }

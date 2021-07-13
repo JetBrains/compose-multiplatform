@@ -152,14 +152,6 @@ open class EventsListenerBuilder {
         listeners.add(WrappedEventListener(INPUT, options, listener))
     }
 
-    fun onChange(options: Options = Options.DEFAULT, listener: (WrappedEvent) -> Unit) {
-        listeners.add(WrappedEventListener(CHANGE, options, listener))
-    }
-
-    fun onInvalid(options: Options = Options.DEFAULT, listener: (WrappedEvent) -> Unit) {
-        listeners.add(WrappedEventListener(INVALID, options, listener))
-    }
-
     fun onSearch(options: Options = Options.DEFAULT, listener: (WrappedEvent) -> Unit) {
         listeners.add(WrappedEventListener(SEARCH, options, listener))
     }
@@ -222,10 +214,6 @@ open class EventsListenerBuilder {
 
     fun onAnimationStart(options: Options = Options.DEFAULT, listener: (WrappedEvent) -> Unit) {
         listeners.add(WrappedEventListener(ANIMATIONSTART, options, listener))
-    }
-
-    fun onBeforeInput(options: Options = Options.DEFAULT, listener: (WrappedInputEvent) -> Unit) {
-        listeners.add(InputEventListener(BEFOREINPUT, options, listener))
     }
 
     fun collectListeners(): List<WrappedEventListener<*>> = listeners

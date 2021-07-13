@@ -221,6 +221,27 @@ class InputsTests {
         }
     }
 
+    val beforeInputEventUpdatesText by testCase {
+        var inputState by remember { mutableStateOf("") }
+        var state by remember { mutableStateOf("None") }
+
+        P { TestText(state) }
+        P { TestText(inputState, id = "txt2") }
+
+
+        Div {
+            TextInput(value = "", attrsBuilder = {
+                id("textInput")
+                onBeforeInput {
+                    state = it.data ?: ""
+                }
+                onInput {
+                    inputState = it.value
+                }
+            })
+        }
+    }
+
     val stopOnInputImmediatePropagationWorks by testCase {
         var state by remember { mutableStateOf("None") }
 
