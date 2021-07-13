@@ -160,7 +160,6 @@ class TextSelectionLongPressDragTest {
         verify(selectionRegistrar, times(1))
             .notifySelectionUpdate(
                 layoutCoordinates = layoutCoordinates,
-                startPosition = beginPosition2,
                 endPosition = beginPosition2 + dragDistance2,
                 adjustment = SelectionAdjustment.CHARACTER
             )
@@ -181,7 +180,6 @@ class TextSelectionLongPressDragTest {
         verify(selectionRegistrar, times(1))
             .notifySelectionUpdate(
                 layoutCoordinates = layoutCoordinates,
-                startPosition = beginPosition,
                 endPosition = beginPosition + dragDistance,
                 adjustment = SelectionAdjustment.CHARACTER
             )
@@ -202,7 +200,6 @@ class TextSelectionLongPressDragTest {
         verify(selectionRegistrar, times(0))
             .notifySelectionUpdate(
                 layoutCoordinates = layoutCoordinates,
-                startPosition = beginPosition,
                 endPosition = beginPosition + dragDistance,
                 adjustment = SelectionAdjustment.CHARACTER
             )
