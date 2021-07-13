@@ -69,3 +69,29 @@ fun StyleBuilder.flexBasis(value: String) {
 fun StyleBuilder.flexBasis(value: CSSNumeric) {
     property("flex-basis", value)
 }
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/flex
+fun StyleBuilder.flex(value: String) {
+    property("flex", value)
+}
+
+fun StyleBuilder.flex(value: Int) {
+    property("flex", value)
+}
+
+fun StyleBuilder.flex(value: CSSNumeric) {
+    property("flex", value)
+}
+
+fun StyleBuilder.flex(flexGrow: Int, flexBasis: CSSNumeric) {
+    property("flex", "${flexGrow} ${flexBasis}")
+}
+
+fun StyleBuilder.flex(flexGrow: Int, flexShrink: Int) {
+    property("flex", "${flexGrow} ${flexShrink}")
+}
+
+fun StyleBuilder.flex(flexGrow: Int, flexShrink: Int, flexBasis: CSSNumeric) {
+    property("flex", "${flexGrow} ${flexShrink} ${flexBasis}")
+}
+

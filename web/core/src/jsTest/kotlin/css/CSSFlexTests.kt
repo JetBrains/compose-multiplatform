@@ -18,7 +18,7 @@ import kotlin.test.assertEquals
 class CSSFlexTests {
 
     @Test
-    fun stylesOrder() = runTest {
+    fun order() = runTest {
         composition {
             Div(
                 {
@@ -41,7 +41,7 @@ class CSSFlexTests {
     }
 
     @Test
-    fun stylesFlexGrow() = runTest {
+    fun flexGrow() = runTest {
         composition {
             Div(
                 {
@@ -80,7 +80,7 @@ class CSSFlexTests {
     }
 
     @Test
-    fun stylesFlexShrink() = runTest {
+    fun flexShrink() = runTest {
         composition {
             Div(
                 {
@@ -119,7 +119,7 @@ class CSSFlexTests {
     }
 
     @Test
-    fun stylesFlexFlow() = runTest {
+    fun flexFlow() = runTest {
         val flexWraps = FlexWrap.values()
         val flexDirections = FlexDirection.values()
         composition {
@@ -147,7 +147,7 @@ class CSSFlexTests {
     }
 
     @Test
-    fun stylesJustifyContent() = runTest {
+    fun justifyContent() = runTest {
         val enumValues = JustifyContent.values()
         composition {
             enumValues.forEach { justifyContent ->
@@ -170,7 +170,7 @@ class CSSFlexTests {
     }
 
     @Test
-    fun stylesAlignSelf() = runTest {
+    fun alignSelf() = runTest {
         val enumValues = AlignSelf.values()
         composition {
             enumValues.forEach { alignSelf ->
@@ -193,7 +193,7 @@ class CSSFlexTests {
     }
 
     @Test
-    fun stylesAlignItems() = runTest {
+    fun alignItems() = runTest {
         val enumValues = AlignItems.values()
         composition {
             enumValues.forEach { alignItems ->
@@ -216,7 +216,7 @@ class CSSFlexTests {
     }
 
     @Test
-    fun stylesAlignContent() = runTest {
+    fun alignContent() = runTest {
         val enumValues = AlignContent.values()
         composition {
             enumValues.forEach { alignContent ->
@@ -239,7 +239,7 @@ class CSSFlexTests {
     }
 
     @Test
-    fun stylesFlexDirection() = runTest {
+    fun flexDirection() = runTest {
         val enumValues = FlexDirection.values()
         composition {
             enumValues.forEach { flexDirection ->
@@ -263,7 +263,7 @@ class CSSFlexTests {
 
 
     @Test
-    fun stylesFlexWrap() = runTest {
+    fun flexWrap() = runTest {
         val enumValues = FlexWrap.values()
         composition {
             enumValues.forEach { flexWrap ->
@@ -286,7 +286,7 @@ class CSSFlexTests {
     }
 
     @Test
-    fun stylesFlexBasis() = runTest {
+    fun flexBasis() = runTest {
         composition {
             Span({
                 style {
@@ -303,4 +303,79 @@ class CSSFlexTests {
         assertEquals("10em", (root.children[0] as HTMLElement).style.flexBasis)
         assertEquals("auto", (root.children[1] as HTMLElement).style.flexBasis)
     }
+
+    @Test
+    fun flexOneValue() = runTest {
+        composition {
+            Span({
+                style {
+                    flex("auto")
+                }
+            })
+            Span({
+                style {
+                    flex("initial")
+                }
+            })
+            Span({
+                style {
+                    flex(2)
+                }
+            })
+            Span({
+                style {
+                    flex(10.em)
+                }
+            })
+        }
+
+        assertEquals("auto", (root.children[0] as HTMLElement).style.flexBasis)
+        assertEquals("initial", (root.children[1] as HTMLElement).style.flexBasis)
+        assertEquals("2", (root.children[2] as HTMLElement).style.flexGrow)
+        assertEquals("10em", (root.children[3] as HTMLElement).style.flexBasis)
+    }
+
+    @Test
+    fun flexTwoValues() = runTest {
+        composition {
+            Span({
+                style {
+                    flex(3, 30.px)
+                }
+            })
+            Span({
+                style {
+                    flex(3, 5)
+                }
+            })
+        }
+
+        (root.children[0] as HTMLElement).let {
+            assertEquals("3", it.style.flexGrow)
+            assertEquals("30px", it.style.flexBasis)
+        }
+
+        (root.children[1] as HTMLElement).let {
+            assertEquals("3", it.style.flexGrow)
+            assertEquals("5", it.style.flexShrink)
+        }
+    }
+
+    @Test
+    fun flexThreeValues() = runTest {
+        composition {
+            Span({
+                style {
+                    flex(2, 3, 10.percent)
+                }
+            })
+        }
+
+        (root.children[0] as HTMLElement).let {
+            assertEquals("2", it.style.flexGrow)
+            assertEquals("3", it.style.flexShrink)
+            assertEquals("10%", it.style.flexBasis)
+        }
+    }
+
 }
