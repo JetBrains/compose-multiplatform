@@ -36,7 +36,7 @@ fun Intro() {
                         classes(WtTexts.wtHero)
                         style {
                             display(DisplayStyle.InlineBlock)
-                            property("white-space", "nowrap")
+                            whiteSpace("nowrap")
                         }
                     }) {
                         Text("Web")
