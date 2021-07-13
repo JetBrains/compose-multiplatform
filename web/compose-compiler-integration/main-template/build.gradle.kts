@@ -1,8 +1,6 @@
 plugins {
-    val composeIntegrationVersion = (System.getenv("COMPOSE_INTEGRATION_VERSION")?.takeIf { it.isNotEmpty() } ?: "0.0.0-SNASPHOT")
-
     kotlin("multiplatform") version "1.5.10"
-    id("org.jetbrains.compose") version composeIntegrationVersion
+    id("org.jetbrains.compose")
 }
 
 repositories {

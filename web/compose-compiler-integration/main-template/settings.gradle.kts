@@ -9,7 +9,13 @@ pluginManagement {
     resolutionStrategy {
         eachPlugin {
             if (requested.id.id == "org.jetbrains.compose") {
-                println("COMPOSE_INTEGRATION_VERSION=[${requested.version}]")
+                val useVersion = if (extra.has("COMPOSE_CORE_VERSION")) {
+                    extra["COMPOSE_CORE_VERSION"].toString()
+                } else {
+                    "0.0.0-SNASPHOT"
+                }
+                println("COMPOSE_INTEGRATION_VERSION=[$useVersion]")
+                useVersion(useVersion)
             }
         }
     }

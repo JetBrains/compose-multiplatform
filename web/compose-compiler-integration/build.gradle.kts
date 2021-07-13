@@ -17,13 +17,18 @@ fun build(
     caseName: String,
     directory: File,
     failureExpected: Boolean = false,
+    composeVersion: String,
     vararg buildCmd: String = arrayOf("build", "jsNodeRun")
 ) {
     val isWin = System.getProperty("os.name").startsWith("Win")
+    val arguments = buildCmd.toMutableList().also {
+        it.add("-PCOMPOSE_CORE_VERSION=$composeVersion")
+    }.toTypedArray()
+
     val procBuilder = if (isWin) {
-        ProcessBuilder("gradlew.bat", *buildCmd)
+        ProcessBuilder("gradlew.bat", *arguments)
     } else {
-        ProcessBuilder("bash", "./gradlew", *buildCmd)
+        ProcessBuilder("bash", "./gradlew", *arguments)
     }
     val proc = procBuilder
         .directory(directory)
@@ -62,11 +67,26 @@ data class RunChecksResult(
             println(name + " : " + (throwable ?: "OK"))
         }
     }
+
+    fun reportToTeamCity() {
+        cases.forEach { (caseName, error) ->
+            println("##teamcity[testStarted name='compileTestCase_$caseName']")
+            if (error != null) {
+                println("##teamcity[testFailed name='compileTestCase_$caseName']")
+            }
+            println("##teamcity[testFinished name='compileTestCase_$caseName']")
+        }
+    }
 }
 
-fun runCasesInDirectory(dir: File, filterPath: String, expectCompilationError: Boolean): RunChecksResult {
+fun runCasesInDirectory(
+    dir: File,
+    filterPath: String,
+    expectCompilationError: Boolean,
+    composeVersion: String
+): RunChecksResult {
     return dir.listFiles()!!.filter { it.absolutePath.contains(filterPath) }.mapIndexed { _, file ->
-        println("Running check for ${file.name}, expectCompilationError = $expectCompilationError")
+        println("Running check for ${file.name}, expectCompilationError = $expectCompilationError, composeVersion = $composeVersion")
 
         val contentLines = file.readLines()
         val startMainLineIx = contentLines.indexOf("// @Module:Main").let { ix ->
@@ -98,7 +118,12 @@ fun runCasesInDirectory(dir: File, filterPath: String, expectCompilationError: B
         val tmpDir = cloneTemplate(caseName, contentMain = mainContent, contentLib = libContent)
 
         caseName to kotlin.runCatching {
-            build(caseName = caseName, directory = tmpDir, failureExpected = expectCompilationError)
+            build(
+                caseName = caseName,
+                directory = tmpDir,
+                failureExpected = expectCompilationError,
+                composeVersion = composeVersion
+            )
         }.exceptionOrNull()
 
     }.let {
@@ -109,23 +134,29 @@ fun runCasesInDirectory(dir: File, filterPath: String, expectCompilationError: B
 tasks.register("checkComposeCases") {
     doLast {
         val filterCases = project.findProperty("FILTER_CASES")?.toString() ?: ""
+        val composeVersion = project.findProperty("COMPOSE_CORE_VERSION")?.toString() ?: "0.0.0-SNASPHOT"
 
         val expectedFailingCasesDir = File("${projectDir.absolutePath}/testcases/failing")
         val expectedFailingResult = runCasesInDirectory(
             dir = expectedFailingCasesDir,
             expectCompilationError = true,
-            filterPath = filterCases
+            filterPath = filterCases,
+            composeVersion = composeVersion
         )
 
         val passingCasesDir = File("${projectDir.absolutePath}/testcases/passing")
         val passingResult = runCasesInDirectory(
             dir = passingCasesDir,
             expectCompilationError = false,
-            filterPath = filterCases
+            filterPath = filterCases,
+            composeVersion = composeVersion
         )
 
         expectedFailingResult.printResults()
+        expectedFailingResult.reportToTeamCity()
+
         passingResult.printResults()
+        passingResult.reportToTeamCity()
 
         if (expectedFailingResult.hasFailed || passingResult.hasFailed) {
             error("There were failed cases. Check the logs above")
