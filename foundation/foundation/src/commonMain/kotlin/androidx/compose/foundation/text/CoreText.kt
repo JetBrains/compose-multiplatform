@@ -408,9 +408,13 @@ internal class TextController(val state: TextState) {
                 dragTotalDistance += delta
 
                 if (!outOfBoundary(dragBeginPosition, dragBeginPosition + dragTotalDistance)) {
+                    // Notice that only the end position needs to be updated here.
+                    // Start position is left unchanged. This is typically important when
+                    // long-press is using SelectionAdjustment.WORD or
+                    // SelectionAdjustment.PARAGRAPH that updates the start handle position from
+                    // the dragBeginPosition.
                     selectionRegistrar?.notifySelectionUpdate(
                         layoutCoordinates = it,
-                        startPosition = dragBeginPosition,
                         endPosition = dragBeginPosition + dragTotalDistance,
                         adjustment = SelectionAdjustment.CHARACTER
                     )
