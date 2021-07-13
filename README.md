@@ -7,6 +7,8 @@
 Compose Kotlin UI framework port for desktop platforms (macOS, Linux, Windows), components outside of the core Compose repository
 at https://android.googlesource.com/platform/frameworks/support.
 
+Preview functionality (check your application UI without building/running it) for desktop platforms is available via IDEA plugin (https://plugins.jetbrains.com/plugin/16541-compose-multiplatform-ide-support).
+
 ## Repository organization ##
 
    * [artwork](artwork) - design artifacts
