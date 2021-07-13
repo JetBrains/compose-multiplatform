@@ -106,7 +106,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
 import androidx.compose.ui.unit.toOffset
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import org.junit.Assert.assertEquals
@@ -2916,12 +2915,11 @@ class AndroidLayoutDrawTest {
         validateSquareColors(outerColor = Color.Blue, innerColor = Color.White, size = 10)
     }
 
-    @FlakyTest
     @Test
     fun makingItemLarger() {
         var height by mutableStateOf(30)
-        var actualHeight = 0
         var latch = CountDownLatch(1)
+        var composeView: View? = null
         activityTestRule.runOnUiThread {
             val linearLayout = LinearLayout(activity)
             linearLayout.orientation = LinearLayout.VERTICAL
@@ -2943,29 +2941,30 @@ class AndroidLayoutDrawTest {
                     10000f
                 )
             )
-            child.viewTreeObserver.addOnPreDrawListener {
-                actualHeight = child.measuredHeight
-                latch.countDown()
-                true
-            }
             child.setContent {
-                Layout({}) { _, constraints ->
+                Layout(
+                    {},
+                    Modifier.onGloballyPositioned {
+                        latch.countDown()
+                    }
+                ) { _, constraints ->
                     layout(constraints.maxWidth, height.coerceAtMost(constraints.maxHeight)) {}
                 }
             }
+            composeView = child
         }
 
         assertTrue(latch.await(1, TimeUnit.SECONDS))
         latch = CountDownLatch(1)
 
         activityTestRule.runOnUiThread {
-            assertEquals(height, actualHeight)
+            assertEquals(height, composeView!!.measuredHeight)
             height = 60
         }
 
         assertTrue(latch.await(1, TimeUnit.SECONDS))
         activityTestRule.runOnUiThread {
-            assertEquals(height, actualHeight)
+            assertEquals(height, composeView!!.measuredHeight)
         }
     }
 
