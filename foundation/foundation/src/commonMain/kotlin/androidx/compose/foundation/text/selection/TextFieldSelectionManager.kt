@@ -724,17 +724,18 @@ internal class TextFieldSelectionManager(
 @Composable
 internal fun TextFieldSelectionHandle(
     isStartHandle: Boolean,
-    directions: Pair<ResolvedTextDirection, ResolvedTextDirection>,
+    direction: ResolvedTextDirection,
     manager: TextFieldSelectionManager
 ) {
     val observer = remember(isStartHandle, manager) {
         manager.handleDragObserver(isStartHandle)
     }
+    val position = manager.getHandlePosition(isStartHandle)
+
     SelectionHandle(
-        startHandlePosition = manager.getHandlePosition(true),
-        endHandlePosition = manager.getHandlePosition(false),
+        position = position,
         isStartHandle = isStartHandle,
-        directions = directions,
+        direction = direction,
         handlesCrossed = manager.value.selection.reversed,
         modifier = Modifier.pointerInput(observer) {
             detectDragGesturesWithObserver(observer)

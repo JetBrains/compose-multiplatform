@@ -23,10 +23,9 @@ import androidx.compose.ui.text.style.ResolvedTextDirection
 
 @Composable
 internal actual fun SelectionHandle(
-    startHandlePosition: Offset?,
-    endHandlePosition: Offset?,
+    position: Offset,
     isStartHandle: Boolean,
-    directions: Pair<ResolvedTextDirection, ResolvedTextDirection>,
+    direction: ResolvedTextDirection,
     handlesCrossed: Boolean,
     modifier: Modifier,
     content: (@Composable () -> Unit)?

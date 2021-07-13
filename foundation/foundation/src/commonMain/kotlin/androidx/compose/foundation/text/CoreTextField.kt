@@ -769,18 +769,17 @@ private fun SelectionToolbarAndHandles(manager: TextFieldSelectionManager, show:
                     val endOffset = offsetMapping.originalToTransformed(value.selection.end)
                     val startDirection = it.getBidiRunDirection(startOffset)
                     val endDirection = it.getBidiRunDirection(max(endOffset - 1, 0))
-                    val directions = Pair(startDirection, endDirection)
                     if (manager.state?.showSelectionHandleStart == true) {
                         TextFieldSelectionHandle(
                             isStartHandle = true,
-                            directions = directions,
+                            direction = startDirection,
                             manager = manager
                         )
                     }
                     if (manager.state?.showSelectionHandleEnd == true) {
                         TextFieldSelectionHandle(
                             isStartHandle = false,
-                            directions = directions,
+                            direction = endDirection,
                             manager = manager
                         )
                     }
