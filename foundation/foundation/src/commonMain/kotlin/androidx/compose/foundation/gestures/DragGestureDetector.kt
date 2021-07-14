@@ -16,6 +16,14 @@
 
 package androidx.compose.foundation.gestures
 
+// Note, that there is a copy-paste version of this file (DragGestureDetectorCopy.kt), don't
+// forget to change it too.
+//
+// We can't make *PointerSlop* functions public just yet because the new pointer API isn't ready.
+
+// TODO(b/193549931): when the new pointer API will be ready we should make *PointerSlop*
+//  functions public
+
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.AwaitPointerEventScope
 import androidx.compose.ui.input.pointer.PointerEvent
@@ -23,6 +31,7 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.positionChangeConsumed
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
@@ -33,6 +42,7 @@ import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.positionChangeIgnoreConsumed
 import androidx.compose.ui.input.pointer.positionChangedIgnoreConsumed
 import androidx.compose.ui.platform.ViewConfiguration
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastFirstOrNull
@@ -69,11 +79,26 @@ suspend fun AwaitPointerEventScope.awaitTouchSlopOrCancellation(
     pointerId: PointerId,
     onTouchSlopReached: (change: PointerInputChange, overSlop: Offset) -> Unit
 ): PointerInputChange? {
+    return awaitPointerSlopOrCancellation(
+        pointerId,
+        PointerType.Touch,
+        onTouchSlopReached
+    )
+}
+
+// TODO(demin): probably we can get rid of copy-paste and reuse awaitPointerSlopOrCancellation
+//  at the bottom of this file. We just need to change its interface:
+//  awaitPointerSlopOrCancellation(getDragValue: (Offset) -> Offset)
+internal suspend fun AwaitPointerEventScope.awaitPointerSlopOrCancellation(
+    pointerId: PointerId,
+    pointerType: PointerType,
+    onPointerSlopReached: (change: PointerInputChange, overSlop: Offset) -> Unit
+): PointerInputChange? {
     if (currentEvent.isPointerUp(pointerId)) {
         return null // The pointer has already been lifted, so the gesture is canceled
     }
     var offset = Offset.Zero
-    val touchSlop = viewConfiguration.touchSlop
+    val touchSlop = viewConfiguration.pointerSlop(pointerType)
 
     var pointer = pointerId
 
@@ -96,7 +121,7 @@ suspend fun AwaitPointerEventScope.awaitTouchSlopOrCancellation(
             var acceptedDrag = false
             if (distance >= touchSlop) {
                 val touchSlopOffset = offset / distance * touchSlop
-                onTouchSlopReached(dragEvent, offset - touchSlopOffset)
+                onPointerSlopReached(dragEvent, offset - touchSlopOffset)
                 if (dragEvent.positionChangeConsumed()) {
                     acceptedDrag = true
                 } else {
@@ -204,7 +229,10 @@ suspend fun PointerInputScope.detectDragGestures(
             var drag: PointerInputChange?
             var overSlop = Offset.Zero
             do {
-                drag = awaitTouchSlopOrCancellation(down.id) { change, over ->
+                drag = awaitPointerSlopOrCancellation(
+                    down.id,
+                    down.type
+                ) { change, over ->
                     change.consumePositionChange()
                     overSlop = over
                 }
@@ -308,9 +336,21 @@ suspend fun PointerInputScope.detectDragGesturesAfterLongPress(
 suspend fun AwaitPointerEventScope.awaitVerticalTouchSlopOrCancellation(
     pointerId: PointerId,
     onTouchSlopReached: (change: PointerInputChange, overSlop: Float) -> Unit
-) = awaitTouchSlopOrCancellation(
+) = awaitPointerSlopOrCancellation(
     pointerId = pointerId,
-    onTouchSlopReached = onTouchSlopReached,
+    pointerType = PointerType.Touch,
+    onPointerSlopReached = onTouchSlopReached,
+    getDragDirectionValue = { it.y }
+)
+
+internal suspend fun AwaitPointerEventScope.awaitVerticalPointerSlopOrCancellation(
+    pointerId: PointerId,
+    pointerType: PointerType,
+    onTouchSlopReached: (change: PointerInputChange, overSlop: Float) -> Unit
+) = awaitPointerSlopOrCancellation(
+    pointerId = pointerId,
+    pointerType = pointerType,
+    onPointerSlopReached = onTouchSlopReached,
     getDragDirectionValue = { it.y }
 )
 
@@ -396,7 +436,7 @@ suspend fun PointerInputScope.detectVerticalDragGestures(
         awaitPointerEventScope {
             val down = awaitFirstDown(requireUnconsumed = false)
             var overSlop = 0f
-            val drag = awaitVerticalTouchSlopOrCancellation(down.id) { change, over ->
+            val drag = awaitVerticalPointerSlopOrCancellation(down.id, down.type) { change, over ->
                 change.consumePositionChange()
                 overSlop = over
             }
@@ -443,9 +483,21 @@ suspend fun PointerInputScope.detectVerticalDragGestures(
 suspend fun AwaitPointerEventScope.awaitHorizontalTouchSlopOrCancellation(
     pointerId: PointerId,
     onTouchSlopReached: (change: PointerInputChange, overSlop: Float) -> Unit
-) = awaitTouchSlopOrCancellation(
+) = awaitPointerSlopOrCancellation(
     pointerId = pointerId,
-    onTouchSlopReached = onTouchSlopReached,
+    pointerType = PointerType.Touch,
+    onPointerSlopReached = onTouchSlopReached,
+    getDragDirectionValue = { it.x }
+)
+
+internal suspend fun AwaitPointerEventScope.awaitHorizontalPointerSlopOrCancellation(
+    pointerId: PointerId,
+    pointerType: PointerType,
+    onPointerSlopReached: (change: PointerInputChange, overSlop: Float) -> Unit
+) = awaitPointerSlopOrCancellation(
+    pointerId = pointerId,
+    pointerType = pointerType,
+    onPointerSlopReached = onPointerSlopReached,
     getDragDirectionValue = { it.x }
 )
 
@@ -528,7 +580,10 @@ suspend fun PointerInputScope.detectHorizontalDragGestures(
         awaitPointerEventScope {
             val down = awaitFirstDown(requireUnconsumed = false)
             var overSlop = 0f
-            val drag = awaitHorizontalTouchSlopOrCancellation(down.id) { change, over ->
+            val drag = awaitHorizontalPointerSlopOrCancellation(
+                down.id,
+                down.type
+            ) { change, over ->
                 change.consumePositionChange()
                 overSlop = over
             }
@@ -616,34 +671,35 @@ private suspend inline fun AwaitPointerEventScope.awaitDragOrUp(
 }
 
 /**
- * Waits for drag motion along one axis based on [getDragDirectionValue] to pass touch slop,
+ * Waits for drag motion along one axis based on [getDragDirectionValue] to pass pointer slop,
  * using [pointerId] as the pointer to examine. If [pointerId] is raised, another pointer
  * from those that are down will be chosen to lead the gesture, and if none are down,
- * `null` is returned. If [pointerId] is not down when [awaitTouchSlopOrCancellation] is called,
+ * `null` is returned. If [pointerId] is not down when [awaitPointerSlopOrCancellation] is called,
  * then `null` is returned.
  *
- * When touch slop is detected, [onTouchSlopReached] is called with the change and the distance
- * beyond the touch slop. [getDragDirectionValue] should return the position change in the direction
- * of the drag axis. If [onTouchSlopReached] does not consume the position change, touch slop
- * will not have been considered detected and the detection will continue or, if it is consumed,
- * the [PointerInputChange] that was consumed will be returned.
+ * When pointer slop is detected, [onPointerSlopReached] is called with the change and the distance
+ * beyond the pointer slop. [getDragDirectionValue] should return the position change in the
+ * direction of the drag axis. If [onPointerSlopReached] does not consume the position change,
+ * pointer slop will not have been considered detected and the detection will continue or,
+ * if it is consumed, the [PointerInputChange] that was consumed will be returned.
  *
  * This works with [awaitTouchSlopOrCancellation] for the other axis to ensure that only horizontal
  * or vertical dragging is done, but not both.
  *
- * @return The [PointerInputChange] of the event that was consumed in [onTouchSlopReached] or
+ * @return The [PointerInputChange] of the event that was consumed in [onPointerSlopReached] or
  * `null` if all pointers are raised or the position change was consumed by another gesture
  * detector.
  */
-private suspend inline fun AwaitPointerEventScope.awaitTouchSlopOrCancellation(
+private suspend inline fun AwaitPointerEventScope.awaitPointerSlopOrCancellation(
     pointerId: PointerId,
-    onTouchSlopReached: (PointerInputChange, Float) -> Unit,
+    pointerType: PointerType,
+    onPointerSlopReached: (PointerInputChange, Float) -> Unit,
     getDragDirectionValue: (Offset) -> Float
 ): PointerInputChange? {
     if (currentEvent.isPointerUp(pointerId)) {
         return null // The pointer has already been lifted, so the gesture is canceled
     }
-    val touchSlop = viewConfiguration.touchSlop
+    val touchSlop = viewConfiguration.pointerSlop(pointerType)
     var pointer: PointerId = pointerId
     var totalPositionChange = 0f
 
@@ -675,7 +731,7 @@ private suspend inline fun AwaitPointerEventScope.awaitTouchSlopOrCancellation(
                     return null
                 }
             } else {
-                onTouchSlopReached(
+                onPointerSlopReached(
                     dragEvent,
                     totalPositionChange - (sign(totalPositionChange) * touchSlop)
                 )
@@ -743,3 +799,22 @@ private suspend fun PointerInputScope.awaitLongPressOrCancellation(
 
 private fun PointerEvent.isPointerUp(pointerId: PointerId): Boolean =
     changes.fastFirstOrNull { it.id == pointerId }?.pressed != true
+
+// This value was determined using experiments and common sense.
+// We can't use zero slop, because some hypothetical desktop/mobile devices can send
+// pointer events with a very high precision (but I haven't encountered any that send
+// events with less than 1px precision)
+private val mouseSlop = 0.125.dp
+private val defaultTouchSlop = 18.dp // The default touch slop on Android devices
+private val mouseToTouchSlopRatio = mouseSlop / defaultTouchSlop
+
+// TODO(demin): consider this as part of ViewConfiguration class after we make *PointerSlop*
+//  functions public (see the comment at the top of the file).
+//  After it will be a public API, we should get rid of `touchSlop / 144` and return absolute
+//  value 0.125.dp.toPx(). It is not possible right now, because we can't access density.
+internal fun ViewConfiguration.pointerSlop(pointerType: PointerType): Float {
+    return when (pointerType) {
+        PointerType.Mouse -> touchSlop * mouseToTouchSlopRatio
+        else -> touchSlop
+    }
+}

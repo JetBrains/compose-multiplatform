@@ -204,6 +204,9 @@ package androidx.compose.material {
     method @androidx.compose.runtime.Composable public static void Divider(optional androidx.compose.ui.Modifier modifier, optional long color, optional float thickness, optional float startIndent);
   }
 
+  public final class DragGestureDetectorCopyKt {
+  }
+
   public final class DrawerDefaults {
     method public float getElevation();
     method @androidx.compose.runtime.Composable public long getScrimColor();

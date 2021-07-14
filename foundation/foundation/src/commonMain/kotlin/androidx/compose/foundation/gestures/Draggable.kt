@@ -301,14 +301,14 @@ private suspend fun AwaitPointerEventScope.awaitDownAndSlop(
         down to 0f
     } else {
         var initialDelta = 0f
-        val postTouchSlop = { event: PointerInputChange, offset: Float ->
+        val postPointerSlop = { event: PointerInputChange, offset: Float ->
             event.consumePositionChange()
             initialDelta = offset
         }
         val afterSlopResult = if (orientation == Orientation.Vertical) {
-            awaitVerticalTouchSlopOrCancellation(down.id, postTouchSlop)
+            awaitVerticalPointerSlopOrCancellation(down.id, down.type, postPointerSlop)
         } else {
-            awaitHorizontalTouchSlopOrCancellation(down.id, postTouchSlop)
+            awaitHorizontalPointerSlopOrCancellation(down.id, down.type, postPointerSlop)
         }
         if (afterSlopResult != null) afterSlopResult to initialDelta else null
     }

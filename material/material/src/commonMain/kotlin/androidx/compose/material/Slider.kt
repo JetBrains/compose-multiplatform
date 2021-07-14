@@ -27,7 +27,6 @@ import androidx.compose.foundation.gestures.DragScope
 import androidx.compose.foundation.gestures.DraggableState
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.awaitHorizontalTouchSlopOrCancellation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.forEachGesture
@@ -75,6 +74,7 @@ import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.input.pointer.AwaitPointerEventScope
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputChange
+import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
@@ -703,14 +703,15 @@ private fun snapValueToTick(
 }
 
 private suspend fun AwaitPointerEventScope.awaitSlop(
-    id: PointerId
+    id: PointerId,
+    type: PointerType
 ): Pair<PointerInputChange, Float>? {
     var initialDelta = 0f
-    val postTouchSlop = { pointerInput: PointerInputChange, offset: Float ->
+    val postPointerSlop = { pointerInput: PointerInputChange, offset: Float ->
         pointerInput.consumePositionChange()
         initialDelta = offset
     }
-    val afterSlopResult = awaitHorizontalTouchSlopOrCancellation(id, postTouchSlop)
+    val afterSlopResult = awaitHorizontalPointerSlopOrCancellation(id, type, postPointerSlop)
     return if (afterSlopResult != null) afterSlopResult to initialDelta else null
 }
 
@@ -862,7 +863,7 @@ private fun Modifier.rangeSliderPressDragModifier(
                         var draggingStart = true
                         val pointerEvent = awaitFirstDown(requireUnconsumed = false)
                         val interaction = PressInteraction.Press(pointerEvent.position)
-                        val slop = viewConfiguration.touchSlop
+                        val slop = viewConfiguration.pointerSlop(pointerEvent.type)
                         val posX =
                             if (isRtl) maxPx - pointerEvent.position.x else pointerEvent.position.x
 
@@ -880,7 +881,7 @@ private fun Modifier.rangeSliderPressDragModifier(
                             thumbCaptured = true
                         }
 
-                        awaitSlop(pointerEvent.id)?.let {
+                        awaitSlop(pointerEvent.id, pointerEvent.type)?.let {
                             if (thumbCaptured) {
                                 onDrag(draggingStart, if (isRtl) -it.second else it.second)
                             } else {
