@@ -1,9 +1,11 @@
 package org.jetbrains.compose.web.attributes
 
 import androidx.compose.web.events.SyntheticDragEvent
+import androidx.compose.web.events.SyntheticEvent
 import androidx.compose.web.events.SyntheticMouseEvent
 import androidx.compose.web.events.SyntheticWheelEvent
 import org.jetbrains.compose.web.events.*
+import org.w3c.dom.events.EventTarget
 
 private typealias SyntheticMouseEventListener = (SyntheticMouseEvent) -> Unit
 private typealias SyntheticWheelEventListener = (SyntheticWheelEvent) -> Unit
@@ -228,10 +230,6 @@ open class EventsListenerBuilder {
         listeners.add(WrappedEventListener(INPUT, options, listener))
     }
 
-    fun onScroll(options: Options = Options.DEFAULT, listener: (WrappedEvent) -> Unit) {
-        listeners.add(WrappedEventListener(SCROLL, options, listener))
-    }
-
     /* Animation Events */
 
     fun onAnimationEnd(options: Options = Options.DEFAULT, listener: (SyntheticAnimationEvent) -> Unit) {
@@ -253,6 +251,12 @@ open class EventsListenerBuilder {
     }
 
     /* End of Animation Events */
+
+    fun onScroll(options: Options = Options.DEFAULT, listener: (SyntheticEvent<EventTarget>) -> Unit) {
+        listeners.add(WrappedEventListener<WrappedEvent>(SCROLL, options) {
+            listener(SyntheticEvent(it.nativeEvent))
+        })
+    }
 
     fun collectListeners(): List<WrappedEventListener<*>> = listeners
 
