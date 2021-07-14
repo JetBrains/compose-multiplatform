@@ -10,6 +10,7 @@ import org.jetbrains.compose.web.attributes.AttrsBuilder
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.attributes.Options
 import org.jetbrains.compose.web.events.SyntheticChangeEvent
+import org.jetbrains.compose.web.events.SyntheticSelectEvent
 import org.w3c.dom.DataTransfer
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLInputElement
@@ -65,6 +66,15 @@ class InputAttrsBuilder<T>(
         addEventListener(BEFOREINPUT, options) {
             val value = inputType.inputValue(it.nativeEvent)
             listener(SyntheticInputEvent(value, it.nativeEvent))
+        }
+    }
+
+    fun onSelect(
+        options: Options = Options.DEFAULT,
+        listener: (SyntheticSelectEvent<HTMLInputElement>) -> Unit
+    ) {
+        addEventListener(SELECT, options) {
+            listener(SyntheticSelectEvent(it.nativeEvent))
         }
     }
 }

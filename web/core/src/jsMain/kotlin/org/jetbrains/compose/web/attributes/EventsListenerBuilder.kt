@@ -196,10 +196,6 @@ open class EventsListenerBuilder {
         listeners.add(WrappedEventListener(SCROLL, options, listener))
     }
 
-    fun onSelect(options: Options = Options.DEFAULT, listener: (WrappedEvent) -> Unit) {
-        listeners.add(WrappedEventListener(SELECT, options, listener))
-    }
-
     fun onTouchCancel(options: Options = Options.DEFAULT, listener: (WrappedTouchEvent) -> Unit) {
         listeners.add(TouchEventListener(TOUCHCANCEL, options, listener))
     }

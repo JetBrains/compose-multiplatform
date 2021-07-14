@@ -118,7 +118,23 @@ class EventTests : BaseIntegrationTests() {
         val selectAll = Keys.chord(COMMAND_CROSS_PLATFORM, "a")
         selectableText.sendKeys(selectAll)
 
-        driver.waitTextToBe(value = "Text Selected")
+        driver.waitTextToBe(value = "This is a text to be selected")
+    }
+
+    @ResolveDrivers
+    fun `select event in TextArea update the txt`(driver: WebDriver) {
+        driver.openTestPage("selectEventInTextAreaUpdatesText")
+        driver.waitTextToBe(value = "None")
+        driver.waitTextToBe(value = "None", textId = "txt2")
+
+        val selectableText = driver.findElement(By.id("textArea"))
+
+        val selectAll = Keys.chord(COMMAND_CROSS_PLATFORM, "a")
+        selectableText.sendKeys(selectAll)
+
+        val expectedText = "This is a text to be selected"
+        driver.waitTextToBe(value = expectedText)
+        driver.waitTextToBe(value = "0,${expectedText.length}", textId = "txt2")
     }
 
     @ResolveDrivers

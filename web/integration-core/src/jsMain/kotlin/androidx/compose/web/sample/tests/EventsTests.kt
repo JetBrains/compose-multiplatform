@@ -97,7 +97,23 @@ class EventsTests {
             value("This is a text to be selected")
             id("selectableText")
             onSelect {
-                state = "Text Selected"
+                state = it.selection()
+            }
+        })
+    }
+
+    val selectEventInTextAreaUpdatesText by testCase {
+        var state by remember { mutableStateOf("None") }
+        var selectedIndexes by remember { mutableStateOf("None") }
+
+        P(attrs = { style { height(50.px) } }) { TestText(state) }
+        P(attrs = { style { height(50.px) } }) { TestText(selectedIndexes, id = "txt2") }
+
+        TextArea(value = "This is a text to be selected", attrs = {
+            id("textArea")
+            onSelect {
+                state = it.selection()
+                selectedIndexes = "${it.selectionStart},${it.selectionEnd}"
             }
         })
     }
