@@ -1,13 +1,11 @@
 package org.jetbrains.compose.web
 
 import androidx.compose.runtime.AbstractApplier
-import org.jetbrains.compose.web.attributes.WrappedEventListener
+import org.jetbrains.compose.web.attributes.SyntheticEventListener
 import org.jetbrains.compose.web.css.StyleHolder
 import org.jetbrains.compose.web.dom.setProperty
 import org.jetbrains.compose.web.dom.setVariable
 import kotlinx.dom.clear
-import org.jetbrains.compose.web.attributes.Options
-import org.jetbrains.compose.web.css.jsObject
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
@@ -46,9 +44,9 @@ external interface EventListenerOptions {
 }
 
 open class DomNodeWrapper(open val node: Node) {
-    private var currentListeners = emptyList<WrappedEventListener<*>>()
+    private var currentListeners = emptyList<SyntheticEventListener<*>>()
 
-    fun updateEventListeners(list: List<WrappedEventListener<*>>) {
+    fun updateEventListeners(list: List<SyntheticEventListener<*>>) {
         val htmlElement = node as? HTMLElement ?: return
 
         currentListeners.forEach {
