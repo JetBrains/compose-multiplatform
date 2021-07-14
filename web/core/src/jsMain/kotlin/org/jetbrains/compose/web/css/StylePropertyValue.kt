@@ -11,9 +11,6 @@ external interface StylePropertyValue
 external interface StylePropertyNumber: StylePropertyValue
 external interface StylePropertyString: StylePropertyValue
 
-inline fun StylePropertyValue(value: String): StylePropertyString = value.unsafeCast<StylePropertyString>()
-inline fun StylePropertyValue(value: Number): StylePropertyNumber = value.unsafeCast<StylePropertyNumber>()
-
 external interface CSSStyleValue: StylePropertyValue {
     override fun toString(): String
 }

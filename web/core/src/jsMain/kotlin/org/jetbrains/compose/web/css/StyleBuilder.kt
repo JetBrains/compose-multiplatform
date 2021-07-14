@@ -9,6 +9,9 @@ package org.jetbrains.compose.web.css
 
 import kotlin.properties.ReadOnlyProperty
 
+private fun StylePropertyValue(value: String): StylePropertyString = value.unsafeCast<StylePropertyString>()
+private fun StylePropertyValue(value: Number): StylePropertyNumber = value.unsafeCast<StylePropertyNumber>()
+
 interface StyleBuilder {
     fun property(propertyName: String, value: StylePropertyValue)
     fun variable(variableName: String, value: StylePropertyValue)
@@ -36,11 +39,8 @@ inline fun variableValue(variableName: String, fallback: StylePropertyValue? = n
 
 external interface CSSVariableValueAs<out T: StylePropertyValue>: StylePropertyValue
 
-inline fun <TValue> CSSVariableValue(value: StylePropertyValue) =
-    value.unsafeCast<TValue>()
-
-inline fun <TValue> CSSVariableValue(value: String) =
-    CSSVariableValue<TValue>(StylePropertyValue(value))
+inline fun <TValue> CSSVariableValue(value: StylePropertyValue) = value.unsafeCast<TValue>()
+inline fun <TValue> CSSVariableValue(value: String) = value.unsafeCast<TValue>()
 
 // after adding `variable` word `add` became ambiguous
 @Deprecated(
