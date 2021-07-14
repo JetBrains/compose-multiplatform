@@ -16,87 +16,48 @@ import kotlin.test.assertEquals
 class CSSBorderTests {
 
     @Test
+    fun border() = runTest {
+        composition {
+            Div({ style { property("border", "1px solid red") } })
+            Div({ style { border(3.px, color = Color("green")) } })
+        }
+
+        assertEquals("1px solid red", (root.children[0] as HTMLElement).style.border)
+        root.children[1]?.let {
+            val el = it.unsafeCast<HTMLElement>()
+            assertEquals("green", el.style.getPropertyValue("border-color"))
+            assertEquals("3px", el.style.getPropertyValue("border-width"))
+        }
+    }
+
+    @Test
     fun borderRadius() = runTest {
         composition {
-            Div(
-                {
-                    style {
-                        borderRadius(3.px)
-                    }
-                }
-            )
-            Div(
-                {
-                    style {
-                        borderRadius(3.px, 5.px)
-                    }
-                }
-            )
-            Div(
-                {
-                    style {
-                        borderRadius(3.px, 5.px, 4.px)
-                    }
-                }
-            )
-            Div(
-                {
-                    style {
-                        borderRadius(3.px, 5.px, 4.px, 1.px)
-                    }
-                }
-            )
+            Div({ style { borderRadius(3.px) } })
+            Div({ style { borderRadius(3.px, 5.px) } })
+            Div({ style { borderRadius(3.px, 5.px, 4.px) } })
+            Div({ style { borderRadius(3.px, 5.px, 4.px, 1.px) } })
         }
 
         assertEquals("3px", (root.children[0] as HTMLElement).style.borderRadius)
         assertEquals("3px 5px", (root.children[1] as HTMLElement).style.borderRadius)
         assertEquals("3px 5px 4px", (root.children[2] as HTMLElement).style.borderRadius)
-        assertEquals(
-            "3px 5px 4px 1px",
-            (root.children[3] as HTMLElement).style.borderRadius    
-        )
+        assertEquals("3px 5px 4px 1px", (root.children[3] as HTMLElement).style.borderRadius)
     }
 
 
     @Test
     fun borderWidth() = runTest {
         composition {
-            Div(
-                {
-                    style {
-                        borderWidth(2.px)
-                    }
-                }
-            )
-            Div(
-                {
-                    style {
-                        borderWidth(3.px, 7.px)
-                    }
-                }
-            )
-            Div(
-                {
-                    style {
-                        borderWidth(3.px, 5.px, 4.px)
-                    }
-                }
-            )
-            Div(
-                {
-                    style {
-                        borderWidth(3.px, 5.px, 4.px, 2.px)
-                    }
-                }
-            )
+            Div({ style { borderWidth(2.px) } })
+            Div({ style { borderWidth(3.px, 7.px) } })
+            Div({ style { borderWidth(3.px, 5.px, 4.px) } })
+            Div({ style { borderWidth(3.px, 5.px, 4.px, 2.px) } })
         }
 
         assertEquals("2px", (root.children[0] as HTMLElement).style.borderWidth)
         assertEquals("3px 7px", (root.children[1] as HTMLElement).style.borderWidth)
         assertEquals("3px 5px 4px", (root.children[2] as HTMLElement).style.borderWidth)
-        assertEquals(
-            "3px 5px 4px 2px",
-            (root.children[3] as HTMLElement).style.borderWidth
-        )
+        assertEquals("3px 5px 4px 2px", (root.children[3] as HTMLElement).style.borderWidth)
     }
 }

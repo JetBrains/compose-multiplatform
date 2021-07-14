@@ -90,41 +90,6 @@ class StaticComposableTests {
         assertEquals("opacity: 0.2; color: green;", (root.children[0] as HTMLElement).style.cssText)
     }
 
-    @Test
-    fun stylesBorder() {
-        val root = "div".asHtmlElement()
-        renderComposable(
-            root = root
-        ) {
-            Div(
-                {
-                    style {
-                        property("border", "1px solid red")
-                    }
-                }
-            )
-            Div(
-                {
-                    style {
-                        border(3.px, color = Color("green"))
-                    }
-                }
-            )
-        }
-
-        assertEquals("border: 1px solid red;", (root.children[0] as HTMLElement).style.cssText)
-        root.children[1]?.let {
-            val el = it.unsafeCast<HTMLElement>()
-            assertEquals(
-                "green",
-                el.style.getPropertyValue("border-color")
-            )
-            assertEquals(
-                "3px",
-                el.style.getPropertyValue("border-width"),
-            )
-        }
-    }
 
     @Test
     fun stylesTop() {
