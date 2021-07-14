@@ -157,6 +157,9 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
             isNoLines = false
             isQuiet = true
 
+            // We run lint on each library, so we don't want transitive checking of each dependency
+            isCheckDependencies = false
+
             fatal("VisibleForTests")
 
             // Disable dependency checks that suggest to change them. We want libraries to be
