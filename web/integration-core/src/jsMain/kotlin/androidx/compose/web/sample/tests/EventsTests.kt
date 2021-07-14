@@ -227,4 +227,28 @@ class EventsTests {
             }
         }
     }
+
+    val keyDownKeyUpTest by testCase {
+        var stateDown by remember { mutableStateOf("None") }
+        var stateUp by remember { mutableStateOf("None") }
+
+        P {
+            TestText(stateDown, id = "txt_down")
+        }
+        P {
+            TestText(stateUp, id = "txt_up")
+        }
+
+        TextInput(value = "") {
+            id("textinput")
+            onKeyDown {
+                stateDown = "keydown = ${it.key}"
+                it.preventDefault()
+            }
+            onKeyUp {
+                stateUp = "keyup = ${it.key}"
+                it.preventDefault()
+            }
+        }
+    }
 }

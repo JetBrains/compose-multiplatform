@@ -309,4 +309,26 @@ class EventTests : BaseIntegrationTests() {
         driver.pasteFromClipboardInto(textinput2)
         driver.waitTextToBe(value = "Modified pasted text = TextToCut")
     }
+
+    @ResolveDrivers
+    fun keyDownKeyUpTest(driver: WebDriver) {
+        driver.openTestPage("keyDownKeyUpTest")
+
+        driver.waitTextToBe(value = "None", textId = "txt_down")
+        driver.waitTextToBe(value = "None", textId = "txt_up")
+
+        val input = driver.findElement(By.id("textinput"))
+        input.sendKeys("a")
+
+        driver.waitTextToBe(value = "keydown = a", textId = "txt_down")
+        driver.waitTextToBe(value = "keyup = a", textId = "txt_up")
+
+        Actions(driver).keyDown(input, Keys.SHIFT).perform()
+        driver.waitTextToBe(value = "keydown = Shift", textId = "txt_down")
+        driver.waitTextToBe(value = "keyup = a", textId = "txt_up")
+
+        Actions(driver).keyUp(input, Keys.SHIFT).perform()
+        driver.waitTextToBe(value = "keydown = Shift", textId = "txt_down")
+        driver.waitTextToBe(value = "keyup = Shift", textId = "txt_up")
+    }
 }

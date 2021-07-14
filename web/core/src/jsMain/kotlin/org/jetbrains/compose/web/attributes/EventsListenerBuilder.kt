@@ -149,6 +149,22 @@ open class EventsListenerBuilder {
 
     /* End of Clipboard Events */
 
+    /* Keyboard Events */
+
+    fun onKeyDown(options: Options = Options.DEFAULT, listener: (SyntheticKeyboardEvent) -> Unit) {
+        listeners.add(KeyboardEventListener(KEYDOWN, options) {
+            listener(SyntheticKeyboardEvent(it.nativeEvent))
+        })
+    }
+
+    fun onKeyUp(options: Options = Options.DEFAULT, listener: (SyntheticKeyboardEvent) -> Unit) {
+        listeners.add(KeyboardEventListener(KEYUP, options) {
+            listener(SyntheticKeyboardEvent(it.nativeEvent))
+        })
+    }
+
+    /* End of Keyboard Events */
+
     fun onGenericInput(
         options: Options = Options.DEFAULT,
         listener: (GenericWrappedEvent<*>) -> Unit
@@ -174,14 +190,6 @@ open class EventsListenerBuilder {
 
     fun onFocusOut(options: Options = Options.DEFAULT, listener: (WrappedFocusEvent) -> Unit) {
         listeners.add(FocusEventListener(FOCUSOUT, options, listener))
-    }
-
-    fun onKeyDown(options: Options = Options.DEFAULT, listener: (WrappedKeyboardEvent) -> Unit) {
-        listeners.add(KeyboardEventListener(KEYDOWN, options, listener))
-    }
-
-    fun onKeyUp(options: Options = Options.DEFAULT, listener: (WrappedKeyboardEvent) -> Unit) {
-        listeners.add(KeyboardEventListener(KEYUP, options, listener))
     }
 
     fun onScroll(options: Options = Options.DEFAULT, listener: (WrappedEvent) -> Unit) {
