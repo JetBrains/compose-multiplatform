@@ -53,7 +53,7 @@ interface CSSVariables
 class CSSVariable<out TValue: StylePropertyValue>(val name: String)
 
 private inline fun <TValue : StylePropertyValue?> variableValue(variableName: String, fallback: TValue? = null) =
-    "var(--$variableName${fallback?.let { ", $it" } ?: ""})"
+    "var(--$variableName${fallback?.let { ", $it" } ?: ""})".unsafeCast<TValue>()
 
 fun <TValue: StylePropertyValue> CSSVariable<TValue>.value(fallback: TValue? = null) =
         variableValue(
