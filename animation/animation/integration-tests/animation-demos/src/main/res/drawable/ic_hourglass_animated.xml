@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright 2021 The Android Open Source Project
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+    <target android:name="hourglass_frame">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="333"
+                android:interpolator="@android:interpolator/accelerate_decelerate"
+                android:propertyName="rotation"
+                android:valueFrom="0"
+                android:valueTo="180" />
+        </aapt:attr>
+    </target>
+    <target android:name="fill_outlines">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="333"
+                android:interpolator="@android:interpolator/accelerate_decelerate"
+                android:propertyName="rotation"
+                android:valueFrom="0"
+                android:valueTo="180" />
+        </aapt:attr>
+    </target>
+    <target android:name="mask_sand">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="1000"
+                android:interpolator="@android:interpolator/accelerate_decelerate"
+                android:propertyName="pathData"
+                android:startOffset="333"
+                android:valueFrom="M 24 13.3999938965 c 0 0.0 -24 0.0 -24 0.0
+                    c 0 0.0 0 10.6000061035 0 10.6000061035 c 0 0 24 0 24 0
+                    c 0 0 0 -10.6000061035 0 -10.6000061035 Z"
+                android:valueTo="M 24 0.00173950195312 c 0 0.0 -24 0.0 -24 0.0
+                    c 0 0.0 0 10.6982574463 0 10.6982574463 c 0 0.0 24 0.0 24 0.0
+                    c 0 0.0 0 -10.6982574463 0 -10.6982574463 Z"
+                android:valueType="pathType" />
+        </aapt:attr>
+    </target>
+    <aapt:attr name="android:drawable">
+        <vector
+            android:width="24dp"
+            android:height="24dp"
+            android:viewportHeight="24"
+            android:viewportWidth="24">
+            <group
+                android:name="hourglass_frame"
+                android:scaleX="0.75"
+                android:scaleY="0.75"
+                android:translateX="12"
+                android:translateY="12">
+                <group
+                    android:name="hourglass_frame_pivot"
+                    android:translateX="-12"
+                    android:translateY="-12">
+                    <group
+                        android:name="group_bottom"
+                        android:translateX="12"
+                        android:translateY="6.5">
+                        <path
+                            android:name="path_bottom"
+                            android:fillColor="#FF777777"
+                            android:pathData="M 6.52099609375 -3.89300537109
+                                c 0.0 0.0 -6.52099609375 6.87901306152 -6.52099609375 6.87901306152
+                                c 0 0.0 -6.52099609375 -6.87901306152 -6.52099609375 -6.87901306152
+                                c 0.0 0.0 13.0419921875 0.0 13.0419921875 0.0 Z M 9.99800109863 -6.5
+                                c 0.0 0.0 -19.9960021973 0.0 -19.9960021973 0.0
+                                c -0.890991210938 0.0 -1.33700561523 1.07699584961 -0.707000732422
+                                    1.70700073242
+                                c 0.0 0.0 10.7050018311 11.2929992676 10.7050018311 11.2929992676
+                                c 0 0.0 10.7050018311 -11.2929992676 10.7050018311 -11.2929992676
+                                c 0.630004882812 -0.630004882812 0.183990478516 -1.70700073242
+                                    -0.707000732422 -1.70700073242 Z" />
+                    </group>
+                    <group
+                        android:name="group_top"
+                        android:translateX="12"
+                        android:translateY="17.5">
+                        <path
+                            android:name="path_top"
+                            android:fillColor="#FF777777"
+                            android:pathData="M 0 -2.98600769043
+                                c 0 0.0 6.52099609375 6.87901306152 6.52099609375 6.87901306152
+                                c 0.0 0.0 -13.0419921875 0.0 -13.0419921875 0.0
+                                c 0.0 0.0 6.52099609375 -6.87901306152 6.52099609375 -6.87901306152
+                                Z M 0 -6.5
+                                c 0 0.0 -10.7050018311 11.2929992676 -10.7050018311 11.2929992676
+                                c -0.630004882812 0.630004882812 -0.184005737305 1.70700073242
+                                    0.707000732422 1.70700073242
+                                c 0.0 0.0 19.9960021973 0.0 19.9960021973 0.0
+                                c 0.890991210938 0.0 1.33699035645 -1.07699584961 0.707000732422
+                                    -1.70700073242
+                                c 0.0 0.0 -10.7050018311 -11.2929992676 -10.7050018311
+                                    -11.2929992676 Z" />
+                    </group>
+                </group>
+            </group>
+            <group
+                android:name="fill_outlines"
+                android:scaleX="0.75"
+                android:scaleY="0.75"
+                android:translateX="12"
+                android:translateY="12">
+                <group
+                    android:name="fill_outlines_pivot"
+                    android:translateX="-12"
+                    android:translateY="-12">
+                    <clip-path
+                        android:name="mask_sand"
+                        android:pathData="M 24 13.3999938965 c 0 0.0 -24 0.0 -24 0.0
+                            c 0 0.0 0 10.6000061035 0 10.6000061035 c 0 0 24 0 24 0
+                            c 0 0 0 -10.6000061035 0 -10.6000061035 Z" />
+                    <group
+                        android:name="group_sand"
+                        android:translateX="12"
+                        android:translateY="12">
+                        <path
+                            android:name="path_sand"
+                            android:fillColor="#FF777777"
+                            android:pathData="M 10.7100067139 10.2900085449
+                                c 0.629989624023 0.629989624023 0.179992675781 1.70999145508
+                                    -0.710006713867 1.70999145508
+                                c 0 0 -20 0 -20 0
+                                c -0.889999389648 0 -1.33999633789 -1.08000183105 -0.710006713867
+                                    -1.70999145508
+                                c 0.0 0.0 9.76000976562 -10.2900085449 9.76000976563 -10.2900085449
+                                c 0.0 0 -9.76000976562 -10.2899932861 -9.76000976563 -10.2899932861
+                                c -0.629989624023 -0.630004882812 -0.179992675781 -1.71000671387
+                                    0.710006713867 -1.71000671387
+                                c 0 0 20 0 20 0
+                                c 0.889999389648 0 1.33999633789 1.08000183105 0.710006713867
+                                    1.71000671387
+                                c 0.0 0.0 -9.76000976562 10.2899932861 -9.76000976563 10.2899932861
+                                c 0.0 0 9.76000976562 10.2900085449 9.76000976563 10.2900085449
+                                Z" />
+                    </group>
+                </group>
+            </group>
+        </vector>
+    </aapt:attr>
+</animated-vector>
