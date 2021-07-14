@@ -11,14 +11,8 @@ import org.w3c.dom.events.WheelEvent
  * https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent
  */
 open class SyntheticMouseEvent(
-    target: HTMLElement,
     nativeEvent: MouseEvent
-) : SyntheticEvent<HTMLElement>(target, nativeEvent) {
-
-    constructor(nativeEvent: MouseEvent): this(
-        target = nativeEvent.target as HTMLElement,
-        nativeEvent = nativeEvent
-    )
+) : SyntheticEvent<EventTarget>(nativeEvent) {
 
     private val mouseEvent = nativeEvent
 
@@ -51,18 +45,10 @@ open class SyntheticMouseEvent(
  * https://developer.mozilla.org/en-US/docs/Web/API/WheelEvent
  */
 class SyntheticWheelEvent(
-    target: HTMLElement,
     nativeEvent: WheelEvent
 ) : SyntheticMouseEvent(
-    target,
     nativeEvent
 ) {
-
-    constructor(nativeEvent: WheelEvent): this(
-        target = nativeEvent.target as HTMLElement,
-        nativeEvent = nativeEvent
-    )
-
     val deltaX: Double = nativeEvent.deltaX
     val deltaY: Double = nativeEvent.deltaY
     val deltaZ: Double = nativeEvent.deltaZ
@@ -73,17 +59,9 @@ class SyntheticWheelEvent(
  * https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
  */
 class SyntheticDragEvent(
-    target: HTMLElement,
     nativeEvent: DragEvent
 ) : SyntheticMouseEvent(
-    target,
     nativeEvent
 ) {
-
-    constructor(nativeEvent: DragEvent): this(
-        target = nativeEvent.target as HTMLElement,
-        nativeEvent = nativeEvent
-    )
-
     val dataTransfer: DataTransfer? = nativeEvent.dataTransfer
 }

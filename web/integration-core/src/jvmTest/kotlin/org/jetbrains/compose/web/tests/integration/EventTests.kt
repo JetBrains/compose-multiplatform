@@ -174,4 +174,66 @@ class EventTests : BaseIntegrationTests() {
         driver.waitTextToBe(value = "childInput")
         driver.waitTextToBe(textId = "txt2", value = "None")
     }
+
+    @ResolveDrivers
+    fun mouseEnterPlusExtraButtonsPressedUpdatesText(driver: WebDriver) {
+        driver.openTestPage("mouseEnterPlusExtraButtonsPressedUpdatesText")
+        driver.waitTextToBe(value = "None")
+
+        val box = driver.findElement(By.id("box"))
+
+        Actions(driver).moveToElement(box).perform()
+
+        driver.waitTextToBe(value = "ENTERED+")
+
+        Actions(driver).moveByOffset(0, 100)
+            .keyDown(Keys.CONTROL)
+            .moveToElement(box)
+            .keyUp(Keys.CONTROL)
+            .perform()
+
+        driver.waitTextToBe(value = "ENTERED+CTRL")
+
+        Actions(driver).moveByOffset(0, 100)
+            .keyDown(Keys.SHIFT)
+            .moveToElement(box)
+            .keyUp(Keys.SHIFT)
+            .perform()
+
+        driver.waitTextToBe(value = "ENTERED+SHIFT")
+
+        Actions(driver).moveByOffset(0, 100)
+            .keyDown(Keys.ALT)
+            .moveToElement(box)
+            .keyUp(Keys.ALT)
+            .perform()
+
+        driver.waitTextToBe(value = "ENTERED+ALT")
+    }
+
+    @ResolveDrivers
+    fun onMouseContextMenuUpdatesText(driver: WebDriver) {
+        driver.openTestPage("onMouseContextMenuUpdatesText")
+        driver.waitTextToBe(value = "None")
+
+        val box = driver.findElement(By.id("box"))
+
+        Actions(driver).contextClick(box).perform()
+
+        driver.waitTextToBe(value = "MOUSE CONTEXT MENU")
+    }
+
+    @ResolveDrivers
+    fun displayMouseCoordinates(driver: WebDriver) {
+        driver.openTestPage("displayMouseCoordinates")
+        driver.waitTextToBe(value = "None")
+
+        val box = driver.findElement(By.id("box"))
+
+        Actions(driver).moveToElement(box).perform()
+        driver.waitTextToBe(value = "108,108|100,100")
+
+        Actions(driver).moveToElement(box).moveByOffset(-20, -20).perform()
+        driver.waitTextToBe(value = "88,88|80,80")
+    }
 }

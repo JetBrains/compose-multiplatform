@@ -101,4 +101,77 @@ class EventsTests {
             }
         })
     }
+
+    val mouseEnterPlusExtraButtonsPressedUpdatesText by testCase {
+        var state by remember { mutableStateOf("None") }
+
+        P(
+            attrs = {
+                style { height(50.px) }
+            }
+        ) { TestText(state) }
+
+        Div(attrs = {
+            id("box")
+            style {
+                backgroundColor("red")
+                padding(50.px)
+                width(300.px)
+            }
+            onMouseEnter {
+                val buttonsPressed = mutableListOf<String>()
+                if (it.altKey) buttonsPressed.add("ALT")
+                if (it.ctrlKey) buttonsPressed.add("CTRL")
+                if (it.shiftKey) buttonsPressed.add("SHIFT")
+                if (it.metaKey) buttonsPressed.add("META")
+
+                state = "ENTERED+${buttonsPressed.joinToString(separator = ",")}"
+            }
+
+        }) {
+            Text("Enter mouse over me with buttons pressed (META, ALT, SHIFT, CTRL)")
+        }
+    }
+
+    val onMouseContextMenuUpdatesText by testCase {
+        var state by remember { mutableStateOf("None") }
+
+        P(
+            attrs = {
+                id("box")
+                style { height(50.px) }
+                onContextMenu {
+                    if (it.button == 2.toShort()) {
+                        it.preventDefault()
+                        it.stopImmediatePropagation()
+                        state = "MOUSE CONTEXT MENU"
+                    }
+                }
+            }
+        ) { TestText(state) }
+    }
+
+    val displayMouseCoordinates by testCase {
+        var state by remember { mutableStateOf("None") }
+
+        Div(
+            attrs = {
+                id("box")
+                style {
+                    width(200.px)
+                    height(200.px)
+                    backgroundColor("red")
+                }
+                onMouseMove {
+                    state = "${it.x},${it.y}|${it.offsetX},${it.offsetY}"
+                }
+            }
+        )
+
+        P(
+            attrs = {
+                style { height(50.px) }
+            }
+        ) { TestText(state) }
+    }
 }
