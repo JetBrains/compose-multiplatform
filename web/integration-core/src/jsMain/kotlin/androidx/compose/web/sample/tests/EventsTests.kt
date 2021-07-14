@@ -307,4 +307,63 @@ class EventsTests {
             Text("Touch me and move the pointer")
         }
     }
+
+    val animationEventsDispatched by testCase {
+        var animationStart by remember { mutableStateOf("None") }
+        var animationEnd by remember { mutableStateOf("None") }
+
+        var shouldAddBounceClass by remember { mutableStateOf(false) }
+
+        Style(AppStyleSheetWithAnimation)
+
+        P {
+            TestText(value = animationStart, id = "txt_start")
+        }
+        P {
+            TestText(value = animationEnd, id = "txt_end")
+        }
+
+        Div(attrs = {
+            id("box")
+            if (shouldAddBounceClass) classes(AppStyleSheetWithAnimation.bounceClass)
+
+            onClick {
+                shouldAddBounceClass = true
+            }
+            onAnimationStart {
+                animationStart = "STARTED"
+            }
+            onAnimationEnd {
+                shouldAddBounceClass = false
+                animationEnd = "ENDED"
+            }
+            style {
+                backgroundColor("red")
+            }
+        }) {
+            Text("Click to Animate")
+        }
+    }
+}
+
+
+object AppStyleSheetWithAnimation : StyleSheet() {
+    val bounce by keyframes {
+        from {
+            property("transform", "translateX(50%)")
+        }
+
+        to {
+            property("transform", "translateX(-50%)")
+        }
+    }
+
+    val bounceClass by style {
+        color("green")
+        animation(bounce) {
+            duration(500.ms)
+            timingFunction(AnimationTimingFunction.EaseIn)
+            direction(AnimationDirection.Alternate)
+        }
+    }
 }

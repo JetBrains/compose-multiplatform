@@ -369,4 +369,16 @@ class EventTests : BaseIntegrationTests() {
         driver.waitTextToBe(value = "MOVED", textId = "txt_move")
         driver.waitTextToBe(value = "ENDED", textId = "txt_end")
     }
+
+    @ResolveDrivers
+    fun animationEventsDispatched(driver: WebDriver) {
+        driver.openTestPage("animationEventsDispatched")
+        driver.waitTextToBe(value = "None", textId = "txt_start")
+        driver.waitTextToBe(value = "None", textId = "txt_end")
+
+        driver.findElement(By.id("box")).click()
+
+        driver.waitTextToBe(value = "STARTED", textId = "txt_start")
+        driver.waitTextToBe(value = "ENDED", textId = "txt_end")
+    }
 }

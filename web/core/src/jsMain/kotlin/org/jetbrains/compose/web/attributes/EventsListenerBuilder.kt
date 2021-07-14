@@ -232,17 +232,27 @@ open class EventsListenerBuilder {
         listeners.add(WrappedEventListener(SCROLL, options, listener))
     }
 
-    fun onAnimationEnd(options: Options = Options.DEFAULT, listener: (WrappedTouchEvent) -> Unit) {
-        listeners.add(WrappedEventListener(ANIMATIONEND, options, listener))
+    /* Animation Events */
+
+    fun onAnimationEnd(options: Options = Options.DEFAULT, listener: (SyntheticAnimationEvent) -> Unit) {
+        listeners.add(WrappedEventListener<WrappedEvent>(ANIMATIONEND, options) {
+            listener(SyntheticAnimationEvent(it.nativeEvent))
+        })
     }
 
-    fun onAnimationIteration(options: Options = Options.DEFAULT, listener: (WrappedEvent) -> Unit) {
-        listeners.add(WrappedEventListener(ANIMATIONITERATION, options, listener))
+    fun onAnimationIteration(options: Options = Options.DEFAULT, listener: (SyntheticAnimationEvent) -> Unit) {
+        listeners.add(WrappedEventListener<WrappedEvent>(ANIMATIONITERATION, options) {
+            listener(SyntheticAnimationEvent(it.nativeEvent))
+        })
     }
 
-    fun onAnimationStart(options: Options = Options.DEFAULT, listener: (WrappedEvent) -> Unit) {
-        listeners.add(WrappedEventListener(ANIMATIONSTART, options, listener))
+    fun onAnimationStart(options: Options = Options.DEFAULT, listener: (SyntheticAnimationEvent) -> Unit) {
+        listeners.add(WrappedEventListener<WrappedEvent>(ANIMATIONSTART, options) {
+            listener(SyntheticAnimationEvent(it.nativeEvent))
+        })
     }
+
+    /* End of Animation Events */
 
     fun collectListeners(): List<WrappedEventListener<*>> = listeners
 
