@@ -525,6 +525,7 @@ fun kotlinAndCompiledStub(
 ): KotlinAndCompiledStub {
     val filenameWithoutExtension = filename.substringBefore(".").lowercase(Locale.ROOT)
     val kotlin = kotlin(source).to("$filepath/$filename")
+    @Suppress("DEPRECATION") // b/193244821
     val compiled = compiled(
         "libs/$filenameWithoutExtension.jar",
         kotlin,

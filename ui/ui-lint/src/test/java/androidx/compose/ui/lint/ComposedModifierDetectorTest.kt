@@ -23,6 +23,7 @@ import androidx.compose.lint.test.compiledStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -104,6 +105,7 @@ class ComposedModifierDetectorTest : LintDetectorTest() {
         """
     )
 
+    @Ignore // b/193270279
     @Test
     fun noComposableCalls() {
         lint().files(
@@ -226,6 +228,7 @@ src/test/test.kt:22: Warning: Unnecessary use of Modifier.composed [UnnecessaryC
             Stubs.Modifier,
             Stubs.Remember
         )
+            .allowCompilationErrors(true) // b/193270279
             .run()
             .expectClean()
     }

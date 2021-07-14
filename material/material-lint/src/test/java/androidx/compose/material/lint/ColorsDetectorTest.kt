@@ -23,6 +23,7 @@ import androidx.compose.lint.test.kotlinAndCompiledStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -590,6 +591,7 @@ src/androidx/compose/material/foo/test.kt:22: Error: Conflicting 'on' color for 
             .expectClean()
     }
 
+    @Ignore // b/193270279
     @Test
     fun lightColorsErrors_compiled() {
         lint().files(
@@ -629,6 +631,7 @@ src/androidx/compose/material/foo/test.kt:15: Error: Conflicting 'on' color for 
             )
     }
 
+    @Ignore // b/193270279
     @Test
     fun darkColorsErrors_compiled() {
         lint().files(

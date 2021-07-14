@@ -28,6 +28,7 @@ import com.android.tools.lint.checks.infrastructure.TestFile
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
 import org.intellij.lang.annotations.Language
+import org.junit.Ignore
 import org.junit.runners.Parameterized
 
 /* ktlint-disable max-line-length */
@@ -110,6 +111,7 @@ class UnnecessaryLambdaCreationDetectorTest(
             .run()
     }
 
+    @Ignore // b/193270279
     @Test
     fun warnsForSingleExpressions() {
         check(

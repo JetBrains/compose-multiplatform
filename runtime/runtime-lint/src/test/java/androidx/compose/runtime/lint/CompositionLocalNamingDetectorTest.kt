@@ -22,6 +22,7 @@ import androidx.compose.lint.test.compiledStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -162,6 +163,7 @@ class CompositionLocalNamingDetectorTest : LintDetectorTest() {
         """
     )
 
+    @Ignore // b/193270279
     @Test
     fun noLocalPrefix() {
         lint().files(
