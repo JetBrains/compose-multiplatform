@@ -44,6 +44,7 @@ import androidx.compose.material.samples.LinearProgressIndicatorSample
 import androidx.compose.material.samples.MenuSample
 import androidx.compose.material.samples.ModalBottomSheetSample
 import androidx.compose.material.samples.ModalDrawerSample
+import androidx.compose.material.samples.NavigationRailBottomAlignSample
 import androidx.compose.material.samples.NavigationRailSample
 import androidx.compose.material.samples.NavigationRailWithOnlySelectedLabelsSample
 import androidx.compose.material.samples.OneLineListItems
@@ -663,5 +664,12 @@ val NavigationRailExamples = listOf(
         sourceUrl = NavigationRailExampleSourceUrl
     ) {
         CompactNavigationRailSample()
+    },
+    Example(
+        name = ::NavigationRailBottomAlignSample.name,
+        description = NavigationRailExampleDescription,
+        sourceUrl = NavigationRailExampleSourceUrl
+    ) {
+        NavigationRailBottomAlignSample()
     }
 )
