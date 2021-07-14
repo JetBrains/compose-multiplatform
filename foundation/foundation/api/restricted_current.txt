@@ -600,6 +600,9 @@ package androidx.compose.foundation.text {
     method public static void appendInlineContent(androidx.compose.ui.text.AnnotatedString.Builder, String id, optional String alternateText);
   }
 
+  public final class KeyEventHelpers_androidKt {
+  }
+
   public final class KeyMappingKt {
   }
 

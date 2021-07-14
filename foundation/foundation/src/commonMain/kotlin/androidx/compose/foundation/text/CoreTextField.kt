@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.IntrinsicMeasurable
@@ -479,6 +480,7 @@ internal fun CoreTextField(
         .then(pointerModifier)
         .then(semanticsModifier)
         .then(focusModifier)
+        .previewKeyEventToDeselectOnBack(state, manager)
         .then(textKeyInputModifier)
         .onGloballyPositioned {
             state.layoutResult?.decorationBoxCoordinates = it
@@ -586,6 +588,22 @@ internal enum class HandleState {
      * Also notice that TextField won't enter this state if the current input text is empty.
      */
     Cursor
+}
+
+/**
+ * Modifier to intercept back key presses, when supported by the platform, and deselect selected
+ * text and clear selection popups.
+ */
+private fun Modifier.previewKeyEventToDeselectOnBack(
+    state: TextFieldState,
+    manager: TextFieldSelectionManager
+) = onPreviewKeyEvent { keyEvent ->
+    if (state.handleState != HandleState.None && keyEvent.cancelsTextSelection()) {
+        manager.deselect()
+        true
+    } else {
+        false
+    }
 }
 
 @OptIn(InternalFoundationTextApi::class)
