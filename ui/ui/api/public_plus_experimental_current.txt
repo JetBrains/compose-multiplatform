@@ -579,6 +579,10 @@ package androidx.compose.ui.graphics.vector {
     method @androidx.compose.runtime.Composable public static void Path(java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> pathData, optional int pathFillType, optional String name, optional androidx.compose.ui.graphics.Brush? fill, optional float fillAlpha, optional androidx.compose.ui.graphics.Brush? stroke, optional float strokeAlpha, optional float strokeLineWidth, optional int strokeLineCap, optional int strokeLineJoin, optional float strokeLineMiter, optional float trimPathStart, optional float trimPathEnd, optional float trimPathOffset);
   }
 
+  @androidx.compose.ui.ExperimentalComposeUiApi public interface VectorConfig {
+    method public default <T> T! getOrDefault(androidx.compose.ui.graphics.vector.VectorProperty<T> property, T? defaultValue);
+  }
+
   @androidx.compose.runtime.Immutable public final class VectorGroup extends androidx.compose.ui.graphics.vector.VectorNode implements java.lang.Iterable<androidx.compose.ui.graphics.vector.VectorNode> kotlin.jvm.internal.markers.KMappedMarker {
     method public operator androidx.compose.ui.graphics.vector.VectorNode get(int index);
     method public java.util.List<androidx.compose.ui.graphics.vector.PathNode> getClipPathData();
@@ -639,6 +643,7 @@ package androidx.compose.ui.graphics.vector {
   }
 
   public final class VectorPainterKt {
+    method @androidx.compose.runtime.Composable @androidx.compose.ui.ExperimentalComposeUiApi public static void RenderVectorGroup(androidx.compose.ui.graphics.vector.VectorGroup group, optional java.util.Map<java.lang.String,? extends androidx.compose.ui.graphics.vector.VectorConfig> configs);
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter(float defaultWidth, float defaultHeight, optional float viewportWidth, optional float viewportHeight, optional String name, optional long tintColor, optional int tintBlendMode, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> content);
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter(androidx.compose.ui.graphics.vector.ImageVector image);
     field public static final String RootGroupName = "VectorRootGroup";
@@ -673,6 +678,73 @@ package androidx.compose.ui.graphics.vector {
     property public final float trimPathEnd;
     property public final float trimPathOffset;
     property public final float trimPathStart;
+  }
+
+  @androidx.compose.ui.ExperimentalComposeUiApi public abstract sealed class VectorProperty<T> {
+  }
+
+  public static final class VectorProperty.Fill extends androidx.compose.ui.graphics.vector.VectorProperty<androidx.compose.ui.graphics.Brush> {
+    field public static final androidx.compose.ui.graphics.vector.VectorProperty.Fill INSTANCE;
+  }
+
+  public static final class VectorProperty.FillAlpha extends androidx.compose.ui.graphics.vector.VectorProperty<java.lang.Float> {
+    field public static final androidx.compose.ui.graphics.vector.VectorProperty.FillAlpha INSTANCE;
+  }
+
+  public static final class VectorProperty.PathData extends androidx.compose.ui.graphics.vector.VectorProperty<java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode>> {
+    field public static final androidx.compose.ui.graphics.vector.VectorProperty.PathData INSTANCE;
+  }
+
+  public static final class VectorProperty.PivotX extends androidx.compose.ui.graphics.vector.VectorProperty<java.lang.Float> {
+    field public static final androidx.compose.ui.graphics.vector.VectorProperty.PivotX INSTANCE;
+  }
+
+  public static final class VectorProperty.PivotY extends androidx.compose.ui.graphics.vector.VectorProperty<java.lang.Float> {
+    field public static final androidx.compose.ui.graphics.vector.VectorProperty.PivotY INSTANCE;
+  }
+
+  public static final class VectorProperty.Rotation extends androidx.compose.ui.graphics.vector.VectorProperty<java.lang.Float> {
+    field public static final androidx.compose.ui.graphics.vector.VectorProperty.Rotation INSTANCE;
+  }
+
+  public static final class VectorProperty.ScaleX extends androidx.compose.ui.graphics.vector.VectorProperty<java.lang.Float> {
+    field public static final androidx.compose.ui.graphics.vector.VectorProperty.ScaleX INSTANCE;
+  }
+
+  public static final class VectorProperty.ScaleY extends androidx.compose.ui.graphics.vector.VectorProperty<java.lang.Float> {
+    field public static final androidx.compose.ui.graphics.vector.VectorProperty.ScaleY INSTANCE;
+  }
+
+  public static final class VectorProperty.Stroke extends androidx.compose.ui.graphics.vector.VectorProperty<androidx.compose.ui.graphics.Brush> {
+    field public static final androidx.compose.ui.graphics.vector.VectorProperty.Stroke INSTANCE;
+  }
+
+  public static final class VectorProperty.StrokeAlpha extends androidx.compose.ui.graphics.vector.VectorProperty<java.lang.Float> {
+    field public static final androidx.compose.ui.graphics.vector.VectorProperty.StrokeAlpha INSTANCE;
+  }
+
+  public static final class VectorProperty.StrokeLineWidth extends androidx.compose.ui.graphics.vector.VectorProperty<java.lang.Float> {
+    field public static final androidx.compose.ui.graphics.vector.VectorProperty.StrokeLineWidth INSTANCE;
+  }
+
+  public static final class VectorProperty.TranslateX extends androidx.compose.ui.graphics.vector.VectorProperty<java.lang.Float> {
+    field public static final androidx.compose.ui.graphics.vector.VectorProperty.TranslateX INSTANCE;
+  }
+
+  public static final class VectorProperty.TranslateY extends androidx.compose.ui.graphics.vector.VectorProperty<java.lang.Float> {
+    field public static final androidx.compose.ui.graphics.vector.VectorProperty.TranslateY INSTANCE;
+  }
+
+  public static final class VectorProperty.TrimPathEnd extends androidx.compose.ui.graphics.vector.VectorProperty<java.lang.Float> {
+    field public static final androidx.compose.ui.graphics.vector.VectorProperty.TrimPathEnd INSTANCE;
+  }
+
+  public static final class VectorProperty.TrimPathOffset extends androidx.compose.ui.graphics.vector.VectorProperty<java.lang.Float> {
+    field public static final androidx.compose.ui.graphics.vector.VectorProperty.TrimPathOffset INSTANCE;
+  }
+
+  public static final class VectorProperty.TrimPathStart extends androidx.compose.ui.graphics.vector.VectorProperty<java.lang.Float> {
+    field public static final androidx.compose.ui.graphics.vector.VectorProperty.TrimPathStart INSTANCE;
   }
 
 }

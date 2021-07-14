@@ -59,6 +59,12 @@ val AnimationDemos = DemoCategory(
                 ComposableDemo("Swipe to dismiss") { SwipeToDismissDemo() },
             )
         ),
+        DemoCategory(
+            "Graphics Animation Demos",
+            listOf(
+                ComposableDemo("Animated Vector Graphics") { AnimatedVectorGraphicsDemo() },
+            )
+        ),
 
         DemoCategory(
             "⛔ DO NOT ENTER ⛔",
