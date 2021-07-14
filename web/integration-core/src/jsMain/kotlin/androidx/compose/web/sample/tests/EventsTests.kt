@@ -267,4 +267,44 @@ class EventsTests {
             }
         }
     }
+
+    val touchEventsDispatched by testCase {
+        var touchStart by remember { mutableStateOf("None") }
+        var touchMove by remember { mutableStateOf("None") }
+        var touchEnd by remember { mutableStateOf("None") }
+
+        P {
+            TestText(touchStart, id = "txt_start")
+        }
+        P {
+            TestText(touchMove, id = "txt_move")
+        }
+        P {
+            TestText(touchEnd, id = "txt_end")
+        }
+
+        Div(attrs = {
+            id("box")
+
+            onTouchStart {
+                touchStart = "STARTED"
+            }
+
+            onTouchMove {
+                touchMove = "MOVED"
+            }
+
+            onTouchEnd {
+                touchEnd = "ENDED"
+            }
+
+            style {
+                width(300.px)
+                height(300.px)
+                backgroundColor("red")
+            }
+        }) {
+            Text("Touch me and move the pointer")
+        }
+    }
 }

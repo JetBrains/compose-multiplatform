@@ -14,6 +14,7 @@ import org.openqa.selenium.Keys
 import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
+import org.openqa.selenium.interactions.touch.TouchActions
 
 class EventTests : BaseIntegrationTests() {
 
@@ -346,5 +347,26 @@ class EventTests : BaseIntegrationTests() {
         Actions(driver).keyUp(input, Keys.SHIFT).perform()
         driver.waitTextToBe(value = "keydown = Shift", textId = "txt_down")
         driver.waitTextToBe(value = "keyup = Shift", textId = "txt_up")
+    }
+
+    //@ResolveDrivers
+    // TODO: at least chrome driver has mobile emulation, so we can try it out (didn't work right away)
+    fun touchEventsDispatched(driver: WebDriver) {
+        driver.openTestPage("touchEventsDispatched")
+        driver.waitTextToBe(value = "None", textId = "txt_start")
+        driver.waitTextToBe(value = "None", textId = "txt_move")
+        driver.waitTextToBe(value = "None", textId = "txt_end")
+
+        val box = driver.findElement(By.id("box"))
+
+        TouchActions(driver)
+            .down(box.rect.x + 50, box.rect.y + 50)
+            .move(box.rect.x + 70, box.rect.y + 70)
+            .up(box.rect.x + 70, box.rect.y + 70)
+            .perform()
+
+        driver.waitTextToBe(value = "STARTED", textId = "txt_start")
+        driver.waitTextToBe(value = "MOVED", textId = "txt_move")
+        driver.waitTextToBe(value = "ENDED", textId = "txt_end")
     }
 }

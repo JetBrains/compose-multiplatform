@@ -191,7 +191,35 @@ open class EventsListenerBuilder {
         })
     }
 
-    /* End of Focus Events*/
+    /* End of Focus Events */
+
+    /* Touch Events */
+
+    fun onTouchCancel(options: Options = Options.DEFAULT, listener: (SyntheticTouchEvent) -> Unit) {
+        listeners.add(TouchEventListener(TOUCHCANCEL, options) {
+            listener(SyntheticTouchEvent((it.nativeEvent)))
+        })
+    }
+
+    fun onTouchMove(options: Options = Options.DEFAULT, listener: (SyntheticTouchEvent) -> Unit) {
+        listeners.add(TouchEventListener(TOUCHMOVE, options) {
+            listener(SyntheticTouchEvent((it.nativeEvent)))
+        })
+    }
+
+    fun onTouchEnd(options: Options = Options.DEFAULT, listener: (SyntheticTouchEvent) -> Unit) {
+        listeners.add(TouchEventListener(TOUCHEND, options) {
+            listener(SyntheticTouchEvent((it.nativeEvent)))
+        })
+    }
+
+    fun onTouchStart(options: Options = Options.DEFAULT, listener: (SyntheticTouchEvent) -> Unit) {
+        listeners.add(TouchEventListener(TOUCHSTART, options) {
+            listener(SyntheticTouchEvent((it.nativeEvent)))
+        })
+    }
+
+    /* End of Touch Events */
 
     fun onGenericInput(
         options: Options = Options.DEFAULT,
@@ -206,22 +234,6 @@ open class EventsListenerBuilder {
 
     fun onScroll(options: Options = Options.DEFAULT, listener: (WrappedEvent) -> Unit) {
         listeners.add(WrappedEventListener(SCROLL, options, listener))
-    }
-
-    fun onTouchCancel(options: Options = Options.DEFAULT, listener: (WrappedTouchEvent) -> Unit) {
-        listeners.add(TouchEventListener(TOUCHCANCEL, options, listener))
-    }
-
-    fun onTouchMove(options: Options = Options.DEFAULT, listener: (WrappedTouchEvent) -> Unit) {
-        listeners.add(TouchEventListener(TOUCHMOVE, options, listener))
-    }
-
-    fun onTouchEnd(options: Options = Options.DEFAULT, listener: (WrappedTouchEvent) -> Unit) {
-        listeners.add(TouchEventListener(TOUCHEND, options, listener))
-    }
-
-    fun onTouchStart(options: Options = Options.DEFAULT, listener: (WrappedTouchEvent) -> Unit) {
-        listeners.add(TouchEventListener(TOUCHSTART, options, listener))
     }
 
     fun onAnimationEnd(options: Options = Options.DEFAULT, listener: (WrappedTouchEvent) -> Unit) {
