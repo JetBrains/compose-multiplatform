@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-@file:Suppress("UNUSED", "NOTHING_TO_INLINE", "FunctionName")
+@file:Suppress("UNUSED", "NOTHING_TO_INLINE")
 package org.jetbrains.compose.web.css
 
 external interface StylePropertyValue
@@ -17,5 +17,3 @@ inline fun StylePropertyValue(value: Number): StylePropertyNumber = value.unsafe
 external interface CSSStyleValue: StylePropertyValue {
     override fun toString(): String
 }
-
-inline fun CSSStyleValue(value: String): CSSStyleValue = StylePropertyValue(value).unsafeCast<CSSStyleValue>()
