@@ -43,7 +43,7 @@ object AppStylesheet : StyleSheet() {
         color(Color.RGBA(39,40,44,.7))
         borderRadius(4.px, 4.px, 4.px)
 
-        media(maxWidth(640.px)) {
+        media(mediaMaxWidth(640.px)) {
             self style {
                 top((-16).px)
             }
@@ -66,7 +66,7 @@ object AppStylesheet : StyleSheet() {
             margin(0.px)
         }
 
-        media(maxWidth(640.px)) {
+        media(mediaMaxWidth(640.px)) {
             CSSSelector.Universal style {
                 AppCSSVariables.wtOffsetTopUnit(16.px)
                 AppCSSVariables.wtFlowUnit(16.px)

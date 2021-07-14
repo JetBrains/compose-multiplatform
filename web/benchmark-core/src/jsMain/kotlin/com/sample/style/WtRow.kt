@@ -1,11 +1,6 @@
 package com.sample.style
 
-import androidx.compose.runtime.Composable
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.css.selectors.*
-import org.jetbrains.compose.web.attributes.*
-import org.jetbrains.compose.web.dom.*
-import org.jetbrains.compose.web.*
 
 object WtRows : StyleSheet(AppStylesheet) {
     
@@ -28,7 +23,7 @@ object WtRows : StyleSheet(AppStylesheet) {
     val wtRowSizeM by style {
         AppCSSVariables.wtHorizontalLayoutGutter(16.px)
 
-        media(maxWidth(640.px)) {
+        media(mediaMaxWidth(640.px)) {
             self style {
                 AppCSSVariables.wtHorizontalLayoutGutter(8.px)
             }

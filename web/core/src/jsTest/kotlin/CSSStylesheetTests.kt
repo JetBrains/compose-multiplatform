@@ -50,13 +50,13 @@ object AppStylesheet : StyleSheet() {
         color("lime")
         backgroundColor("lime")
 
-        media(minWidth(20000.px)) {
+        media(mediaMinWidth(20000.px)) {
             self style {
                 color("red")
             }
         }
 
-        media(minWidth(20.px)) {
+        media(mediaMinWidth(20.px)) {
             self style {
                 backgroundColor("green")
             }

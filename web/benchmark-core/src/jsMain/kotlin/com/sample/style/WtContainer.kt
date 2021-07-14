@@ -1,11 +1,6 @@
 package com.sample.style
 
-import androidx.compose.runtime.Composable
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.css.selectors.*
-import org.jetbrains.compose.web.attributes.*
-import org.jetbrains.compose.web.dom.*
-import org.jetbrains.compose.web.*
 
 object WtContainer : StyleSheet(AppStylesheet) {
     val wtContainer by style {
@@ -16,7 +11,7 @@ object WtContainer : StyleSheet(AppStylesheet) {
         property("padding-right", 22.px)
         property("max-width", 1276.px)
 
-        media(maxWidth(640.px)) {
+        media(mediaMaxWidth(640.px)) {
             self style {
                 property("max-width", 100.percent)
                 property("padding-left", 16.px)
@@ -24,7 +19,7 @@ object WtContainer : StyleSheet(AppStylesheet) {
             }
         }
 
-        media(maxWidth(1276.px)) {
+        media(mediaMaxWidth(1276.px)) {
             self style {
                 property("max-width", 996.px)
                 property("padding-left", 996.px)
@@ -32,7 +27,7 @@ object WtContainer : StyleSheet(AppStylesheet) {
             }
         }
 
-        media(maxWidth(1000.px)) {
+        media(mediaMaxWidth(1000.px)) {
             self style {
                 property("max-width", 100.percent)
                 property("padding-left", 22.px)

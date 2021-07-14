@@ -79,7 +79,7 @@ object AppStyleSheet : StyleSheet() {
             color(MyCSSVariables.myVar.value())
         }
 
-        media(maxWidth(640.px)) {
+        media(mediaMaxWidth(640.px)) {
             self style {
                 backgroundColor(MyCSSVariables.myVar.value())
                 property("color", MyCSSVariables.myVar2.value())
@@ -180,7 +180,7 @@ fun main() {
                 color("red")
             }
 
-            media(minWidth(500.px) and maxWidth(700.px)) {
+            media(mediaMinWidth(500.px) and mediaMaxWidth(700.px)) {
                 className(MyClassName) style {
                     fontSize(40.px)
                 }

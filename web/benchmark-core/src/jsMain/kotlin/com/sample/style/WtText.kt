@@ -2,9 +2,6 @@ package com.sample.style
 
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.selectors.*
-import org.jetbrains.compose.web.attributes.*
-import org.jetbrains.compose.web.dom.*
-import org.jetbrains.compose.web.*
 
 object WtTexts : StyleSheet(AppStylesheet) {
 
@@ -17,7 +14,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
         property("line-height", 64.px)
         property("line-height", AppCSSVariables.wtHeroLineHeight.value(64.px))
 
-        media(maxWidth(640.px)) {
+        media(mediaMaxWidth(640.px)) {
             self style {
                 AppCSSVariables.wtHeroFontSize(42.px)
                 AppCSSVariables.wtHeroLineHeight(48.px)
@@ -39,7 +36,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
         property("line-height", 40.px)
         property("line-height", AppCSSVariables.wtSubtitle2LineHeight.value(40.px))
 
-        media(maxWidth(640.px)) {
+        media(mediaMaxWidth(640.px)) {
             self style {
                 AppCSSVariables.wtSubtitle2FontSize(24.px)
                 AppCSSVariables.wtSubtitle2LineHeight(32.px)
@@ -126,7 +123,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
         property("line-height", 40.px)
         property("line-height", AppCSSVariables.wtH2LineHeight.value(40.px))
 
-        media(maxWidth(640.px)) {
+        media(mediaMaxWidth(640.px)) {
             self style {
                 AppCSSVariables.wtH2FontSize(24.px)
                 AppCSSVariables.wtH2LineHeight(32.px)
@@ -214,7 +211,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
             property("border-radius", 24.px)
         }
 
-        media(maxWidth(640.px)) {
+        media(mediaMaxWidth(640.px)) {
             self style {
                 property("margin-right", 8.px)
                 property("margin-left", 8.px)

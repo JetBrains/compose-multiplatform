@@ -5,7 +5,7 @@ import org.jetbrains.compose.web.css.CSSUnitValue
 import org.jetbrains.compose.web.css.GenericStyleSheetBuilder
 import org.jetbrains.compose.web.css.StyleSheet
 import org.jetbrains.compose.web.css.flexGrow
-import org.jetbrains.compose.web.css.maxWidth
+import org.jetbrains.compose.web.css.mediaMaxWidth
 import org.jetbrains.compose.web.css.media
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
@@ -16,7 +16,7 @@ fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.mediaMaxWidth(
     cssSelector: CSSSelector,
     rulesBuild: TBuilder.() -> Unit
 ) {
-    media(maxWidth(value)) {
+    media(mediaMaxWidth(value)) {
         cssSelector style rulesBuild
     }
 }

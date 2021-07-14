@@ -5,15 +5,14 @@
 
 package org.jetbrains.compose.web.core.tests
 
-import org.jetbrains.compose.web.css.CSSMediaQuery
 import org.jetbrains.compose.web.css.CSSMediaRuleDeclaration
 import org.jetbrains.compose.web.css.StyleSheet
 import org.jetbrains.compose.web.css.and
-import org.jetbrains.compose.web.css.maxHeight
-import org.jetbrains.compose.web.css.maxWidth
+import org.jetbrains.compose.web.css.madiaMaxHeight
+import org.jetbrains.compose.web.css.mediaMaxWidth
 import org.jetbrains.compose.web.css.media
-import org.jetbrains.compose.web.css.minHeight
-import org.jetbrains.compose.web.css.minWidth
+import org.jetbrains.compose.web.css.mediaMinHeight
+import org.jetbrains.compose.web.css.mediaMinWidth
 import org.jetbrains.compose.web.css.px
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -22,20 +21,20 @@ class MediaQueryTests {
 
     private object CombinedMediaQueries : StyleSheet() {
         val combine by style {
-            media(minWidth(200.px).and(maxWidth(400.px))) {
+            media(mediaMinWidth(200.px).and(mediaMaxWidth(400.px))) {
             }
 
-            media(minWidth(300.px), maxWidth(500.px)) {
+            media(mediaMinWidth(300.px), mediaMaxWidth(500.px)) {
             }
         }
     }
 
     private object MediaFeatures : StyleSheet() {
         val features by style {
-            media(minWidth(200.px)) {}
-            media(minHeight(300.px)) {}
-            media(maxWidth(500.px)) {}
-            media(maxHeight(600.px)) {}
+            media(mediaMinWidth(200.px)) {}
+            media(mediaMinHeight(300.px)) {}
+            media(mediaMaxWidth(500.px)) {}
+            media(madiaMaxHeight(600.px)) {}
         }
     }
 

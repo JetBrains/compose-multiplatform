@@ -14,7 +14,7 @@ import org.jetbrains.compose.web.css.color
 import org.jetbrains.compose.web.css.display
 import org.jetbrains.compose.web.css.flexDirection
 import org.jetbrains.compose.web.css.flexGrow
-import org.jetbrains.compose.web.css.maxWidth
+import org.jetbrains.compose.web.css.mediaMaxWidth
 import org.jetbrains.compose.web.css.media
 import org.jetbrains.compose.web.css.padding
 import org.jetbrains.compose.web.css.percent
@@ -50,7 +50,7 @@ object WtCards : StyleSheet(AppStylesheet) {
         property("box-sizing", "border-box")
         property("padding", "24px 32px")
 
-        media(maxWidth(640.px)) {
+        media(mediaMaxWidth(640.px)) {
             self style { padding(16.px) }
         }
     }

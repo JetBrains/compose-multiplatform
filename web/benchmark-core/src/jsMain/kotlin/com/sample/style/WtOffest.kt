@@ -1,11 +1,6 @@
 package com.sample.style
 
-import androidx.compose.runtime.Composable
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.css.selectors.*
-import org.jetbrains.compose.web.attributes.*
-import org.jetbrains.compose.web.dom.*
-import org.jetbrains.compose.web.*
 
 object WtOffsets : StyleSheet(AppStylesheet) {
     val wtTopOffset96 by style {
@@ -29,7 +24,7 @@ object WtOffsets : StyleSheet(AppStylesheet) {
     }
     
     val wtTopOffsetSm12 by style {
-        media(maxWidth(640.px)) {
+        media(mediaMaxWidth(640.px)) {
             self style {
                 marginTop(12.px)
             }
@@ -37,7 +32,7 @@ object WtOffsets : StyleSheet(AppStylesheet) {
     }
 
     val wtTopOffsetSm24 by style {
-        media(maxWidth(640.px)) {
+        media(mediaMaxWidth(640.px)) {
             self style {
                 marginTop(24.px)
             }

@@ -16,7 +16,7 @@ object SwitcherStylesheet : StyleSheet(AppStylesheet) {
 
     val boxed by style {
 
-        media(maxWidth(640.px)) {
+        media(mediaMaxWidth(640.px)) {
             self style {
                 SwitcherVariables.labelWidth(48.px)
                 SwitcherVariables.labelPadding(5.px)

@@ -128,14 +128,14 @@ fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.not(
     query: CSSMediaQuery.Invertible
 ) = CSSMediaQuery.Not(query)
 
-fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.minWidth(value: CSSUnitValue) =
+fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.mediaMinWidth(value: CSSUnitValue) =
     CSSMediaQuery.MediaFeature("min-width", value)
 
-fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.maxWidth(value: CSSUnitValue) =
+fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.mediaMaxWidth(value: CSSUnitValue) =
     CSSMediaQuery.MediaFeature("max-width", value)
 
-fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.minHeight(value: CSSUnitValue) =
+fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.mediaMinHeight(value: CSSUnitValue) =
     CSSMediaQuery.MediaFeature("min-height", value)
 
-fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.maxHeight(value: CSSUnitValue) =
+fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.madiaMaxHeight(value: CSSUnitValue) =
     CSSMediaQuery.MediaFeature("max-height", value)
