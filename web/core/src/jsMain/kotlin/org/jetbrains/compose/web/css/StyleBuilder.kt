@@ -9,17 +9,10 @@ package org.jetbrains.compose.web.css
 
 import kotlin.properties.ReadOnlyProperty
 
-private fun StylePropertyValue(value: String): StylePropertyValue = value.unsafeCast<StylePropertyString>()
-private fun StylePropertyValue(value: Number): StylePropertyValue = value.unsafeCast<StylePropertyNumber>()
 
 interface StyleBuilder {
     fun property(propertyName: String, value: StylePropertyValue)
     fun variable(variableName: String, value: StylePropertyValue)
-
-    fun property(propertyName: String, value: String) = property(propertyName, StylePropertyValue(value))
-    fun property(propertyName: String, value: Number) = property(propertyName, StylePropertyValue(value))
-    fun variable(variableName: String, value: String) = variable(variableName, StylePropertyValue(value))
-    fun variable(variableName: String, value: Number) = variable(variableName, StylePropertyValue(value))
 
     operator fun <TValue: StylePropertyValue> CSSStyleVariable<TValue>.invoke(value: TValue) {
         variable(name, value.toString())
@@ -33,6 +26,16 @@ interface StyleBuilder {
         variable(name, value)
     }
 }
+
+fun StyleBuilder.property(propertyName: String, value: String)
+        = property(propertyName, value.unsafeCast<StylePropertyValue>())
+fun StyleBuilder.property(propertyName: String, value: Number)
+        = property(propertyName, value.unsafeCast<StylePropertyValue>())
+fun StyleBuilder.variable(variableName: String, value: String)
+        = variable(variableName, value.unsafeCast<StylePropertyValue>())
+fun StyleBuilder.variable(variableName: String, value: Number)
+        = variable(variableName, value.unsafeCast<StylePropertyValue>())
+
 
 inline fun variableValue(variableName: String, fallback: StylePropertyValue? = null) =
     "var(--$variableName${fallback?.let { ", $it" } ?: ""})"

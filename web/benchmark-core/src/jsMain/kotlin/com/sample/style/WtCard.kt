@@ -1,25 +1,6 @@
 package com.sample.style
 
-import org.jetbrains.compose.web.css.AlignItems
-import org.jetbrains.compose.web.css.Color
-import org.jetbrains.compose.web.css.DisplayStyle
-import org.jetbrains.compose.web.css.FlexDirection
-import org.jetbrains.compose.web.css.LineStyle
-import org.jetbrains.compose.web.css.Position
-import org.jetbrains.compose.web.css.StyleSheet
-import org.jetbrains.compose.web.css.alignItems
-import org.jetbrains.compose.web.css.backgroundColor
-import org.jetbrains.compose.web.css.border
-import org.jetbrains.compose.web.css.color
-import org.jetbrains.compose.web.css.display
-import org.jetbrains.compose.web.css.flexDirection
-import org.jetbrains.compose.web.css.flexGrow
-import org.jetbrains.compose.web.css.mediaMaxWidth
-import org.jetbrains.compose.web.css.media
-import org.jetbrains.compose.web.css.padding
-import org.jetbrains.compose.web.css.percent
-import org.jetbrains.compose.web.css.position
-import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.*
 
 object WtCards : StyleSheet(AppStylesheet) {
     val wtCard by style {
