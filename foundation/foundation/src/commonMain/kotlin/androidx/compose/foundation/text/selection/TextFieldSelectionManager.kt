@@ -17,6 +17,7 @@
 package androidx.compose.foundation.text.selection
 
 import androidx.compose.foundation.text.InternalFoundationTextApi
+import androidx.compose.foundation.text.HandleState
 import androidx.compose.foundation.text.TextDragObserver
 import androidx.compose.foundation.text.TextFieldState
 import androidx.compose.foundation.text.UndoManager
@@ -354,6 +355,50 @@ internal class TextFieldSelectionManager(
     }
 
     /**
+     * [TextDragObserver] for dragging the cursor to change the selection in TextField.
+     */
+    internal fun cursorDragObserver(): TextDragObserver {
+        return object : TextDragObserver {
+            override fun onStart(startPoint: Offset) {
+                // The position of the character where the drag gesture should begin. This is in
+                // the composable coordinates.
+                dragBeginPosition = getAdjustedCoordinates(getHandlePosition(true))
+                // Zero out the total distance that being dragged.
+                dragTotalDistance = Offset.Zero
+                state?.draggingHandle = true
+            }
+
+            override fun onDrag(delta: Offset) {
+                dragTotalDistance += delta
+
+                state?.layoutResult?.value?.let { layoutResult ->
+                    val offset =
+                        layoutResult.getOffsetForPosition(dragBeginPosition + dragTotalDistance)
+
+                    val newSelection = TextRange(offset, offset)
+
+                    // Nothing changed, skip onValueChange hand hapticFeedback.
+                    if (newSelection == value.selection) return
+
+                    hapticFeedBack?.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onValueChange(
+                        createTextFieldValue(
+                            annotatedString = value.annotatedString,
+                            selection = newSelection
+                        )
+                    )
+                }
+            }
+
+            override fun onStop() {
+                state?.draggingHandle = false
+            }
+
+            override fun onCancel() {}
+        }
+    }
+
+    /**
      * The method to record the required state values on entering the selection mode.
      *
      * Is triggered on long press or accessibility action.
@@ -364,7 +409,7 @@ internal class TextFieldSelectionManager(
         }
         oldValue = value
         state?.showFloatingToolbar = true
-        setSelectionStatus(true)
+        setHandleState(HandleState.Selection)
     }
 
     /**
@@ -374,7 +419,7 @@ internal class TextFieldSelectionManager(
      */
     internal fun exitSelectionMode() {
         state?.showFloatingToolbar = false
-        setSelectionStatus(false)
+        setHandleState(HandleState.None)
     }
 
     internal fun deselect(position: Offset? = null) {
@@ -392,7 +437,15 @@ internal class TextFieldSelectionManager(
             val newValue = value.copy(selection = TextRange(newCursorOffset))
             onValueChange(newValue)
         }
-        setSelectionStatus(false)
+
+        // If a new cursor position is given and the text is not empty, enter the
+        // HandleState.Cursor state.
+        val selectionMode = if (position != null && value.text.isNotEmpty()) {
+            HandleState.Cursor
+        } else {
+            HandleState.None
+        }
+        setHandleState(selectionMode)
         hideSelectionToolbar()
     }
 
@@ -420,7 +473,7 @@ internal class TextFieldSelectionManager(
             selection = TextRange(newCursorOffset, newCursorOffset)
         )
         onValueChange(newValue)
-        setSelectionStatus(false)
+        setHandleState(HandleState.None)
     }
 
     /**
@@ -445,7 +498,7 @@ internal class TextFieldSelectionManager(
             selection = TextRange(newCursorOffset, newCursorOffset)
         )
         onValueChange(newValue)
-        setSelectionStatus(false)
+        setHandleState(HandleState.None)
         undoManager?.forceNextSnapshot()
     }
 
@@ -473,13 +526,13 @@ internal class TextFieldSelectionManager(
             selection = TextRange(newCursorOffset, newCursorOffset)
         )
         onValueChange(newValue)
-        setSelectionStatus(false)
+        setHandleState(HandleState.None)
         undoManager?.forceNextSnapshot()
     }
 
     /*@VisibleForTesting*/
     internal fun selectAll() {
-        setSelectionStatus(true)
+        setHandleState(HandleState.None)
 
         val newValue = createTextFieldValue(
             annotatedString = value.annotatedString,
@@ -653,10 +706,8 @@ internal class TextFieldSelectionManager(
         state?.showSelectionHandleEnd = isSelectionHandleInVisibleBound(false)
     }
 
-    private fun setSelectionStatus(on: Boolean) {
-        state?.let {
-            it.selectionIsOn = on
-        }
+    private fun setHandleState(handleState: HandleState) {
+        state?.let { it.handleState = handleState }
     }
 
     private fun createTextFieldValue(
