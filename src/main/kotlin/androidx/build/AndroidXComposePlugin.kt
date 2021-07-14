@@ -142,10 +142,11 @@ class AndroidXComposePlugin : Plugin<Project> {
         private fun Project.configureAndroidCommonOptions(testedExtension: TestedExtension) {
             testedExtension.defaultConfig.minSdk = 21
 
-            afterEvaluate { project ->
-                val isPublished = project.extensions.findByType(AndroidXExtension::class.java)
+            val finalizeDsl: () -> Unit = {
+                val isPublished = extensions.findByType(AndroidXExtension::class.java)
                     ?.type == LibraryType.PUBLISHED_LIBRARY
 
+                @Suppress("DEPRECATION") // lintOptions methods
                 testedExtension.lintOptions.apply {
                     // Too many Kotlin features require synthetic accessors - we want to rely on R8 to
                     // remove these accessors
@@ -197,6 +198,12 @@ class AndroidXComposePlugin : Plugin<Project> {
                     }
                 }
             }
+
+            // TODO(aurimas): migrate away from this when upgrading to AGP 7.1.0-alpha03 or newer
+            @Suppress("UnstableApiUsage", "DEPRECATION")
+            extensions.findByType(
+                com.android.build.api.extension.AndroidComponentsExtension::class.java
+            )!!.finalizeDsl { finalizeDsl() }
 
             // TODO(148540713): remove this exclusion when Lint can support using multiple lint jars
             configurations.getByName("lintChecks").exclude(

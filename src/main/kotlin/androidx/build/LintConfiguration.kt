@@ -118,6 +118,7 @@ private fun Project.setUpLintDebugIfNeeded() {
     }
 }
 
+@Suppress("DEPRECATION") // lintOptions methods
 fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension) {
     project.dependencies.add(
         "lintChecks",
@@ -184,9 +185,6 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
             // Broken in 7.0.0-alpha15 due to b/180408990
             disable("RestrictedApi")
 
-            // Broken in 7.0.0-alpha15 due to b/187343720
-            disable("UnusedResources")
-
             // Broken in 7.0.0-alpha15 due to b/187418637
             disable("EnforceSampledAnnotation")
 
@@ -222,6 +220,9 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
             } else {
                 disable("BanUncheckedReflection")
             }
+
+            // Broken in 7.0.0-alpha15 due to b/187343720
+            disable("UnusedResources")
 
             // Only run certain checks where API tracking is important.
             if (extension.type.checkApi is RunApiTasks.No) {

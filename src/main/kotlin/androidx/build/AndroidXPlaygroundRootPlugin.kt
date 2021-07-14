@@ -91,6 +91,7 @@ class AndroidXPlaygroundRootPlugin : Plugin<Project> {
                 is LibraryPlugin -> {
                     val libraryExtension = extensions.getByType<LibraryExtension>()
                     afterEvaluate {
+                        @Suppress("DEPRECATION") // lintOptions methods
                         libraryExtension.lintOptions.apply {
                             disable("InvalidFragmentVersionForActivityResult")
                         }
