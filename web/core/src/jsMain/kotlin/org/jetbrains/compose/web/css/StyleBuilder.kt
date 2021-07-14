@@ -58,7 +58,7 @@ interface CSSVariable {
     val name: String
 }
 
-class CSSStyleVariable<out TValue: StylePropertyValue>(override val name: String) : CSSVariable
+value class CSSStyleVariable<out TValue: StylePropertyValue>(override val name: String) : CSSVariable
 
 fun <TValue: StylePropertyValue> CSSStyleVariable<TValue>.value(fallback: TValue? = null) =
     CSSVariableValue<TValue>(
