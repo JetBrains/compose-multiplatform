@@ -36,7 +36,7 @@ fun StyleBuilder.variable(variableName: String, value: String)
 fun StyleBuilder.variable(variableName: String, value: Number)
         = variable(variableName, value.unsafeCast<StylePropertyValue>())
 
-external interface CSSVariableValueAs<out T: StylePropertyValue>: StylePropertyValue
+external interface CSSVariableValueAs<out T: StylePropertyValue>
 
 // after adding `variable` word `add` became ambiguous
 @Deprecated(
@@ -55,13 +55,15 @@ class CSSVariable<out TValue: StylePropertyValue>(val name: String)
 private inline fun <TValue : StylePropertyValue?> variableValue(variableName: String, fallback: TValue? = null) =
     "var(--$variableName${fallback?.let { ", $it" } ?: ""})".unsafeCast<TValue>()
 
-fun <TValue: StylePropertyValue> CSSVariable<TValue>.value(fallback: TValue? = null) =
+fun <TValue: StylePropertyValue> CSSVariable<TValue>.value(fallback: TValue? = null): TValue =
         variableValue(
             name,
             fallback
         )
 
-fun <TValue: CSSVariableValueAs<TValue>> CSSVariable<TValue>.value(fallback: TValue? = null) =
+fun <TValue> CSSVariable<TValue>.value(fallback: TValue? = null): TValue
+    where TValue: CSSVariableValueAs<TValue>, TValue: StylePropertyValue
+    =
     variableValue(
         name,
         fallback
