@@ -9,8 +9,8 @@ package org.jetbrains.compose.web.css
 
 import kotlin.properties.ReadOnlyProperty
 
-private fun StylePropertyValue(value: String): StylePropertyString = value.unsafeCast<StylePropertyString>()
-private fun StylePropertyValue(value: Number): StylePropertyNumber = value.unsafeCast<StylePropertyNumber>()
+private fun StylePropertyValue(value: String): StylePropertyValue = value.unsafeCast<StylePropertyString>()
+private fun StylePropertyValue(value: Number): StylePropertyValue = value.unsafeCast<StylePropertyNumber>()
 
 interface StyleBuilder {
     fun property(propertyName: String, value: StylePropertyValue)
