@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 
-apply from: "../generate.gradle"
+apply from: "../material-icons-extended/generate.gradle"
