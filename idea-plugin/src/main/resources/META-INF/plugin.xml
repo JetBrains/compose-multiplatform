@@ -36,5 +36,7 @@
                 factoryClass="org.jetbrains.compose.desktop.ide.preview.PreviewToolWindow"
                 id="Desktop Preview" doNotActivateOnStart="true"
                 anchor="right" />
+
+        <lang.inspectionSuppressor language="kotlin" implementationClass="org.jetbrains.compose.inspections.ComposeSuppressor"/>
     </extensions>
 </idea-plugin>

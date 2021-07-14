@@ -16,6 +16,10 @@
 
 package org.jetbrains.compose.desktop.ide.preview
 
+import com.intellij.openapi.roots.ProjectRootModificationTracker
+import com.intellij.psi.PsiElement
+import com.intellij.psi.util.CachedValueProvider
+import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.parentOfType
 import org.jetbrains.kotlin.asJava.findFacadeClass
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
@@ -28,6 +32,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
 
 internal const val DESKTOP_PREVIEW_ANNOTATION_FQN = "androidx.compose.desktop.ui.tooling.preview.Preview"
+internal const val COMPOSABLE_FQ_NAME = "androidx.compose.runtime.Composable"
 
 /**
  * Utils based on functions from AOSP, taken from
@@ -50,6 +55,7 @@ internal fun KtNamedFunction.isValidComposePreview() =
  */
 internal fun KtNamedFunction.isValidPreviewLocation(): Boolean {
     if (valueParameters.size > 0) return false
+    if (receiverTypeReference != null) return false
 
     if (isTopLevel) return true
 
@@ -111,4 +117,19 @@ private fun KtAnnotationEntry.getQualifiedName(): String? =
 
 internal fun KtNamedFunction.composePreviewFunctionFqn() = "${getClassName()}.${name}"
 
+// based on AndroidComposePsiUtils.kt from AOSP
+internal fun PsiElement.isComposableFunction(): Boolean {
+    if (this !is KtNamedFunction) return false
 
+    return CachedValuesManager.getCachedValue(this) {
+        val hasComposableAnnotation = annotationEntries.any { it.fqNameMatches(COMPOSABLE_FQ_NAME) }
+        val containingKtFile = this.containingKtFile
+
+        CachedValueProvider.Result.create(
+            // TODO: see if we can handle alias imports without ruining performance.
+            hasComposableAnnotation,
+            containingKtFile,
+            ProjectRootModificationTracker.getInstance(project)
+        )
+    }
+}
