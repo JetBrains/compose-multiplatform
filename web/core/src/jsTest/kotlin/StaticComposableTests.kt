@@ -1,8 +1,6 @@
 package org.jetbrains.compose.web.core.tests
 
-import org.jetbrains.compose.web.css.Color
 import org.jetbrains.compose.web.css.Position
-import org.jetbrains.compose.web.css.border
 import org.jetbrains.compose.web.css.bottom
 import org.jetbrains.compose.web.css.color
 import org.jetbrains.compose.web.css.left

@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.web.core.tests.css
 
+import kotlinx.browser.window
 import org.jetbrains.compose.web.core.tests.runTest
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
@@ -23,11 +24,19 @@ class CSSBorderTests {
         }
 
         assertEquals("1px solid red", (root.children[0] as HTMLElement).style.border)
-        root.children[1]?.let {
-            val el = it.unsafeCast<HTMLElement>()
+        (root.children[1] as HTMLElement).let { el ->
             assertEquals("green", el.style.getPropertyValue("border-color"))
             assertEquals("3px", el.style.getPropertyValue("border-width"))
         }
+    }
+
+    @Test
+    fun borderThreeValues() = runTest {
+        composition {
+            Div({ style { border(3.px, LineStyle.Dotted, Color("green")) } })
+        }
+
+        assertEquals("3px dotted green", (root.children[0] as HTMLElement).style.border)
     }
 
     @Test
