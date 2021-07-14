@@ -36,11 +36,7 @@ fun StyleBuilder.variable(variableName: String, value: String)
 fun StyleBuilder.variable(variableName: String, value: Number)
         = variable(variableName, value.unsafeCast<StylePropertyValue>())
 
-
 external interface CSSVariableValueAs<out T: StylePropertyValue>: StylePropertyValue
-
-inline fun <TValue> CSSVariableValue(value: StylePropertyValue) = value.unsafeCast<TValue>()
-inline fun <TValue> CSSVariableValue(value: String) = value.unsafeCast<TValue>()
 
 // after adding `variable` word `add` became ambiguous
 @Deprecated(
