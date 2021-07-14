@@ -174,4 +174,57 @@ class EventsTests {
             }
         ) { TestText(state) }
     }
+
+    val copyPasteEventsTest by testCase {
+        var state by remember { mutableStateOf("None") }
+
+        P {
+            TestText(state)
+        }
+
+        Div(attrs = {
+            onCopy {
+                it.preventDefault()
+                it.setData("text", "COPIED_TEXT_WAS_OVERRIDDEN")
+            }
+        }) {
+            TestText("SomeTestTextToCopy1", id = "txt_to_copy")
+        }
+
+        Div {
+            TestText("SomeTestTextToCopy2", id = "txt_to_copy2")
+        }
+
+        TextInput(value = state) {
+            id("textinput")
+            onPaste {
+                state = it.getData("text")?.lowercase() ?: "None"
+            }
+        }
+    }
+
+    val cutPasteEventsTest by testCase {
+        var state by remember { mutableStateOf("None") }
+
+        var stateToCut by remember { mutableStateOf("TextToCut") }
+
+        P {
+            TestText(state)
+        }
+
+        TextInput(value = stateToCut) {
+            id("textinput1")
+            onCut {
+                state = "Text was cut"
+                stateToCut = ""
+            }
+        }
+
+        TextInput(value = state) {
+            id("textinput2")
+            onPaste {
+                state = "Modified pasted text = ${it.getData("text")}"
+            }
+        }
+    }
 }

@@ -3,13 +3,7 @@ package org.jetbrains.compose.web.attributes
 import androidx.compose.web.events.SyntheticDragEvent
 import androidx.compose.web.events.SyntheticMouseEvent
 import androidx.compose.web.events.SyntheticWheelEvent
-import org.jetbrains.compose.web.events.WrappedClipboardEvent
-import org.jetbrains.compose.web.events.WrappedEvent
-import org.jetbrains.compose.web.events.WrappedFocusEvent
-import org.jetbrains.compose.web.events.WrappedInputEvent
-import org.jetbrains.compose.web.events.WrappedKeyboardEvent
-import org.jetbrains.compose.web.events.WrappedTouchEvent
-import org.jetbrains.compose.web.events.GenericWrappedEvent
+import org.jetbrains.compose.web.events.*
 
 private typealias SyntheticMouseEventListener = (SyntheticMouseEvent) -> Unit
 private typealias SyntheticWheelEventListener = (SyntheticWheelEvent) -> Unit
@@ -133,17 +127,27 @@ open class EventsListenerBuilder {
 
     /* End of Drag Events */
 
-    fun onCopy(options: Options = Options.DEFAULT, listener: (WrappedClipboardEvent) -> Unit) {
-        listeners.add(ClipboardEventListener(COPY, options, listener))
+    /* Clipboard Events */
+
+    fun onCopy(options: Options = Options.DEFAULT, listener: (SyntheticClipboardEvent) -> Unit) {
+        listeners.add(ClipboardEventListener(COPY, options) {
+            listener(SyntheticClipboardEvent(it.nativeEvent))
+        })
     }
 
-    fun onCut(options: Options = Options.DEFAULT, listener: (WrappedClipboardEvent) -> Unit) {
-        listeners.add(ClipboardEventListener(CUT, options, listener))
+    fun onCut(options: Options = Options.DEFAULT, listener: (SyntheticClipboardEvent) -> Unit) {
+        listeners.add(ClipboardEventListener(CUT, options) {
+            listener(SyntheticClipboardEvent(it.nativeEvent))
+        })
     }
 
-    fun onPaste(options: Options = Options.DEFAULT, listener: (WrappedClipboardEvent) -> Unit) {
-        listeners.add(ClipboardEventListener(PASTE, options, listener))
+    fun onPaste(options: Options = Options.DEFAULT, listener: (SyntheticClipboardEvent) -> Unit) {
+        listeners.add(ClipboardEventListener(PASTE, options) {
+            listener(SyntheticClipboardEvent(it.nativeEvent))
+        })
     }
+
+    /* End of Clipboard Events */
 
     fun onGenericInput(
         options: Options = Options.DEFAULT,
