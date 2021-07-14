@@ -444,6 +444,9 @@ class AndroidXPlugin : Plugin<Project> {
             check(minSdkVersion >= DEFAULT_MIN_SDK_VERSION) {
                 "minSdkVersion $minSdkVersion lower than the default of $DEFAULT_MIN_SDK_VERSION"
             }
+            check(compileSdkVersion == COMPILE_SDK_VERSION) {
+                "compileSdkVersion must not be explicitly specified, was \"$compileSdkVersion\""
+            }
             project.configurations.all { configuration ->
                 configuration.resolutionStrategy.eachDependency { dep ->
                     val target = dep.target
