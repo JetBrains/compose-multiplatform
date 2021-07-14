@@ -22,6 +22,7 @@ import androidx.compose.lint.test.Stubs
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -38,6 +39,7 @@ class RememberDetectorTest : LintDetectorTest() {
     override fun getIssues(): MutableList<Issue> =
         mutableListOf(RememberDetector.RememberReturnType)
 
+    @Ignore // b/193270279
     @Test
     fun returnsUnit() {
         lint().files(
@@ -159,6 +161,7 @@ src/androidx/compose/runtime/foo/FooState.kt:69: Error: remember calls must not 
             )
     }
 
+    @Ignore // b/193270279
     @Test
     fun returnsValue_explicitUnitType() {
         lint().files(
@@ -280,6 +283,7 @@ src/androidx/compose/runtime/foo/FooState.kt:69: Error: remember calls must not 
             )
     }
 
+    @Ignore // b/193270279
     @Test
     fun noErrors() {
         lint().files(
