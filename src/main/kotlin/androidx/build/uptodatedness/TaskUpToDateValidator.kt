@@ -46,7 +46,6 @@ private const val ENABLE_FLAG_NAME = VERIFY_UP_TO_DATE
 // Entries in this set do still get rerun because they might produce files that are needed by
 // subsequent tasks
 val ALLOW_RERUNNING_TASKS = setOf(
-    "analyticsRecordingRelease",
     "buildOnServer",
     "checkExternalLicenses",
     "createArchive",
@@ -182,6 +181,8 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
     "lintAnalyzeDebug",
     "lintDebug",
     "lintVitalRelease",
+    "lintWithExpandProjectionDebug",
+    "lintWithoutExpandProjectionDebug",
 )
 
 abstract class TaskUpToDateValidator :

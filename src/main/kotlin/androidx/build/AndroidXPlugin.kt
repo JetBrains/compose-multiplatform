@@ -45,6 +45,7 @@ import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.TestExtension
 import com.android.build.gradle.TestPlugin
 import com.android.build.gradle.TestedExtension
+import com.android.build.gradle.internal.tasks.AnalyticsRecordingTask
 import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.Plugin
@@ -512,6 +513,12 @@ class AndroidXPlugin : Plugin<Project> {
         // lives alongside the project's buildDir.
         externalNativeBuild.cmake.buildStagingDirectory =
             File(project.buildDir, "../nativeBuildStaging")
+
+        // disable analytics recording
+        // It's always out-of-date, and we don't release any apps in this repo
+        project.tasks.withType(AnalyticsRecordingTask::class.java).configureEach { task ->
+            task.enabled = false
+        }
     }
 
     /**
