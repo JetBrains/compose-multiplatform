@@ -207,4 +207,63 @@ class CSSBoxTests {
         assertEquals("yellow inset 8px", (root.children[3] as HTMLElement).style.outline)
     }
 
+    @Test
+    fun minWidth() = runTest {
+        composition {
+            Div({ style { minWidth(3.5.em) } })
+            Div({ style { minWidth(75.percent) } })
+            Div({ style { minWidth("max-content") } })
+            Div({ style { minWidth("min-content") } })
+        }
+
+        assertEquals("3.5em", (root.children[0] as HTMLElement).style.minWidth)
+        assertEquals("75%", (root.children[1] as HTMLElement).style.minWidth)
+        assertEquals("max-content", (root.children[2] as HTMLElement).style.minWidth)
+        assertEquals("min-content", (root.children[3] as HTMLElement).style.minWidth)
+    }
+
+    @Test
+    fun maxWidth() = runTest {
+        composition {
+            Div({ style { maxWidth(0.5.em) } })
+            Div({ style { maxWidth(10.percent) } })
+            Div({ style { maxWidth("max-content") } })
+            Div({ style { maxWidth("min-content") } })
+        }
+
+        assertEquals("0.5em", (root.children[0] as HTMLElement).style.maxWidth)
+        assertEquals("10%", (root.children[1] as HTMLElement).style.maxWidth)
+        assertEquals("max-content", (root.children[2] as HTMLElement).style.maxWidth)
+        assertEquals("min-content", (root.children[3] as HTMLElement).style.maxWidth)
+    }
+
+    @Test
+    fun minHeight() = runTest {
+        composition {
+            Div({ style { minHeight(5.px) } })
+            Div({ style { minHeight(25.percent) } })
+            Div({ style { minHeight("max-content") } })
+            Div({ style { minHeight("min-content") } })
+        }
+
+        assertEquals("5px", (root.children[0] as HTMLElement).style.minHeight)
+        assertEquals("25%", (root.children[1] as HTMLElement).style.minHeight)
+        assertEquals("max-content", (root.children[2] as HTMLElement).style.minHeight)
+        assertEquals("min-content", (root.children[3] as HTMLElement).style.minHeight)
+    }
+
+    @Test
+    fun maxHeight() = runTest {
+        composition {
+            Div({ style { maxHeight(15.px) } })
+            Div({ style { maxHeight(35.percent) } })
+            Div({ style { maxHeight("max-content") } })
+            Div({ style { maxHeight("min-content") } })
+        }
+
+        assertEquals("15px", (root.children[0] as HTMLElement).style.maxHeight)
+        assertEquals("35%", (root.children[1] as HTMLElement).style.maxHeight)
+        assertEquals("max-content", (root.children[2] as HTMLElement).style.maxHeight)
+        assertEquals("min-content", (root.children[3] as HTMLElement).style.maxHeight)
+    }
 }

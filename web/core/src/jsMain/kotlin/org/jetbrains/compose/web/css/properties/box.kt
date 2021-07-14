@@ -79,3 +79,39 @@ fun StyleBuilder.outline(color: String, style: String, width: String) {
 fun StyleBuilder.outline(color: String, style: String, width: CSSNumeric) {
     property("outline", "$color $style $width")
 }
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/min-width
+fun StyleBuilder.minWidth(value: String) {
+    property("min-width", value)
+}
+
+fun StyleBuilder.minWidth(value: CSSNumeric) {
+    property("min-width", value)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/max-width
+fun StyleBuilder.maxWidth(value: String) {
+    property("max-width", value)
+}
+
+fun StyleBuilder.maxWidth(value: CSSNumeric) {
+    property("max-width", value)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/min-height
+fun StyleBuilder.minHeight(value: String) {
+    property("min-height", value)
+}
+
+fun StyleBuilder.minHeight(value: CSSNumeric) {
+    property("min-height", value)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/max-height
+fun StyleBuilder.maxHeight(value: String) {
+    property("max-height", value)
+}
+
+fun StyleBuilder.maxHeight(value: CSSNumeric) {
+    property("max-height", value)
+}
