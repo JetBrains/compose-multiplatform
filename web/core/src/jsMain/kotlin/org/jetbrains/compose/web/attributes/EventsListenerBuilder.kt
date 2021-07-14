@@ -228,10 +228,6 @@ open class EventsListenerBuilder {
         listeners.add(WrappedEventListener(INPUT, options, listener))
     }
 
-    fun onSearch(options: Options = Options.DEFAULT, listener: (WrappedEvent) -> Unit) {
-        listeners.add(WrappedEventListener(SEARCH, options, listener))
-    }
-
     fun onScroll(options: Options = Options.DEFAULT, listener: (WrappedEvent) -> Unit) {
         listeners.add(WrappedEventListener(SCROLL, options, listener))
     }
@@ -302,7 +298,6 @@ open class EventsListenerBuilder {
         const val INPUT = "input"
         const val CHANGE = "change"
         const val INVALID = "invalid"
-        const val SEARCH = "search"
 
         const val DRAG = "drag"
         const val DROP = "drop"
@@ -311,5 +306,11 @@ open class EventsListenerBuilder {
         const val DRAGOVER = "dragover"
         const val DRAGENTER = "dragenter"
         const val DRAGLEAVE = "dragleave"
+
+        /*
+        * search event is not supported in Firefox, so we skip it for now
+        * https://caniuse.com/mdn-api_htmlinputelement_search_event
+        */
+        const val SEARCH = "search"
     }
 }
