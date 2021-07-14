@@ -619,6 +619,7 @@ private val dackkaDirsToProcess = listOf(
     "androidx/recommendation/**",
     "androidx/recyclerview/**",
     "androidx/remotecallback/**",
+    "androidx/resourceinspection/**",
     "androidx/room/**",
     "androidx/savedstate/**",
     "androidx/security/**",
