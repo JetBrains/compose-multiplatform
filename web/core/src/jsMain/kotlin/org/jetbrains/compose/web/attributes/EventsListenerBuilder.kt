@@ -165,6 +165,34 @@ open class EventsListenerBuilder {
 
     /* End of Keyboard Events */
 
+    /* Focus Events */
+
+    fun onFocus(options: Options = Options.DEFAULT, listener: (SyntheticFocusEvent) -> Unit) {
+        listeners.add(FocusEventListener(FOCUS, options) {
+            listener(SyntheticFocusEvent(it.nativeEvent))
+        })
+    }
+
+    fun onBlur(options: Options = Options.DEFAULT, listener: (SyntheticFocusEvent) -> Unit) {
+        listeners.add(FocusEventListener(BLUR, options) {
+            listener(SyntheticFocusEvent(it.nativeEvent))
+        })
+    }
+
+    fun onFocusIn(options: Options = Options.DEFAULT, listener: (SyntheticFocusEvent) -> Unit) {
+        listeners.add(FocusEventListener(FOCUSIN, options) {
+            listener(SyntheticFocusEvent(it.nativeEvent))
+        })
+    }
+
+    fun onFocusOut(options: Options = Options.DEFAULT, listener: (SyntheticFocusEvent) -> Unit) {
+        listeners.add(FocusEventListener(FOCUSOUT, options) {
+            listener(SyntheticFocusEvent(it.nativeEvent))
+        })
+    }
+
+    /* End of Focus Events*/
+
     fun onGenericInput(
         options: Options = Options.DEFAULT,
         listener: (GenericWrappedEvent<*>) -> Unit
@@ -174,22 +202,6 @@ open class EventsListenerBuilder {
 
     fun onSearch(options: Options = Options.DEFAULT, listener: (WrappedEvent) -> Unit) {
         listeners.add(WrappedEventListener(SEARCH, options, listener))
-    }
-
-    fun onFocus(options: Options = Options.DEFAULT, listener: (WrappedFocusEvent) -> Unit) {
-        listeners.add(FocusEventListener(FOCUS, options, listener))
-    }
-
-    fun onBlur(options: Options = Options.DEFAULT, listener: (WrappedFocusEvent) -> Unit) {
-        listeners.add(FocusEventListener(BLUR, options, listener))
-    }
-
-    fun onFocusIn(options: Options = Options.DEFAULT, listener: (WrappedFocusEvent) -> Unit) {
-        listeners.add(FocusEventListener(FOCUSIN, options, listener))
-    }
-
-    fun onFocusOut(options: Options = Options.DEFAULT, listener: (WrappedFocusEvent) -> Unit) {
-        listeners.add(FocusEventListener(FOCUSOUT, options, listener))
     }
 
     fun onScroll(options: Options = Options.DEFAULT, listener: (WrappedEvent) -> Unit) {
