@@ -19,6 +19,8 @@ object AppCSSVariables : CSSVariables {
 
     val stringWidth by variable<StylePropertyString>()
     val stringHeight by variable<StylePropertyString>()
+
+    val order by variable<StylePropertyNumber>()
 }
 
 object AppStylesheet : StyleSheet() {
@@ -35,8 +37,10 @@ object AppStylesheet : StyleSheet() {
     val classWithRawVariables by style {
         AppCSSVariables.stringWidth("150px")
         AppCSSVariables.stringHeight("170px")
+        AppCSSVariables.order(4)
         property("width", AppCSSVariables.stringWidth.value())
         property("height", AppCSSVariables.stringHeight.value())
+        property("order", AppCSSVariables.order.value())
     }
 
     val classWithTypedVariables by style {
@@ -104,7 +108,9 @@ class CSSVariableTests {
             })
         }
 
-        val boundingRect = (root.children[1] as HTMLElement).getBoundingClientRect()
+        val el = root.children[1] as HTMLElement
+        val boundingRect = el.getBoundingClientRect()
+        assertEquals("4", window.getComputedStyle(el).order)
         assertEquals(150.toDouble(), boundingRect.width)
         assertEquals(170.toDouble(), boundingRect.height)
     }
