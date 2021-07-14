@@ -578,6 +578,7 @@ class AndroidXPlugin : Plugin<Project> {
             versionName = "1.0"
         }
 
+        @Suppress("DEPRECATION") // lintOptions methods
         lintOptions.apply {
             isAbortOnError = true
 
