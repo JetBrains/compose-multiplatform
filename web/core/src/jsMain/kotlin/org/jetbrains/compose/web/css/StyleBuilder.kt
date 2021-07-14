@@ -14,15 +14,15 @@ interface StyleBuilder {
     fun property(propertyName: String, value: StylePropertyValue)
     fun variable(variableName: String, value: StylePropertyValue)
 
-    operator fun <TValue: StylePropertyValue> CSSStyleVariable<TValue>.invoke(value: TValue) {
+    operator fun <TValue: StylePropertyValue> CSSVariable<TValue>.invoke(value: TValue) {
         variable(name, value.toString())
     }
 
-    operator fun CSSStyleVariable<StylePropertyString>.invoke(value: String) {
+    operator fun CSSVariable<StylePropertyString>.invoke(value: String) {
         variable(name, value)
     }
 
-    operator fun CSSStyleVariable<StylePropertyNumber>.invoke(value: Number) {
+    operator fun CSSVariable<StylePropertyNumber>.invoke(value: Number) {
         variable(name, value)
     }
 }
@@ -57,13 +57,9 @@ fun StyleBuilder.add(
 
 interface CSSVariables
 
-interface CSSVariable {
-    val name: String
-}
+class CSSVariable<out TValue: StylePropertyValue>(val name: String)
 
-class CSSStyleVariable<out TValue: StylePropertyValue>(override val name: String) : CSSVariable
-
-fun <TValue: StylePropertyValue> CSSStyleVariable<TValue>.value(fallback: TValue? = null) =
+fun <TValue: StylePropertyValue> CSSVariable<TValue>.value(fallback: TValue? = null) =
     CSSVariableValue<TValue>(
         variableValue(
             name,
@@ -71,7 +67,7 @@ fun <TValue: StylePropertyValue> CSSStyleVariable<TValue>.value(fallback: TValue
         )
     )
 
-fun <TValue: CSSVariableValueAs<TValue>> CSSStyleVariable<TValue>.value(fallback: TValue? = null) =
+fun <TValue: CSSVariableValueAs<TValue>> CSSVariable<TValue>.value(fallback: TValue? = null) =
     CSSVariableValue<TValue>(
         variableValue(
             name,
@@ -80,8 +76,8 @@ fun <TValue: CSSVariableValueAs<TValue>> CSSStyleVariable<TValue>.value(fallback
     )
 
 fun <TValue: StylePropertyValue> CSSVariables.variable() =
-    ReadOnlyProperty<Any?, CSSStyleVariable<TValue>> { _, property ->
-        CSSStyleVariable(property.name)
+    ReadOnlyProperty<Any?, CSSVariable<TValue>> { _, property ->
+        CSSVariable(property.name)
     }
 
 interface StyleHolder {
