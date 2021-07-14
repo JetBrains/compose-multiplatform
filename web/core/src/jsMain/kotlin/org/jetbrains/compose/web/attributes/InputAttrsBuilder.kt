@@ -5,42 +5,29 @@
 
 package androidx.compose.web.attributes
 
+import androidx.compose.web.events.SyntheticEvent
 import org.jetbrains.compose.web.attributes.AttrsBuilder
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.attributes.Options
-import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventTarget
 
-class SyntheticInputEvent<ValueType, Element : HTMLElement>(
+class SyntheticInputEvent<ValueType, Element : EventTarget>(
     val value: ValueType,
-    val target: Element,
-    val nativeEvent: Event
-) {
+    nativeEvent: Event
+) : SyntheticEvent<Element>(
+    nativeEvent = nativeEvent
+)
 
-    val bubbles: Boolean = nativeEvent.bubbles
-    val cancelable: Boolean = nativeEvent.cancelable
-    val composed: Boolean = nativeEvent.composed
-    val currentTarget: HTMLElement? = nativeEvent.currentTarget.unsafeCast<HTMLInputElement?>()
-    val eventPhase: Short = nativeEvent.eventPhase
-    val defaultPrevented: Boolean = nativeEvent.defaultPrevented
-    val timestamp: Number = nativeEvent.timeStamp
-    val type: String = nativeEvent.type
-    val isTrusted: Boolean = nativeEvent.isTrusted
-
-    fun preventDefault(): Unit = nativeEvent.preventDefault()
-    fun stopPropagation(): Unit = nativeEvent.stopPropagation()
-    fun stopImmediatePropagation(): Unit = nativeEvent.stopImmediatePropagation()
-    fun composedPath(): Array<EventTarget> = nativeEvent.composedPath()
-}
-
-class InputAttrsBuilder<T>(val inputType: InputType<T>) : AttrsBuilder<HTMLInputElement>() {
+class InputAttrsBuilder<T>(
+    val inputType: InputType<T>
+) : AttrsBuilder<HTMLInputElement>() {
 
     fun onInput(options: Options = Options.DEFAULT, listener: (SyntheticInputEvent<T, HTMLInputElement>) -> Unit) {
         addEventListener(INPUT, options) {
             val value = inputType.inputValue(it.nativeEvent)
-            listener(SyntheticInputEvent(value, it.nativeEvent.target as HTMLInputElement, it.nativeEvent))
+            listener(SyntheticInputEvent(value, it.nativeEvent))
         }
     }
 }

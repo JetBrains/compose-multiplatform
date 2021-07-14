@@ -18,7 +18,7 @@ interface GenericWrappedEvent<T : Event> {
 
 interface WrappedEvent : GenericWrappedEvent<Event>
 
-open class WrappedMouseEvent(
+internal open class WrappedMouseEvent(
     override val nativeEvent: MouseEvent
 ) : GenericWrappedEvent<MouseEvent> {
 
@@ -29,7 +29,7 @@ open class WrappedMouseEvent(
         get() = nativeEvent.asDynamic().movementY as Double
 }
 
-open class WrappedWheelEvent(
+internal open class WrappedWheelEvent(
     override val nativeEvent: WheelEvent
 ) : GenericWrappedEvent<WheelEvent>
 

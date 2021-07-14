@@ -17,7 +17,7 @@ class TextAreaAttrsBuilder : AttrsBuilder<HTMLTextAreaElement>() {
     ) {
         addEventListener(INPUT, options) {
             val text = it.nativeEvent.target.asDynamic().value.unsafeCast<String>()
-            listener(SyntheticInputEvent(text, it.nativeEvent.target as HTMLTextAreaElement, it.nativeEvent))
+            listener(SyntheticInputEvent(text, it.nativeEvent))
         }
     }
 }

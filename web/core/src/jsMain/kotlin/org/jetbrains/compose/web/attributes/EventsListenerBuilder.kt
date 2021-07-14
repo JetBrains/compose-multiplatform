@@ -1,22 +1,137 @@
 package org.jetbrains.compose.web.attributes
 
-import org.jetbrains.compose.web.events.WrappedCheckBoxInputEvent
+import androidx.compose.web.events.SyntheticDragEvent
+import androidx.compose.web.events.SyntheticMouseEvent
+import androidx.compose.web.events.SyntheticWheelEvent
 import org.jetbrains.compose.web.events.WrappedClipboardEvent
-import org.jetbrains.compose.web.events.WrappedDragEvent
 import org.jetbrains.compose.web.events.WrappedEvent
 import org.jetbrains.compose.web.events.WrappedFocusEvent
 import org.jetbrains.compose.web.events.WrappedInputEvent
 import org.jetbrains.compose.web.events.WrappedKeyboardEvent
-import org.jetbrains.compose.web.events.WrappedMouseEvent
-import org.jetbrains.compose.web.events.WrappedRadioInputEvent
-import org.jetbrains.compose.web.events.WrappedTextInputEvent
 import org.jetbrains.compose.web.events.WrappedTouchEvent
-import org.jetbrains.compose.web.events.WrappedWheelEvent
 import org.jetbrains.compose.web.events.GenericWrappedEvent
+
+private typealias SyntheticMouseEventListener = (SyntheticMouseEvent) -> Unit
+private typealias SyntheticWheelEventListener = (SyntheticWheelEvent) -> Unit
+private typealias SyntheticDragEventListener = (SyntheticDragEvent) -> Unit
 
 open class EventsListenerBuilder {
 
     protected val listeners = mutableListOf<WrappedEventListener<*>>()
+
+    /* Mouse Events */
+
+    private fun createMouseEventListener(
+        name: String, options: Options, listener: SyntheticMouseEventListener
+    ): MouseEventListener {
+        return MouseEventListener(
+            event = name,
+            options = options,
+            listener = {
+                listener(SyntheticMouseEvent(it.nativeEvent))
+            }
+        )
+    }
+
+    private fun createMouseWheelEventListener(
+        name: String, options: Options, listener: SyntheticWheelEventListener
+    ): MouseWheelEventListener {
+        return MouseWheelEventListener(
+            event = name,
+            options = options,
+            listener = {
+                listener(SyntheticWheelEvent(it.nativeEvent))
+            }
+        )
+    }
+
+    fun onContextMenu(options: Options = Options.DEFAULT, listener: SyntheticMouseEventListener) {
+        listeners.add(createMouseEventListener(CONTEXTMENU, options, listener))
+    }
+
+    fun onClick(options: Options = Options.DEFAULT, listener: SyntheticMouseEventListener) {
+        listeners.add(createMouseEventListener(CLICK, options, listener))
+    }
+
+    fun onDoubleClick(options: Options = Options.DEFAULT, listener: SyntheticMouseEventListener) {
+        listeners.add(createMouseEventListener(DBLCLICK, options, listener))
+    }
+
+    fun onMouseDown(options: Options = Options.DEFAULT, listener: SyntheticMouseEventListener) {
+        listeners.add(createMouseEventListener(MOUSEDOWN, options, listener))
+    }
+
+    fun onMouseUp(options: Options = Options.DEFAULT, listener: SyntheticMouseEventListener) {
+        listeners.add(createMouseEventListener(MOUSEUP, options, listener))
+    }
+
+    fun onMouseEnter(options: Options = Options.DEFAULT, listener: SyntheticMouseEventListener) {
+        listeners.add(createMouseEventListener(MOUSEENTER, options, listener))
+    }
+
+    fun onMouseLeave(options: Options = Options.DEFAULT, listener: SyntheticMouseEventListener) {
+        listeners.add(createMouseEventListener(MOUSELEAVE, options, listener))
+    }
+
+    fun onMouseMove(options: Options = Options.DEFAULT, listener: SyntheticMouseEventListener) {
+        listeners.add(createMouseEventListener(MOUSEMOVE, options, listener))
+    }
+
+    fun onMouseOut(options: Options = Options.DEFAULT, listener: SyntheticMouseEventListener) {
+        listeners.add(createMouseEventListener(MOUSEOUT, options, listener))
+    }
+
+    fun onMouseOver(options: Options = Options.DEFAULT, listener: SyntheticMouseEventListener) {
+        listeners.add(createMouseEventListener(MOUSEOVER, options, listener))
+    }
+
+    fun onWheel(options: Options = Options.DEFAULT, listener: (SyntheticWheelEvent) -> Unit) {
+        listeners.add(createMouseWheelEventListener(WHEEL, options, listener))
+    }
+
+    /* Drag Events */
+
+    private fun createDragEventListener(
+        name: String, options: Options, listener: SyntheticDragEventListener
+    ): DragEventListener {
+        return DragEventListener(
+            event = name,
+            options = options,
+            listener = {
+                listener(SyntheticDragEvent(it.nativeEvent))
+            }
+        )
+    }
+
+    fun onDrag(options: Options = Options.DEFAULT, listener: SyntheticDragEventListener) {
+        listeners.add(createDragEventListener(DRAG, options, listener))
+    }
+
+    fun onDrop(options: Options = Options.DEFAULT, listener: SyntheticDragEventListener) {
+        listeners.add(createDragEventListener(DROP, options, listener))
+    }
+
+    fun onDragStart(options: Options = Options.DEFAULT, listener: SyntheticDragEventListener) {
+        listeners.add(createDragEventListener(DRAGSTART, options, listener))
+    }
+
+    fun onDragEnd(options: Options = Options.DEFAULT, listener: SyntheticDragEventListener) {
+        listeners.add(createDragEventListener(DRAGEND, options, listener))
+    }
+
+    fun onDragOver(options: Options = Options.DEFAULT, listener: SyntheticDragEventListener) {
+        listeners.add(createDragEventListener(DRAGOVER, options, listener))
+    }
+
+    fun onDragEnter(options: Options = Options.DEFAULT, listener: SyntheticDragEventListener) {
+        listeners.add(createDragEventListener(DRAGENTER, options, listener))
+    }
+
+    fun onDragLeave(options: Options = Options.DEFAULT, listener: SyntheticDragEventListener) {
+        listeners.add(createDragEventListener(DRAGLEAVE, options, listener))
+    }
+
+    /* End of Drag Events */
 
     fun onCopy(options: Options = Options.DEFAULT, listener: (WrappedClipboardEvent) -> Unit) {
         listeners.add(ClipboardEventListener(COPY, options, listener))
@@ -28,18 +143,6 @@ open class EventsListenerBuilder {
 
     fun onPaste(options: Options = Options.DEFAULT, listener: (WrappedClipboardEvent) -> Unit) {
         listeners.add(ClipboardEventListener(PASTE, options, listener))
-    }
-
-    fun onContextMenu(options: Options = Options.DEFAULT, listener: (WrappedMouseEvent) -> Unit) {
-        listeners.add(MouseEventListener(CONTEXTMENU, options, listener))
-    }
-
-    fun onClick(options: Options = Options.DEFAULT, listener: (WrappedMouseEvent) -> Unit) {
-        listeners.add(MouseEventListener(CLICK, options, listener))
-    }
-
-    fun onDoubleClick(options: Options = Options.DEFAULT, listener: (WrappedMouseEvent) -> Unit) {
-        listeners.add(MouseEventListener(DBLCLICK, options, listener))
     }
 
     fun onGenericInput(
@@ -85,38 +188,6 @@ open class EventsListenerBuilder {
         listeners.add(KeyboardEventListener(KEYUP, options, listener))
     }
 
-    fun onMouseDown(options: Options = Options.DEFAULT, listener: (WrappedMouseEvent) -> Unit) {
-        listeners.add(MouseEventListener(MOUSEDOWN, options, listener))
-    }
-
-    fun onMouseUp(options: Options = Options.DEFAULT, listener: (WrappedMouseEvent) -> Unit) {
-        listeners.add(MouseEventListener(MOUSEUP, options, listener))
-    }
-
-    fun onMouseEnter(options: Options = Options.DEFAULT, listener: (WrappedMouseEvent) -> Unit) {
-        listeners.add(MouseEventListener(MOUSEENTER, options, listener))
-    }
-
-    fun onMouseLeave(options: Options = Options.DEFAULT, listener: (WrappedMouseEvent) -> Unit) {
-        listeners.add(MouseEventListener(MOUSELEAVE, options, listener))
-    }
-
-    fun onMouseMove(options: Options = Options.DEFAULT, listener: (WrappedMouseEvent) -> Unit) {
-        listeners.add(MouseEventListener(MOUSEMOVE, options, listener))
-    }
-
-    fun onMouseOut(options: Options = Options.DEFAULT, listener: (WrappedMouseEvent) -> Unit) {
-        listeners.add(MouseEventListener(MOUSEOUT, options, listener))
-    }
-
-    fun onMouseOver(options: Options = Options.DEFAULT, listener: (WrappedMouseEvent) -> Unit) {
-        listeners.add(MouseEventListener(MOUSEOVER, options, listener))
-    }
-
-    fun onWheel(options: Options = Options.DEFAULT, listener: (WrappedWheelEvent) -> Unit) {
-        listeners.add(MouseWheelEventListener(WHEEL, options, listener))
-    }
-
     fun onScroll(options: Options = Options.DEFAULT, listener: (WrappedEvent) -> Unit) {
         listeners.add(WrappedEventListener(SCROLL, options, listener))
     }
@@ -155,34 +226,6 @@ open class EventsListenerBuilder {
 
     fun onBeforeInput(options: Options = Options.DEFAULT, listener: (WrappedInputEvent) -> Unit) {
         listeners.add(InputEventListener(BEFOREINPUT, options, listener))
-    }
-
-    fun onDrag(options: Options = Options.DEFAULT, listener: (WrappedDragEvent) -> Unit) {
-        listeners.add(DragEventListener(DRAG, options, listener))
-    }
-
-    fun onDrop(options: Options = Options.DEFAULT, listener: (WrappedDragEvent) -> Unit) {
-        listeners.add(DragEventListener(DROP, options, listener))
-    }
-
-    fun onDragStart(options: Options = Options.DEFAULT, listener: (WrappedDragEvent) -> Unit) {
-        listeners.add(DragEventListener(DRAGSTART, options, listener))
-    }
-
-    fun onDragEnd(options: Options = Options.DEFAULT, listener: (WrappedDragEvent) -> Unit) {
-        listeners.add(DragEventListener(DRAGEND, options, listener))
-    }
-
-    fun onDragOver(options: Options = Options.DEFAULT, listener: (WrappedDragEvent) -> Unit) {
-        listeners.add(DragEventListener(DRAGOVER, options, listener))
-    }
-
-    fun onDragEnter(options: Options = Options.DEFAULT, listener: (WrappedDragEvent) -> Unit) {
-        listeners.add(DragEventListener(DRAGENTER, options, listener))
-    }
-
-    fun onDragLeave(options: Options = Options.DEFAULT, listener: (WrappedDragEvent) -> Unit) {
-        listeners.add(DragEventListener(DRAGLEAVE, options, listener))
     }
 
     fun collectListeners(): List<WrappedEventListener<*>> = listeners
