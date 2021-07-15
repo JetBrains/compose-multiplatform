@@ -1,9 +1,13 @@
 package org.jetbrains.compose.web.attributes
 
+import androidx.compose.web.attributes.SyntheticInputEvent
 import androidx.compose.web.events.SyntheticDragEvent
 import androidx.compose.web.events.SyntheticEvent
 import androidx.compose.web.events.SyntheticMouseEvent
 import androidx.compose.web.events.SyntheticWheelEvent
+import org.jetbrains.compose.web.attributes.EventsListenerBuilder.Companion.CHANGE
+import org.jetbrains.compose.web.attributes.EventsListenerBuilder.Companion.INPUT
+import org.jetbrains.compose.web.attributes.EventsListenerBuilder.Companion.SELECT
 import org.jetbrains.compose.web.events.*
 import org.w3c.dom.DragEvent
 import org.w3c.dom.TouchEvent
@@ -14,7 +18,7 @@ open class SyntheticEventListener<T : SyntheticEvent<*>>(
     val event: String,
     val options: Options,
     val listener: (T) -> Unit
-) : org.w3c.dom.events.EventListener {
+) : EventListener {
 
     @Suppress("UNCHECKED_CAST")
     override fun handleEvent(event: Event) {
@@ -112,4 +116,41 @@ internal class ClipboardEventListener(
     }
 }
 
+internal class InputEventListener<InputValueType, Target: EventTarget>(
+    eventName: String = INPUT,
+    options: Options,
+    val inputType: InputType<InputValueType>,
+    listener: (SyntheticInputEvent<InputValueType, Target>) -> Unit
+) : SyntheticEventListener<SyntheticInputEvent<InputValueType, Target>>(
+    eventName, options, listener
+) {
+    override fun handleEvent(event: Event) {
+        val value = inputType.inputValue(event)
+        listener(SyntheticInputEvent(value, event))
+    }
+}
+
+internal class ChangeEventListener<InputValueType, Target: EventTarget>(
+    options: Options,
+    val inputType: InputType<InputValueType>,
+    listener: (SyntheticChangeEvent<InputValueType, Target>) -> Unit
+) : SyntheticEventListener<SyntheticChangeEvent<InputValueType, Target>>(
+    CHANGE, options, listener
+) {
+    override fun handleEvent(event: Event) {
+        val value = inputType.inputValue(event)
+        listener(SyntheticChangeEvent(value, event))
+    }
+}
+
+internal class SelectEventListener<Target: EventTarget>(
+    options: Options,
+    listener: (SyntheticSelectEvent<Target>) -> Unit
+) : SyntheticEventListener<SyntheticSelectEvent<Target>>(
+    SELECT, options, listener
+) {
+    override fun handleEvent(event: Event) {
+        listener(SyntheticSelectEvent(event))
+    }
+}
 

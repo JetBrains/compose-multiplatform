@@ -4,7 +4,9 @@ import androidx.compose.web.events.SyntheticDragEvent
 import androidx.compose.web.events.SyntheticEvent
 import androidx.compose.web.events.SyntheticMouseEvent
 import androidx.compose.web.events.SyntheticWheelEvent
+import org.jetbrains.compose.web.attributes.EventsListenerBuilder.Companion.SUBMIT
 import org.jetbrains.compose.web.events.*
+import org.w3c.dom.HTMLFormElement
 import org.w3c.dom.events.EventTarget
 
 private typealias SyntheticMouseEventListener = (SyntheticMouseEvent) -> Unit
@@ -57,7 +59,7 @@ open class EventsListenerBuilder {
         listeners.add(MouseEventListener(MOUSEOVER, options, listener))
     }
 
-    fun onWheel(options: Options = Options.DEFAULT, listener: (SyntheticWheelEvent) -> Unit) {
+    fun onWheel(options: Options = Options.DEFAULT, listener: SyntheticWheelEventListener) {
         listeners.add(MouseWheelEventListener(WHEEL, options, listener))
     }
 
@@ -183,10 +185,18 @@ open class EventsListenerBuilder {
 
     fun collectListeners(): List<SyntheticEventListener<*>> = listeners
 
+    fun <T : SyntheticEvent<out EventTarget>> addEventListener(
+        eventName: String,
+        options: Options = Options.DEFAULT,
+        listener: (T) -> Unit
+    ) {
+        listeners.add(SyntheticEventListener(eventName, options, listener))
+    }
+
     fun addEventListener(
         eventName: String,
         options: Options = Options.DEFAULT,
-        listener: (SyntheticEvent<*>) -> Unit
+        listener: (SyntheticEvent<EventTarget>) -> Unit
     ) {
         listeners.add(SyntheticEventListener(eventName, options, listener))
     }
