@@ -39,7 +39,7 @@ val globalState = State()
 val globalInt = mutableStateOf(1)
 
 object MyCSSVariables : CSSVariables {
-    val myVar by variable<Color>()
+    val myVar by variable<CSSColorValue>()
     val myVar2 by variable<StylePropertyString>()
 }
 
