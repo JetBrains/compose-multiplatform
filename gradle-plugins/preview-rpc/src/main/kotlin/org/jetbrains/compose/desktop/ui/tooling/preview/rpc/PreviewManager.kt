@@ -47,7 +47,9 @@ private data class RunningPreview(
         get() = connection.isAlive && process.isAlive
 }
 
-class PreviewManagerImpl(private val onNewFrame: (RenderedFrame) -> Unit) : PreviewManager {
+class PreviewManagerImpl(
+    private val previewListener: PreviewListener = PreviewListenerBase()
+) : PreviewManager {
     private val log = PrintStreamLogger("SERVER")
     private val previewSocket = newServerSocket()
     private val gradleCallbackSocket = newServerSocket()
@@ -101,6 +103,7 @@ class PreviewManagerImpl(private val onNewFrame: (RenderedFrame) -> Unit) : Prev
                 if (shouldRequestFrame.get() && frameRequest.get() == null) {
                     if (shouldRequestFrame.compareAndSet(true, false)) {
                         if (frameRequest.compareAndSet(null, request)) {
+                            previewListener.onNewRenderRequest(request)
                             sendPreviewRequest(classpath, request)
                         } else {
                             shouldRequestFrame.compareAndSet(false, true)
@@ -117,7 +120,7 @@ class PreviewManagerImpl(private val onNewFrame: (RenderedFrame) -> Unit) : Prev
                 frameRequest.get()?.let { request ->
                     frameRequest.compareAndSet(request, null)
                 }
-                onNewFrame(renderedFrame)
+                previewListener.onRenderedFrame(renderedFrame)
             }
         }
     }
