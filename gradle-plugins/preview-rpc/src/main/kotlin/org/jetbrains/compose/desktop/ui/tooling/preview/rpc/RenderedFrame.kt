@@ -5,6 +5,11 @@
 
 package org.jetbrains.compose.desktop.ui.tooling.preview.rpc
 
+import java.awt.Dimension
+import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
+import javax.imageio.ImageIO
+
 data class RenderedFrame(
     val bytes: ByteArray,
     val width: Int,
@@ -29,4 +34,10 @@ data class RenderedFrame(
         result = 31 * result + height
         return result
     }
+
+    val image: BufferedImage
+        get() = ByteArrayInputStream(bytes).use { ImageIO.read(it) }
+
+    val dimension: Dimension
+        get() = Dimension(width, height)
 }

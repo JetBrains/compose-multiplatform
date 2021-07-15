@@ -35,12 +35,18 @@ class RunPreviewAction(
         settings.taskNames = listOf("configureDesktopPreview")
         settings.vmOptions = gradleVmOptions
         settings.externalSystemIdString = GradleConstants.SYSTEM_ID.id
-        val gradleCallbackPort = project.service<PreviewStateService>().gradleCallbackPort
+        val previewService = project.service<PreviewStateService>()
+        val gradleCallbackPort = previewService.gradleCallbackPort
         settings.scriptParameters =
             listOf(
                 "-Pcompose.desktop.preview.target=$fqName",
                 "-Pcompose.desktop.preview.ide.port=$gradleCallbackPort"
             ).joinToString(" ")
+        SwingUtilities.invokeLater {
+            ToolWindowManager.getInstance(project).getToolWindow("Desktop Preview")?.activate {
+                previewService.buildStarted()
+            }
+        }
         runTask(
             settings,
             DefaultRunExecutor.EXECUTOR_ID,
@@ -48,11 +54,10 @@ class RunPreviewAction(
             GradleConstants.SYSTEM_ID,
             object : TaskCallback {
                 override fun onSuccess() {
-                    SwingUtilities.invokeLater {
-                        ToolWindowManager.getInstance(project).getToolWindow("Desktop Preview")?.activate {  }
-                    }
+                    previewService.buildFinished(success = true)
                 }
                 override fun onFailure() {
+                    previewService.buildFinished(success = false)
                 }
             },
             ProgressExecutionMode.IN_BACKGROUND_ASYNC,
