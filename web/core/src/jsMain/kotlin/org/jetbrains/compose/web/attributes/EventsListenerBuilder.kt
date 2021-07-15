@@ -4,7 +4,6 @@ import androidx.compose.web.events.SyntheticDragEvent
 import androidx.compose.web.events.SyntheticEvent
 import androidx.compose.web.events.SyntheticMouseEvent
 import androidx.compose.web.events.SyntheticWheelEvent
-import org.jetbrains.compose.web.attributes.EventsListenerBuilder.Companion.SUBMIT
 import org.jetbrains.compose.web.events.*
 import org.w3c.dom.HTMLFormElement
 import org.w3c.dom.events.EventTarget
