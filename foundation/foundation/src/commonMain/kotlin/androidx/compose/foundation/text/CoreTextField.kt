@@ -232,6 +232,10 @@ internal fun CoreTextField(
     )
 
     val onValueChangeWrapper: (TextFieldValue) -> Unit = {
+        if (it.text != state.textDelegate.text.text) {
+            // Text has been changed, enter the HandleState.None and hide the cursor handle.
+            state.handleState = HandleState.None
+        }
         state.onValueChange(it)
         scope.invalidate()
     }
@@ -448,13 +452,7 @@ internal fun CoreTextField(
                 value = value,
                 editProcessor = state.processor,
                 imeOptions = imeOptions,
-                onValueChange = {
-                    // Text has been modified, enter the Edit state.
-                    if (state.textDelegate.text.text != it.annotatedString.text) {
-                        state.handleState = HandleState.None
-                    }
-                    onValueChangeWrapper(it)
-                },
+                onValueChange = onValueChangeWrapper,
                 onImeActionPerformed = onImeActionPerformedWrapper
             )
         }
@@ -728,13 +726,7 @@ private fun notifyTextInputServiceOnFocusChange(
             value,
             state.processor,
             imeOptions,
-            {
-                onValueChange(it)
-                if (state.textDelegate.text.text != it.annotatedString.text) {
-                    // Text has been changed, set the selection mode to Edit.
-                    state.handleState = HandleState.None
-                }
-            },
+            onValueChange,
             onImeActionPerformed
         ).also { newSession ->
             state.layoutCoordinates?.let { coords ->
