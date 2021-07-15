@@ -263,7 +263,7 @@ fun FormattedCodeSnippet(code: String, language: String = "kotlin") {
                     property("font-family", "'JetBrains Mono', monospace")
                     property("tab-size", 4)
                     fontSize(10.pt)
-                    backgroundColor(Color("transparent"))
+                    backgroundColor(Color.transparent)
                 }
             }
         ) {
