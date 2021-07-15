@@ -2,7 +2,7 @@
 
 package org.jetbrains.compose.web.css
 
-external interface CSSColorValue: StylePropertyValue, CSSVariableValueAs<CSSColorValue>
+external interface CSSColorValue : StylePropertyValue, CSSVariableValueAs<CSSColorValue>
 
 abstract class Color : CSSStyleValue, CSSColorValue {
     data class Named(val value: String) : Color() {
@@ -29,6 +29,20 @@ abstract class Color : CSSStyleValue, CSSColorValue {
         override fun toString(): String = "hsla($h, $s%, $l%, $a)"
     }
 
+    companion object {
+        val black = Named("black")
+        val fuchsia = Named("fuchsia")
+        val gray = Named("gray")
+        val green = Named("green")
+        val lime = Named("lime")
+        val maroon = Named("maroon")
+        val olive = Named("olive")
+        val purple = Named("purple")
+        val red = Named("red")
+        val silver = Named("silver")
+        val white = Named("white")
+        val yellow = Named("yellow")
+    }
 }
 
 fun Color(name: String): Color = Color.Named(name)
