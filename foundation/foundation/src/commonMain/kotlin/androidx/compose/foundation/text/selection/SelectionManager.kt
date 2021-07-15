@@ -616,7 +616,8 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 updateSelection(
                     startPosition = currentStart,
                     endPosition = currentEnd,
-                    isStartHandle = isStartHandle
+                    isStartHandle = isStartHandle,
+                    adjustment = SelectionAdjustment.CHARACTER
                 )
                 return
             }

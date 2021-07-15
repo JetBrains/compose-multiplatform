@@ -157,7 +157,7 @@ class SelectionManagerDragTest {
         assertThat(selectable.lastEndPosition).isEqualTo(childToLocalOffset)
         assertThat(selectable.lastContainerLayoutCoordinates)
             .isEqualTo(selectionManager.requireContainerCoordinates())
-        assertThat(selectable.lastAdjustment).isEqualTo(SelectionAdjustment.NONE)
+        assertThat(selectable.lastAdjustment).isEqualTo(SelectionAdjustment.CHARACTER)
         assertThat(selectable.lastIsStartHandle).isEqualTo(true)
         assertThat(selectable.lastPreviousSelection).isEqualTo(fakeInitialSelection)
 
@@ -184,7 +184,7 @@ class SelectionManagerDragTest {
         assertThat(selectable.lastEndPosition).isEqualTo(childToLocalOffset + dragDistance)
         assertThat(selectable.lastContainerLayoutCoordinates)
             .isEqualTo(selectionManager.requireContainerCoordinates())
-        assertThat(selectable.lastAdjustment).isEqualTo(SelectionAdjustment.NONE)
+        assertThat(selectable.lastAdjustment).isEqualTo(SelectionAdjustment.CHARACTER)
         assertThat(selectable.lastIsStartHandle).isEqualTo(false)
         assertThat(selectable.lastPreviousSelection).isEqualTo(fakeInitialSelection)
 
