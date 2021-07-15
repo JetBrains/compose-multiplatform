@@ -147,6 +147,17 @@ fun SinglePointerInputRecorder.assertOnlyLastEventIsUp() {
     assertThat(events.count { !it.down }).isEqualTo(1)
 }
 
+fun SinglePointerInputRecorder.assertUpSameAsLastMove() {
+    check(events.isNotEmpty()) { "No events recorded" }
+    events.last().also {
+        downEvents.last().verify(it.timestamp, it.id, true, it.position)
+    }
+}
+
+fun SinglePointerInputRecorder.assertSinglePointer() {
+    assertThat(events.map { it.id }.distinct()).hasSize(1)
+}
+
 fun DataPoint.verify(
     expectedTimestamp: Long?,
     expectedId: PointerId?,
@@ -169,4 +180,17 @@ fun DataPoint.verify(
 fun List<DataPoint>.isMonotonicBetween(start: Offset, end: Offset) {
     map { it.x }.isMonotonicBetween(start.x, end.x, 1e-3f)
     map { it.y }.isMonotonicBetween(start.y, end.y, 1e-3f)
+}
+
+fun List<DataPoint>.hasSameTimeBetweenEvents() {
+    zipWithNext { a, b -> b.timestamp - a.timestamp }.sorted().apply {
+        assertThat(last() - first()).isAtMost(1L)
+    }
+}
+
+fun List<DataPoint>.areSampledFromCurve(curve: (Long) -> Offset) {
+    val t0 = first().timestamp
+    forEach {
+        it.position.isAlmostEqualTo(curve(it.timestamp - t0))
+    }
 }

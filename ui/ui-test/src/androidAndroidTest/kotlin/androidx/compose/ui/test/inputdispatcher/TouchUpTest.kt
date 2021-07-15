@@ -20,16 +20,16 @@ import android.view.MotionEvent.ACTION_DOWN
 import android.view.MotionEvent.ACTION_POINTER_DOWN
 import android.view.MotionEvent.ACTION_POINTER_UP
 import android.view.MotionEvent.ACTION_UP
-import androidx.compose.ui.geometry.Offset
-import androidx.test.filters.SmallTest
-import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
-import androidx.compose.ui.test.AndroidInputDispatcher
-import androidx.compose.ui.test.util.assertHasValidEventTimes
 import androidx.compose.testutils.expectError
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.test.AndroidInputDispatcher
+import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.test.util.Finger
 import androidx.compose.ui.test.util.Touchscreen
+import androidx.compose.ui.test.util.assertHasValidEventTimes
 import androidx.compose.ui.test.util.verifyEvent
 import androidx.compose.ui.test.util.verifyPointer
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
@@ -37,7 +37,7 @@ import org.junit.Test
  * Tests if [AndroidInputDispatcher.enqueueTouchUp] works
  */
 @SmallTest
-class SendUpTest : InputDispatcherTest() {
+class TouchUpTest : InputDispatcherTest() {
     companion object {
         // pointerIds
         private const val pointer1 = 11
@@ -150,14 +150,14 @@ class SendUpTest : InputDispatcherTest() {
     }
 
     @Test
-    fun upWithoutDown() {
+    fun enqueueTouchUp_withoutDown() {
         expectError<IllegalStateException> {
             subject.enqueueTouchUp(pointer1)
         }
     }
 
     @Test
-    fun upWrongPointerId() {
+    fun enqueueTouchUp_wrongPointerId() {
         subject.enqueueTouchDown(pointer1, position1_1)
         expectError<IllegalArgumentException> {
             subject.enqueueTouchUp(pointer2)
@@ -165,7 +165,7 @@ class SendUpTest : InputDispatcherTest() {
     }
 
     @Test
-    fun upAfterUp() {
+    fun enqueueTouchUp_afterUp() {
         subject.enqueueTouchDown(pointer1, position1_1)
         subject.enqueueTouchUp(pointer1)
         expectError<IllegalStateException> {
@@ -174,7 +174,7 @@ class SendUpTest : InputDispatcherTest() {
     }
 
     @Test
-    fun upAfterCancel() {
+    fun enqueueTouchUp_afterCancel() {
         subject.enqueueTouchDown(pointer1, position1_1)
         subject.enqueueTouchCancel()
         expectError<IllegalStateException> {

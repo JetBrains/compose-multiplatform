@@ -21,13 +21,13 @@ import android.view.MotionEvent.ACTION_DOWN
 import android.view.MotionEvent.ACTION_MOVE
 import android.view.MotionEvent.ACTION_POINTER_DOWN
 import android.view.MotionEvent.ACTION_POINTER_UP
+import androidx.compose.testutils.expectError
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.AndroidInputDispatcher
 import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
-import androidx.compose.ui.test.util.assertHasValidEventTimes
-import androidx.compose.testutils.expectError
 import androidx.compose.ui.test.util.Finger
 import androidx.compose.ui.test.util.Touchscreen
+import androidx.compose.ui.test.util.assertHasValidEventTimes
 import androidx.compose.ui.test.util.verifyEvent
 import androidx.compose.ui.test.util.verifyPointer
 import androidx.test.filters.SmallTest
@@ -39,7 +39,7 @@ import org.junit.Test
  * [AndroidInputDispatcher.enqueueTouchMove] work
  */
 @SmallTest
-class SendMoveTest : InputDispatcherTest() {
+class TouchMoveTest : InputDispatcherTest() {
     companion object {
         // pointerIds
         private const val pointer1 = 11
@@ -68,6 +68,7 @@ class SendMoveTest : InputDispatcherTest() {
     fun onePointer() {
         subject.generateTouchDownAndCheck(pointer1, position1_1)
         subject.updateTouchPointerAndCheck(pointer1, position1_2)
+        subject.advanceEventTime()
         subject.enqueueTouchMove()
         subject.sendAllSynchronous()
 
@@ -83,31 +84,15 @@ class SendMoveTest : InputDispatcherTest() {
     }
 
     @Test
-    fun onePointerWithDelay() {
-        subject.generateTouchDownAndCheck(pointer1, position1_1)
-        subject.updateTouchPointerAndCheck(pointer1, position1_2)
-        subject.enqueueTouchMove(2 * eventPeriodMillis)
-        subject.sendAllSynchronous()
-
-        var t = 0L
-        recorder.assertHasValidEventTimes()
-        assertThat(recorder.events).hasSize(2)
-        recorder.events[0].verifyEvent(1, ACTION_DOWN, 0, t, Touchscreen) // pointer1
-        recorder.events[0].verifyPointer(pointer1, position1_1, Finger)
-
-        t += 2 * eventPeriodMillis
-        recorder.events[1].verifyEvent(1, ACTION_MOVE, 0, t, Touchscreen) // pointer1
-        recorder.events[1].verifyPointer(pointer1, position1_2, Finger)
-    }
-
-    @Test
     fun twoPointers_downDownMoveMove() {
         // 2 fingers, both go down before they move
         subject.generateTouchDownAndCheck(pointer1, position1_1)
         subject.generateTouchDownAndCheck(pointer2, position2_1)
         subject.updateTouchPointerAndCheck(pointer1, position1_2)
+        subject.advanceEventTime()
         subject.enqueueTouchMove()
         subject.updateTouchPointerAndCheck(pointer2, position2_2)
+        subject.advanceEventTime()
         subject.enqueueTouchMove()
         subject.sendAllSynchronous()
 
@@ -140,9 +125,11 @@ class SendMoveTest : InputDispatcherTest() {
         // 2 fingers, 1st finger moves before 2nd finger goes down and moves
         subject.generateTouchDownAndCheck(pointer1, position1_1)
         subject.updateTouchPointerAndCheck(pointer1, position1_2)
+        subject.advanceEventTime()
         subject.enqueueTouchMove()
         subject.generateTouchDownAndCheck(pointer2, position2_1)
         subject.updateTouchPointerAndCheck(pointer2, position2_2)
+        subject.advanceEventTime()
         subject.enqueueTouchMove()
         subject.sendAllSynchronous()
 
@@ -170,12 +157,13 @@ class SendMoveTest : InputDispatcherTest() {
     }
 
     @Test
-    fun movePointer_oneMovePerPointer() {
+    fun updateTouchPointer_oneMovePerPointer() {
         // 2 fingers, use [updateTouchPointer] and [enqueueTouchMove]
         subject.generateTouchDownAndCheck(pointer1, position1_1)
         subject.generateTouchDownAndCheck(pointer2, position2_1)
         subject.updateTouchPointerAndCheck(pointer1, position1_2)
         subject.updateTouchPointerAndCheck(pointer2, position2_2)
+        subject.advanceEventTime()
         subject.enqueueTouchMove()
         subject.sendAllSynchronous()
 
@@ -199,12 +187,13 @@ class SendMoveTest : InputDispatcherTest() {
     }
 
     @Test
-    fun movePointer_multipleMovesPerPointer() {
+    fun updateTouchPointer_multipleMovesPerPointer() {
         // 2 fingers, do several [updateTouchPointer]s and then [enqueueTouchMove]
         subject.generateTouchDownAndCheck(pointer1, position1_1)
         subject.generateTouchDownAndCheck(pointer2, position2_1)
         subject.updateTouchPointerAndCheck(pointer1, position1_2)
         subject.updateTouchPointerAndCheck(pointer1, position1_3)
+        subject.advanceEventTime()
         subject.enqueueTouchMove()
         subject.sendAllSynchronous()
 
@@ -228,10 +217,11 @@ class SendMoveTest : InputDispatcherTest() {
     }
 
     @Test
-    fun sendMoveWithoutMovePointer() {
+    fun enqueueTouchMove_withoutUpdateTouchPointer() {
         // 2 fingers, do [enqueueTouchMove] without [updateTouchPointer]
         subject.generateTouchDownAndCheck(pointer1, position1_1)
         subject.generateTouchDownAndCheck(pointer2, position2_1)
+        subject.advanceEventTime()
         subject.enqueueTouchMove()
         subject.sendAllSynchronous()
 
@@ -255,12 +245,13 @@ class SendMoveTest : InputDispatcherTest() {
     }
 
     @Test
-    fun downFlushesPointerMovement() {
+    fun enqueueTouchDown_flushesPointerMovement() {
         // Movement from [updateTouchPointer] that hasn't been sent will be sent when sending DOWN
         subject.generateTouchDownAndCheck(pointer1, position1_1)
         subject.generateTouchDownAndCheck(pointer2, position2_1)
         subject.updateTouchPointerAndCheck(pointer1, position1_2)
         subject.updateTouchPointerAndCheck(pointer1, position1_3)
+        subject.advanceEventTime()
         subject.generateTouchDownAndCheck(pointer3, position3_1)
         subject.sendAllSynchronous()
 
@@ -289,19 +280,20 @@ class SendMoveTest : InputDispatcherTest() {
     }
 
     @Test
-    fun upFlushesPointerMovement() {
+    fun enqueueTouchUp_flushesPointerMovement() {
         // Movement from [updateTouchPointer] that hasn't been sent will be sent when sending UP
         subject.generateTouchDownAndCheck(pointer1, position1_1)
         subject.generateTouchDownAndCheck(pointer2, position2_1)
         subject.updateTouchPointerAndCheck(pointer1, position1_2)
         subject.updateTouchPointerAndCheck(pointer1, position1_3)
+        subject.advanceEventTime()
         subject.generateTouchUpAndCheck(pointer1)
         subject.sendAllSynchronous()
 
         recorder.assertHasValidEventTimes()
         recorder.events.apply {
             var t = 0L
-            assertThat(this).hasSize(4)
+            assertThat(this).hasSize(3)
 
             this[0].verifyEvent(1, ACTION_DOWN, 0, t, Touchscreen) // pointer1
             this[0].verifyPointer(pointer1, position1_1, Finger)
@@ -311,24 +303,21 @@ class SendMoveTest : InputDispatcherTest() {
             this[1].verifyPointer(pointer2, position2_1, Finger)
 
             t += eventPeriodMillis
-            this[2].verifyEvent(2, ACTION_MOVE, 0, t, Touchscreen)
+            this[2].verifyEvent(2, ACTION_POINTER_UP, 0, t, Touchscreen) // pointer1
             this[2].verifyPointer(pointer1, position1_3, Finger)
             this[2].verifyPointer(pointer2, position2_1, Finger)
-
-            this[3].verifyEvent(2, ACTION_POINTER_UP, 0, t, Touchscreen) // pointer1
-            this[3].verifyPointer(pointer1, position1_3, Finger)
-            this[3].verifyPointer(pointer2, position2_1, Finger)
         }
     }
 
     @Test
-    fun cancelDoesNotFlushPointerMovement() {
+    fun enqueueTouchCancel_doesNotFlushPointerMovement() {
         // 2 fingers, both with pending movement.
         // CANCEL doesn't force a MOVE, but _does_ reflect the latest positions
         subject.generateTouchDownAndCheck(pointer1, position1_1)
         subject.generateTouchDownAndCheck(pointer2, position2_1)
         subject.updateTouchPointerAndCheck(pointer1, position1_2)
         subject.updateTouchPointerAndCheck(pointer2, position2_2)
+        subject.advanceEventTime()
         subject.generateCancelAndCheckPointers()
         subject.sendAllSynchronous()
 
@@ -351,14 +340,14 @@ class SendMoveTest : InputDispatcherTest() {
     }
 
     @Test
-    fun movePointerWithoutDown() {
+    fun updateTouchPointer_withoutDown() {
         expectError<IllegalStateException> {
             subject.updateTouchPointer(pointer1, position1_1)
         }
     }
 
     @Test
-    fun movePointerWrongPointerId() {
+    fun updateTouchPointer_wrongPointerId() {
         subject.enqueueTouchDown(pointer1, position1_1)
         expectError<IllegalArgumentException> {
             subject.updateTouchPointer(pointer2, position1_2)
@@ -366,7 +355,7 @@ class SendMoveTest : InputDispatcherTest() {
     }
 
     @Test
-    fun movePointerAfterUp() {
+    fun updateTouchPointer_afterUp() {
         subject.enqueueTouchDown(pointer1, position1_1)
         subject.enqueueTouchUp(pointer1)
         expectError<IllegalStateException> {
@@ -375,7 +364,7 @@ class SendMoveTest : InputDispatcherTest() {
     }
 
     @Test
-    fun movePointerAfterCancel() {
+    fun updateTouchPointer_afterCancel() {
         subject.enqueueTouchDown(pointer1, position1_1)
         subject.enqueueTouchCancel()
         expectError<IllegalStateException> {
@@ -384,14 +373,14 @@ class SendMoveTest : InputDispatcherTest() {
     }
 
     @Test
-    fun sendMoveWithoutDown() {
+    fun enqueueTouchMove_withoutDown() {
         expectError<IllegalStateException> {
             subject.enqueueTouchMove()
         }
     }
 
     @Test
-    fun sendMoveAfterUp() {
+    fun enqueueTouchMove_afterUp() {
         subject.enqueueTouchDown(pointer1, position1_1)
         subject.enqueueTouchUp(pointer1)
         expectError<IllegalStateException> {
@@ -400,7 +389,7 @@ class SendMoveTest : InputDispatcherTest() {
     }
 
     @Test
-    fun sendMoveAfterCancel() {
+    fun enqueueTouchMove_afterCancel() {
         subject.enqueueTouchDown(pointer1, position1_1)
         subject.enqueueTouchCancel()
         expectError<IllegalStateException> {

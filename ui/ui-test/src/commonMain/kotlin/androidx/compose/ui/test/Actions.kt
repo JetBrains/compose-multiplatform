@@ -183,8 +183,8 @@ fun SemanticsNodeInteraction.performScrollToKey(key: Any): SemanticsNodeInteract
  * complete and can be resumed in a later invocation of [performGesture]. The event time is
  * initialized to the current time of the [MainTestClock].
  *
- * Be aware that if you split a gesture over two invocations of [performGesture], everything that
- * happens in between will run as if the gesture is still ongoing (imagine a finger still
+ * Be aware that if you split a gesture over multiple invocations of [performGesture], everything
+ * that happens in between will run as if the gesture is still ongoing (imagine a finger still
  * touching the screen).
  *
  * All events that are injected from the [block] are batched together and sent after [block] is
@@ -219,6 +219,107 @@ fun SemanticsNodeInteraction.performGesture(
     with(GestureScope(node, testContext)) {
         try {
             block()
+        } finally {
+            try {
+                inputDispatcher.sendAllSynchronous()
+            } finally {
+                dispose()
+            }
+        }
+    }
+    return this
+}
+
+// TODO(fresen): create sample module like in the rest of Compose
+/**
+ * Executes the touch gesture specified in the given [block]. The gesture doesn't need to be
+ * complete and can be resumed in a later invocation of one of the `perform.*Input` methods. The
+ * event time is initialized to the current time of the [MainTestClock].
+ *
+ * Be aware that if you split a gesture over multiple invocations of `perform.*Input`, everything
+ * that happens in between will run as if the gesture is still ongoing (imagine a finger still
+ * touching the screen).
+ *
+ * All events that are injected from the [block] are batched together and sent after [block] is
+ * complete. This method blocks while the events are injected. If an error occurs during
+ * execution of [block] or injection of the events, all (subsequent) events are dropped and the
+ * error is thrown here.
+ *
+ * Example usage:
+ * ```
+ * // Perform a swipe up
+ * testRule.onNodeWithTag("myWidget")
+ *     .performTouchInput { swipeUp() }
+ *
+ * // Perform a click off-center
+ * testRule.onNodeWithTag("myWidget")
+ *     .performTouchInput { click(percentOffset(.2f, .5f) }
+ *
+ * // Do an assertion while performing a click
+ * testRule.onNodeWithTag("myWidget")
+ *     .performTouchInput { down(topLeft) }
+ *     .assertHasClickAction()
+ *     .performTouchInput { up(topLeft) }
+ *
+ * // Perform a click-and-drag
+ * testRule.onNodeWithTag("myWidget").performTouchInput {
+ *     click()
+ *     advanceEventTime(100)
+ *     swipeUp()
+ * }
+ * ```
+ *
+ * @see TouchInjectionScope
+ */
+fun SemanticsNodeInteraction.performTouchInput(
+    block: TouchInjectionScope.() -> Unit
+): SemanticsNodeInteraction {
+    val node = fetchSemanticsNode("Failed to inject touch input.")
+    with(MultiModalInjectionScope(node, testContext)) {
+        try {
+            block.invoke(Touch)
+        } finally {
+            try {
+                inputDispatcher.sendAllSynchronous()
+            } finally {
+                dispose()
+            }
+        }
+    }
+    return this
+}
+
+/**
+ * Executes the multi-modal gesture specified in the given [block]. The gesture doesn't need to be
+ * complete and can be resumed in a later invocation of one of the `perform.*Input` methods. The
+ * event time is initialized to the current time of the [MainTestClock]. If only a single
+ * modality is needed (e.g. touch, mouse, stylus, keyboard, etc), you should use the
+ * `perform.*Input` of that modality instead.
+ *
+ * Each input modality is made available via a property of that modality's scope type, like
+ * [Touch][MultiModalInjectionScope.Touch] of type [TouchInjectionScope]. This allows you to
+ * inject events for each modality.
+ *
+ * Be aware that if you split a gesture over multiple invocations of `perform.*Input`, everything
+ * that happens in between will run as if the gesture is still ongoing (imagine a finger still
+ * touching the screen).
+ *
+ * All events that are injected from the [block] are batched together and sent after [block] is
+ * complete. This method blocks while the events are injected. If an error occurs during
+ * execution of [block] or injection of the events, all (subsequent) events are dropped and the
+ * error is thrown here.
+ *
+ * @see MultiModalInjectionScope
+ */
+// TODO(fresen): add example of multi-modal input when Keyboard input is added (touch and mouse
+//  don't work together, so an example with those two doesn't make sense)
+fun SemanticsNodeInteraction.performMultiModalInput(
+    block: MultiModalInjectionScope.() -> Unit
+): SemanticsNodeInteraction {
+    val node = fetchSemanticsNode("Failed to inject multi-modal input.")
+    with(MultiModalInjectionScope(node, testContext)) {
+        try {
+            block.invoke(this)
         } finally {
             try {
                 inputDispatcher.sendAllSynchronous()

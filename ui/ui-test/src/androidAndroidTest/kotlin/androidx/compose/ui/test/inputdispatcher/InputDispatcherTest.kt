@@ -72,19 +72,17 @@ internal fun AndroidInputDispatcher.updateTouchPointerAndCheck(pointerId: Int, p
 
 internal fun AndroidInputDispatcher.generateTouchUpAndCheck(pointerId: Int, delay: Long? = null) {
     if (delay != null) {
-        enqueueTouchUp(pointerId, delay)
-    } else {
-        enqueueTouchUp(pointerId)
+        advanceEventTime(delay)
     }
+    enqueueTouchUp(pointerId)
     assertThat(getCurrentTouchPosition(pointerId)).isNull()
 }
 
 internal fun AndroidInputDispatcher.generateTouchCancelAndCheck(delay: Long? = null) {
     if (delay != null) {
-        enqueueTouchCancel(delay)
-    } else {
-        enqueueTouchCancel()
+        advanceEventTime(delay)
     }
+    enqueueTouchCancel()
     verifyNoTouchGestureInProgress()
 }
 
