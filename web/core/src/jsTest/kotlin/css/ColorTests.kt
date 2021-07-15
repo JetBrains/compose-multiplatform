@@ -20,7 +20,6 @@ class ColorTests {
     fun colorConstants() = runTest {
         composition {
             Div({ style { color(Color.black) } })
-            Div({ style { color(Color.black) } })
             Div({ style { color(Color.gray) } })
             Div({ style { color(Color.maroon) } })
             Div({ style { color(Color.purple) } })
