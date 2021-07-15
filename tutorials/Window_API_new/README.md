@@ -299,7 +299,7 @@ fun main() = application {
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
-                    state.placement == WindowPlacement.Fullscreen,
+                    state.placement == WindowPlacement.Maximized,
                     {
                         state.placement = if (it) {
                             WindowPlacement.Maximized
