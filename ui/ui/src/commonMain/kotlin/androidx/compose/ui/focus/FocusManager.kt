@@ -149,17 +149,18 @@ internal class FocusManagerImpl(
 
         // We don't want moveFocus to set focus to the root, as this would essentially clear focus.
         if (destination.findParentFocusNode() == null) {
-            when (focusDirection) {
+            return when (focusDirection) {
                 // Skip the root and proceed to the next/previous item from the root's perspective.
-                // TODO(b/170155659): Add tests after implementing one dimensional focus search.
-                Next, Previous -> moveFocus(focusDirection)
-
+                Next, Previous -> {
+                    destination.requestFocus(propagateFocus = false)
+                    moveFocus(focusDirection)
+                }
                 // Instead of moving out to the root, we return false.
                 // When we return false the key event will not be consumed, but it will bubble
                 // up to the owner. (In the case of Android, the back key will be sent to the
                 // activity, where it can be handled appropriately).
                 @OptIn(ExperimentalComposeUiApi::class)
-                Out -> return false
+                Out -> false
                 else -> error("Move focus landed at the root through an unknown path.")
             }
         }

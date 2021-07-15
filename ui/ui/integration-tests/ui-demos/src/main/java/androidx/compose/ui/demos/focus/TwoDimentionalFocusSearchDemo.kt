@@ -38,9 +38,9 @@ import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun FocusSearchDemo() {
+fun TwoDimensionalFocusSearchDemo() {
     Column {
-        Text("Use Tab/Shift+Tab or arrow keys to move focus:")
+        Text("Use DPad/Arrow keys to move focus:")
         Box(Modifier.padding(10.dp).size(330.dp, 280.dp)) {
             FocusableBox(Modifier.offset(10.dp, 10.dp).size(40.dp, 40.dp))
             FocusableBox(Modifier.offset(60.dp, 10.dp).size(40.dp, 40.dp))

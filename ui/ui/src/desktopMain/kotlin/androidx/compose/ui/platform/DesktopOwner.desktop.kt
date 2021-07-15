@@ -106,7 +106,10 @@ internal class DesktopOwner(
         properties = {}
     )
 
-    private val _focusManager: FocusManagerImpl = FocusManagerImpl()
+    private val _focusManager: FocusManagerImpl = FocusManagerImpl().apply {
+        // TODO(demin): support RTL [onRtlPropertiesChanged]
+        layoutDirection = LayoutDirection.Ltr
+    }
     override val focusManager: FocusManager
         get() = _focusManager
 
