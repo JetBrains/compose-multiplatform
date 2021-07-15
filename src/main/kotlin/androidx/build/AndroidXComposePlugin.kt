@@ -16,6 +16,7 @@
 
 package androidx.build
 
+import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
@@ -142,7 +143,8 @@ class AndroidXComposePlugin : Plugin<Project> {
         private fun Project.configureAndroidCommonOptions(testedExtension: TestedExtension) {
             testedExtension.defaultConfig.minSdk = 21
 
-            val finalizeDsl: () -> Unit = {
+            @Suppress("UnstableApiUsage")
+            extensions.findByType(AndroidComponentsExtension::class.java)!!.finalizeDsl {
                 val isPublished = extensions.findByType(AndroidXExtension::class.java)
                     ?.type == LibraryType.PUBLISHED_LIBRARY
 
@@ -198,12 +200,6 @@ class AndroidXComposePlugin : Plugin<Project> {
                     }
                 }
             }
-
-            // TODO(aurimas): migrate away from this when upgrading to AGP 7.1.0-alpha03 or newer
-            @Suppress("UnstableApiUsage", "DEPRECATION")
-            extensions.findByType(
-                com.android.build.api.extension.AndroidComponentsExtension::class.java
-            )!!.finalizeDsl { finalizeDsl() }
 
             // TODO(148540713): remove this exclusion when Lint can support using multiple lint jars
             configurations.getByName("lintChecks").exclude(
