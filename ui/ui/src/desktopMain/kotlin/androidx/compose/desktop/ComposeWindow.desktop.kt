@@ -52,6 +52,8 @@ class ComposeWindow : JFrame() {
             clipMap.remove(component)
             super.remove(component)
         }
+
+        override fun getPreferredSize() = layer.wrapped.preferredSize
     }
 
     private val clipMap = mutableMapOf<Component, ClipComponent>()

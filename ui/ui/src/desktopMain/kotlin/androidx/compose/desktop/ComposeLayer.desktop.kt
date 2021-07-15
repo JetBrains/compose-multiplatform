@@ -34,6 +34,7 @@ import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skija.Canvas
 import org.jetbrains.skiko.SkiaLayer
 import org.jetbrains.skiko.SkiaRenderer
+import java.awt.Dimension
 import java.awt.Point
 import java.awt.event.FocusEvent
 import java.awt.event.InputMethodEvent
@@ -103,6 +104,23 @@ internal class ComposeLayer {
 
         override fun disableInput() {
             currentInputMethodRequests = null
+        }
+
+        override fun doLayout() {
+            super.doLayout()
+            val owner = owner
+            if (owner != null) {
+                val density = density.density
+                owner.setSize(
+                    (width * density).toInt().coerceAtLeast(0),
+                    (height * density).toInt().coerceAtLeast(0)
+                )
+                owner.measureAndLayout()
+                preferredSize = Dimension(
+                    (owner.root.width / density).toInt(),
+                    (owner.root.height / density).toInt()
+                )
+            }
         }
 
         override val locationOnScreen: Point

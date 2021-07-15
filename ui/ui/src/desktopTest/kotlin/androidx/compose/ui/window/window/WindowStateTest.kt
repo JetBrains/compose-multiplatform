@@ -16,6 +16,9 @@
 package androidx.compose.ui.window.window
 
 import androidx.compose.desktop.ComposeWindow
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +26,8 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
@@ -40,6 +45,7 @@ import org.junit.Test
 import java.awt.Dimension
 import java.awt.Point
 import java.awt.Rectangle
+import java.awt.Window
 import java.awt.event.WindowEvent
 import javax.swing.JFrame
 import kotlin.math.abs
@@ -596,4 +602,124 @@ class WindowStateTest {
 
         isOpen = false
     }
+
+    @Test
+    fun `set window height by its content`() = runApplicationTest(useDelay = isLinux) {
+        lateinit var window: ComposeWindow
+        val state = WindowState(size = WindowSize(300.dp, Dp.Unspecified))
+
+        launchApplication {
+            Window(
+                onCloseRequest = ::exitApplication,
+                state = state
+            ) {
+                window = this.window
+
+                Box(
+                    Modifier
+                        .width(400.dp)
+                        .height(200.dp)
+                )
+            }
+        }
+
+        awaitIdle()
+        assertThat(window.width).isEqualTo(300)
+        assertThat(window.contentSize.height).isEqualTo(200)
+        assertThat(state.size).isEqualTo(WindowSize(window.size.width.dp, window.size.height.dp))
+
+        exitApplication()
+    }
+
+    @Test
+    fun `set window width by its content`() = runApplicationTest(useDelay = isLinux) {
+        lateinit var window: ComposeWindow
+        val state = WindowState(size = WindowSize(Dp.Unspecified, 300.dp))
+
+        launchApplication {
+            Window(
+                onCloseRequest = ::exitApplication,
+                state = state
+            ) {
+                window = this.window
+
+                Box(
+                    Modifier
+                        .width(400.dp)
+                        .height(200.dp)
+                )
+            }
+        }
+
+        awaitIdle()
+        assertThat(window.height).isEqualTo(300)
+        assertThat(window.contentSize.width).isEqualTo(400)
+        assertThat(state.size).isEqualTo(WindowSize(window.size.width.dp, window.size.height.dp))
+
+        exitApplication()
+    }
+
+    @Test
+    fun `set window size by its content`() = runApplicationTest(useDelay = isLinux) {
+        lateinit var window: ComposeWindow
+        val state = WindowState(size = WindowSize(Dp.Unspecified, Dp.Unspecified))
+
+        launchApplication {
+            Window(
+                onCloseRequest = ::exitApplication,
+                state = state
+            ) {
+                window = this.window
+
+                Box(
+                    Modifier
+                        .width(400.dp)
+                        .height(200.dp)
+                )
+            }
+        }
+
+        awaitIdle()
+        assertThat(window.contentSize).isEqualTo(Dimension(400, 200))
+        assertThat(state.size).isEqualTo(WindowSize(window.size.width.dp, window.size.height.dp))
+
+        exitApplication()
+    }
+
+    @Test
+    fun `set window size by its content when window is on the screen`() = runApplicationTest(
+        useDelay = isLinux
+    ) {
+        lateinit var window: ComposeWindow
+        val state = WindowState(size = WindowSize(100.dp, 100.dp))
+
+        launchApplication {
+            Window(
+                onCloseRequest = ::exitApplication,
+                state = state
+            ) {
+                window = this.window
+
+                Box(
+                    Modifier
+                        .width(400.dp)
+                        .height(200.dp)
+                )
+            }
+        }
+
+        awaitIdle()
+
+        state.size = WindowSize(Dp.Unspecified, Dp.Unspecified)
+        awaitIdle()
+        assertThat(window.contentSize).isEqualTo(Dimension(400, 200))
+        assertThat(state.size).isEqualTo(WindowSize(window.size.width.dp, window.size.height.dp))
+
+        exitApplication()
+    }
+
+    private val Window.contentSize get() = Dimension(
+        size.width - insets.left - insets.right,
+        size.height - insets.top - insets.bottom,
+    )
 }
