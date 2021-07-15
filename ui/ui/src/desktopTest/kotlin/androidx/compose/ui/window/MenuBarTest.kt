@@ -21,8 +21,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.readFirstPixel
+import androidx.compose.ui.testImage
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
+import javax.swing.JCheckBoxMenuItem
+import javax.swing.JRadioButtonMenuItem
 import javax.swing.JSeparator
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -172,57 +178,275 @@ class MenuBarTest {
     }
 
     @Test(timeout = 20000)
-    fun `change parameters`() = runApplicationTest {
-        var isOpen by mutableStateOf(true)
-        var menuLabel by mutableStateOf("Menu")
-        var menuEnabled by mutableStateOf(true)
-        var submenuLabel by mutableStateOf("Submenu")
-        var submenuEnabled by mutableStateOf(true)
-        var itemLabel by mutableStateOf("Item")
-        var itemEnabled by mutableStateOf(true)
+    fun `change label`() = runApplicationTest {
         var window: ComposeWindow? = null
 
-        launchApplication {
-            if (isOpen) {
-                Window(onCloseRequest = {}) {
-                    window = this.window
+        var menuLabel by mutableStateOf("Menu")
+        var submenuLabel by mutableStateOf("Submenu")
+        var itemLabel by mutableStateOf("Item")
 
-                    MenuBar {
-                        Menu(menuLabel, enabled = menuEnabled) {
-                            Menu(submenuLabel, enabled = submenuEnabled) {}
-                            Item(itemLabel, enabled = itemEnabled, onClick = {})
-                        }
+        launchApplication {
+            Window(onCloseRequest = {}) {
+                window = this.window
+
+                MenuBar {
+                    Menu(menuLabel) {
+                        Menu(submenuLabel) {}
+                        Item(itemLabel, onClick = {})
                     }
                 }
             }
         }
 
         awaitIdle()
+        with(window!!.jMenuBar) {
+            assertThat(getMenu(0).text).isEqualTo("Menu")
+            assertThat(getMenu(0).getItem(0).text).isEqualTo("Submenu")
+            assertThat(getMenu(0).getItem(1).text).isEqualTo("Item")
 
-        menuLabel = "Menu2"
+            menuLabel = "Menu2"
+            submenuLabel = "Submenu2"
+            itemLabel = "Item2"
+            awaitIdle()
+            assertThat(getMenu(0).text).isEqualTo("Menu2")
+            assertThat(getMenu(0).getItem(0).text).isEqualTo("Submenu2")
+            assertThat(getMenu(0).getItem(1).text).isEqualTo("Item2")
+        }
+
+        exitApplication()
+    }
+
+    @Test(timeout = 20000)
+    fun `change enabled`() = runApplicationTest {
+        var window: ComposeWindow? = null
+
+        var menuEnabled by mutableStateOf(true)
+        var submenuEnabled by mutableStateOf(true)
+        var itemEnabled by mutableStateOf(true)
+
+        launchApplication {
+            Window(onCloseRequest = {}) {
+                window = this.window
+
+                MenuBar {
+                    Menu("Menu", enabled = menuEnabled) {
+                        Menu("Menu", enabled = submenuEnabled) {}
+                        Item("Item", enabled = itemEnabled, onClick = {})
+                    }
+                }
+            }
+        }
+
         awaitIdle()
-        assertThat(window!!.jMenuBar.getMenu(0).text).isEqualTo("Menu2")
+        with(window!!.jMenuBar) {
+            assertThat(getMenu(0).isEnabled).isTrue()
+            assertThat(getMenu(0).getItem(0).isEnabled).isTrue()
+            assertThat(getMenu(0).getItem(1).isEnabled).isTrue()
 
-        menuEnabled = false
+            menuEnabled = false
+            submenuEnabled = false
+            itemEnabled = false
+            awaitIdle()
+            assertThat(getMenu(0).isEnabled).isFalse()
+            assertThat(getMenu(0).getItem(0).isEnabled).isFalse()
+            assertThat(getMenu(0).getItem(1).isEnabled).isFalse()
+        }
+
+        exitApplication()
+    }
+
+    @Test(timeout = 20000)
+    fun `change icon`() = runApplicationTest {
+        var window: ComposeWindow? = null
+
+        val redIcon = testImage(Color.Red)
+        val blueIcon = testImage(Color.Blue)
+
+        var icon: Painter? by mutableStateOf(redIcon)
+
+        launchApplication {
+            Window(onCloseRequest = {}) {
+                window = this.window
+
+                MenuBar {
+                    Menu("Menu") {
+                        Item("Item", icon = icon, onClick = {})
+                    }
+                }
+            }
+        }
+
+        val item by lazy { window!!.jMenuBar.getMenu(0).getItem(0) }
+
         awaitIdle()
-        assertThat(!window!!.jMenuBar.getMenu(0).isEnabled).isTrue()
+        assertThat(item.icon?.readFirstPixel()).isEqualTo(Color.Red)
 
-        submenuLabel = "Submenu2"
+        icon = blueIcon
         awaitIdle()
-        assertThat(window!!.jMenuBar.getMenu(0).getItem(0).text).isEqualTo("Submenu2")
+        assertThat(item.icon?.readFirstPixel()).isEqualTo(Color.Blue)
 
-        submenuEnabled = false
+        icon = null
         awaitIdle()
-        assertThat(!window!!.jMenuBar.getMenu(0).getItem(0).isEnabled).isTrue()
+        assertThat(item.icon?.readFirstPixel()).isEqualTo(null)
 
-        itemLabel = "Item2"
+        exitApplication()
+    }
+
+    @Test(timeout = 20000)
+    fun `change checked of CheckboxItem`() = runApplicationTest {
+        var window: ComposeWindow? = null
+
+        var checked by mutableStateOf(true)
+
+        launchApplication {
+            Window(onCloseRequest = {}) {
+                window = this.window
+
+                MenuBar {
+                    Menu("Menu") {
+                        CheckboxItem("Item", checked = checked, onCheckedChange = { checked = it })
+                    }
+                }
+            }
+        }
+
+        val item by lazy { window!!.jMenuBar.getMenu(0).getItem(0) as JCheckBoxMenuItem }
+
         awaitIdle()
-        assertThat(window!!.jMenuBar.getMenu(0).getItem(1).text).isEqualTo("Item2")
+        assertThat(item.state).isEqualTo(true)
 
-        itemEnabled = false
+        checked = false
         awaitIdle()
-        assertThat(!window!!.jMenuBar.getMenu(0).getItem(1).isEnabled)
+        assertThat(item.state).isEqualTo(false)
 
-        isOpen = false
+        item.doClick()
+        awaitIdle()
+        assertThat(checked).isEqualTo(true)
+        assertThat(item.state).isEqualTo(true)
+
+        exitApplication()
+    }
+
+    @Test(timeout = 20000)
+    fun `don't change checked of CheckboxItem`() = runApplicationTest {
+        var window: ComposeWindow? = null
+
+        var checked by mutableStateOf(true)
+
+        launchApplication {
+            Window(onCloseRequest = {}) {
+                window = this.window
+
+                MenuBar {
+                    Menu("Menu") {
+                        CheckboxItem("Item", checked = checked, onCheckedChange = { })
+                    }
+                }
+            }
+        }
+
+        val item by lazy { window!!.jMenuBar.getMenu(0).getItem(0) as JCheckBoxMenuItem }
+
+        awaitIdle()
+        assertThat(item.state).isEqualTo(true)
+
+        checked = false
+        awaitIdle()
+        assertThat(item.state).isEqualTo(false)
+
+        item.doClick()
+        awaitIdle()
+        assertThat(checked).isEqualTo(false)
+        assertThat(item.state).isEqualTo(false)
+
+        exitApplication()
+    }
+
+    @Test(timeout = 20000)
+    fun `change status of RadioButtonItem`() = runApplicationTest {
+        var window: ComposeWindow? = null
+
+        var selected by mutableStateOf(1)
+
+        launchApplication {
+            Window(onCloseRequest = {}) {
+                window = this.window
+
+                MenuBar {
+                    Menu("Menu") {
+                        RadioButtonItem(
+                            "Item0", selected = selected == 0, onClick = { selected = 0 }
+                        )
+                        RadioButtonItem(
+                            "Item1", selected = selected == 1, onClick = { selected = 1 }
+                        )
+                    }
+                }
+            }
+        }
+
+        val item0 by lazy { window!!.jMenuBar.getMenu(0).getItem(0) as JRadioButtonMenuItem }
+        val item1 by lazy { window!!.jMenuBar.getMenu(0).getItem(1) as JRadioButtonMenuItem }
+
+        awaitIdle()
+        assertThat(item0.isSelected).isEqualTo(false)
+        assertThat(item1.isSelected).isEqualTo(true)
+
+        selected = 0
+        awaitIdle()
+        assertThat(item0.isSelected).isEqualTo(true)
+        assertThat(item1.isSelected).isEqualTo(false)
+
+        item1.doClick()
+        awaitIdle()
+        assertThat(selected).isEqualTo(1)
+        assertThat(item0.isSelected).isEqualTo(false)
+        assertThat(item1.isSelected).isEqualTo(true)
+
+        exitApplication()
+    }
+
+    @Test(timeout = 20000)
+    fun `don't change checked of RadioButtonItem`() = runApplicationTest {
+        var window: ComposeWindow? = null
+
+        var selected by mutableStateOf(1)
+
+        launchApplication {
+            Window(onCloseRequest = {}) {
+                window = this.window
+
+                MenuBar {
+                    Menu("Menu") {
+                        RadioButtonItem(
+                            "Item0", selected = selected == 0, onClick = { }
+                        )
+                        RadioButtonItem(
+                            "Item1", selected = selected == 1, onClick = { }
+                        )
+                    }
+                }
+            }
+        }
+
+        val item0 by lazy { window!!.jMenuBar.getMenu(0).getItem(0) as JRadioButtonMenuItem }
+        val item1 by lazy { window!!.jMenuBar.getMenu(0).getItem(1) as JRadioButtonMenuItem }
+
+        awaitIdle()
+        assertThat(item0.isSelected).isEqualTo(false)
+        assertThat(item1.isSelected).isEqualTo(true)
+
+        selected = 0
+        awaitIdle()
+        assertThat(item0.isSelected).isEqualTo(true)
+        assertThat(item1.isSelected).isEqualTo(false)
+
+        item1.doClick()
+        awaitIdle()
+        assertThat(selected).isEqualTo(0)
+        assertThat(item0.isSelected).isEqualTo(true)
+        assertThat(item1.isSelected).isEqualTo(false)
+
+        exitApplication()
     }
 }
