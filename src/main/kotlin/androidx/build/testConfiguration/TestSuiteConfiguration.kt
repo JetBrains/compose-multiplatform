@@ -32,8 +32,9 @@ import androidx.build.hasBenchmarkPlugin
 import androidx.build.renameApkForTesting
 import com.android.build.api.artifact.Artifacts
 import com.android.build.api.artifact.SingleArtifact
-import com.android.build.api.variant.ApplicationVariant
-import com.android.build.api.variant.LibraryVariant
+import com.android.build.api.variant.AndroidComponentsExtension
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import com.android.build.api.variant.HasAndroidTest
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.tasks.PackageAndroidArtifact
 import org.gradle.api.Project
@@ -122,15 +123,11 @@ fun Project.addAppApkToTestConfigGeneration(overrideProject: Project = this) {
     if (project.isMacrobenchmarkTarget()) {
         return
     }
-    // TODO(aurimas): migrate away from this when upgrading to AGP 7.1.0-alpha03 or newer
-    @Suppress("DEPRECATION")
-    extensions.getByType<
-        com.android.build.api.extension.ApplicationAndroidComponentsExtension
-        >().apply {
+
+    extensions.getByType<ApplicationAndroidComponentsExtension>().apply {
         onVariants(selector().withBuildType("debug")) { appVariant ->
             overrideProject.tasks.named(
-                "${AndroidXPlugin.GENERATE_TEST_CONFIGURATION_TASK}" +
-                    "${appVariant.name}AndroidTest"
+                "${AndroidXPlugin.GENERATE_TEST_CONFIGURATION_TASK}${appVariant.name}AndroidTest"
             ) { configTask ->
                 configTask as GenerateTestConfigurationTask
                 configTask.appFolder.set(appVariant.artifacts.get(SingleArtifact.APK))
@@ -191,11 +188,10 @@ private fun getOrCreateMediaTestConfigTask(project: Project, isMedia2: Boolean):
                     }
                 )
             }
-            project.rootProject.tasks.findByName(AndroidXPlugin.ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
+            project.rootProject.tasks.findByName(ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
                 .dependsOn(task)
-            project.rootProject.tasks.findByName(
-                AndroidXPlugin.ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK
-            )!!.dependsOn(task)
+            project.rootProject.tasks.findByName(ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK)!!
+                .dependsOn(task)
             return task
         } else {
             return parentProject.tasks.withType(GenerateMediaTestConfigurationTask::class.java)
@@ -341,11 +337,10 @@ private fun Project.configureMacrobenchmarkConfigTask(
                 it.enabled = this.hasAndroidTestSourceCode()
             }
         }
-        this.rootProject.tasks.findByName(AndroidXPlugin.ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
+        this.rootProject.tasks.findByName(ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
             .dependsOn(configTask)
-        this.rootProject.tasks.findByName(
-            AndroidXPlugin.ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK
-        )!!.dependsOn(configTask)
+        this.rootProject.tasks.findByName(ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK)!!
+            .dependsOn(configTask)
     } else if (isMacrobenchmarkTarget()) {
         configTask.configure { task ->
             task.appFolder.set(artifacts.get(SingleArtifact.APK))
@@ -363,15 +358,10 @@ fun Project.isMacrobenchmarkTarget(): Boolean {
 }
 
 fun Project.configureTestConfigGeneration(baseExtension: BaseExtension) {
-    // TODO(aurimas): migrate away from this when upgrading to AGP 7.1.0-alpha03 or newer
-    @Suppress("DEPRECATION")
-    extensions.getByType(
-        com.android.build.api.extension.AndroidComponentsExtension::class.java
-    ).apply {
+    extensions.getByType(AndroidComponentsExtension::class.java).apply {
         onVariants { variant ->
             val androidTest = when (variant) {
-                is ApplicationVariant -> variant.androidTest
-                is LibraryVariant -> variant.androidTest
+                is HasAndroidTest -> variant.androidTest
                 else -> return@onVariants
             } ?: return@onVariants
             when {
