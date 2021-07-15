@@ -35,7 +35,9 @@ internal const val TimeNotSet = -1L
  * Dispatcher to inject full and partial gestures. An [InputDispatcher] is created at the
  * beginning of [performGesture], and disposed at the end of that method. If there is still a
  * [gesture going on][isGestureInProgress] when the dispatcher is disposed, the state of the
- * current gesture will be persisted and restored on the next invocation of [performGesture].
+ * current gesture will be persisted and restored on the next invocation of [performGesture]. The
+ * [current eventTime][currentTime] will be restored regardless, but will only be used when the
+ * next invocation of [performGesture] has `resumeFinishedGesture = true`.
  *
  * Dispatching input happens in two stages. In the first stage, all events are generated
  * (enqueued), using the `enqueue*` methods, and in the second stage all events are injected.
@@ -56,7 +58,7 @@ internal const val TimeNotSet = -1L
  * * [getCurrentPosition]
  *
  * Chaining methods:
- * * [enqueueDelay]
+ * * [advanceEventTime]
  */
 internal abstract class InputDispatcher(
     private val testContext: TestContext,
@@ -100,8 +102,10 @@ internal abstract class InputDispatcher(
 
     init {
         val state = testContext.states.remove(root)
-        if (state?.partialGesture != null) {
-            currentTime = state.currentTime
+        if (state != null) {
+            val elapsedTime = testContext.currentTime - state.clockTimeOnDispose
+            // current gesture time = time where last gesture left off + elapsed time
+            currentTime = state.currentTime + elapsedTime
             partialGesture = state.partialGesture
         }
     }
@@ -111,10 +115,14 @@ internal abstract class InputDispatcher(
             testContext.states[root] =
                 InputDispatcherState(
                     currentTime,
-                    partialGesture
+                    partialGesture,
+                    testContext.currentTime
                 )
         }
     }
+
+    @OptIn(InternalTestApi::class)
+    private val TestContext.currentTime get() = testOwner.mainClock.currentTime
 
     /**
      * Returns the time to use for the next downTime. If no event has been enqueued yet, will
@@ -303,7 +311,7 @@ internal abstract class InputDispatcher(
      *
      * @param durationMillis The duration of the delay. Must be positive
      */
-    fun enqueueDelay(durationMillis: Long) {
+    fun advanceEventTime(durationMillis: Long) {
         require(durationMillis >= 0) {
             "duration of a delay can only be positive, not $durationMillis"
         }
@@ -550,13 +558,14 @@ internal class PartialGesture(val downTime: Long, startPosition: Offset, pointer
  * when the [GestureScope] is recreated.
  *
  * @param currentTime The current event time. Usually this is when the last event was injected,
- * unless [InputDispatcher.enqueueDelay] has been used after the last event. This property will
- * only be restored if an incomplete gesture was in progress when the state of the
- * [InputDispatcher] was saved.
+ * unless [InputDispatcher.advanceEventTime] has been used after the last event. The current time
+ * will only be restored if there was an incomplete gesture or [performGesture]'s
+ * `resumeFinishedGesture` parameter was true.
  * @param partialGesture The state of an incomplete gesture. If no gesture was in progress
  * when the state of the [InputDispatcher] was saved, this will be `null`.
  */
 internal data class InputDispatcherState(
     val currentTime: Long,
-    val partialGesture: PartialGesture?
+    val partialGesture: PartialGesture?,
+    val clockTimeOnDispose: Long
 )

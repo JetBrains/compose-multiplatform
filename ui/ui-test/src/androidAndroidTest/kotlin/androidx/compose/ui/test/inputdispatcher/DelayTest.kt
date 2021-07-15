@@ -28,7 +28,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 /**
- * Tests if [AndroidInputDispatcher.enqueueDelay] works by performing three gestures with a
+ * Tests if [AndroidInputDispatcher.advanceEventTime] works by performing three gestures with a
  * delay in between them. By varying the gestures and the delay, we test for lingering state
  * problems.
  */
@@ -82,9 +82,9 @@ class DelayTest(private val config: TestConfig) : InputDispatcherTest() {
     fun testDelay() {
         // Perform two gestures with a delay in between
         config.firstGesture.function(subject)
-        subject.enqueueDelay(config.firstDelayMillis)
+        subject.advanceEventTime(config.firstDelayMillis)
         config.secondGesture.function(subject)
-        subject.enqueueDelay(config.secondDelayMillis)
+        subject.advanceEventTime(config.secondDelayMillis)
         config.thirdGesture.function(subject)
         subject.sendAllSynchronous()
 
