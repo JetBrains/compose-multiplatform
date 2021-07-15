@@ -4,8 +4,8 @@ import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.selectors.CSSSelector
 
 object AppCSSVariables : CSSVariables {
-    val wtColorGreyLight by variable<Color>()
-    val wtColorGreyDark by variable<Color>()
+    val wtColorGreyLight by variable<CSSColorValue>()
+    val wtColorGreyDark by variable<CSSColorValue>()
 
     val wtOffsetTopUnit by variable<CSSUnitValue>()
     val wtHorizontalLayoutGutter by variable<CSSUnitValue>()
