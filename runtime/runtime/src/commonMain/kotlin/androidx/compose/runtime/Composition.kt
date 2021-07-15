@@ -492,7 +492,6 @@ internal class CompositionImpl(
                 }
                 composer.dispose()
                 parent.unregisterComposition(this)
-                parent.unregisterComposition(this)
             }
         }
     }
