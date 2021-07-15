@@ -53,8 +53,14 @@ import androidx.compose.foundation.samples.StickyHeaderSample
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.material.Button
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
 import androidx.compose.material.LocalTextStyle
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -68,6 +74,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -94,6 +101,7 @@ val LazyListDemos = listOf(
     ComposableDemo("Reverse scroll direction") { ReverseLayout() },
     ComposableDemo("Nested lazy lists") { NestedLazyDemo() },
     ComposableDemo("LazyGrid") { LazyGridDemo() },
+    ComposableDemo("LazyGrid with Spacing") { LazyGridWithSpacingDemo() },
     ComposableDemo("Custom keys") { ReorderWithCustomKeys() },
     ComposableDemo("Fling Config") { LazyWithFlingConfig() },
     PagingDemos
@@ -550,6 +558,155 @@ private fun LazyGridDemo() {
 private fun LazyGridForMode(mode: GridCells) {
     LazyVerticalGrid(
         cells = mode
+    ) {
+        items(100) {
+            Text(
+                text = "$it",
+                fontSize = 20.sp,
+                modifier = Modifier
+                    .background(Color.Gray.copy(alpha = (it % 10) / 10f))
+                    .padding(8.dp)
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun LazyGridWithSpacingDemo() {
+    val columnModes = listOf(
+        GridCells.Fixed(3),
+        GridCells.Adaptive(minSize = 60.dp)
+    )
+    var currentMode by remember { mutableStateOf(0) }
+    var horizontalSpacing by remember { mutableStateOf(8) }
+    var horizontalSpacingExpanded by remember { mutableStateOf(false) }
+    var verticalSpacing by remember { mutableStateOf(8) }
+    var verticalSpacingExpanded by remember { mutableStateOf(false) }
+    Column {
+        Row {
+            Button(
+                modifier = Modifier.wrapContentSize(),
+                onClick = {
+                    currentMode = (currentMode + 1) % columnModes.size
+                }
+            ) {
+                Text("Switch mode")
+            }
+            Box {
+                OutlinedButton(
+                    modifier = Modifier.wrapContentSize(),
+                    onClick = { verticalSpacingExpanded = true }
+                ) {
+                    Text("Vertical:\n$verticalSpacing dp")
+                    Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "expand")
+                }
+                DropdownMenu(
+                    expanded = verticalSpacingExpanded,
+                    onDismissRequest = { verticalSpacingExpanded = false }
+                ) {
+                    DropdownMenuItem(
+                        onClick = {
+                            verticalSpacing = 0
+                            verticalSpacingExpanded = false
+                        }
+                    ) {
+                        Text("None")
+                    }
+                    DropdownMenuItem(
+                        onClick = {
+                            verticalSpacing = 8
+                            verticalSpacingExpanded = false
+                        }
+                    ) {
+                        Text("8 dp")
+                    }
+                    DropdownMenuItem(
+                        onClick = {
+                            verticalSpacing = 16
+                            verticalSpacingExpanded = false
+                        }
+                    ) {
+                        Text("16 dp")
+                    }
+                    DropdownMenuItem(
+                        onClick = {
+                            verticalSpacing = 32
+                            verticalSpacingExpanded = false
+                        }
+                    ) {
+                        Text("32 dp")
+                    }
+                }
+            }
+
+            Box {
+                OutlinedButton(
+                    modifier = Modifier.wrapContentSize(),
+                    onClick = { horizontalSpacingExpanded = true }
+                ) {
+                    Text("Horizontal:\n$horizontalSpacing dp")
+                    Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "expand")
+                }
+                DropdownMenu(
+                    expanded = horizontalSpacingExpanded,
+                    onDismissRequest = { horizontalSpacingExpanded = false }
+                ) {
+                    DropdownMenuItem(
+                        onClick = {
+                            horizontalSpacing = 0
+                            horizontalSpacingExpanded = false
+                        }
+                    ) {
+                        Text("None")
+                    }
+                    DropdownMenuItem(
+                        onClick = {
+                            horizontalSpacing = 8
+                            horizontalSpacingExpanded = false
+                        }
+                    ) {
+                        Text("8 dp")
+                    }
+                    DropdownMenuItem(
+                        onClick = {
+                            horizontalSpacing = 16
+                            horizontalSpacingExpanded = false
+                        }
+                    ) {
+                        Text("16 dp")
+                    }
+                    DropdownMenuItem(
+                        onClick = {
+                            horizontalSpacing = 32
+                            horizontalSpacingExpanded = false
+                        }
+                    ) {
+                        Text("32 dp")
+                    }
+                }
+            }
+        }
+
+        LazyGridWithSpacingForMode(
+            mode = columnModes[currentMode],
+            horizontalSpacing = horizontalSpacing.dp,
+            verticalSpacing = verticalSpacing.dp
+        )
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun LazyGridWithSpacingForMode(
+    mode: GridCells,
+    horizontalSpacing: Dp,
+    verticalSpacing: Dp
+) {
+    LazyVerticalGrid(
+        cells = mode,
+        horizontalArrangement = Arrangement.spacedBy(horizontalSpacing),
+        verticalArrangement = Arrangement.spacedBy(verticalSpacing)
     ) {
         items(100) {
             Text(
