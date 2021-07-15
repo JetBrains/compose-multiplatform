@@ -29,6 +29,8 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.asAwtImage
+import androidx.compose.ui.input.key.KeyShortcut
+import androidx.compose.ui.input.key.toSwingKeyStroke
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -36,7 +38,9 @@ import androidx.compose.ui.util.AddRemoveMutableList
 import java.awt.CheckboxMenuItem
 import java.awt.Menu
 import java.awt.MenuItem
+import java.awt.event.KeyEvent
 import java.lang.UnsupportedOperationException
+import javax.swing.AbstractButton
 import javax.swing.Icon
 import javax.swing.ImageIcon
 import javax.swing.JCheckBoxMenuItem
@@ -154,6 +158,7 @@ private fun AwtMenu(
 private fun SwingMenu(
     text: String,
     enabled: Boolean,
+    mnemonic: Char?,
     content: @Composable MenuScope.() -> Unit
 ) {
     val menu = remember(::JMenu)
@@ -171,6 +176,7 @@ private fun SwingMenu(
         update = {
             set(text, JMenu::setText)
             set(enabled, JMenu::setEnabled)
+            set(mnemonic, JMenu::setMnemonic)
         }
     )
 }
@@ -186,16 +192,22 @@ class MenuBarScope internal constructor() {
      *
      * @param text text of the menu that will be shown on the menu bar
      * @param enabled is this menu item can be chosen
+     * @param mnemonic character that corresponds to some key on the keyboard.
+     * When this key and Alt modifier will be pressed - menu will be open.
+     * If the character is found within the item's text, the first occurrence
+     * of it will be underlined.
      * @param content content of the menu (sub menus, items, separators, etc)
      */
     @Composable
     fun Menu(
         text: String,
+        mnemonic: Char? = null,
         enabled: Boolean = true,
         content: @Composable MenuScope.() -> Unit
     ): Unit = SwingMenu(
         text,
         enabled,
+        mnemonic,
         content
     )
 }
@@ -205,6 +217,7 @@ internal interface MenuScopeImpl {
     fun Menu(
         text: String,
         enabled: Boolean,
+        mnemonic: Char?,
         content: @Composable MenuScope.() -> Unit
     )
 
@@ -216,6 +229,8 @@ internal interface MenuScopeImpl {
         text: String,
         icon: Painter?,
         enabled: Boolean,
+        mnemonic: Char?,
+        shortcut: KeyShortcut?,
         onClick: () -> Unit
     )
 
@@ -225,6 +240,8 @@ internal interface MenuScopeImpl {
         checked: Boolean,
         icon: Painter?,
         enabled: Boolean,
+        mnemonic: Char?,
+        shortcut: KeyShortcut?,
         onCheckedChange: (Boolean) -> Unit
     )
 
@@ -234,6 +251,8 @@ internal interface MenuScopeImpl {
         selected: Boolean,
         icon: Painter?,
         enabled: Boolean,
+        mnemonic: Char?,
+        shortcut: KeyShortcut?,
         onClick: () -> Unit
     )
 }
@@ -250,12 +269,19 @@ private class AwtMenuScope : MenuScopeImpl {
     override fun Menu(
         text: String,
         enabled: Boolean,
+        mnemonic: Char?,
         content: @Composable MenuScope.() -> Unit
-    ): Unit = AwtMenu(
-        text,
-        enabled,
-        content
-    )
+    ) {
+        if (mnemonic != null) {
+            throw UnsupportedOperationException("java.awt.Menu doesn't support mnemonic")
+        }
+
+        AwtMenu(
+            text,
+            enabled,
+            content
+        )
+    }
 
     @Composable
     override fun Separator() {
@@ -271,10 +297,18 @@ private class AwtMenuScope : MenuScopeImpl {
         text: String,
         icon: Painter?,
         enabled: Boolean,
+        mnemonic: Char?,
+        shortcut: KeyShortcut?,
         onClick: () -> Unit
     ) {
         if (icon != null) {
             throw UnsupportedOperationException("java.awt.Menu doesn't support icon")
+        }
+        if (mnemonic != null) {
+            throw UnsupportedOperationException("java.awt.Menu doesn't support mnemonic")
+        }
+        if (shortcut != null) {
+            throw UnsupportedOperationException("java.awt.Menu doesn't support shortcut")
         }
 
         val currentOnClick by rememberUpdatedState(onClick)
@@ -300,10 +334,18 @@ private class AwtMenuScope : MenuScopeImpl {
         checked: Boolean,
         icon: Painter?,
         enabled: Boolean,
+        mnemonic: Char?,
+        shortcut: KeyShortcut?,
         onCheckedChange: (Boolean) -> Unit
     ) {
         if (icon != null) {
             throw UnsupportedOperationException("java.awt.Menu doesn't support icon")
+        }
+        if (mnemonic != null) {
+            throw UnsupportedOperationException("java.awt.Menu doesn't support mnemonic")
+        }
+        if (shortcut != null) {
+            throw UnsupportedOperationException("java.awt.Menu doesn't support shortcut")
         }
 
         val currentOnCheckedChange by rememberUpdatedState(onCheckedChange)
@@ -335,6 +377,8 @@ private class AwtMenuScope : MenuScopeImpl {
         selected: Boolean,
         icon: Painter?,
         enabled: Boolean,
+        mnemonic: Char?,
+        shortcut: KeyShortcut?,
         onClick: () -> Unit
     ) {
         throw UnsupportedOperationException("java.awt.Menu doesn't support RadioButtonItem")
@@ -353,10 +397,12 @@ private class SwingMenuScope : MenuScopeImpl {
     override fun Menu(
         text: String,
         enabled: Boolean,
+        mnemonic: Char?,
         content: @Composable MenuScope.() -> Unit
     ): Unit = SwingMenu(
         text,
         enabled,
+        mnemonic,
         content
     )
 
@@ -374,6 +420,8 @@ private class SwingMenuScope : MenuScopeImpl {
         text: String,
         icon: Painter?,
         enabled: Boolean,
+        mnemonic: Char?,
+        shortcut: KeyShortcut?,
         onClick: () -> Unit
     ) {
         val currentOnClick by rememberUpdatedState(onClick)
@@ -391,6 +439,7 @@ private class SwingMenuScope : MenuScopeImpl {
                 set(text, JMenuItem::setText)
                 set(awtIcon, JMenuItem::setIcon)
                 set(enabled, JMenuItem::setEnabled)
+                set(mnemonic, JMenuItem::setMnemonic)
             }
         )
     }
@@ -401,6 +450,8 @@ private class SwingMenuScope : MenuScopeImpl {
         checked: Boolean,
         icon: Painter?,
         enabled: Boolean,
+        mnemonic: Char?,
+        shortcut: KeyShortcut?,
         onCheckedChange: (Boolean) -> Unit,
     ) {
         val currentOnCheckedChange by rememberUpdatedState(onCheckedChange)
@@ -424,6 +475,8 @@ private class SwingMenuScope : MenuScopeImpl {
                 set(checked, checkedState::set)
                 set(awtIcon, JCheckBoxMenuItem::setIcon)
                 set(enabled, JCheckBoxMenuItem::setEnabled)
+                set(mnemonic, JCheckBoxMenuItem::setMnemonic)
+                set(shortcut, JCheckBoxMenuItem::setShortcut)
             }
         )
     }
@@ -434,6 +487,8 @@ private class SwingMenuScope : MenuScopeImpl {
         selected: Boolean,
         icon: Painter?,
         enabled: Boolean,
+        mnemonic: Char?,
+        shortcut: KeyShortcut?,
         onClick: () -> Unit,
     ) {
         val currentOnClick by rememberUpdatedState(onClick)
@@ -457,6 +512,8 @@ private class SwingMenuScope : MenuScopeImpl {
                 set(selected, selectedState::set)
                 set(awtIcon, JRadioButtonMenuItem::setIcon)
                 set(enabled, JRadioButtonMenuItem::setEnabled)
+                set(mnemonic, JRadioButtonMenuItem::setMnemonic)
+                set(shortcut, JRadioButtonMenuItem::setShortcut)
             }
         )
     }
@@ -473,16 +530,22 @@ class MenuScope internal constructor(private val impl: MenuScopeImpl) {
      *
      * @param text text of the menu that will be shown in the menu
      * @param enabled is this menu item can be chosen
+     * @param mnemonic character that corresponds to some key on the keyboard.
+     * When this key will be pressed - menu will be open.
+     * If the character is found within the item's text, the first occurrence
+     * of it will be underlined.
      * @param content content of the menu (sub menus, items, separators, etc)
      */
     @Composable
     fun Menu(
         text: String,
         enabled: Boolean = true,
+        mnemonic: Char? = null,
         content: @Composable MenuScope.() -> Unit
     ): Unit = impl.Menu(
         text,
         enabled,
+        mnemonic,
         content
     )
 
@@ -498,6 +561,12 @@ class MenuScope internal constructor(private val impl: MenuScopeImpl) {
      * @param text text of the item that will be shown in the menu
      * @param icon icon of the item
      * @param enabled is this item item can be chosen
+     * @param mnemonic character that corresponds to some key on the keyboard.
+     * When this key will be pressed - [onClick] will be triggered.
+     * If the character is found within the item's text, the first occurrence
+     * of it will be underlined.
+     * @param shortcut key combination which triggers [onClick] action without
+     * navigating the menu hierarchy.
      * @param onClick action that should be performed when the user clicks on the item
      */
     @Composable
@@ -505,8 +574,10 @@ class MenuScope internal constructor(private val impl: MenuScopeImpl) {
         text: String,
         icon: Painter? = null,
         enabled: Boolean = true,
+        mnemonic: Char? = null,
+        shortcut: KeyShortcut? = null,
         onClick: () -> Unit
-    ): Unit = impl.Item(text, icon, enabled, onClick)
+    ): Unit = impl.Item(text, icon, enabled, mnemonic, shortcut, onClick)
 
     /**
      * Adds item with checkbox to the menu
@@ -515,6 +586,12 @@ class MenuScope internal constructor(private val impl: MenuScopeImpl) {
      * @param checked whether checkbox is checked or unchecked
      * @param icon icon of the item
      * @param enabled is this item item can be chosen
+     * @param mnemonic character that corresponds to some key on the keyboard.
+     * When this key will be pressed - [onCheckedChange] will be triggered.
+     * If the character is found within the item's text, the first occurrence
+     * of it will be underlined.
+     * @param shortcut key combination which triggers [onCheckedChange] action without
+     * navigating the menu hierarchy.
      * @param onCheckedChange callback to be invoked when checkbox is being clicked,
      * therefore the change of checked state in requested
      */
@@ -524,8 +601,12 @@ class MenuScope internal constructor(private val impl: MenuScopeImpl) {
         checked: Boolean,
         icon: Painter? = null,
         enabled: Boolean = true,
+        mnemonic: Char? = null,
+        shortcut: KeyShortcut? = null,
         onCheckedChange: (Boolean) -> Unit
-    ): Unit = impl.CheckboxItem(text, checked, icon, enabled, onCheckedChange)
+    ): Unit = impl.CheckboxItem(
+        text, checked, icon, enabled, mnemonic, shortcut, onCheckedChange
+    )
 
     /**
      * Adds item with radio button to the menu
@@ -534,6 +615,12 @@ class MenuScope internal constructor(private val impl: MenuScopeImpl) {
      * @param selected boolean state for this button: either it is selected or not
      * @param icon icon of the item
      * @param enabled is this item item can be chosen
+     * @param mnemonic character that corresponds to some key on the keyboard.
+     * When this key will be pressed - [onClick] will be triggered.
+     * If the character is found within the item's text, the first occurrence
+     * of it will be underlined.
+     * @param shortcut key combination which triggers [onClick] action without
+     * navigating the menu hierarchy.
      * @param onClick callback to be invoked when the radio button is being clicked
      */
     @Composable
@@ -542,8 +629,12 @@ class MenuScope internal constructor(private val impl: MenuScopeImpl) {
         selected: Boolean,
         icon: Painter? = null,
         enabled: Boolean = true,
+        mnemonic: Char? = null,
+        shortcut: KeyShortcut? = null,
         onClick: () -> Unit
-    ): Unit = impl.RadioButtonItem(text, selected, icon, enabled, onClick)
+    ): Unit = impl.RadioButtonItem(
+        text, selected, icon, enabled, mnemonic, shortcut, onClick
+    )
 }
 
 private class MutableListApplier<T>(
@@ -616,6 +707,14 @@ private fun Menu.asMutableList(): MutableList<MenuItem> {
             this@asMutableList.remove(index)
         }
     }
+}
+
+private fun AbstractButton.setMnemonic(char: Char?) {
+    mnemonic = KeyEvent.getExtendedKeyCodeForChar(char?.code ?: 0)
+}
+
+private fun JMenuItem.setShortcut(shortcut: KeyShortcut?) {
+    accelerator = shortcut?.toSwingKeyStroke()
 }
 
 @Composable
