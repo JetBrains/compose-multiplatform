@@ -17,6 +17,7 @@
 package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.NavigationRail
@@ -31,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 
 @OptIn(ExperimentalMaterialApi::class)
 @Sampled
@@ -82,6 +84,28 @@ fun CompactNavigationRailSample() {
                 icon = { Icon(icons[index], contentDescription = item) },
                 selected = selectedItem == index,
                 onClick = { selectedItem = index }
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun NavigationRailBottomAlignSample() {
+    var selectedItem by remember { mutableStateOf(0) }
+    val items = listOf("Home", "Search", "Settings")
+    val icons = listOf(Icons.Filled.Home, Icons.Filled.Search, Icons.Filled.Settings)
+
+    NavigationRail {
+        // A Spacer that pushes the NavigationRail items to the bottom of the NavigationRail.
+        Spacer(Modifier.weight(1f))
+        items.forEachIndexed { index, item ->
+            NavigationRailItem(
+                icon = { Icon(icons[index], contentDescription = item) },
+                label = { Text(item) },
+                selected = selectedItem == index,
+                onClick = { selectedItem = index },
+                alwaysShowLabel = false
             )
         }
     }
