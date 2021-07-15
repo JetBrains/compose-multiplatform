@@ -23,6 +23,7 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
@@ -89,14 +90,22 @@ interface WindowState {
     var isMinimized: Boolean
 
     /**
-     * Current position of the window. If position is not specified ([WindowPosition.isSpecified]
-     * is false) then once the window shows on the screen the position will be set to
-     * absolute values [WindowPosition.Absolute].
+     * The current position of the window. If the position is not specified
+     * ([WindowPosition.isSpecified] is false), the position will be set to absolute values
+     * [WindowPosition.Absolute] when the window appears on the screen.
      */
     var position: WindowPosition
 
     /**
-     * Current size of the window.
+     * The current size of the window.
+     *
+     * If the size is not specified
+     * ([WindowSize.isSpecified] is false), the size will be set to absolute values
+     * ([Dp.isSpecified] is true) when the window appears on the screen.
+     *
+     * Unspecified can be only width, only height, or both. If, for example, window contains some
+     * text and we use size=WindowSize(300.dp, Dp.Unspecified) then the width will be exactly
+     * 300.dp, but the height will be such that all the text will fit.
      */
     var size: WindowSize
 }

@@ -20,10 +20,13 @@ import androidx.compose.desktop.ComposeWindow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.isSpecified
+import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowSize
 import java.awt.Dialog
+import java.awt.Dimension
 import java.awt.Frame
 import java.awt.Toolkit
 import java.awt.Window
@@ -55,9 +58,32 @@ internal fun ComposeWindow.setPositionSafely(
  * Limit the width and the height to a minimum of 0
  */
 internal fun Window.setSizeSafely(size: WindowSize) {
-    val width = size.width.value.roundToInt().coerceAtLeast(0)
-    val height = size.height.value.roundToInt().coerceAtLeast(0)
-    setSize(width, height)
+    val screenBounds by lazy { graphicsConfiguration.bounds }
+
+    val width = if (size.width.isSpecified) {
+        size.width.value.roundToInt().coerceAtLeast(0)
+    } else {
+        screenBounds.width
+    }
+
+    val height = if (size.height.isSpecified) {
+        size.height.value.roundToInt().coerceAtLeast(0)
+    } else {
+        screenBounds.height
+    }
+
+    if (size.width.isUnspecified || size.height.isUnspecified) {
+        preferredSize = Dimension(width, height)
+        pack()
+        // if we set null, getPreferredSize will return the default inner size determined by
+        // the inner components (see the description of setPreferredSize)
+        preferredSize = null
+    }
+
+    setSize(
+        if (size.width.isSpecified) width else preferredSize.width,
+        if (size.height.isSpecified) height else preferredSize.height,
+    )
 }
 
 internal fun Window.setPositionSafely(
