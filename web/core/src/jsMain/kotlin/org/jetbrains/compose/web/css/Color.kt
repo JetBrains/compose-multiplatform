@@ -162,6 +162,9 @@ object Color {
     inline val whitesmoke get() = Color("whitesmoke")
     inline val yellowgreen get() = Color("yellowgreen")
     inline val yellow get() = Color("yellow")
+
+    inline val transparent get() = Color("transparent")
+    inline val currentColor get() = Color("currentColor")
 }
 
 fun Color(name: String): CSSColorValue = name.unsafeCast<CSSColorValue>()

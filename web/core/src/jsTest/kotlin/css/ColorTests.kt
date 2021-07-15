@@ -154,6 +154,9 @@ class ColorTests {
             Div({ style { color(Color.whitesmoke) } })
             Div({ style { color(Color.yellowgreen) } })
             Div({ style { color(Color.yellow) } })
+
+            Div({ style { color(Color.transparent) } })
+            Div({ style { color(Color.currentColor) } })
         }
 
         var counter = 0
@@ -293,5 +296,7 @@ class ColorTests {
         assertEquals("whitesmoke", (root.children[counter++] as HTMLElement).style.color)
         assertEquals("yellowgreen", (root.children[counter++] as HTMLElement).style.color)
         assertEquals("yellow", (root.children[counter++] as HTMLElement).style.color)
+        assertEquals("transparent", (root.children[counter++] as HTMLElement).style.color)
+        assertEquals("currentcolor", (root.children[counter++] as HTMLElement).style.color)
     }
 }
