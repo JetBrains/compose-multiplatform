@@ -1,6 +1,7 @@
 package org.jetbrains.compose.web.sample.tests
 
 import androidx.compose.runtime.Composable
+import androidx.compose.web.sample.tests.SelectElementTests
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.renderComposableInBody
@@ -32,7 +33,7 @@ internal val testCases = mutableMapOf<String, TestCase>()
 
 fun launchTestCase(testCaseId: String) {
     // this makes test cases get initialised:
-    listOf<Any>(TestCases1(), InputsTests(), EventsTests())
+    listOf<Any>(TestCases1(), InputsTests(), EventsTests(), SelectElementTests())
 
     if (testCaseId !in testCases) error("Test Case '$testCaseId' not found")
 

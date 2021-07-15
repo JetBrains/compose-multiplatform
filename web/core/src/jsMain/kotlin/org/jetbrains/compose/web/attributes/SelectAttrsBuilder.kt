@@ -30,13 +30,6 @@ class SelectAttrsBuilder : AttrsBuilder<HTMLSelectElement>() {
     ) {
         listeners.add(SelectChangeEventListener(options, listener))
     }
-
-    fun onBeforeInput(
-        options: Options = Options.DEFAULT,
-        listener: (SyntheticInputEvent<String?, HTMLSelectElement>) -> Unit
-    ) {
-        listeners.add(SelectInputEventListener(BEFOREINPUT, options, listener))
-    }
 }
 
 private class SelectInputEventListener(
