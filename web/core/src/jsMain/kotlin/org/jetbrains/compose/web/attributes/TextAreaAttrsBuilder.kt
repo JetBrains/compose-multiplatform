@@ -8,6 +8,7 @@ package androidx.compose.web.attributes
 import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.events.SyntheticChangeEvent
 import org.jetbrains.compose.web.events.SyntheticSelectEvent
+import org.jetbrains.compose.web.events.SyntheticInputEvent
 import org.w3c.dom.HTMLTextAreaElement
 
 class TextAreaAttrsBuilder : AttrsBuilder<HTMLTextAreaElement>() {

@@ -1,6 +1,6 @@
 package org.jetbrains.compose.web.attributes
 
-import androidx.compose.web.attributes.SyntheticInputEvent
+import org.jetbrains.compose.web.events.SyntheticInputEvent
 import androidx.compose.web.events.SyntheticDragEvent
 import androidx.compose.web.events.SyntheticEvent
 import androidx.compose.web.events.SyntheticMouseEvent

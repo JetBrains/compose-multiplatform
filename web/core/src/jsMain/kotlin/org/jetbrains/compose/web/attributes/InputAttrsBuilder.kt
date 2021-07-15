@@ -8,23 +8,9 @@ package androidx.compose.web.attributes
 import androidx.compose.web.events.SyntheticEvent
 import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.events.SyntheticChangeEvent
+import org.jetbrains.compose.web.events.SyntheticInputEvent
 import org.jetbrains.compose.web.events.SyntheticSelectEvent
-import org.w3c.dom.DataTransfer
 import org.w3c.dom.HTMLInputElement
-import org.w3c.dom.events.Event
-import org.w3c.dom.events.EventTarget
-
-class SyntheticInputEvent<ValueType, Element : EventTarget>(
-    val value: ValueType,
-    nativeEvent: Event
-) : SyntheticEvent<Element>(
-    nativeEvent = nativeEvent
-) {
-    val data: String? = nativeEvent.asDynamic().data?.unsafeCast<String>()
-    val dataTransfer: DataTransfer? = nativeEvent.asDynamic().dataTransfer?.unsafeCast<DataTransfer>()
-    val inputType: String? = nativeEvent.asDynamic().inputType?.unsafeCast<String>()
-    val isComposing: Boolean = nativeEvent.asDynamic().isComposing?.unsafeCast<Boolean>() ?: false
-}
 
 class InputAttrsBuilder<T>(
     val inputType: InputType<T>

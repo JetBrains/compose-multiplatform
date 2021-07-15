@@ -11,6 +11,7 @@ import org.jetbrains.compose.web.attributes.EventsListenerBuilder.Companion.INPU
 import org.jetbrains.compose.web.attributes.Options
 import org.jetbrains.compose.web.attributes.SyntheticEventListener
 import org.jetbrains.compose.web.events.SyntheticChangeEvent
+import org.jetbrains.compose.web.events.SyntheticInputEvent
 import org.w3c.dom.HTMLSelectElement
 import org.w3c.dom.events.Event
 
