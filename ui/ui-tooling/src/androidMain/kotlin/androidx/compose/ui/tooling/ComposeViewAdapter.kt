@@ -70,6 +70,7 @@ import java.lang.reflect.Method
 
 private const val TOOLS_NS_URI = "http://schemas.android.com/tools"
 private const val DESIGN_INFO_METHOD = "getDesignInfo"
+private const val UPDATE_TRANSITION_FUNCTION_NAME = "updateTransition"
 
 private val emptyContent: @Composable () -> Unit = @Composable {}
 
@@ -312,6 +313,16 @@ internal class ComposeViewAdapter : FrameLayout {
     @Suppress("UNCHECKED_CAST")
     @OptIn(InternalAnimationApi::class)
     private fun findAndTrackTransitions() {
+        @Suppress("UNCHECKED_CAST")
+        fun List<Group>.findTransitionObjects(): List<Transition<Any>> {
+            val rememberCalls = mapNotNull { it.firstOrNull { call -> call.name == "remember" } }
+            return rememberCalls.mapNotNull {
+                it.data.firstOrNull { data ->
+                    data is Transition<*>
+                } as? Transition<Any>
+            }
+        }
+
         val slotTrees = slotTableRecord.store.map { it.asTree() }
         val transitions = mutableSetOf<Transition<Any>>()
         // Check all the slot tables, since some animations might not be present in the same
@@ -319,18 +330,25 @@ internal class ComposeViewAdapter : FrameLayout {
         // defined using sub-composition.
         slotTrees.forEach { tree ->
             transitions.addAll(
-                tree.findAll {
-                    // Find `updateTransition` calls in the user code, i.e. when source location is
-                    // known.
-                    it.name == "updateTransition" && it.location != null
-                }.mapNotNull {
-                    val rememberCall =
-                        it.firstOrNull { it.name == "remember" } ?: return@mapNotNull null
-                    rememberCall.data.firstOrNull { data ->
-                        data is Transition<*>
-                    } as? Transition<Any>
-                }
+                // Find `updateTransition` calls in the user code, i.e. when source location is
+                // known.
+                tree.findAll { it.name == UPDATE_TRANSITION_FUNCTION_NAME && it.location != null }
+                    .findTransitionObjects()
             )
+            // Find `AnimatedVisibility` calls in the user code, i.e. when source location is
+            // known. Then, find the underlying `updateTransition` it uses.
+            val animatedVisibilityParentTransitions =
+                tree.findAll {
+                    it.name == "AnimatedVisibility" && it.location != null
+                }.mapNotNull {
+                    it.children.firstOrNull { updateTransitionCall ->
+                        updateTransitionCall.name == UPDATE_TRANSITION_FUNCTION_NAME
+                    }
+                }.findTransitionObjects()
+            // Remove all AnimatedVisibility parent transitions from the transitions list,
+            // otherwise we'd list them in the Animation Preview in Android Studio, but we don't
+            // support inspecting child transitions yet.
+            transitions.removeAll(animatedVisibilityParentTransitions)
         }
         hasAnimations = transitions.isNotEmpty()
         // Make the `PreviewAnimationClock` track all the transitions found.
