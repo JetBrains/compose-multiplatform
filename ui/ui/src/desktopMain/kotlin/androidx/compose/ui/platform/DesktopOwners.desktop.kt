@@ -111,6 +111,9 @@ internal class DesktopOwners(
         desktopOwner.onDispatchCommand = null
         desktopOwner.onNeedsRender = null
         invalidateIfNeeded()
+        if (desktopOwner == focusedOwner) {
+            focusedOwner = list.lastOrNull { it.isFocusable }
+        }
     }
 
     fun onFrame(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {

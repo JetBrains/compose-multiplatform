@@ -139,7 +139,7 @@ internal fun ModifiedFocusNode.focusSearch(
     layoutDirection: LayoutDirection
 ): ModifiedFocusNode? {
     return when (focusDirection) {
-        Next, Previous -> null // TODO(b/170155659): Perform one dimensional focus search.
+        Next, Previous -> oneDimensionalFocusSearch(focusDirection)
         Left, Right, Up, Down -> twoDimensionalFocusSearch(focusDirection)
         @OptIn(ExperimentalComposeUiApi::class)
         In -> {

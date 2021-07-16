@@ -25,9 +25,10 @@ import androidx.compose.ui.demos.focus.CustomFocusOrderDemo
 import androidx.compose.ui.demos.focus.FocusInDialogDemo
 import androidx.compose.ui.demos.focus.FocusInPopupDemo
 import androidx.compose.ui.demos.focus.FocusManagerMoveFocusDemo
-import androidx.compose.ui.demos.focus.FocusSearchDemo
 import androidx.compose.ui.demos.focus.FocusableDemo
+import androidx.compose.ui.demos.focus.OneDimensionalFocusSearchDemo
 import androidx.compose.ui.demos.focus.ReuseFocusRequesterDemo
+import androidx.compose.ui.demos.focus.TwoDimensionalFocusSearchDemo
 import androidx.compose.ui.demos.gestures.DetectTapGesturesDemo
 import androidx.compose.ui.demos.gestures.DoubleTapGestureFilterDemo
 import androidx.compose.ui.demos.gestures.DoubleTapInTapDemo
@@ -117,7 +118,8 @@ private val FocusDemos = DemoCategory(
         ComposableDemo("Focus Within Dialog") { FocusInDialogDemo() },
         ComposableDemo("Focus Within Popup") { FocusInPopupDemo() },
         ComposableDemo("Reuse Focus Requester") { ReuseFocusRequesterDemo() },
-        ComposableDemo("Focus Search") { FocusSearchDemo() },
+        ComposableDemo("1D Focus Search") { OneDimensionalFocusSearchDemo() },
+        ComposableDemo("2D Focus Search") { TwoDimensionalFocusSearchDemo() },
         ComposableDemo("Custom Focus Order") { CustomFocusOrderDemo() },
         ComposableDemo("FocusManager.moveFocus()") { FocusManagerMoveFocusDemo() },
         ComposableDemo("Capture/Free Focus") { CaptureFocusDemo() }
