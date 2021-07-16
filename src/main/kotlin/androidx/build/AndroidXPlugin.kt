@@ -37,6 +37,8 @@ import androidx.build.studio.StudioTask
 import androidx.build.testConfiguration.addAppApkToTestConfigGeneration
 import androidx.build.testConfiguration.addToTestZips
 import androidx.build.testConfiguration.configureTestConfigGeneration
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import com.android.build.api.variant.HasAndroidTest
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
@@ -244,19 +246,8 @@ class AndroidXPlugin : Plugin<Project> {
             configureAndroidApplicationOptions(project)
         }
 
-        // TODO: Replace this with a per-variant packagingOption for androidTest specifically once
-        //  b/69953968 is resolved.
-        appExtension.packagingOptions.resources {
-            // Workaround for b/161465530 in AGP that fails to strip these <module>.kotlin_module files,
-            // which causes mergeDebugAndroidTestJavaResource to fail for sample apps.
-            excludes.add("/META-INF/*.kotlin_module")
-            // Workaround a limitation in AGP that fails to merge these META-INF license files.
-            pickFirsts.add("/META-INF/AL2.0")
-            // In addition to working around the above issue, we exclude the LGPL2.1 license as we're
-            // approved to distribute code via AL2.0 and the only dependencies which pull in LGPL2.1
-            // are currently dual-licensed with AL2.0 and LGPL2.1. The affected dependencies are:
-            //   - net.java.dev.jna:jna:5.5.0
-            excludes.add("/META-INF/LGPL2.1")
+        project.extensions.getByType<ApplicationAndroidComponentsExtension>().apply {
+            onVariants { it.configureLicensePackaging() }
         }
         project.configureAndroidProjectForLint(appExtension.lintOptions, androidXExtension)
     }
@@ -272,6 +263,18 @@ class AndroidXPlugin : Plugin<Project> {
         project.configureJavaCompilationWarnings(androidXExtension)
 
         project.addToProjectMap(androidXExtension)
+    }
+
+    private fun HasAndroidTest.configureLicensePackaging() {
+        androidTest?.packaging?.resources?.apply {
+            // Workaround a limitation in AGP that fails to merge these META-INF license files.
+            pickFirsts.add("/META-INF/AL2.0")
+            // In addition to working around the above issue, we exclude the LGPL2.1 license as we're
+            // approved to distribute code via AL2.0 and the only dependencies which pull in LGPL2.1
+            // are currently dual-licensed with AL2.0 and LGPL2.1. The affected dependencies are:
+            //   - net.java.dev.jna:jna:5.5.0
+            excludes.add("/META-INF/LGPL2.1")
+        }
     }
 
     @Suppress("UnstableApiUsage") // AGP DSL APIs
@@ -294,21 +297,7 @@ class AndroidXPlugin : Plugin<Project> {
             beforeVariants(selector().withBuildType("release")) { variant ->
                 variant.enableUnitTest = false
             }
-        }
-
-        libraryExtension.packagingOptions.resources {
-            // TODO: Replace this with a per-variant packagingOption for androidTest specifically
-            //  once b/69953968 is resolved.
-            // Workaround for b/161465530 in AGP that fails to merge these META-INF license files
-            // for libraries that publish Java resources under the same name.
-            pickFirsts.add("/META-INF/AL2.0")
-            // In addition to working around the above issue, we exclude the LGPL2.1 license as we're
-            // approved to distribute code via AL2.0 and the only dependencies which pull in LGPL2.1
-            // currently are dual-licensed with AL2.0 and LGPL2.1. The affected dependencies are:
-            //   - net.java.dev.jna:jna:5.5.0
-            excludes.add("/META-INF/LGPL2.1")
-
-            check(!excludes.contains("/META-INF/*.kotlin_module"))
+            onVariants { it.configureLicensePackaging() }
         }
 
         project.configurePublicResourcesStub(libraryExtension)
