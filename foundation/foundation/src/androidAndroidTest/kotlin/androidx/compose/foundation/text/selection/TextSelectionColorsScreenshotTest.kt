@@ -161,7 +161,7 @@ private fun TextTestContent(textSelectionColors: TextSelectionColors) {
             DefaultSelectionHandle(
                 modifier = Modifier,
                 isStartHandle = true,
-                directions = ResolvedTextDirection.Ltr to ResolvedTextDirection.Ltr,
+                direction = ResolvedTextDirection.Ltr,
                 handlesCrossed = false
             )
 
@@ -172,7 +172,7 @@ private fun TextTestContent(textSelectionColors: TextSelectionColors) {
             DefaultSelectionHandle(
                 modifier = Modifier,
                 isStartHandle = false,
-                directions = ResolvedTextDirection.Ltr to ResolvedTextDirection.Ltr,
+                direction = ResolvedTextDirection.Ltr,
                 handlesCrossed = false
             )
         }

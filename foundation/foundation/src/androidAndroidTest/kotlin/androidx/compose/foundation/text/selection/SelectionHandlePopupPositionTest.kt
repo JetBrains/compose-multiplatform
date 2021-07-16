@@ -76,7 +76,7 @@ class SelectionHandlePopupPositionTest {
            y = offset.y
         */
         with(rule.density) {
-            val expectedPositionX = offset.x.toDp() - HANDLE_WIDTH
+            val expectedPositionX = offset.x.toDp() - HandleWidth
             val expectedPositionY = offset.y.toDp()
 
             createSelectionHandle(isStartHandle = true)
@@ -97,7 +97,7 @@ class SelectionHandlePopupPositionTest {
            y = offset.y
         */
         with(rule.density) {
-            val expectedPositionX = offset.x.toDp() - HANDLE_WIDTH
+            val expectedPositionX = offset.x.toDp() - HandleWidth
             val expectedPositionY = offset.y.toDp()
 
             createSelectionHandle(isStartHandle = true, isRtl = true)
@@ -176,13 +176,9 @@ class SelectionHandlePopupPositionTest {
                     SimpleLayout {
                         SimpleContainer(width = parentWidthDp, height = parentHeightDp) {}
                         SelectionHandle(
-                            startHandlePosition = offset,
-                            endHandlePosition = offset,
+                            position = offset,
                             isStartHandle = isStartHandle,
-                            directions = Pair(
-                                ResolvedTextDirection.Ltr,
-                                ResolvedTextDirection.Ltr
-                            ),
+                            direction = ResolvedTextDirection.Ltr,
                             handlesCrossed = false,
                             modifier = Modifier.onGloballyPositioned {
                                 measureLatch.countDown()
