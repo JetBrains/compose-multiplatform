@@ -405,7 +405,9 @@ class AndroidXPlugin : Plugin<Project> {
         // AndroidXExtension.mavenGroup is not readable until afterEvaluate.
         afterEvaluate {
             validateProjectStructure.configure { task ->
-                task.enabled = extension.mavenGroup != null
+                val type = extension.type
+                task.enabled = extension.mavenGroup != null &&
+                    (type == LibraryType.PUBLISHED_LIBRARY || type == LibraryType.UNSET)
                 task.libraryGroup.set(extension.mavenGroup)
             }
         }
