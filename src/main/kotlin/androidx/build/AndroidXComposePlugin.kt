@@ -56,47 +56,7 @@ class AndroidXComposePlugin : Plugin<Project> {
                     project.configureAndroidCommonOptions(app)
                 }
                 is KotlinBasePluginWrapper -> {
-                    val conf = project.configurations.create("kotlinPlugin")
-                    val kotlinPlugin = conf.incoming.artifactView { view ->
-                        view.attributes { attributes ->
-                            attributes.attribute(
-                                Attribute.of("artifactType", String::class.java),
-                                ArtifactTypeDefinition.JAR_TYPE
-                            )
-                        }
-                    }.files
-
-                    project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
-                        // TODO(b/157230235): remove when this is enabled by default
-                        compile.kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
-                        compile.inputs.files({ kotlinPlugin })
-                            .withPropertyName("composeCompilerExtension")
-                            .withNormalizer(ClasspathNormalizer::class.java)
-                        compile.doFirst {
-                            if (!kotlinPlugin.isEmpty) {
-                                compile.kotlinOptions.freeCompilerArgs +=
-                                    "-Xplugin=${kotlinPlugin.first()}"
-                            }
-                        }
-                    }
-
-                    project.afterEvaluate {
-                        val androidXExtension =
-                            project.extensions.findByType(AndroidXExtension::class.java)
-                        if (androidXExtension != null) {
-                            if (androidXExtension.publish.shouldPublish()) {
-                                project.tasks.withType(KotlinCompile::class.java)
-                                    .configureEach { compile ->
-                                        compile.doFirst {
-                                            if (!kotlinPlugin.isEmpty) {
-                                                compile.kotlinOptions.freeCompilerArgs +=
-                                                    listOf("-P", composeSourceOption)
-                                            }
-                                        }
-                                    }
-                            }
-                        }
-                    }
+                    project.configureComposePluginForAndroidx()
 
                     if (plugin is KotlinMultiplatformPluginWrapper) {
                         project.configureForMultiplatform()
@@ -315,6 +275,51 @@ class AndroidXComposePlugin : Plugin<Project> {
                 if (multiplatformExtension.targets.findByName("desktop") != null) {
                     tasks.named("desktopTestClasses").also(::addToBuildOnServer)
                 }
+            }
+        }
+    }
+}
+
+fun Project.configureComposePluginForAndroidx() {
+
+    val conf = project.configurations.create("kotlinPlugin")
+    val kotlinPlugin = conf.incoming.artifactView { view ->
+        view.attributes { attributes ->
+            attributes.attribute(
+                Attribute.of("artifactType", String::class.java),
+                ArtifactTypeDefinition.JAR_TYPE
+            )
+        }
+    }.files
+
+    project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
+        // TODO(b/157230235): remove when this is enabled by default
+        compile.kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+        compile.inputs.files({ kotlinPlugin })
+            .withPropertyName("composeCompilerExtension")
+            .withNormalizer(ClasspathNormalizer::class.java)
+        compile.doFirst {
+            if (!kotlinPlugin.isEmpty) {
+                compile.kotlinOptions.freeCompilerArgs +=
+                    "-Xplugin=${kotlinPlugin.first()}"
+            }
+        }
+    }
+
+    project.afterEvaluate {
+        val androidXExtension =
+            project.extensions.findByType(AndroidXExtension::class.java)
+        if (androidXExtension != null) {
+            if (androidXExtension.publish.shouldPublish()) {
+                project.tasks.withType(KotlinCompile::class.java)
+                    .configureEach { compile ->
+                        compile.doFirst {
+                            if (!kotlinPlugin.isEmpty) {
+                                compile.kotlinOptions.freeCompilerArgs +=
+                                    listOf("-P", composeSourceOption)
+                            }
+                        }
+                    }
             }
         }
     }
