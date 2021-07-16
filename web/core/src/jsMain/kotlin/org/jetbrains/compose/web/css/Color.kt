@@ -174,19 +174,19 @@ object Color {
 
 fun Color(name: String): CSSColorValue = name.unsafeCast<CSSColorValue>()
 
-private data class RGB(val r: Number, val g: Number, val b: Number): CSSColorValue {
+private class RGB(val r: Number, val g: Number, val b: Number): CSSColorValue {
     override fun toString(): String = "rgb($r, $g, $b)"
 }
 
-private data class RGBA(val r: Number, val g: Number, val b: Number, val a: Number) : CSSColorValue {
+private class RGBA(val r: Number, val g: Number, val b: Number, val a: Number) : CSSColorValue {
     override fun toString(): String = "rgba($r, $g, $b, $a)"
 }
 
-private data class HSL(val h: CSSAngleValue, val s: Number, val l: Number) : CSSColorValue {
+private class HSL(val h: CSSAngleValue, val s: Number, val l: Number) : CSSColorValue {
     override fun toString(): String = "hsl($h, $s%, $l%)"
 }
 
-private data class HSLA(val h: CSSAngleValue, val s: Number, val l: Number, val a: Number) : CSSColorValue {
+private class HSLA(val h: CSSAngleValue, val s: Number, val l: Number, val a: Number) : CSSColorValue {
     override fun toString(): String = "hsla($h, $s%, $l%, $a)"
 }
 
