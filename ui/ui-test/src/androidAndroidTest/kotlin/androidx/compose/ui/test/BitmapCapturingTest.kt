@@ -88,7 +88,7 @@ class BitmapCapturingTest(val config: TestConfig) {
                 calledCount++
                 color11
             }
-        assertThat(calledCount).isEqualTo(100 * 50)
+        assertThat(calledCount).isEqualTo((100 * 50))
 
         rule.onNodeWithTag(tag12)
             .captureToImage()

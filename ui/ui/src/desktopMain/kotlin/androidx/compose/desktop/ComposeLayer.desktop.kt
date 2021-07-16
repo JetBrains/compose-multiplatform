@@ -124,6 +124,7 @@ internal class ComposeLayer {
         }
 
         override val locationOnScreen: Point
+            @Suppress("ACCIDENTAL_OVERRIDE") // KT-47743
             get() = super.getLocationOnScreen()
 
         override val density: Density
