@@ -209,7 +209,7 @@ class CSSTextTests {
             })
             Div({
                 style {
-                    textDecorationColor(Color.RGBA(0, 200, 20, 0.85))
+                    textDecorationColor(rgba(0, 200, 20, 0.85))
                 }
             })
         }

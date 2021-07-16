@@ -195,8 +195,8 @@ class CSSBoxTests {
     @Test
     fun outlineThreeValues() = runTest {
         composition {
-            Div({ style { outline(Color.RGB(0, 20, 100), "dashed", "thick") } })
-            Div({ style { outline(Color.RGB(0, 100, 20), "double", 4.px) } })
+            Div({ style { outline(rgb(0, 20, 100), "dashed", "thick") } })
+            Div({ style { outline(rgb(0, 100, 20), "double", 4.px) } })
             Div({ style { outline("red", "outset", "thin") } })
             Div({ style { outline("yellow", "inset", 8.px) } })
         }
