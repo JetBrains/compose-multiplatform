@@ -18,17 +18,24 @@
 
 package androidx.compose.foundation.gestures
 
+import androidx.compose.foundation.DesktopPlatform
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.input.mouse.MouseScrollOrientation
 import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.input.mouse.mouseScrollFilter
-import androidx.compose.ui.platform.DesktopPlatform
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalDesktopPlatform
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import kotlin.math.sqrt
+
+// TODO(demin): figure out how we can provide a public API for changing MouseScrollConfig.
+//  There are two ways:
+//  - provide as CompositionLocal
+//  - provide as a parameter Modifier.scrollable(mouseScrollConfig=)
+//  This should be done only after new Pointer Input API with mouse support
+internal val LocalMouseScrollConfig = compositionLocalOf { MouseScrollableConfig.CurrentPlatform }
 
 // TODO(demin): implement smooth scroll animation on Windows
 // TODO(demin): implement touchpad bounce physics on MacOS
@@ -39,8 +46,7 @@ internal actual fun Modifier.mouseScrollable(
     onScroll: (Float) -> Unit
 ): Modifier = composed {
     val density = LocalDensity.current
-    val desktopPlatform = LocalDesktopPlatform.current
-    val config = PlatformScrollConfig(density, desktopPlatform)
+    val config = LocalMouseScrollConfig.current
 
     mouseScrollFilter { event, bounds ->
         if (isOrientationMatches(orientation, event.orientation)) {
@@ -48,7 +54,8 @@ internal actual fun Modifier.mouseScrollable(
                 Orientation.Vertical -> bounds.height
                 Orientation.Horizontal -> bounds.width
             }
-            onScroll(-config.toScrollOffset(event.delta, scrollBounds))
+            val scrollOffset = config.offsetOf(event.delta, scrollBounds, density)
+            onScroll(-scrollOffset)
             true
         } else {
             false
@@ -67,37 +74,59 @@ fun isOrientationMatches(
     }
 }
 
-private class PlatformScrollConfig(
-    private val density: Density,
-    private val desktopPlatform: DesktopPlatform
-) {
-    fun toScrollOffset(
-        unit: MouseScrollUnit,
-        bounds: Int
-    ): Float = when (unit) {
-        is MouseScrollUnit.Line -> unit.value * platformLineScrollOffset(bounds)
+private fun MouseScrollableConfig.offsetOf(
+    unit: MouseScrollUnit,
+    bounds: Int,
+    density: Density
+) = when (unit) {
+    is MouseScrollUnit.Line -> offsetOf(unit.value, bounds, density)
 
-        // TODO(demin): Chrome/Firefox on Windows scroll differently: value * 0.90f * bounds
-        // the formula was determined experimentally based on Windows Start behaviour
-        is MouseScrollUnit.Page -> unit.value * bounds.toFloat()
-    }
+    // TODO(demin): Chrome/Firefox on Windows scroll differently: value * 0.90f * bounds
+    //
+    // TODO(demin): How can we integrate page scrolling into MouseScrollConfig and new
+    //  Pointer Input API with mouse support?
+    // the formula was determined experimentally based on Windows Start behaviour
+    is MouseScrollUnit.Page -> unit.value * bounds.toFloat()
+}
+
+internal interface MouseScrollableConfig {
+    fun offsetOf(scrollDelta: Float, bounds: Int, density: Density): Float
 
     // TODO(demin): Chrome on Windows/Linux uses different scroll strategy
     //  (always the same scroll offset, bounds-independent).
-    //  Figure out why and decide if we can use this strategy instead of current one.
-    private fun platformLineScrollOffset(bounds: Int): Float {
-        return when (desktopPlatform) {
-            // TODO(demin): is this formula actually correct? some experimental values don't fit
-            //  the formula
+    //  Figure out why and decide if we can use this strategy instead of the current one.
+    companion object {
+        // TODO(demin): is this formula actually correct? some experimental values don't fit
+        //  the formula
+        val LinuxGnome = object : MouseScrollableConfig {
             // the formula was determined experimentally based on Ubuntu Nautilus behaviour
-            DesktopPlatform.Linux -> sqrt(bounds.toFloat())
+            override fun offsetOf(scrollDelta: Float, bounds: Int, density: Density): Float {
+                return scrollDelta * sqrt(bounds.toFloat())
+            }
+        }
 
+        val WindowsWinUI = object : MouseScrollableConfig {
             // the formula was determined experimentally based on Windows Start behaviour
-            DesktopPlatform.Windows -> bounds / 20f
+            override fun offsetOf(scrollDelta: Float, bounds: Int, density: Density): Float {
+                return scrollDelta * bounds / 20f
+            }
+        }
 
+        val MacOSCocoa = object : MouseScrollableConfig {
             // the formula was determined experimentally based on MacOS Finder behaviour
             // MacOS driver will send events with accelerating delta
-            DesktopPlatform.MacOS -> with(density) { 10.dp.toPx() }
+            override fun offsetOf(scrollDelta: Float, bounds: Int, density: Density): Float {
+                return with(density) {
+                    scrollDelta * 10.dp.toPx()
+                }
+            }
+        }
+
+        val CurrentPlatform: MouseScrollableConfig = when (DesktopPlatform.Current) {
+            DesktopPlatform.Linux -> LinuxGnome
+            DesktopPlatform.Windows -> WindowsWinUI
+            DesktopPlatform.MacOS -> MacOSCocoa
+            DesktopPlatform.Unknown -> WindowsWinUI
         }
     }
 }
