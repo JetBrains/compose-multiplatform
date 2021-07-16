@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.ui.configureSwingGlobalsForCompose
 import androidx.compose.ui.platform.Keyboard
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -81,20 +82,25 @@ fun Window(
     events: WindowEvents = WindowEvents(),
     onDismissRequest: (() -> Unit)? = null,
     content: @Composable () -> Unit = { }
-) = SwingUtilities.invokeLater {
-    AppWindow(
-        title = title,
-        size = size,
-        location = location,
-        centered = centered,
-        icon = icon,
-        menuBar = menuBar,
-        undecorated = undecorated,
-        resizable = resizable,
-        events = events,
-        onDismissRequest = onDismissRequest
-    ).show {
-        content()
+) {
+    if (System.getProperty("compose.application.configure.swing.globals") == "true") {
+        configureSwingGlobalsForCompose()
+    }
+    SwingUtilities.invokeLater {
+        AppWindow(
+            title = title,
+            size = size,
+            location = location,
+            centered = centered,
+            icon = icon,
+            menuBar = menuBar,
+            undecorated = undecorated,
+            resizable = resizable,
+            events = events,
+            onDismissRequest = onDismissRequest
+        ).show {
+            content()
+        }
     }
 }
 
