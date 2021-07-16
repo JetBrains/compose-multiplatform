@@ -638,6 +638,9 @@ package androidx.compose.foundation.text {
   @kotlin.RequiresOptIn(message="Internal/Unstable API for use only between foundation modules sharing " + "the same exact version, subject to change without notice.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface InternalFoundationTextApi {
   }
 
+  public final class KeyEventHelpers_androidKt {
+  }
+
   public final class KeyMappingKt {
   }
 
