@@ -1,28 +1,18 @@
 package org.jetbrains.compose.internal
 
 import org.gradle.api.Project
-import org.gradle.configurationcache.extensions.serviceOf
-import org.gradle.internal.logging.text.StyledTextOutput
-import org.gradle.internal.logging.text.StyledTextOutputFactory
 
 internal fun Project.checkAndWarnAboutComposeWithSerialization() {
-    afterEvaluate {
-        val usesKotlinxSerialization = configurations.names.asSequence().filter {
-            it.startsWith("kotlinCompilerPluginClasspath")
-        }.any { configurationName ->
-            configurations.getByName(configurationName).dependencies.any { dependency ->
-                dependency.name.contains("kotlin-serialization")
-            }
-        }
+    project.plugins.withId("org.jetbrains.kotlin.plugin.serialization") {
+        val warningMessage = """
 
-        if (usesKotlinxSerialization) {
-            val out = serviceOf<StyledTextOutputFactory>().create("COMPOSE_PLUGIN")
-            out.style(StyledTextOutput.Style.FailureHeader)
-                .text("WARNING! Both Compose and kotlinx.serialization plugins are used in the module '${project.name}'")
-                .println()
-                .style(StyledTextOutput.Style.Failure)
-                .text("Consider using these plugins in separate modules to avoid compilation errors")
-                .println()
-        }
+            >>> COMPOSE WARNING
+            >>> Project `${project.name}` has `compose` and `kotlinx.serialization` plugins applied!
+            >>> Consider using these plugins in separate modules to avoid compilation errors
+            >>> Check more details here: https://github.com/JetBrains/compose-jb
+
+        """.trimIndent()
+
+        logger.warn(warningMessage)
     }
 }
