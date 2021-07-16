@@ -2,9 +2,9 @@ package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
-import androidx.compose.web.attributes.InputAttrsBuilder
+import org.jetbrains.compose.web.attributes.builders.InputAttrsBuilder
 import androidx.compose.web.attributes.SelectAttrsBuilder
-import androidx.compose.web.attributes.TextAreaAttrsBuilder
+import org.jetbrains.compose.web.attributes.builders.TextAreaAttrsBuilder
 import org.jetbrains.compose.web.DomApplier
 import org.jetbrains.compose.web.DomNodeWrapper
 import kotlinx.browser.document

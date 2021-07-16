@@ -243,7 +243,7 @@ class InputsTests {
 
 
         Div {
-            TextInput(value = "", attrsBuilder = {
+            TextInput(value = "", attrs = {
                 id("textInput")
                 onBeforeInput {
                     state = it.data ?: ""
