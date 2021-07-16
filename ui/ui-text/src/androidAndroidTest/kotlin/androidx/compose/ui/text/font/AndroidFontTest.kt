@@ -20,11 +20,11 @@ import android.os.ParcelFileDescriptor
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import org.junit.After
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
@@ -77,7 +77,7 @@ class AndroidFontTest {
         assertThat(font.typeface).isNotNull()
     }
 
-    @Ignore
+    @SdkSuppress(minSdkVersion = 26)
     @Test
     @MediumTest
     fun test_load_from_file_descriptor() {
