@@ -73,7 +73,7 @@ class EventsTests {
                 style {
                     property("overflow-y", "scroll")
                     height(200.px)
-                    backgroundColor(Color.RGB(220, 220, 220))
+                    backgroundColor(rgb(220, 220, 220))
                 }
                 onScroll {
                     state = "Scrolled"

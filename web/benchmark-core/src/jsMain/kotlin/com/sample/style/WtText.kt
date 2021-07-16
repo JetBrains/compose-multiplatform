@@ -50,7 +50,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
     }
 
     val wtText1 by style {
-        color(Color.RGBA(39, 40, 44, .7))
+        color(rgba(39, 40, 44, .7))
         fontSize(18.px)
         property("letter-spacing", "normal")
         property("font-weight", 400)
@@ -63,11 +63,11 @@ object WtTexts : StyleSheet(AppStylesheet) {
     }
 
     val wtText1ThemeDark by style {
-        color(Color.RGBA(255, 255, 255, 0.6))
+        color(rgba(255, 255, 255, 0.6))
     }
 
     val wtText2 by style {
-        color(Color.RGBA(39, 40, 44, .7))
+        color(rgba(39, 40, 44, .7))
         fontSize(15.px)
         property("letter-spacing", "normal")
         property("font-weight", 400)
@@ -80,7 +80,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
     }
 
     val wtText3 by style {
-        color(Color.RGBA(39, 40, 44, .7))
+        color(rgba(39, 40, 44, .7))
         fontSize(12.px)
         property("letter-spacing", "normal")
         property("font-weight", 400)
@@ -93,15 +93,15 @@ object WtTexts : StyleSheet(AppStylesheet) {
     }
 
     val wtTextPale by style {
-        color(Color.RGBA(255, 255, 255, 0.30))
+        color(rgba(255, 255, 255, 0.30))
     }
 
     val wtText2ThemeDark by style {
-        color(Color.RGBA(255, 255, 255, 0.6))
+        color(rgba(255, 255, 255, 0.6))
     }
 
     val wtText3ThemeDark by style {
-        color(Color.RGBA(255, 255, 255, 0.6))
+        color(rgba(255, 255, 255, 0.6))
     }
 
     val wtLink by style {
@@ -172,7 +172,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
         property("width", "fit-content")
 
         hover(self) style {
-            backgroundColor(Color.RGBA(22, 125, 255, .8))
+            backgroundColor(rgba(22, 125, 255, .8))
         }
     }
 
@@ -186,7 +186,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
         property("outline", "none")
 
         hover(self) style {
-            backgroundColor(Color.RGBA(255, 255, 255, 0.1))
+            backgroundColor(rgba(255, 255, 255, 0.1))
         }
     }
 
@@ -195,7 +195,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
         backgroundColor("#27282c")
 
         hover(self) style {
-            backgroundColor(Color.RGBA(39, 40, 44, .7))
+            backgroundColor(rgba(39, 40, 44, .7))
         }
     }
 
@@ -207,7 +207,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
         display(DisplayStyle.LegacyInlineFlex)
 
         hover(self) style {
-            backgroundColor(Color.RGBA(255, 255, 255, 0.1))
+            backgroundColor(rgba(255, 255, 255, 0.1))
             property("border-radius", 24.px)
         }
 

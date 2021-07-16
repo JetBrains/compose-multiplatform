@@ -47,7 +47,7 @@ private val DeclareAndUseStylesheet = CodeSnippetData(
     source = """
         object MyStyleSheet : StyleSheet() {
             val container by style { /* define a class `container` */
-                border(1.px, LineStyle.Solid, Color.RGB(255, 0, 0))
+                border(1.px, LineStyle.Solid, rgb(255, 0, 0))
             }
         }
         
@@ -237,7 +237,7 @@ private fun TitledCodeSample(title: String, code: String) {
         attrs = {
             classes(WtOffsets.wtTopOffset24)
             style {
-                backgroundColor(Color.RGBA(39, 40, 44, 0.05))
+                backgroundColor(rgba(39, 40, 44, 0.05))
                 borderRadius(8.px, 8.px, 8.px)
                 property("padding", "12px 16px")
             }

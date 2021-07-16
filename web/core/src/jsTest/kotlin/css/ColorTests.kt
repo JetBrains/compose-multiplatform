@@ -6,15 +6,115 @@
 package org.jetbrains.compose.web.core.tests.css
 
 import org.jetbrains.compose.web.core.tests.runTest
-import org.jetbrains.compose.web.css.Color
-import org.jetbrains.compose.web.css.color
+import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+
 class ColorTests {
+    @Test
+    @Suppress("DEPRECATION")
+    fun rgbTestDeprecated() = runTest {
+        composition {
+            Div({ style { color(Color.RGB(0, 0, 0)) } })
+            Div({ style { color(Color.RGB(200, 10, 20)) } })
+        }
+
+        assertEquals("rgb(0, 0, 0)", (root.children[0] as HTMLElement).style.color)
+        assertEquals("rgb(200, 10, 20)", (root.children[1] as HTMLElement).style.color)
+    }
+
+
+    @Test
+    fun rgbTest() = runTest {
+        composition {
+            Div({ style { color(rgb(0, 0, 0)) } })
+            Div({ style { color(rgb(200, 10, 20)) } })
+        }
+
+        assertEquals("rgb(0, 0, 0)", (root.children[0] as HTMLElement).style.color)
+        assertEquals("rgb(200, 10, 20)", (root.children[1] as HTMLElement).style.color)
+    }
+
+    @Test
+    @Suppress("DEPRECATION")
+    fun rgbaTestDeprecated() = runTest {
+        composition {
+            Div({ style { color(Color.RGBA(0, 220, 0, 0.2)) } })
+            Div({ style { color(Color.RGBA(200, 10, 20, 1)) } })
+            Div({ style { color(Color.RGBA(200, 10, 20, 0.3)) } })
+        }
+
+        assertEquals("rgba(0, 220, 0, 0.2)", (root.children[0] as HTMLElement).style.color)
+        assertEquals("rgb(200, 10, 20)", (root.children[1] as HTMLElement).style.color)
+        assertEquals("rgba(200, 10, 20, 0.3)", (root.children[2] as HTMLElement).style.color)
+    }
+
+
+    @Test
+    fun rgbaTest() = runTest {
+        composition {
+            Div({ style { color(rgba(0, 220, 0, 0.2)) } })
+            Div({ style { color(rgba(200, 10, 20, 1)) } })
+            Div({ style { color(rgba(200, 10, 20, 0.3)) } })
+        }
+
+        assertEquals("rgba(0, 220, 0, 0.2)", (root.children[0] as HTMLElement).style.color)
+        assertEquals("rgb(200, 10, 20)", (root.children[1] as HTMLElement).style.color)
+        assertEquals("rgba(200, 10, 20, 0.3)", (root.children[2] as HTMLElement).style.color)
+    }
+
+    @Test
+    @Suppress("DEPRECATION")
+    fun hslTestDeprecated() = runTest {
+        composition {
+            Div({ style { color(Color.HSL(100, 120, 50)) } })
+            Div({ style { color(Color.HSL(235, 100, 50)) } })
+        }
+
+        assertEquals("rgb(85, 255, 0)", (root.children[0] as HTMLElement).style.color)
+        assertEquals("rgb(0, 21, 255)", (root.children[1] as HTMLElement).style.color)
+    }
+
+    @Test
+    fun hslTest() = runTest {
+        composition {
+            Div({ style { color(hsl(100, 120, 50)) } })
+            Div({ style { color(hsl(235, 100, 50)) } })
+        }
+
+        assertEquals("rgb(85, 255, 0)", (root.children[0] as HTMLElement).style.color)
+        assertEquals("rgb(0, 21, 255)", (root.children[1] as HTMLElement).style.color)
+    }
+
+    @Test
+    @Suppress("DEPRECATION")
+    fun hslaTestDeprecated() = runTest {
+        composition {
+            Div({ style { color(Color.HSLA(100, 100, 50, 1)) } })
+            Div({ style { color(Color.HSLA(235, 100, 50, .5)) } })
+        }
+
+        assertEquals("rgb(85, 255, 0)", (root.children[0] as HTMLElement).style.color)
+        assertEquals("rgba(0, 21, 255, 0.5)", (root.children[1] as HTMLElement).style.color)
+    }
+
+
+    @Test
+    fun hslaTest() = runTest {
+        composition {
+            Div({ style { color(hsla(100, 100, 50, 1)) } })
+            Div({ style { color(hsla(235, 100, 50, .5)) } })
+        }
+
+        assertEquals("rgb(85, 255, 0)", (root.children[0] as HTMLElement).style.color)
+        assertEquals("rgba(0, 21, 255, 0.5)", (root.children[1] as HTMLElement).style.color)
+    }
+
+
     @Test
     fun colorConstants() = runTest {
         composition {
@@ -297,6 +397,6 @@ class ColorTests {
         assertEquals("yellowgreen", (root.children[counter++] as HTMLElement).style.color)
         assertEquals("yellow", (root.children[counter++] as HTMLElement).style.color)
         assertEquals("transparent", (root.children[counter++] as HTMLElement).style.color)
-        assertEquals("currentcolor", (root.children[counter++] as HTMLElement).style.color)
+        assertEquals("currentcolor", (root.children[counter] as HTMLElement).style.color)
     }
 }
