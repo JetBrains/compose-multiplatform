@@ -34,7 +34,7 @@ object SwitcherStylesheet : StyleSheet(AppStylesheet) {
             border {
                 style(LineStyle.Solid)
                 width(3.px)
-                color(Color("transparent"))
+                color(Color.transparent)
                 borderRadius(20.px, 20.px, 20.px)
             }
             color("#aaa")

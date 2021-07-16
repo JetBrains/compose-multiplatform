@@ -180,7 +180,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
         display(DisplayStyle.LegacyInlineFlex)
         justifyContent(JustifyContent.Center)
         alignItems(AlignItems.Center)
-        backgroundColor(Color("transparent"))
+        backgroundColor(Color.transparent)
         border(0.px)
 
         property("outline", "none")
