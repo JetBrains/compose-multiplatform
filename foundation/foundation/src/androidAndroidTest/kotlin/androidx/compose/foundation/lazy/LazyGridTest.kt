@@ -18,7 +18,9 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,10 +33,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
+import androidx.compose.ui.test.assertWidthIsAtLeast
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
@@ -243,6 +247,310 @@ class LazyGridTest {
 
         rule.onNodeWithTag("3")
             .assertDoesNotExist()
+    }
+
+    @Test
+    fun adaptiveLazyGridAppliesHorizontalSpacings() {
+        val items = (1..3).map { it.toString() }
+
+        val spacing = with(rule.density) { 10.toDp() }
+        val itemSize = with(rule.density) { 100.toDp() }
+
+        rule.setContent {
+            LazyVerticalGrid(
+                cells = GridCells.Adaptive(itemSize),
+                modifier = Modifier.height(itemSize).width(itemSize * 3 + spacing * 2),
+                horizontalArrangement = Arrangement.spacedBy(spacing)
+            ) {
+                items(items) {
+                    Spacer(Modifier.size(itemSize).testTag(it))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertIsDisplayed()
+            .assertLeftPositionInRootIsEqualTo(0.dp)
+            .assertWidthIsAtLeast(itemSize)
+
+        rule.onNodeWithTag("2")
+            .assertIsDisplayed()
+            .assertLeftPositionInRootIsEqualTo(itemSize + spacing)
+            .assertWidthIsAtLeast(itemSize)
+
+        rule.onNodeWithTag("3")
+            .assertIsDisplayed()
+            .assertLeftPositionInRootIsEqualTo(itemSize * 2 + spacing * 2)
+            .assertWidthIsAtLeast(itemSize)
+    }
+
+    @Test
+    fun adaptiveLazyGridAppliesHorizontalSpacingsWithContentPaddings() {
+        val items = (1..3).map { it.toString() }
+
+        val spacing = with(rule.density) { 8.toDp() }
+        val itemSize = with(rule.density) { 40.toDp() }
+
+        rule.setContent {
+            LazyVerticalGrid(
+                cells = GridCells.Adaptive(itemSize),
+                modifier = Modifier.height(itemSize).width(itemSize * 3 + spacing * 4),
+                horizontalArrangement = Arrangement.spacedBy(spacing),
+                contentPadding = PaddingValues(horizontal = spacing)
+            ) {
+                items(items) {
+                    Spacer(Modifier.size(itemSize).testTag(it))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertIsDisplayed()
+            .assertLeftPositionInRootIsEqualTo(spacing)
+            .assertWidthIsAtLeast(itemSize)
+
+        rule.onNodeWithTag("2")
+            .assertIsDisplayed()
+            .assertLeftPositionInRootIsEqualTo(itemSize + spacing * 2)
+            .assertWidthIsAtLeast(itemSize)
+
+        rule.onNodeWithTag("3")
+            .assertIsDisplayed()
+            .assertLeftPositionInRootIsEqualTo(itemSize * 2 + spacing * 3)
+            .assertWidthIsAtLeast(itemSize)
+    }
+
+    @Test
+    fun adaptiveLazyGridAppliesVerticalSpacings() {
+        val items = (1..3).map { it.toString() }
+
+        val spacing = with(rule.density) { 4.toDp() }
+        val itemSize = with(rule.density) { 32.toDp() }
+
+        rule.setContent {
+            LazyVerticalGrid(
+                cells = GridCells.Adaptive(itemSize),
+                modifier = Modifier.height(itemSize * 3 + spacing * 2).width(itemSize),
+                verticalArrangement = Arrangement.spacedBy(spacing)
+            ) {
+                items(items) {
+                    Spacer(Modifier.size(itemSize).testTag(it))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertIsDisplayed()
+            .assertTopPositionInRootIsEqualTo(0.dp)
+            .assertHeightIsAtLeast(itemSize)
+
+        rule.onNodeWithTag("2")
+            .assertIsDisplayed()
+            .assertTopPositionInRootIsEqualTo(itemSize + spacing)
+            .assertHeightIsAtLeast(itemSize)
+
+        rule.onNodeWithTag("3")
+            .assertIsDisplayed()
+            .assertTopPositionInRootIsEqualTo(itemSize * 2 + spacing * 2)
+            .assertHeightIsAtLeast(itemSize)
+    }
+
+    @Test
+    fun adaptiveLazyGridAppliesVerticalSpacingsWithContentPadding() {
+        val items = (1..3).map { it.toString() }
+
+        val spacing = with(rule.density) { 16.toDp() }
+        val itemSize = with(rule.density) { 72.toDp() }
+
+        rule.setContent {
+            LazyVerticalGrid(
+                cells = GridCells.Adaptive(itemSize),
+                modifier = Modifier.height(itemSize * 3 + spacing * 2).width(itemSize),
+                verticalArrangement = Arrangement.spacedBy(space = spacing),
+                contentPadding = PaddingValues(vertical = spacing)
+            ) {
+                items(items) {
+                    Spacer(Modifier.size(itemSize).testTag(it))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertIsDisplayed()
+            .assertTopPositionInRootIsEqualTo(spacing)
+            .assertHeightIsAtLeast(itemSize)
+
+        rule.onNodeWithTag("2")
+            .assertIsDisplayed()
+            .assertTopPositionInRootIsEqualTo(spacing * 2 + itemSize)
+            .assertHeightIsAtLeast(itemSize)
+
+        rule.onNodeWithTag("3")
+            .assertIsDisplayed()
+            .assertTopPositionInRootIsEqualTo(spacing * 3 + itemSize * 2)
+            .assertHeightIsAtLeast(itemSize)
+    }
+
+    @Test
+    fun fixedLazyGridAppliesVerticalSpacings() {
+        val items = (1..4).map { it.toString() }
+
+        val spacing = with(rule.density) { 24.toDp() }
+        val itemSize = with(rule.density) { 80.toDp() }
+
+        rule.setContent {
+            LazyVerticalGrid(
+                cells = GridCells.Fixed(2),
+                modifier = Modifier.height(itemSize * 2 + spacing).width(itemSize),
+                verticalArrangement = Arrangement.spacedBy(space = spacing),
+            ) {
+                items(items) {
+                    Spacer(Modifier.size(itemSize).testTag(it))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertIsDisplayed()
+            .assertTopPositionInRootIsEqualTo(0.dp)
+            .assertHeightIsAtLeast(itemSize)
+
+        rule.onNodeWithTag("2")
+            .assertIsDisplayed()
+            .assertTopPositionInRootIsEqualTo(0.dp)
+            .assertHeightIsAtLeast(itemSize)
+
+        rule.onNodeWithTag("3")
+            .assertIsDisplayed()
+            .assertTopPositionInRootIsEqualTo(spacing + itemSize)
+            .assertHeightIsAtLeast(itemSize)
+
+        rule.onNodeWithTag("4")
+            .assertIsDisplayed()
+            .assertTopPositionInRootIsEqualTo(spacing + itemSize)
+            .assertHeightIsAtLeast(itemSize)
+    }
+
+    @Test
+    fun fixedLazyGridAppliesHorizontalSpacings() {
+        val items = (1..4).map { it.toString() }
+
+        val spacing = with(rule.density) { 15.toDp() }
+        val itemSize = with(rule.density) { 30.toDp() }
+
+        rule.setContent {
+            LazyVerticalGrid(
+                cells = GridCells.Fixed(2),
+                modifier = Modifier.height(itemSize * 2).width(itemSize * 2 + spacing),
+                horizontalArrangement = Arrangement.spacedBy(space = spacing),
+            ) {
+                items(items) {
+                    Spacer(Modifier.size(itemSize).testTag(it))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertIsDisplayed()
+            .assertLeftPositionInRootIsEqualTo(0.dp)
+            .assertWidthIsAtLeast(itemSize)
+
+        rule.onNodeWithTag("2")
+            .assertIsDisplayed()
+            .assertLeftPositionInRootIsEqualTo(spacing + itemSize)
+            .assertWidthIsAtLeast(itemSize)
+
+        rule.onNodeWithTag("3")
+            .assertIsDisplayed()
+            .assertLeftPositionInRootIsEqualTo(0.dp)
+            .assertWidthIsAtLeast(itemSize)
+
+        rule.onNodeWithTag("4")
+            .assertIsDisplayed()
+            .assertLeftPositionInRootIsEqualTo(spacing + itemSize)
+            .assertWidthIsAtLeast(itemSize)
+    }
+
+    @Test
+    fun fixedLazyGridAppliesVerticalSpacingsWithContentPadding() {
+        val items = (1..4).map { it.toString() }
+
+        val spacing = with(rule.density) { 30.toDp() }
+        val itemSize = with(rule.density) { 77.toDp() }
+
+        rule.setContent {
+            LazyVerticalGrid(
+                cells = GridCells.Fixed(2),
+                modifier = Modifier.height(itemSize * 2 + spacing).width(itemSize),
+                verticalArrangement = Arrangement.spacedBy(space = spacing),
+                contentPadding = PaddingValues(vertical = spacing)
+            ) {
+                items(items) {
+                    Spacer(Modifier.size(itemSize).testTag(it))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertIsDisplayed()
+            .assertTopPositionInRootIsEqualTo(spacing)
+            .assertHeightIsAtLeast(itemSize)
+
+        rule.onNodeWithTag("2")
+            .assertIsDisplayed()
+            .assertTopPositionInRootIsEqualTo(spacing)
+            .assertHeightIsAtLeast(itemSize)
+
+        rule.onNodeWithTag("3")
+            .assertIsDisplayed()
+            .assertTopPositionInRootIsEqualTo(spacing * 2 + itemSize)
+            .assertHeightIsAtLeast(itemSize)
+
+        rule.onNodeWithTag("4")
+            .assertIsDisplayed()
+            .assertTopPositionInRootIsEqualTo(spacing * 2 + itemSize)
+            .assertHeightIsAtLeast(itemSize)
+    }
+
+    @Test
+    fun fixedLazyGridAppliesHorizontalSpacingsWithContentPadding() {
+        val items = (1..4).map { it.toString() }
+
+        val spacing = with(rule.density) { 22.toDp() }
+        val itemSize = with(rule.density) { 44.toDp() }
+
+        rule.setContent {
+            LazyVerticalGrid(
+                cells = GridCells.Fixed(2),
+                modifier = Modifier.height(itemSize * 2).width(itemSize * 2 + spacing * 3),
+                horizontalArrangement = Arrangement.spacedBy(space = spacing),
+                contentPadding = PaddingValues(horizontal = spacing)
+            ) {
+                items(items) {
+                    Spacer(Modifier.size(itemSize).testTag(it))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertIsDisplayed()
+            .assertLeftPositionInRootIsEqualTo(spacing)
+            .assertWidthIsAtLeast(itemSize)
+
+        rule.onNodeWithTag("2")
+            .assertIsDisplayed()
+            .assertLeftPositionInRootIsEqualTo(spacing * 2 + itemSize)
+            .assertWidthIsAtLeast(itemSize)
+
+        rule.onNodeWithTag("3")
+            .assertIsDisplayed()
+            .assertLeftPositionInRootIsEqualTo(spacing)
+            .assertWidthIsAtLeast(itemSize)
+
+        rule.onNodeWithTag("4")
+            .assertIsDisplayed()
+            .assertLeftPositionInRootIsEqualTo(spacing * 2 + itemSize)
+            .assertWidthIsAtLeast(itemSize)
     }
 
     @Test
