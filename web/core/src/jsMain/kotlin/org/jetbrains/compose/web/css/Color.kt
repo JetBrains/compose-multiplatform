@@ -168,3 +168,26 @@ object Color {
 }
 
 fun Color(name: String): CSSColorValue = name.unsafeCast<CSSColorValue>()
+
+private data class RGB(val r: Number, val g: Number, val b: Number): CSSColorValue {
+    override fun toString(): String = "rgb($r, $g, $b)"
+}
+
+private data class RGBA(val r: Number, val g: Number, val b: Number, val a: Number) : CSSColorValue {
+    override fun toString(): String = "rgba($r, $g, $b, $a)"
+}
+
+private data class HSL(val h: CSSAngleValue, val s: Number, val l: Number) : CSSColorValue {
+    override fun toString(): String = "hsl($h, $s%, $l%)"
+}
+
+private data class HSLA(val h: CSSAngleValue, val s: Number, val l: Number, val a: Number) : CSSColorValue {
+    override fun toString(): String = "hsla($h, $s%, $l%, $a)"
+}
+
+fun rgb(r: Number, g: Number, b: Number): CSSColorValue = RGB(r, g, b)
+fun rgba(r: Number, g: Number, b: Number, a: Number): CSSColorValue = RGBA(r, g, b, a)
+fun hsl(h: CSSAngleValue, s: Number, l: Number): CSSColorValue = HSL(h, s, l)
+fun hsl(h: Number, s: Number, l: Number): CSSColorValue = HSL(h.deg, s, l)
+fun hsla(h: CSSAngleValue, s: Number, l: Number, a: Number): CSSColorValue = HSLA(h, s, l, a)
+fun hsla(h: Number, s: Number, l: Number, a: Number): CSSColorValue = HSLA(h.deg, s, l, a)
