@@ -50,29 +50,46 @@ fun RemoteConnection.sendConfigFromGradle(
     sendUtf8StringData(previewFqName)
 }
 
-internal fun RemoteConnection.receiveConfigFromGradle(
-    onPreviewClasspath: (String) -> Unit,
-    onPreviewFqName: (String) -> Unit,
-    onPreviewHostConfig: (PreviewHostConfig) -> Unit
-) {
+data class ConfigFromGradle(
+    val previewClasspath: String,
+    val previewFqName: String,
+    val previewHostConfig: PreviewHostConfig
+)
+
+internal fun RemoteConnection.receiveConfigFromGradle(): ConfigFromGradle? {
+    var previewClasspath: String? = null
+    var previewFqName: String? = null
+    var previewHostConfig: PreviewHostConfig? = null
+
     receiveCommand { (type, args) ->
-        when (type) {
-            Command.Type.PREVIEW_CLASSPATH ->
-                receiveUtf8StringData { onPreviewClasspath(it) }
-            Command.Type.PREVIEW_FQ_NAME ->
-                receiveUtf8StringData { onPreviewFqName(it) }
-            Command.Type.PREVIEW_CONFIG -> {
-                val javaExecutable = URLDecoder.decode(args[0], Charsets.UTF_8)
-                receiveUtf8StringData { hostClasspath ->
-                    val config = PreviewHostConfig(javaExecutable = javaExecutable, hostClasspath = hostClasspath)
-                    onPreviewHostConfig(config)
-                }
-            }
-            else -> {
-                // todo
-            }
+        check(type == Command.Type.PREVIEW_CONFIG) {
+            "Expected ${Command.Type.PREVIEW_CONFIG}, got $type"
+        }
+        val javaExecutable = URLDecoder.decode(args[0], Charsets.UTF_8)
+        receiveUtf8StringData { hostClasspath ->
+            previewHostConfig = PreviewHostConfig(javaExecutable = javaExecutable, hostClasspath = hostClasspath)
         }
     }
+    receiveCommand { (type, _) ->
+        check(type == Command.Type.PREVIEW_CLASSPATH) {
+            "Expected ${Command.Type.PREVIEW_CLASSPATH}, got $type"
+        }
+        receiveUtf8StringData { previewClasspath = it }
+    }
+    receiveCommand { (type, _) ->
+        check(type == Command.Type.PREVIEW_FQ_NAME) {
+            "Expected ${Command.Type.PREVIEW_FQ_NAME}, got $type"
+        }
+        receiveUtf8StringData { previewFqName = it }
+    }
+
+    return if (previewClasspath != null && previewFqName != null && previewHostConfig != null) {
+        ConfigFromGradle(
+            previewClasspath = previewClasspath!!,
+            previewFqName = previewFqName!!,
+            previewHostConfig = previewHostConfig!!
+        )
+    } else null
 }
 
 internal fun RemoteConnection.sendPreviewRequest(
@@ -81,9 +98,9 @@ internal fun RemoteConnection.sendPreviewRequest(
 ) {
     sendCommand(Command.Type.PREVIEW_CLASSPATH)
     sendData(previewClasspath.toByteArray(Charsets.UTF_8))
-    val (fqName, frameConfig) = request
+    val (id, fqName, frameConfig) = request
     val (w, h, scale) = frameConfig
-    val args = arrayListOf(fqName, w.toString(), h.toString())
+    val args = arrayListOf(fqName, id.toString(), w.toString(), h.toString())
     if (scale != null) {
         val scaleLong = java.lang.Double.doubleToRawLongBits(scale)
         args.add(scaleLong.toString())
@@ -102,15 +119,17 @@ internal fun RemoteConnection.receivePreviewRequest(
             }
             Command.Type.FRAME_REQUEST -> {
                 val fqName = args.getOrNull(0)
-                val w = args.getOrNull(1)?.toIntOrNull()
-                val h = args.getOrNull(2)?.toIntOrNull()
-                val scale = args.getOrNull(3)?.toLongOrNull()?.let { java.lang.Double.longBitsToDouble(it) }
+                val id = args.getOrNull(1)?.toLongOrNull()
+                val w = args.getOrNull(2)?.toIntOrNull()
+                val h = args.getOrNull(3)?.toIntOrNull()
+                val scale = args.getOrNull(4)?.toLongOrNull()?.let { java.lang.Double.longBitsToDouble(it) }
                 if (
                     fqName != null && fqName.isNotEmpty()
+                        && id != null
                         && w != null && w > 0
                         && h != null && h > 0
                 ) {
-                    onFrameRequest(FrameRequest(fqName, FrameConfig(width = w, height = h, scale = scale)))
+                    onFrameRequest(FrameRequest(id, fqName, FrameConfig(width = w, height = h, scale = scale)))
                 }
             }
             else -> {
