@@ -331,7 +331,7 @@ class EventsTests {
                 shouldAddBounceClass = true
             }
             onAnimationStart {
-                animationStart = "STARTED"
+                animationStart = "STARTED - ${it.animationName}"
             }
             onAnimationEnd {
                 shouldAddBounceClass = false

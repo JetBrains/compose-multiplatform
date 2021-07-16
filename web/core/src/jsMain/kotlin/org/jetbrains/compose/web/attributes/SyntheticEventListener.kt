@@ -14,7 +14,7 @@ import org.w3c.dom.TouchEvent
 import org.w3c.dom.clipboard.ClipboardEvent
 import org.w3c.dom.events.*
 
-open class SyntheticEventListener<T : SyntheticEvent<*>>(
+open class SyntheticEventListener<T : SyntheticEvent<*>> internal constructor(
     val event: String,
     val options: Options,
     val listener: (T) -> Unit
@@ -22,7 +22,7 @@ open class SyntheticEventListener<T : SyntheticEvent<*>>(
 
     @Suppress("UNCHECKED_CAST")
     override fun handleEvent(event: Event) {
-        listener(SyntheticEvent<EventTarget>(event) as T)
+        listener(SyntheticEvent<EventTarget>(event).unsafeCast<T>())
     }
 }
 
@@ -42,7 +42,7 @@ internal class AnimationEventListener(
     event, options, listener
 ) {
     override fun handleEvent(event: Event) {
-        listener(SyntheticAnimationEvent(event))
+        listener(SyntheticAnimationEvent(event, event.unsafeCast<AnimationEventDetails>()))
     }
 }
 
@@ -62,7 +62,7 @@ internal class MouseWheelEventListener(
     listener: (SyntheticWheelEvent) -> Unit
 ) : SyntheticEventListener<SyntheticWheelEvent>(event, options, listener) {
     override fun handleEvent(event: Event) {
-        listener(SyntheticWheelEvent(event as WheelEvent))
+        listener(SyntheticWheelEvent(event.unsafeCast<WheelEvent>()))
     }
 }
 
@@ -72,7 +72,7 @@ internal class KeyboardEventListener(
     listener: (SyntheticKeyboardEvent) -> Unit
 ) : SyntheticEventListener<SyntheticKeyboardEvent>(event, options, listener) {
     override fun handleEvent(event: Event) {
-        listener(SyntheticKeyboardEvent(event as KeyboardEvent))
+        listener(SyntheticKeyboardEvent(event.unsafeCast<KeyboardEvent>()))
     }
 }
 
@@ -82,7 +82,7 @@ internal class FocusEventListener(
     listener: (SyntheticFocusEvent) -> Unit
 ) : SyntheticEventListener<SyntheticFocusEvent>(event, options, listener) {
     override fun handleEvent(event: Event) {
-        listener(SyntheticFocusEvent(event as FocusEvent))
+        listener(SyntheticFocusEvent(event.unsafeCast<FocusEvent>()))
     }
 }
 
@@ -92,7 +92,7 @@ internal class TouchEventListener(
     listener: (SyntheticTouchEvent) -> Unit
 ) : SyntheticEventListener<SyntheticTouchEvent>(event, options, listener) {
     override fun handleEvent(event: Event) {
-        listener(SyntheticTouchEvent(event as TouchEvent))
+        listener(SyntheticTouchEvent(event.unsafeCast<TouchEvent>()))
     }
 }
 
@@ -102,7 +102,7 @@ internal class DragEventListener(
     listener: (SyntheticDragEvent) -> Unit
 ) : SyntheticEventListener<SyntheticDragEvent>(event, options, listener) {
     override fun handleEvent(event: Event) {
-        listener(SyntheticDragEvent(event as DragEvent))
+        listener(SyntheticDragEvent(event.unsafeCast<DragEvent>()))
     }
 }
 
@@ -112,7 +112,7 @@ internal class ClipboardEventListener(
     listener: (SyntheticClipboardEvent) -> Unit
 ) : SyntheticEventListener<SyntheticClipboardEvent>(event, options, listener) {
     override fun handleEvent(event: Event) {
-        listener(SyntheticClipboardEvent(event as ClipboardEvent))
+        listener(SyntheticClipboardEvent(event.unsafeCast<ClipboardEvent>()))
     }
 }
 
@@ -150,7 +150,7 @@ internal class SelectEventListener<Target: EventTarget>(
     SELECT, options, listener
 ) {
     override fun handleEvent(event: Event) {
-        listener(SyntheticSelectEvent(event))
+        listener(SyntheticSelectEvent(event, event.target.unsafeCast<SelectionInfoDetails>()))
     }
 }
 

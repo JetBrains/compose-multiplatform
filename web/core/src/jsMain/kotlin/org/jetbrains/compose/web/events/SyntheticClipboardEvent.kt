@@ -5,7 +5,7 @@ import org.w3c.dom.DataTransfer
 import org.w3c.dom.clipboard.ClipboardEvent
 import org.w3c.dom.events.EventTarget
 
-class SyntheticClipboardEvent(
+class SyntheticClipboardEvent internal constructor(
     nativeEvent: ClipboardEvent
 ) : SyntheticEvent<EventTarget>(nativeEvent) {
 

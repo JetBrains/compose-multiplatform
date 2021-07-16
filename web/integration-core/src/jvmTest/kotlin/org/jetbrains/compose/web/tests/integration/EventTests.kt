@@ -359,10 +359,16 @@ class EventTests : BaseIntegrationTests() {
 
         val box = driver.findElement(By.id("box"))
 
+        val boxMiddleX = box.rect.x + box.rect.width / 2
+        val boxMiddleY = box.rect.y + box.rect.height / 2
+
+        val boxRightBottomX = box.rect.x + box.rect.width
+        val boxRightBottomY = box.rect.y + box.rect.height
+
         TouchActions(driver)
-            .down(box.rect.x + 50, box.rect.y + 50)
-            .move(box.rect.x + 70, box.rect.y + 70)
-            .up(box.rect.x + 70, box.rect.y + 70)
+            .down(boxMiddleX, boxMiddleY)
+            .move(boxRightBottomX, boxRightBottomY)
+            .up(boxRightBottomX, boxRightBottomY)
             .perform()
 
         driver.waitTextToBe(value = "STARTED", textId = "txt_start")
@@ -378,7 +384,7 @@ class EventTests : BaseIntegrationTests() {
 
         driver.findElement(By.id("box")).click()
 
-        driver.waitTextToBe(value = "STARTED", textId = "txt_start")
+        driver.waitTextToBe(value = "STARTED - AppStyleSheetWithAnimation-bounce", textId = "txt_start")
         driver.waitTextToBe(value = "ENDED", textId = "txt_end")
     }
 

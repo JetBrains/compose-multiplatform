@@ -10,7 +10,7 @@ class SyntheticTouchEvent(
 ) : SyntheticEvent<EventTarget>(nativeEvent) {
 
     val altKey: Boolean = nativeEvent.altKey
-    val changedTouched: TouchList = nativeEvent.changedTouches
+    val changedTouches: TouchList = nativeEvent.changedTouches
     val ctrlKey: Boolean = nativeEvent.ctrlKey
     val metaKey: Boolean = nativeEvent.metaKey
     val shiftKey: Boolean = nativeEvent.shiftKey

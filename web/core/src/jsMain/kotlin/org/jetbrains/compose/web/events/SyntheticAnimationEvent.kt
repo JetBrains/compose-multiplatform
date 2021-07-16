@@ -4,11 +4,18 @@ import androidx.compose.web.events.SyntheticEvent
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventTarget
 
-class SyntheticAnimationEvent(
+class SyntheticAnimationEvent internal constructor(
     nativeEvent: Event,
+    animationEventDetails: AnimationEventDetails
 ) : SyntheticEvent<EventTarget>(nativeEvent) {
 
-    val animationName: String = nativeEvent.asDynamic().animationName.unsafeCast<String>()
-    val elapsedTime: Number = nativeEvent.asDynamic().elapsedTime.unsafeCast<Number>()
-    val pseudoElement: String = nativeEvent.asDynamic().pseudoElement.unsafeCast<String>()
+    val animationName: String = animationEventDetails.animationName
+    val elapsedTime: Number = animationEventDetails.elapsedTime
+    val pseudoElement: String = animationEventDetails.pseudoElement
+}
+
+internal external interface AnimationEventDetails {
+    val animationName: String
+    val elapsedTime: Number
+    val pseudoElement: String
 }

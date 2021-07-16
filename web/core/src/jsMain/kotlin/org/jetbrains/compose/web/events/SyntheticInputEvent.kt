@@ -5,7 +5,9 @@ import org.w3c.dom.DataTransfer
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventTarget
 
-class SyntheticInputEvent<ValueType, Element : EventTarget>(
+// @param nativeEvent: Event - we don't use [org.w3c.dom.events.InputEvent] here,
+// since for cases it can be just [org.w3c.dom.events.Event]
+class SyntheticInputEvent<ValueType, Element : EventTarget> internal constructor(
     val value: ValueType,
     nativeEvent: Event
 ) : SyntheticEvent<Element>(

@@ -12,8 +12,8 @@ import org.jetbrains.compose.web.events.SyntheticInputEvent
 import org.jetbrains.compose.web.events.SyntheticSelectEvent
 import org.w3c.dom.HTMLInputElement
 
-class InputAttrsBuilder<T>(
-    val inputType: InputType<T>
+class InputAttrsBuilder<ValueType>(
+    val inputType: InputType<ValueType>
 ) : AttrsBuilder<HTMLInputElement>() {
 
     fun onInvalid(
@@ -25,21 +25,21 @@ class InputAttrsBuilder<T>(
 
     fun onInput(
         options: Options = Options.DEFAULT,
-        listener: (SyntheticInputEvent<T, HTMLInputElement>) -> Unit
+        listener: (SyntheticInputEvent<ValueType, HTMLInputElement>) -> Unit
     ) {
         listeners.add(InputEventListener(eventName = INPUT, options, inputType, listener))
     }
 
     fun onChange(
         options: Options = Options.DEFAULT,
-        listener: (SyntheticChangeEvent<T, HTMLInputElement>) -> Unit
+        listener: (SyntheticChangeEvent<ValueType, HTMLInputElement>) -> Unit
     ) {
         listeners.add(ChangeEventListener(options, inputType, listener))
     }
 
     fun onBeforeInput(
         options: Options = Options.DEFAULT,
-        listener: (SyntheticInputEvent<T, HTMLInputElement>) -> Unit
+        listener: (SyntheticInputEvent<ValueType, HTMLInputElement>) -> Unit
     ) {
         listeners.add(InputEventListener(eventName = BEFOREINPUT, options, inputType, listener))
     }

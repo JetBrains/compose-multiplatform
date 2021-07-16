@@ -255,11 +255,5 @@ open class EventsListenerBuilder {
 
         const val SUBMIT = "submit"
         const val RESET = "reset"
-
-        /*
-        * search event is not supported in Firefox, so we skip it for now
-        * https://caniuse.com/mdn-api_htmlinputelement_search_event
-        */
-        const val SEARCH = "search"
     }
 }

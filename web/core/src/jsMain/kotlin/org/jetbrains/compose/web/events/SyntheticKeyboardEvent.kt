@@ -4,7 +4,7 @@ import androidx.compose.web.events.SyntheticEvent
 import org.w3c.dom.events.EventTarget
 import org.w3c.dom.events.KeyboardEvent
 
-class SyntheticKeyboardEvent(
+class SyntheticKeyboardEvent internal constructor(
     nativeEvent: KeyboardEvent
 ) : SyntheticEvent<EventTarget>(nativeEvent) {
 
