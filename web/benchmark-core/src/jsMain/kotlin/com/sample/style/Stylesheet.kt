@@ -39,8 +39,8 @@ object AppStylesheet : StyleSheet() {
         top((-32).px)
         marginLeft(8.px)
         fontSize(15.px)
-        backgroundColor(Color.RGBA(39, 40, 44, .05))
-        color(Color.RGBA(39,40,44,.7))
+        backgroundColor(rgba(39, 40, 44, .05))
+        color(rgba(39, 40, 44, .7))
         borderRadius(4.px, 4.px, 4.px)
 
         media(mediaMaxWidth(640.px)) {

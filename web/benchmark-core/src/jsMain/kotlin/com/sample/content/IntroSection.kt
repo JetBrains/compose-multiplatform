@@ -117,7 +117,7 @@ private fun IntroCodeSample() {
     Div(attrs = {
         style {
             marginTop(24.px)
-            backgroundColor(Color.RGBA(39, 40, 44, 0.05))
+            backgroundColor(rgba(39, 40, 44, 0.05))
             borderRadius(8.px)
             property("font-family", "'JetBrains Mono', monospace")
         }
@@ -145,7 +145,7 @@ private fun IntroCodeSample() {
             style {
                 height(1.px)
                 border(width = 0.px)
-                backgroundColor(Color.RGBA(39, 40, 44, 0.15))
+                backgroundColor(rgba(39, 40, 44, 0.15))
             }
         })
 
