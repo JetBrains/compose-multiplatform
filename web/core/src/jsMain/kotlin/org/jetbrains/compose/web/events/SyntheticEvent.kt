@@ -3,7 +3,7 @@ package androidx.compose.web.events
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventTarget
 
-open class SyntheticEvent<Element : EventTarget>(
+open class SyntheticEvent<Element : EventTarget> internal constructor(
     val nativeEvent: Event
 ) {
     val target: Element = nativeEvent.target.unsafeCast<Element>()

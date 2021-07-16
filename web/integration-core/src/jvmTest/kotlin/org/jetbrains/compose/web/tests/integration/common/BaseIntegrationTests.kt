@@ -21,7 +21,7 @@ fun WebDriver.openTestPage(test: String) {
 }
 
 fun WebDriver.waitTextToBe(textId: String = "txt", value: String) {
-    WebDriverWait(this, 1).until(ExpectedConditions.textToBe(By.id(textId), value))
+    WebDriverWait(this, 1, 16).until(ExpectedConditions.textToBe(By.id(textId), value))
 }
 
 internal object Drivers {

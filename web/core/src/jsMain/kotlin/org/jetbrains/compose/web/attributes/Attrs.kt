@@ -1,5 +1,6 @@
 package org.jetbrains.compose.web.attributes
 
+import org.jetbrains.compose.web.events.SyntheticSubmitEvent
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLFormElement
@@ -91,6 +92,20 @@ fun AttrsBuilder<HTMLFormElement>.noValidate() =
 
 fun AttrsBuilder<HTMLFormElement>.target(value: FormTarget) =
     attr("target", value.targetStr)
+
+fun AttrsBuilder<HTMLFormElement>.onSubmit(
+    options: Options = Options.DEFAULT,
+    listener: (SyntheticSubmitEvent) -> Unit
+) {
+    addEventListener(eventName = EventsListenerBuilder.SUBMIT, options = options, listener = listener)
+}
+
+fun AttrsBuilder<HTMLFormElement>.onReset(
+    options: Options = Options.DEFAULT,
+    listener: (SyntheticSubmitEvent) -> Unit
+) {
+    addEventListener(eventName = EventsListenerBuilder.RESET, options = options, listener = listener)
+}
 
 /* Input attributes */
 

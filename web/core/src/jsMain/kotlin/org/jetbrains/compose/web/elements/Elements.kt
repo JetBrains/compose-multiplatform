@@ -2,8 +2,9 @@ package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
-import androidx.compose.web.attributes.InputAttrsBuilder
-import androidx.compose.web.attributes.TextAreaAttrsBuilder
+import org.jetbrains.compose.web.attributes.builders.InputAttrsBuilder
+import androidx.compose.web.attributes.SelectAttrsBuilder
+import org.jetbrains.compose.web.attributes.builders.TextAreaAttrsBuilder
 import org.jetbrains.compose.web.DomApplier
 import org.jetbrains.compose.web.DomNodeWrapper
 import kotlinx.browser.document
@@ -595,11 +596,21 @@ fun Form(
 
 @Composable
 fun Select(
-    attrs: AttrBuilderContext<HTMLSelectElement>? = null,
+    attrs: (SelectAttrsBuilder.() -> Unit)? = null,
+    multiple: Boolean = false,
     content: ContentBuilder<HTMLSelectElement>? = null
 ) = TagElement(
     elementBuilder = Select,
-    applyAttrs = attrs,
+    applyAttrs = {
+        if (multiple) multiple()
+        if (attrs != null) {
+            val selectAttrsBuilder = with(SelectAttrsBuilder()) {
+                attrs()
+                this
+            }
+            copyFrom(selectAttrsBuilder)
+        }
+    },
     content = content
 )
 

@@ -13,6 +13,8 @@ import org.openqa.selenium.By
 import org.openqa.selenium.Keys
 import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.WebDriver
+import org.openqa.selenium.WebElement
+import org.openqa.selenium.interactions.touch.TouchActions
 
 class EventTests : BaseIntegrationTests() {
 
@@ -117,7 +119,23 @@ class EventTests : BaseIntegrationTests() {
         val selectAll = Keys.chord(COMMAND_CROSS_PLATFORM, "a")
         selectableText.sendKeys(selectAll)
 
-        driver.waitTextToBe(value = "Text Selected")
+        driver.waitTextToBe(value = "This is a text to be selected")
+    }
+
+    @ResolveDrivers
+    fun `select event in TextArea update the txt`(driver: WebDriver) {
+        driver.openTestPage("selectEventInTextAreaUpdatesText")
+        driver.waitTextToBe(value = "None")
+        driver.waitTextToBe(value = "None", textId = "txt2")
+
+        val selectableText = driver.findElement(By.id("textArea"))
+
+        val selectAll = Keys.chord(COMMAND_CROSS_PLATFORM, "a")
+        selectableText.sendKeys(selectAll)
+
+        val expectedText = "This is a text to be selected"
+        driver.waitTextToBe(value = expectedText)
+        driver.waitTextToBe(value = "0,${expectedText.length}", textId = "txt2")
     }
 
     @ResolveDrivers
@@ -235,5 +253,158 @@ class EventTests : BaseIntegrationTests() {
 
         Actions(driver).moveToElement(box).moveByOffset(-20, -20).perform()
         driver.waitTextToBe(value = "88,88|80,80")
+    }
+
+    private fun WebDriver.copyElementTextToClipboard(element: WebElement) {
+        Actions(this)
+            .doubleClick(element)
+            .keyDown(COMMAND_CROSS_PLATFORM)
+            .sendKeys("C")
+            .keyUp(COMMAND_CROSS_PLATFORM)
+            .perform()
+    }
+
+    private fun WebDriver.cutElementTextToClipboard(element: WebElement) {
+        Actions(this)
+            .doubleClick(element)
+            .keyDown(COMMAND_CROSS_PLATFORM)
+            .sendKeys("X")
+            .keyUp(COMMAND_CROSS_PLATFORM)
+            .perform()
+    }
+
+    private fun WebDriver.pasteFromClipboardInto(element: WebElement) {
+        Actions(this)
+            .click(element)
+            .keyDown(COMMAND_CROSS_PLATFORM)
+            .sendKeys("V")
+            .keyUp(COMMAND_CROSS_PLATFORM)
+            .perform()
+    }
+
+    @ResolveDrivers
+    fun copyPasteOverriddenEventsTest(driver: WebDriver) {
+        driver.openTestPage("copyPasteEventsTest")
+        driver.waitTextToBe(value = "None")
+
+        val textToCopy1 = driver.findElement(By.id("txt_to_copy"))
+        val textinput1 = driver.findElement(By.id("textinput"))
+
+        driver.copyElementTextToClipboard(textToCopy1)
+        driver.pasteFromClipboardInto(textinput1)
+
+        // Copied text should be changed by the onCopy handler
+        driver.waitTextToBe(value = "COPIED_TEXT_WAS_OVERRIDDEN".lowercase())
+    }
+
+    @ResolveDrivers
+    fun copyPasteUnchangedEventsTest(driver: WebDriver) {
+        driver.openTestPage("copyPasteEventsTest")
+        driver.waitTextToBe(value = "None")
+
+        val textinput2 = driver.findElement(By.id("textinput"))
+        val textToCopy2 = driver.findElement(By.id("txt_to_copy2"))
+
+        driver.copyElementTextToClipboard(textToCopy2)
+        driver.pasteFromClipboardInto(textinput2)
+
+        // Copied text should not be changed by the onCopy handler
+        driver.waitTextToBe(value = "SomeTestTextToCopy2".lowercase())
+    }
+
+    @ResolveDrivers
+    fun cutPasteEventsTests(driver: WebDriver) {
+        driver.openTestPage("cutPasteEventsTest")
+        driver.waitTextToBe(value = "None")
+
+        val textinput1 = driver.findElement(By.id("textinput1"))
+        val textinput2 = driver.findElement(By.id("textinput2"))
+
+        driver.cutElementTextToClipboard(textinput1)
+        driver.waitTextToBe(value = "Text was cut")
+
+        driver.pasteFromClipboardInto(textinput2)
+        driver.waitTextToBe(value = "Modified pasted text = TextToCut")
+    }
+
+    @ResolveDrivers
+    fun keyDownKeyUpTest(driver: WebDriver) {
+        driver.openTestPage("keyDownKeyUpTest")
+
+        driver.waitTextToBe(value = "None", textId = "txt_down")
+        driver.waitTextToBe(value = "None", textId = "txt_up")
+
+        val input = driver.findElement(By.id("textinput"))
+        input.sendKeys("a")
+
+        driver.waitTextToBe(value = "keydown = a", textId = "txt_down")
+        driver.waitTextToBe(value = "keyup = a", textId = "txt_up")
+
+        Actions(driver).keyDown(input, Keys.SHIFT).perform()
+        driver.waitTextToBe(value = "keydown = Shift", textId = "txt_down")
+        driver.waitTextToBe(value = "keyup = a", textId = "txt_up")
+
+        Actions(driver).keyUp(input, Keys.SHIFT).perform()
+        driver.waitTextToBe(value = "keydown = Shift", textId = "txt_down")
+        driver.waitTextToBe(value = "keyup = Shift", textId = "txt_up")
+    }
+
+    //@ResolveDrivers
+    // TODO: at least chrome driver has mobile emulation, so we can try it out (didn't work right away)
+    fun touchEventsDispatched(driver: WebDriver) {
+        driver.openTestPage("touchEventsDispatched")
+        driver.waitTextToBe(value = "None", textId = "txt_start")
+        driver.waitTextToBe(value = "None", textId = "txt_move")
+        driver.waitTextToBe(value = "None", textId = "txt_end")
+
+        val box = driver.findElement(By.id("box"))
+
+        val boxMiddleX = box.rect.x + box.rect.width / 2
+        val boxMiddleY = box.rect.y + box.rect.height / 2
+
+        val boxRightBottomX = box.rect.x + box.rect.width
+        val boxRightBottomY = box.rect.y + box.rect.height
+
+        TouchActions(driver)
+            .down(boxMiddleX, boxMiddleY)
+            .move(boxRightBottomX, boxRightBottomY)
+            .up(boxRightBottomX, boxRightBottomY)
+            .perform()
+
+        driver.waitTextToBe(value = "STARTED", textId = "txt_start")
+        driver.waitTextToBe(value = "MOVED", textId = "txt_move")
+        driver.waitTextToBe(value = "ENDED", textId = "txt_end")
+    }
+
+    @ResolveDrivers
+    fun animationEventsDispatched(driver: WebDriver) {
+        driver.openTestPage("animationEventsDispatched")
+        driver.waitTextToBe(value = "None", textId = "txt_start")
+        driver.waitTextToBe(value = "None", textId = "txt_end")
+
+        driver.findElement(By.id("box")).click()
+
+        driver.waitTextToBe(value = "STARTED - AppStyleSheetWithAnimation-bounce", textId = "txt_start")
+        driver.waitTextToBe(value = "ENDED", textId = "txt_end")
+    }
+
+    @ResolveDrivers
+    fun onSubmitEventForFormDispatched(driver: WebDriver) {
+        driver.openTestPage("onSubmitEventForFormDispatched")
+        driver.waitTextToBe(value = "None")
+
+        driver.findElement(By.id("send_form_btn")).click()
+
+        driver.waitTextToBe(value = "Form submitted")
+    }
+
+    @ResolveDrivers
+    fun onResetEventForFormDispatched(driver: WebDriver) {
+        driver.openTestPage("onResetEventForFormDispatched")
+        driver.waitTextToBe(value = "None")
+
+        driver.findElement(By.id("reset_form_btn")).click()
+
+        driver.waitTextToBe(value = "Form reset")
     }
 }

@@ -10,7 +10,7 @@ import org.w3c.dom.events.WheelEvent
 /**
  * https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent
  */
-open class SyntheticMouseEvent(
+open class SyntheticMouseEvent internal constructor(
     nativeEvent: MouseEvent
 ) : SyntheticEvent<EventTarget>(nativeEvent) {
 
