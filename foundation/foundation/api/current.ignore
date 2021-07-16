@@ -1,3 +1,7 @@
 // Baseline format: 1.0
 RemovedClass: androidx.compose.foundation.gestures.RelativeVelocityTrackerKt:
     Removed class androidx.compose.foundation.gestures.RelativeVelocityTrackerKt
+
+
+RemovedMethod: androidx.compose.foundation.ImageKt#Image(androidx.compose.ui.graphics.ImageBitmap, String, androidx.compose.ui.Modifier, androidx.compose.ui.Alignment, androidx.compose.ui.layout.ContentScale, float, androidx.compose.ui.graphics.ColorFilter):
+    Removed method androidx.compose.foundation.ImageKt.Image(androidx.compose.ui.graphics.ImageBitmap,String,androidx.compose.ui.Modifier,androidx.compose.ui.Alignment,androidx.compose.ui.layout.ContentScale,float,androidx.compose.ui.graphics.ColorFilter)

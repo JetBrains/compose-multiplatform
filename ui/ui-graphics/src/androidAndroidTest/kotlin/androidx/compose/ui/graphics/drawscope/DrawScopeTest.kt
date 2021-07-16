@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.LinearGradientShader
 import androidx.compose.ui.graphics.Paint
@@ -38,6 +39,7 @@ import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -47,6 +49,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.math.roundToInt
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
@@ -1629,6 +1632,61 @@ class DrawScopeTest {
                         this.strokeWidth = strokeWidth
                     }
                 )
+            }
+        )
+    }
+
+    @Test
+    fun testDrawImageWithFilterQualityNone() {
+        // Create a small 3x3 ImageBitmap that has red, blue and green squares
+        // along the diagonal. Drawing this bitmap scaled into any square drawing area
+        // with FilterQuality.None should draw 3 equivalently sized squares each red, blue and green
+        // without any interpolation/anti-aliasing algorithm applied to the result
+        val width = 90f
+        val height = 90f
+        val sampleBitmap = ImageBitmap(3, 3)
+        val canvas = androidx.compose.ui.graphics.Canvas(sampleBitmap)
+        val samplePaint = Paint().apply {
+            color = Color.White
+        }
+
+        canvas.drawRect(0f, 0f, 3f, 3f, samplePaint)
+
+        samplePaint.color = Color.Red
+        canvas.drawRect(0f, 0f, 1f, 1f, samplePaint)
+
+        samplePaint.color = Color.Blue
+        canvas.drawRect(1f, 1f, 2f, 2f, samplePaint)
+
+        samplePaint.color = Color.Green
+        canvas.drawRect(2f, 2f, 3f, 3f, samplePaint)
+
+        testDrawScopeAndCanvasAreEquivalent(
+            width.toInt(),
+            height.toInt(),
+            {
+                drawRect(Color.White)
+                drawImage(
+                    sampleBitmap,
+                    dstSize = IntSize(size.width.roundToInt(), size.height.roundToInt()),
+                    filterQuality = FilterQuality.None
+                )
+            },
+            {
+                // Compare the result above with a similarly rendered result that is 30x larger
+                // In this case, scaling up the original 3x3 ImageBitmap will generate the
+                // same exact output
+                val canvasPaint = Paint().apply { color = Color.White }
+                it.drawRect(0f, 0f, width, height, canvasPaint)
+
+                canvasPaint.color = Color.Red
+                it.drawRect(0f, 0f, 30f, 30f, canvasPaint)
+
+                canvasPaint.color = Color.Blue
+                it.drawRect(30f, 30f, 60f, 60f, canvasPaint)
+
+                canvasPaint.color = Color.Green
+                it.drawRect(60f, 60f, 90f, 90f, canvasPaint)
             }
         )
     }
