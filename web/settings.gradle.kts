@@ -2,8 +2,8 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         mavenCentral()
-        maven { 
-            url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev") 
+        maven {
+            url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         }
         maven {
             url = uri("https://packages.jetbrains.team/maven/p/ui/dev")
@@ -32,6 +32,7 @@ module(":web-widgets", "$rootDir/widgets")
 module(":web-integration-core", "$rootDir/integration-core")
 module(":web-integration-widgets", "$rootDir/integration-widgets")
 module(":web-benchmark-core", "$rootDir/benchmark-core")
+module(":compose-compiler-integration", "$rootDir/compose-compiler-integration")
 
 if (extra["COMPOSE_WEB_BUILD_WITH_EXAMPLES"]!!.toString().toBoolean() == true) {
     println("building with examples")
