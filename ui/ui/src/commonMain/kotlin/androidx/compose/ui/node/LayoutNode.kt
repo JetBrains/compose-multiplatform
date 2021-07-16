@@ -756,7 +756,6 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
                 outerWrapper != innerLayoutNodeWrapper
             ) {
                 requestRemeasure()
-                parent?.requestRelayout()
             } else if (layoutState == Ready && addedCallback) {
                 // We need to notify the callbacks of a change in position since there's
                 // a new one.
