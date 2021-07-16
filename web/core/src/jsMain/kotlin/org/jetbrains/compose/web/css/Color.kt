@@ -5,20 +5,25 @@ package org.jetbrains.compose.web.css
 external interface CSSColorValue : StylePropertyValue, CSSVariableValueAs<CSSColorValue>
 
 object Color {
+
+    @Deprecated("use org.jetbrains.compose.web.css.rgb", ReplaceWith("rgb(r, g, b)"))
     data class RGB(val r: Number, val g: Number, val b: Number) : CSSColorValue {
         override fun toString(): String = "rgb($r, $g, $b)"
     }
 
+    @Deprecated("use org.jetbrains.compose.web.css.rgba", ReplaceWith("rgba(r, g, b, a)"))
     data class RGBA(val r: Number, val g: Number, val b: Number, val a: Number) : CSSColorValue {
         override fun toString(): String = "rgba($r, $g, $b, $a)"
     }
 
+    @Deprecated("use org.jetbrains.compose.web.css.hsl", ReplaceWith("hsl(r, g, b)"))
     data class HSL(val h: CSSAngleValue, val s: Number, val l: Number) : CSSColorValue {
         constructor(h: Number, s: Number, l: Number) : this(h.deg, s, l)
 
         override fun toString(): String = "hsl($h, $s%, $l%)"
     }
 
+    @Deprecated("use org.jetbrains.compose.web.css.hsla", ReplaceWith("hsla(r, g, b, a)"))
     data class HSLA(val h: CSSAngleValue, val s: Number, val l: Number, val a: Number) : CSSColorValue {
         constructor(h: Number, s: Number, l: Number, a: Number) : this(h.deg, s, l, a)
 

@@ -16,6 +16,7 @@ import kotlin.test.assertEquals
 
 class ColorTests {
     @Test
+    @Suppress("DEPRECATION")
     fun rgbTestDeprecated() = runTest {
         composition {
             Div({ style { color(Color.RGB(0, 0, 0)) } })
@@ -39,6 +40,7 @@ class ColorTests {
     }
 
     @Test
+    @Suppress("DEPRECATION")
     fun rgbaTestDeprecated() = runTest {
         composition {
             Div({ style { color(Color.RGBA(0, 220, 0, 0.2)) } })
@@ -66,6 +68,30 @@ class ColorTests {
     }
 
     @Test
+    @Suppress("DEPRECATION")
+    fun hslTestDeprecated() = runTest {
+        composition {
+            Div({ style { color(Color.HSL(100, 120, 50)) } })
+            Div({ style { color(Color.HSL(235, 100, 50)) } })
+        }
+
+        assertEquals("rgb(85, 255, 0)", (root.children[0] as HTMLElement).style.color)
+        assertEquals("rgb(0, 21, 255)", (root.children[1] as HTMLElement).style.color)
+    }
+
+    @Test
+    fun hslTest() = runTest {
+        composition {
+            Div({ style { color(hsl(100, 120, 50)) } })
+            Div({ style { color(hsl(235, 100, 50)) } })
+        }
+
+        assertEquals("rgb(85, 255, 0)", (root.children[0] as HTMLElement).style.color)
+        assertEquals("rgb(0, 21, 255)", (root.children[1] as HTMLElement).style.color)
+    }
+
+    @Test
+    @Suppress("DEPRECATION")
     fun hslaTestDeprecated() = runTest {
         composition {
             Div({ style { color(Color.HSLA(100, 100, 50, 1)) } })
@@ -86,29 +112,6 @@ class ColorTests {
 
         assertEquals("rgb(85, 255, 0)", (root.children[0] as HTMLElement).style.color)
         assertEquals("rgba(0, 21, 255, 0.5)", (root.children[1] as HTMLElement).style.color)
-    }
-
-    @Test
-    fun hslTestDeprecated() = runTest {
-        composition {
-            Div({ style { color(Color.HSL(100, 120, 50)) } })
-            Div({ style { color(Color.HSL(235, 100, 50)) } })
-        }
-
-        assertEquals("rgb(85, 255, 0)", (root.children[0] as HTMLElement).style.color)
-        assertEquals("rgb(0, 21, 255)", (root.children[1] as HTMLElement).style.color)
-    }
-
-
-    @Test
-    fun hslTest() = runTest {
-        composition {
-            Div({ style { color(hsl(100, 120, 50)) } })
-            Div({ style { color(hsl(235, 100, 50)) } })
-        }
-
-        assertEquals("rgb(85, 255, 0)", (root.children[0] as HTMLElement).style.color)
-        assertEquals("rgb(0, 21, 255)", (root.children[1] as HTMLElement).style.color)
     }
 
 
@@ -394,6 +397,6 @@ class ColorTests {
         assertEquals("yellowgreen", (root.children[counter++] as HTMLElement).style.color)
         assertEquals("yellow", (root.children[counter++] as HTMLElement).style.color)
         assertEquals("transparent", (root.children[counter++] as HTMLElement).style.color)
-        assertEquals("currentcolor", (root.children[counter++] as HTMLElement).style.color)
+        assertEquals("currentcolor", (root.children[counter] as HTMLElement).style.color)
     }
 }
