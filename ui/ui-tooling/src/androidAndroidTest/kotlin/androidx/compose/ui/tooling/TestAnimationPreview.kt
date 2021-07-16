@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.tooling
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.tween
@@ -26,6 +28,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.Composable
@@ -49,6 +52,16 @@ fun CheckBoxPreview() {
 fun CheckBoxScaffoldPreview() {
     Scaffold {
         CheckBox()
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Preview(name = "AnimatedVisibility")
+@Composable
+fun AnimatedVisibilityPreview() {
+    val editable by remember { mutableStateOf(true) }
+    AnimatedVisibility(visible = editable) {
+        Text(text = "Edit")
     }
 }
 
