@@ -65,16 +65,51 @@ class ColorTests {
         assertEquals("rgba(200, 10, 20, 0.3)", (root.children[2] as HTMLElement).style.color)
     }
 
-//    @Test
-//    fun hslTest() = runTest {
-//        composition {
-//            Div({ style { color(hsl(0, 220, 0)) } })
-//            Div({ style { color(hsl(235, 100, 50)) } })
-//        }
-//
-//        assertEquals("rgba(0, 220, 0, 0.2)", (root.children[0] as HTMLElement).style.color)
-//    }
+    @Test
+    fun hslaTestDeprecated() = runTest {
+        composition {
+            Div({ style { color(Color.HSLA(100, 100, 50, 1)) } })
+            Div({ style { color(Color.HSLA(235, 100, 50, .5)) } })
+        }
 
+        assertEquals("rgb(85, 255, 0)", (root.children[0] as HTMLElement).style.color)
+        assertEquals("rgba(0, 21, 255, 0.5)", (root.children[1] as HTMLElement).style.color)
+    }
+
+
+    @Test
+    fun hslaTest() = runTest {
+        composition {
+            Div({ style { color(hsla(100, 100, 50, 1)) } })
+            Div({ style { color(hsla(235, 100, 50, .5)) } })
+        }
+
+        assertEquals("rgb(85, 255, 0)", (root.children[0] as HTMLElement).style.color)
+        assertEquals("rgba(0, 21, 255, 0.5)", (root.children[1] as HTMLElement).style.color)
+    }
+
+    @Test
+    fun hslTestDeprecated() = runTest {
+        composition {
+            Div({ style { color(Color.HSL(100, 120, 50)) } })
+            Div({ style { color(Color.HSL(235, 100, 50)) } })
+        }
+
+        assertEquals("rgb(85, 255, 0)", (root.children[0] as HTMLElement).style.color)
+        assertEquals("rgb(0, 21, 255)", (root.children[1] as HTMLElement).style.color)
+    }
+
+
+    @Test
+    fun hslTest() = runTest {
+        composition {
+            Div({ style { color(hsl(100, 120, 50)) } })
+            Div({ style { color(hsl(235, 100, 50)) } })
+        }
+
+        assertEquals("rgb(85, 255, 0)", (root.children[0] as HTMLElement).style.color)
+        assertEquals("rgb(0, 21, 255)", (root.children[1] as HTMLElement).style.color)
+    }
 
 
     @Test
