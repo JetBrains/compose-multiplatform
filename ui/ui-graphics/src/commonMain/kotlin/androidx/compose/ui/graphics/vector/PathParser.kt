@@ -266,8 +266,8 @@ class PathParser {
         target.relativeQuadraticBezierTo(dx1, dy1, dx2, dy2)
         ctrlPoint.x = currentPoint.x + dx1
         ctrlPoint.y = currentPoint.y + dy1
-        currentPoint.x += dx1
-        currentPoint.y += dy1
+        currentPoint.x += dx2
+        currentPoint.y += dy2
     }
 
     private fun QuadTo.quadTo(target: Path) {
