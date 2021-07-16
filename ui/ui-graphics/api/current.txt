@@ -1059,6 +1059,7 @@ package androidx.compose.ui.graphics.drawscope {
     method public void drawCircle(androidx.compose.ui.graphics.Brush brush, optional float radius, optional long center, optional float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional int blendMode);
     method public void drawCircle(long color, optional float radius, optional long center, optional float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional int blendMode);
     method public void drawImage(androidx.compose.ui.graphics.ImageBitmap image, optional long topLeft, optional float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional int blendMode);
+    method public default void drawImage(androidx.compose.ui.graphics.ImageBitmap image, optional long srcOffset, optional long srcSize, optional long dstOffset, optional long dstSize, optional float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional int blendMode, optional int filterQuality);
     method public void drawImage(androidx.compose.ui.graphics.ImageBitmap image, optional long srcOffset, optional long srcSize, optional long dstOffset, optional long dstSize, optional float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional int blendMode);
     method public void drawLine(androidx.compose.ui.graphics.Brush brush, long start, long end, optional float strokeWidth, optional int cap, optional androidx.compose.ui.graphics.PathEffect? pathEffect, optional float alpha, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional int blendMode);
     method public void drawLine(long color, long start, long end, optional float strokeWidth, optional int cap, optional androidx.compose.ui.graphics.PathEffect? pathEffect, optional float alpha, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional int blendMode);
@@ -1086,7 +1087,9 @@ package androidx.compose.ui.graphics.drawscope {
 
   public static final class DrawScope.Companion {
     method public int getDefaultBlendMode();
+    method public int getDefaultFilterQuality();
     property public final int DefaultBlendMode;
+    property public final int DefaultFilterQuality;
   }
 
   public final class DrawScopeKt {
@@ -1168,6 +1171,10 @@ package androidx.compose.ui.graphics.painter {
     method public long getIntrinsicSize();
     method protected void onDraw(androidx.compose.ui.graphics.drawscope.DrawScope);
     property public long intrinsicSize;
+  }
+
+  public final class BitmapPainterKt {
+    method public static androidx.compose.ui.graphics.painter.BitmapPainter BitmapPainter(androidx.compose.ui.graphics.ImageBitmap image, optional long srcOffset, optional long srcSize, optional int filterQuality);
   }
 
   public final class ColorPainter extends androidx.compose.ui.graphics.painter.Painter {

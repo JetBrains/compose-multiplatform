@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
@@ -456,6 +457,16 @@ interface DrawScope : Density {
      * @param colorFilter ColorFilter to apply to the [image] when drawn into the destination
      * @param blendMode Blending algorithm to apply to destination
      */
+    @Deprecated(
+        "Prefer usage of drawImage that consumes an optional FilterQuality parameter",
+        level = DeprecationLevel.HIDDEN,
+        replaceWith = ReplaceWith(
+            "drawImage(image, srcOffset, srcSize, dstOffset, dstSize, alpha, style, " +
+                "colorFilter, blendMode, FilterQuality.Low)",
+            "androidx.compose.ui.graphics.drawscope",
+            "androidx.compose.ui.graphics.FilterQuality"
+        )
+    ) // Binary API compatibility.
     fun drawImage(
         image: ImageBitmap,
         srcOffset: IntOffset = IntOffset.Zero,
@@ -468,6 +479,57 @@ interface DrawScope : Density {
         colorFilter: ColorFilter? = null,
         blendMode: BlendMode = DefaultBlendMode
     )
+
+    /**
+     * Draws the subset of the given image described by the `src` argument into
+     * the canvas in the axis-aligned rectangle given by the `dst` argument.
+     *
+     * If no src rect is provided, the entire image is scaled into the corresponding destination
+     * bounds
+     *
+     * @param image The source image to draw
+     * @param srcOffset Optional offset representing the top left offset of the source image
+     * to draw, this defaults to the origin of [image]
+     * @param srcSize Optional dimensions of the source image to draw relative to [srcOffset],
+     * this defaults the width and height of [image]
+     * @param dstOffset Optional offset representing the top left offset of the destination
+     * to draw the given image, this defaults to the origin of the current translation
+     * tarting top left offset in the destination to draw the image
+     * @param dstSize Optional dimensions of the destination to draw, this defaults to [srcSize]
+     * @param alpha Opacity to be applied to [image] from 0.0f to 1.0f representing
+     * fully transparent to fully opaque respectively
+     * @param style Specifies whether the image is to be drawn filled in or as a rectangular stroke
+     * @param colorFilter ColorFilter to apply to the [image] when drawn into the destination
+     * @param blendMode Blending algorithm to apply to destination
+     * @param filterQuality Sampling algorithm applied to the [image] when it is scaled and drawn
+     * into the destination. The default is [FilterQuality.Low] which scales using a bilinear
+     * sampling algorithm
+     */
+    fun drawImage(
+        image: ImageBitmap,
+        srcOffset: IntOffset = IntOffset.Zero,
+        srcSize: IntSize = IntSize(image.width, image.height),
+        dstOffset: IntOffset = IntOffset.Zero,
+        dstSize: IntSize = srcSize,
+        /*@FloatRange(from = 0.0, to = 1.0)*/
+        alpha: Float = 1.0f,
+        style: DrawStyle = Fill,
+        colorFilter: ColorFilter? = null,
+        blendMode: BlendMode = DefaultBlendMode,
+        filterQuality: FilterQuality = DefaultFilterQuality
+    ) {
+        drawImage(
+            image = image,
+            srcOffset = srcOffset,
+            srcSize = srcSize,
+            dstOffset = dstOffset,
+            dstSize = dstSize,
+            alpha = alpha,
+            style = style,
+            colorFilter = colorFilter,
+            blendMode = blendMode
+        )
+    }
 
     /**
      * Draws a rounded rectangle with the provided size, offset and radii for the x and y axis
@@ -815,6 +877,13 @@ interface DrawScope : Density {
          * in the destination
          */
         val DefaultBlendMode: BlendMode = BlendMode.SrcOver
+
+        /**
+         * Default FilterQuality used for determining the filtering algorithm
+         * to apply when scaling [ImageBitmap] objects. Maps to the default
+         * behavior of bilinear filtering
+         */
+        val DefaultFilterQuality: FilterQuality = FilterQuality.Low
     }
 }
 
