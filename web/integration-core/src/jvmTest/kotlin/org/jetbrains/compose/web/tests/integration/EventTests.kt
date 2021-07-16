@@ -381,4 +381,24 @@ class EventTests : BaseIntegrationTests() {
         driver.waitTextToBe(value = "STARTED", textId = "txt_start")
         driver.waitTextToBe(value = "ENDED", textId = "txt_end")
     }
+
+    @ResolveDrivers
+    fun onSubmitEventForFormDispatched(driver: WebDriver) {
+        driver.openTestPage("onSubmitEventForFormDispatched")
+        driver.waitTextToBe(value = "None")
+
+        driver.findElement(By.id("send_form_btn")).click()
+
+        driver.waitTextToBe(value = "Form submitted")
+    }
+
+    @ResolveDrivers
+    fun onResetEventForFormDispatched(driver: WebDriver) {
+        driver.openTestPage("onResetEventForFormDispatched")
+        driver.waitTextToBe(value = "None")
+
+        driver.findElement(By.id("reset_form_btn")).click()
+
+        driver.waitTextToBe(value = "Form reset")
+    }
 }

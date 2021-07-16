@@ -344,6 +344,46 @@ class EventsTests {
             Text("Click to Animate")
         }
     }
+
+    val onSubmitEventForFormDispatched by testCase {
+        var state by remember { mutableStateOf("None") }
+
+        P { TestText(value = state) }
+
+        Form(action = "#", attrs = {
+            onSubmit {
+                it.preventDefault()
+                state = "Form submitted"
+            }
+        }) {
+            Button(attrs = {
+                id("send_form_btn")
+                type(ButtonType.Submit)
+            }) {
+                Text("Send Form")
+            }
+        }
+    }
+
+    val onResetEventForFormDispatched by testCase {
+        var state by remember { mutableStateOf("None") }
+
+        P { TestText(value = state) }
+
+        Form(action = "#", attrs = {
+            onReset {
+                it.preventDefault()
+                state = "Form reset"
+            }
+        }) {
+            Button(attrs = {
+                id("reset_form_btn")
+                type(ButtonType.Reset)
+            }) {
+                Text("Send Form")
+            }
+        }
+    }
 }
 
 

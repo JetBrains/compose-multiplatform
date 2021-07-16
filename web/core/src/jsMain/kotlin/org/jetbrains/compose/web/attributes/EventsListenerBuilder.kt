@@ -253,6 +253,9 @@ open class EventsListenerBuilder {
         const val DRAGENTER = "dragenter"
         const val DRAGLEAVE = "dragleave"
 
+        const val SUBMIT = "submit"
+        const val RESET = "reset"
+
         /*
         * search event is not supported in Firefox, so we skip it for now
         * https://caniuse.com/mdn-api_htmlinputelement_search_event
