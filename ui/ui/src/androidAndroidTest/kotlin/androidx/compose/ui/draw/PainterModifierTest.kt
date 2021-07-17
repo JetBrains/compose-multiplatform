@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.requiredWidthIn
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
@@ -76,6 +77,7 @@ import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
@@ -694,6 +696,42 @@ class PainterModifierTest {
             ValueElement("alpha", DefaultAlpha),
             ValueElement("colorFilter", null)
         )
+    }
+
+    @Test
+    @SmallTest
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun testBackgroundPainterChain() {
+        val painter = TestPainter(100f, 100f).apply {
+            color = Color.Red
+        }
+
+        val painter2 = TestPainter(100f, 100f).apply {
+            color = Color.Blue.copy(alpha = 0.5f)
+        }
+
+        val tag = "testTag"
+        var sizePx = 0f
+        val size = 2.dp
+        rule.setContent {
+            with(LocalDensity.current) { sizePx = size.toPx() }
+            Box(
+                modifier = Modifier.testTag(tag)
+                    .size(size)
+                    .paint(painter)
+                    .paint(painter2)
+            )
+        }
+
+        rule.onNodeWithTag(tag).captureToImage().apply {
+            assertEquals(sizePx.roundToInt(), width)
+            assertEquals(sizePx.roundToInt(), height)
+            assertPixels {
+                // Verify that the last painter in the chain covers all the pixels rendered by
+                // the painter before it
+                Color.Blue.copy(alpha = 0.5f).compositeOver(Color.Red)
+            }
+        }
     }
 
     @Composable

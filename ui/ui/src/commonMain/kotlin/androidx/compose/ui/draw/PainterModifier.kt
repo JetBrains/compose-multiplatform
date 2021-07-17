@@ -289,6 +289,9 @@ private class PainterModifier(
                 draw(size = scaledSize, alpha = alpha, colorFilter = colorFilter)
             }
         }
+
+        // Maintain the same pattern as Modifier.drawBehind to allow chaining of DrawModifiers
+        drawContent()
     }
 
     private fun Size.hasSpecifiedAndFiniteWidth() = this != Size.Unspecified && width.isFinite()
