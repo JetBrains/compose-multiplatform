@@ -17,6 +17,7 @@
 
 <manifest
         xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         package="androidx.compose.material.catalog">
 
     <application
@@ -29,5 +30,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- TODO: Remove this when releasing to production -->
+        <!-- b/194064773 -->
+        <meta-data
+            android:name="com.android.vending.restrict_releases_to"
+            android:value="__nonproduction__"
+            tools:ignore="MetadataTagInsideApplicationTag" />
     </application>
 </manifest>

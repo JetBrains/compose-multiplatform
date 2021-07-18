@@ -23,6 +23,21 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
+android {
+    defaultConfig {
+        applicationId "androidx.compose.material.catalog"
+        versionCode 1000
+        versionName "1.0.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
+        }
+    }
+}
+
 dependencies {
     kotlinPlugin project(":compose:compiler:compiler")
     implementation(libs.kotlinStdlib)
