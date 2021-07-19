@@ -88,7 +88,7 @@ class PreviewManagerImpl(
         if (previewConfig != null && runningPreview?.isAlive != true) {
             val process = startPreviewProcess(previewConfig)
             val connection = tryAcceptConnection(previewSocket, "PREVIEW")
-            connection?.receiveAttach {
+            connection?.receiveAttach(listener = previewListener) {
                 this.runningPreview.set(RunningPreview(connection, process))
             }
         }
