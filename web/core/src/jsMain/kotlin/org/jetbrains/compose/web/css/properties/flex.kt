@@ -30,11 +30,19 @@ fun StyleBuilder.justifyContent(justifyContent: SpacedContent) {
     property("justify-content", justifyContent)
 }
 
+fun StyleBuilder.justifyContent(justifyContent: ContentPositioning) {
+    property("justify-content", justifyContent)
+}
+
 fun StyleBuilder.justifyContent(justifyContent: JustifyContent) {
     property("justify-content", justifyContent)
 }
 
 fun StyleBuilder.alignSelf(alignSelf: BasicStringProperty) {
+    property("align-self", alignSelf)
+}
+
+fun StyleBuilder.alignSelf(alignSelf: ContentPositioning) {
     property("align-self", alignSelf)
 }
 
@@ -46,11 +54,19 @@ fun StyleBuilder.alignItems(alignItems: BasicStringProperty) {
     property("align-items", alignItems)
 }
 
+fun StyleBuilder.alignItems(alignItems: ContentPositioning) {
+    property("align-items", alignItems)
+}
+
 fun StyleBuilder.alignItems(alignItems: AlignItems) {
     property("align-items", alignItems)
 }
 
 fun StyleBuilder.alignContent(alignContent: BasicStringProperty) {
+    property("align-content", alignContent)
+}
+
+fun StyleBuilder.alignContent(alignContent: ContentPositioning) {
     property("align-content", alignContent)
 }
 

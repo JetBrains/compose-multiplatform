@@ -76,21 +76,23 @@ val Nowrap = "nowrap".unsafeCast<FlexWrap>()
 val WrapReverse = "wrap-reverse".unsafeCast<FlexWrap>()
 
 external interface SpacedContent : StylePropertyString
+external interface ContentPositioning : StylePropertyString
 
-object Center : JustifyContent, AlignSelf, AlignItems, AlignContent, StylePropertyStringValue("center")
-object Start : JustifyContent, AlignSelf, AlignItems, AlignContent, StepPosition, StylePropertyStringValue("start")
-object End : JustifyContent, AlignSelf, AlignItems, AlignContent, StepPosition, StylePropertyStringValue("end")
-object FlexStart : JustifyContent, AlignSelf, AlignItems, AlignContent, StylePropertyStringValue("flex-start")
-object FlexEnd : JustifyContent, AlignSelf, AlignItems, AlignContent, StylePropertyStringValue("flex-end")
+val Center = "center".unsafeCast<ContentPositioning>()
+val FlexStart = "flex-start".unsafeCast<ContentPositioning>()
+val FlexEnd = "flex-end".unsafeCast<ContentPositioning>()
+val Stretch = "stretch".unsafeCast<ContentPositioning>()
+val SafeCenter = "safe center".unsafeCast<ContentPositioning>()
+val UnsafeCenter = "unsafe center".unsafeCast<ContentPositioning>()
+
+object Start : ContentPositioning, StepPosition, StylePropertyStringValue("start")
+object End : ContentPositioning, StepPosition, StylePropertyStringValue("end")
 val Left = "left".unsafeCast<JustifyContent>()
 val Right = "right".unsafeCast<JustifyContent>()
 object Normal : JustifyContent, AlignSelf, AlignItems, AnimationDirection, StylePropertyStringValue("normal")
 val SpaceBetween = "space-between".unsafeCast<SpacedContent>()
 val SpaceAround = "space-around".unsafeCast<SpacedContent>()
 val SpaceEvenly = "space-evenly".unsafeCast<SpacedContent>()
-object Stretch : JustifyContent, AlignSelf, AlignItems, AlignContent, StylePropertyStringValue("stretch")
-object SafeCenter : JustifyContent, AlignSelf, AlignItems, AlignContent, StylePropertyStringValue("safe center")
-object UnsafeCenter : JustifyContent, AlignSelf, AlignItems, AlignContent, StylePropertyStringValue("unsafe center")
 
 val Auto = "auto".unsafeCast<AlignSelf>()
 val SelfStart = "self-start".unsafeCast<AlignSelf>()
