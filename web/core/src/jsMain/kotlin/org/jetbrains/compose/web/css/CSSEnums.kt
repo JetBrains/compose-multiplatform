@@ -10,10 +10,6 @@ external interface LineStyle : StylePropertyString
 external interface DisplayStyle : StylePropertyString
 external interface FlexDirection : StylePropertyString
 external interface FlexWrap : StylePropertyString
-external interface JustifyContent : StylePropertyString
-external interface AlignSelf : StylePropertyString
-external interface AlignItems : StylePropertyString
-external interface AlignContent : StylePropertyString
 external interface Position : StylePropertyString
 external interface StepPosition : StylePropertyString
 interface AnimationTimingFunction : StylePropertyString {
@@ -25,6 +21,15 @@ interface AnimationTimingFunction : StylePropertyString {
 
     fun steps(count: Int) = "steps($count)".unsafeCast<AnimationTimingFunction>()
 }
+
+
+external interface ContentPositioning : StylePropertyString
+
+external interface JustifyContent : ContentPositioning
+external interface AlignSelf : ContentPositioning
+external interface AlignItems : ContentPositioning
+external interface AlignContent : ContentPositioning
+
 
 external interface AnimationDirection : StylePropertyString
 external interface AnimationFillMode : StylePropertyString
@@ -78,20 +83,21 @@ val Wrap = "wrap".unsafeCast<FlexWrap>()
 val Nowrap = "nowrap".unsafeCast<FlexWrap>()
 val WrapReverse = "wrap-reverse".unsafeCast<FlexWrap>()
 
-object Center : JustifyContent, AlignSelf, AlignItems, AlignContent, StylePropertyStringValue("center")
-object Start : JustifyContent, AlignSelf, AlignItems, AlignContent, StepPosition, StylePropertyStringValue("start")
-object End : JustifyContent, AlignSelf, AlignItems, AlignContent, StepPosition, StylePropertyStringValue("end")
-object FlexStart : JustifyContent, AlignSelf, AlignItems, AlignContent, StylePropertyStringValue("flex-start")
-object FlexEnd : JustifyContent, AlignSelf, AlignItems, AlignContent, StylePropertyStringValue("flex-end")
+
+val Center = "center".unsafeCast<ContentPositioning>()
+object Start : ContentPositioning, StepPosition, StylePropertyStringValue("start")
+object End : ContentPositioning, StepPosition, StylePropertyStringValue("end")
+val FlexStart = "flex-start".unsafeCast<ContentPositioning>()
+val FlexEnd = "flex-end".unsafeCast<ContentPositioning>()
 object Left : JustifyContent, StylePropertyStringValue("left")
 object Right : JustifyContent, StylePropertyStringValue("right")
 object Normal : JustifyContent, AlignSelf, AlignItems, AnimationDirection, StylePropertyStringValue("normal")
 object SpaceBetween : JustifyContent, AlignContent, StylePropertyStringValue("space-between")
 object SpaceAround : JustifyContent, AlignContent, StylePropertyStringValue("space-around")
 object SpaceEvenly : JustifyContent, AlignContent, StylePropertyStringValue("space-evenly")
-object Stretch : JustifyContent, AlignSelf, AlignItems, AlignContent, StylePropertyStringValue("stretch")
-object SafeCenter : JustifyContent, AlignSelf, AlignItems, AlignContent, StylePropertyStringValue("safe center")
-object UnsafeCenter : JustifyContent, AlignSelf, AlignItems, AlignContent, StylePropertyStringValue("unsafe center")
+val Stretch = "stretch".unsafeCast<ContentPositioning>()
+val SafeCenter = "safe center".unsafeCast<ContentPositioning>()
+val UnsafeCenter = "unsafe center".unsafeCast<ContentPositioning>()
 
 val Auto = "auto".unsafeCast<AlignSelf>()
 val SelfStart = "self-start".unsafeCast<AlignSelf>()
