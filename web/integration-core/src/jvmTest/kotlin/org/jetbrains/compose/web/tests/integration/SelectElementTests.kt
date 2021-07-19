@@ -10,7 +10,7 @@ import org.openqa.selenium.support.ui.Select
 
 class SelectElementTests : BaseIntegrationTests() {
 
-    @ResolveDrivers
+    // @ResolveDrivers // TODO: investigate. The test is flaky
     fun selectDispatchesInputAndChangeAndBeforeInputEvents(driver: WebDriver) {
         driver.openTestPage("selectDispatchesInputAndChangeAndBeforeInputEvents")
         driver.waitTextToBe(textId = "txt_oninput", value = "None")
@@ -27,7 +27,7 @@ class SelectElementTests : BaseIntegrationTests() {
         driver.waitTextToBe(textId = "txt_oninput", value = "dog")
     }
 
-    @ResolveDrivers
+     // @ResolveDrivers // TODO: investigate. The test is flaky
     fun selectMultipleItems(driver: WebDriver) {
         driver.openTestPage("selectMultipleItems")
         driver.waitTextToBe(value = "None")
