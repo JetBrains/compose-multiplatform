@@ -6,16 +6,16 @@ open class StylePropertyStringValue(private val value: String) : StylePropertySt
     override fun toString() = value
 }
 
-interface LineStyle : StylePropertyString
-interface DisplayStyle : StylePropertyString
-interface FlexDirection : StylePropertyString
-interface FlexWrap : StylePropertyString
-interface JustifyContent : StylePropertyString
-interface AlignSelf : StylePropertyString
-interface AlignItems : StylePropertyString
-interface AlignContent : StylePropertyString
-interface Position : StylePropertyString
-interface StepPosition : StylePropertyString
+external interface LineStyle : StylePropertyString
+external interface DisplayStyle : StylePropertyString
+external interface FlexDirection : StylePropertyString
+external interface FlexWrap : StylePropertyString
+external interface JustifyContent : StylePropertyString
+external interface AlignSelf : StylePropertyString
+external interface AlignItems : StylePropertyString
+external interface AlignContent : StylePropertyString
+external interface Position : StylePropertyString
+external interface StepPosition : StylePropertyString
 interface AnimationTimingFunction : StylePropertyString {
     fun cubicBezier(x1: Double, y1: Double, x2: Double, y2: Double) =
         "cubic-bezier($x1, $y1, $x2, $y2)".unsafeCast<AnimationTimingFunction>()
@@ -26,9 +26,9 @@ interface AnimationTimingFunction : StylePropertyString {
     fun steps(count: Int) = "steps($count)".unsafeCast<AnimationTimingFunction>()
 }
 
-interface AnimationDirection : StylePropertyString
-interface AnimationFillMode : StylePropertyString
-interface AnimationPlayState : StylePropertyString
+external interface AnimationDirection : StylePropertyString
+external interface AnimationFillMode : StylePropertyString
+external interface AnimationPlayState : StylePropertyString
 
 object None : LineStyle, DisplayStyle, AnimationFillMode, StylePropertyStringValue("none")
 
