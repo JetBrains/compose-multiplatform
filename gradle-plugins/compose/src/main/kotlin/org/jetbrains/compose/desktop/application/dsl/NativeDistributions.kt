@@ -13,7 +13,7 @@ import java.util.*
 import javax.inject.Inject
 
 internal val DEFAULT_RUNTIME_MODULES = arrayOf(
-    "java.base", "java.desktop", "java.logging"
+    "java.base", "java.desktop", "java.logging", "jdk.crypto.ec"
 )
 
 open class NativeDistributions @Inject constructor(
