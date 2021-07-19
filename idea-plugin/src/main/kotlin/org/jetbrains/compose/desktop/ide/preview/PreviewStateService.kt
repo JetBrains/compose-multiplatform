@@ -7,57 +7,91 @@ package org.jetbrains.compose.desktop.ide.preview
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
-import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.FrameConfig
-import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.PreviewManager
-import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.PreviewManagerImpl
+import com.intellij.openapi.util.Disposer
+import com.intellij.ui.components.JBLoadingPanel
+import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.*
 import java.awt.Dimension
-import java.io.ByteArrayInputStream
-import javax.imageio.ImageIO
 import javax.swing.JComponent
 import javax.swing.event.AncestorEvent
 import javax.swing.event.AncestorListener
 
 @Service
 class PreviewStateService : Disposable {
-    private var myPanel: PreviewPanel? = null
-    private val previewManager: PreviewManager = PreviewManagerImpl { frame ->
-        ByteArrayInputStream(frame.bytes).use { input ->
-            val image = ImageIO.read(input)
-            myPanel?.previewImage(image, Dimension(frame.width, frame.height))
-        }
-    }
+    private val previewListener = CompositePreviewListener()
+    private val previewManager: PreviewManager = PreviewManagerImpl(previewListener)
     val gradleCallbackPort: Int
         get() = previewManager.gradleCallbackPort
 
-    private val myListener = object : AncestorListener {
-        private fun updateFrameSize(c: JComponent) {
-            val frameConfig = FrameConfig(
-                width = c.width,
-                height = c.height,
-                scale = c.graphicsConfiguration.defaultTransform.scaleX
-            )
-            previewManager.updateFrameConfig(frameConfig)
-        }
-
-        override fun ancestorAdded(event: AncestorEvent) {
-            updateFrameSize(event.component)
-        }
-
-        override fun ancestorRemoved(event: AncestorEvent) {
-        }
-
-        override fun ancestorMoved(event: AncestorEvent) {
-            updateFrameSize(event.component)
-        }
-    }
-
     override fun dispose() {
-        myPanel?.removeAncestorListener(myListener)
         previewManager.close()
     }
 
-    internal fun registerPreviewPanel(panel: PreviewPanel) {
-        myPanel = panel
-        panel.addAncestorListener(myListener)
+    internal fun registerPreviewPanels(
+        previewPanel: PreviewPanel,
+        loadingPanel: JBLoadingPanel
+    ) {
+        val previewResizeListener = PreviewResizeListener(previewManager)
+        previewPanel.addAncestorListener(previewResizeListener)
+        Disposer.register(this) { previewPanel.removeAncestorListener(previewResizeListener) }
+
+        previewListener.addListener(PreviewPanelUpdater(previewPanel))
+        previewListener.addListener(LoadingPanelUpdater(loadingPanel))
+    }
+
+    internal fun buildStarted() {
+        previewListener.onNewBuildRequest()
+    }
+
+    internal fun buildFinished(success: Boolean) {
+        previewListener.onFinishedBuild(success)
+    }
+}
+
+private class PreviewResizeListener(private val previewManager: PreviewManager) : AncestorListener {
+    private fun updateFrameSize(c: JComponent) {
+        val frameConfig = FrameConfig(
+            width = c.width,
+            height = c.height,
+            scale = c.graphicsConfiguration.defaultTransform.scaleX
+        )
+        previewManager.updateFrameConfig(frameConfig)
+    }
+
+    override fun ancestorAdded(event: AncestorEvent) {
+        updateFrameSize(event.component)
+
+    }
+
+    override fun ancestorRemoved(event: AncestorEvent) {
+    }
+
+    override fun ancestorMoved(event: AncestorEvent) {
+        updateFrameSize(event.component)
+    }
+}
+
+private class PreviewPanelUpdater(private val panel: PreviewPanel) : PreviewListenerBase() {
+    override fun onRenderedFrame(frame: RenderedFrame) {
+        panel.previewImage(frame.image, frame.dimension)
+    }
+}
+
+private class LoadingPanelUpdater(private val panel: JBLoadingPanel) : PreviewListenerBase() {
+    override fun onNewBuildRequest() {
+        panel.setLoadingText("Building project")
+        panel.startLoading()
+    }
+
+    override fun onFinishedBuild(success: Boolean) {
+        panel.stopLoading()
+    }
+
+    override fun onNewRenderRequest(previewRequest: FrameRequest) {
+        panel.setLoadingText("Rendering preview")
+        panel.startLoading()
+    }
+
+    override fun onRenderedFrame(frame: RenderedFrame) {
+        panel.stopLoading()
     }
 }

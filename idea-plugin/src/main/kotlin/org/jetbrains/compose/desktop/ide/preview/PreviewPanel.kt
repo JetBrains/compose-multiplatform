@@ -37,4 +37,7 @@ internal class PreviewPanel : JPanel() {
 
         repaint()
     }
+
+    override fun getPreferredSize(): Dimension? =
+        imageDimension ?: super.getPreferredSize()
 }

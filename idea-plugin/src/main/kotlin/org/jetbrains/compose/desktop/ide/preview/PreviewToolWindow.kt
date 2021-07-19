@@ -9,6 +9,8 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
+import com.intellij.ui.components.JBLoadingPanel
+import java.awt.BorderLayout
 
 class PreviewToolWindow : ToolWindowFactory, DumbAware {
     override fun isApplicable(project: Project): Boolean {
@@ -23,8 +25,10 @@ class PreviewToolWindow : ToolWindowFactory, DumbAware {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         toolWindow.contentManager.let { content ->
             val panel = PreviewPanel()
-            content.addContent(content.factory.createContent(panel, null, false))
-            project.service<PreviewStateService>().registerPreviewPanel(panel)
+            val loadingPanel = JBLoadingPanel(BorderLayout(), project)
+            loadingPanel.add(panel, BorderLayout.CENTER)
+            content.addContent(content.factory.createContent(loadingPanel, null, false))
+            project.service<PreviewStateService>().registerPreviewPanels(panel, loadingPanel)
         }
     }
 

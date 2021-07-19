@@ -29,6 +29,7 @@ data class FrameConfig(val width: Int, val height: Int, val scale: Double?) {
 }
 
 data class FrameRequest(
+    val id: Long,
     val composableFqName: String,
     val frameConfig: FrameConfig
 )
@@ -47,7 +48,9 @@ private data class RunningPreview(
         get() = connection.isAlive && process.isAlive
 }
 
-class PreviewManagerImpl(private val onNewFrame: (RenderedFrame) -> Unit) : PreviewManager {
+class PreviewManagerImpl(
+    private val previewListener: PreviewListener = PreviewListenerBase()
+) : PreviewManager {
     private val log = PrintStreamLogger("SERVER")
     private val previewSocket = newServerSocket()
     private val gradleCallbackSocket = newServerSocket()
@@ -59,8 +62,9 @@ class PreviewManagerImpl(private val onNewFrame: (RenderedFrame) -> Unit) : Prev
     private val previewClasspath = AtomicReference<String>(null)
     private val previewFqName = AtomicReference<String>(null)
     private val previewFrameConfig = AtomicReference<FrameConfig>(null)
-    private val frameRequest = AtomicReference<FrameRequest>(null)
-    private val shouldRequestFrame = AtomicBoolean(false)
+    private val inProcessRequest = AtomicReference<FrameRequest>(null)
+    private val processedRequest = AtomicReference<FrameRequest>(null)
+    private val userRequestCount = AtomicLong(0)
     private val runningPreview = AtomicReference<RunningPreview>(null)
     private val threads = arrayListOf<Thread>()
 
@@ -97,14 +101,12 @@ class PreviewManagerImpl(private val onNewFrame: (RenderedFrame) -> Unit) : Prev
             val frameConfig = previewFrameConfig.get()
 
             if (classpath != null && frameConfig != null && fqName != null) {
-                val request = FrameRequest(fqName, frameConfig)
-                if (shouldRequestFrame.get() && frameRequest.get() == null) {
-                    if (shouldRequestFrame.compareAndSet(true, false)) {
-                        if (frameRequest.compareAndSet(null, request)) {
-                            sendPreviewRequest(classpath, request)
-                        } else {
-                            shouldRequestFrame.compareAndSet(false, true)
-                        }
+                val request = FrameRequest(userRequestCount.get(), fqName, frameConfig)
+                val prevRequest = processedRequest.get()
+                if (inProcessRequest.get() == null && request != prevRequest) {
+                    if (inProcessRequest.compareAndSet(null, request)) {
+                        previewListener.onNewRenderRequest(request)
+                        sendPreviewRequest(classpath, request)
                     }
                 }
             }
@@ -114,10 +116,11 @@ class PreviewManagerImpl(private val onNewFrame: (RenderedFrame) -> Unit) : Prev
     private val receivePreviewResponseThread = repeatWhileAliveThread("receivePreviewResponse") {
         withLivePreviewConnection {
             receiveFrame { renderedFrame ->
-                frameRequest.get()?.let { request ->
-                    frameRequest.compareAndSet(request, null)
+                inProcessRequest.get()?.let { request ->
+                    processedRequest.set(request)
+                    inProcessRequest.compareAndSet(request, null)
                 }
-                onNewFrame(renderedFrame)
+                previewListener.onRenderedFrame(renderedFrame)
             }
         }
     }
@@ -125,13 +128,14 @@ class PreviewManagerImpl(private val onNewFrame: (RenderedFrame) -> Unit) : Prev
     private val gradleCallbackThread = repeatWhileAliveThread("gradleCallback") {
         tryAcceptConnection(gradleCallbackSocket, "GRADLE_CALLBACK")?.let { connection ->
             while (isAlive.get() && connection.isAlive) {
-                connection.receiveConfigFromGradle(
-                    onPreviewClasspath = { previewClasspath.set(it) },
-                    onPreviewHostConfig = { previewHostConfig.set(it) },
-                    onPreviewFqName = { previewFqName.set(it) }
-                )
-                shouldRequestFrame.set(true)
-                sendPreviewRequestThread.interrupt()
+                val config = connection.receiveConfigFromGradle()
+                if (config != null) {
+                    previewClasspath.set(config.previewClasspath)
+                    previewFqName.set(config.previewFqName)
+                    previewHostConfig.set(config.previewHostConfig)
+                    userRequestCount.incrementAndGet()
+                    sendPreviewRequestThread.interrupt()
+                }
             }
         }
     }
@@ -191,7 +195,6 @@ class PreviewManagerImpl(private val onNewFrame: (RenderedFrame) -> Unit) : Prev
 
     override fun updateFrameConfig(frameConfig: FrameConfig) {
         previewFrameConfig.set(frameConfig)
-        shouldRequestFrame.set(true)
         sendPreviewRequestThread.interrupt()
     }
 
