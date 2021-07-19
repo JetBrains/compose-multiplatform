@@ -74,9 +74,9 @@ val RowReverse = "row-reverse".unsafeCast<FlexDirection>()
 val Column = "column".unsafeCast<FlexDirection>()
 val ColumnReverse = "column-reverse".unsafeCast<FlexDirection>()
 
-object Wrap : FlexWrap, StylePropertyStringValue("wrap")
-object Nowrap : FlexWrap, StylePropertyStringValue("nowrap")
-object WrapReverse : FlexWrap, StylePropertyStringValue("wrap-reverse")
+val Wrap = "wrap".unsafeCast<FlexWrap>()
+val Nowrap = "nowrap".unsafeCast<FlexWrap>()
+val WrapReverse = "wrap-reverse".unsafeCast<FlexWrap>()
 
 object Center : JustifyContent, AlignSelf, AlignItems, AlignContent, StylePropertyStringValue("center")
 object Start : JustifyContent, AlignSelf, AlignItems, AlignContent, StepPosition, StylePropertyStringValue("start")
