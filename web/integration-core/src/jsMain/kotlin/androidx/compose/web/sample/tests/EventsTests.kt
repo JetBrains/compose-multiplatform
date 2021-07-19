@@ -402,8 +402,8 @@ object AppStyleSheetWithAnimation : StyleSheet() {
         color("green")
         animation(bounce) {
             duration(500.ms)
-            timingFunction(AnimationTimingFunction.EaseIn)
-            direction(AnimationDirection.Alternate)
+            timingFunction(EaseIn)
+            direction(Alternate)
         }
     }
 }

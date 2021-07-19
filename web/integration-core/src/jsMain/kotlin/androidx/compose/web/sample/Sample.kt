@@ -58,8 +58,8 @@ object AppStyleSheet : StyleSheet() {
         color("green")
         animation(bounce) {
             duration(2.s)
-            timingFunction(AnimationTimingFunction.EaseIn)
-            direction(AnimationDirection.Alternate)
+            timingFunction(EaseIn)
+            direction(Alternate)
         }
     }
 
