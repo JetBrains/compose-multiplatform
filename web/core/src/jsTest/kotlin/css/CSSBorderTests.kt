@@ -33,7 +33,7 @@ class CSSBorderTests {
     @Test
     fun borderThreeValues() = runTest {
         composition {
-            Div({ style { border(3.px, LineStyle.Dotted, Color("green")) } })
+            Div({ style { border(3.px, Dotted, Color("green")) } })
         }
 
         assertEquals("3px dotted green", (root.children[0] as HTMLElement).style.border)

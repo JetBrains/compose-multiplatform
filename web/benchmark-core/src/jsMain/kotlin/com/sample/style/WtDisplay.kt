@@ -4,13 +4,13 @@ import org.jetbrains.compose.web.css.*
 
 object WtDisplay : StyleSheet(AppStylesheet) {
     val wtDisplayNone by style {
-        display(DisplayStyle.None)
+        display(None)
     }
 
     val wtDisplayMdBlock by style {
         media(mediaMaxWidth(1000.px)) {
             self style {
-                display(DisplayStyle.Block)
+                display(Block)
             }
         }
     }
@@ -18,7 +18,7 @@ object WtDisplay : StyleSheet(AppStylesheet) {
     val wtDisplayMdNone by style {
         media(mediaMaxWidth(1000.px)) {
             self style {
-                display(DisplayStyle.None)
+                display(None)
             }
         }
     }

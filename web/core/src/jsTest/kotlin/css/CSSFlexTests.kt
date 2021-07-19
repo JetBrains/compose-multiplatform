@@ -120,16 +120,16 @@ class CSSFlexTests {
     @Test
     fun flexFlow() = runTest {
         val flexWraps = listOf(
-            FlexWrap.Wrap,
-            FlexWrap.Nowrap,
-            FlexWrap.WrapReverse
+            Wrap,
+            Nowrap,
+            WrapReverse
         )
 
         val flexDirections = listOf(
-            FlexDirection.Row,
-            FlexDirection.RowReverse,
-            FlexDirection.Column,
-            FlexDirection.ColumnReverse
+            Row,
+            RowReverse,
+            Column,
+            ColumnReverse
         )
 
         composition {
@@ -159,23 +159,23 @@ class CSSFlexTests {
     @Test
     fun justifyContent() = runTest {
         val enumValues = listOf(
-            JustifyContent.Center,
-            JustifyContent.Start,
-            JustifyContent.End,
-            JustifyContent.FlexStart,
-            JustifyContent.FlexEnd,
-            JustifyContent.Left,
-            JustifyContent.Right,
-            JustifyContent.Normal,
-            JustifyContent.SpaceBetween,
-            JustifyContent.SpaceAround,
-            JustifyContent.SpaceEvenly,
-            JustifyContent.Stretch,
-            JustifyContent.Inherit,
-            JustifyContent.Initial,
-            JustifyContent.Unset,
-            JustifyContent.SafeCenter,
-            JustifyContent.UnsafeCenter
+            Center,
+            Start,
+            End,
+            FlexStart,
+            FlexEnd,
+            Left,
+            Right,
+            Normal,
+            SpaceBetween,
+            SpaceAround,
+            SpaceEvenly,
+            Stretch,
+            Inherit,
+            Initial,
+            Unset,
+            SafeCenter,
+            UnsafeCenter
         )
 
         composition {
@@ -201,22 +201,22 @@ class CSSFlexTests {
     @Test
     fun alignSelf() = runTest {
         val enumValues = listOf(
-            AlignSelf.Auto,
-            AlignSelf.Normal,
-            AlignSelf.Center,
-            AlignSelf.Start,
-            AlignSelf.End,
-            AlignSelf.SelfStart,
-            AlignSelf.SelfEnd,
-            AlignSelf.FlexStart,
-            AlignSelf.FlexEnd,
-            AlignSelf.Baseline,
-            AlignSelf.Stretch,
-            AlignSelf.SafeCenter,
-            AlignSelf.UnsafeCenter,
-            AlignSelf.Inherit,
-            AlignSelf.Initial,
-            AlignSelf.Unset
+            Auto,
+            Normal,
+            Center,
+            Start,
+            End,
+            SelfStart,
+            SelfEnd,
+            FlexStart,
+            FlexEnd,
+            Baseline,
+            Stretch,
+            SafeCenter,
+            UnsafeCenter,
+            Inherit,
+            Initial,
+            Unset
         )
 
         composition {
@@ -242,19 +242,19 @@ class CSSFlexTests {
     @Test
     fun alignItems() = runTest {
         val enumValues = listOf(
-            AlignItems.Normal,
-            AlignItems.Stretch,
-            AlignItems.Center,
-            AlignItems.Start,
-            AlignItems.End,
-            AlignItems.FlexStart,
-            AlignItems.FlexEnd,
-            AlignItems.Baseline,
-            AlignItems.SafeCenter,
-            AlignItems.UnsafeCenter,
-            AlignItems.Inherit,
-            AlignItems.Initial,
-            AlignItems.Unset
+            Normal,
+            Stretch,
+            Center,
+            Start,
+            End,
+            FlexStart,
+            FlexEnd,
+            Baseline,
+            SafeCenter,
+            UnsafeCenter,
+            Inherit,
+            Initial,
+            Unset
         )
 
         composition {
@@ -280,21 +280,21 @@ class CSSFlexTests {
     @Test
     fun alignContent() = runTest {
         val enumValues = listOf(
-            AlignContent.Center,
-            AlignContent.Start,
-            AlignContent.End,
-            AlignContent.FlexStart,
-            AlignContent.FlexEnd,
-            AlignContent.Baseline,
-            AlignContent.SafeCenter,
-            AlignContent.UnsafeCenter,
-            AlignContent.SpaceBetween,
-            AlignContent.SpaceAround,
-            AlignContent.SpaceEvenly,
-            AlignContent.Stretch,
-            AlignContent.Inherit,
-            AlignContent.Initial,
-            AlignContent.Unset
+            Center,
+            Start,
+            End,
+            FlexStart,
+            FlexEnd,
+            Baseline,
+            SafeCenter,
+            UnsafeCenter,
+            SpaceBetween,
+            SpaceAround,
+            SpaceEvenly,
+            Stretch,
+            Inherit,
+            Initial,
+            Unset
         )
 
         composition {
@@ -320,10 +320,10 @@ class CSSFlexTests {
     @Test
     fun flexDirection() = runTest {
         val enumValues = listOf(
-            FlexDirection.Row,
-            FlexDirection.RowReverse,
-            FlexDirection.Column,
-            FlexDirection.ColumnReverse
+            Row,
+            RowReverse,
+            Column,
+            ColumnReverse
         )
 
         composition {
@@ -350,9 +350,9 @@ class CSSFlexTests {
     @Test
     fun flexWrap() = runTest {
         val enumValues = listOf(
-            FlexWrap.Wrap,
-            FlexWrap.Nowrap,
-            FlexWrap.WrapReverse
+            Wrap,
+            Nowrap,
+            WrapReverse
         )
 
         composition {

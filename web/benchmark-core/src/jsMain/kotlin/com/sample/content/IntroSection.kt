@@ -17,7 +17,7 @@ fun Intro() {
 
             Div(attrs = {
                 classes(WtCols.wtCol2, WtCols.wtColMd3)
-                styleBuilder.alignSelf(AlignSelf.Start)
+                styleBuilder.alignSelf(Start)
             }) {
                 Img(src = "i1.svg", attrs = { classes(AppStylesheet.composeLogo) })
             }
@@ -35,7 +35,7 @@ fun Intro() {
                     Span(attrs = {
                         classes(WtTexts.wtHero)
                         style {
-                            display(DisplayStyle.InlineBlock)
+                            display(InlineBlock)
                             property("white-space", "nowrap")
                         }
                     }) {
@@ -158,9 +158,9 @@ private fun IntroCodeSampleResult() {
     Div(attrs = {
         style {
             property("padding", "12px 16px")
-            display(DisplayStyle.Flex)
-            flexDirection(FlexDirection.Row)
-            alignItems(AlignItems.Center)
+            display(Flex)
+            flexDirection(Row)
+            alignItems(Center)
         }
     }) {
         Span(

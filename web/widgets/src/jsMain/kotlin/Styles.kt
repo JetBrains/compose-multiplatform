@@ -1,48 +1,37 @@
 package org.jetbrains.compose.web.ui
 
-import org.jetbrains.compose.web.css.justifyContent
-import org.jetbrains.compose.web.css.JustifyContent
-import org.jetbrains.compose.web.css.alignItems
-import org.jetbrains.compose.web.css.AlignItems
-import org.jetbrains.compose.web.css.flexDirection
-import org.jetbrains.compose.web.css.FlexDirection
-import org.jetbrains.compose.web.css.display
-import org.jetbrains.compose.web.css.DisplayStyle
-import org.jetbrains.compose.web.css.left
-import org.jetbrains.compose.web.css.px
-
-import org.jetbrains.compose.web.css.StyleSheet
+import org.jetbrains.compose.web.css.*
 
 object Styles : StyleSheet() {
     val columnClass = "compose-web-column"
 
     val textClass by style {
-        display(DisplayStyle.Block)
+        display(Block)
         left(0.px)
     }
 
     val rowClass by style {
-        display(DisplayStyle.Flex)
-        flexDirection(FlexDirection.Row)
+        display(Flex)
+        flexDirection(Row)
     }
 
     val composeWebArrangementHorizontalStart by style {
-        justifyContent(JustifyContent.FlexStart)
+        justifyContent(FlexStart)
     }
 
     val composeWebArrangementHorizontalEnd by style {
-        justifyContent(JustifyContent.FlexEnd)
+        justifyContent(FlexEnd)
     }
 
     val composeWebAlignmentVerticalTop by style {
-        alignItems(AlignItems.FlexStart)
+        alignItems(FlexStart)
     }
 
     val composeWebAlignmentVerticalCenter by style {
-        alignItems(AlignItems.Center)
+        alignItems(Center)
     }
 
     val composeWebAlignmentVerticalBottom by style {
-        alignItems(AlignItems.FlexEnd)
+        alignItems(FlexEnd)
     }
 }

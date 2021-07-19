@@ -163,7 +163,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
         color("white")
         backgroundColor("#167dff")
         fontSize(15.px)
-        display(DisplayStyle.InlineBlock)
+        display(InlineBlock)
         property("text-decoration", "none")
         property("border-radius", 24.px)
         property("padding", "12px 32px")
@@ -177,9 +177,9 @@ object WtTexts : StyleSheet(AppStylesheet) {
     }
 
     val wtLangButton by style {
-        display(DisplayStyle.LegacyInlineFlex)
-        justifyContent(JustifyContent.Center)
-        alignItems(AlignItems.Center)
+        display(LegacyInlineFlex)
+        justifyContent(Center)
+        alignItems(Center)
         backgroundColor(Color.transparent)
         border(0.px)
 
@@ -204,7 +204,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
         marginLeft(16.px)
         padding(12.px)
         backgroundColor("transparent")
-        display(DisplayStyle.LegacyInlineFlex)
+        display(LegacyInlineFlex)
 
         hover(self) style {
             backgroundColor(rgba(255, 255, 255, 0.1))

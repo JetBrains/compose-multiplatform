@@ -75,7 +75,7 @@ object AppStyleSheet : StyleSheet() {
 
         border {
             width(1.px)
-            style(LineStyle.Solid)
+            style(Solid)
             color(MyCSSVariables.myVar.value())
         }
 

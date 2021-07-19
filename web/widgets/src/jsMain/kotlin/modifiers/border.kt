@@ -8,9 +8,10 @@ import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.LineStyle
 import org.jetbrains.compose.web.css.border
 import org.jetbrains.compose.web.css.Color.RGB
+import org.jetbrains.compose.web.css.Solid
 
 actual fun Modifier.border(size: Dp, color: Color): Modifier = castOrCreate().apply {
     add {
-        border(size.value.px, LineStyle.Solid, RGB(color.red, color.green, color.blue))
+        border(size.value.px, Solid, RGB(color.red, color.green, color.blue))
     }
 }

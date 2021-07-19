@@ -6,8 +6,7 @@
 package org.jetbrains.compose.web.core.tests.css
 
 import org.jetbrains.compose.web.core.tests.runTest
-import org.jetbrains.compose.web.css.DisplayStyle
-import org.jetbrains.compose.web.css.display
+import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
@@ -19,22 +18,22 @@ class CSSDisplayTests {
     @Test
     fun stylesDisplay() = runTest {
         val enumValues = listOf(
-            DisplayStyle.Block,
-            DisplayStyle.Inline,
-            DisplayStyle.InlineBlock,
-            DisplayStyle.Flex,
-            DisplayStyle.LegacyInlineFlex,
-            DisplayStyle.Grid,
-            DisplayStyle.LegacyInlineGrid,
-            DisplayStyle.FlowRoot,
-            DisplayStyle.None,
-            DisplayStyle.Contents,
-            DisplayStyle.Table,
-            DisplayStyle.TableRow,
-            DisplayStyle.ListItem,
-            DisplayStyle.Inherit,
-            DisplayStyle.Initial,
-            DisplayStyle.Unset
+            Block,
+            Inline,
+            InlineBlock,
+            Flex,
+            LegacyInlineFlex,
+            Grid,
+            LegacyInlineGrid,
+            FlowRoot,
+            None,
+            Contents,
+            Table,
+            TableRow,
+            ListItem,
+            Inherit,
+            Initial,
+            Unset
         )
 
         composition {

@@ -4,9 +4,9 @@ import org.jetbrains.compose.web.css.*
 
 object WtCards : StyleSheet(AppStylesheet) {
     val wtCard by style {
-        display(DisplayStyle.Flex)
-        flexDirection(FlexDirection.Column)
-        border(1.px, LineStyle.Solid)
+        display(Flex)
+        flexDirection(Column)
+        border(1.px, Solid)
         property("min-height", 0)
         property("box-sizing", "border-box")
     }
@@ -24,7 +24,7 @@ object WtCards : StyleSheet(AppStylesheet) {
     }
 
     val wtCardSection by style {
-        position(Position.Relative)
+        position(Relative)
         property("overflow", "auto")
         property("flex", "1 1 auto")
         property("min-height", 0)
@@ -37,9 +37,9 @@ object WtCards : StyleSheet(AppStylesheet) {
     }
 
     val wtVerticalFlex by style {
-        display(DisplayStyle.Flex)
-        flexDirection(FlexDirection.Column)
-        alignItems(AlignItems.FlexStart)
+        display(Flex)
+        flexDirection(Column)
+        alignItems(FlexStart)
     }
 
     val wtVerticalFlexGrow by style {

@@ -1,16 +1,6 @@
 package org.jetbrains.compose.web.core.tests
 
-import org.jetbrains.compose.web.css.Position
-import org.jetbrains.compose.web.css.bottom
-import org.jetbrains.compose.web.css.color
-import org.jetbrains.compose.web.css.left
-import org.jetbrains.compose.web.css.opacity
-import org.jetbrains.compose.web.css.percent
-import org.jetbrains.compose.web.css.position
-import org.jetbrains.compose.web.css.px
-import org.jetbrains.compose.web.css.right
-import org.jetbrains.compose.web.css.top
-import org.jetbrains.compose.web.css.value
+import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
@@ -197,11 +187,11 @@ class StaticComposableTests {
     fun stylesPosition() {
         val root = "div".asHtmlElement()
         val enumValues = listOf(
-            Position.Static,
-            Position.Relative,
-            Position.Absolute,
-            Position.Sticky,
-            Position.Fixed
+            Static,
+            Relative,
+            Absolute,
+            Sticky,
+            Fixed
         )
 
         renderComposable(

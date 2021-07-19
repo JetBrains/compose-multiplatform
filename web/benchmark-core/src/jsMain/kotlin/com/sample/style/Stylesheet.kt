@@ -35,7 +35,7 @@ object AppStylesheet : StyleSheet() {
         property("font-weight", 400)
         property("line-height", 24.px)
 
-        position(Position.Relative)
+        position(Relative)
         top((-32).px)
         marginLeft(8.px)
         fontSize(15.px)

@@ -77,7 +77,7 @@ private object AppStyleSheet : StyleSheet() {
             }
 
             CSSSelector.Child(self, CSSSelector.Type("span")) style {
-                display(DisplayStyle.None)
+                display(None)
             }
         }
     }

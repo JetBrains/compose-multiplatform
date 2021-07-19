@@ -6,8 +6,8 @@ object WtRows : StyleSheet(AppStylesheet) {
     
     val wtRow by style {
         AppCSSVariables.wtHorizontalLayoutGutter(0.px)
-        display(DisplayStyle.Flex)
-        flexWrap(FlexWrap.Wrap)
+        display(Flex)
+        flexWrap(Wrap)
 
         property(
             "margin-right",
@@ -36,7 +36,7 @@ object WtRows : StyleSheet(AppStylesheet) {
     
     val wtRowSmAlignItemsCenter by style {
         self style {
-            alignItems(AlignItems.Center)
+            alignItems(Center)
         }
     }
 }

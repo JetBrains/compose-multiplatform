@@ -25,8 +25,8 @@ fun PageFooter() {
                 Div(attrs = {
                     classes(WtRows.wtRow, WtRows.wtRowSizeM, WtRows.wtRowSmAlignItemsCenter)
                     style {
-                        justifyContent(JustifyContent.Center)
-                        flexWrap(FlexWrap.Wrap)
+                        justifyContent(Center)
+                        flexWrap(Wrap)
                     }
                 }) {
                     Div(attrs = {
@@ -57,8 +57,8 @@ private fun CopyrightInFooter() {
     Div(attrs = {
         classes(WtRows.wtRow, WtRows.wtRowSizeM, WtRows.wtRowSmAlignItemsCenter, WtOffsets.wtTopOffset48)
         style {
-            justifyContent(JustifyContent.SpaceEvenly)
-            flexWrap(FlexWrap.Wrap)
+            justifyContent(SpaceEvenly)
+            flexWrap(Wrap)
             property("padding", "0px 12px")
         }
     }) {

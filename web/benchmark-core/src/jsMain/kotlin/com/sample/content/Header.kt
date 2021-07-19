@@ -16,8 +16,8 @@ fun Header() {
             Div(attrs = {
                 classes(WtRows.wtRow, WtRows.wtRowSizeM)
                 style {
-                    alignItems(AlignItems.Center)
-                    justifyContent(JustifyContent.SpaceBetween)
+                    alignItems(Center)
+                    justifyContent(SpaceBetween)
                 }
             }) {
                 Logo()

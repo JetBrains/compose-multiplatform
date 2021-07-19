@@ -12,8 +12,8 @@ fun Layout(content: @Composable () -> Unit) {
     Div(
         attrs = {
             style {
-                display(DisplayStyle.Flex)
-                flexDirection(FlexDirection.Column)
+                display(Flex)
+                flexDirection(Column)
                 height(100.percent)
                 margin(0.px)
                 property("box-sizing", "border-box")

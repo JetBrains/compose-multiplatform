@@ -202,7 +202,7 @@ fun CodeSamples() {
         Div(attrs = {
             classes(WtRows.wtRow)
             style {
-                justifyContent(JustifyContent.SpaceBetween)
+                justifyContent(SpaceBetween)
             }
         }) {
             Div(attrs = { classes(WtCols.wtCol6, WtCols.wtColMd4, WtCols.wtColSm12) }) {

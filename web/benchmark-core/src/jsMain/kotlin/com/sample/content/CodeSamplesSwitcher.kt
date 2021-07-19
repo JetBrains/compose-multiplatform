@@ -24,7 +24,7 @@ object SwitcherStylesheet : StyleSheet(AppStylesheet) {
         }
 
         descendant(self, CSSSelector.Type("label")) style {
-            display(DisplayStyle.InlineBlock)
+            display(InlineBlock)
             property("width", SwitcherVariables.labelWidth.value(56.px))
             property("padding", SwitcherVariables.labelPadding.value(10.px))
             property("transition", "all 0.3s")
@@ -32,7 +32,7 @@ object SwitcherStylesheet : StyleSheet(AppStylesheet) {
             property("box-sizing", "border-box")
 
             border {
-                style(LineStyle.Solid)
+                style(Solid)
                 width(3.px)
                 color(Color.transparent)
                 borderRadius(20.px, 20.px, 20.px)
@@ -41,7 +41,7 @@ object SwitcherStylesheet : StyleSheet(AppStylesheet) {
         }
 
         border {
-            style(LineStyle.Solid)
+            style(Solid)
             width(1.px)
             color(Color("#aaa"))
             padding(0.px)
@@ -49,12 +49,12 @@ object SwitcherStylesheet : StyleSheet(AppStylesheet) {
         }
 
         descendant(self, selector("input[type=\"radio\"]")) style {
-            display(DisplayStyle.None)
+            display(None)
         }
 
         descendant(self, selector("input[type=\"radio\"]:checked + label")) style {
             border {
-                style(LineStyle.Solid)
+                style(Solid)
                 width(3.px)
                 color(Color("#167dff"))
                 borderRadius(20.px, 20.px, 20.px)
