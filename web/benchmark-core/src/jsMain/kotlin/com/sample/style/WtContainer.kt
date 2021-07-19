@@ -9,11 +9,11 @@ object WtContainer : StyleSheet(AppStylesheet) {
         property("box-sizing", "border-box")
         property("padding-left", 22.px)
         property("padding-right", 22.px)
-        property("max-width", 1276.px)
+        maxWidth(1276.px)
 
         media(mediaMaxWidth(640.px)) {
             self style {
-                property("max-width", 100.percent)
+                maxWidth(100.percent)
                 property("padding-left", 16.px)
                 property("padding-right", 16.px)
             }
@@ -21,7 +21,7 @@ object WtContainer : StyleSheet(AppStylesheet) {
 
         media(mediaMaxWidth(1276.px)) {
             self style {
-                property("max-width", 996.px)
+                maxWidth(996.px)
                 property("padding-left", 996.px)
                 property("padding-right", 22.px)
             }
@@ -29,7 +29,7 @@ object WtContainer : StyleSheet(AppStylesheet) {
 
         media(mediaMaxWidth(1000.px)) {
             self style {
-                property("max-width", 100.percent)
+                maxWidth(100.percent)
                 property("padding-left", 22.px)
                 property("padding-right", 22.px)
             }

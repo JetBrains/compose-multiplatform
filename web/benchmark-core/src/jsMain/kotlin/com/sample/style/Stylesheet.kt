@@ -26,7 +26,7 @@ object AppCSSVariables : CSSVariables {
 
 object AppStylesheet : StyleSheet() {
     val composeLogo by style {
-        property("max-width", 100.percent)
+        maxWidth(100.percent)
     }
 
     val composeTitleTag by style {
@@ -85,8 +85,7 @@ object AppStylesheet : StyleSheet() {
                 "flex-basis",
                 "calc(8.33333%*${AppCSSVariables.wtColCount.value()} - ${AppCSSVariables.wtHorizontalLayoutGutter.value()}*2)"
             )
-            property(
-                "max-width",
+            maxWidth(
                 "calc(8.33333%*${AppCSSVariables.wtColCount.value()} - ${AppCSSVariables.wtHorizontalLayoutGutter.value()}*2)"
             )
             property("box-sizing", "border-box")
