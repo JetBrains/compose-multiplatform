@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+
+import androidx.build.AndroidXPluginKt
+import androidx.build.BuildOnServerKt
+import androidx.build.BuildServerConfigurationKt
 import androidx.build.Publish
 
 plugins {
@@ -47,6 +51,24 @@ dependencies {
     implementation project(":activity:activity-compose")
     implementation project(":navigation:navigation-compose")
 }
+
+// We want to publish a release APK of this project for the Compose Material Catalog
+def copyReleaseApk = tasks.register("copyReleaseApk", Copy) { task ->
+    android.applicationVariants.all { variant ->
+        if (variant.buildType.name == "release") {
+            task.from(variant.packageApplicationProvider.get().outputDirectory)
+        }
+    }
+    task.include("*.apk")
+    task.rename { fileName ->
+        "${AndroidXPluginKt.asFilenamePrefix(project.path)}_$fileName"
+    }
+    task.destinationDir =
+            new File(BuildServerConfigurationKt.getDistributionDirectory(project), "apks")
+    task.dependsOn(project.path + ":assembleRelease")
+}
+
+BuildOnServerKt.addToBuildOnServer(project, copyReleaseApk)
 
 androidx {
     name = "Compose Material Catalog"
