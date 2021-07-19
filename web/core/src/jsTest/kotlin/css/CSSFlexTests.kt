@@ -318,31 +318,18 @@ class CSSFlexTests {
 
     @Test
     fun flexDirection() = runTest {
-        val enumValues = listOf(
-            Row,
-            RowReverse,
-            Column,
-            ColumnReverse
-        )
-
         composition {
-            enumValues.forEach { flexDirection ->
-                Span(
-                    {
-                        style {
-                            flexDirection(flexDirection)
-                        }
-                    }
-                )
-            }
+            Span({ style { flexDirection(Row) } })
+            Span({ style { flexDirection(RowReverse) } })
+            Span({ style { flexDirection(Column) } })
+            Span({ style { flexDirection(ColumnReverse) } })
         }
 
-        enumValues.forEachIndexed { index, displayStyle ->
-            assertEquals(
-                "${displayStyle}",
-                (root.children[index] as HTMLElement).style.flexDirection
-            )
-        }
+        var counter = 0
+        assertEquals("row", (root.children[counter++] as HTMLElement).style.flexDirection)
+        assertEquals("row-reverse", (root.children[counter++] as HTMLElement).style.flexDirection)
+        assertEquals("column", (root.children[counter++] as HTMLElement).style.flexDirection)
+        assertEquals("column-reverse", (root.children[counter] as HTMLElement).style.flexDirection)
     }
 
 
