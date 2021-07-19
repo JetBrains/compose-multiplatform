@@ -9,12 +9,19 @@ import java.net.URLDecoder
 import java.net.URLEncoder
 
 internal fun RemoteConnection.sendAttach() {
-    sendCommand(Command.Type.ATTACH)
+    sendCommand(Command.Type.ATTACH, PROTOCOL_VERSION.toString())
 }
 
-internal fun RemoteConnection.receiveAttach(fn: () -> Unit) {
-    receiveCommand { (type, _) ->
+internal fun RemoteConnection.receiveAttach(
+    listener: PreviewListener? = null,
+    fn: () -> Unit
+) {
+    receiveCommand { (type, args) ->
         if (type == Command.Type.ATTACH) {
+            val version = args.firstOrNull()?.toIntOrNull() ?: 0
+            if (PROTOCOL_VERSION != version) {
+                listener?.onIncompatibleProtocolVersions(PROTOCOL_VERSION, version)
+            }
             fn()
         }
     }
