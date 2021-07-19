@@ -60,14 +60,11 @@ val Table = "table".unsafeCast<DisplayStyle>()
 val TableRow = "table-row".unsafeCast<DisplayStyle>()
 val ListItem = "list-item".unsafeCast<DisplayStyle>()
 
-object Inherit : DisplayStyle, JustifyContent, AlignSelf, AlignItems, AlignContent, AnimationTimingFunction,
-    AnimationDirection, AnimationPlayState, StylePropertyStringValue("inherit")
+interface BasicStringProperty : StylePropertyString
 
-object Initial : DisplayStyle, JustifyContent, AlignSelf, AlignItems, AlignContent, AnimationTimingFunction,
-    AnimationDirection, AnimationPlayState, StylePropertyStringValue("initial")
-
-object Unset : DisplayStyle, JustifyContent, AlignSelf, AlignItems, AlignContent, AnimationTimingFunction,
-    AnimationDirection, AnimationPlayState, StylePropertyStringValue("unset")
+val Inherit = "inherit".unsafeCast<BasicStringProperty>()
+val Initial = "initial".unsafeCast<BasicStringProperty>()
+val Unset = "unset".unsafeCast<BasicStringProperty>()
 
 val Row = "row".unsafeCast<FlexDirection>()
 val RowReverse = "row-reverse".unsafeCast<FlexDirection>()

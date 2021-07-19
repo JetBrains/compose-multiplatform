@@ -9,12 +9,12 @@ package org.jetbrains.compose.web.css
 data class CSSAnimation(
     val keyframesName: String,
     var duration: List<CSSSizeValue<out CSSUnitTime>>? = null,
-    var timingFunction: List<AnimationTimingFunction>? = null,
+    var timingFunction: List<Any>? = null,
     var delay: List<CSSSizeValue<out CSSUnitTime>>? = null,
     var iterationCount: List<Int?>? = null,
-    var direction: List<AnimationDirection>? = null,
+    var direction: List<Any>? = null,
     var fillMode: List<AnimationFillMode>? = null,
-    var playState: List<AnimationPlayState>? = null
+    var playState: List<Any>? = null
 ) : CSSStyleValue {
     override fun toString(): String {
         val values = listOfNotNull(
@@ -35,6 +35,11 @@ inline fun CSSAnimation.duration(vararg values: CSSSizeValue<out CSSUnitTime>) {
     this.duration = values.toList()
 }
 
+
+inline fun CSSAnimation.timingFunction(vararg values: BasicStringProperty) {
+    this.timingFunction = values.toList()
+}
+
 inline fun CSSAnimation.timingFunction(vararg values: AnimationTimingFunction) {
     this.timingFunction = values.toList()
 }
@@ -47,12 +52,21 @@ inline fun CSSAnimation.iterationCount(vararg values: Int?) {
     this.iterationCount = values.toList()
 }
 
+
+inline fun CSSAnimation.direction(vararg values: BasicStringProperty) {
+    this.direction = values.toList()
+}
+
 inline fun CSSAnimation.direction(vararg values: AnimationDirection) {
     this.direction = values.toList()
 }
 
 inline fun CSSAnimation.fillMode(vararg values: AnimationFillMode) {
     this.fillMode = values.toList()
+}
+
+inline fun CSSAnimation.playState(vararg values: BasicStringProperty) {
+    this.playState = values.toList()
 }
 
 inline fun CSSAnimation.playState(vararg values: AnimationPlayState) {

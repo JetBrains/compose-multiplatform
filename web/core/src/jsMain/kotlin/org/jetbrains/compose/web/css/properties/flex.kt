@@ -22,31 +22,43 @@ fun StyleBuilder.flexFlow(flexDirection: FlexDirection, flexWrap: FlexWrap) {
     )
 }
 
+fun StyleBuilder.justifyContent(justifyContent: BasicStringProperty) {
+    property(
+        "justify-content",
+        justifyContent
+    )
+}
+
+
 fun StyleBuilder.justifyContent(justifyContent: JustifyContent) {
     property(
         "justify-content",
         justifyContent
     )
 }
+
+fun StyleBuilder.alignSelf(alignSelf: BasicStringProperty) {
+    property("align-self", alignSelf)
+}
+
 fun StyleBuilder.alignSelf(alignSelf: AlignSelf) {
-    property(
-        "align-self",
-        alignSelf
-    )
+    property("align-self", alignSelf)
+}
+
+fun StyleBuilder.alignItems(alignItems: BasicStringProperty) {
+    property("align-items", alignItems)
 }
 
 fun StyleBuilder.alignItems(alignItems: AlignItems) {
-    property(
-        "align-items",
-        alignItems
-    )
+    property("align-items", alignItems)
+}
+
+fun StyleBuilder.alignContent(alignContent: BasicStringProperty) {
+    property("align-content", alignContent)
 }
 
 fun StyleBuilder.alignContent(alignContent: AlignContent) {
-    property(
-        "align-content",
-        alignContent
-    )
+    property("align-content", alignContent)
 }
 
 fun StyleBuilder.order(value: Int) {
