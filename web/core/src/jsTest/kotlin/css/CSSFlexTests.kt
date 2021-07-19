@@ -158,44 +158,44 @@ class CSSFlexTests {
 
     @Test
     fun justifyContent() = runTest {
-        val enumValues = listOf(
-            Center,
-            Start,
-            End,
-            FlexStart,
-            FlexEnd,
-            Left,
-            Right,
-            Normal,
-            SpaceBetween,
-            SpaceAround,
-            SpaceEvenly,
-            Stretch,
-            Inherit,
-            Initial,
-            Unset,
-            SafeCenter,
-            UnsafeCenter
-        )
-
         composition {
-            enumValues.forEach { justifyContent ->
-                Span(
-                    {
-                        style {
-                            justifyContent(justifyContent)
-                        }
-                    }
-                )
-            }
+            Span({ style { justifyContent(Center) } })
+            Span({ style { justifyContent(Start) } })
+            Span({ style { justifyContent(End) } })
+            Span({ style { justifyContent(FlexStart) } })
+            Span({ style { justifyContent(FlexEnd) } })
+            Span({ style { justifyContent(Left) } })
+            Span({ style { justifyContent(Right) } })
+            Span({ style { justifyContent(Normal) } })
+            Span({ style { justifyContent(SpaceBetween) } })
+            Span({ style { justifyContent(SpaceAround) } })
+            Span({ style { justifyContent(SpaceEvenly) } })
+            Span({ style { justifyContent(Stretch) } })
+            Span({ style { justifyContent(Inherit) } })
+            Span({ style { justifyContent(Initial) } })
+            Span({ style { justifyContent(Unset) } })
+            Span({ style { justifyContent(SafeCenter) } })
+            Span({ style { justifyContent(UnsafeCenter) } })
         }
 
-        enumValues.forEachIndexed { index, justifyContent ->
-            assertEquals(
-                "${justifyContent}",
-                (root.children[index] as HTMLElement).style.justifyContent
-            )
-        }
+        var counter = 0
+        assertEquals("center", (root.children[counter++] as HTMLElement).style.justifyContent)
+        assertEquals("start", (root.children[counter++] as HTMLElement).style.justifyContent)
+        assertEquals("end", (root.children[counter++] as HTMLElement).style.justifyContent)
+        assertEquals("flex-start", (root.children[counter++] as HTMLElement).style.justifyContent)
+        assertEquals("flex-end", (root.children[counter++] as HTMLElement).style.justifyContent)
+        assertEquals("left", (root.children[counter++] as HTMLElement).style.justifyContent)
+        assertEquals("right", (root.children[counter++] as HTMLElement).style.justifyContent)
+        assertEquals("normal", (root.children[counter++] as HTMLElement).style.justifyContent)
+        assertEquals("space-between", (root.children[counter++] as HTMLElement).style.justifyContent)
+        assertEquals("space-around", (root.children[counter++] as HTMLElement).style.justifyContent)
+        assertEquals("space-evenly", (root.children[counter++] as HTMLElement).style.justifyContent)
+        assertEquals("stretch", (root.children[counter++] as HTMLElement).style.justifyContent)
+        assertEquals("inherit", (root.children[counter++] as HTMLElement).style.justifyContent)
+        assertEquals("initial", (root.children[counter++] as HTMLElement).style.justifyContent)
+        assertEquals("unset", (root.children[counter++] as HTMLElement).style.justifyContent)
+        assertEquals("safe center", (root.children[counter++] as HTMLElement).style.justifyContent)
+        assertEquals("unsafe center", (root.children[counter] as HTMLElement).style.justifyContent)
     }
 
     @Test
