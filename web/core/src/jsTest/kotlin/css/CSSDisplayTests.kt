@@ -17,43 +17,42 @@ class CSSDisplayTests {
 
     @Test
     fun stylesDisplay() = runTest {
-        val enumValues = listOf(
-            Block,
-            Inline,
-            InlineBlock,
-            Flex,
-            LegacyInlineFlex,
-            Grid,
-            LegacyInlineGrid,
-            FlowRoot,
-            None,
-            Contents,
-            Table,
-            TableRow,
-            ListItem,
-            Inherit,
-            Initial,
-            Unset
-        )
-
         composition {
-            enumValues.forEach { displayStyle ->
-                Div(
-                    {
-                        style {
-                            display(displayStyle)
-                        }
-                    }
-                )
-            }
+            Div({ style { display(Block) } })
+            Div({ style { display(Inline) } })
+            Div({ style { display(InlineBlock) } })
+            Div({ style { display(Flex) } })
+            Div({ style { display(LegacyInlineFlex) } })
+            Div({ style { display(Grid) } })
+            Div({ style { display(LegacyInlineGrid) } })
+            Div({ style { display(FlowRoot) } })
+            Div({ style { display(None) } })
+            Div({ style { display(Contents) } })
+            Div({ style { display(Table) } })
+            Div({ style { display(TableRow) } })
+            Div({ style { display(ListItem) } })
+            Div({ style { display(Inherit) } })
+            Div({ style { display(Initial) } })
+            Div({ style { display(Unset) } })
         }
 
-        enumValues.forEachIndexed { index, displayStyle ->
-            assertEquals(
-                displayStyle.toString(),
-                (root.children[index] as HTMLElement).style.display
-            )
-        }
+        var counter = 0
+        assertEquals("block", (root.children[counter++] as HTMLElement).style.display)
+        assertEquals("inline", (root.children[counter++] as HTMLElement).style.display)
+        assertEquals("inline-block", (root.children[counter++] as HTMLElement).style.display)
+        assertEquals("flex", (root.children[counter++] as HTMLElement).style.display)
+        assertEquals("inline-flex", (root.children[counter++] as HTMLElement).style.display)
+        assertEquals("grid", (root.children[counter++] as HTMLElement).style.display)
+        assertEquals("inline-grid", (root.children[counter++] as HTMLElement).style.display)
+        assertEquals("flow-root", (root.children[counter++] as HTMLElement).style.display)
+        assertEquals("none", (root.children[counter++] as HTMLElement).style.display)
+        assertEquals("contents", (root.children[counter++] as HTMLElement).style.display)
+        assertEquals("table", (root.children[counter++] as HTMLElement).style.display)
+        assertEquals("table-row", (root.children[counter++] as HTMLElement).style.display)
+        assertEquals("list-item", (root.children[counter++] as HTMLElement).style.display)
+        assertEquals("inherit", (root.children[counter++] as HTMLElement).style.display)
+        assertEquals("initial", (root.children[counter++] as HTMLElement).style.display)
+        assertEquals("unset", (root.children[counter] as HTMLElement).style.display)
     }
 
 }
