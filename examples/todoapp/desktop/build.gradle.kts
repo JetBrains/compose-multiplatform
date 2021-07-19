@@ -25,6 +25,11 @@ kotlin {
                 implementation(Deps.ArkIvanov.MVIKotlin.mvikotlinMain)
                 implementation(Deps.Badoo.Reaktive.reaktive)
                 implementation(Deps.Badoo.Reaktive.coroutinesInterop)
+
+                // The dependencies below are required only for previews, see https://github.com/JetBrains/compose-jb/issues/908
+                implementation(compose.uiTooling)
+                implementation(project(":common:edit"))
+                implementation(project(":common:main"))
             }
         }
     }
@@ -38,7 +43,7 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "ComoseDesktopTodo"
             packageVersion = "1.0.0"
-            
+
             modules("java.sql")
 
             windows {
