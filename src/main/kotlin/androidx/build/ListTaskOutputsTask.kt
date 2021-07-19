@@ -126,6 +126,8 @@ val taskNamesKnownToDuplicateOutputs = setOf(
     // https://github.com/square/wire/issues/1947
     "generateDebugProtos",
     "generateReleaseProtos",
+    // Release APKs
+    "copyReleaseApk"
 )
 
 // For this project and all subprojects, collects all tasks and creates a map keyed by their output files
