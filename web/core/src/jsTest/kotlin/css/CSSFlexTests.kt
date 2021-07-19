@@ -329,30 +329,16 @@ class CSSFlexTests {
 
     @Test
     fun flexWrap() = runTest {
-        val enumValues = listOf(
-            Wrap,
-            Nowrap,
-            WrapReverse
-        )
-
         composition {
-            enumValues.forEach { flexWrap ->
-                Span(
-                    {
-                        style {
-                            flexWrap(flexWrap)
-                        }
-                    }
-                )
-            }
+            Span({ style { flexWrap(Wrap) } })
+            Span({ style { flexWrap(Nowrap) } })
+            Span({ style { flexWrap(WrapReverse) } })
         }
 
-        enumValues.forEachIndexed { index, displayStyle ->
-            assertEquals(
-                "${displayStyle}",
-                (root.children[index] as HTMLElement).style.flexWrap
-            )
-        }
+        var counter = 0
+        assertEquals("wrap", (root.children[counter++] as HTMLElement).style.flexWrap)
+        assertEquals("nowrap", (root.children[counter++] as HTMLElement).style.flexWrap)
+        assertEquals("wrap-reverse", (root.children[counter] as HTMLElement).style.flexWrap)
     }
 
     @Test
