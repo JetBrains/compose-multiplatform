@@ -36,15 +36,8 @@ external interface DisplayStyle: StylePropertyEnum {
         inline val None get() = DisplayStyle("none")
         inline val Contents get() = DisplayStyle("contents")
 
-// TODO(shabunc): This properties behave them iconsistenly in both Chrome and Firefox so I turned the off so far
-//    BlockFlow("block flow")
-//    InlineFlow("inline flow")
-//    InlineFlowRoot("inline flow-root")
-//    BlocklFlex("block flex")
-//    InlineFlex("inline flex")
-//    BlockGrid("block grid")
-//    InlineGrid("inline grid")
-//    BlockFlowRoot("block flow-root")
+// TODO(shabunc): Following properties behave them iconsistenly in both Chrome and Firefox so I turned the off so far:
+// "block flow", "inline flow", "inline flow-root",  "block flex",  "inline flex",  "block grid",  "inline grid", "block flow-root",
 
         inline val Table get() = DisplayStyle("table")
         inline val TableRow get() = DisplayStyle("table-row")
