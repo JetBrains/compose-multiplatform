@@ -274,42 +274,40 @@ class CSSFlexTests {
 
     @Test
     fun alignContent() = runTest {
-        val enumValues = listOf(
-            Center,
-            Start,
-            End,
-            FlexStart,
-            FlexEnd,
-            Baseline,
-            SafeCenter,
-            UnsafeCenter,
-            SpaceBetween,
-            SpaceAround,
-            SpaceEvenly,
-            Stretch,
-            Inherit,
-            Initial,
-            Unset
-        )
-
         composition {
-            enumValues.forEach { alignContent ->
-                Span(
-                    {
-                        style {
-                            alignContent(alignContent)
-                        }
-                    }
-                )
-            }
+            Span({ style { alignContent(Center) } })
+            Span({ style { alignContent(Start) } })
+            Span({ style { alignContent(End) } })
+            Span({ style { alignContent(FlexStart) } })
+            Span({ style { alignContent(FlexEnd) } })
+            Span({ style { alignContent(Baseline) } })
+            Span({ style { alignContent(SafeCenter) } })
+            Span({ style { alignContent(UnsafeCenter) } })
+            Span({ style { alignContent(SpaceBetween) } })
+            Span({ style { alignContent(SpaceAround) } })
+            Span({ style { alignContent(SpaceEvenly) } })
+            Span({ style { alignContent(Stretch) } })
+            Span({ style { alignContent(Inherit) } })
+            Span({ style { alignContent(Initial) } })
+            Span({ style { alignContent(Unset) } })
         }
 
-        enumValues.forEachIndexed { index, alignContent ->
-            assertEquals(
-                "${alignContent}",
-                (root.children[index] as HTMLElement).style.alignContent
-            )
-        }
+        var counter = 0
+        assertEquals("center", (root.children[counter++] as HTMLElement).style.alignContent)
+        assertEquals("start", (root.children[counter++] as HTMLElement).style.alignContent)
+        assertEquals("end", (root.children[counter++] as HTMLElement).style.alignContent)
+        assertEquals("flex-start", (root.children[counter++] as HTMLElement).style.alignContent)
+        assertEquals("flex-end", (root.children[counter++] as HTMLElement).style.alignContent)
+        assertEquals("baseline", (root.children[counter++] as HTMLElement).style.alignContent)
+        assertEquals("safe center", (root.children[counter++] as HTMLElement).style.alignContent)
+        assertEquals("unsafe center", (root.children[counter++] as HTMLElement).style.alignContent)
+        assertEquals("space-between", (root.children[counter++] as HTMLElement).style.alignContent)
+        assertEquals("space-around", (root.children[counter++] as HTMLElement).style.alignContent)
+        assertEquals("space-evenly", (root.children[counter++] as HTMLElement).style.alignContent)
+        assertEquals("stretch", (root.children[counter++] as HTMLElement).style.alignContent)
+        assertEquals("inherit", (root.children[counter++] as HTMLElement).style.alignContent)
+        assertEquals("initial", (root.children[counter++] as HTMLElement).style.alignContent)
+        assertEquals("unset", (root.children[counter++] as HTMLElement).style.alignContent)
     }
 
     @Test
