@@ -6,7 +6,6 @@
 package org.jetbrains.compose.web.core.tests.css
 
 import org.jetbrains.compose.web.core.tests.runTest
-import org.jetbrains.compose.web.core.tests.values
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Span
@@ -120,8 +119,19 @@ class CSSFlexTests {
 
     @Test
     fun flexFlow() = runTest {
-        val flexWraps = FlexWrap.values()
-        val flexDirections = FlexDirection.values()
+        val flexWraps = listOf(
+            FlexWrap.Wrap,
+            FlexWrap.Nowrap,
+            FlexWrap.WrapReverse
+        )
+
+        val flexDirections = listOf(
+            FlexDirection.Row,
+            FlexDirection.RowReverse,
+            FlexDirection.Column,
+            FlexDirection.ColumnReverse
+        )
+
         composition {
             flexDirections.forEach { flexDirection ->
                 flexWraps.forEach { flexWrap ->
@@ -148,7 +158,26 @@ class CSSFlexTests {
 
     @Test
     fun justifyContent() = runTest {
-        val enumValues = JustifyContent.values()
+        val enumValues = listOf(
+            JustifyContent.Center,
+            JustifyContent.Start,
+            JustifyContent.End,
+            JustifyContent.FlexStart,
+            JustifyContent.FlexEnd,
+            JustifyContent.Left,
+            JustifyContent.Right,
+            JustifyContent.Normal,
+            JustifyContent.SpaceBetween,
+            JustifyContent.SpaceAround,
+            JustifyContent.SpaceEvenly,
+            JustifyContent.Stretch,
+            JustifyContent.Inherit,
+            JustifyContent.Initial,
+            JustifyContent.Unset,
+            JustifyContent.SafeCenter,
+            JustifyContent.UnsafeCenter
+        )
+
         composition {
             enumValues.forEach { justifyContent ->
                 Span(
@@ -171,7 +200,25 @@ class CSSFlexTests {
 
     @Test
     fun alignSelf() = runTest {
-        val enumValues = AlignSelf.values()
+        val enumValues = listOf(
+            AlignSelf.Auto,
+            AlignSelf.Normal,
+            AlignSelf.Center,
+            AlignSelf.Start,
+            AlignSelf.End,
+            AlignSelf.SelfStart,
+            AlignSelf.SelfEnd,
+            AlignSelf.FlexStart,
+            AlignSelf.FlexEnd,
+            AlignSelf.Baseline,
+            AlignSelf.Stretch,
+            AlignSelf.SafeCenter,
+            AlignSelf.UnsafeCenter,
+            AlignSelf.Inherit,
+            AlignSelf.Initial,
+            AlignSelf.Unset
+        )
+
         composition {
             enumValues.forEach { alignSelf ->
                 Span(
@@ -194,7 +241,22 @@ class CSSFlexTests {
 
     @Test
     fun alignItems() = runTest {
-        val enumValues = AlignItems.values()
+        val enumValues = listOf(
+            AlignItems.Normal,
+            AlignItems.Stretch,
+            AlignItems.Center,
+            AlignItems.Start,
+            AlignItems.End,
+            AlignItems.FlexStart,
+            AlignItems.FlexEnd,
+            AlignItems.Baseline,
+            AlignItems.SafeCenter,
+            AlignItems.UnsafeCenter,
+            AlignItems.Inherit,
+            AlignItems.Initial,
+            AlignItems.Unset
+        )
+
         composition {
             enumValues.forEach { alignItems ->
                 Span(
@@ -217,7 +279,24 @@ class CSSFlexTests {
 
     @Test
     fun alignContent() = runTest {
-        val enumValues = AlignContent.values()
+        val enumValues = listOf(
+            AlignContent.Center,
+            AlignContent.Start,
+            AlignContent.End,
+            AlignContent.FlexStart,
+            AlignContent.FlexEnd,
+            AlignContent.Baseline,
+            AlignContent.SafeCenter,
+            AlignContent.UnsafeCenter,
+            AlignContent.SpaceBetween,
+            AlignContent.SpaceAround,
+            AlignContent.SpaceEvenly,
+            AlignContent.Stretch,
+            AlignContent.Inherit,
+            AlignContent.Initial,
+            AlignContent.Unset
+        )
+
         composition {
             enumValues.forEach { alignContent ->
                 Span(
@@ -240,7 +319,13 @@ class CSSFlexTests {
 
     @Test
     fun flexDirection() = runTest {
-        val enumValues = FlexDirection.values()
+        val enumValues = listOf(
+            FlexDirection.Row,
+            FlexDirection.RowReverse,
+            FlexDirection.Column,
+            FlexDirection.ColumnReverse
+        )
+
         composition {
             enumValues.forEach { flexDirection ->
                 Span(
@@ -264,7 +349,12 @@ class CSSFlexTests {
 
     @Test
     fun flexWrap() = runTest {
-        val enumValues = FlexWrap.values()
+        val enumValues = listOf(
+            FlexWrap.Wrap,
+            FlexWrap.Nowrap,
+            FlexWrap.WrapReverse
+        )
+
         composition {
             enumValues.forEach { flexWrap ->
                 Span(

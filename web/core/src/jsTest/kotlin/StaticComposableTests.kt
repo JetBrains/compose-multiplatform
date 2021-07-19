@@ -196,7 +196,14 @@ class StaticComposableTests {
     @Test
     fun stylesPosition() {
         val root = "div".asHtmlElement()
-        val enumValues = Position.values()
+        val enumValues = listOf(
+            Position.Static,
+            Position.Relative,
+            Position.Absolute,
+            Position.Sticky,
+            Position.Fixed
+        )
+
         renderComposable(
             root = root
         ) {
