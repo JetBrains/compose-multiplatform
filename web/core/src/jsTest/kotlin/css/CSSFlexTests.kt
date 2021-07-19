@@ -119,41 +119,40 @@ class CSSFlexTests {
 
     @Test
     fun flexFlow() = runTest {
-        val flexWraps = listOf(
-            Wrap,
-            Nowrap,
-            WrapReverse
-        )
-
-        val flexDirections = listOf(
-            Row,
-            RowReverse,
-            Column,
-            ColumnReverse
-        )
-
         composition {
-            flexDirections.forEach { flexDirection ->
-                flexWraps.forEach { flexWrap ->
-                    Span(
-                        {
-                            style {
-                                flexFlow(flexDirection, flexWrap)
-                            }
-                        }
-                    )
-                }
-            }
+            Span({ style { flexFlow(Row, Wrap) } })
+            Span({ style { flexFlow(Row, Nowrap) } })
+            Span({ style { flexFlow(Row, WrapReverse) } })
+
+            Span({ style { flexFlow(RowReverse, Wrap) } })
+            Span({ style { flexFlow(RowReverse, Nowrap) } })
+            Span({ style { flexFlow(RowReverse, WrapReverse) } })
+
+            Span({ style { flexFlow(Column, Wrap) } })
+            Span({ style { flexFlow(Column, Nowrap) } })
+            Span({ style { flexFlow(Column, WrapReverse) } })
+
+            Span({ style { flexFlow(ColumnReverse, Wrap) } })
+            Span({ style { flexFlow(ColumnReverse, Nowrap) } })
+            Span({ style { flexFlow(ColumnReverse, WrapReverse) } })
         }
 
-        flexDirections.forEachIndexed { i, flexDirection ->
-            flexWraps.forEachIndexed { j, flexWrap ->
-                assertEquals(
-                    "${flexDirection} ${flexWrap}",
-                    (root.children[3 * i + j % 3] as HTMLElement).style.flexFlow
-                )
-            }
-        }
+        var counter = 0
+        assertEquals("row wrap", (root.children[counter++] as HTMLElement).style.flexFlow)
+        assertEquals("row nowrap", (root.children[counter++] as HTMLElement).style.flexFlow)
+        assertEquals("row wrap-reverse", (root.children[counter++] as HTMLElement).style.flexFlow)
+
+        assertEquals("row-reverse wrap", (root.children[counter++] as HTMLElement).style.flexFlow)
+        assertEquals("row-reverse nowrap", (root.children[counter++] as HTMLElement).style.flexFlow)
+        assertEquals("row-reverse wrap-reverse", (root.children[counter++] as HTMLElement).style.flexFlow)
+
+        assertEquals("column wrap", (root.children[counter++] as HTMLElement).style.flexFlow)
+        assertEquals("column nowrap", (root.children[counter++] as HTMLElement).style.flexFlow)
+        assertEquals("column wrap-reverse", (root.children[counter++] as HTMLElement).style.flexFlow)
+
+        assertEquals("column-reverse wrap", (root.children[counter++] as HTMLElement).style.flexFlow)
+        assertEquals("column-reverse nowrap", (root.children[counter++] as HTMLElement).style.flexFlow)
+        assertEquals("column-reverse wrap-reverse", (root.children[counter] as HTMLElement).style.flexFlow)
     }
 
     @Test
