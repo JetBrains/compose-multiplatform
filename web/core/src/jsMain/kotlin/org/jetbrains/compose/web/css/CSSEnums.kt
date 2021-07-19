@@ -3,7 +3,6 @@
 package org.jetbrains.compose.web.css
 
 external interface StylePropertyEnum: StylePropertyString
-inline val StylePropertyEnum.name get() = this.unsafeCast<String>()
 inline val StylePropertyEnum.value get() = this.unsafeCast<String>()
 
 external interface LineStyle: StylePropertyEnum {
