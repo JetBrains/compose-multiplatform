@@ -16,14 +16,14 @@ object Color {
         override fun toString(): String = "rgba($r, $g, $b, $a)"
     }
 
-    @Deprecated("use org.jetbrains.compose.web.css.hsl", ReplaceWith("hsl(r, g, b)"))
+    @Deprecated("use org.jetbrains.compose.web.css.hsl", ReplaceWith("hsl(h, s, l)"))
     data class HSL(val h: CSSAngleValue, val s: Number, val l: Number) : CSSColorValue {
         constructor(h: Number, s: Number, l: Number) : this(h.deg, s, l)
 
         override fun toString(): String = "hsl($h, $s%, $l%)"
     }
 
-    @Deprecated("use org.jetbrains.compose.web.css.hsla", ReplaceWith("hsla(r, g, b, a)"))
+    @Deprecated("use org.jetbrains.compose.web.css.hsla", ReplaceWith("hsla(h, s, l, a)"))
     data class HSLA(val h: CSSAngleValue, val s: Number, val l: Number, val a: Number) : CSSColorValue {
         constructor(h: Number, s: Number, l: Number, a: Number) : this(h.deg, s, l, a)
 
