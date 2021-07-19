@@ -5,18 +5,20 @@
 
 package org.jetbrains.compose.desktop.ide.preview
 
+import com.intellij.notification.NotificationGroupManager
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.components.JBLoadingPanel
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.*
-import java.awt.Dimension
 import javax.swing.JComponent
 import javax.swing.event.AncestorEvent
 import javax.swing.event.AncestorListener
 
 @Service
-class PreviewStateService : Disposable {
+class PreviewStateService(private val myProject: Project) : Disposable {
     private val previewListener = CompositePreviewListener()
     private val previewManager: PreviewManager = PreviewManagerImpl(previewListener)
     val gradleCallbackPort: Int
@@ -36,6 +38,21 @@ class PreviewStateService : Disposable {
 
         previewListener.addListener(PreviewPanelUpdater(previewPanel))
         previewListener.addListener(LoadingPanelUpdater(loadingPanel))
+        previewListener.addListener(object : PreviewListenerBase() {
+            private val reported = hashSetOf<Pair<Int, Int>>()
+
+            override fun onIncompatibleProtocolVersions(versionServer: Int, versionClient: Int) {
+                if (reported.add(versionServer to versionClient)) {
+                    NotificationGroupManager.getInstance()
+                        .getNotificationGroup("Compose MPP Notifications")
+                        .createNotification("Compose Desktop Preview may be incompatible " +
+                                "with provided Compose Gradle plugin. " +
+                                "Please use matching versions.",
+                            NotificationType.ERROR)
+                        .notify(myProject)
+                }
+            }
+        })
     }
 
     internal fun buildStarted() {

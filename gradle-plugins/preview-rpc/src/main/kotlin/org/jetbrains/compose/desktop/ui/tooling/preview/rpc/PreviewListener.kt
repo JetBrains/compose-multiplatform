@@ -10,6 +10,7 @@ interface PreviewListener {
     fun onFinishedBuild(success: Boolean)
     fun onNewRenderRequest(previewRequest: FrameRequest)
     fun onRenderedFrame(frame: RenderedFrame)
+    fun onIncompatibleProtocolVersions(versionServer: Int, versionClient: Int)
 }
 
 open class PreviewListenerBase : PreviewListener {
@@ -18,6 +19,8 @@ open class PreviewListenerBase : PreviewListener {
 
     override fun onNewRenderRequest(previewRequest: FrameRequest) {}
     override fun onRenderedFrame(frame: RenderedFrame) {}
+
+    override fun onIncompatibleProtocolVersions(versionServer: Int, versionClient: Int) {}
 }
 
 class CompositePreviewListener : PreviewListener {
@@ -37,6 +40,10 @@ class CompositePreviewListener : PreviewListener {
 
     override fun onRenderedFrame(frame: RenderedFrame) {
         forEachListener { it.onRenderedFrame(frame) }
+    }
+
+    override fun onIncompatibleProtocolVersions(versionServer: Int, versionClient: Int) {
+        forEachListener { it.onIncompatibleProtocolVersions(versionServer, versionClient) }
     }
 
     @Synchronized

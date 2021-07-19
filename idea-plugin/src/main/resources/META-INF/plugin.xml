@@ -38,5 +38,7 @@
                 anchor="right" />
 
         <lang.inspectionSuppressor language="kotlin" implementationClass="org.jetbrains.compose.inspections.ComposeSuppressor"/>
+
+        <notificationGroup id="Compose MPP Notifications" displayType="BALLOON"/>
     </extensions>
 </idea-plugin>
