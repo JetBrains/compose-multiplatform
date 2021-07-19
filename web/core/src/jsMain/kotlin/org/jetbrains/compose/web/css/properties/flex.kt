@@ -23,18 +23,15 @@ fun StyleBuilder.flexFlow(flexDirection: FlexDirection, flexWrap: FlexWrap) {
 }
 
 fun StyleBuilder.justifyContent(justifyContent: BasicStringProperty) {
-    property(
-        "justify-content",
-        justifyContent
-    )
+    property("justify-content", justifyContent)
 }
 
+fun StyleBuilder.justifyContent(justifyContent: SpacedContent) {
+    property("justify-content", justifyContent)
+}
 
 fun StyleBuilder.justifyContent(justifyContent: JustifyContent) {
-    property(
-        "justify-content",
-        justifyContent
-    )
+    property("justify-content", justifyContent)
 }
 
 fun StyleBuilder.alignSelf(alignSelf: BasicStringProperty) {
@@ -54,6 +51,10 @@ fun StyleBuilder.alignItems(alignItems: AlignItems) {
 }
 
 fun StyleBuilder.alignContent(alignContent: BasicStringProperty) {
+    property("align-content", alignContent)
+}
+
+fun StyleBuilder.alignContent(alignContent: SpacedContent) {
     property("align-content", alignContent)
 }
 

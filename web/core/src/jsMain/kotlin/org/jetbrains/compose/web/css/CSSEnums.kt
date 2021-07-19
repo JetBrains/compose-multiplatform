@@ -75,6 +75,8 @@ val Wrap = "wrap".unsafeCast<FlexWrap>()
 val Nowrap = "nowrap".unsafeCast<FlexWrap>()
 val WrapReverse = "wrap-reverse".unsafeCast<FlexWrap>()
 
+external interface SpacedContent : StylePropertyString
+
 object Center : JustifyContent, AlignSelf, AlignItems, AlignContent, StylePropertyStringValue("center")
 object Start : JustifyContent, AlignSelf, AlignItems, AlignContent, StepPosition, StylePropertyStringValue("start")
 object End : JustifyContent, AlignSelf, AlignItems, AlignContent, StepPosition, StylePropertyStringValue("end")
@@ -83,9 +85,9 @@ object FlexEnd : JustifyContent, AlignSelf, AlignItems, AlignContent, StylePrope
 val Left = "left".unsafeCast<JustifyContent>()
 val Right = "right".unsafeCast<JustifyContent>()
 object Normal : JustifyContent, AlignSelf, AlignItems, AnimationDirection, StylePropertyStringValue("normal")
-object SpaceBetween : JustifyContent, AlignContent, StylePropertyStringValue("space-between")
-object SpaceAround : JustifyContent, AlignContent, StylePropertyStringValue("space-around")
-object SpaceEvenly : JustifyContent, AlignContent, StylePropertyStringValue("space-evenly")
+val SpaceBetween = "space-between".unsafeCast<SpacedContent>()
+val SpaceAround = "space-around".unsafeCast<SpacedContent>()
+val SpaceEvenly = "space-evenly".unsafeCast<SpacedContent>()
 object Stretch : JustifyContent, AlignSelf, AlignItems, AlignContent, StylePropertyStringValue("stretch")
 object SafeCenter : JustifyContent, AlignSelf, AlignItems, AlignContent, StylePropertyStringValue("safe center")
 object UnsafeCenter : JustifyContent, AlignSelf, AlignItems, AlignContent, StylePropertyStringValue("unsafe center")
