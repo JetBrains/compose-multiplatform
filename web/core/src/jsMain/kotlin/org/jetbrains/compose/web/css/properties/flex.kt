@@ -22,27 +22,27 @@ fun StyleBuilder.flexFlow(flexDirection: FlexDirection, flexWrap: FlexWrap) {
     )
 }
 
-fun <T : ContentPositioning> StyleBuilder.justifyContent(justifyContent: T) {
+fun StyleBuilder.justifyContent(justifyContent: JustifyContent) {
     property(
         "justify-content",
         justifyContent
     )
 }
-fun <T : ContentPositioning> StyleBuilder.alignSelf(alignSelf: T) {
+fun StyleBuilder.alignSelf(alignSelf: AlignSelf) {
     property(
         "align-self",
         alignSelf
     )
 }
 
-fun <T : ContentPositioning> StyleBuilder.alignItems(alignItems: T) {
+fun StyleBuilder.alignItems(alignItems: AlignItems) {
     property(
         "align-items",
         alignItems
     )
 }
 
-fun <T : ContentPositioning> StyleBuilder.alignContent(alignContent: T) {
+fun StyleBuilder.alignContent(alignContent: AlignContent) {
     property(
         "align-content",
         alignContent
