@@ -14,6 +14,6 @@ fun StyleBuilder.opacity(value: CSSSizeValue<CSSUnit.percent>) {
 }
 
 fun StyleBuilder.display(displayStyle: DisplayStyle) {
-    property("display", displayStyle.value)
+    property("display", displayStyle)
 }
 

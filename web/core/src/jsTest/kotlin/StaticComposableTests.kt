@@ -213,7 +213,7 @@ class StaticComposableTests {
 
         enumValues.forEachIndexed { index, position ->
             assertEquals(
-                "position: ${position.value};",
+                "position: ${position};",
                 (root.children[index] as HTMLElement).style.cssText
             )
         }

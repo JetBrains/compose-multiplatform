@@ -139,7 +139,7 @@ class CSSFlexTests {
         flexDirections.forEachIndexed { i, flexDirection ->
             flexWraps.forEachIndexed { j, flexWrap ->
                 assertEquals(
-                    "${flexDirection.value} ${flexWrap.value}",
+                    "${flexDirection} ${flexWrap}",
                     (root.children[3 * i + j % 3] as HTMLElement).style.flexFlow
                 )
             }
@@ -163,7 +163,7 @@ class CSSFlexTests {
 
         enumValues.forEachIndexed { index, justifyContent ->
             assertEquals(
-                "${justifyContent.value}",
+                "${justifyContent}",
                 (root.children[index] as HTMLElement).style.justifyContent
             )
         }
@@ -186,7 +186,7 @@ class CSSFlexTests {
 
         enumValues.forEachIndexed { index, alignSelf ->
             assertEquals(
-                "${alignSelf.value}",
+                "${alignSelf}",
                 (root.children[index] as HTMLElement).style.alignSelf
             )
         }
@@ -209,7 +209,7 @@ class CSSFlexTests {
 
         enumValues.forEachIndexed { index, alignItems ->
             assertEquals(
-                "${alignItems.value}",
+                "${alignItems}",
                 (root.children[index] as HTMLElement).style.alignItems
             )
         }
@@ -232,7 +232,7 @@ class CSSFlexTests {
 
         enumValues.forEachIndexed { index, alignContent ->
             assertEquals(
-                "${alignContent.value}",
+                "${alignContent}",
                 (root.children[index] as HTMLElement).style.alignContent
             )
         }
@@ -255,7 +255,7 @@ class CSSFlexTests {
 
         enumValues.forEachIndexed { index, displayStyle ->
             assertEquals(
-                "${displayStyle.value}",
+                "${displayStyle}",
                 (root.children[index] as HTMLElement).style.flexDirection
             )
         }
@@ -279,7 +279,7 @@ class CSSFlexTests {
 
         enumValues.forEachIndexed { index, displayStyle ->
             assertEquals(
-                "${displayStyle.value}",
+                "${displayStyle}",
                 (root.children[index] as HTMLElement).style.flexWrap
             )
         }

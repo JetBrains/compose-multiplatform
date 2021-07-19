@@ -10,7 +10,7 @@ import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 fun StyleBuilder.position(position: Position) {
     property(
         "position",
-        position.value
+        position
     )
 }
 

@@ -2,10 +2,7 @@
 
 package org.jetbrains.compose.web.css
 
-external interface StylePropertyEnum: StylePropertyString
-inline val StylePropertyEnum.value get() = this.unsafeCast<String>()
-
-external interface LineStyle: StylePropertyEnum {
+external interface LineStyle: StylePropertyString {
     external companion object {
         inline val None get() = LineStyle("none")
         inline val Hidden get() = LineStyle("hidden")
@@ -21,7 +18,7 @@ external interface LineStyle: StylePropertyEnum {
 }
 inline fun LineStyle(value: String) = value.unsafeCast<LineStyle>()
 
-external interface DisplayStyle: StylePropertyEnum {
+external interface DisplayStyle: StylePropertyString {
     external companion object {
         inline val Block get() = DisplayStyle("block")
         inline val Inline get() = DisplayStyle("inline")
@@ -49,7 +46,7 @@ external interface DisplayStyle: StylePropertyEnum {
 }
 inline fun DisplayStyle(value: String) = value.unsafeCast<DisplayStyle>()
 
-external interface FlexDirection: StylePropertyEnum {
+external interface FlexDirection: StylePropertyString {
     companion object {
         inline val Row get() = FlexDirection("row")
         inline val RowReverse get() = FlexDirection("row-reverse")
@@ -59,7 +56,7 @@ external interface FlexDirection: StylePropertyEnum {
 }
 inline fun FlexDirection(value: String) = value.unsafeCast<FlexDirection>()
 
-external interface FlexWrap: StylePropertyEnum {
+external interface FlexWrap: StylePropertyString {
     companion object {
         inline val Wrap get() = FlexWrap("wrap")
         inline val Nowrap get() = FlexWrap("nowrap")
@@ -68,7 +65,7 @@ external interface FlexWrap: StylePropertyEnum {
 }
 inline fun FlexWrap(value: String) = value.unsafeCast<FlexWrap>()
 
-external interface JustifyContent: StylePropertyEnum {
+external interface JustifyContent: StylePropertyString {
     companion object {
         inline val Center get() = JustifyContent("center")
         inline val Start get() = JustifyContent("start")
@@ -91,7 +88,7 @@ external interface JustifyContent: StylePropertyEnum {
 }
 inline fun JustifyContent(value: String) = value.unsafeCast<JustifyContent>()
 
-external interface AlignSelf: StylePropertyEnum {
+external interface AlignSelf: StylePropertyString {
     companion object {
         inline val Auto get() = AlignSelf("auto")
         inline val Normal get() = AlignSelf("normal")
@@ -115,7 +112,7 @@ external interface AlignSelf: StylePropertyEnum {
 }
 inline fun AlignSelf(value: String) = value.unsafeCast<AlignSelf>()
 
-external interface AlignItems: StylePropertyEnum {
+external interface AlignItems: StylePropertyString {
     companion object {
         inline val Normal get() = AlignItems("normal")
         inline val Stretch get() = AlignItems("stretch")
@@ -137,7 +134,7 @@ external interface AlignItems: StylePropertyEnum {
 }
 inline fun AlignItems(value: String) = value.unsafeCast<AlignItems>()
 
-external interface AlignContent: StylePropertyEnum {
+external interface AlignContent: StylePropertyString {
     companion object {
         inline val Center get() = AlignContent("center")
         inline val Start get() = AlignContent("start")
@@ -161,7 +158,7 @@ external interface AlignContent: StylePropertyEnum {
 }
 inline fun AlignContent(value: String) = value.unsafeCast<AlignContent>()
 
-external interface Position: StylePropertyEnum {
+external interface Position: StylePropertyString {
     companion object {
         inline val Static get() = Position("static")
         inline val Relative get() = Position("relative")
@@ -174,7 +171,7 @@ inline fun Position(value: String) = value.unsafeCast<Position>()
 
 typealias LanguageCode = String
 
-external interface StepPosition: StylePropertyEnum {
+external interface StepPosition: StylePropertyString {
     companion object {
         inline val JumpStart get() = StepPosition("jump-start")
         inline val JumpEnd get() = StepPosition("jump-end")
@@ -186,7 +183,7 @@ external interface StepPosition: StylePropertyEnum {
 }
 inline fun StepPosition(value: String) = value.unsafeCast<StepPosition>()
 
-external interface AnimationTimingFunction: StylePropertyEnum {
+external interface AnimationTimingFunction: StylePropertyString {
     companion object {
         inline val Ease get() = AnimationTimingFunction("ease")
         inline val EaseIn get() = AnimationTimingFunction("ease-in")
@@ -207,7 +204,7 @@ external interface AnimationTimingFunction: StylePropertyEnum {
 }
 inline fun AnimationTimingFunction(value: String) = value.unsafeCast<AnimationTimingFunction>()
 
-external interface AnimationDirection: StylePropertyEnum {
+external interface AnimationDirection: StylePropertyString {
     companion object {
         inline val Normal get() = AnimationDirection("normal")
         inline val Reverse get() = AnimationDirection("reverse")
@@ -221,7 +218,7 @@ external interface AnimationDirection: StylePropertyEnum {
 }
 inline fun AnimationDirection(value: String) = value.unsafeCast<AnimationDirection>()
 
-external interface AnimationFillMode: StylePropertyEnum {
+external interface AnimationFillMode: StylePropertyString {
     companion object {
         inline val None get() = AnimationFillMode("none")
         inline val Forwards get() = AnimationFillMode("forwards")
@@ -231,7 +228,7 @@ external interface AnimationFillMode: StylePropertyEnum {
 }
 inline fun AnimationFillMode(value: String) = value.unsafeCast<AnimationFillMode>()
 
-external interface AnimationPlayState: StylePropertyEnum {
+external interface AnimationPlayState: StylePropertyString {
     companion object {
         inline val Running get() = AnimationPlayState("running")
         inline val Paused get() = AnimationPlayState("Paused")

@@ -36,7 +36,7 @@ class CSSDisplayTests {
 
         enumValues.forEachIndexed { index, displayStyle ->
             assertEquals(
-                displayStyle.value,
+                displayStyle.toString(),
                 (root.children[index] as HTMLElement).style.display
             )
         }

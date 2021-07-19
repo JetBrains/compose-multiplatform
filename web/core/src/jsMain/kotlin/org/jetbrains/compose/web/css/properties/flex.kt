@@ -8,44 +8,44 @@ package org.jetbrains.compose.web.css
 import org.w3c.dom.css.CSS
 
 fun StyleBuilder.flexDirection(flexDirection: FlexDirection) {
-    property("flex-direction", flexDirection.value)
+    property("flex-direction", flexDirection)
 }
 
 fun StyleBuilder.flexWrap(flexWrap: FlexWrap) {
-    property("flex-wrap", flexWrap.value)
+    property("flex-wrap", flexWrap)
 }
 
 fun StyleBuilder.flexFlow(flexDirection: FlexDirection, flexWrap: FlexWrap) {
     property(
         "flex-flow",
-        "${flexDirection.value} ${flexWrap.value}"
+        "${flexDirection} ${flexWrap}"
     )
 }
 
 fun StyleBuilder.justifyContent(justifyContent: JustifyContent) {
     property(
         "justify-content",
-        justifyContent.value
+        justifyContent
     )
 }
 fun StyleBuilder.alignSelf(alignSelf: AlignSelf) {
     property(
         "align-self",
-        alignSelf.value
+        alignSelf
     )
 }
 
 fun StyleBuilder.alignItems(alignItems: AlignItems) {
     property(
         "align-items",
-        alignItems.value
+        alignItems
     )
 }
 
 fun StyleBuilder.alignContent(alignContent: AlignContent) {
     property(
         "align-content",
-        alignContent.value
+        alignContent
     )
 }
 
