@@ -136,11 +136,11 @@ class CSSFlexTests {
             }
         }
 
-        flexDirections.forEachIndexed { i, flexDirection ->
-            flexWraps.forEachIndexed { j, flexWrap ->
+        flexDirections.forEach { flexDirection ->
+            flexWraps.forEach { flexWrap ->
                 assertEquals(
                     "${flexDirection.value} ${flexWrap.value}",
-                    (root.children[3 * i + j % 3] as HTMLElement).style.flexFlow
+                    (nextChild()).style.flexFlow
                 )
             }
         }
@@ -161,10 +161,10 @@ class CSSFlexTests {
             }
         }
 
-        enumValues.forEachIndexed { index, justifyContent ->
+        enumValues.forEach { justifyContent ->
             assertEquals(
-                "${justifyContent.value}",
-                (root.children[index] as HTMLElement).style.justifyContent
+                justifyContent.value,
+                (nextChild()).style.justifyContent
             )
         }
     }
@@ -184,10 +184,10 @@ class CSSFlexTests {
             }
         }
 
-        enumValues.forEachIndexed { index, alignSelf ->
+        enumValues.forEach { alignSelf ->
             assertEquals(
-                "${alignSelf.value}",
-                (root.children[index] as HTMLElement).style.alignSelf
+                alignSelf.value,
+                nextChild().style.alignSelf
             )
         }
     }
@@ -209,7 +209,7 @@ class CSSFlexTests {
 
         enumValues.forEachIndexed { index, alignItems ->
             assertEquals(
-                "${alignItems.value}",
+                alignItems.value,
                 (root.children[index] as HTMLElement).style.alignItems
             )
         }
@@ -230,10 +230,10 @@ class CSSFlexTests {
             }
         }
 
-        enumValues.forEachIndexed { index, alignContent ->
+        enumValues.forEach { alignContent ->
             assertEquals(
-                "${alignContent.value}",
-                (root.children[index] as HTMLElement).style.alignContent
+                alignContent.value,
+                (nextChild()).style.alignContent
             )
         }
     }
@@ -253,10 +253,10 @@ class CSSFlexTests {
             }
         }
 
-        enumValues.forEachIndexed { index, displayStyle ->
+        enumValues.forEach { displayStyle ->
             assertEquals(
-                "${displayStyle.value}",
-                (root.children[index] as HTMLElement).style.flexDirection
+                displayStyle.value,
+                (nextChild()).style.flexDirection
             )
         }
     }
@@ -277,10 +277,10 @@ class CSSFlexTests {
             }
         }
 
-        enumValues.forEachIndexed { index, displayStyle ->
+        enumValues.forEach { displayStyle ->
             assertEquals(
-                "${displayStyle.value}",
-                (root.children[index] as HTMLElement).style.flexWrap
+                displayStyle.value,
+                nextChild().style.flexWrap
             )
         }
     }
