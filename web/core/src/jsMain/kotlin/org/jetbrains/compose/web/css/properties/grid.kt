@@ -75,4 +75,8 @@ fun StyleBuilder.gridArea(rowStart: String, columnStart: String, rowEnd: String,
     property("grid-area", "$rowStart / $columnStart / $rowEnd / $columnEnd")
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-areas
+fun StyleBuilder.gridTemplateAreas(vararg rows: String) {
+    property("grid-template-areas", rows.joinToString(" ") { "\"$it\"" })
+}
 

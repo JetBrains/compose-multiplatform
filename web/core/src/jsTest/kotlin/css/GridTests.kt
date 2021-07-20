@@ -206,3 +206,14 @@ class GridAreaTests {
     }
 
 }
+
+class GridTemplateAreasTests {
+    @Test
+    fun gridTemplateAreas() = runTest {
+        composition {
+            Div({ style { gridTemplateAreas("head head", "nav main", "nav foot")  } })
+        }
+
+        assertEquals("\"head head\" \"nav main\" \"nav foot\"", (root.children[0] as HTMLElement).style.asDynamic().gridTemplateAreas)
+    }
+}
