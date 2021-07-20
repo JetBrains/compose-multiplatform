@@ -652,6 +652,10 @@ private class PopupLayout(
             height = WindowManager.LayoutParams.WRAP_CONTENT
 
             format = PixelFormat.TRANSLUCENT
+
+            // accessibilityTitle is not exposed as a public API therefore we set popup window
+            // title which is used as a fallback by a11y services
+            title = composeView.context.resources.getString(R.string.default_popup_window_title)
         }
     }
 

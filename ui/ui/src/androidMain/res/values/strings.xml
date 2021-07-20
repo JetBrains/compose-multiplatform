@@ -15,7 +15,7 @@
   limitations under the License.
   -->
 
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<resources xmlns:tools="http://schemas.android.com/tools" xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- Spoken description of indeterminate state of a tri-state checkbox -->
     <string name="indeterminate">Neither checked nor unchecked</string>
     <!-- Spoken description of on state of a switch -->
@@ -42,4 +42,6 @@
     <string name="close_sheet">"Close sheet"</string>
     <!-- Default accessibility error text for an editable text field. -->
     <string name="default_error_message">"Invalid input"</string>
+    <!-- Default title of the popup window to be read by a screen reader. -->
+    <string name="default_popup_window_title" tools:ignore="ExtraTranslation">"Pop-Up Window"</string>
 </resources>
