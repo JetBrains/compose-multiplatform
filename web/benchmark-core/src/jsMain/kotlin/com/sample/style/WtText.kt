@@ -161,7 +161,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
 
     val wtButton by style {
         color("white")
-        backgroundColor("#167dff")
+        backgroundColor(Color("#167dff"))
         fontSize(15.px)
         display(DisplayStyle.InlineBlock)
         property("text-decoration", "none")
@@ -192,7 +192,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
 
     val wtButtonContrast by style {
         color("white")
-        backgroundColor("#27282c")
+        backgroundColor(Color("#27282c"))
 
         hover(self) style {
             backgroundColor(rgba(39, 40, 44, .7))
@@ -203,7 +203,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
         property("margin-right", 16.px)
         marginLeft(16.px)
         padding(12.px)
-        backgroundColor("transparent")
+        backgroundColor(Color.transparent)
         display(DisplayStyle.LegacyInlineFlex)
 
         hover(self) style {

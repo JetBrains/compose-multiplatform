@@ -50,7 +50,7 @@ class TestCases1 {
                 style {
                     width(100.px)
                     height(100.px)
-                    backgroundColor("red")
+                    backgroundColor(Color.red)
                 }
             }
         ) {}
