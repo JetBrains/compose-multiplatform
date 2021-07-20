@@ -5,7 +5,7 @@ plugins {
     // __KOTLIN_COMPOSE_VERSION__
     kotlin("multiplatform") version "1.5.21"
     // __LATEST_COMPOSE_RELEASE_VERSION__
-    id("org.jetbrains.compose") version ("0.5.0-build235")
+    id("org.jetbrains.compose") version ("0.0.0-sync-2021-07-19-build259")
 }
 
 repositories {
