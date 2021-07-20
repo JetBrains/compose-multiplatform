@@ -16,6 +16,7 @@
 
 package androidx.compose.runtime
 
+import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentHashMapOf
 import androidx.compose.runtime.mock.Text
 import androidx.compose.runtime.mock.compositionTest
 import androidx.compose.runtime.mock.expectChanges
@@ -527,6 +528,37 @@ class CompositionLocalTests {
         // Ensure the old providerUpdates is not longer contains old values.
         state.value++
         advance()
+    }
+
+    @Test // Regression test for b/193433239
+    fun canProvideManyProvidersSimultaneously() {
+        val locals = (1..1000).map { compositionLocalOf { 2 } }
+        val LocalTest = compositionLocalOf<Int> { error("") }
+
+        @Composable
+        fun Test() {
+            CompositionLocalProvider(
+                LocalTest provides 1,
+            ) {
+                CompositionLocalProvider(
+                    *locals.map { it provides 3 }.toTypedArray(),
+                    LocalTest provides 2,
+                ) {
+                    assertEquals(2, LocalTest.current)
+                }
+            }
+        }
+    }
+
+    @Test // Regression test for b/193433239
+    fun testTheUnderlyingPropertiesOfPersistentHashMap() {
+        val p = persistentHashMapOf<Int, Int>(99 to 1)
+        val e = Array(101) { it }.map { it to it }
+        val c = persistentHashMapOf(*e.toTypedArray())
+        val n = p.builder().apply { putAll(c) }.build()
+        repeat(101) {
+            assertEquals(it, n[it])
+        }
     }
 }
 
