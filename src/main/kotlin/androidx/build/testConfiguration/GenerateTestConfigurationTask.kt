@@ -143,8 +143,13 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
                     configBuilder.tag("microbenchmarks_interpreted")
                 }
                 configBuilder.tag("microbenchmarks")
+            } else {
+                // in presubmit, we treat micro benchmarks as regular correctness tests as
+                // they run with dryRunMode to check crashes don't happen, without measurement
+                configBuilder.tag("androidx_unit_tests")
             }
         } else if (testProjectPath.get().endsWith("macrobenchmark")) {
+            // macro benchmarks do not have a dryRunMode, so we don't run them in presubmit
             configBuilder.tag("macrobenchmarks")
         } else {
             configBuilder.tag("androidx_unit_tests")
