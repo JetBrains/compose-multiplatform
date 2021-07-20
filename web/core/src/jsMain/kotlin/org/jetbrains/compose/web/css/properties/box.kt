@@ -5,21 +5,11 @@
 
 package org.jetbrains.compose.web.css
 
-import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
-
 fun StyleBuilder.width(value: CSSNumeric) {
     property("width", value)
 }
 
-fun StyleBuilder.width(value: CSSAutoKeyword) {
-    property("width", value)
-}
-
 fun StyleBuilder.height(value: CSSNumeric) {
-    property("height", value)
-}
-
-fun StyleBuilder.height(value: CSSAutoKeyword) {
     property("height", value)
 }
 
