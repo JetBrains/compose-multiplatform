@@ -55,7 +55,7 @@ object AppStyleSheet : StyleSheet() {
     }
 
     val myClass by style {
-        color("green")
+        color(Color.green)
         animation(bounce) {
             duration(2.s)
             timingFunction(AnimationTimingFunction.EaseIn)
@@ -64,13 +64,13 @@ object AppStyleSheet : StyleSheet() {
     }
 
     val classWithNested by style {
-        color("green")
+        color(Color.green)
 
         MyCSSVariables.myVar(Color("blue"))
         MyCSSVariables.myVar2("red")
 
         hover(self) style {
-            color("red")
+            color(Color.red)
         }
 
         border {
@@ -99,7 +99,7 @@ fun CounterApp(counter: MutableState<Int>) {
     Button(
         {
             style {
-                color(if (counter.value % 2 == 0) "green" else "red")
+                color(if (counter.value % 2 == 0) Color.green else Color.red)
                 width((counter.value + 200).px)
                 fontSize(if (counter.value % 2 == 0) 25.px else 30.px)
                 margin(15.px)
@@ -123,7 +123,7 @@ fun Counter(value: Int) {
             onDrag { println("DRAGGING NOW!!!!") }
 
             style {
-                color("red")
+                color(Color.red)
             }
         }
     ) {
@@ -177,7 +177,7 @@ fun main() {
             }
 
             ".${AppStyleSheet.myClass}:hover" {
-                color("red")
+                color(Color.red)
             }
 
             media(mediaMinWidth(500.px) and mediaMaxWidth(700.px)) {
@@ -222,9 +222,9 @@ fun main() {
             attrs = {
                 classes(
                     Auto.css {
-                        color("pink")
+                        color(Color.pink)
                         hover(self) style {
-                            color("blue")
+                            color(Color.blue)
                         }
                     }
                 )
@@ -343,9 +343,9 @@ fun smallColoredText(text: String) {
 
                 style {
                     if (globalState.isDarkTheme) {
-                        color("black")
+                        color(Color.black)
                     } else {
-                        color("green")
+                        color(Color.green)
                     }
                 }
             },

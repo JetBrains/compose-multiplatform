@@ -122,12 +122,12 @@ class CSSBoxTests {
         composition {
             Div({
                 style {
-                    outlineColor("red")
+                    outlineColor(Color.red)
                 }
             })
             Div({
                 style {
-                    outlineColor("#32a1ce")
+                    outlineColor(Color("#32a1ce"))
                 }
             })
         }

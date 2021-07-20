@@ -21,7 +21,7 @@ class EventsTests {
                 style {
                     width(100.px)
                     height(100.px)
-                    backgroundColor("red")
+                    backgroundColor(Color.red)
                 }
                 onDoubleClick { state = "Double Click Works!" }
             }
@@ -130,7 +130,7 @@ class EventsTests {
         Div(attrs = {
             id("box")
             style {
-                backgroundColor("red")
+                backgroundColor(Color.red)
                 padding(50.px)
                 width(300.px)
             }
@@ -176,7 +176,7 @@ class EventsTests {
                 style {
                     width(200.px)
                     height(200.px)
-                    backgroundColor("red")
+                    backgroundColor(Color.red)
                 }
                 onMouseMove {
                     state = "${it.x},${it.y}|${it.offsetX},${it.offsetY}"
@@ -301,7 +301,7 @@ class EventsTests {
             style {
                 width(300.px)
                 height(300.px)
-                backgroundColor("red")
+                backgroundColor(Color.red)
             }
         }) {
             Text("Touch me and move the pointer")
@@ -338,7 +338,7 @@ class EventsTests {
                 animationEnd = "ENDED"
             }
             style {
-                backgroundColor("red")
+                backgroundColor(Color.red)
             }
         }) {
             Text("Click to Animate")
@@ -399,7 +399,7 @@ object AppStyleSheetWithAnimation : StyleSheet() {
     }
 
     val bounceClass by style {
-        color("green")
+        color(Color.green)
         animation(bounce) {
             duration(500.ms)
             timingFunction(AnimationTimingFunction.EaseIn)

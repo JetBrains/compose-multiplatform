@@ -13,8 +13,8 @@ object WtCards : StyleSheet(AppStylesheet) {
 
     val wtCardThemeLight by style {
         border(color = rgba(39, 40, 44, .2))
-        color("#27282c")
-        backgroundColor("white")
+        color(Color("#27282c"))
+        backgroundColor(Color.white)
     }
 
     val wtCardThemeDark by style {

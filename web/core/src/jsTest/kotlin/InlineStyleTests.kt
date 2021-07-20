@@ -21,9 +21,9 @@ class InlineStyleTests {
                 {
                     style {
                         if (isRed) {
-                            color("red")
+                            color(Color.red)
                         } else {
-                            color("green")
+                            color(Color.green)
                         }
                     }
                 }
@@ -54,7 +54,7 @@ class InlineStyleTests {
                 {
                     style {
                         if (isRed) {
-                            color("red")
+                            color(Color.red)
                         }
                     }
                 }
@@ -85,7 +85,7 @@ class InlineStyleTests {
                 {
                     style {
                         if (isRed) {
-                            color("red")
+                            color(Color.red)
                         }
                     }
                 }
@@ -116,7 +116,7 @@ class InlineStyleTests {
                 {
                     style {
                         if (isRed) {
-                            color("red")
+                            color(Color.red)
                         }
                     }
                 }

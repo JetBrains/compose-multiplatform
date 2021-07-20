@@ -204,7 +204,7 @@ class CSSTextTests {
         composition {
             Div({
                 style {
-                    textDecorationColor("red")
+                    textDecorationColor(Color.red)
                 }
             })
             Div({

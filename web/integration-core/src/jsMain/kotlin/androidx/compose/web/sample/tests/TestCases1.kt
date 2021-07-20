@@ -50,7 +50,7 @@ class TestCases1 {
                 style {
                     width(100.px)
                     height(100.px)
-                    backgroundColor("red")
+                    backgroundColor(Color.red)
                 }
             }
         ) {}
@@ -70,10 +70,10 @@ class TestCases1 {
 
 private object AppStyleSheet : StyleSheet() {
     val textClass by style {
-        color("rgba(0, 200, 0, 0.92)")
+        color(rgba(0, 200, 0, 0.92))
         media(mediaMaxWidth(600.px)) {
             self style {
-                color("rgba(255, 200, 0, 0.99)")
+                color(rgba(255, 200, 0, 0.99))
             }
 
             CSSSelector.Child(self, CSSSelector.Type("span")) style {

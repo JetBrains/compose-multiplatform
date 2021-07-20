@@ -16,16 +16,16 @@ object WtSections : StyleSheet(AppStylesheet) {
             propertyName = "padding-bottom",
             value = "calc(4*${AppCSSVariables.wtOffsetTopUnit.value(24.px)})"
         )
-        backgroundColor("#fff")
+        backgroundColor(Color("#fff"))
     }
 
     val wtSectionBgGrayLight by style {
-        backgroundColor("#f4f4f4")
+        backgroundColor(Color("#f4f4f4"))
         backgroundColor(AppCSSVariables.wtColorGreyLight.value())
     }
 
     val wtSectionBgGrayDark by style {
-        backgroundColor("#323236")
+        backgroundColor(Color("#323236"))
         backgroundColor(AppCSSVariables.wtColorGreyDark.value())
     }
 }

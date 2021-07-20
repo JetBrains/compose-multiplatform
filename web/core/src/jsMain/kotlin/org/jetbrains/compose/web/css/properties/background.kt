@@ -14,10 +14,6 @@ fun StyleBuilder.backgroundClip(value: String) {
     property("background-clip", value)
 }
 
-fun StyleBuilder.backgroundColor(value: String) {
-    property("background-color", value)
-}
-
 fun StyleBuilder.backgroundColor(value: CSSColorValue) {
     property("background-color", value)
 }

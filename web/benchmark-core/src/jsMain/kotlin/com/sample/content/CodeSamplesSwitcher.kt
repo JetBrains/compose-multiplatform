@@ -37,7 +37,7 @@ object SwitcherStylesheet : StyleSheet(AppStylesheet) {
                 color(Color.transparent)
                 borderRadius(20.px, 20.px, 20.px)
             }
-            color("#aaa")
+            color(Color("#aaa"))
         }
 
         border {
@@ -59,7 +59,7 @@ object SwitcherStylesheet : StyleSheet(AppStylesheet) {
                 color(Color("#167dff"))
                 borderRadius(20.px, 20.px, 20.px)
             }
-            color("#000")
+            color(Color("#000"))
         }
     }
 }

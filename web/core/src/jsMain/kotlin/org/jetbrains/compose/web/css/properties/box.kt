@@ -38,10 +38,6 @@ fun StyleBuilder.outlineWidth(value: CSSNumeric) {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/outline-color
-fun StyleBuilder.outlineColor(value: String) {
-    property("outline-color", value)
-}
-
 fun StyleBuilder.outlineColor(value: CSSColorValue) {
     property("outline-color", value)
 }

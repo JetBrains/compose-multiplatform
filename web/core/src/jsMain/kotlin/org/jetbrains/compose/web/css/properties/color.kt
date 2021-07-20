@@ -5,10 +5,6 @@
 
 package org.jetbrains.compose.web.css
 
-fun StyleBuilder.color(value: String) {
-    property("color", value)
-}
-
 fun StyleBuilder.color(value: CSSColorValue) {
     // color hasn't Typed OM yet
     property("color", value)

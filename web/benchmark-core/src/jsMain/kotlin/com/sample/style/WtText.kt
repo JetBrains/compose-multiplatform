@@ -6,7 +6,7 @@ import org.jetbrains.compose.web.css.selectors.*
 object WtTexts : StyleSheet(AppStylesheet) {
 
     val wtHero by style {
-        color("#27282c")
+        color(Color("#27282c"))
         fontSize(60.px)
         property("font-size", AppCSSVariables.wtHeroFontSize.value(60.px))
         property("letter-spacing", (-1.5).px)
@@ -28,7 +28,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
     }
 
     val wtSubtitle2 by style {
-        color("#27282c")
+        color(Color("#27282c"))
         fontSize(28.px)
         property("font-size", AppCSSVariables.wtSubtitle2FontSize.value(28.px))
         property("letter-spacing", "normal")
@@ -107,7 +107,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
     val wtLink by style {
         property("border-bottom", "1px solid transparent")
         property("text-decoration", "none")
-        color("#167dff")
+        color(Color("#167dff"))
 
         hover(self) style {
             property("border-bottom-color", "#167dff")
@@ -115,7 +115,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
     }
 
     val wtH2 by style {
-        color("#27282c")
+        color(Color("#27282c"))
         fontSize(31.px)
         property("font-size", AppCSSVariables.wtH2FontSize.value(31.px))
         property("letter-spacing", (-.5).px)
@@ -137,11 +137,11 @@ object WtTexts : StyleSheet(AppStylesheet) {
     }
 
     val wtH2ThemeDark by style {
-        color("#fff")
+        color(Color("#fff"))
     }
 
     val wtH3 by style {
-        color("#27282c")
+        color(Color("#27282c"))
         fontSize(21.px)
         property("font-size", AppCSSVariables.wtH3FontSize.value(20.px))
         property("letter-spacing", "normal")
@@ -156,12 +156,12 @@ object WtTexts : StyleSheet(AppStylesheet) {
     }
 
     val wtH3ThemeDark by style {
-        color("#fff")
+        color(Color("#fff"))
     }
 
     val wtButton by style {
-        color("white")
-        backgroundColor("#167dff")
+        color(Color.white)
+        backgroundColor(Color("#167dff"))
         fontSize(15.px)
         display(DisplayStyle.InlineBlock)
         property("text-decoration", "none")
@@ -191,8 +191,8 @@ object WtTexts : StyleSheet(AppStylesheet) {
     }
 
     val wtButtonContrast by style {
-        color("white")
-        backgroundColor("#27282c")
+        color(Color.white)
+        backgroundColor(Color("#27282c"))
 
         hover(self) style {
             backgroundColor(rgba(39, 40, 44, .7))
@@ -203,7 +203,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
         property("margin-right", 16.px)
         marginLeft(16.px)
         padding(12.px)
-        backgroundColor("transparent")
+        backgroundColor(Color.transparent)
         display(DisplayStyle.LegacyInlineFlex)
 
         hover(self) style {

@@ -58,10 +58,6 @@ fun StyleBuilder.textAlign(value: String) {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-color
-fun StyleBuilder.textDecorationColor(value: String) {
-    property("text-decoration-color", value)
-}
-
 fun StyleBuilder.textDecorationColor(value: CSSColorValue) {
     property("text-decoration-color", value)
 }
