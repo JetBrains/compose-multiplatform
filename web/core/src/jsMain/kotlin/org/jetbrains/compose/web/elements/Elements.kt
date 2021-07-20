@@ -551,13 +551,7 @@ fun Ol(
 ) = TagElement(elementBuilder = Ol, applyAttrs = attrs, content = content)
 
 @Composable
-fun DOMScope<HTMLOListElement>.Li(
-    attrs: AttrBuilderContext<HTMLLIElement>? = null,
-    content: ContentBuilder<HTMLLIElement>? = null
-) = TagElement(elementBuilder = Li, applyAttrs = attrs, content = content)
-
-@Composable
-fun DOMScope<HTMLUListElement>.Li(
+fun Li(
     attrs: AttrBuilderContext<HTMLLIElement>? = null,
     content: ContentBuilder<HTMLLIElement>? = null
 ) = TagElement(elementBuilder = Li, applyAttrs = attrs, content = content)
