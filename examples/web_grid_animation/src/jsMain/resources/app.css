@@ -1,0 +1,149 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700');
+
+:root {
+  --columns: 3;
+}
+
+body{
+  color: #5A626F;
+  background-color: #E7FFF4;
+  font-family: 'Open Sans Condensed', sans-serif;
+}
+
+ul{
+  margin: 100px 0;
+  display: grid;
+  grid-template-columns: repeat(var(--columns),1fr);
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 600 1040' xmlns='http://www.w3.org/2000/svg' fill-rule='evenodd' clip-rule='evenodd' stroke-linejoin='round' stroke-miterlimit='2'%3E%3Cpath d='M0 0l300 173.205v346.41L0 346.41V0z' fill='url(%23_Linear1)'/%3E%3Cpath d='M300 519.615L600 692.82v346.411L300 866.025v-346.41z' fill='url(%23_Linear2)'/%3E%3Cpath d='M600 0L300 173.205v346.41L600 346.41V0z' fill='url(%23_Linear3)'/%3E%3Cpath d='M300 519.615L0 692.82v346.411l300-173.206v-346.41z' fill='url(%23_Linear4)'/%3E%3Cdefs%3E%3ClinearGradient id='_Linear1' x1='0' y1='0' x2='1' y2='0' gradientUnits='userSpaceOnUse' gradientTransform='rotate(-30 646.41 173.205) scale(346.41)'%3E%3Cstop offset='0' stop-color='%23b7ccc3'/%3E%3Cstop offset='1' stop-color='%23cde2d9'/%3E%3C/linearGradient%3E%3ClinearGradient id='_Linear2' x1='0' y1='0' x2='1' y2='0' gradientUnits='userSpaceOnUse' gradientTransform='rotate(-30 1766.025 -126.796) scale(346.41)'%3E%3Cstop offset='0' stop-color='%23b7ccc3'/%3E%3Cstop offset='1' stop-color='%23cde2d9'/%3E%3C/linearGradient%3E%3ClinearGradient id='_Linear3' x1='0' y1='0' x2='1' y2='0' gradientUnits='userSpaceOnUse' gradientTransform='rotate(-150 346.41 92.82) scale(346.41)'%3E%3Cstop offset='0' stop-color='%23e8dad1'/%3E%3Cstop offset='1' stop-color='%23fff0e7'/%3E%3C/linearGradient%3E%3ClinearGradient id='_Linear4' x1='0' y1='0' x2='1' y2='0' gradientUnits='userSpaceOnUse' gradientTransform='rotate(-150 266.025 392.82) scale(346.41)'%3E%3Cstop offset='0' stop-color='%23e8dad1'/%3E%3Cstop offset='1' stop-color='%23fff0e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3C/svg%3E");
+  background-size: calc(200%/(var(--columns)));
+}
+
+li{
+  grid-column-end: span 2;
+  position: relative;
+  padding-bottom: 86.66%;
+}
+
+li:nth-child(2n-1){
+  grid-column-start:2;
+}
+
+li:before{
+  content: "";
+  position: absolute;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  background-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/881020/adidas.png);
+  background-position: 90% 27%;
+  opacity: 0.6;
+  transform: skewy(30deg);
+  background-size: 40%;
+  background-repeat: no-repeat;
+}
+.adidas:before{
+  background-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/881020/adidas.png);
+}
+.tiger:before{
+  background-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/881020/tiger.png);
+}
+div{
+  position: absolute;
+  width: 50%;
+  font-size: calc(15vw/var(--columns));
+  transform: skewy(-30deg);
+  margin-top: 14%;
+  padding: 3%;
+}
+
+p{
+  font-size: 2em;
+}
+
+img{
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 62%;
+  bottom: -10%;
+  -webkit-filter: drop-shadow(0 50px 20px  rgba(0, 0, 0, 0.20));
+  filter: drop-shadow(0 50px 20px rgba(0, 0, 0, 0.20));
+  transition-property: bottom, filter, -webkit-filter;
+  transition-duration: .3s;
+}
+
+img:hover{
+  bottom: 0;
+  -webkit-filter: drop-shadow(0 80px 40px  rgba(0, 0, 0, 0.20));
+  filter: drop-shadow(0 80px 30px rgba(0, 0, 0, 0.20));
+ }
+
+@media (min-width:600px){
+  :root {
+    --columns: 5;
+  }
+  li:nth-child(2n-1){
+    grid-column-start:auto;
+  }
+  li:nth-child(4n-3){
+    grid-column-start:2;
+  }
+}
+@media (min-width:900px){
+  :root {
+    --columns: 7;
+  }
+  li:nth-child(4n-3){
+    grid-column-start:auto;
+  }
+  li:nth-child(6n-5){
+    grid-column-start:2;
+  }
+}
+@media (min-width:1200px){
+  :root {
+    --columns: 9;
+  }
+  li:nth-child(6n-5){
+    grid-column-start:auto;
+  }
+  li:nth-child(8n-7){
+    grid-column-start:2;
+  }
+}
+@media (min-width:1500px){
+  :root {
+    --columns: 11;
+  }
+  li:nth-child(8n-7){
+    grid-column-start:auto;
+  }
+  li:nth-child(10n-9){
+    grid-column-start:2;
+  }
+}
+@media (min-width:1800px){
+  :root {
+    --columns: 13;
+  }
+  li:nth-child(10n-9){
+    grid-column-start:auto;
+  }
+  li:nth-child(12n-11){
+    grid-column-start:2;
+  }
+
+}
+@media (min-width:2100px){
+  :root {
+    --columns: 15;
+  }
+  li:nth-child(12n-11){
+    grid-column-start:auto;
+  }
+  li:nth-child(14n-13){
+    grid-column-start:2;
+  }
+
+}
+
