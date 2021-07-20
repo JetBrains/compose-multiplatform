@@ -6,10 +6,7 @@
 package org.jetbrains.compose.web.core.tests.css
 
 import org.jetbrains.compose.web.core.tests.runTest
-import org.jetbrains.compose.web.css.gridColumn
-import org.jetbrains.compose.web.css.gridRow
-import org.jetbrains.compose.web.css.gridTemplateColumns
-import org.jetbrains.compose.web.css.gridTemplateRows
+import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
@@ -131,7 +128,7 @@ class GridRawTests {
     }
 }
 
-class GridTemplateRows {
+class GridTemplateRowsTests {
     @Test
     fun gridTemplateRawsGlobalValues() = runTest {
         composition {
@@ -148,7 +145,7 @@ class GridTemplateRows {
     }
 }
 
-class GridTemplateColumns {
+class GridTemplateColumnsTests {
     @Test
     fun gridTemplateColumnsGlobalValues() = runTest {
         composition {
@@ -163,4 +160,49 @@ class GridTemplateColumns {
         assertEquals("revert", (root.children[2] as HTMLElement).style.asDynamic().gridTemplateColumns)
         assertEquals("unset", (root.children[3] as HTMLElement).style.asDynamic().gridTemplateColumns)
     }
+}
+
+class GridAreaTests {
+    @Test
+    fun gridAreaOneValue() = runTest {
+        composition {
+            Div({ style { gridArea("span 3") } })
+        }
+
+        assertEquals("span 3", (root.children[0] as HTMLElement).style.asDynamic().gridRowStart)
+    }
+
+    @Test
+    fun gridAreaTwoValues() = runTest {
+        composition {
+            Div({ style { gridArea("some-grid-area", "another-grid-area") } })
+        }
+
+        val el = root.children[0] as HTMLElement
+        assertEquals("some-grid-area", el.style.asDynamic().gridRowStart)
+        assertEquals("another-grid-area", el.style.asDynamic().gridColumnStart)
+    }
+
+    @Test
+    fun gridAreaThreeValues() = runTest {
+        composition {
+            Div({ style { gridArea("some-grid-area", "another-grid-area", "yet-another-grid-area") } })
+        }
+
+        val el = root.children[0] as HTMLElement
+        assertEquals("some-grid-area", el.style.asDynamic().gridRowStart)
+        assertEquals("another-grid-area", el.style.asDynamic().gridColumnStart)
+        assertEquals("yet-another-grid-area", el.style.asDynamic().gridRowEnd)
+    }
+
+    @Test
+    fun gridAreaFourValues() = runTest {
+        composition {
+            Div({ style { gridArea("2 span", "another-grid-area span", "span 3", "2 span") } })
+        }
+
+        val el = root.children[0] as HTMLElement
+        assertEquals("span 2 / span another-grid-area / span 3 / span 2", el.style.asDynamic().gridArea)
+    }
+
 }

@@ -58,3 +58,21 @@ fun StyleBuilder.gridTemplateRows(value: String) {
     property("grid-template-rows", value)
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/grid-area
+fun StyleBuilder.gridArea(rowStart: String) {
+    property("grid-area", rowStart)
+}
+
+fun StyleBuilder.gridArea(rowStart: String, columnStart: String) {
+    property("grid-area", "$rowStart / $columnStart")
+}
+
+fun StyleBuilder.gridArea(rowStart: String, columnStart: String, rowEnd: String) {
+    property("grid-area", "$rowStart / $columnStart / $rowEnd")
+}
+
+fun StyleBuilder.gridArea(rowStart: String, columnStart: String, rowEnd: String, columnEnd: String) {
+    property("grid-area", "$rowStart / $columnStart / $rowEnd / $columnEnd")
+}
+
+
