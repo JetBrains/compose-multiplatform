@@ -17,7 +17,6 @@
 package androidx.build.docs
 
 import androidx.build.SupportConfig
-import androidx.build.addToBuildOnServer
 import androidx.build.dackka.DackkaTask
 import androidx.build.dependencies.KOTLIN_VERSION
 import androidx.build.doclava.DacOptions
@@ -33,6 +32,7 @@ import androidx.build.getKeystore
 import com.android.build.api.attributes.BuildTypeAttr
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
+import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -46,16 +46,21 @@ import org.gradle.api.attributes.Usage
 import org.gradle.api.file.FileCollection
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.JavaBasePlugin
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Sync
+import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.all
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.register
 import org.jetbrains.dokka.gradle.DokkaAndroidTask
 import org.jetbrains.dokka.gradle.PackageOptions
 import java.io.File
+import java.io.FileNotFoundException
 import javax.inject.Inject
 
 /**
@@ -90,6 +95,11 @@ class AndroidXDocsPlugin : Plugin<Project> {
         }
         disableUnneededTasks()
         createConfigurations()
+        val buildOnServer = project.tasks.register<DocsBuildOnServer>("buildOnServer") {
+            buildId = getBuildId()
+            docsType = this@AndroidXDocsPlugin.docsType
+            distributionDirectory = project.getDistributionDirectory()
+        }
 
         val unzippedSamplesSources = File(project.buildDir, "unzippedSampleSources")
         val unzipSamplesTask = configureUnzipTask(
@@ -115,19 +125,22 @@ class AndroidXDocsPlugin : Plugin<Project> {
             unzipSourcesForDackkaTask,
             unzippedSamplesSources,
             unzipSamplesTask,
-            dependencyClasspath
+            dependencyClasspath,
+            buildOnServer
         )
         configureDokka(
             unzippedDocsSources,
             unzipDocsTask,
             unzippedSamplesSources,
             unzipSamplesTask,
-            dependencyClasspath
+            dependencyClasspath,
+            buildOnServer
         )
         configureDoclava(
             unzippedDocsSources,
             unzipDocsTask,
-            dependencyClasspath
+            dependencyClasspath,
+            buildOnServer
         )
     }
 
@@ -290,7 +303,8 @@ class AndroidXDocsPlugin : Plugin<Project> {
         unzipDocsTask: TaskProvider<Sync>,
         unzippedSamplesSources: File,
         unzipSamplesTask: TaskProvider<Sync>,
-        dependencyClasspath: FileCollection
+        dependencyClasspath: FileCollection,
+        buildOnServer: TaskProvider<*>
     ) {
         val generatedDocsDir = project.file("${project.buildDir}/dackkaDocs")
 
@@ -340,8 +354,7 @@ class AndroidXDocsPlugin : Plugin<Project> {
                     " style of d.android.com) into $destinationFile"
             }
         }
-
-        project.addToBuildOnServer(zipTask)
+        buildOnServer.configure { it.dependsOn(zipTask) }
     }
 
     private fun configureDokka(
@@ -349,7 +362,8 @@ class AndroidXDocsPlugin : Plugin<Project> {
         unzipDocsTask: TaskProvider<Sync>,
         unzippedSamplesSources: File,
         unzipSamplesTask: TaskProvider<Sync>,
-        dependencyClasspath: FileCollection
+        dependencyClasspath: FileCollection,
+        buildOnServer: TaskProvider<*>
     ) {
         val dokkaTask = Dokka.createDokkaTask(
             project,
@@ -409,13 +423,14 @@ class AndroidXDocsPlugin : Plugin<Project> {
                     "style of d.android.com) into $destinationFile"
             }
         }
-        project.addToBuildOnServer(zipTask)
+        buildOnServer.configure { it.dependsOn(zipTask) }
     }
 
     private fun configureDoclava(
         unzippedDocsSources: File,
         unzipDocsTask: TaskProvider<Sync>,
         dependencyClasspath: FileCollection,
+        buildOnServer: TaskProvider<*>
     ) {
         // Hack to force tools.jar (required by com.sun.javadoc) to be available on the Doclava
         // run-time classpath. Note this breaks the ability to use JDK 9+ for compilation.
@@ -457,7 +472,7 @@ class AndroidXDocsPlugin : Plugin<Project> {
                 destinationDir = destDir
                 classpath = androidJarFile(project) + dependencyClasspath
                 checksConfig = GENERATE_DOCS_CONFIG
-                extraArgumentsBuilder.apply({
+                extraArgumentsBuilder.apply {
                     addStringOption(
                         "templatedir",
                         "${project.getCheckoutRoot()}/external/doclava/res/assets/templates-sdk"
@@ -490,7 +505,7 @@ class AndroidXDocsPlugin : Plugin<Project> {
                         addStringOption("dac_libraryroot", dacOptions.libraryroot)
                         addStringOption("dac_dataname", dacOptions.dataname)
                     }
-                })
+                }
                 it.source(project.fileTree(unzippedDocsSources))
             }
         }
@@ -511,7 +526,7 @@ class AndroidXDocsPlugin : Plugin<Project> {
                     "style of d.android.com) into $destinationFile"
             }
         }
-        project.addToBuildOnServer(zipTask)
+        buildOnServer.configure { it.dependsOn(zipTask) }
     }
 
     /**
@@ -536,6 +551,39 @@ class AndroidXDocsPlugin : Plugin<Project> {
                     reentrance = false
                 }
             }
+        }
+    }
+}
+
+open class DocsBuildOnServer : DefaultTask() {
+    @Internal
+    lateinit var docsType: String
+    @Internal
+    lateinit var buildId: String
+    @Internal
+    lateinit var distributionDirectory: File
+
+    @InputFiles
+    fun getRequiredFiles(): List<File> {
+        return listOf(
+            File(distributionDirectory, "dackka-$docsType-docs-$buildId.zip"),
+            File(distributionDirectory, "doclava-$docsType-docs-$buildId.zip"),
+            File(distributionDirectory, "dokka-$docsType-docs-$buildId.zip")
+        )
+    }
+
+    @TaskAction
+    fun checkAllBuildOutputs() {
+        val missingFiles = mutableListOf<String>()
+        getRequiredFiles().forEach { file ->
+            if (!file.exists()) {
+                missingFiles.add(file.path)
+            }
+        }
+
+        if (missingFiles.isNotEmpty()) {
+            val missingFileString = missingFiles.reduce { acc, s -> "$acc, $s" }
+            throw FileNotFoundException("buildOnServer required output missing: $missingFileString")
         }
     }
 }
