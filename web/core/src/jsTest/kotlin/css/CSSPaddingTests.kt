@@ -25,7 +25,7 @@ class CSSPaddingTests {
             })
         }
 
-        assertEquals("5px", (root.children[0] as HTMLElement).style.paddingLeft)
+        assertEquals("5px", (nextChild()).style.paddingLeft)
     }
 
     @Test
@@ -38,7 +38,7 @@ class CSSPaddingTests {
             })
         }
 
-        assertEquals("15px", (root.children[0] as HTMLElement).style.paddingTop)
+        assertEquals("15px", (nextChild()).style.paddingTop)
     }
 
     @Test
@@ -51,7 +51,7 @@ class CSSPaddingTests {
             })
         }
 
-        assertEquals("12vw", (root.children[0] as HTMLElement).style.paddingRight)
+        assertEquals("12vw", (nextChild()).style.paddingRight)
     }
 
     @Test
@@ -64,7 +64,7 @@ class CSSPaddingTests {
             })
         }
 
-        assertEquals("12%", (root.children[0] as HTMLElement).style.paddingBottom)
+        assertEquals("12%", (nextChild()).style.paddingBottom)
     }
 
     @Test
@@ -77,7 +77,7 @@ class CSSPaddingTests {
             })
         }
 
-        val el = window.getComputedStyle(root.children[0] as HTMLElement)
+        val el = window.getComputedStyle(nextChild())
 
         assertEquals("4px", el.paddingTop, "paddingTop")
         assertEquals("4px", el.paddingRight, "paddingRight")
@@ -95,7 +95,7 @@ class CSSPaddingTests {
             })
         }
 
-        val el = window.getComputedStyle(root.children[0] as HTMLElement)
+        val el = window.getComputedStyle(nextChild())
 
         assertEquals("4px", el.paddingTop, "paddingTop")
         assertEquals("6px", el.paddingRight, "paddingRight")
@@ -113,7 +113,7 @@ class CSSPaddingTests {
             })
         }
 
-        val el = window.getComputedStyle(root.children[0] as HTMLElement)
+        val el = window.getComputedStyle(nextChild())
 
         assertEquals("4px", el.paddingTop, "paddingTop")
         assertEquals("6px", el.paddingRight, "paddingRight")
@@ -131,7 +131,7 @@ class CSSPaddingTests {
             })
         }
 
-        val el = window.getComputedStyle(root.children[0] as HTMLElement)
+        val el = window.getComputedStyle(nextChild())
 
         assertEquals("4px", el.paddingTop, "paddingTop")
         assertEquals("6px", el.paddingRight, "paddingRight")

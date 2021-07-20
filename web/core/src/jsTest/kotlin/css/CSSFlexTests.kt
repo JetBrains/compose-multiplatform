@@ -36,8 +36,8 @@ class CSSFlexTests {
             )
         }
 
-        assertEquals("-4", (root.children[0] as HTMLElement).style.order)
-        assertEquals("3", (root.children[1] as HTMLElement).style.order)
+        assertEquals("-4", (nextChild()).style.order)
+        assertEquals("3", (nextChild()).style.order)
     }
 
     @Test
@@ -73,10 +73,10 @@ class CSSFlexTests {
             )
         }
 
-        assertEquals("3", (root.children[0] as HTMLElement).style.flexGrow)
-        assertEquals("2.5", (root.children[1] as HTMLElement).style.flexGrow)
-        assertEquals("100", (root.children[2] as HTMLElement).style.flexGrow)
-        assertEquals("0.6", (root.children[3] as HTMLElement).style.flexGrow)
+        assertEquals("3", (nextChild()).style.flexGrow)
+        assertEquals("2.5", (nextChild()).style.flexGrow)
+        assertEquals("100", (nextChild()).style.flexGrow)
+        assertEquals("0.6", (nextChild()).style.flexGrow)
     }
 
     @Test
@@ -112,10 +112,10 @@ class CSSFlexTests {
             )
         }
 
-        assertEquals("3", (root.children[0] as HTMLElement).style.flexShrink)
-        assertEquals("2.5", (root.children[1] as HTMLElement).style.flexShrink)
-        assertEquals("100", (root.children[2] as HTMLElement).style.flexShrink)
-        assertEquals("0.6", (root.children[3] as HTMLElement).style.flexShrink)
+        assertEquals("3", (nextChild()).style.flexShrink)
+        assertEquals("2.5", (nextChild()).style.flexShrink)
+        assertEquals("100", (nextChild()).style.flexShrink)
+        assertEquals("0.6", (nextChild()).style.flexShrink)
     }
 
     @Test
@@ -300,8 +300,8 @@ class CSSFlexTests {
             })
         }
 
-        assertEquals("10em", (root.children[0] as HTMLElement).style.flexBasis)
-        assertEquals("auto", (root.children[1] as HTMLElement).style.flexBasis)
+        assertEquals("10em", (nextChild()).style.flexBasis)
+        assertEquals("auto", (nextChild()).style.flexBasis)
     }
 
     @Test
@@ -329,10 +329,10 @@ class CSSFlexTests {
             })
         }
 
-        assertEquals("auto", (root.children[0] as HTMLElement).style.flexBasis)
-        assertEquals("initial", (root.children[1] as HTMLElement).style.flexBasis)
-        assertEquals("2", (root.children[2] as HTMLElement).style.flexGrow)
-        assertEquals("10em", (root.children[3] as HTMLElement).style.flexBasis)
+        assertEquals("auto", (nextChild()).style.flexBasis)
+        assertEquals("initial", (nextChild()).style.flexBasis)
+        assertEquals("2", (nextChild()).style.flexGrow)
+        assertEquals("10em", (nextChild()).style.flexBasis)
     }
 
     @Test
@@ -350,12 +350,12 @@ class CSSFlexTests {
             })
         }
 
-        (root.children[0] as HTMLElement).let {
+        (nextChild()).let {
             assertEquals("3", it.style.flexGrow)
             assertEquals("30px", it.style.flexBasis)
         }
 
-        (root.children[1] as HTMLElement).let {
+        (nextChild()).let {
             assertEquals("3", it.style.flexGrow)
             assertEquals("5", it.style.flexShrink)
         }
@@ -371,7 +371,7 @@ class CSSFlexTests {
             })
         }
 
-        (root.children[0] as HTMLElement).let {
+        (nextChild()).let {
             assertEquals("2", it.style.flexGrow)
             assertEquals("3", it.style.flexShrink)
             assertEquals("10%", it.style.flexBasis)

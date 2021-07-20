@@ -35,9 +35,9 @@ class CSSListStyleTests {
 
         }
 
-        assertEquals("none", (root.children[0] as HTMLElement).style.listStyleImage)
-        assertEquals("url(\"starsolid.gif\")", (root.children[1] as HTMLElement).style.listStyleImage)
-        assertEquals("linear-gradient(to left bottom, red, blue)", (root.children[2] as HTMLElement).style.listStyleImage)
+        assertEquals("none", (nextChild()).style.listStyleImage)
+        assertEquals("url(\"starsolid.gif\")", (nextChild()).style.listStyleImage)
+        assertEquals("linear-gradient(to left bottom, red, blue)", (nextChild()).style.listStyleImage)
     }
 
     @Test
@@ -55,8 +55,8 @@ class CSSListStyleTests {
             })
         }
 
-        assertEquals("inside", (root.children[0] as HTMLElement).style.listStylePosition)
-        assertEquals("outside", (root.children[1] as HTMLElement).style.listStylePosition)
+        assertEquals("inside", (nextChild()).style.listStylePosition)
+        assertEquals("outside", (nextChild()).style.listStylePosition)
     }
 
 
@@ -85,10 +85,10 @@ class CSSListStyleTests {
             })
         }
 
-        assertEquals("armenian", (root.children[0] as HTMLElement).style.listStyleType)
-        assertEquals("disc", (root.children[1] as HTMLElement).style.listStyleType)
-        assertEquals("circle", (root.children[2] as HTMLElement).style.listStyleType)
-        assertEquals("square", (root.children[3] as HTMLElement).style.listStyleType)
+        assertEquals("armenian", (nextChild()).style.listStyleType)
+        assertEquals("disc", (nextChild()).style.listStyleType)
+        assertEquals("circle", (nextChild()).style.listStyleType)
+        assertEquals("square", (nextChild()).style.listStyleType)
     }
 
     @Test
@@ -101,8 +101,8 @@ class CSSListStyleTests {
             })
         }
 
-        assertEquals("inside", (root.children[0] as HTMLElement).style.listStylePosition)
-        assertEquals("georgian", (root.children[0] as HTMLElement).style.listStyleType)
+        assertEquals("inside", (nextChild()).style.listStylePosition)
+        assertEquals("georgian", (currentChild()).style.listStyleType)
     }
 
 }

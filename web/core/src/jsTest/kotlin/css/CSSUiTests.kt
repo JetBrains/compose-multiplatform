@@ -39,9 +39,9 @@ class CSSUiTests {
             })
         }
 
-        assertEquals("pointer", (root.children[0] as HTMLElement).style.cursor)
-        assertEquals("auto", (root.children[1] as HTMLElement).style.cursor)
-        assertEquals("url(\"hand.cur\"), pointer", (root.children[2] as HTMLElement).style.cursor)
-        assertEquals("url(\"cursor2.png\") 2 2, pointer", (root.children[3] as HTMLElement).style.cursor)
+        assertEquals("pointer", (nextChild()).style.cursor)
+        assertEquals("auto", (nextChild()).style.cursor)
+        assertEquals("url(\"hand.cur\"), pointer", (nextChild()).style.cursor)
+        assertEquals("url(\"cursor2.png\") 2 2, pointer", (nextChild()).style.cursor)
     }
 }

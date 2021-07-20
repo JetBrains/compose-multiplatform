@@ -29,7 +29,7 @@ class CSSBoxTests {
             )
         }
 
-        assertEquals("100px", (root.children[0] as HTMLElement).style.width)
+        assertEquals("100px", (nextChild()).style.width)
     }
 
     @Test
@@ -44,7 +44,7 @@ class CSSBoxTests {
             )
         }
 
-        assertEquals("90px", (root.children[0] as HTMLElement).style.height)
+        assertEquals("90px", (nextChild()).style.height)
     }
 
     @Test
@@ -66,8 +66,8 @@ class CSSBoxTests {
             )
         }
 
-        assertEquals("border-box", (root.children[0] as HTMLElement).style.boxSizing)
-        assertEquals("content-box", (root.children[1] as HTMLElement).style.boxSizing)
+        assertEquals("border-box", (nextChild()).style.boxSizing)
+        assertEquals("content-box", (nextChild()).style.boxSizing)
     }
 
     @Test
@@ -110,10 +110,10 @@ class CSSBoxTests {
             )
         }
 
-        assertEquals("thin", (root.children[0] as HTMLElement).style.outlineWidth)
-        assertEquals("medium", (root.children[1] as HTMLElement).style.outlineWidth)
-        assertEquals("thick", (root.children[2] as HTMLElement).style.outlineWidth)
-        assertEquals("8px", (root.children[3] as HTMLElement).style.outlineWidth)
+        assertEquals("thin", (nextChild()).style.outlineWidth)
+        assertEquals("medium", (nextChild()).style.outlineWidth)
+        assertEquals("thick", (nextChild()).style.outlineWidth)
+        assertEquals("8px", (nextChild()).style.outlineWidth)
         assertEquals("0.1em", (root.children[4] as HTMLElement).style.outlineWidth)
     }
 
@@ -132,8 +132,8 @@ class CSSBoxTests {
             })
         }
 
-        assertEquals("red", (root.children[0] as HTMLElement).style.outlineColor)
-        assertEquals("rgb(50, 161, 206)", (root.children[1] as HTMLElement).style.outlineColor)
+        assertEquals("red", (nextChild()).style.outlineColor)
+        assertEquals("rgb(50, 161, 206)", (nextChild()).style.outlineColor)
     }
 
     @Test
@@ -149,10 +149,10 @@ class CSSBoxTests {
             Div({ style { outlineStyle("inset") } })
         }
 
-        assertEquals("dotted", (root.children[0] as HTMLElement).style.outlineStyle)
-        assertEquals("dashed", (root.children[1] as HTMLElement).style.outlineStyle)
-        assertEquals("solid", (root.children[2] as HTMLElement).style.outlineStyle)
-        assertEquals("double", (root.children[3] as HTMLElement).style.outlineStyle)
+        assertEquals("dotted", (nextChild()).style.outlineStyle)
+        assertEquals("dashed", (nextChild()).style.outlineStyle)
+        assertEquals("solid", (nextChild()).style.outlineStyle)
+        assertEquals("double", (nextChild()).style.outlineStyle)
         assertEquals("groove", (root.children[4] as HTMLElement).style.outlineStyle)
         assertEquals("ridge", (root.children[5] as HTMLElement).style.outlineStyle)
         assertEquals("outset", (root.children[6] as HTMLElement).style.outlineStyle)
@@ -165,7 +165,7 @@ class CSSBoxTests {
             Div({ style { outline("dotted") } })
         }
 
-        assertEquals("dotted", (root.children[0] as HTMLElement).style.outlineStyle)
+        assertEquals("dotted", (nextChild()).style.outlineStyle)
     }
 
     @Test
@@ -176,17 +176,17 @@ class CSSBoxTests {
             Div({ style { outline("ridge", 3.px) } })
         }
 
-        (root.children[0] as HTMLElement).let {
+        (nextChild()).let {
             assertEquals("rgb(255, 102, 102)", it.style.outlineColor)
             assertEquals("dashed", it.style.outlineStyle)
         }
 
-        (root.children[1] as HTMLElement).let {
+        (nextChild()).let {
             assertEquals("inset", it.style.outlineStyle)
             assertEquals("thick", it.style.outlineWidth)
         }
 
-        (root.children[2] as HTMLElement).let {
+        (nextChild()).let {
             assertEquals("ridge", it.style.outlineStyle)
             assertEquals("3px", it.style.outlineWidth)
         }
@@ -201,10 +201,10 @@ class CSSBoxTests {
             Div({ style { outline("yellow", "inset", 8.px) } })
         }
 
-        assertEquals("rgb(0, 20, 100) dashed thick", (root.children[0] as HTMLElement).style.outline)
-        assertEquals("rgb(0, 100, 20) double 4px", (root.children[1] as HTMLElement).style.outline)
-        assertEquals("red outset thin", (root.children[2] as HTMLElement).style.outline)
-        assertEquals("yellow inset 8px", (root.children[3] as HTMLElement).style.outline)
+        assertEquals("rgb(0, 20, 100) dashed thick", (nextChild()).style.outline)
+        assertEquals("rgb(0, 100, 20) double 4px", (nextChild()).style.outline)
+        assertEquals("red outset thin", (nextChild()).style.outline)
+        assertEquals("yellow inset 8px", (nextChild()).style.outline)
     }
 
     @Test
@@ -216,10 +216,10 @@ class CSSBoxTests {
             Div({ style { minWidth("min-content") } })
         }
 
-        assertEquals("3.5em", (root.children[0] as HTMLElement).style.minWidth)
-        assertEquals("75%", (root.children[1] as HTMLElement).style.minWidth)
-        assertEquals("max-content", (root.children[2] as HTMLElement).style.minWidth)
-        assertEquals("min-content", (root.children[3] as HTMLElement).style.minWidth)
+        assertEquals("3.5em", (nextChild()).style.minWidth)
+        assertEquals("75%", (nextChild()).style.minWidth)
+        assertEquals("max-content", (nextChild()).style.minWidth)
+        assertEquals("min-content", (nextChild()).style.minWidth)
     }
 
     @Test
@@ -231,10 +231,10 @@ class CSSBoxTests {
             Div({ style { maxWidth("min-content") } })
         }
 
-        assertEquals("0.5em", (root.children[0] as HTMLElement).style.maxWidth)
-        assertEquals("10%", (root.children[1] as HTMLElement).style.maxWidth)
-        assertEquals("max-content", (root.children[2] as HTMLElement).style.maxWidth)
-        assertEquals("min-content", (root.children[3] as HTMLElement).style.maxWidth)
+        assertEquals("0.5em", (nextChild()).style.maxWidth)
+        assertEquals("10%", (nextChild()).style.maxWidth)
+        assertEquals("max-content", (nextChild()).style.maxWidth)
+        assertEquals("min-content", (nextChild()).style.maxWidth)
     }
 
     @Test
@@ -246,10 +246,10 @@ class CSSBoxTests {
             Div({ style { minHeight("min-content") } })
         }
 
-        assertEquals("5px", (root.children[0] as HTMLElement).style.minHeight)
-        assertEquals("25%", (root.children[1] as HTMLElement).style.minHeight)
-        assertEquals("max-content", (root.children[2] as HTMLElement).style.minHeight)
-        assertEquals("min-content", (root.children[3] as HTMLElement).style.minHeight)
+        assertEquals("5px", (nextChild()).style.minHeight)
+        assertEquals("25%", (nextChild()).style.minHeight)
+        assertEquals("max-content", (nextChild()).style.minHeight)
+        assertEquals("min-content", (nextChild()).style.minHeight)
     }
 
     @Test
@@ -261,9 +261,9 @@ class CSSBoxTests {
             Div({ style { maxHeight("min-content") } })
         }
 
-        assertEquals("15px", (root.children[0] as HTMLElement).style.maxHeight)
-        assertEquals("35%", (root.children[1] as HTMLElement).style.maxHeight)
-        assertEquals("max-content", (root.children[2] as HTMLElement).style.maxHeight)
-        assertEquals("min-content", (root.children[3] as HTMLElement).style.maxHeight)
+        assertEquals("15px", (nextChild()).style.maxHeight)
+        assertEquals("35%", (nextChild()).style.maxHeight)
+        assertEquals("max-content", (nextChild()).style.maxHeight)
+        assertEquals("min-content", (nextChild()).style.maxHeight)
     }
 }

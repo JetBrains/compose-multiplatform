@@ -26,8 +26,8 @@ class CSSBackgroundTests {
             }})
         }
 
-        assertEquals("rgb(0, 128, 0)", window.getComputedStyle(root.children[0] as HTMLElement).backgroundColor)
-        assertEquals("rgba(0, 129, 0, 0.2)", window.getComputedStyle(root.children[1] as HTMLElement).backgroundColor)
+        assertEquals("rgb(0, 128, 0)", window.getComputedStyle(nextChild()).backgroundColor)
+        assertEquals("rgba(0, 129, 0, 0.2)", window.getComputedStyle(nextChild()).backgroundColor)
     }
 
     @Test
@@ -44,9 +44,9 @@ class CSSBackgroundTests {
             }})
         }
 
-        assertEquals("scroll", window.getComputedStyle(root.children[0] as HTMLElement).backgroundAttachment)
-        assertEquals("fixed", window.getComputedStyle(root.children[1] as HTMLElement).backgroundAttachment)
-        assertEquals("local", window.getComputedStyle(root.children[2] as HTMLElement).backgroundAttachment)
+        assertEquals("scroll", window.getComputedStyle(nextChild()).backgroundAttachment)
+        assertEquals("fixed", window.getComputedStyle(nextChild()).backgroundAttachment)
+        assertEquals("local", window.getComputedStyle(nextChild()).backgroundAttachment)
     }
 
     @Test
@@ -63,9 +63,9 @@ class CSSBackgroundTests {
             }})
         }
 
-        assertEquals("url(\"https://localhost:3333/media/examples/lizard.png\")", window.getComputedStyle(root.children[0] as HTMLElement).backgroundImage)
-        assertEquals("url(\"https://localhost:3333/media/examples/lizard.png\"), url(\"https://localhost:3333/media/examples/star.png\")", window.getComputedStyle(root.children[1] as HTMLElement).backgroundImage)
-        assertEquals("linear-gradient(rgba(0, 0, 255, 0.5), rgba(255, 255, 0, 0.5))", window.getComputedStyle(root.children[2] as HTMLElement).backgroundImage)
+        assertEquals("url(\"https://localhost:3333/media/examples/lizard.png\")", window.getComputedStyle(nextChild()).backgroundImage)
+        assertEquals("url(\"https://localhost:3333/media/examples/lizard.png\"), url(\"https://localhost:3333/media/examples/star.png\")", window.getComputedStyle(nextChild()).backgroundImage)
+        assertEquals("linear-gradient(rgba(0, 0, 255, 0.5), rgba(255, 255, 0, 0.5))", window.getComputedStyle(nextChild()).backgroundImage)
     }
 
     @Test
@@ -85,10 +85,10 @@ class CSSBackgroundTests {
             }})
         }
 
-        assertEquals("50% 0%", window.getComputedStyle(root.children[0] as HTMLElement).backgroundPosition)
-        assertEquals("0% 50%", window.getComputedStyle(root.children[1] as HTMLElement).backgroundPosition)
-        assertEquals("50% 50%", window.getComputedStyle(root.children[2] as HTMLElement).backgroundPosition)
-        assertEquals("25% 75%", window.getComputedStyle(root.children[3] as HTMLElement).backgroundPosition)
+        assertEquals("50% 0%", window.getComputedStyle(nextChild()).backgroundPosition)
+        assertEquals("0% 50%", window.getComputedStyle(nextChild()).backgroundPosition)
+        assertEquals("50% 50%", window.getComputedStyle(nextChild()).backgroundPosition)
+        assertEquals("25% 75%", window.getComputedStyle(nextChild()).backgroundPosition)
     }
 
     @Test
@@ -99,7 +99,7 @@ class CSSBackgroundTests {
             }})
         }
 
-        assertEquals("space repeat", window.getComputedStyle(root.children[0] as HTMLElement).backgroundRepeat)
+        assertEquals("space repeat", window.getComputedStyle(nextChild()).backgroundRepeat)
     }
 
 
@@ -118,9 +118,9 @@ class CSSBackgroundTests {
         }
 
 
-        assertEquals("border-box", window.getComputedStyle(root.children[0] as HTMLElement).backgroundClip)
-        assertEquals("padding-box", window.getComputedStyle(root.children[1] as HTMLElement).backgroundClip)
-        assertEquals("content-box", window.getComputedStyle(root.children[2] as HTMLElement).backgroundClip)
+        assertEquals("border-box", window.getComputedStyle(nextChild()).backgroundClip)
+        assertEquals("padding-box", window.getComputedStyle(nextChild()).backgroundClip)
+        assertEquals("content-box", window.getComputedStyle(nextChild()).backgroundClip)
     }
 
     @Test
@@ -138,9 +138,9 @@ class CSSBackgroundTests {
         }
 
 
-        assertEquals("border-box", window.getComputedStyle(root.children[0] as HTMLElement).backgroundOrigin)
-        assertEquals("padding-box", window.getComputedStyle(root.children[1] as HTMLElement).backgroundOrigin)
-        assertEquals("content-box", window.getComputedStyle(root.children[2] as HTMLElement).backgroundOrigin)
+        assertEquals("border-box", window.getComputedStyle(nextChild()).backgroundOrigin)
+        assertEquals("padding-box", window.getComputedStyle(nextChild()).backgroundOrigin)
+        assertEquals("content-box", window.getComputedStyle(nextChild()).backgroundOrigin)
     }
 
 
@@ -161,10 +161,10 @@ class CSSBackgroundTests {
             }})
         }
 
-        assertEquals("contain", window.getComputedStyle(root.children[0] as HTMLElement).backgroundSize)
-        assertEquals("cover", window.getComputedStyle(root.children[1] as HTMLElement).backgroundSize)
-        assertEquals("50%", window.getComputedStyle(root.children[2] as HTMLElement).backgroundSize)
-        assertEquals("auto 50px", window.getComputedStyle(root.children[3] as HTMLElement).backgroundSize)
+        assertEquals("contain", window.getComputedStyle(nextChild()).backgroundSize)
+        assertEquals("cover", window.getComputedStyle(nextChild()).backgroundSize)
+        assertEquals("50%", window.getComputedStyle(nextChild()).backgroundSize)
+        assertEquals("auto 50px", window.getComputedStyle(nextChild()).backgroundSize)
     }
 
     @Test
@@ -181,10 +181,10 @@ class CSSBackgroundTests {
             }})
         }
 
-        assertEquals("rgb(0, 128, 0)", window.getComputedStyle(root.children[0] as HTMLElement).backgroundColor)
-        assertEquals("content-box", window.getComputedStyle(root.children[1] as HTMLElement).backgroundOrigin)
-        assertEquals("radial-gradient(rgb(220, 20, 60), rgb(135, 206, 235))", window.getComputedStyle(root.children[1] as HTMLElement).backgroundImage)
-        assertEquals("no-repeat", window.getComputedStyle(root.children[2] as HTMLElement).backgroundRepeat)
+        assertEquals("rgb(0, 128, 0)", window.getComputedStyle(nextChild()).backgroundColor)
+        assertEquals("content-box", window.getComputedStyle(nextChild()).backgroundOrigin)
+        assertEquals("radial-gradient(rgb(220, 20, 60), rgb(135, 206, 235))", window.getComputedStyle(currentChild()).backgroundImage)
+        assertEquals("no-repeat", window.getComputedStyle(nextChild()).backgroundRepeat)
     }
 
 }

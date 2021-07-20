@@ -26,7 +26,7 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("20em", (root.children[0] as HTMLElement).style.fontSize)
+        assertEquals("20em", (nextChild()).style.fontSize)
     }
 
     @Test
@@ -44,8 +44,8 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("italic", (root.children[0] as HTMLElement).style.fontStyle)
-        assertEquals("oblique", (root.children[1] as HTMLElement).style.fontStyle)
+        assertEquals("italic", (nextChild()).style.fontStyle)
+        assertEquals("oblique", (nextChild()).style.fontStyle)
     }
 
     @Test
@@ -78,11 +78,11 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("bold", (root.children[0] as HTMLElement).style.fontWeight)
-        assertEquals("bolder", (root.children[1] as HTMLElement).style.fontWeight)
-        assertEquals("lighter", (root.children[2] as HTMLElement).style.fontWeight)
-        assertEquals("100", (root.children[3] as HTMLElement).style.fontWeight)
-        assertEquals("800", (root.children[4] as HTMLElement).style.fontWeight)
+        assertEquals("bold", (nextChild()).style.fontWeight)
+        assertEquals("bolder", (nextChild()).style.fontWeight)
+        assertEquals("lighter", (nextChild()).style.fontWeight)
+        assertEquals("100", (nextChild()).style.fontWeight)
+        assertEquals("800", (nextChild()).style.fontWeight)
     }
 
     @Test
@@ -100,8 +100,8 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("normal", (root.children[0] as HTMLElement).style.lineHeight)
-        assertEquals("2em", (root.children[1] as HTMLElement).style.lineHeight)
+        assertEquals("normal", (nextChild()).style.lineHeight)
+        assertEquals("2em", (nextChild()).style.lineHeight)
     }
 
     @Test
@@ -119,8 +119,8 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("normal", (root.children[0] as HTMLElement).style.letterSpacing)
-        assertEquals("2em", (root.children[1] as HTMLElement).style.letterSpacing)
+        assertEquals("normal", (nextChild()).style.letterSpacing)
+        assertEquals("2em", (nextChild()).style.letterSpacing)
     }
 
     @Test
@@ -138,8 +138,8 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("\"Gill Sans Extrabold\", sans-serif", (root.children[0] as HTMLElement).style.fontFamily)
-        assertEquals("sans-serif", (root.children[1] as HTMLElement).style.fontFamily)
+        assertEquals("\"Gill Sans Extrabold\", sans-serif", (nextChild()).style.fontFamily)
+        assertEquals("sans-serif", (nextChild()).style.fontFamily)
     }
 
     @Test
@@ -152,7 +152,7 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("italic bold 0.8em / 1.2 Arial, sans-serif", (root.children[0] as HTMLElement).style.font)
+        assertEquals("italic bold 0.8em / 1.2 Arial, sans-serif", (nextChild()).style.font)
     }
 
     @Test
@@ -190,12 +190,12 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("left", (root.children[0] as HTMLElement).style.textAlign)
-        assertEquals("right", (root.children[1] as HTMLElement).style.textAlign)
-        assertEquals("center", (root.children[2] as HTMLElement).style.textAlign)
-        assertEquals("justify", (root.children[3] as HTMLElement).style.textAlign)
-        assertEquals("start", (root.children[4] as HTMLElement).style.textAlign)
-        assertEquals("end", (root.children[5] as HTMLElement).style.textAlign)
+        assertEquals("left", (nextChild()).style.textAlign)
+        assertEquals("right", (nextChild()).style.textAlign)
+        assertEquals("center", (nextChild()).style.textAlign)
+        assertEquals("justify", (nextChild()).style.textAlign)
+        assertEquals("start", (nextChild()).style.textAlign)
+        assertEquals("end", (nextChild()).style.textAlign)
     }
 
 
@@ -214,8 +214,8 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("red", (root.children[0] as HTMLElement).style.textDecorationColor)
-        assertEquals("rgba(0, 200, 20, 0.85)", (root.children[1] as HTMLElement).style.textDecorationColor)
+        assertEquals("red", (nextChild()).style.textDecorationColor)
+        assertEquals("rgba(0, 200, 20, 0.85)", (nextChild()).style.textDecorationColor)
     }
 
     @Test
@@ -248,11 +248,11 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("solid", (root.children[0] as HTMLElement).style.textDecorationStyle)
-        assertEquals("double", (root.children[1] as HTMLElement).style.textDecorationStyle)
-        assertEquals("dotted", (root.children[2] as HTMLElement).style.textDecorationStyle)
-        assertEquals("dashed", (root.children[3] as HTMLElement).style.textDecorationStyle)
-        assertEquals("wavy", (root.children[4] as HTMLElement).style.textDecorationStyle)
+        assertEquals("solid", (nextChild()).style.textDecorationStyle)
+        assertEquals("double", (nextChild()).style.textDecorationStyle)
+        assertEquals("dotted", (nextChild()).style.textDecorationStyle)
+        assertEquals("dashed", (nextChild()).style.textDecorationStyle)
+        assertEquals("wavy", (nextChild()).style.textDecorationStyle)
     }
 
     @Test
@@ -280,10 +280,10 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("text-decoration-thickness: auto;", (root.children[0] as HTMLElement).style.cssText)
-        assertEquals("text-decoration-thickness: from-font;", (root.children[1] as HTMLElement).style.cssText)
-        assertEquals("text-decoration-thickness: 10px;", (root.children[2] as HTMLElement).style.cssText)
-        assertEquals("text-decoration-thickness: 2%;", (root.children[3] as HTMLElement).style.cssText)
+        assertEquals("text-decoration-thickness: auto;", (nextChild()).style.cssText)
+        assertEquals("text-decoration-thickness: from-font;", (nextChild()).style.cssText)
+        assertEquals("text-decoration-thickness: 10px;", (nextChild()).style.cssText)
+        assertEquals("text-decoration-thickness: 2%;", (nextChild()).style.cssText)
     }
 
     @Test
@@ -316,11 +316,11 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("none", (root.children[0] as HTMLElement).style.textDecorationLine)
-        assertEquals("underline", (root.children[1] as HTMLElement).style.textDecorationLine)
-        assertEquals("overline", (root.children[2] as HTMLElement).style.textDecorationLine)
-        assertEquals("line-through", (root.children[3] as HTMLElement).style.textDecorationLine)
-        assertEquals("blink", (root.children[4] as HTMLElement).style.textDecorationLine)
+        assertEquals("none", (nextChild()).style.textDecorationLine)
+        assertEquals("underline", (nextChild()).style.textDecorationLine)
+        assertEquals("overline", (nextChild()).style.textDecorationLine)
+        assertEquals("line-through", (nextChild()).style.textDecorationLine)
+        assertEquals("blink", (nextChild()).style.textDecorationLine)
     }
 
     @Test
@@ -348,10 +348,10 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("underline red", (root.children[0] as HTMLElement).style.textDecoration)
-        assertEquals("overline wavy lime", (root.children[1] as HTMLElement).style.textDecoration)
-        assertEquals("line-through", (root.children[2] as HTMLElement).style.textDecoration)
-        assertEquals("underline overline dashed", (root.children[3] as HTMLElement).style.textDecoration)
+        assertEquals("underline red", (nextChild()).style.textDecoration)
+        assertEquals("overline wavy lime", (nextChild()).style.textDecoration)
+        assertEquals("line-through", (nextChild()).style.textDecoration)
+        assertEquals("underline overline dashed", (nextChild()).style.textDecoration)
     }
 
     @Test
@@ -389,12 +389,12 @@ class CSSTextTests {
             })
         }
 
-        assertEquals("normal", (root.children[0] as HTMLElement).style.whiteSpace)
-        assertEquals("nowrap", (root.children[1] as HTMLElement).style.whiteSpace)
-        assertEquals("pre", (root.children[2] as HTMLElement).style.whiteSpace)
-        assertEquals("pre-wrap", (root.children[3] as HTMLElement).style.whiteSpace)
-        assertEquals("pre-line", (root.children[4] as HTMLElement).style.whiteSpace)
-        assertEquals("break-spaces", (root.children[5] as HTMLElement).style.whiteSpace)
+        assertEquals("normal", (nextChild()).style.whiteSpace)
+        assertEquals("nowrap", (nextChild()).style.whiteSpace)
+        assertEquals("pre", (nextChild()).style.whiteSpace)
+        assertEquals("pre-wrap", (nextChild()).style.whiteSpace)
+        assertEquals("pre-line", (nextChild()).style.whiteSpace)
+        assertEquals("break-spaces", (nextChild()).style.whiteSpace)
     }
 
 }

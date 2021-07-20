@@ -25,7 +25,7 @@ class CSSMarginTests {
             })
         }
 
-        assertEquals("5px", (root.children[0] as HTMLElement).style.marginLeft)
+        assertEquals("5px", (nextChild()).style.marginLeft)
     }
 
     @Test
@@ -38,7 +38,7 @@ class CSSMarginTests {
             })
         }
 
-        assertEquals("15px", (root.children[0] as HTMLElement).style.marginTop)
+        assertEquals("15px", (nextChild()).style.marginTop)
     }
 
     @Test
@@ -51,7 +51,7 @@ class CSSMarginTests {
             })
         }
 
-        assertEquals("12vw", (root.children[0] as HTMLElement).style.marginRight)
+        assertEquals("12vw", (nextChild()).style.marginRight)
     }
 
     @Test
@@ -64,7 +64,7 @@ class CSSMarginTests {
             })
         }
 
-        assertEquals("12%", (root.children[0] as HTMLElement).style.marginBottom)
+        assertEquals("12%", (nextChild()).style.marginBottom)
     }
 
     @Test
@@ -77,7 +77,7 @@ class CSSMarginTests {
             })
         }
 
-        val el = window.getComputedStyle(root.children[0] as HTMLElement)
+        val el = window.getComputedStyle(nextChild())
 
         assertEquals("4px", el.marginTop, "marginTop")
         assertEquals("4px", el.marginRight, "marginRight")
@@ -95,7 +95,7 @@ class CSSMarginTests {
             })
         }
 
-        val el = window.getComputedStyle(root.children[0] as HTMLElement)
+        val el = window.getComputedStyle(nextChild())
 
         assertEquals("4px", el.marginTop, "marginTop")
         assertEquals("6px", el.marginRight, "marginRight")
@@ -113,7 +113,7 @@ class CSSMarginTests {
             })
         }
 
-        val el = window.getComputedStyle(root.children[0] as HTMLElement)
+        val el = window.getComputedStyle(nextChild())
 
         assertEquals("4px", el.marginTop, "marginTop")
         assertEquals("6px", el.marginRight, "marginRight")
@@ -131,7 +131,7 @@ class CSSMarginTests {
             })
         }
 
-        val el = window.getComputedStyle(root.children[0] as HTMLElement)
+        val el = window.getComputedStyle(nextChild())
 
         assertEquals("4px", el.marginTop, "marginTop")
         assertEquals("6px", el.marginRight, "marginRight")

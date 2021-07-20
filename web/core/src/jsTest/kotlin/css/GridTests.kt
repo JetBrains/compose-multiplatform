@@ -8,8 +8,6 @@ package org.jetbrains.compose.web.core.tests.css
 import org.jetbrains.compose.web.core.tests.runTest
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
-import org.w3c.dom.HTMLElement
-import org.w3c.dom.get
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -20,7 +18,7 @@ class GridColumnTests {
             Div({ style { gridColumn("1") } })
         }
 
-        val el = (root.children[0] as HTMLElement).style.asDynamic()
+        val el = nextChild().style.asDynamic()
         assertEquals("1", el.gridColumnStart)
         assertEquals("auto", el.gridColumnEnd)
     }
@@ -31,7 +29,7 @@ class GridColumnTests {
             Div({ style { gridColumn(1, 3) } })
         }
 
-        val el = (root.children[0] as HTMLElement).style.asDynamic()
+        val el = nextChild().style.asDynamic()
         assertEquals("1", el.gridColumnStart)
         assertEquals("3", el.gridColumnEnd)
     }
@@ -43,9 +41,9 @@ class GridColumnTests {
             Div({ style { gridColumn("main-start", "main-end") } })
         }
 
-        assertEquals("main-start", (root.children[0] as HTMLElement).style.asDynamic().gridColumnStart)
-        assertEquals("main-start", (root.children[1] as HTMLElement).style.asDynamic().gridColumnStart)
-        assertEquals("main-end", (root.children[1] as HTMLElement).style.asDynamic().gridColumnEnd)
+        assertEquals("main-start", nextChild().style.asDynamic().gridColumnStart)
+        assertEquals("main-start", nextChild().style.asDynamic().gridColumnStart)
+        assertEquals("main-end", currentChild().style.asDynamic().gridColumnEnd)
     }
 
 
@@ -58,10 +56,10 @@ class GridColumnTests {
             Div({ style { gridColumn("unset") } })
         }
 
-        assertEquals("inherit", (root.children[0] as HTMLElement).style.asDynamic().gridColumnStart)
-        assertEquals("initial", (root.children[1] as HTMLElement).style.asDynamic().gridColumnStart)
-        assertEquals("revert", (root.children[2] as HTMLElement).style.asDynamic().gridColumnStart)
-        assertEquals("unset", (root.children[3] as HTMLElement).style.asDynamic().gridColumnStart)
+        assertEquals("inherit", nextChild().style.asDynamic().gridColumnStart)
+        assertEquals("initial", nextChild().style.asDynamic().gridColumnStart)
+        assertEquals("revert", nextChild().style.asDynamic().gridColumnStart)
+        assertEquals("unset", nextChild().style.asDynamic().gridColumnStart)
     }
 }
 
@@ -73,7 +71,7 @@ class GridRawTests {
             Div({ style { gridRow("1") } })
         }
 
-        val el = (root.children[0] as HTMLElement).style.asDynamic()
+        val el = nextChild().style.asDynamic()
         assertEquals("1", el.gridRowStart)
         assertEquals("auto", el.gridRowEnd)
     }
@@ -84,7 +82,7 @@ class GridRawTests {
             Div({ style { gridRow(2, -1) } })
         }
 
-        val el = (root.children[0] as HTMLElement).style.asDynamic()
+        val el = nextChild().style.asDynamic()
         assertEquals("2", el.gridRowStart)
         assertEquals("-1", el.gridRowEnd)
     }
@@ -95,7 +93,7 @@ class GridRawTests {
             Div({ style { gridRow("4 somegridarea", 6) } })
         }
 
-        val el = (root.children[0] as HTMLElement).style.asDynamic()
+        val el = nextChild().style.asDynamic()
         assertEquals("4 somegridarea", el.gridRowStart)
         assertEquals("6", el.gridRowEnd)
     }
@@ -106,7 +104,7 @@ class GridRawTests {
             Div({ style { gridRow(5, "4 somegridarea") } })
         }
 
-        val el = (root.children[0] as HTMLElement).style.asDynamic()
+        val el = nextChild().style.asDynamic()
         assertEquals("5", el.gridRowStart)
         assertEquals("4 somegridarea", el.gridRowEnd)
     }
@@ -121,10 +119,10 @@ class GridRawTests {
             Div({ style { gridRow("unset") } })
         }
 
-        assertEquals("inherit", (root.children[0] as HTMLElement).style.asDynamic().gridRowStart)
-        assertEquals("initial", (root.children[1] as HTMLElement).style.asDynamic().gridRowStart)
-        assertEquals("revert", (root.children[2] as HTMLElement).style.asDynamic().gridRowStart)
-        assertEquals("unset", (root.children[3] as HTMLElement).style.asDynamic().gridRowStart)
+        assertEquals("inherit", nextChild().style.asDynamic().gridRowStart)
+        assertEquals("initial", nextChild().style.asDynamic().gridRowStart)
+        assertEquals("revert", nextChild().style.asDynamic().gridRowStart)
+        assertEquals("unset", nextChild().style.asDynamic().gridRowStart)
     }
 }
 
@@ -138,10 +136,10 @@ class GridTemplateRowsTests {
             Div({ style { gridTemplateRows("unset") } })
         }
 
-        assertEquals("inherit", (root.children[0] as HTMLElement).style.asDynamic().gridTemplateRows)
-        assertEquals("initial", (root.children[1] as HTMLElement).style.asDynamic().gridTemplateRows)
-        assertEquals("revert", (root.children[2] as HTMLElement).style.asDynamic().gridTemplateRows)
-        assertEquals("unset", (root.children[3] as HTMLElement).style.asDynamic().gridTemplateRows)
+        assertEquals("inherit", nextChild().style.asDynamic().gridTemplateRows)
+        assertEquals("initial", nextChild().style.asDynamic().gridTemplateRows)
+        assertEquals("revert", nextChild().style.asDynamic().gridTemplateRows)
+        assertEquals("unset", nextChild().style.asDynamic().gridTemplateRows)
     }
 }
 
@@ -155,10 +153,10 @@ class GridTemplateColumnsTests {
             Div({ style { gridTemplateColumns("unset") } })
         }
 
-        assertEquals("inherit", (root.children[0] as HTMLElement).style.asDynamic().gridTemplateColumns)
-        assertEquals("initial", (root.children[1] as HTMLElement).style.asDynamic().gridTemplateColumns)
-        assertEquals("revert", (root.children[2] as HTMLElement).style.asDynamic().gridTemplateColumns)
-        assertEquals("unset", (root.children[3] as HTMLElement).style.asDynamic().gridTemplateColumns)
+        assertEquals("inherit", nextChild().style.asDynamic().gridTemplateColumns)
+        assertEquals("initial", nextChild().style.asDynamic().gridTemplateColumns)
+        assertEquals("revert", nextChild().style.asDynamic().gridTemplateColumns)
+        assertEquals("unset", nextChild().style.asDynamic().gridTemplateColumns)
     }
 }
 
@@ -169,7 +167,7 @@ class GridAreaTests {
             Div({ style { gridArea("span 3") } })
         }
 
-        assertEquals("span 3", (root.children[0] as HTMLElement).style.asDynamic().gridRowStart)
+        assertEquals("span 3", nextChild().style.asDynamic().gridRowStart)
     }
 
     @Test
@@ -178,7 +176,7 @@ class GridAreaTests {
             Div({ style { gridArea("some-grid-area", "another-grid-area") } })
         }
 
-        val el = root.children[0] as HTMLElement
+        val el = nextChild()
         assertEquals("some-grid-area", el.style.asDynamic().gridRowStart)
         assertEquals("another-grid-area", el.style.asDynamic().gridColumnStart)
     }
@@ -189,7 +187,7 @@ class GridAreaTests {
             Div({ style { gridArea("some-grid-area", "another-grid-area", "yet-another-grid-area") } })
         }
 
-        val el = root.children[0] as HTMLElement
+        val el = nextChild()
         assertEquals("some-grid-area", el.style.asDynamic().gridRowStart)
         assertEquals("another-grid-area", el.style.asDynamic().gridColumnStart)
         assertEquals("yet-another-grid-area", el.style.asDynamic().gridRowEnd)
@@ -201,7 +199,7 @@ class GridAreaTests {
             Div({ style { gridArea("2 span", "another-grid-area span", "span 3", "2 span") } })
         }
 
-        val el = root.children[0] as HTMLElement
+        val el = nextChild()
         assertEquals("span 2 / span another-grid-area / span 3 / span 2", el.style.asDynamic().gridArea)
     }
 
@@ -214,6 +212,6 @@ class GridTemplateAreasTests {
             Div({ style { gridTemplateAreas("head head", "nav main", "nav foot")  } })
         }
 
-        assertEquals("\"head head\" \"nav main\" \"nav foot\"", (root.children[0] as HTMLElement).style.asDynamic().gridTemplateAreas)
+        assertEquals("\"head head\" \"nav main\" \"nav foot\"", nextChild().style.asDynamic().gridTemplateAreas)
     }
 }
