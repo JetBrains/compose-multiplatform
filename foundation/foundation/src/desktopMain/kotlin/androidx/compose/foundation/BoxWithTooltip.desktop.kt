@@ -17,7 +17,6 @@
 package androidx.compose.foundation
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.Immutable
@@ -56,6 +55,7 @@ import kotlinx.coroutines.launch
  * @param propagateMinConstraints Whether the incoming min constraints should be passed to content.
  * @param delay Delay in milliseconds.
  * @param offset Tooltip offset.
+ * @param tooltipPlacement Alignment of the tooltip relative to the [content].
  * @param content Composable content that the current tooltip is set to.
  */
 @Composable
@@ -65,8 +65,8 @@ fun BoxWithTooltip(
     contentAlignment: Alignment = Alignment.TopStart,
     propagateMinConstraints: Boolean = false,
     delay: Int = 500,
-    offset: DpOffset = DpOffset.Zero,
-    content: @Composable BoxScope.() -> Unit
+    tooltipPlacement: TooltipPlacement = DefaultTooltipPlacement,
+    content: @Composable () -> Unit
 ) {
     val density = LocalDensity.current
     val mousePosition = remember { mutableStateOf(IntOffset.Zero) }
@@ -90,7 +90,7 @@ fun BoxWithTooltip(
 
     val popupPositionProvider = TooltipPositionProvider(
         point = mousePosition.value,
-        offset = offset,
+        placement = tooltipPlacement,
         density = density.density
     )
 
@@ -156,7 +156,7 @@ private suspend fun PointerInputScope.detectDown(onDown: (Offset) -> Unit) {
 @Immutable
 internal data class TooltipPositionProvider(
     val point: IntOffset,
-    val offset: DpOffset,
+    val placement: TooltipPlacement,
     val density: Float
 ) : PopupPositionProvider {
     override fun calculatePosition(
@@ -165,54 +165,56 @@ internal data class TooltipPositionProvider(
         layoutDirection: LayoutDirection,
         popupContentSize: IntSize
     ): IntOffset {
-        val cursorRect = IntRect(
-            point,
-            IntSize(
-                (DefaultCursorSize * density).toInt(),
-                (DefaultCursorSize * density).toInt()
+        val anchorRect = when (placement.anchor) {
+            TooltipPlacement.Anchor.Pointer -> IntRect(
+                point,
+                IntSize(
+                    (DefaultCursorSize * density).toInt(),
+                    (DefaultCursorSize * density).toInt()
+                )
             )
+            TooltipPlacement.Anchor.Component -> anchorBounds
+        }
+        val area = IntSize(
+            popupContentSize.width * 2 + anchorRect.width,
+            popupContentSize.height * 2 + anchorRect.height
         )
-        val positionOffset = offset.toIntOffsetWithDensity(density)
-        val tooltipMargin = (TooltipMargin * density).toInt()
-
-        var x = when (layoutDirection) {
-            LayoutDirection.Ltr -> {
-                var result = cursorRect.left + positionOffset.x
-                if (result + popupContentSize.width > windowSize.width - tooltipMargin) {
-                    result -= popupContentSize.width
-                }
-                if (result < tooltipMargin) {
-                    result = tooltipMargin
-                }
-                result
+        val anchor = IntOffset(
+            anchorRect.left - popupContentSize.width,
+            anchorRect.top - popupContentSize.height,
+        )
+        val position = placement.alignment.align(popupContentSize, area, layoutDirection)
+        var x = anchor.x + position.x + (placement.offset.x.value * density).toInt()
+        var y = anchor.y + position.y + (placement.offset.y.value * density).toInt()
+        if (placement.anchor == TooltipPlacement.Anchor.Pointer) {
+            if (x + popupContentSize.width > windowSize.width - TooltipMargin * density) {
+                x -= popupContentSize.width
             }
-            LayoutDirection.Rtl -> {
-                var result = cursorRect.right + positionOffset.x - popupContentSize.width
-                if (result < tooltipMargin) {
-                    result += popupContentSize.width
-                }
-                if (result + popupContentSize.width > windowSize.width - tooltipMargin) {
-                    result = windowSize.width - tooltipMargin - popupContentSize.width
-                }
-                result
+            if (y + popupContentSize.height > windowSize.height - TooltipMargin * density) {
+                y -= popupContentSize.height + anchorRect.height
+            }
+            if (x < TooltipMargin * density) {
+                x = (TooltipMargin * density).toInt()
+            }
+            if (y < TooltipMargin * density) {
+                y = (TooltipMargin * density).toInt()
             }
         }
-        var y = cursorRect.bottom + positionOffset.y
-
-        if (y + popupContentSize.height > windowSize.height - tooltipMargin) {
-            y -= popupContentSize.height + cursorRect.height
-        }
-        if (y < tooltipMargin) {
-            y = tooltipMargin
-        }
-
         return IntOffset(x, y)
     }
 }
 
-private fun DpOffset.toIntOffsetWithDensity(density: Float) = IntOffset(
-    (x.value * density).toInt(),
-    (y.value * density).toInt(),
+class TooltipPlacement(
+    val anchor: Anchor,
+    val alignment: Alignment,
+    val offset: DpOffset = DpOffset.Zero
+) {
+    enum class Anchor { Pointer, Component }
+}
+
+private val DefaultTooltipPlacement = TooltipPlacement(
+    anchor = TooltipPlacement.Anchor.Pointer,
+    alignment = Alignment.BottomStart
 )
 private val DefaultCursorSize = 16
 private val TooltipMargin = 4

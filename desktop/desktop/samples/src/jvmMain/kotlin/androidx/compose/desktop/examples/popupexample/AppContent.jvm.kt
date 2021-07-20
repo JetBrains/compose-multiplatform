@@ -20,6 +20,7 @@ import androidx.compose.desktop.AppWindow
 import androidx.compose.desktop.SwingPanel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.BoxWithTooltip
+import androidx.compose.foundation.TooltipPlacement
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,7 +53,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -416,7 +416,10 @@ fun ContextMenu() {
     val selectedIndex = remember { mutableStateOf(0) }
     BoxWithTooltip(
         delay = 100,
-        offset = DpOffset(40.dp, 0.dp),
+        tooltipPlacement = TooltipPlacement(
+            anchor = TooltipPlacement.Anchor.Component,
+            alignment = Alignment.TopCenter
+        ),
         tooltip = {
             Surface(
                 color = Color(210, 210, 210),
