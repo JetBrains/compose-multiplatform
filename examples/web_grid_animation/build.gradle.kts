@@ -17,8 +17,7 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                implementation(npm("highlight.js", "10.7.2"))
-                implementation(compose.web.core)
+                implementation(project(":web-core"))
                 implementation(compose.runtime)
             }
         }

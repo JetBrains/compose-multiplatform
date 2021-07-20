@@ -34,11 +34,12 @@ module(":web-integration-widgets", "$rootDir/integration-widgets")
 module(":web-benchmark-core", "$rootDir/benchmark-core")
 module(":compose-compiler-integration", "$rootDir/compose-compiler-integration")
 
+module(":examples:compose-web-grid-animation", "../examples/web_grid_animation")
+
 if (extra["COMPOSE_WEB_BUILD_WITH_EXAMPLES"]!!.toString().toBoolean() == true) {
     println("building with examples")
     module(":examples:falling_balls_with_web", "../examples/falling_balls_with_web")
     module(":examples:compose-web-lp", "../examples/web_landing")
-    module(":examples:compose-web-grid-animation", "../examples/web_grid_animation")
     module(":examples:web-compose-bird", "../examples/web-compose-bird")
     module(":examples:web-with-react", "../examples/web-with-react")
     module(":examples:web-getting-started", "../examples/web-getting-started")
