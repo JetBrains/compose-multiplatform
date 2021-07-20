@@ -19,10 +19,10 @@ class CSSBackgroundTests {
     fun backgroundColor() = runTest {
         composition {
             Div({style {
-                backgroundColor("rgb(0, 128, 0)")
+                backgroundColor(rgb(0, 128, 0))
             }})
             Div({style {
-                backgroundColor("rgba(0, 129, 0, 0.2)")
+                backgroundColor(rgba(0, 129, 0, 0.2))
             }})
         }
 

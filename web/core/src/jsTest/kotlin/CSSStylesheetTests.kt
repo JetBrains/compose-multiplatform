@@ -52,7 +52,7 @@ object AppStylesheet : StyleSheet() {
 
     val withMedia by style {
         color("lime")
-        backgroundColor("lime")
+        backgroundColor(Color.lime)
 
         media(mediaMinWidth(20000.px)) {
             self style {
@@ -62,7 +62,7 @@ object AppStylesheet : StyleSheet() {
 
         media(mediaMinWidth(20.px)) {
             self style {
-                backgroundColor("green")
+                backgroundColor(Color.green)
             }
         }
 

@@ -48,7 +48,7 @@ class AttributesTests {
             ref { onDispose {  } }
             style {
                 width(500.px)
-                backgroundColor("red")
+                backgroundColor(Color.red)
             }
 
             onClick {  }
