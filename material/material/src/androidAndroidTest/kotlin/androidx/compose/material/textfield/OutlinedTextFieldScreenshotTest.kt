@@ -22,10 +22,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material.GOLDEN_MATERIAL
+import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.setMaterialContent
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.testutils.assertAgainstGolden
@@ -524,6 +529,55 @@ class OutlinedTextFieldScreenshotTest {
     private fun SemanticsNodeInteraction.focus() {
         // split click into (down) and (move, up) to enforce a composition in between
         this.performGesture { down(center) }.performGesture { move(); up() }
+    }
+
+    @Test
+    fun outlinedTextField_customShape() {
+        rule.setMaterialContent {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                label = { Text("Label") },
+                modifier = Modifier.width(300.dp).testTag(TextFieldTag),
+                singleLine = true,
+                shape = CutCornerShape(10.dp)
+            )
+        }
+
+        assertAgainstGolden("outlinedTextField_customShape")
+    }
+
+    @Test
+    fun outlinedTextField_leadingTrailingIcons() {
+        rule.setMaterialContent {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                label = { Text("Label") },
+                modifier = Modifier.width(300.dp).testTag(TextFieldTag),
+                leadingIcon = { Icon(Icons.Default.Call, null) },
+                trailingIcon = { Icon(Icons.Default.Clear, null) }
+            )
+        }
+
+        assertAgainstGolden("outlinedTextField_leadingTrailingIcons")
+    }
+
+    @Test
+    fun outlinedTextField_leadingTrailingIcons_error() {
+        rule.setMaterialContent {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                label = { Text("Label") },
+                modifier = Modifier.width(300.dp).testTag(TextFieldTag),
+                leadingIcon = { Icon(Icons.Default.Call, null) },
+                trailingIcon = { Icon(Icons.Default.Clear, null) },
+                isError = true
+            )
+        }
+
+        assertAgainstGolden("outlinedTextField_leadingTrailingIcons_error")
     }
 
     private fun assertAgainstGolden(goldenIdentifier: String) {
