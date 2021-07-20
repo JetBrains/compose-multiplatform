@@ -47,3 +47,14 @@ fun StyleBuilder.gridRow(start: Int, end: String) {
 fun StyleBuilder.gridRow(start: Int, end: Int) {
     property("grid-row", "$start / $end")
 }
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-columns
+fun StyleBuilder.gridTemplateColumns(value: String) {
+    property("grid-template-columns", value)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-rows
+fun StyleBuilder.gridTemplateRows(value: String) {
+    property("grid-template-rows", value)
+}
+

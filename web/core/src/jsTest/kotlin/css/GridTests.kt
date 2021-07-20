@@ -8,6 +8,8 @@ package org.jetbrains.compose.web.core.tests.css
 import org.jetbrains.compose.web.core.tests.runTest
 import org.jetbrains.compose.web.css.gridColumn
 import org.jetbrains.compose.web.css.gridRow
+import org.jetbrains.compose.web.css.gridTemplateColumns
+import org.jetbrains.compose.web.css.gridTemplateRows
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
@@ -126,5 +128,39 @@ class GridRawTests {
         assertEquals("initial", (root.children[1] as HTMLElement).style.asDynamic().gridRowStart)
         assertEquals("revert", (root.children[2] as HTMLElement).style.asDynamic().gridRowStart)
         assertEquals("unset", (root.children[3] as HTMLElement).style.asDynamic().gridRowStart)
+    }
+}
+
+class GridTemplateRows {
+    @Test
+    fun gridTemplateRawsGlobalValues() = runTest {
+        composition {
+            Div({ style { gridTemplateRows("inherit") } })
+            Div({ style { gridTemplateRows("initial") } })
+            Div({ style { gridTemplateRows("revert") } })
+            Div({ style { gridTemplateRows("unset") } })
+        }
+
+        assertEquals("inherit", (root.children[0] as HTMLElement).style.asDynamic().gridTemplateRows)
+        assertEquals("initial", (root.children[1] as HTMLElement).style.asDynamic().gridTemplateRows)
+        assertEquals("revert", (root.children[2] as HTMLElement).style.asDynamic().gridTemplateRows)
+        assertEquals("unset", (root.children[3] as HTMLElement).style.asDynamic().gridTemplateRows)
+    }
+}
+
+class GridTemplateColumns {
+    @Test
+    fun gridTemplateColumnsGlobalValues() = runTest {
+        composition {
+            Div({ style { gridTemplateColumns("inherit") } })
+            Div({ style { gridTemplateColumns("initial") } })
+            Div({ style { gridTemplateColumns("revert") } })
+            Div({ style { gridTemplateColumns("unset") } })
+        }
+
+        assertEquals("inherit", (root.children[0] as HTMLElement).style.asDynamic().gridTemplateColumns)
+        assertEquals("initial", (root.children[1] as HTMLElement).style.asDynamic().gridTemplateColumns)
+        assertEquals("revert", (root.children[2] as HTMLElement).style.asDynamic().gridTemplateColumns)
+        assertEquals("unset", (root.children[3] as HTMLElement).style.asDynamic().gridTemplateColumns)
     }
 }
