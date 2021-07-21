@@ -27,16 +27,7 @@ li:before{
   background-repeat: no-repeat;
 }
 
-li > img{
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 62%;
-  bottom: -10%;
-  filter: drop-shadow(0 50px 20px rgba(0, 0, 0, 0.20));
-  transition-property: bottom, filter, -webkit-filter;
-  transition-duration: .3s;
-}
+
 
 li > img:hover{
   bottom: 0;

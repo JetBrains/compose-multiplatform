@@ -60,6 +60,17 @@ object AppStyleSheet: StyleSheet() {
         "p" style {
             fontSize(2.em)
         }
+
+        "li > img" {
+            position(Position.Absolute)
+            left(50.percent)
+            property("transform", "translateX(-50%)")
+            width(62.percent)
+            property("bottom", "-10%")
+            property("filter", "drop-shadow(0 50px 20px rgba(0, 0, 0, 0.20))")
+            property("transition-property", "bottom, filter")
+            property("transition-duration", ".3s")
+        }
     }
 }
 
