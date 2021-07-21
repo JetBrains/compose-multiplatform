@@ -71,6 +71,11 @@ object AppStyleSheet: StyleSheet() {
             property("transition-property", "bottom, filter")
             property("transition-duration", ".3s")
         }
+
+        "li > img:hover" style  {
+            bottom(0.px)
+            property("filter", "drop-shadow(0 80px 30px rgba(0, 0, 0, 0.20))")
+        }
     }
 }
 
