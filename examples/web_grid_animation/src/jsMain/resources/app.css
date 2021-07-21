@@ -26,18 +26,6 @@ li:before{
   background-size: 40%;
   background-repeat: no-repeat;
 }
-div{
-  position: absolute;
-  width: 50%;
-  font-size: calc(15vw/var(--columns));
-  transform: skewy(-30deg);
-  margin-top: 14%;
-  padding: 3%;
-}
-
-p{
-  font-size: 2em;
-}
 
 li > img{
   position: absolute;

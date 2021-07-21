@@ -47,6 +47,19 @@ object AppStyleSheet: StyleSheet() {
             position(Position.Relative)
             paddingBottom(86.66.percent)
         }
+
+        "div" style {
+            position(Position.Absolute)
+            width(50.percent)
+            property("font-size", "calc(15vw/var(--columns))")
+            property("transform", "skewy(-30deg)")
+            marginTop(14.percent)
+            padding(3.percent)
+        }
+
+        "p" style {
+            fontSize(2.em)
+        }
     }
 }
 
