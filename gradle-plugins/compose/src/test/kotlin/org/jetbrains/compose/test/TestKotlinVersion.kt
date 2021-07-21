@@ -8,6 +8,6 @@ package org.jetbrains.compose.test
 @Suppress("EnumEntryName")
 enum class TestKotlinVersion(val versionString: String) {
     // __KOTLIN_COMPOSE_VERSION__
-    Default("1.5.10"),
+    Default("1.5.21"),
     V1_5_20("1.5.20")
 }

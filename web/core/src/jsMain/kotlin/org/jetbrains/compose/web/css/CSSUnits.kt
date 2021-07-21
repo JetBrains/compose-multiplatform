@@ -16,16 +16,16 @@ data class CSSUnitValueTyped<T : CSSUnit>(
     override fun toString(): String = "$value$unit"
 }
 
-external interface CSSUnitLengthOrPercentage: CSSUnit
-external interface CSSUnitPercentage: CSSUnitLengthOrPercentage
-external interface CSSUnitLength: CSSUnitLengthOrPercentage
-external interface CSSUnitRel : CSSUnitLength
-external interface CSSUnitAbs: CSSUnitLength
-external interface CSSUnitAngle: CSSUnit
-external interface CSSUnitTime: CSSUnit
-external interface CSSUnitFrequency: CSSUnit
-external interface CSSUnitResolution: CSSUnit
-external interface CSSUnitFlex: CSSUnit
+interface CSSUnitLengthOrPercentage: CSSUnit
+interface CSSUnitPercentage: CSSUnitLengthOrPercentage
+interface CSSUnitLength: CSSUnitLengthOrPercentage
+interface CSSUnitRel : CSSUnitLength
+interface CSSUnitAbs: CSSUnitLength
+interface CSSUnitAngle: CSSUnit
+interface CSSUnitTime: CSSUnit
+interface CSSUnitFrequency: CSSUnit
+interface CSSUnitResolution: CSSUnit
+interface CSSUnitFlex: CSSUnit
 
 typealias CSSAngleValue = CSSSizeValue<out CSSUnitAngle>
 typealias CSSLengthOrPercentageValue = CSSSizeValue<out CSSUnitLengthOrPercentage>
@@ -36,82 +36,82 @@ typealias CSSNumeric = CSSNumericValue<out CSSUnit>
 typealias CSSpxValue = CSSSizeValue<CSSUnit.px>
 
 // fake interfaces to distinguish units
-external interface CSSUnit {
-    external interface percent: CSSUnitPercentage
+interface CSSUnit {
+    interface percent: CSSUnitPercentage
 
-    external interface em: CSSUnitRel
+    interface em: CSSUnitRel
 
-    external interface ex: CSSUnitRel
+    interface ex: CSSUnitRel
 
-    external interface ch: CSSUnitRel
+    interface ch: CSSUnitRel
 
-    external interface ic: CSSUnitRel
+    interface ic: CSSUnitRel
 
-    external interface rem: CSSUnitRel
+    interface rem: CSSUnitRel
 
-    external interface lh: CSSUnitRel
+    interface lh: CSSUnitRel
 
-    external interface rlh: CSSUnitRel
+    interface rlh: CSSUnitRel
 
-    external interface vw: CSSUnitRel
+    interface vw: CSSUnitRel
 
-    external interface vh: CSSUnitRel
+    interface vh: CSSUnitRel
 
-    external interface vi: CSSUnitRel
+    interface vi: CSSUnitRel
 
-    external interface vb: CSSUnitRel
+    interface vb: CSSUnitRel
 
-    external interface vmin: CSSUnitRel
+    interface vmin: CSSUnitRel
 
-    external interface vmax: CSSUnitRel
+    interface vmax: CSSUnitRel
 
-    external interface cm: CSSUnitRel
+    interface cm: CSSUnitRel
 
-    external interface mm: CSSUnitRel
+    interface mm: CSSUnitRel
 
-    external interface Q: CSSUnitRel
+    interface Q: CSSUnitRel
 
-    external interface pt: CSSUnitAbs
+    interface pt: CSSUnitAbs
 
-    external interface pc: CSSUnitAbs
+    interface pc: CSSUnitAbs
 
-    external interface px: CSSUnitAbs
+    interface px: CSSUnitAbs
 
-    external interface deg: CSSUnitAngle
+    interface deg: CSSUnitAngle
 
-    external interface grad: CSSUnitAngle
+    interface grad: CSSUnitAngle
 
-    external interface rad: CSSUnitAngle
+    interface rad: CSSUnitAngle
 
-    external interface turn: CSSUnitAngle
+    interface turn: CSSUnitAngle
 
-    external interface s: CSSUnitTime
+    interface s: CSSUnitTime
 
-    external interface ms: CSSUnitTime
+    interface ms: CSSUnitTime
 
-    external interface Hz: CSSUnitFrequency
+    interface Hz: CSSUnitFrequency
 
-    external interface kHz: CSSUnitFrequency
+    interface kHz: CSSUnitFrequency
 
-    external interface dpi: CSSUnitResolution
+    interface dpi: CSSUnitResolution
 
-    external interface dpcm: CSSUnitResolution
+    interface dpcm: CSSUnitResolution
 
-    external interface dppx: CSSUnitResolution
+    interface dppx: CSSUnitResolution
 
-    external interface fr: CSSUnitFlex
+    interface fr: CSSUnitFlex
 
-    external interface number: CSSUnit
-    
-    external companion object {
+    interface number: CSSUnit
+
+    companion object {
         inline val percent get() = "%".unsafeCast<percent>()
 
         inline val em get() = "em".unsafeCast<em>()
-        
+
         inline val ex get() = "ex".unsafeCast<ex>()
 
         inline val ch get() = "ch".unsafeCast<ch>()
-        
+
         inline val ic get() = "ic".unsafeCast<ic>()
 
         inline val rem get() = "rem".unsafeCast<rem>()
@@ -119,7 +119,7 @@ external interface CSSUnit {
         inline val lh get() = "lh".unsafeCast<lh>()
 
         inline val rlh get() = "rlh".unsafeCast<rlh>()
-        
+
         inline val vw get() = "vw".unsafeCast<vw>()
 
         inline val vh get() = "vh".unsafeCast<vh>()

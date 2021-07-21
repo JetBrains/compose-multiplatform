@@ -12,7 +12,7 @@ subprojects {
     version = COMPOSE_WEB_VERSION
 
     pluginManager.withPlugin("maven-publish") {
-        configure<PublishingExtension> { 
+        configure<PublishingExtension> {
             repositories {
                 maven {
                     name = "internal"
@@ -42,9 +42,10 @@ subprojects {
 
     repositories {
         gradlePluginPortal()
+        mavenLocal()
         mavenCentral()
-        maven { 
-            url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev") 
+        maven {
+            url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         }
         maven {
             url = uri("https://packages.jetbrains.team/maven/p/ui/dev")

@@ -256,6 +256,7 @@ The main arguments of the `BoxWithTooltip` function:
 ```kotlin
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.BoxWithTooltip
+import androidx.compose.foundation.TooltipPlacement
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -293,7 +294,11 @@ fun main() = Window(title = "Tooltip Example", size = IntSize(300, 300)) {
                     }
                 },
                 delay = 600, // in milliseconds
-                offset = if (index % 2 == 0) DpOffset(-16.dp, 0.dp) else DpOffset.Zero // tooltip offset
+                tooltipPlacement = TooltipPlacement(
+                    anchor = TooltipPlacement.Anchor.Pointer,
+                    alignment = Alignment.BottomEnd,
+                    offset = if (index % 2 == 0) DpOffset(-16.dp, 0.dp) else DpOffset.Zero // tooltip offset
+                )
             ) {
                 Button(onClick = {}) { Text(text = name) }
             }
