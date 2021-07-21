@@ -99,10 +99,14 @@ private object CompositionLocalSnippet3 {
         MaterialTheme { // MaterialTheme sets ContentAlpha.high as default
             Column {
                 Text("Uses MaterialTheme's provided alpha")
-                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                CompositionLocalProvider(
+                    LocalContentAlpha provides ContentAlpha.medium
+                ) {
                     Text("Medium value provided for LocalContentAlpha")
                     Text("This Text also uses the medium value")
-                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+                    CompositionLocalProvider(
+                        LocalContentAlpha provides ContentAlpha.disabled
+                    ) {
                         DescendantExample()
                     }
                 }
