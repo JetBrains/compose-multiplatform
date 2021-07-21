@@ -3,9 +3,9 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     // __KOTLIN_COMPOSE_VERSION__
-    kotlin("multiplatform") version "1.5.21"
+    kotlin("multiplatform") version "1.5.10"
     // __LATEST_COMPOSE_RELEASE_VERSION__
-    id("org.jetbrains.compose") version ("0.5.0-build262")
+    id("org.jetbrains.compose") version ("0.5.0-build235")
 }
 
 repositories {
