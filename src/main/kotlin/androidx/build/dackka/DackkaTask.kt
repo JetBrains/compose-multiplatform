@@ -22,6 +22,7 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Classpath
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -63,6 +64,18 @@ abstract class DackkaTask @Inject constructor(
     // Location of generated reference docs
     @OutputDirectory
     lateinit var destinationDir: File
+
+    // Set of packages to exclude for refdoc generation for all languages
+    @Input
+    lateinit var excludedPackages: Set<String>
+
+    // Set of packages to exclude for Java refdoc generation
+    @Input
+    lateinit var excludedPackagesForJava: Set<String>
+
+    // Set of packages to exclude for Kotlin refdoc generation
+    @Input
+    lateinit var excludedPackagesForKotlin: Set<String>
 
     // Documentation for Dackka command line usage and arguments can be found at
     // https://kotlin.github.io/dokka/1.4.0/user_guide/cli/usage/
@@ -122,7 +135,14 @@ abstract class DackkaTask @Inject constructor(
 
     @TaskAction
     fun generate() {
-        runDackkaWithArgs(dackkaClasspath, computeArguments(), workerExecutor)
+        runDackkaWithArgs(
+            dackkaClasspath,
+            computeArguments(),
+            workerExecutor,
+            excludedPackages,
+            excludedPackagesForJava,
+            excludedPackagesForKotlin,
+        )
     }
 }
 
@@ -130,18 +150,27 @@ abstract class DackkaTask @Inject constructor(
 interface DackkaParams : WorkParameters {
     val args: ListProperty<String>
     val classpath: SetProperty<File>
+    val excludedPackages: ListProperty<String>
+    val excludedPackagesForJava: ListProperty<String>
+    val excludedPackagesForKotlin: ListProperty<String>
 }
 
 @Suppress("UnstableApiUsage")
 fun runDackkaWithArgs(
     classpath: FileCollection,
     args: List<String>,
-    workerExecutor: WorkerExecutor
+    workerExecutor: WorkerExecutor,
+    excludedPackages: Set<String>,
+    excludedPackagesForJava: Set<String>,
+    excludedPackagesForKotlin: Set<String>,
 ) {
     val workQueue = workerExecutor.noIsolation()
     workQueue.submit(DackkaWorkAction::class.java) { parameters ->
         parameters.args.set(args)
         parameters.classpath.set(classpath)
+        parameters.excludedPackages.set(excludedPackages)
+        parameters.excludedPackagesForJava.set(excludedPackagesForJava)
+        parameters.excludedPackagesForKotlin.set(excludedPackagesForKotlin)
     }
 }
 
@@ -153,8 +182,26 @@ abstract class DackkaWorkAction @Inject constructor (
         execOperations.javaexec {
             it.args = parameters.args.get()
             it.classpath(parameters.classpath.get())
-            // b/183989795 tracks moving this away from an environment variable
+            // b/183989795 tracks moving these away from an environment variables
             it.environment("DEVSITE_TENANT", "androidx")
+
+            if (parameters.excludedPackages.get().isNotEmpty())
+                it.environment(
+                    "DACKKA_EXCLUDED_PACKAGES",
+                    parameters.excludedPackages.get().joinToString(",")
+                )
+
+            if (parameters.excludedPackagesForJava.get().isNotEmpty())
+                it.environment(
+                    "DACKKA_EXCLUDED_PACKAGES_JAVA",
+                    parameters.excludedPackagesForJava.get().joinToString(",")
+                )
+
+            if (parameters.excludedPackagesForKotlin.get().isNotEmpty())
+                it.environment(
+                    "DACKKA_EXCLUDED_PACKAGES_KOTLIN",
+                    parameters.excludedPackagesForKotlin.get().joinToString(",")
+                )
         }
     }
 }
