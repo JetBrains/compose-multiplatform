@@ -18,6 +18,37 @@ li:nth-child(2n-1){
   :root {
     --columns: 5;
   }
+}
+@media (min-width:900px){
+  :root {
+    --columns: 7;
+  }
+}
+@media (min-width:1200px){
+  :root {
+    --columns: 9;
+  }
+}
+@media (min-width:1500px){
+  :root {
+    --columns: 11;
+  }
+}
+@media (min-width:1800px){
+  :root {
+    --columns: 13;
+  }
+}
+
+@media (min-width:2100px){
+  :root {
+    --columns: 15;
+  }
+}
+
+
+
+@media (min-width:600px){
   li:nth-child(2n-1){
     grid-column-start:auto;
   }
@@ -26,9 +57,6 @@ li:nth-child(2n-1){
   }
 }
 @media (min-width:900px){
-  :root {
-    --columns: 7;
-  }
   li:nth-child(4n-3){
     grid-column-start:auto;
   }
@@ -37,9 +65,6 @@ li:nth-child(2n-1){
   }
 }
 @media (min-width:1200px){
-  :root {
-    --columns: 9;
-  }
   li:nth-child(6n-5){
     grid-column-start:auto;
   }
@@ -48,9 +73,6 @@ li:nth-child(2n-1){
   }
 }
 @media (min-width:1500px){
-  :root {
-    --columns: 11;
-  }
   li:nth-child(8n-7){
     grid-column-start:auto;
   }
@@ -58,10 +80,8 @@ li:nth-child(2n-1){
     grid-column-start:2;
   }
 }
+
 @media (min-width:1800px){
-  :root {
-    --columns: 13;
-  }
   li:nth-child(10n-9){
     grid-column-start:auto;
   }
@@ -70,16 +90,13 @@ li:nth-child(2n-1){
   }
 
 }
+
 @media (min-width:2100px){
-  :root {
-    --columns: 15;
-  }
   li:nth-child(12n-11){
     grid-column-start:auto;
   }
   li:nth-child(14n-13){
     grid-column-start:2;
   }
-
 }
 
