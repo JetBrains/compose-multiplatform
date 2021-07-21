@@ -27,6 +27,24 @@ fun StyleBuilder.gridColumn(start: Int, end: Int) {
 }
 
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/grid-column-start
+fun StyleBuilder.gridColumnStart(value: String) {
+    property("grid-column-start", value)
+}
+
+fun StyleBuilder.gridColumnStart(value: Int) {
+    property("grid-column-start", value)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/grid-column-end
+fun StyleBuilder.gridColumnEnd(value: String) {
+    property("grid-column-end", value)
+}
+
+fun StyleBuilder.gridColumnEnd(value: Int) {
+    property("grid-column-end", value)
+}
+
 // https://developer.mozilla.org/en-US/docs/Web/CSS/grid-row
 fun StyleBuilder.gridRow(value: String) {
     property("grid-row", value)
@@ -46,6 +64,24 @@ fun StyleBuilder.gridRow(start: Int, end: String) {
 
 fun StyleBuilder.gridRow(start: Int, end: Int) {
     property("grid-row", "$start / $end")
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/grid-row-start
+fun StyleBuilder.gridRowStart(value: String) {
+    property("grid-row-start", value)
+}
+
+fun StyleBuilder.gridRowStart(value: Int) {
+    property("grid-row-start", value)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/grid-row-end
+fun StyleBuilder.gridRowEnd(value: String) {
+    property("grid-row-end", value)
+}
+
+fun StyleBuilder.gridRowEnd(value: Int) {
+    property("grid-row-end", value)
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-columns
