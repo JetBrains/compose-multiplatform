@@ -60,21 +60,19 @@ p{
   font-size: 2em;
 }
 
-img{
+li > img{
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
   width: 62%;
   bottom: -10%;
-  -webkit-filter: drop-shadow(0 50px 20px  rgba(0, 0, 0, 0.20));
   filter: drop-shadow(0 50px 20px rgba(0, 0, 0, 0.20));
   transition-property: bottom, filter, -webkit-filter;
   transition-duration: .3s;
 }
 
-img:hover{
+li > img:hover{
   bottom: 0;
-  -webkit-filter: drop-shadow(0 80px 40px  rgba(0, 0, 0, 0.20));
   filter: drop-shadow(0 80px 30px rgba(0, 0, 0, 0.20));
  }
 
