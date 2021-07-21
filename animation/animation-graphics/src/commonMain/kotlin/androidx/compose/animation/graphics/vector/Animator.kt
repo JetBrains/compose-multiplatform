@@ -118,12 +118,99 @@ internal data class AnimatorSet(
             }
             Ordering.Sequentially -> {
                 var accumulatedDelay = parentDelay
-                animators.fastForEach { animator ->
+                normalizeSequentialAnimators().fastForEach { animator ->
                     animator.Configure(transition, config, overallDuration, accumulatedDelay)
                     accumulatedDelay += animator.totalDuration
                 }
             }
         }
+    }
+
+    /**
+     * Normalizes a sequential animator set that is used as a list of keyframes for a single
+     * property. The animators are expected to run one after another animating the same property
+     * continuously, and none of the animators should use intermediate keyframes in it. If the
+     * animators meet this criteria, they are converted to an animator with multiple keyframes.
+     * Otherwise, this returns [animators] as they are.
+     */
+    private fun normalizeSequentialAnimators(): List<Animator> {
+        if (ordering != Ordering.Sequentially) {
+            return animators
+        }
+        var propertyName: String? = null
+        val keyframes = mutableListOf<Keyframe<Any?>>()
+        var startDelay: Int? = null
+        var resultHolder: PropertyValuesHolder<*>? = null
+        var accumulatedDuration = 0f
+        val totalDuration = totalDuration
+        for (animator in animators) {
+            if (animator !is ObjectAnimator) {
+                return animators
+            }
+            if (startDelay == null) {
+                startDelay = animator.startDelay
+            }
+            val holders = animator.holders
+            if (holders.size != 1) {
+                return animators
+            }
+            val holder = holders[0]
+            if (holder !is PropertyValuesHolder1D) {
+                return animators
+            }
+            if (propertyName == null) {
+                propertyName = holder.propertyName
+            } else if (propertyName != holder.propertyName) {
+                return animators
+            }
+            if (resultHolder == null) {
+                @Suppress("UNCHECKED_CAST")
+                resultHolder = when (holder) {
+                    is PropertyValuesHolderFloat -> PropertyValuesHolderFloat(
+                        propertyName,
+                        keyframes as List<Keyframe<Float>>
+                    )
+                    is PropertyValuesHolderInt -> PropertyValuesHolderInt(
+                        propertyName,
+                        keyframes as List<Keyframe<Int>>
+                    )
+                    is PropertyValuesHolderPath -> PropertyValuesHolderPath(
+                        propertyName,
+                        keyframes as List<Keyframe<List<PathNode>>>
+                    )
+                    is PropertyValuesHolderColor -> PropertyValuesHolderColor(
+                        propertyName,
+                        keyframes as List<Keyframe<Color>>
+                    )
+                }
+            }
+            if (holder.animatorKeyframes.size != 2) {
+                return animators
+            }
+            val start = holder.animatorKeyframes[0]
+            val end = holder.animatorKeyframes[1]
+            if (start.fraction != 0f || end.fraction != 1f) {
+                return animators
+            }
+            if (keyframes.isEmpty()) {
+                keyframes.add(Keyframe(0f, start.value, start.interpolator))
+            }
+            accumulatedDuration += animator.duration
+            val fraction = accumulatedDuration / (totalDuration - startDelay)
+            keyframes.add(Keyframe(fraction, end.value, end.interpolator))
+        }
+        if (resultHolder == null) {
+            return animators
+        }
+        return listOf(
+            ObjectAnimator(
+                duration = totalDuration,
+                startDelay = startDelay ?: 0,
+                repeatCount = 0,
+                repeatMode = RepeatMode.Restart,
+                holders = listOf(resultHolder)
+            )
+        )
     }
 }
 
@@ -335,7 +422,8 @@ internal class PropertyValuesHolderPath(
     }
 
     fun interpolate(fraction: Float): List<PathNode> {
-        val index = (animatorKeyframes.indexOfFirst { it.fraction > fraction } - 1).coerceAtLeast(0)
+        val index = (animatorKeyframes.indexOfFirst { it.fraction >= fraction } - 1)
+            .coerceAtLeast(0)
         val easing = animatorKeyframes[index + 1].interpolator
         val innerFraction = easing.transform(
             (
