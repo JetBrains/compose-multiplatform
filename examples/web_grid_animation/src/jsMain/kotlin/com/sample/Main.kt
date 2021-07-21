@@ -76,6 +76,72 @@ object AppStyleSheet: StyleSheet() {
             bottom(0.px)
             property("filter", "drop-shadow(0 80px 30px rgba(0, 0, 0, 0.20))")
         }
+
+        media(mediaMinWidth(600.px)) {
+            "li:nth-child(2n-1)" style {
+                property("grid-column-start", "auto")
+            }
+
+            "li:nth-child(4n-3)" style {
+                property("grid-column-start", "2")
+
+            }
+        }
+
+        media(mediaMinWidth(900.px)) {
+            "li:nth-child(4n-3)" style {
+                property("grid-column-start", "auto")
+            }
+
+            "li:nth-child(6n-5)" style {
+                property("grid-column-start", "2")
+
+            }
+        }
+
+        media(mediaMinWidth(1200.px)) {
+            "li:nth-child(6n-5)" style {
+                property("grid-column-start", "auto")
+            }
+
+            "li:nth-child(8n-7)" style {
+                property("grid-column-start", "2")
+            }
+        }
+
+        media(mediaMinWidth(1500.px)) {
+            "li:nth-child(8n-7)" style {
+                property("grid-column-start", "auto")
+            }
+
+            "li:nth-child(10n-9)" style {
+                property("grid-column-start", "2")
+
+            }
+        }
+
+        media(mediaMinWidth(1800.px)) {
+            "li:nth-child(10n-9)" style {
+                property("grid-column-start", "auto")
+            }
+
+            "li:nth-child(12n-11)" style {
+                property("grid-column-start", "2")
+
+            }
+        }
+
+        media(mediaMinWidth(2100.px)) {
+            "li:nth-child(12n-11)" style {
+                property("grid-column-start", "auto")
+            }
+
+            "li:nth-child(14n-12)" style {
+                property("grid-column-start", "2")
+
+            }
+
+        }
     }
 }
 
