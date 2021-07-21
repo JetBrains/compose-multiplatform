@@ -17,7 +17,9 @@
 package androidx.compose.ui.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.horizontalScroll
@@ -33,9 +35,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.RelocationRequester
 import androidx.compose.ui.layout.onRelocationRequest
 import androidx.compose.ui.layout.relocationRequester
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import kotlinx.coroutines.launch
@@ -95,6 +101,82 @@ fun BringIntoViewSample() {
         }
         Button(onClick = { coroutineScope.launch { relocationRequester.bringIntoView() } }) {
             Text("Bring box into view")
+        }
+    }
+}
+
+@ExperimentalComposeUiApi
+@Sampled
+@Composable
+fun BringPartOfComposableIntoViewSample() {
+    // This is a helper function that users will have to use since experimental "ui" API cannot
+    // be used inside Scrollable, which is ihe "foundation" package. After onRelocationRequest is
+    // added to Scrollable, users can use Modifier.horizontalScroll directly.
+    @OptIn(ExperimentalComposeUiApi::class)
+    fun Modifier.horizontalScrollWithRelocation(
+        state: ScrollState,
+        enabled: Boolean = true,
+        flingBehavior: FlingBehavior? = null,
+        reverseScrolling: Boolean = false
+    ): Modifier {
+        // Calculate the offset needed to bring one of the edges into view. The leadingEdge is
+        // the side closest to the origin (For the x-axis this is 'left', for the y-axis this is
+        // 'top'). The trailing edge is the other side (For the x-axis this is 'right', for the
+        // y-axis this is 'bottom').
+        fun relocationDistance(leadingEdge: Float, trailingEdge: Float, parentSize: Float) = when {
+            // If the item is already visible, no need to scroll.
+            leadingEdge >= 0 && trailingEdge <= parentSize -> 0f
+
+            // If the item is visible but larger than the parent, we don't scroll.
+            leadingEdge < 0 && trailingEdge > parentSize -> 0f
+
+            // Find the minimum scroll needed to make one of the edges coincide with the parent's edge.
+            abs(leadingEdge) < abs(trailingEdge - parentSize) -> leadingEdge
+            else -> trailingEdge - parentSize
+        }
+
+        return this
+            .onRelocationRequest(
+                onProvideDestination = { rect, layoutCoordinates ->
+                    val size = layoutCoordinates.size.toSize()
+                    rect.translate(relocationDistance(rect.left, rect.right, size.width), 0f)
+                },
+                onPerformRelocation = { source, destination ->
+                    val offset = destination.left - source.left
+                    state.animateScrollBy(if (reverseScrolling) -offset else offset)
+                }
+            )
+            .horizontalScroll(state, enabled, flingBehavior, reverseScrolling)
+    }
+
+    with(LocalDensity.current) {
+        val relocationRequester = remember { RelocationRequester() }
+        val coroutineScope = rememberCoroutineScope()
+        Column {
+            Box(
+                Modifier
+                    .border(2.dp, Color.Black)
+                    .size(500f.toDp())
+                    .horizontalScrollWithRelocation(rememberScrollState())
+            ) {
+                Canvas(
+                    Modifier
+                        .size(1500f.toDp(), 500f.toDp())
+                        .relocationRequester(relocationRequester)
+                ) {
+                    drawCircle(color = Color.Red, radius = 250f, center = Offset(750f, 250f))
+                }
+            }
+            Button(
+                onClick = {
+                    val circleCoordinates = Rect(500f, 0f, 1000f, 500f)
+                    coroutineScope.launch {
+                        relocationRequester.bringIntoView(circleCoordinates)
+                    }
+                }
+            ) {
+                Text("Bring circle into View")
+            }
         }
     }
 }

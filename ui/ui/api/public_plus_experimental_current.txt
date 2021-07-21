@@ -1876,7 +1876,7 @@ package androidx.compose.ui.layout {
 
   @androidx.compose.ui.ExperimentalComposeUiApi public final class RelocationRequester {
     ctor public RelocationRequester();
-    method public suspend Object? bringIntoView(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? bringIntoView(optional androidx.compose.ui.geometry.Rect? rect, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
   }
 
   public final class RelocationRequesterModifierKt {
