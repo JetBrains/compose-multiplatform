@@ -167,8 +167,8 @@ enum class Scope(val str: String) {
  * https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/autocomplete
  */
 @Suppress("Unused", "NOTHING_TO_INLINE", "NESTED_CLASS_IN_EXTERNAL_INTERFACE", "INLINE_EXTERNAL_DECLARATION", "WRONG_BODY_OF_EXTERNAL_DECLARATION", "NESTED_EXTERNAL_DECLARATION", "ClassName")
-external interface AutoComplete {
-    external companion object {
+interface AutoComplete {
+     companion object {
         /**
          * The browser is not permitted to automatically enter or select a value for this field. It is possible that the document or application provides its own autocomplete feature, or that security concerns require that the field's value not be automatically entered.
          * Note: In most modern browsers, setting autocomplete to "off" will not prevent a password manager from asking the user if they would like to save username and password information, or from automatically filling in those values in a site's login form. See the autocomplete attribute and login fields.

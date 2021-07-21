@@ -63,6 +63,159 @@ class GridColumnTests {
     }
 }
 
+class GridColumnEndTests {
+    @Test
+    fun gridColumnEndOneValue() = runTest {
+        composition {
+            Div({ style { gridColumnEnd("1") } })
+            Div({ style { gridColumnEnd("somegridarea") } })
+        }
+
+        assertEquals("1", nextChild().style.asDynamic().gridColumnEnd)
+        assertEquals("somegridarea", nextChild().style.asDynamic().gridColumnEnd)
+    }
+
+    @Test
+    fun gridColumnEndIntValue() = runTest {
+        composition {
+            Div({ style { gridColumnEnd(-4) } })
+        }
+
+        val el = nextChild().style.asDynamic()
+        assertEquals("-4", el.gridColumnEnd)
+    }
+
+    @Test
+    fun gridColumnEndGlobalValues() = runTest {
+        composition {
+            Div({ style { gridColumn("inherit") } })
+            Div({ style { gridColumn("initial") } })
+            Div({ style { gridColumn("revert") } })
+            Div({ style { gridColumn("unset") } })
+        }
+
+        assertEquals("inherit", nextChild().style.asDynamic().gridColumnEnd)
+        assertEquals("initial", nextChild().style.asDynamic().gridColumnEnd)
+        assertEquals("revert", nextChild().style.asDynamic().gridColumnEnd)
+        assertEquals("unset", nextChild().style.asDynamic().gridColumnEnd)
+    }
+}
+
+class GridColumnStartTests {
+    @Test
+    fun gridColumnStartOneValue() = runTest {
+        composition {
+            Div({ style { gridColumnStart("1") } })
+            Div({ style { gridColumnStart("somegridarea") } })
+        }
+
+        assertEquals("1", nextChild().style.asDynamic().gridColumnStart)
+        assertEquals("somegridarea", nextChild().style.asDynamic().gridColumnStart)
+    }
+
+    @Test
+    fun gridColumnStartIntValue() = runTest {
+        composition {
+            Div({ style { gridColumnStart(-4) } })
+        }
+
+        val el = nextChild().style.asDynamic()
+        assertEquals("-4", el.gridColumnStart)
+    }
+
+    @Test
+    fun gridColumnStartGlobalValues() = runTest {
+        composition {
+            Div({ style { gridColumn("inherit") } })
+            Div({ style { gridColumn("initial") } })
+            Div({ style { gridColumn("revert") } })
+            Div({ style { gridColumn("unset") } })
+        }
+
+        assertEquals("inherit", nextChild().style.asDynamic().gridColumnStart)
+        assertEquals("initial", nextChild().style.asDynamic().gridColumnStart)
+        assertEquals("revert", nextChild().style.asDynamic().gridColumnStart)
+        assertEquals("unset", nextChild().style.asDynamic().gridColumnStart)
+    }
+}
+
+class GridRowStartTests {
+    @Test
+    fun gridRowStartOneValue() = runTest {
+        composition {
+            Div({ style { gridRowStart("1") } })
+            Div({ style { gridRowStart("somegridarea") } })
+        }
+
+        assertEquals("1", nextChild().style.asDynamic().gridRowStart)
+        assertEquals("somegridarea", nextChild().style.asDynamic().gridRowStart)
+    }
+
+    @Test
+    fun gridRowStartIntValue() = runTest {
+        composition {
+            Div({ style { gridRowStart(-4) } })
+        }
+
+        val el = nextChild().style.asDynamic()
+        assertEquals("-4", el.gridRowStart)
+    }
+
+    @Test
+    fun gridRowStartGlobalValues() = runTest {
+        composition {
+            Div({ style { gridRow("inherit") } })
+            Div({ style { gridRow("initial") } })
+            Div({ style { gridRow("revert") } })
+            Div({ style { gridRow("unset") } })
+        }
+
+        assertEquals("inherit", nextChild().style.asDynamic().gridRowStart)
+        assertEquals("initial", nextChild().style.asDynamic().gridRowStart)
+        assertEquals("revert", nextChild().style.asDynamic().gridRowStart)
+        assertEquals("unset", nextChild().style.asDynamic().gridRowStart)
+    }
+}
+
+class GridRowEndTests {
+    @Test
+    fun gridRowEndOneValue() = runTest {
+        composition {
+            Div({ style { gridRowEnd("1") } })
+            Div({ style { gridRowEnd("somegridarea") } })
+        }
+
+        assertEquals("1", nextChild().style.asDynamic().gridRowEnd)
+        assertEquals("somegridarea", nextChild().style.asDynamic().gridRowEnd)
+    }
+
+    @Test
+    fun gridRowEndIntValue() = runTest {
+        composition {
+            Div({ style { gridRowEnd(-4) } })
+        }
+
+        val el = nextChild().style.asDynamic()
+        assertEquals("-4", el.gridRowEnd)
+    }
+
+    @Test
+    fun gridRowEndGlobalValues() = runTest {
+        composition {
+            Div({ style { gridRow("inherit") } })
+            Div({ style { gridRow("initial") } })
+            Div({ style { gridRow("revert") } })
+            Div({ style { gridRow("unset") } })
+        }
+
+        assertEquals("inherit", nextChild().style.asDynamic().gridRowEnd)
+        assertEquals("initial", nextChild().style.asDynamic().gridRowEnd)
+        assertEquals("revert", nextChild().style.asDynamic().gridRowEnd)
+        assertEquals("unset", nextChild().style.asDynamic().gridRowEnd)
+    }
+}
+
+
 class GridRawTests {
 
     @Test

@@ -191,6 +191,7 @@ fun getTrayIcon(): BufferedImage {
 If an application has multiple windows, then it is better to put its state into a separate class and open/close window in response to `mutableStateListOf` changes (see [notepad example](https://github.com/JetBrains/compose-jb/tree/master/examples/notepad) for more complex use cases):
 ```kotlin
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -203,7 +204,9 @@ fun main() = application {
     val applicationState = remember { MyApplicationState() }
 
     for (window in applicationState.windows) {
-        MyWindow(window)
+        key(window) {
+            MyWindow(window)
+        }
     }
 }
 
