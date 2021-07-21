@@ -1,0 +1,26 @@
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="linear-gradient" x1="37.7" y1="-754.46" x2="128" y2="-754.46" gradientTransform="matrix(1, 0, 0, -1, 0, -648.86)" gradientUnits="userSpaceOnUse">
+      <stop offset="0.19" stop-color="#00daf0"/>
+      <stop offset="0.9" stop-color="#247ce6"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-2" x1="2.33" y1="-680.66" x2="70.23" y2="-680.66" xlink:href="#linear-gradient"/>
+    <linearGradient id="linear-gradient-3" x1="83.87" y1="-780.92" x2="20.45" y2="-692.42" gradientTransform="matrix(1, 0, 0, -1, 0, -648.86)" gradientUnits="userSpaceOnUse">
+      <stop offset="0.09" stop-color="#1ddf93"/>
+      <stop offset="0.48" stop-color="#00daf0"/>
+      <stop offset="0.9" stop-color="#247ce6"/>
+    </linearGradient>
+  </defs>
+  <g>
+    <polygon points="108.2 100.6 128 48.2 68.2 34.6 60.4 57 108.2 100.6" fill="#247ce6"/>
+    <polygon points="128 102.6 97.8 128 37.6 112.4 53.8 83.2 128 102.6" fill="url(#linear-gradient)"/>
+    <polygon points="17.6 63.6 2.4 19.8 70.2 0 64.8 56.8 17.6 63.6" fill="url(#linear-gradient-2)"/>
+    <polygon points="111.6 74 92.6 41.6 93 41.4 70.2 0 0 75.8 0 128 127.6 102.6 111.6 74" fill="url(#linear-gradient-3)"/>
+  </g>
+  <g>
+    <rect x="24" y="24" width="80" height="80"/>
+    <rect x="31.4" y="89" width="30" height="5" fill="#fff"/>
+    <path d="M44.6,34.4h6.6l14,33H57.6l-3-7.4H40.8l-3,7.4H30.4Zm7.6,19.4L47.8,43.2,43.4,53.8h8.8Z" fill="#fff"/>
+    <path d="M63.4,51.2h0A17,17,0,0,1,80.8,33.8c6.2,0,10,2,13.2,5.2l-4.6,5.4c-2.6-2.4-5.2-3.8-8.6-3.8-5.6,0-9.6,4.6-9.6,10.4h0c0,5.8,4,10.4,9.6,10.4,3.8,0,6.2-1.6,8.8-4l4.6,4.8c-3.4,3.6-7.2,6-13.6,6a16.78,16.78,0,0,1-17.2-17" fill="#fff"/>
+  </g>
+</svg>

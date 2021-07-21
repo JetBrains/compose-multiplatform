@@ -6,11 +6,11 @@ import org.jetbrains.compose.web.dom.*
 import org.jetbrains.compose.web.renderComposable
 
 @Composable
-fun Card(className: String, title: String, subTitle: String, imgUrl: String) {
-    Li({ classes(className) }) {
+fun Card(title: String, subTitle: String, imgUrl: String) {
+    Li {
         Div {
             H2 { Text(title) }
-            P { Text(subTitle) }
+            H4 { Text(subTitle) }
         }
         Img(src = imgUrl, alt = "")
     }
@@ -19,15 +19,35 @@ fun Card(className: String, title: String, subTitle: String, imgUrl: String) {
 
 fun main() {
     renderComposable(rootElementId = "root") {
-        Card("adidas", "IDEA", "£99.95", "https://upload.wikimedia.org/wikipedia/commons/9/9c/IntelliJ_IDEA_Icon.svg")
-        Card("tiger", "PyCharm", "£95.00", "https://upload.wikimedia.org/wikipedia/commons/1/1d/PyCharm_Icon.svg")
-        Card("adidas", "PHPStorm", "£109.95", "https://upload.wikimedia.org/wikipedia/commons/c/c9/PhpStorm_Icon.svg")
-        Card("tiger", "WebStorm", "£75.00", "/webstorm.png")
-        Card("adidas", "RubyMine", ">£109.95", "https://upload.wikimedia.org/wikipedia/commons/9/95/RubyMine_Icon.svg")
-        Card("tiger", "AppCode", "£80.00", "https://upload.wikimedia.org/wikipedia/commons/5/5f/AppCode_Icon.svg")
-        Card("adidas", "GoLand", "£149.95", "/goland.png")
-        Card("tiger", "DataGrip", "£75.00", "/datagrip.png")
-        Card("adidas", "Datalore", "£74.95", "/datalore.png")
-        Card("tiger", "Clion", "£70.00", "/clion.png")
+        Card(
+            "IDEA",
+            "3 out of every 4 Java developers choose IntelliJ IDEA",
+            "/idea.svg"
+        )
+        Card(
+            "PyCharm",
+            "The Python IDE for Professional Developers",
+            "/pycharm.svg"
+        )
+        Card(
+            "PHPStorm",
+            "The Lightning-Smart PHP IDE",
+            "/phpstorm.svg"
+        )
+        Card("WebStorm", "The smartest JavaScript IDE", "/webstorm.png")
+        Card(
+            "RubyMine",
+            "The most intelligent Ruby IDE",
+            "/rubymine.svg"
+        )
+        Card(
+            "AppCode",
+            "Smart IDE for iOS/macOS development",
+            "/appcode.svg"
+        )
+        Card("GoLand", "Built specially for Go developers", "/goland.png")
+        Card("DataGrip", "Many databases, one tool", "/datagrip.png")
+        Card("Datalore", "The online data science notebook", "/datalore.png")
+        Card("Clion", "A cross-platform IDE for C and C++", "/clion.png")
     }
 }
