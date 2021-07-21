@@ -116,3 +116,49 @@ fun StyleBuilder.gridTemplateAreas(vararg rows: String) {
     property("grid-template-areas", rows.joinToString(" ") { "\"$it\"" })
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/justify-self
+fun StyleBuilder.justifySelf(value: String) {
+    property("justify-self", value)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/justify-items
+fun StyleBuilder.justifyItems(value: String) {
+    property("justify-items", value)
+}
+
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/align-self
+fun StyleBuilder.alignSelf(value: String) {
+    property("align-self", value)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/align-items
+fun StyleBuilder.alignItems(value: String) {
+    property("align-items", value)
+}
+
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/place-self
+fun StyleBuilder.placeSelf(value: String) {
+    property("place-self", value)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/row-gap
+fun StyleBuilder.rowGap(value: CSSNumeric) {
+    property("row-gap", value)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/column-gap
+fun StyleBuilder.columnGap(value: CSSNumeric) {
+    property("column-gap", value)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/gap
+fun StyleBuilder.gap(value: CSSNumeric) {
+    property("gap", value)
+}
+
+fun StyleBuilder.gap(rowGap: CSSNumeric, columnGap: CSSNumeric) {
+    property("gap", "$rowGap $columnGap")
+}
+
