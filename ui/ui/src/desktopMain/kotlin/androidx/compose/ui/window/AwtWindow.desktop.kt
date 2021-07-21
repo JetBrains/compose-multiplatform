@@ -74,17 +74,24 @@ fun <T : Window> OwnerWindowScope.AwtWindow(
 ) {
     val currentVisible by rememberUpdatedState(visible)
 
-    val window = remember { Ref<T>() }
+    val windowRef = remember { Ref<T>() }
+    fun window() = windowRef.value!!
 
     DisposableEffect(Unit) {
-        window.value = create()
+        windowRef.value = create()
+        // We should init a native window even if it is not yet visible.
+        // `pack` method makes window displayable, creates a native window, init graphic
+        // context, performs the first composition and runs effects
+        if (!currentVisible) {
+            window().pack()
+        }
         onDispose {
-            dispose(window.value!!)
+            dispose(window())
         }
     }
 
     UpdateEffect {
-        update(window.value!!)
+        update(window())
     }
 
     val showJob = Ref<Job?>()
@@ -118,14 +125,14 @@ fun <T : Window> OwnerWindowScope.AwtWindow(
 
         showJob.value?.cancel()
         showJob.value = GlobalScope.launch(Dispatchers.Swing) {
-            window.value!!.isVisible = currentVisible
+            window().isVisible = currentVisible
         }
     }
 
     DisposableEffect(Unit) {
         onDispose {
             showJob.value?.cancel()
-            window.value!!.isVisible = false
+            window().isVisible = false
         }
     }
 }

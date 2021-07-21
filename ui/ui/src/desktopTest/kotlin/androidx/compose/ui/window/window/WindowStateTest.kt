@@ -40,6 +40,8 @@ import androidx.compose.ui.window.launchApplication
 import androidx.compose.ui.window.rememberWindowState
 import androidx.compose.ui.window.runApplicationTest
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consumeEach
 import org.junit.Assume.assumeTrue
 import org.junit.Test
 import java.awt.Dimension
@@ -714,6 +716,55 @@ class WindowStateTest {
         awaitIdle()
         assertThat(window.contentSize).isEqualTo(Dimension(400, 200))
         assertThat(state.size).isEqualTo(WindowSize(window.size.width.dp, window.size.height.dp))
+
+        exitApplication()
+    }
+
+    @Test
+    fun `change visible`() = runApplicationTest {
+        lateinit var window: ComposeWindow
+
+        var visible by mutableStateOf(false)
+
+        launchApplication {
+            Window(onCloseRequest = ::exitApplication, visible = visible) {
+                window = this.window
+            }
+        }
+
+        awaitIdle()
+        assertThat(window.isVisible).isEqualTo(false)
+
+        visible = true
+        awaitIdle()
+        assertThat(window.isVisible).isEqualTo(true)
+
+        exitApplication()
+    }
+
+    @Test
+    fun `invisible window should be active`() = runApplicationTest {
+        val receivedNumbers = mutableListOf<Int>()
+
+        val sendChannel = Channel<Int>(Channel.UNLIMITED)
+
+        launchApplication {
+            Window(onCloseRequest = ::exitApplication, visible = false) {
+                LaunchedEffect(Unit) {
+                    sendChannel.consumeEach {
+                        receivedNumbers.add(it)
+                    }
+                }
+            }
+        }
+
+        sendChannel.send(1)
+        awaitIdle()
+        assertThat(receivedNumbers).isEqualTo(listOf(1))
+
+        sendChannel.send(2)
+        awaitIdle()
+        assertThat(receivedNumbers).isEqualTo(listOf(1, 2))
 
         exitApplication()
     }
