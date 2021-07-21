@@ -27,8 +27,6 @@ object LibraryVersions {
     val APPCOMPAT = Version("1.4.0-alpha03")
     val APPSEARCH = Version("1.0.0-alpha03")
     val ARCH_CORE = Version("2.2.0-alpha01")
-    val ARCH_CORE_TESTING = ARCH_CORE
-    val ARCH_RUNTIME = Version("2.2.0-alpha01")
     val ASYNCLAYOUTINFLATER = Version("1.1.0-alpha01")
     val AUTOFILL = Version("1.2.0-beta02")
     val BENCHMARK = Version("1.1.0-alpha05")
@@ -42,8 +40,6 @@ object LibraryVersions {
     val CAMERA_VIEW = Version("1.0.0-alpha28")
     val CARDVIEW = Version("1.1.0-alpha01")
     val CAR_APP = Version("1.1.0-alpha03")
-    // Pre-release before confirming to the same version as the rest of the CAR_APP library group.
-    val CAR_APP_PRE_RELEASE = Version("1.0.0-alpha01")
     val COLLECTION = Version("1.2.0-alpha02")
     val CONTENTPAGER = Version("1.1.0-alpha01")
     val COMPOSE = Version(System.getenv("COMPOSE_CUSTOM_VERSION") ?: "1.1.0-alpha01")
