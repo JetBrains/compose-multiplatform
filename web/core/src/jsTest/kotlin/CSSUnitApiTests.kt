@@ -273,6 +273,78 @@ class CSSUnitApiTests {
         assertEquals(1.fr, 7.fr - 4.fr - 2.fr)
     }
 
+
+    @Test
+    fun unaryMinus() {
+        assertEquals((-3).percent, -3.percent)
+
+        assertEquals((-3).em, -3.em)
+        assertEquals((-3).ch, -3.ch)
+
+        assertEquals((-3).cssRem, -3.cssRem)
+        assertEquals((-3).vw, -3.vw)
+        assertEquals((-3).vh, -3.vh)
+
+        assertEquals((-3).vmin, -3.vmin)
+        assertEquals((-3).vmax, -3.vmax)
+        assertEquals((-3).cm, -3.cm)
+        assertEquals((-3).mm, -3.mm)
+
+        assertEquals((-3).pt, -3.pt)
+        assertEquals((-3).pc, -3.pc)
+        assertEquals((-3).px, -3.px)
+
+        assertEquals((-3).deg, -3.deg)
+        assertEquals((-3).grad, -3.grad)
+        assertEquals((-3).rad, -3.rad)
+        assertEquals((-3).turn, -3.turn)
+
+        assertEquals((-3).s, -3.s)
+        assertEquals((-3).ms, -3.ms)
+
+        assertEquals((-3).dpi, -3.dpi)
+        assertEquals((-3).dpcm, -3.dpcm)
+        assertEquals((-3).dppx, -3.dppx)
+        assertEquals((-3).fr, -3.fr)
+    }
+
+
+    @Test
+    fun unaryPlus() {
+        assertEquals(3.percent, +3.percent)
+
+        assertEquals(3.em, +3.em)
+        assertEquals(3.ch, +3.ch)
+
+        assertEquals(3.cssRem, +3.cssRem)
+        assertEquals(3.vw, +3.vw)
+        assertEquals(3.vh, +3.vh)
+
+        assertEquals(3.vmin, +3.vmin)
+        assertEquals(3.vmax, +3.vmax)
+        assertEquals(3.cm, +3.cm)
+        assertEquals(3.mm, +3.mm)
+
+        assertEquals(3.pt, +3.pt)
+        assertEquals(3.pc, +3.pc)
+        assertEquals(3.px, +3.px)
+
+        assertEquals(3.deg, +3.deg)
+        assertEquals(3.grad, +3.grad)
+        assertEquals(3.rad, +3.rad)
+        assertEquals(3.turn, +3.turn)
+
+        assertEquals(3.s, +3.s)
+        assertEquals(3.ms, +3.ms)
+
+        assertEquals(3.dpi, +3.dpi)
+        assertEquals(3.dpcm, +3.dpcm)
+        assertEquals(3.dppx, +3.dppx)
+        assertEquals(3.fr, +3.fr)
+    }
+
+
+
     @Test
     fun calcMultiplicationLeft() {
         val typedResultAbs: CSSNumericValue<CSSUnitAbs> = ((4.pt + 4.px) * 4)

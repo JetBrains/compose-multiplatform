@@ -12,6 +12,8 @@ operator fun <T: CSSUnit> CSSSizeValue<T>.div(num: Number): CSSSizeValue<T> = CS
 
 operator fun <T: CSSUnit> CSSSizeValue<T>.plus(b: CSSSizeValue<T>): CSSSizeValue<T> = CSSUnitValueTyped(value + b.value, unit)
 operator fun <T: CSSUnit> CSSSizeValue<T>.minus(b: CSSSizeValue<T>): CSSSizeValue<T> = CSSUnitValueTyped(value - b.value, unit)
+operator fun <T: CSSUnit> CSSSizeValue<T>.unaryMinus(): CSSSizeValue<T> = CSSUnitValueTyped(-value, unit)
+operator fun <T: CSSUnit> CSSSizeValue<T>.unaryPlus(): CSSSizeValue<T> = CSSUnitValueTyped(value, unit)
 
 external interface CSSCalcOperation<T : CSSUnit>: CSSNumericValue<T>
 
