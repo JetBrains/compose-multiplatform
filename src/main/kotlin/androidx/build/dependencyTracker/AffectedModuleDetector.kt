@@ -130,14 +130,8 @@ abstract class AffectedModuleDetector(
                     ignoreUnknownProjects = false,
                     changedFilesProvider = changedFilesProvider
                 ).also {
-                    if (!enabled) {
-                        logger.info("swapping with accept all")
-                        // doing it just for testing
-                        setInstance(rootProject, AcceptAll(it, logger))
-                    } else {
-                        logger.info("using real detector")
-                        setInstance(rootProject, it)
-                    }
+                    logger.info("using real detector")
+                    setInstance(rootProject, it)
                 }
             }
         }
@@ -197,18 +191,15 @@ abstract class AffectedModuleDetector(
  * Implementation that accepts everything without checking.
  */
 private class AcceptAll(
-    private val wrapped: AffectedModuleDetector? = null,
     logger: Logger? = null
 ) : AffectedModuleDetector(logger) {
     override fun shouldInclude(project: Project): Boolean {
-        val wrappedResult = wrapped?.shouldInclude(project)
-        logger?.info("[AcceptAll] wrapper returned $wrappedResult but I'll return true")
+        logger?.info("[AcceptAll] wrapper.shouldInclude returning true")
         return true
     }
 
     override fun getSubset(project: Project): ProjectSubset {
-        val wrappedResult = wrapped?.getSubset(project)
-        logger?.info("[AcceptAll] wrapper returned $wrappedResult but I'll return CHANGED_PROJECTS")
+        logger?.info("[AcceptAll] AcceptAll.getSubset returning CHANGED_PROJECTS")
         return ProjectSubset.CHANGED_PROJECTS
     }
 }
