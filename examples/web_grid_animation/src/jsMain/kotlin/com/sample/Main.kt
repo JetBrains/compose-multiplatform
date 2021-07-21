@@ -18,25 +18,42 @@ fun Card(title: String, subTitle: String, imgUrl: String) {
 
 @Composable
 fun App() {
-    Card("IDEA", "3 out of every 4 Java developers choose IntelliJ IDEA", "/idea.svg")
-    Card("PyCharm", "The Python IDE for Professional Developers", "/pycharm.svg")
-    Card("PHPStorm", "The Lightning-Smart PHP IDE", "/phpstorm.svg")
-    Card("WebStorm", "The smartest JavaScript IDE", "/webstorm.png")
-    Card("RubyMine", "The most intelligent Ruby IDE", "/rubymine.svg")
-    Card("AppCode", "Smart IDE for iOS/macOS development", "/appcode.svg")
-    Card("GoLand", "Built specially for Go developers", "/goland.png")
-    Card("DataGrip", "Many databases, one tool", "/datagrip.png")
-    Card("Datalore", "The online data science notebook", "/datalore.png")
-    Card("Clion", "A cross-platform IDE for C and C++", "/clion.png")
+    Ul {
+        Card("IDEA", "3 out of every 4 Java developers choose IntelliJ IDEA", "/idea.svg")
+        Card("PyCharm", "The Python IDE for Professional Developers", "/pycharm.svg")
+        Card("PHPStorm", "The Lightning-Smart PHP IDE", "/phpstorm.svg")
+        Card("WebStorm", "The smartest JavaScript IDE", "/webstorm.png")
+        Card("RubyMine", "The most intelligent Ruby IDE", "/rubymine.svg")
+        Card("AppCode", "Smart IDE for iOS/macOS development", "/appcode.svg")
+        Card("GoLand", "Built specially for Go developers", "/goland.png")
+        Card("DataGrip", "Many databases, one tool", "/datagrip.png")
+        Card("Datalore", "The online data science notebook", "/datalore.png")
+        Card("Clion", "A cross-platform IDE for C and C++", "/clion.png")
+    }
 }
 
 object AppStyleSheet: StyleSheet() {
+    init {
+        "ul" style {
+            margin(100.px, 0.px)
+            display(DisplayStyle.Grid)
+            gridTemplateColumns("repeat(var(--columns),1fr")
+            backgroundImage("url(\"/background.svg\")")
+            backgroundSize("calc(200%/(var(--columns)))")
+        }
+
+        "li" style {
+            property("grid-column-end", "span 2")
+            position(Position.Relative)
+            paddingBottom(86.66.percent)
+        }
+    }
 }
 
 
 fun main() {
-    //Style(AppStyleSheet)
     renderComposable(rootElementId = "root") {
+        Style(AppStyleSheet)
         App()
     }
 }
