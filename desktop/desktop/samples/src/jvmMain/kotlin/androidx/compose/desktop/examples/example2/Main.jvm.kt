@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:Suppress("DEPRECATION")
 
 package androidx.compose.desktop.examples.example2
 
-import androidx.compose.desktop.Window
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
@@ -25,12 +23,15 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.inset
 import androidx.compose.ui.graphics.drawscope.withTransform
-import androidx.compose.ui.unit.IntSize
-
-private const val title = "Desktop Compose Canvas"
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.WindowState
+import androidx.compose.ui.window.singleWindowApplication
 
 fun main() {
-    Window(title, IntSize(1024, 768)) {
+    singleWindowApplication(
+        title = "Desktop Compose Canvas",
+        state = WindowState(width = 1024.dp, height = 850.dp)
+    ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             drawRect(Color.Magenta)
             inset(10.0f) {

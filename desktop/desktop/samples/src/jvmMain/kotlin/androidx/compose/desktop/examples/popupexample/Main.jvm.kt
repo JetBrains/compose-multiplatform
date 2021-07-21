@@ -13,80 +13,57 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:Suppress("DEPRECATION")
+
 package androidx.compose.desktop.examples.popupexample
 
-import androidx.compose.desktop.AppManager
-import androidx.compose.desktop.AppWindow
-import androidx.compose.desktop.WindowEvents
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.window.v1.Menu
-import androidx.compose.ui.window.v1.MenuBar
-import javax.swing.SwingUtilities
+import androidx.compose.runtime.key
+import androidx.compose.ui.graphics.asPainter
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Tray
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowSize
+import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberTrayState
+import androidx.compose.ui.window.rememberWindowState
 
-fun main() = SwingUtilities.invokeLater {
-    AppManager.apply {
-        setEvents(
-            onAppStart = { println("onAppStart") },
-            onAppExit = { println("onAppExit") },
-            onWindowsEmpty = onCloseAppEvent
-        )
-        setMenu(
-            MenuBar(
-                Menu(
-                    "Shared actions",
-                    MenuItems.Exit
-                )
-            )
-        )
-    }
+fun main() = application {
+    val windowState = rememberWindowState(
+        size = WindowSize(800.dp, 600.dp)
+    )
 
-    AppWindow(
-        title = AppState.wndTitle.value,
-        events = WindowEvents(
-            onOpen = { println("onOpen") },
-            onClose = { println("onClose") },
-            onMinimize = { println("onMinimize") },
-            onMaximize = { println("onMaximize") },
-            onRestore = { println("onRestore") },
-            onFocusGet = { println("onFocusGet") },
-            onFocusLost = { println("onFocusLost") },
-            onResize = { size ->
-                AppState.wndSize.value = size
-            },
-            onRelocate = { location ->
-                AppState.wndPos.value = location
+    val trayState = rememberTrayState()
+
+    if (AppState.isMainWindowOpen) {
+        Tray(
+            state = trayState,
+            icon = AppState.image().asPainter(),
+            menu = {
+                ActionItems(trayState)
             }
-        ),
-        size = IntSize(800, 600),
-        location = IntOffset(200, 200),
-        icon = AppState.image(),
-        menuBar = MenuBar(
-            Menu(
-                "Actions",
-                MenuItems.Notify,
-                MenuItems.Increment,
-                MenuItems.Exit
-            ),
-            Menu(
-                "About",
-                MenuItems.IsFullscreen,
-                MenuItems.About,
-                MenuItems.Update
-            )
         )
-    ).show {
-        CompositionLocalProvider(
-            LocalTest provides 42
+
+        Window(
+            onCloseRequest = AppState::closeMainWindow,
+            title = AppState.wndTitle.value,
+            state = windowState,
+            icon = AppState.image().asPainter(),
         ) {
-            content()
+            MainMenuBar(windowState, trayState)
+
+            CompositionLocalProvider(
+                LocalTest provides 42
+            ) {
+                Content(windowState, trayState)
+            }
         }
     }
-}
 
-val onCloseAppEvent = {
-    println("App exit.")
-    System.exit(0)
+    for (id in AppState.secondaryWindowIds) {
+        key(id) {
+            SecondaryWindow(
+                onCloseRequest = { AppState.closeSecondaryWindow(id) }
+            )
+        }
+    }
 }
