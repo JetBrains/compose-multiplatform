@@ -10,9 +10,6 @@ body{
   font-family: 'Open Sans Condensed', sans-serif;
 }
 
-li:nth-child(2n-1){
-   grid-column-start:2;
-}
 
 @media (min-width:600px){
   :root {

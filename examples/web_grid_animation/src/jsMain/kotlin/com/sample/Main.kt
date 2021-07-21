@@ -48,6 +48,11 @@ object AppStyleSheet: StyleSheet() {
             paddingBottom(86.66.percent)
         }
 
+
+        "li:nth-child(2n-1)" style {
+            property("grid-column-start", 2)
+        }
+
         "div" style {
             position(Position.Absolute)
             width(50.percent)
@@ -140,7 +145,6 @@ object AppStyleSheet: StyleSheet() {
                 property("grid-column-start", "2")
 
             }
-
         }
     }
 }
