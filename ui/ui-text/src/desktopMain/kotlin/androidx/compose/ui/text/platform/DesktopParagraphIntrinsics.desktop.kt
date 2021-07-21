@@ -17,7 +17,7 @@ package androidx.compose.ui.text.platform
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.graphics.isSpecified
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.text.AnnotatedString.Range
 import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.Placeholder
@@ -84,10 +84,11 @@ internal class DesktopParagraphIntrinsics(
         shadow: Shadow? = builder.textStyle.shadow,
         textDecoration: TextDecoration? = builder.textStyle.textDecoration,
     ): Paragraph {
+        val actualColor = color.takeOrElse { builder.textStyle.color }
         if (
             builder.maxLines != maxLines ||
             builder.ellipsis != ellipsis ||
-            (builder.textStyle.color != color && color.isSpecified) ||
+            builder.textStyle.color != actualColor ||
             builder.textStyle.shadow != shadow ||
             builder.textStyle.textDecoration != textDecoration
         ) {
@@ -95,7 +96,7 @@ internal class DesktopParagraphIntrinsics(
             builder.maxLines = maxLines
             builder.ellipsis = ellipsis
             builder.textStyle = builder.textStyle.copy(
-                color = color,
+                color = actualColor,
                 shadow = shadow,
                 textDecoration = textDecoration
             )
