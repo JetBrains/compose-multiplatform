@@ -32,11 +32,11 @@ packaging JDK 15 or later must be used.
 
 ### Update the wizard plugin
 
-The Сompose plugin version used in the wizard above may be not the last. Update the version of the plugin to the latest available by editing the `build.gradle.kts` file, finding and updating the version information as shown below. In this example the latest version of the plugin was 0.5.0-build235 and a compatible version of kotlin was 1.5.10. For the latest versions, see the [latest versions](https://github.com/JetBrains/compose-jb/releases) site and the [Kotlin](https://kotlinlang.org/) site.
+The Сompose plugin version used in the wizard above may be not the last. Update the version of the plugin to the latest available by editing the `build.gradle.kts` file, finding and updating the version information as shown below. In this example the latest version of the plugin was 0.5.0-build262 and a compatible version of kotlin was 1.5.21. For the latest versions, see the [latest versions](https://github.com/JetBrains/compose-jb/releases) site and the [Kotlin](https://kotlinlang.org/) site.
 ```
 plugins {
-    kotlin("jvm") version "1.5.10"
-    id("org.jetbrains.compose") version "0.5.0-build235"
+    kotlin("jvm") version "1.5.21"
+    id("org.jetbrains.compose") version "0.5.0-build262"
 }
 ```
 
@@ -71,8 +71,8 @@ Then create `build.gradle.kts` with the following content:
 import org.jetbrains.compose.compose
 
 plugins {
-    kotlin("jvm") version "1.5.10"
-    id("org.jetbrains.compose") version "0.5.0-build235"
+    kotlin("jvm") version "1.5.21"
+    id("org.jetbrains.compose") version "0.5.0-build262"
 }
 
 repositories {
