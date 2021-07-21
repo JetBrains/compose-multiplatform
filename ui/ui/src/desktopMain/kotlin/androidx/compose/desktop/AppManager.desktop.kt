@@ -13,10 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("DEPRECATION")
 package androidx.compose.desktop
 
 import androidx.compose.ui.window.v1.MenuBar
 
+@Deprecated(
+    "Use new Composable Window API (https://github.com/JetBrains/compose-jb/" +
+        "tree/master/tutorials/Window_API_new)"
+)
 object AppManager {
 
     init {

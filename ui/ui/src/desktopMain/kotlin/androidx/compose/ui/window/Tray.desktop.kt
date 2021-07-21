@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.window
 
-import androidx.compose.desktop.AppManager
-import androidx.compose.desktop.AppWindow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
@@ -26,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.asAwtImage
 import kotlinx.coroutines.channels.Channel
@@ -53,8 +50,6 @@ val isTraySupported: Boolean get() = SystemTray.isSupported()
  * See [isTraySupported] to know if tray icon is supported
  * (for example to show/hide an option in the application settings)
  *
- * This API is experimental and will eventually replace [AppWindow] / [AppManager].
- *
  * @param icon Icon of the tray
  * @param state State to control tray and show notifications
  * @param hint Hint/tooltip that will be shown to the user
@@ -65,7 +60,6 @@ val isTraySupported: Boolean get() = SystemTray.isSupported()
  * right click on macOs)
  */
 @Suppress("unused")
-@ExperimentalComposeUiApi
 @Composable
 fun ApplicationScope.Tray(
     icon: Painter,

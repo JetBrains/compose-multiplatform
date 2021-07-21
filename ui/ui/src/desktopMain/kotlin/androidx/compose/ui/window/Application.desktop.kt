@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.window
 
-import androidx.compose.desktop.AppManager
-import androidx.compose.desktop.AppWindow
 import androidx.compose.desktop.ComposePanel
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
@@ -31,7 +29,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.configureSwingGlobalsForCompose
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.platform.GlobalSnapshotManager
 import androidx.compose.ui.platform.LocalDensity
 import kotlinx.coroutines.CoroutineScope
@@ -43,9 +40,6 @@ import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
 import java.awt.Window
-
-// TODO(demin): remove ExperimentalComposeUiApi once we implement Dialog/Menu/Tray/Notifier, deprecate
-//  AppWindow/AppWindowManager
 
 /**
  * An entry point for the Compose application. See [awaitApplication] for more information.
@@ -70,11 +64,8 @@ import java.awt.Window
  * }
  * ```
  *
- * This API is experimental and will eventually will replace [AppWindow] / [AppManager].
- *
  * @see [awaitApplication]
  */
-@ExperimentalComposeUiApi
 fun application(
     content: @Composable ApplicationScope.() -> Unit
 ) {
@@ -105,11 +96,8 @@ fun application(
  * (because global coroutines are daemon threads, daemon threads don't keep process alive:
  * https://kotlinlang.org/docs/coroutines-basics.html#global-coroutines-are-like-daemon-threads)
  *
- * This API is experimental and will eventually replace [AppWindow] / [AppManager].
- *
  * @see [awaitApplication]
  */
-@ExperimentalComposeUiApi
 fun CoroutineScope.launchApplication(
     content: @Composable ApplicationScope.() -> Unit
 ): Job {
@@ -157,8 +145,6 @@ fun CoroutineScope.launchApplication(
  *
  * All animation's should be created inside Composable content of the
  * [Window] / [Dialog] / [ComposePanel].
- *
- * This API is experimental and will eventually replace [AppWindow] / [AppManager].
  */
 suspend fun awaitApplication(
     content: @Composable ApplicationScope.() -> Unit

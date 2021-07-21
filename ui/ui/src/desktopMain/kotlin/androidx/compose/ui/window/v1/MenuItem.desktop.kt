@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.ui.window.v1
 
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -26,6 +28,11 @@ import javax.swing.KeyStroke
  * Can be used with Menu or Tray.
  */
 @OptIn(ExperimentalComposeUiApi::class)
+@Deprecated(
+    "Use new Composable Window API (https://github.com/JetBrains/compose-jb/" +
+        "tree/master/tutorials/Tray_Notifications_MenuBar_new)"
+)
+@Suppress("DEPRECATION")
 class MenuItem {
 
     /**
@@ -69,6 +76,10 @@ class MenuItem {
  *
  * @return KeyStroke for the given key.
  */
+@Deprecated(
+    "Use new Composable Window API (https://github.com/JetBrains/compose-jb/" +
+        "tree/master/tutorials/Tray_Notifications_MenuBar_new)"
+)
 fun KeyStroke(key: Key): KeyStroke {
     return KeyStroke.getKeyStroke(
         key.nativeKeyCode,

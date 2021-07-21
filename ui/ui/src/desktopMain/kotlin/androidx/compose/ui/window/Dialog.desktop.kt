@@ -22,7 +22,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.unit.dp
@@ -89,10 +88,7 @@ import javax.swing.JDialog
  * keyboard. While implementing this callback, return true to stop propagation of this event.
  * If you return false, the key event will be sent to this [onKeyEvent]'s parent.
  * @param content content of the dialog
- *
- * This API is experimental and will eventually replace [androidx.compose.ui.window.v1.Dialog]
  */
-@ExperimentalComposeUiApi
 @Composable
 fun OwnerWindowScope.Dialog(
     onCloseRequest: () -> Unit,
@@ -184,8 +180,6 @@ fun OwnerWindowScope.Dialog(
  * Dialog is needed for creating dialog's that still can't be created with
  * the default Compose function [androidx.compose.ui.window.Dialog]
  *
- * This API is experimental and will eventually replace [androidx.compose.ui.window.v1.Dialog].
- *
  * @param visible Is [ComposeDialog] visible to user.
  * If `false`:
  * - internal state of [ComposeDialog] is preserved and will be restored next time the dialog
@@ -207,7 +201,6 @@ fun OwnerWindowScope.Dialog(
  * @param content Composable content of the creating dialog.
  */
 @Suppress("unused")
-@ExperimentalComposeUiApi
 @Composable
 fun OwnerWindowScope.Dialog(
     visible: Boolean = true,

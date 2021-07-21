@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+@file:Suppress("DEPRECATION")
 package androidx.compose.material
 
 import androidx.compose.foundation.layout.Box
@@ -56,6 +56,17 @@ import androidx.compose.ui.window.v1.DialogProperties
  * @param contentColor The preferred content color provided by this dialog to its children.
  * @param properties Typically platform specific properties to further configure the dialog.
  */
+@Deprecated(
+    "Use new Composable Window API (https://github.com/JetBrains/compose-jb/" +
+        "tree/master/tutorials/Window_API_new) and your own implementation of AlertDialog " +
+        "" +
+        "(https://cs.android.com/androidx/platform/frameworks/support/+/" +
+        "androidx-main:compose/material/material/src/commonMain/kotlin/" +
+        "androidx/compose/material/AlertDialog.kt;l=44;" +
+        "drc=a153977dfc2a43aadb38a1e5a1a151336f8c2360), as the look and feel of the current " +
+        "implementation doesn't fit well to the desktop platform. We will experiment with " +
+        "different approaches, and when we will be ready, we will provide our own implementation"
+)
 @Composable
 fun AlertDialog(
     onDismissRequest: () -> Unit,
@@ -114,6 +125,17 @@ fun AlertDialog(
  * @param contentColor The preferred content color provided by this dialog to its children.
  * @param properties Typically platform specific properties to further configure the dialog.
  */
+@Deprecated(
+    "Use new Composable Window API (https://github.com/JetBrains/compose-jb/" +
+        "tree/master/tutorials/Window_API_new) and your own implementation of AlertDialog " +
+        "" +
+        "(https://cs.android.com/androidx/platform/frameworks/support/+/" +
+        "androidx-main:compose/material/material/src/commonMain/kotlin/" +
+        "androidx/compose/material/AlertDialog.kt;l=44;" +
+        "drc=a153977dfc2a43aadb38a1e5a1a151336f8c2360), as the look and feel of the current " +
+        "implementation doesn't fit well to the desktop platform. We will experiment with " +
+        "different approaches, and when we will be ready, we will provide our own implementation"
+)
 @Composable
 fun AlertDialog(
     onDismissRequest: () -> Unit,

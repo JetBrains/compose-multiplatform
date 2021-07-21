@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.ui.window.v1
 
 import org.jetbrains.skiko.Library
@@ -27,6 +29,10 @@ import javax.swing.JMenuItem
  * The menu bar can be displayed inside a window (Windows, Linux) or at the top of
  * the screen (Mac OS).
  */
+@Deprecated(
+    "Use new Composable Window API (https://github.com/JetBrains/compose-jb/" +
+        "tree/master/tutorials/Tray_Notifications_MenuBar_new)"
+)
 class MenuBar {
     internal var menuBar: JMenuBar
 
@@ -74,6 +80,10 @@ class MenuBar {
 /**
  * Menu is a class that represents a menu on a menu bar.
  */
+@Deprecated(
+    "Use new Composable Window API (https://github.com/JetBrains/compose-jb/" +
+        "tree/master/tutorials/Tray_Notifications_MenuBar_new)"
+)
 class Menu {
     /**
      * Gets the menu name.
