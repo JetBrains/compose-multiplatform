@@ -435,6 +435,9 @@ package androidx.compose.material {
     method @androidx.compose.runtime.Composable public static void MaterialTheme(optional androidx.compose.material.Colors colors, optional androidx.compose.material.Typography typography, optional androidx.compose.material.Shapes shapes, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
+  public final class MaterialTheme_androidKt {
+  }
+
   public final class MenuDefaults {
     method public androidx.compose.foundation.layout.PaddingValues getDropdownMenuItemContentPadding();
     property public final androidx.compose.foundation.layout.PaddingValues DropdownMenuItemContentPadding;

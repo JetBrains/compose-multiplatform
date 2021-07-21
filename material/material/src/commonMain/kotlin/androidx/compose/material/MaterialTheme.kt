@@ -78,9 +78,14 @@ fun MaterialTheme(
         LocalTextSelectionColors provides selectionColors,
         LocalTypography provides typography
     ) {
-        ProvideTextStyle(value = typography.body1, content = content)
+        ProvideTextStyle(value = typography.body1) {
+            PlatformMaterialTheme(content)
+        }
     }
 }
+
+@Composable
+internal expect fun PlatformMaterialTheme(content: @Composable () -> Unit)
 
 /**
  * Contains functions to access the current theme values provided at the call site's position in
