@@ -14,21 +14,6 @@ li:nth-child(2n-1){
   grid-column-start:2;
 }
 
-li:before{
-  content: "";
-  position: absolute;
-  right: 0;
-  width: 50%;
-  height: 100%;
-  background-position: 90% 27%;
-  opacity: 0.6;
-  transform: skewy(30deg);
-  background-size: 40%;
-  background-repeat: no-repeat;
-}
-
-
-
 li > img:hover{
   bottom: 0;
   filter: drop-shadow(0 80px 30px rgba(0, 0, 0, 0.20));
