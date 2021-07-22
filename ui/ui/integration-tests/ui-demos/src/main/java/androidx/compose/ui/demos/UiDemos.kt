@@ -51,6 +51,7 @@ import androidx.compose.ui.demos.gestures.ScrollGestureFilterDemo
 import androidx.compose.ui.demos.gestures.VerticalScrollerInDrawerDemo
 import androidx.compose.ui.demos.scroll.BringIntoViewDemo
 import androidx.compose.ui.demos.keyinput.KeyInputDemo
+import androidx.compose.ui.demos.scroll.BringRectangleIntoViewDemo
 import androidx.compose.ui.demos.scroll.RequestRectangleOnScreenDemo
 import androidx.compose.ui.demos.viewinterop.AndroidInComposeDemos
 import androidx.compose.ui.demos.viewinterop.ComplexTouchInterop
@@ -138,6 +139,7 @@ private val RelocationDemos = DemoCategory(
     "Relocation",
     listOf(
         ComposableDemo("Bring Into View") { BringIntoViewDemo() },
+        ComposableDemo("Bring Rectangle Into View") { BringRectangleIntoViewDemo() },
         ComposableDemo("Request Rectangle On Screen") { RequestRectangleOnScreenDemo() }
     )
 )

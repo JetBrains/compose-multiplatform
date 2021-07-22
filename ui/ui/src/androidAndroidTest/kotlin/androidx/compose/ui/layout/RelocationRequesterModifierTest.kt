@@ -18,6 +18,7 @@ package androidx.compose.ui.layout
 
 import android.os.Build.VERSION_CODES.O
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
@@ -38,15 +39,20 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.GOLDEN_UI
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.graphics.Color.Companion.Red
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.TestMonotonicFrameClock
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.test.filters.MediumTest
@@ -731,6 +737,62 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
 
         // Assert.
         assertScreenshot(if (horizontal) "blueBoxLeft" else "blueBoxTop")
+    }
+
+    @Test
+    fun specifiedPartOfComponentBroughtOnScreen() {
+        // Arrange.
+        val relocationRequester = RelocationRequester()
+        lateinit var density: Density
+        rule.setContent {
+            density = LocalDensity.current
+            Box(
+                Modifier
+                    .testTag(parentBox)
+                    .size(50.dp)
+                    .background(LightGray)
+                    .then(
+                        when (orientation) {
+                            Horizontal ->
+                                Modifier.horizontalScrollWithRelocation(rememberScrollState())
+                            Vertical ->
+                                Modifier.verticalScrollWithRelocation(rememberScrollState())
+                        }
+                    )
+            ) {
+                Canvas(
+                    when (orientation) {
+                        Horizontal -> Modifier.size(150.dp, 50.dp)
+                        Vertical -> Modifier.size(50.dp, 150.dp)
+                    }.relocationRequester(relocationRequester)
+                ) {
+                    with(density) {
+                        drawRect(
+                            color = Blue,
+                            topLeft = when (orientation) {
+                                Horizontal -> Offset(50.dp.toPx(), 0.dp.toPx())
+                                Vertical -> Offset(0.dp.toPx(), 50.dp.toPx())
+                            },
+                            size = Size(50.dp.toPx(), 50.dp.toPx())
+                        )
+                    }
+                }
+            }
+        }
+
+        // Act.
+        runBlockingAndAwaitIdle {
+            val rect = with(density) {
+                when (orientation) {
+                    Horizontal -> Rect(50.dp.toPx(), 0.dp.toPx(), 100.dp.toPx(), 50.dp.toPx())
+                    Vertical -> Rect(0.dp.toPx(), 50.dp.toPx(), 50.dp.toPx(), 100.dp.toPx())
+                }
+            }
+            relocationRequester.bringIntoView(rect)
+        }
+
+        // Assert.
+        assertScreenshot("blueBox")
     }
 
     private val horizontal: Boolean get() = (orientation == Horizontal)
