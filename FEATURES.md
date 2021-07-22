@@ -1,7 +1,7 @@
  ## Features
 
 Features currently available in Compose for Desktop
-   * [Scrollbars support](tutorials/Scrollbars/README.md)
+   * [Desktop Components](tutorials/Desktop_Components/README.md)
    * [Image loading support](tutorials/Image_And_Icons_Manipulations/README.md)
    * [Keyboard handling](tutorials/Keyboard/README.md)
    * [Mouse clicks and move](tutorials/Mouse_Events/README.md)
