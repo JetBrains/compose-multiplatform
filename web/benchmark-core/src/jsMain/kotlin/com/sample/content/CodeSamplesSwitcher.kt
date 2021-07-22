@@ -7,7 +7,7 @@ import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.dom.*
 import com.sample.style.AppStylesheet
 
-private object SwitcherVariables : CSSVariables {
+private object SwitcherVariables {
     val labelWidth by variable<CSSpxValue>()
     val labelPadding by variable<CSSpxValue>()
 }

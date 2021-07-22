@@ -13,7 +13,7 @@ import org.w3c.dom.get
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-object AppCSSVariables : CSSVariables {
+object AppCSSVariables {
     val width by variable<CSSUnitValue>()
     val height by variable<CSSUnitValue>()
 

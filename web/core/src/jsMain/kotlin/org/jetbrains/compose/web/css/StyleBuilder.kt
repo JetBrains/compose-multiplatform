@@ -52,8 +52,6 @@ fun StyleBuilder.add(
     value: StylePropertyValue
 ) = property(propertyName, value)
 
-interface CSSVariables
-
 interface CSSVariable {
     val name: String
 }
@@ -79,7 +77,7 @@ fun <TValue> CSSStyleVariable<TValue>.value(fallback: TValue? = null)
         )
     )
 
-fun <TValue: StylePropertyValue> CSSVariables.variable() =
+fun <TValue: StylePropertyValue> variable() =
     ReadOnlyProperty<Any?, CSSStyleVariable<TValue>> { _, property ->
         CSSStyleVariable(property.name)
     }

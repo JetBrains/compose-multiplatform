@@ -491,7 +491,7 @@ class CSSUnitApiTests {
 
     @Test
     fun calcVaraiables() {
-        val variables = object : CSSVariables {
+        val variables = object {
             val pxVar by variable<CSSSizeValue<CSSUnit.px>>()
         }
         val typedResultLength: CSSNumericValue<CSSUnitLength> = 4.pt + variables.pxVar.value()
