@@ -184,13 +184,13 @@ class PreviewAnimationClockTest {
             setUpOffsetScenario()
         }
         composeRule.waitForIdle()
-        val animationWithLabel = testClock.trackedTransitions.keys.single {
+        val animationWithLabel = testClock.trackedTransitions.single {
             it.states.contains(someState)
         }
         // Label explicitly set
         assertEquals("My animation label", animationWithLabel.label)
 
-        val animationWithoutLabel = testClock.trackedTransitions.keys.single {
+        val animationWithoutLabel = testClock.trackedTransitions.single {
             it.states.contains(Offset.O1)
         }
         // Label is not explicitly set, but inferred from the state type
@@ -228,7 +228,7 @@ class PreviewAnimationClockTest {
         }
 
         testClock.trackTransition(transition as Transition<Any>)
-        val animation = testClock.trackedTransitions.keys.single {
+        val animation = testClock.trackedTransitions.single {
             it.states.contains(RotationColor.RC1)
         }
         testClock.updateFromAndToStates(animation, RotationColor.RC1, RotationColor.RC3)
@@ -253,7 +253,7 @@ class PreviewAnimationClockTest {
         }
 
         testClock.trackTransition(transition as Transition<Any>)
-        val animation = testClock.trackedTransitions.keys.single { it.states.contains(Offset.O1) }
+        val animation = testClock.trackedTransitions.single { it.states.contains(Offset.O1) }
         testClock.updateFromAndToStates(animation, Offset.O1, Offset.O2)
         return animation
     }

@@ -45,12 +45,12 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
     private val DEBUG = false
 
     /**
-     * Maps [ComposeAnimation]s representing [Transition]s to their corresponding [Transition]
-     * objects. These objects are used when setting the clock time, where we call `seek`, and in
-     * [getAnimatedProperties], where we get the animation values.
+     * Set of tracked [TransitionComposeAnimation]s, each one having a [Transition] object that
+     * is used [setClockTime], where we call [Transition.seek], and in [getAnimatedProperties],
+     * where we get the animation values.
      */
     @VisibleForTesting
-    internal val trackedTransitions = hashMapOf<ComposeAnimation, Transition<Any>>()
+    internal val trackedTransitions = hashSetOf<TransitionComposeAnimation>()
 
     /**
      * Maps [Transition]s to their corresponding cached [TransitionState], which we use to seek
@@ -77,7 +77,7 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
         }
 
         val composeAnimation = transition.parse()
-        trackedTransitions[composeAnimation] = transition
+        trackedTransitions.add(composeAnimation)
         notifySubscribe(composeAnimation)
     }
 
@@ -101,13 +101,13 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
     fun updateFromAndToStates(composeAnimation: ComposeAnimation, fromState: Any, toState: Any) {
         if (composeAnimation.type != ComposeAnimationType.TRANSITION_ANIMATION) return
 
-        trackedTransitions.entries.firstOrNull { it.key == composeAnimation }
-            ?.let { transitionEntry ->
-                val transition = transitionEntry.value
-                synchronized(transitionStatesLock) {
-                    transitionStates[transition] = TransitionState(fromState, toState)
-                }
+        if (trackedTransitions.contains(composeAnimation)) {
+            val transitionComposeAnimation = composeAnimation as TransitionComposeAnimation
+            synchronized(transitionStatesLock) {
+                transitionStates[transitionComposeAnimation.animationObject] =
+                    TransitionState(fromState, toState)
             }
+        }
     }
 
     /**
@@ -115,11 +115,8 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
      */
     fun getMaxDuration(): Long {
         // TODO(b/160126628): support other animation types, e.g. AnimatedValue
-        return trackedTransitions.map { entry ->
-            val composeAnimation = entry.key
-            if (composeAnimation.type == ComposeAnimationType.TRANSITION_ANIMATION)
-                nanosToMillis(entry.value.totalDurationNanos)
-            else -1
+        return trackedTransitions.map { composeAnimation ->
+            nanosToMillis(composeAnimation.animationObject.totalDurationNanos)
         }.maxOrNull() ?: -1
     }
 
@@ -132,11 +129,8 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
      */
     fun getMaxDurationPerIteration(): Long {
         // TODO(b/160126628): support other animation types, e.g. AnimatedValue
-        return trackedTransitions.map { entry ->
-            val composeAnimation = entry.key
-            if (composeAnimation.type == ComposeAnimationType.TRANSITION_ANIMATION)
-                nanosToMillis(entry.value.totalDurationNanos)
-            else -1
+        return trackedTransitions.map { composeAnimation ->
+            nanosToMillis(composeAnimation.animationObject.totalDurationNanos)
         }.maxOrNull() ?: -1
     }
 
@@ -146,10 +140,10 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
      */
     fun getAnimatedProperties(animation: ComposeAnimation): List<ComposeAnimatedProperty> {
         if (animation.type != ComposeAnimationType.TRANSITION_ANIMATION) return emptyList()
-        trackedTransitions[animation]?.let { transition ->
+        if (trackedTransitions.contains(animation)) {
+            val transition = (animation as TransitionComposeAnimation).animationObject
             return transition.animations.mapNotNull {
-                val value = it.value ?: return@mapNotNull null
-                ComposeAnimatedProperty(it.label, value)
+                ComposeAnimatedProperty(it.label, it.value ?: return@mapNotNull null)
             }
         }
         return emptyList()
@@ -161,13 +155,10 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
      */
     fun setClockTime(animationTimeMs: Long) {
         val timeNs = TimeUnit.MILLISECONDS.toNanos(animationTimeMs)
-        trackedTransitions.forEach { entry ->
-            val composeAnimation = entry.key
-            if (composeAnimation.type == ComposeAnimationType.TRANSITION_ANIMATION) {
-                entry.value.let {
-                    val states = transitionStates[it] ?: return@let
-                    it.seek(states.current, states.target, timeNs)
-                }
+        trackedTransitions.forEach { composeAnimation ->
+            composeAnimation.animationObject.let {
+                val states = transitionStates[it] ?: return@let
+                it.seek(states.current, states.target, timeNs)
             }
         }
         setAnimationsTimeCallback.invoke()
@@ -177,7 +168,7 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
      * Unsubscribes the currently tracked animations and clears all the caches.
      */
     fun dispose() {
-        trackedTransitions.forEach { notifyUnsubscribe(it.key) }
+        trackedTransitions.forEach { notifyUnsubscribe(it) }
         trackedTransitions.clear()
         transitionStates.clear()
     }

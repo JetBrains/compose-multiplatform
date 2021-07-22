@@ -166,7 +166,7 @@ class ComposeViewAdapterTest {
         }
 
         activityTestRule.runOnUiThread {
-            val animation = clock.trackedTransitions.keys.single()
+            val animation = clock.trackedTransitions.single()
             assertEquals("checkBoxAnim", animation.label)
         }
     }
