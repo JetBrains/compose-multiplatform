@@ -1217,7 +1217,10 @@ class SlotTableTests {
             writer.startGroup()
             writer.startGroup()
             writer.beginInsert()
-            writer.moveFrom(sourceTable, anchors.first().toIndexFor(sourceTable))
+            writer.moveFrom(
+                sourceTable,
+                anchors.first().toIndexFor(sourceTable)
+            )
             writer.endInsert()
             writer.skipToGroupEnd()
             writer.endGroup()
@@ -1261,7 +1264,10 @@ class SlotTableTests {
             writer.startGroup()
             writer.startGroup()
             writer.beginInsert()
-            writer.moveFrom(sourceTable, anchors.first().toIndexFor(sourceTable))
+            writer.moveFrom(
+                sourceTable,
+                anchors.first().toIndexFor(sourceTable)
+            )
             writer.endInsert()
             writer.skipToGroupEnd()
             writer.endGroup()
@@ -1310,7 +1316,10 @@ class SlotTableTests {
             writer.startGroup()
             writer.startGroup()
             writer.beginInsert()
-            writer.moveFrom(sourceTable, anchors.first().toIndexFor(sourceTable))
+            writer.moveFrom(
+                sourceTable,
+                anchors.first().toIndexFor(sourceTable)
+            )
             writer.endInsert()
             writer.skipToGroupEnd()
             writer.endGroup()
@@ -1358,7 +1367,10 @@ class SlotTableTests {
 
                     writer.skipToGroupEnd()
                     writer.beginInsert()
-                    movedAnchors += writer.moveFrom(sourceTable, anchor.toIndexFor(sourceTable))
+                    movedAnchors += writer.moveFrom(
+                        sourceTable,
+                        anchor.toIndexFor(sourceTable)
+                    )
                     sourceTable.verifyWellFormed()
                     writer.verifyDataAnchors()
                     writer.endInsert()
@@ -2629,7 +2641,10 @@ class SlotTableTests {
                     started = true
                 }
                 writer.beginInsert()
-                writer.moveFrom(sourceTable, sourceAnchor.toIndexFor(sourceTable))
+                writer.moveFrom(
+                    sourceTable,
+                    sourceAnchor.toIndexFor(sourceTable)
+                )
                 writer.endInsert()
             }
             writer.skipToGroupEnd()
@@ -3234,6 +3249,702 @@ class SlotTableTests {
         val table = SlotTable()
         table.write {
             table.write { }
+        }
+    }
+
+    @Test
+    fun prioritySet_Ordering() {
+        val set = PrioritySet()
+
+        repeat(100) {
+            Random.nextInt().let {
+                if (it < Int.MAX_VALUE)
+                    set.add(it)
+                set.validateHeap()
+            }
+        }
+        var lastValue = Int.MAX_VALUE
+        while (set.isNotEmpty()) {
+            val m = set.takeMax()
+            assertTrue(lastValue > m)
+            lastValue = m
+        }
+    }
+
+    @Test
+    fun prioritySet_Completeness() {
+        val set = PrioritySet()
+        val values = Array(100) { it }.also { it.shuffle() }
+        values.forEach {
+            set.add(it)
+            set.validateHeap()
+        }
+
+        repeat(100) {
+            val expected = 99 - it
+            assertFalse(set.isEmpty())
+            assertEquals(expected, set.takeMax())
+            set.validateHeap()
+        }
+        assertTrue(set.isEmpty())
+    }
+
+    @Test
+    fun prioritySet_Deduplicate() {
+        val set = PrioritySet()
+        val values = Array(100) { it / 4 }.also { it.shuffle() }
+        values.forEach {
+            set.add(it)
+            set.validateHeap()
+        }
+
+        repeat(25) {
+            val expected = 24 - it
+            assertFalse(set.isEmpty())
+            assertEquals(expected, set.takeMax())
+            set.validateHeap()
+        }
+
+        assertTrue(set.isEmpty())
+    }
+
+    @Test
+    fun canMarkAGroup() {
+        val table = SlotTable()
+        table.write { writer ->
+            writer.insert {
+                writer.group(0) {
+                    writer.group(1) {
+                        writer.group(2) {
+                            writer.markGroup()
+                        }
+                        writer.group(3) {
+                            writer.group(4) { }
+                        }
+                    }
+                    writer.group(5) {
+                        writer.markGroup()
+                        writer.group(6) {
+                            writer.markGroup()
+                        }
+                    }
+                }
+            }
+        }
+        table.verifyWellFormed()
+        table.read { reader ->
+            fun assertMark() = assertTrue(reader.hasMark(reader.parent))
+            fun assertNoMark() = assertFalse(reader.hasMark(reader.parent))
+            fun assertContainsMark() = assertTrue(reader.containsMark(reader.parent))
+            fun assertDoesNotContainMarks() = assertFalse(reader.containsMark(reader.parent))
+
+            reader.group(0) {
+                assertNoMark()
+                assertContainsMark()
+                reader.group(1) {
+                    assertNoMark()
+                    assertContainsMark()
+                    reader.group(2) {
+                        assertMark()
+                        assertDoesNotContainMarks()
+                    }
+                    reader.group(3) {
+                        assertNoMark()
+                        assertDoesNotContainMarks()
+                        reader.group(4) {
+                            assertNoMark()
+                            assertDoesNotContainMarks()
+                        }
+                    }
+                }
+                reader.group(5) {
+                    assertMark()
+                    assertContainsMark()
+                    reader.group(6) {
+                        assertMark()
+                        assertDoesNotContainMarks()
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun canRemoveAMarkedGroups() {
+        val slots = SlotTable()
+        slots.write { writer ->
+            writer.insert {
+                writer.group(0) {
+                    repeat(10) { key ->
+                        writer.group(key) {
+                            if (key % 2 == 0) writer.markGroup()
+                        }
+                    }
+                }
+            }
+        }
+        slots.verifyWellFormed()
+        slots.read { reader ->
+            assertTrue(reader.containsMark(0))
+        }
+
+        slots.write { writer ->
+            writer.group(0) {
+                repeat(10) { key ->
+                    if (key % 2 == 0)
+                        writer.removeGroup()
+                    else
+                        writer.skipGroup()
+                }
+            }
+        }
+        slots.verifyWellFormed()
+
+        slots.read { reader ->
+            assertFalse(reader.containsMark(0))
+        }
+    }
+
+    @Test
+    fun canInsertAMarkedGroup() {
+        val slots = SlotTable()
+        slots.write { writer ->
+            writer.insert {
+                writer.group(0) {
+                    writer.group(1) { }
+                }
+            }
+        }
+        slots.verifyWellFormed()
+
+        slots.write { writer ->
+            writer.group(0) {
+                writer.group(1) {
+                    writer.insert {
+                        writer.group(2) {
+                            writer.markGroup()
+                        }
+                    }
+                }
+            }
+        }
+        slots.verifyWellFormed()
+
+        slots.read { reader ->
+            fun assertMark() = assertTrue(reader.hasMark(reader.parent))
+            fun assertNoMark() = assertFalse(reader.hasMark(reader.parent))
+            fun assertContainsMark() = assertTrue(reader.containsMark(reader.parent))
+            fun assertDoesNotContainMarks() = assertFalse(reader.containsMark(reader.parent))
+
+            reader.group(0) {
+                assertNoMark()
+                assertContainsMark()
+                reader.group(1) {
+                    assertNoMark()
+                    assertContainsMark()
+                    reader.group(2) {
+                        assertMark()
+                        assertDoesNotContainMarks()
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun canInsertAMarkedTableGroup() {
+        val slots = SlotTable()
+        slots.write { writer ->
+            writer.insert {
+                writer.group(0) { }
+            }
+        }
+        slots.verifyWellFormed()
+
+        val insertTable = SlotTable()
+        insertTable.write { writer ->
+            writer.insert {
+                writer.group(1) {
+                    writer.group(2) {
+                        writer.markGroup()
+                    }
+                }
+            }
+        }
+        insertTable.verifyWellFormed()
+
+        slots.write { writer ->
+            writer.group(0) {
+                writer.insert {
+                    writer.moveFrom(insertTable, 0)
+                }
+            }
+        }
+        slots.verifyWellFormed()
+        slots.read { reader ->
+            assertTrue(reader.containsMark(0))
+        }
+    }
+
+    @Test
+    fun canMoveTo() {
+        val slots = SlotTable()
+        var anchor = Anchor(-1)
+
+        // Create a slot table
+        slots.write { writer ->
+            writer.insert {
+                writer.group(100) {
+                    writer.group(200) {
+                        repeat(5) {
+                            writer.group(1000 + it) {
+                                writer.group(2000 + it) {
+                                    if (it == 3) {
+                                        anchor = writer.anchor(writer.parent)
+                                        writer.markGroup(writer.parent)
+                                    }
+                                    repeat(it) { node ->
+                                        writer.nodeGroup(2000 + node, node)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        assertTrue(slots.ownsAnchor(anchor))
+
+        // Move the anchored group into another table
+        val movedNodes = SlotTable()
+        movedNodes.write { movedNodesWriter ->
+            movedNodesWriter.insert {
+                slots.write { writer ->
+                    writer.group {
+                        writer.group {
+                            repeat(5) {
+                                if (it == 3) {
+                                    writer.moveTo(anchor, 0, movedNodesWriter)
+                                }
+                                writer.skipGroup()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Validate the slot table
+        assertFalse(slots.ownsAnchor(anchor))
+        assertTrue(movedNodes.ownsAnchor(anchor))
+        slots.verifyWellFormed()
+        movedNodes.verifyWellFormed()
+
+        slots.read { reader ->
+            reader.expectGroup(100) {
+                reader.expectGroup(200) {
+                    repeat(5) {
+                        reader.expectGroup(1000 + it) {
+                            if (it != 3) {
+                                reader.expectGroup(2000 + it) {
+                                    repeat(it) { node ->
+                                        reader.expectNode(2000 + node, node)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        movedNodes.read { reader ->
+            reader.expectGroup(2003) {
+                repeat(3) { node ->
+                    reader.expectNode(2000 + node, node)
+                }
+            }
+        }
+
+        // Insert the nodes back
+        slots.write { writer ->
+            writer.group {
+                writer.group {
+                    repeat(5) {
+                        if (it == 3) {
+                            writer.group {
+                                writer.insert {
+                                    writer.moveFrom(movedNodes, 0)
+                                }
+                            }
+                        } else writer.skipGroup()
+                    }
+                }
+            }
+        }
+
+        // Validate the move back
+        assertTrue(slots.ownsAnchor(anchor))
+        assertFalse(movedNodes.ownsAnchor(anchor))
+        slots.verifyWellFormed()
+        movedNodes.verifyWellFormed()
+
+        assertEquals(0, movedNodes.groupsSize)
+
+        slots.read { reader ->
+            reader.expectGroup(100) {
+                reader.expectGroup(200) {
+                    repeat(5) {
+                        reader.expectGroup(1000 + it) {
+                            reader.expectGroup(2000 + it) {
+                                repeat(it) { node ->
+                                    reader.expectNode(2000 + node, node)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun canDeleteAGroupAfterMovingPartOfItsContent() {
+        val slots = SlotTable()
+        var deleteAnchor = Anchor(-1)
+        var moveAnchor = Anchor(-1)
+
+        // Create a slot table
+        slots.write { writer ->
+            writer.insert {
+                writer.group(100) {
+                    writer.group(200) {
+                        writer.group(300) {
+                            writer.group(400) {
+                                writer.group(500) {
+                                    deleteAnchor = writer.anchor(writer.parent)
+                                    writer.nodeGroup(501, 501) {
+                                        writer.group(600) {
+                                            writer.group(700) {
+                                                moveAnchor = writer.anchor(writer.parent)
+                                                writer.markGroup(writer.parent)
+                                                writer.group(800) {
+                                                    writer.nodeGroup(801, 801)
+                                                }
+                                                writer.group(900) {
+                                                    writer.nodeGroup(901, 901)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        val movedNodes = SlotTable()
+        movedNodes.write { movedNodesWriter ->
+            movedNodesWriter.insert {
+                slots.write { writer ->
+                    val deleteLocation = writer.anchorIndex(deleteAnchor)
+
+                    writer.advanceBy(deleteLocation)
+                    writer.ensureStarted(0)
+                    writer.ensureStarted(writer.parent(deleteLocation))
+                    writer.moveTo(moveAnchor, 0, movedNodesWriter)
+                    assertEquals(deleteLocation, writer.currentGroup)
+                    writer.removeGroup()
+                    writer.skipToGroupEnd()
+                    writer.endGroup()
+                    writer.skipToGroupEnd()
+                    writer.endGroup()
+                }
+            }
+        }
+
+        movedNodes.verifyWellFormed()
+        slots.verifyWellFormed()
+
+        // Validate slots
+        slots.read { reader ->
+            reader.expectGroup(100) {
+                reader.expectGroup(200) {
+                    reader.expectGroup(300) {
+                        reader.expectGroup(400)
+                    }
+                }
+            }
+        }
+
+        // Validate moved nodes
+        movedNodes.read { reader ->
+            reader.expectGroup(700) {
+                reader.expectGroup(800) {
+                    reader.expectNode(801, 801)
+                }
+                reader.expectGroup(900) {
+                    reader.expectNode(901, 901)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun canMoveAndDeleteAfterAnInsert() {
+        val slots = SlotTable()
+        var insertAnchor = Anchor(-1)
+        var deleteAnchor = Anchor(-1)
+        var moveAnchor = Anchor(-1)
+
+        // Create a slot table
+        slots.write { writer ->
+            writer.insert {
+                writer.group(100) {
+                    writer.group(200) {
+                        writer.group(300) {
+                            writer.group(400) {
+                                writer.group(450) {
+                                    insertAnchor = writer.anchor(writer.parent)
+                                }
+                                writer.group(500) {
+                                    deleteAnchor = writer.anchor(writer.parent)
+                                    writer.nodeGroup(501, 501) {
+                                        writer.group(600) {
+                                            writer.group(700) {
+                                                moveAnchor = writer.anchor(writer.parent)
+                                                writer.markGroup(writer.parent)
+                                                writer.group(800) {
+                                                    writer.nodeGroup(801, 801)
+                                                }
+                                                writer.group(900) {
+                                                    writer.nodeGroup(901, 901)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        val movedNodes = SlotTable()
+        movedNodes.write { movedNodesWriter ->
+            movedNodesWriter.insert {
+                slots.write { writer ->
+                    writer.seek(insertAnchor)
+                    writer.ensureStarted(0)
+                    writer.group() {
+                        writer.insert {
+                            writer.group(455) {
+                                writer.nodeGroup(456, 456)
+                            }
+                        }
+                    }
+
+                    // Move and delete
+                    val deleteLocation = writer.anchorIndex(deleteAnchor)
+                    writer.seek(deleteAnchor)
+                    assertEquals(deleteLocation, writer.currentGroup)
+                    writer.ensureStarted(0)
+                    writer.ensureStarted(writer.parent(deleteLocation))
+                    writer.moveTo(moveAnchor, 0, movedNodesWriter)
+                    assertEquals(deleteLocation, writer.currentGroup)
+                    writer.removeGroup()
+                    writer.skipToGroupEnd()
+                    writer.endGroup()
+                    writer.skipToGroupEnd()
+                    writer.endGroup()
+                }
+            }
+        }
+
+        movedNodes.verifyWellFormed()
+        slots.verifyWellFormed()
+    }
+
+    @Test
+    fun canMoveAGroupFromATableIntoAnotherGroup() {
+        val slots = SlotTable()
+        var insertAnchor = Anchor(-1)
+
+        // Create a slot table
+        slots.write { writer ->
+            writer.insert {
+                writer.group(100) {
+                    writer.group(200) {
+                        writer.group(300) {
+                            writer.group(400) {
+                                writer.group(410) {
+                                    writer.update(1)
+                                    writer.update(2)
+                                }
+                                writer.group(450) {
+                                    insertAnchor = writer.anchor(writer.parent)
+                                }
+                                writer.group(460) {
+                                    writer.update(3)
+                                    writer.update(4)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        slots.verifyWellFormed()
+
+        val insertTable = SlotTable()
+        insertTable.write { writer ->
+            writer.insert {
+                writer.group(1000) {
+                    writer.update(100)
+                    writer.update(200)
+                    writer.nodeGroup(125, 1000)
+                    writer.nodeGroup(125, 2000)
+                }
+            }
+        }
+        insertTable.verifyWellFormed()
+
+        slots.write { writer ->
+            writer.seek(insertAnchor)
+            writer.ensureStarted(0)
+            writer.ensureStarted(writer.parent(writer.currentGroup))
+            writer.moveIntoGroupFrom(0, insertTable, 0)
+            writer.skipToGroupEnd()
+            writer.endGroup()
+            writer.skipToGroupEnd()
+            writer.endGroup()
+        }
+        slots.verifyWellFormed()
+
+        slots.read { reader ->
+            reader.expectGroup(100) {
+                reader.expectGroup(200) {
+                    reader.expectGroup(300) {
+                        reader.expectGroup(400) {
+                            reader.expectGroup(410) {
+                                reader.expectData(1)
+                                reader.expectData(2)
+                            }
+                            reader.expectGroup(450) {
+                                reader.expectGroup(1000) {
+                                    reader.expectData(100)
+                                    reader.expectData(200)
+                                    reader.expectNode(125, 1000)
+                                    reader.expectNode(125, 2000)
+                                }
+                            }
+                            reader.expectGroup(460) {
+                                reader.expectData(3)
+                                reader.expectData(4)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun canMoveAGroupFromATableIntoAnotherGroupAndModifyThatGroup() {
+        val slots = SlotTable()
+        var insertAnchor = Anchor(-1)
+
+        // Create a slot table
+        slots.write { writer ->
+            writer.insert {
+                writer.group(100) {
+                    writer.group(200) {
+                        writer.group(300) {
+                            writer.group(400) {
+                                writer.group(410) {
+                                    writer.update(1)
+                                    writer.update(2)
+                                }
+                                writer.group(450) {
+                                    insertAnchor = writer.anchor(writer.parent)
+                                }
+                                writer.group(460) {
+                                    writer.update(3)
+                                    writer.update(4)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        slots.verifyWellFormed()
+
+        val insertTable = SlotTable()
+        insertTable.write { writer ->
+            writer.insert {
+                writer.group(1000) {
+                    writer.update(100)
+                    writer.update(200)
+                    writer.nodeGroup(125, 1000)
+                    writer.nodeGroup(125, 2000)
+                }
+            }
+        }
+        insertTable.verifyWellFormed()
+
+        val (previous1, previous2) = slots.write { writer ->
+            writer.seek(insertAnchor)
+            writer.ensureStarted(0)
+            writer.ensureStarted(writer.parent(writer.currentGroup))
+            writer.moveIntoGroupFrom(0, insertTable, 0)
+            writer.startGroup()
+            writer.startGroup()
+            val previous1 = writer.update(300)
+            val previous2 = writer.update(400)
+            writer.skipToGroupEnd()
+            writer.endGroup()
+            writer.endGroup()
+            writer.skipToGroupEnd()
+            writer.endGroup()
+            writer.skipToGroupEnd()
+            writer.endGroup()
+            previous1 to previous2
+        }
+        slots.verifyWellFormed()
+
+        assertEquals(100, previous1)
+        assertEquals(200, previous2)
+
+        slots.read { reader ->
+            reader.expectGroup(100) {
+                reader.expectGroup(200) {
+                    reader.expectGroup(300) {
+                        reader.expectGroup(400) {
+                            reader.expectGroup(410) {
+                                reader.expectData(1)
+                                reader.expectData(2)
+                            }
+                            reader.expectGroup(450) {
+                                reader.expectGroup(1000) {
+                                    reader.expectData(300)
+                                    reader.expectData(400)
+                                    reader.expectNode(125, 1000)
+                                    reader.expectNode(125, 2000)
+                                }
+                            }
+                            reader.expectGroup(460) {
+                                reader.expectData(3)
+                                reader.expectData(4)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

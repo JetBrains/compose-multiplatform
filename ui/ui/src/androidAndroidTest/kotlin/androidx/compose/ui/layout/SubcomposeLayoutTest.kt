@@ -1067,11 +1067,11 @@ class SubcomposeLayoutTest {
 
         rule.setContent {
             CompositionLocalProvider(compositionLocal provides flag) {
-                val mainCompositionValue = flag
+                val mainMovableValue = flag
                 SubcomposeLayout(
                     Modifier.drawBehind {
                         // makes sure we never draw inconsistent states
-                        assertThat(subcomposionValue).isEqualTo(mainCompositionValue)
+                        assertThat(subcomposionValue).isEqualTo(mainMovableValue)
                     }
                 ) {
                     subcompose(Unit, subcomposeLambda)
