@@ -15,14 +15,13 @@
  */
 package androidx.compose.desktop.examples.popupexample
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
-import java.lang.Exception
 
 object AppState {
     private val imageRes: String = "androidx/compose/desktop/example/tray.png"
@@ -74,6 +73,7 @@ object AppState {
     val amount = mutableStateOf(0)
 
     val undecorated = mutableStateOf(false)
+    val alertDialog = mutableStateOf(false)
 
     val notify = mutableStateOf(true)
     val warn = mutableStateOf(false)
