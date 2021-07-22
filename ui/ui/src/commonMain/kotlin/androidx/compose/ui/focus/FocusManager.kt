@@ -145,7 +145,9 @@ internal class FocusManagerImpl(
         }
 
         val destination = focusModifier.focusNode.focusSearch(focusDirection, layoutDirection)
-            ?: return false
+        if (destination == null || destination == source) {
+            return false
+        }
 
         // We don't want moveFocus to set focus to the root, as this would essentially clear focus.
         if (destination.findParentFocusNode() == null) {
