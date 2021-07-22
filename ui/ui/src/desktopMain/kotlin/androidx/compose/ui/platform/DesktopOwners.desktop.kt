@@ -67,8 +67,6 @@ internal class DesktopOwners(
     val list = LinkedHashSet<DesktopOwner>()
     private val listCopy = mutableListOf<DesktopOwner>()
 
-    var keyboard: Keyboard? = null
-
     private var pointerId = 0L
     private var isMousePressed = false
 
