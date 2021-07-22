@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.WindowPlacement
 import org.jetbrains.skiko.ClipComponent
 import org.jetbrains.skiko.GraphicsApi
@@ -96,8 +97,11 @@ class ComposeWindow : JFrame() {
         parentComposition: CompositionContext? = null,
         onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
         onKeyEvent: (KeyEvent) -> Boolean = { false },
-        content: @Composable () -> Unit
+        content: @Composable FrameWindowScope.() -> Unit
     ) {
+        val scope = object : FrameWindowScope {
+            override val window: ComposeWindow get() = this@ComposeWindow
+        }
         layer.setContent(
             parentComposition = parentComposition,
             onPreviewKeyEvent = onPreviewKeyEvent,
@@ -106,7 +110,7 @@ class ComposeWindow : JFrame() {
             CompositionLocalProvider(
                 LocalLayerContainer provides pane
             ) {
-                content()
+                scope.content()
             }
         }
     }

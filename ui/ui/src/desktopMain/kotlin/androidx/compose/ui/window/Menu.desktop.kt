@@ -184,7 +184,7 @@ private fun SwingMenu(
 // TODO(demin): consider making MenuBarScope/MenuScope as an interface
 //  after b/165812010 will be fixed
 /**
- * Receiver scope which is used by [JMenuBar.setContent] and [WindowScope.MenuBar].
+ * Receiver scope which is used by [JMenuBar.setContent] and [FrameWindowScope.MenuBar].
  */
 class MenuBarScope internal constructor() {
     /**

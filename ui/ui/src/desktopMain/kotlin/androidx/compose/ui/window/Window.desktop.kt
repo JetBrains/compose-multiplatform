@@ -123,7 +123,7 @@ fun ApplicationScope.Window(
     alwaysOnTop: Boolean = false,
     onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
     onKeyEvent: (KeyEvent) -> Boolean = { false },
-    content: @Composable WindowScope.() -> Unit
+    content: @Composable FrameWindowScope.() -> Unit
 ) {
     val currentState by rememberUpdatedState(state)
     val currentTitle by rememberUpdatedState(title)
@@ -246,7 +246,7 @@ fun singleWindowApplication(
     alwaysOnTop: Boolean = false,
     onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
     onKeyEvent: (KeyEvent) -> Boolean = { false },
-    content: @Composable WindowScope.() -> Unit
+    content: @Composable FrameWindowScope.() -> Unit
 ) = application {
     Window(
         ::exitApplication,
@@ -313,19 +313,14 @@ fun ApplicationScope.Window(
     create: () -> ComposeWindow,
     dispose: (ComposeWindow) -> Unit,
     update: (ComposeWindow) -> Unit = {},
-    content: @Composable WindowScope.() -> Unit
+    content: @Composable FrameWindowScope.() -> Unit
 ) {
     val composition = rememberCompositionContext()
     AwtWindow(
         visible = visible,
         create = {
             create().apply {
-                val scope = object : WindowScope {
-                    override val window: ComposeWindow get() = this@apply
-                }
-                setContent(composition, onPreviewKeyEvent, onKeyEvent) {
-                    scope.content()
-                }
+                setContent(composition, onPreviewKeyEvent, onKeyEvent, content)
             }
         },
         dispose = dispose,
@@ -336,13 +331,11 @@ fun ApplicationScope.Window(
 /**
  * Receiver scope which is used by [androidx.compose.ui.window.Window].
  */
-interface WindowScope : OwnerWindowScope {
+interface FrameWindowScope : WindowScope {
     /**
      * [ComposeWindow] that was created inside [androidx.compose.ui.window.Window].
      */
-    val window: ComposeWindow
-
-    override val ownerWindow: Window get() = window
+    override val window: ComposeWindow
 }
 
 /**
@@ -351,7 +344,7 @@ interface WindowScope : OwnerWindowScope {
  * @param content content of the menu bar (list of menus)
  */
 @Composable
-fun WindowScope.MenuBar(content: @Composable MenuBarScope.() -> Unit) {
+fun FrameWindowScope.MenuBar(content: @Composable MenuBarScope.() -> Unit) {
     val parentComposition = rememberCompositionContext()
 
     DisposableEffect(Unit) {
