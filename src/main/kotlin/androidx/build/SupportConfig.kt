@@ -39,7 +39,7 @@ object SupportConfig {
      * Either an integer value or a pre-release platform code, prefixed with "android-" (ex.
      * "android-28" or "android-Q") as you would see within the SDK's platforms directory.
      */
-    const val COMPILE_SDK_VERSION = "android-S"
+    const val COMPILE_SDK_VERSION = "android-31"
 
     /**
      * The Android SDK version to use for targetSdkVersion meta-data.
@@ -52,7 +52,7 @@ object SupportConfig {
      * order for tests to run on devices running released versions of the Android OS. If this is
      * set to a pre-release version, tests will only be able to run on pre-release devices.
      */
-    const val TARGET_SDK_VERSION = 30
+    const val TARGET_SDK_VERSION = 31
 }
 
 fun Project.getExternalProjectPath(): File {
