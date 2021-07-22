@@ -40,6 +40,18 @@ class OneDimensionalFocusSearchNextTest {
     private val initialFocus: FocusRequester = FocusRequester()
 
     @Test
+    fun moveFocus_noFocusableItem() {
+        // Arrange.
+        rule.setContentWithInitialRootFocus {}
+
+        // Act.
+        val movedFocusSuccessfully = focusManager.moveFocus(Next)
+
+        // Assert.
+        rule.runOnIdle { assertThat(movedFocusSuccessfully).isFalse() }
+    }
+
+    @Test
     fun initialFocus_oneItem() {
         // Arrange.
         val isItemFocused = mutableStateOf(false)
