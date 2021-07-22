@@ -35,13 +35,10 @@ class PreviewRunLineMarkerContributor : RunLineMarkerContributor() {
         if (element !is LeafPsiElement) return null
         if (element.node.elementType != KtTokens.IDENTIFIER) return null
 
-        val parent = element.parent
-        return when {
-            parent is KtNamedFunction && parent.isValidComposePreview() -> {
-                val fqName = parent.composePreviewFunctionFqn()
-                val module = parent.module?.let { ExternalSystemApiUtil.getExternalProjectPath(it) }
-                    ?: error("Could not determine module for $parent")
-                val actions = arrayOf(RunPreviewAction(fqName, module))
+        return when (val parent = element.parent) {
+            is KtNamedFunction -> {
+                val previewFunction = parent.asPreviewFunctionOrNull() ?: return null
+                val actions = arrayOf(RunPreviewAction(previewFunction))
                 Info(PreviewIcons.COMPOSE, actions) { PreviewMessages.runPreview(parent.name!!) }
             }
             else -> null

@@ -62,7 +62,6 @@ internal class PreviewHost(private val log: PreviewLogger, connection: RemoteCon
             try {
                 val classpath = previewClasspath.get()
                 val request = previewRequest.get()
-                log { "request != null == ${request != null} && classpath != null == ${classpath != null}" }
                 if (classpath != null && request != null) {
                     if (previewRequest.compareAndSet(request, null)) {
                         val bytes = renderFrame(classpath, request)

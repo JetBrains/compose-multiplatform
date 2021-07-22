@@ -17,10 +17,10 @@
 package org.jetbrains.compose.desktop.ide.preview
 
 import com.intellij.openapi.roots.ProjectRootModificationTracker
-import com.intellij.psi.PsiElement
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.parentOfType
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.jetbrains.kotlin.asJava.findFacadeClass
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.ClassKind
@@ -40,20 +40,12 @@ internal const val COMPOSABLE_FQ_NAME = "androidx.compose.runtime.Composable"
  */
 
 /**
- *  Whether this function is properly annotated with [PREVIEW_ANNOTATION_FQN] and is defined in a valid location.
- *
- *  @see [isValidPreviewLocation]
- */
-internal fun KtNamedFunction.isValidComposePreview() =
-    isValidPreviewLocation() && annotationEntries.any { it.fqNameMatches(DESKTOP_PREVIEW_ANNOTATION_FQN) }
-
-/**
  * Returns whether a `@Composable` [PREVIEW_ANNOTATION_FQN] is defined in a valid location, which can be either:
  * 1. Top-level functions
  * 2. Non-nested functions defined in top-level classes that have a default (no parameter) constructor
  *
  */
-internal fun KtNamedFunction.isValidPreviewLocation(): Boolean {
+private fun KtNamedFunction.isValidPreviewLocation(): Boolean {
     if (valueParameters.size > 0) return false
     if (receiverTypeReference != null) return false
 
@@ -117,19 +109,39 @@ private fun KtAnnotationEntry.getQualifiedName(): String? =
 
 internal fun KtNamedFunction.composePreviewFunctionFqn() = "${getClassName()}.${name}"
 
-// based on AndroidComposePsiUtils.kt from AOSP
-internal fun PsiElement.isComposableFunction(): Boolean {
-    if (this !is KtNamedFunction) return false
+@RequiresReadLock
+internal fun KtNamedFunction.isValidComposablePreviewFunction(): Boolean {
+    fun isValidComposablePreviewImpl(): Boolean {
+        if (!isValidPreviewLocation()) return false
+
+        var hasComposableAnnotation = false
+        var hasPreviewAnnotation = false
+        val annotationIt = annotationEntries.iterator()
+        while (annotationIt.hasNext() && !(hasComposableAnnotation && hasPreviewAnnotation)) {
+            val annotation = annotationIt.next()
+            hasComposableAnnotation = hasComposableAnnotation || annotation.fqNameMatches(COMPOSABLE_FQ_NAME)
+            hasPreviewAnnotation = hasPreviewAnnotation || annotation.fqNameMatches(DESKTOP_PREVIEW_ANNOTATION_FQN)
+        }
+
+        return hasComposableAnnotation && hasPreviewAnnotation
+    }
 
     return CachedValuesManager.getCachedValue(this) {
-        val hasComposableAnnotation = annotationEntries.any { it.fqNameMatches(COMPOSABLE_FQ_NAME) }
-        val containingKtFile = this.containingKtFile
-
-        CachedValueProvider.Result.create(
-            // TODO: see if we can handle alias imports without ruining performance.
-            hasComposableAnnotation,
-            containingKtFile,
-            ProjectRootModificationTracker.getInstance(project)
-        )
+        cachedResult(isValidComposablePreviewImpl())
     }
 }
+
+// based on AndroidComposePsiUtils.kt from AOSP
+internal fun KtNamedFunction.isComposableFunction(): Boolean {
+    return CachedValuesManager.getCachedValue(this) {
+        cachedResult(annotationEntries.any { it.fqNameMatches(COMPOSABLE_FQ_NAME) })
+    }
+}
+
+private fun <T> KtNamedFunction.cachedResult(value: T) =
+    CachedValueProvider.Result.create(
+        // TODO: see if we can handle alias imports without ruining performance.
+        value,
+        this.containingKtFile,
+        ProjectRootModificationTracker.getInstance(project)
+    )
