@@ -11,6 +11,7 @@ tasks.register("publishComposeJb") {
     dependsOnComposeTask(":compose:compiler:compiler:publishMavenPublicationToMavenRepository")
     dependsOnComposeTask(":compose:compiler:compiler-hosted:publishMavenPublicationToMavenRepository")
     dependsOnComposeTask(":compose:ui:ui-tooling-data:publishMavenPublicationToMavenRepository")
+    dependsOnComposeTask(":compose:ui:ui-tooling-preview:publishMavenPublicationToMavenRepository")
 
     dependsOnComposeTask(":compose:desktop:desktop:publishKotlinMultiplatformPublicationToMavenRepository")
     dependsOnComposeTask(":compose:desktop:desktop:publishJvmPublicationToMavenRepository")
