@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.window
 
-import androidx.compose.desktop.ComposeWindow
+import androidx.compose.ui.awt.ComposeWindow
 import java.awt.Dimension
 import java.awt.Cursor
 import java.awt.event.MouseAdapter

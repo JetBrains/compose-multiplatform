@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package androidx.compose.desktop
+package androidx.compose.ui.awt
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.ui.input.key.KeyEvent
-import androidx.compose.ui.window.FrameWindowScope
-import androidx.compose.ui.window.UndecoratedWindowResizer
-import androidx.compose.ui.window.WindowPlacement
+import androidx.compose.ui.window.DialogWindowScope
 import org.jetbrains.skiko.GraphicsApi
 import java.awt.Component
+import java.awt.Window
 import java.awt.event.MouseListener
 import java.awt.event.MouseMotionListener
 import java.awt.event.MouseWheelListener
-import javax.swing.JFrame
+import javax.swing.JDialog
 
 /**
- * ComposeWindow is a window for building UI using Compose for Desktop.
- * ComposeWindow inherits javax.swing.JFrame.
+ * ComposeDialog is a dialog for building UI using Compose for Desktop.
+ * ComposeDialog inherits javax.swing.JDialog.
  */
-class ComposeWindow : JFrame() {
+class ComposeDialog(
+    owner: Window? = null,
+    modalityType: ModalityType = ModalityType.MODELESS
+) : JDialog(owner, modalityType) {
     private val delegate = ComposeWindowDelegate()
     internal val layer get() = delegate.layer
 
@@ -45,7 +47,7 @@ class ComposeWindow : JFrame() {
     override fun remove(component: Component) = delegate.remove(component)
 
     /**
-     * Composes the given composable into the ComposeWindow.
+     * Composes the given composable into the ComposeDialog.
      *
      * The new composition can be logically "linked" to an existing one, by providing a
      * [parentComposition]. This will ensure that invalidations and CompositionLocals will flow
@@ -66,17 +68,17 @@ class ComposeWindow : JFrame() {
      */
     fun setContent(
         parentComposition: CompositionContext? = null,
-        onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
-        onKeyEvent: (KeyEvent) -> Boolean = { false },
-        content: @Composable FrameWindowScope.() -> Unit
+        onPreviewKeyEvent: ((KeyEvent) -> Boolean) = { false },
+        onKeyEvent: ((KeyEvent) -> Boolean) = { false },
+        content: @Composable DialogWindowScope.() -> Unit
     ) {
-        val scope = object : FrameWindowScope {
-            override val window: ComposeWindow get() = this@ComposeWindow
+        val scope = object : DialogWindowScope {
+            override val window: ComposeDialog get() = this@ComposeDialog
         }
         delegate.setContent(
             parentComposition,
             onPreviewKeyEvent,
-            onKeyEvent
+            onKeyEvent,
         ) {
             scope.content()
         }
@@ -87,80 +89,12 @@ class ComposeWindow : JFrame() {
         super.dispose()
     }
 
-    private val undecoratedWindowResizer = UndecoratedWindowResizer(this)
-
-    override fun setUndecorated(value: Boolean) {
-        super.setUndecorated(value)
-        undecoratedWindowResizer.enabled = isUndecorated && isResizable
-    }
-
-    override fun setResizable(value: Boolean) {
-        super.setResizable(value)
-        undecoratedWindowResizer.enabled = isUndecorated && isResizable
-    }
-
     override fun setVisible(value: Boolean) {
         if (value != isVisible) {
             super.setVisible(value)
             delegate.setVisible(value)
         }
     }
-
-    var placement: WindowPlacement
-        get() = when {
-            isFullscreen -> WindowPlacement.Fullscreen
-            isMaximized -> WindowPlacement.Maximized
-            else -> WindowPlacement.Floating
-        }
-        set(value) {
-            when (value) {
-                WindowPlacement.Fullscreen -> {
-                    isFullscreen = true
-                }
-                WindowPlacement.Maximized -> {
-                    isMaximized = true
-                }
-                WindowPlacement.Floating -> {
-                    isFullscreen = false
-                    isMaximized = false
-                }
-            }
-        }
-
-    /**
-     * `true` if the window is in fullscreen mode, `false` otherwise
-     */
-    private var isFullscreen: Boolean
-        get() = layer.component.fullscreen
-        set(value) {
-            layer.component.fullscreen = value
-        }
-
-    /**
-     * `true` if the window is maximized to fill all available screen space, `false` otherwise
-     */
-    private var isMaximized: Boolean
-        get() = extendedState and MAXIMIZED_BOTH != 0
-        set(value) {
-            extendedState = if (value) {
-                extendedState or MAXIMIZED_BOTH
-            } else {
-                extendedState and MAXIMIZED_BOTH.inv()
-            }
-        }
-
-    /**
-     * `true` if the window is minimized to the taskbar, `false` otherwise
-     */
-    var isMinimized: Boolean
-        get() = extendedState and ICONIFIED != 0
-        set(value) {
-            extendedState = if (value) {
-                extendedState or ICONIFIED
-            } else {
-                extendedState and ICONIFIED.inv()
-            }
-        }
 
     /**
      * Registers a task to run when the rendering API changes.
@@ -171,13 +105,13 @@ class ComposeWindow : JFrame() {
 
     /**
      * Retrieve underlying platform-specific operating system handle for the root window where
-     * ComposeWindow is rendered. Currently returns HWND on Windows, Display on X11 and NSWindow
+     * ComposeDialog is rendered. Currently returns HWND on Windows, Display on X11 and NSWindow
      * on macOS.
      */
     val windowHandle: Long get() = delegate.windowHandle
 
     /**
-     * Returns low-level rendering API used for rendering in this ComposeWindow. API is
+     * Returns low-level rendering API used for rendering in this ComposeDialog. API is
      * automatically selected based on operating system, graphical hardware and `SKIKO_RENDER_API`
      * environment variable.
      */

@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.window
 
-import androidx.compose.desktop.ComposePanel
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
@@ -28,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
+import androidx.compose.ui.awt.ComposePanel
 import androidx.compose.ui.configureSwingGlobalsForCompose
 import androidx.compose.ui.platform.GlobalSnapshotManager
 import androidx.compose.ui.platform.LocalDensity

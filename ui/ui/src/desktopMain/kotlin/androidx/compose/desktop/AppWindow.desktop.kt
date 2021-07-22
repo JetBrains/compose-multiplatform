@@ -20,12 +20,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.configureSwingGlobalsForCompose
 import androidx.compose.ui.platform.Keyboard
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.window.v1.MenuBar
-import java.awt.Container
 import java.awt.Frame
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
@@ -49,9 +49,6 @@ import javax.swing.WindowConstants
 )
 val LocalAppWindow = compositionLocalOf<AppWindow> {
     error("CompositionLocal LocalAppWindow not provided")
-}
-internal val LocalLayerContainer = compositionLocalOf<Container> {
-    error("CompositionLocal LayerContainer not provided")
 }
 
 /**

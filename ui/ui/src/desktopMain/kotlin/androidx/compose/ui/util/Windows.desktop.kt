@@ -16,10 +16,10 @@
 
 package androidx.compose.ui.util
 
-import androidx.compose.desktop.ComposeWindow
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.graphics.asAwtImage
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.isSpecified
