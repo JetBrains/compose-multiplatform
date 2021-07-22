@@ -89,9 +89,24 @@ fun StyleBuilder.gridTemplateColumns(value: String) {
     property("grid-template-columns", value)
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/grid-auto-columns
+fun StyleBuilder.gridAutoColumns(value: String) {
+    property("grid-auto-columns", value)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/grid-auto-flow
+fun StyleBuilder.gridAutoFlow(value: GridAutoFlow) {
+    property("grid-auto-flow", value)
+}
+
 // https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-rows
 fun StyleBuilder.gridTemplateRows(value: String) {
     property("grid-template-rows", value)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/grid-auto-rows
+fun StyleBuilder.gridAutoRows(value: String) {
+    property("grid-auto-rows", value)
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/grid-area

@@ -252,3 +252,12 @@ interface AnimationPlayState: StylePropertyEnum {
     }
 }
 inline fun AnimationPlayState(value: String) = value.unsafeCast<AnimationPlayState>()
+
+
+object GridAutoFlow : StylePropertyString  {
+    inline val Row get() = "row".unsafeCast<GridAutoFlow>()
+    inline val Column get() = "column".unsafeCast<GridAutoFlow>()
+    inline val Dense get() = "dense".unsafeCast<GridAutoFlow>()
+    inline val RowDense get() = "row dense".unsafeCast<GridAutoFlow>()
+    inline val ColumnDense get() = "column dense".unsafeCast<GridAutoFlow>()
+}

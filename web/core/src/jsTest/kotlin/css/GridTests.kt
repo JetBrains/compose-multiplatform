@@ -9,6 +9,7 @@ import androidx.compose.runtime.compositionLocalOf
 import org.jetbrains.compose.web.core.tests.runTest
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
+import kotlin.js.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -282,7 +283,7 @@ class GridRawTests {
 
 class GridTemplateRowsTests {
     @Test
-    fun gridTemplateRawsGlobalValues() = runTest {
+    fun gridTemplateRowsGlobalValues() = runTest {
         composition {
             Div({ style { gridTemplateRows("inherit") } })
             Div({ style { gridTemplateRows("initial") } })
@@ -295,6 +296,22 @@ class GridTemplateRowsTests {
         assertEquals("revert", nextChild().style.asDynamic().gridTemplateRows)
         assertEquals("unset", nextChild().style.asDynamic().gridTemplateRows)
     }
+
+    @Test
+    fun gridAutoRowsGlobalValues() = runTest {
+        composition {
+            Div({ style { gridAutoRows("inherit") } })
+            Div({ style { gridAutoRows("initial") } })
+            Div({ style { gridAutoRows("revert") } })
+            Div({ style { gridAutoRows("unset") } })
+        }
+
+        assertEquals("inherit", nextChild().style.asDynamic().gridAutoRows)
+        assertEquals("initial", nextChild().style.asDynamic().gridAutoRows)
+        assertEquals("revert", nextChild().style.asDynamic().gridAutoRows)
+        assertEquals("unset", nextChild().style.asDynamic().gridAutoRows)
+    }
+
 }
 
 class GridTemplateColumnsTests {
@@ -311,6 +328,21 @@ class GridTemplateColumnsTests {
         assertEquals("initial", nextChild().style.asDynamic().gridTemplateColumns)
         assertEquals("revert", nextChild().style.asDynamic().gridTemplateColumns)
         assertEquals("unset", nextChild().style.asDynamic().gridTemplateColumns)
+    }
+
+    @Test
+    fun gridAutoColumnsGlobalValues() = runTest {
+        composition {
+            Div({ style { gridAutoColumns("inherit") } })
+            Div({ style { gridAutoColumns("initial") } })
+            Div({ style { gridAutoColumns("revert") } })
+            Div({ style { gridAutoColumns("unset") } })
+        }
+
+        assertEquals("inherit", nextChild().style.asDynamic().gridAutoColumns)
+        assertEquals("initial", nextChild().style.asDynamic().gridAutoColumns)
+        assertEquals("revert", nextChild().style.asDynamic().gridAutoColumns)
+        assertEquals("unset", nextChild().style.asDynamic().gridAutoColumns)
     }
 }
 
@@ -599,4 +631,21 @@ class GridGapTests {
         assertEquals("20px 30%", nextChild().style.asDynamic().gap)
     }
 
+}
+
+class GridAutoFlowTests {
+    @Test
+    fun gridAutoFlowKeywords() = runTest {
+        composition {
+            Div({ style { gridAutoFlow(GridAutoFlow.Column) } })
+            Div({ style { gridAutoFlow(GridAutoFlow.ColumnDense) } })
+            Div({ style { gridAutoFlow(GridAutoFlow.Dense) } })
+            Div({ style { gridAutoFlow(GridAutoFlow.Row) } })
+        }
+
+        assertEquals("column", nextChild().style.asDynamic().gridAutoFlow)
+        assertEquals("column dense", nextChild().style.asDynamic().gridAutoFlow)
+        assertEquals("dense", nextChild().style.asDynamic().gridAutoFlow)
+        assertEquals("row", nextChild().style.asDynamic().gridAutoFlow)
+    }
 }
