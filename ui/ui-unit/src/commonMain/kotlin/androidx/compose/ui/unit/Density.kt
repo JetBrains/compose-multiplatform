@@ -19,6 +19,7 @@ package androidx.compose.ui.unit
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import kotlin.math.roundToInt
 
 /**
@@ -37,7 +38,7 @@ private data class DensityImpl(
 ) : Density
 
 /**
- * A density of the screen. Used for the conversions between [Dp], [Px], [Int] and [TextUnit].
+ * A density of the screen. Used for the conversions between pixels, [Dp], [Int] and [TextUnit].
  *
  * @sample androidx.compose.ui.unit.samples.WithDensitySample
  */
@@ -135,4 +136,16 @@ interface Density {
             bottom.toPx()
         )
     }
+
+    /**
+     * Convert a [DpSize] to a [Size].
+     */
+    @Stable
+    fun DpSize.toSize(): Size = Size(width.toPx(), height.toPx())
+
+    /**
+     * Convert a [Size] to a [DpSize].
+     */
+    @Stable
+    fun Size.toDpSize(): DpSize = DpSize(width.toDp(), height.toDp())
 }

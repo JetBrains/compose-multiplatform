@@ -323,6 +323,111 @@ fun lerp(start: DpOffset, stop: DpOffset, fraction: Float): DpOffset =
     DpOffset(lerp(start.x, stop.x, fraction), lerp(start.y, stop.y, fraction))
 
 /**
+ * Constructs a [DpSize] from [width] and [height] [Dp] values.
+ */
+@Stable
+fun DpSize(width: Dp, height: Dp): DpSize = DpSize(packFloats(width.value, height.value))
+
+/**
+ * A two-dimensional Size using [Dp] for units
+ */
+@OptIn(ExperimentalUnsignedTypes::class)
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
+@Immutable
+inline class DpSize internal constructor(@PublishedApi internal val packedValue: Long) {
+
+    /**
+     * The horizontal aspect of the Size in [Dp]
+     */
+    @Stable
+    /*inline*/ val width: Dp
+        get() = unpackFloat1(packedValue).dp
+
+    /**
+     * The vertical aspect of the Size in [Dp]
+     */
+    @Stable
+    /*inline*/ val height: Dp
+        get() = unpackFloat2(packedValue).dp
+
+    /**
+     * Returns a copy of this [DpSize] instance optionally overriding the
+     * width or height parameter
+     */
+    fun copy(width: Dp = this.width, height: Dp = this.height): DpSize = DpSize(width, height)
+
+    /**
+     * Subtract a [DpSize] from another one.
+     */
+    @Stable
+    inline operator fun minus(other: DpSize) =
+        DpSize(width - other.width, height - other.height)
+
+    /**
+     * Add a [DpSize] to another one.
+     */
+    @Stable
+    inline operator fun plus(other: DpSize) =
+        DpSize(width + other.width, height + other.height)
+
+    @Stable
+    inline operator fun component1(): Dp = width
+
+    @Stable
+    inline operator fun component2(): Dp = height
+
+    @Stable
+    operator fun times(other: Int): DpSize = DpSize(width * other, height * other)
+
+    @Stable
+    operator fun times(other: Float): DpSize = DpSize(width * other, height * other)
+
+    @Stable
+    operator fun div(other: Int): DpSize = DpSize(width / other, height / other)
+
+    @Stable
+    operator fun div(other: Float): DpSize = DpSize(width / other, height / other)
+
+    @Stable
+    override fun toString(): String = "$width x $height"
+
+    companion object {
+        /**
+         * A [DpSize] with 0 DP [width] and 0 DP [height] values.
+         */
+        val Zero = DpSize(0.dp, 0.dp)
+    }
+}
+
+/**
+ * Returns the [DpOffset] of the center of the rect from the point of [0, 0]
+ * with this [DpSize].
+ */
+@Stable
+val DpSize.center: DpOffset
+    get() = DpOffset(width / 2f, height / 2f)
+
+@Stable
+inline operator fun Int.times(size: DpSize) = size * this
+
+@Stable
+inline operator fun Float.times(size: DpSize) = size * this
+
+/**
+ * Linearly interpolate between two [DpSize]s.
+ *
+ * The [fraction] argument represents position on the timeline, with 0.0 meaning
+ * that the interpolation has not started, returning [start], 1.0 meaning that the
+ * interpolation has finished, returning [stop], and values in between
+ * meaning that the interpolation is at the relevant point on the timeline
+ * between [start] and [stop]. The interpolation can be extrapolated beyond 0.0 and
+ * 1.0, so negative values and values greater than 1.0 are valid.
+ */
+@Stable
+fun lerp(start: DpSize, stop: DpSize, fraction: Float): DpSize =
+    DpSize(lerp(start.width, stop.width, fraction), lerp(start.height, stop.height, fraction))
+
+/**
  * A four dimensional bounds using [Dp] for units
  */
 @Immutable
@@ -350,3 +455,9 @@ inline val DpRect.width: Dp get() = right - left
  */
 @Stable
 inline val DpRect.height: Dp get() = bottom - top
+
+/**
+ * Returns the size of the [DpRect].
+ */
+@Stable
+inline val DpRect.size: DpSize get() = DpSize(width, height)

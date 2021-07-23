@@ -33,9 +33,11 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public default float toDp(long);
     method @androidx.compose.runtime.Stable public default float toDp(int);
     method @androidx.compose.runtime.Stable public default float toDp(float);
+    method @androidx.compose.runtime.Stable public default long toDpSize(long);
     method @androidx.compose.runtime.Stable public default float toPx(float);
     method @androidx.compose.runtime.Stable public default float toPx(long);
     method @androidx.compose.runtime.Stable public default androidx.compose.ui.geometry.Rect toRect(androidx.compose.ui.unit.DpRect);
+    method @androidx.compose.runtime.Stable public default long toSize(long);
     method @androidx.compose.runtime.Stable public default long toSp(float);
     method @androidx.compose.runtime.Stable public default long toSp(int);
     method @androidx.compose.runtime.Stable public default long toSp(float);
@@ -65,18 +67,22 @@ package androidx.compose.ui.unit {
 
   public final class DpKt {
     method @androidx.compose.runtime.Stable public static long DpOffset(float x, float y);
+    method @androidx.compose.runtime.Stable public static long DpSize(float width, float height);
     method @androidx.compose.runtime.Stable public static inline float coerceAtLeast(float, float minimumValue);
     method @androidx.compose.runtime.Stable public static inline float coerceAtMost(float, float maximumValue);
     method @androidx.compose.runtime.Stable public static inline float coerceIn(float, float minimumValue, float maximumValue);
+    method public static long getCenter(long);
     method public static inline float getDp(int);
     method public static inline float getDp(double);
     method public static inline float getDp(float);
     method public static inline float getHeight(androidx.compose.ui.unit.DpRect);
+    method public static inline long getSize(androidx.compose.ui.unit.DpRect);
     method public static inline float getWidth(androidx.compose.ui.unit.DpRect);
     method public static inline boolean isFinite(float);
     method public static inline boolean isSpecified(float);
     method public static inline boolean isUnspecified(float);
     method @androidx.compose.runtime.Stable public static float lerp(float start, float stop, float fraction);
+    method @androidx.compose.runtime.Stable public static long lerp(long start, long stop, float fraction);
     method @androidx.compose.runtime.Stable public static long lerp(long start, long stop, float fraction);
     method @androidx.compose.runtime.Stable public static inline float max(float a, float b);
     method @androidx.compose.runtime.Stable public static inline float min(float a, float b);
@@ -84,6 +90,8 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public static inline operator float times(float, float other);
     method @androidx.compose.runtime.Stable public static inline operator float times(double, float other);
     method @androidx.compose.runtime.Stable public static inline operator float times(int, float other);
+    method @androidx.compose.runtime.Stable public static inline operator long times(int, long size);
+    method @androidx.compose.runtime.Stable public static inline operator long times(float, long size);
   }
 
   @androidx.compose.runtime.Immutable public final inline class DpOffset {
@@ -114,6 +122,15 @@ package androidx.compose.ui.unit {
   }
 
   public static final class DpRect.Companion {
+  }
+
+  @androidx.compose.runtime.Immutable public final inline class DpSize {
+    ctor public DpSize();
+  }
+
+  public static final class DpSize.Companion {
+    method public long getZero();
+    property public final long Zero;
   }
 
   @androidx.compose.runtime.Immutable public final inline class IntOffset {
