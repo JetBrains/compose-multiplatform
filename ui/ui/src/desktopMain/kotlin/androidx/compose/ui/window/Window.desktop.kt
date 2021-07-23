@@ -103,7 +103,7 @@ import javax.swing.JMenuBar
  * @param content Content of the window
  */
 @Composable
-fun ApplicationScope.Window(
+fun Window(
     onCloseRequest: () -> Unit,
     state: WindowState = rememberWindowState(),
     visible: Boolean = true,
@@ -293,7 +293,7 @@ fun singleWindowApplication(
  */
 @Suppress("unused")
 @Composable
-fun ApplicationScope.Window(
+fun Window(
     visible: Boolean = true,
     onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
     onKeyEvent: (KeyEvent) -> Boolean = { false },

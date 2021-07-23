@@ -248,8 +248,63 @@ class WindowTest {
     }
 
     @Test
+    fun `open nested window`() = runApplicationTest {
+        var window1: ComposeWindow? = null
+        var window2: ComposeWindow? = null
+
+        var isOpen by mutableStateOf(true)
+        var isNestedOpen by mutableStateOf(true)
+
+        launchApplication {
+            if (isOpen) {
+                Window(
+                    onCloseRequest = {},
+                    state = rememberWindowState(
+                        size = WindowSize(600.dp, 600.dp),
+                    )
+                ) {
+                    window1 = this.window
+                    Box(Modifier.size(32.dp).background(Color.Red))
+
+                    if (isNestedOpen) {
+                        Window(
+                            onCloseRequest = {},
+                            state = rememberWindowState(
+                                size = WindowSize(300.dp, 300.dp),
+                            )
+                        ) {
+                            window2 = this.window
+                            Box(Modifier.size(32.dp).background(Color.Blue))
+                        }
+                    }
+                }
+            }
+        }
+
+        awaitIdle()
+        assertThat(window1?.isShowing).isTrue()
+        assertThat(window2?.isShowing).isTrue()
+
+        isNestedOpen = false
+        awaitIdle()
+        assertThat(window1?.isShowing).isTrue()
+        assertThat(window2?.isShowing).isFalse()
+
+        isNestedOpen = true
+        awaitIdle()
+        assertThat(window1?.isShowing).isTrue()
+        assertThat(window2?.isShowing).isTrue()
+
+        isOpen = false
+        awaitIdle()
+        assertThat(window1?.isShowing).isFalse()
+        assertThat(window2?.isShowing).isFalse()
+    }
+
+    @Test
     fun `pass composition local to windows`() = runApplicationTest {
         var actualValue1: Int? = null
+        var actualValue2: Int? = null
 
         var isOpen by mutableStateOf(true)
         var testValue by mutableStateOf(0)
@@ -266,6 +321,16 @@ class WindowTest {
                     ) {
                         actualValue1 = localTestValue.current
                         Box(Modifier.size(32.dp).background(Color.Red))
+
+                        Window(
+                            onCloseRequest = {},
+                            state = rememberWindowState(
+                                size = WindowSize(300.dp, 300.dp),
+                            )
+                        ) {
+                            actualValue2 = localTestValue.current
+                            Box(Modifier.size(32.dp).background(Color.Blue))
+                        }
                     }
                 }
             }
@@ -273,10 +338,12 @@ class WindowTest {
 
         awaitIdle()
         assertThat(actualValue1).isEqualTo(0)
+        assertThat(actualValue2).isEqualTo(0)
 
         testValue = 42
         awaitIdle()
         assertThat(actualValue1).isEqualTo(42)
+        assertThat(actualValue2).isEqualTo(42)
 
         isOpen = false
     }

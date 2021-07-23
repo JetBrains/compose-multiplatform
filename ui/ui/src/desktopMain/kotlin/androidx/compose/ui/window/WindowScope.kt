@@ -22,12 +22,10 @@ import java.awt.Window
  * Receiver scope which is used by [androidx.compose.ui.window.Window] and
  * [androidx.compose.ui.window.Dialog].
  */
-interface WindowScope : OwnerWindowScope {
+interface WindowScope {
     /**
      * [Window] that was created inside [androidx.compose.ui.window.Window]
      * or [androidx.compose.ui.window.Dialog]
      */
     val window: Window
-
-    override val ownerWindow: Window get() = window
 }
