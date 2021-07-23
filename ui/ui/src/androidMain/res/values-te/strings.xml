@@ -29,4 +29,5 @@
     <string name="close_drawer" msgid="406453423630273620">"నావిగేషన్ మెనూను మూసివేయి"</string>
     <string name="close_sheet" msgid="7573152094250666567">"షీట్‌ను మూసివేయి"</string>
     <string name="default_error_message" msgid="8038256446254964252">"ఇన్‌పుట్ చెల్లదు"</string>
+    <string name="default_popup_window_title" msgid="6312721426453364202">"పాప్-అప్ విండో"</string>
 </resources>

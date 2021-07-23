@@ -29,4 +29,5 @@
     <string name="close_drawer" msgid="406453423630273620">"வழிசெலுத்தல் மெனுவை மூடும்"</string>
     <string name="close_sheet" msgid="7573152094250666567">"ஷீட்டை மூடும்"</string>
     <string name="default_error_message" msgid="8038256446254964252">"தவறான உள்ளீடு"</string>
+    <string name="default_popup_window_title" msgid="6312721426453364202">"பாப்-அப் சாளரம்"</string>
 </resources>

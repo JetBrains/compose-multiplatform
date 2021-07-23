@@ -29,4 +29,5 @@
     <string name="close_drawer" msgid="406453423630273620">"Навигацын цэсийг хаах"</string>
     <string name="close_sheet" msgid="7573152094250666567">"Хүснэгтийг хаах"</string>
     <string name="default_error_message" msgid="8038256446254964252">"Буруу оролт"</string>
+    <string name="default_popup_window_title" msgid="6312721426453364202">"Попап цонх"</string>
 </resources>

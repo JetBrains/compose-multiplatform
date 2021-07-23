@@ -29,4 +29,5 @@
     <string name="close_drawer" msgid="406453423630273620">"Sulje navigointivalikko"</string>
     <string name="close_sheet" msgid="7573152094250666567">"Sulje taulukko"</string>
     <string name="default_error_message" msgid="8038256446254964252">"Virheellinen syöte"</string>
+    <string name="default_popup_window_title" msgid="6312721426453364202">"Ponnahdusikkuna"</string>
 </resources>
