@@ -29,4 +29,5 @@
     <string name="close_drawer" msgid="406453423630273620">"Tutup menu navigasi"</string>
     <string name="close_sheet" msgid="7573152094250666567">"Tutup sheet"</string>
     <string name="default_error_message" msgid="8038256446254964252">"Input tidak valid"</string>
+    <string name="default_popup_window_title" msgid="6312721426453364202">"Jendela Pop-Up"</string>
 </resources>

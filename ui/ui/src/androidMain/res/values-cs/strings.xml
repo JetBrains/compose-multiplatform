@@ -29,4 +29,5 @@
     <string name="close_drawer" msgid="406453423630273620">"Zavřít navigační panel"</string>
     <string name="close_sheet" msgid="7573152094250666567">"Zavřít sešit"</string>
     <string name="default_error_message" msgid="8038256446254964252">"Neplatný údaj"</string>
+    <string name="default_popup_window_title" msgid="6312721426453364202">"Vyskakovací okno"</string>
 </resources>
