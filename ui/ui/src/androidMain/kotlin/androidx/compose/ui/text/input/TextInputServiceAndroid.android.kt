@@ -199,12 +199,27 @@ internal class TextInputServiceAndroid(
             Log.d(TAG, "$DEBUG_CLASS.updateState called: $oldValue -> $newValue")
         }
 
+        // If the selection has changed from the last time, we need to update selection even though
+        // the oldValue in EditBuffer is already in sync with the newValue.
+        val needUpdateSelection = (this.state.selection != newValue.selection)
         this.state = newValue
         // update the latest TextFieldValue in InputConnection
         ic?.mTextFieldValue = newValue
 
         if (oldValue == newValue) {
-            if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.updateState early return") }
+            if (DEBUG) {
+                Log.d(TAG, "$DEBUG_CLASS.updateState early return")
+            }
+            if (needUpdateSelection) {
+                // updateSelection API requires -1 if there is no composition
+                inputMethodManager.updateSelection(
+                    view = view,
+                    selectionStart = newValue.selection.min,
+                    selectionEnd = newValue.selection.max,
+                    compositionStart = state.composition?.min ?: -1,
+                    compositionEnd = state.composition?.max ?: -1
+                )
+            }
             return
         }
 

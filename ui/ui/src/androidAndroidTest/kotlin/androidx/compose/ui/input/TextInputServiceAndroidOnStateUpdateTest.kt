@@ -108,6 +108,27 @@ class TextInputServiceAndroidOnStateUpdateTest {
     }
 
     @Test
+    fun onUpdateState_updateSelectionCalled_whenSelectionIsDifferentFromState() {
+        // The textInputService.state has selection = TextRange(0, 0)
+        // Here we simulate a situation where a character is inserted and selection is updated to
+        // TextRange(1, 1). The EditBuffer is still in sync with the newValue, so the oldValue
+        // equals to newValue, but different from the textInputService.state.
+        // We still need to call IMM.updateSelection in this case, for more info please check:
+        // https://developer.android.com/reference/android/view/inputmethod/InputMethodManager#updateSelection(android.view.View,%20int,%20int,%20int,%20int)
+        val value = TextFieldValue("a", TextRange(1), null)
+        textInputService.updateState(
+            oldValue = value,
+            newValue = value
+        )
+
+        verify(inputMethodManager, never()).restartInput(any())
+        verify(inputMethodManager, times(1)).updateSelection(any(), any(), any(), any(), any())
+
+        assertThat(inputConnection.mTextFieldValue).isEqualTo(value)
+        assertThat(textInputService.state).isEqualTo(value)
+    }
+
+    @Test
     fun onUpdateState_resetInputNotCalled_whenSelectionAndCompositionChanged() {
         val newValue = TextFieldValue("a", TextRange(1), null)
         textInputService.updateState(
