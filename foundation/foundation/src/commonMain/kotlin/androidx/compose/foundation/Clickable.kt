@@ -412,7 +412,10 @@ internal fun Modifier.genericClickableWithoutGesture(
             this.role = role
         }
         // b/156468846:  add long click semantics and double click if needed
-        onClick(action = { onClick(); true }, label = onClickLabel)
+        onClick(
+            action = { onClick(); true },
+            label = onClickLabel
+        )
         if (onLongClick != null) {
             onLongClick(action = { onLongClick(); true }, label = onLongClickLabel)
         }

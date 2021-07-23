@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.fastMapNotNull
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
@@ -38,6 +39,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension
 import kotlin.coroutines.createCoroutine
 import kotlin.coroutines.resume
+import kotlin.math.max
 
 /**
  * Receiver scope for awaiting pointer events in a call to [PointerInputScope.awaitPointerEventScope].
@@ -55,6 +57,13 @@ interface AwaitPointerEventScope : Density {
      * (0, 0) indicating the upper left corner.
      */
     val size: IntSize
+
+    /*
+     * The additional space applied to each side of the layout area. This can be
+     * non-[zero][Size.Zero] when `minimumTouchTargetSize` is set in [pointerInput].
+     */
+    val extendedTouchPadding: Size
+        get() = Size.Zero
 
     /**
      * The [PointerEvent] from the most recent touch event.
@@ -98,6 +107,13 @@ interface PointerInputScope : Density {
      * (0, 0) indicating the upper left corner.
      */
     val size: IntSize
+
+    /**
+     * The additional space applied to each side of the layout area when the layout is smaller
+     * than [ViewConfiguration.minimumTouchTargetSize].
+     */
+    val extendedTouchPadding: Size
+        get() = Size.Zero
 
     /**
      * The [ViewConfiguration] used to tune gesture detectors.
@@ -289,6 +305,15 @@ internal class SuspendingPointerInputFilter(
      */
     private var boundsSize: IntSize = IntSize.Zero
 
+    override val extendedTouchPadding: Size
+        get() {
+            val minimumTouchTargetSize = viewConfiguration.minimumTouchTargetSize.toSize()
+            val size = size
+            val horizontal = max(0f, minimumTouchTargetSize.width - size.width) / 2f
+            val vertical = max(0f, minimumTouchTargetSize.height - size.height) / 2f
+            return Size(horizontal, vertical)
+        }
+
     /**
      * Snapshot the current [pointerHandlers] and run [block] on each one.
      * May not be called reentrant or concurrent with itself.
@@ -424,6 +449,8 @@ internal class SuspendingPointerInputFilter(
             get() = this@SuspendingPointerInputFilter.boundsSize
         override val viewConfiguration: ViewConfiguration
             get() = this@SuspendingPointerInputFilter.viewConfiguration
+        override val extendedTouchPadding: Size
+            get() = this@SuspendingPointerInputFilter.extendedTouchPadding
 
         fun offerPointerEvent(event: PointerEvent, pass: PointerEventPass) {
             if (pass == awaitPass) {

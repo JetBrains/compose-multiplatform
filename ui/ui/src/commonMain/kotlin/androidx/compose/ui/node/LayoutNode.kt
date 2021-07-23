@@ -55,6 +55,7 @@ import androidx.compose.ui.node.LayoutNode.LayoutState.Measuring
 import androidx.compose.ui.node.LayoutNode.LayoutState.NeedsRelayout
 import androidx.compose.ui.node.LayoutNode.LayoutState.NeedsRemeasure
 import androidx.compose.ui.node.LayoutNode.LayoutState.Ready
+import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.nativeClass
 import androidx.compose.ui.platform.simpleIdentityToString
 import androidx.compose.ui.semantics.SemanticsModifier
@@ -62,6 +63,7 @@ import androidx.compose.ui.semantics.SemanticsWrapper
 import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.LayoutDirection
 
 /**
@@ -513,6 +515,8 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
             }
         }
 
+    override var viewConfiguration: ViewConfiguration = DummyViewConfiguration
+
     private fun onDensityOrLayoutDirectionChanged() {
         // measure/layout modifiers on the node
         requestRemeasure()
@@ -825,28 +829,32 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      * all [PointerInputModifier]s on all descendant [LayoutNode]s.
      *
      * If [pointerPosition] is within the bounds of any tested
-     * [PointerInputModifier]s, the [PointerInputModifier] is added to [hitPointerInputFilters]
+     * [PointerInputModifier]s, the [PointerInputModifier] is added to [hitTestResult]
      * and true is returned.
      *
      * @param pointerPosition The tested pointer position, which is relative to
      * the LayoutNode.
-     * @param hitPointerInputFilters The collection that the hit [PointerInputFilter]s will be
+     * @param hitTestResult The collection that the hit [PointerInputFilter]s will be
      * added to if hit.
      */
     internal fun hitTest(
         pointerPosition: Offset,
-        hitPointerInputFilters: MutableList<PointerInputFilter>
+        hitTestResult: HitTestResult<PointerInputFilter>,
+        isTouchEvent: Boolean = false
     ) {
         val positionInWrapped = outerLayoutNodeWrapper.fromParentPosition(pointerPosition)
         outerLayoutNodeWrapper.hitTest(
             positionInWrapped,
-            hitPointerInputFilters
+            hitTestResult,
+            isTouchEvent
         )
     }
 
+    @Suppress("UNUSED_PARAMETER")
     internal fun hitTestSemantics(
         pointerPosition: Offset,
-        hitSemanticsWrappers: MutableList<SemanticsWrapper>
+        hitSemanticsWrappers: HitTestResult<SemanticsWrapper>,
+        isTouchEvent: Boolean = true
     ) {
         val positionInWrapped = outerLayoutNodeWrapper.fromParentPosition(pointerPosition)
         outerLayoutNodeWrapper.hitTestSemantics(
@@ -1335,6 +1343,23 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
          * Pre-allocated constructor to be used with ComposeNode
          */
         internal val Constructor: () -> LayoutNode = { LayoutNode() }
+
+        /**
+         * All of these values are only used in tests. The real ViewConfiguration should
+         * be set in Layout()
+         */
+        internal val DummyViewConfiguration = object : ViewConfiguration {
+            override val longPressTimeoutMillis: Long
+                get() = 400L
+            override val doubleTapTimeoutMillis: Long
+                get() = 300L
+            override val doubleTapMinTimeMillis: Long
+                get() = 40L
+            override val touchSlop: Float
+                get() = 16f
+            override val minimumTouchTargetSize: DpSize
+                get() = DpSize.Zero
+        }
     }
 
     /**

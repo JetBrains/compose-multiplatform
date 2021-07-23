@@ -21,6 +21,7 @@ package androidx.compose.ui.input.pointer
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.input.pointer.PointerEventPass.Final
 import androidx.compose.ui.input.pointer.PointerEventPass.Initial
 import androidx.compose.ui.input.pointer.PointerEventPass.Main
@@ -498,6 +499,10 @@ fun PointerInputChange.consumeAllChanges() {
  * `(0, 0, size.width, size.height)` or `false` if the current pointer is up or it is inside the
  * given bounds.
  */
+@Deprecated(
+    message = "Use isOutOfBounds() that supports minimum touch target",
+    replaceWith = ReplaceWith("this.isOutOfBounds(size, extendedTouchPadding)")
+)
 fun PointerInputChange.isOutOfBounds(size: IntSize): Boolean {
     val position = position
     val x = position.x
@@ -505,4 +510,26 @@ fun PointerInputChange.isOutOfBounds(size: IntSize): Boolean {
     val width = size.width
     val height = size.height
     return x < 0f || x > width || y < 0f || y > height
+}
+
+/**
+ * Returns `true` if the pointer has moved outside of the pointer region. For Touch
+ * events, this is (-extendedTouchPadding.width, -extendedTouchPadding.height,
+ * size.width + extendedTouchPadding.width, size.height + extendedTouchPadding.height) and
+ * for other events, this is `(0, 0, size.width, size.height)`. Returns`false` if the
+ * current pointer is up or it is inside the pointer region.
+ */
+fun PointerInputChange.isOutOfBounds(size: IntSize, extendedTouchPadding: Size): Boolean {
+    if (type != PointerType.Touch) {
+        @Suppress("DEPRECATION")
+        return isOutOfBounds(size)
+    }
+    val position = position
+    val x = position.x
+    val y = position.y
+    val minX = -extendedTouchPadding.width
+    val maxX = size.width + extendedTouchPadding.width
+    val minY = -extendedTouchPadding.height
+    val maxY = size.height + extendedTouchPadding.height
+    return x < minX || x > maxX || y < minY || y > maxY
 }

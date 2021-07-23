@@ -189,6 +189,7 @@ internal class AndroidComposeView(context: Context) :
             .then(semanticsModifier)
             .then(_focusManager.modifier)
             .then(keyInputModifier)
+        it.density = density
     }
 
     override val rootForTest: RootForTest = this

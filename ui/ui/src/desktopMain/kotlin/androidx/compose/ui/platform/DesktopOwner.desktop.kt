@@ -55,6 +55,7 @@ import androidx.compose.ui.input.pointer.ProcessResult
 import androidx.compose.ui.input.pointer.TestPointerInputEventData
 import androidx.compose.ui.layout.RootMeasurePolicy
 import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.node.HitTestResult
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNodeDrawScope
@@ -336,7 +337,7 @@ internal class DesktopOwner(
     internal fun onMouseScroll(position: Offset, event: MouseScrollEvent) {
         measureAndLayout()
 
-        val inputFilters = mutableListOf<PointerInputFilter>()
+        val inputFilters = HitTestResult<PointerInputFilter>()
         root.hitTest(position, inputFilters)
 
         for (
@@ -351,7 +352,7 @@ internal class DesktopOwner(
     }
 
     private var oldMoveFilters = listOf<PointerMoveEventFilter>()
-    private var newMoveFilters = mutableListOf<PointerInputFilter>()
+    private val newMoveFilters = HitTestResult<PointerInputFilter>()
 
     internal fun onPointerMove(position: Offset) {
         // TODO: do we actually need that?
@@ -391,7 +392,7 @@ internal class DesktopOwner(
         }
 
         oldMoveFilters = newMoveFilters.filterIsInstance<PointerMoveEventFilter>()
-        newMoveFilters = mutableListOf()
+        newMoveFilters.clear()
     }
 
     internal fun onPointerEnter(position: Offset) {
@@ -410,7 +411,7 @@ internal class DesktopOwner(
             }
         }
         oldMoveFilters = newMoveFilters.filterIsInstance<PointerMoveEventFilter>()
-        newMoveFilters = mutableListOf()
+        newMoveFilters.clear()
     }
 
     internal fun onPointerExit() {
@@ -421,6 +422,6 @@ internal class DesktopOwner(
             }
         }
         oldMoveFilters = listOf()
-        newMoveFilters = mutableListOf()
+        newMoveFilters.clear()
     }
 }
