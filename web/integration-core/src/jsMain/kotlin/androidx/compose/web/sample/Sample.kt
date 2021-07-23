@@ -38,7 +38,7 @@ class State {
 val globalState = State()
 val globalInt = mutableStateOf(1)
 
-object MyCSSVariables : CSSVariables {
+object MyCSSVariables {
     val myVar by variable<CSSColorValue>()
     val myVar2 by variable<StylePropertyString>()
 }
