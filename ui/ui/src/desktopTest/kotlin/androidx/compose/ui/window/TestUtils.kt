@@ -124,8 +124,3 @@ internal class WindowTestScope(
         }
     }
 }
-
-private val os = System.getProperty("os.name").lowercase()
-internal val isLinux = os.startsWith("linux")
-internal val isWindows = os.startsWith("win")
-internal val isMacOs = os.startsWith("mac")
