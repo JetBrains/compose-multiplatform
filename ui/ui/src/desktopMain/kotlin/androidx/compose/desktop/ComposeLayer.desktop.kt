@@ -47,6 +47,7 @@ import java.awt.event.MouseMotionAdapter
 import java.awt.event.MouseWheelEvent
 import java.awt.im.InputMethodRequests
 import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
+import androidx.compose.ui.window.density
 
 internal class ComposeLayer {
     private var isDisposed = false
@@ -89,7 +90,7 @@ internal class ComposeLayer {
         }
 
         internal fun resetDensity() {
-            this@ComposeLayer.density = detectCurrentDensity()
+            this@ComposeLayer.density = (this as SkiaLayer).density
             owner?.density = density
         }
 
@@ -248,14 +249,6 @@ internal class ComposeLayer {
             MouseScrollOrientation.Vertical
         }
     )
-
-    // TODO(demin): detect OS fontScale
-    //  font size can be changed on Windows 10 in Settings - Ease of Access,
-    //  on Ubuntu in Settings - Universal Access
-    //  on macOS there is no such setting
-    private fun detectCurrentDensity(): Density {
-        return Density(wrapped.contentScale, 1f)
-    }
 
     fun dispose() {
         check(!isDisposed)

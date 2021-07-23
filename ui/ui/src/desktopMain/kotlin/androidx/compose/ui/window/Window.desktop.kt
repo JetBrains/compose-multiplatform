@@ -26,13 +26,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.ComponentUpdater
+import androidx.compose.ui.util.setIcon
 import androidx.compose.ui.util.setPositionSafely
 import androidx.compose.ui.util.setSizeSafely
 import androidx.compose.ui.util.setUndecoratedSafely
-import java.awt.Image
 import java.awt.Window
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
@@ -114,8 +115,7 @@ fun ApplicationScope.Window(
     state: WindowState = rememberWindowState(),
     visible: Boolean = true,
     title: String = "Untitled",
-    // TODO(demin): can we replace this by icon: Painter? What to do with different densities?
-    icon: Image? = null,
+    icon: Painter? = null,
     undecorated: Boolean = false,
     resizable: Boolean = true,
     enabled: Boolean = true,
@@ -173,7 +173,7 @@ fun ApplicationScope.Window(
         update = { window ->
             updater.update {
                 set(currentTitle, window::setTitle)
-                set(currentIcon, window::setIconImage)
+                set(currentIcon, window::setIcon)
                 set(currentUndecorated, window::setUndecoratedSafely)
                 set(currentResizable, window::setResizable)
                 set(currentEnabled, window::setEnabled)

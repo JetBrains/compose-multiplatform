@@ -34,8 +34,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.asPainter
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
+import androidx.compose.ui.res.loadSvgResource
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.AwtWindow
@@ -66,7 +70,6 @@ import java.awt.FileDialog
 import java.awt.Frame
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
-import java.awt.image.BufferedImage
 import java.lang.Thread.currentThread
 import javax.imageio.ImageIO
 
@@ -321,10 +324,9 @@ private fun OwnerWindowScope.FileDialog(
     },
     dispose = FileDialog::dispose
 )
-
 @OptIn(DelicateCoroutinesApi::class)
 fun setIcon() = GlobalScope.launchApplication {
-    var icon: BufferedImage? by remember { mutableStateOf(null) }
+    var icon: Painter? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
         delay(1000)
@@ -338,8 +340,27 @@ fun setIcon() = GlobalScope.launchApplication {
     Window(onCloseRequest = ::exitApplication, icon = icon) {}
 }
 
+@OptIn(DelicateCoroutinesApi::class)
+fun setAwtIcon() = GlobalScope.launchApplication {
+    var icon: Painter? by remember { mutableStateOf(null) }
+
+    LaunchedEffect(Unit) {
+        icon = loadAwtIcon()?.asPainter()
+    }
+
+    Window(onCloseRequest = ::exitApplication, icon = icon) {}
+}
+
 @Suppress("BlockingMethodInNonBlockingContext")
 private suspend fun loadIcon() = withContext(Dispatchers.IO) {
+    val path = "androidx/compose/desktop/example/star.svg"
+    currentThread().contextClassLoader.getResource(path)!!.openStream().use {
+        loadSvgResource(it, Density(1f))
+    }
+}
+
+@Suppress("BlockingMethodInNonBlockingContext")
+private suspend fun loadAwtIcon() = withContext(Dispatchers.IO) {
     val path = "androidx/compose/desktop/example/tray.png"
     ImageIO.read(currentThread().contextClassLoader.getResource(path))
 }

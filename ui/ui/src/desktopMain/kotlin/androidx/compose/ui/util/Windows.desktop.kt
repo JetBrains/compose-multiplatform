@@ -18,6 +18,8 @@ package androidx.compose.ui.util
 
 import androidx.compose.desktop.ComposeWindow
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.asAwtImage
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.isSpecified
@@ -25,6 +27,8 @@ import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowSize
+import androidx.compose.ui.window.density
+import androidx.compose.ui.window.layoutDirection
 import java.awt.Dialog
 import java.awt.Dimension
 import java.awt.Frame
@@ -139,4 +143,8 @@ internal fun Dialog.setUndecoratedSafely(value: Boolean) {
     if (this.isUndecorated != value) {
         this.isUndecorated = value
     }
+}
+
+internal fun Window.setIcon(painter: Painter?) {
+    setIconImage(painter?.asAwtImage(density, layoutDirection))
 }
