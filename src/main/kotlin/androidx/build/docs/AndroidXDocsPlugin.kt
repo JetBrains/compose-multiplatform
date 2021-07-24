@@ -315,6 +315,9 @@ class AndroidXDocsPlugin : Plugin<Project> {
                 sourcesDir = unzippedDocsSources
                 docsProjectDir = File(project.rootDir, "docs-public")
                 dependenciesClasspath = androidJarFile(project) + dependencyClasspath
+                excludedPackages = hiddenPackages.toSet()
+                excludedPackagesForJava = hiddenPackagesJava
+                excludedPackagesForKotlin = emptySet()
             }
         }
 
@@ -644,6 +647,7 @@ private val dackkaDirsToProcess = listOf(
     "androidx/work/**"
 )
 
+// List of packages to exclude from both Java and Kotlin refdoc generation
 private val hiddenPackages = listOf(
     "androidx.camera.camera2.impl",
     "androidx.camera.camera2.internal",
@@ -671,4 +675,75 @@ private val hiddenPackages = listOf(
     "androidx.work.impl.utils",
     "androidx.work.impl.utils.futures",
     "androidx.work.impl.utils.taskexecutor"
+)
+
+// Set of packages to exclude from Java refdoc generation
+private val hiddenPackagesJava = setOf(
+    "androidx.compose.animation",
+    "androidx.compose.animation.core",
+    "androidx.compose.foundation",
+    "androidx.compose.foundation.gestures",
+    "androidx.compose.foundation.interaction",
+    "androidx.compose.foundation.layout",
+    "androidx.compose.foundation.lazy",
+    "androidx.compose.foundation.selection",
+    "androidx.compose.foundation.shape",
+    "androidx.compose.foundation.text",
+    "androidx.compose.foundation.text.selection",
+    "androidx.compose.material",
+    "androidx.compose.material.icons",
+    "androidx.compose.material.icons.filled",
+    "androidx.compose.material.icons.outlined",
+    "androidx.compose.material.icons.rounded",
+    "androidx.compose.material.icons.sharp",
+    "androidx.compose.material.icons.twotone",
+    "androidx.compose.material.ripple",
+    "androidx.compose.runtime",
+    "androidx.compose.runtime.collection",
+    "androidx.compose.runtime.internal",
+    "androidx.compose.runtime.livedata",
+    "androidx.compose.runtime.rxjava2",
+    "androidx.compose.runtime.rxjava3",
+    "androidx.compose.runtime.saveable",
+    "androidx.compose.runtime.snapshots",
+    "androidx.compose.runtime.tooling",
+    "androidx.compose.ui",
+    "androidx.compose.ui.autofill",
+    "androidx.compose.ui.draw",
+    "androidx.compose.ui.focus",
+    "androidx.compose.ui.geometry",
+    "androidx.compose.ui.graphics",
+    "androidx.compose.ui.graphics.colorspace",
+    "androidx.compose.ui.graphics.drawscope",
+    "androidx.compose.ui.graphics.painter",
+    "androidx.compose.ui.graphics.vector",
+    "androidx.compose.ui.hapticfeedback",
+    "androidx.compose.ui.input.key",
+    "androidx.compose.ui.input.nestedscroll",
+    "androidx.compose.ui.input.pointer",
+    "androidx.compose.ui.input.pointer.util",
+    "androidx.compose.ui.layout",
+    "androidx.compose.ui.node",
+    "androidx.compose.ui.platform",
+    "androidx.compose.ui.res",
+    "androidx.compose.ui.semantics",
+    "androidx.compose.ui.state",
+    "androidx.compose.ui.test",
+    "androidx.compose.ui.test.junit4",
+    "androidx.compose.ui.test.junit4.android",
+    "androidx.compose.ui.text",
+    "androidx.compose.ui.text.android",
+    "androidx.compose.ui.text.font",
+    "androidx.compose.ui.text.input",
+    "androidx.compose.ui.text.intl",
+    "androidx.compose.ui.text.platform.extensions",
+    "androidx.compose.ui.text.style",
+    "androidx.compose.ui.tooling",
+    "androidx.compose.ui.tooling.data",
+    "androidx.compose.ui.tooling.preview",
+    "androidx.compose.ui.tooling.preview.datasource",
+    "androidx.compose.ui.unit",
+    "androidx.compose.ui.util",
+    "androidx.compose.ui.viewinterop",
+    "androidx.compose.ui.window",
 )
