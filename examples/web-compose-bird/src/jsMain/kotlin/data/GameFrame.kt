@@ -1,5 +1,6 @@
 package data
 
+
 data class GameFrame(
     val birdPos: Int,
     val tubes: List<Tube>,
