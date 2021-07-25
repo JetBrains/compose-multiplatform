@@ -17,3 +17,5 @@ public data class Color(val red: Int, val green: Int, val blue: Int, val alpha: 
         val Transparent = Color(0x00, 0x00, 0x00, 0x00)
     }
 }
+
+fun Color(red: Int, green: Int, blue: Int) = Color(red, green, blue, 255)

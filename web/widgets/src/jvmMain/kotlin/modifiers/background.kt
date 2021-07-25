@@ -1,4 +1,4 @@
-package modifiers
+package org.jetbrains.compose.common.foundation
 
 import androidx.compose.foundation.background
 import org.jetbrains.compose.common.core.graphics.Color

@@ -1,4 +1,4 @@
-package modifiers
+package org.jetbrains.compose.common.foundation
 
 import implementation
 import org.jetbrains.compose.common.core.graphics.Color
