@@ -16,6 +16,7 @@
 
 package androidx.build.dependencyTracker
 
+import java.io.Serializable
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.logging.Logger
@@ -25,12 +26,14 @@ import org.gradle.api.logging.Logger
  * on each other. This is mainly used by [AffectedModuleDetector] to find out which projects
  * should be run.
  */
-internal class DependencyTracker constructor(
-    private val rootProject: Project,
-    private val logger: Logger?
-) {
-    private val dependentList: Map<Project, Set<Project>> by lazy {
-        val result = mutableMapOf<Project, MutableSet<Project>>()
+class DependencyTracker(
+    rootProject: Project,
+    logger: Logger?
+) : Serializable {
+    val dependentList: Map<String, Set<String>>
+
+    init {
+        val result = mutableMapOf<String, MutableSet<String>>()
         rootProject.subprojects.forEach { project ->
             logger?.info("checking ${project.path} for dependencies")
             project.configurations.forEach { config ->
@@ -43,27 +46,23 @@ internal class DependencyTracker constructor(
                             "there is a dependency from ${project.path} to " +
                                 it.dependencyProject.path
                         )
-                        result.getOrPut(it.dependencyProject) { mutableSetOf() }
-                            .add(project)
+                        result.getOrPut(it.dependencyProject.path) { mutableSetOf() }
+                            .add(project.path)
                     }
             }
         }
-        result
+        dependentList = result
     }
 
-    fun findAllDependents(project: Project): Set<Project> {
-        logger?.info("finding dependents of ${project.path}")
-        val result = mutableSetOf<Project>()
-        fun addAllDependents(project: Project) {
-            if (result.add(project)) {
-                dependentList[project]?.forEach(::addAllDependents)
+    fun findAllDependents(projectPath: String): Set<String> {
+        val result = mutableSetOf<String>()
+        fun addAllDependents(projectPath: String) {
+            if (result.add(projectPath)) {
+                dependentList[projectPath]?.forEach(::addAllDependents)
             }
         }
-        addAllDependents(project)
-        logger?.info(
-            "dependents of ${project.path} is ${result.map { it.path }}"
-        )
-        // the project isn't a dependent of itself
-        return result.minus(project)
+        addAllDependents(projectPath)
+        // the projectPath isn't a dependent of itself
+        return result.minus(projectPath)
     }
 }

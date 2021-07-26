@@ -17,6 +17,8 @@
 package androidx.build.playground
 
 import androidx.build.dependencyTracker.AffectedModuleDetectorImpl
+import androidx.build.dependencyTracker.DependencyTracker
+import androidx.build.dependencyTracker.ProjectGraph
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
@@ -54,6 +56,12 @@ abstract class FindAffectedModulesTask : DefaultTask() {
     )
     abstract var outputFilePath: String
 
+    @get:Input
+    abstract var projectGraph: ProjectGraph
+
+    @get:Input
+    abstract var dependencyTracker: DependencyTracker
+
     @get:OutputFile
     val outputFile by lazy {
         File(outputFilePath)
@@ -77,14 +85,16 @@ abstract class FindAffectedModulesTask : DefaultTask() {
                 it.contains("buildSrc")
         }
         val detector = AffectedModuleDetectorImpl(
-            rootProject = project,
+            projectGraph = projectGraph,
+            dependencyTracker = dependencyTracker,
             logger = logger,
+            cobuiltTestPaths = setOf<Set<String>>(),
             changedFilesProvider = {
                 changedFiles
             }
         )
         val changedProjectPaths = detector.affectedProjects.map {
-            it.path
+            it
         } + if (hasChangedGithubInfraFiles) {
             listOf(INFRA_CHANGE)
         } else {

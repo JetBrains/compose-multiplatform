@@ -20,18 +20,19 @@ import androidx.build.getSupportRootFolder
 import org.gradle.api.Project
 import java.io.File
 
+import java.io.Serializable
 import org.gradle.api.logging.Logger
 
 /**
  * Creates a project graph for fast lookup by file path
  */
-class ProjectGraph(project: Project, val logger: Logger? = null) {
+class ProjectGraph(project: Project, logger: Logger? = null) : Serializable {
     private val rootNode: Node
 
     init {
         // always use cannonical file: b/112205561
         logger?.info("initializing ProjectGraph")
-        rootNode = Node(logger)
+        rootNode = Node()
         val rootProjectDir = project.getSupportRootFolder().canonicalFile
         val projects = if (rootProjectDir == project.rootDir.canonicalFile) {
             project.subprojects
@@ -47,7 +48,7 @@ class ProjectGraph(project: Project, val logger: Logger? = null) {
             val leaf = sections.fold(rootNode) { left, right ->
                 left.getOrCreateNode(right)
             }
-            leaf.project = it
+            leaf.projectPath = it.path
         }
         logger?.info("finished creating ProjectGraph")
     }
@@ -56,32 +57,46 @@ class ProjectGraph(project: Project, val logger: Logger? = null) {
      * Finds the project that contains the given file.
      * The file's path prefix should match the project's path.
      */
-    fun findContainingProject(filePath: String): Project? {
+    fun findContainingProject(filePath: String, logger: Logger? = null): String? {
         val sections = filePath.split(File.separatorChar)
         logger?.info("finding containing project for $filePath , sections: $sections")
-        return rootNode.find(sections, 0)
+        return rootNode.find(sections, 0, logger)
     }
 
-    private class Node(val logger: Logger? = null) {
-        var project: Project? = null
+    val allProjects by lazy {
+        val result = mutableSetOf<String>()
+        rootNode.addAllProjectPaths(result)
+        result
+    }
+
+    private class Node() : Serializable {
+        var projectPath: String? = null
         private val children = mutableMapOf<String, Node>()
 
         fun getOrCreateNode(key: String): Node {
-            return children.getOrPut(key) { Node(logger) }
+            return children.getOrPut(key) { Node() }
         }
 
-        fun find(sections: List<String>, index: Int): Project? {
-            logger?.info("finding $sections with index $index in ${project?.path ?: "root"}")
+        fun find(sections: List<String>, index: Int, logger: Logger?): String? {
             if (sections.size <= index) {
                 logger?.info("nothing")
-                return project
+                return projectPath
             }
             val child = children[sections[index]]
             return if (child == null) {
-                logger?.info("no child found, returning ${project?.path ?: "root"}")
-                project
+                logger?.info("no child found, returning ${projectPath ?: "root"}")
+                projectPath
             } else {
-                child.find(sections, index + 1)
+                child.find(sections, index + 1, logger)
+            }
+        }
+
+        fun addAllProjectPaths(collection: MutableSet<String>) {
+            projectPath?.let { path ->
+                collection.add(path)
+            }
+            for (child in children.values) {
+                child.addAllProjectPaths(collection)
             }
         }
     }
