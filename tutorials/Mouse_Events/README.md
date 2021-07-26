@@ -13,23 +13,27 @@ Click listeners are available in both Compose on Android and Compose for Desktop
 so code like this will work on both platforms:
 
 ```kotlin
-import androidx.compose.desktop.Window
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Text
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.singleWindowApplication
 
-fun main() = Window(title = "Compose for Desktop", size = IntSize(400, 400)) {
+@OptIn(ExperimentalComposeUiApi::class)
+fun main() = singleWindowApplication {
     var count by remember { mutableStateOf(0) }
     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
         var text by remember { mutableStateOf("Click magenta box!") }
@@ -67,20 +71,23 @@ the following code will only work with Compose for Desktop.
 Let's create a window and install a pointer move filter on it that changes the background
 color according to the mouse pointer position:
 ```kotlin
-import androidx.compose.desktop.Window
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerMoveFilter
-import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.window.singleWindowApplication
 
-fun main() = Window(title = "Compose for Desktop", size = IntSize(400, 400)) {
+@OptIn(ExperimentalComposeUiApi::class)
+fun main() = singleWindowApplication {
     var color by remember { mutableStateOf(Color(0, 0, 0)) }
     Box(
         modifier = Modifier
@@ -103,23 +110,26 @@ fun main() = Window(title = "Compose for Desktop", size = IntSize(400, 400)) {
 
 Compose for Desktop also supports pointer enter and exit handlers, like this:
 ```kotlin
-import androidx.compose.desktop.Window
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Text
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.singleWindowApplication
 
-fun main() = Window(title = "Compose for Desktop", size = IntSize(400, 400)) {
+@OptIn(ExperimentalComposeUiApi::class)
+fun main() = singleWindowApplication {
     Column(
         Modifier.background(Color.White),
         verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -155,19 +165,19 @@ fun main() = Window(title = "Compose for Desktop", size = IntSize(400, 400)) {
 Compose for Desktop contains desktop-only `Modifier.mouseClickable`, where data about pressed mouse buttons and keyboard modifiers is available. This is an experimental API, which means that it's likely to be changed before release.
 
 ```kotlin
-import androidx.compose.desktop.Window
 import androidx.compose.foundation.ExperimentalDesktopApi
 import androidx.compose.foundation.mouseClickable
 import androidx.compose.material.Text
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.window.singleWindowApplication
 
-@OptIn(ExperimentalDesktopApi::class)
-fun main() = Window(title = "Compose for Desktop", size = IntSize(400, 400)) {
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalDesktopApi::class)
+fun main() = singleWindowApplication {
     var clickableText by remember { mutableStateOf("Click me!") }
 
     Text(
