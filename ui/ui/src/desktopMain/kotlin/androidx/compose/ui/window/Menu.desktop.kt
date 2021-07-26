@@ -26,14 +26,28 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.asAwtImage
+import androidx.compose.ui.node.Ref
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.util.AddRemoveMutableList
+import java.awt.CheckboxMenuItem
 import java.awt.Menu
 import java.awt.MenuItem
+import java.lang.UnsupportedOperationException
+import javax.swing.Icon
+import javax.swing.ImageIcon
+import javax.swing.JCheckBoxMenuItem
 import javax.swing.JComponent
 import javax.swing.JMenu
 import javax.swing.JMenuBar
 import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
+import javax.swing.JRadioButtonMenuItem
+
+private val DefaultIconSize = Size(16f, 16f)
 
 /**
  * Composes the given composable into the MenuBar.
@@ -186,7 +200,7 @@ class MenuBarScope internal constructor() {
     )
 }
 
-interface MenuScopeImpl {
+internal interface MenuScopeImpl {
     @Composable
     fun Menu(
         text: String,
@@ -200,6 +214,25 @@ interface MenuScopeImpl {
     @Composable
     fun Item(
         text: String,
+        icon: Painter?,
+        enabled: Boolean,
+        onClick: () -> Unit
+    )
+
+    @Composable
+    fun CheckboxItem(
+        text: String,
+        checked: Boolean,
+        icon: Painter?,
+        enabled: Boolean,
+        onCheckedChange: (Boolean) -> Unit
+    )
+
+    @Composable
+    fun RadioButtonItem(
+        text: String,
+        selected: Boolean,
+        icon: Painter?,
         enabled: Boolean,
         onClick: () -> Unit
     )
@@ -236,9 +269,14 @@ private class AwtMenuScope : MenuScopeImpl {
     @Composable
     override fun Item(
         text: String,
+        icon: Painter?,
         enabled: Boolean,
         onClick: () -> Unit
     ) {
+        if (icon != null) {
+            throw UnsupportedOperationException("java.awt.Menu doesn't support icon")
+        }
+
         val currentOnClick by rememberUpdatedState(onClick)
 
         ComposeNode<MenuItem, MutableListApplier<MenuItem>>(
@@ -254,6 +292,52 @@ private class AwtMenuScope : MenuScopeImpl {
                 set(enabled, MenuItem::setEnabled)
             }
         )
+    }
+
+    @Composable
+    override fun CheckboxItem(
+        text: String,
+        checked: Boolean,
+        icon: Painter?,
+        enabled: Boolean,
+        onCheckedChange: (Boolean) -> Unit
+    ) {
+        if (icon != null) {
+            throw UnsupportedOperationException("java.awt.Menu doesn't support icon")
+        }
+
+        val currentOnCheckedChange by rememberUpdatedState(onCheckedChange)
+
+        val checkedState = rememberStateChanger(
+            CheckboxMenuItem::setState,
+            CheckboxMenuItem::getState
+        )
+
+        ComposeNode<CheckboxMenuItem, MutableListApplier<JComponent>>(
+            factory = {
+                CheckboxMenuItem().apply {
+                    addItemListener {
+                        checkedState.fireChange(this, currentOnCheckedChange)
+                    }
+                }
+            },
+            update = {
+                set(text, CheckboxMenuItem::setLabel)
+                set(checked, checkedState::set)
+                set(enabled, CheckboxMenuItem::setEnabled)
+            }
+        )
+    }
+
+    @Composable
+    override fun RadioButtonItem(
+        text: String,
+        selected: Boolean,
+        icon: Painter?,
+        enabled: Boolean,
+        onClick: () -> Unit
+    ) {
+        throw UnsupportedOperationException("java.awt.Menu doesn't support RadioButtonItem")
     }
 }
 
@@ -288,10 +372,12 @@ private class SwingMenuScope : MenuScopeImpl {
     @Composable
     override fun Item(
         text: String,
+        icon: Painter?,
         enabled: Boolean,
         onClick: () -> Unit
     ) {
         val currentOnClick by rememberUpdatedState(onClick)
+        val awtIcon = rememberAwtIcon(icon)
 
         ComposeNode<JMenuItem, MutableListApplier<JComponent>>(
             factory = {
@@ -303,7 +389,74 @@ private class SwingMenuScope : MenuScopeImpl {
             },
             update = {
                 set(text, JMenuItem::setText)
+                set(awtIcon, JMenuItem::setIcon)
                 set(enabled, JMenuItem::setEnabled)
+            }
+        )
+    }
+
+    @Composable
+    override fun CheckboxItem(
+        text: String,
+        checked: Boolean,
+        icon: Painter?,
+        enabled: Boolean,
+        onCheckedChange: (Boolean) -> Unit,
+    ) {
+        val currentOnCheckedChange by rememberUpdatedState(onCheckedChange)
+        val awtIcon = rememberAwtIcon(icon)
+
+        val checkedState = rememberStateChanger(
+            JCheckBoxMenuItem::setState,
+            JCheckBoxMenuItem::getState
+        )
+
+        ComposeNode<JCheckBoxMenuItem, MutableListApplier<JComponent>>(
+            factory = {
+                JCheckBoxMenuItem().apply {
+                    addItemListener {
+                        checkedState.fireChange(this, currentOnCheckedChange)
+                    }
+                }
+            },
+            update = {
+                set(text, JCheckBoxMenuItem::setText)
+                set(checked, checkedState::set)
+                set(awtIcon, JCheckBoxMenuItem::setIcon)
+                set(enabled, JCheckBoxMenuItem::setEnabled)
+            }
+        )
+    }
+
+    @Composable
+    override fun RadioButtonItem(
+        text: String,
+        selected: Boolean,
+        icon: Painter?,
+        enabled: Boolean,
+        onClick: () -> Unit,
+    ) {
+        val currentOnClick by rememberUpdatedState(onClick)
+        val awtIcon = rememberAwtIcon(icon)
+
+        val selectedState = rememberStateChanger(
+            JRadioButtonMenuItem::setSelected,
+            JRadioButtonMenuItem::isSelected
+        )
+
+        ComposeNode<JRadioButtonMenuItem, MutableListApplier<JComponent>>(
+            factory = {
+                JRadioButtonMenuItem().apply {
+                    addItemListener {
+                        selectedState.fireChange(this) { currentOnClick() }
+                    }
+                }
+            },
+            update = {
+                set(text, JRadioButtonMenuItem::setText)
+                set(selected, selectedState::set)
+                set(awtIcon, JRadioButtonMenuItem::setIcon)
+                set(enabled, JRadioButtonMenuItem::setEnabled)
             }
         )
     }
@@ -339,20 +492,58 @@ class MenuScope internal constructor(private val impl: MenuScopeImpl) {
     @Composable
     fun Separator() = impl.Separator()
 
-    // TODO(demin): implement shortcuts
     /**
      * Adds item to the menu
      *
      * @param text text of the item that will be shown in the menu
+     * @param icon icon of the item
      * @param enabled is this item item can be chosen
      * @param onClick action that should be performed when the user clicks on the item
      */
     @Composable
     fun Item(
         text: String,
+        icon: Painter? = null,
         enabled: Boolean = true,
         onClick: () -> Unit
-    ): Unit = impl.Item(text, enabled, onClick)
+    ): Unit = impl.Item(text, icon, enabled, onClick)
+
+    /**
+     * Adds item with checkbox to the menu
+     *
+     * @param text text of the item that will be shown in the menu
+     * @param checked whether checkbox is checked or unchecked
+     * @param icon icon of the item
+     * @param enabled is this item item can be chosen
+     * @param onCheckedChange callback to be invoked when checkbox is being clicked,
+     * therefore the change of checked state in requested
+     */
+    @Composable
+    fun CheckboxItem(
+        text: String,
+        checked: Boolean,
+        icon: Painter? = null,
+        enabled: Boolean = true,
+        onCheckedChange: (Boolean) -> Unit
+    ): Unit = impl.CheckboxItem(text, checked, icon, enabled, onCheckedChange)
+
+    /**
+     * Adds item with radio button to the menu
+     *
+     * @param text text of the item that will be shown in the menu
+     * @param selected boolean state for this button: either it is selected or not
+     * @param icon icon of the item
+     * @param enabled is this item item can be chosen
+     * @param onClick callback to be invoked when the radio button is being clicked
+     */
+    @Composable
+    fun RadioButtonItem(
+        text: String,
+        selected: Boolean,
+        icon: Painter? = null,
+        enabled: Boolean = true,
+        onClick: () -> Unit
+    ): Unit = impl.RadioButtonItem(text, selected, icon, enabled, onClick)
 }
 
 private class MutableListApplier<T>(
@@ -423,6 +614,58 @@ private fun Menu.asMutableList(): MutableList<MenuItem> {
 
         override fun performRemove(index: Int) {
             this@asMutableList.remove(index)
+        }
+    }
+}
+
+@Composable
+private fun rememberAwtIcon(painter: Painter?): Icon? {
+    val density = LocalDensity.current
+    val layoutDirection = LocalLayoutDirection.current
+
+    return remember(painter, density, layoutDirection) {
+        painter
+            ?.asAwtImage(density, layoutDirection, DefaultIconSize)
+            ?.let(::ImageIcon)
+    }
+}
+
+@Composable
+private fun <R, V> rememberStateChanger(
+    set: R.(V) -> Unit,
+    get: R.() -> V
+): ComposeState<R, V> = remember {
+    ComposeState(set, get)
+}
+
+/**
+ * Helper class to change state without firing a listener, and fire a listener without state change
+ *
+ * The purpose is to make Swing's state behave as it was attribute in stateless Compose widget.
+ * For example, ComposeState don't fire `onCheckedChange` if we change `checkbox.checked`,
+ * and don't change `checkbox.checked` if user clicks on checkbox.
+ */
+private class ComposeState<R, V>(
+    private val set: R.(V) -> Unit,
+    private val get: R.() -> V,
+) {
+    private var needEatEvent = false
+    private val ref = Ref<V>()
+
+    fun set(receiver: R, value: V) {
+        try {
+            needEatEvent = true
+            receiver.set(value)
+            ref.value = value
+        } finally {
+            needEatEvent = false
+        }
+    }
+
+    fun fireChange(receiver: R, onChange: (V) -> Unit) {
+        if (!needEatEvent) {
+            onChange(receiver.get())
+            set(receiver, ref.value!!) // prevent internal state change
         }
     }
 }
