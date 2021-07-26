@@ -543,22 +543,29 @@ fun saveWindowState() {
 @OptIn(DelicateCoroutinesApi::class)
 fun menu() = GlobalScope.launchApplication {
     var isSubmenuShowing by remember { mutableStateOf(false) }
+    val icon = remember {
+        runBlocking {
+            loadIcon()
+        }
+    }
 
     Window(
         onCloseRequest = ::exitApplication
     ) {
         MenuBar {
             Menu("File") {
-                Item(
+                CheckboxItem(
                     "Toggle submenu",
-                    onClick = {
-                        isSubmenuShowing = !isSubmenuShowing
+                    isSubmenuShowing,
+                    onCheckedChange = {
+                        isSubmenuShowing = it
                     }
                 )
                 if (isSubmenuShowing) {
                     Menu("Submenu") {
                         Item(
                             "item1",
+                            icon = icon,
                             onClick = {
                                 println("item1")
                             }
@@ -571,6 +578,26 @@ fun menu() = GlobalScope.launchApplication {
                         )
                     }
                 }
+
+                var radioState by remember { mutableStateOf(0) }
+
+                Menu("RadioButton") {
+                    RadioButtonItem(
+                        "item1",
+                        selected = radioState == 0,
+                        onClick = {
+                            radioState = 0
+                        }
+                    )
+                    RadioButtonItem(
+                        "item2",
+                        selected = radioState == 1,
+                        onClick = {
+                            radioState = 1
+                        }
+                    )
+                }
+
                 Separator()
                 Item("Exit", onClick = this@launchApplication::exitApplication)
             }
