@@ -539,16 +539,19 @@ internal fun CoreTextField(
                     }
                 )
 
+                val showHandle = enabled && state.hasFocus && isInTouchMode
                 SelectionToolbarAndHandles(
                     manager = manager,
-                    show = enabled &&
-                        state.handleState == HandleState.Selection &&
-                        state.hasFocus &&
+                    show = state.handleState == HandleState.Selection &&
                         state.layoutCoordinates != null &&
                         state.layoutCoordinates!!.isAttached &&
-                        isInTouchMode
+                        showHandle
                 )
-                if (state.handleState == HandleState.Cursor) {
+                if (
+                    state.handleState == HandleState.Cursor &&
+                    !readOnly &&
+                    showHandle
+                ) {
                     TextFieldCursorHandle(manager = manager)
                 }
             }
