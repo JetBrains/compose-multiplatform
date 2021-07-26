@@ -35,49 +35,54 @@ fun main() {
     if (!result) {
         output = "Failed to cteate file: $fileName"
     }
+    try {
+        Window(
+            title = "DebugWriter",
+            size = IntSize(650, 450)
+        ) {
+            val window = LocalAppWindow.current
 
-    Window(
-        title = "DebugWriter",
-        size = IntSize(650, 450)
-    ) {
-        val window = LocalAppWindow.current
-
-        AppTheme {
-            Surface(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxSize().padding(20.dp),
-                    contentAlignment = Alignment.Center
+            AppTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    Column {
-                        Header("Click [Refresh] to refresh info or [Open file] to see the output file.")
-                        if (isReady) {
-                            TextBox(output, Modifier.weight(1f).padding(start = 30.dp, end = 30.dp))
-                        } else {
-                            Loader(Modifier.weight(1f).fillMaxWidth())
-                        }
-                        Row(modifier = Modifier.fillMaxWidth()) {
-                            Button("Refresh", Modifier.weight(1f), { writeDebugInfo() })
-                            Button(
-                                text = "Open file",
-                                modifier = Modifier.weight(1f),
-                                action = {
-                                    if(!revealDebugOutput(fileName)) {
-                                        output = "Failed to open file: $fileName"
+                    Box(
+                        modifier = Modifier.fillMaxSize().padding(20.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column {
+                            Header("Click [Refresh] to refresh info or [Open file] to see the output file.")
+                            if (isReady) {
+                                TextBox(output, Modifier.weight(1f).padding(start = 30.dp, end = 30.dp))
+                            } else {
+                                Loader(Modifier.weight(1f).fillMaxWidth())
+                            }
+                            Row(modifier = Modifier.fillMaxWidth()) {
+                                Button("Refresh", Modifier.weight(1f), { writeDebugInfo() })
+                                Button(
+                                    text = "Open file",
+                                    modifier = Modifier.weight(1f),
+                                    action = {
+                                        if(!revealDebugOutput(fileName)) {
+                                            output = "Failed to open file: $fileName"
+                                        }
                                     }
-                                }
-                            )
-                            Button("Close", Modifier.weight(1f), { window.close() })
+                                )
+                                Button("Close", Modifier.weight(1f), { window.close() })
+                            }
                         }
                     }
                 }
             }
-        }
 
-        if (result) {
-            writeDebugInfo()
+            if (result) {
+                writeDebugInfo()
+            }
         }
+    }
+    catch(e: Exception) {
+        writeException(fileName, e)
+        System.exit(0)
     }
 }
 

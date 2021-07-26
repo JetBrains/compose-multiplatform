@@ -24,6 +24,20 @@ fun enableDebugWritingTo(fileName: String = "output.txt"): Boolean {
     }
 }
 
+fun writeException(fileName: String = "output.txt", e: Exception) {
+    try {
+        val directory = File(Paths.get(fileName).getParent().toString())
+        if (!directory.exists()) {
+            directory.mkdir()
+        }
+        val stream = PrintStream(FileOutputStream("$fileName"))
+        e.printStackTrace(stream)
+        revealDebugOutput(fileName)
+    } catch(e: Exception) {
+
+    }
+}
+
 fun readDebugOutput(fileName: String = "output.txt"): String {
     val file = File("$fileName")
     if (!file.exists()) {
