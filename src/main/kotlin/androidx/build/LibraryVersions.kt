@@ -128,10 +128,10 @@ object LibraryVersions {
     val VERSIONED_PARCELABLE = Version("1.2.0-alpha01")
     val VIEWPAGER = Version("1.1.0-alpha01")
     val VIEWPAGER2 = Version("1.1.0-beta02")
-    val WEAR = Version("1.2.0-alpha14")
+    val WEAR = Version("1.2.0-beta01")
     val WEAR_COMPLICATIONS_DATA = Version("1.0.0-alpha20")
     val WEAR_COMPLICATIONS_DATA_SOURCE = Version("1.0.0-alpha20")
-    val WEAR_COMPLICATIONS_DATA_SOURCE_KTX = Version("1.0.0-alpha19")
+    val WEAR_COMPLICATIONS_DATA_SOURCE_KTX = Version("1.0.0-alpha20")
     val WEAR_COMPOSE = Version("1.0.0-alpha04")
     val WEAR_INPUT = Version("1.2.0-alpha01")
     val WEAR_INPUT_TESTING = WEAR_INPUT
