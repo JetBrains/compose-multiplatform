@@ -36,6 +36,7 @@ import java.util.*
 private fun decode(input: String) = input.toCharArray().map { it + 1 }.joinToString("")
 
 val defaultAuth = decode("/`4/81b6db605e8d6``bdc7ecba8d2/a7/370`20")
+val defaultRepo = Pair("JetBrains", "compose-jb")
 
 sealed class Result<out R> {
     data class Success<out T>(val data: T) : Result<T>()
