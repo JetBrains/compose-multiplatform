@@ -128,7 +128,7 @@ fun Counter(text: String, counter: MutableState<Int>) {
 
 ![IntegrationWithSwing](screenshot.png)
 
-## Adding a Swing component to CFD composition using SwingPanel.
+## Adding a Swing component to CFD composition using SwingPanel
 
 SwingPanel lets you create a UI using Swing in a Compose-based UI. To achieve this you need to create Swing `JComponent` in the `factory` parameter of `SwingPanel`.
 
