@@ -25,6 +25,7 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.with
 import androidx.compose.foundation.background
@@ -99,8 +100,11 @@ fun ScreenTransitionDemo() {
                     slideIntoContainer(towards = SlideDirection.Right) with
                         slideOutOfContainer(towards = SlideDirection.Right)
                 } else {
-                    fadeIn(animationSpec = tween(300, 300)) with
-                        fadeOut(animationSpec = tween(durationMillis = 300))
+                    // Material fade through
+                    fadeIn(animationSpec = tween(220, delayMillis = 90)) +
+                        scaleIn(
+                            initialScale = 0.92f, animationSpec = tween(220, delayMillis = 90)
+                        ) with fadeOut(animationSpec = tween(90))
                 }
             }
         ) {
