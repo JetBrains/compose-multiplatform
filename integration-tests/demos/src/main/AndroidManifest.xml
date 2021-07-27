@@ -26,6 +26,7 @@
         <activity
             android:name=".DemoActivity"
             android:configChanges="uiMode"
+            android:exported="true"
             android:theme="@android:style/Theme.Material.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,6 +38,7 @@
         <activity
             android:name=".DemoSettingsActivity"
             android:label="Demo Theme Settings"
+            android:exported="false"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
     </application>
 </manifest>
