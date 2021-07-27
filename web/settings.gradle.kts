@@ -35,7 +35,7 @@ module(":web-integration-widgets", "$rootDir/integration-widgets")
 module(":web-benchmark-core", "$rootDir/benchmark-core")
 module(":compose-compiler-integration", "$rootDir/compose-compiler-integration")
 
-if (extra["COMPOSE_WEB_BUILD_WITH_EXAMPLES"]!!.toString().toBoolean() == true) {
+if (extra["compose.web.buildSamples"]!!.toString().toBoolean() == true) {
     println("building with examples")
     module(":examples:falling_balls_with_web", "../examples/falling_balls_with_web")
     module(":examples:compose-web-lp", "../examples/web_landing")

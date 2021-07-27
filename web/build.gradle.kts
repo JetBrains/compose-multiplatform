@@ -1,7 +1,7 @@
 val COMPOSE_WEB_VERSION: String by project
 val COMPOSE_REPO_USERNAME: String? by project
 val COMPOSE_REPO_KEY: String? by project
-val COMPOSE_WEB_BUILD_WITH_EXAMPLES = project.property("COMPOSE_WEB_BUILD_WITH_EXAMPLES")!!.toString()?.toBoolean()
+val COMPOSE_WEB_BUILD_WITH_SAMPLES = project.property("compose.web.buildSamples")!!.toString().toBoolean()
 
 apply<jetbrains.compose.web.gradle.SeleniumDriverPlugin>()
 
@@ -26,7 +26,7 @@ subprojects {
         }
     }
 
-    if (COMPOSE_WEB_BUILD_WITH_EXAMPLES) {
+    if (COMPOSE_WEB_BUILD_WITH_SAMPLES) {
         println("substituting published artifacts with projects ones in project $name")
         configurations.all {
             resolutionStrategy.dependencySubstitution {
