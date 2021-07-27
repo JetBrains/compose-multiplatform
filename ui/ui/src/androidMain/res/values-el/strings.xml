@@ -29,4 +29,5 @@
     <string name="close_drawer" msgid="406453423630273620">"Κλείσιμο του μενού πλοήγησης"</string>
     <string name="close_sheet" msgid="7573152094250666567">"Κλείσιμο φύλλου"</string>
     <string name="default_error_message" msgid="8038256446254964252">"Μη έγκυρη καταχώριση"</string>
+    <string name="default_popup_window_title" msgid="6312721426453364202">"Αναδυόμενο παράθυρο"</string>
 </resources>

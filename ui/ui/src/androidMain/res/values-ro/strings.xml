@@ -31,4 +31,5 @@
     <string name="close_drawer" msgid="406453423630273620">"Închideți meniul de navigare"</string>
     <string name="close_sheet" msgid="7573152094250666567">"Închideți foaia"</string>
     <string name="default_error_message" msgid="8038256446254964252">"Intrare nevalidă"</string>
+    <string name="default_popup_window_title" msgid="6312721426453364202">"Fereastră pop-up"</string>
 </resources>
