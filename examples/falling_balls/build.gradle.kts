@@ -24,6 +24,8 @@ dependencies {
 
 tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "11"
+    kotlinOptions.allWarningsAsErrors = true
+    kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
 }
 
 compose.desktop {
