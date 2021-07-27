@@ -199,7 +199,10 @@ class AndroidXPlugin : Plugin<Project> {
         }
         task.systemProperty("robolectric.offline", "true")
         val robolectricDependencies =
-            File(project.getPrebuiltsRoot(), "androidx/external/org/robolectric/android-all")
+            File(
+                project.getPrebuiltsRoot(),
+                "androidx/external/org/robolectric/android-all-instrumented"
+            )
         task.systemProperty(
             "robolectric.dependency.dir",
             robolectricDependencies.absolutePath
