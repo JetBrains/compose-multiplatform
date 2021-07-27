@@ -16,17 +16,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="androidx.compose.foundation.layout">
-
-    <!--
-      ~ Important: disable debuggable for accurate performance results
-      ~ requestLegacyExternalStorage to enable legacy JSON reporting when targeting Q
-      -->
-    <application
-        android:requestLegacyExternalStorage="true"
-        android:debuggable="false"
-        tools:ignore="HardcodedDebugMode"
-        tools:replace="android:debuggable">
-
+    <application>
         <activity
             android:name="androidx.compose.foundation.layout.TestActivity"
             android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen" />

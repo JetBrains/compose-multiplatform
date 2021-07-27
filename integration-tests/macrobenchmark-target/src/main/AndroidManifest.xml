@@ -26,7 +26,6 @@
         tools:ignore="GoogleAppIndexingWarning">
 
         <!-- Profileable to enable macrobenchmark profiling -->
-        <!--suppress AndroidElementNotAllowed -->
         <profileable android:shell="true"/>
 
         <!--
