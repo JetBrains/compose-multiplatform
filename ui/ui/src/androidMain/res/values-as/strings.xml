@@ -29,6 +29,5 @@
     <string name="close_drawer" msgid="406453423630273620">"নেভিগেশ্বন মেনু বন্ধ কৰক"</string>
     <string name="close_sheet" msgid="7573152094250666567">"শ্বীট বন্ধ কৰক"</string>
     <string name="default_error_message" msgid="8038256446254964252">"অমান্য ইনপুট"</string>
-    <!-- no translation found for default_popup_window_title (6312721426453364202) -->
-    <skip />
+    <string name="default_popup_window_title" msgid="6312721426453364202">"পপ-আপ ৱিণ্ড’"</string>
 </resources>
