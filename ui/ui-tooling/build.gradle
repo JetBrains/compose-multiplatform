@@ -39,7 +39,7 @@ dependencies {
         api(project(":compose:ui:ui-tooling-preview"))
         api(project(":compose:ui:ui-tooling-data"))
         implementation(project(":compose:material:material"))
-        implementation(project(":activity:activity-compose"))
+        implementation("androidx.activity:activity-compose:1.3.0")
 
         // kotlin-reflect and animation-tooling-internal are provided by Studio at runtime
         compileOnly(project(":compose:animation:animation-tooling-internal"))
@@ -81,7 +81,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 api(project(":compose:ui:ui-tooling-preview"))
                 api(project(":compose:ui:ui-tooling-data"))
                 implementation(project(":compose:material:material"))
-                implementation(project(":activity:activity-compose"))
+                implementation("androidx.activity:activity-compose:1.3.0")
 
                 // kotlin-reflect and tooling-animation-internal are provided by Studio at runtime
                 compileOnly(project(":compose:animation:animation-tooling-internal"))
