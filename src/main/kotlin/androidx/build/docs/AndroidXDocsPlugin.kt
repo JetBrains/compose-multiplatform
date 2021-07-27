@@ -666,6 +666,7 @@ private val hiddenPackages = listOf(
     "androidx.webkit.internal",
     "androidx.work.impl",
     "androidx.work.impl.background",
+    "androidx.work.impl.background.gcm",
     "androidx.work.impl.background.systemalarm",
     "androidx.work.impl.background.systemjob",
     "androidx.work.impl.constraints",
