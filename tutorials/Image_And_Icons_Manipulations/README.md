@@ -208,7 +208,9 @@ private fun ImageBitmap.getBytes(): ByteArray {
 
 ## Setting the application window icon
 
-You can set the icon for the window via parameter in the `Window` function:
+You can set the icon for the window via parameter in the `Window` function.
+
+Note that to change the icon on the taskbar on some OS (macOs), you should change icon in [build.gradle](https://github.com/JetBrains/compose-jb/tree/sync/2021-07-23/tutorials/Native_distributions_and_local_execution#app-icon)
 
 ```kotlin
 import androidx.compose.foundation.layout.Box
