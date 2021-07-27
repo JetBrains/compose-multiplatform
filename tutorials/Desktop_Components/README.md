@@ -267,8 +267,8 @@ fun TextBox(text: String = "Item") {
 You can add tooltip to any components using `BoxWithTooltip`. Basically `BoxWithTooltip` is a `Box` with the ability to show a tooltip, and has the same arguments and behavior as `Box`.
 The main arguments of the `BoxWithTooltip` function:
  - tooltip - composable content representing tooltip
+ - tooltipPlacement - describes how to place tooltip. You can specify an anchor (the mouse cursor or the component), an offset and an alignment
  - delay - time delay in milliseconds after which the tooltip will be shown (default is 500 ms)
- - offset - tooltip offset, the default position of the tooltip is under the mouse cursor
 
 ```kotlin
 import androidx.compose.foundation.BoxWithTooltip
