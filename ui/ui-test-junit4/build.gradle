@@ -44,7 +44,7 @@ dependencies {
         api(libs.kotlinStdlibCommon)
 
         implementation(project(":compose:runtime:runtime-saveable"))
-        implementation(project(":activity:activity-compose"))
+        implementation("androidx.activity:activity-compose:1.3.0")
         implementation("androidx.annotation:annotation:1.1.0")
         implementation("androidx.lifecycle:lifecycle-common:2.3.0")
         implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
@@ -97,7 +97,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
             androidMain.dependencies {
                 api("androidx.activity:activity:1.2.0")
-                implementation project(":activity:activity-compose")
+                implementation "androidx.activity:activity-compose:1.3.0"
                 api("androidx.test.ext:junit:1.1.2")
 
                 implementation(project(":compose:runtime:runtime-saveable"))
