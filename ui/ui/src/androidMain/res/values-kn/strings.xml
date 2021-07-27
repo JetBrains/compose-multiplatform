@@ -29,6 +29,5 @@
     <string name="close_drawer" msgid="406453423630273620">"ನ್ಯಾವಿಗೇಷನ್‌ ಮೆನು ಮುಚ್ಚಿರಿ"</string>
     <string name="close_sheet" msgid="7573152094250666567">"ಶೀಟ್ ಮುಚ್ಚಿರಿ"</string>
     <string name="default_error_message" msgid="8038256446254964252">"ಅಮಾನ್ಯ ಇನ್‌ಪುಟ್"</string>
-    <!-- no translation found for default_popup_window_title (6312721426453364202) -->
-    <skip />
+    <string name="default_popup_window_title" msgid="6312721426453364202">"ಪಾಪ್-ಅಪ್ ವಿಂಡೋ"</string>
 </resources>
