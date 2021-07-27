@@ -236,6 +236,8 @@ package androidx.compose.ui.graphics {
 
   @androidx.compose.runtime.Immutable public abstract sealed class Brush {
     method public abstract void applyTo(long size, androidx.compose.ui.graphics.Paint p, float alpha);
+    method public long getIntrinsicSize();
+    property public long intrinsicSize;
     field public static final androidx.compose.ui.graphics.Brush.Companion Companion;
   }
 
@@ -449,6 +451,7 @@ package androidx.compose.ui.graphics {
 
   @androidx.compose.runtime.Immutable public final class LinearGradient extends androidx.compose.ui.graphics.ShaderBrush {
     method public android.graphics.Shader createShader(long size);
+    property public long intrinsicSize;
   }
 
   public final inline class Matrix {
@@ -678,6 +681,7 @@ package androidx.compose.ui.graphics {
 
   @androidx.compose.runtime.Immutable public final class RadialGradient extends androidx.compose.ui.graphics.ShaderBrush {
     method public android.graphics.Shader createShader(long size);
+    property public long intrinsicSize;
   }
 
   public final class RectHelper_androidKt {
@@ -1231,6 +1235,15 @@ package androidx.compose.ui.graphics.painter {
 
   public final class BitmapPainterKt {
     method public static androidx.compose.ui.graphics.painter.BitmapPainter BitmapPainter(androidx.compose.ui.graphics.ImageBitmap image, optional long srcOffset, optional long srcSize, optional int filterQuality);
+  }
+
+  public final class BrushPainter extends androidx.compose.ui.graphics.painter.Painter {
+    ctor public BrushPainter(androidx.compose.ui.graphics.Brush brush);
+    method public androidx.compose.ui.graphics.Brush getBrush();
+    method public long getIntrinsicSize();
+    method protected void onDraw(androidx.compose.ui.graphics.drawscope.DrawScope);
+    property public final androidx.compose.ui.graphics.Brush brush;
+    property public long intrinsicSize;
   }
 
   public final class ColorPainter extends androidx.compose.ui.graphics.painter.Painter {
