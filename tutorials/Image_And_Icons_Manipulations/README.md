@@ -131,7 +131,7 @@ fun loadXmlImageVector(file: File, density: Density): ImageVector =
     file.inputStream().buffered().use { loadXmlImageVector(InputSource(it), density) }
 ```
 
-![Storage](image_from_resources.png)
+![Storage](image_from_resources2.png)
 
 [PNG](sample.png)
 
