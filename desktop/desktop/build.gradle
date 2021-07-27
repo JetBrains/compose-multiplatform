@@ -45,7 +45,7 @@ kotlin {
             api(project(":compose:material:material"))
             api(project(":compose:runtime:runtime"))
             api(project(":compose:ui:ui"))
-            api(project(":compose:ui:ui-tooling"))
+            api(project(":compose:ui:ui-tooling-preview"))
         }
 
         jvmMain.dependencies {
