@@ -69,6 +69,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.packFloats
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -218,12 +219,21 @@ class ParameterFactoryTest {
                     parameter("x", ParameterType.DimensionDp, 2.5f)
                     parameter("y", ParameterType.DimensionDp, 5.0f)
                 }
+                parameter("intrinsicSize", ParameterType.String, Size::class.java.simpleName) {
+                    val width = 5.0f
+                    val height = 9.5f
+                    parameter("height", ParameterType.Float, height)
+                    parameter("maxDimension", ParameterType.Float, height)
+                    parameter("minDimension", ParameterType.Float, width)
+                    parameter("packedValue", ParameterType.Int64, packFloats(width, height))
+                    parameter("width", ParameterType.Float, width)
+                }
                 parameter("start", ParameterType.String, Offset::class.java.simpleName) {
                     parameter("x", ParameterType.DimensionDp, 0.0f)
                     parameter("y", ParameterType.DimensionDp, 0.25f)
                 }
-                parameter("tileMode", ParameterType.String, "Clamp", index = 4)
-                parameter("createdSize", ParameterType.String, "Unspecified", index = 5)
+                parameter("tileMode", ParameterType.String, "Clamp", index = 5)
+                parameter("createdSize", ParameterType.String, "Unspecified", index = 6)
             }
         }
         // TODO: add tests for RadialGradient & ShaderBrush

@@ -120,6 +120,83 @@ class ShaderTest {
         assertEquals(Color.Blue, pixelMap[5, centerY - 5])
     }
 
+    @Test
+    fun testLinearGradientIntrinsicSize() {
+        assertEquals(
+            Size(100f, 200f),
+            Brush.linearGradient(
+                listOf(Color.Red, Color.Blue),
+                start = Offset(200f, 100f),
+                end = Offset(300f, 300f)
+            ).intrinsicSize
+        )
+    }
+
+    @Test
+    fun testLinearGradientNegativePosition() {
+        assertEquals(
+            Size(100f, 200f),
+            Brush.linearGradient(
+                listOf(Color.Red, Color.Blue),
+                start = Offset(200f, 100f),
+                end = Offset(100f, -100f)
+            ).intrinsicSize
+        )
+    }
+
+    @Test
+    fun testLinearGradientInfiniteWidth() {
+        assertEquals(
+            Size(Float.NaN, 200f),
+            Brush.linearGradient(
+                listOf(Color.Red, Color.Blue),
+                start = Offset(Float.POSITIVE_INFINITY, 100f),
+                end = Offset(Float.POSITIVE_INFINITY, 300f)
+            ).intrinsicSize
+        )
+    }
+
+    @Test
+    fun testLinearGradientInfiniteHeight() {
+        assertEquals(
+            Size(100f, Float.NaN),
+            Brush.linearGradient(
+                listOf(Color.Red, Color.Blue),
+                start = Offset(100f, 0f),
+                end = Offset(200f, Float.POSITIVE_INFINITY)
+            ).intrinsicSize
+        )
+    }
+
+    @Test
+    fun testSweepGradientIntrinsicSize() {
+        // Sweep gradients do not have an intrinsic size as they sweep/fill the geometry they are
+        // drawn with
+        assertEquals(
+            Size.Unspecified,
+            Brush.sweepGradient(listOf(Color.Red, Color.Blue)).intrinsicSize
+        )
+    }
+
+    @Test
+    fun testRadialGradientIntrinsicSize() {
+        assertEquals(
+            Size(100f, 100f),
+            Brush.radialGradient(
+                listOf(Color.Red, Color.Blue),
+                radius = 50f
+            ).intrinsicSize
+        )
+    }
+
+    @Test
+    fun testRadialGradientInfiniteSize() {
+        assertEquals(
+            Size.Unspecified,
+            Brush.radialGradient(listOf(Color.Red, Color.Blue)).intrinsicSize
+        )
+    }
+
     private fun ImageBitmap.drawInto(
         block: DrawScope.() -> Unit
     ) = CanvasDrawScope().draw(
