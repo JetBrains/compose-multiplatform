@@ -22,9 +22,9 @@ object WtOffsets : StyleSheet(AppStylesheet) {
     val wtTopOffset48 by style {
         marginTop(48.px)
     }
-    
+
     val wtTopOffsetSm12 by style {
-        media(maxWidth(640.px)) {
+        media(mediaMaxWidth(640.px)) {
             self style {
                 marginTop(12.px)
             }
@@ -32,7 +32,7 @@ object WtOffsets : StyleSheet(AppStylesheet) {
     }
 
     val wtTopOffsetSm24 by style {
-        media(maxWidth(640.px)) {
+        media(mediaMaxWidth(640.px)) {
             self style {
                 marginTop(24.px)
             }

@@ -43,7 +43,7 @@ fun MaterialCheckbox(
                 attrs = {
                     classes("filled-in")
                     if (checked) checked()
-                    onCheckboxInput { onCheckedChange(it.checked) }
+                    onChange { onCheckedChange(it.value) }
                 }
             )
 
@@ -85,7 +85,7 @@ fun MaterialTextArea(
             attrs = {
                 id("text_area_add_todo")
                 classes("materialize-textarea")
-                onTextInput { onTextChanged(it.inputValue) }
+                onInput { onTextChanged(it.value) }
                 style {
                     width(100.percent)
                     height(100.percent)
