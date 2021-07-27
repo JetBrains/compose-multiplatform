@@ -99,13 +99,6 @@ class ComposeWindow : JFrame() {
         undecoratedWindowResizer.enabled = isUndecorated && isResizable
     }
 
-    override fun setVisible(value: Boolean) {
-        if (value != isVisible) {
-            super.setVisible(value)
-            delegate.setVisible(value)
-        }
-    }
-
     var placement: WindowPlacement
         get() = when {
             isFullscreen -> WindowPlacement.Fullscreen

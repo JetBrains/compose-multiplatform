@@ -23,6 +23,8 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import java.awt.Image
+import java.awt.Window
+import java.awt.event.KeyEvent
 import java.awt.image.BufferedImage
 import java.awt.image.MultiResolutionImage
 import javax.swing.Icon
@@ -46,3 +48,18 @@ private val os = System.getProperty("os.name").lowercase()
 internal val isLinux = os.startsWith("linux")
 internal val isWindows = os.startsWith("win")
 internal val isMacOs = os.startsWith("mac")
+
+fun Window.sendKey(
+    code: Int,
+    modifiers: Int = 0
+) = dispatchEvent(
+    KeyEvent(
+        focusOwner,
+        KeyEvent.KEY_PRESSED,
+        0,
+        modifiers,
+        code,
+        code.toChar(),
+        KeyEvent.KEY_LOCATION_STANDARD
+    )
+)

@@ -102,13 +102,6 @@ class ComposeDialog(
         undecoratedWindowResizer.enabled = isUndecorated && isResizable
     }
 
-    override fun setVisible(value: Boolean) {
-        if (value != isVisible) {
-            super.setVisible(value)
-            delegate.setVisible(value)
-        }
-    }
-
     /**
      * Registers a task to run when the rendering API changes.
      */
