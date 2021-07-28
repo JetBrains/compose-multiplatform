@@ -5,11 +5,26 @@ val COMPOSE_WEB_BUILD_WITH_SAMPLES = project.property("compose.web.buildSamples"
 
 apply<jetbrains.compose.web.gradle.SeleniumDriverPlugin>()
 
+fun Project.isSampleProject() = projectDir.parentFile.name == "samples"
+
 subprojects {
     apply(plugin = "maven-publish")
 
     group = "org.jetbrains.compose.web"
     version = COMPOSE_WEB_VERSION
+
+    if (isSampleProject()) {
+        tasks.register<Sync>("sync") {
+            println("project ===> ${project.projectDir.parentFile.name}")
+            val targetDir = rootProject.projectDir.resolve("../examples/${project.projectDir.name}")
+            from(project.projectDir)
+            into(targetDir)
+            exclude("build")
+            doLast {
+                println("from ${project.projectDir} => $targetDir")
+            }
+        }
+    }
 
     pluginManager.withPlugin("maven-publish") {
         configure<PublishingExtension> {

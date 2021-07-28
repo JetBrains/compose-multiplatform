@@ -8,15 +8,6 @@ repositories {
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
-tasks.register<Sync>("sync") {
-    val targetDir = rootProject.projectDir.resolve("examples/${project.projectDir.name}")
-    from(project.projectDir)
-    into(targetDir)
-    doLast {
-        println("from ${project.projectDir} => $targetDir")
-    }
-}
-
 kotlin {
     js(IR) {
         browser()
