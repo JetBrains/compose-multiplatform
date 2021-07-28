@@ -6,7 +6,7 @@ In this tutorial, we will show you how to use tabbing navigation between compone
 
 ## Default `Next/Previous` tabbing navigation
 
-By default, `Next/Previous` tabbed navigation moves focus in composition order (in order of appearance), to see how this works, we can use some of the components that are already available by default:`TextField`, `OutlinedTextField`, `BasicTextField`, `CircularProgressIndicator`, `LinearProgressIndicator`.
+By default, `Next/Previous` tabbed navigation moves focus in composition order (in order of appearance), to see how this works, we can use some of the components that are already focusable by default:`TextField`, `OutlinedTextField`, `BasicTextField`, `CircularProgressIndicator`, `LinearProgressIndicator`.
 
 ```kotlin
 import androidx.compose.ui.window.application
