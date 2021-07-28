@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+
+import androidx.build.AndroidXComposePlugin
 import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 
@@ -21,16 +23,42 @@ plugins {
     id("AndroidXPlugin")
     id("AndroidXComposePlugin")
     id("com.android.library")
-    id("org.jetbrains.kotlin.android")
 }
+
+AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
+
 
 dependencies {
-    implementation(libs.kotlinStdlib)
-    api("androidx.annotation:annotation:1.2.0")
-    api(project(":compose:runtime:runtime"))
-
-    testImplementation(libs.junit)
+    if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
+        implementation(libs.kotlinStdlib)
+        api("androidx.annotation:annotation:1.2.0")
+        api(project(":compose:runtime:runtime"))
+        testImplementation(libs.junit)
+    }
 }
+
+if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
+    kotlin {
+        android()
+        jvm("desktop")
+
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block above
+         */
+        sourceSets {
+            commonMain.dependencies {
+                implementation(libs.kotlinStdlibCommon)
+                api("androidx.annotation:annotation:1.2.0")
+                api(project(":compose:runtime:runtime"))
+            }
+
+            androidMain.dependsOn(jvmMain)
+            desktopMain.dependsOn(jvmMain)
+        }
+    }
+}
+
 
 androidx {
     name = "Compose Tooling API"
