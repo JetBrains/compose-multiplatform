@@ -130,6 +130,10 @@ fun AttrsBuilder<HTMLInputElement>.capture(value: String) =
 fun AttrsBuilder<HTMLInputElement>.checked() =
     attr("checked", "") // radio, checkbox
 
+fun AttrsBuilder<HTMLInputElement>.checkedProp(checked: Boolean) =
+    prop(setCheckedValue, checked)
+    //attr("checked", "") // radio, checkbox
+
 fun AttrsBuilder<HTMLInputElement>.dirName(value: String) =
     attr("dirname", value) // text, search
 
@@ -314,6 +318,10 @@ fun AttrsBuilder<HTMLImageElement>.alt(value: String): AttrsBuilder<HTMLImageEle
 
 private val setInputValue: (HTMLInputElement, String) -> Unit = { e, v ->
     e.value = v
+}
+
+private val setCheckedValue: (HTMLInputElement, Boolean) -> Unit = { e, v ->
+    e.checked = v
 }
 
 /* Img attributes */

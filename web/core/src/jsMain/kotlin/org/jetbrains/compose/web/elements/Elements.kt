@@ -2,6 +2,8 @@ package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.remember
 import org.jetbrains.compose.web.attributes.builders.InputAttrsBuilder
 import androidx.compose.web.attributes.SelectAttrsBuilder
 import org.jetbrains.compose.web.attributes.builders.TextAreaAttrsBuilder
@@ -919,6 +921,35 @@ fun Style(
     val builder = StyleSheetBuilderImpl()
     builder.rulesBuild()
     Style(applyAttrs, builder.cssRules)
+}
+
+@Composable
+internal fun <K> InputControlled(
+    type: InputType<K>,
+    attrs: InputAttrsBuilder<K>.() -> Unit
+) {
+
+    TagElement(
+        elementBuilder = Input,
+        applyAttrs = {
+            val inputAttrsBuilder = InputAttrsBuilder(type)
+            inputAttrsBuilder.type(type)
+
+            inputAttrsBuilder.attrs()
+
+            inputAttrsBuilder.onInput {
+                val target = it.target
+                if (target.type == "checkbox" || target.type == "radio") {
+                    target.checked = target.getAttribute("data-remembered-value")?.toBoolean() ?: false
+                } else {
+                    target.value = target.getAttribute("data-remembered-value") ?: ""
+                }
+            }
+
+            this.copyFrom(inputAttrsBuilder)
+        },
+        content = null
+    )
 }
 
 @Composable

@@ -16,10 +16,11 @@ private fun InputAttrsBuilder<String>.applyAttrsWithStringValue(
 @Composable
 @NonRestartableComposable
 fun CheckboxInput(checked: Boolean = false, attrs: InputAttrsBuilder<Boolean>.() -> Unit = {}) {
-    Input(
+    InputControlled(
         type = InputType.Checkbox,
         attrs = {
-            if (checked) checked()
+            checkedProp(checked)
+            //if (checked) checked()
             this.attrs()
         }
     )
@@ -40,7 +41,7 @@ fun DateTimeLocalInput(value: String = "", attrs: InputAttrsBuilder<String>.() -
 @Composable
 @NonRestartableComposable
 fun EmailInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = {}) {
-    Input(type = InputType.Email, attrs = { applyAttrsWithStringValue(value, attrs) })
+    InputControlled(type = InputType.Email, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
 
 @Composable
@@ -58,7 +59,7 @@ fun HiddenInput(attrs: InputAttrsBuilder<String>.() -> Unit = {}) {
 @Composable
 @NonRestartableComposable
 fun MonthInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = {}) {
-    Input(type = InputType.Month, attrs = { applyAttrsWithStringValue(value, attrs) })
+    InputControlled(type = InputType.Month, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
 
 @Composable
@@ -69,7 +70,7 @@ fun NumberInput(
     max: Number? = null,
     attrs: InputAttrsBuilder<Number?>.() -> Unit = {}
 ) {
-    Input(
+    InputControlled(
         type = InputType.Number,
         attrs = {
             if (value != null) value(value.toString())
@@ -107,7 +108,7 @@ fun RangeInput(
     step: Number = 1,
     attrs: InputAttrsBuilder<Number?>.() -> Unit = {}
 ) {
-    Input(
+    InputControlled(
         type = InputType.Range,
         attrs = {
             if (value != null) value(value.toString())
@@ -140,7 +141,7 @@ fun TelInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = {
 @Composable
 @NonRestartableComposable
 fun TextInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = {}) {
-    Input(type = InputType.Text, attrs = { applyAttrsWithStringValue(value, attrs) })
+    InputControlled(type = InputType.Text, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
 
 @Composable
