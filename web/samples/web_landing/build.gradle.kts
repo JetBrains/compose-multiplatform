@@ -1,4 +1,5 @@
 plugins {
+    /** SHABUNC **/
     kotlin("multiplatform") version "1.5.21"
     id("org.jetbrains.compose")
 }

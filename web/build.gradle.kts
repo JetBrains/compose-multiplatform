@@ -1,3 +1,4 @@
+val COMPOSE_CORE_VERSION: String by project
 val COMPOSE_WEB_VERSION: String by project
 val COMPOSE_REPO_USERNAME: String? by project
 val COMPOSE_REPO_KEY: String? by project
@@ -14,12 +15,27 @@ subprojects {
     version = COMPOSE_WEB_VERSION
 
     if (isSampleProject()) {
+
+        val buildGradleSpec = copySpec {
+            from("build.gradle.kts") {
+                filter { 
+                    it.replace(
+                        "id(\"org.jetbrains.compose\")", 
+                        "id(\"org.jetbrains.compose\") version \"$COMPOSE_CORE_VERSION\"", 
+                    )
+                }
+            }
+        }
+
         tasks.register<Sync>("sync") {
             println("project ===> ${project.projectDir.parentFile.name}")
             val targetDir = rootProject.projectDir.resolve("../examples/${project.projectDir.name}")
+            duplicatesStrategy = DuplicatesStrategy.INCLUDE
             from(project.projectDir)
             into(targetDir)
             exclude("build")
+
+            with(buildGradleSpec)
             doLast {
                 println("from ${project.projectDir} => $targetDir")
             }
