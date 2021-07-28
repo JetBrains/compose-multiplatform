@@ -3,6 +3,7 @@ package example.imageviewer.model
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.window.WindowState
 import example.imageviewer.ResString
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.filtration.FiltersManager
@@ -19,10 +20,12 @@ import javax.swing.SwingUtilities.invokeLater
 
 object ContentState : RememberObserver {
 
+    lateinit var windowState: WindowState
     private lateinit var repository: ImageRepository
     private lateinit var uriRepository: String
 
-    fun applyContent(uriRepository: String): ContentState {
+    fun applyContent(state: WindowState, uriRepository: String): ContentState {
+        windowState = state
         if (this::uriRepository.isInitialized && this.uriRepository == uriRepository) {
             return this
         }

@@ -35,8 +35,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import example.imageviewer.ResString
@@ -165,9 +166,9 @@ fun setPreviewImageUI(content: ContentState) {
             Image(
                 if (content.isMainImageEmpty())
                     icEmpty()
-                else org.jetbrains.skija.Image.makeFromEncoded(
+                else BitmapPainter(org.jetbrains.skija.Image.makeFromEncoded(
                     toByteArray(content.getSelectedImage())
-                ).asImageBitmap(),
+                ).asImageBitmap()),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth().padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 5.dp),

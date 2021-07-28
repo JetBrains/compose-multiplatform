@@ -25,13 +25,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.shortcuts
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.WindowSize
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.AppState
 import example.imageviewer.model.ContentState
@@ -50,11 +56,9 @@ import example.imageviewer.style.icFilterGrayscaleOn
 import example.imageviewer.style.icFilterPixelOff
 import example.imageviewer.style.icFilterPixelOn
 import example.imageviewer.utils.cropImage
-import example.imageviewer.utils.displayWidth
 import example.imageviewer.utils.getDisplayBounds
 import example.imageviewer.utils.toByteArray
 import java.awt.Rectangle
-import java.awt.event.KeyEvent
 import java.awt.image.BufferedImage
 import kotlin.math.pow
 import kotlin.math.roundToInt
@@ -192,7 +196,7 @@ fun FilterButton(
 }
 
 @Composable
-fun getFilterImage(type: FilterType, content: ContentState): ImageBitmap {
+fun getFilterImage(type: FilterType, content: ContentState): Painter {
 
     return when (type) {
         FilterType.GrayScale -> if (content.isFilterEnabled(type)) icFilterGrayscaleOn() else icFilterGrayscaleOff()
@@ -201,6 +205,7 @@ fun getFilterImage(type: FilterType, content: ContentState): ImageBitmap {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun setImage(content: ContentState) {
     val drag = remember { DragHandler() }
@@ -214,13 +219,14 @@ fun setImage(content: ContentState) {
             Zoomable(
                 onScale = scale,
                 modifier = Modifier.fillMaxSize()
-                    .shortcuts {
-                        on(Key(KeyEvent.VK_LEFT)) {
-                            content.swipePrevious()
+                    .onPreviewKeyEvent {
+                        if (it.type == KeyEventType.KeyUp) {
+                            when (it.key) {
+                                Key.DirectionLeft -> content.swipePrevious()
+                                Key.DirectionRight -> content.swipeNext()
+                            }
                         }
-                        on(Key(KeyEvent.VK_RIGHT)) {
-                            content.swipeNext()
-                        }
+                        false
                     }
             ) {
                 val bitmap = imageByGesture(content, scale, drag)
@@ -240,15 +246,20 @@ fun imageByGesture(
     scale: ScaleHandler,
     drag: DragHandler
 ): ImageBitmap {
-    val bitmap = cropBitmapByScale(content.getSelectedImage(), scale.factor.value, drag)
+    val bitmap = cropBitmapByScale(content.getSelectedImage(), content.windowState.size, scale.factor.value, drag)
     return org.jetbrains.skija.Image.makeFromEncoded(toByteArray(bitmap)).asImageBitmap()
 }
 
-private fun cropBitmapByScale(bitmap: BufferedImage, scale: Float, drag: DragHandler): BufferedImage {
-
+private fun cropBitmapByScale(
+    bitmap: BufferedImage,
+    size: WindowSize,
+    scale: Float,
+    drag: DragHandler
+): BufferedImage {
     val crop = cropBitmapByBounds(
         bitmap,
-        getDisplayBounds(bitmap),
+        getDisplayBounds(bitmap, size),
+        size,
         scale,
         drag
     )
@@ -261,6 +272,7 @@ private fun cropBitmapByScale(bitmap: BufferedImage, scale: Float, drag: DragHan
 private fun cropBitmapByBounds(
     bitmap: BufferedImage,
     bounds: Rectangle,
+    size: WindowSize,
     scaleFactor: Float,
     drag: DragHandler
 ): Rectangle {
@@ -274,7 +286,7 @@ private fun cropBitmapByBounds(
     var boundW = (bounds.width / scale).roundToInt()
     var boundH = (bounds.height / scale).roundToInt()
 
-    scale *= displayWidth() / bounds.width.toDouble()
+    scale *= size.width.value / bounds.width.toDouble()
 
     val offsetX = drag.getAmount().x / scale
     val offsetY = drag.getAmount().y / scale
