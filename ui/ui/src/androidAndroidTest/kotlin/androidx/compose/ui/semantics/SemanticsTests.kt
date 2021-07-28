@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
@@ -285,6 +286,36 @@ class SemanticsTests {
 
         assertTrue(childrenMerged.isEmpty())
         assertTrue(allChildrenMerged.isEmpty())
+    }
+
+    @Test
+    fun replacedChildren_includeFakeNodes() {
+        val tag = "tag1"
+        rule.setContent {
+            SimpleTestLayout(Modifier.clickable(role = Role.Button, onClick = {}).testTag(tag)) {
+                BasicText("text")
+            }
+        }
+
+        val node = rule.onNodeWithTag(tag, true).fetchSemanticsNode()
+        val children = node.replacedChildren
+        assertThat(children.count()).isEqualTo(2)
+        assertThat(children.last().isFake).isTrue()
+    }
+
+    @Test
+    fun children_doNotIncludeFakeNodes() {
+        val tag = "tag1"
+        rule.setContent {
+            SimpleTestLayout(Modifier.clickable(role = Role.Button, onClick = {}).testTag(tag)) {
+                BasicText("text")
+            }
+        }
+
+        val node = rule.onNodeWithTag(tag, true).fetchSemanticsNode()
+        val children = node.children
+        assertThat(children.count()).isEqualTo(1)
+        assertThat(children.last().isFake).isFalse()
     }
 
     @Test
