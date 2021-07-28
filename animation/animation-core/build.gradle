@@ -40,9 +40,9 @@ dependencies {
         api("androidx.annotation:annotation:1.1.0")
 
         implementation(project(":compose:runtime:runtime"))
-        implementation(project(":compose:ui:ui"))
-        implementation(project(":compose:ui:ui-unit"))
-        implementation(project(":compose:ui:ui-util"))
+        implementation("androidx.compose.ui:ui:1.0.0")
+        implementation("androidx.compose.ui:ui-unit:1.0.0")
+        implementation("androidx.compose.ui:ui-util:1.0.0")
         implementation(libs.kotlinStdlib)
         api(libs.kotlinCoroutinesCore)
 
@@ -57,7 +57,7 @@ dependencies {
         androidTestImplementation(libs.testCore)
         androidTestImplementation(libs.junit)
         androidTestImplementation(project(":compose:animation:animation"))
-        androidTestImplementation(project(":compose:ui:ui-test-junit4"))
+        androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.0.0")
         androidTestImplementation(project(":compose:test-utils"))
 
         lintPublish project(":compose:animation:animation-core-lint")
