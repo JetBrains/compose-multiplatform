@@ -24,8 +24,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.asAwtImage
+import androidx.compose.ui.platform.DesktopPlatform
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
@@ -34,6 +36,20 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import java.awt.PopupMenu
 import java.awt.SystemTray
 import java.awt.TrayIcon
+
+// In fact, this size doesn't affect anything on Windows/Linux, because they request what they
+// need, and not what we provide. It only affects macOs. This size will be scaled in asAwtImage to
+// support DPI=2.0
+// Unfortunately I hadn't enough time to find sources from the official docs
+private val iconSize = when (DesktopPlatform.Current) {
+    // https://doc.qt.io/qt-5/qtwidgets-desktop-systray-example.html (search 22x22)
+    DesktopPlatform.Linux -> Size(22f, 22f)
+    // https://doc.qt.io/qt-5/qtwidgets-desktop-systray-example.html (search 16x16)
+    DesktopPlatform.Windows -> Size(16f, 16f)
+    // https://medium.com/@acwrightdesign/creating-a-macos-menu-bar-application-using-swiftui-54572a5d5f87
+    DesktopPlatform.MacOS -> Size(22f, 22f)
+    DesktopPlatform.Unknown -> Size(32f, 32f)
+}
 
 /**
  * `true` if the platform supports tray icons in the taskbar
@@ -94,7 +110,7 @@ fun ApplicationScope.Tray(
         // (see MultiResolutionImage.getResolutionVariant). Resources like svg/xml should look okay
         // because they don't use absolute '.dp' values to draw, they use values which are
         // relative to their viewport.
-        icon.asAwtImage(GlobalDensity, GlobalLayoutDirection)
+        icon.asAwtImage(GlobalDensity, GlobalLayoutDirection, iconSize)
     }
 
     val tray = remember {
