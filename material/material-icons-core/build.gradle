@@ -36,7 +36,8 @@ if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
          */
         kotlinPlugin(project(":compose:compiler:compiler"))
 
-        api(project(":compose:ui:ui"))
+        api("androidx.compose.ui:ui:1.0.0")
+        implementation(project(":compose:runtime:runtime"))
         implementation(libs.kotlinStdlib)
     }
 }
