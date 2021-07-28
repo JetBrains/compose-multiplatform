@@ -8,7 +8,7 @@ object WtDisplay : StyleSheet(AppStylesheet) {
     }
 
     val wtDisplayMdBlock by style {
-        media(maxWidth(1000.px)) {
+        media(mediaMaxWidth(1000.px)) {
             self style {
                 display(DisplayStyle.Block)
             }
@@ -16,7 +16,7 @@ object WtDisplay : StyleSheet(AppStylesheet) {
     }
 
     val wtDisplayMdNone by style {
-        media(maxWidth(1000.px)) {
+        media(mediaMaxWidth(1000.px)) {
             self style {
                 display(DisplayStyle.None)
             }

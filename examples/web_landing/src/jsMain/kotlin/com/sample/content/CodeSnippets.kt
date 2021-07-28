@@ -236,7 +236,7 @@ private fun TitledCodeSample(title: String, code: String) {
     Div({
         classes(WtOffsets.wtTopOffset24)
         style {
-            backgroundColor(Color.RGBA(39, 40, 44, 0.05))
+            backgroundColor(rgba(39, 40, 44, 0.05))
             borderRadius(8.px, 8.px, 8.px)
             property("padding", "12px 16px")
         }
