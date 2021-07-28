@@ -87,7 +87,7 @@ import android.view.KeyEvent.KEYCODE_A as KeyCodeA
 }
 
 private object TestingSnippet3 {
-    // file: app/src/androidTest/java/com/package/MyComposeTest.kt
+    // file: app/src/androidTest/kotlin/com/package/MyComposeTest.kt
 
     class MyComposeTest {
 
