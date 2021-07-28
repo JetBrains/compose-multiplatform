@@ -1,5 +1,5 @@
 # Style DSL in Compose Web
-**The API is experimental, and breaking changes can be expected**
+**The API is not finalized, and breaking changes can be expected**
 
 ## Introduction
 In this tutorial we have a look at how to style the components using the Style DSL. It’s a typesafe DSL for style sheets, which you can use to express CSS rules in your Kotlin code, and even modify styles based on the state of your Compose application.
@@ -101,11 +101,11 @@ object AppStylesheet : StyleSheet() {
     // A convenient way to create a class selector
     // AppStylesheet.container can be used as a class in component attrs
     val container by style {
-        color("red")
+        color(Color.red)
         
         // hover selector for a class
         self + hover() style { // self is a selector for `container`
-            color("green")
+            color(Color.green)
         }
     }
 }
@@ -135,9 +135,9 @@ object AppStylesheet : StyleSheet() {
 The style DSL also provides support for CSS variables.
 
 ``` kotlin
-object MyVariables : CSSVariables {
+object MyVariables {
     // declare a variable
-    val contentBackgroundColor by variable<Color>() 
+    val contentBackgroundColor by variable<CSSColorValue>()
 }
 
 object MyStyleSheet: StyleSheet() {
@@ -168,6 +168,30 @@ import androidx.compose.runtime.Composable
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.*
 import org.jetbrains.compose.web.renderComposable
+
+object MyVariables {
+    // declare a variable
+    val contentBackgroundColor by variable<CSSColorValue>()
+}
+
+object MyStyleSheet: StyleSheet() {
+
+    val container by style {
+        //set variable's value for the `container` scope
+        MyVariables.contentBackgroundColor(Color("blue"))
+    }
+
+    val content by style {
+        // get the value
+        backgroundColor(MyVariables.contentBackgroundColor.value())
+    }
+
+    val contentWithDefaultBgColor by style {
+        // default value can be provided as well
+        // default value is used when the value is not previously set
+        backgroundColor(MyVariables.contentBackgroundColor.value(Color("#333")))
+    }
+}
 
 object AppStylesheet : StyleSheet() {
     val container by style { // container is a class

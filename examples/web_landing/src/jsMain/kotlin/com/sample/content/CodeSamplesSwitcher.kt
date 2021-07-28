@@ -15,7 +15,7 @@ import org.jetbrains.compose.web.dom.Text
 import com.sample.style.AppStylesheet
 import org.jetbrains.compose.web.attributes.value
 
-private object SwitcherVariables : CSSVariables {
+private object SwitcherVariables {
     val labelWidth by variable<CSSpxValue>()
     val labelPadding by variable<CSSpxValue>()
 }
@@ -23,7 +23,7 @@ private object SwitcherVariables : CSSVariables {
 object SwitcherStylesheet : StyleSheet(AppStylesheet) {
     val boxed by style {
 
-        media(maxWidth(640.px)) {
+        media(mediaMaxWidth(640.px)) {
             self style {
                 SwitcherVariables.labelWidth(48.px)
                 SwitcherVariables.labelPadding(5.px)
@@ -44,7 +44,7 @@ object SwitcherStylesheet : StyleSheet(AppStylesheet) {
                 color(Color("transparent"))
                 borderRadius(20.px, 20.px, 20.px)
             }
-            color("#aaa")
+            color(Color("#aaa"))
         }
 
         border {
@@ -66,7 +66,7 @@ object SwitcherStylesheet : StyleSheet(AppStylesheet) {
                 color(Color("#167dff"))
                 borderRadius(20.px, 20.px, 20.px)
             }
-            color("#000")
+            color(Color("#000"))
         }
     }
 }
@@ -82,7 +82,7 @@ fun CodeSampleSwitcher(count: Int, current: Int, onSelect: (Int) -> Unit) {
                 value("snippet$ix")
                 id("snippet$ix")
                 if (current == ix) checked()
-                onRadioInput { onSelect(ix) }
+                onChange { onSelect(ix) }
             })
             Label(forId = "snippet$ix") { Text("${ix + 1}") }
         }

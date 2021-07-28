@@ -1,6 +1,6 @@
 # Building the UI with Compose Web
 
-**The API is experimental, and breaking changes can be expected**
+**The API is not finalized, and breaking changes can be expected**
 
 ## Introduction
 
@@ -62,7 +62,7 @@ If you want to apply styles to text, it needs to be wrapped in a container with 
 
 ``` kotlin
 Span(
-    attrs = { style { color("red") } } // inline style
+    attrs = { style { color(Color.red) } } // inline style
 ) {
     Text("Red text")
 }
@@ -202,7 +202,7 @@ fun main() {
         Text("Arbitrary text")
 
         Span({
-            style { color("red") } // inline style
+            style { color(Color.red) } // inline style
         }) {
             Text("Red text")
         }

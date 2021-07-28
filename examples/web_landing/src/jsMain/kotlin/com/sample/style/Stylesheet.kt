@@ -3,9 +3,9 @@ package com.sample.style
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.selectors.CSSSelector
 
-object AppCSSVariables : CSSVariables {
-    val wtColorGreyLight by variable<Color>()
-    val wtColorGreyDark by variable<Color>()
+object AppCSSVariables {
+    val wtColorGreyLight by variable<CSSColorValue>()
+    val wtColorGreyDark by variable<CSSColorValue>()
 
     val wtOffsetTopUnit by variable<CSSUnitValue>()
     val wtHorizontalLayoutGutter by variable<CSSUnitValue>()
@@ -39,11 +39,11 @@ object AppStylesheet : StyleSheet() {
         top((-32).px)
         marginLeft(8.px)
         fontSize(15.px)
-        backgroundColor(Color.RGBA(39, 40, 44, .05))
-        color(Color.RGBA(39,40,44,.7))
+        backgroundColor(rgba(39, 40, 44, .05))
+        color(rgba(39,40,44,.7))
         borderRadius(4.px, 4.px, 4.px)
 
-        media(maxWidth(640.px)) {
+        media(mediaMaxWidth(640.px)) {
             self style {
                 top((-16).px)
             }
@@ -66,7 +66,7 @@ object AppStylesheet : StyleSheet() {
             margin(0.px)
         }
 
-        media(maxWidth(640.px)) {
+        media(mediaMaxWidth(640.px)) {
             CSSSelector.Universal style {
                 AppCSSVariables.wtOffsetTopUnit(16.px)
                 AppCSSVariables.wtFlowUnit(16.px)
