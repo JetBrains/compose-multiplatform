@@ -17,7 +17,7 @@ kotlin {
 	sourceSets {
 		val jsMain by getting {
 			dependencies {
-				implementation(compose.web.core)
+				implementation(project(":web-core"))
 				implementation(compose.runtime)
 				implementation("org.jetbrains.kotlin-wrappers:kotlin-react:17.0.2-pre.201-kotlin-1.5.0")
 				implementation("org.jetbrains.kotlin-wrappers:kotlin-react-dom:17.0.2-pre.201-kotlin-1.5.0")

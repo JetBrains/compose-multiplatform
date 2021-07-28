@@ -18,10 +18,19 @@ subprojects {
 
         val buildGradleSpec = copySpec {
             from("build.gradle.kts") {
-                filter { 
-                    it.replace(
+                filter { line -> 
+                    line
+                    .replace(
                         "id(\"org.jetbrains.compose\")", 
                         "id(\"org.jetbrains.compose\") version \"$COMPOSE_CORE_VERSION\"", 
+                    )
+                    .replace(
+                        "implementation(project(\":web-core\"))",
+                        "implementation(compose.web.core)"
+                    )
+                    .replace(
+                        "implementation(project(\":web-widgets\"))",
+                        "implementation(compose.web.widgets)"
                     )
                 }
             }

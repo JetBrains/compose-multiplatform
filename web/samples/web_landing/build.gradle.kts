@@ -1,5 +1,4 @@
 plugins {
-    /** SHABUNC **/
     kotlin("multiplatform") version "1.5.21"
     id("org.jetbrains.compose")
 }
@@ -19,7 +18,7 @@ kotlin {
         val jsMain by getting {
             dependencies {
                 implementation(npm("highlight.js", "10.7.2"))
-                implementation(compose.web.core)
+                implementation(project(":web-core"))
                 implementation(compose.runtime)
             }
         }

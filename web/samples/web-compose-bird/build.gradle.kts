@@ -20,7 +20,7 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                implementation(compose.web.core)
+                implementation(project(":web-core"))
                 implementation(compose.runtime)
             }
         }
