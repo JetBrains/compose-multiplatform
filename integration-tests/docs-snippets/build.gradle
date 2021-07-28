@@ -29,6 +29,7 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.2.1")
 
     kotlinPlugin(project(":compose:compiler:compiler"))
+    implementation(project(":compose:animation:animation-graphics"))
     implementation(project(":compose:foundation:foundation-layout"))
     implementation(project(":compose:material:material"))
     implementation(project(":compose:material:material-icons-extended"))
