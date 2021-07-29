@@ -16,10 +16,7 @@ import org.jetbrains.compose.desktop.application.dsl.Application
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.validation.validatePackageVersions
 import org.jetbrains.compose.desktop.application.tasks.*
-import org.jetbrains.compose.internal.KOTLIN_JVM_PLUGIN_ID
-import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
-import org.jetbrains.compose.internal.javaExt
-import org.jetbrains.compose.internal.mppExt
+import org.jetbrains.compose.internal.*
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import java.io.File
 import java.util.*
@@ -34,7 +31,7 @@ fun configureApplicationImpl(project: Project, app: Application) {
         if (project.plugins.hasPlugin(KOTLIN_MPP_PLUGIN_ID)) {
             project.configureFromMppPlugin(app)
         } else if (project.plugins.hasPlugin(KOTLIN_JVM_PLUGIN_ID)) {
-            val mainSourceSet = project.javaExt.sourceSets.getByName("main")
+            val mainSourceSet = project.javaSourceSets.getByName("main")
             app.from(mainSourceSet)
         }
     }

@@ -3,10 +3,7 @@ package org.jetbrains.compose.desktop.preview.internal
 import org.gradle.api.Project
 import org.jetbrains.compose.desktop.application.dsl.ConfigurationSource
 import org.jetbrains.compose.desktop.preview.tasks.AbstractConfigureDesktopPreviewTask
-import org.jetbrains.compose.internal.KOTLIN_JVM_PLUGIN_ID
-import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
-import org.jetbrains.compose.internal.javaExt
-import org.jetbrains.compose.internal.mppExt
+import org.jetbrains.compose.internal.*
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
@@ -20,7 +17,7 @@ fun Project.initializePreview() {
         }
     }
     plugins.withId(KOTLIN_JVM_PLUGIN_ID) {
-        val config = ConfigurationSource.GradleSourceSet(project.javaExt.sourceSets.getByName("main"))
+        val config = ConfigurationSource.GradleSourceSet(project.javaSourceSets.getByName("main"))
         registerConfigurePreviewTask(project, config)
     }
 }
