@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.AwtWindow
+import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.WindowScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -16,7 +17,7 @@ import javax.swing.JOptionPane
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun WindowScope.FileDialog(
+fun FrameWindowScope.FileDialog(
     title: String,
     isLoad: Boolean,
     onResult: (result: Path?) -> Unit
