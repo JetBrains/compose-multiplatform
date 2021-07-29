@@ -1,27 +1,18 @@
 package org.jetbrains.compose.demo.widgets
 
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.*
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowSize
+import androidx.compose.ui.window.WindowState
+import androidx.compose.ui.window.application
 import org.jetbrains.compose.demo.widgets.ui.MainView
-import java.awt.Dimension
-import java.awt.Toolkit
 
-fun main() {
-    val size = getPreferredWindowSize(600, 800)
-    singleWindowApplication (
-            title = "Widgets Gallery",
-            state = WindowState(size = WindowSize(size.width.dp, size.height.dp)),
-        ) {
+fun main() = application {
+    Window(
+        onCloseRequest = ::exitApplication,
+        title = "Widgets Gallery",
+        state = WindowState(size = WindowSize(800.dp, 600.dp))
+    ) {
         MainView()
     }
-}
-
-private fun getPreferredWindowSize(desiredWidth: Int, desiredHeight: Int): IntSize {
-    val screenSize: Dimension = Toolkit.getDefaultToolkit().screenSize
-    val preferredWidth: Int = (screenSize.width * 0.8f).toInt()
-    val preferredHeight: Int = (screenSize.height * 0.8f).toInt()
-    val width: Int = if (desiredWidth < preferredWidth) desiredWidth else preferredWidth
-    val height: Int = if (desiredHeight < preferredHeight) desiredHeight else preferredHeight
-    return IntSize(width, height)
 }
