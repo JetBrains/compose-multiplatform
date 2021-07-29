@@ -185,8 +185,7 @@ internal fun CoreText(
                     } else {
                         Modifier.pointerInput(controller.mouseSelectionObserver) {
                             mouseSelectionDetector(
-                                controller.mouseSelectionObserver,
-                                finalPass = true
+                                controller.mouseSelectionObserver
                             )
                         }
                     }
@@ -473,10 +472,9 @@ internal class TextController(val state: TextState) {
             state.layoutCoordinates?.let {
                 if (!it.isAttached) return false
 
-                selectionRegistrar?.notifySelectionUpdate(
+                selectionRegistrar?.notifySelectionUpdateStart(
                     layoutCoordinates = it,
                     startPosition = downPosition,
-                    endPosition = downPosition,
                     adjustment = adjustment
                 )
 

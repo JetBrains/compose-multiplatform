@@ -82,14 +82,13 @@ private class ClicksCounter(
 }
 
 internal suspend fun PointerInputScope.mouseSelectionDetector(
-    observer: MouseSelectionObserver,
-    finalPass: Boolean
+    observer: MouseSelectionObserver
 ) {
     forEachGesture {
         awaitPointerEventScope {
             val clicksCounter = ClicksCounter(viewConfiguration)
             while (true) {
-                val down = awaitMouseEventDown(finalPass)
+                val down = awaitMouseEventDown()
                 clicksCounter.update(down)
                 val downChange = down.changes[0]
                 if (down.isShiftPressed) {
@@ -123,16 +122,10 @@ internal suspend fun PointerInputScope.mouseSelectionDetector(
     }
 }
 
-private suspend fun AwaitPointerEventScope.awaitMouseEventDown(finalPass: Boolean): PointerEvent {
+private suspend fun AwaitPointerEventScope.awaitMouseEventDown(): PointerEvent {
     var event: PointerEvent
     do {
-        event = awaitPointerEvent(
-            pass = if (finalPass) {
-                PointerEventPass.Final
-            } else {
-                PointerEventPass.Main
-            }
-        )
+        event = awaitPointerEvent(PointerEventPass.Main)
     } while (
         !event.changes.fastAll { it.type == PointerType.Mouse && it.changedToDown() }
     )
