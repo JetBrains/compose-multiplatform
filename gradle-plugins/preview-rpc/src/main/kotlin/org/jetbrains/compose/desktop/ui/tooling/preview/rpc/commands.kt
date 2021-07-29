@@ -63,7 +63,7 @@ data class ConfigFromGradle(
     val previewHostConfig: PreviewHostConfig
 )
 
-internal fun RemoteConnection.receiveConfigFromGradle(): ConfigFromGradle? {
+fun RemoteConnection.receiveConfigFromGradle(): ConfigFromGradle? {
     var previewClasspath: String? = null
     var previewFqName: String? = null
     var previewHostConfig: PreviewHostConfig? = null

@@ -28,12 +28,21 @@ fun module(name: String, path: String) {
     project(name).projectDir = file(path)
 }
 
+
 module(":web-core", "$rootDir/core")
 module(":web-widgets", "$rootDir/widgets")
 module(":web-integration-core", "$rootDir/integration-core")
 module(":web-integration-widgets", "$rootDir/integration-widgets")
 module(":web-benchmark-core", "$rootDir/benchmark-core")
 module(":compose-compiler-integration", "$rootDir/compose-compiler-integration")
+
+module(":samples:falling_balls_with_web", "samples/falling_balls_with_web")
+module(":samples:compose-web-lp", "samples/web_landing")
+module(":samples:web-compose-bird", "samples/web-compose-bird")
+module(":samples:web-with-react", "samples/web-with-react")
+module(":samples:web-getting-started", "samples/web-getting-started")
+
+
 
 if (extra["compose.web.buildSamples"]!!.toString().toBoolean() == true) {
     println("building with examples")

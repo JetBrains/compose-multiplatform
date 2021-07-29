@@ -8,6 +8,7 @@ package org.jetbrains.compose.web
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
 import org.jetbrains.compose.internal.mppExt
+import org.jetbrains.compose.internal.mppExtOrNull
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 
@@ -45,7 +46,7 @@ abstract class WebExtension : ExtensionAware {
     }
 
     private fun defaultJsTargetsToConfigure(project: Project): Set<KotlinJsIrTarget> {
-        val mppTargets = project.mppExt?.targets?.asMap?.values ?: emptySet()
+        val mppTargets = project.mppExtOrNull?.targets?.asMap?.values ?: emptySet()
         val jsIRTargets = mppTargets.filterIsInstanceTo(LinkedHashSet<KotlinJsIrTarget>())
 
         return if (jsIRTargets.size > 1) {
