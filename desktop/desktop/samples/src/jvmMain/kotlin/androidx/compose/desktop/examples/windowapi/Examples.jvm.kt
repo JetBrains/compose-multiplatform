@@ -37,7 +37,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.asPainter
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.res.loadSvgResource
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
@@ -553,16 +555,18 @@ fun menu() = GlobalScope.launchApplication {
         onCloseRequest = ::exitApplication
     ) {
         MenuBar {
-            Menu("File") {
+            Menu("File", mnemonic = 'F') {
                 CheckboxItem(
                     "Toggle submenu",
                     isSubmenuShowing,
+                    mnemonic = 'T',
                     onCheckedChange = {
                         isSubmenuShowing = it
-                    }
+                    },
+                    shortcut = KeyShortcut(Key.T, ctrl = true)
                 )
                 if (isSubmenuShowing) {
-                    Menu("Submenu") {
+                    Menu("Submenu", mnemonic = 'S') {
                         Item(
                             "item1",
                             icon = icon,
@@ -581,7 +585,7 @@ fun menu() = GlobalScope.launchApplication {
 
                 var radioState by remember { mutableStateOf(0) }
 
-                Menu("RadioButton") {
+                Menu("RadioButton", mnemonic = 'R') {
                     RadioButtonItem(
                         "item1",
                         selected = radioState == 0,
@@ -601,6 +605,11 @@ fun menu() = GlobalScope.launchApplication {
                 Separator()
                 Item("Exit", onClick = this@launchApplication::exitApplication)
             }
+        }
+
+        Column {
+            TextField("Consume T Key", {}, Modifier.onKeyEvent { it.key == Key.T })
+            TextField("Don't consume", {})
         }
     }
 }
