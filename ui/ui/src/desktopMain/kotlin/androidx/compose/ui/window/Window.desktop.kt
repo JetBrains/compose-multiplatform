@@ -190,6 +190,82 @@ fun ApplicationScope.Window(
 }
 
 /**
+ * An entry point for the Compose application with single window.
+ *
+ * If you need to change attributes of the window in runtime, or need a custom closing logic, use
+ * Composable `Window` in `application` entry point instead:
+ * ```
+ * application {
+ *     Window(...) { }
+ * }
+ * ```
+ *
+ * @param state The state object to be used to control or observe the window's state
+ * When size/position/status is changed by the user, state will be updated.
+ * When size/position/status of the window is changed by the application (changing state),
+ * the native window will update its corresponding properties.
+ * If application changes, for example [WindowState.placement], then after the next
+ * recomposition, [WindowState.size] will be changed to correspond the real size of the window.
+ * If [WindowState.position] is not [WindowPosition.isSpecified], then after the first show on the
+ * screen [WindowState.position] will be set to the absolute values.
+ * @param visible Is [Window] visible to user.
+ * If `false`:
+ * - internal state of [Window] is preserved and will be restored next time the window
+ * will be visible;
+ * - native resources will not be released. They will be released only when [Window]
+ * will leave the composition.
+ * @param title Title in the titlebar of the window
+ * @param icon Icon in the titlebar of the window (for platforms which support this)
+ * @param resizable Can window be resized by the user (application still can resize the window
+ * changing [state])
+ * @param enabled Can window react to input events
+ * @param focusable Can window receive focus
+ * @param alwaysOnTop Should window always be on top of another windows
+ * @param onPreviewKeyEvent This callback is invoked when the user interacts with the hardware
+ * keyboard. It gives ancestors of a focused component the chance to intercept a [KeyEvent].
+ * Return true to stop propagation of this event. If you return false, the key event will be
+ * sent to this [onPreviewKeyEvent]'s child. If none of the children consume the event,
+ * it will be sent back up to the root using the onKeyEvent callback.
+ * @param onKeyEvent This callback is invoked when the user interacts with the hardware
+ * keyboard. While implementing this callback, return true to stop propagation of this event.
+ * If you return false, the key event will be sent to this [onKeyEvent]'s parent.
+ * @param content Content of the window
+ *
+ * This API is experimental and will eventually replace [AppWindow] / [AppManager]
+ */
+@ExperimentalComposeUiApi
+fun singleWindowApplication(
+    state: WindowState = WindowState(),
+    visible: Boolean = true,
+    title: String = "Untitled",
+    icon: Painter? = null,
+    undecorated: Boolean = false,
+    resizable: Boolean = true,
+    enabled: Boolean = true,
+    focusable: Boolean = true,
+    alwaysOnTop: Boolean = false,
+    onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
+    onKeyEvent: (KeyEvent) -> Boolean = { false },
+    content: @Composable WindowScope.() -> Unit
+) = application {
+    Window(
+        ::exitApplication,
+        state,
+        visible,
+        title,
+        icon,
+        undecorated,
+        resizable,
+        enabled,
+        focusable,
+        alwaysOnTop,
+        onPreviewKeyEvent,
+        onKeyEvent,
+        content
+    )
+}
+
+/**
  * Compose [ComposeWindow] obtained from [create]. The [create] block will be called
  * exactly once to obtain the [ComposeWindow] to be composed, and it is also guaranteed to
  * be invoked on the UI thread (Event Dispatch Thread).

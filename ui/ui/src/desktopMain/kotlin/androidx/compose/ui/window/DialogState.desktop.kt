@@ -24,6 +24,7 @@ import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
@@ -50,23 +51,56 @@ fun rememberDialogState(
  * A state object that can be hoisted to control and observe dialog attributes
  * (size/position).
  *
- * In most cases, this will be created via [rememberDialogState].
- *
  * @param position the initial value for [DialogState.position]
  * @param size the initial value for [DialogState.size]
  */
 fun DialogState(
     position: WindowPosition = WindowPosition(Alignment.Center),
     size: WindowSize = WindowSize(400.dp, 300.dp)
-): DialogState = DialogStateImpl(
+): DialogState = DialogState(
     position, size
+)
+
+/**
+ * Creates a [DialogState] that is remembered across compositions.
+ *
+ * Changes to the provided initial values will **not** result in the state being recreated or
+ * changed in any way if it has already been created.
+ *
+ * @param position the initial value for [DialogState.position]
+ * @param width the initial value for width of [WindowState.size]
+ * @param height the initial value for height of  [WindowState.size]
+ */
+@Composable
+fun rememberDialogState(
+    position: WindowPosition = WindowPosition(Alignment.Center),
+    width: Dp = 400.dp,
+    height: Dp = 300.dp,
+): DialogState = rememberDialogState(
+    position,
+    WindowSize(width, height)
 )
 
 /**
  * A state object that can be hoisted to control and observe dialog attributes
  * (size/position).
  *
- * In most cases, this will be created via [rememberDialogState].
+ * @param position the initial value for [DialogState.position]
+ * @param width the initial value for width of [WindowState.size]
+ * @param height the initial value for height of  [WindowState.size]
+ */
+fun DialogState(
+    position: WindowPosition = WindowPosition(Alignment.Center),
+    width: Dp = 400.dp,
+    height: Dp = 300.dp,
+): DialogState = DialogStateImpl(
+    position,
+    WindowSize(width, height)
+)
+
+/**
+ * A state object that can be hoisted to control and observe dialog attributes
+ * (size/position).
  */
 interface DialogState {
     /**
