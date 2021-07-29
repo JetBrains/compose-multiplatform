@@ -33,7 +33,8 @@ internal fun buildErrorMessageForCountMismatch(
     errorMessage: String,
     selector: SemanticsSelector?,
     foundNodes: List<SemanticsNode>,
-    expectedCount: Int
+    expectedCount: Int,
+    foundNodesUnmerged: List<SemanticsNode> = emptyList()
 ): String {
     val sb = StringBuilder()
 
@@ -63,6 +64,18 @@ internal fun buildErrorMessageForCountMismatch(
         }
     } else {
         sb.append(".")
+    }
+
+    // If no nodes were found but they exist in the unmerged tree, display a warning.
+    if (foundNodes.isEmpty() && foundNodesUnmerged.isNotEmpty()) {
+        sb.appendLine()
+        sb.append("However, the unmerged tree contains ")
+        if (foundNodesUnmerged.size == 1) {
+            sb.append("'1' node that matches. ")
+        } else {
+            sb.append("'${foundNodesUnmerged.size}' nodes that match. ")
+        }
+        sb.append("Are you missing `useUnmergedNode = true` in your finder?")
     }
 
     sb.appendLine()
