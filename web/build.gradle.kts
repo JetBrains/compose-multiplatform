@@ -8,6 +8,12 @@ apply<jetbrains.compose.web.gradle.SeleniumDriverPlugin>()
 
 fun Project.isSampleProject() = projectDir.parentFile.name == "samples"
 
+tasks.register("generateExamples") {
+    dependsOn(
+       subprojects.filter { it.isSampleProject() }.map { ":samples:${it.name}:sync" } 
+    )
+}
+
 subprojects {
     apply(plugin = "maven-publish")
 
@@ -43,8 +49,7 @@ plugins {"""
         }
 
         tasks.register<Sync>("sync") {
-            println("project ===> ${project.projectDir.parentFile.name}")
-            val targetDir = rootProject.projectDir.resolve("../examples/${project.projectDir.name}")
+            val targetDir = rootProject.projectDir.resolve("../examples/${project.projectDir.name}").normalize()
             duplicatesStrategy = DuplicatesStrategy.INCLUDE
             from(project.projectDir)
             into(targetDir)
