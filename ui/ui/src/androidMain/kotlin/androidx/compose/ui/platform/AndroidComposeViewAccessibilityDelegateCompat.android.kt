@@ -2476,10 +2476,16 @@ internal fun SemanticsOwner
             unaccountedSpace.op(boundsInRoot, unaccountedSpace, Region.Op.REVERSE_DIFFERENCE)
         } else {
             if (currentNode.isFake) {
+                val parentNode = currentNode.parent
+                // use parent bounds for fake node
+                val boundsForFakeNode = if (parentNode?.layoutInfo?.isPlaced == true) {
+                    parentNode.boundsInRoot
+                } else {
+                    Rect(0f, 0f, 10f, 10f)
+                }
                 nodes[virtualViewId] = SemanticsNodeWithAdjustedBounds(
                     currentNode,
-                    // provide some non-zero size as otherwise it will be ignored
-                    Rect(0f, 0f, 10f, 10f).toAndroidRect()
+                    boundsForFakeNode.toAndroidRect()
                 )
             } else if (virtualViewId == AccessibilityNodeProviderCompat.HOST_VIEW_ID) {
                 // Root view might have WRAP_CONTENT layout params in which case it will have zero
