@@ -20,11 +20,9 @@ import android.os.Build.VERSION_CODES.O
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.Orientation.Horizontal
 import androidx.compose.foundation.gestures.Orientation.Vertical
-import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -54,7 +52,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.toSize
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
@@ -66,7 +63,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import kotlin.math.abs
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalComposeUiApi::class)
 @MediumTest
@@ -171,11 +167,11 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                             Horizontal ->
                                 Modifier
                                     .size(100.dp, 50.dp)
-                                    .horizontalScrollWithRelocation(rememberScrollState())
+                                    .horizontalScroll(rememberScrollState())
                             Vertical ->
                                 Modifier
                                     .size(50.dp, 100.dp)
-                                    .verticalScrollWithRelocation(rememberScrollState())
+                                    .verticalScroll(rememberScrollState())
                         }
                     )
             ) {
@@ -209,11 +205,11 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                             Horizontal ->
                                 Modifier
                                     .size(100.dp, 50.dp)
-                                    .horizontalScrollWithRelocation(rememberScrollState())
+                                    .horizontalScroll(rememberScrollState())
                             Vertical ->
                                 Modifier
                                     .size(50.dp, 100.dp)
-                                    .verticalScrollWithRelocation(rememberScrollState())
+                                    .verticalScroll(rememberScrollState())
                         }
                     )
             ) {
@@ -253,11 +249,11 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                             Horizontal ->
                                 Modifier
                                     .size(100.dp, 50.dp)
-                                    .horizontalScrollWithRelocation(rememberScrollState())
+                                    .horizontalScroll(rememberScrollState())
                             Vertical ->
                                 Modifier
                                     .size(50.dp, 100.dp)
-                                    .verticalScrollWithRelocation(rememberScrollState())
+                                    .verticalScroll(rememberScrollState())
                         }
                     )
             ) {
@@ -295,10 +291,8 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                     .background(LightGray)
                     .then(
                         when (orientation) {
-                            Horizontal ->
-                                Modifier.horizontalScrollWithRelocation(rememberScrollState())
-                            Vertical ->
-                                Modifier.verticalScrollWithRelocation(rememberScrollState())
+                            Horizontal -> Modifier.horizontalScroll(rememberScrollState())
+                            Vertical -> Modifier.verticalScroll(rememberScrollState())
                         }
                     )
             ) {
@@ -333,8 +327,8 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                     .background(LightGray)
                     .then(
                         when (orientation) {
-                            Horizontal -> Modifier.horizontalScrollWithRelocation(scrollState)
-                            Vertical -> Modifier.verticalScrollWithRelocation(scrollState)
+                            Horizontal -> Modifier.horizontalScroll(scrollState)
+                            Vertical -> Modifier.verticalScroll(scrollState)
                         }
                     )
             ) {
@@ -370,8 +364,8 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                     .background(LightGray)
                     .then(
                         when (orientation) {
-                            Horizontal -> Modifier.horizontalScrollWithRelocation(scrollState)
-                            Vertical -> Modifier.verticalScrollWithRelocation(scrollState)
+                            Horizontal -> Modifier.horizontalScroll(scrollState)
+                            Vertical -> Modifier.verticalScroll(scrollState)
                         }
                     )
             ) {
@@ -409,11 +403,11 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                             Horizontal ->
                                 Modifier
                                     .size(100.dp, 50.dp)
-                                    .horizontalScrollWithRelocation(scrollState)
+                                    .horizontalScroll(scrollState)
                             Vertical ->
                                 Modifier
                                     .size(50.dp, 100.dp)
-                                    .verticalScrollWithRelocation(scrollState)
+                                    .verticalScroll(scrollState)
                         }
                     )
             ) {
@@ -463,11 +457,11 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                             Horizontal ->
                                 Modifier
                                     .size(100.dp, 50.dp)
-                                    .horizontalScrollWithRelocation(scrollState)
+                                    .horizontalScroll(scrollState)
                             Vertical ->
                                 Modifier
                                     .size(50.dp, 100.dp)
-                                    .verticalScrollWithRelocation(scrollState)
+                                    .verticalScroll(scrollState)
                         }
                     )
             ) {
@@ -517,11 +511,11 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                             Horizontal ->
                                 Modifier
                                     .size(100.dp, 50.dp)
-                                    .horizontalScrollWithRelocation(scrollState)
+                                    .horizontalScroll(scrollState)
                             Vertical ->
                                 Modifier
                                     .size(50.dp, 100.dp)
-                                    .verticalScrollWithRelocation(scrollState)
+                                    .verticalScroll(scrollState)
                         }
                     )
             ) {
@@ -566,11 +560,11 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                             Horizontal ->
                                 Modifier
                                     .size(100.dp, 50.dp)
-                                    .horizontalScrollWithRelocation(scrollState)
+                                    .horizontalScroll(scrollState)
                             Vertical ->
                                 Modifier
                                     .size(50.dp, 100.dp)
-                                    .verticalScrollWithRelocation(scrollState)
+                                    .verticalScroll(scrollState)
                         }
                     )
             ) {
@@ -622,11 +616,11 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                             Horizontal ->
                                 Modifier
                                     .size(100.dp, 50.dp)
-                                    .horizontalScrollWithRelocation(grandParentScrollState)
+                                    .horizontalScroll(grandParentScrollState)
                             Vertical ->
                                 Modifier
                                     .size(50.dp, 100.dp)
-                                    .verticalScrollWithRelocation(grandParentScrollState)
+                                    .verticalScroll(grandParentScrollState)
                         }
                     )
             ) {
@@ -638,11 +632,11 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                                 Horizontal ->
                                     Modifier
                                         .size(200.dp, 50.dp)
-                                        .horizontalScrollWithRelocation(parentScrollState)
+                                        .horizontalScroll(parentScrollState)
                                 Vertical ->
                                     Modifier
                                         .size(50.dp, 200.dp)
-                                        .verticalScrollWithRelocation(parentScrollState)
+                                        .verticalScroll(parentScrollState)
                             }
                         )
                 ) {
@@ -696,11 +690,11 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                             Horizontal ->
                                 Modifier
                                     .size(100.dp, 50.dp)
-                                    .verticalScrollWithRelocation(grandParentScrollState)
+                                    .verticalScroll(grandParentScrollState)
                             Vertical ->
                                 Modifier
                                     .size(50.dp, 100.dp)
-                                    .horizontalScrollWithRelocation(grandParentScrollState)
+                                    .horizontalScroll(grandParentScrollState)
                         }
                     )
             ) {
@@ -710,10 +704,8 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                         .background(LightGray)
                         .then(
                             when (orientation) {
-                                Horizontal ->
-                                    Modifier.horizontalScrollWithRelocation(parentScrollState)
-                                Vertical ->
-                                    Modifier.verticalScrollWithRelocation(parentScrollState)
+                                Horizontal -> Modifier.horizontalScroll(parentScrollState)
+                                Vertical -> Modifier.verticalScroll(parentScrollState)
                             }
                         )
                 ) {
@@ -753,10 +745,8 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                     .background(LightGray)
                     .then(
                         when (orientation) {
-                            Horizontal ->
-                                Modifier.horizontalScrollWithRelocation(rememberScrollState())
-                            Vertical ->
-                                Modifier.verticalScrollWithRelocation(rememberScrollState())
+                            Horizontal -> Modifier.horizontalScroll(rememberScrollState())
+                            Vertical -> Modifier.verticalScroll(rememberScrollState())
                         }
                     )
             ) {
@@ -824,68 +814,4 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         }
         rule.waitForIdle()
     }
-}
-
-// This is a helper function that users will have to use since experimental "ui" API cannot be used
-// inside Scrollable, which is ihe "foundation" package. After onRelocationRequest is added
-// to Scrollable, users can use Modifier.horizontalScroll directly.
-@OptIn(ExperimentalComposeUiApi::class)
-private fun Modifier.horizontalScrollWithRelocation(
-    state: ScrollState,
-    enabled: Boolean = true,
-    flingBehavior: FlingBehavior? = null,
-    reverseScrolling: Boolean = false
-): Modifier {
-    return this
-        .onRelocationRequest(
-            onProvideDestination = { rect, layoutCoordinates ->
-                val size = layoutCoordinates.size.toSize()
-                rect.translate(relocationDistance(rect.left, rect.right, size.width), 0f)
-            },
-            onPerformRelocation = { source, destination ->
-                val offset = destination.left - source.left
-                state.animateScrollBy(if (reverseScrolling) -offset else offset)
-            }
-        )
-        .horizontalScroll(state, enabled, flingBehavior, reverseScrolling)
-}
-
-// This is a helper function that users will have to use since experimental "ui" API cannot be used
-// inside Scrollable, which is ihe "foundation" package. After onRelocationRequest is added
-// to Scrollable, users can use Modifier.verticalScroll directly.
-@OptIn(ExperimentalComposeUiApi::class)
-private fun Modifier.verticalScrollWithRelocation(
-    state: ScrollState,
-    enabled: Boolean = true,
-    flingBehavior: FlingBehavior? = null,
-    reverseScrolling: Boolean = false
-): Modifier {
-    return this
-        .onRelocationRequest(
-            onProvideDestination = { rect, layoutCoordinates ->
-                val size = layoutCoordinates.size.toSize()
-                rect.translate(0f, relocationDistance(rect.top, rect.bottom, size.height))
-            },
-            onPerformRelocation = { source, destination ->
-                val offset = destination.top - source.top
-                state.animateScrollBy(if (reverseScrolling) -offset else offset)
-            }
-        )
-        .verticalScroll(state, enabled, flingBehavior, reverseScrolling)
-}
-
-// Calculate the offset needed to bring one of the edges into view. The leadingEdge is the side
-// closest to the origin (For the x-axis this is 'left', for the y-axis this is 'top').
-// The trailing edge is the other side (For the x-axis this is 'right', for the y-axis this is
-// 'bottom').
-private fun relocationDistance(leadingEdge: Float, trailingEdge: Float, parentSize: Float) = when {
-    // If the item is already visible, no need to scroll.
-    leadingEdge >= 0 && trailingEdge <= parentSize -> 0f
-
-    // If the item is visible but larger than the parent, we don't scroll.
-    leadingEdge < 0 && trailingEdge > parentSize -> 0f
-
-    // Find the minimum scroll needed to make one of the edges coincide with the parent's edge.
-    abs(leadingEdge) < abs(trailingEdge - parentSize) -> leadingEdge
-    else -> trailingEdge - parentSize
 }

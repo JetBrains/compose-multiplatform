@@ -18,8 +18,6 @@ package androidx.compose.ui.focus
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.gestures.FlingBehavior
-import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -32,24 +30,24 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.focus.FocusDirection.Companion.Left
+import androidx.compose.ui.focus.FocusDirection.Companion.Right
 import androidx.compose.ui.layout.RelocationRequester
-import androidx.compose.ui.layout.onRelocationRequest
 import androidx.compose.ui.layout.relocationRequester
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.unit.toSize
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.launch
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.math.abs
+import org.junit.runners.Parameterized
 
 @MediumTest
-@RunWith(AndroidJUnit4::class)
-class FocusInScrollableRowTest {
+@RunWith(Parameterized::class)
+class FocusInScrollableRowTest(private val reverseScrolling: Boolean) {
     @get:Rule
     val rule = createComposeRule()
     val itemSize = with(rule.density) { 100.toDp() }
@@ -60,12 +58,13 @@ class FocusInScrollableRowTest {
     fun focusingOnVisibleItemDoesNotScroll() {
         // Arrange.
         val visibleItem = FocusRequester()
-        rule.setContent {
-            ScrollableRow {
-                FocusableBox(Modifier.focusRequester(visibleItem))
-                FocusableBox()
-                FocusableBox()
-                FocusableBox()
+        rule.setContentForTest {
+            ScrollableRow(Modifier.size(itemSize * 3, itemSize)) {
+                FocusableBox(Modifier.size(itemSize))
+                FocusableBox(Modifier.size(itemSize))
+                FocusableBox(Modifier.size(itemSize).focusRequester(visibleItem))
+                FocusableBox(Modifier.size(itemSize))
+                FocusableBox(Modifier.size(itemSize))
             }
         }
 
@@ -73,21 +72,20 @@ class FocusInScrollableRowTest {
         rule.runOnIdle { visibleItem.requestFocus() }
 
         // Assert.
-        rule.runOnIdle {
-            assertThat(scrollState.value).isEqualTo(0)
-        }
+        rule.runOnIdle { assertThat(scrollState.value).isEqualTo(0) }
     }
 
     @Test
     fun focusingOutOfBoundsItem_bringsItIntoView() {
         // Arrange.
         val outOfBoundsItem = FocusRequester()
-        rule.setContent {
-            ScrollableRow {
-                FocusableBox()
-                FocusableBox()
-                FocusableBox(Modifier.focusRequester(outOfBoundsItem))
-                FocusableBox()
+        rule.setContentForTest {
+            ScrollableRow(Modifier.size(itemSize * 2, itemSize)) {
+                FocusableBox(Modifier.size(itemSize))
+                FocusableBox(Modifier.size(itemSize))
+                FocusableBox(Modifier.size(itemSize).focusRequester(outOfBoundsItem))
+                FocusableBox(Modifier.size(itemSize))
+                FocusableBox(Modifier.size(itemSize))
             }
         }
 
@@ -95,52 +93,60 @@ class FocusInScrollableRowTest {
         rule.runOnIdle { outOfBoundsItem.requestFocus() }
 
         // Assert.
-        rule.runOnIdle {
-            assertThat(scrollState.value).isEqualTo(100)
-        }
+        rule.runOnIdle { assertThat(scrollState.value).isEqualTo(100) }
     }
 
     @Test
-    fun moveRightFromBoundaryItem_bringsNextItemIntoView() {
+    fun moveOutFromBoundaryItem_bringsNextItemIntoView() {
         // Arrange.
         val itemOnBoundary = FocusRequester()
-        rule.setContent {
-            ScrollableRow {
-                FocusableBox()
-                FocusableBox(Modifier.focusRequester(itemOnBoundary))
-                FocusableBox()
-                FocusableBox()
+        rule.setContentForTest {
+            ScrollableRow(Modifier.size(itemSize * 2, itemSize)) {
+                FocusableBox(Modifier.size(itemSize))
+                FocusableBox(Modifier.size(itemSize).focusRequester(itemOnBoundary))
+                FocusableBox(Modifier.size(itemSize))
             }
         }
         rule.runOnIdle { itemOnBoundary.requestFocus() }
 
         // Act.
-        rule.runOnIdle { focusManager.moveFocus(FocusDirection.Right) }
+        rule.runOnIdle { focusManager.moveFocus(if (reverseScrolling) Left else Right) }
 
         // Assert.
         rule.runOnIdle { assertThat(scrollState.value).isEqualTo(100) }
     }
 
+    companion object {
+        @JvmStatic
+        @Parameterized.Parameters(name = "reverseScrolling = {0}")
+        fun initParameters() = listOf(true, false)
+    }
+
     @Composable
-    private fun ScrollableRow(content: @Composable RowScope.() -> Unit) {
-        scrollState = rememberScrollState()
-        focusManager = LocalFocusManager.current
+    private fun ScrollableRow(modifier: Modifier, content: @Composable RowScope.() -> Unit) {
         Row(
-            modifier = Modifier
-                .size(itemSize * 2, itemSize)
-                .horizontalScrollWithRelocation(scrollState),
+            modifier = modifier.horizontalScroll(
+                state = scrollState,
+                reverseScrolling = reverseScrolling
+            ),
             content = content
         )
     }
 
-    @Composable
-    private fun FocusableBox(modifier: Modifier = Modifier) {
-        Box(
-            modifier
-                .size(itemSize)
-                .focusableWithRelocation()
-        )
+    private fun ComposeContentTestRule.setContentForTest(
+        composable: @Composable () -> Unit
+    ) {
+        setContent {
+            scrollState = rememberScrollState()
+            focusManager = LocalFocusManager.current
+            composable()
+        }
     }
+}
+
+@Composable
+private fun FocusableBox(modifier: Modifier = Modifier) {
+    Box(modifier.focusableWithRelocation())
 }
 
 // This is a hel function that users will have to use until bringIntoView is added to
@@ -157,44 +163,4 @@ private fun Modifier.focusableWithRelocation() = composed {
             }
         }
         .focusable()
-}
-
-// This is a helper function that users will have to use since experimental "ui" API cannot be used
-// inside Scrollable, which is ihe "foundation" package. After onRelocationRequest is added
-// to Scrollable, users can use Modifier.horizontalScroll directly.
-@OptIn(ExperimentalComposeUiApi::class)
-private fun Modifier.horizontalScrollWithRelocation(
-    state: ScrollState,
-    enabled: Boolean = true,
-    flingBehavior: FlingBehavior? = null,
-    reverseScrolling: Boolean = false
-): Modifier {
-    return this
-        .onRelocationRequest(
-            onProvideDestination = { rect, layoutCoordinates ->
-                val size = layoutCoordinates.size.toSize()
-                rect.translate(relocationDistance(rect.left, rect.right, size.width), 0f)
-            },
-            onPerformRelocation = { source, destination ->
-                val offset = destination.left - source.left
-                state.animateScrollBy(if (reverseScrolling) -offset else offset)
-            }
-        )
-        .horizontalScroll(state, enabled, flingBehavior, reverseScrolling)
-}
-
-// Calculate the offset needed to bring one of the edges into view. The leadingEdge is the side
-// closest to the origin (For the x-axis this is 'left', for the y-axis this is 'top').
-// The trailing edge is the other side (For the x-axis this is 'right', for the y-axis this is
-// 'bottom').
-private fun relocationDistance(leadingEdge: Float, trailingEdge: Float, parentSize: Float) = when {
-    // If the item is already visible, no need to scroll.
-    leadingEdge >= 0 && trailingEdge <= parentSize -> 0f
-
-    // If the item is visible but larger than the parent, we don't scroll.
-    leadingEdge < 0 && trailingEdge > parentSize -> 0f
-
-    // Find the minimum scroll needed to make one of the edges coincide with the parent's edge.
-    abs(leadingEdge) < abs(trailingEdge - parentSize) -> leadingEdge
-    else -> trailingEdge - parentSize
 }
