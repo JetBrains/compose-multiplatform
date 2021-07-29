@@ -148,13 +148,17 @@ internal class DesktopOwners(
             return list.lastOrNull()
         }
 
+    private fun DesktopOwner?.isAbove(
+        targetOwner: DesktopOwner?
+    ) = list.indexOf(this) > list.indexOf(targetOwner)
+
     fun onMousePressed(x: Int, y: Int, nativeEvent: MouseEvent? = null) {
         isMousePressed = true
         val currentOwner = hoveredOwner
         if (currentOwner != null) {
-            if (currentOwner.isFocusable && focusedOwner != currentOwner) {
+            if (focusedOwner.isAbove(currentOwner)) {
                 focusedOwner?.onDismissRequest?.invoke()
-                focusedOwner = currentOwner
+                return
             } else {
                 currentOwner.processPointerInput(
                     pointerInputEvent(nativeEvent, x, y, isMousePressed)
