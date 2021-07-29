@@ -132,7 +132,9 @@ package androidx.compose.ui.graphics {
   }
 
   public final class AndroidTileMode_androidKt {
+    method public static boolean isSupported(int);
     method public static android.graphics.Shader.TileMode toAndroidTileMode(int);
+    method public static int toComposeTileMode(android.graphics.Shader.TileMode);
   }
 
   public final class AndroidVertexMode_androidKt {
@@ -756,9 +758,11 @@ package androidx.compose.ui.graphics {
 
   public static final class TileMode.Companion {
     method public int getClamp();
+    method public int getDecal();
     method public int getMirror();
     method public int getRepeated();
     property public final int Clamp;
+    property public final int Decal;
     property public final int Mirror;
     property public final int Repeated;
   }

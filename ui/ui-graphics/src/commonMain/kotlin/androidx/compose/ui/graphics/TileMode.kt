@@ -62,12 +62,27 @@ inline class TileMode internal constructor(@Suppress("unused") private val value
          * negative direction).
          */
         val Mirror = TileMode(2)
+
+        /**
+         * Render the shader's image pixels only within its original bounds. If the shader
+         * draws outside of its original bounds, transparent black is drawn instead.
+         */
+        val Decal = TileMode(3)
     }
 
     override fun toString() = when (this) {
         Clamp -> "Clamp"
         Repeated -> "Repeated"
         Mirror -> "Mirror"
+        Decal -> "Decal"
         else -> "Unknown"
     }
 }
+
+/**
+ * Capability query to determine if the particular platform supports the [TileMode]. Not
+ * all platforms support all tile mode algorithms, however, [TileMode.Clamp], [TileMode.Repeated]
+ * and [TileMode.Mirror] are guaranteed to be supported. If a [TileMode] that is not supported is
+ * used, the default of [TileMode.Clamp] is consumed instead.
+ */
+expect fun TileMode.isSupported(): Boolean
