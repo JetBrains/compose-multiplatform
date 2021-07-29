@@ -53,10 +53,34 @@ fun rememberWindowState(
 }
 
 /**
+ * Creates a [WindowState] that is remembered across compositions.
+ *
+ * Changes to the provided initial values will **not** result in the state being recreated or
+ * changed in any way if it has already been created.
+ *
+ * @param placement the initial value for [WindowState.placement]
+ * @param isMinimized the initial value for [WindowState.isMinimized]
+ * @param position the initial value for [WindowState.position]
+ * @param width the initial value for width of [WindowState.size]
+ * @param height the initial value for height of  [WindowState.size]
+ */
+@Composable
+fun rememberWindowState(
+    placement: WindowPlacement = WindowPlacement.Floating,
+    isMinimized: Boolean = false,
+    position: WindowPosition = WindowPosition.PlatformDefault,
+    width: Dp = 800.dp,
+    height: Dp = 600.dp
+): WindowState = rememberWindowState(
+    placement,
+    isMinimized,
+    position,
+    WindowSize(width, height)
+)
+
+/**
  * A state object that can be hoisted to control and observe window attributes
  * (size/position/state).
- *
- * In most cases, this will be created via [rememberWindowState].
  *
  * @param placement the initial value for [WindowState.placement]
  * @param isMinimized the initial value for [WindowState.isMinimized]
@@ -76,7 +100,25 @@ fun WindowState(
  * A state object that can be hoisted to control and observe window attributes
  * (size/position/state).
  *
- * In most cases, this will be created via [rememberWindowState].
+ * @param placement the initial value for [WindowState.placement]
+ * @param isMinimized the initial value for [WindowState.isMinimized]
+ * @param position the initial value for [WindowState.position]
+ * @param width the initial value for width of [WindowState.size]
+ * @param height the initial value for height of  [WindowState.size]
+ */
+fun WindowState(
+    placement: WindowPlacement = WindowPlacement.Floating,
+    isMinimized: Boolean = false,
+    position: WindowPosition = WindowPosition.PlatformDefault,
+    width: Dp = 800.dp,
+    height: Dp = 600.dp
+): WindowState = WindowState(
+    placement, isMinimized, position, WindowSize(width, height)
+)
+
+/**
+ * A state object that can be hoisted to control and observe window attributes
+ * (size/position/state).
  */
 interface WindowState {
     /**
