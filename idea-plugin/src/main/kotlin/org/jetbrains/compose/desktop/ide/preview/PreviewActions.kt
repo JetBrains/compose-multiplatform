@@ -57,7 +57,7 @@ private fun buildPreviewViaGradle(project: Project, previewLocation: PreviewLoca
     val settings = ExternalSystemTaskExecutionSettings()
     settings.executionName = "Preview: ${previewLocation.fqName}"
     settings.externalProjectPath = previewLocation.modulePath
-    settings.taskNames = listOf("configureDesktopPreview")
+    settings.taskNames = listOf(previewLocation.taskName)
     settings.vmOptions = gradleVmOptions
     settings.externalSystemIdString = GradleConstants.SYSTEM_ID.id
     val previewService = project.service<PreviewStateService>()
