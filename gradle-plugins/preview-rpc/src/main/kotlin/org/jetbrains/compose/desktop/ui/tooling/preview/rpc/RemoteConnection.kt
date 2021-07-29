@@ -39,6 +39,7 @@ abstract class RemoteConnection : AutoCloseable {
     }
 }
 
+// Constructor is also used in GradlePluginTest#configurePreview via reflection
 internal class RemoteConnectionImpl(
     private val socket: Socket,
     private val log: PreviewLogger,
