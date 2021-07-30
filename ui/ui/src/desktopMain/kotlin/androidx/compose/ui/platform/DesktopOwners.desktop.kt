@@ -104,6 +104,9 @@ internal class DesktopOwners(
         desktopOwner.onNeedsRender = ::invalidateIfNeeded
         desktopOwner.onDispatchCommand = ::dispatchCommand
         invalidateIfNeeded()
+        if (desktopOwner.isFocusable) {
+            focusedOwner = desktopOwner
+        }
     }
 
     fun unregister(desktopOwner: DesktopOwner) {
@@ -133,7 +136,7 @@ internal class DesktopOwners(
         invalidateIfNeeded()
     }
 
-    internal var focusedOwner: DesktopOwner? = null
+    private var focusedOwner: DesktopOwner? = null
     private val hoveredOwner: DesktopOwner?
         get() {
             listCopy.addAll(list)
@@ -173,14 +176,11 @@ internal class DesktopOwners(
         isMousePressed = false
         val currentOwner = hoveredOwner
         if (currentOwner != null) {
-            if (currentOwner.isFocusable) {
-                focusedOwner = currentOwner
-            } else {
-                currentOwner.processPointerInput(
-                    pointerInputEvent(nativeEvent, x, y, isMousePressed)
-                )
-                return
-            }
+            currentOwner.processPointerInput(
+                pointerInputEvent(nativeEvent, x, y, isMousePressed)
+            )
+            pointerId += 1
+            return
         }
         focusedOwner?.processPointerInput(pointerInputEvent(nativeEvent, x, y, isMousePressed))
         pointerId += 1
@@ -190,11 +190,12 @@ internal class DesktopOwners(
 
     fun onMouseMoved(x: Int, y: Int, nativeEvent: MouseEvent? = null) {
         pointLocation = IntOffset(x, y)
+        val currentOwner = hoveredOwner
         val event = pointerInputEvent(nativeEvent, x, y, isMousePressed)
-        val result = hoveredOwner?.processPointerInput(event)
+        val result = currentOwner?.processPointerInput(event)
         if (result?.anyMovementConsumed != true) {
             val position = Offset(x.toFloat(), y.toFloat())
-            hoveredOwner?.onPointerMove(position)
+            currentOwner?.onPointerMove(position)
         }
     }
 
