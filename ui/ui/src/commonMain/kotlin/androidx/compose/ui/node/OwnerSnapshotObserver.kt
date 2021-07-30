@@ -39,6 +39,12 @@ internal class OwnerSnapshotObserver(onChangedExecutor: (callback: () -> Unit) -
         }
     }
 
+    private val onCommitAffectingLayoutModifier: (LayoutNode) -> Unit = { layoutNode ->
+        if (layoutNode.isValid) {
+            layoutNode.requestRelayout()
+        }
+    }
+
     /**
      * Observing the snapshot reads are temporary disabled during the [block] execution.
      * For example if we are currently within the measure stage and we want some code block to
@@ -54,6 +60,13 @@ internal class OwnerSnapshotObserver(onChangedExecutor: (callback: () -> Unit) -
      */
     internal fun observeLayoutSnapshotReads(node: LayoutNode, block: () -> Unit) {
         observeReads(node, onCommitAffectingLayout, block)
+    }
+
+    /**
+     * Observe snapshot reads during layout of [node]'s LayoutModifiers, executed in [block].
+     */
+    internal fun observeLayoutModifierSnapshotReads(node: LayoutNode, block: () -> Unit) {
+        observeReads(node, onCommitAffectingLayoutModifier, block)
     }
 
     /**
