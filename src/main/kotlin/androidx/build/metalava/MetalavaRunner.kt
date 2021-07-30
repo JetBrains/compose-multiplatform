@@ -17,10 +17,12 @@
 package androidx.build.metalava
 
 import androidx.build.checkapi.ApiLocation
+import androidx.build.dependencies.getDependencyAsString
 import androidx.build.java.JavaCompileInputs
 import androidx.build.logging.TERMINAL_RED
 import androidx.build.logging.TERMINAL_RESET
 import org.gradle.api.Project
+import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.SetProperty
@@ -76,8 +78,14 @@ abstract class MetalavaWorkAction @Inject constructor (
 }
 
 fun Project.getMetalavaClasspath(): FileCollection {
+    @Suppress("UnstableApiUsage") // Usage of VersionCatalogsExtension
     val configuration = configurations.findByName("metalava") ?: configurations.create("metalava") {
-        val dependency = dependencies.create("com.android.tools.metalava:metalava:1.0.0-alpha03")
+        val libs = project.extensions.getByType(
+            VersionCatalogsExtension::class.java
+        ).find("libs").get()
+        val dependency = dependencies.create(
+            getDependencyAsString(libs.findDependency("metalava").get())
+        )
         it.dependencies.add(dependency)
     }
     return project.files(configuration)
