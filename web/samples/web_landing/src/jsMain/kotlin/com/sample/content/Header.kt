@@ -50,8 +50,8 @@ private fun LanguageButton() {
             onClick { window.alert("Oops! This feature is yet to be implemented") }
         }) {
             Img(src = "ic_lang.svg", attrs = { style {
-                property("padding-left", 8.px)
-                property("padding-right", 8.px)
+                paddingLeft(8.px)
+                paddingRight(8.px)
             }})
             Text("English")
         }

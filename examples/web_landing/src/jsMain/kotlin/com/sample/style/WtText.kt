@@ -8,11 +8,11 @@ object WtTexts : StyleSheet(AppStylesheet) {
     val wtHero by style {
         color(Color("#27282c"))
         fontSize(60.px)
-        property("font-size", AppCSSVariables.wtHeroFontSize.value(60.px))
-        property("letter-spacing", (-1.5).px)
-        property("font-weight", 900)
-        property("line-height", 64.px)
-        property("line-height", AppCSSVariables.wtHeroLineHeight.value(64.px))
+        fontSize(AppCSSVariables.wtHeroFontSize.value(60.px))
+        letterSpacing((-1.5).px)
+        fontWeight(900)
+        lineHeight(64.px)
+        lineHeight(AppCSSVariables.wtHeroLineHeight.value(64.px))
 
         media(mediaMaxWidth(640.px)) {
             self style {
@@ -30,11 +30,11 @@ object WtTexts : StyleSheet(AppStylesheet) {
     val wtSubtitle2 by style {
         color(Color("#27282c"))
         fontSize(28.px)
-        property("font-size", AppCSSVariables.wtSubtitle2FontSize.value(28.px))
-        property("letter-spacing", "normal")
-        property("font-weight", 300)
-        property("line-height", 40.px)
-        property("line-height", AppCSSVariables.wtSubtitle2LineHeight.value(40.px))
+        fontSize(AppCSSVariables.wtSubtitle2FontSize.value(28.px))
+        letterSpacing("normal")
+        fontWeight(300)
+        lineHeight(40.px)
+        lineHeight(AppCSSVariables.wtSubtitle2LineHeight.value(40.px))
 
         media(mediaMaxWidth(640.px)) {
             self style {
@@ -52,9 +52,9 @@ object WtTexts : StyleSheet(AppStylesheet) {
     val wtText1 by style {
         color(rgba(39, 40, 44, .7))
         fontSize(18.px)
-        property("letter-spacing", "normal")
-        property("font-weight", 400)
-        property("line-height", 28.px)
+        letterSpacing("normal")
+        fontWeight(400)
+        lineHeight(28.px)
 
         property(
             "font-family",
@@ -69,9 +69,9 @@ object WtTexts : StyleSheet(AppStylesheet) {
     val wtText2 by style {
         color(rgba(39, 40, 44, .7))
         fontSize(15.px)
-        property("letter-spacing", "normal")
-        property("font-weight", 400)
-        property("line-height", 24.px)
+        letterSpacing("normal")
+        fontWeight(400)
+        lineHeight(24.px)
 
         property(
             "font-family",
@@ -82,9 +82,9 @@ object WtTexts : StyleSheet(AppStylesheet) {
     val wtText3 by style {
         color(rgba(39, 40, 44, .7))
         fontSize(12.px)
-        property("letter-spacing", "normal")
-        property("font-weight", 400)
-        property("line-height", 16.px)
+        letterSpacing("normal")
+        fontWeight(400)
+        lineHeight(16.px)
 
         property(
             "font-family",
@@ -117,11 +117,11 @@ object WtTexts : StyleSheet(AppStylesheet) {
     val wtH2 by style {
         color(Color("#27282c"))
         fontSize(31.px)
-        property("font-size", AppCSSVariables.wtH2FontSize.value(31.px))
-        property("letter-spacing", (-.5).px)
-        property("font-weight", 700)
-        property("line-height", 40.px)
-        property("line-height", 40.px)
+        fontSize(AppCSSVariables.wtH2FontSize.value(31.px))
+        letterSpacing((-.5).px)
+        fontWeight(700)
+        lineHeight(40.px)
+        lineHeight(40.px)
 
         media(mediaMaxWidth(640.px)) {
             self style {
@@ -143,11 +143,11 @@ object WtTexts : StyleSheet(AppStylesheet) {
     val wtH3 by style {
         color(Color("#27282c"))
         fontSize(21.px)
-        property("font-size", AppCSSVariables.wtH3FontSize.value(20.px))
-        property("letter-spacing", "normal")
-        property("font-weight", 700)
-        property("line-height", 28.px)
-        property("line-height", AppCSSVariables.wtH3LineHeight.value(28.px))
+        fontSize(AppCSSVariables.wtH3FontSize.value(20.px))
+        letterSpacing("normal")
+        fontWeight(700)
+        lineHeight(28.px)
+        lineHeight(AppCSSVariables.wtH3LineHeight.value(28.px))
 
         property(
             "font-family",
@@ -164,11 +164,11 @@ object WtTexts : StyleSheet(AppStylesheet) {
         backgroundColor(Color("#167dff"))
         fontSize(15.px)
         display(DisplayStyle.InlineBlock)
-        property("text-decoration", "none")
-        property("border-radius", "24px")
-        property("padding", "12px 32px")
-        property("line-height", 24.px)
-        property("font-weight", 400)
+        textDecoration("none")
+        borderRadius(24.px)
+        padding(12.px, 32.px)
+        lineHeight(24.px)
+        fontWeight(400)
         property("width", "fit-content")
 
         hover(self) style {
@@ -183,7 +183,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
         backgroundColor(Color("transparent"))
         border(0.px)
 
-        property("outline", "none")
+        outline("none")
 
         hover(self) style {
             backgroundColor(rgba(255, 255, 255, 0.1))
@@ -200,7 +200,7 @@ object WtTexts : StyleSheet(AppStylesheet) {
     }
 
     val wtSocialButtonItem by style {
-        property("margin-right", 16.px)
+        marginRight(16.px)
         marginLeft(16.px)
         padding(12.px)
         backgroundColor(Color("transparent"))
@@ -208,13 +208,13 @@ object WtTexts : StyleSheet(AppStylesheet) {
 
         hover(self) style {
             backgroundColor(rgba(255, 255, 255, 0.1))
-            property("border-radius", "24px")
+            borderRadius(24.px)
         }
 
         media(mediaMaxWidth(640.px)) {
             self style {
-                property("margin-right", 8.px)
-                property("margin-left", 8.px)
+                marginRight(8.px)
+                marginLeft(8.px)
             }
         }
     }

@@ -10,7 +10,7 @@ import androidx.ui.examples.jetissues.data.IssuesRepositoryImpl
 import androidx.ui.examples.jetissues.data.defaultAuth
 import androidx.ui.examples.jetissues.data.defaultRepo
 
-val repo = IssuesRepositoryImpl(defaultAuth.first, defaultRepo.second, System.getenv("GITHUB_TOKEN") ?: defaultAuth)
+val repo = IssuesRepositoryImpl(defaultRepo.first, defaultRepo.second, System.getenv("GITHUB_TOKEN") ?: defaultAuth)
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

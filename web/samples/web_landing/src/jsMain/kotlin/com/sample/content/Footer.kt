@@ -13,13 +13,13 @@ fun PageFooter() {
     Footer({
         style {
             flexShrink(0)
-            property("box-sizing", "border-box")
+            boxSizing("border-box")
         }
     }) {
         Section({
             classes(WtSections.wtSectionBgGrayDark)
             style {
-                property("padding", "24px 0")
+                padding(24.px, 0.px)
             }
         }) {
             Div({ classes(WtContainer.wtContainer) }) {
@@ -61,7 +61,7 @@ private fun CopyrightInFooter() {
         style {
             justifyContent(JustifyContent.SpaceEvenly)
             flexWrap(FlexWrap.Wrap)
-            property("padding", "0px 12px")
+            padding(0.px, 12.px)
         }
     }) {
         Span({

@@ -8,6 +8,7 @@ import com.sample.components.Card
 import com.sample.components.ContainerInSection
 import com.sample.components.LinkOnCard
 import com.sample.style.*
+import org.jetbrains.compose.web.css.paddingTop
 
 data class CardWithListPresentation(
     val title: String,
@@ -87,7 +88,7 @@ private fun CardWithList(card: CardWithListPresentation) {
             card.list.forEachIndexed { _, it ->
                 Li({
                     style {
-                        property("padding-top", 24.px)
+                        paddingTop(24.px)
                     }
                 }) { Text(it) }
             }
