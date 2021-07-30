@@ -112,6 +112,7 @@ object LibraryGroups {
         val DESKTOP = LibraryGroup("$group.desktop", LibraryVersions.COMPOSE)
         val FOUNDATION = LibraryGroup("$group.foundation", LibraryVersions.COMPOSE)
         val MATERIAL = LibraryGroup("$group.material", LibraryVersions.COMPOSE)
+        val MATERIAL3 = LibraryGroup("$group.material3", LibraryVersions.COMPOSE_MATERIAL3)
         val RUNTIME = LibraryGroup("$group.runtime", LibraryVersions.COMPOSE)
         val UI = LibraryGroup("$group.ui", LibraryVersions.COMPOSE)
     }
