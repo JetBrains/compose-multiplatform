@@ -50,6 +50,7 @@ plugins {
 repositories {
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    google()
 }
 
 // Enable JS(IR) target and add dependencies
