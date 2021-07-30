@@ -9,6 +9,7 @@ pluginManagement {
         maven {
             url = uri("https://packages.jetbrains.team/maven/p/ui/dev")
         }
+        google()
     }
 
     resolutionStrategy {
