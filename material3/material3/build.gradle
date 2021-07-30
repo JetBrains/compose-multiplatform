@@ -1,0 +1,74 @@
+/*
+ * Copyright (C) 2021 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import androidx.build.AndroidXComposePlugin
+import androidx.build.LibraryGroups
+import androidx.build.LibraryType
+import androidx.build.Publish
+
+plugins {
+    id("AndroidXPlugin")
+    id("com.android.library")
+    id("AndroidXComposePlugin")
+}
+
+AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
+
+dependencies {
+    kotlinPlugin(project(":compose:compiler:compiler"))
+
+    if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block below
+         */
+        implementation(libs.kotlinStdlibCommon)
+    }
+}
+
+if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
+    kotlin {
+        android()
+        jvm("desktop")
+
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block above
+         */
+        sourceSets {
+            commonMain.dependencies {
+                implementation(libs.kotlinStdlibCommon)
+            }
+
+            androidMain.dependencies {
+                api("androidx.annotation:annotation:1.1.0")
+            }
+
+            desktopMain.dependencies {
+                implementation(libs.kotlinStdlib)
+            }
+        }
+    }
+}
+
+androidx {
+    name = "Compose Material3 Components"
+    type = LibraryType.PUBLISHED_LIBRARY
+    publish = Publish.NONE
+    mavenGroup = LibraryGroups.Compose.MATERIAL3
+    inceptionYear = "2021"
+    description = "Compose Material You Design Components library"
+}
