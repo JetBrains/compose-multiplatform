@@ -24,10 +24,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.layout.RelocationRequester
+import androidx.compose.ui.layout.relocationRequester
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.semantics
@@ -57,6 +60,9 @@ fun Modifier.focusable(
     val scope = rememberCoroutineScope()
     val focusedInteraction = remember { mutableStateOf<FocusInteraction.Focus?>(null) }
     var isFocused by remember { mutableStateOf(false) }
+    // TODO(b/195353459): Remove this annotation before 1.1 goes stable.
+    @OptIn(ExperimentalComposeUiApi::class)
+    val relocationRequester = remember { RelocationRequester() }
     DisposableEffect(interactionSource) {
         onDispose {
             focusedInteraction.value?.let { oldValue ->
@@ -79,11 +85,14 @@ fun Modifier.focusable(
         onDispose { }
     }
 
+    // TODO(b/195353459): Remove this annotation before 1.1 goes stable.
+    @OptIn(ExperimentalComposeUiApi::class)
     if (enabled) {
         Modifier
             .semantics {
                 this.focused = isFocused
             }
+            .relocationRequester(relocationRequester)
             .onFocusChanged {
                 isFocused = it.isFocused
                 if (isFocused) {
@@ -96,6 +105,7 @@ fun Modifier.focusable(
                         val interaction = FocusInteraction.Focus()
                         interactionSource?.emit(interaction)
                         focusedInteraction.value = interaction
+                        relocationRequester.bringIntoView()
                     }
                 } else {
                     scope.launch {
