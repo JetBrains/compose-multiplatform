@@ -57,7 +57,7 @@ internal class IntervalList<T> {
         var right = list.lastIndex
 
         while (left < right) {
-            val middle = (left + right) / 2
+            val middle = left + (right - left) / 2
 
             val middleValue = list[middle].startIndex
             if (middleValue == value) {
