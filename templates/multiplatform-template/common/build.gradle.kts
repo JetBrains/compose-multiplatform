@@ -18,6 +18,11 @@ kotlin {
                 api(compose.material)
             }
         }
+        named("desktopMain") {
+            dependencies {
+                implementation(compose.uiTooling)
+            }
+        }
         named("androidMain") {
             dependencies {
                 api("androidx.appcompat:appcompat:1.3.0-beta01")

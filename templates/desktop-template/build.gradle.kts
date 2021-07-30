@@ -10,12 +10,13 @@ plugins {
 
 repositories {
     mavenCentral()
+    google()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     google()
 }
 
 dependencies {
-    implementation(compose.desktop.currentOs)
+    implementation(compose.desktop.macos_x64)
 }
 
 compose.desktop {
