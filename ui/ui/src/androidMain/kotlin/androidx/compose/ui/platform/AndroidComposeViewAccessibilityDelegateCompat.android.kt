@@ -64,6 +64,7 @@ import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.fastJoinToString
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.accessibility.hasCollectionInfo
 import androidx.compose.ui.platform.accessibility.setCollectionInfo
 import androidx.compose.ui.platform.accessibility.setCollectionItemInfo
 import androidx.compose.ui.semantics.AccessibilityAction
@@ -648,8 +649,11 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             val maxValue = xScrollState.maxValue()
             val reverseScrolling = xScrollState.reverseScrolling
             // Talkback defines SCROLLABLE_ROLE_FILTER_FOR_DIRECTION_NAVIGATION, so we need to
-            // assign a role for auto scroll to work.
-            info.className = "android.widget.HorizontalScrollView"
+            // assign a role for auto scroll to work. Node with collectionInfo resolved by
+            // Talkback to ROLE_LIST and supports autoscroll too
+            if (!semanticsNode.hasCollectionInfo()) {
+                info.className = "android.widget.HorizontalScrollView"
+            }
             if (maxValue > 0f) {
                 info.isScrollable = true
             }
@@ -689,8 +693,11 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             val maxValue = yScrollState.maxValue()
             val reverseScrolling = yScrollState.reverseScrolling
             // Talkback defines SCROLLABLE_ROLE_FILTER_FOR_DIRECTION_NAVIGATION, so we need to
-            // assign a role for auto scroll to work.
-            info.className = "android.widget.ScrollView"
+            // assign a role for auto scroll to work. Node with collectionInfo resolved by
+            // Talkback to ROLE_LIST and supports autoscroll too
+            if (!semanticsNode.hasCollectionInfo()) {
+                info.className = "android.widget.ScrollView"
+            }
             if (maxValue > 0f) {
                 info.isScrollable = true
             }

@@ -41,7 +41,9 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -54,6 +56,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.progressSemantics
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.BasicText
@@ -2511,6 +2514,33 @@ class AndroidAccessibilityTest {
         val imageNode = rule.onNodeWithTag("image", true).fetchSemanticsNode()
         val imageInfo = provider.createAccessibilityNodeInfo(imageNode.id)
         assertEquals("android.widget.ImageView", imageInfo.className)
+    }
+
+    @Test
+    fun testScrollableContainer_scrollViewClassNotSet_whenCollectionInfo() {
+        val tagColumn = "lazy column"
+        val tagRow = "scrollable row"
+        container.setContent {
+            LazyColumn(Modifier.testTag(tagColumn)) {
+                item {
+                    Row(
+                        Modifier
+                            .testTag(tagRow)
+                            .scrollable(rememberScrollState(), Orientation.Horizontal)
+                    ) {
+                        BasicText("test")
+                    }
+                }
+            }
+        }
+
+        val columnNode = rule.onNodeWithTag(tagColumn).fetchSemanticsNode()
+        val columnInfo = provider.createAccessibilityNodeInfo(columnNode.id)
+        assertNotEquals("android.widget.ScrollView", columnInfo.className)
+
+        val rowNode = rule.onNodeWithTag(tagRow).fetchSemanticsNode()
+        val rowInfo = provider.createAccessibilityNodeInfo(rowNode.id)
+        assertNotEquals("android.widget.HorizontalScrollView", rowInfo.className)
     }
 
     private fun eventIndex(list: List<AccessibilityEvent>, event: AccessibilityEvent): Int {
