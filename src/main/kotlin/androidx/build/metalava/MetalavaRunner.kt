@@ -46,7 +46,9 @@ fun runMetalavaWithArgs(
         "HiddenSuperclass", // We allow having a hidden parent class
 
         "--error",
-        "UnresolvedImport"
+        "UnresolvedImport",
+
+        "--delete-empty-removed-signatures"
     ) + args
     val workQueue = workerExecutor.processIsolation()
     workQueue.submit(MetalavaWorkAction::class.java) { parameters ->
@@ -210,14 +212,6 @@ fun generateApi(
         metalavaClasspath, files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
         apiLocation, restrictedAPIMode, ApiLintMode.Skip, workerExecutor
     )
-    workerExecutor.await()
-    val removedApiFile = apiLocation.removedApiFile
-    if (removedApiFile.exists()) {
-        if (removedApiFile.readText().split("\n", limit = 3).count() < 3) {
-            // If the removedApi file is just a header (one "\n"), then we treat it as empty
-            removedApiFile.delete()
-        }
-    }
 }
 
 // Gets arguments for generating the specified api file
