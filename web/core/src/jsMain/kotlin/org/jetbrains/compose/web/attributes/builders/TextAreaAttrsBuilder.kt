@@ -18,6 +18,11 @@ class TextAreaAttrsBuilder : AttrsBuilder<HTMLTextAreaElement>() {
         return this
     }
 
+    fun defaultValue(value: String): AttrsBuilder<HTMLTextAreaElement> {
+        prop(setTextAreaDefaultValue, value)
+        return this
+    }
+
     fun onInput(
         options: Options = Options.DEFAULT,
         listener: (SyntheticInputEvent<String, HTMLTextAreaElement>) -> Unit

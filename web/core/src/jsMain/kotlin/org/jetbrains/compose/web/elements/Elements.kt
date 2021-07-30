@@ -2,6 +2,7 @@ package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
+import androidx.compose.runtime.remember
 import org.jetbrains.compose.web.attributes.builders.InputAttrsBuilder
 import androidx.compose.web.attributes.SelectAttrsBuilder
 import org.jetbrains.compose.web.attributes.builders.TextAreaAttrsBuilder
@@ -653,45 +654,35 @@ fun Section(
 
 @Composable
 fun TextArea(
-    attrs: (TextAreaAttrsBuilder.() -> Unit)? = null,
-    value: String
-) = TagElement(
-    elementBuilder = TextArea,
-    applyAttrs = {
-        val  taab = TextAreaAttrsBuilder()
-        if (attrs != null) {
-            taab.attrs()
-        }
-        taab.value(value)
+    value: String? = null,
+    attrs: (TextAreaAttrsBuilder.() -> Unit)? = null
+) {
+    // if firstProvidedValueWasNotNull then TextArea behaves as controlled input
+    val firstProvidedValueWasNotNull = remember { value != null }
 
-        taab.onInput {
-            val target = it.target
-            if (controlledInputsValuesWeakMap.has(target)) {
-                target.value = controlledInputsValuesWeakMap.get(target).toString()
+    TagElement(
+        elementBuilder = TextArea,
+        applyAttrs = {
+            val  taab = TextAreaAttrsBuilder()
+            if (attrs != null) {
+                taab.attrs()
             }
-        }
+            if (firstProvidedValueWasNotNull) {
+                taab.value(value ?: "")
+            }
 
-        this.copyFrom(taab)
-    },
-    content = null
-)
+            taab.onInput {
+                val target = it.target
+                if (controlledInputsValuesWeakMap.has(target)) {
+                    target.value = controlledInputsValuesWeakMap.get(target).toString()
+                }
+            }
 
-@Composable
-fun TextAreaRaw(
-    attrs: (TextAreaAttrsBuilder.() -> Unit)? = null,
-    value: String
-) = TagElement(
-    elementBuilder = TextArea,
-    applyAttrs = {
-        val taab = TextAreaAttrsBuilder()
-        if (attrs != null) {
-            taab.attrs()
-        }
-        taab.value(value)
-        this.copyFrom(taab)
-    },
-    content = null
-)
+            this.copyFrom(taab)
+        },
+        content = null
+    )
+}
 
 @Composable
 fun Nav(
@@ -977,26 +968,4 @@ fun <K> Input(
 @Composable
 fun <K> Input(type: InputType<K>) {
     Input(type) {}
-}
-
-@Composable
-fun <K> InputRaw(
-    type: InputType<K>,
-    attrs: InputAttrsBuilder<K>.() -> Unit
-) {
-    TagElement(
-        elementBuilder = Input,
-        applyAttrs = {
-            val inputAttrsBuilder = InputAttrsBuilder(type)
-            inputAttrsBuilder.type(type)
-            inputAttrsBuilder.attrs()
-            this.copyFrom(inputAttrsBuilder)
-        },
-        content = null
-    )
-}
-
-@Composable
-fun <K> InputRaw(type: InputType<K>) {
-    InputRaw(type) {}
 }

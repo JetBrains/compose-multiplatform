@@ -13,8 +13,7 @@ class InputsTests {
 
         TestText(value = state)
 
-        TextAreaRaw(
-            value = state,
+        TextArea(
             attrs = {
                 id("input")
                 onInput { state = it.value }
@@ -23,14 +22,14 @@ class InputsTests {
     }
 
     val textInputGetsPrinted by testCase {
-        var state by remember { mutableStateOf("") }
+        var state by remember { mutableStateOf("Initial-") }
 
         TestText(value = state)
 
-        InputRaw(
+        Input(
             type = InputType.Text,
             attrs = {
-                value(state)
+                defaultValue(state)
                 id("input")
                 onInput { state = it.value }
             }
@@ -225,7 +224,8 @@ class InputsTests {
         P { TestText(state) }
 
         Div {
-            TextAreaRaw(value = state, attrs = {
+            TextArea(attrs = {
+                defaultValue(state)
                 id("textArea")
                 onChange { state = it.value }
             })
@@ -262,7 +262,7 @@ class InputsTests {
 
 
         Div {
-            TextAreaRaw(value = "", attrs = {
+            TextArea(attrs = {
                 id("textArea")
                 onBeforeInput {
                     state = it.data ?: ""

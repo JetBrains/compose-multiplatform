@@ -25,11 +25,12 @@ class InputsTests : BaseIntegrationTests() {
     @ResolveDrivers
     fun `text input gets printed`(driver: WebDriver) {
         driver.openTestPage("textInputGetsPrinted")
+        driver.waitTextToBe(textId = "txt", value = "Initial-")
 
         val input = driver.findElement(By.id("input"))
         input.sendKeys("Hello World!")
 
-        driver.waitTextToBe(textId = "txt", value = "Hello World!")
+        driver.waitTextToBe(textId = "txt", value = "Initial-Hello World!")
     }
 
     @ResolveDrivers

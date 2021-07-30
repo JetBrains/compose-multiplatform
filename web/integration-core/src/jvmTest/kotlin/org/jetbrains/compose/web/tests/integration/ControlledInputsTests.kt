@@ -63,4 +63,109 @@ class ControlledInputsTests : BaseIntegrationTests() {
 
         check(controlledTextInput.getAttribute("value") == "InitialValueABC")
     }
+
+    @ResolveDrivers
+    fun textAreaHardcodedValueShouldNotChange(driver: WebDriver) {
+        driver.openTestPage("textAreaHardcodedValueShouldNotChange")
+        driver.waitTextToBe(value = "None")
+
+        val controlledTextArea = driver.findElement(By.id("textArea"))
+
+        controlledTextArea.sendKeys("A")
+        driver.waitTextToBe(value = "hardcodedA")
+
+        controlledTextArea.sendKeys("B")
+        driver.waitTextToBe(value = "hardcodedB")
+
+        controlledTextArea.sendKeys("C")
+        driver.waitTextToBe(value = "hardcodedC")
+
+        check(controlledTextArea.getAttribute("value") == "hardcoded")
+    }
+
+    @ResolveDrivers
+    fun textAreaMutableValueShouldGetOverridden(driver: WebDriver) {
+        driver.openTestPage("textAreaMutableValueShouldGetOverridden")
+        driver.waitTextToBe(value = "InitialValue")
+
+        val controlledTextArea = driver.findElement(By.id("textArea"))
+        controlledTextArea.sendKeys("ABC")
+
+        driver.waitTextToBe(value = "OVERRIDDEN VALUE")
+        check(controlledTextArea.getAttribute("value") == "OVERRIDDEN VALUE")
+    }
+
+    @ResolveDrivers
+    fun textAreaMutableValueShouldChange(driver: WebDriver) {
+        driver.openTestPage("textAreaMutableValueShouldChange")
+        driver.waitTextToBe(value = "InitialValue")
+
+        val controlledTextArea = driver.findElement(By.id("textArea"))
+
+        controlledTextArea.sendKeys("A")
+        driver.waitTextToBe(value = "InitialValueA")
+
+        controlledTextArea.sendKeys("B")
+        driver.waitTextToBe(value = "InitialValueAB")
+
+        controlledTextArea.sendKeys("C")
+        driver.waitTextToBe(value = "InitialValueABC")
+
+        check(controlledTextArea.getAttribute("value") == "InitialValueABC")
+    }
+
+    @ResolveDrivers
+    fun checkBoxHardcodedNeverChanges(driver: WebDriver) {
+        driver.openTestPage("checkBoxHardcodedNeverChanges")
+        driver.waitTextToBe(value = "false")
+
+        val checkbox = driver.findElement(By.id("checkbox"))
+        check(!checkbox.isSelected)
+
+        checkbox.click()
+
+        driver.waitTextToBe(value = "true") // input received but ignored
+        check(!checkbox.isSelected)
+    }
+
+    @ResolveDrivers
+    fun checkBoxMutableValueChanges(driver: WebDriver) {
+        driver.openTestPage("checkBoxMutableValueChanges")
+        driver.waitTextToBe(value = "false")
+
+        val checkbox = driver.findElement(By.id("checkbox"))
+        check(!checkbox.isSelected)
+
+        checkbox.click()
+
+        driver.waitTextToBe(value = "true")
+        check(checkbox.isSelected)
+    }
+
+    @ResolveDrivers
+    fun checkBoxDefaultCheckedChangesDoesntAffectState(driver: WebDriver) {
+        driver.openTestPage("checkBoxDefaultCheckedChangesDoesntAffectState")
+        driver.waitTextToBe(value = "true")
+
+        val mainCheckbox = driver.findElement(By.id("checkboxMain"))
+        val mirrorCheckbox = driver.findElement(By.id("checkboxMirror"))
+
+        check(mainCheckbox.isSelected)
+        check(mirrorCheckbox.isSelected)
+
+        mirrorCheckbox.click()
+        driver.waitTextToBe(value = "true")
+        check(!mirrorCheckbox.isSelected)
+        check(mainCheckbox.isSelected)
+
+        mainCheckbox.click()
+        driver.waitTextToBe(value = "false")
+        check(!mainCheckbox.isSelected)
+        check(!mirrorCheckbox.isSelected)
+
+        mainCheckbox.click()
+        driver.waitTextToBe(value = "true")
+        check(mainCheckbox.isSelected)
+        check(!mirrorCheckbox.isSelected)
+    }
 }

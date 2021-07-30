@@ -405,9 +405,9 @@ class InputsGenerateCorrectHtmlTests {
     @Test
     fun textAreaWithAutoComplete() = runTest {
         composition {
-            TextArea({
+            TextArea(attrs = {
                 autoComplete(AutoComplete.email)
-            }, value = "")
+            })
         }
         assertEquals("""<textarea autocomplete="email"></textarea>""", root.innerHTML)
     }

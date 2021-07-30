@@ -303,6 +303,10 @@ internal val setInputValue: (HTMLInputElement, String) -> Unit = { e, v ->
     controlledInputsValuesWeakMap.set(e, v)
 }
 
+internal val setTextAreaDefaultValue: (HTMLTextAreaElement, String) -> Unit = { e, v ->
+    e.value = v
+}
+
 internal val setCheckedValue: (HTMLInputElement, Boolean) -> Unit = { e, v ->
     e.checked = v
     controlledInputsValuesWeakMap.set(e, v)
