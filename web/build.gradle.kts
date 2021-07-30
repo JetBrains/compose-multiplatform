@@ -14,6 +14,12 @@ tasks.register("generateExamples") {
     )
 }
 
+tasks.register("printBundleSize") {
+    dependsOn(
+       subprojects.filter { it.isSampleProject() }.map { ":samples:${it.name}:printBundleSize" } 
+    )
+}
+
 subprojects {
     apply(plugin = "maven-publish")
 
@@ -59,6 +65,19 @@ plugins {"""
             doLast {
                 println("from ${project.projectDir} => $targetDir")
             }
+        }
+
+        val printBundleSize by tasks.registering {
+            dependsOn(tasks.named("jsBrowserDistribution"))
+            doLast {
+                val jsFile = buildDir.resolve("distributions/${project.name}.js")
+                val size = jsFile.length()
+                println("##teamcity[buildStatisticValue key='bundleSize::${project.name}' value='$size']")
+            }
+        }
+
+        afterEvaluate {
+            tasks.named("build") { finalizedBy(printBundleSize) }
         }
     }
 
