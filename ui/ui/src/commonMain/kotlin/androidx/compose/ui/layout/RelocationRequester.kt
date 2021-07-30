@@ -21,6 +21,7 @@ import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.toRect
+import androidx.compose.ui.platform.ifDebug
 import androidx.compose.ui.unit.toSize
 
 /**
@@ -57,7 +58,12 @@ class RelocationRequester {
      */
     suspend fun bringIntoView(rect: Rect? = null) {
         modifiers.forEach {
-            it.bringRectIntoView(rect ?: it.relocationRequesterNode.size.toSize().toRect())
+            val node = it.relocationRequesterNode
+            when {
+                rect != null -> it.bringRectIntoView(rect)
+                node.isAttached -> it.bringRectIntoView(node.size.toSize().toRect())
+                else -> ifDebug { println("Cannot calculate rectangle to be brought into view") }
+            }
         }
     }
 }
