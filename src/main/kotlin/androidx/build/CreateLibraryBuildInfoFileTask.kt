@@ -26,6 +26,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
@@ -54,6 +55,10 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
 
     @get:Input
     abstract val version: Property<String>
+
+    @get:Optional
+    @get:Input
+    abstract val kotlinVersion: Property<String>
 
     @get:Input
     abstract val projectDir: Property<String>
@@ -111,7 +116,7 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
         }
 
         // Create json object from the artifact instance
-        val gson = GsonBuilder().setPrettyPrinting().create()
+        val gson = GsonBuilder().serializeNulls().setPrettyPrinting().create()
         val serializedInfo: String = gson.toJson(info)
         resolvedOutputFile.writeText(serializedInfo)
     }
@@ -133,6 +138,12 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
             it.name == "releaseRuntimeElements"
         }.forEach { configuration ->
             configuration.allDependencies.forEach { dep ->
+                // For Kotlin libraries, populate the Kotlin version. Note that
+                // we assume all of androidx uses the same version of the Kotlin
+                // stdlib.
+                if (dep.group.toString().startsWith("org.jetbrains.kotlin")) {
+                    libraryBuildInfoFile.kotlinVersion = kotlinVersion.getOrNull()
+                }
                 // Only consider androidx dependencies
                 if (dep.group != null &&
                     dep.group.toString().startsWith("androidx.") &&
@@ -202,6 +213,7 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
                     it.artifactId.set(name)
                     it.groupId.set(group)
                     it.version.set(project.version.toString())
+                    it.kotlinVersion.set(androidx.build.dependencies.kotlinVersion)
                     it.projectDir.set(
                         project.projectDir.absolutePath.removePrefix(
                             project.getSupportRootFolder().absolutePath
