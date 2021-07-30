@@ -13,12 +13,10 @@ Using images from application resources is very simple. Suppose we have a PNG im
 ```kotlin
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.singleWindowApplication
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = singleWindowApplication {
     Image(
         painter = painterResource("sample.png"), // ImageBitmap
@@ -44,7 +42,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
@@ -65,7 +62,6 @@ import org.xml.sax.InputSource
 import java.io.File
 import java.io.IOException
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = singleWindowApplication {
     val density = LocalDensity.current
     Column {
@@ -147,7 +143,6 @@ You may want to draw raw image data, in which case you can use `Canvas` and` dra
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
@@ -163,7 +158,6 @@ import org.jetbrains.skija.ImageInfo
 
 private val sample = useResource("sample.png", ::loadImageBitmap)
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = singleWindowApplication {
     val bitmap = remember { bitmapFromByteArray(sample.getBytes(), sample.width, sample.height) }
     Canvas(

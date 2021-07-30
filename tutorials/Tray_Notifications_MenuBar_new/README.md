@@ -1,4 +1,4 @@
-# Menu, tray, notifications (new Composable API, experimental)
+# Menu, tray, notifications
 
 ## What is covered
 
