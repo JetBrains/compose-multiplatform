@@ -161,12 +161,8 @@ fun main() {
 
         RangeInput(rangeState) {
             onBeforeInput { println(("RangeInput onBeforeInput = ${it.value}")) }
-//            onInput {
-//                println(("RangeInput onInput = ${it.value}"))
-//                rangeState = it.value ?: 0
-//            }
-            onChange {
-                println(("RangeInput onChange = ${it.value}"))
+            onInput {
+                println(("RangeInput onInput = ${it.value}"))
                 rangeState = it.value ?: 0
             }
         }

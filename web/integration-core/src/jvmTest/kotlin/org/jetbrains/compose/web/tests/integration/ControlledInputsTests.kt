@@ -20,9 +20,16 @@ class ControlledInputsTests : BaseIntegrationTests() {
         driver.waitTextToBe(value = "None")
 
         val controlledTextInput = driver.findElement(By.id("textInput"))
-        controlledTextInput.sendKeys("ABC")
 
+        controlledTextInput.sendKeys("A")
+        driver.waitTextToBe(value = "hardcodedA")
+
+        controlledTextInput.sendKeys("B")
+        driver.waitTextToBe(value = "hardcodedB")
+
+        controlledTextInput.sendKeys("C")
         driver.waitTextToBe(value = "hardcodedC")
+
         check(controlledTextInput.getAttribute("value") == "hardcoded")
     }
 

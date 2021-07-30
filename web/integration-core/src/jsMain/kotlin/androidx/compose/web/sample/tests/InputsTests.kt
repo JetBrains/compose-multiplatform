@@ -13,7 +13,7 @@ class InputsTests {
 
         TestText(value = state)
 
-        TextArea(
+        TextAreaRaw(
             value = state,
             attrs = {
                 id("input")
@@ -27,7 +27,7 @@ class InputsTests {
 
         TestText(value = state)
 
-        Input(
+        InputRaw(
             type = InputType.Text,
             attrs = {
                 value(state)
@@ -46,9 +46,7 @@ class InputsTests {
             type = InputType.Checkbox,
             attrs = {
                 id("checkbox")
-                if (checked) {
-                    checked()
-                }
+                checked(checked)
                 onInput { checked = !checked }
             }
         )
@@ -227,7 +225,7 @@ class InputsTests {
         P { TestText(state) }
 
         Div {
-            TextArea(value = state, attrs = {
+            TextAreaRaw(value = state, attrs = {
                 id("textArea")
                 onChange { state = it.value }
             })
@@ -264,7 +262,7 @@ class InputsTests {
 
 
         Div {
-            TextArea(value = "", attrs = {
+            TextAreaRaw(value = "", attrs = {
                 id("textArea")
                 onBeforeInput {
                     state = it.data ?: ""

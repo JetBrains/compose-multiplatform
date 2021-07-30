@@ -2,8 +2,6 @@ package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.remember
 import org.jetbrains.compose.web.attributes.builders.InputAttrsBuilder
 import androidx.compose.web.attributes.SelectAttrsBuilder
 import org.jetbrains.compose.web.attributes.builders.TextAreaAttrsBuilder
@@ -11,6 +9,7 @@ import org.jetbrains.compose.web.DomApplier
 import org.jetbrains.compose.web.DomNodeWrapper
 import kotlinx.browser.document
 import org.jetbrains.compose.web.attributes.*
+import org.jetbrains.compose.web.attributes.builders.controlledInputsValuesWeakMap
 import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.StyleSheetBuilder
 import org.jetbrains.compose.web.css.StyleSheetBuilderImpl
@@ -664,11 +663,35 @@ fun TextArea(
             taab.attrs()
         }
         taab.value(value)
+
+        taab.onInput {
+            val target = it.target
+            if (controlledInputsValuesWeakMap.has(target)) {
+                target.value = controlledInputsValuesWeakMap.get(target).toString()
+            }
+        }
+
         this.copyFrom(taab)
-    }
-) {
-    Text(value)
-}
+    },
+    content = null
+)
+
+@Composable
+fun TextAreaRaw(
+    attrs: (TextAreaAttrsBuilder.() -> Unit)? = null,
+    value: String
+) = TagElement(
+    elementBuilder = TextArea,
+    applyAttrs = {
+        val taab = TextAreaAttrsBuilder()
+        if (attrs != null) {
+            taab.attrs()
+        }
+        taab.value(value)
+        this.copyFrom(taab)
+    },
+    content = null
+)
 
 @Composable
 fun Nav(
@@ -924,35 +947,6 @@ fun Style(
 }
 
 @Composable
-internal fun <K> InputControlled(
-    type: InputType<K>,
-    attrs: InputAttrsBuilder<K>.() -> Unit
-) {
-
-    TagElement(
-        elementBuilder = Input,
-        applyAttrs = {
-            val inputAttrsBuilder = InputAttrsBuilder(type)
-            inputAttrsBuilder.type(type)
-
-            inputAttrsBuilder.attrs()
-
-            inputAttrsBuilder.onInput {
-                val target = it.target
-                if (target.type == "checkbox" || target.type == "radio") {
-                    target.checked = target.getAttribute("data-remembered-value")?.toBoolean() ?: false
-                } else {
-                    target.value = target.getAttribute("data-remembered-value") ?: ""
-                }
-            }
-
-            this.copyFrom(inputAttrsBuilder)
-        },
-        content = null
-    )
-}
-
-@Composable
 fun <K> Input(
     type: InputType<K>,
     attrs: InputAttrsBuilder<K>.() -> Unit
@@ -963,6 +957,17 @@ fun <K> Input(
             val inputAttrsBuilder = InputAttrsBuilder(type)
             inputAttrsBuilder.type(type)
             inputAttrsBuilder.attrs()
+
+            inputAttrsBuilder.onInput {
+                if (controlledInputsValuesWeakMap.has(it.target)) {
+                    if (type == InputType.Radio || type == InputType.Checkbox) {
+                        it.target.checked = controlledInputsValuesWeakMap.get(it.target).toString().toBoolean()
+                    } else {
+                        it.target.value = controlledInputsValuesWeakMap.get(it.target).toString()
+                    }
+                }
+            }
+
             this.copyFrom(inputAttrsBuilder)
         },
         content = null
@@ -971,13 +976,27 @@ fun <K> Input(
 
 @Composable
 fun <K> Input(type: InputType<K>) {
+    Input(type) {}
+}
+
+@Composable
+fun <K> InputRaw(
+    type: InputType<K>,
+    attrs: InputAttrsBuilder<K>.() -> Unit
+) {
     TagElement(
         elementBuilder = Input,
         applyAttrs = {
             val inputAttrsBuilder = InputAttrsBuilder(type)
             inputAttrsBuilder.type(type)
+            inputAttrsBuilder.attrs()
             this.copyFrom(inputAttrsBuilder)
         },
         content = null
     )
+}
+
+@Composable
+fun <K> InputRaw(type: InputType<K>) {
+    InputRaw(type) {}
 }

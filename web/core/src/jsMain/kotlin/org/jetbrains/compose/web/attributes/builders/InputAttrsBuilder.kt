@@ -12,9 +12,40 @@ import org.jetbrains.compose.web.events.SyntheticInputEvent
 import org.jetbrains.compose.web.events.SyntheticSelectEvent
 import org.w3c.dom.HTMLInputElement
 
-class InputAttrsBuilder<ValueType>(
+open class InputAttrsBuilder<ValueType>(
     val inputType: InputType<ValueType>
 ) : AttrsBuilder<HTMLInputElement>() {
+
+    open fun value(value: String): InputAttrsBuilder<ValueType> {
+        when (inputType) {
+            InputType.Checkbox,
+            InputType.Radio,
+            InputType.Hidden,
+            InputType.Submit -> attr("value", value)
+            else -> prop(setInputValue, value)
+        }
+        return this
+    }
+
+    open fun value(value: Number): InputAttrsBuilder<ValueType> {
+        value(value.toString())
+        return this
+    }
+
+    open fun checked(checked: Boolean): InputAttrsBuilder<ValueType> {
+        prop(setCheckedValue, checked)
+        return this
+    }
+
+    open fun defaultChecked(): InputAttrsBuilder<ValueType> {
+        attr("checked", "")
+        return this
+    }
+
+    open fun defaultValue(value: String): InputAttrsBuilder<ValueType> {
+        attr("value", value)
+        return this
+    }
 
     fun onInvalid(
         options: Options = Options.DEFAULT,
@@ -51,3 +82,12 @@ class InputAttrsBuilder<ValueType>(
         listeners.add(SelectEventListener(options, listener))
     }
 }
+
+external interface JsWeakMap {
+    fun delete(key: Any)
+    fun get(key: Any): Any?
+    fun has(key: Any): Boolean
+    fun set(key: Any, value: Any): JsWeakMap
+}
+
+internal val controlledInputsValuesWeakMap: JsWeakMap = js("new WeakMap();").unsafeCast<JsWeakMap>()
