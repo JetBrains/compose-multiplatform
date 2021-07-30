@@ -1,4 +1,4 @@
-# Top level windows management (new Composable API, experimental)
+# Top level windows management
 
 ## What is covered
 
@@ -185,7 +185,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Window
@@ -201,7 +200,6 @@ fun main() = application {
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ApplicationScope.MyWindow(
     state: MyWindowState
@@ -440,16 +438,26 @@ fun main() = SwingUtilities.invokeLater {
 You can also access ComposeWindow in the Composable `Window` scope:
 ```kotlin
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import java.awt.Cursor
+import java.awt.datatransfer.DataFlavor
+import java.awt.dnd.DnDConstants
+import java.awt.dnd.DropTarget
+import java.awt.dnd.DropTargetAdapter
+import java.awt.dnd.DropTargetDropEvent
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     Window(onCloseRequest = ::exitApplication) {
         LaunchedEffect(Unit) {
-            window.cursor = Cursor(Cursor.CROSSHAIR_CURSOR)
+            window.dropTarget = DropTarget().apply {
+                addDropTargetListener(object : DropTargetAdapter() {
+                    override fun drop(event: DropTargetDropEvent) {
+                        event.acceptDrop(DnDConstants.ACTION_COPY);
+                        val fileName = event.transferable.getTransferData(DataFlavor.javaFileListFlavor)
+                        println(fileName)
+                    }
+                })
+            }
         }
     }
 }

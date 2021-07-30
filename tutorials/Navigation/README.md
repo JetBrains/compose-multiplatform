@@ -293,12 +293,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.singleWindowApplication
 import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponent
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = singleWindowApplication(
     title = "Navigation tutorial"
 ) {
