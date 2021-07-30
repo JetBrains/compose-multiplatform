@@ -32,11 +32,11 @@ object SwitcherStylesheet : StyleSheet(AppStylesheet) {
 
         descendant(self, CSSSelector.Type("label")) style {
             display(DisplayStyle.InlineBlock)
-            property("width", SwitcherVariables.labelWidth.value(56.px))
-            property("padding", SwitcherVariables.labelPadding.value(10.px))
+            width(SwitcherVariables.labelWidth.value(56.px))
+            padding(SwitcherVariables.labelPadding.value(10.px))
             property("transition", "all 0.3s")
-            property("text-align", "center")
-            property("box-sizing", "border-box")
+            textAlign("center")
+            boxSizing("border-box")
 
             border {
                 style(LineStyle.Solid)

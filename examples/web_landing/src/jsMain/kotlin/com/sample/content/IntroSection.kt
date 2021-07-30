@@ -40,7 +40,7 @@ fun Intro() {
                         classes(WtTexts.wtHero)
                         style {
                             display(DisplayStyle.InlineBlock)
-                            property("white-space", "nowrap")
+                            whiteSpace("nowrap")
                         }
                     }) {
                         Text("Web")
@@ -170,7 +170,7 @@ private fun IntroCodeSampleResult() {
         Span({
             classes(WtTexts.wtText2)
             style {
-                property("margin-right", 8.px)
+                marginRight(8.px)
             }
         }) {
             Text("Result:")

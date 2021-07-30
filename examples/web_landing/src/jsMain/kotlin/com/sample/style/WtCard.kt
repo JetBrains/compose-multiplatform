@@ -7,8 +7,8 @@ object WtCards : StyleSheet(AppStylesheet) {
         display(DisplayStyle.Flex)
         flexDirection(FlexDirection.Column)
         border(1.px, LineStyle.Solid)
-        property("min-height", 0)
-        property("box-sizing", "border-box")
+        minHeight(0.px)
+        boxSizing("border-box")
     }
 
     val wtCardThemeLight by style {
@@ -25,11 +25,11 @@ object WtCards : StyleSheet(AppStylesheet) {
 
     val wtCardSection by style {
         position(Position.Relative)
-        property("overflow", "auto")
-        property("flex", "1 1 auto")
-        property("min-height", 0)
-        property("box-sizing", "border-box")
-        property("padding", "24px 32px")
+        overflow("auto")
+        flex( "1 1 auto")
+        minHeight( 0.px)
+        boxSizing("border-box")
+        padding(24.px, 32.px)
 
         media(mediaMaxWidth(640.px)) {
             self style { padding(16.px) }
@@ -44,6 +44,6 @@ object WtCards : StyleSheet(AppStylesheet) {
 
     val wtVerticalFlexGrow by style {
         flexGrow(1)
-        property("max-width", 100.percent)
+        maxWidth(100.percent)
     }
 }
