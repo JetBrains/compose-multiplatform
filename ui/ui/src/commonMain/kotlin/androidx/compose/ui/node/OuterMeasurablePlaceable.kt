@@ -139,16 +139,32 @@ internal class OuterMeasurablePlaceable(
         zIndex: Float,
         layerBlock: (GraphicsLayerScope.() -> Unit)?
     ) {
-        placedOnce = true
         lastPosition = position
         lastZIndex = zIndex
         lastLayerBlock = layerBlock
-        layoutNode.alignmentLines.usedByModifierLayout = false
+
+        if (outerWrapper.wrappedBy?.isShallowPlacing == true) {
+            placeOuterWrapper(position, zIndex, layerBlock)
+        } else {
+            placedOnce = true
+            layoutNode.alignmentLines.usedByModifierLayout = false
+            val owner = layoutNode.requireOwner()
+            owner.snapshotObserver.observeLayoutModifierSnapshotReads(layoutNode) {
+                placeOuterWrapper(position, zIndex, layerBlock)
+            }
+        }
+    }
+
+    private fun placeOuterWrapper(
+        position: IntOffset,
+        zIndex: Float,
+        layerBlock: (GraphicsLayerScope.() -> Unit)?
+    ) {
         with(PlacementScope) {
             if (layerBlock == null) {
-                outerWrapper.place(position, lastZIndex)
+                outerWrapper.place(position, zIndex)
             } else {
-                outerWrapper.placeWithLayer(position, lastZIndex, layerBlock)
+                outerWrapper.placeWithLayer(position, zIndex, layerBlock)
             }
         }
     }

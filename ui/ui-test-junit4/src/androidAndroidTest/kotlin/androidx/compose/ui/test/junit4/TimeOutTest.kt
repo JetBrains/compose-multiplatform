@@ -77,15 +77,13 @@ class TimeOutTest {
     fun InfiniteCase() {
         Box {
             val infiniteCounter = remember { mutableStateOf(0) }
-            Box(
+
+            Text(
+                "Hello ${infiniteCounter.value}",
                 Modifier.onGloballyPositioned {
                     infiniteCounter.value += 1
                 }
-            ) {
-                Text("Hello")
-            }
-
-            Text("Hello ${infiniteCounter.value}")
+            )
         }
     }
 
