@@ -11,7 +11,6 @@ tasks.register("publishComposeJb") {
     dependsOnComposeTask(":compose:compiler:compiler:publishMavenPublicationToMavenRepository")
     dependsOnComposeTask(":compose:compiler:compiler-hosted:publishMavenPublicationToMavenRepository")
     dependsOnComposeTask(":compose:ui:ui-tooling-data:publishMavenPublicationToMavenRepository")
-    dependsOnComposeTask(":compose:ui:ui-tooling-preview:publishMavenPublicationToMavenRepository")
 
     dependsOnComposeTask(":compose:desktop:desktop:publishKotlinMultiplatformPublicationToMavenRepository")
     dependsOnComposeTask(":compose:desktop:desktop:publishJvmPublicationToMavenRepository")
@@ -38,6 +37,7 @@ tasks.register("publishComposeJb") {
         ":compose:ui:ui-test-junit4",
         ":compose:ui:ui-text",
         ":compose:ui:ui-tooling",
+        ":compose:ui:ui-tooling-preview",
         ":compose:ui:ui-unit",
         ":compose:ui:ui-util",
     ).forEach {
