@@ -204,7 +204,7 @@ private fun FixedLazyGrid(
         val scope = LazyGridScopeImpl()
         scope.apply(content)
 
-        val rows = (scope.totalSize + nColumns - 1) / nColumns
+        val rows = if (scope.totalSize == 0) 0 else 1 + (scope.totalSize - 1) / nColumns
         items(rows) { rowIndex ->
             Row(horizontalArrangement = horizontalArrangement) {
                 for (columnIndex in 0 until nColumns) {

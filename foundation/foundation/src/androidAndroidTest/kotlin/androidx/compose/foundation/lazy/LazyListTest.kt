@@ -1468,6 +1468,29 @@ class LazyListTest(private val orientation: Orientation) {
         assertThat(state.firstVisibleItemScrollOffset).isEqualTo(100)
     }
 
+    @Test
+    fun maxIntElements() {
+        val itemSize = with(rule.density) { 15.toDp() }
+
+        rule.setContent {
+            LazyColumnOrRow(
+                modifier = Modifier.requiredSize(itemSize * 3),
+                state = LazyListState(firstVisibleItemIndex = Int.MAX_VALUE - 3)
+            ) {
+                items(Int.MAX_VALUE) {
+                    Box(Modifier.size(itemSize).testTag("$it"))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("${Int.MAX_VALUE - 3}").assertStartPositionInRootIsEqualTo(0.dp)
+        rule.onNodeWithTag("${Int.MAX_VALUE - 2}").assertStartPositionInRootIsEqualTo(itemSize)
+        rule.onNodeWithTag("${Int.MAX_VALUE - 1}").assertStartPositionInRootIsEqualTo(itemSize * 2)
+
+        rule.onNodeWithTag("${Int.MAX_VALUE}").assertDoesNotExist()
+        rule.onNodeWithTag("0").assertDoesNotExist()
+    }
+
     // ********************* END OF TESTS *********************
     // Helper functions, etc. live below here
 
