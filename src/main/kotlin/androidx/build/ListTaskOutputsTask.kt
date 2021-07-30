@@ -130,6 +130,13 @@ val taskNamesKnownToDuplicateOutputs = setOf(
     "copyReleaseApk"
 )
 
+fun shouldValidateTaskOutput(task: Task): Boolean {
+    if (!task.enabled) {
+        return false
+    }
+    return !taskNamesKnownToDuplicateOutputs.contains(task.name)
+}
+
 // For this project and all subprojects, collects all tasks and creates a map keyed by their output files
 fun Project.findAllTasksByOutput(): Map<File, Task> {
     // find list of all tasks
@@ -146,9 +153,7 @@ fun Project.findAllTasksByOutput(): Map<File, Task> {
         for (otherTaskOutput in otherTask.outputs.files.files) {
             val existingTask = tasksByOutput[otherTaskOutput]
             if (existingTask != null) {
-                if (!taskNamesKnownToDuplicateOutputs.contains(otherTask.name) ||
-                    !taskNamesKnownToDuplicateOutputs.contains(existingTask.name)
-                ) {
+                if (shouldValidateTaskOutput(existingTask) && shouldValidateTaskOutput(otherTask)) {
                     throw GradleException(
                         "Output file " + otherTaskOutput + " was declared as an output of " +
                             "multiple tasks: " + otherTask + " and " + existingTask
