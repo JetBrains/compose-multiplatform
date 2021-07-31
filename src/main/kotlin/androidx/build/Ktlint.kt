@@ -38,12 +38,13 @@ private val DisabledRules = listOf(
     "final-newline",
 ).joinToString(",")
 
+private const val excludeTestDataFiles = "**/test-data/**/*.kt"
+private const val excludeExternalFiles = "**/external/**/*.kt"
+
 fun Project.configureKtlint() {
     val outputDir = "${project.buildDir}/reports/ktlint/"
     val inputDir = "src"
     val includeFiles = "**/*.kt"
-    val excludeTestDataFiles = "**/test-data/**/*.kt"
-    val excludeExternalFiles = "**/external/**/*.kt"
     val inputFiles = project.fileTree(
         mutableMapOf(
             "dir" to inputDir, "include" to includeFiles,
@@ -78,7 +79,11 @@ fun Project.configureKtlint() {
     addToBuildOnServer(lintProvider)
 
     tasks.register("ktlintFormat", JavaExec::class.java) { task ->
-        task.inputs.files(inputFiles)
+        task.inputs.files(
+            inputFiles.apply {
+                setExcludes(listOf(excludeTestDataFiles, excludeExternalFiles))
+            }
+        )
         task.outputs.file(outputFile)
         task.description = "Fix Kotlin code style deviations."
         task.group = "formatting"
@@ -142,6 +147,11 @@ fun Project.configureKtlintCheckFile() {
             if (task.format) {
                 args.add("-F")
             }
+
+            // Note: These exclusions must come after the inputs.
+            args.add("!$excludeTestDataFiles")
+            args.add("!$excludeExternalFiles")
+
             task.args = args
         }
     }
