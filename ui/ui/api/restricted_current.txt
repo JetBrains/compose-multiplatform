@@ -366,7 +366,7 @@ package androidx.compose.ui.focus {
 package androidx.compose.ui.graphics {
 
   public final class GraphicsLayerModifierKt {
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier graphicsLayer(androidx.compose.ui.Modifier, optional float scaleX, optional float scaleY, optional float alpha, optional float translationX, optional float translationY, optional float shadowElevation, optional float rotationX, optional float rotationY, optional float rotationZ, optional float cameraDistance, optional long transformOrigin, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier graphicsLayer(androidx.compose.ui.Modifier, optional float scaleX, optional float scaleY, optional float alpha, optional float translationX, optional float translationY, optional float shadowElevation, optional float rotationX, optional float rotationY, optional float rotationZ, optional float cameraDistance, optional long transformOrigin, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip, optional androidx.compose.ui.graphics.RenderEffect? renderEffect);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier graphicsLayer(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.GraphicsLayerScope,kotlin.Unit> block);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier toolingGraphicsLayer(androidx.compose.ui.Modifier);
   }
@@ -375,6 +375,7 @@ package androidx.compose.ui.graphics {
     method public float getAlpha();
     method public float getCameraDistance();
     method public boolean getClip();
+    method public default androidx.compose.ui.graphics.RenderEffect? getRenderEffect();
     method public float getRotationX();
     method public float getRotationY();
     method public float getRotationZ();
@@ -388,6 +389,7 @@ package androidx.compose.ui.graphics {
     method public void setAlpha(float alpha);
     method public void setCameraDistance(float cameraDistance);
     method public void setClip(boolean clip);
+    method public default void setRenderEffect(androidx.compose.ui.graphics.RenderEffect? _);
     method public void setRotationX(float rotationX);
     method public void setRotationY(float rotationY);
     method public void setRotationZ(float rotationZ);
@@ -401,6 +403,7 @@ package androidx.compose.ui.graphics {
     property public abstract float alpha;
     property public abstract float cameraDistance;
     property public abstract boolean clip;
+    property public default androidx.compose.ui.graphics.RenderEffect? renderEffect;
     property public abstract float rotationX;
     property public abstract float rotationY;
     property public abstract float rotationZ;

@@ -151,6 +151,7 @@ internal class SkijaLayer(
         transformOrigin: TransformOrigin,
         shape: Shape,
         clip: Boolean,
+        renderEffect: RenderEffect?, // TODO consume RenderEffect
         layoutDirection: LayoutDirection,
         density: Density
     ) {

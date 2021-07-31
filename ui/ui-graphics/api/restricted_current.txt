@@ -158,6 +158,10 @@ package androidx.compose.ui.graphics {
     method public static androidx.compose.ui.graphics.Path asComposePath(android.graphics.Path);
   }
 
+  public final class AndroidRenderEffect_androidKt {
+    method public static androidx.compose.ui.graphics.RenderEffect asComposeRenderEffect(android.graphics.RenderEffect);
+  }
+
   public final class AndroidShader_androidKt {
   }
 
@@ -234,6 +238,19 @@ package androidx.compose.ui.graphics {
     property public final int SrcOut;
     property public final int SrcOver;
     property public final int Xor;
+  }
+
+  @androidx.compose.runtime.Immutable public final class BlurEffect extends androidx.compose.ui.graphics.RenderEffect {
+    ctor public BlurEffect(androidx.compose.ui.graphics.RenderEffect? renderEffect, float radiusX, float radiusY, int edgeTreatment);
+    method @RequiresApi(android.os.Build.VERSION_CODES.S) protected android.graphics.RenderEffect createRenderEffect();
+    method public int getEdgeTreatment();
+    method public float getRadiusX();
+    method public float getRadiusY();
+    method public androidx.compose.ui.graphics.RenderEffect? getRenderEffect();
+    property public final int edgeTreatment;
+    property public final float radiusX;
+    property public final float radiusY;
+    property public final androidx.compose.ui.graphics.RenderEffect? renderEffect;
   }
 
   @androidx.compose.runtime.Immutable public abstract sealed class Brush {
@@ -694,6 +711,16 @@ package androidx.compose.ui.graphics {
 
   public final class RectangleShapeKt {
     method public static androidx.compose.ui.graphics.Shape getRectangleShape();
+  }
+
+  @androidx.compose.runtime.Immutable public abstract sealed class RenderEffect {
+    method @RequiresApi(android.os.Build.VERSION_CODES.S) public final android.graphics.RenderEffect asAndroidRenderEffect();
+    method @RequiresApi(android.os.Build.VERSION_CODES.S) protected abstract android.graphics.RenderEffect createRenderEffect();
+    method public boolean isSupported();
+  }
+
+  public final class RenderEffectKt {
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.BlurEffect BlurEffect(float radiusX, float radiusY, optional int edgeTreatment);
   }
 
   @androidx.compose.runtime.Immutable public abstract class ShaderBrush extends androidx.compose.ui.graphics.Brush {

@@ -23,6 +23,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.RenderEffect
 
 /**
  * RenderNode on Q+ devices, where it is officially supported.
@@ -30,6 +31,8 @@ import androidx.compose.ui.graphics.Path
 @RequiresApi(Build.VERSION_CODES.Q)
 internal class RenderNodeApi29(val ownerView: AndroidComposeView) : DeviceRenderNode {
     private val renderNode = RenderNode("Compose")
+
+    private var internalRenderEffect: RenderEffect? = null
 
     override val uniqueId: Long get() = renderNode.uniqueId
 
@@ -124,6 +127,15 @@ internal class RenderNodeApi29(val ownerView: AndroidComposeView) : DeviceRender
             renderNode.alpha = value
         }
 
+    override var renderEffect: RenderEffect?
+        get() = internalRenderEffect
+        set(value) {
+            internalRenderEffect = value
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                RenderNodeApi29VerificationHelper.setRenderEffect(renderNode, value)
+            }
+        }
+
     override val hasDisplayList: Boolean
         get() = renderNode.hasDisplayList()
 
@@ -198,6 +210,16 @@ internal class RenderNodeApi29(val ownerView: AndroidComposeView) : DeviceRender
             pivotY = renderNode.pivotY,
             clipToOutline = renderNode.clipToOutline,
             clipToBounds = renderNode.clipToBounds,
-            alpha = renderNode.alpha
+            alpha = renderNode.alpha,
+            renderEffect = internalRenderEffect
         )
+}
+
+@RequiresApi(Build.VERSION_CODES.S)
+private object RenderNodeApi29VerificationHelper {
+
+    @androidx.annotation.DoNotInline
+    fun setRenderEffect(renderNode: RenderNode, target: RenderEffect?) {
+        renderNode.setRenderEffect(target?.asAndroidRenderEffect())
+    }
 }

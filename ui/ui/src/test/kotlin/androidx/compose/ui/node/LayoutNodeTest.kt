@@ -27,6 +27,7 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
@@ -2228,6 +2229,7 @@ private class MockOwner(
                 transformOrigin: TransformOrigin,
                 shape: Shape,
                 clip: Boolean,
+                renderEffect: RenderEffect?,
                 layoutDirection: LayoutDirection,
                 density: Density
             ) {

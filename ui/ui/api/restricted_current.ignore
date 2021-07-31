@@ -11,3 +11,7 @@ RemovedClass: androidx.compose.ui.res.AnimatedVectorResources_androidKt:
     Removed class androidx.compose.ui.res.AnimatedVectorResources_androidKt
 RemovedClass: androidx.compose.ui.res.AnimatorResources_androidKt:
     Removed class androidx.compose.ui.res.AnimatorResources_androidKt
+
+
+RemovedMethod: androidx.compose.ui.graphics.GraphicsLayerModifierKt#graphicsLayer(androidx.compose.ui.Modifier, float, float, float, float, float, float, float, float, float, float, long, androidx.compose.ui.graphics.Shape, boolean):
+    Removed method androidx.compose.ui.graphics.GraphicsLayerModifierKt.graphicsLayer(androidx.compose.ui.Modifier,float,float,float,float,float,float,float,float,float,float,long,androidx.compose.ui.graphics.Shape,boolean)

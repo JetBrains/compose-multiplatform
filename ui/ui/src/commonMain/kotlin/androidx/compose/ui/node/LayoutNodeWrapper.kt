@@ -326,6 +326,7 @@ internal abstract class LayoutNodeWrapper(
                 transformOrigin = graphicsLayerScope.transformOrigin,
                 shape = graphicsLayerScope.shape,
                 clip = graphicsLayerScope.clip,
+                renderEffect = graphicsLayerScope.renderEffect,
                 layoutDirection = layoutNode.layoutDirection,
                 density = layoutNode.density
             )

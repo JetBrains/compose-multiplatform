@@ -20,6 +20,7 @@ import android.graphics.Outline
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.RenderEffect
 
 /**
  * RenderNode on Q+ and RenderNode on M-P devices have different APIs. This interface
@@ -47,6 +48,7 @@ internal interface DeviceRenderNode {
     var clipToOutline: Boolean
     var clipToBounds: Boolean
     var alpha: Float
+    var renderEffect: RenderEffect?
     val hasDisplayList: Boolean
 
     fun setOutline(outline: Outline?)
@@ -100,5 +102,6 @@ internal data class DeviceRenderNodeData(
     var pivotY: Float,
     var clipToOutline: Boolean,
     var clipToBounds: Boolean,
-    var alpha: Float
+    var alpha: Float,
+    var renderEffect: RenderEffect?
 )
