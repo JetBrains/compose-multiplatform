@@ -137,6 +137,8 @@ val ALLOW_RERUNNING_TASKS = setOf(
     "buildCMakeRelWithDebInfo",
     ":appsearch:appsearch-local-storage:buildCMakeDebug[icing]",
     ":appsearch:appsearch-local-storage:buildCMakeRelWithDebInfo[icing]",
+    ":external:libyuv:buildCMakeDebug[yuv]",
+    ":external:libyuv:buildCMakeRelWithDebInfo[yuv]",
     ":hilt:hilt-navigation-compose:kaptGenerateStubsDebugKotlin",
     ":hilt:hilt-navigation-compose:kaptGenerateStubsReleaseKotlin",
     ":lint-checks:integration-tests:copyDebugAndroidLintReports",
