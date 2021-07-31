@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    implementation(compose.desktop.macos_x64)
+    implementation(compose.desktop.currentOs)
 }
 
 compose.desktop {
