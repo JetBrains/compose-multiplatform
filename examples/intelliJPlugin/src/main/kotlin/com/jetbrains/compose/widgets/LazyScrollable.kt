@@ -24,7 +24,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LazyScrollable() {
     MaterialTheme {
@@ -46,9 +45,7 @@ fun LazyScrollable() {
                 VerticalScrollbar(
                     modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
                     adapter = rememberScrollbarAdapter(
-                        scrollState = state,
-                        itemCount = itemCount,
-                        averageItemSize = 37.dp // TextBox height + Spacer height
+                        scrollState = state
                     )
                 )
             }
