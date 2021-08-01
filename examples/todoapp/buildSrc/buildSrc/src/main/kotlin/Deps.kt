@@ -13,7 +13,7 @@ object Deps {
 
         object Compose {
             // __LATEST_COMPOSE_RELEASE_VERSION__
-            private const val VERSION = "0.5.0-build270"
+            private const val VERSION = "1.0.0-alpha1-rc1"
             const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
         }
     }
@@ -21,18 +21,18 @@ object Deps {
     object Android {
         object Tools {
             object Build {
-                const val gradlePlugin = "com.android.tools.build:gradle:4.0.1"
+                const val gradlePlugin = "com.android.tools.build:gradle:4.1.0"
             }
         }
     }
 
     object AndroidX {
         object AppCompat {
-            const val appCompat = "androidx.appcompat:appcompat:1.3.0-beta01"
+            const val appCompat = "androidx.appcompat:appcompat:1.3.0"
         }
 
         object Activity {
-            const val activityCompose = "androidx.activity:activity-compose:1.3.0-alpha02"
+            const val activityCompose = "androidx.activity:activity-compose:1.3.0"
         }
     }
 
