@@ -17,6 +17,7 @@
 package androidx.compose.ui.test
 
 import android.os.SystemClock
+import android.view.InputDevice
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_CANCEL
 import android.view.MotionEvent.ACTION_DOWN
@@ -135,7 +136,10 @@ internal class AndroidInputDispatcher(
                     /* action = */ action + (actionIndex shl ACTION_POINTER_INDEX_SHIFT),
                     /* pointerCount = */ coordinates.size,
                     /* pointerProperties = */ Array(coordinates.size) {
-                        MotionEvent.PointerProperties().apply { id = pointerIds[it] }
+                        MotionEvent.PointerProperties().apply {
+                            id = pointerIds[it]
+                            toolType = MotionEvent.TOOL_TYPE_FINGER
+                        }
                     },
                     /* pointerCoords = */ Array(coordinates.size) {
                         MotionEvent.PointerCoords().apply {
@@ -145,11 +149,11 @@ internal class AndroidInputDispatcher(
                     },
                     /* metaState = */ 0,
                     /* buttonState = */ 0,
-                    /* xPrecision = */ 0f,
-                    /* yPrecision = */ 0f,
+                    /* xPrecision = */ 1f,
+                    /* yPrecision = */ 1f,
                     /* deviceId = */ 0,
                     /* edgeFlags = */ 0,
-                    /* source = */ 0,
+                    /* source = */ InputDevice.SOURCE_TOUCHSCREEN,
                     /* flags = */ 0
                 ).apply {
                     offsetLocation(-positionInScreen.x, -positionInScreen.y)
