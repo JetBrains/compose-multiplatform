@@ -1,4 +1,5 @@
 package org.jetbrains.compose.demo.widgets.platform
 
-// TODO: https://github.com/JetBrains/compose-jb/issues/169
-actual fun isSystemInDarkTheme(): Boolean = false
+import org.jetbrains.skiko.SystemTheme
+
+actual fun isSystemInDarkTheme(): Boolean = org.jetbrains.skiko.currentSystemTheme == SystemTheme.DARK
