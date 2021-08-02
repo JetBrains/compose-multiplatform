@@ -10,4 +10,6 @@ implement them and how they look and behave on real devices.
 * Theme picker to change Material Theming values at runtime
 * Links to guidelines, docs, source code, and issue tracker
 
-[> Releases](https://github.com/android/compose-samples/releases)
+[> Get it on Google Play](https://play.google.com/store/apps/details?id=androidx.compose.material.catalog)
+
+[> APK releases](https://github.com/android/compose-samples/releases)
