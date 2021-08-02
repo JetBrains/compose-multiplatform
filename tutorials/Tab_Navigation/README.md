@@ -56,7 +56,7 @@ fun main() = application {
 
 ![default-tab-nav](default-tab-nav.gif)
 
-To make a non-focusable component focusable, you need to apply `Modifier.focusable()` to the component.
+To make a non-focusable component focusable, you need to apply `Modifier.focusable()` modifier to the component.
 
 ```kotlin
 import androidx.compose.ui.window.application
