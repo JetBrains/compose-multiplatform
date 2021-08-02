@@ -34,6 +34,11 @@ compose.desktop {
                 // see https://wixtoolset.org/documentation/manual/v3/howtos/general/generate_guids.html
                 upgradeUuid = "6565BEAD-713A-4DE7-A469-6B10FC4A6861"
             }
+
+            macOS {
+                // Use -Pcompose.desktop.mac.sign=true to sign and notarize.
+                bundleID = "androidx.ui.examples.jetissues"
+            }
         }
     }
 }
