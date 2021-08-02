@@ -5,7 +5,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.vectorResource
-import org.jetbrains.compose.demo.widgets.R
+import org.jetbrains.compose.demo.widgets.platform.R
 
 @Composable
 actual fun imageResource(res: String): ImageBitmap {

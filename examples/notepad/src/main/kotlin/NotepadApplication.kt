@@ -25,7 +25,7 @@ fun NotepadApplication(state: NotepadApplicationState) {
 @Composable
 private fun ApplicationTray(state: NotepadApplicationState) {
     Tray(
-        LocalAppResources.current.icon ?: return,
+        LocalAppResources.current.icon,
         state = state.tray,
         hint = "Notepad",
         menu = { ApplicationMenu(state) }

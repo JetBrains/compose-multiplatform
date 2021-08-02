@@ -20,15 +20,12 @@ kotlin {
             }
         }
         named("androidMain") {
-            kotlin.srcDirs("src/jvmMain/kotlin")
             dependencies {
-                api("androidx.appcompat:appcompat:1.3.0-beta01")
+                api("androidx.appcompat:appcompat:1.3.1")
                 api("androidx.core:core-ktx:1.3.1")
             }
         }
         named("desktopMain") {
-            kotlin.srcDirs("src/jvmMain/kotlin")
-            resources.srcDirs("src/commonMain/resources")
             dependencies {
                 api(compose.desktop.common)
             }
@@ -37,13 +34,11 @@ kotlin {
 }
 
 android {
-    compileSdkVersion(30)
+    compileSdk = 30
 
     defaultConfig {
-        minSdkVersion(21)
-        targetSdkVersion(30)
-        versionCode = 1
-        versionName = "1.0"
+        minSdk = 21
+        targetSdk = 30
     }
 
     compileOptions {
