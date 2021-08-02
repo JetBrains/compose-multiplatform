@@ -12,7 +12,7 @@ import androidx.compose.ui.window.application
 
 @Composable
 @Preview
-fun Screen() {
+fun App() {
     var text by remember { mutableStateOf("Hello, World!") }
 
     DesktopMaterialTheme {
@@ -26,6 +26,6 @@ fun Screen() {
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication) {
-        Screen()
+        App()
     }
 }
