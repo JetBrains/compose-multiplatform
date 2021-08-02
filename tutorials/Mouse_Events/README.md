@@ -13,25 +13,28 @@ Click listeners are available in both Compose on Android and Compose for Desktop
 so code like this will work on both platforms:
 
 ```kotlin
-import androidx.compose.desktop.Window
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Text
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.singleWindowApplication
 
-fun main() = Window(title = "Compose for Desktop", size = IntSize(400, 400)) {
-    var count = remember { mutableStateOf(0) }
+fun main() = singleWindowApplication {
+    var count by remember { mutableStateOf(0) }
     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
-        var text = remember { mutableStateOf("Click magenta box!") }
+        var text by remember { mutableStateOf("Click magenta box!") }
         Column {
             @OptIn(ExperimentalFoundationApi::class)
             Box(
@@ -41,17 +44,17 @@ fun main() = Window(title = "Compose for Desktop", size = IntSize(400, 400)) {
                     .fillMaxHeight(0.2f)
                     .combinedClickable(
                         onClick = {
-                            text.value = "Click! ${count.value++}"
+                            text = "Click! ${count++}"
                         },
                         onDoubleClick = {
-                            text.value = "Double click! ${count.value++}"
+                            text = "Double click! ${count++}"
                         },
                         onLongClick = {
-                            text.value = "Long click! ${count.value++}"
+                            text = "Long click! ${count++}"
                         }
                     )
             )
-            Text(text = text.value, fontSize = 40.sp)
+            Text(text = text, fontSize = 40.sp)
         }
     }
 }
@@ -66,30 +69,33 @@ the following code will only work with Compose for Desktop.
 Let's create a window and install a pointer move filter on it that changes the background
 color according to the mouse pointer position:
 ```kotlin
-import androidx.compose.desktop.Window
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerMoveFilter
-import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.window.singleWindowApplication
 
-fun main() = Window(title = "Compose for Desktop", size = IntSize(400, 400)) {
-    var color = remember { mutableStateOf(Color(0, 0, 0)) }
+fun main() = singleWindowApplication {
+    var color by remember { mutableStateOf(Color(0, 0, 0)) }
     Box(
-            modifier = Modifier
-                    .wrapContentSize(Alignment.Center)
-                    .fillMaxSize()
-                    .background(color = color.value)
-                    .pointerMoveFilter(
-                            onMove = {
-                                color.value = Color(it.x.toInt() % 256, it.y.toInt() % 256, 0)
-                                false
-                            }
-                    )
+        modifier = Modifier
+            .wrapContentSize(Alignment.Center)
+            .fillMaxSize()
+            .background(color = color)
+            .pointerMoveFilter(
+                onMove = {
+                    color = Color(it.x.toInt() % 256, it.y.toInt() % 256, 0)
+                    false
+                }
+            )
     )
 }
 ```
@@ -100,40 +106,46 @@ fun main() = Window(title = "Compose for Desktop", size = IntSize(400, 400)) {
 
 Compose for Desktop also supports pointer enter and exit handlers, like this:
 ```kotlin
-import androidx.compose.desktop.Window
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Text
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.singleWindowApplication
 
-fun main() = Window(title = "Compose for Desktop", size = IntSize(400, 400)) {
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+fun main() = singleWindowApplication {
+    Column(
+        Modifier.background(Color.White),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
         repeat(10) { index ->
-            var active = remember { mutableStateOf(false) }
+            var active by remember { mutableStateOf(false) }
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(color = if (active.value) Color.Green else Color.White)
+                    .background(color = if (active) Color.Green else Color.White)
                     .pointerMoveFilter(
                         onEnter = {
-                            active.value = true
+                            active = true
                             false
                         },
                         onExit = {
-                            active.value = false
+                            active = false
                             false
                         }
                     ),
                 fontSize = 30.sp,
-                fontStyle = if (active.value) FontStyle.Italic else FontStyle.Normal,
+                fontStyle = if (active) FontStyle.Italic else FontStyle.Normal,
                 text = "Item $index"
             )
         }
@@ -144,54 +156,45 @@ fun main() = Window(title = "Compose for Desktop", size = IntSize(400, 400)) {
 
 ### Mouse right/middle clicks and keyboard modifiers
 
-While first-class support for pointer type-specific data, like pressed mouse buttons, is still in development in Compose, there is an available raw AWT mouse event object in Compose for Desktop, that can be used as a workaround when you need advanced functionality.
+Compose for Desktop contains desktop-only `Modifier.mouseClickable`, where data about pressed mouse buttons and keyboard modifiers is available. This is an experimental API, which means that it's likely to be changed before release.
 
 ```kotlin
-import androidx.compose.desktop.Window
-import androidx.compose.foundation.gestures.forEachGesture
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.ExperimentalDesktopApi
+import androidx.compose.foundation.mouseClickable
 import androidx.compose.material.Text
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.AwaitPointerEventScope
-import androidx.compose.ui.input.pointer.PointerEvent
-import androidx.compose.ui.input.pointer.changedToDown
-import androidx.compose.ui.input.pointer.consumeDownChange
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.unit.IntSize
-import java.awt.event.MouseEvent
+import androidx.compose.ui.window.singleWindowApplication
 
-fun main() = Window(title = "Compose for Desktop", size = IntSize(400, 400)) {
-    var lastEvent by remember { mutableStateOf<MouseEvent?>(null) }
-    Column {
-        Text(
-            text = "Custom button",
-            modifier = Modifier.pointerInput(Unit) {
-                forEachGesture {
-                    awaitPointerEventScope {
-                        lastEvent = awaitEventFirstDown().also {
-                            it.changes.forEach { it.consumeDownChange() }
-                        }.mouseEvent
-                    }
+@OptIn(ExperimentalDesktopApi::class)
+fun main() = singleWindowApplication {
+    var clickableText by remember { mutableStateOf("Click me!") }
+
+    Text(
+        modifier = Modifier.mouseClickable(
+            onClick = {
+                clickableText = buildString {
+                    append("Buttons pressed:\n")
+                    append("primary: ${buttons.isPrimaryPressed}\t")
+                    append("secondary: ${buttons.isSecondaryPressed}\t")
+                    append("tertiary: ${buttons.isTertiaryPressed}\t")
+
+                    append("\n\nKeyboard modifiers pressed:\n")
+
+                    append("alt: ${keyboardModifiers.isAltPressed}\t")
+                    append("ctrl: ${keyboardModifiers.isCtrlPressed}\t")
+                    append("meta: ${keyboardModifiers.isMetaPressed}\t")
+                    append("shift: ${keyboardModifiers.isShiftPressed}\t")
                 }
             }
-        )
-        Text("Mouse event: ${lastEvent?.paramString()}")
-    }
-
-}
-
-private suspend fun AwaitPointerEventScope.awaitEventFirstDown(): PointerEvent {
-    var event: PointerEvent
-    do {
-        event = awaitPointerEvent()
-    } while (
-        !event.changes.all { it.changedToDown() }
+        ),
+        text = clickableText
     )
-    return event
 }
 ```
 ![Application running](mouse_event.gif)
+
+If you need more information about events there is an available raw AWT mouse event object in `mouseEvent` property of `PointerEvent`

@@ -28,7 +28,7 @@ class Game {
 
     var elapsed by mutableStateOf(0L)
     var score by mutableStateOf(0)
-    var clicked by mutableStateOf(0)
+    private var clicked by mutableStateOf(0)
 
     var started by mutableStateOf(false)
     var paused by mutableStateOf(false)

@@ -4,9 +4,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     // __KOTLIN_COMPOSE_VERSION__
-    kotlin("jvm") version "1.5.10"
+    kotlin("jvm") version "1.5.21"
     // __LATEST_COMPOSE_RELEASE_VERSION__
-    id("org.jetbrains.compose") version "0.5.0-build229"
+    id("org.jetbrains.compose") version "1.0.0-alpha1-rc1"
 }
 
 group = "me.user"
@@ -14,16 +14,18 @@ version = "1.0"
 
 repositories {
     mavenCentral()
+    google()
     maven { url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev") }
 }
 
 dependencies {
     implementation(compose.desktop.currentOs)
-    implementation(compose.uiTooling)
 }
 
 tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "11"
+    kotlinOptions.allWarningsAsErrors = true
+    kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
 }
 
 compose.desktop {

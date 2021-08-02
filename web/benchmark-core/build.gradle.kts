@@ -41,15 +41,6 @@ kotlin {
     }
 }
 
-val printBundleSize by tasks.registering {
-    dependsOn(tasks.named("jsBrowserDistribution"))
-    doLast {
-        val jsFile = buildDir.resolve("distributions/web-benchmark-core.js")
-        val size = jsFile.length()
-        println("##teamcity[buildStatisticValue key='landingPageBundleSize' value='$size']")
-    }
-}
-
 val printBenchmarkResults by tasks.registering {
     doLast {
         val report = buildDir.resolve("reports/tests/jsTest/classes/BenchmarkTests.html").readText()
@@ -78,4 +69,3 @@ val printBenchmarkResults by tasks.registering {
 }
 
 tasks.named("jsTest") { finalizedBy(printBenchmarkResults) }
-tasks.named("build") { finalizedBy(printBundleSize) }

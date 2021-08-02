@@ -459,24 +459,26 @@ val macExtraPlistKeys: String
 ``` kotlin 
 // src/main/main.kt
 
-import androidx.compose.desktop.Window
-import androidx.compose.material.Text
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.window.singleWindowApplication
 import java.awt.Desktop
 
 fun main() {
-    val text = mutableStateOf("Hello, World!")
+    var text by mutableStateOf("Hello, World!")
 
-    Desktop.getDesktop().setOpenURIHandler { event ->
-        text.value = "Open URI: " + event.uri
+    try {
+        Desktop.getDesktop().setOpenURIHandler { event ->
+            text = "Open URI: " + event.uri
+        }
+    } catch (e: UnsupportedOperationException) {
+        println("setOpenURIHandler is unsupported")
     }
 
-    Window {
-        var text by remember { text }
+    singleWindowApplication {
         MaterialTheme {
             Text(text)
         }

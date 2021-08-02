@@ -1,6 +1,6 @@
 # Getting Started With Compose for Web
 
-**The API is experimental, and breaking changes can be expected**
+**The API is not finalized, and breaking changes can be expected**
 
 ## Introduction
 
@@ -42,14 +42,15 @@ pluginManagement {
 ``` kotlin
 // Add compose gradle plugin
 plugins {
-    kotlin("multiplatform") version "1.5.10"
-    id("org.jetbrains.compose") version "0.5.0-build228"
+    kotlin("multiplatform") version "1.5.21"
+    id("org.jetbrains.compose") version "0.5.0-build270"
 }
 
 // Add maven repositories
 repositories {
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    google()
 }
 
 // Enable JS(IR) target and add dependencies

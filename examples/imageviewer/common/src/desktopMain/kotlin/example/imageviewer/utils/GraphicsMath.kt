@@ -1,7 +1,7 @@
 package example.imageviewer.utils
 
-import androidx.compose.desktop.AppManager
-import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.window.WindowSize
+import androidx.compose.ui.unit.dp
 import java.awt.Dimension
 import java.awt.Graphics2D
 import java.awt.Rectangle
@@ -38,10 +38,10 @@ fun scaleBitmapAspectRatio(
     return result
 }
 
-fun getDisplayBounds(bitmap: BufferedImage): Rectangle {
+fun getDisplayBounds(bitmap: BufferedImage, windowSize: WindowSize): Rectangle {
 
-    val boundW: Float = displayWidth().toFloat()
-    val boundH: Float = displayHeight().toFloat()
+    val boundW: Float = windowSize.width.value.toFloat()
+    val boundH: Float = windowSize.height.value.toFloat()
 
     val ratioX: Float = bitmap.width / boundW
     val ratioY: Float = bitmap.height / boundH
@@ -108,22 +108,6 @@ fun applyBlurFilter(bitmap: BufferedImage): BufferedImage {
     )
 }
 
-fun displayWidth(): Int {
-    val window = AppManager.focusedWindow
-    if (window != null) {
-        return window.width
-    }
-    return 0
-}
-
-fun displayHeight(): Int {
-    val window = AppManager.focusedWindow
-    if (window != null) {
-        return window.height
-    }
-    return 0
-}
-
 fun toByteArray(bitmap: BufferedImage) : ByteArray {
     val baos = ByteArrayOutputStream()
     ImageIO.write(bitmap, "png", baos)
@@ -134,11 +118,11 @@ fun cropImage(bitmap: BufferedImage, crop: Rectangle) : BufferedImage {
     return bitmap.getSubimage(crop.x, crop.y, crop.width, crop.height)
 }
 
-fun getPreferredWindowSize(desiredWidth: Int, desiredHeight: Int): IntSize {
+fun getPreferredWindowSize(desiredWidth: Int, desiredHeight: Int): WindowSize {
     val screenSize: Dimension = Toolkit.getDefaultToolkit().screenSize
     val preferredWidth: Int = (screenSize.width * 0.8f).toInt()
     val preferredHeight: Int = (screenSize.height * 0.8f).toInt()
     val width: Int = if (desiredWidth < preferredWidth) desiredWidth else preferredWidth
     val height: Int = if (desiredHeight < preferredHeight) desiredHeight else preferredHeight
-    return IntSize(width, height)
+    return WindowSize(width.dp, height.dp)
 }

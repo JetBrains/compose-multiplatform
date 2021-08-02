@@ -11,6 +11,7 @@ val properties = ComposeUberJarProperties()
 repositories {
     mavenCentral()
     maven(properties.composeRepoUrl)
+    google()
 }
 
 val composeVersion: String by lazy {

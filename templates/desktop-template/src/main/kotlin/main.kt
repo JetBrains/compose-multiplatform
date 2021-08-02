@@ -1,13 +1,14 @@
-import androidx.compose.desktop.Window
+import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.material.Text
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.application
 
-fun main() = Window {
+@Composable
+@Preview
+fun Screen() {
     var text by remember { mutableStateOf("Hello, World!") }
 
     MaterialTheme {
@@ -16,5 +17,11 @@ fun main() = Window {
         }) {
             Text(text)
         }
+    }
+}
+
+fun main() = application {
+    Window(onCloseRequest = ::exitApplication) {
+        Screen()
     }
 }

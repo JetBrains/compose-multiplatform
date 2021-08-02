@@ -16,6 +16,7 @@ import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.internal.configureApplicationImpl
 import org.jetbrains.compose.desktop.application.internal.currentTarget
 import org.jetbrains.compose.desktop.preview.internal.initializePreview
+import org.jetbrains.compose.internal.checkAndWarnAboutComposeWithSerialization
 import org.jetbrains.compose.web.internal.initializeWeb
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -106,6 +107,8 @@ class ComposePlugin : Plugin<Project> {
                 useIR = true
             }
         }
+
+        project.checkAndWarnAboutComposeWithSerialization()
     }
 
     object Dependencies {
@@ -131,22 +134,6 @@ class ComposePlugin : Plugin<Project> {
         val windows_x64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-windows-x64")
         val macos_x64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-macos-x64")
         val macos_arm64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-macos-arm64")
-
-        @Deprecated(
-            "compose.desktop.linux is deprecated, use compose.desktop.linux_x64 instead",
-            replaceWith = ReplaceWith("linux_x64")
-        )
-        val linux = linux_x64
-        @Deprecated(
-            "compose.desktop.windows is deprecated, use compose.desktop.windows_x64 instead",
-            replaceWith = ReplaceWith("windows_x64")
-        )
-        val windows = windows_x64
-        @Deprecated(
-            "compose.desktop.macos is deprecated, use compose.desktop.macos_x64 instead",
-            replaceWith = ReplaceWith("macos_x64")
-        )
-        val macos = macos_x64
 
         val currentOs by lazy {
             composeDependency("org.jetbrains.compose.desktop:desktop-jvm-${currentTarget.id}")

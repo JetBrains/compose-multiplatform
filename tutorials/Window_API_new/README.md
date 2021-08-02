@@ -1,4 +1,4 @@
-# Top level windows management (new Composable API, experimental)
+# Top level windows management
 
 ## What is covered
 
@@ -13,11 +13,9 @@ Top-level windows can be conditionally created in other composable functions and
 The main function for creating windows is `Window`. This function should be used in a Composable scope. The easiest way to create a Composable scope is to use the `application` function:
 
 ```kotlin
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     Window(onCloseRequest = ::exitApplication) {
         // Content
@@ -33,11 +31,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     var fileName by remember { mutableStateOf("Untitled") }
 
@@ -61,18 +57,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import kotlinx.coroutines.delay
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     var isPerformingTask by remember { mutableStateOf(true) }
+
     LaunchedEffect(Unit) {
         delay(2000) // Do some heavy lifting
         isPerformingTask = false
     }
+
     if (isPerformingTask) {
         Window(onCloseRequest = ::exitApplication) {
             Text("Performing some tasks. Please wait!")
@@ -96,16 +92,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     var isOpen by remember { mutableStateOf(true) }
     var isAskingToClose by remember { mutableStateOf(false) }
-    
+
     if (isOpen) {
         Window(
             onCloseRequest = { isAskingToClose = true }
@@ -136,16 +130,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.window.Tray
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import androidx.compose.ui.window.rememberWindowState
 import kotlinx.coroutines.delay
-import java.awt.Color
-import java.awt.image.BufferedImage
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     var isVisible by remember { mutableStateOf(true) }
 
@@ -166,7 +159,7 @@ fun main() = application {
 
     if (!isVisible) {
         Tray(
-            remember { getTrayIcon() },
+            TrayIcon,
             hint = "Counter",
             onAction = { isVisible = true },
             menu = {
@@ -176,14 +169,12 @@ fun main() = application {
     }
 }
 
-fun getTrayIcon(): BufferedImage {
-    val size = 256
-    val image = BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB)
-    val graphics = image.createGraphics()
-    graphics.color = Color.orange
-    graphics.fillOval(0, 0, size, size)
-    graphics.dispose()
-    return image
+object TrayIcon : Painter() {
+    override val intrinsicSize = Size(256f, 256f)
+
+    override fun DrawScope.onDraw() {
+        drawOval(Color(0xFFFFA500))
+    }
 }
 ```
 ![](hide_instead_of_close.gif)
@@ -194,12 +185,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     val applicationState = remember { MyApplicationState() }
 
@@ -210,9 +200,8 @@ fun main() = application {
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun MyWindow(
+private fun ApplicationScope.MyWindow(
     state: MyWindowState
 ) = Window(onCloseRequest = state::close, title = state.title) {
     MenuBar {
@@ -271,7 +260,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -280,7 +268,6 @@ import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     val state = rememberWindowState(placement = WindowPlacement.Maximized)
 
@@ -344,10 +331,9 @@ fun main() = application {
 ## Listening the state of the window
 Reading the state in composition is useful when you need to update UI, but there are cases when you need to react to the state changes and send a value to another non-composable level of your application (write it to the database, for example):
 
-```
+```kotlin
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowSize
@@ -357,20 +343,19 @@ import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     val state = rememberWindowState()
 
-    Window(state) {
+    Window(onCloseRequest = ::exitApplication, state) {
         // Content
-    
+
         LaunchedEffect(state) {
             snapshotFlow { state.size }
                 .onEach(::onWindowResize)
                 .launchIn(this)
 
             snapshotFlow { state.position }
-                .filterNot { it.isInitial }
+                .filterNot { it.isSpecified }
                 .onEach(::onWindowRelocate)
                 .launchIn(this)
         }
@@ -386,35 +371,6 @@ private fun onWindowRelocate(position: WindowPosition) {
 }
 ```
 
-## Handle window-level shortcuts
-```kotlin
-import androidx.compose.material.TextField
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.type
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
-
-@OptIn(ExperimentalComposeUiApi::class)
-fun main() = application {
-    Window(
-        onCloseRequest = ::exitApplication,
-        onPreviewKeyEvent = {
-            if (it.type == KeyEventType.KeyDown && it.key == Key.Escape) {
-                exitApplication()
-                true
-            } else {
-                false
-            }
-        }
-    ) {
-        TextField("Text", {})
-    }
-}
-```
-
 ## Dialogs
 There are two types of window – modal and regular. Below are the functions for creating each:
 
@@ -427,19 +383,16 @@ You can see an example of both types of window below.
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogState
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
@@ -465,13 +418,11 @@ fun main() = application {
 ## Swing interoperability
 Because Compose for Desktop uses Swing under the hood, it is possible to create a window using Swing directly:
 ```kotlin
-import androidx.compose.desktop.ComposeWindow
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.awt.ComposeWindow
 import java.awt.Dimension
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = SwingUtilities.invokeLater {
     ComposeWindow().apply {
         size = Dimension(300, 300)
@@ -487,16 +438,26 @@ fun main() = SwingUtilities.invokeLater {
 You can also access ComposeWindow in the Composable `Window` scope:
 ```kotlin
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import java.awt.Cursor
+import java.awt.datatransfer.DataFlavor
+import java.awt.dnd.DnDConstants
+import java.awt.dnd.DropTarget
+import java.awt.dnd.DropTargetAdapter
+import java.awt.dnd.DropTargetDropEvent
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     Window(onCloseRequest = ::exitApplication) {
         LaunchedEffect(Unit) {
-            window.cursor = Cursor(Cursor.CROSSHAIR_CURSOR)
+            window.dropTarget = DropTarget().apply {
+                addDropTargetListener(object : DropTargetAdapter() {
+                    override fun drop(event: DropTargetDropEvent) {
+                        event.acceptDrop(DnDConstants.ACTION_COPY);
+                        val fileName = event.transferable.getTransferData(DataFlavor.javaFileListFlavor)
+                        println(fileName)
+                    }
+                })
+            }
         }
     }
 }
@@ -509,13 +470,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.AwtWindow
 import androidx.compose.ui.window.application
 import java.awt.FileDialog
 import java.awt.Frame
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     var isOpen by remember { mutableStateOf(true) }
 
@@ -529,7 +488,6 @@ fun main() = application {
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun FileDialog(
     parent: Frame? = null,
