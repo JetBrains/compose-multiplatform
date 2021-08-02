@@ -1,10 +1,8 @@
 package org.jetbrains.compose.demo.widgets
 
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
-import org.jetbrains.compose.demo.widgets.platform.AppFrame
 import org.jetbrains.compose.demo.widgets.ui.MainView
 import java.awt.Dimension
 import java.awt.Toolkit
@@ -15,9 +13,7 @@ fun main() {
             title = "Widgets Gallery",
             state = WindowState(size = WindowSize(size.width.dp, size.height.dp)),
         ) {
-        CompositionLocalProvider(AppFrame provides this) {
-            MainView()
-        }
+        MainView()
     }
 }
 
