@@ -36,6 +36,11 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
         project.providers.gradleProperty("compose.desktop.preview.ide.port")
 
     @get:InputFiles
+    internal val uiTooling = project.configurations.detachedConfiguration(
+        project.dependencies.create("org.jetbrains.compose.ui:ui-tooling-desktop:${ComposeBuildConfig.composeVersion}")
+    ).apply { isTransitive = false }
+
+    @get:InputFiles
     internal val hostClasspath = project.configurations.detachedConfiguration(
         project.dependencies.create("org.jetbrains.compose:preview-rpc:${ComposeBuildConfig.composeVersion}")
     )
@@ -44,9 +49,11 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
     fun run() {
         val hostConfig = PreviewHostConfig(
                 javaExecutable = javaExecutable(javaHome.get()),
-                hostClasspath = hostClasspath.files.pathString()
+                hostClasspath = hostClasspath.files.asSequence().pathString()
             )
-        val previewClasspathString = previewClasspath.files.pathString()
+        val previewClasspathString =
+            (previewClasspath.files.asSequence() + uiTooling.files.asSequence())
+                .pathString()
 
         val gradleLogger = logger
         val previewLogger = GradlePreviewLoggerAdapter(gradleLogger)
@@ -65,7 +72,7 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
         }
     }
 
-    private fun Collection<File>.pathString(): String =
+    private fun Sequence<File>.pathString(): String =
         joinToString(File.pathSeparator) { it.absolutePath }
 
     private class GradlePreviewLoggerAdapter(

@@ -7,6 +7,4 @@ plugins {
 
 dependencies {
     implementation(compose.desktop.currentOs)
-    // todo: remove after update
-    implementation(compose.uiTooling)
 }
