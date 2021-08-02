@@ -187,7 +187,23 @@ class DesktopComposeTestRule : ComposeContentTestRule {
             return rule.window.roots
         }
 
-        override val mainClock: MainTestClock
-            get() = TODO()
+        // TODO(https://github.com/JetBrains/compose-jb/issues/637): support MainTestClock
+        override val mainClock = object : MainTestClock {
+            override val currentTime: Long
+                get() = 0
+            override var autoAdvance: Boolean = false
+
+            override fun advanceTimeByFrame() {
+                TODO()
+            }
+
+            override fun advanceTimeBy(milliseconds: Long, ignoreFrameDuration: Boolean) {
+                TODO()
+            }
+
+            override fun advanceTimeUntil(timeoutMillis: Long, condition: () -> Boolean) {
+                TODO()
+            }
+        }
     }
 }
