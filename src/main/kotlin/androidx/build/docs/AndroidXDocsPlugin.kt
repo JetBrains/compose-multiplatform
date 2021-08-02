@@ -104,15 +104,9 @@ class AndroidXDocsPlugin : Plugin<Project> {
             docsSourcesConfiguration
         )
 
-        val unzippedSourcesForDackka = File(project.buildDir, "unzippedSourcesForDackka")
-        val unzipSourcesForDackkaTask = configureDackkaUnzipTask(
-            unzippedSourcesForDackka,
-            docsSourcesConfiguration
-        )
-
         configureDackka(
-            unzippedSourcesForDackka,
-            unzipSourcesForDackkaTask,
+            unzippedDocsSources,
+            unzipDocsTask,
             unzippedSamplesSources,
             unzipSamplesTask,
             dependencyClasspath
@@ -168,35 +162,6 @@ class AndroidXDocsPlugin : Plugin<Project> {
             task.filter { line ->
                 regex.replace(line, "{@link $1attr#$3}")
             }
-        }
-    }
-
-    /**
-     * Creates and configures a task that will build a list of select sources, defined by
-     * [dackkaDirsToProcess], and places them in [destinationDirectory].
-     *
-     * This is a modified version of [configureUnzipTask], customized for Dackka usage.
-     */
-    private fun configureDackkaUnzipTask(
-        destinationDirectory: File,
-        docsConfiguration: Configuration
-    ): TaskProvider<Sync> {
-        return project.tasks.register("unzipSourcesForDackka", Sync::class.java) { task ->
-            val sources = docsConfiguration.incoming.artifactView { }.files
-
-            @Suppress("UnstableApiUsage")
-            task.from(
-                sources.elements.map { jars ->
-                    jars.map {
-                        project.zipTree(it).matching {
-                            dackkaDirsToProcess.forEach { dir ->
-                                it.include(dir)
-                            }
-                        }
-                    }
-                }
-            )
-            task.into(destinationDirectory)
         }
     }
 
@@ -565,87 +530,6 @@ abstract class SourcesVariantRule : ComponentMetadataRule {
 
 private const val DACKKA_DEPENDENCY = "com.google.devsite:dackka:0.0.9"
 private const val DOCLAVA_DEPENDENCY = "com.android:doclava:1.0.6"
-
-// Allowlist for directories that should be processed by Dackka
-private val dackkaDirsToProcess = listOf(
-    "android/support/v4/media/**",
-    "androidx/activity/**",
-    "androidx/ads/**",
-    "androidx/annotation/**",
-    "androidx/appcompat/**",
-    "androidx/appsearch/**",
-    "androidx/arch/**",
-    "androidx/asynclayoutinflater/**",
-    "androidx/autofill/**",
-    "androidx/benchmark/**",
-    "androidx/biometric/**",
-    "androidx/browser/**",
-    "androidx/camera/**",
-    "androidx/car/**",
-    "androidx/cardview/**",
-    "androidx/collection/**",
-    "androidx/compose/**",
-    "androidx/concurrent/**",
-    "androidx/contentpager/**",
-    "androidx/coordinatorlayout/**",
-    "androidx/core/**",
-    "androidx/cursoradapter/**",
-    "androidx/customview/**",
-    "androidx/datastore/**",
-    "androidx/documentfile/**",
-    "androidx/drawerlayout/**",
-    "androidx/dynamicanimation/**",
-    "androidx/emoji/**",
-    "androidx/emoji2/**",
-    "androidx/enterprise/**",
-    "androidx/exifinterface/**",
-    "androidx/fragment/**",
-    "androidx/gridlayout/**",
-    "androidx/health/**",
-    "androidx/heifwriter/**",
-    "androidx/hilt/**",
-    "androidx/interpolator/**",
-    "androidx/leanback/**",
-    "androidx/legacy/**",
-    "androidx/lifecycle/**",
-    "androidx/loader/**",
-    "androidx/localbroadcastmanager/**",
-    "androidx/media/**",
-    "androidx/media2/**",
-    "androidx/mediarouter/**",
-    "androidx/navigation/**",
-    "androidx/paging/**",
-    "androidx/palette/**",
-    "androidx/percentlayout/**",
-    "androidx/preference/**",
-    "androidx/print/**",
-    "androidx/profileinstaller/**",
-    "androidx/recommendation/**",
-    "androidx/recyclerview/**",
-    "androidx/remotecallback/**",
-    "androidx/resourceinspection/**",
-    "androidx/room/**",
-    "androidx/savedstate/**",
-    "androidx/security/**",
-    "androidx/sharetarget/**",
-    "androidx/slice/**",
-    "androidx/slidingpanelayout/**",
-    "androidx/sqlite/**",
-    "androidx/startup/**",
-    "androidx/swiperefreshlayout/**",
-    "androidx/textclassifier/**",
-    "androidx/tracing/**",
-    "androidx/transition/**",
-    "androidx/tvprovider/**",
-    "androidx/vectordrawable/**",
-    "androidx/versionedparcelable/**",
-    "androidx/viewpager/**",
-    "androidx/viewpager2/**",
-    "androidx/wear/**",
-    "androidx/webkit/**",
-    "androidx/window/**",
-    "androidx/work/**"
-)
 
 // List of packages to exclude from both Java and Kotlin refdoc generation
 private val hiddenPackages = listOf(
