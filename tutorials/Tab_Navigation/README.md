@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 
 fun main() = application {
     Window(
-        state = WindowState(size = WindowSize(350.dp, 450.dp)),
+        state = WindowState(size = WindowSize(350.dp, 500.dp)),
         onCloseRequest = ::exitApplication
     ) {
         Box(
@@ -43,8 +43,7 @@ fun main() = application {
                     OutlinedTextField(
                         value = text.value,
                         singleLine = true,
-                        onValueChange = { text.value = it },
-                        modifier = Modifier.height(46.dp)
+                        onValueChange = { text.value = it }
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                 }
@@ -196,17 +195,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusOrder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.IntSize
 
 fun main() = application {
     Window(
-        state = WindowState(size = WindowSize(350.dp, 450.dp)),
+        state = WindowState(size = WindowSize(350.dp, 500.dp)),
         onCloseRequest = ::exitApplication
     ) {
         val itemsList = remember { List(5) { FocusRequester() } }
@@ -223,7 +220,7 @@ fun main() = application {
                         value = text.value,
                         singleLine = true,
                         onValueChange = { text.value = it },
-                        modifier = Modifier.height(46.dp).focusOrder(item) {
+                        modifier = Modifier.focusOrder(item) {
                             // reverse order
                             next = if (index - 1 < 0) itemsList.last() else itemsList[index - 1]
                             previous = if (index + 1 == itemsList.size) itemsList.first() else itemsList[index + 1]
@@ -236,6 +233,7 @@ fun main() = application {
     }
 }
 ```
+
 ![reverse-order](reverse-order.gif)
 
 ## Making component focused
@@ -302,7 +300,7 @@ fun main() = application {
                     value = text.value,
                     singleLine = true,
                     onValueChange = { text.value = it },
-                    modifier = Modifier.height(46.dp)
+                    modifier = Modifier
                         .focusRequester(textFieldFocusRequester)
                 )
             }
