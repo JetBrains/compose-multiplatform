@@ -29,6 +29,11 @@ kotlin {
                 api("androidx.core:core-ktx:1.6.0")
             }
         }
+        named("jsMain") {
+            dependencies {
+                api(compose.web.core)
+            }
+        }
     }
 }
 
