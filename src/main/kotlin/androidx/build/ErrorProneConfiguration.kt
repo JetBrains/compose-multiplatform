@@ -18,12 +18,16 @@ package androidx.build
 
 import androidx.build.checkapi.jvmCompileInputsFromKmpProject
 import androidx.build.java.JavaCompileInputs
+import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.builder.core.BuilderConstants
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaPlugin.COMPILE_JAVA_TASK_NAME
+import org.gradle.api.provider.MapProperty
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.compile.JavaCompile
@@ -31,6 +35,7 @@ import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.exclude
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getByName
+import org.gradle.process.CommandLineArgumentProvider
 
 const val ERROR_PRONE_TASK = "runErrorProne"
 
@@ -64,16 +69,38 @@ fun Project.configureErrorProneForJava() {
 fun Project.configureErrorProneForAndroid(
     variants: DomainObjectSet<out com.android.build.gradle.api.BaseVariant>
 ) {
+    var annotationArgs: MapProperty<String, String>? = null
+    val extension = extensions.findByType(AndroidComponentsExtension::class.java)
+    extension?.onVariants { variant ->
+        annotationArgs = variant.javaCompilation.annotationProcessor.arguments
+    }
     val errorProneConfiguration = createErrorProneConfiguration()
     variants.all { variant ->
-        // Using getName() instead of name due to b/150427408
-        if (variant.buildType.getName() == BuilderConstants.RELEASE) {
+        if (variant.buildType.name == BuilderConstants.RELEASE) {
             val task = variant.javaCompileProvider
             (variant as com.android.build.gradle.api.BaseVariant)
                 .annotationProcessorConfiguration.extendsFrom(errorProneConfiguration)
 
             log.info("Configuring error-prone for ${variant.name}'s java compile")
-            makeErrorProneTask(task)
+            makeErrorProneTask(task) { javaCompile ->
+                // Passing along annotation processor arguments to errorprone compile task
+                javaCompile.options.compilerArgumentProviders.add(
+                    CommandLineArgumentProviderAdapter(annotationArgs!!)
+                )
+            }
+        }
+    }
+}
+
+class CommandLineArgumentProviderAdapter(
+    @get:Input
+    val arguments: Provider<Map<String, String>>
+) : CommandLineArgumentProvider {
+    override fun asArguments(): MutableIterable<String> {
+        return mutableListOf<String>().also {
+            for ((key, value) in arguments.get()) {
+                it.add("-A$key=$value")
+            }
         }
     }
 }
