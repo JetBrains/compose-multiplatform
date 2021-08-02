@@ -26,12 +26,18 @@ class PreviewFloatingToolbarProvider : AbstractFloatingToolbarProvider(PREVIEW_E
     override fun register(toolbar: FloatingToolbarComponent, parentDisposable: Disposable) {
         try {
             // todo: use provided data context once 2020.3 is no longer supported
-            val toolbarImpl = toolbar as? FloatingToolbarComponentImpl ?: return
-            val editor = toolbarImpl.getData(CommonDataKeys.EDITOR.name) as? Editor ?: return
+            val toolbarClass = FloatingToolbarComponentImpl::class.java
+            val getDataMethod = toolbarClass.getMethod("getData", String::class.java)
+            val editor = getDataMethod.invoke(toolbar, CommonDataKeys.EDITOR.name) as? Editor ?: return
             registerComponent(toolbar, editor, parentDisposable)
         } catch (e: Exception) {
             LOG.error(e)
         }
+    }
+
+    override fun register(dataContext: DataContext, component: FloatingToolbarComponent, parentDisposable: Disposable) {
+        val editor = dataContext.getData(CommonDataKeys.EDITOR) ?: return
+        registerComponent(component, editor, parentDisposable)
     }
 
     private fun registerComponent(
