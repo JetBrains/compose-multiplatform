@@ -17,6 +17,7 @@
 package androidx.compose.runtime.snapshots
 
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -360,6 +361,69 @@ class SnapshotStateObserverTests {
             running = false
         }
         assertNull(threadException)
+    }
+
+    @Test
+    fun stateChangeTriggersUpdateWhenDerivedStateIsUsedRightAfter() {
+        val data = "data"
+        var changes = 0
+        val derivedState = derivedStateOf { 0 }
+
+        runSimpleTest { stateObserver, state ->
+            stateObserver.observeReads(data, { _ -> changes++ }) {
+                if (state.value == 0) {
+                    state.value++
+                }
+                // derived state read internally calls notifyObjectsInitialized() which triggers
+                // the first onValueChanged invocation.
+                derivedState.value
+            }
+        }
+
+        assertEquals(2, changes)
+    }
+
+    @Test
+    fun nestedObservationIsClearingThePreviousScopesBeforeReexecuting() {
+        val data1 = "data1"
+        val data2 = "data2"
+        var changes = 0
+
+        val stateObserver = SnapshotStateObserver { it() }
+        val state1 = mutableStateOf(true)
+        val state2 = mutableStateOf(0)
+        val onChanged1: (String) -> Unit = { }
+        val onChanged2: (String) -> Unit = { _ -> changes++ }
+
+        fun runObservedBlocks() {
+            // we have nested observations
+            stateObserver.observeReads(data1, onChanged1) {
+                stateObserver.observeReads(data2, onChanged2) {
+                    if (state1.value) {
+                        state2.value++
+                    }
+                }
+            }
+        }
+
+        try {
+            stateObserver.start()
+            Snapshot.notifyObjectsInitialized()
+
+            runObservedBlocks()
+            assertEquals(0, changes)
+
+            state1.value = false
+            Snapshot.sendApplyNotifications()
+            runObservedBlocks()
+            assertEquals(1, changes)
+
+            state2.value++
+            Snapshot.sendApplyNotifications()
+            assertEquals(1, changes)
+        } finally {
+            stateObserver.stop()
+        }
     }
 
     private fun runSimpleTest(

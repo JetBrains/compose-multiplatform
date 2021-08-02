@@ -36,9 +36,6 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
                         hasValues = true
                     }
                 }
-                if (invalidated.isNotEmpty()) {
-                    map.removeValueIf { scope -> scope in invalidated }
-                }
             }
         }
         if (hasValues) {
@@ -112,14 +109,15 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
         currentMap = applyMap
         isPaused = false
 
+        synchronized(applyMaps) {
+            applyMap.map.removeValueIf {
+                it === scope
+            }
+        }
+
         if (!isObserving) {
             isObserving = true
             try {
-                synchronized(applyMaps) {
-                    applyMap.map.removeValueIf {
-                        it === scope
-                    }
-                }
                 Snapshot.observe(readObserver, null, block)
             } finally {
                 isObserving = false
