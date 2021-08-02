@@ -106,6 +106,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.WindowScope
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.singleWindowApplication
+import kotlin.random.Random
 
 private const val title = "Desktop Compose Elements"
 
@@ -513,11 +514,15 @@ fun Animations(isCircularEnabled: Boolean) = Row {
 private fun RightColumn(modifier: Modifier) = Box {
     val state = rememberLazyListState()
     val itemCount = 100000
+    val heights = remember {
+        val random = Random(24)
+        (0 until itemCount).map { random.nextFloat() }
+    }
 
     LazyColumn(modifier.graphicsLayer(alpha = 0.5f), state = state) {
-        items((1..itemCount).toList()) { x ->
-            val itemHeight = 20.dp + 20.dp * Math.random().toFloat()
-            Text(x.toString(), Modifier.graphicsLayer(alpha = 0.5f).height(itemHeight))
+        items((0 until itemCount).toList()) { i ->
+            val itemHeight = 20.dp + 20.dp * heights[i]
+            Text(i.toString(), Modifier.graphicsLayer(alpha = 0.5f).height(itemHeight))
         }
     }
 
