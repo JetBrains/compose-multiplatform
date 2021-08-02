@@ -38,6 +38,7 @@ Preview functionality (check your application UI without building/running it) fo
        * [Top level windows management](tutorials/Window_API_new)
        * [Menu, tray, notifications](tutorials/Tray_Notifications_MenuBar_new)
        * [Keyboard support](tutorials/Keyboard)
+       * [Tab focus navigation](tutorials/Tab_Navigation)
        * [Building native distribution](tutorials/Native_distributions_and_local_execution)
        * [Signing and notarization](tutorials/Signing_and_notarization_on_macOS)
        * [Swing interoperability](tutorials/Swing_Integration)
