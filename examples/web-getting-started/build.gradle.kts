@@ -2,7 +2,7 @@
 // In case you want modify code, please, modify it there. 
 plugins {
     kotlin("multiplatform") version "1.5.21"
-    id("org.jetbrains.compose") version "0.5.0-build270"
+    id("org.jetbrains.compose") version "1.0.0-alpha1-rc1"
 }
 
 repositories {
