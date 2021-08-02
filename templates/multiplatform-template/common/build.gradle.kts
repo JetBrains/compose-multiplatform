@@ -24,7 +24,7 @@ kotlin {
         }
         named("desktopMain") {
             dependencies {
-                implementation(compose.uiTooling)
+                api(compose.uiTooling)
             }
         }
         named("androidMain") {
