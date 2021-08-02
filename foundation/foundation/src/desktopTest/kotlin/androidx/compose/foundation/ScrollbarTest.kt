@@ -403,6 +403,23 @@ class ScrollbarTest {
         }
     }
 
+    @Test
+    fun `drag lazy slider when it is hidden`() {
+        runBlocking(Dispatchers.Main) {
+            rule.setContent {
+                LazyTestBox(
+                    size = 100.dp, childSize = 20.dp, childCount = 1, scrollbarWidth = 10.dp
+                )
+            }
+            rule.awaitIdle()
+            rule.onNodeWithTag("scrollbar").performGesture {
+                instantSwipe(start = Offset(0f, 25f), end = Offset(0f, 50f))
+            }
+            rule.awaitIdle()
+            rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(0.dp)
+        }
+    }
+
     private suspend fun tryUntilSucceeded(block: suspend () -> Unit) {
         while (true) {
             try {
@@ -480,7 +497,7 @@ class ScrollbarTest {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     private fun LazyTestBox(
-        state: LazyListState,
+        state: LazyListState = rememberLazyListState(),
         size: Dp,
         childSize: Dp,
         childCount: Int,
