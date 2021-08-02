@@ -9,6 +9,10 @@ plugins {
 kotlin {
     android()
     jvm("desktop")
+    js(IR) {
+        browser()
+        binaries.executable()
+    }
 
     sourceSets {
         named("commonMain") {
