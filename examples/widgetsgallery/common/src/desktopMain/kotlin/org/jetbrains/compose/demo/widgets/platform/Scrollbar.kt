@@ -25,6 +25,6 @@ actual fun VerticalScrollbar(
     itemCount: Int,
     averageItemSize: Dp
 ) = androidx.compose.foundation.VerticalScrollbar(
-    rememberScrollbarAdapter(scrollState, itemCount, averageItemSize),
+    rememberScrollbarAdapter(scrollState),
     modifier
 )

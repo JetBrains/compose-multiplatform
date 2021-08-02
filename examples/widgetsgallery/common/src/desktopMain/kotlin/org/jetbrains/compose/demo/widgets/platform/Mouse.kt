@@ -1,15 +1,14 @@
 package org.jetbrains.compose.demo.widgets.platform
 
-import androidx.compose.desktop.LocalAppWindow
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerMoveFilter
+import androidx.compose.ui.window.FrameWindowScope
 import java.awt.Cursor
+
+val AppFrame = staticCompositionLocalOf<FrameWindowScope> { error("Undefined repository") }
 
 actual fun Modifier.pointerMoveFilter(
     onEnter: () -> Boolean,
@@ -20,10 +19,11 @@ actual fun Modifier.pointerMoveFilter(
 actual fun Modifier.cursorForHorizontalResize(): Modifier = composed {
     var isHover by remember { mutableStateOf(false) }
 
-    if (isHover) {
-        LocalAppWindow.current.window.cursor = Cursor(Cursor.E_RESIZE_CURSOR)
+    val window = AppFrame.current.window
+    window.cursor = if (isHover) {
+        Cursor(Cursor.E_RESIZE_CURSOR)
     } else {
-        LocalAppWindow.current.window.cursor = Cursor.getDefaultCursor()
+        Cursor.getDefaultCursor()
     }
 
     pointerMoveFilter(

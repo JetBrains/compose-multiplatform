@@ -33,7 +33,7 @@ import org.jetbrains.compose.demo.widgets.ui.utils.withoutWidthConstraints
 @Composable
 fun MainView() {
     DisableSelection {
-        WidgetGalleryTheme() {
+        WidgetGalleryTheme {
             WidgetsPanel()
         }
     }
