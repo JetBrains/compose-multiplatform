@@ -1,3 +1,4 @@
+import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.material.Text
 import androidx.compose.material.Button
@@ -11,7 +12,7 @@ import androidx.compose.ui.window.application
 fun Screen() {
     var text by remember { mutableStateOf("Hello, World!") }
 
-    MaterialTheme {
+    DesktopMaterialTheme {
         Button(onClick = {
             text = "Hello, Desktop!"
         }) {
