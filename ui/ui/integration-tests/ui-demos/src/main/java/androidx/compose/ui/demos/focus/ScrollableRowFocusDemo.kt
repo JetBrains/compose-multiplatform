@@ -16,12 +16,9 @@
 
 package androidx.compose.ui.demos.focus
 
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.gestures.FlingBehavior
-import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,20 +39,17 @@ import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.RelocationRequester
-import androidx.compose.ui.layout.onRelocationRequest
 import androidx.compose.ui.layout.relocationRequester
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.toSize
 import kotlinx.coroutines.launch
-import kotlin.math.abs
 
 @Composable
 fun ScrollableRowFocusDemo() {
     Column {
         Text("Use the dpad or arrow keys to move focus")
-        Row(Modifier.horizontalScrollWithRelocation(rememberScrollState())) {
+        Row(Modifier.horizontalScroll(rememberScrollState())) {
             repeat(20) {
                 FocusableBox(it.toString())
             }
@@ -93,44 +87,4 @@ private fun Modifier.focusableWithRelocation() = composed {
             }
         }
         .focusable()
-}
-
-// This is a helper function that users will have to use since experimental "ui" API cannot be used
-// inside Scrollable, which is ihe "foundation" package. After onRelocationRequest is added
-// to Scrollable, users can use Modifier.horizontalScroll directly.
-@OptIn(ExperimentalComposeUiApi::class)
-private fun Modifier.horizontalScrollWithRelocation(
-    state: ScrollState,
-    enabled: Boolean = true,
-    flingBehavior: FlingBehavior? = null,
-    reverseScrolling: Boolean = false
-): Modifier {
-    return this
-        .onRelocationRequest(
-            onProvideDestination = { rect, layoutCoordinates ->
-                val size = layoutCoordinates.size.toSize()
-                rect.translate(relocationDistance(rect.left, rect.right, size.width), 0f)
-            },
-            onPerformRelocation = { source, destination ->
-                val offset = destination.left - source.left
-                state.animateScrollBy(if (reverseScrolling) -offset else offset)
-            }
-        )
-        .horizontalScroll(state, enabled, flingBehavior, reverseScrolling)
-}
-
-// Calculate the offset needed to bring one of the edges into view. The leadingEdge is the side
-// closest to the origin (For the x-axis this is 'left', for the y-axis this is 'top').
-// The trailing edge is the other side (For the x-axis this is 'right', for the y-axis this is
-// 'bottom').
-private fun relocationDistance(leadingEdge: Float, trailingEdge: Float, parentSize: Float) = when {
-    // If the item is already visible, no need to scroll.
-    leadingEdge >= 0 && trailingEdge <= parentSize -> 0f
-
-    // If the item is visible but larger than the parent, we don't scroll.
-    leadingEdge < 0 && trailingEdge > parentSize -> 0f
-
-    // Find the minimum scroll needed to make one of the edges coincide with the parent's edge.
-    abs(leadingEdge) < abs(trailingEdge - parentSize) -> leadingEdge
-    else -> trailingEdge - parentSize
 }
