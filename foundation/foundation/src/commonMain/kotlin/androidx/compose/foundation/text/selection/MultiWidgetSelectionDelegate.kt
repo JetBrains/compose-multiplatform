@@ -101,11 +101,10 @@ internal class MultiWidgetSelectionDelegate(
 
     override fun getBoundingBox(offset: Int): Rect {
         val textLayoutResult = layoutResultCallback() ?: return Rect.Zero
+        val textLength = textLayoutResult.layoutInput.text.length
+        if (textLength < 1) return Rect.Zero
         return textLayoutResult.getBoundingBox(
-            offset.coerceIn(
-                0,
-                textLayoutResult.layoutInput.text.text.length - 1
-            )
+            offset.coerceIn(0, textLength - 1)
         )
     }
 }
