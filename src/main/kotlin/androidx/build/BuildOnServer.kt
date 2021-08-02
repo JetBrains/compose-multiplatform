@@ -52,15 +52,6 @@ open class BuildOnServer : DefaultTask() {
             "top-of-tree-m2repository-all-$buildId.zip"
         )
 
-        if (project.isDocumentationEnabled()) {
-            filesNames.add("dackka-tip-of-tree-docs-$buildId.zip")
-            filesNames.add("dackka-public-docs-$buildId.zip")
-            filesNames.add("doclava-tip-of-tree-docs-$buildId.zip")
-            filesNames.add("doclava-public-docs-$buildId.zip")
-            filesNames.add("dokka-tip-of-tree-docs-$buildId.zip")
-            filesNames.add("dokka-public-docs-$buildId.zip")
-        }
-
         if (project.findProject(":jetifier:jetifier-standalone") != null) {
             filesNames.add("jetifier-standalone.zip")
             filesNames.add("top-of-tree-m2repository-partially-dejetified-$buildId.zip")
