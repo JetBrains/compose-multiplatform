@@ -16,11 +16,15 @@
 
 package androidx.compose.ui.test.inputdispatcher
 
-import android.view.MotionEvent
+import android.view.MotionEvent.ACTION_DOWN
+import android.view.MotionEvent.ACTION_MOVE
+import android.view.MotionEvent.ACTION_UP
 import androidx.compose.ui.geometry.Offset
 import androidx.test.filters.SmallTest
 import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.test.AndroidInputDispatcher
+import androidx.compose.ui.test.util.Finger
+import androidx.compose.ui.test.util.Touchscreen
 import androidx.compose.ui.test.util.assertHasValidEventTimes
 import androidx.compose.ui.test.util.verify
 import com.google.common.truth.Truth.assertThat
@@ -60,9 +64,9 @@ class SendClickTest(config: TestConfig) : InputDispatcherTest() {
         recorder.assertHasValidEventTimes()
         recorder.events.apply {
             assertThat(size).isEqualTo(3)
-            this[0].verify(position, MotionEvent.ACTION_DOWN, 0)
-            this[1].verify(position, MotionEvent.ACTION_MOVE, eventPeriodMillis)
-            this[2].verify(position, MotionEvent.ACTION_UP, eventPeriodMillis)
+            this[0].verify(position, ACTION_DOWN, 0, Touchscreen, Finger)
+            this[1].verify(position, ACTION_MOVE, eventPeriodMillis, Touchscreen, Finger)
+            this[2].verify(position, ACTION_UP, eventPeriodMillis, Touchscreen, Finger)
         }
     }
 }

@@ -19,6 +19,8 @@ package androidx.compose.ui.test.inputdispatcher
 import android.view.MotionEvent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.AndroidInputDispatcher
+import androidx.compose.ui.test.util.Finger
+import androidx.compose.ui.test.util.Touchscreen
 import androidx.compose.ui.test.util.assertHasValidEventTimes
 import androidx.compose.ui.test.util.isMonotonicBetween
 import androidx.compose.ui.test.util.moveEvents
@@ -73,8 +75,8 @@ class SendSwipeLineTest(private val config: TestConfig) : InputDispatcherTest(co
 
             // Check down and up events
             val durationMs = duration
-            first().verify(start, MotionEvent.ACTION_DOWN, 0)
-            last().verify(end, MotionEvent.ACTION_UP, durationMs)
+            first().verify(start, MotionEvent.ACTION_DOWN, 0, Touchscreen, Finger)
+            last().verify(end, MotionEvent.ACTION_UP, durationMs, Touchscreen, Finger)
 
             // Check coordinates and timestamps of move events
             moveEvents.isMonotonicBetween(start, end)

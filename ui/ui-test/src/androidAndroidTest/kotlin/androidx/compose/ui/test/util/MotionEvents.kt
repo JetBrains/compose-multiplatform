@@ -16,10 +16,14 @@
 
 package androidx.compose.ui.test.util
 
+import android.view.InputDevice
 import android.view.MotionEvent
 import androidx.compose.ui.geometry.Offset
 import com.google.common.truth.Truth.assertThat
 import kotlin.math.abs
+
+const val Finger = MotionEvent.TOOL_TYPE_FINGER
+const val Touchscreen = InputDevice.SOURCE_TOUCHSCREEN
 
 internal class MotionEventRecorder {
 
@@ -56,38 +60,45 @@ internal fun MotionEventRecorder.assertHasValidEventTimes() {
 internal fun MotionEvent.verify(
     curve: (Long) -> Offset,
     expectedAction: Int,
-    expectedRelativeTime: Long
+    expectedRelativeTime: Long,
+    expectedSource: Int,
+    expectedToolType: Int
 ) {
-    verifyEvent(1, expectedAction, 0, expectedRelativeTime)
+    verifyEvent(1, expectedAction, 0, expectedRelativeTime, expectedSource)
     // x and y can just be taken from the function. We're not testing the function, we're
     // testing if the MotionEvent sampled the function at the correct point
-    verifyPointer(0, curve(expectedRelativeTime))
+    verifyPointer(0, curve(expectedRelativeTime), expectedToolType)
 }
 
 internal fun MotionEvent.verify(
     expectedPosition: Offset,
     expectedAction: Int,
-    expectedRelativeTime: Long
+    expectedRelativeTime: Long,
+    expectedSource: Int,
+    expectedToolType: Int
 ) {
-    verifyEvent(1, expectedAction, 0, expectedRelativeTime)
-    verifyPointer(0, expectedPosition)
+    verifyEvent(1, expectedAction, 0, expectedRelativeTime, expectedSource)
+    verifyPointer(0, expectedPosition, expectedToolType)
 }
 
 internal fun MotionEvent.verifyEvent(
     expectedPointerCount: Int,
     expectedAction: Int,
     expectedActionIndex: Int,
-    expectedRelativeTime: Long
+    expectedRelativeTime: Long,
+    expectedSource: Int
 ) {
     assertThat(pointerCount).isEqualTo(expectedPointerCount)
     assertThat(actionMasked).isEqualTo(expectedAction)
     assertThat(actionIndex).isEqualTo(expectedActionIndex)
     assertThat(relativeTime).isEqualTo(expectedRelativeTime)
+    assertThat(source).isEqualTo(expectedSource)
 }
 
 internal fun MotionEvent.verifyPointer(
     expectedPointerId: Int,
-    expectedPosition: Offset
+    expectedPosition: Offset,
+    expectedToolType: Int
 ) {
     var index = -1
     for (i in 0 until pointerCount) {
@@ -99,6 +110,7 @@ internal fun MotionEvent.verifyPointer(
     assertThat(index).isAtLeast(0)
     assertThat(getX(index)).isEqualTo(expectedPosition.x)
     assertThat(getY(index)).isEqualTo(expectedPosition.y)
+    assertThat(getToolType(index)).isEqualTo(expectedToolType)
 }
 
 /**

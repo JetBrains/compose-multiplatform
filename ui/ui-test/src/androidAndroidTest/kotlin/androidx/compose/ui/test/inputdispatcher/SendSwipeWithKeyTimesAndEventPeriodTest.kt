@@ -20,6 +20,8 @@ import android.view.MotionEvent.ACTION_DOWN
 import android.view.MotionEvent.ACTION_UP
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.AndroidInputDispatcher
+import androidx.compose.ui.test.util.Finger
+import androidx.compose.ui.test.util.Touchscreen
 import androidx.compose.ui.test.util.assertHasValidEventTimes
 import androidx.compose.ui.test.util.between
 import androidx.compose.ui.test.util.moveEvents
@@ -112,8 +114,8 @@ class SendSwipeWithKeyTimesAndEventPeriodTest(
 
             // Check down and up events
             val durationMs = duration
-            first().verify(curve, ACTION_DOWN, 0)
-            last().verify(curve, ACTION_UP, durationMs)
+            first().verify(curve, ACTION_DOWN, 0, Touchscreen, Finger)
+            last().verify(curve, ACTION_UP, durationMs, Touchscreen, Finger)
 
             // Check that coordinates are the function's value at the respective timestamps
             forEach {
