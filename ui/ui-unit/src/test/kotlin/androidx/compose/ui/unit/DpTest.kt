@@ -187,6 +187,14 @@ class DpTest {
     }
 
     @Test
+    fun dpRectConstructor() {
+        assertEquals(
+            DpRect(10.dp, 5.dp, 25.dp, 15.dp),
+            DpRect(DpOffset(10.dp, 5.dp), DpSize(15.dp, 10.dp))
+        )
+    }
+
+    @Test
     fun dpRectWidth() {
         val dpRect = DpRect(10.dp, 5.dp, 25.dp, 15.dp)
         assertEquals(15.dp, dpRect.width)

@@ -441,6 +441,12 @@ data class DpRect(
     @Stable
     val bottom: Dp
 ) {
+    /**
+     * Constructs a [DpRect] from the top-left [origin] and the width and height in [size].
+     */
+    constructor(origin: DpOffset, size: DpSize) :
+        this(origin.x, origin.y, origin.x + size.width, origin.y + size.height)
+
     companion object
 }
 
