@@ -433,7 +433,7 @@ class AndroidXDocsPlugin : Plugin<Project> {
                     "generate offline docs use \'-PofflineDocs=true\' parameter.  Places the " +
                     "documentation in $destDir"
                 dependsOn(doclavaConfiguration)
-                setDocletpath(doclavaConfiguration.resolve())
+                setDocletpath(doclavaConfiguration)
                 destinationDir = destDir
                 classpath = androidJarFile(project) + dependencyClasspath
                 checksConfig = GENERATE_DOCS_CONFIG
