@@ -25,21 +25,14 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.focus.FocusDirection.Companion.Left
 import androidx.compose.ui.focus.FocusDirection.Companion.Right
-import androidx.compose.ui.layout.RelocationRequester
-import androidx.compose.ui.layout.relocationRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.launch
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -60,11 +53,11 @@ class FocusInScrollableRowTest(private val reverseScrolling: Boolean) {
         val visibleItem = FocusRequester()
         rule.setContentForTest {
             ScrollableRow(Modifier.size(itemSize * 3, itemSize)) {
-                FocusableBox(Modifier.size(itemSize))
-                FocusableBox(Modifier.size(itemSize))
-                FocusableBox(Modifier.size(itemSize).focusRequester(visibleItem))
-                FocusableBox(Modifier.size(itemSize))
-                FocusableBox(Modifier.size(itemSize))
+                Box(Modifier.size(itemSize).focusable())
+                Box(Modifier.size(itemSize).focusable())
+                Box(Modifier.size(itemSize).focusRequester(visibleItem).focusable())
+                Box(Modifier.size(itemSize).focusable())
+                Box(Modifier.size(itemSize).focusable())
             }
         }
 
@@ -81,11 +74,11 @@ class FocusInScrollableRowTest(private val reverseScrolling: Boolean) {
         val outOfBoundsItem = FocusRequester()
         rule.setContentForTest {
             ScrollableRow(Modifier.size(itemSize * 2, itemSize)) {
-                FocusableBox(Modifier.size(itemSize))
-                FocusableBox(Modifier.size(itemSize))
-                FocusableBox(Modifier.size(itemSize).focusRequester(outOfBoundsItem))
-                FocusableBox(Modifier.size(itemSize))
-                FocusableBox(Modifier.size(itemSize))
+                Box(Modifier.size(itemSize).focusable())
+                Box(Modifier.size(itemSize).focusable())
+                Box(Modifier.size(itemSize).focusRequester(outOfBoundsItem).focusable())
+                Box(Modifier.size(itemSize).focusable())
+                Box(Modifier.size(itemSize).focusable())
             }
         }
 
@@ -102,9 +95,9 @@ class FocusInScrollableRowTest(private val reverseScrolling: Boolean) {
         val itemOnBoundary = FocusRequester()
         rule.setContentForTest {
             ScrollableRow(Modifier.size(itemSize * 2, itemSize)) {
-                FocusableBox(Modifier.size(itemSize))
-                FocusableBox(Modifier.size(itemSize).focusRequester(itemOnBoundary))
-                FocusableBox(Modifier.size(itemSize))
+                Box(Modifier.size(itemSize).focusable())
+                Box(Modifier.size(itemSize).focusRequester(itemOnBoundary).focusable())
+                Box(Modifier.size(itemSize).focusable())
             }
         }
         rule.runOnIdle { itemOnBoundary.requestFocus() }
@@ -142,25 +135,4 @@ class FocusInScrollableRowTest(private val reverseScrolling: Boolean) {
             composable()
         }
     }
-}
-
-@Composable
-private fun FocusableBox(modifier: Modifier = Modifier) {
-    Box(modifier.focusableWithRelocation())
-}
-
-// This is a hel function that users will have to use until bringIntoView is added to
-// Modifier.focusable()
-@OptIn(ExperimentalComposeUiApi::class)
-private fun Modifier.focusableWithRelocation() = composed {
-    val relocationRequester = remember { RelocationRequester() }
-    val coroutineScope = rememberCoroutineScope()
-    Modifier
-        .relocationRequester(relocationRequester)
-        .onFocusChanged {
-            if (it.isFocused) {
-                coroutineScope.launch { relocationRequester.bringIntoView() }
-            }
-        }
-        .focusable()
 }
