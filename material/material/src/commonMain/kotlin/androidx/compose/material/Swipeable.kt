@@ -725,7 +725,8 @@ class ResistanceConfig(
 /**
  *  Given an offset x and a set of anchors, return a list of anchors:
  *   1. [ ] if the set of anchors is empty,
- *   2. [ x ] if x is equal to one of the anchors,
+ *   2. [ x' ] if x is equal to one of the anchors, accounting for a small rounding error, where x'
+ *      is x rounded to the exact value of the matching anchor,
  *   3. [ min ] if min is the minimum anchor and x < min,
  *   4. [ max ] if max is the maximum anchor and x > max, or
  *   5. [ a , b ] if a and b are anchors such that a < x < b and b - a is minimal.
@@ -747,7 +748,9 @@ private fun findBounds(
             listOf(a)
         a == b ->
             // case 2
-            listOf(offset)
+            // Can't return offset itself here since it might not be exactly equal
+            // to the anchor, despite being considered an exact match.
+            listOf(a)
         else ->
             // case 5
             listOf(a, b)
