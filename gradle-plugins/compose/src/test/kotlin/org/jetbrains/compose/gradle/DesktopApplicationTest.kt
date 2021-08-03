@@ -315,4 +315,15 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             }
         }
     }
+
+    @Test
+    fun resources() = with(testProject(TestProjects.resources)) {
+        gradle(":run").build().checks { check ->
+            check.taskOutcome(":run", TaskOutcome.SUCCESS)
+        }
+
+        gradle(":runDistributable").build().checks { check ->
+            check.taskOutcome(":runDistributable", TaskOutcome.SUCCESS)
+        }
+    }
 }

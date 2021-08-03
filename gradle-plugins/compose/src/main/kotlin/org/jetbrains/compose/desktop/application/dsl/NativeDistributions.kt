@@ -25,6 +25,7 @@ open class NativeDistributions @Inject constructor(
     var copyright: String? = null
     var vendor: String? = null
     var packageVersion: String? = null
+    val appResourcesRootDir: DirectoryProperty = objects.directoryProperty()
 
     val outputBaseDir: DirectoryProperty = objects.directoryProperty().apply {
         set(layout.buildDirectory.dir("compose/binaries"))

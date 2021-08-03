@@ -1,0 +1,1 @@
+macos-arm64 only resource
