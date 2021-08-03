@@ -105,6 +105,7 @@ package androidx.compose.ui.unit {
 
   @androidx.compose.runtime.Immutable public final class DpRect {
     ctor public DpRect(@androidx.compose.runtime.Stable float left, @androidx.compose.runtime.Stable float top, @androidx.compose.runtime.Stable float right, @androidx.compose.runtime.Stable float bottom);
+    ctor public DpRect(long origin, long size);
     method public float component1-D9Ej5fM();
     method public float component2-D9Ej5fM();
     method public float component3-D9Ej5fM();
