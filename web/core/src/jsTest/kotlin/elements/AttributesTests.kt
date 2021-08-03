@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import org.jetbrains.compose.web.attributes.AttrsBuilder
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.attributes.forId
+import org.jetbrains.compose.web.attributes.value
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
@@ -330,5 +331,28 @@ class AttributesTests {
         assertEquals(1, refInitCounter)
         assertEquals(2, attrsCallCounter)
         assertEquals(0, refDisposeCounter)
+    }
+
+    @Test // issue: https://github.com/JetBrains/compose-jb/issues/981
+    fun attributesUpdateShouldNotCauseInlineStylesCleanUp() = runTest {
+        var hasValue by mutableStateOf(false)
+
+        composition {
+            Button(attrs = {
+                style {
+                    color(Color.red)
+                }
+                if (hasValue) value("buttonValue")
+            }) {
+                Text("Button")
+            }
+        }
+
+        assertEquals("""<button style="color: red;">Button</button>""", root.innerHTML)
+
+        hasValue = true
+        waitForAnimationFrame()
+
+        assertEquals("""<button style="color: red;" value="buttonValue">Button</button>""", root.innerHTML)
     }
 }
