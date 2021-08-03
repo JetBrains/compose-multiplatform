@@ -178,7 +178,8 @@ abstract class AbstractJPackageTask @Inject constructor(
     private val macSigner: MacSigner? by lazy {
         val nonValidatedSettings = nonValidatedMacSigningSettings
         if (currentOS == OS.MacOS && nonValidatedSettings?.sign?.get() == true) {
-            val validatedSettings = nonValidatedSettings.validate(nonValidatedMacBundleID)
+            val validatedSettings =
+                nonValidatedSettings.validate(nonValidatedMacBundleID, project)
             MacSigner(validatedSettings, runExternalTool)
         } else null
     }
