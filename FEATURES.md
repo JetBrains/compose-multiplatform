@@ -1,6 +1,6 @@
  ## Features
 
-Features currently available in Compose for Desktop
+### Features currently available in Compose for Desktop
    * [Desktop Components](tutorials/Desktop_Components/README.md)
    * [Image loading support](tutorials/Image_And_Icons_Manipulations/README.md)
    * [Keyboard handling](tutorials/Keyboard/README.md)
@@ -12,7 +12,7 @@ Features currently available in Compose for Desktop
    * [Tray, menu bar and notifications](tutorials/Tray_Notifications_MenuBar_new/README.md)
    * [Window properties handling](tutorials/Window_API_new/README.md)
 
-Features currently available in Compose for Web
+### Features currently available in Compose for Web
    * [Intro](tutorials/Web/Building_UI/README.md)
    * [Event handling](tutorials/Web/Events_Handling/README.md)
    * [CSS](tutorials/Web/Style_Dsl/README.md)
