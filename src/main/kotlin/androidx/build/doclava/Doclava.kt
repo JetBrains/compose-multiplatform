@@ -43,12 +43,12 @@ internal fun createGenerateSdkApiTask(
             dependsOn(doclavaConfig)
             dependsOn(annotationConfig)
             description = "Generates API files for the current SDK."
-            setDocletpath(doclavaConfig.resolve())
+            setDocletpath(doclavaConfig)
             destinationDir = destination
             // Strip the androidx.annotation classes injected by Metalava. They are not accessible.
             classpath = androidJarFile(project)
                 .filter { it.path.contains("androidx/annotation") }
-                .plus(project.files(annotationConfig.resolve()))
+                .plus(annotationConfig)
             source(
                 project.zipTree(androidSrcJarFile(project))
                     .matching(PatternSet().include("**/*.java"))

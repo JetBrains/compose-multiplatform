@@ -52,7 +52,7 @@ abstract class DoclavaTask @Inject constructor(
 ) : DefaultTask() {
 
     // All lowercase name to match MinimalJavadocOptions#docletpath
-    private var docletpath: List<File> = emptyList()
+    private lateinit var docletpath: FileCollection
 
     @Input
     var checksConfig: ChecksConfig = DEFAULT_DOCLAVA_CONFIG
@@ -114,7 +114,7 @@ abstract class DoclavaTask @Inject constructor(
      */
     @InputFiles
     fun getDocletpath(): List<File> {
-        return docletpath
+        return docletpath.files.toList()
     }
 
     /**
@@ -123,8 +123,8 @@ abstract class DoclavaTask @Inject constructor(
      * {@link #options JavadocOptions}.
      * @see MinimalJavadocOptions#setDocletpath(java.util.List)
      */
-    fun setDocletpath(docletpath: Collection<File>) {
-        this.docletpath = docletpath.toList()
+    fun setDocletpath(docletpath: FileCollection) {
+        this.docletpath = docletpath
     }
 
     @OutputDirectory
@@ -213,7 +213,7 @@ abstract class DoclavaTask @Inject constructor(
     @TaskAction
     fun generate() {
         val args = computeArguments()
-        runDoclavaWithArgs(docletpath, args, workerExecutor)
+        runDoclavaWithArgs(getDocletpath(), args, workerExecutor)
     }
 }
 
