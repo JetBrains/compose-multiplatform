@@ -47,6 +47,30 @@ open class StyleSheet(
 
     protected fun style(cssRule: CSSBuilder.() -> Unit) = CSSHolder(usePrefix, cssRule)
 
+    /**
+     * Example:
+     * ```
+     * object AppStyleSheet : StyleSheet() {
+     *  val bounce by keyframes {
+     *  from {
+     *       property("transform", "translateX(50%)")
+     *  }
+     *
+     *  to {
+     *      property("transform", "translateX(-50%)")
+     *  }
+     * }
+     *
+     *   val myClass by style {
+     *      animation(bounce) {
+     *          duration(2.s)
+     *          timingFunction(AnimationTimingFunction.EaseIn)
+     *          direction(AnimationDirection.Alternate)
+     *      }
+     *    }
+     *  }
+     * ```
+     */
     protected fun keyframes(cssKeyframes: CSSKeyframesBuilder.() -> Unit) = CSSKeyframesHolder(usePrefix, cssKeyframes)
 
     companion object {
@@ -67,8 +91,8 @@ open class StyleSheet(
         val (style, newCssRules) = buildCSS(selfSelector, selfSelector, cssBuild)
         val cssRule = cssRules.find {
             it is CSSStyleRuleDeclaration &&
-                it.selector is CSSSelector.CSSClass && it.style == style &&
-                (boundClasses[it.selector.className] ?: emptyList()) == newCssRules
+                    it.selector is CSSSelector.CSSClass && it.style == style &&
+                    (boundClasses[it.selector.className] ?: emptyList()) == newCssRules
         }.unsafeCast<CSSStyleRuleDeclaration?>()
         return if (cssRule != null) {
             cssRule.selector.unsafeCast<CSSSelector.CSSClass>().className
@@ -99,7 +123,13 @@ open class StyleSheet(
         }
     }
 
-    protected class CSSKeyframesHolder(private val usePrefix: Boolean, private val keyframesBuilder: CSSKeyframesBuilder.() -> Unit) {
+    /**
+     * See [keyframes]
+     */
+    protected class CSSKeyframesHolder(
+        private val usePrefix: Boolean,
+        private val keyframesBuilder: CSSKeyframesBuilder.() -> Unit
+    ) {
         operator fun provideDelegate(
             sheet: StyleSheet,
             property: KProperty<*>

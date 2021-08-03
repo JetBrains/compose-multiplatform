@@ -128,14 +128,33 @@ fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.not(
     query: CSSMediaQuery.Invertible
 ) = CSSMediaQuery.Not(query)
 
+/**
+ * A mediaQuery selector
+ *
+ * Example:
+ * ```
+ * object CombinedMediaQueries : StyleSheet() {
+ *      media(mediaMinWidth(200.px).and(mediaMaxWidth(400.px))) { ... }
+ * }
+ * ```
+ */
 fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.mediaMinWidth(value: CSSUnitValue) =
     CSSMediaQuery.MediaFeature("min-width", value)
 
+/**
+ * See [mediaMinWidth]
+ */
 fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.mediaMaxWidth(value: CSSUnitValue) =
     CSSMediaQuery.MediaFeature("max-width", value)
 
+/**
+ *  See [mediaMinWidth]
+ */
 fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.mediaMinHeight(value: CSSUnitValue) =
     CSSMediaQuery.MediaFeature("min-height", value)
 
+/**
+ *  See [mediaMinWidth]
+ */
 fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.madiaMaxHeight(value: CSSUnitValue) =
     CSSMediaQuery.MediaFeature("max-height", value)
