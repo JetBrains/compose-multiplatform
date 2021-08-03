@@ -21,7 +21,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import java.io.File
 import java.util.*
 
-private val defaultJvmArgs = listOf("-Dcompose.application.configure.swing.globals=true")
+private val defaultJvmArgs = listOf("-D$CONFIGURE_SWING_GLOBALS=true")
 
 // todo: multiple launchers
 // todo: file associations
@@ -80,6 +80,20 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
             }
         }
 
+        val prepareAppResources = tasks.composeTask<Sync>(
+            taskName("prepareAppResources", app)
+        ) {
+            val appResourcesRootDir = app.nativeDistributions.appResourcesRootDir
+            if (appResourcesRootDir.isPresent) {
+                from(appResourcesRootDir.dir("common"))
+                from(appResourcesRootDir.dir(currentOS.id))
+                from(appResourcesRootDir.dir(currentTarget.id))
+            }
+
+            val destDir = project.layout.buildDirectory.dir("compose/tmp/${app.name}/resources")
+            into(destDir)
+        }
+
         val createRuntimeImage = tasks.composeTask<AbstractJLinkTask>(
             taskName("createRuntimeImage", app)
         ) {
@@ -95,7 +109,11 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
             taskName("createDistributable", app),
             args = listOf(TargetFormat.AppImage)
         ) {
-            configurePackagingTask(app, createRuntimeImage = createRuntimeImage)
+            configurePackagingTask(
+                app,
+                createRuntimeImage = createRuntimeImage,
+                prepareAppResources = prepareAppResources
+            )
         }
 
         val packageFormats = app.nativeDistributions.targetFormats.map { targetFormat ->
@@ -110,7 +128,11 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
                 // in some cases there are failures with JDK 15.
                 // See [AbstractJPackageTask.patchInfoPlistIfNeeded]
                 if (currentOS != OS.MacOS) {
-                    configurePackagingTask(app, createRuntimeImage = createRuntimeImage)
+                    configurePackagingTask(
+                        app,
+                        createRuntimeImage = createRuntimeImage,
+                        prepareAppResources = prepareAppResources
+                    )
                 } else {
                     configurePackagingTask(app, createAppImage = createDistributable)
                 }
@@ -153,7 +175,7 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
         )
 
         val run = project.tasks.composeTask<JavaExec>(taskName("run", app)) {
-            configureRunTask(app)
+            configureRunTask(app, prepareAppResources = prepareAppResources)
         }
     }
 }
@@ -161,7 +183,8 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
 internal fun AbstractJPackageTask.configurePackagingTask(
     app: Application,
     createAppImage: TaskProvider<AbstractJPackageTask>? = null,
-    createRuntimeImage: TaskProvider<AbstractJLinkTask>? = null
+    createRuntimeImage: TaskProvider<AbstractJLinkTask>? = null,
+    prepareAppResources: TaskProvider<Sync>? = null
 ) {
     enabled = targetFormat.isCompatibleWithCurrentOS
 
@@ -173,6 +196,12 @@ internal fun AbstractJPackageTask.configurePackagingTask(
     createRuntimeImage?.let { createRuntimeImage ->
         dependsOn(createRuntimeImage)
         runtimeImage.set(createRuntimeImage.flatMap { it.destinationDir })
+    }
+
+    prepareAppResources?.let { prepareResources ->
+        dependsOn(prepareResources)
+        val resourcesDir = project.layout.dir(prepareResources.map { it.destinationDir })
+        appResourcesDir.set(resourcesDir)
     }
 
     configurePlatformSettings(app)
@@ -276,10 +305,20 @@ internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
     }
 }
 
-private fun JavaExec.configureRunTask(app: Application) {
+private fun JavaExec.configureRunTask(
+    app: Application,
+    prepareAppResources: TaskProvider<Sync>
+) {
+    dependsOn(prepareAppResources)
+
     mainClass.set(provider { app.mainClass })
     executable(javaExecutable(app.javaHomeOrDefault()))
-    jvmArgs = defaultJvmArgs + app.jvmArgs
+    jvmArgs = arrayListOf<String>().apply {
+        addAll(defaultJvmArgs)
+        addAll(app.jvmArgs)
+        val appResourcesDir = prepareAppResources.get().destinationDir
+        add("-D$APP_RESOURCES_DIR=${appResourcesDir.absolutePath}")
+    }
     args = app.args
 
     val cp = project.objects.fileCollection()

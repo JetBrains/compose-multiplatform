@@ -1,0 +1,1 @@
+macos-x64 only resource
