@@ -156,5 +156,5 @@ fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.mediaMinHeight(value: CSSUnitV
 /**
  *  See [mediaMinWidth]
  */
-fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.madiaMaxHeight(value: CSSUnitValue) =
+fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.mediaMaxHeight(value: CSSUnitValue) =
     CSSMediaQuery.MediaFeature("max-height", value)
