@@ -1,5 +1,11 @@
  ## Features
 
+### Supported platforms
+   * macOS (x86-64, arm64)
+   * Windows (x86-64)
+   * Linux (x86-64, arm64)
+   * Web browsers
+
 ### Features currently available in Compose for Desktop
    * [Desktop Components](tutorials/Desktop_Components/README.md)
    * [Image loading support](tutorials/Image_And_Icons_Manipulations/README.md)
