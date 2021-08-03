@@ -33,7 +33,6 @@ Following limitations apply to Alpha release.
   * Only 64-bit x86 Windows is supported
   * Only JDK 11 or later is supported due to the memory management scheme used in Skia bindings
   * Only JDK 15 or later is supported for packaging native distributions due to jpackage limitations
-  * Some Linux distributions require additional packages to be installed, see [this issue](https://github.com/JetBrains/compose-jb/issues/273) for more information
   
 [comment]: <> (__SUPPORTED_GRADLE_VERSIONS__)
 
