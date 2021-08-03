@@ -16,15 +16,8 @@ kotlin {
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material)
-            }
-        }
-        named("desktopMain") {
-            dependencies {
-                // Note, if you develop a library, you should use compose.desktop.common.
-                // compose.desktop.currentOs should be used in launcher-sourceSet
-                // (in a separate module for demo project and in testMain).
-                // With compose.desktop.common you will also lose @Preview functionality
-                api(compose.desktop.currentOs)
+                // Needed only for preview.
+                implementation(compose.preview)
             }
         }
         named("androidMain") {
