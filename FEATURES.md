@@ -7,6 +7,7 @@
    * Web browsers
 
 ### Features currently available in Compose for Desktop
+   * [Intro](tutorials/Getting_Started)
    * [Desktop Components](tutorials/Desktop_Components/README.md)
    * [Image loading support](tutorials/Image_And_Icons_Manipulations/README.md)
    * [Keyboard handling](tutorials/Keyboard/README.md)
