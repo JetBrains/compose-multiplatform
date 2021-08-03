@@ -9,10 +9,6 @@ plugins {
 kotlin {
     android()
     jvm("desktop")
-    js(IR) {
-        browser()
-        binaries.executable()
-    }
 
     sourceSets {
         named("commonMain") {
@@ -31,11 +27,6 @@ kotlin {
             dependencies {
                 api("androidx.appcompat:appcompat:1.3.1")
                 api("androidx.core:core-ktx:1.6.0")
-            }
-        }
-        named("jsMain") {
-            dependencies {
-                api(compose.web.core)
             }
         }
     }
