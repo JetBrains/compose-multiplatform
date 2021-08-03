@@ -47,6 +47,7 @@ import example.imageviewer.style.icFilterGrayscaleOn
 import example.imageviewer.style.icFilterPixelOff
 import example.imageviewer.style.icFilterPixelOn
 import example.imageviewer.utils.adjustImageScale
+import example.imageviewer.utils.cropBitmapByScale
 import example.imageviewer.utils.displayWidth
 import example.imageviewer.utils.getDisplayBounds
 import kotlin.math.abs
@@ -54,37 +55,20 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 
 @Composable
-fun setImageFullScreen(
+fun FullscreenImage(
     content: ContentState
 ) {
-    if (content.isContentReady()) {
-        Column {
-            setToolBar(content.getSelectedImageName(), content)
-            setImage(content)
-        }
-    } else {
-        setLoadingScreen()
+    Column {
+        ToolBar(content.getSelectedImageName(), content)
+        Image(content)
+    }
+    if (!content.isContentReady()) {
+        LoadingScreen()
     }
 }
 
 @Composable
-private fun setLoadingScreen() {
-
-    Box {
-        Surface(color = MiniatureColor, modifier = Modifier.height(44.dp)) {}
-        Box {
-            Surface(color = DarkGray, elevation = 4.dp, shape = CircleShape) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(50.dp).padding(3.dp, 3.dp, 4.dp, 4.dp),
-                    color = DarkGreen
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun setToolBar(
+fun ToolBar(
     text: String,
     content: ContentState
 ) {
@@ -100,7 +84,7 @@ fun setToolBar(
                     onClick = {
                         if (content.isContentReady()) {
                             content.restoreMainImage()
-                            AppState.screenState(ScreenType.Main)
+                            AppState.screenState(ScreenType.MainScreen)
                         }
                     }) {
                     Image(
@@ -160,7 +144,6 @@ fun FilterButton(
 
 @Composable
 fun getFilterImage(type: FilterType, content: ContentState): Painter {
-
     return when (type) {
         FilterType.GrayScale -> if (content.isFilterEnabled(type)) icFilterGrayscaleOn() else icFilterGrayscaleOff()
         FilterType.Pixel -> if (content.isFilterEnabled(type)) icFilterPixelOn() else icFilterPixelOff()
@@ -169,8 +152,7 @@ fun getFilterImage(type: FilterType, content: ContentState): Painter {
 }
 
 @Composable
-fun setImage(content: ContentState) {
-
+fun Image(content: ContentState) {
     val drag = remember { DragHandler() }
     val scale = remember { ScaleHandler() }
 
@@ -212,80 +194,4 @@ fun imageByGesture(
     }
 
     return bitmap
-}
-
-private fun cropBitmapByScale(bitmap: Bitmap, scale: Float, drag: DragHandler): Bitmap {
-
-    val crop = cropBitmapByBounds(
-        bitmap,
-        getDisplayBounds(bitmap),
-        scale,
-        drag
-    )
-    return Bitmap.createBitmap(
-        bitmap,
-        crop.left,
-        crop.top,
-        crop.right - crop.left,
-        crop.bottom - crop.top
-    )
-}
-
-private fun cropBitmapByBounds(
-    bitmap: Bitmap,
-    bounds: Rect,
-    scaleFactor: Float,
-    drag: DragHandler
-): Rect {
-
-    if (scaleFactor <= 1f)
-        return Rect(0, 0, bitmap.width, bitmap.height)
-
-    var scale = scaleFactor.toDouble().pow(1.4)
-
-    var boundW = (bounds.width() / scale).roundToInt()
-    var boundH = (bounds.height() / scale).roundToInt()
-
-    scale *= displayWidth() / bounds.width().toDouble()
-
-    val offsetX = drag.getAmount().x / scale
-    val offsetY = drag.getAmount().y / scale
-
-    if (boundW > bitmap.width) {
-        boundW = bitmap.width
-    }
-    if (boundH > bitmap.height) {
-        boundH = bitmap.height
-    }
-
-    val invisibleW = bitmap.width - boundW
-    var leftOffset = (invisibleW / 2.0 - offsetX).roundToInt().toFloat()
-
-    if (leftOffset > invisibleW) {
-        leftOffset = invisibleW.toFloat()
-        drag.getAmount().x = -((invisibleW / 2.0) * scale).roundToInt().toFloat()
-    }
-    if (leftOffset < 0) {
-        drag.getAmount().x = ((invisibleW / 2.0) * scale).roundToInt().toFloat()
-        leftOffset = 0f
-    }
-
-    val invisibleH = bitmap.height - boundH
-    var topOffset = (invisibleH / 2 - offsetY).roundToInt().toFloat()
-
-    if (topOffset > invisibleH) {
-        topOffset = invisibleH.toFloat()
-        drag.getAmount().y = -((invisibleH / 2.0) * scale).roundToInt().toFloat()
-    }
-    if (topOffset < 0) {
-        drag.getAmount().y = ((invisibleH / 2.0) * scale).roundToInt().toFloat()
-        topOffset = 0f
-    }
-
-    return Rect(
-        leftOffset.toInt(),
-        topOffset.toInt(),
-        (leftOffset + boundW).toInt(),
-        (topOffset + boundH).toInt()
-    )
 }

@@ -1,9 +1,10 @@
 package example.imageviewer.model
 
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.window.WindowState
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.ImageBitmap
 import example.imageviewer.ResString
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.filtration.FiltersManager
@@ -11,18 +12,28 @@ import example.imageviewer.utils.cacheImagePath
 import example.imageviewer.utils.clearCache
 import example.imageviewer.utils.isInternetAvailable
 import example.imageviewer.view.showPopUpMessage
+import example.imageviewer.view.DragHandler
+import example.imageviewer.view.ScaleHandler
+import example.imageviewer.utils.cropBitmapByScale
+import example.imageviewer.utils.toByteArray
 import java.awt.image.BufferedImage
 import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import javax.swing.SwingUtilities.invokeLater
+import org.jetbrains.skija.Image.makeFromEncoded
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 
-
-object ContentState : RememberObserver {
-
+object ContentState {
+    val drag = DragHandler()
+    val scale = ScaleHandler()
     lateinit var windowState: WindowState
     private lateinit var repository: ImageRepository
     private lateinit var uriRepository: String
+    val scope = CoroutineScope(Dispatchers.IO)
 
     fun applyContent(state: WindowState, uriRepository: String): ContentState {
         windowState = state
@@ -38,8 +49,6 @@ object ContentState : RememberObserver {
         return this
     }
 
-    private val executor: ExecutorService by lazy { Executors.newFixedThreadPool(2) }
-
     private val isAppReady = mutableStateOf(false)
     fun isAppReady(): Boolean {
         return isAppReady.value
@@ -51,7 +60,6 @@ object ContentState : RememberObserver {
     }
 
     // drawable content
-    private val mainImageWrapper = MainImageWrapper
     private val mainImage = mutableStateOf(BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB))
     private val currentImageIndex = mutableStateOf(0)
     private val miniatures = Miniatures()
@@ -60,12 +68,12 @@ object ContentState : RememberObserver {
         return miniatures.getMiniatures()
     }
 
-    fun getSelectedImage(): BufferedImage {
-        return mainImage.value
+    fun getSelectedImage(): ImageBitmap {
+        return MainImageWrapper.mainImageAsImageBitmap.value
     }
 
     fun getSelectedImageName(): String {
-        return mainImageWrapper.getName()
+        return MainImageWrapper.getName()
     }
 
     // filters managing
@@ -82,7 +90,6 @@ object ContentState : RememberObserver {
     }
 
     fun toggleFilter(filter: FilterType) {
-
         if (containsFilter(filter)) {
             removeFilter(filter)
         } else {
@@ -91,23 +98,24 @@ object ContentState : RememberObserver {
 
         toggleFilterState(filter)
 
-        var bitmap = mainImageWrapper.origin
+        var bitmap = MainImageWrapper.origin
 
         if (bitmap != null) {
             bitmap = appliedFilters.applyFilters(bitmap)
-            mainImageWrapper.setImage(bitmap)
+            MainImageWrapper.setImage(bitmap)
             mainImage.value = bitmap
+            updateMainImage()
         }
     }
 
     private fun addFilter(filter: FilterType) {
         appliedFilters.add(filter)
-        mainImageWrapper.addFilter(filter)
+        MainImageWrapper.addFilter(filter)
     }
 
     private fun removeFilter(filter: FilterType) {
         appliedFilters.remove(filter)
-        mainImageWrapper.removeFilter(filter)
+        MainImageWrapper.removeFilter(filter)
     }
 
     private fun containsFilter(type: FilterType): Boolean {
@@ -124,7 +132,7 @@ object ContentState : RememberObserver {
     private fun restoreFilters(): BufferedImage {
         filterUIState.clear()
         appliedFilters.clear()
-        return mainImageWrapper.restore()
+        return MainImageWrapper.restore()
     }
 
     fun restoreMainImage() {
@@ -141,52 +149,41 @@ object ContentState : RememberObserver {
             directory.mkdir()
         }
 
-        executor.execute {
+        scope.launch(Dispatchers.IO) {
             try {
                 if (isInternetAvailable()) {
                     val imageList = repository.get()
 
                     if (imageList.isEmpty()) {
-                        invokeLater {
-                            showPopUpMessage(
-                                ResString.repoInvalid
-                            )
-                            onContentReady()
-                        }
-                        return@execute
-                    }
+                        showPopUpMessage(
+                            ResString.repoInvalid
+                        )
+                        onContentReady()
+                    } else {
+                        val pictureList = loadImages(cacheImagePath, imageList)
 
-                    val pictureList = loadImages(cacheImagePath, imageList)
-
-                    if (pictureList.isEmpty()) {
-                        invokeLater {
+                        if (pictureList.isEmpty()) {
                             showPopUpMessage(
                                 ResString.repoEmpty
                             )
                             onContentReady()
-                        }
-                    } else {
-                        val picture = loadFullImage(imageList[0])
-
-                        invokeLater {
+                        } else {
+                            val picture = loadFullImage(imageList[0])
                             miniatures.setMiniatures(pictureList)
-
                             if (isMainImageEmpty()) {
                                 wrapPictureIntoMainImage(picture)
                             } else {
-                                appliedFilters.add(mainImageWrapper.getFilters())
-                                currentImageIndex.value = mainImageWrapper.getId()
+                                appliedFilters.add(MainImageWrapper.getFilters())
+                                currentImageIndex.value = MainImageWrapper.getId()
                             }
                             onContentReady()
                         }
                     }
                 } else {
-                    invokeLater {
-                        showPopUpMessage(
-                            ResString.noInternet
-                        )
-                        onContentReady()
-                    }
+                    showPopUpMessage(
+                        ResString.noInternet
+                    )
+                    onContentReady()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -196,7 +193,7 @@ object ContentState : RememberObserver {
 
     // preview/fullscreen image managing
     fun isMainImageEmpty(): Boolean {
-        return mainImageWrapper.isEmpty()
+        return MainImageWrapper.isEmpty()
     }
 
     fun fullscreen(picture: Picture) {
@@ -206,31 +203,27 @@ object ContentState : RememberObserver {
     }
 
     fun setMainImage(picture: Picture) {
-        if (mainImageWrapper.getId() == picture.id) {
+        if (MainImageWrapper.getId() == picture.id) {
             if (!isContentReady()) {
                 onContentReady()
             }
             return
         }
+        isContentReady.value = false
 
-        executor.execute {
+        scope.launch(Dispatchers.IO) {
+            scale.reset()
             if (isInternetAvailable()) {
-
-                invokeLater {
                     val fullSizePicture = loadFullImage(picture.source)
                     fullSizePicture.id = picture.id
                     wrapPictureIntoMainImage(fullSizePicture)
-                    onContentReady()
-                }
             } else {
-                invokeLater {
                     showPopUpMessage(
                         "${ResString.noInternet}\n${ResString.loadImageUnavailable}"
                     )
                     wrapPictureIntoMainImage(picture)
-                    onContentReady()
-                }
             }
+            onContentReady()
         }
     }
 
@@ -240,10 +233,24 @@ object ContentState : RememberObserver {
     }
 
     private fun wrapPictureIntoMainImage(picture: Picture) {
-        mainImageWrapper.wrapPicture(picture)
-        mainImageWrapper.saveOrigin()
+        MainImageWrapper.wrapPicture(picture)
+        MainImageWrapper.saveOrigin()
         mainImage.value = picture.image
         currentImageIndex.value = picture.id
+        updateMainImage()
+    }
+
+    fun updateMainImage() {
+        MainImageWrapper.mainImageAsImageBitmap.value = makeFromEncoded(
+            toByteArray(
+                cropBitmapByScale(
+                    mainImage.value,
+                    windowState.size,
+                    scale.factor.value,
+                    drag
+                )
+            )
+        ).asImageBitmap()
     }
 
     fun swipeNext() {
@@ -267,28 +274,19 @@ object ContentState : RememberObserver {
     }
 
     fun refresh() {
-        executor.execute {
+        scope.launch(Dispatchers.IO) {
             if (isInternetAvailable()) {
-                invokeLater {
-                    clearCache()
-                    miniatures.clear()
-                    isContentReady.value = false
-                    initData()
-                }
+                clearCache()
+                MainImageWrapper.clear()
+                miniatures.clear()
+                isContentReady.value = false
+                initData()
             } else {
-                invokeLater {
-                    showPopUpMessage(
-                        "${ResString.noInternet}\n${ResString.refreshUnavailable}"
-                    )
-                }
+                showPopUpMessage(
+                    "${ResString.noInternet}\n${ResString.refreshUnavailable}"
+                )
             }
         }
-    }
-
-    override fun onRemembered() { }
-    override fun onAbandoned() { }
-    override fun onForgotten() {
-        executor.shutdown()
     }
 }
 
@@ -302,14 +300,14 @@ private object MainImageWrapper {
     }
 
     fun restore(): BufferedImage {
-
         if (origin != null) {
             picture.value.image = copy(origin!!)
             filtersSet.clear()
         }
-
         return copy(picture.value.image)
     }
+
+    var mainImageAsImageBitmap = mutableStateOf(ImageBitmap(1, 1))
 
     // picture adapter
     private var picture = mutableStateOf(
@@ -326,6 +324,10 @@ private object MainImageWrapper {
 
     fun isEmpty(): Boolean {
         return (picture.value.name == "")
+    }
+
+    fun clear() {
+        picture.value = Picture(image = BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB))
     }
 
     fun getName(): String {

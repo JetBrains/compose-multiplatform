@@ -12,7 +12,7 @@ import androidx.compose.ui.window.rememberWindowState
 import example.imageviewer.model.ContentState
 import example.imageviewer.style.icAppRounded
 import example.imageviewer.utils.getPreferredWindowSize
-import example.imageviewer.view.BuildAppUI
+import example.imageviewer.view.AppUI
 import example.imageviewer.view.SplashUI
 
 fun main() = application {
@@ -37,7 +37,7 @@ fun main() = application {
             icon = icon
         ) {
             MaterialTheme {
-                BuildAppUI(content)
+                AppUI(content)
             }
         }
     } else {

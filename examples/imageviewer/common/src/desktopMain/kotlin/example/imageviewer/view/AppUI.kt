@@ -15,18 +15,18 @@ private val message: MutableState<String> = mutableStateOf("")
 private val state: MutableState<Boolean> = mutableStateOf(false)
 
 @Composable
-fun BuildAppUI(content: ContentState) {
+fun AppUI(content: ContentState) {
 
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Gray
     ) {
         when (AppState.screenState()) {
-            ScreenType.Main -> {
-                setMainScreen(content)
+            ScreenType.MainScreen -> {
+                MainScreen(content)
             }
             ScreenType.FullscreenImage -> {
-                setImageFullScreen(content)
+                FullscreenImage(content)
             }
         }
     }

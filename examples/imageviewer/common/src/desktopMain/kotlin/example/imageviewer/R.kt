@@ -14,6 +14,8 @@ object ResString {
     val picture: String
     val size: String
     val pixels: String
+    val back: String
+    val refresh: String
 
     init {
         if (System.getProperty("user.language").equals("ru")) {
@@ -29,6 +31,8 @@ object ResString {
             picture = "Изображение:"
             size = "Размеры:"
             pixels = "пикселей."
+            back = "Назад"
+            refresh = "Обновить"
         } else {
             appName = "ImageViewer"
             loading = "Loading images..."
@@ -42,6 +46,8 @@ object ResString {
             picture = "Picture:"
             size = "Size:"
             pixels = "pixels."
+            back = "Back"
+            refresh = "Refresh"
         }
     }
 }

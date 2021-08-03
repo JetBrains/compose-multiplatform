@@ -31,7 +31,7 @@ object ContentState {
         this.uriRepository = uriRepository
         repository = ImageRepository(uriRepository)
         appliedFilters = FiltersManager(context)
-        isAppUIReady.value = false
+        isContentReady.value = false
 
         initData()
 
@@ -50,9 +50,14 @@ object ContentState {
         return context.resources.configuration.orientation
     }
 
-    private val isAppUIReady = mutableStateOf(false)
+    private val isAppReady = mutableStateOf(false)
+    fun isAppReady(): Boolean {
+        return isAppReady.value
+    }
+
+    private val isContentReady = mutableStateOf(false)
     fun isContentReady(): Boolean {
-        return isAppUIReady.value
+        return isContentReady.value
     }
 
     fun getString(id: Int): String {
@@ -142,7 +147,7 @@ object ContentState {
 
     // application content initialization
     private fun initData() {
-        if (isAppUIReady.value)
+        if (isContentReady.value)
             return
 
         val directory = context.cacheDir.absolutePath
@@ -158,7 +163,7 @@ object ContentState {
                                 getString(R.string.repo_invalid),
                                 context
                             )
-                            isAppUIReady.value = true
+                            onContentReady()
                         }
                         return@execute
                     }
@@ -171,7 +176,7 @@ object ContentState {
                                 getString(R.string.repo_empty),
                                 context
                             )
-                            isAppUIReady.value = true
+                            onContentReady()
                         }
                     } else {
                         val picture = loadFullImage(imageList[0])
@@ -186,7 +191,7 @@ object ContentState {
                                 mainImage.value = MainImageWrapper.getImage()
                                 currentImageIndex.value = MainImageWrapper.getId()
                             }
-                            isAppUIReady.value = true
+                            onContentReady()
                         }
                     }
                 } else {
@@ -195,7 +200,7 @@ object ContentState {
                             getString(R.string.no_internet),
                             context
                         )
-                        isAppUIReady.value = true
+                        onContentReady()
                     }
                 }
             } catch (e: Exception) {
@@ -210,7 +215,7 @@ object ContentState {
     }
 
     fun fullscreen(picture: Picture) {
-        isAppUIReady.value = false
+        isContentReady.value = false
         AppState.screenState(ScreenType.FullscreenImage)
         setMainImage(picture)
     }
@@ -218,9 +223,10 @@ object ContentState {
     fun setMainImage(picture: Picture) {
         if (MainImageWrapper.getId() == picture.id) {
             if (!isContentReady())
-                isAppUIReady.value = true
+                onContentReady()
             return
         }
+        isContentReady.value = false
 
         executor.execute {
             if (isInternetAvailable()) {
@@ -230,7 +236,7 @@ object ContentState {
 
                 handler.post {
                     wrapPictureIntoMainImage(fullSizePicture)
-                    isAppUIReady.value = true
+                    onContentReady()
                 }
             } else {
                 handler.post {
@@ -242,6 +248,11 @@ object ContentState {
                 }
             }
         }
+    }
+
+    private fun onContentReady() {
+        isContentReady.value = true
+        isAppReady.value = true
     }
 
     private fun wrapPictureIntoMainImage(picture: Picture) {
@@ -282,8 +293,9 @@ object ContentState {
             if (isInternetAvailable()) {
                 handler.post {
                     clearCache(context)
+                    MainImageWrapper.clear()
                     miniatures.clear()
-                    isAppUIReady.value = false
+                    isContentReady.value = false
                     initData()
                 }
             } else {
@@ -332,6 +344,10 @@ private object MainImageWrapper {
 
     fun isEmpty(): Boolean {
         return (picture.value.name == "")
+    }
+
+    fun clear() {
+        picture.value = Picture(image = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888))
     }
 
     fun getName(): String {
