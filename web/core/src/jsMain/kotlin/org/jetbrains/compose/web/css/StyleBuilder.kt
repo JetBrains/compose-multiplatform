@@ -18,7 +18,7 @@ interface StyleBuilder {
     fun variable(variableName: String, value: String) = variable(variableName, StylePropertyValue(value))
     fun variable(variableName: String, value: Number) = variable(variableName, StylePropertyValue(value))
 
-    operator fun <TValue: StylePropertyValue> CSSStyleVariable<TValue>.invoke(value: TValue) {
+    operator fun <TValue : StylePropertyValue> CSSStyleVariable<TValue>.invoke(value: TValue) {
         variable(name, value.toString())
     }
 
@@ -34,7 +34,7 @@ interface StyleBuilder {
 inline fun variableValue(variableName: String, fallback: StylePropertyValue? = null) =
     "var(--$variableName${fallback?.let { ", $it" } ?: ""})"
 
-external interface CSSVariableValueAs<out T: StylePropertyValue>
+external interface CSSVariableValueAs<out T : StylePropertyValue>
 
 inline fun <TValue> CSSVariableValue(value: StylePropertyValue) =
     value.unsafeCast<TValue>()
@@ -56,9 +56,9 @@ interface CSSVariable {
     val name: String
 }
 
-class CSSStyleVariable<out TValue: StylePropertyValue>(override val name: String) : CSSVariable
+class CSSStyleVariable<out TValue : StylePropertyValue>(override val name: String) : CSSVariable
 
-fun <TValue: StylePropertyValue> CSSStyleVariable<TValue>.value(fallback: TValue? = null) =
+fun <TValue : StylePropertyValue> CSSStyleVariable<TValue>.value(fallback: TValue? = null) =
     CSSVariableValue<TValue>(
         variableValue(
             name,
@@ -67,9 +67,8 @@ fun <TValue: StylePropertyValue> CSSStyleVariable<TValue>.value(fallback: TValue
     )
 
 fun <TValue> CSSStyleVariable<TValue>.value(fallback: TValue? = null)
-    where TValue :  CSSVariableValueAs<TValue>,
-          TValue: StylePropertyValue
-    =
+        where TValue : CSSVariableValueAs<TValue>,
+              TValue : StylePropertyValue =
     CSSVariableValue<TValue>(
         variableValue(
             name,
@@ -77,7 +76,26 @@ fun <TValue> CSSStyleVariable<TValue>.value(fallback: TValue? = null)
         )
     )
 
-fun <TValue: StylePropertyValue> variable() =
+/**
+ * Introduces CSS variable that can be later referred anywhere in [StyleSheet]
+ *
+ * Example:
+ * ```
+ * object AppCSSVariables {
+ *  val width by variable<CSSUnitValue>()
+ *  val stringHeight by variable<StylePropertyString>()
+ *  val order by variable<StylePropertyNumber>()
+ * }
+ *
+ * object AppStylesheet : StyleSheet() {
+ *    val classWithProperties by style {
+ *     AppCSSVariables.width(100.px)
+ *     property("width", AppCSSVariables.width.value())
+ * }
+ *```
+ * 
+ */
+fun <TValue : StylePropertyValue> variable() =
     ReadOnlyProperty<Any?, CSSStyleVariable<TValue>> { _, property ->
         CSSStyleVariable(property.name)
     }
@@ -104,7 +122,7 @@ open class StyleBuilderImpl : StyleBuilder, StyleHolder {
     override fun equals(other: Any?): Boolean {
         return if (other is StyleHolder) {
             properties.nativeEquals(other.properties) &&
-                variables.nativeEquals(other.variables)
+                    variables.nativeEquals(other.variables)
         } else false
     }
 
@@ -131,6 +149,6 @@ fun StylePropertyList.nativeEquals(properties: StylePropertyList): Boolean {
     return all { prop ->
         val otherProp = properties[index++]
         prop.name == otherProp.name &&
-            prop.value.toString() == otherProp.value.toString()
+                prop.value.toString() == otherProp.value.toString()
     }
 }
