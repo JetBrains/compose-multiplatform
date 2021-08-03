@@ -29,21 +29,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.layout.RelocationRequester
-import androidx.compose.ui.layout.relocationRequester
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.launch
 
 @Composable
 fun ScrollableRowFocusDemo() {
@@ -69,22 +63,6 @@ private fun FocusableBox(text: String, modifier: Modifier = Modifier) {
             .border(2.dp, Black)
             .onFocusChanged { color = if (it.isFocused) Red else White }
             .background(color)
-            .focusableWithRelocation()
+            .focusable()
     )
-}
-
-// This is a hel function that users will have to use until bringIntoView is added to
-// Modifier.focusable()
-@OptIn(ExperimentalComposeUiApi::class)
-private fun Modifier.focusableWithRelocation() = composed {
-    val relocationRequester = remember { RelocationRequester() }
-    val coroutineScope = rememberCoroutineScope()
-    Modifier
-        .relocationRequester(relocationRequester)
-        .onFocusChanged {
-            if (it.isFocused) {
-                coroutineScope.launch { relocationRequester.bringIntoView() }
-            }
-        }
-        .focusable()
 }
