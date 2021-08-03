@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.openqa.selenium.By
+import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
@@ -82,5 +83,14 @@ abstract class BaseIntegrationTests() {
     companion object {
         @JvmStatic
         fun resolveDrivers() = Drivers.activatedDrivers
+    }
+
+    fun WebDriver.outerHtmlOfElementWithId(id: String): String {
+        val script = """
+             var callback = arguments[arguments.length - 1];
+             callback(document.getElementById("$id").outerHTML);
+        """.trimIndent()
+
+        return (this as JavascriptExecutor).executeAsyncScript(script).toString()
     }
 }

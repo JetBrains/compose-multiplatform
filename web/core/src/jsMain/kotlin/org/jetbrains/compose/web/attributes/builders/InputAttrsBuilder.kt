@@ -33,6 +33,20 @@ open class InputAttrsBuilder<ValueType>(
     }
 
     open fun checked(checked: Boolean): InputAttrsBuilder<ValueType> {
+        if (inputType == InputType.Radio) {
+            prop({ radio: HTMLInputElement, check: Boolean ->
+                setCheckedValue(radio, check)
+
+                if (radio.name.isNotEmpty()) {
+                    if (!controlledRadioGroups.containsKey(radio.name)) {
+                        controlledRadioGroups[radio.name] = mutableSetOf()
+                    }
+                    controlledRadioGroups[radio.name]!!.add(radio)
+                }
+            }, checked)
+            return this
+        }
+
         prop(setCheckedValue, checked)
         return this
     }
@@ -91,3 +105,7 @@ external interface JsWeakMap {
 }
 
 internal val controlledInputsValuesWeakMap: JsWeakMap = js("new WeakMap();").unsafeCast<JsWeakMap>()
+
+internal val controlledRadioGroups = mutableMapOf<String, MutableSet<HTMLInputElement>>()
+
+

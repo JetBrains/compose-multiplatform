@@ -168,4 +168,24 @@ class ControlledInputsTests : BaseIntegrationTests() {
         check(mainCheckbox.isSelected)
         check(!mirrorCheckbox.isSelected)
     }
+
+    @ResolveDrivers
+    fun radioHardcodedNeverChanges(driver: WebDriver) {
+        driver.openTestPage("radioHardcodedNeverChanges")
+
+        val radio1 = driver.findElement(By.id("radio1"))
+        val radio2 = driver.findElement(By.id("radio2"))
+
+        check(radio1.isSelected)
+        check(!radio2.isSelected)
+
+        check(radio1.getAttribute("name") == radio2.getAttribute("name"))
+        check(radio1.getAttribute("name") == "group1")
+        check(radio2.getAttribute("name") == "group1")
+
+        radio2.click()
+
+        check(radio1.isSelected)
+        check(!radio2.isSelected)
+    }
 }

@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import org.jetbrains.compose.web.attributes.InputType
+import org.jetbrains.compose.web.attributes.name
 import org.jetbrains.compose.web.dom.*
 import org.jetbrains.compose.web.sample.tests.TestText
 import org.jetbrains.compose.web.sample.tests.testCase
@@ -151,6 +152,19 @@ class ControlledInputsTests {
                 id("checkboxMain")
                 checked(checked)
                 onInput { checked = it.value }
+            }
+        }
+    }
+
+    val radioHardcodedNeverChanges by testCase {
+        Div {
+            RadioInput(checked = true) {
+                id("radio1")
+                name("group1")
+            }
+            RadioInput(checked = false) {
+                id("radio2")
+                name("group1")
             }
         }
     }

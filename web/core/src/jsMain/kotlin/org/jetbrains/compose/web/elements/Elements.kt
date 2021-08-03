@@ -11,6 +11,7 @@ import org.jetbrains.compose.web.DomNodeWrapper
 import kotlinx.browser.document
 import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.attributes.builders.controlledInputsValuesWeakMap
+import org.jetbrains.compose.web.attributes.builders.controlledRadioGroups
 import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.StyleSheetBuilder
 import org.jetbrains.compose.web.css.StyleSheetBuilderImpl
@@ -951,7 +952,15 @@ fun <K> Input(
 
             inputAttrsBuilder.onInput {
                 if (controlledInputsValuesWeakMap.has(it.target)) {
-                    if (type == InputType.Radio || type == InputType.Checkbox) {
+                    if (type == InputType.Radio) {
+                        controlledRadioGroups[it.target.name]?.forEach { radio ->
+                            radio.checked = controlledInputsValuesWeakMap.get(radio).toString().toBoolean()
+                        }
+                        it.target.checked = controlledInputsValuesWeakMap.get(it.target).toString().toBoolean()
+                        return@onInput
+                    }
+
+                    if (type == InputType.Checkbox) {
                         it.target.checked = controlledInputsValuesWeakMap.get(it.target).toString().toBoolean()
                     } else {
                         it.target.value = controlledInputsValuesWeakMap.get(it.target).toString()
@@ -961,7 +970,16 @@ fun <K> Input(
 
             this.copyFrom(inputAttrsBuilder)
         },
-        content = null
+        content = {
+            DisposableRefEffect { ref ->
+                onDispose {
+                    controlledRadioGroups[ref.name]?.remove(ref)
+                    if (controlledRadioGroups[ref.name]?.isEmpty() == true) {
+                        controlledRadioGroups.remove(ref.name)
+                    }
+                }
+            }
+        }
     )
 }
 
