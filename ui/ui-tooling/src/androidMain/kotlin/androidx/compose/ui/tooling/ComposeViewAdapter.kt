@@ -404,6 +404,7 @@ internal class ComposeViewAdapter : FrameLayout {
         }
     }
 
+    @Suppress("BanUncheckedReflection")
     private fun Any.invokeGetDesignInfo(x: Int, y: Int): String? {
         return this.getDesignInfoMethodOrNull()?.let { designInfoMethod ->
             try {
