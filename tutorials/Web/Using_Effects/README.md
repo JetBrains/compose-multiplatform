@@ -10,10 +10,8 @@ Compose for Web introduces a few dom-specific effects on top of [existing effect
 Under the hood, `ref` uses [DisposableEffect](https://developer.android.com/jetpack/compose/side-effects#disposableeffect)
 
 `ref` can be used to retrieve a reference to a html element.
-The lambda that `ref` takes in is not Composable. It will be called only once when an element added into composition.
-Likewise, the lambda passed in `onDipose` will be called only once when an element gets removed from composition.
-
-Unlike `DisposableEffect`, `ref` doesn't have a key, therefore it's disposed only when an element is being removed from composition.
+The lambda that `ref` takes in is not Composable. It will be called only once when an element added into a composition.
+Likewise, the lambda passed in `onDispose` will be called only once when an element leaves the composition.
 
 ``` kotlin
 Div(attrs = {
@@ -28,19 +26,19 @@ Div(attrs = {
 }
 ```
 
-Only one `ref` can be used per element. Calling it more than once will overwrite earlier calls.
+Only one `ref` can be used per element. Calling it more than once will dismiss earlier calls.
 
-`ref` can be used for example to add and remove some event listeners not provided by compose-web from the box.
+For example, `ref` can be used to add and remove some event listeners not provided by compose-web from the box.
 
 ### DisposableRefEffect
 
 Under the hood, `DisposableRefEffect` uses [DisposableEffect](https://developer.android.com/jetpack/compose/side-effects#disposableeffect)
 
-`DisposableRefEffect` is very similar to `ref`. At the same time it has a few differences.
+`DisposableRefEffect` is similar to `ref`, since it also provides a reference to an element. At the same time it has few differences.
 
 - `DisposableRefEffect` can be added only within a content lambda of an element, while `ref` can be used only in `attrs` scope.
 - Unlike `ref`, `DisposableRefEffect` can be used as many times as needed and every effect will be unique.
-- DisposableRefEffect can be used with a `key` and without it.  When it's used with a `key: Any`, the effect will be disposed and reset when `key` value changes. When it's used without a key, then it behaves like `ref` - the effect gets called only once, and it's disposed only when an element leaves the composition.
+- DisposableRefEffect can be used with a `key` and without it.  When it's used with a `key: Any`, the effect will be disposed and reset when `key` value changes. When it's used without a key, then it behaves like `ref` - the effect gets called only once when an element enters the composition, and it's disposed only when the element leaves the composition.
 
 
 ``` kotlin
@@ -78,12 +76,12 @@ Under the hood, `DomSideEffect` uses [SideEffect](https://developer.android.com/
 Unlike `DisposableRefEffect`, `DomSideEffect` without a key is invoked on every successful recomposition. 
 With a `key`, it will be invoked only when the `key` value changes.
 
-Same as [SideEffect](https://developer.android.com/jetpack/compose/side-effects#sideeffect-publish), `DomSideEffect` can be helpful when there is a need to update the objects not managed by Compose.
-In case of web, it often involves updating HTML nodes, therefore `DomSideEffect` provides a reference to the element in the lambda.
+Same as [SideEffect](https://developer.android.com/jetpack/compose/side-effects#sideeffect-publish), `DomSideEffect` can be helpful when there is a need to update objects not managed by Compose.
+In case of web, it often involves updating HTML nodes, therefore `DomSideEffect` provides a reference to an element in the lambda.
 
 ### Code Sample using effects
 
-The code below showcases how it's possible to use non-composable code in Compose by applying `DomSideEffect` and `DisposableRefEffect`.
+The code below showcases how it's possible to use non-composable components in Compose by applying `DomSideEffect` and `DisposableRefEffect`.
 
 ```kotlin
 import androidx.compose.runtime.mutableStateOf
@@ -99,7 +97,7 @@ import org.w3c.dom.HTMLParagraphElement
 
 
 // Here we pretend that `RedBoldTextNotComposableRenderer`
-// wraps a UI logic provided by 3rd party library that doesn't use compose
+// wraps a UI logic provided by 3rd party library that doesn't use Compose
 
 object RedBoldTextNotComposableRenderer {
     fun unmountFrom(root: HTMLElement) {
@@ -117,8 +115,8 @@ object RedBoldTextNotComposableRenderer {
     }
 }
 
-// Here we define a Composable wrapper for the above code
-@Composable // @param `show: Boolean` was left here intentionally for the sake of an example
+// Here we define a Composable wrapper for the above code. Here we use DomSideEffect and DisposableRefEffect. 
+@Composable // @param `show: Boolean` was left here intentionally for the sake of the example
 fun ComposableWrapperForRedBoldTextFrom3rdPartyLib(state: Int, show: Boolean) {
     Div(attrs = {
         style {
