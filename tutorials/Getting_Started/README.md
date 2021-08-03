@@ -1,9 +1,9 @@
-# Getting Started with Compose for Desktop
+# Getting Started with Compose Multiplatform
 
 ## What is covered
 
 In this tutorial we will create a simple desktop UI application
-using the Compose UI framework.
+using Compose Multiplatform UI framework.
 
 ## Prerequisites
 
@@ -12,7 +12,7 @@ and so any of these platforms can be used for this tutorial.
 
 The following software has to be preinstalled:
    * JDK 11 or later
-   * IntelliJ IDEA Community Edition or Ultimate Edition 20.2 or later (other editors could be used, but we assume you are using IntelliJ IDEA in this tutorial)
+   * IntelliJ IDEA Community Edition or Ultimate Edition 2020.3 or later (other editors could be used, but we assume you are using IntelliJ IDEA in this tutorial)
 
 ## Creating a new project
 
@@ -29,6 +29,14 @@ packaging JDK 15 or later must be used.
 ![Create new project 2](screen4.png)
 
 ![Create new project 3](screen5.png)
+
+### IDE plugin
+
+Compose Multiplatform [IDEA plugin](https://plugins.jetbrains.com/plugin/16541-compose-multiplatform-ide-support)
+can simplify compose development by adding support for `@Preview` annotation on argument-less
+`@Composable` functions. One could see how particular composable function looks like
+directly in IDE panel. This plugin could also be discovered via plugins marketplace,
+just search for "Compose Multiplatform".
 
 ### Update the wizard plugin
 
@@ -148,3 +156,7 @@ The first run may take some time, but afterwards the following dialog will be sh
 
 You can click on the button several times and see that the application reacts and
 updates the UI.
+
+Running and debugging the `main()` function using run gutter is also supported.
+
+![Application running](screen6.png)
