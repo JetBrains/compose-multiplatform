@@ -28,7 +28,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
+import android.view.accessibility.AccessibilityNodeInfo.ACTION_CLEAR_FOCUS
 import android.view.accessibility.AccessibilityNodeInfo.ACTION_CLICK
+import android.view.accessibility.AccessibilityNodeInfo.ACTION_FOCUS
 import android.view.accessibility.AccessibilityNodeInfo.ACTION_NEXT_AT_MOVEMENT_GRANULARITY
 import android.view.accessibility.AccessibilityNodeInfo.ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY
 import android.view.accessibility.AccessibilityNodeInfo.ACTION_SET_SELECTION
@@ -42,6 +44,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
@@ -69,6 +72,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toAndroidRect
@@ -454,12 +459,76 @@ class AndroidAccessibilityTest {
                 )
             )
         )
+        assertTrue(
+            accessibilityNodeInfo.actionList.contains(
+                AccessibilityNodeInfo.AccessibilityAction(ACTION_FOCUS, null)
+            )
+        )
+        assertFalse(
+            accessibilityNodeInfo.actionList.contains(
+                AccessibilityNodeInfo.AccessibilityAction(ACTION_CLEAR_FOCUS, null)
+            )
+        )
         if (Build.VERSION.SDK_INT >= 26) {
             assertEquals(
                 listOf(AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY),
                 accessibilityNodeInfo.availableExtraData
             )
         }
+    }
+
+    @Test
+    fun testCreateAccessibilityNodeInfo_forFocusable_notFocused() {
+        val tag = "node"
+        container.setContent {
+            Box(Modifier.testTag(tag).focusable()) {
+                BasicText("focusable")
+            }
+        }
+
+        val focusableNode = rule.onNodeWithTag(tag)
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Focused, false))
+            .fetchSemanticsNode("couldn't find node with tag $tag")
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(focusableNode.id)
+        assertTrue(
+            accessibilityNodeInfo.actionList.contains(
+                AccessibilityNodeInfo.AccessibilityAction(ACTION_FOCUS, null)
+            )
+        )
+        assertFalse(
+            accessibilityNodeInfo.actionList.contains(
+                AccessibilityNodeInfo.AccessibilityAction(ACTION_CLEAR_FOCUS, null)
+            )
+        )
+        accessibilityNodeInfo.recycle()
+    }
+
+    @Test
+    fun testCreateAccessibilityNodeInfo_forFocusable_focused() {
+        val tag = "node"
+        val focusRequester = FocusRequester()
+        container.setContent {
+            Box(Modifier.testTag(tag).focusRequester(focusRequester).focusable()) {
+                BasicText("focusable")
+            }
+        }
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        val focusableNode = rule.onNodeWithTag(tag)
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Focused, true))
+            .fetchSemanticsNode("couldn't find node with tag $tag")
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(focusableNode.id)
+        assertFalse(
+            accessibilityNodeInfo.actionList.contains(
+                AccessibilityNodeInfo.AccessibilityAction(ACTION_FOCUS, null)
+            )
+        )
+        assertTrue(
+            accessibilityNodeInfo.actionList.contains(
+                AccessibilityNodeInfo.AccessibilityAction(ACTION_CLEAR_FOCUS, null)
+            )
+        )
+        accessibilityNodeInfo.recycle()
     }
 
     @Test
@@ -620,6 +689,50 @@ class AndroidAccessibilityTest {
     }
 
     @Test
+    fun testPerformAction_focus() {
+        val tag = "node"
+        container.setContent {
+            Box(Modifier.testTag(tag).focusable()) {
+                BasicText("focusable")
+            }
+        }
+
+        val focusableNode = rule.onNodeWithTag(tag)
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Focused, false))
+            .fetchSemanticsNode("couldn't find node with tag $tag")
+
+        rule.runOnUiThread {
+            assertTrue(provider.performAction(focusableNode.id, ACTION_FOCUS, null))
+        }
+
+        rule.onNodeWithTag(tag)
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Focused, true))
+    }
+
+    @Test
+    fun testPerformAction_clearFocus() {
+        val tag = "node"
+        val focusRequester = FocusRequester()
+        container.setContent {
+            Box(Modifier.testTag(tag).focusRequester(focusRequester).focusable()) {
+                BasicText("focusable")
+            }
+        }
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        val focusableNode = rule.onNodeWithTag(tag)
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Focused, true))
+            .fetchSemanticsNode("couldn't find node with tag $tag")
+
+        rule.runOnUiThread {
+            assertTrue(provider.performAction(focusableNode.id, ACTION_CLEAR_FOCUS, null))
+        }
+
+        rule.onNodeWithTag(tag)
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Focused, false))
+    }
+
+    @Test
     fun testPerformAction_succeedOnEnabledNodes() {
         val tag = "Toggleable"
         container.setContent {
@@ -744,6 +857,36 @@ class AndroidAccessibilityTest {
                     TextRange(1)
                 )
             )
+    }
+
+    @Test
+    fun testTextField_testFocusClearFocusAction() {
+        val tag = "TextField"
+        container.setContent {
+            BasicTextField(
+                modifier = Modifier.testTag(tag),
+                value = "value",
+                onValueChange = {}
+            )
+        }
+
+        val textFieldNode = rule.onNodeWithTag(tag)
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Focused, false))
+            .fetchSemanticsNode("couldn't find node with tag $tag")
+
+        rule.runOnUiThread {
+            assertTrue(provider.performAction(textFieldNode.id, ACTION_FOCUS, null))
+        }
+
+        rule.onNodeWithTag(tag)
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Focused, true))
+
+        rule.runOnUiThread {
+            assertTrue(provider.performAction(textFieldNode.id, ACTION_CLEAR_FOCUS, null))
+        }
+
+        rule.onNodeWithTag(tag)
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Focused, false))
     }
 
     @Test

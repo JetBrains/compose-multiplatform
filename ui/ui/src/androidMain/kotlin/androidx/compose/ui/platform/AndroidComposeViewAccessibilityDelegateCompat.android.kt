@@ -63,6 +63,7 @@ import androidx.compose.ui.text.platform.toAccessibilitySpannableString
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.fastJoinToString
+import androidx.compose.ui.focus.requestFocus
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.accessibility.hasCollectionInfo
 import androidx.compose.ui.platform.accessibility.setCollectionInfo
@@ -451,6 +452,11 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         info.isFocusable = semanticsNode.unmergedConfig.contains(SemanticsProperties.Focused)
         if (info.isFocusable) {
             info.isFocused = semanticsNode.unmergedConfig[SemanticsProperties.Focused]
+            if (info.isFocused) {
+                info.addAction(AccessibilityNodeInfoCompat.ACTION_CLEAR_FOCUS)
+            } else {
+                info.addAction(AccessibilityNodeInfoCompat.ACTION_FOCUS)
+            }
         }
         info.isVisibleToUser =
             (semanticsNode.unmergedConfig.getOrNull(SemanticsProperties.InvisibleToUser) == null)
@@ -1204,6 +1210,23 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 return node.unmergedConfig.getOrNull(SemanticsActions.SetProgress)?.action?.invoke(
                     arguments.getFloat(AccessibilityNodeInfoCompat.ACTION_ARGUMENT_PROGRESS_VALUE)
                 ) ?: false
+            }
+            AccessibilityNodeInfoCompat.ACTION_FOCUS -> {
+                if (node.unmergedConfig.getOrNull(SemanticsProperties.Focused) == false) {
+                    node.layoutNode.outerLayoutNodeWrapper.findLastFocusWrapper()
+                        ?.requestFocus(propagateFocus = false) ?: return false
+                    return true
+                } else {
+                    return false
+                }
+            }
+            AccessibilityNodeInfoCompat.ACTION_CLEAR_FOCUS -> {
+                return if (node.unmergedConfig.getOrNull(SemanticsProperties.Focused) == true) {
+                    view.focusManager.clearFocus()
+                    true
+                } else {
+                    false
+                }
             }
             AccessibilityNodeInfoCompat.ACTION_SET_TEXT -> {
                 val text = arguments?.getString(
