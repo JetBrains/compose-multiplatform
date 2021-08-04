@@ -30,6 +30,7 @@ import androidx.compose.ui.demos.focus.OneDimensionalFocusSearchDemo
 import androidx.compose.ui.demos.focus.ReuseFocusRequesterDemo
 import androidx.compose.ui.demos.focus.ScrollableRowFocusDemo
 import androidx.compose.ui.demos.focus.TwoDimensionalFocusSearchDemo
+import androidx.compose.ui.demos.gestures.ButtonMetaStateDemo
 import androidx.compose.ui.demos.gestures.DetectTapGesturesDemo
 import androidx.compose.ui.demos.gestures.DoubleTapGestureFilterDemo
 import androidx.compose.ui.demos.gestures.DoubleTapInTapDemo
@@ -75,7 +76,8 @@ private val GestureDemos = DemoCategory(
                 ComposableDemo("Scroll") { ScrollGestureFilterDemo() },
                 ComposableDemo("Drag") { DragGestureFilterDemo() },
                 ComposableDemo("Long Press Drag") { LongPressDragGestureFilterDemo() },
-                ComposableDemo("Scale") { ScaleGestureFilterDemo() }
+                ComposableDemo("Scale") { ScaleGestureFilterDemo() },
+                ComposableDemo("Button/Meta State") { ButtonMetaStateDemo() }
             )
         ),
         DemoCategory(
