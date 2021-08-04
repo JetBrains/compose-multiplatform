@@ -88,6 +88,12 @@ configurations.configureEach { conf ->
 apply plugin: "java-gradle-plugin"
 
 sourceSets {
+    ["public", "private", "plugins"].each { subdir ->
+      main.java.srcDirs += "${subdir}/src/main/kotlin"
+      main.resources.srcDirs += "${subdir}/src/main/resources"
+    }
+
+
     main.java.srcDirs += "${supportRootFolder}/benchmark/gradle-plugin/src/main/kotlin"
     main.resources.srcDirs += "${supportRootFolder}/benchmark/gradle-plugin/src/main/resources"
 
