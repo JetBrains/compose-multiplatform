@@ -90,7 +90,7 @@ fun TextBox(text: String = "Item") {
 }
 ```
 
-![Scrollbars](scrollbars.gif)
+<img alt="Scrollbars" src="scrollbars.gif" height="412" />
 
 ## Lazy scrollable components with Scrollbar
 
@@ -168,14 +168,14 @@ fun TextBox(text: String = "Item") {
 }
 ```
 
-![Lazy component](lazy_scrollbar.gif)
+<img alt="Lazy component" src="lazy_scrollbar.gif" height="412" />
 
 ## Theme applying
 
-Scrollbars support themes to change their appearance. The example below shows how to use the `DesktopTheme` appearance for the scrollbar.
+Scrollbars support themes to change their appearance. The example below shows how to use the `DesktopMaterialTheme` appearance for the scrollbar.
 
 ```kotlin
-import androidx.compose.desktop.DesktopTheme
+import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -190,7 +190,6 @@ import androidx.compose.material.Text
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
@@ -206,34 +205,32 @@ fun main() = application {
         title = "Scrollbars",
         state = rememberWindowState(width = 250.dp, height = 400.dp)
     ) {
-        MaterialTheme {
-            DesktopTheme {
-                Box(
-                    modifier = Modifier.fillMaxSize()
-                        .background(color = Color(180, 180, 180))
-                        .padding(10.dp)
-                ) {
-                    val state = rememberScrollState(0)
+        DesktopMaterialTheme {
+            Box(
+                modifier = Modifier.fillMaxSize()
+                    .background(color = Color(180, 180, 180))
+                    .padding(10.dp)
+            ) {
+                val state = rememberScrollState(0)
 
-                    Column(
-                        modifier = Modifier
-                            .verticalScroll(state)
-                            .fillMaxSize()
-                            .padding(end = 12.dp)
-                    ) {
-                        for (item in 0..30) {
-                            TextBox("Item #$item")
-                            if (item < 30) {
-                                Spacer(modifier = Modifier.height(5.dp))
-                            }
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(state)
+                        .fillMaxSize()
+                        .padding(end = 12.dp)
+                ) {
+                    for (item in 0..30) {
+                        TextBox("Item #$item")
+                        if (item < 30) {
+                            Spacer(modifier = Modifier.height(5.dp))
                         }
                     }
-                    VerticalScrollbar(
-                        modifier = Modifier.align(Alignment.CenterEnd)
-                            .fillMaxHeight(),
-                        adapter = rememberScrollbarAdapter(state)
-                    )
                 }
+                VerticalScrollbar(
+                    modifier = Modifier.align(Alignment.CenterEnd)
+                        .fillMaxHeight(),
+                    adapter = rememberScrollbarAdapter(state)
+                )
             }
         }
     }
@@ -253,7 +250,7 @@ fun TextBox(text: String = "Item") {
 }
 ```
 
-![Themed scrollbar](themed_scrollbar.gif)
+<img alt="Themed scrollbar" src="themed_scrollbar.gif" height="412" />
 
 
 ## Tooltips
@@ -326,4 +323,4 @@ fun main() = application {
 }
 ```
 
-![Tooltip](tooltips.gif)
+<img alt="Tooltip" src="tooltips.gif" height="314" />
