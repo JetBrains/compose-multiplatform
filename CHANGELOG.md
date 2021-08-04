@@ -1,22 +1,25 @@
 # 1.0.0-alpha (Aug 2021)
 ## Common
-
-- Desktop, Web, and Android artifacts are published at the same time with the same version
+- Desktop, Web, and Android artifacts publish at the same time with the same version
 
 ## Desktop
 
 ### Features
-- Context menu support in text fields
+- [Context menu support in selectable text](https://android-review.googlesource.com/c/platform/frameworks/support/+/1742314)
+- [Cursor change behavior in text and pointer icon API](https://android-review.googlesource.com/c/platform/frameworks/support/+/1736714/12/compose/desktop/desktop/samples/src/jvmMain/kotlin/androidx/compose/desktop/examples/example1/Main.jvm.kt#357)
+- [Mouse Clickable modifier](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Mouse_Events#mouse-rightmiddle-clicks-and-keyboard-modifiers)
 - Tab navigation between text fields by default
 - Resource packing to native distribution
-- Support @Preview annotation (when the Compose MPP plugin is installed in IDEA)
-- New features in Composable menu
+- Support @Preview annotation in desktopMain sourceSet's (when the Compose MPP plugin is installed in IDEA)
+- [New features for Composable menu (icons, shortcuts, mnemonics, radiob buttons, checkboxes](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Tray_Notifications_MenuBar_new#menubar)
 - [Adaptive window size](https://github.com/JetBrains/compose-jb/blob/master/tutorials/Window_API_new/README.md#adaptive-window-size)
+- Support Linux on ARM64
+- [Support hidpi on some Linux distros](https://github.com/JetBrains/compose-jb/issues/188#issuecomment-891614869)
 
 ### API changes
 - new Window API is no longer experimental
 - old Window API is deprecated
-- classes from `ndroid.compose.desktop.*` moved to `androidx.compose.ui.awt.*` (ComposeWindow, ComposePanel, etc)
+- classes from `android.compose.desktop.*` moved to `androidx.compose.ui.awt.*` (ComposeWindow, ComposePanel, etc)
 - `svgResource`/`vectorXmlResource`/`imageResource` replaced by painterResource
 
 ### API breaking changes:
