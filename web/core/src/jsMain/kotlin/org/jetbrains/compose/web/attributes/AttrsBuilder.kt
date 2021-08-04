@@ -81,6 +81,23 @@ open class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
         return this
     }
 
+    /**
+     * [prop] allows setting values of element's properties which can't be set by ussing [attr].
+     * [update] is a lambda with two parameters: `element` and `value`. `element` is a reference to a native element.
+     * Some examples of properties that can set using [prop]: `value`, `checked`, `innerText`.
+     *
+     * Unlike [ref], lambda passed to [prop] will be invoked every time when AttrsBuilder being called during recomposition.
+     * [prop] is not supposed to be used for adding listeners, subscriptions, etc.
+     * Also see [ref].
+     *
+     * Code Example:
+     * ```
+     * Input(type = InputType.Text, attrs = {
+     *      // This is only an example. One doesn't need to set `value` like this, since [Input] has `value(v: String)`
+     *      prop({ element: HTMLInputElement, value: String -> element.value = value }, "someTextInputValue")
+     * })
+     * ```
+     */
     @Suppress("UNCHECKED_CAST")
     fun <E : HTMLElement, V> prop(update: (E, V) -> Unit, value: V) {
         propertyUpdates.add((update to value) as Pair<(Element, Any) -> Unit, Any>)
