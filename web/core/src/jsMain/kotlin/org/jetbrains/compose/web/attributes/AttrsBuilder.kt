@@ -57,6 +57,15 @@ open class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
         this.refEffect = effect
     }
 
+    /**
+     * [attr] adds arbitrary attribute to the Element.
+     * If it called twice for the same attribute name, attribute value will be resolved to the last call.
+     *
+     * @param attr - the name of the attribute
+     * @param value - the value of the attribute
+     *
+     * For boolean attributes cast boolean value to String and pass it as value.
+     */
     fun attr(attr: String, value: String): AttrsBuilder<TElement> {
         attributesMap[attr] = value
         return this
