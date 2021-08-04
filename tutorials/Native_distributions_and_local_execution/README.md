@@ -116,7 +116,7 @@ The following formats available for the supported operating systems:
 By default, Apple does not allow users to execute unsigned applications downloaded from the internet.  Users attempting
 to run such applications will be faced with an error like this:
 
-![](attrs-error.png)
+<img alt="" src="attrs-error.png" height="462" />
 
 See [our tutorial](/tutorials/Signing_and_notarization_on_macOS/README.md) 
 on how to sign and notarize your application. 

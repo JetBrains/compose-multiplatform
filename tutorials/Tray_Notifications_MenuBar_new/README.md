@@ -99,7 +99,7 @@ object TrayIcon : Painter() {
 }
 ```
 
-![](tray.gif)
+<img alt="Tray" src="tray.gif" height="266" />
 
 ## MenuBar
 
@@ -179,4 +179,4 @@ object TrayIcon : Painter() {
 }
 ```
 
-![](window_menubar.gif)
+<img alt="" src="window_menubar.gif" height="260" />

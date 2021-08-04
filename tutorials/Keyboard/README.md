@@ -74,7 +74,7 @@ fun main() = singleWindowApplication {
 
 Note the annotation `@OptIn(ExperimentalComposeUiApi::class)`. Some keys related APIs are still an experimental feature of Compose, and later API changes are possible. So it requires the use of a special annotation to emphasize the experimental nature of the code.
 
-![keyInputFilter](keyInputFilter.gif)
+<img alt="keyInputFilter" src="keyInputFilter.gif" height="272" />
 
 ## Window-scoped events
 
@@ -163,4 +163,4 @@ fun App() {
 }
 ```
 
-![window_keyboard](window_keyboard.gif)
+<img alt="window_keyboard" src="window_keyboard.gif" height="280" />

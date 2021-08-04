@@ -126,7 +126,7 @@ fun Counter(text: String, counter: MutableState<Int>) {
 }
 ```
 
-![IntegrationWithSwing](screenshot.png)
+<img alt="IntegrationWithSwing" src="screenshot.png" height="781" />
 
 ## Adding a Swing component to CFD composition using SwingPanel
 
@@ -221,4 +221,4 @@ fun actionButton(
 }
 ```
 
-![IntegrationWithSwing](swing_panel.gif)
+<img alt="IntegrationWithSwing" src="swing_panel.gif" height="523" />
