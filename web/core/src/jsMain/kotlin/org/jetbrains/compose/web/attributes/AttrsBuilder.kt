@@ -56,6 +56,13 @@ open class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
     fun tabIndex(value: Int) = attr(TAB_INDEX, value.toString())
     fun spellCheck(value: Boolean) = attr(SPELLCHECK, value.toString())
 
+    /**
+     * [ref] can be used to retrieve a reference to a html element.
+     * The lambda that `ref` takes in is not Composable. It will be called only once when an element added into a composition.
+     * Likewise, the lambda passed in `onDispose` will be called only once when an element leaves the composition.
+     *
+     * Under the hood, `ref` uses [DisposableEffect](https://developer.android.com/jetpack/compose/side-effects#disposableeffect)
+     */
     fun ref(effect: DisposableEffectScope.(TElement) -> DisposableEffectResult) {
         this.refEffect = effect
     }
