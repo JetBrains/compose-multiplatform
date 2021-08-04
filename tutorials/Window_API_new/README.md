@@ -44,7 +44,7 @@ fun main() = application {
     }
 }
 ```
-![](window_properties.gif)
+<img src="window_properties.gif" height="260" />
 
 You can also close/open windows using a simple `if` statement.
 
@@ -80,7 +80,7 @@ fun main() = application {
     }
 }
 ```
-![](window_splash.gif)
+<img src="window_splash.gif" height="354" />
 
 If the window requires some custom logic on close (for example, to show a dialog), you can override the close action using `onCloseRequest`.
 
@@ -120,7 +120,7 @@ fun main() = application {
     }
 }
 ```
-![](ask_to_close.gif)
+<img src="ask_to_close.gif" height="309" />
 
 If you don't need to close the window and just need to hide it (for example to the tray), you can change the `windowState.isVisible` state:
 ```kotlin
@@ -177,7 +177,7 @@ object TrayIcon : Painter() {
     }
 }
 ```
-![](hide_instead_of_close.gif)
+<img src="hide_instead_of_close.gif" height="308" />
 
 If an application has multiple windows, then it is better to put its state into a separate class and open/close window in response to `mutableStateListOf` changes (see [notepad example](https://github.com/JetBrains/compose-jb/tree/master/examples/notepad) for more complex use cases):
 ```kotlin
@@ -246,7 +246,7 @@ private class MyWindowState(
     fun close() = close(this)
 }
 ```
-![](multiple_windows.gif)
+<img src="multiple_windows.gif" height="280" />
 
 ## Function `singleWindowApplication`
 
@@ -298,7 +298,7 @@ fun main() = application {
     }
 }
 ```
-![](adaptive.png)
+<img src="adaptive.png" height="327" />
 
 ## Changing the state (maximized, minimized, fullscreen, size, position) of the window.
 
@@ -378,7 +378,7 @@ fun main() = application {
     }
 }
 ```
-![](state.gif)
+<img src="state.gif" height="231" />
 
 ## Listening the state of the window
 Reading the state in composition is useful when you need to update UI, but there are cases when you need to react to the state changes and send a value to another non-composable level of your application (write it to the database, for example):
@@ -605,4 +605,5 @@ private fun WindowScope.AppWindowTitleBar() = WindowDraggableArea {
     Box(Modifier.fillMaxWidth().height(48.dp).background(Color.DarkGray))
 }
 ```
+<img src="state.gif" height="239" />
 ![](draggable_area.gif)
