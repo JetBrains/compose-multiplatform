@@ -1,8 +1,8 @@
 package example.todo.web
 
 import com.arkivanov.decompose.DefaultComponentContext
-import com.arkivanov.decompose.lifecycle.LifecycleRegistry
-import com.arkivanov.decompose.lifecycle.resume
+import com.arkivanov.essenty.lifecycle.LifecycleRegistry
+import com.arkivanov.essenty.lifecycle.resume
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import example.todo.common.database.DefaultTodoSharedDatabase
 import example.todo.common.database.todoDatabaseDriver
@@ -21,7 +21,7 @@ fun main() {
     val root =
         TodoRootComponent(
             componentContext = DefaultComponentContext(lifecycle = lifecycle),
-            storeFactory = DefaultStoreFactory,
+            storeFactory = DefaultStoreFactory(),
             database = DefaultTodoSharedDatabase(todoDatabaseDriver())
         )
 

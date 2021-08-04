@@ -11,6 +11,7 @@ kotlin {
         binaries {
             framework {
                 baseName = "Todo"
+                transitiveExport = true
                 linkerOpts.add("-lsqlite3")
                 export(project(":common:database"))
                 export(project(":common:main"))

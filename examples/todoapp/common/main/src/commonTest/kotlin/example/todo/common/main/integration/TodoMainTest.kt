@@ -1,7 +1,7 @@
 package example.todo.common.main.integration
 
 import com.arkivanov.decompose.DefaultComponentContext
-import com.arkivanov.decompose.lifecycle.LifecycleRegistry
+import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.badoo.reaktive.scheduler.overrideSchedulers
 import com.badoo.reaktive.subject.publish.PublishSubject
@@ -32,7 +32,7 @@ class TodoMainTest {
     private val impl by lazy {
         TodoMainComponent(
             componentContext = DefaultComponentContext(lifecycle = lifecycle),
-            storeFactory = DefaultStoreFactory,
+            storeFactory = DefaultStoreFactory(),
             database = database,
             output = outputSubject
         )

@@ -15,7 +15,7 @@ import kotlin.test.assertTrue
 class TodoMainStoreTest {
 
     private val database = TestTodoMainStoreDatabase()
-    private val provider = TodoMainStoreProvider(storeFactory = DefaultStoreFactory, database = database)
+    private val provider = TodoMainStoreProvider(storeFactory = DefaultStoreFactory(), database = database)
 
     @BeforeTest
     fun before() {
