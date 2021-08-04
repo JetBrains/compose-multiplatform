@@ -389,6 +389,32 @@ class PaddingTest : LayoutTest() {
     }
 
     @Test
+    fun testPaddingValuesRtl() = with(density) {
+        val latch = CountDownLatch(1)
+        val boxSize = 10
+        val startPadding = 1
+        val endPadding = 2
+        show {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                Box(
+                    Modifier
+                        .size(boxSize.toDp())
+                        .padding(
+                            PaddingValues(
+                                start = startPadding.toDp(),
+                                end = endPadding.toDp()
+                            )
+                        ).onGloballyPositioned {
+                            assertEquals(boxSize - startPadding - endPadding, it.size.width)
+                            latch.countDown()
+                        }
+                )
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+    }
+
+    @Test
     fun testInspectableParameter() {
         val modifier = Modifier.padding(10.dp, 20.dp, 30.dp, 40.dp) as InspectableValue
         assertThat(modifier.nameFallback).isEqualTo("padding")

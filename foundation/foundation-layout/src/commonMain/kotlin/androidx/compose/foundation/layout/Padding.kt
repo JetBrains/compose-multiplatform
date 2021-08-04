@@ -402,14 +402,14 @@ private class PaddingValuesModifier(
         constraints: Constraints
     ): MeasureResult {
         require(
-            paddingValues.calculateLeftPadding(LayoutDirection.Ltr) >= 0.dp &&
+            paddingValues.calculateLeftPadding(layoutDirection) >= 0.dp &&
                 paddingValues.calculateTopPadding() >= 0.dp &&
-                paddingValues.calculateRightPadding(LayoutDirection.Ltr) >= 0.dp &&
+                paddingValues.calculateRightPadding(layoutDirection) >= 0.dp &&
                 paddingValues.calculateBottomPadding() >= 0.dp
         ) {
             "Padding must be non-negative"
         }
-        val horizontal = paddingValues.calculateLeftPadding(LayoutDirection.Ltr).roundToPx() +
+        val horizontal = paddingValues.calculateLeftPadding(layoutDirection).roundToPx() +
             paddingValues.calculateRightPadding(layoutDirection).roundToPx()
         val vertical = paddingValues.calculateTopPadding().roundToPx() +
             paddingValues.calculateBottomPadding().roundToPx()
