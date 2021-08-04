@@ -1307,12 +1307,20 @@ package androidx.compose.ui.input.pointer {
   public final class MotionEventAdapter_androidKt {
   }
 
+  public final inline class PointerButtons {
+    ctor public PointerButtons();
+  }
+
   public final class PointerEvent {
     ctor public PointerEvent(java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> changes);
     method public java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> component1();
     method public androidx.compose.ui.input.pointer.PointerEvent copy(java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> changes, android.view.MotionEvent? motionEvent);
+    method public int getButtons();
     method public java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> getChanges();
+    method public int getKeyboardModifiers();
+    property public final int buttons;
     property public final java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> changes;
+    property public final int keyboardModifiers;
   }
 
   public final class PointerEventKt {
@@ -1336,6 +1344,28 @@ package androidx.compose.ui.input.pointer {
     enum_constant public static final androidx.compose.ui.input.pointer.PointerEventPass Final;
     enum_constant public static final androidx.compose.ui.input.pointer.PointerEventPass Initial;
     enum_constant public static final androidx.compose.ui.input.pointer.PointerEventPass Main;
+  }
+
+  public final class PointerEvent_androidKt {
+    method public static boolean getAreAnyPressed(int);
+    method public static int indexOfFirstPressed(int);
+    method public static int indexOfLastPressed(int);
+    method public static boolean isAltGraphPressed(int);
+    method public static boolean isAltPressed(int);
+    method public static boolean isBackPressed(int);
+    method public static boolean isCapsLockOn(int);
+    method public static boolean isCtrlPressed(int);
+    method public static boolean isForwardPressed(int);
+    method public static boolean isFunctionPressed(int);
+    method public static boolean isMetaPressed(int);
+    method public static boolean isNumLockOn(int);
+    method public static boolean isPressed(int, int buttonIndex);
+    method public static boolean isPrimaryPressed(int);
+    method public static boolean isScrollLockOn(int);
+    method public static boolean isSecondaryPressed(int);
+    method public static boolean isShiftPressed(int);
+    method public static boolean isSymPressed(int);
+    method public static boolean isTertiaryPressed(int);
   }
 
   public final inline class PointerId {
@@ -1398,6 +1428,10 @@ package androidx.compose.ui.input.pointer {
   }
 
   public final class PointerInteropUtils_androidKt {
+  }
+
+  public final inline class PointerKeyboardModifiers {
+    ctor public PointerKeyboardModifiers();
   }
 
   public final inline class PointerType {
