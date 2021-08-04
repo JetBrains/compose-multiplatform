@@ -534,7 +534,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
 fun main() = application {
-    Window(onCloseRequest = ::exitApplication) {
+    Window(onCloseRequest = ::exitApplication, undecorated = true) {
         WindowDraggableArea {
             Box(Modifier.fillMaxWidth().height(48.dp).background(Color.DarkGray))
         }
@@ -557,7 +557,7 @@ import androidx.compose.ui.window.WindowScope
 import androidx.compose.ui.window.application
 
 fun main() = application {
-    Window(onCloseRequest = ::exitApplication) {
+    Window(onCloseRequest = ::exitApplication, undecorated = true) {
         AppWindowTitleBar()
     }
 }
