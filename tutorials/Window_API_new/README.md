@@ -541,7 +541,7 @@ fun main() = application {
     }
 }
 ```
-Note that `WindowDraggableArea` can be used only inside `singleWindowApplication`, `Window` and `Dialog`. If you need to use it in the other Composable function, pass `WindowScope` as a reciever there:
+Note that `WindowDraggableArea` can be used only inside `singleWindowApplication`, `Window` and `Dialog`. If you need to use it in another Composable function, pass `WindowScope` as a reciever there:
 ```
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
