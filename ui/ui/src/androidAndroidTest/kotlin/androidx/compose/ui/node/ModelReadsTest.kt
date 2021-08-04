@@ -18,6 +18,7 @@ package androidx.compose.ui.node
 
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -717,6 +718,30 @@ class ModelReadsTest {
         latch = CountDownLatch(1)
         rule.runOnUiThread {
             model.value++
+        }
+
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+    }
+
+    @Test
+    fun stateChangeTriggersUpdateWhenDerivedStateIsUsedRightAfter() {
+        val state = mutableStateOf(0)
+        val derivedState = derivedStateOf { 0 }
+        rule.runOnUiThread {
+            activity.setContent {
+                Layout({}) { _, _ ->
+                    state.value++
+                    derivedState.value
+                    latch.countDown()
+                    layout(10, 10) {}
+                }
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+
+        latch = CountDownLatch(1)
+        rule.runOnUiThread {
+            state.value++
         }
 
         assertTrue(latch.await(1, TimeUnit.SECONDS))
