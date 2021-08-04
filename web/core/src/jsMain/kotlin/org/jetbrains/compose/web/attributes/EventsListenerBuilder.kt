@@ -12,6 +12,12 @@ private typealias SyntheticMouseEventListener = (SyntheticMouseEvent) -> Unit
 private typealias SyntheticWheelEventListener = (SyntheticWheelEvent) -> Unit
 private typealias SyntheticDragEventListener = (SyntheticDragEvent) -> Unit
 
+/**
+ * [EventsListenerBuilder] is used most often not directly but via [AttrsBuilder].
+ * Its purpose is to add events to the element. For all most frequently used events there
+ * exist dedicated method. In case you need to support event that doesn't have such method,
+ * use [addEventListener]
+ */
 open class EventsListenerBuilder {
 
     protected val listeners = mutableListOf<SyntheticEventListener<*>>()
@@ -184,6 +190,12 @@ open class EventsListenerBuilder {
 
     fun collectListeners(): List<SyntheticEventListener<*>> = listeners
 
+    /**
+     * [addEventListener] used for adding arbitrary events to the element. It resembles the standard DOM addEventListener method
+     * @param eventName - the name of the event
+     * @param options - as of now this param is always equal to Options.DEFAULT
+     * @listener - event handler
+     */
     fun <T : SyntheticEvent<out EventTarget>> addEventListener(
         eventName: String,
         options: Options = Options.DEFAULT,
