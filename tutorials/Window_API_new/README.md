@@ -122,20 +122,6 @@ fun main() = application {
 ```
 ![](ask_to_close.gif)
 
-
-There is a simplified function for creating a single window application:
-```
-import androidx.compose.ui.window.singleWindowApplication
-
-fun main() = singleWindowApplication {
-    // Content
-}
-```
-Use it if:
-- your application has only one window
-- you don't need custom closing logic
-- you don't need to change the window parameters after it is already created
-
 If you don't need to close the window and just need to hide it (for example to the tray), you can change the `windowState.isVisible` state:
 ```kotlin
 import androidx.compose.material.Text
@@ -261,6 +247,20 @@ private class MyWindowState(
 }
 ```
 ![](multiple_windows.gif)
+
+## Function `singleWindowApplication`
+There is a simplified function for creating a single window application:
+```
+import androidx.compose.ui.window.singleWindowApplication
+
+fun main() = singleWindowApplication {
+    // Content
+}
+```
+Use it if:
+- your application has only one window
+- you don't need custom closing logic
+- you don't need to change the window parameters after it is already created
 
 ## Changing the state (maximized, minimized, fullscreen, size, position) of the window.
 
