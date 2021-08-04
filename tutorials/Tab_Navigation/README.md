@@ -53,7 +53,7 @@ fun main() = application {
 }
 ```
 
-![default-tab-nav](default-tab-nav.gif)
+<img alt="default-tab-nav" src="default-tab-nav.gif" height="480" />
 
 To make a non-focusable component focusable, you need to apply `Modifier.focusable()` modifier to the component.
 
@@ -171,7 +171,7 @@ fun FocusableButton(
 }
 ```
 
-![focusable-buttons](focusable-button.gif)
+<img alt="focusable-buttons" src="focusable-button.gif" height="480" />
 
 ## Custom ordering
 To move focus in custom order we need to create a `FocusRequester` and apply the `Modifier.focusOrder` modifier to each component you want to navigate.
@@ -234,7 +234,7 @@ fun main() = application {
 }
 ```
 
-![reverse-order](reverse-order.gif)
+<img alt="reverse-order" src="reverse-order.gif" height="480" />
 
 ## Making component focused
 
@@ -309,4 +309,4 @@ fun main() = application {
 }
 ```
 
-![reverse-order](focus-switcher.gif)
+<img alt="reverse-order" src="focus-switcher.gif" height="480" />

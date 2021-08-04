@@ -8,7 +8,7 @@ In this tutorial we will show you how to work with images using Compose for Desk
 
 Using images from application resources is very simple. Suppose we have a PNG image that is placed in the `resources` directory in our project. For this tutorial we will use the image sample:
 
-![Sample](sample.png)
+<img alt="Sample" src="sample.png" height="500" />
 
 ```kotlin
 import androidx.compose.foundation.Image
@@ -28,7 +28,7 @@ fun main() = singleWindowApplication {
 
 `painterResource` supports raster (BMP, GIF, HEIF, ICO, JPEG, PNG, WBMP, WebP) and vector formats (SVG, [XML vector drawable](https://developer.android.com/guide/topics/graphics/vector-drawable-resources)).
 
-![Resources](image_from_resources.png)
+<img alt="Resources" src="image_from_resources.png" height="375" />
 
 ## Loading images from device storage asynchronously
 
@@ -127,7 +127,7 @@ fun loadXmlImageVector(file: File, density: Density): ImageVector =
     file.inputStream().buffered().use { loadXmlImageVector(InputSource(it), density) }
 ```
 
-![Storage](image_from_resources2.png)
+<img alt="Storage" src="image_from_resources2.png" height="356" />
 
 [PNG](sample.png)
 
@@ -198,7 +198,7 @@ private fun ImageBitmap.getBytes(): ByteArray {
 }
 ```
 
-![Drawing raw images](draw_image_into_canvas.png)
+<img alt="Drawing raw images" src="draw_image_into_canvas.png" height="496" />
 
 ## Setting the application window icon
 
@@ -226,7 +226,7 @@ fun main() = application {
 }
 ```
 
-![Window icon](window_icon.png)
+<img alt="Window icon" src="window_icon.png" height="371" />
 
 ## Setting the application tray icon
 
@@ -261,4 +261,4 @@ fun main() = application {
 }
 ```
 
-![Tray icon](tray_icon.png)
+<img alt="Tray icon" src="tray_icon.png" height="479" />
