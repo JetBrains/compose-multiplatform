@@ -38,6 +38,14 @@ internal class MultiWidgetSelectionDelegate(
         previousSelection: Selection?,
         isStartHandle: Boolean
     ): Selection? {
+        require(
+            previousSelection == null || (
+                selectableId == previousSelection.start.selectableId &&
+                    selectableId == previousSelection.end.selectableId
+                )
+        ) {
+            "The given previousSelection doesn't belong to this selectable."
+        }
         val layoutCoordinates = getLayoutCoordinates() ?: return null
         val textLayoutResult = layoutResultCallback() ?: return null
 
@@ -59,10 +67,11 @@ internal class MultiWidgetSelectionDelegate(
 
     override fun getSelectAllSelection(): Selection? {
         val textLayoutResult = layoutResultCallback() ?: return null
+        val newSelectionRange = TextRange(0, textLayoutResult.layoutInput.text.length)
 
         return getAssembledSelectionInfo(
-            startOffset = 0,
-            endOffset = textLayoutResult.layoutInput.text.length,
+            newSelectionRange = newSelectionRange,
+            newRawSelectionRange = newSelectionRange,
             handlesCrossed = false,
             selectableId = selectableId,
             textLayoutResult = textLayoutResult
@@ -70,7 +79,7 @@ internal class MultiWidgetSelectionDelegate(
     }
 
     override fun getHandlePosition(selection: Selection, isStartHandle: Boolean): Offset {
-        // Check if the selection handles's selectable is the current selectable.
+        // Check if the selection handle's selectable is the current selectable.
         if (isStartHandle && selection.start.selectableId != this.selectableId ||
             !isStartHandle && selection.end.selectableId != this.selectableId
         ) {
@@ -126,17 +135,22 @@ internal fun getTextSelectionInfo(
     previousSelection: Selection? = null,
     isStartHandle: Boolean = true
 ): Selection? {
-    val textRange = getTextSelectionRange(textLayoutResult, selectionCoordinates) ?: return null
-    val adjustedTextRange = adjustSelection(
+    val newRawSelectionRange =
+        getTextSelectionRange(textLayoutResult, selectionCoordinates) ?: return null
+    val previousRawSelection = previousSelection?.let {
+        TextRange(it.start.rawOffset, it.end.rawOffset)
+    }
+
+    val adjustedTextRange = adjustment.adjust(
         textLayoutResult = textLayoutResult,
-        textRange = textRange,
-        isStartHandle = isStartHandle,
-        previousHandlesCrossed = previousSelection?.handlesCrossed ?: false,
-        adjustment = adjustment
+        newRawSelectionRange = newRawSelectionRange,
+        previousRawSelectionRange = previousRawSelection,
+        previousAdjustedSelection = previousSelection?.toTextRange(),
+        isStartHandle = isStartHandle
     )
     return getAssembledSelectionInfo(
-        startOffset = adjustedTextRange.start,
-        endOffset = adjustedTextRange.end,
+        newSelectionRange = adjustedTextRange,
+        newRawSelectionRange = newRawSelectionRange,
         handlesCrossed = adjustedTextRange.reversed,
         selectableId = selectableId,
         textLayoutResult = textLayoutResult
@@ -241,8 +255,8 @@ private fun getRefinedSelectionRange(
  * [Selection] contains a lot of parameters. It looks more clean to assemble an object of this
  * class in a separate method.
  *
- * @param startOffset the final start offset to be returned.
- * @param endOffset the final end offset to be returned.
+ * @param newSelectionRange the final new selection text range.
+ * @param newRawSelectionRange the new unadjusted selection text range.
  * @param handlesCrossed true if the selection handles are crossed
  * @param selectableId the id of the current [Selectable] for which the [Selection] is being
  * calculated
@@ -251,21 +265,23 @@ private fun getRefinedSelectionRange(
  * @return an assembled object of [Selection] using the offered selection info.
  */
 private fun getAssembledSelectionInfo(
-    startOffset: Int,
-    endOffset: Int,
+    newSelectionRange: TextRange,
+    newRawSelectionRange: TextRange,
     handlesCrossed: Boolean,
     selectableId: Long,
     textLayoutResult: TextLayoutResult
 ): Selection {
     return Selection(
         start = Selection.AnchorInfo(
-            direction = textLayoutResult.getBidiRunDirection(startOffset),
-            offset = startOffset,
+            direction = textLayoutResult.getBidiRunDirection(newSelectionRange.start),
+            offset = newSelectionRange.start,
+            rawOffset = newRawSelectionRange.start,
             selectableId = selectableId
         ),
         end = Selection.AnchorInfo(
-            direction = textLayoutResult.getBidiRunDirection(max(endOffset - 1, 0)),
-            offset = endOffset,
+            direction = textLayoutResult.getBidiRunDirection(max(newSelectionRange.end - 1, 0)),
+            offset = newSelectionRange.end,
+            rawOffset = newRawSelectionRange.end,
             selectableId = selectableId
         ),
         handlesCrossed = handlesCrossed

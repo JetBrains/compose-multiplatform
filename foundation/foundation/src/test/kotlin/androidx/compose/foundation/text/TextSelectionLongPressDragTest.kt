@@ -56,11 +56,13 @@ class TextSelectionLongPressDragTest {
         start = Selection.AnchorInfo(
             direction = ResolvedTextDirection.Ltr,
             offset = 0,
+            rawOffset = 0,
             selectableId = selectableId
         ),
         end = Selection.AnchorInfo(
             direction = ResolvedTextDirection.Ltr,
             offset = 5,
+            rawOffset = 5,
             selectableId = selectableId
         )
     )
@@ -112,7 +114,7 @@ class TextSelectionLongPressDragTest {
         verify(selectionRegistrar, times(1)).notifySelectionUpdateStart(
             layoutCoordinates = layoutCoordinates,
             startPosition = position,
-            adjustment = SelectionAdjustment.WORD
+            adjustment = SelectionAdjustment.Word
         )
     }
 
@@ -161,7 +163,7 @@ class TextSelectionLongPressDragTest {
             .notifySelectionUpdate(
                 layoutCoordinates = layoutCoordinates,
                 endPosition = beginPosition2 + dragDistance2,
-                adjustment = SelectionAdjustment.CHARACTER
+                adjustment = SelectionAdjustment.Character
             )
     }
 
@@ -181,7 +183,7 @@ class TextSelectionLongPressDragTest {
             .notifySelectionUpdate(
                 layoutCoordinates = layoutCoordinates,
                 endPosition = beginPosition + dragDistance,
-                adjustment = SelectionAdjustment.CHARACTER
+                adjustment = SelectionAdjustment.Character
             )
     }
 
@@ -201,7 +203,7 @@ class TextSelectionLongPressDragTest {
             .notifySelectionUpdate(
                 layoutCoordinates = layoutCoordinates,
                 endPosition = beginPosition + dragDistance,
-                adjustment = SelectionAdjustment.CHARACTER
+                adjustment = SelectionAdjustment.Character
             )
     }
 

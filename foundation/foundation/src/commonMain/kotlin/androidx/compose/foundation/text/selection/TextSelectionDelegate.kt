@@ -102,11 +102,11 @@ internal fun adjustSelection(
     adjustment: SelectionAdjustment
 ): TextRange {
     val textLength = textLayoutResult.layoutInput.text.text.length
-    if (adjustment == SelectionAdjustment.NONE || textLength == 0) {
+    if (adjustment == SelectionAdjustment.None || textLength == 0) {
         return textRange
     }
 
-    if (adjustment == SelectionAdjustment.CHARACTER) {
+    if (adjustment == SelectionAdjustment.Character) {
         return if (!textRange.collapsed) {
             textRange
         } else {
@@ -119,7 +119,7 @@ internal fun adjustSelection(
         }
     }
 
-    val boundaryFun = if (adjustment == SelectionAdjustment.WORD) {
+    val boundaryFun = if (adjustment == SelectionAdjustment.Word) {
         textLayoutResult::getWordBoundary
     } else {
         textLayoutResult.layoutInput.text.text::getParagraphBoundary
@@ -137,70 +137,6 @@ internal fun adjustSelection(
     val end = if (textRange.reversed) endBoundary.start else endBoundary.end
 
     return TextRange(start, end)
-}
-
-/**
- * This method adjusts the raw start and end offset and bounds the selection to one character. The
- * logic of bounding evaluates the last selection result, which handle is being dragged, and if
- * selection reaches the boundary.
- *
- * @param offset unprocessed start and end offset calculated directly from input position, in
- * this case start and offset equals to each other.
- * @param lastOffset last offset of the text. It's actually the length of the text.
- * @param isStartHandle true if the start handle is being dragged
- * @param previousHandlesCrossed true if the selection handles are crossed in the previous
- * selection. This function will try to maintain the handle cross state. This can help make
- * selection stable.
- *
- * @return the adjusted [TextRange].
- */
-private fun ensureAtLeastOneChar(
-    offset: Int,
-    lastOffset: Int,
-    isStartHandle: Boolean,
-    previousHandlesCrossed: Boolean
-): TextRange {
-    // When lastOffset is 0, it can only return an empty TextRange.
-    // When previousSelection is null, it won't start a selection and return an empty TextRange.
-    if (lastOffset == 0) return TextRange(offset, offset)
-
-    // When offset is at the boundary, the handle that is not dragged should be at [offset]. Here
-    // the other handle's position is computed accordingly.
-    if (offset == 0) {
-        return if (isStartHandle) {
-            TextRange(1, 0)
-        } else {
-            TextRange(0, 1)
-        }
-    }
-
-    if (offset == lastOffset) {
-        return if (isStartHandle) {
-            TextRange(lastOffset - 1, lastOffset)
-        } else {
-            TextRange(lastOffset, lastOffset - 1)
-        }
-    }
-
-    // In other cases, this function will try to maintain the current cross handle states.
-    // Only in this way the selection can be stable.
-    return if (isStartHandle) {
-        if (!previousHandlesCrossed) {
-            // Handle is NOT crossed, and the start handle is dragged.
-            TextRange(offset - 1, offset)
-        } else {
-            // Handle is crossed, and the start handle is dragged.
-            TextRange(offset + 1, offset)
-        }
-    } else {
-        if (!previousHandlesCrossed) {
-            // Handle is NOT crossed, and the end handle is dragged.
-            TextRange(offset, offset + 1)
-        } else {
-            // Handle is crossed, and the end handle is dragged.
-            TextRange(offset, offset - 1)
-        }
-    }
 }
 
 /**

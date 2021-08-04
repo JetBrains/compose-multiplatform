@@ -95,8 +95,10 @@ class SelectionManagerTest {
 
     @Before
     fun setup() {
+        selectable.clear()
         selectable.selectableId = selectableId
         selectionRegistrar.subscribe(selectable)
+        selectionRegistrar.subselections = mapOf(selectableId to fakeSelection)
         selectionManager.containerLayoutCoordinates = containerLayoutCoordinates
         selectionManager.hapticFeedBack = hapticFeedback
         selectionManager.clipboardManager = clipboardManager
@@ -115,9 +117,13 @@ class SelectionManagerTest {
 
     @Test
     fun mergeSelections_single_selectable_calls_getSelection_once() {
-        val fakeNewSelection = mock<Selection>()
+        val newSelection = fakeSelection.copy(
+            start = fakeSelection.start.copy(
+                offset = fakeSelection.start.offset + 1
+            )
+        )
 
-        selectable.selectionToReturn = fakeNewSelection
+        selectable.selectionToReturn = newSelection
 
         selectionManager.mergeSelections(
             startPosition = startCoordinates,
@@ -130,7 +136,7 @@ class SelectionManagerTest {
         assertThat(selectable.lastEndPosition).isEqualTo(endCoordinates)
         assertThat(selectable.lastContainerLayoutCoordinates)
             .isEqualTo(selectionManager.requireContainerCoordinates())
-        assertThat(selectable.lastAdjustment).isEqualTo(SelectionAdjustment.NONE)
+        assertThat(selectable.lastAdjustment).isEqualTo(SelectionAdjustment.None)
         assertThat(selectable.lastPreviousSelection).isEqualTo(fakeSelection)
 
         verify(
@@ -146,6 +152,10 @@ class SelectionManagerTest {
         whenever(selectableAnother.selectableId).thenReturn(anotherSelectableId)
 
         selectionRegistrar.subscribe(selectableAnother)
+        selectionRegistrar.subselections = mapOf(
+            anotherSelectableId to fakeSelection,
+            selectableId to fakeSelection
+        )
 
         selectionManager.mergeSelections(
             startPosition = startCoordinates,
@@ -158,7 +168,7 @@ class SelectionManagerTest {
         assertThat(selectable.lastEndPosition).isEqualTo(endCoordinates)
         assertThat(selectable.lastContainerLayoutCoordinates)
             .isEqualTo(selectionManager.requireContainerCoordinates())
-        assertThat(selectable.lastAdjustment).isEqualTo(SelectionAdjustment.NONE)
+        assertThat(selectable.lastAdjustment).isEqualTo(SelectionAdjustment.None)
         assertThat(selectable.lastPreviousSelection).isEqualTo(fakeSelection)
 
         verify(selectableAnother, times(1))
@@ -166,7 +176,7 @@ class SelectionManagerTest {
                 startPosition = startCoordinates,
                 endPosition = endCoordinates,
                 containerLayoutCoordinates = selectionManager.requireContainerCoordinates(),
-                adjustment = SelectionAdjustment.NONE,
+                adjustment = SelectionAdjustment.None,
                 previousSelection = fakeSelection
             )
         verify(
@@ -177,13 +187,13 @@ class SelectionManagerTest {
 
     @Test
     fun mergeSelections_selection_does_not_change_hapticFeedBack_Not_triggered() {
-        val selection: Selection = mock()
+        val selection: Selection = fakeSelection
         selectable.selectionToReturn = selection
 
         selectionManager.mergeSelections(
             startPosition = startCoordinates,
             endPosition = endCoordinates,
-            previousSelection = selection
+            previousSelection = fakeSelection
         )
 
         verify(
