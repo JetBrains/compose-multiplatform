@@ -13,6 +13,7 @@ kotlin {
     sourceSets {
         named("jvmMain") {
             dependencies {
+                implementation(compose.desktop.currentOs)
                 implementation(project(":common"))
             }
         }
