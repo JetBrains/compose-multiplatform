@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
@@ -141,6 +142,21 @@ fun Modifier.size(width: Dp, height: Dp) = this.then(
         }
     )
 )
+
+/**
+ * Declare the preferred size of the content to be exactly [size]. The incoming
+ * measurement [Constraints] may override this value, forcing the content to be either smaller or
+ * larger.
+ *
+ * For a modifier that sets the size of the content regardless of the incoming constraints, see
+ * [Modifier.requiredSize]. See [width] or [height] to set width or height alone.
+ * See [widthIn], [heightIn] or [sizeIn] to set a preferred size range.
+ *
+ * Example usage:
+ * @sample androidx.compose.foundation.layout.samples.SimpleSizeModifierWithDpSize
+ */
+@Stable
+fun Modifier.size(size: DpSize) = size(size.width, size.height)
 
 /**
  * Constrain the width of the content to be between [min]dp and [max]dp as permitted
@@ -330,6 +346,21 @@ fun Modifier.requiredSize(width: Dp, height: Dp) = this.then(
         }
     )
 )
+
+/**
+ * Declare the size of the content to be exactly [size]. The incoming measurement
+ * [Constraints] will not override this value. If the content chooses a size that does not
+ * satisfy the incoming [Constraints], the parent layout will be reported a size coerced
+ * in the [Constraints], and the position of the content will be automatically offset to be
+ * centered on the space assigned to the child by the parent layout under the assumption that
+ * [Constraints] were respected.
+ *
+ * See [requiredSizeIn] to set a size range.
+ * See [size] to set a preferred size, which is only respected when the incoming
+ * constraints allow it.
+ */
+@Stable
+fun Modifier.requiredSize(size: DpSize) = requiredSize(size.width, size.height)
 
 /**
  * Constrain the width of the content to be between [min]dp and [max]dp.

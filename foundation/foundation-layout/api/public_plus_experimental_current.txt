@@ -190,11 +190,13 @@ package androidx.compose.foundation.layout {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier requiredHeightIn(androidx.compose.ui.Modifier, optional float min, optional float max);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier requiredSize(androidx.compose.ui.Modifier, float size);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier requiredSize(androidx.compose.ui.Modifier, float width, float height);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier requiredSize(androidx.compose.ui.Modifier, long size);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier requiredSizeIn(androidx.compose.ui.Modifier, optional float minWidth, optional float minHeight, optional float maxWidth, optional float maxHeight);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier requiredWidth(androidx.compose.ui.Modifier, float width);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier requiredWidthIn(androidx.compose.ui.Modifier, optional float min, optional float max);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier size(androidx.compose.ui.Modifier, float size);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier size(androidx.compose.ui.Modifier, float width, float height);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier size(androidx.compose.ui.Modifier, long size);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier sizeIn(androidx.compose.ui.Modifier, optional float minWidth, optional float minHeight, optional float maxWidth, optional float maxHeight);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier width(androidx.compose.ui.Modifier, float width);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier widthIn(androidx.compose.ui.Modifier, optional float min, optional float max);
