@@ -251,7 +251,7 @@ private class MyWindowState(
 ## Function `singleWindowApplication`
 
 There is a simplified function for creating a single window application:
-```
+```kotlin
 import androidx.compose.ui.window.singleWindowApplication
 
 fun main() = singleWindowApplication {
@@ -266,7 +266,7 @@ Use it if:
 ## Adaptive window size
 
 Sometimes we want to show some content as a whole without knowing in advance what exactly will be shown, meaning that we don’t know the optimal window dimensions for it. By setting one or both dimensions of your window’s WindowSize to Dp.Unspecified, Compose for Desktop will automatically adjust the initial size of your window in that dimension to accommodate its content:
-```
+```kotlin
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -558,7 +558,7 @@ private fun FileDialog(
 
 ## Draggable window area
 If you window is undecorated and you want to add a custom draggable titlebar to it (or make the whole window draggable), you can use `DraggableWindowArea`:
-```
+```kotlin
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -580,7 +580,7 @@ fun main() = application {
 }
 ```
 Note that `WindowDraggableArea` can be used only inside `singleWindowApplication`, `Window` and `Dialog`. If you need to use it in another Composable function, pass `WindowScope` as a reciever there:
-```
+```kotlin
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
