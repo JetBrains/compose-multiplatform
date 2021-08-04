@@ -21,12 +21,22 @@ open class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
     val propertyUpdates = mutableListOf<Pair<(Element, Any) -> Unit, Any>>()
     var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
 
+    /**
+     * [style] add inline CSS-style properties to the element via [StyleBuilder] context
+     *
+     * Example:
+     * ```
+     * Div({
+     *      style { maxWidth(5.px) }
+     * })
+     * ```
+     */
     fun style(builder: StyleBuilder.() -> Unit) {
         styleBuilder.apply(builder)
     }
 
     /**
-     * `classes` adds all values passed as params to the element's classList.
+     * [classes] adds all values passed as params to the element's classList.
      *  This method acts cumulatively, that is, each call adds values to the classList.
      *  In the ideology of Composable functions and their recomposition one just don't need to remove classes,
      *  since if your classList is, for instance, condition-dependent, you can always just call this method conditionally.
