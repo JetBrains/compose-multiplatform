@@ -249,6 +249,7 @@ private class MyWindowState(
 ![](multiple_windows.gif)
 
 ## Function `singleWindowApplication`
+
 There is a simplified function for creating a single window application:
 ```
 import androidx.compose.ui.window.singleWindowApplication
@@ -263,6 +264,7 @@ Use it if:
 - you don't need to change the window parameters after it is already created
 
 ## Adaptive window size
+
 Sometimes we want to show some content as a whole without knowing in advance what exactly will be shown, meaning that we don’t know the optimal window dimensions for it. By setting one or both dimensions of your window’s WindowSize to Dp.Unspecified, Compose for Desktop will automatically adjust the initial size of your window in that dimension to accommodate its content:
 ```
 import androidx.compose.foundation.background
@@ -296,6 +298,7 @@ fun main() = application {
     }
 }
 ```
+![](adaptive.png)
 
 ## Changing the state (maximized, minimized, fullscreen, size, position) of the window.
 
