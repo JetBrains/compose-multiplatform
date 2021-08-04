@@ -122,6 +122,20 @@ fun main() = application {
 ```
 ![](ask_to_close.gif)
 
+
+There is a simplified function for creating a single window application:
+```
+import androidx.compose.ui.window.singleWindowApplication
+
+fun main() = singleWindowApplication {
+    // Content
+}
+```
+Use it if:
+- your application has only one window
+- you don't need custom closing logic
+- you don't need to change the window parameters after it is already created
+
 If you don't need to close the window and just need to hide it (for example to the tray), you can change the `windowState.isVisible` state:
 ```kotlin
 import androidx.compose.material.Text
@@ -438,26 +452,23 @@ fun main() = SwingUtilities.invokeLater {
 You can also access ComposeWindow in the Composable `Window` scope:
 ```kotlin
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
+import androidx.compose.ui.window.singleWindowApplication
 import java.awt.datatransfer.DataFlavor
 import java.awt.dnd.DnDConstants
 import java.awt.dnd.DropTarget
 import java.awt.dnd.DropTargetAdapter
 import java.awt.dnd.DropTargetDropEvent
 
-fun main() = application {
-    Window(onCloseRequest = ::exitApplication) {
-        LaunchedEffect(Unit) {
-            window.dropTarget = DropTarget().apply {
-                addDropTargetListener(object : DropTargetAdapter() {
-                    override fun drop(event: DropTargetDropEvent) {
-                        event.acceptDrop(DnDConstants.ACTION_COPY);
-                        val fileName = event.transferable.getTransferData(DataFlavor.javaFileListFlavor)
-                        println(fileName)
-                    }
-                })
-            }
+fun main() = singleWindowApplication {
+    LaunchedEffect(Unit) {
+        window.dropTarget = DropTarget().apply {
+            addDropTargetListener(object : DropTargetAdapter() {
+                override fun drop(event: DropTargetDropEvent) {
+                    event.acceptDrop(DnDConstants.ACTION_COPY);
+                    val fileName = event.transferable.getTransferData(DataFlavor.javaFileListFlavor)
+                    println(fileName)
+                }
+            })
         }
     }
 }
@@ -506,3 +517,26 @@ private fun FileDialog(
     dispose = FileDialog::dispose
 )
 ```
+
+## Draggable window area
+If you window is undecorated and you want to add a custom draggable titlebar to it (or make the whole window draggable), you can use `DraggableWindowArea`:
+```
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.window.WindowDraggableArea
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.singleWindowApplication
+
+fun main() = singleWindowApplication(
+    undecorated = true
+) {
+    WindowDraggableArea {
+        Box(Modifier.fillMaxWidth().height(48.dp).background(Color.DarkGray))
+    }
+}
+```
+![](draggable_area.gif)
