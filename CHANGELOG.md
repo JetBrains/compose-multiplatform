@@ -27,6 +27,27 @@
 - Window(icon: BufferedImage) replaced by Window(icon: Painter)
 - ContextMenu renamed to CursorDropdownMenu
 
+## Web
+
+### API changes
+- [classes behave cumulatively](https://github.com/JetBrains/compose-jb/pull/690)
+- [removed content builder for empty elements](https://github.com/JetBrains/compose-jb/issues/744)
+- [Introduce CSS arithmetic operations](https://github.com/JetBrains/compose-jb/pull/761)
+- [Improved the types of Inputs and input events](https://github.com/JetBrains/compose-jb/pull/799)
+- [All event types expose native properties](https://github.com/JetBrains/compose-jb/pull/887)
+- [Added a complete list of HTML color aliases](https://github.com/JetBrains/compose-jb/issues/890)
+- [Introduce support for CSS Grid API](https://github.com/JetBrains/compose-jb/issues/895)
+- [Deprecate Color.RGB, Color.HSL etc. functions in favor of top-level rgb, hsl an so on](https://github.com/JetBrains/compose-jb/issues/902)
+- [negate CSSNumeric value directly](https://github.com/JetBrains/compose-jb/issues/921)
+
+### API breaking changes
+- [boolean like attributes don't have any parameters anymore](https://github.com/JetBrains/compose-jb/pull/780)
+- [removed input type specific event listeners](https://github.com/JetBrains/compose-jb/pull/861)
+- [replaced maxWidth/minWidth media queries with prefixed names](https://github.com/JetBrains/compose-jb/issues/886)
+- [Remove CSSVariables context and introduce specialized methods for adding String- and Number-valued CSS variables](https://github.com/JetBrains/compose-jb/issues/894)
+- [inline style builder was moved into AttributeBuilder scope](https://github.com/JetBrains/compose-jb/pull/699)
+
+
 # M4 (Jun 2021)
   * New experimental [Composable Window API](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Window_API_new)
   * [Tooltips](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Desktop_Components#tooltips)
