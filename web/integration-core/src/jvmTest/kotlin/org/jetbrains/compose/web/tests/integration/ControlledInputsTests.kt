@@ -10,6 +10,7 @@ import org.jetbrains.compose.web.tests.integration.common.ResolveDrivers
 import org.jetbrains.compose.web.tests.integration.common.openTestPage
 import org.jetbrains.compose.web.tests.integration.common.waitTextToBe
 import org.openqa.selenium.By
+import org.openqa.selenium.Keys
 import org.openqa.selenium.WebDriver
 
 class ControlledInputsTests : BaseIntegrationTests() {
@@ -187,5 +188,94 @@ class ControlledInputsTests : BaseIntegrationTests() {
 
         check(radio1.isSelected)
         check(!radio2.isSelected)
+    }
+    @ResolveDrivers
+    fun radioMutableCheckedChanges(driver: WebDriver) {
+        driver.openTestPage("radioMutableCheckedChanges")
+        driver.waitTextToBe(value = "Checked - 0")
+
+        val radio1 = driver.findElement(By.id("radio1"))
+        val radio2 = driver.findElement(By.id("radio2"))
+
+        check(!radio1.isSelected)
+        check(!radio2.isSelected)
+
+        radio2.click()
+        driver.waitTextToBe(value = "Checked - 2")
+
+        check(!radio1.isSelected)
+        check(radio2.isSelected)
+
+        radio1.click()
+        driver.waitTextToBe(value = "Checked - 1")
+
+        check(radio1.isSelected)
+        check(!radio2.isSelected)
+    }
+
+    @ResolveDrivers
+    fun numberHardcodedNeverChanges(driver: WebDriver) {
+        driver.openTestPage("numberHardcodedNeverChanges")
+        driver.waitTextToBe(value = "None")
+
+        val numberInput = driver.findElement(By.id("numberInput"))
+
+        check(numberInput.getAttribute("value") == "5")
+
+        numberInput.sendKeys("1")
+        driver.waitTextToBe(value = "51")
+
+        check(numberInput.getAttribute("value") == "5")
+    }
+
+    @ResolveDrivers
+    fun numberMutableChanges(driver: WebDriver) {
+        driver.openTestPage("numberMutableChanges")
+        driver.waitTextToBe(value = "5")
+
+        val numberInput = driver.findElement(By.id("numberInput"))
+
+        check(numberInput.getAttribute("value") == "5")
+
+        numberInput.sendKeys("1")
+        driver.waitTextToBe(value = "51")
+
+        check(numberInput.getAttribute("value") == "51")
+    }
+
+    @ResolveDrivers
+    fun rangeHardcodedNeverChanges(driver: WebDriver) {
+        driver.openTestPage("rangeHardcodedNeverChanges")
+        driver.waitTextToBe(value = "None")
+
+        val numberInput = driver.findElement(By.id("rangeInput"))
+
+        check(numberInput.getAttribute("value") == "21")
+
+        numberInput.sendKeys(Keys.ARROW_RIGHT)
+        driver.waitTextToBe(value = "22")
+        check(numberInput.getAttribute("value") == "21")
+
+        numberInput.sendKeys(Keys.ARROW_RIGHT)
+        driver.waitTextToBe(value = "22")
+        check(numberInput.getAttribute("value") == "21")
+    }
+
+    @ResolveDrivers
+    fun rangeMutableChanges(driver: WebDriver) {
+        driver.openTestPage("rangeMutableChanges")
+        driver.waitTextToBe(value = "10")
+
+        val numberInput = driver.findElement(By.id("rangeInput"))
+
+        check(numberInput.getAttribute("value") == "10")
+
+        numberInput.sendKeys(Keys.ARROW_RIGHT)
+        driver.waitTextToBe(value = "11")
+        check(numberInput.getAttribute("value") == "11")
+
+        numberInput.sendKeys(Keys.ARROW_RIGHT)
+        driver.waitTextToBe(value = "12")
+        check(numberInput.getAttribute("value") == "12")
     }
 }

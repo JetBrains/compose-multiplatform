@@ -8,7 +8,9 @@ package org.jetbrains.compose.web.tests.integration
 import org.jetbrains.compose.web.tests.integration.common.BaseIntegrationTests
 import org.jetbrains.compose.web.tests.integration.common.ResolveDrivers
 import org.jetbrains.compose.web.tests.integration.common.openTestPage
+import org.jetbrains.compose.web.tests.integration.common.waitTextToBe
 import org.openqa.selenium.By
+import org.openqa.selenium.Keys
 import org.openqa.selenium.WebDriver
 
 class UncontrolledInputsTests : BaseIntegrationTests() {
@@ -88,4 +90,36 @@ class UncontrolledInputsTests : BaseIntegrationTests() {
         check(!driver.outerHtmlOfElementWithId("radio2").contains("checked"))
     }
 
+    @ResolveDrivers
+    fun numberDefaultValueRemainsTheSameButValueCanBeChanged(driver: WebDriver) {
+        driver.openTestPage("numberDefaultValueRemainsTheSameButValueCanBeChanged")
+        driver.waitTextToBe(value = "Value = None")
+
+        val numberInput = driver.findElement(By.id("numberInput"))
+        check(numberInput.getAttribute("value") == "11")
+
+        numberInput.sendKeys("5")
+        driver.waitTextToBe(value = "Value = 511")
+
+        check(numberInput.getAttribute("value") == "511")
+        check(driver.outerHtmlOfElementWithId("numberInput").contains("value=\"11\""))
+    }
+
+    @ResolveDrivers
+    fun rangeDefaultValueRemainsTheSameButValueCanBeChanged(driver: WebDriver) {
+        driver.openTestPage("rangeDefaultValueRemainsTheSameButValueCanBeChanged")
+        driver.waitTextToBe(value = "Value = None")
+
+        val numberInput = driver.findElement(By.id("rangeInput"))
+        check(numberInput.getAttribute("value") == "7")
+
+        numberInput.sendKeys(Keys.ARROW_RIGHT)
+        driver.waitTextToBe(value = "Value = 8")
+
+        numberInput.sendKeys(Keys.ARROW_RIGHT)
+        driver.waitTextToBe(value = "Value = 9")
+
+        check(numberInput.getAttribute("value") == "9")
+        check(driver.outerHtmlOfElementWithId("rangeInput").contains("value=\"7\""))
+    }
 }

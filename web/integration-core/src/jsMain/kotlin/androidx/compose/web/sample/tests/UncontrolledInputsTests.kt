@@ -12,6 +12,7 @@ import androidx.compose.runtime.setValue
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.attributes.name
 import org.jetbrains.compose.web.dom.*
+import org.jetbrains.compose.web.sample.tests.TestText
 import org.jetbrains.compose.web.sample.tests.testCase
 
 class UncontrolledInputsTests {
@@ -89,6 +90,34 @@ class UncontrolledInputsTests {
 
             onInput {
                 checkedValue = "radio-value2"
+            }
+        }
+    }
+
+    val numberDefaultValueRemainsTheSameButValueCanBeChanged by testCase {
+        var typedValue by remember { mutableStateOf("None") }
+
+        TestText(value = "Value = $typedValue")
+
+        Input(type = InputType.Number) {
+            id("numberInput")
+            defaultValue(11)
+            onInput {
+                typedValue = it.value.toString()
+            }
+        }
+    }
+
+    val rangeDefaultValueRemainsTheSameButValueCanBeChanged by testCase {
+        var typedValue by remember { mutableStateOf("None") }
+
+        TestText(value = "Value = $typedValue")
+
+        Input(type = InputType.Range) {
+            id("rangeInput")
+            defaultValue(7)
+            onInput {
+                typedValue = it.value.toString()
             }
         }
     }

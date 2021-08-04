@@ -168,4 +168,73 @@ class ControlledInputsTests {
             }
         }
     }
+
+    val radioMutableCheckedChanges by testCase {
+        var checked by remember { mutableStateOf(0) }
+
+        TestText("Checked - $checked")
+
+        Div {
+            RadioInput(checked = checked == 1) {
+                id("radio1")
+                name("group1")
+                onInput { checked = 1 }
+            }
+            RadioInput(checked = checked == 2) {
+                id("radio2")
+                name("group1")
+                onInput { checked = 2 }
+            }
+        }
+    }
+
+    val numberHardcodedNeverChanges by testCase {
+        var typedValue by remember { mutableStateOf("None") }
+        TestText(value = typedValue)
+
+        NumberInput(value = 5, min = 0, max = 100) {
+            id("numberInput")
+            onInput {
+                typedValue = it.value.toString()
+            }
+        }
+    }
+
+    val numberMutableChanges by testCase {
+        var value by remember { mutableStateOf(5) }
+        TestText(value = value.toString())
+
+        NumberInput(value = value, min = 0, max = 100) {
+            id("numberInput")
+            onInput {
+                value = it.value!!.toInt()
+            }
+        }
+    }
+
+    val rangeHardcodedNeverChanges by testCase {
+        var typedValue by remember { mutableStateOf("None") }
+
+        TestText(value = typedValue)
+
+        RangeInput(value = 21) {
+            id("rangeInput")
+            onInput {
+                typedValue = it.value.toString()
+            }
+        }
+    }
+
+    val rangeMutableChanges by testCase {
+        var value by remember { mutableStateOf(10) }
+
+        TestText(value = value.toString())
+
+        RangeInput(value = value) {
+            id("rangeInput")
+            onInput {
+                value = it.value!!.toInt()
+            }
+        }
+    }
 }

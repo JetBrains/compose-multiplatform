@@ -61,6 +61,11 @@ open class InputAttrsBuilder<ValueType>(
         return this
     }
 
+    open fun defaultValue(value: Number): InputAttrsBuilder<ValueType> {
+        attr("value", value.toString())
+        return this
+    }
+
     fun onInvalid(
         options: Options = Options.DEFAULT,
         listener: (SyntheticEvent<HTMLInputElement>) -> Unit
