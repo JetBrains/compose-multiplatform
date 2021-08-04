@@ -15,7 +15,7 @@
 - [Adaptive window size](https://github.com/JetBrains/compose-jb/blob/master/tutorials/Window_API_new/README.md#adaptive-window-size)
 - Support Linux on ARM64
 - [Support hidpi on some Linux distros](https://github.com/JetBrains/compose-jb/issues/188#issuecomment-891614869)
-- Support resizing of undecorated riszable windows (`Window(undecorated=true, resizable=true, ...)`)
+- Support resizing of undecorated resizable windows (`Window(undecorated=true, resizable=true, ...)`)
 
 ### API changes
 - new Window API is no longer experimental
