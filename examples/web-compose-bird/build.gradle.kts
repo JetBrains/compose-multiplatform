@@ -1,6 +1,6 @@
 plugins {
     kotlin("multiplatform") version "1.5.21"
-    id("org.jetbrains.compose") version "1.0.0-alpha1-rc5"
+    id("org.jetbrains.compose") version "1.0.0-alpha1"
 }
 group = "com.theapache64.composebird"
 version = "1.0.0-alpha01"
