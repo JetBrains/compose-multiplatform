@@ -7,6 +7,13 @@ import org.jetbrains.compose.web.css.StyleBuilderImpl
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 
+/**
+ * AttrsBuilder is a class that is used (as a builder context, that is as AttrsBuilder<T>.() -> Unit)
+ * in all DOM-element creating API calls. It's used for adding attributes to the element created.
+ *
+ * In that aspect the most important method is [attr]. Setting the most frequently attributes, like [id], [tabIndex]
+ * are extracted to a separate methods.
+ */
 open class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
     internal val attributesMap = mutableMapOf<String, String>()
     val styleBuilder = StyleBuilderImpl()
@@ -18,6 +25,12 @@ open class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
         styleBuilder.apply(builder)
     }
 
+    /**
+     * `classes` adds all values passed as params to the element's classList.
+     *  This method acts cumulatively, that is, each call adds values to the classList.
+     *  In the ideology of Composable functions and their recomposition one just don't need to remove classes,
+     *  since if your classList is, for instance, condition-dependent, you can always just call this method conditionally.
+     */
     fun classes(vararg classes: String) = prop(setClassList, classes)
 
     fun id(value: String) = attr(ID, value)
