@@ -232,8 +232,14 @@ abstract class AbstractJPackageTask @Inject constructor(
     private val libsMapping = FilesMapping()
 
     override fun makeArgs(tmpDir: File): MutableList<String> = super.makeArgs(tmpDir).apply {
-        fun appDir(vararg pathParts: String): String =
-            listOf("${'$'}APPDIR", *pathParts).joinToString(File.separator) { it }
+        fun appDir(vararg pathParts: String): String {
+            /** For windows we need to pass '\\' to jpackage file, each '\' need to be escaped.
+                Otherwise '$APPDIR\resources' is passed to jpackage,
+                and '\r' is treated as a special character at run time.
+             */
+            val separator = if (currentTarget.os == OS.Windows) "\\\\" else "/"
+            return listOf("${'$'}APPDIR", *pathParts).joinToString(separator) { it }
+        }
 
         if (targetFormat == TargetFormat.AppImage || appImage.orNull == null) {
             // Args, that can only be used, when creating an app image or an installer w/o --app-image parameter
