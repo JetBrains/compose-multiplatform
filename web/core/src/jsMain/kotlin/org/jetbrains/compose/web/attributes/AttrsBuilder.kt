@@ -8,11 +8,14 @@ import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 
 /**
- * AttrsBuilder is a class that is used (as a builder context, that is as AttrsBuilder<T>.() -> Unit)
- * in all DOM-element creating API calls. It's used for adding attributes to the element created.
+ * [AttrsBuilder] is a class that is used (as a builder context, that is as AttrsBuilder<T>.() -> Unit)
+ * in all DOM-element creating API calls. It's used for adding attributes to the element created,
+ * adding inline style values (via [style]) and attaching events to the element (since AttrsBuilder
+ * is an [EventsListenerBuilder])
  *
  * In that aspect the most important method is [attr]. Setting the most frequently attributes, like [id], [tabIndex]
  * are extracted to a separate methods.
+ *
  */
 open class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
     internal val attributesMap = mutableMapOf<String, String>()
