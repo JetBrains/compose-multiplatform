@@ -1,3 +1,29 @@
+# 1.0.0-alpha (Aug 2021)
+## Common
+
+- Desktop, Web, and Android artifacts are published at the same time with the same version
+
+## Desktop
+
+### Features
+- Context menu support in text fields
+- Tab navigation between text fields by default
+- Resource packing to native distribution
+- Support @Preview annotation (when the Compose MPP plugin is installed in IDEA)
+- New features in Composable menu
+- [Adaptive window size](https://github.com/JetBrains/compose-jb/blob/master/tutorials/Window_API_new/README.md#adaptive-window-size)
+
+### API changes
+- new Window API is no longer experimental
+- old Window API is deprecated
+- classes from `ndroid.compose.desktop.*` moved to `androidx.compose.ui.awt.*` (ComposeWindow, ComposePanel, etc)
+- `svgResource`/`vectorXmlResource`/`imageResource` replaced by painterResource
+
+### API breaking changes:
+- Window level keyboard API for the old Window API removed
+- Window(icon: BufferedImage) replaced by Window(icon: Painter)
+- ContextMenu renamed to CursorDropdownMenu
+
 # M4 (Jun 2021)
   * New experimental [Composable Window API](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Window_API_new)
   * [Tooltips](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Desktop_Components#tooltips)
