@@ -9,7 +9,30 @@ package org.jetbrains.compose.web.css
 
 import kotlin.properties.ReadOnlyProperty
 
+/**
+ * StyleBuilder serves for two main purposes. Passed as a builder context (in [AttrsBuilder]), it
+ * makes it possible to:
+ * 1. Add inlined css properties to the element (@see [property])
+ * 2. Set values to CSS variables (@see [variable])
+ */
 interface StyleBuilder {
+    /**
+     * Adds arbitrary CSS property to the inline style of the element
+     * @param propertyName - the name of css property as [per spec](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference)
+     * @param value - the value, it can be either String or specialized type like [CSSNumeric] or [CSSColorValue]
+     *
+     * Most frequent CSS property values can be set via specialized methods, like [width], [display] etc.
+     *
+     * Example:
+     * ```
+     * Div({
+     *  style {
+     *      property("some-exotic-css-property", "I am a string value")
+     *      property("some-exotic-css-property-width", 5.px)
+     *  }
+     * })
+     * ```
+     */
     fun property(propertyName: String, value: StylePropertyValue)
     fun variable(variableName: String, value: StylePropertyValue)
 
