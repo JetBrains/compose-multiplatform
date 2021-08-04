@@ -1,3 +1,5 @@
+import org.jetbrains.compose.compose
+
 plugins {
     id("multiplatform-compose-setup")
     id("android-setup")
@@ -12,6 +14,12 @@ kotlin {
                 implementation(project(":common:root"))
                 implementation(Deps.ArkIvanov.Decompose.decompose)
                 implementation(Deps.ArkIvanov.Decompose.extensionsCompose)
+            }
+        }
+
+        named("desktopMain") {
+            dependencies {
+                implementation(compose.uiTooling)
             }
         }
     }

@@ -1,8 +1,4 @@
-/*
- * Should be in the compose-ui module, see https://github.com/JetBrains/compose-jb/issues/908
- */
-
-package example.todo.desktop
+package example.todo.common.ui
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.runtime.Composable
@@ -11,7 +7,6 @@ import com.arkivanov.decompose.value.Value
 import example.todo.common.main.TodoItem
 import example.todo.common.main.TodoMain
 import example.todo.common.main.TodoMain.Model
-import example.todo.common.ui.TodoMainContent
 
 @Preview
 @Composable
