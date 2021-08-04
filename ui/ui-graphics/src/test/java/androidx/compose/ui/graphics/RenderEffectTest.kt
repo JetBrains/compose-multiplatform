@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.graphics
 
+import androidx.compose.ui.geometry.Offset
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -61,7 +62,6 @@ class RenderEffectTest {
             50.0f,
             TileMode.Clamp
         )
-        assertEquals(innerBlur, wrappedBlur.renderEffect)
         assertEquals(wrappedBlur, wrappedBlur2)
     }
 
@@ -75,7 +75,6 @@ class RenderEffectTest {
             50.0f,
             TileMode.Clamp
         )
-        assertEquals(innerBlur.hashCode(), wrappedBlur.renderEffect.hashCode())
         assertEquals(wrappedBlur.hashCode(), wrappedBlur2.hashCode())
     }
 
@@ -101,6 +100,73 @@ class RenderEffectTest {
                 "edgeTreatment=Decal" +
                 ")",
             blur.toString()
+        )
+    }
+
+    @Test
+    fun testOffsetEffectEquality() {
+        val offsetEffect1 = OffsetEffect(10f, 15f)
+        val offsetEffect2 = OffsetEffect(10f, 15f)
+        assertEquals(offsetEffect1, offsetEffect2)
+    }
+
+    @Test
+    fun testOffsetEffectHashcode() {
+        val offsetEffect1 = OffsetEffect(10f, 15f)
+        val offsetEffect2 = OffsetEffect(10f, 15f)
+        assertEquals(offsetEffect1.hashCode(), offsetEffect2.hashCode())
+    }
+
+    @Test
+    fun testOffsetEffectToString() {
+        assertEquals(
+            "OffsetEffect(" +
+                "renderEffect=null, " +
+                "offset=Offset(5.0, 10.0)" +
+                ")",
+            OffsetEffect(5f, 10.0f).toString()
+        )
+    }
+
+    @Test
+    fun testNestedOffsetEffectEquality() {
+        val innerOffset = OffsetEffect(5.0f, 10.0f)
+        val wrappedOffset = OffsetEffect(innerOffset, Offset(20.0f, 50.0f))
+        val wrappedOffset2 = OffsetEffect(
+            OffsetEffect(5.0f, 10.0f),
+            Offset(20.0f, 50.0f)
+        )
+        assertEquals(wrappedOffset, wrappedOffset2)
+    }
+
+    @Test
+    fun testNestedOffsetEffectHashcode() {
+        val innerOffset = OffsetEffect(5.0f, 10.0f)
+        val wrappedOffset = OffsetEffect(innerOffset, Offset(20.0f, 50.0f))
+        val wrappedOffset2 = OffsetEffect(
+            OffsetEffect(5.0f, 10.0f),
+            Offset(20.0f, 50.0f)
+        )
+        assertEquals(wrappedOffset.hashCode(), wrappedOffset2.hashCode())
+    }
+
+    @Test
+    fun testNestedOffsetEffectToString() {
+        val renderEffect = OffsetEffect(
+            BlurEffect(5.0f, 10.0f, TileMode.Clamp),
+            Offset(15.0f, 20.0f)
+        )
+        assertEquals(
+            "OffsetEffect(" +
+                "renderEffect=" +
+                "BlurEffect(" +
+                "renderEffect=null, " +
+                "radiusX=5.0, " +
+                "radiusY=10.0, " +
+                "edgeTreatment=Clamp" +
+                "), " +
+                "offset=Offset(15.0, 20.0))",
+            renderEffect.toString()
         )
     }
 }

@@ -235,6 +235,11 @@ package androidx.compose.ui.draw {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier alpha(androidx.compose.ui.Modifier, float alpha);
   }
 
+  public final class BlurKt {
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier blur(androidx.compose.ui.Modifier, float radiusX, float radiusY, optional int edgeTreatment, optional boolean clip, optional androidx.compose.ui.graphics.Shape shape);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier blur(androidx.compose.ui.Modifier, float radius, optional int edgeTreatment, optional boolean clip, optional androidx.compose.ui.graphics.Shape shape);
+  }
+
   public interface BuildDrawCacheParams {
     method public androidx.compose.ui.unit.Density getDensity();
     method public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();

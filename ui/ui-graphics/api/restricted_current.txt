@@ -243,14 +243,6 @@ package androidx.compose.ui.graphics {
   @androidx.compose.runtime.Immutable public final class BlurEffect extends androidx.compose.ui.graphics.RenderEffect {
     ctor public BlurEffect(androidx.compose.ui.graphics.RenderEffect? renderEffect, float radiusX, float radiusY, int edgeTreatment);
     method @RequiresApi(android.os.Build.VERSION_CODES.S) protected android.graphics.RenderEffect createRenderEffect();
-    method public int getEdgeTreatment();
-    method public float getRadiusX();
-    method public float getRadiusY();
-    method public androidx.compose.ui.graphics.RenderEffect? getRenderEffect();
-    property public final int edgeTreatment;
-    property public final float radiusX;
-    property public final float radiusY;
-    property public final androidx.compose.ui.graphics.RenderEffect? renderEffect;
   }
 
   @androidx.compose.runtime.Immutable public abstract sealed class Brush {
@@ -484,6 +476,11 @@ package androidx.compose.ui.graphics {
 
   public final class MatrixKt {
     method public static boolean isIdentity(float[]);
+  }
+
+  @androidx.compose.runtime.Immutable public final class OffsetEffect extends androidx.compose.ui.graphics.RenderEffect {
+    ctor public OffsetEffect(androidx.compose.ui.graphics.RenderEffect? renderEffect, long offset);
+    method @RequiresApi(android.os.Build.VERSION_CODES.S) protected android.graphics.RenderEffect createRenderEffect();
   }
 
   public abstract sealed class Outline {
@@ -721,6 +718,7 @@ package androidx.compose.ui.graphics {
 
   public final class RenderEffectKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.BlurEffect BlurEffect(float radiusX, float radiusY, optional int edgeTreatment);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.OffsetEffect OffsetEffect(float offsetX, float offsetY);
   }
 
   @androidx.compose.runtime.Immutable public abstract class ShaderBrush extends androidx.compose.ui.graphics.Brush {

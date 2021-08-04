@@ -18,6 +18,7 @@ package androidx.compose.ui.platform
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -330,12 +331,13 @@ class SkijaLayerTest {
         cameraDistance: Float = 0f,
         transformOrigin: TransformOrigin = TransformOrigin.Center,
         shape: Shape = RectangleShape,
-        clip: Boolean = false
+        clip: Boolean = false,
+        renderEffect: RenderEffect? = null
     ) {
         updateLayerProperties(
             scaleX, scaleY, alpha, translationX, translationY, shadowElevation, rotationX,
-            rotationY, rotationZ, cameraDistance, transformOrigin, shape, clip, LayoutDirection.Ltr,
-            Density(1f, 1f)
+            rotationY, rotationZ, cameraDistance, transformOrigin, shape, clip,
+            renderEffect, LayoutDirection.Ltr, Density(1f, 1f)
         )
     }
 }

@@ -18,9 +18,21 @@ package androidx.compose.ui.graphics
 
 import org.jetbrains.skija.FilterTileMode
 
+actual fun TileMode.isSupported(): Boolean = true
+
 fun TileMode.toDesktopTileMode(): FilterTileMode = when (this) {
     TileMode.Clamp -> FilterTileMode.CLAMP
     TileMode.Repeated -> FilterTileMode.REPEAT
     TileMode.Mirror -> FilterTileMode.MIRROR
+    TileMode.Decal -> FilterTileMode.DECAL
     else -> FilterTileMode.CLAMP
 }
+
+fun FilterTileMode.toComposeTileMode(): TileMode =
+    when (this) {
+        FilterTileMode.CLAMP -> TileMode.Clamp
+        FilterTileMode.MIRROR -> TileMode.Mirror
+        FilterTileMode.REPEAT -> TileMode.Repeated
+        FilterTileMode.DECAL -> TileMode.Decal
+        else -> TileMode.Clamp
+    }

@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.asDesktopPath
@@ -73,6 +74,7 @@ internal class SkijaLayer(
     private var scaleY: Float = 1f
     private var alpha: Float = 1f
     private var clip: Boolean = false
+    private var renderEffect: RenderEffect? = null
     private var shadowElevation: Float = 0f
 
     override val layerId = lastId++
@@ -151,7 +153,7 @@ internal class SkijaLayer(
         transformOrigin: TransformOrigin,
         shape: Shape,
         clip: Boolean,
-        renderEffect: RenderEffect?, // TODO consume RenderEffect
+        renderEffect: RenderEffect?,
         layoutDirection: LayoutDirection,
         density: Density
     ) {
@@ -167,6 +169,7 @@ internal class SkijaLayer(
         this.clip = clip
         this.shadowElevation = shadowElevation
         this.density = density
+        this.renderEffect = renderEffect
         outlineCache.shape = shape
         outlineCache.layoutDirection = layoutDirection
         outlineCache.density = density
@@ -227,16 +230,8 @@ internal class SkijaLayer(
                 drawShadow(canvas)
             }
 
-            if (alpha < 1) {
-                canvas.saveLayer(
-                    bounds,
-                    Paint().apply { alpha = this@SkijaLayer.alpha }
-                )
-            } else {
-                canvas.save()
-            }
-
             if (clip) {
+                canvas.save()
                 when (val outline = outlineCache.outline) {
                     is Outline.Rectangle -> canvas.clipRect(outline.rect)
                     is Outline.Rounded -> canvas.clipRoundRect(outline.roundRect)
@@ -244,8 +239,24 @@ internal class SkijaLayer(
                 }
             }
 
+            val currentRenderEffect = renderEffect
+            if (alpha < 1 || currentRenderEffect != null) {
+                canvas.saveLayer(
+                    bounds,
+                    Paint().apply {
+                        alpha = this@SkijaLayer.alpha
+                        asFrameworkPaint().imageFilter = currentRenderEffect?.asDesktopImageFilter()
+                    }
+                )
+            } else {
+                canvas.save()
+            }
+
             drawBlock(canvas)
             canvas.restore()
+            if (clip) {
+                canvas.restore()
+            }
         }
     }
 

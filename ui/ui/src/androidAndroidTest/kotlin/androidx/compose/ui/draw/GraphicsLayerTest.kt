@@ -17,7 +17,6 @@
 package androidx.compose.ui.draw
 
 import android.os.Build
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,11 +39,14 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlurEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.GraphicsLayerScope
+import androidx.compose.ui.graphics.OffsetEffect
 import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.inset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
@@ -68,6 +70,7 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -451,18 +454,32 @@ class GraphicsLayerTest {
 
     @Composable
     fun BoxBlur(tag: String, size: Float, blurRadius: Float) {
+        BoxRenderEffect(
+            tag,
+            (size / LocalDensity.current.density).dp,
+            ({ BlurEffect(blurRadius, blurRadius, TileMode.Decal) })
+        ) {
+            inset(blurRadius, blurRadius) {
+                drawRect(androidx.compose.ui.graphics.Color.Blue)
+            }
+        }
+    }
+
+    @Composable
+    fun BoxRenderEffect(
+        tag: String,
+        size: Dp,
+        renderEffectCreator: () -> RenderEffect,
+        drawBlock: DrawScope.() -> Unit
+    ) {
         Box(
             Modifier.testTag(tag)
-                .size((size / LocalDensity.current.density).dp)
+                .size(size)
                 .background(Color.Black)
                 .graphicsLayer {
-                    renderEffect = BlurEffect(blurRadius, blurRadius, TileMode.Decal)
+                    renderEffect = renderEffectCreator()
                 }
-                .drawBehind {
-                    inset(blurRadius, blurRadius) {
-                        drawRect(Color.Blue)
-                    }
-                }
+                .drawBehind(drawBlock)
         )
     }
 
@@ -509,6 +526,37 @@ class GraphicsLayerTest {
                     if (x >= blurRadius && x < width - blurRadius &&
                         y >= blurRadius && y < height - blurRadius
                     ) {
+                        assertEquals("Index $x, $y should be blue", Color.Blue, pixelMap[x, y])
+                    } else {
+                        assertEquals("Index $x, $y should be black", Color.Black, pixelMap[x, y])
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.S)
+    fun testOffsetEffect() {
+        val tag = "blurTag"
+        val size = 100f
+        rule.setContent {
+            BoxRenderEffect(
+                tag,
+                (size / LocalDensity.current.density).dp,
+                { OffsetEffect(20f, 20f) }
+            ) {
+                drawRect(
+                    Color.Blue,
+                    size = Size(this.size.width - 20, this.size.height - 20)
+                )
+            }
+        }
+        rule.onNodeWithTag(tag).captureToImage().apply {
+            val pixelMap = toPixelMap()
+            for (x in 0 until width) {
+                for (y in 0 until height) {
+                    if (x >= 20f && y >= 20f) {
                         assertEquals("Index $x, $y should be blue", Color.Blue, pixelMap[x, y])
                     } else {
                         assertEquals("Index $x, $y should be black", Color.Black, pixelMap[x, y])

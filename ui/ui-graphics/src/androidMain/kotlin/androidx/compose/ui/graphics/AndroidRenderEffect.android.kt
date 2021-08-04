@@ -19,6 +19,7 @@ package androidx.compose.ui.graphics
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.geometry.Offset
 
 /**
  * Convert the [android.graphics.RenderEffect] instance into a compose compatible [RenderEffect]
@@ -53,10 +54,10 @@ internal class AndroidRenderEffect(
 
 @Immutable
 actual class BlurEffect actual constructor(
-    val renderEffect: RenderEffect?,
-    val radiusX: Float,
-    val radiusY: Float,
-    val edgeTreatment: TileMode
+    private val renderEffect: RenderEffect?,
+    private val radiusX: Float,
+    private val radiusY: Float,
+    private val edgeTreatment: TileMode
 ) : RenderEffect() {
 
     @RequiresApi(Build.VERSION_CODES.S)
@@ -94,6 +95,37 @@ actual class BlurEffect actual constructor(
     }
 }
 
+@Immutable
+actual class OffsetEffect actual constructor(
+    private val renderEffect: RenderEffect?,
+    private val offset: Offset
+) : RenderEffect() {
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    override fun createRenderEffect(): android.graphics.RenderEffect =
+        RenderEffectVerificationHelper.createOffsetEffect(renderEffect, offset)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is OffsetEffect) return false
+
+        if (renderEffect != other.renderEffect) return false
+        if (offset != other.offset) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = renderEffect?.hashCode() ?: 0
+        result = 31 * result + offset.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "OffsetEffect(renderEffect=$renderEffect, offset=$offset)"
+    }
+}
+
 @RequiresApi(Build.VERSION_CODES.S)
 private object RenderEffectVerificationHelper {
 
@@ -116,6 +148,21 @@ private object RenderEffectVerificationHelper {
                 radiusY,
                 inputRenderEffect.asAndroidRenderEffect(),
                 edgeTreatment.toAndroidTileMode()
+            )
+        }
+
+    @androidx.annotation.DoNotInline
+    fun createOffsetEffect(
+        inputRenderEffect: RenderEffect?,
+        offset: Offset
+    ): android.graphics.RenderEffect =
+        if (inputRenderEffect == null) {
+            android.graphics.RenderEffect.createOffsetEffect(offset.x, offset.y)
+        } else {
+            android.graphics.RenderEffect.createOffsetEffect(
+                offset.x,
+                offset.y,
+                inputRenderEffect.asAndroidRenderEffect()
             )
         }
 }

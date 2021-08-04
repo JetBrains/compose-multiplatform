@@ -31,13 +31,25 @@ class AndroidRenderEffectTest {
 
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.S)
-    fun testRenderEffectSupported() {
+    fun testBlurEffectSupported() {
         assertTrue(BlurEffect(5f, 10f).isSupported())
     }
 
     @Test
     @SdkSuppress(maxSdkVersion = Build.VERSION_CODES.R)
-    fun testRenderEffectNotSupported() {
+    fun testBlurEffectNotSupported() {
         assertFalse(BlurEffect(1f, 2f).isSupported())
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.S)
+    fun testOffsetEffectSupported() {
+        assertTrue(OffsetEffect(5f, 10f).isSupported())
+    }
+
+    @Test
+    @SdkSuppress(maxSdkVersion = Build.VERSION_CODES.R)
+    fun testOffsetEffectNotSupported() {
+        assertFalse(OffsetEffect(1f, 2f).isSupported())
     }
 }
