@@ -15,7 +15,6 @@ import org.gradle.api.tasks.Optional
 import org.gradle.process.ExecResult
 import org.gradle.work.ChangeType
 import org.gradle.work.InputChanges
-import org.jetbrains.compose.desktop.application.dsl.InfoPlistSettings
 import org.jetbrains.compose.desktop.application.dsl.MacOSSigningSettings
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.*
@@ -23,10 +22,8 @@ import org.jetbrains.compose.desktop.application.internal.files.*
 import org.jetbrains.compose.desktop.application.internal.files.MacJarSignFileCopyingProcessor
 import org.jetbrains.compose.desktop.application.internal.files.fileHash
 import org.jetbrains.compose.desktop.application.internal.files.transformJar
-import org.jetbrains.compose.desktop.application.internal.validation.ValidatedMacOSSigningSettings
 import org.jetbrains.compose.desktop.application.internal.validation.validate
 import java.io.*
-import java.nio.file.Files
 import java.util.*
 import java.util.zip.ZipEntry
 import javax.inject.Inject
@@ -181,7 +178,8 @@ abstract class AbstractJPackageTask @Inject constructor(
     private val macSigner: MacSigner? by lazy {
         val nonValidatedSettings = nonValidatedMacSigningSettings
         if (currentOS == OS.MacOS && nonValidatedSettings?.sign?.get() == true) {
-            val validatedSettings = nonValidatedSettings.validate(nonValidatedMacBundleID)
+            val validatedSettings =
+                nonValidatedSettings.validate(nonValidatedMacBundleID, project)
             MacSigner(validatedSettings, runExternalTool)
         } else null
     }
@@ -190,7 +188,7 @@ abstract class AbstractJPackageTask @Inject constructor(
     protected val signDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/sign")
 
     @get:LocalState
-    protected val resourcesDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/resources")
+    protected val jpackageResources: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/resources")
 
     @get:LocalState
     protected val skikoDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/skiko")
@@ -201,6 +199,31 @@ abstract class AbstractJPackageTask @Inject constructor(
     }
 
     @get:Internal
+    private val packagedResourcesDir: Provider<Directory> = libsDir.map {
+        it.dir("resources")
+    }
+
+    @get:Internal
+    val appResourcesDir: DirectoryProperty = objects.directoryProperty()
+
+    /**
+     * Gradle runtime verification fails,
+     * if InputDirectory is not null, but a directory does not exist.
+     * The directory might not exist, because prepareAppResources task
+     * does not create output directory if there are no resources.
+     *
+     * To work around this, appResourcesDir is used as a real property,
+     * but it is annotated as @Internal, so it ignored during inputs checking.
+     * This property is used only for inputs checking.
+     * It returns appResourcesDir value if the underlying directory exists.
+     */
+    @Suppress("unused")
+    @get:InputDirectory
+    @get:Optional
+    internal val appResourcesDirInputDirHackForVerification: Provider<Directory>
+        get() = appResourcesDir.map { it.takeIf { it.asFile.exists() } }
+
+    @get:Internal
     private val libsMappingFile: Provider<RegularFile> = workingDir.map {
         it.file("libs-mapping.txt")
     }
@@ -209,11 +232,22 @@ abstract class AbstractJPackageTask @Inject constructor(
     private val libsMapping = FilesMapping()
 
     override fun makeArgs(tmpDir: File): MutableList<String> = super.makeArgs(tmpDir).apply {
+        fun appDir(vararg pathParts: String): String {
+            /** For windows we need to pass '\\' to jpackage file, each '\' need to be escaped.
+                Otherwise '$APPDIR\resources' is passed to jpackage,
+                and '\r' is treated as a special character at run time.
+             */
+            val separator = if (currentTarget.os == OS.Windows) "\\\\" else "/"
+            return listOf("${'$'}APPDIR", *pathParts).joinToString(separator) { it }
+        }
+
         if (targetFormat == TargetFormat.AppImage || appImage.orNull == null) {
             // Args, that can only be used, when creating an app image or an installer w/o --app-image parameter
             cliArg("--input", libsDir)
             cliArg("--runtime-image", runtimeImage)
-            cliArg("--resource-dir", resourcesDir)
+            cliArg("--resource-dir", jpackageResources)
+
+            javaOption("-D$APP_RESOURCES_DIR=${appDir(packagedResourcesDir.ioFile.name)}")
 
             val mappedJar = libsMapping[launcherMainJar.ioFile]?.singleOrNull()
                 ?: error("Main jar was not processed correctly: ${launcherMainJar.ioFile}")
@@ -230,12 +264,12 @@ abstract class AbstractJPackageTask @Inject constructor(
                 cliArg("--arguments", "'$it'")
             }
             launcherJvmArgs.orNull?.forEach {
-                cliArg("--java-options", "'$it'")
+                javaOption(it)
             }
-            cliArg("--java-options", "'-Dskiko.library.path=${'$'}APPDIR'")
+            javaOption("-D$SKIKO_LIBRARY_PATH=${appDir()}")
             if (currentOS == OS.MacOS) {
                 macDockName.orNull?.let { dockName ->
-                    cliArg("--java-options", "'-Xdock:name=$dockName'")
+                    javaOption("-Xdock:name=$dockName")
                 }
             }
         }
@@ -363,12 +397,29 @@ abstract class AbstractJPackageTask @Inject constructor(
             }
         }
 
-        fileOperations.delete(resourcesDir)
-        fileOperations.mkdir(resourcesDir)
+        // todo: incremental copy
+        val destResourcesDir = packagedResourcesDir.ioFile
+        fileOperations.delete(destResourcesDir)
+        fileOperations.mkdir(destResourcesDir)
+        val appResourcesDir = appResourcesDir.ioFileOrNull
+        if (appResourcesDir != null) {
+            for (file in appResourcesDir.walk()) {
+                val relPath = file.relativeTo(appResourcesDir).path
+                val destFile = destResourcesDir.resolve(relPath)
+                if (file.isDirectory) {
+                    fileOperations.mkdir(destFile)
+                } else {
+                    file.copyTo(destFile)
+                }
+            }
+        }
+
+        fileOperations.delete(jpackageResources)
+        fileOperations.mkdir(jpackageResources)
         if (currentOS == OS.MacOS) {
             InfoPlistBuilder(macExtraPlistKeysRawXml.orNull)
                 .also { setInfoPlistValues(it) }
-                .writeToFile(resourcesDir.ioFile.resolve("Info.plist"))
+                .writeToFile(jpackageResources.ioFile.resolve("Info.plist"))
         }
     }
 

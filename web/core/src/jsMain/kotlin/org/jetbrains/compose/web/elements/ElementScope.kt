@@ -15,8 +15,27 @@ import org.w3c.dom.HTMLElement
 
 interface DOMScope<out TElement : Element>
 
+/**
+ * ElementScope allows adding effects to the Composable representing html element.
+ * Also see a tutorial: https://github.com/JetBrains/compose-jb/tree/master/tutorials/Web/Using_Effects
+ *
+ * Example:
+ * ```
+ * Div {
+ *   DisposableRefEffect { htmlDivElement ->
+ *      onDispose {}
+ *   }
+ * }
+ * ```
+ */
 interface ElementScope<out TElement : Element> : DOMScope<TElement> {
 
+    /**
+     * A side effect of composition that must run for any new unique value of [key]
+     * and must be reversed or cleaned up if [key] changes or if the DisposableRefEffect leaves the composition.
+     * [effect] lambda provides a reference to a native element represented by Composable.
+     * Adding [DisposableEffectScope.onDispose] to [effect] is mandatory.
+     */
     @Composable
     @NonRestartableComposable
     fun DisposableRefEffect(
@@ -24,6 +43,12 @@ interface ElementScope<out TElement : Element> : DOMScope<TElement> {
         effect: DisposableEffectScope.(TElement) -> DisposableEffectResult
     )
 
+    /**
+     * A side effect of composition that must run once an element enters composition
+     * and must be reversed or cleaned up if element or the DisposableRefEffect leaves the composition.
+     * [effect] lambda provides a reference to a native element represented by Composable.
+     * Adding [DisposableEffectScope.onDispose] to [effect] is mandatory.
+     */
     @Composable
     @NonRestartableComposable
     fun DisposableRefEffect(
@@ -32,10 +57,20 @@ interface ElementScope<out TElement : Element> : DOMScope<TElement> {
         DisposableRefEffect(null, effect)
     }
 
+    /**
+     * A side effect of composition that runs on every successful recomposition if [key] changes.
+     * Also see [SideEffect].
+     * Same as other effects in [ElementScope], it provides a reference to a native element in [effect] lambda.
+     */
     @Composable
     @NonRestartableComposable
     fun DomSideEffect(key: Any?, effect: DomEffectScope.(TElement) -> Unit)
 
+    /**
+     * A side effect of composition that runs on every successful recomposition.
+     * Also see [SideEffect].
+     * Same as other effects in [ElementScope], it provides a reference to a native element in [effect] lambda.
+     */
     @Composable
     @NonRestartableComposable
     fun DomSideEffect(effect: DomEffectScope.(TElement) -> Unit)

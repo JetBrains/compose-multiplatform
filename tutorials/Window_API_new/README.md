@@ -44,7 +44,7 @@ fun main() = application {
     }
 }
 ```
-![](window_properties.gif)
+<img alt="Window properties" src="window_properties.gif" height="260" />
 
 You can also close/open windows using a simple `if` statement.
 
@@ -80,7 +80,7 @@ fun main() = application {
     }
 }
 ```
-![](window_splash.gif)
+<img alt="Window splash" src="window_splash.gif" height="354" />
 
 If the window requires some custom logic on close (for example, to show a dialog), you can override the close action using `onCloseRequest`.
 
@@ -120,7 +120,7 @@ fun main() = application {
     }
 }
 ```
-![](ask_to_close.gif)
+<img alt="Ask to close" src="ask_to_close.gif" height="309" />
 
 If you don't need to close the window and just need to hide it (for example to the tray), you can change the `windowState.isVisible` state:
 ```kotlin
@@ -177,7 +177,7 @@ object TrayIcon : Painter() {
     }
 }
 ```
-![](hide_instead_of_close.gif)
+<img alt="Hide instead of closing" src="hide_instead_of_close.gif" height="308" />
 
 If an application has multiple windows, then it is better to put its state into a separate class and open/close window in response to `mutableStateListOf` changes (see [notepad example](https://github.com/JetBrains/compose-jb/tree/master/examples/notepad) for more complex use cases):
 ```kotlin
@@ -246,7 +246,59 @@ private class MyWindowState(
     fun close() = close(this)
 }
 ```
-![](multiple_windows.gif)
+<img alt="Multiple windows" src="multiple_windows.gif" height="280" />
+
+## Function `singleWindowApplication`
+
+There is a simplified function for creating a single window application:
+```kotlin
+import androidx.compose.ui.window.singleWindowApplication
+
+fun main() = singleWindowApplication {
+    // Content
+}
+```
+Use it if:
+- your application has only one window
+- you don't need custom closing logic
+- you don't need to change the window parameters after it is already created
+
+## Adaptive window size
+
+Sometimes we want to show some content as a whole without knowing in advance what exactly will be shown, meaning that we don’t know the optimal window dimensions for it. By setting one or both dimensions of your window’s WindowSize to Dp.Unspecified, Compose for Desktop will automatically adjust the initial size of your window in that dimension to accommodate its content:
+```kotlin
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.Text
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
+
+fun main() = application {
+    Window(
+        onCloseRequest = ::exitApplication,
+        state = rememberWindowState(width = Dp.Unspecified, height = Dp.Unspecified),
+        title = "Adaptive",
+        resizable = false
+    ) {
+        Column(Modifier.background(Color(0xFFEEEEEE))) {
+            Row {
+                Text("label 1", Modifier.size(100.dp, 100.dp).padding(10.dp).background(Color.White))
+                Text("label 2", Modifier.size(150.dp, 200.dp).padding(5.dp).background(Color.White))
+                Text("label 3", Modifier.size(200.dp, 300.dp).padding(25.dp).background(Color.White))
+            }
+        }
+    }
+}
+```
+<img alt="Adaptive window size" src="adaptive.png" height="327" />
 
 ## Changing the state (maximized, minimized, fullscreen, size, position) of the window.
 
@@ -326,7 +378,7 @@ fun main() = application {
     }
 }
 ```
-![](state.gif)
+<img alt="Changing the state" src="state.gif" height="231" />
 
 ## Listening the state of the window
 Reading the state in composition is useful when you need to update UI, but there are cases when you need to react to the state changes and send a value to another non-composable level of your application (write it to the database, for example):
@@ -438,26 +490,23 @@ fun main() = SwingUtilities.invokeLater {
 You can also access ComposeWindow in the Composable `Window` scope:
 ```kotlin
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
+import androidx.compose.ui.window.singleWindowApplication
 import java.awt.datatransfer.DataFlavor
 import java.awt.dnd.DnDConstants
 import java.awt.dnd.DropTarget
 import java.awt.dnd.DropTargetAdapter
 import java.awt.dnd.DropTargetDropEvent
 
-fun main() = application {
-    Window(onCloseRequest = ::exitApplication) {
-        LaunchedEffect(Unit) {
-            window.dropTarget = DropTarget().apply {
-                addDropTargetListener(object : DropTargetAdapter() {
-                    override fun drop(event: DropTargetDropEvent) {
-                        event.acceptDrop(DnDConstants.ACTION_COPY);
-                        val fileName = event.transferable.getTransferData(DataFlavor.javaFileListFlavor)
-                        println(fileName)
-                    }
-                })
-            }
+fun main() = singleWindowApplication {
+    LaunchedEffect(Unit) {
+        window.dropTarget = DropTarget().apply {
+            addDropTargetListener(object : DropTargetAdapter() {
+                override fun drop(event: DropTargetDropEvent) {
+                    event.acceptDrop(DnDConstants.ACTION_COPY);
+                    val fileName = event.transferable.getTransferData(DataFlavor.javaFileListFlavor)
+                    println(fileName)
+                }
+            })
         }
     }
 }
@@ -506,3 +555,54 @@ private fun FileDialog(
     dispose = FileDialog::dispose
 )
 ```
+
+## Draggable window area
+If you window is undecorated and you want to add a custom draggable titlebar to it (or make the whole window draggable), you can use `DraggableWindowArea`:
+```kotlin
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.window.WindowDraggableArea
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.application
+
+fun main() = application {
+    Window(onCloseRequest = ::exitApplication, undecorated = true) {
+        WindowDraggableArea {
+            Box(Modifier.fillMaxWidth().height(48.dp).background(Color.DarkGray))
+        }
+    }
+}
+```
+Note that `WindowDraggableArea` can be used only inside `singleWindowApplication`, `Window` and `Dialog`. If you need to use it in another Composable function, pass `WindowScope` as a receiver there:
+```kotlin
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.window.WindowDraggableArea
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowScope
+import androidx.compose.ui.window.application
+
+fun main() = application {
+    Window(onCloseRequest = ::exitApplication, undecorated = true) {
+        AppWindowTitleBar()
+    }
+}
+
+@Composable
+private fun WindowScope.AppWindowTitleBar() = WindowDraggableArea {
+    Box(Modifier.fillMaxWidth().height(48.dp).background(Color.DarkGray))
+}
+```
+<img alt="Draggable area" src="draggable_area.gif" height="239" />

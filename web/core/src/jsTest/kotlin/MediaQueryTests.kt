@@ -8,7 +8,7 @@ package org.jetbrains.compose.web.core.tests
 import org.jetbrains.compose.web.css.CSSMediaRuleDeclaration
 import org.jetbrains.compose.web.css.StyleSheet
 import org.jetbrains.compose.web.css.and
-import org.jetbrains.compose.web.css.madiaMaxHeight
+import org.jetbrains.compose.web.css.mediaMaxHeight
 import org.jetbrains.compose.web.css.mediaMaxWidth
 import org.jetbrains.compose.web.css.media
 import org.jetbrains.compose.web.css.mediaMinHeight
@@ -34,7 +34,7 @@ class MediaQueryTests {
             media(mediaMinWidth(200.px)) {}
             media(mediaMinHeight(300.px)) {}
             media(mediaMaxWidth(500.px)) {}
-            media(madiaMaxHeight(600.px)) {}
+            media(mediaMaxHeight(600.px)) {}
         }
     }
 

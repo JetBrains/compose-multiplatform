@@ -7,6 +7,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import org.jetbrains.compose.ComposeBuildConfig
+import org.jetbrains.compose.desktop.application.internal.currentTarget
 import org.jetbrains.compose.desktop.application.internal.javaExecutable
 import org.jetbrains.compose.desktop.application.internal.notNullProperty
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
@@ -36,6 +37,11 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
         project.providers.gradleProperty("compose.desktop.preview.ide.port")
 
     @get:InputFiles
+    internal val uiTooling = project.configurations.detachedConfiguration(
+        project.dependencies.create("org.jetbrains.compose.ui:ui-tooling-desktop:${ComposeBuildConfig.composeVersion}")
+    ).apply { isTransitive = false }
+
+    @get:InputFiles
     internal val hostClasspath = project.configurations.detachedConfiguration(
         project.dependencies.create("org.jetbrains.compose:preview-rpc:${ComposeBuildConfig.composeVersion}")
     )
@@ -44,9 +50,13 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
     fun run() {
         val hostConfig = PreviewHostConfig(
                 javaExecutable = javaExecutable(javaHome.get()),
-                hostClasspath = hostClasspath.files.pathString()
+                hostClasspath = hostClasspath.files.asSequence().pathString()
             )
-        val previewClasspathString = previewClasspath.files.pathString()
+        val previewClasspathString =
+            (previewClasspath.files.asSequence() +
+                    uiTooling.files.asSequence() +
+                    tryGetSkikoRuntimeFilesIfNeeded().asSequence()
+            ).pathString()
 
         val gradleLogger = logger
         val previewLogger = GradlePreviewLoggerAdapter(gradleLogger)
@@ -65,7 +75,40 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
         }
     }
 
-    private fun Collection<File>.pathString(): String =
+    private fun tryGetSkikoRuntimeFilesIfNeeded(): Collection<File> {
+        try {
+            var hasSkikoJvm = false
+            var hasSkikoJvmRuntime = false
+            var skikoVersion: String? = null
+            for (file in previewClasspath.files) {
+                if (file.name.endsWith(".jar")) {
+                    if (file.name.startsWith("skiko-jvm-runtime-")) {
+                        hasSkikoJvmRuntime = true
+                        continue
+                    } else if (file.name.startsWith("skiko-jvm-")) {
+                        hasSkikoJvm = true
+                        skikoVersion = file.name
+                            .removePrefix("skiko-jvm-")
+                            .removeSuffix(".jar")
+                    }
+                }
+            }
+            if (hasSkikoJvmRuntime) return emptyList()
+
+            if (hasSkikoJvm && skikoVersion != null && skikoVersion.isNotBlank()) {
+                val skikoRuntimeConfig = project.configurations.detachedConfiguration(
+                    project.dependencies.create("org.jetbrains.skiko:skiko-jvm-runtime-${currentTarget.id}:$skikoVersion")
+                ).apply { isTransitive = false }
+                return skikoRuntimeConfig.files
+            }
+        } catch (e: Exception) {
+            // OK
+        }
+
+        return emptyList()
+    }
+
+    private fun Sequence<File>.pathString(): String =
         joinToString(File.pathSeparator) { it.absolutePath }
 
     private class GradlePreviewLoggerAdapter(

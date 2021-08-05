@@ -21,8 +21,9 @@ import example.imageviewer.style.Transparent
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Zoomable(
-    onScale: ScaleHandler,
+    scaleHandler: ScaleHandler,
     modifier: Modifier = Modifier,
+    onUpdate: (() -> Unit)? = null,
     children: @Composable() () -> Unit
 ) {
     val focusRequester = FocusRequester()
@@ -32,9 +33,18 @@ fun Zoomable(
         modifier = modifier.onPreviewKeyEvent {
             if (it.type == KeyEventType.KeyUp) {
                 when (it.key) {
-                    Key.I -> onScale.onScale(1.2f)
-                    Key.O -> onScale.onScale(0.8f)
-                    Key.R -> onScale.resetFactor()
+                    Key.I -> {
+                        scaleHandler.onScale(1.2f)
+                        onUpdate?.invoke()
+                    } 
+                    Key.O -> {
+                        scaleHandler.onScale(0.8f) 
+                        onUpdate?.invoke()
+                    }
+                    Key.R -> {
+                        scaleHandler.reset() 
+                        onUpdate?.invoke()
+                    }
                 }
             }
             false
@@ -42,7 +52,7 @@ fun Zoomable(
         .focusRequester(focusRequester)
         .focusable()
         .pointerInput(Unit) {
-            detectTapGestures(onDoubleTap = { onScale.resetFactor() }) {
+            detectTapGestures(onDoubleTap = { scaleHandler.reset() }) {
                 focusRequester.requestFocus()
             }
         }

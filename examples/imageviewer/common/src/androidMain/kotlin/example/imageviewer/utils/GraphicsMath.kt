@@ -8,6 +8,9 @@ import android.renderscript.Element
 import android.renderscript.RenderScript
 import android.renderscript.ScriptIntrinsicBlur
 import androidx.compose.ui.layout.ContentScale
+import kotlin.math.pow
+import kotlin.math.roundToInt
+import example.imageviewer.view.DragHandler
 
 fun scaleBitmapAspectRatio(
     bitmap: Bitmap,
@@ -115,4 +118,78 @@ fun displayWidth(): Int {
 
 fun displayHeight(): Int {
     return Resources.getSystem().displayMetrics.heightPixels
+}
+
+fun cropBitmapByScale(bitmap: Bitmap, scale: Float, drag: DragHandler): Bitmap {
+    val crop = cropBitmapByBounds(
+        bitmap,
+        getDisplayBounds(bitmap),
+        scale,
+        drag
+    )
+    return Bitmap.createBitmap(
+        bitmap,
+        crop.left,
+        crop.top,
+        crop.right - crop.left,
+        crop.bottom - crop.top
+    )
+}
+
+fun cropBitmapByBounds(
+    bitmap: Bitmap,
+    bounds: Rect,
+    scaleFactor: Float,
+    drag: DragHandler
+): Rect {
+    if (scaleFactor <= 1f)
+        return Rect(0, 0, bitmap.width, bitmap.height)
+
+    var scale = scaleFactor.toDouble().pow(1.4)
+
+    var boundW = (bounds.width() / scale).roundToInt()
+    var boundH = (bounds.height() / scale).roundToInt()
+
+    scale *= displayWidth() / bounds.width().toDouble()
+
+    val offsetX = drag.getAmount().x / scale
+    val offsetY = drag.getAmount().y / scale
+
+    if (boundW > bitmap.width) {
+        boundW = bitmap.width
+    }
+    if (boundH > bitmap.height) {
+        boundH = bitmap.height
+    }
+
+    val invisibleW = bitmap.width - boundW
+    var leftOffset = (invisibleW / 2.0 - offsetX).roundToInt().toFloat()
+
+    if (leftOffset > invisibleW) {
+        leftOffset = invisibleW.toFloat()
+        drag.getAmount().x = -((invisibleW / 2.0) * scale).roundToInt().toFloat()
+    }
+    if (leftOffset < 0) {
+        drag.getAmount().x = ((invisibleW / 2.0) * scale).roundToInt().toFloat()
+        leftOffset = 0f
+    }
+
+    val invisibleH = bitmap.height - boundH
+    var topOffset = (invisibleH / 2 - offsetY).roundToInt().toFloat()
+
+    if (topOffset > invisibleH) {
+        topOffset = invisibleH.toFloat()
+        drag.getAmount().y = -((invisibleH / 2.0) * scale).roundToInt().toFloat()
+    }
+    if (topOffset < 0) {
+        drag.getAmount().y = ((invisibleH / 2.0) * scale).roundToInt().toFloat()
+        topOffset = 0f
+    }
+
+    return Rect(
+        leftOffset.toInt(),
+        topOffset.toInt(),
+        (leftOffset + boundW).toInt(),
+        (topOffset + boundH).toInt()
+    )
 }

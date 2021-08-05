@@ -16,17 +16,14 @@ kotlin {
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material)
-            }
-        }
-        named("desktopMain") {
-            dependencies {
-                implementation(compose.uiTooling)
+                // Needed only for preview.
+                implementation(compose.preview)
             }
         }
         named("androidMain") {
             dependencies {
-                api("androidx.appcompat:appcompat:1.3.0-beta01")
-                api("androidx.core:core-ktx:1.3.1")
+                api("androidx.appcompat:appcompat:1.3.1")
+                api("androidx.core:core-ktx:1.6.0")
             }
         }
     }

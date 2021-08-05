@@ -60,7 +60,7 @@ fun main() = singleWindowApplication {
 }
 ```
 
-![Application running](mouse_click.gif)
+<img alt="Application running" src="mouse_click.gif" height="500" />
 
 ### Mouse move listeners
 
@@ -100,7 +100,7 @@ fun main() = singleWindowApplication {
 }
 ```
 
-![Application running](mouse_move.gif)
+<img alt="Application running" src="mouse_move.gif" height="519" />
 
 ### Mouse enter listeners
 
@@ -152,7 +152,7 @@ fun main() = singleWindowApplication {
     }
 }
 ```
-![Application running](mouse_enter.gif)
+<img alt="Application running" src="mouse_enter.gif" height="500" />
 
 ### Mouse right/middle clicks and keyboard modifiers
 
@@ -195,6 +195,6 @@ fun main() = singleWindowApplication {
     )
 }
 ```
-![Application running](mouse_event.gif)
+<img alt="Application running" src="mouse_event.gif" height="500" />
 
 If you need more information about events there is an available raw AWT mouse event object in `mouseEvent` property of `PointerEvent`

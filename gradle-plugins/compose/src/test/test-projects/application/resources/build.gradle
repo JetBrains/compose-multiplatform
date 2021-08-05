@@ -1,0 +1,31 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+
+plugins {
+    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.compose"
+}
+
+repositories {
+    google()
+    mavenCentral()
+    maven {
+        url "https://maven.pkg.jetbrains.space/public/p/compose/dev"
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation compose.desktop.currentOs
+}
+
+compose.desktop {
+    application {
+        mainClass = "MainKt"
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageVersion = "1.0.0"
+
+            appResourcesRootDir.set(project.layout.projectDirectory.dir("resources"))
+        }
+    }
+}

@@ -25,7 +25,7 @@ The project wizard doesn't support Compose for web projects yet, so we need to p
 - Tick `Kotlin DSL build script`
 - Tick `Kotlin/Multiplatform`
 
-![](create-mpp.png)
+<img alt="" src="create-mpp.png" height="500" />
 
 
 #### 2. Update `settings.gradle.kts`:
@@ -135,8 +135,8 @@ Use the command line to run:
 
 Or run it from the IDE:
 
-![](run_project.png)
+<img alt="" src="run_project.png" height="500" />
 
 The browser will open `localhost:8080`:
 
-![](run_result.png)
+<img alt="" src="run_result.png" height="500" />

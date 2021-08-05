@@ -7,11 +7,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.window.MenuBar
-import androidx.compose.ui.window.Notification
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowPlacement
-import androidx.compose.ui.window.WindowScope
+import androidx.compose.ui.window.*
 import common.LocalAppResources
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -28,7 +24,7 @@ fun NotepadWindow(state: NotepadWindowState) {
     Window(
         state = state.window,
         title = titleOf(state),
-        icon = LocalAppResources.current.icon ?: return,
+        icon = LocalAppResources.current.icon,
         onCloseRequest = { exit() }
     ) {
         LaunchedEffect(Unit) { state.run() }
@@ -98,7 +94,7 @@ private fun WindowNotifications(state: NotepadWindowState) {
 }
 
 @Composable
-private fun WindowScope.WindowMenuBar(state: NotepadWindowState) = MenuBar {
+private fun FrameWindowScope.WindowMenuBar(state: NotepadWindowState) = MenuBar {
     val scope = rememberCoroutineScope()
 
     fun save() = scope.launch { state.save() }
