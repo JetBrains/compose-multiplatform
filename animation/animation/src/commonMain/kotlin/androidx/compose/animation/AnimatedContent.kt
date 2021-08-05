@@ -82,8 +82,8 @@ import androidx.compose.ui.util.fastForEachIndexed
  * [SizeTransform] is set to `null`. Once the [ContentTransform] is finished, the
  * outgoing content will be disposed.
  *
- * By default, the [ContentTransform] will be a delayed [fadeIn] of the target content
- * [with] a [fadeOut] of the initial content, using a [SizeTransform] to
+ * By default, the [ContentTransform] will be a delayed [fadeIn] of the target content and a delayed
+ * [scaleIn] [with] a [fadeOut] of the initial content, using a [SizeTransform] to
  * animate any size change of the content. This behavior can be customized using [transitionSpec].
  * If desired, different [ContentTransform]s can be defined for different pairs of initial content
  * and target content.
@@ -118,7 +118,9 @@ fun <S> AnimatedContent(
     targetState: S,
     modifier: Modifier = Modifier,
     transitionSpec: AnimatedContentScope<S>.() -> ContentTransform = {
-        fadeIn(animationSpec = tween(220, delayMillis = 90)) with fadeOut(animationSpec = tween(90))
+        fadeIn(animationSpec = tween(220, delayMillis = 90)) +
+            scaleIn(initialScale = 0.92f, animationSpec = tween(220, delayMillis = 90)) with
+            fadeOut(animationSpec = tween(90))
     },
     contentAlignment: Alignment = Alignment.TopStart,
     content: @Composable() AnimatedVisibilityScope.(targetState: S) -> Unit
@@ -557,8 +559,8 @@ class AnimatedContentScope<S> internal constructor(
  * [SizeTransform] is set to `null`. Once the [ContentTransform] is finished, the
  * outgoing content will be disposed.
  *
- * By default, the [ContentTransform] will be a delayed [fadeIn] of the target content
- * [with] a [fadeOut] of the initial content, using a [SizeTransform] to
+ * By default, the [ContentTransform] will be a delayed [fadeIn] of the target content and a delayed
+ * [scaleIn] [with] a [fadeOut] of the initial content, using a [SizeTransform] to
  * animate any size change of the content. This behavior can be customized using [transitionSpec].
  * If desired, different [ContentTransform]s can be defined for different pairs of initial content
  * and target content.
@@ -587,7 +589,9 @@ class AnimatedContentScope<S> internal constructor(
 fun <S> Transition<S>.AnimatedContent(
     modifier: Modifier = Modifier,
     transitionSpec: AnimatedContentScope<S>.() -> ContentTransform = {
-        fadeIn(animationSpec = tween(220, delayMillis = 90)) with fadeOut(animationSpec = tween(90))
+        fadeIn(animationSpec = tween(220, delayMillis = 90)) +
+            scaleIn(initialScale = 0.92f, animationSpec = tween(220, delayMillis = 90)) with
+            fadeOut(animationSpec = tween(90))
     },
     contentAlignment: Alignment = Alignment.TopStart,
     content: @Composable() AnimatedVisibilityScope.(targetState: S) -> Unit

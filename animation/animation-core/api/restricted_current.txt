@@ -415,6 +415,7 @@ package androidx.compose.animation.core {
     field public static final float StiffnessHigh = 10000.0f;
     field public static final float StiffnessLow = 200.0f;
     field public static final float StiffnessMedium = 1500.0f;
+    field public static final float StiffnessMediumLow = 400.0f;
     field public static final float StiffnessVeryLow = 50.0f;
   }
 

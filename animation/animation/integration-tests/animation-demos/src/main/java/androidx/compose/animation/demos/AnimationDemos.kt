@@ -44,6 +44,7 @@ val AnimationDemos = DemoCategory(
                 ComposableDemo("Cross Fade") { CrossfadeDemo() },
                 ComposableDemo("Modifier.animateEnterExit Demo") { AnimateEnterExitDemo() },
                 ComposableDemo("Nested Menu") { NestedMenuDemo() },
+                ComposableDemo("Scaled Enter/Exit") { ScaleEnterExitDemo() },
                 ComposableDemo("Shrine Cart") { ShrineCartDemo() },
                 ComposableDemo("Screen Transition") { ScreenTransitionDemo() },
             )

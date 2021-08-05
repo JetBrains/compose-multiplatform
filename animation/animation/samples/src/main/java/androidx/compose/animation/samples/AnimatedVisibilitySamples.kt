@@ -38,6 +38,8 @@ import androidx.compose.animation.expandIn
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.shrinkOut
 import androidx.compose.animation.shrinkVertically
@@ -87,8 +89,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -181,8 +183,11 @@ fun FullyLoadedTransition() {
             initialOffsetY = { -40 }
         ) + expandVertically(
             expandFrom = Alignment.Top
+        ) + scaleIn(
+            // Animate scale from 0f to 1f using the top center as the pivot point.
+            transformOrigin = TransformOrigin(0.5f, 0f)
         ) + fadeIn(initialAlpha = 0.3f),
-        exit = slideOutVertically() + shrinkVertically() + fadeOut()
+        exit = slideOutVertically() + shrinkVertically() + fadeOut() + scaleOut(targetScale = 1.2f)
     ) {
         // Content that needs to appear/disappear goes here:
         Text("Content to appear/disappear", Modifier.fillMaxWidth().requiredHeight(200.dp))
@@ -198,37 +203,24 @@ fun AnimatedVisibilityWithBooleanVisibleParamNoReceiver() {
         AnimatedVisibility(
             visible = visible,
             modifier = Modifier.align(Alignment.Center),
-            enter = slideInVertically(
-                // Start the slide from 40 (pixels) above where the content is supposed to go, to
-                // produce a parallax effect
-                initialOffsetY = { -40 }
-            ) + expandVertically(
-                expandFrom = Alignment.Top
-            ) + fadeIn(initialAlpha = 0.3f),
-            exit = shrinkVertically() + fadeOut(animationSpec = tween(200))
+            enter = fadeIn(),
+            exit = fadeOut(animationSpec = tween(200)) + scaleOut()
         ) { // Content that needs to appear/disappear goes here:
             // Here we can optionally define a custom enter/exit animation by creating an animation
             // using the Transition<EnterExitState> object from AnimatedVisibilityScope:
-            val scale by transition.animateFloat {
+
+            // As a part of the enter transition, the corner radius will be animated from 0.dp to 50.dp.
+            val cornerRadius by transition.animateDp {
                 when (it) {
-                    // Scale will be animating from 0.8f to 1.0f during enter transition.
-                    EnterExitState.PreEnter -> 0.8f
-                    EnterExitState.Visible -> 1f
-                    // Scale will be animating from 1.0f to 1.2f during exit animation. If the
-                    // targetValue specified for PreEnter is the same as PostExit, the enter and
-                    // exit animation for this property will be symmetric.
-                    EnterExitState.PostExit -> 1.2f
+                    EnterExitState.PreEnter -> 0.dp
+                    EnterExitState.Visible -> 50.dp
+                    // No corner radius change when exiting.
+                    EnterExitState.PostExit -> 50.dp
                 }
             }
-            Text(
-                "Content to appear/disappear",
-                Modifier.fillMaxWidth().requiredHeight(100.dp).background(Color(0xffa1feff))
-                    .graphicsLayer {
-                        // Apply our custom enter/exit transition
-                        scaleX = scale
-                        scaleY = scale
-                    }.padding(top = 20.dp),
-                textAlign = TextAlign.Center
+            Box(
+                Modifier.background(Color.Red, shape = RoundedCornerShape(cornerRadius))
+                    .height(100.dp).fillMaxWidth()
             )
         }
     }
@@ -698,6 +690,52 @@ fun AnimateEnterExitPartialContent() {
                     // Content of the notification goes here
                 }
             }
+        }
+    }
+}
+
+@Sampled
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun ScaledEnterExit() {
+    Column {
+        var showRed by remember { mutableStateOf(true) }
+        var showGreen by remember { mutableStateOf(true) }
+
+        AnimatedVisibility(
+            visible = showGreen,
+            // By Default, `scaleIn` uses the center as its pivot point. When used with a vertical
+            // expansion from the vertical center, the content will be growing from the center of
+            // the vertically expanding layout.
+            enter = scaleIn() + expandVertically(expandFrom = Alignment.CenterVertically),
+            // By Default, `scaleOut` uses the center as its pivot point. When used with an
+            // ExitTransition that shrinks towards the center, the content will be shrinking both
+            // in terms of scale and layout size towards the center.
+            exit = scaleOut() + shrinkVertically(shrinkTowards = Alignment.CenterVertically)
+        ) {
+            Box(
+                Modifier.size(100.dp)
+                    .background(color = Color.Green, shape = RoundedCornerShape(20.dp))
+            )
+        }
+
+        AnimatedVisibility(
+            visible = showRed,
+            // Scale up from the TopLeft by setting TransformOrigin to (0f, 0f), while expanding the
+            // layout size from Top start and fading. This will create a coherent look as if the
+            // scale is impacting the size.
+            enter = scaleIn(transformOrigin = TransformOrigin(0f, 0f)) +
+                fadeIn() + expandIn(expandFrom = Alignment.TopStart),
+            // Scale down from the TopLeft by setting TransformOrigin to (0f, 0f), while shrinking
+            // the layout towards Top start and fading. This will create a coherent look as if the
+            // scale is impacting the layout size.
+            exit = scaleOut(transformOrigin = TransformOrigin(0f, 0f)) +
+                fadeOut() + shrinkOut(shrinkTowards = Alignment.TopStart)
+        ) {
+            Box(
+                Modifier.size(100.dp)
+                    .background(color = Color.Red, shape = RoundedCornerShape(20.dp))
+            )
         }
     }
 }

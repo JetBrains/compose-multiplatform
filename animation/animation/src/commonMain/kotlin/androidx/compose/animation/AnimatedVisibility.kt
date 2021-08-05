@@ -46,11 +46,11 @@ import kotlinx.coroutines.flow.collect
 /**
  * [AnimatedVisibility] composable animates the appearance and disappearance of its content, as
  * [visible] value changes. Different [EnterTransition]s and [ExitTransition]s can be defined in
- * [enter] and [exit] for the appearance and disappearance animation. There are 3 types of
- * [EnterTransition] and [ExitTransition]: Fade, Expand/Shrink, and Slide. The enter transitions
- * and exit transitions can be combined using `+`. The order of the combination does not matter,
- * as the transition animations will start simultaneously. See [EnterTransition] and
- * [ExitTransition] for details on the three types of transition.
+ * [enter] and [exit] for the appearance and disappearance animation. There are 4 types of
+ * [EnterTransition] and [ExitTransition]: Fade, Expand/Shrink, Scale and Slide. The enter
+ * transitions can be combined using `+`. Same for exit transitions. The order of the combination
+ * does not matter, as the transition animations will start simultaneously. See [EnterTransition]
+ * and [ExitTransition] for details on the three types of transition.
  *
  * Aside from these three types of [EnterTransition] and [ExitTransition], [AnimatedVisibility]
  * also supports custom enter/exit animations. Some use cases may benefit from custom enter/exit
@@ -126,11 +126,11 @@ fun AnimatedVisibility(
  * specific to the [Row] layout. See more details below.
  *
  * Different [EnterTransition]s and [ExitTransition]s can be defined in
- * [enter] and [exit] for the appearance and disappearance animation. There are 3 types of
- * [EnterTransition] and [ExitTransition]: Fade, Expand/Shrink and Slide. The enter transitions
- * and exit transitions can be combined using `+`. The order of the combination does not matter,
- * as the transition animations will start simultaneously. See [EnterTransition] and
- * [ExitTransition] for details on the three types of transition.
+ * [enter] and [exit] for the appearance and disappearance animation. There are 4 types of
+ * [EnterTransition] and [ExitTransition]: Fade, Expand/Shrink, Scale, and Slide. The enter
+ * transitions can be combined using `+`. Same for exit transitions. The order of the combination
+ * does not matter, as the transition animations will start simultaneously. See [EnterTransition]
+ * and [ExitTransition] for details on the three types of transition.
  *
  * The default [enter] and [exit] transition is configured based on the horizontal layout of a
  * [Row]. [enter] defaults to a combination of fading in and expanding the content horizontally.
@@ -201,11 +201,11 @@ fun RowScope.AnimatedVisibility(
  * specific to the [Column] layout. See more details below.
  *
  * Different [EnterTransition]s and [ExitTransition]s can be defined in
- * [enter] and [exit] for the appearance and disappearance animation. There are 3 types of
- * [EnterTransition] and [ExitTransition]: Fade, Expand/Shrink and Slide. The enter transitions
- * and exit transitions can be combined using `+`. The order of the combination does not matter,
- * as the transition animations will start simultaneously. See [EnterTransition] and
- * [ExitTransition] for details on the three types of transition.
+ * [enter] and [exit] for the appearance and disappearance animation. There are 4 types of
+ * [EnterTransition] and [ExitTransition]: Fade, Expand/Shrink, Scale and Slide. The enter
+ * transitions can be combined using `+`. Same for exit transitions. The order of the combination
+ * does not matter, as the transition animations will start simultaneously. See [EnterTransition]
+ * and [ExitTransition] for details on the three types of transition.
  *
  * The default [enter] and [exit] transition is configured based on the vertical layout of a
  * [Column]. [enter] defaults to a combination of fading in and expanding the content vertically.
@@ -307,11 +307,11 @@ enum class EnterExitState {
  * and `visibleState.currentState` returns the initial state of the current animations.
  *
  * Different [EnterTransition]s and [ExitTransition]s can be defined in
- * [enter] and [exit] for the appearance and disappearance animation. There are 3 types of
- * [EnterTransition] and [ExitTransition]: Fade, Expand/Shrink and Slide. The enter transitions
- * and exit transitions can be combined using `+`. The order of the combination does not matter,
- * as the transition animations will start simultaneously. See [EnterTransition] and
- * [ExitTransition] for details on the three types of transition.
+ * [enter] and [exit] for the appearance and disappearance animation. There are 4 types of
+ * [EnterTransition] and [ExitTransition]: Fade, Expand/Shrink, Scale and Slide. The enter
+ * transitions can be combined using `+`. Same for exit transitions. The order of the combination
+ * does not matter, as the transition animations will start simultaneously. See [EnterTransition]
+ * and [ExitTransition] for details on the three types of transition.
  *
  * Aside from these three types of [EnterTransition] and [ExitTransition], [AnimatedVisibility]
  * also supports custom enter/exit animations. Some use cases may benefit from custom enter/exit
@@ -384,11 +384,11 @@ fun AnimatedVisibility(
  * animations.
  *
  * Different [EnterTransition]s and [ExitTransition]s can be defined in
- * [enter] and [exit] for the appearance and disappearance animation. There are 3 types of
- * [EnterTransition] and [ExitTransition]: Fade, Expand/Shrink and Slide. The enter transitions
- * and exit transitions can be combined using `+`. The order of the combination does not matter,
- * as the transition animations will start simultaneously. See [EnterTransition] and
- * [ExitTransition] for details on the three types of transition.
+ * [enter] and [exit] for the appearance and disappearance animation. There are 4 types of
+ * [EnterTransition] and [ExitTransition]: Fade, Expand/Shrink, Scale and Slide. The enter
+ * transitions can be combined using `+`. Same for exit transitions. The order of the combination
+ * does not matter, as the transition animations will start simultaneously. See [EnterTransition]
+ * and [ExitTransition] for details on the three types of transition.
  *
  * The default [enter] and [exit] transition is configured based on the horizontal layout of a
  * [Row]. [enter] defaults to a combination of fading in and expanding the content horizontally.
@@ -459,11 +459,11 @@ fun RowScope.AnimatedVisibility(
  * animations.
  *
  * Different [EnterTransition]s and [ExitTransition]s can be defined in
- * [enter] and [exit] for the appearance and disappearance animation. There are 3 types of
- * [EnterTransition] and [ExitTransition]: Fade, Expand/Shrink and Slide. The enter transitions
- * and exit transitions can be combined using `+`. The order of the combination does not matter,
- * as the transition animations will start simultaneously. See [EnterTransition] and
- * [ExitTransition] for details on the three types of transition.
+ * [enter] and [exit] for the appearance and disappearance animation. There are 4 types of
+ * [EnterTransition] and [ExitTransition]: Fade, Expand/Shrink, Scale and Slide. The enter
+ * transitions can be combined using `+`. Same for exit transitions. The order of the combination
+ * does not matter, as the transition animations will start simultaneously. See [EnterTransition]
+ * and [ExitTransition] for details on the three types of transition.
  *
  * The default [enter] and [exit] transition is configured based on the vertical layout of a
  * [Column]. [enter] defaults to a combination of fading in and expanding the content vertically.
@@ -536,11 +536,11 @@ fun ColumnScope.AnimatedVisibility(
  * = [Transition.targetState]), and subsequently removes the content in the exit case.
  *
  * Different [EnterTransition]s and [ExitTransition]s can be defined in
- * [enter] and [exit] for the appearance and disappearance animation. There are 3 types of
- * [EnterTransition] and [ExitTransition]: Fade, Expand/Shrink and Slide. The enter transitions
- * and exit transitions can be combined using `+`. The order of the combination does not matter,
- * as the transition animations will start simultaneously. See [EnterTransition] and
- * [ExitTransition] for details on the three types of transition.
+ * [enter] and [exit] for the appearance and disappearance animation. There are 4 types of
+ * [EnterTransition] and [ExitTransition]: Fade, Expand/Shrink, Scale and Slide. The enter
+ * transitions can be combined using `+`. Same for exit transitions. The order of the combination
+ * does not matter, as the transition animations will start simultaneously. See [EnterTransition]
+ * and [ExitTransition] for details on the three types of transition.
  *
  * Aside from these three types of [EnterTransition] and [ExitTransition], [AnimatedVisibility]
  * also supports custom enter/exit animations. Some use cases may benefit from custom enter/exit
@@ -626,11 +626,11 @@ interface AnimatedVisibilityScope {
      * [AnimatedVisibility]'s animation and their own enter/exit animations.
      *
      * [enter] and [exit] defines different [EnterTransition]s and [ExitTransition]s that will be
-     * used for the appearance and disappearance animation. There are 3 types of
-     * [EnterTransition] and [ExitTransition]: Fade, Expand/Shrink, and Slide. The enter transitions
-     * and exit transitions can be combined using `+`. The order of the combination does not matter,
-     * as the transition animations will start simultaneously. See [EnterTransition] and
-     * [ExitTransition] for details on the three types of transition.
+     * used for the appearance and disappearance animation. There are 4 types of
+     * [EnterTransition] and [ExitTransition]: Fade, Expand/Shrink, Scale and Slide. The enter
+     * transitions can be combined using `+`. Same for exit transitions. The order of the combination
+     * does not matter, as the transition animations will start simultaneously. See [EnterTransition]
+     * and [ExitTransition] for details on the three types of transition.
      *
      * By default, the enter transition will be a combination of [fadeIn] and [expandIn] of the
      * content from the bottom end. And the exit transition will be shrinking the content towards

@@ -21,10 +21,13 @@ package androidx.compose.animation
 import androidx.compose.animation.core.AnimationVector2D
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.InternalAnimationApi
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.Transition
+import androidx.compose.animation.core.TwoWayConverter
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateValue
 import androidx.compose.animation.core.createDeferredAnimation
 import androidx.compose.animation.core.spring
 import androidx.compose.runtime.Composable
@@ -41,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
@@ -57,19 +61,21 @@ annotation class ExperimentalAnimationApi
 
 /**
  * [EnterTransition] defines how an [AnimatedVisibility] Composable appears on screen as it
- * becomes visible. The 3 categories of EnterTransitions available are:
- * 1. fade [fadeIn])
- * 2. slide: [slideIn], [slideInHorizontally], [slideInVertically]
- * 3. expand: [expandIn], [expandHorizontally], [expandVertically]
+ * becomes visible. The 4 categories of EnterTransitions available are:
+ * 1. fade: [fadeIn]
+ * 2. scale: [scaleIn]
+ * 3. slide: [slideIn], [slideInHorizontally], [slideInVertically]
+ * 4. expand: [expandIn], [expandHorizontally], [expandVertically]
  * They can be combined using plus operator,  for example:
  *
  * @sample androidx.compose.animation.samples.SlideTransition
  *
- * __Note__: [fadeIn] and [slideIn] do not affect the size of the [AnimatedVisibility]
+ * __Note__: [fadeIn], [scaleIn] and [slideIn] do not affect the size of the [AnimatedVisibility]
  * composable. In contrast, [expandIn] will grow the clip bounds to reveal the whole content. This
  * will automatically animate other layouts out of the way, very much like [animateContentSize].
  *
  * @see fadeIn
+ * @see scaleIn
  * @see slideIn
  * @see slideInHorizontally
  * @see slideInVertically
@@ -85,7 +91,9 @@ sealed class EnterTransition {
 
     /**
      * Combines different enter transitions. The order of the [EnterTransition]s being combined
-     * does not matter, as these [EnterTransition]s will start simultaneously.
+     * does not matter, as these [EnterTransition]s will start simultaneously. The order of
+     * applying transforms from these enter transitions (if defined) is: alpha and scale first,
+     * shrink or expand, then slide.
      *
      * @sample androidx.compose.animation.samples.FullyLoadedTransition
      *
@@ -97,7 +105,8 @@ sealed class EnterTransition {
             TransitionData(
                 fade = data.fade ?: enter.data.fade,
                 slide = data.slide ?: enter.data.slide,
-                changeSize = data.changeSize ?: enter.data.changeSize
+                changeSize = data.changeSize ?: enter.data.changeSize,
+                scale = data.scale ?: enter.data.scale
             )
         )
     }
@@ -123,10 +132,11 @@ sealed class EnterTransition {
 
 /**
  * [ExitTransition] defines how an [AnimatedVisibility] Composable disappears on screen as it
- * becomes not visible. The 3 categories of [ExitTransition] available are:
+ * becomes not visible. The 4 categories of [ExitTransition] available are:
  * 1. fade: [fadeOut]
- * 2. slide: [slideOut], [slideOutHorizontally], [slideOutVertically]
- * 3. shrink: [shrinkOut], [shrinkHorizontally], [shrinkVertically]
+ * 2. scale: [scaleOut]
+ * 3. slide: [slideOut], [slideOutHorizontally], [slideOutVertically]
+ * 4. shrink: [shrinkOut], [shrinkHorizontally], [shrinkVertically]
  *
  * They can be combined using plus operator, for example:
  *
@@ -138,6 +148,7 @@ sealed class EnterTransition {
  * layouts to fill in the space, very much like [animateContentSize].
  *
  * @see fadeOut
+ * @see scaleOut
  * @see slideOut
  * @see slideOutHorizontally
  * @see slideOutVertically
@@ -153,7 +164,9 @@ sealed class ExitTransition {
 
     /**
      * Combines different exit transitions. The order of the [ExitTransition]s being combined
-     * does not matter, as these [ExitTransition]s will start simultaneously.
+     * does not matter, as these [ExitTransition]s will start simultaneously. The order of
+     * applying transforms from these exit transitions (if defined) is: alpha and scale first,
+     * shrink or expand, then slide.
      *
      * @sample androidx.compose.animation.samples.FullyLoadedTransition
      *
@@ -165,7 +178,8 @@ sealed class ExitTransition {
             TransitionData(
                 fade = data.fade ?: exit.data.fade,
                 slide = data.slide ?: exit.data.slide,
-                changeSize = data.changeSize ?: exit.data.changeSize
+                changeSize = data.changeSize ?: exit.data.changeSize,
+                scale = data.scale ?: exit.data.scale
             )
         )
     }
@@ -206,15 +220,16 @@ sealed class ExitTransition {
 @ExperimentalAnimationApi
 fun fadeIn(
     initialAlpha: Float = 0f,
-    animationSpec: FiniteAnimationSpec<Float> = spring()
+    animationSpec: FiniteAnimationSpec<Float> = spring(stiffness = Spring.StiffnessMediumLow)
 ): EnterTransition {
     return EnterTransitionImpl(TransitionData(fade = Fade(initialAlpha, animationSpec)))
 }
 
 /**
  * This fades out the content of the transition, from full opacity to the specified target alpha
- * (i.e. [targetAlpha]), using the supplied [animationSpec]. By default, the content will be faded out to
- * fully transparent (i.e. [targetAlpha] defaults to 0), and [animationSpec] uses [spring] by default.
+ * (i.e. [targetAlpha]), using the supplied [animationSpec]. By default, the content will be faded
+ * out to fully transparent (i.e. [targetAlpha] defaults to 0), and [animationSpec] uses
+ * [spring] by default.
  *
  * @sample androidx.compose.animation.samples.FadeTransition
  *
@@ -225,7 +240,7 @@ fun fadeIn(
 @ExperimentalAnimationApi
 fun fadeOut(
     targetAlpha: Float = 0f,
-    animationSpec: FiniteAnimationSpec<Float> = spring()
+    animationSpec: FiniteAnimationSpec<Float> = spring(stiffness = Spring.StiffnessMediumLow)
 ): ExitTransition {
     return ExitTransitionImpl(TransitionData(fade = Fade(targetAlpha, animationSpec)))
 }
@@ -254,7 +269,10 @@ fun fadeOut(
 fun slideIn(
     initialOffset: (fullSize: IntSize) -> IntOffset,
     animationSpec: FiniteAnimationSpec<IntOffset> =
-        spring(visibilityThreshold = IntOffset.VisibilityThreshold)
+        spring(
+            stiffness = Spring.StiffnessMediumLow,
+            visibilityThreshold = IntOffset.VisibilityThreshold
+        )
 ): EnterTransition {
     return EnterTransitionImpl(TransitionData(slide = Slide(initialOffset, animationSpec)))
 }
@@ -283,9 +301,72 @@ fun slideIn(
 fun slideOut(
     targetOffset: (fullSize: IntSize) -> IntOffset,
     animationSpec: FiniteAnimationSpec<IntOffset> =
-        spring(visibilityThreshold = IntOffset.VisibilityThreshold)
+        spring(
+            stiffness = Spring.StiffnessMediumLow,
+            visibilityThreshold = IntOffset.VisibilityThreshold
+        )
 ): ExitTransition {
     return ExitTransitionImpl(TransitionData(slide = Slide(targetOffset, animationSpec)))
+}
+
+/**
+ * This scales the content as it appears, from an initial scale (defined in [initialScale]) to 1f.
+ * [transformOrigin] defines the pivot point in terms of fraction of the overall size.
+ * [TransformOrigin.Center] by default. [scaleIn] can be used in combination with any other type
+ * of [EnterTransition] using the plus operator (e.g. `scaleIn() + slideInHorizontally()`)
+ *
+ * Note: Scale is applied __before__ slide. This means when using [slideIn]/[slideOut] with
+ * [scaleIn]/[scaleOut], the amount of scaling needs to be taken into account when sliding.
+ *
+ * The scaling will change the visual of the content, but will __not__ affect the layout size.
+ * [scaleIn] can be combined with [expandIn]/[expandHorizontally]/[expandVertically] to coordinate
+ * layout size change while scaling. For example:
+ * @sample androidx.compose.animation.samples.ScaledEnterExit
+ *
+ * @param transformOrigin the pivot point in terms of fraction of the overall size. By default it's
+ *                        [TransformOrigin.Center].
+ * @param animationSpec the animation used for the slide-out, [spring] by default.
+ */
+@Stable
+@ExperimentalAnimationApi
+fun scaleIn(
+    initialScale: Float = 0f,
+    transformOrigin: TransformOrigin = TransformOrigin.Center,
+    animationSpec: FiniteAnimationSpec<Float> = spring(stiffness = Spring.StiffnessMediumLow)
+): EnterTransition {
+    return EnterTransitionImpl(
+        TransitionData(scale = Scale(initialScale, transformOrigin, animationSpec))
+    )
+}
+
+/**
+ * This scales the content of the exit transition, from 1f to the target scale defined in
+ * [targetScale]. [transformOrigin] defines the pivot point in terms of fraction of the overall
+ * size. By default it's [TransformOrigin.Center]. [scaleOut] can be used in combination with any
+ * other type of [ExitTransition] using the plus operator (e.g. `scaleOut() + fadeOut()`)
+ *
+ * Note: Scale is applied __before__ slide. This means when using [slideIn]/[slideOut] with
+ * [scaleIn]/[scaleOut], the amount of scaling needs to be taken into account when sliding.
+ *
+ * The scaling will change the visual of the content, but will __not__ affect the layout size.
+ * [scaleOut] can be combined with [shrinkOut]/[shrinkHorizontally]/[shrinkVertically] for
+ * coordinated layout size change animation. For example:
+ * @sample androidx.compose.animation.samples.ScaledEnterExit
+ *
+ * @param transformOrigin the pivot point in terms of fraction of the overall size. By default it's
+ *                        [TransformOrigin.Center].
+ * @param animationSpec the animation used for the slide-out, [spring] by default.
+ */
+@Stable
+@ExperimentalAnimationApi
+fun scaleOut(
+    targetScale: Float = 0f,
+    transformOrigin: TransformOrigin = TransformOrigin.Center,
+    animationSpec: FiniteAnimationSpec<Float> = spring(stiffness = Spring.StiffnessMediumLow)
+): ExitTransition {
+    return ExitTransitionImpl(
+        TransitionData(scale = Scale(targetScale, transformOrigin, animationSpec))
+    )
 }
 
 /**
@@ -320,7 +401,10 @@ fun expandIn(
     expandFrom: Alignment = Alignment.BottomEnd,
     initialSize: (fullSize: IntSize) -> IntSize = { IntSize(0, 0) },
     animationSpec: FiniteAnimationSpec<IntSize> =
-        spring(visibilityThreshold = IntSize.VisibilityThreshold),
+        spring(
+            stiffness = Spring.StiffnessMediumLow,
+            visibilityThreshold = IntSize.VisibilityThreshold
+        ),
     clip: Boolean = true
 ): EnterTransition {
     return EnterTransitionImpl(
@@ -361,7 +445,10 @@ fun shrinkOut(
     shrinkTowards: Alignment = Alignment.BottomEnd,
     targetSize: (fullSize: IntSize) -> IntSize = { IntSize(0, 0) },
     animationSpec: FiniteAnimationSpec<IntSize> =
-        spring(visibilityThreshold = IntSize.VisibilityThreshold),
+        spring(
+            stiffness = Spring.StiffnessMediumLow,
+            visibilityThreshold = IntSize.VisibilityThreshold
+        ),
     clip: Boolean = true
 ): ExitTransition {
     return ExitTransitionImpl(
@@ -400,7 +487,10 @@ fun expandHorizontally(
     expandFrom: Alignment.Horizontal = Alignment.End,
     initialWidth: (fullWidth: Int) -> Int = { 0 },
     animationSpec: FiniteAnimationSpec<IntSize> =
-        spring(visibilityThreshold = IntSize.VisibilityThreshold),
+        spring(
+            stiffness = Spring.StiffnessMediumLow,
+            visibilityThreshold = IntSize.VisibilityThreshold
+        ),
     clip: Boolean = true
 ): EnterTransition {
     // TODO: Support different animation types
@@ -421,9 +511,9 @@ fun expandHorizontally(
  * __Note__: [expandVertically] animates the bounds of the content. This bounds change will also
  * result in the animation of other layouts that are dependent on this size.
  *
- * [initialHeight] is a lambda that takes the full height of the content and returns an initial height
- * of the bounds of the content. This allows not only an absolute height, but also an initial height
- * that is proportional to the content height.
+ * [initialHeight] is a lambda that takes the full height of the content and returns an initial
+ * height of the bounds of the content. This allows not only an absolute height, but also an initial
+ * height that is proportional to the content height.
  *
  * [clip] defines whether the content outside of the animated bounds should be clipped. By
  * default, clip is set to true, which only shows content in the animated bounds.
@@ -441,7 +531,10 @@ fun expandVertically(
     expandFrom: Alignment.Vertical = Alignment.Bottom,
     initialHeight: (fullHeight: Int) -> Int = { 0 },
     animationSpec: FiniteAnimationSpec<IntSize> =
-        spring(visibilityThreshold = IntSize.VisibilityThreshold),
+        spring(
+            stiffness = Spring.StiffnessMediumLow,
+            visibilityThreshold = IntSize.VisibilityThreshold
+        ),
     clip: Boolean = true
 ): EnterTransition {
     return expandIn(
@@ -454,8 +547,8 @@ fun expandVertically(
 
 /**
  * This shrinks the clip bounds of the disappearing content horizontally, from the full width to
- * the width returned from [targetWidth]. [shrinkTowards] controls the direction of the bounds shrink
- * animation. By default, the clip bounds animates from full width to 0, shrinking towards the
+ * the width returned from [targetWidth]. [shrinkTowards] controls the direction of the bounds
+ * shrink animation. By default, the clip bounds animates from full width to 0, shrinking towards
  * the end of the content.
  *
  * __Note__: [shrinkHorizontally] animates the bounds of the content. This bounds change will also
@@ -481,7 +574,10 @@ fun shrinkHorizontally(
     shrinkTowards: Alignment.Horizontal = Alignment.End,
     targetWidth: (fullWidth: Int) -> Int = { 0 },
     animationSpec: FiniteAnimationSpec<IntSize> =
-        spring(visibilityThreshold = IntSize.VisibilityThreshold),
+        spring(
+            stiffness = Spring.StiffnessMediumLow,
+            visibilityThreshold = IntSize.VisibilityThreshold
+        ),
     clip: Boolean = true
 ): ExitTransition {
     // TODO: Support different animation types
@@ -495,16 +591,16 @@ fun shrinkHorizontally(
 
 /**
  * This shrinks the clip bounds of the disappearing content vertically, from the full height to
- * the height returned from [targetHeight]. [shrinkTowards] controls the direction of the bounds shrink
- * animation. By default, the clip bounds animates from full height to 0, shrinking towards the
+ * the height returned from [targetHeight]. [shrinkTowards] controls the direction of the bounds
+ * shrink animation. By default, the clip bounds animates from full height to 0, shrinking towards
  * the bottom of the content.
  *
  * __Note__: [shrinkVertically] animates the bounds of the content. This bounds change will also
  * result in the animation of other layouts that are dependent on this size.
  *
- * [targetHeight] is a lambda that takes the full height of the content and returns a target height of
- * the content. This allows not only absolute height, but also a target height that is proportional
- * to the content height.
+ * [targetHeight] is a lambda that takes the full height of the content and returns a target height
+ * of the content. This allows not only absolute height, but also a target height that is
+ * proportional to the content height.
  *
  * [clip] defines whether the content outside of the animated bounds should be clipped. By
  * default, clip is set to true, which only shows content in the animated bounds.
@@ -522,7 +618,10 @@ fun shrinkVertically(
     shrinkTowards: Alignment.Vertical = Alignment.Bottom,
     targetHeight: (fullHeight: Int) -> Int = { 0 },
     animationSpec: FiniteAnimationSpec<IntSize> =
-        spring(visibilityThreshold = IntSize.VisibilityThreshold),
+        spring(
+            stiffness = Spring.StiffnessMediumLow,
+            visibilityThreshold = IntSize.VisibilityThreshold
+        ),
     clip: Boolean = true
 ): ExitTransition {
     // TODO: Support different animation types
@@ -556,7 +655,10 @@ fun shrinkVertically(
 fun slideInHorizontally(
     initialOffsetX: (fullWidth: Int) -> Int = { -it / 2 },
     animationSpec: FiniteAnimationSpec<IntOffset> =
-        spring(visibilityThreshold = IntOffset.VisibilityThreshold),
+        spring(
+            stiffness = Spring.StiffnessMediumLow,
+            visibilityThreshold = IntOffset.VisibilityThreshold
+        ),
 ): EnterTransition =
     slideIn(
         initialOffset = { IntOffset(initialOffsetX(it.width), 0) },
@@ -585,7 +687,10 @@ fun slideInHorizontally(
 fun slideInVertically(
     initialOffsetY: (fullHeight: Int) -> Int = { -it / 2 },
     animationSpec: FiniteAnimationSpec<IntOffset> =
-        spring(visibilityThreshold = IntOffset.VisibilityThreshold),
+        spring(
+            stiffness = Spring.StiffnessMediumLow,
+            visibilityThreshold = IntOffset.VisibilityThreshold
+        ),
 ): EnterTransition =
     slideIn(
         initialOffset = { IntOffset(0, initialOffsetY(it.height)) },
@@ -614,7 +719,10 @@ fun slideInVertically(
 fun slideOutHorizontally(
     targetOffsetX: (fullWidth: Int) -> Int = { -it / 2 },
     animationSpec: FiniteAnimationSpec<IntOffset> =
-        spring(visibilityThreshold = IntOffset.VisibilityThreshold),
+        spring(
+            stiffness = Spring.StiffnessMediumLow,
+            visibilityThreshold = IntOffset.VisibilityThreshold
+        ),
 ): ExitTransition =
     slideOut(
         targetOffset = { IntOffset(targetOffsetX(it.width), 0) },
@@ -641,7 +749,10 @@ fun slideOutHorizontally(
 fun slideOutVertically(
     targetOffsetY: (fullHeight: Int) -> Int = { -it / 2 },
     animationSpec: FiniteAnimationSpec<IntOffset> =
-        spring(visibilityThreshold = IntOffset.VisibilityThreshold),
+        spring(
+            stiffness = Spring.StiffnessMediumLow,
+            visibilityThreshold = IntOffset.VisibilityThreshold
+        ),
 ): ExitTransition =
     slideOut(
         targetOffset = { IntOffset(0, targetOffsetY(it.height)) },
@@ -662,9 +773,15 @@ internal data class Slide(
 internal data class ChangeSize(
     val alignment: Alignment,
     val size: (fullSize: IntSize) -> IntSize = { IntSize(0, 0) },
-    val animationSpec: FiniteAnimationSpec<IntSize> =
-        spring(visibilityThreshold = IntSize.VisibilityThreshold),
+    val animationSpec: FiniteAnimationSpec<IntSize>,
     val clip: Boolean = true
+)
+
+@Immutable
+internal data class Scale(
+    val scale: Float,
+    val transformOrigin: TransformOrigin,
+    val animationSpec: FiniteAnimationSpec<Float>
 )
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -689,13 +806,12 @@ private fun Alignment.Vertical.toAlignment() =
         else -> Alignment.Center
     }
 
-internal enum class AnimStates { Entering, Visible, Exiting, Gone }
-
 @Immutable
 internal data class TransitionData(
     val fade: Fade? = null,
     val slide: Slide? = null,
-    val changeSize: ChangeSize? = null
+    val changeSize: ChangeSize? = null,
+    val scale: Scale? = null
 )
 
 @Suppress("ModifierFactoryExtensionFunction", "ComposableModifierFactory")
@@ -723,23 +839,28 @@ internal fun Transition<EnterExitState>.createModifier(
     // We'll animate if at any point during the transition fadeIn/fadeOut becomes non-null. This
     // would ensure the removal of fadeIn/Out amid a fade animation doesn't result in a jump.
     var shouldAnimateAlpha by remember(this) { mutableStateOf(false) }
+    var shouldAnimateScale by remember(this) { mutableStateOf(false) }
     if (currentState == targetState) {
         shouldAnimateAlpha = false
+        shouldAnimateScale = false
     } else {
         if (enter.data.fade != null || exit.data.fade != null) {
             shouldAnimateAlpha = true
         }
+        if (enter.data.scale != null || exit.data.scale != null) {
+            shouldAnimateScale = true
+        }
     }
 
-    if (shouldAnimateAlpha) {
-        val alpha by animateFloat(
+    val alpha by if (shouldAnimateAlpha) {
+        animateFloat(
             transitionSpec = {
                 when {
                     EnterExitState.PreEnter isTransitioningTo EnterExitState.Visible ->
-                        enter.data.fade?.animationSpec ?: spring()
+                        enter.data.fade?.animationSpec ?: DefaultAlphaAndScaleSpring
                     EnterExitState.Visible isTransitioningTo EnterExitState.PostExit ->
-                        exit.data.fade?.animationSpec ?: spring()
-                    else -> spring()
+                        exit.data.fade?.animationSpec ?: DefaultAlphaAndScaleSpring
+                    else -> DefaultAlphaAndScaleSpring
                 }
             },
             label = "alpha"
@@ -750,12 +871,71 @@ internal fun Transition<EnterExitState>.createModifier(
                 EnterExitState.PostExit -> exit.data.fade?.alpha ?: 1f
             }
         }
+    } else {
+        DefaultAlpha
+    }
+
+    if (shouldAnimateScale) {
+        val scale by animateFloat(
+            transitionSpec = {
+                when {
+                    EnterExitState.PreEnter isTransitioningTo EnterExitState.Visible ->
+                        enter.data.scale?.animationSpec ?: DefaultAlphaAndScaleSpring
+                    EnterExitState.Visible isTransitioningTo EnterExitState.PostExit ->
+                        exit.data.scale?.animationSpec ?: DefaultAlphaAndScaleSpring
+                    else -> DefaultAlphaAndScaleSpring
+                }
+            },
+            label = "scale"
+        ) {
+            when (it) {
+                EnterExitState.Visible -> 1f
+                EnterExitState.PreEnter -> enter.data.scale?.scale ?: 1f
+                EnterExitState.PostExit -> exit.data.scale?.scale ?: 1f
+            }
+        }
+        val transformOriginWhenVisible =
+            if (currentState == EnterExitState.PreEnter) {
+                enter.data.scale?.transformOrigin ?: exit.data.scale?.transformOrigin
+            } else {
+                exit.data.scale?.transformOrigin ?: enter.data.scale?.transformOrigin
+            }
+        // Animate transform origin if there's any change. If scale is only defined for enter or
+        // exit, use the same transform origin for both.
+        val transformOrigin by animateValue(
+            TransformOriginVectorConverter,
+            label = "TransformOriginInterruptionHandling"
+        ) {
+            when (it) {
+                EnterExitState.Visible -> transformOriginWhenVisible
+                EnterExitState.PreEnter ->
+                    enter.data.scale?.transformOrigin ?: exit.data.scale?.transformOrigin
+                EnterExitState.PostExit ->
+                    exit.data.scale?.transformOrigin ?: enter.data.scale?.transformOrigin
+            } ?: TransformOrigin.Center
+        }
+
+        modifier = modifier.graphicsLayer {
+            this.alpha = alpha
+            this.scaleX = scale
+            this.scaleY = scale
+            this.transformOrigin = transformOrigin
+        }
+    } else if (shouldAnimateAlpha) {
         modifier = modifier.graphicsLayer {
             this.alpha = alpha
         }
     }
     return modifier
 }
+
+private val TransformOriginVectorConverter = TwoWayConverter<TransformOrigin, AnimationVector2D>(
+    convertToVector = { AnimationVector2D(it.pivotFractionX, it.pivotFractionY) },
+    convertFromVector = { TransformOrigin(it.v1, it.v2) }
+)
+
+private val DefaultAlpha = mutableStateOf(1f)
+private val DefaultAlphaAndScaleSpring = spring<Float>(stiffness = Spring.StiffnessMediumLow)
 
 @Suppress("ModifierInspectorInfo")
 private fun Modifier.slideInOut(
@@ -785,7 +965,9 @@ private fun Modifier.slideInOut(
     }
 }
 
-private val defaultOffsetAnimationSpec = spring(visibilityThreshold = IntOffset.VisibilityThreshold)
+private val DefaultOffsetAnimationSpec = spring(
+    stiffness = Spring.StiffnessMediumLow, visibilityThreshold = IntOffset.VisibilityThreshold
+)
 
 private class SlideModifier(
     val lazyAnimation: Transition<EnterExitState>.DeferredAnimation<IntOffset, AnimationVector2D>,
@@ -796,12 +978,12 @@ private class SlideModifier(
         {
             when {
                 EnterExitState.PreEnter isTransitioningTo EnterExitState.Visible -> {
-                    slideIn.value?.animationSpec ?: defaultOffsetAnimationSpec
+                    slideIn.value?.animationSpec ?: DefaultOffsetAnimationSpec
                 }
                 EnterExitState.Visible isTransitioningTo EnterExitState.PostExit -> {
-                    slideOut.value?.animationSpec ?: defaultOffsetAnimationSpec
+                    slideOut.value?.animationSpec ?: DefaultOffsetAnimationSpec
                 }
-                else -> defaultOffsetAnimationSpec
+                else -> DefaultOffsetAnimationSpec
             }
         }
 
@@ -896,7 +1078,9 @@ private fun Modifier.shrinkExpand(
     }
 }
 
-private val defaultSizeAnimationSpec = spring(visibilityThreshold = IntSize.VisibilityThreshold)
+private val DefaultSizeAnimationSpec = spring(
+    stiffness = Spring.StiffnessMediumLow, visibilityThreshold = IntSize.VisibilityThreshold
+)
 
 private class ExpandShrinkModifier(
     val sizeAnimation: Transition<EnterExitState>.DeferredAnimation<IntSize, AnimationVector2D>,
@@ -914,8 +1098,8 @@ private class ExpandShrinkModifier(
                     expand.value?.animationSpec
                 EnterExitState.Visible isTransitioningTo EnterExitState.PostExit ->
                     shrink.value?.animationSpec
-                else -> defaultSizeAnimationSpec
-            } ?: defaultSizeAnimationSpec
+                else -> DefaultSizeAnimationSpec
+            } ?: DefaultSizeAnimationSpec
         }
 
     fun sizeByState(targetState: EnterExitState, fullSize: IntSize): IntSize {
@@ -969,7 +1153,7 @@ private class ExpandShrinkModifier(
             sizeByState(it, measuredSize)
         }.value
 
-        val offsetDelta = offsetAnimation.animate({ defaultOffsetAnimationSpec }) {
+        val offsetDelta = offsetAnimation.animate({ DefaultOffsetAnimationSpec }) {
             targetOffsetByState(it, measuredSize)
         }.value
 
