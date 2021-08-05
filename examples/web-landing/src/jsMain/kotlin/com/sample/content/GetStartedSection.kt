@@ -42,7 +42,7 @@ private fun getCards(): List<GetStartedCardPresentation> {
             links = listOf(
                 LinkOnCard(
                     linkText = "Explore the source code",
-                    linkUrl = "https://github.com/JetBrains/compose-jb/tree/master/examples/falling_balls_with_web"
+                    linkUrl = "https://github.com/JetBrains/compose-jb/tree/master/examples/falling-balls-web"
                 ),
                 LinkOnCard(
                     linkText = "Play",
