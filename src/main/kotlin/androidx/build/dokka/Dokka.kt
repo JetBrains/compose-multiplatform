@@ -26,10 +26,14 @@ import org.jetbrains.dokka.gradle.DokkaAndroidTask
 import org.jetbrains.dokka.gradle.PackageOptions
 import java.io.File
 import java.net.URL
+import java.util.Locale
 
 object Dokka {
     private fun generatorTaskNameForType(language: String = ""): String {
-        val formattedLangauage = language.toLowerCase().capitalize()
+        val formattedLangauage = language.lowercase(Locale.getDefault())
+            .replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+            }
         return "dokka${formattedLangauage}Docs"
     }
 

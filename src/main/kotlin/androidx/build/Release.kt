@@ -24,6 +24,7 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.plugin.devel.GradlePluginDevelopmentExtension
 import java.io.File
+import java.util.Locale
 import java.util.TreeSet
 
 /**
@@ -336,7 +337,9 @@ private fun groupToTaskNameSuffix(group: String): String {
     return group
         .split('.')
         .joinToString("") {
-            it.capitalize()
+            it.replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+            }
         }
 }
 /**
@@ -346,7 +349,9 @@ private fun projectToNameSuffix(project: Project): String {
     return project.path
         .split(":", "-")
         .joinToString("") {
-            it.capitalize()
+            it.replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+            }
         }
 }
 

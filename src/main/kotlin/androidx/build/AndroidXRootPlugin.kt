@@ -39,6 +39,7 @@ import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.kotlin.dsl.KotlinClosure1
 import org.gradle.kotlin.dsl.extra
 import java.io.File
+import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 
 abstract class AndroidXRootPlugin : Plugin<Project> {
@@ -124,8 +125,14 @@ abstract class AndroidXRootPlugin : Plugin<Project> {
                         project.agpVariants.all { variant ->
                             // in AndroidX, release and debug variants are essentially the same,
                             // so we don't run the lintRelease task on the build server
-                            if (!variant.name.toLowerCase().contains("release")) {
-                                val taskName = "lint${variant.name.capitalize()}"
+                            if (!variant.name.lowercase(Locale.getDefault()).contains("release")) {
+                                val taskName = "lint${variant.name.replaceFirstChar {
+                                    if (it.isLowerCase()) {
+                                        it.titlecase(Locale.getDefault())
+                                    } else {
+                                        it.toString()
+                                    }
+                                }}"
                                 buildOnServerTask.dependsOn("${project.path}:$taskName")
                             }
                         }

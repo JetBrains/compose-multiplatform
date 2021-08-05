@@ -156,7 +156,9 @@ class AndroidXPlugin : Plugin<Project> {
             val htmlReport = task.reports.html
 
             val zipHtmlTask = project.tasks.register(
-                "zipHtmlResultsOf${task.name.capitalize()}",
+                "zipHtmlResultsOf${task.name.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+                }}",
                 Zip::class.java
             ) {
                 val destinationDirectory = File("$xmlReportDestDir-html")
@@ -180,7 +182,9 @@ class AndroidXPlugin : Plugin<Project> {
             val xmlReport = task.reports.junitXml
             if (xmlReport.required.get()) {
                 val zipXmlTask = project.tasks.register(
-                    "zipXmlResultsOf${task.name.capitalize()}",
+                    "zipXmlResultsOf${task.name.replaceFirstChar {
+                        if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+                    }}",
                     Zip::class.java
                 ) {
                     it.destinationDirectory.set(xmlReportDestDir)
@@ -482,7 +486,7 @@ class AndroidXPlugin : Plugin<Project> {
         project.configurations.all { configuration ->
             // Gradle seems to crash on androidtest configurations
             // preferring project modules...
-            if (!configuration.name.toLowerCase(Locale.US).contains("androidtest")) {
+            if (!configuration.name.lowercase(Locale.US).contains("androidtest")) {
                 configuration.resolutionStrategy.preferProjectModules()
             }
         }
@@ -542,7 +546,7 @@ class AndroidXPlugin : Plugin<Project> {
         // pre-release SDK.
         defaultConfig.aarMetadata.minCompileSdk = TARGET_SDK_VERSION
         project.configurations.all { config ->
-            val isTestConfig = config.name.toLowerCase(Locale.US).contains("test")
+            val isTestConfig = config.name.lowercase(Locale.US).contains("test")
 
             config.dependencyConstraints.configureEach { dependencyConstraint ->
                 dependencyConstraint.apply {
