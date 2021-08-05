@@ -567,7 +567,7 @@ class DraggableTest {
                 "startDragImmediately",
                 "onDragStarted",
                 "onDragStopped",
-                "state",
+                "stateFactory",
             )
         }
     }

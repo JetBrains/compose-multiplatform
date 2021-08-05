@@ -77,25 +77,53 @@ fun Modifier.scrollable(
     reverseDirection: Boolean = false,
     flingBehavior: FlingBehavior? = null,
     interactionSource: MutableInteractionSource? = null
+): Modifier = scrollable(
+    state = state,
+    orientation = orientation,
+    enabled = enabled,
+    reverseDirection = reverseDirection,
+    flingBehavior = flingBehavior,
+    interactionSource = interactionSource,
+    overScrollController = null
+)
+
+internal fun Modifier.scrollable(
+    state: ScrollableState,
+    orientation: Orientation,
+    overScrollController: OverScrollController?,
+    enabled: Boolean = true,
+    reverseDirection: Boolean = false,
+    flingBehavior: FlingBehavior? = null,
+    interactionSource: MutableInteractionSource? = null
 ): Modifier = composed(
     inspectorInfo = debugInspectorInfo {
         name = "scrollable"
         properties["orientation"] = orientation
         properties["state"] = state
+        properties["overScrollController"] = overScrollController
         properties["enabled"] = enabled
         properties["reverseDirection"] = reverseDirection
         properties["flingBehavior"] = flingBehavior
         properties["interactionSource"] = interactionSource
     },
     factory = {
+        val overscrollModifier =
+            if (overScrollController != null) {
+                Modifier.overScroll(overScrollController)
+            } else {
+                Modifier
+            }
+
         fun Float.reverseIfNeeded(): Float = if (reverseDirection) this * -1 else this
         relocationScrollable(state, orientation, reverseDirection)
+            .then(overscrollModifier)
             .touchScrollable(
                 interactionSource,
                 orientation,
                 reverseDirection,
                 state,
                 flingBehavior,
+                overScrollController,
                 enabled
             )
             .mouseScrollable(orientation) {
@@ -138,12 +166,20 @@ private fun Modifier.touchScrollable(
     reverseDirection: Boolean,
     controller: ScrollableState,
     flingBehavior: FlingBehavior?,
+    overScrollController: OverScrollController?,
     enabled: Boolean
 ): Modifier {
     val fling = flingBehavior ?: ScrollableDefaults.flingBehavior()
     val nestedScrollDispatcher = remember { mutableStateOf(NestedScrollDispatcher()) }
     val scrollLogic = rememberUpdatedState(
-        ScrollingLogic(orientation, reverseDirection, nestedScrollDispatcher, controller, fling)
+        ScrollingLogic(
+            orientation,
+            reverseDirection,
+            nestedScrollDispatcher,
+            controller,
+            fling,
+            overScrollController
+        )
     )
     val nestedScrollConnection = remember(enabled) {
         scrollableNestedScrollConnection(scrollLogic, enabled)
@@ -151,7 +187,7 @@ private fun Modifier.touchScrollable(
     val draggableState = remember { ScrollDraggableState(scrollLogic) }
 
     return draggable(
-        draggableState,
+        { draggableState },
         orientation = orientation,
         enabled = enabled,
         interactionSource = interactionSource,
@@ -171,7 +207,8 @@ private class ScrollingLogic(
     val reverseDirection: Boolean,
     val nestedScrollDispatcher: State<NestedScrollDispatcher>,
     val scrollableState: ScrollableState,
-    val flingBehavior: FlingBehavior
+    val flingBehavior: FlingBehavior,
+    val overScrollController: OverScrollController?
 ) {
     fun Float.toOffset(): Offset = when {
         this == 0f -> Offset.Zero
@@ -190,7 +227,11 @@ private class ScrollingLogic(
 
     fun Float.reverseIfNeeded(): Float = if (reverseDirection) this * -1 else this
 
-    fun ScrollScope.dispatchScroll(scrollDelta: Float, source: NestedScrollSource): Float {
+    fun ScrollScope.dispatchScroll(
+        scrollDelta: Float,
+        pointerPosition: Offset?,
+        source: NestedScrollSource
+    ): Float {
         val nestedScrollDispatcher = nestedScrollDispatcher.value
         val preConsumedByParent = nestedScrollDispatcher
             .dispatchPreScroll(scrollDelta.toOffset(), source)
@@ -198,10 +239,12 @@ private class ScrollingLogic(
         val scrollAvailable = scrollDelta - preConsumedByParent.toFloat()
         val consumed = scrollBy(scrollAvailable.reverseIfNeeded()).reverseIfNeeded()
         val leftForParent = scrollAvailable - consumed
-        nestedScrollDispatcher.dispatchPostScroll(
-            consumed.toOffset(),
-            leftForParent.toOffset(),
-            source
+        val parentConsumed = nestedScrollDispatcher
+            .dispatchPostScroll(consumed.toOffset(), leftForParent.toOffset(), source)
+        overScrollController?.processDragDelta(
+            scrollAvailable.reverseIfNeeded().toOffset(),
+            (leftForParent - parentConsumed.toFloat()).reverseIfNeeded().toOffset(),
+            pointerPosition
         )
         return leftForParent
     }
@@ -220,14 +263,19 @@ private class ScrollingLogic(
         val preConsumedByParent = nestedScrollDispatcher.value.dispatchPreFling(velocity)
         val available = velocity - preConsumedByParent
         val velocityLeft = doFlingAnimation(available)
-        nestedScrollDispatcher.value.dispatchPostFling(available - velocityLeft, velocityLeft)
+        val consumedPost =
+            nestedScrollDispatcher.value.dispatchPostFling(available - velocityLeft, velocityLeft)
+        val totalLeft = velocityLeft - consumedPost
+        overScrollController?.release()
+        overScrollController?.processVelocity(totalLeft.toFloat().reverseIfNeeded().toVelocity())
     }
 
     suspend fun doFlingAnimation(available: Velocity): Velocity {
         var result: Velocity = available
         scrollableState.scroll {
             val outerScopeScroll: (Float) -> Float = { delta ->
-                delta - this.dispatchScroll(delta.reverseIfNeeded(), Fling).reverseIfNeeded()
+                val consumed = this.dispatchScroll(delta.reverseIfNeeded(), null, Fling)
+                delta - consumed.reverseIfNeeded()
             }
             val scope = object : ScrollScope {
                 override fun scrollBy(pixels: Float): Float {
@@ -247,20 +295,20 @@ private class ScrollingLogic(
 
 private class ScrollDraggableState(
     val scrollLogic: State<ScrollingLogic>
-) : DraggableState, DragScope {
+) : PointerAwareDraggableState, PointerAwareDragScope {
     var latestScrollScope: ScrollScope = NoOpScrollScope
 
-    override fun dragBy(pixels: Float) {
+    override fun dragBy(pixels: Float, pointerPosition: Offset) {
         with(scrollLogic.value) {
             with(latestScrollScope) {
-                dispatchScroll(pixels, Drag)
+                dispatchScroll(pixels, pointerPosition, Drag)
             }
         }
     }
 
     override suspend fun drag(
         dragPriority: MutatePriority,
-        block: suspend DragScope.() -> Unit
+        block: suspend PointerAwareDragScope.() -> Unit
     ) {
         scrollLogic.value.scrollableState.scroll(dragPriority) {
             latestScrollScope = this

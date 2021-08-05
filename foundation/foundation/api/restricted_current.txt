@@ -122,6 +122,9 @@ package androidx.compose.foundation {
 
 package androidx.compose.foundation.gestures {
 
+  public final class AndroidOverScrollKt {
+  }
+
   public final class AndroidScrollable_androidKt {
   }
 
@@ -171,6 +174,9 @@ package androidx.compose.foundation.gestures {
   public enum Orientation {
     enum_constant public static final androidx.compose.foundation.gestures.Orientation Horizontal;
     enum_constant public static final androidx.compose.foundation.gestures.Orientation Vertical;
+  }
+
+  public final class OverScrollConfigurationKt {
   }
 
   public interface PressGestureScope extends androidx.compose.ui.unit.Density {

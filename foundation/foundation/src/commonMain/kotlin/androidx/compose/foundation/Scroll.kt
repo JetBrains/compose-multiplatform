@@ -20,10 +20,12 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.OverScrollController
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.gestures.rememberOverScrollController
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.InteractionSource
@@ -260,6 +262,7 @@ private fun Modifier.scroll(
     isVertical: Boolean
 ) = composed(
     factory = {
+        val overScrollController = rememberOverScrollController()
         val coroutineScope = rememberCoroutineScope()
         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
         // Add RTL to the mix: if horizontal and RTL, reverse reverseScrolling
@@ -299,9 +302,11 @@ private fun Modifier.scroll(
             enabled = isScrollable,
             interactionSource = state.internalInteractionSource,
             flingBehavior = flingBehavior,
-            state = state
+            state = state,
+            overScrollController = overScrollController
         )
-        val layout = ScrollingLayoutModifier(state, reverseScrolling, isVertical)
+        val layout =
+            ScrollingLayoutModifier(state, reverseScrolling, isVertical, overScrollController)
         semantics.then(scrolling).clipScrollableContainer(isVertical).then(layout)
     },
     inspectorInfo = debugInspectorInfo {
@@ -317,7 +322,8 @@ private fun Modifier.scroll(
 private data class ScrollingLayoutModifier(
     val scrollerState: ScrollState,
     val isReversed: Boolean,
-    val isVertical: Boolean
+    val isVertical: Boolean,
+    val overScrollController: OverScrollController
 ) : LayoutModifier {
     override fun MeasureScope.measure(
         measurable: Measurable,
@@ -334,6 +340,8 @@ private data class ScrollingLayoutModifier(
         val scrollHeight = placeable.height - height
         val scrollWidth = placeable.width - width
         val side = if (isVertical) scrollHeight else scrollWidth
+        overScrollController
+            .refreshContainerInfo(Size(width.toFloat(), height.toFloat()), side != 0)
         return layout(width, height) {
             scrollerState.maxValue = side
             val scroll = scrollerState.value.coerceIn(0, side)
