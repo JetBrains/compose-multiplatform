@@ -107,10 +107,9 @@ private class MacOsUtilities(projectRoot: File, studioInstallationDir: File) :
 
     override val StudioTask.launchCommandArguments: List<String>
         get() {
+            val studioBinary = File(binaryDirectory.absolutePath, "Contents/MacOS/studio")
             return listOf(
-                "open",
-                "-a",
-                binaryDirectory.absolutePath,
+                studioBinary.absolutePath,
                 projectRoot.absolutePath
             )
         }
