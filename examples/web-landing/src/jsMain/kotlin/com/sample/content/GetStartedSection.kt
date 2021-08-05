@@ -32,7 +32,7 @@ private fun getCards(): List<GetStartedCardPresentation> {
             links = listOf(
                 LinkOnCard(
                     linkText = "Explore the source code",
-                    linkUrl = "https://github.com/JetBrains/compose-jb/tree/master/examples/web_landing"
+                    linkUrl = "https://github.com/JetBrains/compose-jb/tree/master/examples/web-landing"
                 )
             )
         ),
