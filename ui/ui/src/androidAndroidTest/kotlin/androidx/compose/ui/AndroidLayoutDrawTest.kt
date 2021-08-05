@@ -106,6 +106,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
 import androidx.compose.ui.unit.toOffset
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import org.junit.Assert.assertEquals
@@ -2915,6 +2916,7 @@ class AndroidLayoutDrawTest {
         validateSquareColors(outerColor = Color.Blue, innerColor = Color.White, size = 10)
     }
 
+    @FlakyTest
     @Test
     fun makingItemLarger() {
         var height by mutableStateOf(30)
