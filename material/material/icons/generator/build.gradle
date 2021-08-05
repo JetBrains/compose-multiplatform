@@ -28,9 +28,9 @@ plugins {
 dependencies {
     implementation(gradleApi())
 
-    implementation(libs.androidGradlePlugin)
+    implementation(libs.androidGradlePluginz)
     implementation(libs.guava)
-    implementation(libs.kotlinGradlePlugin)
+    implementation(libs.kotlinGradlePluginz)
     implementation(libs.kotlinStdlib)
     implementation(libs.kotlinPoet)
     implementation(libs.xmlpull)
