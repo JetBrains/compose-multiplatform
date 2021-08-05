@@ -39,6 +39,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 
 @Sampled
@@ -90,6 +91,14 @@ fun SimpleRequiredHeightModifier() {
 fun SimpleSizeModifier() {
     Box {
         Box(Modifier.size(100.dp, 100.dp).background(Color.Red))
+    }
+}
+
+@Sampled
+@Composable
+fun SimpleSizeModifierWithDpSize() {
+    Box {
+        Box(Modifier.size(DpSize(100.dp, 100.dp)).background(Color.Red))
     }
 }
 

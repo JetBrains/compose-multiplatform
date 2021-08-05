@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
@@ -1043,6 +1044,33 @@ class SizeTest : LayoutTest() {
         val childWidth = 40
         val childHeight = 30
         val childModifier = Modifier.size(childWidth.toDp(), childHeight.toDp())
+
+        assertEquals(
+            IntSize(childWidth, childHeight),
+            calculateSizeFor(parentModifier, childModifier)
+        )
+        assertEquals(
+            IntSize(parentWidth, childHeight),
+            calculateSizeFor(parentModifier, Modifier.fillMaxWidth().then(childModifier))
+        )
+        assertEquals(
+            IntSize(childWidth, parentHeight),
+            calculateSizeFor(parentModifier, Modifier.fillMaxHeight().then(childModifier))
+        )
+        assertEquals(
+            IntSize(parentWidth, parentHeight),
+            calculateSizeFor(parentModifier, Modifier.fillMaxSize().then(childModifier))
+        )
+    }
+
+    @Test
+    fun testFillModifier_correctDpSize() = with(density) {
+        val parentWidth = 100
+        val parentHeight = 80
+        val parentModifier = Modifier.requiredSize(DpSize(parentWidth.toDp(), parentHeight.toDp()))
+        val childWidth = 40
+        val childHeight = 30
+        val childModifier = Modifier.size(DpSize(childWidth.toDp(), childHeight.toDp()))
 
         assertEquals(
             IntSize(childWidth, childHeight),
