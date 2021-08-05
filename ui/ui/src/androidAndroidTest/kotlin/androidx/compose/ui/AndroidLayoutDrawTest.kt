@@ -113,6 +113,12 @@ import androidx.compose.ui.unit.toOffset
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.roundToInt
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -123,12 +129,6 @@ import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.roundToInt
 
 /**
  * Corresponds to ContainingViewTest, but tests single composition measure, layout and draw.
@@ -3735,26 +3735,6 @@ class AndroidLayoutDrawTest {
         activityTestRule.runOnUiThread {
             assertEquals(1, parentLayoutsCount)
         }
-    }
-
-    @Test
-    fun androidComposeViewIsTransitionGroup() {
-        // ensure that the android compose view is a transition group.
-
-        val latch = CountDownLatch(1)
-        activityTestRule.runOnUiThread {
-            activity.setContent {
-                Layout({}) { _, _ ->
-                    layout(10, 10) {
-                        latch.countDown()
-                    }
-                }
-            }
-        }
-        assertTrue(latch.await(1, TimeUnit.SECONDS))
-
-        val composeView = activityTestRule.findAndroidComposeView()
-        assertTrue(composeView.isTransitionGroup)
     }
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
