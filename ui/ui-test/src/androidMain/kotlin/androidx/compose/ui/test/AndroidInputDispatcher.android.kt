@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.test
 
-import android.os.SystemClock
 import android.view.InputDevice
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_CANCEL
@@ -52,9 +51,7 @@ internal class AndroidInputDispatcher(
     private val batchLock = Any()
     private var batchedEvents = mutableListOf<MotionEvent>()
     private var acceptEvents = true
-    private var lastEventTime = currentTime
-
-    override val now: Long get() = SystemClock.uptimeMillis()
+    private var currentClockTime = currentTime
 
     override fun PartialGesture.enqueueDown(pointerId: Int) {
         batchMotionEvent(
@@ -119,9 +116,6 @@ internal class AndroidInputDispatcher(
                     "coordinates=$coordinates" +
                     "), events have already been (or are being) dispatched or disposed"
             }
-            if (lastEventTime == TimeNotSet) {
-                lastEventTime = eventTime
-            }
             val positionInScreen = if (root != null) {
                 val array = intArrayOf(0, 0)
                 root.view.getLocationOnScreen(array)
@@ -168,12 +162,11 @@ internal class AndroidInputDispatcher(
         testContext.testOwner.runOnUiThread {
             checkAndStopAcceptingEvents()
 
-            var currentEventTime = lastEventTime
             batchedEvents.forEach { event ->
                 // Before injecting the next event, pump the clock
                 // by the difference between this and the last event
-                pumpClock(event.eventTime - currentEventTime)
-                currentEventTime = event.eventTime
+                advanceClockTime(event.eventTime - currentClockTime)
+                currentClockTime = event.eventTime
                 sendAndRecycleEvent(event)
             }
         }
@@ -182,8 +175,8 @@ internal class AndroidInputDispatcher(
     }
 
     @OptIn(InternalTestApi::class, ExperimentalCoroutinesApi::class)
-    private fun pumpClock(millis: Long) {
-        // Don't bother calling the method if there's nothing to advance
+    private fun advanceClockTime(millis: Long) {
+        // Don't bother advancing the clock if there's nothing to advance
         if (millis > 0) {
             testContext.testOwner.mainClock.advanceTimeBy(millis, ignoreFrameDuration = true)
         }

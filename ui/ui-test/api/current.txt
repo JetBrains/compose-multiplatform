@@ -169,9 +169,6 @@ package androidx.compose.ui.test {
     property public abstract boolean isIdleNow;
   }
 
-  public final class InputDispatcherKt {
-  }
-
   public final class KeyInputHelpersKt {
     method public static boolean performKeyPress(androidx.compose.ui.test.SemanticsNodeInteraction, android.view.KeyEvent keyEvent);
   }
