@@ -25,6 +25,7 @@ import androidx.build.playground.VerifyPlaygroundGradlePropertiesTask
 import androidx.build.studio.StudioTask.Companion.registerStudioTask
 import androidx.build.testConfiguration.registerOwnersServiceTasks
 import androidx.build.uptodatedness.TaskUpToDateValidator
+import com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import org.gradle.api.GradleException
@@ -43,6 +44,7 @@ import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 
 abstract class AndroidXRootPlugin : Plugin<Project> {
+    @Suppress("UnstableApiUsage")
     @get:javax.inject.Inject
     abstract val registry: BuildEventsListenerRegistry
 
@@ -53,12 +55,23 @@ abstract class AndroidXRootPlugin : Plugin<Project> {
         project.configureRootProject()
     }
 
+    @OptIn(ExperimentalStdlibApi::class) // string extensions
     private fun Project.configureRootProject() {
         project.validateAllAndroidxArgumentsAreRecognized()
         tasks.register("listAndroidXProperties", ListAndroidXPropertiesTask::class.java)
         setDependencyVersions()
         configureKtlintCheckFile()
         tasks.register(CheckExternalDependencyLicensesTask.TASK_NAME)
+
+        // Validate the Android Gradle Plugin version, if specified.
+        val expectedAgpVersion = System.getenv("EXPECTED_AGP_VERSION")
+        if (expectedAgpVersion != null && expectedAgpVersion != ANDROID_GRADLE_PLUGIN_VERSION) {
+            throw Exception(
+                "Expected AGP version \"$expectedAgpVersion\" does not match actual " +
+                    "AGP version \"$ANDROID_GRADLE_PLUGIN_VERSION\". Please close and restart " +
+                    "Studio."
+            )
+        }
 
         val buildOnServerTask = tasks.create(
             AndroidXPlugin.BUILD_ON_SERVER_TASK,
