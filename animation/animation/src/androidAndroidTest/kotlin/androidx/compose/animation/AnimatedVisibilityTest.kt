@@ -406,6 +406,81 @@ class AnimatedVisibilityTest {
         }
     }
 
+    // Test different animations for scale in and scale out, in a complete run without interruptions
+    @OptIn(ExperimentalAnimationApi::class, InternalAnimationApi::class)
+    @Test
+    fun animateVisibilityScaleTest() {
+        var visible by mutableStateOf(false)
+        val easing = FastOutLinearInEasing
+        val easingOut = FastOutSlowInEasing
+        var scale by mutableStateOf(0f)
+        rule.setContent {
+            AnimatedVisibility(
+                visible,
+                enter = scaleIn(animationSpec = tween(500, easing = easing)),
+                exit = scaleOut(animationSpec = tween(300, easing = easingOut)),
+            ) {
+                Box(modifier = Modifier.size(size = 20.dp).background(Color.White))
+                LaunchedEffect(visible) {
+                    var exit = false
+                    val enterExit = transition
+                    while (true) {
+                        withFrameNanos {
+                            if (enterExit.targetState == Visible) {
+                                scale = enterExit.animations.firstOrNull {
+                                    it.label == "scale"
+                                }?.value as Float
+                                val fraction =
+                                    (enterExit.playTimeNanos / 1_000_000) / 500f
+                                if (enterExit.currentState != Visible) {
+                                    assertEquals(easing.transform(fraction), scale, 0.01f)
+                                } else {
+                                    // When currentState = targetState, the playTime will be reset
+                                    // to 0. So compare scale against expected visible value.
+                                    assertEquals(1f, scale)
+                                    exit = true
+                                }
+                            } else if (enterExit.targetState == PostExit) {
+                                scale = enterExit.animations.firstOrNull {
+                                    it.label == "scale"
+                                }?.value as Float
+                                val fraction =
+                                    (enterExit.playTimeNanos / 1_000_000) / 300f
+                                if (enterExit.currentState != PostExit) {
+                                    assertEquals(
+                                        1f - easingOut.transform(fraction),
+                                        scale,
+                                        0.01f
+                                    )
+                                } else {
+                                    // When currentState = targetState, the playTime will be reset
+                                    // to 0. So compare scale against expected invisible value.
+                                    assertEquals(0f, scale)
+                                    exit = true
+                                }
+                            } else {
+                                exit = enterExit.currentState == enterExit.targetState
+                            }
+                        }
+                        if (exit) break
+                    }
+                }
+            }
+        }
+        rule.runOnIdle {
+            visible = true
+        }
+        rule.runOnIdle {
+            // At this point fade in has finished, expect alpha = 1
+            assertEquals(1f, scale)
+            visible = false
+        }
+        rule.runOnIdle {
+            // At this point fade out has finished, expect scale = 0
+            assertEquals(0f, scale)
+        }
+    }
+
     @OptIn(ExperimentalAnimationApi::class)
     @Test
     fun testEnterTransitionNoneAndExitTransitionNone() {

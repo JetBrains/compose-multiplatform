@@ -524,6 +524,12 @@ object Spring {
     const val StiffnessMedium = 1500f
 
     /**
+     * Stiffness constant for medium-low stiff spring. This is the default stiffness for springs
+     * used in enter/exit transitions.
+     */
+    const val StiffnessMediumLow = 400f
+
+    /**
      * Stiffness constant for a spring with low stiffness.
      */
     const val StiffnessLow = 200f
