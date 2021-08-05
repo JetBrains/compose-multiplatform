@@ -257,6 +257,7 @@ class ColorsDetectorTest : LintDetectorTest() {
             Stubs.Color,
             ColorsStub.kotlin
         )
+            .allowCompilationErrors(true) // b/195443860
             .run()
             .expect(
                 """
@@ -332,6 +333,7 @@ src/androidx/compose/material/foo/test.kt:55: Error: Conflicting 'on' color for 
             Stubs.Color,
             ColorsStub.kotlin
         )
+            .allowCompilationErrors(true) // b/195443860
             .run()
             .expect(
                 """
@@ -381,6 +383,7 @@ src/androidx/compose/material/foo/test.kt:21: Error: Conflicting 'on' color for 
             Stubs.Color,
             ColorsStub.kotlin
         )
+            .allowCompilationErrors(true) // b/195443860
             .run()
             .expect(
                 """
@@ -442,6 +445,7 @@ src/androidx/compose/material/foo/test.kt:22: Error: Conflicting 'on' color for 
             Stubs.Color,
             ColorsStub.kotlin
         )
+            .allowCompilationErrors(true) // b/195443860
             .run()
             .expectClean()
     }
@@ -515,6 +519,7 @@ src/androidx/compose/material/foo/test.kt:22: Error: Conflicting 'on' color for 
             Stubs.Color,
             ColorsStub.kotlin
         )
+            .allowCompilationErrors(true) // b/195443860
             .run()
             .expectClean()
     }
