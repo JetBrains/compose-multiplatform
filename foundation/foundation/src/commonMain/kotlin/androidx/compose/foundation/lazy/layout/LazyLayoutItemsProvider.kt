@@ -33,4 +33,10 @@ internal interface LazyLayoutItemsProvider {
      * the list as an optimization.
      **/
     val keyToIndexMap: Map<Any, Int>
+
+    /**
+     * Returns the content type for the item on this index. It is used to improve the item
+     * compositions reusing efficiency.
+     **/
+    fun getContentType(index: Int): Any?
 }

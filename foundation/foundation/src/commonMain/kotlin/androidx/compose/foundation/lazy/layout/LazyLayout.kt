@@ -37,8 +37,8 @@ internal fun LazyLayout(
     val state = remember { LazyLayoutState() }
     state.itemsProvider = itemsProvider
     val itemContentFactory = rememberItemContentFactory(state)
-    val subcomposeLayoutState = remember {
-        SubcomposeLayoutState(SubcomposeSlotReusePolicy(MaxItemsToRetainForReuse))
+    val subcomposeLayoutState = remember(itemContentFactory) {
+        SubcomposeLayoutState(LazyLayoutItemReusePolicy(itemContentFactory))
     }
     prefetchPolicy?.let {
         LazyLayoutPrefetcher(prefetchPolicy, state, itemContentFactory, subcomposeLayoutState)
@@ -66,6 +66,31 @@ internal fun LazyLayout(
             }
         }
     )
+}
+
+private class LazyLayoutItemReusePolicy(
+    private val factory: LazyLayoutItemContentFactory
+) : SubcomposeSlotReusePolicy {
+    private val countPerType = mutableMapOf<Any?, Int>()
+
+    override fun getSlotsToRetain(slotIds: MutableSet<Any?>) {
+        countPerType.clear()
+        with(slotIds.iterator()) {
+            while (hasNext()) {
+                val slotId = next()
+                val type = factory.getContentType(slotId)
+                val currentCount = countPerType[type] ?: 0
+                if (currentCount == MaxItemsToRetainForReuse) {
+                    remove()
+                } else {
+                    countPerType[type] = currentCount + 1
+                }
+            }
+        }
+    }
+
+    override fun areCompatible(slotId: Any?, reusableSlotId: Any?): Boolean =
+        factory.getContentType(slotId) == factory.getContentType(reusableSlotId)
 }
 
 private const val MaxItemsToRetainForReuse = 2

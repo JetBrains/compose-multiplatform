@@ -45,7 +45,7 @@ class DifferentTypesListActivity : ComponentActivity() {
             LazyColumn(
                 modifier = Modifier.fillMaxWidth().semantics { contentDescription = "IamLazy" }
             ) {
-                items(itemCount, key = { it }) {
+                items(count = itemCount, key = { it }, contentType = { it % 2 }) {
                     if (it % 2 == 0) {
                         EvenItem(it)
                     } else {

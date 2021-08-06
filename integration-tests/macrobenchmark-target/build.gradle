@@ -27,6 +27,7 @@ dependencies {
     // See aosp/1804059
     implementation projectOrArtifact(":lifecycle:lifecycle-common-java8")
     implementation(project(":compose:foundation:foundation-layout"))
+    implementation(project(":compose:foundation:foundation"))
     implementation(project(":compose:material:material"))
     implementation(project(":compose:runtime:runtime"))
     implementation(project(":compose:ui:ui"))

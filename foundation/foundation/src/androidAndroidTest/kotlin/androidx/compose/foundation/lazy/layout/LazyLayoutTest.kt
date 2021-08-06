@@ -56,6 +56,7 @@ class LazyLayoutTest {
                 override val itemsCount: Int = 0
                 override fun getKey(index: Int) = Unit
                 override val keyToIndexMap: Map<Any, Int> = emptyMap()
+                override fun getContentType(index: Int): Any? = null
             }
         }
 

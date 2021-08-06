@@ -94,6 +94,12 @@ internal class LazyListItemsProviderImpl(
 
     override val keyToIndexMap: Map<Any, Int> = generateKeyToIndexMap(nearestItemsRange, list)
 
+    override fun getContentType(index: Int): Any? {
+        val interval = getIntervalForIndex(index)
+        val localIntervalIndex = index - interval.startIndex
+        return interval.content.type.invoke(localIntervalIndex)
+    }
+
     private fun getIntervalForIndex(itemIndex: Int) = lastInterval.let {
         if (it != null && itemIndex in it.startIndex until it.startIndex + it.size) {
             it
