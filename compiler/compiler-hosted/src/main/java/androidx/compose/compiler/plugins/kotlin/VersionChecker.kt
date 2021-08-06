@@ -56,13 +56,14 @@ class VersionChecker(val context: IrPluginContext) {
          * The minimum version int that this compiler is guaranteed to be compatible with. Typically
          * this will match the version int that is in ComposeVersion.kt in the runtime.
          */
-        private val minimumRuntimeVersionInt: Int = 3302
+        private const val minimumRuntimeVersionInt: Int = 3300
 
         /**
          * The maven version string of this compiler. This string should be updated before/after every
          * release.
          */
-        val compilerVersion: String = "1.0.2"
+        const val compilerVersion: String = "1.0.2"
+
         private val minimumRuntimeVersion: String
             get() = versionTable[minimumRuntimeVersionInt] ?: "unknown"
     }
