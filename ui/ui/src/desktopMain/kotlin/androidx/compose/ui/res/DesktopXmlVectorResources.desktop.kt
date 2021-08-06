@@ -41,14 +41,20 @@ import javax.xml.parsers.DocumentBuilderFactory
  * @return the decoded vector image associated with the resource
  */
 @Composable
+@Deprecated(
+    "Use painterResource(resourcePath)",
+    replaceWith = ReplaceWith("painterResource(resourcePath)")
+)
 fun vectorXmlResource(resourcePath: String): ImageVector {
     val inputSource = remember(resourcePath) {
         object : InputSource() {
-            override fun getByteStream() = openResourceStream(resourcePath)
+            override fun getByteStream() = openResource(resourcePath)
         }
     }
-
-    return vectorXmlResource(inputSource)
+    val density = LocalDensity.current
+    return remember(inputSource, density) {
+        loadXmlImageVector(inputSource, density)
+    }
 }
 
 /**
@@ -77,12 +83,51 @@ fun vectorXmlResource(resourcePath: String): ImageVector {
  * @return the decoded vector image associated with the resource
  */
 @Composable
+@Deprecated(
+    "Use loadVectorXml(inputSource, density) explicitly",
+    replaceWith = ReplaceWith(
+        "remember(inputSource, density) {\n" +
+            "    loadXmlImageVector(inputSource, density)\n" +
+            "}",
+        "androidx.compose.runtime.remember",
+        "androidx.compose.ui.platform.LocalDensity",
+        "androidx.compose.ui.res.loadVectorXml"
+    )
+)
 fun vectorXmlResource(inputSource: InputSource): ImageVector {
     val density = LocalDensity.current
     return remember(inputSource, density) {
-        loadVectorXmlResource(inputSource, density)
+        loadXmlImageVector(inputSource, density)
     }
 }
+
+/**
+ * Synchronously load an xml vector image from some [inputSource].
+ *
+ * In contrast to [vectorXmlResource] this function isn't [Composable]
+ *
+ * XML Vector Image is came from Android world. See:
+ * https://developer.android.com/guide/topics/graphics/vector-drawable-resources
+ *
+ * On desktop it is fully implemented except there is no resource linking
+ * (for example, we can't reference to color defined in another file)
+ *
+ * @param inputSource input source to load xml vector image. Will be closed automatically.
+ * @param density density that will be used to set the default size of the ImageVector. If the image
+ * will be drawn with the specified size, density will have no effect.
+ * @return the decoded vector image associated with the image
+ */
+fun loadXmlImageVector(
+    inputSource: InputSource,
+    density: Density
+): ImageVector = DocumentBuilderFactory
+    .newInstance().apply {
+        isNamespaceAware = true
+    }
+    .newDocumentBuilder()
+    .parse(inputSource)
+    .documentElement
+    .parseVectorRoot(density)
 
 /**
  * Synchronously load an xml vector image from some [inputSource].
@@ -101,14 +146,11 @@ fun vectorXmlResource(inputSource: InputSource): ImageVector {
  * @param inputSource input source to load xml resource. Will be closed automatically.
  * @return the decoded vector image associated with the resource
  */
+@Deprecated(
+    "Use loadVectorXml",
+    replaceWith = ReplaceWith("loadXmlImageVector(inputStream, density)")
+)
 fun loadVectorXmlResource(
     inputSource: InputSource,
     density: Density
-): ImageVector = DocumentBuilderFactory
-    .newInstance().apply {
-        isNamespaceAware = true
-    }
-    .newDocumentBuilder()
-    .parse(inputSource)
-    .documentElement
-    .parseVectorRoot(density)
+): ImageVector = loadXmlImageVector(inputSource, density)

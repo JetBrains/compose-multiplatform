@@ -77,7 +77,7 @@ class DesktopPaintTest : DesktopGraphicsTest() {
         canvas.drawRect(left = 0f, top = 0f, right = 16f, bottom = 16f, paint = redPaint)
 
         canvas.drawImage(
-            image = imageFromResource("androidx/compose/desktop/test.png"),
+            image = loadResourceBitmap("androidx/compose/desktop/test.png"),
             topLeftOffset = Offset(2f, 4f),
             paint = Paint().apply {
                 colorFilter = ColorFilter.tint(Color.Blue, BlendMode.Plus)
@@ -92,7 +92,7 @@ class DesktopPaintTest : DesktopGraphicsTest() {
         assumeTrue(isWindows || isLinux)
 
         canvas.drawImageRect(
-            image = imageFromResource("androidx/compose/desktop/test.png"),
+            image = loadResourceBitmap("androidx/compose/desktop/test.png"),
             srcOffset = IntOffset(0, 2),
             srcSize = IntSize(2, 4),
             dstOffset = IntOffset(0, 4),
@@ -102,7 +102,7 @@ class DesktopPaintTest : DesktopGraphicsTest() {
             }
         )
         canvas.drawImageRect(
-            image = imageFromResource("androidx/compose/desktop/test.png"),
+            image = loadResourceBitmap("androidx/compose/desktop/test.png"),
             srcOffset = IntOffset(0, 2),
             srcSize = IntSize(2, 4),
             dstOffset = IntOffset(4, 4),
@@ -112,7 +112,7 @@ class DesktopPaintTest : DesktopGraphicsTest() {
             }
         )
         canvas.drawImageRect(
-            image = imageFromResource("androidx/compose/desktop/test.png"),
+            image = loadResourceBitmap("androidx/compose/desktop/test.png"),
             srcOffset = IntOffset(0, 2),
             srcSize = IntSize(2, 4),
             dstOffset = IntOffset(8, 4),
@@ -132,7 +132,7 @@ class DesktopPaintTest : DesktopGraphicsTest() {
         canvas.scale(2f, 2f)
 
         canvas.drawImageRect(
-            image = imageFromResource("androidx/compose/desktop/test.png"),
+            image = loadResourceBitmap("androidx/compose/desktop/test.png"),
             srcOffset = IntOffset(0, 2),
             srcSize = IntSize(2, 4),
             dstOffset = IntOffset(0, 2),
@@ -142,7 +142,7 @@ class DesktopPaintTest : DesktopGraphicsTest() {
             }
         )
         canvas.drawImageRect(
-            image = imageFromResource("androidx/compose/desktop/test.png"),
+            image = loadResourceBitmap("androidx/compose/desktop/test.png"),
             srcOffset = IntOffset(0, 2),
             srcSize = IntSize(2, 4),
             dstOffset = IntOffset(2, 2),
@@ -152,7 +152,7 @@ class DesktopPaintTest : DesktopGraphicsTest() {
             }
         )
         canvas.drawImageRect(
-            image = imageFromResource("androidx/compose/desktop/test.png"),
+            image = loadResourceBitmap("androidx/compose/desktop/test.png"),
             srcOffset = IntOffset(0, 2),
             srcSize = IntSize(2, 4),
             dstOffset = IntOffset(4, 2),
@@ -248,7 +248,7 @@ class DesktopPaintTest : DesktopGraphicsTest() {
             left = 2f, top = 2f, right = 14f, bottom = 14f,
             paint = Paint().apply {
                 shader = ImageShader(
-                    imageFromResource("androidx/compose/desktop/test.png"),
+                    loadResourceBitmap("androidx/compose/desktop/test.png"),
                     tileModeX = TileMode.Clamp,
                     tileModeY = TileMode.Repeated
                 )
