@@ -65,7 +65,7 @@ internal fun createGenerateSdkApiTask(
 /**
  * List of Doclava checks that should be ignored when generating documentation.
  */
-private val GENERATEDOCS_HIDDEN = listOf(105, 106, 107, 111, 112, 113, 115, 116, 121)
+private val GENERATEDOCS_HIDDEN = listOf(101, 105, 106, 107, 111, 112, 113, 115, 116, 121)
 
 /**
  * Doclava checks configuration for use in generating documentation.
