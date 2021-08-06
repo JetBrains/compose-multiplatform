@@ -2601,6 +2601,33 @@ class AndroidAccessibilityTest {
     }
 
     @Test
+    fun testFakeNode_reportParentBoundsAsFakeNodeBounds() {
+        val density = Density(2f)
+        val tag = "button"
+        container.setContent {
+            CompositionLocalProvider(LocalDensity provides density) {
+                with(density) {
+                    Box(Modifier.size(100.toDp()).clickable(role = Role.Button) {}.testTag(tag)) {
+                        BasicText("Example")
+                    }
+                }
+            }
+        }
+
+        // Button node
+        val parentNode = rule.onNodeWithTag(tag, useUnmergedTree = true).fetchSemanticsNode()
+        val parentBounds = Rect()
+        provider.createAccessibilityNodeInfo(parentNode.id).getBoundsInScreen(parentBounds)
+
+        // Button role fake node
+        val fakeRoleNode = parentNode.unmergedChildren(includeFakeNodes = true).last()
+        val fakeRoleNodeBounds = Rect()
+        provider.createAccessibilityNodeInfo(fakeRoleNode.id).getBoundsInScreen(fakeRoleNodeBounds)
+
+        assertEquals(parentBounds, fakeRoleNodeBounds)
+    }
+
+    @Test
     fun testContentDescription_withFakeNode_mergedCorrectly() {
         val testTag = "Column"
         container.setContent {
