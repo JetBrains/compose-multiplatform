@@ -71,12 +71,14 @@ fun rememberWindowState(
     position: WindowPosition = WindowPosition.PlatformDefault,
     width: Dp = 800.dp,
     height: Dp = 600.dp
-): WindowState = rememberWindowState(
-    placement,
-    isMinimized,
-    position,
-    WindowSize(width, height)
-)
+): WindowState = rememberSaveable(saver = WindowStateImpl.Saver(position)) {
+    WindowStateImpl(
+        placement,
+        isMinimized,
+        position,
+        WindowSize(width, height)
+    )
+}
 
 /**
  * A state object that can be hoisted to control and observe window attributes
@@ -112,7 +114,7 @@ fun WindowState(
     position: WindowPosition = WindowPosition.PlatformDefault,
     width: Dp = 800.dp,
     height: Dp = 600.dp
-): WindowState = WindowState(
+): WindowState = WindowStateImpl(
     placement, isMinimized, position, WindowSize(width, height)
 )
 
