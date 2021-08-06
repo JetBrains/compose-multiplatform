@@ -17,61 +17,31 @@ package androidx.compose.desktop
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.WindowPlacement
-import org.jetbrains.skiko.ClipComponent
 import org.jetbrains.skiko.GraphicsApi
-import org.jetbrains.skiko.SkiaLayer
 import java.awt.Component
+import java.awt.event.MouseListener
+import java.awt.event.MouseMotionListener
+import java.awt.event.MouseWheelListener
 import javax.swing.JFrame
-import javax.swing.JLayeredPane
 
 /**
  * ComposeWindow is a window for building UI using Compose for Desktop.
  * ComposeWindow inherits javax.swing.JFrame.
  */
 class ComposeWindow : JFrame() {
-    private var isDisposed = false
-    internal val layer = ComposeLayer()
-    private val pane = object : JLayeredPane() {
-        override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
-            layer.wrapped.setSize(width, height)
-            super.setBounds(x, y, width, height)
-        }
-
-        override fun add(component: Component): Component {
-            val clipComponent = ClipComponent(component)
-            clipMap.put(component, clipComponent)
-            layer.wrapped.clipComponents.add(clipComponent)
-            return add(component, Integer.valueOf(0))
-        }
-
-        override fun remove(component: Component) {
-            layer.wrapped.clipComponents.remove(clipMap.get(component)!!)
-            clipMap.remove(component)
-            super.remove(component)
-        }
-
-        override fun getPreferredSize() = layer.wrapped.preferredSize
-    }
-
-    private val clipMap = mutableMapOf<Component, ClipComponent>()
+    private val delegate = ComposeWindowDelegate()
+    internal val layer get() = delegate.layer
 
     init {
-        pane.setLayout(null)
-        pane.add(layer.component, Integer.valueOf(1))
-        contentPane.add(pane)
+        contentPane.add(delegate.pane)
     }
 
-    override fun add(component: Component): Component {
-        return pane.add(component)
-    }
+    override fun add(component: Component) = delegate.add(component)
 
-    override fun remove(component: Component) {
-        pane.remove(component)
-    }
+    override fun remove(component: Component) = delegate.remove(component)
 
     /**
      * Composes the given composable into the ComposeWindow.
@@ -83,14 +53,14 @@ class ComposeWindow : JFrame() {
      * @param parentComposition The parent composition reference to coordinate
      * scheduling of composition updates.
      * If null then default root composition will be used.
-     * @param onKeyEvent This callback is invoked when the user interacts with the hardware
-     * keyboard. While implementing this callback, return true to stop propagation of this event.
-     * If you return false, the key event will be sent to this [onKeyEvent]'s parent.
      * @param onPreviewKeyEvent This callback is invoked when the user interacts with the hardware
      * keyboard. It gives ancestors of a focused component the chance to intercept a [KeyEvent].
      * Return true to stop propagation of this event. If you return false, the key event will be
      * sent to this [onPreviewKeyEvent]'s child. If none of the children consume the event,
      * it will be sent back up to the root using the onKeyEvent callback.
+     * @param onKeyEvent This callback is invoked when the user interacts with the hardware
+     * keyboard. While implementing this callback, return true to stop propagation of this event.
+     * If you return false, the key event will be sent to this [onKeyEvent]'s parent.
      * @param content Composable content of the ComposeWindow.
      */
     fun setContent(
@@ -102,33 +72,24 @@ class ComposeWindow : JFrame() {
         val scope = object : FrameWindowScope {
             override val window: ComposeWindow get() = this@ComposeWindow
         }
-        layer.setContent(
-            parentComposition = parentComposition,
-            onPreviewKeyEvent = onPreviewKeyEvent,
-            onKeyEvent = onKeyEvent,
+        delegate.setContent(
+            parentComposition,
+            onPreviewKeyEvent,
+            onKeyEvent
         ) {
-            CompositionLocalProvider(
-                LocalLayerContainer provides pane
-            ) {
-                scope.content()
-            }
+            scope.content()
         }
     }
 
     override fun dispose() {
-        if (!isDisposed) {
-            layer.dispose()
-            isDisposed = true
-        }
+        delegate.dispose()
         super.dispose()
     }
 
     override fun setVisible(value: Boolean) {
         if (value != isVisible) {
             super.setVisible(value)
-            if (value) {
-                layer.component.requestFocus()
-            }
+            delegate.setVisible(value)
         }
     }
 
@@ -192,9 +153,7 @@ class ComposeWindow : JFrame() {
      * Registers a task to run when the rendering API changes.
      */
     fun onRenderApiChanged(action: () -> Unit) {
-        layer.component.onStateChanged(SkiaLayer.PropertyKind.Renderer) {
-            action()
-        }
+        delegate.onRenderApiChanged(action)
     }
 
     /**
@@ -202,14 +161,34 @@ class ComposeWindow : JFrame() {
      * ComposeWindow is rendered. Currently returns HWND on Windows, Display on X11 and NSWindow
      * on macOS.
      */
-    val windowHandle: Long
-        get() = layer.component.windowHandle
+    val windowHandle: Long get() = delegate.windowHandle
 
     /**
      * Returns low-level rendering API used for rendering in this ComposeWindow. API is
      * automatically selected based on operating system, graphical hardware and `SKIKO_RENDER_API`
      * environment variable.
      */
-    val renderApi: GraphicsApi
-        get() = layer.component.renderApi
+    val renderApi: GraphicsApi get() = delegate.renderApi
+
+    // We need overridden listeners because we mix Swing and AWT components in the
+    // org.jetbrains.skiko.SkiaLayer, they don't work well together.
+    // TODO(demin): is it possible to fix that without overriding?
+
+    override fun addMouseListener(listener: MouseListener) =
+        delegate.addMouseListener(listener)
+
+    override fun removeMouseListener(listener: MouseListener) =
+        delegate.removeMouseListener(listener)
+
+    override fun addMouseMotionListener(listener: MouseMotionListener) =
+        delegate.addMouseMotionListener(listener)
+
+    override fun removeMouseMotionListener(listener: MouseMotionListener) =
+        delegate.removeMouseMotionListener(listener)
+
+    override fun addMouseWheelListener(listener: MouseWheelListener) =
+        delegate.addMouseWheelListener(listener)
+
+    override fun removeMouseWheelListener(listener: MouseWheelListener) =
+        delegate.removeMouseWheelListener(listener)
 }
