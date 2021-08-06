@@ -28,7 +28,6 @@ import android.view.MotionEvent.ACTION_UP
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.ViewRootForTest
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 internal actual fun createInputDispatcher(
     testContext: TestContext,
@@ -54,25 +53,25 @@ internal class AndroidInputDispatcher(
     private var currentClockTime = currentTime
 
     override fun PartialGesture.enqueueDown(pointerId: Int) {
-        batchMotionEvent(
+        enqueueTouchEvent(
             if (lastPositions.size == 1) ACTION_DOWN else ACTION_POINTER_DOWN,
             lastPositions.keys.sorted().indexOf(pointerId)
         )
     }
 
     override fun PartialGesture.enqueueMove() {
-        batchMotionEvent(ACTION_MOVE, 0)
+        enqueueTouchEvent(ACTION_MOVE, 0)
     }
 
     override fun PartialGesture.enqueueUp(pointerId: Int) {
-        batchMotionEvent(
+        enqueueTouchEvent(
             if (lastPositions.size == 1) ACTION_UP else ACTION_POINTER_UP,
             lastPositions.keys.sorted().indexOf(pointerId)
         )
     }
 
     override fun PartialGesture.enqueueCancel() {
-        batchMotionEvent(ACTION_CANCEL, 0)
+        enqueueTouchEvent(ACTION_CANCEL, 0)
     }
 
     /**
@@ -82,22 +81,22 @@ internal class AndroidInputDispatcher(
      * @see MotionEvent.getAction
      * @see MotionEvent.getActionIndex
      */
-    private fun PartialGesture.batchMotionEvent(action: Int, actionIndex: Int) {
+    private fun PartialGesture.enqueueTouchEvent(action: Int, actionIndex: Int) {
         val entries = lastPositions.entries.sortedBy { it.key }
-        batchMotionEvent(
-            downTime,
-            currentTime,
-            action,
-            actionIndex,
-            List(entries.size) { entries[it].value },
-            List(entries.size) { entries[it].key }
+        enqueueTouchEvent(
+            downTime = downTime,
+            eventTime = currentTime,
+            action = action,
+            actionIndex = actionIndex,
+            coordinates = List(entries.size) { entries[it].value },
+            pointerIds = List(entries.size) { entries[it].key }
         )
     }
 
     /**
      * Generates an event with the given parameters.
      */
-    private fun batchMotionEvent(
+    private fun enqueueTouchEvent(
         downTime: Long,
         eventTime: Long,
         action: Int,
@@ -107,7 +106,7 @@ internal class AndroidInputDispatcher(
     ) {
         synchronized(batchLock) {
             check(acceptEvents) {
-                "Can't enqueue event (" +
+                "Can't enqueue touch event (" +
                     "downTime=$downTime, " +
                     "eventTime=$eventTime, " +
                     "action=$action, " +
@@ -174,7 +173,7 @@ internal class AndroidInputDispatcher(
         // dispatcher, so we don't have to reset firstEventTime after use
     }
 
-    @OptIn(InternalTestApi::class, ExperimentalCoroutinesApi::class)
+    @OptIn(InternalTestApi::class)
     private fun advanceClockTime(millis: Long) {
         // Don't bother advancing the clock if there's nothing to advance
         if (millis > 0) {

@@ -34,7 +34,7 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 /**
- * Tests if [AndroidInputDispatcher.enqueueUp] works
+ * Tests if [AndroidInputDispatcher.enqueueTouchUp] works
  */
 @SmallTest
 class SendUpTest : InputDispatcherTest() {
@@ -50,9 +50,9 @@ class SendUpTest : InputDispatcherTest() {
 
     @Test
     fun onePointer() {
-        subject.generateDownAndCheck(pointer1, position1_1)
-        subject.generateUpAndCheck(pointer1)
-        subject.verifyNoGestureInProgress()
+        subject.generateTouchDownAndCheck(pointer1, position1_1)
+        subject.generateTouchUpAndCheck(pointer1)
+        subject.verifyNoTouchGestureInProgress()
         subject.sendAllSynchronous()
 
         recorder.assertHasValidEventTimes()
@@ -70,9 +70,9 @@ class SendUpTest : InputDispatcherTest() {
 
     @Test
     fun onePointerWithDelay() {
-        subject.generateDownAndCheck(pointer1, position1_1)
-        subject.generateUpAndCheck(pointer1, 2 * eventPeriodMillis)
-        subject.verifyNoGestureInProgress()
+        subject.generateTouchDownAndCheck(pointer1, position1_1)
+        subject.generateTouchUpAndCheck(pointer1, 2 * eventPeriodMillis)
+        subject.verifyNoTouchGestureInProgress()
         subject.sendAllSynchronous()
 
         recorder.assertHasValidEventTimes()
@@ -91,11 +91,11 @@ class SendUpTest : InputDispatcherTest() {
 
     @Test
     fun multiplePointers_ascending() {
-        subject.generateDownAndCheck(pointer1, position1_1)
-        subject.generateDownAndCheck(pointer2, position2_1)
-        subject.generateUpAndCheck(pointer1)
-        subject.generateUpAndCheck(pointer2)
-        subject.verifyNoGestureInProgress()
+        subject.generateTouchDownAndCheck(pointer1, position1_1)
+        subject.generateTouchDownAndCheck(pointer2, position2_1)
+        subject.generateTouchUpAndCheck(pointer1)
+        subject.generateTouchUpAndCheck(pointer2)
+        subject.verifyNoTouchGestureInProgress()
         subject.sendAllSynchronous()
 
         recorder.assertHasValidEventTimes()
@@ -121,11 +121,11 @@ class SendUpTest : InputDispatcherTest() {
 
     @Test
     fun multiplePointers_descending() {
-        subject.generateDownAndCheck(pointer1, position1_1)
-        subject.generateDownAndCheck(pointer2, position2_1)
-        subject.generateUpAndCheck(pointer2)
-        subject.generateUpAndCheck(pointer1)
-        subject.verifyNoGestureInProgress()
+        subject.generateTouchDownAndCheck(pointer1, position1_1)
+        subject.generateTouchDownAndCheck(pointer2, position2_1)
+        subject.generateTouchUpAndCheck(pointer2)
+        subject.generateTouchUpAndCheck(pointer1)
+        subject.verifyNoTouchGestureInProgress()
         subject.sendAllSynchronous()
 
         recorder.assertHasValidEventTimes()
@@ -152,33 +152,33 @@ class SendUpTest : InputDispatcherTest() {
     @Test
     fun upWithoutDown() {
         expectError<IllegalStateException> {
-            subject.enqueueUp(pointer1)
+            subject.enqueueTouchUp(pointer1)
         }
     }
 
     @Test
     fun upWrongPointerId() {
-        subject.enqueueDown(pointer1, position1_1)
+        subject.enqueueTouchDown(pointer1, position1_1)
         expectError<IllegalArgumentException> {
-            subject.enqueueUp(pointer2)
+            subject.enqueueTouchUp(pointer2)
         }
     }
 
     @Test
     fun upAfterUp() {
-        subject.enqueueDown(pointer1, position1_1)
-        subject.enqueueUp(pointer1)
+        subject.enqueueTouchDown(pointer1, position1_1)
+        subject.enqueueTouchUp(pointer1)
         expectError<IllegalStateException> {
-            subject.enqueueUp(pointer1)
+            subject.enqueueTouchUp(pointer1)
         }
     }
 
     @Test
     fun upAfterCancel() {
-        subject.enqueueDown(pointer1, position1_1)
-        subject.enqueueCancel()
+        subject.enqueueTouchDown(pointer1, position1_1)
+        subject.enqueueTouchCancel()
         expectError<IllegalStateException> {
-            subject.enqueueUp(pointer1)
+            subject.enqueueTouchUp(pointer1)
         }
     }
 }

@@ -16,15 +16,15 @@
 
 package androidx.compose.ui.test.inputdispatcher
 
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.testutils.expectError
+import androidx.compose.ui.geometry.Offset
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class BatchingTest : InputDispatcherTest() {
 
     companion object {
-        private const val cannotEnqueueError = "Can't enqueue event \\(.*\\), " +
+        private const val cannotEnqueueError = "Can't enqueue touch event \\(.*\\), " +
             "events have already been \\(or are being\\) dispatched or disposed"
         private const val cannotSendError = "Events have already " +
             "been \\(or are being\\) dispatched or disposed"
@@ -37,9 +37,9 @@ class BatchingTest : InputDispatcherTest() {
      */
     @Test
     fun enqueueSendDispose() {
-        subject.enqueueDown(0, Offset.Zero)
-        subject.enqueueMove()
-        subject.enqueueMove()
+        subject.enqueueTouchDown(0, Offset.Zero)
+        subject.enqueueTouchMove()
+        subject.enqueueTouchMove()
         assertThat(recorder.events).isEmpty()
 
         subject.sendAllSynchronous()
@@ -54,16 +54,16 @@ class BatchingTest : InputDispatcherTest() {
      */
     @Test
     fun enqueueSendEnqueue() {
-        subject.enqueueDown(0, Offset.Zero)
-        subject.enqueueMove()
-        subject.enqueueMove()
+        subject.enqueueTouchDown(0, Offset.Zero)
+        subject.enqueueTouchMove()
+        subject.enqueueTouchMove()
         assertThat(recorder.events).isEmpty()
 
         subject.sendAllSynchronous()
         assertThat(recorder.events).hasSize(3)
 
         expectError<IllegalStateException>(expectedMessage = cannotEnqueueError) {
-            subject.enqueueMove()
+            subject.enqueueTouchMove()
         }
         assertThat(recorder.events).hasSize(3)
 
@@ -79,9 +79,9 @@ class BatchingTest : InputDispatcherTest() {
      */
     @Test
     fun enqueueSendSend() {
-        subject.enqueueDown(0, Offset.Zero)
-        subject.enqueueMove()
-        subject.enqueueMove()
+        subject.enqueueTouchDown(0, Offset.Zero)
+        subject.enqueueTouchMove()
+        subject.enqueueTouchMove()
         assertThat(recorder.events).isEmpty()
 
         subject.sendAllSynchronous()
@@ -98,16 +98,16 @@ class BatchingTest : InputDispatcherTest() {
      */
     @Test
     fun enqueueDisposeEnqueue() {
-        subject.enqueueDown(0, Offset.Zero)
-        subject.enqueueMove()
-        subject.enqueueMove()
+        subject.enqueueTouchDown(0, Offset.Zero)
+        subject.enqueueTouchMove()
+        subject.enqueueTouchMove()
         assertThat(recorder.events).isEmpty()
 
         subject.dispose()
         assertThat(recorder.events).isEmpty()
 
         expectError<IllegalStateException>(expectedMessage = cannotEnqueueError) {
-            subject.enqueueMove()
+            subject.enqueueTouchMove()
         }
         assertThat(recorder.events).isEmpty()
 
@@ -123,9 +123,9 @@ class BatchingTest : InputDispatcherTest() {
      */
     @Test
     fun enqueueDisposeSend() {
-        subject.enqueueDown(0, Offset.Zero)
-        subject.enqueueMove()
-        subject.enqueueMove()
+        subject.enqueueTouchDown(0, Offset.Zero)
+        subject.enqueueTouchMove()
+        subject.enqueueTouchMove()
         assertThat(recorder.events).isEmpty()
 
         subject.dispose()
@@ -143,9 +143,9 @@ class BatchingTest : InputDispatcherTest() {
      */
     @Test
     fun enqueueDisposeDispose() {
-        subject.enqueueDown(0, Offset.Zero)
-        subject.enqueueMove()
-        subject.enqueueMove()
+        subject.enqueueTouchDown(0, Offset.Zero)
+        subject.enqueueTouchMove()
+        subject.enqueueTouchMove()
         assertThat(recorder.events).isEmpty()
 
         subject.dispose()

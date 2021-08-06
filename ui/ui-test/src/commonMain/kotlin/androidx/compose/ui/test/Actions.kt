@@ -37,7 +37,7 @@ import kotlin.math.min
  * Performs a click action on the element represented by the given semantics node.
  */
 fun SemanticsNodeInteraction.performClick(): SemanticsNodeInteraction {
-    // TODO(jellefresen): Replace with semantics action when semantics merging is done
+    // TODO(fresen): Replace with semantics action when semantics merging is done
     // The problem we currently have is that the click action might be defined on a different
     // semantics node than we're interacting with now, even though it is "semantically" the same.
     // E.g., findByText(buttonText) finds the Text's semantics node, but the click action is
