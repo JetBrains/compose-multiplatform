@@ -440,10 +440,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogState
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberDialogState
 
 fun main() = application {
     Window(
@@ -458,7 +458,7 @@ fun main() = application {
         if (isDialogOpen) {
             Dialog(
                 onCloseRequest = { isDialogOpen = false },
-                state = DialogState(position = WindowPosition(Alignment.Center))
+                state = rememberDialogState(position = WindowPosition(Alignment.Center))
             ) {
                 // Dialog's content
             }
