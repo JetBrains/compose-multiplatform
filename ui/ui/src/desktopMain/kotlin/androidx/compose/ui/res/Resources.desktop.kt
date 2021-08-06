@@ -18,8 +18,31 @@ package androidx.compose.ui.res
 
 import java.io.InputStream
 
-internal fun openResourceStream(resourcePath: String): InputStream {
-    val classLoader = Thread.currentThread().contextClassLoader
+/**
+ * Open [InputStream] from a resource stored in resources for the application, calls the [block]
+ * callback giving it a InputStream and closes stream once the processing is
+ * complete.
+ *
+ * @return object that was returned by [block]
+ *
+ * @throws IllegalArgumentException if there is no [resourcePath] in resources
+ */
+inline fun <T> useResource(
+    resourcePath: String,
+    block: (InputStream) -> T
+): T = openResource(resourcePath).use(block)
+
+/**
+ * Open [InputStream] from a resource stored in resources for the application.
+ *
+ * @throws IllegalArgumentException if there is no [resourcePath] in resources
+ */
+@PublishedApi
+internal fun openResource(resourcePath: String): InputStream {
+    // TODO(https://github.com/JetBrains/compose-jb/issues/618): probably we shouldn't use
+    //  contextClassLoader here, as it is not defined in threads created by non-JVM
+    val classLoader = Thread.currentThread().contextClassLoader!!
+
     return requireNotNull(classLoader.getResourceAsStream(resourcePath)) {
         "Resource $resourcePath not found"
     }

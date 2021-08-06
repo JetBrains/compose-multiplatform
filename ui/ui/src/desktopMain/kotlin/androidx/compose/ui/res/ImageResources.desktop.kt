@@ -19,15 +19,34 @@ package androidx.compose.ui.res
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.imageFromResource
+import androidx.compose.ui.graphics.asImageBitmap
+import org.jetbrains.skija.Image
+import java.io.InputStream
 
 /**
  * Synchronously load an image file stored in resources for the application.
  *
- * @param path path to the image file
+ * @param resourcePath path to the image file
  * @return the decoded image data associated with the resource
  */
 @Composable
-fun imageResource(path: String): ImageBitmap {
-    return remember(path) { imageFromResource(path) }
+@Deprecated(
+    "Use painterResource(resourcePath)",
+    replaceWith = ReplaceWith("painterResource(resourcePath)")
+)
+fun imageResource(resourcePath: String): ImageBitmap {
+    return remember(resourcePath) {
+        useResource(resourcePath, ::loadImageBitmap)
+    }
 }
+
+/**
+ * Load and decode [ImageBitmap] from the given [inputStream]. [inputStream] should contain encoded
+ * raster image in a format supported by Skia (BMP, GIF, HEIF, ICO, JPEG, PNG, WBMP, WebP)
+ *
+ * @param inputStream input stream to load an rater image. All bytes will be read from this
+ * stream, but stream will not be closed after this method.
+ * @return the decoded SVG image associated with the resource
+ */
+fun loadImageBitmap(inputStream: InputStream): ImageBitmap =
+    Image.makeFromEncoded(inputStream.readAllBytes()).asImageBitmap()
