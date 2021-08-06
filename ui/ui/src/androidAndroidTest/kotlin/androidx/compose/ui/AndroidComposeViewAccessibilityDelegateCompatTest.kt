@@ -81,6 +81,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.accessibility.AccessibilityNodeProviderCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.nhaarman.mockitokotlin2.argThat
@@ -628,6 +629,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     }
 
     @Test
+    @FlakyTest(bugId = 195287742)
     fun sendScrollEvent_byStateObservation() {
         var scrollValue by mutableStateOf(0f, structuralEqualityPolicy())
         var scrollMaxValue by mutableStateOf(100f, structuralEqualityPolicy())
