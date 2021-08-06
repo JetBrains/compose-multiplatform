@@ -256,6 +256,61 @@ compose.desktop {
 }
 ```
 
+## Packaging resources
+
+There are multiple ways to package and load resources with Compose for Desktop.
+
+### JVM resource loading
+
+Since Compose for Desktop uses JVM platform, you can load resources from a jar file using `java.lang.Class` API. Put a file under `src/main/resources`, 
+then access it using [Class::getResource](https://docs.oracle.com/en/java/javase/15/docs/api/java.base/java/lang/Class.html#getResource(java.lang.String))
+or [Class::getResourceAsStream](https://docs.oracle.com/en/java/javase/15/docs/api/java.base/java/lang/Class.html#getResourceAsStream(java.lang.String)).
+
+### Adding files to packaged application
+
+In some cases putting and reading resources from jar files might be inconvenient.
+Or you may want to include a target specific asset (e.g. a file, that is included only 
+into a macOS package, but not into a Windows one).
+
+Compose Gradle plugin can be configured to put additional
+resource files under an installation directory.
+
+To do so, specify a root resource directory via DSL:
+```
+compose.desktop {
+    application {
+        mainClass = "MainKt"
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageVersion = "1.0.0"
+
+            appResourcesRootDir.set(project.layout.projectDirectory.dir("resources"))
+        }
+    }
+}
+```
+In the example above a root resource directory is set to `<PROJECT_DIR>/resources`.
+
+Compose Gradle plugin will include all files under the following subdirectories:
+1. Files from `<RESOURCES_ROOT_DIR>/common` will be included into all packages.
+2. Files from `<RESOURCES_ROOT_DIR>/<OS_NAME>` will be included only into packages for 
+a specific OS. Possible values for `<OS_NAME>` are: `windows`, `macos`, `linux`.
+3. Files from `<RESOURCES_ROOT_DIR>/<OS_NAME>-<ARCH_NAME>` will be included only into packages for
+   a specific combination of OS and CPU architecture. Possible values for `<ARCH_NAME>` are: `x64` and `arm64`.
+For example, files from `<RESOURCES_ROOT_DIR>/macos-arm64` will be included only into packages built for Apple Silicon
+Macs.
+
+Included resources can be accessed via `compose.application.resources.dir` system property:
+```
+import java.io.File
+
+val resourcesDir = File(System.getProperty("compose.application.resources.dir"))
+
+fun main() {
+    println(resourcesDir.resolve("resource.txt").readText())
+}
+```
+
 ## Customizing content
 
 The plugin can configure itself, when either `org.jetbrains.kotlin.jvm` or `org.jetbrains.kotlin.multiplatform` plugins 
