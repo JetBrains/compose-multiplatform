@@ -25,7 +25,7 @@ class ModifierTests {
         val el = root.firstChild
         assertTrue(el is HTMLElement, "element not found")
 
-        assertEquals("background-color: rgb(255, 0, 0);", el.style.cssText)
+        assertEquals("background-color: rgba(255, 0, 0, 255);", el.style.cssText)
     }
 
     @Test

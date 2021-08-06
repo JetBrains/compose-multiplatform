@@ -1,13 +1,10 @@
 package org.jetbrains.compose.common.ui
 
+import org.jetbrains.compose.common.internal.castOrCreate
 import org.jetbrains.compose.common.ui.unit.Dp
-import org.jetbrains.compose.common.core.graphics.Color
-import org.jetbrains.compose.web.css.backgroundColor
+import org.jetbrains.compose.web.attributes.AttrsBuilder
 import org.jetbrains.compose.web.css.margin
 import org.jetbrains.compose.web.css.px
-import org.jetbrains.compose.web.css.Color.RGB
-import org.jetbrains.compose.common.internal.castOrCreate
-import org.jetbrains.compose.web.attributes.AttrsBuilder
 
 fun Modifier.asAttributeBuilderApplier(
     passThroughHandler: (AttrsBuilder<*>.() -> Unit)? = null
