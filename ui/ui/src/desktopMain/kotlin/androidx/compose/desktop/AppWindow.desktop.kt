@@ -424,7 +424,7 @@ class AppWindow : AppFrame {
     ) {
         window.setContent(parentComposition) {
             CompositionLocalProvider(
-                LocalAppWindow provides this,
+                LocalAppWindow provides this@AppWindow,
                 content = content
             )
         }

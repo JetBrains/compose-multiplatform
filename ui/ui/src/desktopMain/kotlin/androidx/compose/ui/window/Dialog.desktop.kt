@@ -106,7 +106,7 @@ fun OwnerWindowScope.Dialog(
     focusable: Boolean = true,
     onPreviewKeyEvent: ((KeyEvent) -> Boolean) = { false },
     onKeyEvent: ((KeyEvent) -> Boolean) = { false },
-    content: @Composable DialogScope.() -> Unit
+    content: @Composable DialogWindowScope.() -> Unit
 ) {
     val owner = this.ownerWindow
 
@@ -216,19 +216,14 @@ fun OwnerWindowScope.Dialog(
     create: () -> ComposeDialog,
     dispose: (ComposeDialog) -> Unit,
     update: (ComposeDialog) -> Unit = {},
-    content: @Composable DialogScope.() -> Unit
+    content: @Composable DialogWindowScope.() -> Unit
 ) {
     val composition = rememberCompositionContext()
     AwtWindow(
         visible = visible,
         create = {
             create().apply {
-                val scope = object : DialogScope {
-                    override val dialog: ComposeDialog get() = this@apply
-                }
-                setContent(composition, onPreviewKeyEvent, onKeyEvent) {
-                    scope.content()
-                }
+                setContent(composition, onPreviewKeyEvent, onKeyEvent, content)
             }
         },
         dispose = dispose,
@@ -239,11 +234,9 @@ fun OwnerWindowScope.Dialog(
 /**
  * Receiver scope which is used by [androidx.compose.ui.window.Dialog].
  */
-interface DialogScope : OwnerWindowScope {
+interface DialogWindowScope : WindowScope {
     /**
      * [ComposeDialog] that was created inside [androidx.compose.ui.window.Dialog].
      */
-    val dialog: ComposeDialog
-
-    override val ownerWindow: Window get() = dialog
+    override val window: ComposeDialog
 }

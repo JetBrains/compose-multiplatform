@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.window.DialogWindowScope
 import org.jetbrains.skiko.ClipComponent
 import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.SkiaLayer
@@ -99,8 +100,11 @@ class ComposeDialog(
         parentComposition: CompositionContext? = null,
         onKeyEvent: ((KeyEvent) -> Boolean) = { false },
         onPreviewKeyEvent: ((KeyEvent) -> Boolean) = { false },
-        content: @Composable () -> Unit
+        content: @Composable DialogWindowScope.() -> Unit
     ) {
+        val scope = object : DialogWindowScope {
+            override val window: ComposeDialog get() = this@ComposeDialog
+        }
         layer.setContent(
             parentComposition = parentComposition,
             onPreviewKeyEvent = onPreviewKeyEvent,
@@ -109,7 +113,7 @@ class ComposeDialog(
             CompositionLocalProvider(
                 LocalLayerContainer provides pane
             ) {
-                content()
+                scope.content()
             }
         }
     }
