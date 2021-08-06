@@ -57,7 +57,7 @@ fun rememberDialogState(
 fun DialogState(
     position: WindowPosition = WindowPosition(Alignment.Center),
     size: WindowSize = WindowSize(400.dp, 300.dp)
-): DialogState = DialogState(
+): DialogState = DialogStateImpl(
     position, size
 )
 
@@ -76,10 +76,12 @@ fun rememberDialogState(
     position: WindowPosition = WindowPosition(Alignment.Center),
     width: Dp = 400.dp,
     height: Dp = 300.dp,
-): DialogState = rememberDialogState(
-    position,
-    WindowSize(width, height)
-)
+): DialogState = rememberSaveable(saver = DialogStateImpl.Saver(position)) {
+    DialogStateImpl(
+        position,
+        WindowSize(width, height)
+    )
+}
 
 /**
  * A state object that can be hoisted to control and observe dialog attributes
