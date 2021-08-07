@@ -58,7 +58,7 @@ class ImageVectorGenerator(
         // Kotlin 1.4) each property with the same name will be considered as a possible candidate
         // for resolution, regardless of the access modifier, so by using unique names we reduce
         // the size from ~6000 to 1, and speed up compilation time for these icons.
-        val backingPropertyName = "_" + iconName.decapitalize(Locale.ROOT)
+        val backingPropertyName = "_" + iconName.replaceFirstChar { it.lowercase(Locale.ROOT) }
         val backingProperty = backingProperty(name = backingPropertyName)
         return FileSpec.builder(
             packageName = combinedPackageName,
