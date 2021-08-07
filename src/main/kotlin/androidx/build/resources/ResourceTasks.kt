@@ -41,7 +41,11 @@ object ResourceTasks {
     ) {
         @OptIn(ExperimentalStdlibApi::class)
         val packageResTask = project.tasks
-            .named("package${variantName.capitalize(Locale.US)}Resources")
+            .named(
+                "package${variantName.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(Locale.US) else it.toString()
+                }}Resources"
+            )
         @Suppress("UnstableApiUsage") // flatMap
         val builtApiFile = packageResTask.flatMap { task ->
             (task as com.android.build.gradle.tasks.MergeResources).publicFile

@@ -26,7 +26,7 @@ enum class OperatingSystem {
 }
 
 fun getOperatingSystem(): OperatingSystem {
-    val os = System.getProperty("os.name").toLowerCase(Locale.US)
+    val os = System.getProperty("os.name").lowercase(Locale.US)
     return when {
         os.contains("mac os x") -> OperatingSystem.MAC
         os.contains("darwin") -> OperatingSystem.MAC

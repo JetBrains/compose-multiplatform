@@ -76,7 +76,7 @@ sealed class StudioPlatformUtilities(val projectRoot: File, val studioInstallati
     protected val jvmHeapRegex = "-Xmx.*".toRegex()
 
     companion object {
-        val osName = if (System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("linux")) {
+        val osName = if (System.getProperty("os.name").lowercase(Locale.ROOT).contains("linux")) {
             "linux"
         } else {
             "mac"

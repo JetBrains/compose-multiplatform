@@ -90,10 +90,18 @@ fun Project.configureAndroidProjectForLint(lintOptions: LintOptions, extension: 
     }
     afterEvaluate {
         for (variant in project.agpVariants) {
-            tasks.named("lint${variant.name.capitalize(Locale.US)}").configure { task ->
+            tasks.named(
+                "lint${variant.name.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(Locale.US) else it.toString()
+                }}"
+            ).configure { task ->
                 AffectedModuleDetector.configureTaskGuard(task)
             }
-            tasks.named("lintAnalyze${variant.name.capitalize(Locale.US)}").configure { task ->
+            tasks.named(
+                "lintAnalyze${variant.name.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(Locale.US) else it.toString()
+                }}"
+            ).configure { task ->
                 AffectedModuleDetector.configureTaskGuard(task)
             }
             /* TODO: uncomment when we upgrade to AGP 7.1.0-alpha04
@@ -110,8 +118,14 @@ private fun Project.setUpLintDebugIfNeeded() {
     if (!variantNames.contains("debug")) {
         tasks.register("lintDebug") {
             for (variantName in variantNames) {
-                if (variantName.toLowerCase(Locale.US).contains("debug")) {
-                    it.dependsOn(tasks.named("lint${variantName.capitalize(Locale.US)}"))
+                if (variantName.lowercase(Locale.US).contains("debug")) {
+                    it.dependsOn(
+                        tasks.named(
+                            "lint${variantName.replaceFirstChar {
+                                if (it.isLowerCase()) it.titlecase(Locale.US) else it.toString()
+                            }}"
+                        )
+                    )
                 }
             }
         }
