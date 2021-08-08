@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -44,21 +43,19 @@ import androidx.compose.ui.platform.InfiniteAnimationPolicy
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-val minWidth = 240.dp
-
 @Composable
 fun RowConfigurationDemo() {
-    val width by produceState(minWidth) {
+    val width by produceState(240.dp) {
         // Skip the animations in tests.
         while (coroutineContext[InfiniteAnimationPolicy] == null) {
             animate(
-                Dp.VectorConverter, minWidth, 500.dp,
+                Dp.VectorConverter, 240.dp, 500.dp,
                 animationSpec = spring(Spring.DampingRatioHighBouncy, Spring.StiffnessLow)
             ) { value, _ ->
                 this.value = value
             }
             animate(
-                Dp.VectorConverter, 500.dp, minWidth,
+                Dp.VectorConverter, 500.dp, 240.dp,
                 animationSpec = tween(500)
             ) { value, _ ->
                 this.value = value
@@ -106,24 +103,20 @@ fun ResizableLayout(width: Dp) {
                 RowItem(text = "B")
                 RowItem(text = "C")
             }
-            Row(rowModifier.fillMaxWidth()) {
-                Spacer(Modifier.weight(1f))
+            Row(rowModifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 RowItem(text = "A")
                 RowItem(text = "B")
                 RowItem(text = "C")
             }
-            Row(rowModifier.fillMaxWidth()) {
-                Spacer(Modifier.weight(1f))
+            Row(rowModifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 RowItem(text = "A")
                 RowItem(text = "B")
                 RowItem(text = "C")
-                Spacer(Modifier.weight(1f))
             }
-            Row(rowModifier.fillMaxWidth()) {
+            Row(rowModifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
                 RowItem(text = "A")
                 RowItem(text = "B")
                 RowItem(text = "C")
-                Spacer(Modifier.weight(1f))
             }
         }
     }
