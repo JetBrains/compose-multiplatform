@@ -28,7 +28,6 @@ import com.android.tools.lint.checks.infrastructure.TestFile
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
 import org.intellij.lang.annotations.Language
-import org.junit.Ignore
 import org.junit.runners.Parameterized
 
 /* ktlint-disable max-line-length */
@@ -42,6 +41,7 @@ class UnnecessaryLambdaCreationDetectorTest(
         private val stub = kotlinAndCompiledStub(
             filename = "Stub.kt",
             filepath = "test",
+            checksum = 0xdbff73f0,
             source = """
                 package test
 
@@ -65,30 +65,30 @@ class UnnecessaryLambdaCreationDetectorTest(
                 }
             """,
             """
-            test/StubKt.class:
-            H4sIAAAAAAAAAJVUW08TQRT+ZnvZpRRYKigtCohVCl621NsDxMSYEBsrGqr4
-            wNN0u+DQdtbsThsfiS/+Bp9M/Ae+oQ+G4Js/ynhmS7kjuknPmT3n+8535uxM
-            f/3+/gPAPTxk6FdeqJyqateeKROMwd7kHe40udxwXtQ2PZeiMQZrvS1dJXzJ
-            ECvMrjJknvitd37Ia01vaT91rVBp+KoppLPZaTk9Suj0EMUFTS2dh1rs5V9L
-            oRYeRaTrFS7rgS/q7x03UvacoC2VaHnOQScL1ELFDzacTU/VAi6oKJfSV7wr
-            sOyr5XazSSjT9aXypLKQZpg41I2gcCB50ylLFRBfuKGJQYZR963nNvYKvOQB
-            b3kEZJgpVI7Pa+FQpKqLbNAG0rAxnMIQMkf1Ttm9iRGGpJAdv+ExjBRmTyqk
-            cRGX+jGKMYap80bOMFaWBPBO+2JX8iK/nj87z8oM2RVPrAuvflp+IuL/BTDc
-            a++5p3idK079GK1OjM4f0yZBGg29MCj+XuhVkVb1eYbPO1sjqZ2tlGEbkRsz
-            uj8rnhu3d7ZyRpGVhm0jN5CJZ2hdjO1+SVLyqZmbtBNnZnc/Wj+3GdFn7KQG
-            TSetnS3bHDsHnbQtjd79YJiphLX7qVRkus0So30g09vk4amzV3TO9MW601AM
-            8Sd+nT7nUIUGvdxu1bzglR6U5voub67yQOj3vWBfVWxIrtoBrcdXuue8LDsi
-            FJR+fHCkGfLHs/uH8wgsVfXbgestCV09u8dZPVEP8zAQh37iyCKBJO3Oobcs
-            ug/7qg2KZHVK2yxMWATXsEWi6+jgXGZgGxfmviHL8EZzjIiTIp8kO4B+kgLS
-            XTT5HPlShOvD3b3qqehPCjBpmETQXYzvSz0lqEHe7krFFk8Vs+jKDdHd02IX
-            o3cLl3ElkrX/UdbOYoJoxn/JjpDs6BHZyWOyh+UM3I/sHTwgv0TRKRr+1TXE
-            ypgu4xpZ5Mu4jhtlzKCwBhZiFnNr6AthhrgZIh3iVohUiPEQEyFuh0j8ATwh
-            ftTnBQAA
-            """,
-            """
             META-INF/main.kotlin_module:
             H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3AJcbFUpJaXCLEFlxSmuQNpEOAPO8S
             JQYtBgBDd0xtMAAAAA==
+            """,
+            """
+            test/StubKt.class:
+            H4sIAAAAAAAAAJ1UW08TQRT+ZnvZpRRZKigtCqhVCl621GuEmBgTQmNFI4gP
+            PE23Cw5tZ83utOGR+OJv8MnEf+Cb+mAIvvmjjGe2FLlUUZvsnJlzvu9858yl
+            3398+QrgFu4x9CsvVM6yalUfKxOMwd7kbe40uNxwnlY3PZe8MQZrvSVdJXzJ
+            ECtMrzJkHvnN137Iqw1vYT90qVCp+6ohpLPZbjpdSuh0EcU5TS2dhJrvxl9I
+            oeYeRKTLFS5rgS9qW44bKXtO0JJKND3nVyVzVELFDzacTU9VAy4oKZfSV7wj
+            sOSrpVajQSjT9aXypLKQZhg/UI0gdyB5wylLFRBfuKGJUwwj7ivPre8leMYD
+            3vQIyDBVqBzdr7kDnmWdZIMaSMPGUAqDyBzW69G9iWGGpJBtv+4xDBemjyuk
+            cQZn+zGCUYbJk7acYbQsCeD1OrHzeZFfz/8+zsoM2eeeWBderVd8cX7l/vH6
+            HvzPCY9HpfxBa6hLeuIpXuOKU2tGsx2jq8z0kKBy63pikH9L6FmRZrVZhvc7
+            28Opne2UYRuRGTU6nxXPjdk72zmjyEpDtpEbyMQzNC/Gdj8kKbho5ibsxG+j
+            u2+tb58Y0afspAZdTFo727Y5egI6aVsavfvGMFMJa/ddqch0mSVGfSDTbfLg
+            AbIVurL6jd6oK4b4I79GN2OwQme21GpWvWBFb5Tm+i5vrPJA6PWes29ZbEiu
+            WgHNx553nkxZtkUoKPzw1+tgyB+N7t/zQ7DUst8KXG9B6OzZPc7qsXyYhYE4
+            9C+OLBJIUndFWmXR+bGPeiAYopAeszBhEVzD5omuvadmMgOfcHrmM7IMLzXH
+            iDgpskkaB9CPEq3THTTZHNmbEa6P/uM62VNkb9Nn0mYSQVcxti+1SFCDrN2R
+            is33FLPo9Q7SM9ZiZ6K1hXM4H8nafylrZzFOtNg/yQ6T7Mgh2cmeshOHZA3c
+            iUYHd8kukPcCHcLFNcTKuFRGnkZcLuMKpsooYHoNLMQMrq6hL4QZ4lqIdIjr
+            IVIhxkKMh7gRIvETuPI3KzoGAAA=
             """
         )
 
@@ -111,7 +111,6 @@ class UnnecessaryLambdaCreationDetectorTest(
             .run()
     }
 
-    @Ignore // b/193270279
     @Test
     fun warnsForSingleExpressions() {
         check(

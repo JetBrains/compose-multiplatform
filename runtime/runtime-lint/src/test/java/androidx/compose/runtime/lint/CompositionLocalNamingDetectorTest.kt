@@ -22,7 +22,6 @@ import androidx.compose.lint.test.compiledStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -43,6 +42,7 @@ class CompositionLocalNamingDetectorTest : LintDetectorTest() {
     private val compositionLocalStub = compiledStub(
         filename = "CompositionLocal.kt",
         filepath = "androidx/compose/runtime",
+        checksum = 0x48f5c823,
         """
             package androidx.compose.runtime
 
@@ -69,41 +69,10 @@ class CompositionLocalNamingDetectorTest : LintDetectorTest() {
             ): ProvidableCompositionLocal<T> = StaticProvidableCompositionLocal(defaultFactory)
         """,
 """
-        androidx/compose/runtime/CompositionLocalKt.class:
-        H4sIAAAAAAAAAJ1UW08TQRg9s72yFChFoRQvCFW5KFtuGmklMRhiQ7lEGozh
-        abq7kOlll+xuG3gx/A3/hW8aTUyf/VHGb7YlarHUdJOd+WbmzDlnv/lmf/z8
-        +h3AGp4zLHLLcGxhnGu6XTuzXVNz6pYnaqa25Y+FJ2yrYOu8uuNFwBjiZd7g
-        WpVbp9p+qWzqNBtgSOgd6P0ThndzhYrtVYWllRs17aRu6XLZ1bbbUSY7X+gq
-        f+DYDWHwUtXsNJJlOM8VNwqdRrKbvfRyi8VidrM/1Zy/lWG2YDunWtn0Sg4X
-        RM4ty/Z4S2jP9vbqVWkwfROKIFKBYBtdjby+sHhN6N39RKAyhHPCEt4mueqd
-        6qMYYhhSMYhhhtU+MhBBnGHYME94veptc92znQuG6V7CDKnrxZFu0zCUezrP
-        Xz/p/uomhhDCKhSMMyRdeRx6J0aW7Yuu3If+npsyNKkiJfM73Y3+6sNjSLa8
-        3GUYvcrArulxg3uccqbUGgG6o0w2IQZWkYFC8+dCRhmKjGUGo3kZV5uXqpJU
-        VCWq+H3zMpWOUxNNBBPKGyXDZoJRgikr8agSD6TU1nSSZYKEC/0HTGqtMKz3
-        eVlZkf4PV5/4Z12MdYKXKlQQwS3bMBlGCsIy9+q1kukUJbHkkJgj7gg5bk8O
-        HIpTi3t1h+Kpty07eashXEHLr37fOrqSnasH3OE10zOdv2BDdMh6ZZeftQXU
-        Q7vu6Oa2kIPJNsfRNX4s01kGIZ8gJmWhUb9Eo2cIgFEf+4bB9wufMdLE6Cd5
-        ltCoDftrt5CRiBYOCYxRv+xjIlhpo6LUr9IboYRiAIgP0LbbFLdEFMiyGJoK
-        fvhI9bKz8AUTLZU1aslB1Jcb9lEJIhwjwgQZTf7LaEoanfqH0WR/Ru/caPRe
-        V6PjRDhBhOO0vO6DnhID8JLY7lOOp48RyONBHjPUYjaPNB7m8QiPj8FczGH+
-        GGEXIRcLLhZdJFw8cZH8BUMfUaX/BgAA
-        """,
-        """
-        androidx/compose/runtime/ProvidableCompositionLocal.class:
-        H4sIAAAAAAAAAI1S308TQRD+9lracmIpRaHgLxAkAolXURNjK0YxDTUFURpe
-        eNr2Ftz2umf29hp869/if+CTiQ+m8dE/yjjblogkBO5hZvabb76Z29nff378
-        BPAUKwxPuPJ1KP0Trxl2PoeR8HSsjOwIb0+HXenzRiC2BhlpZKhqYZMHaTCG
-        Srn+otbiXe4FXB177xst0TSlzdqFeudVyvV6abPEsHrlijSSDKmyVNJsMiw9
-        rLVDE0jltbod7yhWTUuMvMooKpZWD0j9MlZ5fTCH5S7XQn3stYRpaC6Jw5UK
-        DR/yd+MgsHdBA3+4tPHZvFRGaMUD76044nFgtohqdNw0od7hui00tZ5ACq6L
-        MVxjSJpPMmJ4dvFFXrwYGi7rD9tUuO3whWHhsmEZpk4pO8JwnxtOmNPpJuiN
-        MGvGGFiboBNpT0WK/McM7/q9vOsUHLff+99lVgr93loy0+/l2EYmn8w726zo
-        vJklIJ/NJeZdCz3v9wqsmPz1NeXkxqziBjWpM6xf/QHRlPnTyc/+zvR54qO2
-        oXvdCn3BMFmTSuzGnYbQdXuFVsNyDriW9jwCx/flseIm1hQvfxwOUFVdGUlK
-        73HNO4LW+vrfA2Fw98NYN0VF2vq5Uc3BsOIMMbkIhzZtP/pjWnwaCdyj0yvy
-        Dvn02jr7jolvFDpYIOsO4AxRU1ikaGZIw3VkBzJpTCJHUvcHFRksWcxqj1OQ
-        GMEJLA/8XTwg/5KyUzRF/hCJKqaruEEWN62ZqWIWhUOwCHOYP0QqQjbCrQi3
-        I0xGuBMh/Rejxn6KQAQAAA==
+        META-INF/main.kotlin_module:
+        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcclkZiXUpSfmVKhl5yfW5BfnKpX
+        VJpXkpmbKiTkDBbILMnMz/PJT07M8S7hUuOSwaVeLy0/X4gtJLW4xLtEiUGL
+        AQBypVQ1cAAAAA==
         """,
         """
         androidx/compose/runtime/CompositionLocal.class:
@@ -124,20 +93,24 @@ class CompositionLocalNamingDetectorTest : LintDetectorTest() {
         JVwjixllrpdwAzd3wEJin9tBMsRIiFsh5kOMhlgIVeb2T+jXEMfzBAAA
         """,
         """
-        androidx/compose/runtime/StaticProvidableCompositionLocal.class:
-        H4sIAAAAAAAAAJ1SXW8SQRQ9s3x2bSmlVmn9qhYT2yYurZqoIIk2aUpCKxHC
-        C0/D7hQHll2zO0vqG7/Ff+CTiQ+G+OiPMt4BGqsJIek+3I8z55699878+v39
-        B4DneMzwintO4EvnwrL9wSc/FFYQeUoOhNVQXEm7HvhD6fCOK44m51JJ36v5
-        NndTYAz1cvN1rceH3HK517Xed3rCVqVKba7qfL1ys1mqlBieXaM2hThDsiw9
-        qSoMO09qfV+50rN6w4F1Hnm2JobW8SwqlnZbDLuLWOX9SUeaW6j5QdfqCdUJ
-        uCQO9zxfr0fzzyLX1T2VlpFEykQCJkNcfZQhQ2n+IhatlzaRccQ5j1x1zG3l
-        B58ZthfNxbB2STkVijtcccKMwTBG9820STCwPkEXUmdFipwDhpPxKGcaecMc
-        j/516fEoPx7txcln2WE6F88ZJ6xovNvIZbKxLVPnL4nCivGfX5JGNqH1DukX
-        TYYX13kE1G3ucoKrY63/T3zaV7TlI98RDKs16YmzaNARQVOLag3NafFA6nwG
-        LjVk1+MqCigufJi2UvWGMpR0XOcBHwglgrd/r5bBbPhRYItjqes3ZzWtacUV
-        Ig5g0L3rj2bXzwAx3KesQrhBPrm3/w03vlJk4AFZc4JmqSaDbYpuTVlYxspE
-        JUn4Kik9nFSk8Yh8SksvURCbwTHsTPw9FMi/oVMtuNZGrIpcFetkcVObjSr9
-        4HYbLEQem20kQ6yE2ApxJ0QmxN0QqT/sQJiNEwQAAA==
+        androidx/compose/runtime/CompositionLocalKt.class:
+        H4sIAAAAAAAAAJ1UW08TQRg9s72yFChFoRQvCFW5KFtuGmklMRhiQ7lEGozh
+        abq7kOlll+xuG3gx/A3/hW8aTUyf/VHGb7YlarHUdJOd+WbmzDlnv/lmf/z8
+        +h3AGp4zLHLLcGxhnGu6XTuzXVNz6pYnaqa25Y+FJ2yrYOu8uuNFwBjiZd7g
+        WpVbp9p+qWzqNBtgSOgd6P0ThndzhYrtVYWllRs17aRu6XLZ1bbbUSY7X+gq
+        f+DYDWHwUtXsNJJlOM8VNwqdRrKbvfRyi8VidrM/1Zy/lWG2YDunWtn0Sg4X
+        RM4ty/Z4S2jP9vbqVWkwfROKIFKBYBtdjby+sHhN6N39RKAyhHPCEt4mueqd
+        6qMYYhhSMYhhhtU+MhBBnGHYME94veptc92znQuG6V7CDKnrxZFu0zCUezrP
+        Xz/p/uomhhDCKhSMMyRdeRx6J0aW7Yuu3If+npsyNKkiJfM73Y3+6sNjSLa8
+        3GUYvcrArulxg3uccqbUGgG6o0w2IQZWkYFC8+dCRhmKjGUGo3kZV5uXqpJU
+        VCWq+H3zMpWOUxNNBBPKGyXDZoJRgikr8agSD6TU1nSSZYKEC/0HTGqtMKz3
+        eVlZkf4PV5/4Z12MdYKXKlQQwS3bMBlGCsIy9+q1kukUJbHkkJgj7gg5bk8O
+        HIpTi3t1h+Kpty07eashXEHLr37fOrqSnasH3OE10zOdv2BDdMh6ZZeftQXU
+        Q7vu6Oa2kIPJNsfRNX4s01kGIZ8gJmWhUb9Eo2cIgFEf+4bB9wufMdLE6Cd5
+        ltCoDftrt5CRiBYOCYxRv+xjIlhpo6LUr9IboYRiAIgP0LbbFLdEFMiyGJoK
+        fvhI9bKz8AUTLZU1aslB1Jcb9lEJIhwjwgQZTf7LaEoanfqH0WR/Ru/caPRe
+        V6PjRDhBhOO0vO6DnhID8JLY7lOOp48RyONBHjPUYjaPNB7m8QiPj8FczGH+
+        GGEXIRcLLhZdJFw8cZH8BUMfUaX/BgAA
         """,
         """
         androidx/compose/runtime/DynamicProvidableCompositionLocal.class:
@@ -156,14 +129,40 @@ class CompositionLocalNamingDetectorTest : LintDetectorTest() {
         Drh7BBajjMUjZGPMxFiKcS9GIcb9GLk/6rXJ3BUEAAA=
         """,
         """
-        META-INF/main.kotlin_module:
-        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcclkZiXUpSfmVKhl5yfW5BfnKpX
-        VJpXkpmbKiTkDBbILMnMz/PJT07M8S7hUuOSwaVeLy0/X4gtJLW4xLtEiUGL
-        AQBypVQ1cAAAAA==
+        androidx/compose/runtime/ProvidableCompositionLocal.class:
+        H4sIAAAAAAAAAI1S308TQRD+9lracmIpRaHgLxAkAolXURNjK0YxDTUFURpe
+        eNr2Ftz2umf29hp869/if+CTiQ+m8dE/yjjblogkBO5hZvabb76Z29nff378
+        BPAUKwxPuPJ1KP0Trxl2PoeR8HSsjOwIb0+HXenzRiC2BhlpZKhqYZMHaTCG
+        Srn+otbiXe4FXB177xst0TSlzdqFeudVyvV6abPEsHrlijSSDKmyVNJsMiw9
+        rLVDE0jltbod7yhWTUuMvMooKpZWD0j9MlZ5fTCH5S7XQn3stYRpaC6Jw5UK
+        DR/yd+MgsHdBA3+4tPHZvFRGaMUD76044nFgtohqdNw0od7hui00tZ5ACq6L
+        MVxjSJpPMmJ4dvFFXrwYGi7rD9tUuO3whWHhsmEZpk4pO8JwnxtOmNPpJuiN
+        MGvGGFiboBNpT0WK/McM7/q9vOsUHLff+99lVgr93loy0+/l2EYmn8w726zo
+        vJklIJ/NJeZdCz3v9wqsmPz1NeXkxqziBjWpM6xf/QHRlPnTyc/+zvR54qO2
+        oXvdCn3BMFmTSuzGnYbQdXuFVsNyDriW9jwCx/flseIm1hQvfxwOUFVdGUlK
+        73HNO4LW+vrfA2Fw98NYN0VF2vq5Uc3BsOIMMbkIhzZtP/pjWnwaCdyj0yvy
+        Dvn02jr7jolvFDpYIOsO4AxRU1ikaGZIw3VkBzJpTCJHUvcHFRksWcxqj1OQ
+        GMEJLA/8XTwg/5KyUzRF/hCJKqaruEEWN62ZqWIWhUOwCHOYP0QqQjbCrQi3
+        I0xGuBMh/Rejxn6KQAQAAA==
+        """,
+        """
+        androidx/compose/runtime/StaticProvidableCompositionLocal.class:
+        H4sIAAAAAAAAAJ1SXW8SQRQ9s3x2bSmlVmn9qhYT2yYurZqoIIk2aUpCKxHC
+        C0/D7hQHll2zO0vqG7/Ff+CTiQ+G+OiPMt4BGqsJIek+3I8z55699878+v39
+        B4DneMzwintO4EvnwrL9wSc/FFYQeUoOhNVQXEm7HvhD6fCOK44m51JJ36v5
+        NndTYAz1cvN1rceH3HK517Xed3rCVqVKba7qfL1ys1mqlBieXaM2hThDsiw9
+        qSoMO09qfV+50rN6w4F1Hnm2JobW8SwqlnZbDLuLWOX9SUeaW6j5QdfqCdUJ
+        uCQO9zxfr0fzzyLX1T2VlpFEykQCJkNcfZQhQ2n+IhatlzaRccQ5j1x1zG3l
+        B58ZthfNxbB2STkVijtcccKMwTBG9820STCwPkEXUmdFipwDhpPxKGcaecMc
+        j/516fEoPx7txcln2WE6F88ZJ6xovNvIZbKxLVPnL4nCivGfX5JGNqH1DukX
+        TYYX13kE1G3ucoKrY63/T3zaV7TlI98RDKs16YmzaNARQVOLag3NafFA6nwG
+        LjVk1+MqCigufJi2UvWGMpR0XOcBHwglgrd/r5bBbPhRYItjqes3ZzWtacUV
+        Ig5g0L3rj2bXzwAx3KesQrhBPrm3/w03vlJk4AFZc4JmqSaDbYpuTVlYxspE
+        JUn4Kik9nFSk8Yh8SksvURCbwTHsTPw9FMi/oVMtuNZGrIpcFetkcVObjSr9
+        4HYbLEQem20kQ6yE2ApxJ0QmxN0QqT/sQJiNEwQAAA==
         """
     )
 
-    @Ignore // b/193270279
     @Test
     fun noLocalPrefix() {
         lint().files(
