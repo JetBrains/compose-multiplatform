@@ -122,7 +122,6 @@ internal class InnerPlaceable(
         // get(line), to obtain the position of the alignment line the wrapper currently needs
         // our position in order ot know how to offset the value we provided).
         if (wrappedBy?.isShallowPlacing == true) return
-
         layoutNode.onNodePlaced()
     }
 

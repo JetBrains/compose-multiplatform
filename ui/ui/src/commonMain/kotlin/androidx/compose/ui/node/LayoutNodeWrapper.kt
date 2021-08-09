@@ -259,6 +259,8 @@ internal abstract class LayoutNodeWrapper(
 
     protected abstract fun performDraw(canvas: Canvas)
 
+    open fun onPlaced() {}
+
     // implementation of draw block passed to the OwnedLayer
     @Suppress("LiftReturnOrAssignment")
     override fun invoke(canvas: Canvas) {
