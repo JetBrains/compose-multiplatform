@@ -139,7 +139,7 @@ object LibraryVersions {
     val WEAR_ONGOING = Version("1.0.0-beta02")
     val WEAR_PHONE_INTERACTIONS = Version("1.0.0-alpha08")
     val WEAR_REMOTE_INTERACTIONS = Version("1.0.0-beta01")
-    val WEAR_TILES = Version("1.0.0-alpha11")
+    val WEAR_TILES = Version("1.0.0-alpha10")
     val WEAR_WATCHFACE = Version("1.0.0-alpha20")
     val WEAR_WATCHFACE_CLIENT = Version("1.0.0-alpha20")
     val WEAR_WATCHFACE_CLIENT_GUAVA = WEAR_WATCHFACE_CLIENT
