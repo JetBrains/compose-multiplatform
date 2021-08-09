@@ -106,9 +106,11 @@ class InputsTests : BaseIntegrationTests() {
         driver.waitTextToBe(value = "")
 
         val dateInput = driver.findElement(By.id("date"))
-        driver.sendKeysForDateInput(dateInput, 2021, 10, 12)
 
-        driver.waitTextToBe(value = "2021-10-12")
+        // we use the same value of month and day here to avoid a need for a more complex formatting
+        driver.sendKeysForDateInput(dateInput, 2021, 10, 10)
+
+        driver.waitTextToBe(value = "2021-10-10")
     }
 
 //    @_root_ide_package_.org.jetbrains.compose.web.tests.integration.common.ResolveDrivers
