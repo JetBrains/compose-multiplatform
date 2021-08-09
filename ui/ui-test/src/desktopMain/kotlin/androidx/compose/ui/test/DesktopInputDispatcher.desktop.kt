@@ -58,6 +58,35 @@ internal class DesktopInputDispatcher(
         println("PartialGesture.sendCancel")
     }
 
+    override fun MouseInputState.enqueuePress(buttonId: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun MouseInputState.enqueueMove() {
+        TODO("Not yet implemented")
+    }
+
+    override fun MouseInputState.enqueueRelease(buttonId: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun MouseInputState.enqueueEnter() {
+        TODO("Not yet implemented")
+    }
+
+    override fun MouseInputState.enqueueExit() {
+        TODO("Not yet implemented")
+    }
+
+    override fun MouseInputState.enqueueCancel() {
+        TODO("Not yet implemented")
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    override fun MouseInputState.enqueueScroll(delta: Float, scrollWheel: ScrollWheel) {
+        TODO("Not yet implemented")
+    }
+
     private fun enqueueEvent(event: List<TestPointerInputEventData>) {
         batchedEvents.add(event)
     }

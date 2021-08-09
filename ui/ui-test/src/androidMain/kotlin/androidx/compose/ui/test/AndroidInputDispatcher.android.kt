@@ -18,16 +18,24 @@ package androidx.compose.ui.test
 
 import android.view.InputDevice
 import android.view.MotionEvent
+import android.view.MotionEvent.ACTION_BUTTON_PRESS
+import android.view.MotionEvent.ACTION_BUTTON_RELEASE
 import android.view.MotionEvent.ACTION_CANCEL
 import android.view.MotionEvent.ACTION_DOWN
+import android.view.MotionEvent.ACTION_HOVER_ENTER
+import android.view.MotionEvent.ACTION_HOVER_EXIT
+import android.view.MotionEvent.ACTION_HOVER_MOVE
 import android.view.MotionEvent.ACTION_MOVE
 import android.view.MotionEvent.ACTION_POINTER_DOWN
 import android.view.MotionEvent.ACTION_POINTER_INDEX_SHIFT
 import android.view.MotionEvent.ACTION_POINTER_UP
+import android.view.MotionEvent.ACTION_SCROLL
 import android.view.MotionEvent.ACTION_UP
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.ViewRootForTest
+
+private val MouseAsTouchEvents = listOf(ACTION_DOWN, ACTION_MOVE, ACTION_UP)
 
 internal actual fun createInputDispatcher(
     testContext: TestContext,
@@ -38,7 +46,23 @@ internal actual fun createInputDispatcher(
             root::class.java.simpleName
     }
     val view = root.view
-    return AndroidInputDispatcher(testContext, root) { view.dispatchTouchEvent(it) }
+    return AndroidInputDispatcher(testContext, root) {
+        when (it.source) {
+            InputDevice.SOURCE_TOUCHSCREEN -> {
+                view.dispatchTouchEvent(it)
+            }
+            InputDevice.SOURCE_MOUSE -> {
+                if (it.action in MouseAsTouchEvents) {
+                    view.dispatchTouchEvent(it)
+                } else {
+                    view.dispatchGenericMotionEvent(it)
+                }
+            }
+            else -> throw IllegalArgumentException(
+                "Can't dispatch MotionEvents with source ${it.source}"
+            )
+        }
+    }
 }
 
 internal class AndroidInputDispatcher(
@@ -72,6 +96,45 @@ internal class AndroidInputDispatcher(
 
     override fun PartialGesture.enqueueCancel() {
         enqueueTouchEvent(ACTION_CANCEL, 0)
+    }
+
+    override fun MouseInputState.enqueuePress(buttonId: Int) {
+        enqueueMouseEvent(if (hasOneButtonPressed) ACTION_DOWN else ACTION_MOVE)
+        enqueueMouseEvent(ACTION_BUTTON_PRESS)
+    }
+
+    override fun MouseInputState.enqueueMove() {
+        enqueueMouseEvent(if (isEntered) ACTION_HOVER_MOVE else ACTION_MOVE)
+    }
+
+    override fun MouseInputState.enqueueRelease(buttonId: Int) {
+        enqueueMouseEvent(ACTION_BUTTON_RELEASE)
+        enqueueMouseEvent(if (hasNoButtonsPressed) ACTION_UP else ACTION_MOVE)
+    }
+
+    override fun MouseInputState.enqueueEnter() {
+        enqueueMouseEvent(ACTION_HOVER_ENTER)
+    }
+
+    override fun MouseInputState.enqueueExit() {
+        enqueueMouseEvent(ACTION_HOVER_EXIT)
+    }
+
+    override fun MouseInputState.enqueueCancel() {
+        enqueueMouseEvent(ACTION_CANCEL)
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    override fun MouseInputState.enqueueScroll(delta: Float, scrollWheel: ScrollWheel) {
+        enqueueMouseEvent(
+            ACTION_SCROLL,
+            delta,
+            when (scrollWheel) {
+                ScrollWheel.Horizontal -> MotionEvent.AXIS_HSCROLL
+                ScrollWheel.Vertical -> MotionEvent.AXIS_VSCROLL
+                else -> -1
+            }
+        )
     }
 
     /**
@@ -115,13 +178,11 @@ internal class AndroidInputDispatcher(
                     "coordinates=$coordinates" +
                     "), events have already been (or are being) dispatched or disposed"
             }
-            val positionInScreen = if (root != null) {
+            val positionInScreen = root?.let {
                 val array = intArrayOf(0, 0)
-                root.view.getLocationOnScreen(array)
+                it.view.getLocationOnScreen(array)
                 Offset(array[0].toFloat(), array[1].toFloat())
-            } else {
-                Offset.Zero
-            }
+            } ?: Offset.Zero
             batchedEvents.add(
                 MotionEvent.obtain(
                     /* downTime = */ downTime,
@@ -147,6 +208,80 @@ internal class AndroidInputDispatcher(
                     /* deviceId = */ 0,
                     /* edgeFlags = */ 0,
                     /* source = */ InputDevice.SOURCE_TOUCHSCREEN,
+                    /* flags = */ 0
+                ).apply {
+                    offsetLocation(-positionInScreen.x, -positionInScreen.y)
+                }
+            )
+        }
+    }
+
+    private fun MouseInputState.enqueueMouseEvent(action: Int, delta: Float = 0f, axis: Int = -1) {
+        enqueueMouseEvent(
+            downTime = downTime,
+            eventTime = currentTime,
+            action = action,
+            coordinate = lastPosition,
+            buttonState = pressedButtons.fold(0) { state, buttonId -> state or buttonId },
+            axis = axis,
+            axisDelta = delta
+        )
+    }
+
+    private fun enqueueMouseEvent(
+        downTime: Long,
+        eventTime: Long,
+        action: Int,
+        coordinate: Offset,
+        buttonState: Int,
+        axis: Int = -1,
+        axisDelta: Float = 0f
+    ) {
+        synchronized(batchLock) {
+            check(acceptEvents) {
+                "Can't enqueue mouse event (" +
+                    "downTime=$downTime, " +
+                    "eventTime=$eventTime, " +
+                    "action=$action, " +
+                    "coordinate=$coordinate, " +
+                    "buttonState=$buttonState, " +
+                    "axis=$axis, " +
+                    "axisDelta=$axisDelta" +
+                    "), events have already been (or are being) dispatched or disposed"
+            }
+            val positionInScreen = root?.let {
+                val array = intArrayOf(0, 0)
+                root.view.getLocationOnScreen(array)
+                Offset(array[0].toFloat(), array[1].toFloat())
+            } ?: Offset.Zero
+            batchedEvents.add(
+                MotionEvent.obtain(
+                    /* downTime = */ downTime,
+                    /* eventTime = */ eventTime,
+                    /* action = */ action,
+                    /* pointerCount = */ 1,
+                    /* pointerProperties = */ arrayOf(
+                        MotionEvent.PointerProperties().apply {
+                            id = 0
+                            toolType = MotionEvent.TOOL_TYPE_MOUSE
+                        }
+                    ),
+                    /* pointerCoords = */ arrayOf(
+                        MotionEvent.PointerCoords().apply {
+                            x = positionInScreen.x + coordinate.x
+                            y = positionInScreen.y + coordinate.y
+                            if (axis != -1) {
+                                setAxisValue(axis, axisDelta)
+                            }
+                        }
+                    ),
+                    /* metaState = */ 0,
+                    /* buttonState = */ buttonState,
+                    /* xPrecision = */ 1f,
+                    /* yPrecision = */ 1f,
+                    /* deviceId = */ 0,
+                    /* edgeFlags = */ 0,
+                    /* source = */ InputDevice.SOURCE_MOUSE,
                     /* flags = */ 0
                 ).apply {
                     offsetLocation(-positionInScreen.x, -positionInScreen.y)
