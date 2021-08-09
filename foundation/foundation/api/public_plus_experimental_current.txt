@@ -760,6 +760,9 @@ package androidx.compose.foundation.text.selection {
   public final class MultiWidgetSelectionDelegateKt {
   }
 
+  public final class SelectionAdjustmentKt {
+  }
+
   public final class SelectionContainerKt {
     method @androidx.compose.runtime.Composable public static void DisableSelection(kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method @androidx.compose.runtime.Composable public static void SelectionContainer(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function0<kotlin.Unit> content);

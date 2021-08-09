@@ -67,6 +67,18 @@ class SelectionManagerDragTest {
     private val endSelectableKey = 3L
     private val startLayoutCoordinates = mock<LayoutCoordinates>()
     private val endLayoutCoordinates = mock<LayoutCoordinates>()
+    private val fakeSubselection: Selection = Selection(
+        start = Selection.AnchorInfo(
+            direction = ResolvedTextDirection.Ltr,
+            offset = 0,
+            selectableId = selectableKey
+        ),
+        end = Selection.AnchorInfo(
+            direction = ResolvedTextDirection.Ltr,
+            offset = 5,
+            selectableId = selectableKey
+        )
+    )
     private val fakeInitialSelection: Selection = Selection(
         start = Selection.AnchorInfo(
             direction = ResolvedTextDirection.Ltr,
@@ -105,7 +117,11 @@ class SelectionManagerDragTest {
         selectionRegistrar.subscribe(selectable)
         selectionRegistrar.subscribe(startSelectable)
         selectionRegistrar.subscribe(endSelectable)
+        selectionRegistrar.subselections = mapOf(
+            selectableKey to fakeSubselection
+        )
 
+        selectable.clear()
         selectable.selectionToReturn = fakeResultSelection
 
         selectionManager.containerLayoutCoordinates = containerLayoutCoordinates
@@ -157,9 +173,10 @@ class SelectionManagerDragTest {
         assertThat(selectable.lastEndPosition).isEqualTo(childToLocalOffset)
         assertThat(selectable.lastContainerLayoutCoordinates)
             .isEqualTo(selectionManager.requireContainerCoordinates())
-        assertThat(selectable.lastAdjustment).isEqualTo(SelectionAdjustment.CHARACTER)
+        assertThat(selectable.lastAdjustment)
+            .isEqualTo(SelectionAdjustment.CharacterWithWordAccelerate)
         assertThat(selectable.lastIsStartHandle).isEqualTo(true)
-        assertThat(selectable.lastPreviousSelection).isEqualTo(fakeInitialSelection)
+        assertThat(selectable.lastPreviousSelection).isEqualTo(fakeSubselection)
 
         assertThat(selection).isEqualTo(fakeResultSelection)
         verify(spyLambda, times(1)).invoke(fakeResultSelection)
@@ -184,9 +201,10 @@ class SelectionManagerDragTest {
         assertThat(selectable.lastEndPosition).isEqualTo(childToLocalOffset + dragDistance)
         assertThat(selectable.lastContainerLayoutCoordinates)
             .isEqualTo(selectionManager.requireContainerCoordinates())
-        assertThat(selectable.lastAdjustment).isEqualTo(SelectionAdjustment.CHARACTER)
+        assertThat(selectable.lastAdjustment)
+            .isEqualTo(SelectionAdjustment.CharacterWithWordAccelerate)
         assertThat(selectable.lastIsStartHandle).isEqualTo(false)
-        assertThat(selectable.lastPreviousSelection).isEqualTo(fakeInitialSelection)
+        assertThat(selectable.lastPreviousSelection).isEqualTo(fakeSubselection)
 
         assertThat(selection).isEqualTo(fakeResultSelection)
         verify(spyLambda, times(1)).invoke(fakeResultSelection)
@@ -215,11 +233,13 @@ internal class FakeSelectable : Selectable {
         start = Selection.AnchorInfo(
             direction = ResolvedTextDirection.Ltr,
             offset = 0,
+            rawOffset = 0,
             selectableId = selectableKey
         ),
         end = Selection.AnchorInfo(
             direction = ResolvedTextDirection.Ltr,
             offset = 10,
+            rawOffset = 10,
             selectableId = selectableKey
         )
     )
@@ -259,5 +279,18 @@ internal class FakeSelectable : Selectable {
 
     override fun getBoundingBox(offset: Int): Rect {
         TODO("Not yet implemented")
+    }
+
+    fun clear() {
+        lastStartPosition = null
+        lastEndPosition = null
+        lastContainerLayoutCoordinates = null
+        lastAdjustment = null
+        lastPreviousSelection = null
+        lastIsStartHandle = null
+        getSelectionCalledTimes = 0
+        getTextCalledTimes = 0
+        selectionToReturn = null
+        textToReturn = null
     }
 }

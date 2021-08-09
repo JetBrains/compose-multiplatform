@@ -386,7 +386,7 @@ internal class TextController(val state: TextState) {
                     selectionRegistrar?.notifySelectionUpdateStart(
                         layoutCoordinates = it,
                         startPosition = startPoint,
-                        adjustment = SelectionAdjustment.WORD
+                        adjustment = SelectionAdjustment.Word
                     )
                 }
 
@@ -415,7 +415,7 @@ internal class TextController(val state: TextState) {
                     selectionRegistrar?.notifySelectionUpdate(
                         layoutCoordinates = it,
                         endPosition = dragBeginPosition + dragTotalDistance,
-                        adjustment = SelectionAdjustment.CHARACTER
+                        adjustment = SelectionAdjustment.Character
                     )
                 }
             }
@@ -444,7 +444,7 @@ internal class TextController(val state: TextState) {
                 selectionRegistrar?.notifySelectionUpdate(
                     layoutCoordinates = it,
                     endPosition = downPosition,
-                    adjustment = SelectionAdjustment.NONE
+                    adjustment = SelectionAdjustment.None
                 )
                 return selectionRegistrar.hasSelection(state.selectableId)
             }
@@ -459,7 +459,7 @@ internal class TextController(val state: TextState) {
                 selectionRegistrar?.notifySelectionUpdate(
                     layoutCoordinates = it,
                     endPosition = dragPosition,
-                    adjustment = SelectionAdjustment.NONE
+                    adjustment = SelectionAdjustment.None
                 )
             }
             return true

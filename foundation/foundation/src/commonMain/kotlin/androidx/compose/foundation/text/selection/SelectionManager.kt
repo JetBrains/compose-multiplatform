@@ -242,6 +242,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
 
         selectionRegistrar.onSelectionUpdateEndCallback = {
             showSelectionToolbar()
+            finishSelectionUpdate()
         }
 
         selectionRegistrar.onSelectableChangeCallback = { selectableKey ->
@@ -353,27 +354,27 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
     internal fun mergeSelections(
         startPosition: Offset,
         endPosition: Offset,
-        adjustment: SelectionAdjustment = SelectionAdjustment.NONE,
+        adjustment: SelectionAdjustment = SelectionAdjustment.None,
         previousSelection: Selection? = null,
         isStartHandle: Boolean = true
     ): Pair<Selection?, Map<Long, Selection>> {
         val subselections = mutableMapOf<Long, Selection>()
         val newSelection = selectionRegistrar.sort(requireContainerCoordinates())
             .fastFold(null) { mergedSelection: Selection?, selectable: Selectable ->
+                val subselection =
+                    selectionRegistrar.subselections[selectable.selectableId]
                 val selection = selectable.getSelection(
                     startPosition = startPosition,
                     endPosition = endPosition,
                     containerLayoutCoordinates = requireContainerCoordinates(),
-                    previousSelection = previousSelection,
+                    adjustment = adjustment,
+                    previousSelection = subselection,
                     isStartHandle = isStartHandle,
-                    adjustment = adjustment
                 )
                 selection?.let { subselections[selectable.selectableId] = it }
                 merge(mergedSelection, selection)
             }
-        if (previousSelection != newSelection) hapticFeedBack?.performHapticFeedback(
-            HapticFeedbackType.TextHandleMove
-        )
+        performHapticFeedbackIfNeeded(newSelection, previousSelection, hapticFeedBack)
         return Pair(newSelection, subselections)
     }
 
@@ -389,9 +390,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 selection?.let { subselections[selectable.selectableId] = it }
                 merge(mergedSelection, selection)
             }
-        if (previousSelection != newSelection) hapticFeedBack?.performHapticFeedback(
-            HapticFeedbackType.TextHandleMove
-        )
+        performHapticFeedbackIfNeeded(previousSelection, newSelection, hapticFeedBack)
         return Pair(newSelection, subselections)
     }
 
@@ -617,13 +616,14 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                     startPosition = currentStart,
                     endPosition = currentEnd,
                     isStartHandle = isStartHandle,
-                    adjustment = SelectionAdjustment.CHARACTER
+                    adjustment = SelectionAdjustment.CharacterWithWordAccelerate
                 )
                 return
             }
 
             override fun onStop() {
                 showSelectionToolbar()
+                finishSelectionUpdate()
             }
 
             override fun onCancel() {
@@ -663,7 +663,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
     private fun updateSelection(
         startPosition: Offset?,
         endPosition: Offset?,
-        adjustment: SelectionAdjustment = SelectionAdjustment.NONE,
+        adjustment: SelectionAdjustment = SelectionAdjustment.None,
         isStartHandle: Boolean = true
     ) {
         if (startPosition == null || endPosition == null) return
@@ -671,11 +671,22 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
             startPosition = startPosition,
             endPosition = endPosition,
             adjustment = adjustment,
-            isStartHandle = isStartHandle,
             previousSelection = selection,
+            isStartHandle = isStartHandle
         )
         if (newSelection != selection) {
             selectionRegistrar.subselections = newSubselection
+            onSelectionChange(newSelection)
+        }
+    }
+
+    private fun finishSelectionUpdate() {
+        selection?.let {
+            val newSelection = Selection(
+                start = it.start.copy(rawOffset = it.start.offset),
+                end = it.end.copy(rawOffset = it.end.offset),
+                handlesCrossed = it.handlesCrossed
+            )
             onSelectionChange(newSelection)
         }
     }
@@ -744,3 +755,33 @@ internal fun LayoutCoordinates.visibleBounds(): Rect {
 
 internal fun Rect.containsInclusive(offset: Offset): Boolean =
     offset.x in left..right && offset.y in top..bottom
+
+private fun performHapticFeedbackIfNeeded(
+    previousSelection: Selection?,
+    newSelection: Selection?,
+    hapticFeedback: HapticFeedback?,
+) {
+    if (hapticFeedback == null) {
+        return
+    }
+    if (previousSelection == null) {
+        if (newSelection != null) {
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        }
+        return
+    }
+    if (newSelection == null) {
+        // We know previousSelection is not null, so selection is updated.
+        hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        return
+    }
+    // We don't care if rawOffset of Selection.AnchorInfo is different, so we only compare the
+    // other fields. If any of them changes, we need to perform hapticFeedback.
+    if (previousSelection.start.offset != newSelection.start.offset ||
+        previousSelection.start.selectableId != newSelection.start.selectableId ||
+        previousSelection.end.offset != newSelection.end.offset ||
+        previousSelection.end.selectableId != previousSelection.end.selectableId
+    ) {
+        hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+    }
+}

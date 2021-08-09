@@ -103,9 +103,9 @@ internal suspend fun PointerInputScope.mouseSelectionDetector(
                     }
                 } else {
                     val selectionMode = when (clicksCounter.clicks) {
-                        1 -> SelectionAdjustment.NONE
-                        2 -> SelectionAdjustment.WORD
-                        else -> SelectionAdjustment.PARAGRAPH
+                        1 -> SelectionAdjustment.None
+                        2 -> SelectionAdjustment.Word
+                        else -> SelectionAdjustment.Paragraph
                     }
                     val started = observer.onStart(downChange.position, selectionMode)
                     if (started) {

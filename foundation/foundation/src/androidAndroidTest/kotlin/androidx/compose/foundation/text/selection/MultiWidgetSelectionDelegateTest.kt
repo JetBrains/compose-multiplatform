@@ -961,7 +961,7 @@ class MultiWidgetSelectionDelegateTest {
             textLayoutResult = textLayoutResult,
             selectionCoordinates = Pair(start, end),
             selectableId = 1,
-            adjustment = SelectionAdjustment.WORD
+            adjustment = SelectionAdjustment.Word
         )
 
         // Assert.
@@ -1000,7 +1000,7 @@ class MultiWidgetSelectionDelegateTest {
             textLayoutResult = textLayoutResult,
             selectionCoordinates = Pair(start, end),
             selectableId = 1,
-            adjustment = SelectionAdjustment.WORD
+            adjustment = SelectionAdjustment.Word
         )
 
         // Assert.
@@ -1041,7 +1041,7 @@ class MultiWidgetSelectionDelegateTest {
             textLayoutResult = textLayoutResult,
             selectionCoordinates = Pair(start, end),
             selectableId = 1,
-            adjustment = SelectionAdjustment.WORD
+            adjustment = SelectionAdjustment.Word
         )
 
         // Assert.
@@ -1083,7 +1083,7 @@ class MultiWidgetSelectionDelegateTest {
             textLayoutResult = textLayoutResult,
             selectionCoordinates = Pair(start, end),
             selectableId = 1,
-            adjustment = SelectionAdjustment.WORD
+            adjustment = SelectionAdjustment.Word
         )
 
         // Assert.
@@ -1124,7 +1124,7 @@ class MultiWidgetSelectionDelegateTest {
             textLayoutResult = textLayoutResult,
             selectionCoordinates = Pair(start, end),
             selectableId = 1,
-            adjustment = SelectionAdjustment.WORD
+            adjustment = SelectionAdjustment.Word
         )
 
         // Drag downwards, after the drag the selection should remain the same.
@@ -1132,7 +1132,7 @@ class MultiWidgetSelectionDelegateTest {
             textLayoutResult = textLayoutResult,
             selectionCoordinates = Pair(start, end + Offset(0f, fontSizeInPx / 4)),
             selectableId = 1,
-            adjustment = SelectionAdjustment.WORD,
+            adjustment = SelectionAdjustment.Word,
             previousSelection = textSelectionInfo1,
             isStartHandle = false
         )
@@ -1179,7 +1179,7 @@ class MultiWidgetSelectionDelegateTest {
             textLayoutResult = textLayoutResult,
             selectionCoordinates = Pair(start, end),
             selectableId = 1,
-            adjustment = SelectionAdjustment.NONE
+            adjustment = SelectionAdjustment.None
         )
 
         // Assert.
@@ -1227,7 +1227,7 @@ class MultiWidgetSelectionDelegateTest {
             textLayoutResult = textLayoutResult,
             selectionCoordinates = Pair(start, end),
             selectableId = 1,
-            adjustment = SelectionAdjustment.NONE
+            adjustment = SelectionAdjustment.None
         )
 
         // Assert.
@@ -1277,7 +1277,7 @@ class MultiWidgetSelectionDelegateTest {
             textLayoutResult = textLayoutResult,
             selectionCoordinates = Pair(start, end),
             selectableId = 1,
-            adjustment = SelectionAdjustment.NONE
+            adjustment = SelectionAdjustment.None
         )
 
         // Assert.
@@ -1316,7 +1316,7 @@ class MultiWidgetSelectionDelegateTest {
             selectionCoordinates = Pair(start, end),
             textLayoutResult = textLayoutResult,
             selectableId = 1,
-            adjustment = SelectionAdjustment.NONE
+            adjustment = SelectionAdjustment.None
         )
         // Assert.
         assertThat(textSelectionInfo).isNotNull()
@@ -1362,7 +1362,7 @@ class MultiWidgetSelectionDelegateTest {
             selectionCoordinates = Pair(start, end),
             textLayoutResult = textLayoutResult,
             selectableId = 1,
-            adjustment = SelectionAdjustment.NONE
+            adjustment = SelectionAdjustment.None
         )
         // Assert.
         assertThat(textSelectionInfo).isNotNull()
@@ -1410,7 +1410,7 @@ class MultiWidgetSelectionDelegateTest {
             selectionCoordinates = Pair(start, end),
             textLayoutResult = textLayoutResult,
             selectableId = 1,
-            adjustment = SelectionAdjustment.NONE
+            adjustment = SelectionAdjustment.None
         )
         // Assert.
         assertThat(textSelectionInfo).isNotNull()
@@ -1465,7 +1465,7 @@ class MultiWidgetSelectionDelegateTest {
             selectionCoordinates = Pair(start, end),
             textLayoutResult = textLayoutResult,
             selectableId = 1,
-            adjustment = SelectionAdjustment.CHARACTER,
+            adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
             isStartHandle = false
         )
@@ -1526,7 +1526,7 @@ class MultiWidgetSelectionDelegateTest {
             selectionCoordinates = Pair(start, end),
             textLayoutResult = textLayoutResult,
             selectableId = 1,
-            adjustment = SelectionAdjustment.CHARACTER,
+            adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
             isStartHandle = false
         )
@@ -1581,7 +1581,7 @@ class MultiWidgetSelectionDelegateTest {
             selectionCoordinates = Pair(start, end),
             textLayoutResult = textLayoutResult,
             selectableId = 1,
-            adjustment = SelectionAdjustment.CHARACTER,
+            adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
             isStartHandle = true
         )
@@ -1637,7 +1637,7 @@ class MultiWidgetSelectionDelegateTest {
             selectionCoordinates = Pair(start, end),
             textLayoutResult = textLayoutResult,
             selectableId = 1,
-            adjustment = SelectionAdjustment.CHARACTER,
+            adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
             isStartHandle = true
         )
@@ -1693,13 +1693,14 @@ class MultiWidgetSelectionDelegateTest {
             selectionCoordinates = Pair(start, end),
             textLayoutResult = textLayoutResult,
             selectableId = 1,
-            adjustment = SelectionAdjustment.CHARACTER,
+            adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
             isStartHandle = true
         )
 
         // Assert.
-        assertThat(textSelectionInfo).isEqualTo(previousSelection)
+        assertThat(textSelectionInfo?.start?.offset).isEqualTo(previousSelection.start.offset)
+        assertThat(textSelectionInfo?.end?.offset).isEqualTo(previousSelection.end.offset)
     }
 
     @Test
@@ -1739,13 +1740,14 @@ class MultiWidgetSelectionDelegateTest {
             selectionCoordinates = Pair(start, end),
             textLayoutResult = textLayoutResult,
             selectableId = 1,
-            adjustment = SelectionAdjustment.CHARACTER,
+            adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
             isStartHandle = true
         )
 
         // Assert.
-        assertThat(textSelectionInfo).isEqualTo(previousSelection)
+        assertThat(textSelectionInfo?.start?.offset).isEqualTo(previousSelection.start.offset)
+        assertThat(textSelectionInfo?.end?.offset).isEqualTo(previousSelection.end.offset)
     }
 
     @Test
@@ -1791,13 +1793,14 @@ class MultiWidgetSelectionDelegateTest {
             selectionCoordinates = Pair(start, end),
             textLayoutResult = textLayoutResult,
             selectableId = 1,
-            adjustment = SelectionAdjustment.CHARACTER,
+            adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
             isStartHandle = true
         )
 
         // Assert.
-        assertThat(textSelectionInfo).isEqualTo(previousSelection)
+        assertThat(textSelectionInfo?.start?.offset).isEqualTo(previousSelection.start.offset)
+        assertThat(textSelectionInfo?.end?.offset).isEqualTo(previousSelection.end.offset)
     }
 
     @Test
@@ -1837,13 +1840,14 @@ class MultiWidgetSelectionDelegateTest {
             selectionCoordinates = Pair(start, end),
             textLayoutResult = textLayoutResult,
             selectableId = 1,
-            adjustment = SelectionAdjustment.CHARACTER,
+            adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
             isStartHandle = true
         )
 
         // Assert.
-        assertThat(textSelectionInfo).isEqualTo(previousSelection)
+        assertThat(textSelectionInfo?.start?.offset).isEqualTo(previousSelection.start.offset)
+        assertThat(textSelectionInfo?.end?.offset).isEqualTo(previousSelection.end.offset)
     }
 
     @Test
@@ -1882,7 +1886,7 @@ class MultiWidgetSelectionDelegateTest {
             selectionCoordinates = Pair(start, end),
             textLayoutResult = textLayoutResult,
             selectableId = 1,
-            adjustment = SelectionAdjustment.CHARACTER,
+            adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
             isStartHandle = false
         )
@@ -1938,13 +1942,14 @@ class MultiWidgetSelectionDelegateTest {
             selectionCoordinates = Pair(start, end),
             textLayoutResult = textLayoutResult,
             selectableId = 1,
-            adjustment = SelectionAdjustment.CHARACTER,
+            adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
             isStartHandle = false
         )
 
         // Assert.
-        assertThat(textSelectionInfo).isEqualTo(previousSelection)
+        assertThat(textSelectionInfo?.start?.offset).isEqualTo(previousSelection.start.offset)
+        assertThat(textSelectionInfo?.end?.offset).isEqualTo(previousSelection.end.offset)
     }
 
     @Test
@@ -1984,13 +1989,14 @@ class MultiWidgetSelectionDelegateTest {
             selectionCoordinates = Pair(start, end),
             textLayoutResult = textLayoutResult,
             selectableId = 1,
-            adjustment = SelectionAdjustment.CHARACTER,
+            adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
             isStartHandle = false
         )
 
         // Assert.
-        assertThat(textSelectionInfo).isEqualTo(previousSelection)
+        assertThat(textSelectionInfo?.start?.offset).isEqualTo(previousSelection.start.offset)
+        assertThat(textSelectionInfo?.end?.offset).isEqualTo(previousSelection.end.offset)
     }
 
     @Test
@@ -2036,13 +2042,14 @@ class MultiWidgetSelectionDelegateTest {
             selectionCoordinates = Pair(start, end),
             textLayoutResult = textLayoutResult,
             selectableId = 1,
-            adjustment = SelectionAdjustment.CHARACTER,
+            adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
             isStartHandle = false
         )
 
         // Assert.
-        assertThat(textSelectionInfo).isEqualTo(previousSelection)
+        assertThat(textSelectionInfo?.start?.offset).isEqualTo(previousSelection.start.offset)
+        assertThat(textSelectionInfo?.end?.offset).isEqualTo(previousSelection.end.offset)
     }
 
     @Test
@@ -2088,13 +2095,14 @@ class MultiWidgetSelectionDelegateTest {
             selectionCoordinates = Pair(start, end),
             textLayoutResult = textLayoutResult,
             selectableId = 1,
-            adjustment = SelectionAdjustment.CHARACTER,
+            adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
             isStartHandle = false
         )
 
         // Assert.
-        assertThat(textSelectionInfo).isEqualTo(previousSelection)
+        assertThat(textSelectionInfo?.start?.offset).isEqualTo(previousSelection.start.offset)
+        assertThat(textSelectionInfo?.end?.offset).isEqualTo(previousSelection.end.offset)
     }
 
     @Test
@@ -2117,7 +2125,7 @@ class MultiWidgetSelectionDelegateTest {
             selectionCoordinates = Pair(start, end),
             textLayoutResult = textLayoutResult,
             selectableId = 1,
-            adjustment = SelectionAdjustment.NONE
+            adjustment = SelectionAdjustment.None
         )
         // Assert.
         assertThat(textSelectionInfo).isNotNull()
@@ -2157,7 +2165,7 @@ class MultiWidgetSelectionDelegateTest {
             selectionCoordinates = Pair(start, end),
             textLayoutResult = textLayoutResult,
             selectableId = 1,
-            adjustment = SelectionAdjustment.NONE
+            adjustment = SelectionAdjustment.None
         )
         // Assert.
         assertThat(textSelectionInfo).isNotNull()
@@ -2196,7 +2204,7 @@ class MultiWidgetSelectionDelegateTest {
             selectionCoordinates = Pair(start, end),
             textLayoutResult = textLayoutResult,
             selectableId = 1,
-            adjustment = SelectionAdjustment.NONE
+            adjustment = SelectionAdjustment.None
         )
         // Assert.
         assertThat(textSelectionInfo).isNotNull()
@@ -2236,7 +2244,7 @@ class MultiWidgetSelectionDelegateTest {
             selectionCoordinates = Pair(start, end),
             textLayoutResult = textLayoutResult,
             selectableId = 1,
-            adjustment = SelectionAdjustment.NONE
+            adjustment = SelectionAdjustment.None
         )
         // Assert.
         assertThat(textSelectionInfo).isNotNull()
@@ -2271,7 +2279,7 @@ class MultiWidgetSelectionDelegateTest {
             selectionCoordinates = Pair(start, end),
             textLayoutResult = textLayoutResult,
             selectableId = 1,
-            adjustment = SelectionAdjustment.WORD
+            adjustment = SelectionAdjustment.Word
         )
         assertThat(textSelectionInfo).isNull()
     }

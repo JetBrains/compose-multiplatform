@@ -62,6 +62,14 @@ internal data class Selection(
         val offset: Int,
 
         /**
+         * Character offset for the selection edge. This offset is computed based on the user
+         * input and might be adjusted to compute the final offset. This information is needed
+         * for [SelectionAdjustment].
+         * @see [SelectionAdjustment]
+         */
+        val rawOffset: Int = offset,
+
+        /**
          * The id of the [Selectable] which contains this [Selection] Anchor.
          */
         val selectableId: Long

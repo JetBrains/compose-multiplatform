@@ -68,7 +68,7 @@ class TextFieldSelectionDelegateTest {
             rawEndOffset = 2,
             previousSelection = null,
             isStartHandle = true,
-            adjustment = SelectionAdjustment.WORD
+            adjustment = SelectionAdjustment.Word
         )
 
         // Assert.
@@ -94,7 +94,7 @@ class TextFieldSelectionDelegateTest {
             rawEndOffset = 5,
             previousSelection = null,
             isStartHandle = true,
-            adjustment = SelectionAdjustment.WORD
+            adjustment = SelectionAdjustment.Word
         )
 
         // Assert.
@@ -123,7 +123,7 @@ class TextFieldSelectionDelegateTest {
             rawEndOffset = rawEndOffset,
             previousSelection = null,
             isStartHandle = true,
-            adjustment = SelectionAdjustment.WORD
+            adjustment = SelectionAdjustment.Word
         )
 
         // Assert.
@@ -152,7 +152,7 @@ class TextFieldSelectionDelegateTest {
             rawEndOffset = rawEndOffset,
             previousSelection = null,
             isStartHandle = true,
-            adjustment = SelectionAdjustment.WORD
+            adjustment = SelectionAdjustment.Word
         )
 
         // Assert.
@@ -182,7 +182,7 @@ class TextFieldSelectionDelegateTest {
             rawEndOffset = endOffset,
             previousSelection = null,
             isStartHandle = true,
-            adjustment = SelectionAdjustment.NONE
+            adjustment = SelectionAdjustment.None
         )
 
         // Assert.
@@ -212,7 +212,7 @@ class TextFieldSelectionDelegateTest {
             rawEndOffset = endOffset,
             previousSelection = null,
             isStartHandle = true,
-            adjustment = SelectionAdjustment.CHARACTER
+            adjustment = SelectionAdjustment.Character
         )
 
         // Assert.
@@ -244,7 +244,7 @@ class TextFieldSelectionDelegateTest {
             rawEndOffset = endOffset,
             previousSelection = null,
             isStartHandle = true,
-            adjustment = SelectionAdjustment.CHARACTER
+            adjustment = SelectionAdjustment.Character
         )
 
         // Assert.
@@ -274,7 +274,7 @@ class TextFieldSelectionDelegateTest {
             rawEndOffset = endOffset,
             previousSelection = null,
             isStartHandle = true,
-            adjustment = SelectionAdjustment.CHARACTER
+            adjustment = SelectionAdjustment.Character
         )
 
         // Assert.
@@ -304,7 +304,7 @@ class TextFieldSelectionDelegateTest {
             rawEndOffset = endOffset,
             previousSelection = null,
             isStartHandle = true,
-            adjustment = SelectionAdjustment.CHARACTER
+            adjustment = SelectionAdjustment.Character
         )
 
         // Assert.
@@ -336,7 +336,7 @@ class TextFieldSelectionDelegateTest {
             rawEndOffset = endOffset,
             previousSelection = null,
             isStartHandle = true,
-            adjustment = SelectionAdjustment.CHARACTER,
+            adjustment = SelectionAdjustment.Character,
         )
 
         // Assert.
@@ -362,7 +362,7 @@ class TextFieldSelectionDelegateTest {
             rawEndOffset = 0,
             previousSelection = null,
             isStartHandle = true,
-            adjustment = SelectionAdjustment.WORD
+            adjustment = SelectionAdjustment.Word
         )
 
         // Assert.
