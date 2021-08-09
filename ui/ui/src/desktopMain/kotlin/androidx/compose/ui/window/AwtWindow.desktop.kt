@@ -16,15 +16,12 @@
 
 package androidx.compose.ui.window
 
-import androidx.compose.desktop.AppManager
-import androidx.compose.desktop.AppWindow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.util.UpdateEffect
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -52,8 +49,6 @@ import java.awt.Window
  * the default Compose functions [androidx.compose.ui.window.Window] or
  * [androidx.compose.ui.window.Dialog].
  *
- * This API is experimental and will eventually replace [AppWindow] / [AppManager].
- *
  * @param visible Is [Window] visible to user.
  * Note that if we set `false` - native resources will not be released. They will be released
  * only when [Window] will leave the composition.
@@ -64,7 +59,6 @@ import java.awt.Window
  */
 @OptIn(DelicateCoroutinesApi::class)
 @Suppress("unused")
-@ExperimentalComposeUiApi
 @Composable
 fun <T : Window> OwnerWindowScope.AwtWindow(
     visible: Boolean = true,

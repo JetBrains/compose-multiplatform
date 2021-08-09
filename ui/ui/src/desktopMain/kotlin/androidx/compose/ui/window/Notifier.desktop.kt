@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.ui.window
 
 import java.awt.SystemTray
@@ -24,6 +26,11 @@ import java.awt.TrayIcon.MessageType
 /**
  * Notifier is a class that can send system notifications.
  */
+@Deprecated(
+    "Use new Composable Window API (https://github.com/JetBrains/compose-jb/" +
+        "tree/master/tutorials/Tray_Notifications_MenuBar_new). Global notifications was not " +
+        "implemented in the new API as we don't properly support them in the current API."
+)
 class Notifier {
 
     /**

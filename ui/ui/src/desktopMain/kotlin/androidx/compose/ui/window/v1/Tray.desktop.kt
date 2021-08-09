@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.ui.window.v1
 
 import java.awt.Image
@@ -26,6 +28,10 @@ import java.awt.event.ActionListener
 /**
  * Tray is class for working with the system tray.
  */
+@Deprecated(
+    "Use new Composable Window API (https://github.com/JetBrains/compose-jb/" +
+        "tree/master/tutorials/Tray_Notifications_MenuBar_new)"
+)
 class Tray {
     private lateinit var trayIcon: TrayIcon
     private var init: Boolean = false

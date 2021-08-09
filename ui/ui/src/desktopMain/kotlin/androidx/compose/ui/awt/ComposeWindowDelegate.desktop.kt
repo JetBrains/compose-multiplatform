@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.desktop
+package androidx.compose.ui.awt
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
