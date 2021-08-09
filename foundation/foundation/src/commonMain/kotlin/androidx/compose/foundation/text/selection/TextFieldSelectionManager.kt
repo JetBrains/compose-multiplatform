@@ -176,7 +176,7 @@ internal class TextFieldSelectionManager(
                     transformedStartOffset = offset,
                     transformedEndOffset = offset,
                     isStartHandle = false,
-                    adjustment = SelectionAdjustment.WORD
+                    adjustment = SelectionAdjustment.Word
                 )
                 dragBeginOffsetInText = offset
             }
@@ -203,7 +203,7 @@ internal class TextFieldSelectionManager(
                     transformedStartOffset = startOffset,
                     transformedEndOffset = endOffset,
                     isStartHandle = false,
-                    adjustment = SelectionAdjustment.WORD
+                    adjustment = SelectionAdjustment.Word
                 )
             }
             state?.showFloatingToolbar = false
@@ -228,7 +228,7 @@ internal class TextFieldSelectionManager(
                     transformedStartOffset = startOffset,
                     transformedEndOffset = clickOffset,
                     isStartHandle = false,
-                    adjustment = SelectionAdjustment.NONE
+                    adjustment = SelectionAdjustment.None
                 )
                 return true
             }
@@ -251,7 +251,7 @@ internal class TextFieldSelectionManager(
                     transformedStartOffset = startOffset,
                     transformedEndOffset = dragOffset,
                     isStartHandle = false,
-                    adjustment = SelectionAdjustment.NONE
+                    adjustment = SelectionAdjustment.None
                 )
                 return true
             }
@@ -338,7 +338,7 @@ internal class TextFieldSelectionManager(
                         transformedStartOffset = startOffset,
                         transformedEndOffset = endOffset,
                         isStartHandle = isStartHandle,
-                        adjustment = SelectionAdjustment.CHARACTER
+                        adjustment = SelectionAdjustment.Character
                     )
                 }
                 state?.showFloatingToolbar = false

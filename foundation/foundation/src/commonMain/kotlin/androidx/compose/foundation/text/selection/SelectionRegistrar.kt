@@ -22,19 +22,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 
 /**
- * Selection can be adjusted depends on context. For example, in touch mode dragging after a long
- * press adjusts selection by word. But selection by dragging handles is character precise
- * without adjustments. With a mouse, double-click selects by words and triple-clicks by paragraph.
- * @see [SelectionRegistrar.notifySelectionUpdate]
- */
-
-internal enum class SelectionAdjustment {
-    NONE,
-    CHARACTER,
-    WORD,
-    PARAGRAPH
-}
-/**
  *  An interface allowing a composable to subscribe and unsubscribe to selection changes.
  */
 internal interface SelectionRegistrar {

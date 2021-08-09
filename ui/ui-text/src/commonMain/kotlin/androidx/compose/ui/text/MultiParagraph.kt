@@ -424,9 +424,13 @@ class MultiParagraph(
      * http://www.unicode.org/reports/tr29/#Word_Boundaries
      */
     fun getWordBoundary(offset: Int): TextRange {
-        requireIndexInRange(offset)
+        requireIndexInRangeInclusiveEnd(offset)
 
-        val paragraphIndex = findParagraphByIndex(paragraphInfoList, offset)
+        val paragraphIndex = if (offset == annotatedString.length) {
+            paragraphInfoList.lastIndex
+        } else {
+            findParagraphByIndex(paragraphInfoList, offset)
+        }
 
         return with(paragraphInfoList[paragraphIndex]) {
             paragraph.getWordBoundary(offset.toLocalIndex()).toGlobal()

@@ -44,9 +44,12 @@ internal interface Selectable {
      * @param endPosition graphical position of the end of the selection
      * @param containerLayoutCoordinates [LayoutCoordinates] of the widget
      * @param adjustment [Selection] range is adjusted according to this param
-     * @param previousSelection previous selection result
-     * @param isStartHandle true if the start handle is being dragged
+     * @param previousSelection previous selection result on this [Selectable]
      *
+     * @throws IllegalStateException when the given [previousSelection] doesn't belong to this
+     * selectable. In other words, one of the [Selection.AnchorInfo] in the given
+     * [previousSelection] has a selectableId that doesn't match to the [selectableId] of this
+     * selectable.
      * @return null if no selection will be applied for this composable, or [Selection] instance
      *  if selection is applied to this composable.
      */
