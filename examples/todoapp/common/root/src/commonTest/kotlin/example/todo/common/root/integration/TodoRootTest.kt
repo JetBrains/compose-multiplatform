@@ -1,8 +1,8 @@
 package example.todo.common.root.integration
 
 import com.arkivanov.decompose.DefaultComponentContext
-import com.arkivanov.decompose.lifecycle.LifecycleRegistry
-import com.arkivanov.decompose.lifecycle.resume
+import com.arkivanov.essenty.lifecycle.LifecycleRegistry
+import com.arkivanov.essenty.lifecycle.resume
 import com.badoo.reaktive.base.invoke
 import example.todo.common.edit.TodoEdit
 import example.todo.common.main.TodoMain
