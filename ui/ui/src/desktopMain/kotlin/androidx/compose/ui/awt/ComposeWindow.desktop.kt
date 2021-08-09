@@ -87,7 +87,7 @@ class ComposeWindow : JFrame() {
         super.dispose()
     }
 
-    private val undecoratedWindowResizer = UndecoratedWindowResizer(this)
+    private val undecoratedWindowResizer = UndecoratedWindowResizer(this, layer)
 
     override fun setUndecorated(value: Boolean) {
         super.setUndecorated(value)

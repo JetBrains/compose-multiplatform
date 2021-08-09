@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.window.DialogWindowScope
+import androidx.compose.ui.window.UndecoratedWindowResizer
 import org.jetbrains.skiko.GraphicsApi
 import java.awt.Component
 import java.awt.Window
@@ -87,6 +88,18 @@ class ComposeDialog(
     override fun dispose() {
         delegate.dispose()
         super.dispose()
+    }
+
+    private val undecoratedWindowResizer = UndecoratedWindowResizer(this, layer)
+
+    override fun setUndecorated(value: Boolean) {
+        super.setUndecorated(value)
+        undecoratedWindowResizer.enabled = isUndecorated && isResizable
+    }
+
+    override fun setResizable(value: Boolean) {
+        super.setResizable(value)
+        undecoratedWindowResizer.enabled = isUndecorated && isResizable
     }
 
     override fun setVisible(value: Boolean) {
