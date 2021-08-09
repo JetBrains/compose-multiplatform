@@ -12,11 +12,27 @@ import org.jetbrains.compose.web.events.SyntheticInputEvent
 import org.jetbrains.compose.web.events.SyntheticSelectEvent
 import org.w3c.dom.HTMLInputElement
 
-open class InputAttrsBuilder<ValueType>(
+/**
+ * An extension of [AttrsBuilder].
+ * This class provides a set of methods specific for [Input] element:
+ *
+ * [value] - sets the current input's value.
+ * [defaultValue] - sets the default input's value.
+ *
+ * [checked] - sets the current checked/unchecked state of a checkbox or a radio.
+ * [defaultChecked] - sets the default checked state of a checkbox or a radio.
+ *
+ * [onInvalid] - adds invalid` event listener
+ * [onInput] - adds `input` event listener
+ * [onChange] - adds `change` event listener
+ * [onBeforeInput] - add `beforeinput` event listener
+ * [onSelect] - add `select` event listener
+ */
+class InputAttrsBuilder<ValueType>(
     val inputType: InputType<ValueType>
 ) : AttrsBuilder<HTMLInputElement>() {
 
-    open fun value(value: String): InputAttrsBuilder<ValueType> {
+    fun value(value: String): InputAttrsBuilder<ValueType> {
         when (inputType) {
             InputType.Checkbox,
             InputType.Radio,
@@ -27,27 +43,27 @@ open class InputAttrsBuilder<ValueType>(
         return this
     }
 
-    open fun value(value: Number): InputAttrsBuilder<ValueType> {
+    fun value(value: Number): InputAttrsBuilder<ValueType> {
         value(value.toString())
         return this
     }
 
-    open fun checked(checked: Boolean): InputAttrsBuilder<ValueType> {
+    fun checked(checked: Boolean): InputAttrsBuilder<ValueType> {
         prop(setCheckedValue, checked)
         return this
     }
 
-    open fun defaultChecked(): InputAttrsBuilder<ValueType> {
+    fun defaultChecked(): InputAttrsBuilder<ValueType> {
         attr("checked", "")
         return this
     }
 
-    open fun defaultValue(value: String): InputAttrsBuilder<ValueType> {
+    fun defaultValue(value: String): InputAttrsBuilder<ValueType> {
         attr("value", value)
         return this
     }
 
-    open fun defaultValue(value: Number): InputAttrsBuilder<ValueType> {
+    fun defaultValue(value: Number): InputAttrsBuilder<ValueType> {
         attr("value", value.toString())
         return this
     }
@@ -88,7 +104,7 @@ open class InputAttrsBuilder<ValueType>(
     }
 }
 
-external interface JsWeakMap {
+internal external interface JsWeakMap {
     fun delete(key: Any)
     fun get(key: Any): Any?
     fun has(key: Any): Boolean

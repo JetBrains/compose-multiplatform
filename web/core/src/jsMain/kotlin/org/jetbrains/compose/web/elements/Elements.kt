@@ -650,6 +650,24 @@ fun Section(
     content = content
 )
 
+/**
+ * Adds <textarea> element.
+ * Same as [Input], [TextArea] has two modes: controlled and uncontrolled.
+ *
+ * Controlled mode means that <textarea> value can be changed only by passing a different [value].
+ * Uncontrolled mode means that <textarea> uses its default state management.
+ *
+ * To use controlled mode, simply pass non-null [value].
+ * By default [value] is null and [TextArea] will be in uncontrolled mode.
+ *
+ * Use `defaultValue("some default text")` in uncontrolled mode to set a default text if needed:
+ *
+ * ```
+ * TextArea {
+ *      defaultValue("Some Default Text")
+ * }
+ * ```
+ */
 @Composable
 fun TextArea(
     value: String? = null,
@@ -932,6 +950,37 @@ fun Style(
     Style(applyAttrs, builder.cssRules)
 }
 
+/**
+ * Adds <input> element of [type].
+ *
+ * Input has two modes: controlled and uncontrolled.
+ * Uncontrolled is a default mode. The input's state is managed by [HTMLInputElement] itself.
+ * Controlled mode means that the input's state is managed by compose state.
+ * To use Input in controlled mode, it's required to set its state by calling `value(String|Number)`.
+ *
+ * Consider using [TextInput], [CheckboxInput], [RadioInput], [NumberInput] etc. to use controlled mode.
+ *
+ * Code example of a controlled Input:
+ * ```
+ * val textInputState by remember { mutableStateOf("initial text") }
+ *
+ * Input(type = InputType.Text) {
+ *      value(textInputState)
+ *      onInput { event ->
+ *          textInputState = event.value // without updating the state, the <input> will keep showing an old value
+ *      }
+ * }
+ * ```
+ *
+ * Code example of an uncontrolled Input:
+ * ```
+ * Input(type = InputType.Text) {
+ *      defaultValue("someDefaultValue") // calling `defaultValue` is optional
+ *      // No value set explicitly.
+ *      // Whatever typed into the input will be immediately displayed in UI without handling any onInput events.
+ * }
+ * ```
+ */
 @Composable
 fun <K> Input(
     type: InputType<K>,
