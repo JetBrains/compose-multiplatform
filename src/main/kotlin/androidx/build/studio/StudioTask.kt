@@ -19,6 +19,7 @@ package androidx.build.studio
 import androidx.build.StudioType
 import androidx.build.getSupportRootFolder
 import androidx.build.studioType
+import com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -186,17 +187,21 @@ abstract class StudioTask : DefaultTask() {
             inheritIO()
             with(platformUtilities) { command(launchCommandArguments) }
 
-            // Some environment properties are already set in gradlew, and these by default carry
-            // through here
             val additionalStudioEnvironmentProperties = mapOf(
+                // These environment variables are used to set up AndroidX's default configuration.
                 "STUDIO_PROPERTIES" to ideaProperties.absolutePath,
                 "STUDIO_VM_OPTIONS" to vmOptions.absolutePath,
                 // This environment variable prevents Studio from showing IDE inspection warnings
                 // for nullability issues, if the context is deprecated. This environment variable
                 // is consumed by InteroperabilityDetector.kt
-                "ANDROID_LINT_NULLNESS_IGNORE_DEPRECATED" to "true"
+                "ANDROID_LINT_NULLNESS_IGNORE_DEPRECATED" to "true",
+                // This environment variable is read by AndroidXRootPlugin to ensure that
+                // Studio-initiated Gradle tasks are run against the same version of AGP that was
+                // used to start Studio, which prevents version mismatch after repo sync.
+                "EXPECTED_AGP_VERSION" to ANDROID_GRADLE_PLUGIN_VERSION
             )
 
+            // Append to the existing environment variables set by gradlew and the user.
             environment().putAll(additionalStudioEnvironmentProperties)
             start()
         }
