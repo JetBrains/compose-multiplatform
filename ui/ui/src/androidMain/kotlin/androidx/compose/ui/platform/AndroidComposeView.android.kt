@@ -90,6 +90,7 @@ import androidx.compose.ui.layout.onRelocationRequest
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.UsageByParent
+import androidx.compose.ui.node.LayoutNodeDrawScope
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
@@ -138,6 +139,8 @@ internal class AndroidComposeView(context: Context) :
      * can lead to this case, e.g. [onRtlPropertiesChanged].
      */
     private var superclassInitComplete = true
+
+    override val sharedDrawScope = LayoutNodeDrawScope()
 
     override val view: View get() = this
 

@@ -35,6 +35,7 @@ import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.node.LayoutNodeDrawScope
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
@@ -3269,6 +3270,8 @@ private class TestOwner : Owner {
     override val viewConfiguration: ViewConfiguration
         get() = TODO("Not yet implemented")
     override val snapshotObserver = OwnerSnapshotObserver { it.invoke() }
+
+    override val sharedDrawScope = LayoutNodeDrawScope()
 }
 
 private fun List<LogEntry>.verifyOnPointerEventCall(
