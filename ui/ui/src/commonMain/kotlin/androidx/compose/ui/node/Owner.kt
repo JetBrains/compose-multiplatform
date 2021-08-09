@@ -46,6 +46,11 @@ internal interface Owner {
      */
     val root: LayoutNode
 
+    /**
+     * Draw scope reused for drawing speed up.
+     */
+    val sharedDrawScope: LayoutNodeDrawScope
+
     val rootForTest: RootForTest
 
     /**

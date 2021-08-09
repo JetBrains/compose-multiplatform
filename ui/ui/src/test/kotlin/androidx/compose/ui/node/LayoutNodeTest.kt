@@ -1894,6 +1894,8 @@ private class MockOwner(
     override var measureIteration: Long = 0
     override val viewConfiguration: ViewConfiguration
         get() = TODO("Not yet implemented")
+
+    override val sharedDrawScope = LayoutNodeDrawScope()
 }
 
 private fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Modifier) =
