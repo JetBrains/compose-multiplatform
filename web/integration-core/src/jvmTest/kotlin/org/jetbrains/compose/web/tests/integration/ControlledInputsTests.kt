@@ -9,9 +9,11 @@ import org.jetbrains.compose.web.tests.integration.common.BaseIntegrationTests
 import org.jetbrains.compose.web.tests.integration.common.ResolveDrivers
 import org.jetbrains.compose.web.tests.integration.common.openTestPage
 import org.jetbrains.compose.web.tests.integration.common.waitTextToBe
+import org.junit.jupiter.api.Assumptions
 import org.openqa.selenium.By
 import org.openqa.selenium.Keys
 import org.openqa.selenium.WebDriver
+import org.openqa.selenium.chrome.ChromeDriver
 
 class ControlledInputsTests : BaseIntegrationTests() {
 
@@ -189,6 +191,7 @@ class ControlledInputsTests : BaseIntegrationTests() {
         check(radio1.isSelected)
         check(!radio2.isSelected)
     }
+
     @ResolveDrivers
     fun radioMutableCheckedChanges(driver: WebDriver) {
         driver.openTestPage("radioMutableCheckedChanges")
@@ -431,5 +434,74 @@ class ControlledInputsTests : BaseIntegrationTests() {
 
         driver.waitTextToBe(value = "onInput Caught")
         check(dateInput.getAttribute("value") == "")
+    }
+
+    @ResolveDrivers
+    fun mutableDateInputChanges(driver: WebDriver) {
+        // We skip chrome, since for some reason `sendKeys` doesn't work as expected when used for Controlled Input in Chrome
+        Assumptions.assumeTrue(
+            driver !is ChromeDriver,
+            "chrome driver doesn't work properly when using sendKeys on Controlled Input"
+        )
+
+        driver.openTestPage("mutableDateInputChanges")
+        driver.waitTextToBe(value = "")
+
+        val dateInput = driver.findElement(By.id("dateInput"))
+        check(dateInput.getAttribute("value") == "")
+
+        driver.sendKeysForDateInput(dateInput, 2021, 10, 22)
+
+        driver.waitTextToBe(value = "2021-10-22")
+        check(dateInput.getAttribute("value") == "2021-10-22")
+    }
+
+    @ResolveDrivers
+    fun hardcodedTimeNeverChanges(driver: WebDriver) {
+        driver.openTestPage("hardcodedTimeNeverChanges")
+        driver.waitTextToBe(value = "None")
+
+        val timeInput = driver.findElement(By.id("time"))
+        check(timeInput.getAttribute("value") == "14:00")
+
+        timeInput.sendKeys("18:31")
+
+        driver.waitTextToBe(value = "onInput Caught")
+        check(timeInput.getAttribute("value") == "14:00")
+    }
+
+    @ResolveDrivers
+    fun mutableTimeChanges(driver: WebDriver) {
+        // We skip chrome, since for some reason `sendKeys` doesn't work as expected when used for Controlled Input in Chrome
+        Assumptions.assumeTrue(
+            driver !is ChromeDriver,
+            "chrome driver doesn't work properly when using sendKeys on Controlled Input"
+        )
+
+        driver.openTestPage("mutableTimeChanges")
+        driver.waitTextToBe(value = "")
+
+        val timeInput = driver.findElement(By.id("time"))
+        check(timeInput.getAttribute("value") == "")
+
+        timeInput.sendKeys("18:31")
+
+        driver.waitTextToBe(value = "18:31")
+        check(timeInput.getAttribute("value") == "18:31")
+    }
+
+    @ResolveDrivers
+    fun timeInputSendKeysOnChromeFailingTest(driver: WebDriver) {
+        Assumptions.assumeTrue(
+            driver is ChromeDriver,
+            "this a `failing test for Chrome only` to catch when issue with sendKeys is resolved"
+        )
+        driver.openTestPage("mutableTimeChanges")
+        driver.waitTextToBe(value = "")
+
+        val timeInput = driver.findElement(By.id("time"))
+
+        timeInput.sendKeys("18:31")
+        driver.waitTextToBe(value = "18:03") // it should be 18:31, but this is a failing test, so wrong value is expected
     }
 }

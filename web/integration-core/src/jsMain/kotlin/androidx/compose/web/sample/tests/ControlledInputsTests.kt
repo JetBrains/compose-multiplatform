@@ -370,4 +370,43 @@ class ControlledInputsTests {
             }
         }
     }
+
+    val mutableDateInputChanges by testCase {
+        var inputValue by remember { mutableStateOf("") }
+
+        TestText(inputValue)
+
+        DateInput(value = inputValue) {
+            id("dateInput")
+            onInput {
+                inputValue = it.value
+            }
+        }
+    }
+
+    val hardcodedTimeNeverChanges by testCase {
+        var typedValue by remember { mutableStateOf("None") }
+
+        TestText(typedValue)
+
+        TimeInput(value = "14:00") {
+            id("time")
+            onInput {
+                typedValue = "onInput Caught"
+            }
+        }
+    }
+
+    val mutableTimeChanges by testCase {
+        var value by remember { mutableStateOf("") }
+
+        TestText(value)
+
+        TimeInput(value = value) {
+            id("time")
+            onInput {
+                value = it.value
+            }
+        }
+    }
 }
