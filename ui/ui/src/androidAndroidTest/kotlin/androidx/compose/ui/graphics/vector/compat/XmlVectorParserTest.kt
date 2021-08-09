@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.graphics.vector.compat
 
+import android.content.res.Resources
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -159,6 +161,107 @@ class XmlVectorParserTest {
         }
 
         path[2].assertType<PathNode.Close>()
+    }
+
+    @Test
+    fun testParsePlus() {
+        val asset = loadVector(R.drawable.ic_triangle_plus)
+        assertEquals(Color.Blue, asset.tintColor)
+        assertEquals(BlendMode.Plus, asset.tintBlendMode)
+    }
+
+    @Test
+    fun testParseScreen() {
+        val asset = loadVector(R.drawable.ic_triangle_screen)
+        assertEquals(Color.Blue, asset.tintColor)
+        assertEquals(BlendMode.Screen, asset.tintBlendMode)
+    }
+
+    @Test
+    fun testParseSrcAtop() {
+        val asset = loadVector(R.drawable.ic_triangle_src_atop)
+        assertEquals(Color.Blue, asset.tintColor)
+        assertEquals(BlendMode.SrcAtop, asset.tintBlendMode)
+    }
+
+    @Test
+    fun testParseSrcIn() {
+        val asset = loadVector(R.drawable.ic_triangle_src_in)
+        assertEquals(Color.Blue, asset.tintColor)
+        assertEquals(BlendMode.SrcIn, asset.tintBlendMode)
+    }
+
+    @Test
+    fun testParseModulate() {
+        val asset = loadVector(R.drawable.ic_triangle_modulate)
+        assertEquals(Color.Blue, asset.tintColor)
+        assertEquals(BlendMode.Modulate, asset.tintBlendMode)
+    }
+
+    @Test
+    fun testParseSrcOver() {
+        val asset = loadVector(R.drawable.ic_triangle_src_over)
+        assertEquals(Color.Blue, asset.tintColor)
+        assertEquals(BlendMode.SrcOver, asset.tintBlendMode)
+    }
+
+    @Test
+    fun testTintFromColorStateList() {
+        val asset = loadVector(R.drawable.ic_triangle_csl_tint)
+        assertEquals(Color.Blue, asset.tintColor)
+        assertEquals(BlendMode.SrcIn, asset.tintBlendMode)
+    }
+
+    @Test
+    fun testTintFromColorStateListTheme() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val theme = context.resources.newTheme()
+        theme.applyStyle(R.style.VectorTestTheme, true)
+
+        val asset = loadVector(R.drawable.ic_triangle_csl_tint_theme, theme)
+        assertEquals(Color.Green, asset.tintColor)
+        assertEquals(BlendMode.SrcIn, asset.tintBlendMode)
+    }
+
+    @Test
+    fun testTintColorFromAndroidResources() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val theme = context.resources.newTheme()
+        theme.applyStyle(R.style.VectorTestTheme, true)
+        val asset = loadVector(R.drawable.ic_triangle_color_resource_tint, theme)
+        assertEquals(Color.Black, asset.tintColor)
+        assertEquals(BlendMode.SrcIn, asset.tintBlendMode)
+    }
+
+    @Test
+    fun testTintColorFromThemeParsed() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+        val theme = context.resources.newTheme()
+        theme.applyStyle(R.style.VectorTestTheme, true)
+
+        val asset = loadVector(R.drawable.ic_triangle_color_theme_tint, theme)
+        assertEquals(Color.Green, asset.tintColor)
+        assertEquals(BlendMode.SrcIn, asset.tintBlendMode)
+    }
+
+    @Test
+    fun testTintColorFromThemeIgnored() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+        val theme = context.resources.newTheme()
+        val asset = loadVector(R.drawable.ic_triangle_color_theme_tint, theme)
+        assertEquals(Color.Unspecified, asset.tintColor)
+        assertEquals(BlendMode.SrcIn, asset.tintBlendMode)
+    }
+
+    private fun loadVector(id: Int, theme: Resources.Theme? = null): ImageVector {
+        val res = InstrumentationRegistry.getInstrumentation().targetContext.resources
+        return ImageVector.vectorResource(
+            theme,
+            res,
+            id
+        )
     }
 
     /**
