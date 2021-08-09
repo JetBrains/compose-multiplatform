@@ -13,6 +13,7 @@
         <!-- Required for AppSearch icing tests. -->
         <ignore path="**/java/tests/**" />
     </issue>
-    <!-- Re-enable NewApi for tests (and everything else). -->
+    <!-- Re-enable high-priority checks for tests (and everything else). -->
     <issue id="NewApi" severity="fatal" />
+    <issue id="WrongThread" severity="fatal" />
 </lint>
