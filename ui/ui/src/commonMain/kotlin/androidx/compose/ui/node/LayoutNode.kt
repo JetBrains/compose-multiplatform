@@ -69,10 +69,6 @@ import androidx.compose.ui.unit.LayoutDirection
  */
 private const val DebugChanges = false
 
-// Top level DrawScope instance shared across the LayoutNode hierarchy to re-use internal
-// drawing objects
-internal val sharedDrawScope = LayoutNodeDrawScope()
-
 /**
  * An element in the layout hierarchy, built with compose UI.
  */
@@ -541,7 +537,8 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
      */
     internal val alignmentLines = LayoutNodeAlignmentLines(this)
 
-    internal val mDrawScope: LayoutNodeDrawScope = sharedDrawScope
+    internal val mDrawScope: LayoutNodeDrawScope
+        get() = requireOwner().sharedDrawScope
 
     /**
      * Whether or not this [LayoutNode] and all of its parents have been placed in the hierarchy.
