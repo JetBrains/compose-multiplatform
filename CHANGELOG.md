@@ -35,6 +35,7 @@
 - [removed content builder for empty elements](https://github.com/JetBrains/compose-jb/issues/744)
 - [Introduce CSS arithmetic operations](https://github.com/JetBrains/compose-jb/pull/761)
 - [Improved the types of Inputs and input events](https://github.com/JetBrains/compose-jb/pull/799)
+- [CSS Animations](https://github.com/JetBrains/compose-jb/pull/810)
 - [All event types expose native properties](https://github.com/JetBrains/compose-jb/pull/887)
 - [Added a complete list of HTML color aliases](https://github.com/JetBrains/compose-jb/issues/890)
 - [Introduce support for CSS Grid API](https://github.com/JetBrains/compose-jb/issues/895)
