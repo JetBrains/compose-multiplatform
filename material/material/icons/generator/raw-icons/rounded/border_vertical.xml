@@ -6,5 +6,5 @@
     android:tint="?attr/colorControlNormal">
   <path
       android:fillColor="@android:color/white"
-      android:pathData="M3,9h2V7H3V9zM3,5h2V3H3V5zM7,21h2v-2H7V21zM7,13h2v-2H7V13zM3,13h2v-2H3V13zM3,21h2v-2H3V21zM3,17h2v-2H3V17zM7,5h2V3H7V5zM19,17h2v-2h-2V17zM12,21L12,21c0.55,0 1,-0.45 1,-1V4c0,-0.55 -0.45,-1 -1,-1l0,0c-0.55,0 -1,0.45 -1,1v16C11,20.55 11.45,21 12,21zM19,21h2v-2h-2V21zM19,13h2v-2h-2V13zM19,3v2h2V3H19zM19,9h2V7h-2V9zM15,5h2V3h-2V5zM15,21h2v-2h-2V21zM15,13h2v-2h-2V13z"/>
+      android:pathData="M3,9h2L5,7L3,7v2zM3,5h2L5,3L3,3v2zM7,21h2v-2L7,19v2zM7,13h2v-2L7,11v2zM3,13h2v-2L3,11v2zM3,21h2v-2L3,19v2zM3,17h2v-2L3,15v2zM7,5h2L9,3L7,3v2zM19,17h2v-2h-2v2zM12,21c0.55,0 1,-0.45 1,-1L13,4c0,-0.55 -0.45,-1 -1,-1s-1,0.45 -1,1v16c0,0.55 0.45,1 1,1zM19,21h2v-2h-2v2zM19,13h2v-2h-2v2zM19,3v2h2L21,3h-2zM19,9h2L21,7h-2v2zM15,5h2L17,3h-2v2zM15,21h2v-2h-2v2zM15,13h2v-2h-2v2z"/>
 </vector>
