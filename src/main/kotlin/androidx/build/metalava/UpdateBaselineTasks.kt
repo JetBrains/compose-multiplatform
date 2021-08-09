@@ -181,7 +181,6 @@ private fun getCommonBaselineUpdateArgs(baselineFile: File): List<String> {
         baselineFile.toString(),
         "--pass-baseline-updates",
         "--delete-empty-baselines",
-        "--format=v3",
-        "--omit-common-packages=yes"
+        "--format=v4"
     )
 }
