@@ -16,16 +16,13 @@
 
 package androidx.compose.ui.window
 
-import androidx.compose.desktop.AppManager
-import androidx.compose.desktop.AppWindow
-import androidx.compose.desktop.ComposeWindow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.unit.dp
@@ -104,11 +101,7 @@ import javax.swing.JMenuBar
  * keyboard. While implementing this callback, return true to stop propagation of this event.
  * If you return false, the key event will be sent to this [onKeyEvent]'s parent.
  * @param content Content of the window
- *
- * This API is experimental and will eventually replace [AppWindow] / [AppManager]
  */
-@Suppress("unused")
-@ExperimentalComposeUiApi
 @Composable
 fun ApplicationScope.Window(
     onCloseRequest: () -> Unit,
@@ -230,10 +223,7 @@ fun ApplicationScope.Window(
  * keyboard. While implementing this callback, return true to stop propagation of this event.
  * If you return false, the key event will be sent to this [onKeyEvent]'s parent.
  * @param content Content of the window
- *
- * This API is experimental and will eventually replace [AppWindow] / [AppManager]
  */
-@ExperimentalComposeUiApi
 fun singleWindowApplication(
     state: WindowState = WindowState(),
     visible: Boolean = true,
@@ -281,8 +271,6 @@ fun singleWindowApplication(
  * Window is needed for creating window's that still can't be created with
  * the default Compose function [androidx.compose.ui.window.Window]
  *
- * This API is experimental and will eventually replace [AppWindow] / [AppManager].
- *
  * @param visible Is [ComposeWindow] visible to user.
  * If `false`:
  * - internal state of [ComposeWindow] is preserved and will be restored next time the window
@@ -304,7 +292,6 @@ fun singleWindowApplication(
  * @param content Composable content of the creating window.
  */
 @Suppress("unused")
-@ExperimentalComposeUiApi
 @Composable
 fun ApplicationScope.Window(
     visible: Boolean = true,

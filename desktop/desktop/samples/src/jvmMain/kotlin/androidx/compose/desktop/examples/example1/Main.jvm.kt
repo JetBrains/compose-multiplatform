@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package androidx.compose.desktop.examples.example1
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.desktop.AppWindow
 import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.foundation.ExperimentalDesktopApi
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -80,8 +80,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.plus
-import androidx.compose.ui.input.key.shortcuts
 import androidx.compose.ui.input.pointer.isAltPressed
 import androidx.compose.ui.input.pointer.isCtrlPressed
 import androidx.compose.ui.input.pointer.isMetaPressed
@@ -89,6 +87,10 @@ import androidx.compose.ui.input.pointer.isPrimaryPressed
 import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.isShiftPressed
 import androidx.compose.ui.input.pointer.isTertiaryPressed
+import androidx.compose.ui.input.key.isMetaPressed
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
@@ -104,13 +106,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDecoration.Companion.Underline
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.singleWindowApplication
+import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.FrameWindowScope
+import androidx.compose.ui.window.WindowSize
 import androidx.compose.ui.window.WindowState
+import androidx.compose.ui.window.launchApplication
+import androidx.compose.ui.window.rememberWindowState
+import androidx.compose.ui.window.singleWindowApplication
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlin.random.Random
 
 private const val title = "Desktop Compose Elements"
@@ -126,7 +133,6 @@ val italicFont = try {
     FontFamily.SansSerif
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = singleWindowApplication(
     title = title,
     state = WindowState(width = 1024.dp, height = 850.dp)
@@ -409,12 +415,22 @@ private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
                 Button(
                     modifier = Modifier.padding(4.dp),
                     onClick = {
-                        AppWindow(size = IntSize(400, 200)).also {
-                            it.keyboard.setShortcut(Key.Escape) {
-                                it.close()
+                        @OptIn(DelicateCoroutinesApi::class)
+                        GlobalScope.launchApplication {
+                            Window(
+                                onCloseRequest = ::exitApplication,
+                                state = rememberWindowState(size = WindowSize(400.dp, 200.dp)),
+                                onPreviewKeyEvent = {
+                                    if (it.key == Key.Escape) {
+                                        exitApplication()
+                                        true
+                                    } else {
+                                        false
+                                    }
+                                }
+                            ) {
+                                Animations(isCircularEnabled = animation.value)
                             }
-                        }.show {
-                            Animations(isCircularEnabled = animation.value)
                         }
                     }
                 ) {
@@ -447,12 +463,17 @@ private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
                 Text(text = "Important input")
             },
             maxLines = 1,
-            modifier = Modifier.shortcuts {
-                on(Key.MetaLeft + Key.ShiftLeft + Key.Enter) {
-                    text.value = "Cleared with shift!"
-                }
-                on(Key.MetaLeft + Key.Enter) {
-                    text.value = "Cleared!"
+            modifier = Modifier.onPreviewKeyEvent {
+                when {
+                    (it.isMetaPressed && it.key == Key.Enter) -> {
+                        if (it.isShiftPressed) {
+                            text.value = "Cleared with shift!"
+                        } else {
+                            text.value = "Cleared!"
+                        }
+                        true
+                    }
+                    else -> false
                 }
             }.focusOrder(focusItem1) {
                 next = focusItem2

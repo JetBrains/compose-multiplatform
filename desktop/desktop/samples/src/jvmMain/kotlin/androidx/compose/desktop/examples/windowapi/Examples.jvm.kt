@@ -17,7 +17,6 @@
 
 package androidx.compose.desktop.examples.windowapi
 
-import androidx.compose.desktop.ComposeWindow
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -34,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.asPainter
 import androidx.compose.ui.input.key.Key

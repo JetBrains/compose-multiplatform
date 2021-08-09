@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.window
 
-import androidx.compose.desktop.AppWindow
 import androidx.compose.desktop.LocalAppWindow
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.drag
@@ -38,6 +37,15 @@ import java.awt.Point
  *
  * @param modifier The modifier to be applied to the layout.
  */
+@Deprecated(
+    "Use another variant of WindowDraggableArea for the new Composable Window API (https://github" +
+        ".com/JetBrains/compose-jb/tree/master/tutorials/Window_API_new)",
+    replaceWith = ReplaceWith(
+        "WindowDraggableArea(modifier, content)",
+        "androidx.compose.foundation.window.WindowDraggableArea"
+    )
+)
+@Suppress("DEPRECATION")
 @Composable
 fun WindowDraggableArea(
     modifier: Modifier = Modifier,
@@ -60,7 +68,8 @@ fun WindowDraggableArea(
     }
 }
 
-private class DragHandler(private val window: AppWindow) {
+@Suppress("DEPRECATION")
+private class DragHandler(private val window: androidx.compose.desktop.AppWindow) {
     private var location = window.window.location.toComposeOffset()
     private var pointStart = MouseInfo.getPointerInfo().location.toComposeOffset()
 

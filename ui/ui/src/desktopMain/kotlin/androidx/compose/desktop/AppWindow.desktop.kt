@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("DEPRECATION")
 package androidx.compose.desktop
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.configureSwingGlobalsForCompose
 import androidx.compose.ui.platform.Keyboard
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.window.v1.MenuBar
-import java.awt.Container
 import java.awt.Frame
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
@@ -42,11 +43,12 @@ import javax.swing.WindowConstants
  * Local composition of [AppWindow]. [AppWindow] is a high level window implementation. This local
  * composition is used to get the current [AppWindow].
  */
+@Deprecated(
+    "Use new Composable Window API (https://github.com/JetBrains/compose-jb/" +
+        "tree/master/tutorials/Window_API_new)"
+)
 val LocalAppWindow = compositionLocalOf<AppWindow> {
     error("CompositionLocal LocalAppWindow not provided")
-}
-internal val LocalLayerContainer = compositionLocalOf<Container> {
-    error("CompositionLocal LayerContainer not provided")
 }
 
 /**
@@ -70,6 +72,10 @@ internal val LocalLayerContainer = compositionLocalOf<Container> {
  * onResize, onRelocate.
  * @param onDismissRequest Executes when the user tries to close the Window.
  */
+@Deprecated(
+    "Use new Composable Window API (https://github.com/JetBrains/compose-jb/" +
+        "tree/master/tutorials/Window_API_new)"
+)
 fun Window(
     title: String = "JetpackDesktopWindow",
     size: IntSize = IntSize(800, 600),
@@ -107,6 +113,10 @@ fun Window(
 /**
  * AppWindow is a class that represents a window.
  */
+@Deprecated(
+    "Use new Composable Window API (https://github.com/JetBrains/compose-jb/" +
+        "tree/master/tutorials/Tray_Notifications_MenuBar_new)"
+)
 class AppWindow : AppFrame {
 
     /**

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("DEPRECATION")
 
 package androidx.compose.ui.window.v1
 
@@ -48,6 +49,10 @@ import java.awt.image.BufferedImage
  * Supported events: onOpen, onClose, onMinimize, onMaximize, onRestore, onFocusGet, onFocusLost,
  * onResize, onRelocate.
  */
+@Deprecated(
+    "Use new Composable Window API (https://github.com/JetBrains/compose-jb/" +
+        "tree/master/tutorials/Window_API_new)"
+)
 @Immutable
 data class DialogProperties(
     val title: String = "JetpackDesktopDialog",
@@ -72,6 +77,10 @@ data class DialogProperties(
  * @param properties [DialogProperties] for further customization of this dialog's behavior.
  * @param content The content to be displayed inside the dialog.
  */
+@Deprecated(
+    "Use new Composable Window API (https://github.com/JetBrains/compose-jb/" +
+        "tree/master/tutorials/Window_API_new)"
+)
 @Composable
 fun Dialog(
     onDismissRequest: () -> Unit,

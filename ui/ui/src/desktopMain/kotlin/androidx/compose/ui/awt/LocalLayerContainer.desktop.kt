@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.window
+package androidx.compose.ui.awt
 
-import androidx.compose.desktop.ComposeDialog
-import androidx.compose.desktop.ComposePanel
-import androidx.compose.desktop.ComposeWindow
 import androidx.compose.runtime.compositionLocalOf
-import java.awt.Window
+import java.awt.Container
 
-/**
- * Window-owner of the current composition (for example, [ComposeWindow] or [ComposeDialog]).
- * If the composition is not inside Window (for example, [ComposePanel]), then return null
- */
-internal val LocalWindow = compositionLocalOf<Window?> { null }
+internal val LocalLayerContainer = compositionLocalOf<Container> {
+    error("CompositionLocal LayerContainer not provided")
+}
