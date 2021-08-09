@@ -146,7 +146,7 @@ fun main() = application {
 
 Open `build.gradle.kts` as a project in IntelliJ IDEA.
 
-<img alt="New project" src="screen1.png" height="1596" />
+<img alt="New project" src="screen1.png" height="500" />
 
 After you download the Compose for Desktop dependencies from the Maven repositories your new project is ready
 to go. Open the Gradle toolbar on the right, and select `sample/Tasks/compose desktop/run`.
