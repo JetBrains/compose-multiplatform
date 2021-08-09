@@ -78,6 +78,12 @@ internal abstract class LayoutNodeWrapper(
     private var layerDensity: Density = layoutNode.density
     private var layerLayoutDirection: LayoutDirection = layoutNode.layoutDirection
 
+    private var lastLayerAlpha: Float = 0.8f
+    fun isTransparent(): Boolean {
+        if (layer != null && lastLayerAlpha <= 0f) return true
+        return this.wrappedBy?.isTransparent() ?: return false
+    }
+
     private var _isAttached = false
     final override val isAttached: Boolean
         get() {
@@ -334,6 +340,7 @@ internal abstract class LayoutNodeWrapper(
         } else {
             require(layerBlock == null)
         }
+        lastLayerAlpha = graphicsLayerScope.alpha
         layoutNode.owner?.onLayoutChange(layoutNode)
     }
 

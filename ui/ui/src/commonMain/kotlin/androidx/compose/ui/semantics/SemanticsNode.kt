@@ -330,7 +330,7 @@ class SemanticsNode internal constructor(
      * of use cases it means that accessibility bounds will be equal to the clickable area.
      * Otherwise the outermost semantics will be used to report bounds, size and position.
      */
-    private fun findWrapperToGetBounds(): SemanticsWrapper {
+    internal fun findWrapperToGetBounds(): SemanticsWrapper {
         return if (unmergedConfig.isMergingSemanticsOfDescendants) {
             layoutNode.outerMergingSemantics ?: outerSemanticsNodeWrapper
         } else {
