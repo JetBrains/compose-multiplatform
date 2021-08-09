@@ -38,15 +38,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.centerX
-import androidx.compose.ui.test.centerY
-import androidx.compose.ui.test.down
-import androidx.compose.ui.test.height
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.moveBy
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performGesture
-import androidx.compose.ui.test.width
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -78,7 +72,7 @@ class OverScrollScreenshotTest {
         }
 
         rule.onNodeWithTag(overScrollTag)
-            .performGesture {
+            .performTouchInput {
                 down(Offset(centerX + width / 2 - 10, centerY))
                 moveBy(Offset(0f, 500f))
                 repeat(5) {
@@ -99,7 +93,7 @@ class OverScrollScreenshotTest {
         }
 
         rule.onNodeWithTag(overScrollTag)
-            .performGesture {
+            .performTouchInput {
                 down(Offset(centerX + width / 2 - 10, centerY))
                 moveBy(Offset(0f, -500f))
                 repeat(5) {
@@ -120,7 +114,7 @@ class OverScrollScreenshotTest {
         }
 
         rule.onNodeWithTag(overScrollTag)
-            .performGesture {
+            .performTouchInput {
                 down(Offset(centerX, centerY + height / 2 - 10))
                 moveBy(Offset(500f, 0f))
                 repeat(5) {
@@ -141,7 +135,7 @@ class OverScrollScreenshotTest {
         }
 
         rule.onNodeWithTag(overScrollTag)
-            .performGesture {
+            .performTouchInput {
                 down(Offset(centerX, centerY + height / 2 - 10))
                 moveBy(Offset(-500f, 0f))
                 repeat(5) {

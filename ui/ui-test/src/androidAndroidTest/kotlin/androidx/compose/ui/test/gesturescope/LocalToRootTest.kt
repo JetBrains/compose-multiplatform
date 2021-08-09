@@ -57,6 +57,7 @@ class LocalToRootTest {
             }
         }
 
+        @Suppress("DEPRECATION")
         rule.onNodeWithTag("viewport").performGesture { click(center) }
 
         val expectedClickLocation = Offset(50f, 30f)

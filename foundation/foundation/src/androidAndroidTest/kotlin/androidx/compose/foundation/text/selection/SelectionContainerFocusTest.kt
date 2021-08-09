@@ -36,12 +36,11 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.center
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.longClick
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -88,14 +87,14 @@ class SelectionContainerFocusTest {
             fontSize.toPx() / 2
         }
         rule.onNode(hasTestTag("selectionContainer1"))
-            .performGesture { longClick(Offset(x = positionInText, y = positionInText)) }
+            .performTouchInput { longClick(Offset(x = positionInText, y = positionInText)) }
         rule.runOnIdle {
             assertThat(selection1.value).isNotNull()
         }
 
         // Act.
         rule.onNode(hasTestTag("box"))
-            .performGesture { click(center) }
+            .performTouchInput { click(center) }
 
         // Assert.
         rule.runOnIdle {
@@ -118,14 +117,14 @@ class SelectionContainerFocusTest {
             fontSize.toPx() / 2
         }
         rule.onNode(hasTestTag("selectionContainer1"))
-            .performGesture { longClick(Offset(x = positionInText, y = positionInText)) }
+            .performTouchInput { longClick(Offset(x = positionInText, y = positionInText)) }
         rule.runOnIdle {
             assertThat(selection1.value).isNotNull()
         }
 
         // Act.
         rule.onNode(hasTestTag("selectionContainer2"))
-            .performGesture { longClick(Offset(x = positionInText, y = positionInText)) }
+            .performTouchInput { longClick(Offset(x = positionInText, y = positionInText)) }
 
         // Assert.
         rule.runOnIdle {

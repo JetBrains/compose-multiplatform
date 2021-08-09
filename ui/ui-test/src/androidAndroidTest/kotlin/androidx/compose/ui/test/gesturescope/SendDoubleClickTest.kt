@@ -87,6 +87,7 @@ class SendDoubleClickTest(private val config: TestConfig) {
         }
 
         // When we inject a double click
+        @Suppress("DEPRECATION")
         rule.onNodeWithTag(defaultTag).performGesture {
             if (config.position != null && config.delayMillis != null) {
                 doubleClick(config.position, config.delayMillis)

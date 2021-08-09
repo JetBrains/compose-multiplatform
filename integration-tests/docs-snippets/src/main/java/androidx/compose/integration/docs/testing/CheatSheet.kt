@@ -28,6 +28,7 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertAll
@@ -60,20 +61,9 @@ import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertValueEquals
 import androidx.compose.ui.test.assertWidthIsAtLeast
 import androidx.compose.ui.test.assertWidthIsEqualTo
-import androidx.compose.ui.test.bottom
-import androidx.compose.ui.test.bottomCenter
-import androidx.compose.ui.test.bottomLeft
-import androidx.compose.ui.test.bottomRight
-import androidx.compose.ui.test.cancel
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.center
-import androidx.compose.ui.test.centerLeft
-import androidx.compose.ui.test.centerRight
-import androidx.compose.ui.test.centerX
-import androidx.compose.ui.test.centerY
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.doubleClick
-import androidx.compose.ui.test.down
 import androidx.compose.ui.test.filter
 import androidx.compose.ui.test.filterToOne
 import androidx.compose.ui.test.getAlignmentLinePosition
@@ -94,7 +84,6 @@ import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasStateDescription
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
-import androidx.compose.ui.test.height
 import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.isEnabled
 import androidx.compose.ui.test.isFocusable
@@ -113,13 +102,8 @@ import androidx.compose.ui.test.isSelected
 import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.left
 import androidx.compose.ui.test.longClick
-import androidx.compose.ui.test.move
-import androidx.compose.ui.test.moveBy
-import androidx.compose.ui.test.movePointerBy
-import androidx.compose.ui.test.movePointerTo
-import androidx.compose.ui.test.moveTo
+import androidx.compose.ui.test.multiTouchSwipe
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
@@ -136,9 +120,7 @@ import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.onSibling
 import androidx.compose.ui.test.onSiblings
-import androidx.compose.ui.test.percentOffset
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.test.performKeyPress
 import androidx.compose.ui.test.performScrollTo
@@ -146,22 +128,16 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.pinch
 import androidx.compose.ui.test.printToLog
 import androidx.compose.ui.test.printToString
-import androidx.compose.ui.test.right
 import androidx.compose.ui.test.swipe
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.test.swipeWithVelocity
-import androidx.compose.ui.test.top
-import androidx.compose.ui.test.topCenter
-import androidx.compose.ui.test.topLeft
-import androidx.compose.ui.test.topRight
-import androidx.compose.ui.test.up
-import androidx.compose.ui.test.width
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -256,7 +232,7 @@ private fun TestingCheatSheetFinders() {
 private fun TestingCheatSheetActions() {
     composeTestRule.onRoot()
         .performClick()
-        .performGesture { longClick() }
+        .performTouchInput { longClick() }
         .performScrollTo()
         .performSemanticsAction(SemanticsActions.OnLongClick)
     composeTestRule.onRoot()
@@ -272,11 +248,14 @@ private fun TestingCheatSheetActions() {
 
     // GESTURES
 
-    composeTestRule.onRoot().performGesture {
+    composeTestRule.onRoot().performTouchInput {
         click()
         longClick()
         doubleClick()
         swipe(this.center, offset)
+        swipe({ Offset(it.toFloat(), it.toFloat()) }, 1L)
+        @OptIn(ExperimentalTestApi::class)
+        multiTouchSwipe(listOf { Offset(it.toFloat(), it.toFloat()) }, 1L)
         pinch(offset, offset, offset, offset)
         swipeWithVelocity(offset, offset, 1f)
         swipeUp()
@@ -287,14 +266,18 @@ private fun TestingCheatSheetActions() {
         // PARTIAL GESTURES
         down(offset)
         moveTo(offset)
-        movePointerTo(0, offset)
+        updatePointerTo(0, offset)
         moveBy(offset)
-        movePointerBy(0, offset)
+        updatePointerBy(0, offset)
         move()
         percentOffset()
         up()
         cancel()
 
+        currentPosition(0)
+        advanceEventTime(1L)
+
+        eventPeriodMillis
         visibleSize
 
         bottom

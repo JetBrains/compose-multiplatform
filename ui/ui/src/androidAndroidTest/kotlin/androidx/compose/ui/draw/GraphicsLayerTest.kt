@@ -67,7 +67,7 @@ import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -648,7 +648,7 @@ class GraphicsLayerTest {
         }
 
         rule.onNodeWithTag("layout")
-            .performGesture {
+            .performTouchInput {
                 click(position = Offset(50f, 170f))
             }
 

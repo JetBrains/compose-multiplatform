@@ -56,6 +56,7 @@ class SendCancelTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun onePointer() {
         // When we inject a down event followed by a cancel event
@@ -74,6 +75,7 @@ class SendCancelTest {
         rule.partialGesture { inputDispatcher.verifyNoTouchGestureInProgress() }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun twoPointers() {
         // When we inject two down events followed by a cancel event
@@ -93,6 +95,7 @@ class SendCancelTest {
         rule.partialGesture { inputDispatcher.verifyNoTouchGestureInProgress() }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun cancelWithoutDown() {
         expectError<IllegalStateException> {
@@ -100,6 +103,7 @@ class SendCancelTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun cancelAfterUp() {
         rule.partialGesture { down(downPosition1) }
@@ -109,6 +113,7 @@ class SendCancelTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun cancelAfterCancel() {
         rule.partialGesture { down(downPosition1) }

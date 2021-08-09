@@ -62,6 +62,7 @@ class SendMoveByTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun onePointer() {
         // When we inject a down event followed by a move event
@@ -85,6 +86,7 @@ class SendMoveByTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun twoPointers() {
         // When we inject two down events followed by two move events
@@ -116,6 +118,7 @@ class SendMoveByTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun twoPointers_oneMoveEvent() {
         // When we inject two down events followed by one move events
@@ -144,6 +147,7 @@ class SendMoveByTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun moveByWithoutDown() {
         expectError<IllegalStateException> {
@@ -151,6 +155,7 @@ class SendMoveByTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun moveByWrongPointerId() {
         rule.partialGesture { down(1, downPosition1) }
@@ -159,6 +164,7 @@ class SendMoveByTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun moveByAfterUp() {
         rule.partialGesture { down(downPosition1) }
@@ -168,6 +174,7 @@ class SendMoveByTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun moveByAfterCancel() {
         rule.partialGesture { down(downPosition1) }
@@ -177,6 +184,7 @@ class SendMoveByTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun movePointerByWithoutDown() {
         expectError<IllegalStateException> {
@@ -184,6 +192,7 @@ class SendMoveByTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun movePointerByWrongPointerId() {
         rule.partialGesture { down(1, downPosition1) }
@@ -192,6 +201,7 @@ class SendMoveByTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun movePointerByAfterUp() {
         rule.partialGesture { down(1, downPosition1) }
@@ -201,6 +211,7 @@ class SendMoveByTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun movePointerByAfterCancel() {
         rule.partialGesture { down(1, downPosition1) }

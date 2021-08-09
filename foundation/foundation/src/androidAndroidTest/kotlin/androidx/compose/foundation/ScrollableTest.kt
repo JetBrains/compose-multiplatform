@@ -44,16 +44,12 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.center
-import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.moveBy
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipe
 import androidx.compose.ui.test.swipeWithVelocity
-import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -114,7 +110,7 @@ class ScrollableTest {
                 orientation = Orientation.Horizontal
             )
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
@@ -126,7 +122,7 @@ class ScrollableTest {
             assertThat(total).isGreaterThan(0)
             total
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y + 100f),
@@ -137,7 +133,7 @@ class ScrollableTest {
         rule.runOnIdle {
             assertThat(total).isEqualTo(lastTotal)
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x - 100f, this.center.y),
@@ -165,7 +161,7 @@ class ScrollableTest {
                 orientation = Orientation.Horizontal
             )
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
@@ -177,7 +173,7 @@ class ScrollableTest {
             assertThat(total).isLessThan(0)
             total
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y + 100f),
@@ -188,7 +184,7 @@ class ScrollableTest {
         rule.runOnIdle {
             assertThat(total).isEqualTo(lastTotal)
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x - 100f, this.center.y),
@@ -215,7 +211,7 @@ class ScrollableTest {
                 orientation = Orientation.Vertical
             )
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y + 100f),
@@ -227,7 +223,7 @@ class ScrollableTest {
             assertThat(total).isGreaterThan(0)
             total
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
@@ -238,7 +234,7 @@ class ScrollableTest {
         rule.runOnIdle {
             assertThat(total).isEqualTo(lastTotal)
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y - 100f),
@@ -266,7 +262,7 @@ class ScrollableTest {
                 orientation = Orientation.Vertical
             )
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y + 100f),
@@ -278,7 +274,7 @@ class ScrollableTest {
             assertThat(total).isLessThan(0)
             total
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
@@ -289,7 +285,7 @@ class ScrollableTest {
         rule.runOnIdle {
             assertThat(total).isEqualTo(lastTotal)
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y - 100f),
@@ -318,7 +314,7 @@ class ScrollableTest {
                 enabled = enabled.value
             )
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
@@ -330,7 +326,7 @@ class ScrollableTest {
             enabled.value = false
             total
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
@@ -358,7 +354,7 @@ class ScrollableTest {
                 orientation = Orientation.Horizontal
             )
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             swipeWithVelocity(
                 start = this.center,
                 end = Offset(this.center.x + 200f, this.center.y),
@@ -374,7 +370,7 @@ class ScrollableTest {
         val prevAfterSomeFling = total
         assertThat(prevAfterSomeFling).isGreaterThan(prev)
         // don't advance main clock anymore since we're in the middle of the fling. Now interrupt
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             down(this.center)
             moveBy(Offset(115f, 0f))
             up()
@@ -438,7 +434,7 @@ class ScrollableTest {
                 Modifier
             }
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipeWithVelocity(
                 start = this.center,
                 end = Offset(this.center.x + 200f, this.center.y),
@@ -510,7 +506,7 @@ class ScrollableTest {
                 }
             }
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipeWithVelocity(
                 start = this.center,
                 end = Offset(this.center.x + 200f, this.center.y),
@@ -574,7 +570,7 @@ class ScrollableTest {
         }
 
         // swipe again with velocity
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 200f, this.center.y),
@@ -637,7 +633,7 @@ class ScrollableTest {
             }
         }
 
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 200f, this.center.y),
@@ -707,7 +703,7 @@ class ScrollableTest {
             }
         }
 
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipeWithVelocity(
                 start = this.center,
                 end = Offset(this.center.x + 500f, this.center.y),
@@ -776,7 +772,7 @@ class ScrollableTest {
             }
         }
 
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipeWithVelocity(
                 start = this.center,
                 end = Offset(this.center.x + 500f, this.center.y),
@@ -901,7 +897,7 @@ class ScrollableTest {
         }
 
         rule.onNodeWithTag(scrollableBoxTag)
-            .performGesture {
+            .performTouchInput {
                 swipe(center, center.copy(x = center.x + 100f))
             }
 
@@ -972,7 +968,7 @@ class ScrollableTest {
         }
 
         rule.onNodeWithTag(scrollableBoxTag)
-            .performGesture {
+            .performTouchInput {
                 swipe(center, center.copy(x = center.x + 100f))
             }
 
@@ -1015,7 +1011,7 @@ class ScrollableTest {
         }
 
         rule.onNodeWithTag(scrollableBoxTag)
-            .performGesture {
+            .performTouchInput {
                 down(Offset(visibleSize.width / 4f, visibleSize.height / 2f))
                 moveBy(Offset(visibleSize.width / 2f, 0f))
             }
@@ -1026,7 +1022,7 @@ class ScrollableTest {
         }
 
         rule.onNodeWithTag(scrollableBoxTag)
-            .performGesture {
+            .performTouchInput {
                 up()
             }
 
@@ -1079,7 +1075,7 @@ class ScrollableTest {
         }
 
         rule.onNodeWithTag(scrollableBoxTag)
-            .performGesture {
+            .performTouchInput {
                 down(Offset(visibleSize.width / 4f, visibleSize.height / 2f))
                 moveBy(Offset(visibleSize.width / 2f, 0f))
             }
@@ -1128,7 +1124,7 @@ class ScrollableTest {
                 orientation = Orientation.Horizontal
             )
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             down(this.center)
             moveBy(Offset(115f, 0f))
             up()
@@ -1162,7 +1158,7 @@ class ScrollableTest {
                 orientation = Orientation.Horizontal
             )
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             swipeWithVelocity(
                 this.center,
                 this.center + Offset(115f, 0f),
@@ -1199,7 +1195,7 @@ class ScrollableTest {
                 orientation = Orientation.Horizontal
             )
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             swipeWithVelocity(
                 this.center,
                 this.center + Offset(115f, 0f),
@@ -1233,7 +1229,7 @@ class ScrollableTest {
                 orientation = Orientation.Horizontal
             )
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             down(center)
             moveBy(Offset(x = 100f, y = 0f))
         }
@@ -1243,7 +1239,7 @@ class ScrollableTest {
             total
         }
 
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             up()
         }
 
@@ -1277,7 +1273,7 @@ class ScrollableTest {
                 orientation = Orientation.Horizontal
             )
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             down(center)
             moveBy(Offset(x = 100f, y = 0f))
         }
@@ -1287,7 +1283,7 @@ class ScrollableTest {
             total
         }
 
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             up()
         }
 

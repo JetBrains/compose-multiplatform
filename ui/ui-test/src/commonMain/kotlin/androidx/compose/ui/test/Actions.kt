@@ -33,21 +33,15 @@ import androidx.compose.ui.unit.toSize
 import kotlin.math.max
 import kotlin.math.min
 
+internal expect fun SemanticsNodeInteraction.performClickImpl(): SemanticsNodeInteraction
+
 /**
- * Performs a click action on the element represented by the given semantics node.
+ * Performs a click action on the element represented by the given semantics node. Depending on
+ * the platform this may be implemented by a touch click (tap), a mouse click, or another more
+ * appropriate method for that platform.
  */
 fun SemanticsNodeInteraction.performClick(): SemanticsNodeInteraction {
-    // TODO(fresen): Replace with semantics action when semantics merging is done
-    // The problem we currently have is that the click action might be defined on a different
-    // semantics node than we're interacting with now, even though it is "semantically" the same.
-    // E.g., findByText(buttonText) finds the Text's semantics node, but the click action is
-    // defined on the wrapping Button's semantics node.
-    // Since in general the intended click action can be on a wrapping node or a child node, we
-    // can't just forward to the correct node, as we don't know if we should search up or down the
-    // tree.
-    return performGesture {
-        click()
-    }
+    return performClickImpl()
 }
 
 /**
@@ -212,6 +206,14 @@ fun SemanticsNodeInteraction.performScrollToKey(key: Any): SemanticsNodeInteract
  *     .performGesture(true) { swipeUp() }
  * ```
  */
+@Deprecated(
+    message = "Replaced by performTouchInput",
+    replaceWith = ReplaceWith(
+        "performTouchInput(block)",
+        "import androidx.compose.ui.test.performGesture"
+    )
+)
+@Suppress("DEPRECATION")
 fun SemanticsNodeInteraction.performGesture(
     block: GestureScope.() -> Unit
 ): SemanticsNodeInteraction {

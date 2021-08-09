@@ -38,8 +38,6 @@ import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
-import androidx.compose.ui.test.bottomCenter
-import androidx.compose.ui.test.centerLeft
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onChildAt
@@ -47,7 +45,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeLeft
@@ -412,7 +410,7 @@ class DrawerTest {
         }
 
         // Click in the middle of the drawer (which is the middle of the body)
-        rule.onNodeWithTag("Drawer").performGesture { click() }
+        rule.onNodeWithTag("Drawer").performTouchInput { click() }
 
         rule.runOnIdle {
             assertThat(drawerClicks).isEqualTo(0)
@@ -421,7 +419,7 @@ class DrawerTest {
         drawerState.open()
 
         // Click on the left-center pixel of the drawer
-        rule.onNodeWithTag("Drawer").performGesture {
+        rule.onNodeWithTag("Drawer").performTouchInput {
             click(centerLeft)
         }
 
@@ -460,7 +458,7 @@ class DrawerTest {
         drawerState.open()
 
         // Click on the left-center pixel of the drawer
-        rule.onNodeWithTag("Drawer").performGesture {
+        rule.onNodeWithTag("Drawer").performTouchInput {
             click(centerLeft)
         }
 
@@ -489,14 +487,14 @@ class DrawerTest {
         }
 
         rule.onNodeWithTag("Drawer")
-            .performGesture { swipeRight() }
+            .performTouchInput { swipeRight() }
 
         rule.runOnIdle {
             assertThat(drawerState.currentValue).isEqualTo(DrawerValue.Open)
         }
 
         rule.onNodeWithTag("Drawer")
-            .performGesture { swipeLeft() }
+            .performTouchInput { swipeLeft() }
 
         rule.runOnIdle {
             assertThat(drawerState.currentValue).isEqualTo(DrawerValue.Closed)
@@ -532,7 +530,7 @@ class DrawerTest {
         }
 
         rule.onNodeWithTag("Drawer")
-            .performGesture { swipeLeft() }
+            .performTouchInput { swipeLeft() }
 
         // still open
         rule.runOnIdle {
@@ -571,14 +569,14 @@ class DrawerTest {
         }
 
         rule.onNodeWithTag("Drawer")
-            .performGesture { swipeLeft() }
+            .performTouchInput { swipeLeft() }
 
         rule.runOnIdle {
             assertThat(drawerState.currentValue).isEqualTo(DrawerValue.Open)
         }
 
         rule.onNodeWithTag("Drawer")
-            .performGesture { swipeRight() }
+            .performTouchInput { swipeRight() }
 
         rule.runOnIdle {
             assertThat(drawerState.currentValue).isEqualTo(DrawerValue.Closed)
@@ -649,7 +647,7 @@ class DrawerTest {
         }
 
         // Click in the middle of the drawer (which is the middle of the body)
-        rule.onNodeWithTag(bottomDrawerTag).performGesture { click() }
+        rule.onNodeWithTag(bottomDrawerTag).performTouchInput { click() }
 
         rule.runOnIdle {
             assertThat(drawerClicks).isEqualTo(0)
@@ -660,7 +658,7 @@ class DrawerTest {
         sleep(100) // TODO(147586311): remove this sleep when opening the drawer triggers a wait
 
         // Click on the bottom-center pixel of the drawer
-        rule.onNodeWithTag(bottomDrawerTag).performGesture {
+        rule.onNodeWithTag(bottomDrawerTag).performTouchInput {
             click(bottomCenter)
         }
 
@@ -697,7 +695,7 @@ class DrawerTest {
         drawerState.open()
 
         // Click on the left-center pixel of the drawer
-        rule.onNodeWithTag(bottomDrawerTag).performGesture {
+        rule.onNodeWithTag(bottomDrawerTag).performTouchInput {
             click(centerLeft)
         }
 
@@ -707,7 +705,7 @@ class DrawerTest {
         drawerState.expand()
 
         // Click on the left-center pixel of the drawer once again in a new state
-        rule.onNodeWithTag(bottomDrawerTag).performGesture {
+        rule.onNodeWithTag(bottomDrawerTag).performTouchInput {
             click(centerLeft)
         }
 
@@ -739,7 +737,7 @@ class DrawerTest {
         }
 
         rule.onNodeWithTag(contentTag)
-            .performGesture { swipeUp() }
+            .performTouchInput { swipeUp() }
 
         advanceClock()
 
@@ -748,7 +746,7 @@ class DrawerTest {
         }
 
         rule.onNodeWithTag(bottomDrawerTag)
-            .performGesture { swipeDown() }
+            .performTouchInput { swipeDown() }
 
         advanceClock()
 
@@ -859,7 +857,7 @@ class DrawerTest {
         }
 
         rule.onNodeWithTag(contentTag)
-            .performGesture { swipeDown() }
+            .performTouchInput { swipeDown() }
 
         advanceClock()
 
@@ -905,7 +903,7 @@ class DrawerTest {
 
         @OptIn(ExperimentalTestApi::class)
         rule.onNodeWithTag(contentTag)
-            .performGesture { swipeUp(endY = peekHeight) }
+            .performTouchInput { swipeUp(endY = peekHeight) }
 
         advanceClock()
 
@@ -916,7 +914,7 @@ class DrawerTest {
         }
 
         rule.onNodeWithTag(bottomDrawerTag)
-            .performGesture { swipeUp() }
+            .performTouchInput { swipeUp() }
 
         advanceClock()
 
@@ -926,7 +924,7 @@ class DrawerTest {
 
         @OptIn(ExperimentalTestApi::class)
         rule.onNodeWithTag(bottomDrawerTag)
-            .performGesture { swipeDown(endY = peekHeight) }
+            .performTouchInput { swipeDown(endY = peekHeight) }
 
         advanceClock()
 
@@ -937,7 +935,7 @@ class DrawerTest {
         }
 
         rule.onNodeWithTag(bottomDrawerTag)
-            .performGesture { swipeDown() }
+            .performTouchInput { swipeDown() }
 
         advanceClock()
 
@@ -964,7 +962,7 @@ class DrawerTest {
         }
 
         rule.onNodeWithTag(contentTag)
-            .performGesture { swipeUp() }
+            .performTouchInput { swipeUp() }
 
         advanceClock()
 

@@ -62,6 +62,7 @@ class SendPinchTest {
         val end1 = Offset(92f, 50f)
         val duration = 400L
 
+        @Suppress("DEPRECATION")
         rule.onNodeWithTag(TAG).performGesture {
             pinch(start0, end0, start1, end1, duration)
         }

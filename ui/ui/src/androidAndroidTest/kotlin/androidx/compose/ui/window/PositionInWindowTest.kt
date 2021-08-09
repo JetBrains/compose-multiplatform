@@ -45,7 +45,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipe
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
@@ -265,7 +265,7 @@ class PositionInWindowTest {
         }
 
         rule.onNodeWithTag(smallBoxTag)
-            .performGesture {
+            .performTouchInput {
                 swipe(Offset.Zero, Offset(endOffsetPx, endOffsetPx))
             }
 

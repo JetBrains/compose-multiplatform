@@ -3,7 +3,7 @@ package androidx.compose.ui.test {
 
   public final class ActionsKt {
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performClick(androidx.compose.ui.test.SemanticsNodeInteraction);
-    method public static androidx.compose.ui.test.SemanticsNodeInteraction performGesture(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.GestureScope,kotlin.Unit> block);
+    method @Deprecated public static androidx.compose.ui.test.SemanticsNodeInteraction performGesture(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.GestureScope,kotlin.Unit> block);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performMultiModalInput(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.MultiModalInjectionScope,kotlin.Unit> block);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performScrollTo(androidx.compose.ui.test.SemanticsNodeInteraction);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performScrollToIndex(androidx.compose.ui.test.SemanticsNodeInteraction, int index);
@@ -11,6 +11,9 @@ package androidx.compose.ui.test {
     method public static <T extends kotlin.Function<? extends java.lang.Boolean>> void performSemanticsAction(androidx.compose.ui.test.SemanticsNodeInteraction, androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<T>> key, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> invocation);
     method public static void performSemanticsAction(androidx.compose.ui.test.SemanticsNodeInteraction, androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> key);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performTouchInput(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.TouchInjectionScope,kotlin.Unit> block);
+  }
+
+  public final class Actions_androidKt {
   }
 
   public final class AndroidAssertions_androidKt {
@@ -128,57 +131,57 @@ package androidx.compose.ui.test {
     method public static androidx.compose.ui.test.SemanticsNodeInteraction onRoot(androidx.compose.ui.test.SemanticsNodeInteractionsProvider, optional boolean useUnmergedTree);
   }
 
-  public final class GestureScope {
-    ctor public GestureScope(androidx.compose.ui.semantics.SemanticsNode node, androidx.compose.ui.test.TestContext testContext);
-    method public long getVisibleSize();
+  @Deprecated public final class GestureScope {
+    ctor @Deprecated public GestureScope(androidx.compose.ui.semantics.SemanticsNode node, androidx.compose.ui.test.TestContext testContext);
+    method @Deprecated public long getVisibleSize();
     property public final long visibleSize;
   }
 
   public final class GestureScopeKt {
-    method @androidx.compose.ui.test.ExperimentalTestApi public static void advanceEventTime(androidx.compose.ui.test.GestureScope, long durationMillis);
-    method public static void cancel(androidx.compose.ui.test.GestureScope);
-    method public static void click(androidx.compose.ui.test.GestureScope, optional long position);
-    method public static void doubleClick(androidx.compose.ui.test.GestureScope, optional long position, optional long delayMillis);
-    method public static void down(androidx.compose.ui.test.GestureScope, int pointerId, long position);
-    method public static void down(androidx.compose.ui.test.GestureScope, long position);
-    method public static inline float getBottom(androidx.compose.ui.test.GestureScope);
-    method public static long getBottomCenter(androidx.compose.ui.test.GestureScope);
-    method public static long getBottomLeft(androidx.compose.ui.test.GestureScope);
-    method public static long getBottomRight(androidx.compose.ui.test.GestureScope);
-    method public static long getCenter(androidx.compose.ui.test.GestureScope);
-    method public static long getCenterLeft(androidx.compose.ui.test.GestureScope);
-    method public static long getCenterRight(androidx.compose.ui.test.GestureScope);
-    method public static inline float getCenterX(androidx.compose.ui.test.GestureScope);
-    method public static inline float getCenterY(androidx.compose.ui.test.GestureScope);
-    method public static inline int getHeight(androidx.compose.ui.test.GestureScope);
-    method public static inline float getLeft(androidx.compose.ui.test.GestureScope);
-    method public static inline float getRight(androidx.compose.ui.test.GestureScope);
-    method public static inline float getTop(androidx.compose.ui.test.GestureScope);
-    method public static long getTopCenter(androidx.compose.ui.test.GestureScope);
-    method public static long getTopLeft(androidx.compose.ui.test.GestureScope);
-    method public static long getTopRight(androidx.compose.ui.test.GestureScope);
-    method public static inline int getWidth(androidx.compose.ui.test.GestureScope);
-    method public static void longClick(androidx.compose.ui.test.GestureScope, optional long position, optional long durationMillis);
-    method public static void move(androidx.compose.ui.test.GestureScope);
-    method public static void moveBy(androidx.compose.ui.test.GestureScope, int pointerId, long delta);
-    method public static void moveBy(androidx.compose.ui.test.GestureScope, long delta);
-    method public static void movePointerBy(androidx.compose.ui.test.GestureScope, int pointerId, long delta);
-    method public static void movePointerTo(androidx.compose.ui.test.GestureScope, int pointerId, long position);
-    method public static void moveTo(androidx.compose.ui.test.GestureScope, int pointerId, long position);
-    method public static void moveTo(androidx.compose.ui.test.GestureScope, long position);
-    method public static long percentOffset(androidx.compose.ui.test.GestureScope, optional float x, optional float y);
-    method public static void pinch(androidx.compose.ui.test.GestureScope, long start0, long end0, long start1, long end1, optional long durationMillis);
-    method public static void swipe(androidx.compose.ui.test.GestureScope, long start, long end, optional long durationMillis);
-    method public static void swipeDown(androidx.compose.ui.test.GestureScope);
-    method @androidx.compose.ui.test.ExperimentalTestApi public static void swipeDown(androidx.compose.ui.test.GestureScope, optional float startY, optional float endY, optional long durationMillis);
-    method public static void swipeLeft(androidx.compose.ui.test.GestureScope);
-    method @androidx.compose.ui.test.ExperimentalTestApi public static void swipeLeft(androidx.compose.ui.test.GestureScope, optional float startX, optional float endX, optional long durationMillis);
-    method public static void swipeRight(androidx.compose.ui.test.GestureScope);
-    method @androidx.compose.ui.test.ExperimentalTestApi public static void swipeRight(androidx.compose.ui.test.GestureScope, optional float startX, optional float endX, optional long durationMillis);
-    method public static void swipeUp(androidx.compose.ui.test.GestureScope);
-    method @androidx.compose.ui.test.ExperimentalTestApi public static void swipeUp(androidx.compose.ui.test.GestureScope, optional float startY, optional float endY, optional long durationMillis);
-    method public static void swipeWithVelocity(androidx.compose.ui.test.GestureScope, long start, long end, float endVelocity, optional long durationMillis);
-    method public static void up(androidx.compose.ui.test.GestureScope, optional int pointerId);
+    method @Deprecated @androidx.compose.ui.test.ExperimentalTestApi public static void advanceEventTime(androidx.compose.ui.test.GestureScope, long durationMillis);
+    method @Deprecated public static void cancel(androidx.compose.ui.test.GestureScope);
+    method @Deprecated public static void click(androidx.compose.ui.test.GestureScope, optional long position);
+    method @Deprecated public static void doubleClick(androidx.compose.ui.test.GestureScope, optional long position, optional long delayMillis);
+    method @Deprecated public static void down(androidx.compose.ui.test.GestureScope, int pointerId, long position);
+    method @Deprecated public static void down(androidx.compose.ui.test.GestureScope, long position);
+    method @Deprecated public static inline float getBottom(androidx.compose.ui.test.GestureScope);
+    method @Deprecated public static long getBottomCenter(androidx.compose.ui.test.GestureScope);
+    method @Deprecated public static long getBottomLeft(androidx.compose.ui.test.GestureScope);
+    method @Deprecated public static long getBottomRight(androidx.compose.ui.test.GestureScope);
+    method @Deprecated public static long getCenter(androidx.compose.ui.test.GestureScope);
+    method @Deprecated public static long getCenterLeft(androidx.compose.ui.test.GestureScope);
+    method @Deprecated public static long getCenterRight(androidx.compose.ui.test.GestureScope);
+    method @Deprecated public static inline float getCenterX(androidx.compose.ui.test.GestureScope);
+    method @Deprecated public static inline float getCenterY(androidx.compose.ui.test.GestureScope);
+    method @Deprecated public static inline int getHeight(androidx.compose.ui.test.GestureScope);
+    method @Deprecated public static inline float getLeft(androidx.compose.ui.test.GestureScope);
+    method @Deprecated public static inline float getRight(androidx.compose.ui.test.GestureScope);
+    method @Deprecated public static inline float getTop(androidx.compose.ui.test.GestureScope);
+    method @Deprecated public static long getTopCenter(androidx.compose.ui.test.GestureScope);
+    method @Deprecated public static long getTopLeft(androidx.compose.ui.test.GestureScope);
+    method @Deprecated public static long getTopRight(androidx.compose.ui.test.GestureScope);
+    method @Deprecated public static inline int getWidth(androidx.compose.ui.test.GestureScope);
+    method @Deprecated public static void longClick(androidx.compose.ui.test.GestureScope, optional long position, optional long durationMillis);
+    method @Deprecated public static void move(androidx.compose.ui.test.GestureScope);
+    method @Deprecated public static void moveBy(androidx.compose.ui.test.GestureScope, int pointerId, long delta);
+    method @Deprecated public static void moveBy(androidx.compose.ui.test.GestureScope, long delta);
+    method @Deprecated public static void movePointerBy(androidx.compose.ui.test.GestureScope, int pointerId, long delta);
+    method @Deprecated public static void movePointerTo(androidx.compose.ui.test.GestureScope, int pointerId, long position);
+    method @Deprecated public static void moveTo(androidx.compose.ui.test.GestureScope, int pointerId, long position);
+    method @Deprecated public static void moveTo(androidx.compose.ui.test.GestureScope, long position);
+    method @Deprecated public static long percentOffset(androidx.compose.ui.test.GestureScope, optional float x, optional float y);
+    method @Deprecated public static void pinch(androidx.compose.ui.test.GestureScope, long start0, long end0, long start1, long end1, optional long durationMillis);
+    method @Deprecated public static void swipe(androidx.compose.ui.test.GestureScope, long start, long end, optional long durationMillis);
+    method @Deprecated public static void swipeDown(androidx.compose.ui.test.GestureScope);
+    method @Deprecated @androidx.compose.ui.test.ExperimentalTestApi public static void swipeDown(androidx.compose.ui.test.GestureScope, optional float startY, optional float endY, optional long durationMillis);
+    method @Deprecated public static void swipeLeft(androidx.compose.ui.test.GestureScope);
+    method @Deprecated @androidx.compose.ui.test.ExperimentalTestApi public static void swipeLeft(androidx.compose.ui.test.GestureScope, optional float startX, optional float endX, optional long durationMillis);
+    method @Deprecated public static void swipeRight(androidx.compose.ui.test.GestureScope);
+    method @Deprecated @androidx.compose.ui.test.ExperimentalTestApi public static void swipeRight(androidx.compose.ui.test.GestureScope, optional float startX, optional float endX, optional long durationMillis);
+    method @Deprecated public static void swipeUp(androidx.compose.ui.test.GestureScope);
+    method @Deprecated @androidx.compose.ui.test.ExperimentalTestApi public static void swipeUp(androidx.compose.ui.test.GestureScope, optional float startY, optional float endY, optional long durationMillis);
+    method @Deprecated public static void swipeWithVelocity(androidx.compose.ui.test.GestureScope, long start, long end, float endVelocity, optional long durationMillis);
+    method @Deprecated public static void up(androidx.compose.ui.test.GestureScope, optional int pointerId);
   }
 
   public interface IdlingResource {

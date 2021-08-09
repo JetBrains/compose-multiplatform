@@ -35,17 +35,11 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.center
-import androidx.compose.ui.test.centerX
-import androidx.compose.ui.test.centerY
-import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.moveBy
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeWithVelocity
-import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -100,7 +94,7 @@ class OverScrollTest {
 
         rule.onNodeWithTag(boxTag).assertExists()
 
-        rule.onNodeWithTag(boxTag).performGesture {
+        rule.onNodeWithTag(boxTag).performTouchInput {
             swipeWithVelocity(
                 center,
                 Offset(centerX + 10800, centerY),
@@ -133,7 +127,7 @@ class OverScrollTest {
         }
 
         var centerXAxis = 0f
-        rule.onNodeWithTag(boxTag).performGesture {
+        rule.onNodeWithTag(boxTag).performTouchInput {
             centerXAxis = centerX
             down(center)
             moveBy(Offset(1000f, 0f))
@@ -150,7 +144,7 @@ class OverScrollTest {
             assertThat(controller.lastNestedScrollSource).isEqualTo(NestedScrollSource.Drag)
         }
 
-        rule.onNodeWithTag(boxTag).performGesture {
+        rule.onNodeWithTag(boxTag).performTouchInput {
             up()
         }
     }
@@ -183,7 +177,7 @@ class OverScrollTest {
 
         rule.onNodeWithTag(boxTag).assertExists()
 
-        rule.onNodeWithTag(boxTag).performGesture {
+        rule.onNodeWithTag(boxTag).performTouchInput {
             swipeWithVelocity(
                 center,
                 Offset(centerX + 10800, centerY),
@@ -215,7 +209,7 @@ class OverScrollTest {
             assertThat(controller.stopAnimationCallsCount).isEqualTo(0)
         }
 
-        rule.onNodeWithTag(boxTag).performGesture {
+        rule.onNodeWithTag(boxTag).performTouchInput {
             down(center)
             moveBy(Offset(500f, 0f))
             up()
@@ -231,7 +225,7 @@ class OverScrollTest {
             acummulatedScroll
         }
 
-        rule.onNodeWithTag(boxTag).performGesture {
+        rule.onNodeWithTag(boxTag).performTouchInput {
             down(center)
             moveBy(Offset(500f, 0f))
             up()
@@ -342,7 +336,7 @@ class OverScrollTest {
         rule.onNodeWithTag(boxTag).assertExists()
 
         var centerXAxis = 0f
-        rule.onNodeWithTag(boxTag).performGesture {
+        rule.onNodeWithTag(boxTag).performTouchInput {
             centerXAxis = centerX
             down(center)
             moveBy(Offset(1000f, 0f))
@@ -359,7 +353,7 @@ class OverScrollTest {
             assertThat(controller.lastOverscrollDelta).isEqualTo(Offset.Zero)
         }
 
-        rule.onNodeWithTag(boxTag).performGesture {
+        rule.onNodeWithTag(boxTag).performTouchInput {
             up()
         }
 
@@ -368,7 +362,7 @@ class OverScrollTest {
             consumeOnlyHalf = true
         }
 
-        rule.onNodeWithTag(boxTag).performGesture {
+        rule.onNodeWithTag(boxTag).performTouchInput {
             down(center)
             moveBy(Offset(1000f, 0f))
         }
@@ -381,7 +375,7 @@ class OverScrollTest {
             assertThat(controller.lastNestedScrollSource).isEqualTo(NestedScrollSource.Drag)
         }
 
-        rule.onNodeWithTag(boxTag).performGesture {
+        rule.onNodeWithTag(boxTag).performTouchInput {
             up()
         }
 

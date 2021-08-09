@@ -85,7 +85,7 @@ import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
@@ -819,7 +819,7 @@ class TextFieldTest {
 
         // click outside core text field area
         rule.onNodeWithTag("label", useUnmergedTree = true)
-            .performGesture {
+            .performTouchInput {
                 click(Offset.Zero)
             }
 

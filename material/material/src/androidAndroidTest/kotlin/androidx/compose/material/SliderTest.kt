@@ -39,18 +39,10 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertRangeInfoEquals
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
-import androidx.compose.ui.test.center
-import androidx.compose.ui.test.centerX
-import androidx.compose.ui.test.centerY
-import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.left
-import androidx.compose.ui.test.moveBy
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.performSemanticsAction
-import androidx.compose.ui.test.right
-import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -199,7 +191,7 @@ class SliderTest {
         var expected = 0f
 
         rule.onNodeWithTag(tag)
-            .performGesture {
+            .performTouchInput {
                 down(center)
                 moveBy(Offset(100f, 0f))
                 up()
@@ -229,7 +221,7 @@ class SliderTest {
         var expected = 0f
 
         rule.onNodeWithTag(tag)
-            .performGesture {
+            .performTouchInput {
                 down(Offset(centerX + 50, centerY))
                 up()
                 expected = calculateFraction(left, right, centerX + 50)
@@ -260,7 +252,7 @@ class SliderTest {
         var expected = 0f
 
         rule.onNodeWithTag(tag)
-            .performGesture {
+            .performTouchInput {
                 down(Offset(centerX + 50, centerY))
                 up()
                 expected = calculateFraction(left, right, centerX + 50)
@@ -294,7 +286,7 @@ class SliderTest {
         var expected = 0f
 
         rule.onNodeWithTag(tag)
-            .performGesture {
+            .performTouchInput {
                 down(center)
                 moveBy(Offset(100f, 0f))
                 up()
@@ -327,7 +319,7 @@ class SliderTest {
         var expected = 0f
 
         rule.onNodeWithTag(tag)
-            .performGesture {
+            .performTouchInput {
                 down(Offset(centerX + 50, centerY))
                 up()
                 expected = calculateFraction(left, right, centerX - 50)
@@ -358,7 +350,7 @@ class SliderTest {
         var expected = 0f
 
         rule.onNodeWithTag(tag)
-            .performGesture {
+            .performTouchInput {
                 down(Offset(centerX + 50, centerY))
                 up()
                 expected = calculateFraction(left, right, centerX - 50)
@@ -440,7 +432,7 @@ class SliderTest {
             Truth.assertThat(callCount.value).isEqualTo(0)
         }
 
-        rule.onNodeWithTag(tag).performGesture {
+        rule.onNodeWithTag(tag).performTouchInput {
             down(center)
             moveBy(Offset(50f, 50f))
             up()
@@ -483,7 +475,7 @@ class SliderTest {
         }
 
         rule.onNodeWithTag(tag)
-            .performGesture { down(center) }
+            .performTouchInput { down(center) }
 
         rule.runOnIdle {
             Truth.assertThat(interactions).hasSize(1)
@@ -526,7 +518,7 @@ class SliderTest {
         var expected = 0f
 
         rule.onNodeWithTag(tag)
-            .performGesture {
+            .performTouchInput {
                 down(center)
                 moveBy(Offset(100f, 0f))
                 up()
@@ -558,7 +550,7 @@ class SliderTest {
         var expected = 0f
 
         rule.onNodeWithTag(tag)
-            .performGesture {
+            .performTouchInput {
                 down(Offset(centerX + 50, centerY))
                 up()
                 expected = calculateFraction(left, right, centerX + 50)
@@ -591,7 +583,7 @@ class SliderTest {
         var expected = 0f
 
         rule.onNodeWithTag(tag)
-            .performGesture {
+            .performTouchInput {
                 down(Offset(centerX + 50, centerY))
                 up()
                 expected = calculateFraction(left, right, centerX + 50)
@@ -626,7 +618,7 @@ class SliderTest {
         var expected = 0f
 
         rule.onNodeWithTag(tag)
-            .performGesture {
+            .performTouchInput {
                 down(center)
                 moveBy(Offset(100f, 0f))
                 up()
@@ -661,7 +653,7 @@ class SliderTest {
         var expected = 0f
 
         rule.onNodeWithTag(tag)
-            .performGesture {
+            .performTouchInput {
                 down(center)
                 moveBy(Offset(slop, 0f))
                 moveBy(Offset(100f, 0f))
@@ -697,7 +689,7 @@ class SliderTest {
         var expected = 0f
 
         rule.onNodeWithTag(tag)
-            .performGesture {
+            .performTouchInput {
                 down(center)
                 moveBy(Offset(-slop - 1, 0f))
                 moveBy(Offset(-100f, 0f))

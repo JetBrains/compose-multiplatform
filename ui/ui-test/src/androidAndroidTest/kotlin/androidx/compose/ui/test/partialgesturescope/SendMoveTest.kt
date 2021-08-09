@@ -50,6 +50,7 @@ class SendMoveTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun moveWithoutDown() {
         expectError<IllegalStateException> {
@@ -57,6 +58,7 @@ class SendMoveTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun moveAfterUp() {
         rule.partialGesture { down(downPosition1) }
@@ -66,6 +68,7 @@ class SendMoveTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun moveAfterCancel() {
         rule.partialGesture { down(downPosition1) }

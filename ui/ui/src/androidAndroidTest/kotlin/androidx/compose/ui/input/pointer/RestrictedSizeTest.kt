@@ -28,7 +28,7 @@ import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
@@ -63,7 +63,7 @@ class RestrictedSizeTest {
         }
 
         rule.onNodeWithTag(tag)
-            .performGesture {
+            .performTouchInput {
                 click(Offset.Zero)
             }
 
@@ -94,7 +94,7 @@ class RestrictedSizeTest {
         }
 
         rule.onNodeWithTag(tag)
-            .performGesture {
+            .performTouchInput {
                 click(Offset(-5f, -2f))
             }
 
@@ -139,7 +139,7 @@ class RestrictedSizeTest {
         }
 
         rule.onNodeWithTag(tag)
-            .performGesture {
+            .performTouchInput {
                 click(Offset(-1f, -3f))
             }
 

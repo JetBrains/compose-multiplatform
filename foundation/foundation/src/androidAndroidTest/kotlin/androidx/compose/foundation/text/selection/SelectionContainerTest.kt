@@ -52,7 +52,7 @@ import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -115,14 +115,14 @@ class SelectionContainerTest {
         createSelectionContainer()
         val position = 50f
         rule.onSelectionContainer()
-            .performGesture { longClick(Offset(x = position, y = position)) }
+            .performTouchInput { longClick(Offset(x = position, y = position)) }
         rule.runOnIdle {
             assertThat(selection.value).isNotNull()
         }
 
         // Act.
         rule.onSelectionContainer()
-            .performGesture { click(Offset(x = position, y = position)) }
+            .performTouchInput { click(Offset(x = position, y = position)) }
 
         // Assert.
         rule.runOnIdle {
@@ -142,13 +142,13 @@ class SelectionContainerTest {
         createSelectionContainer()
         val position = 50f
         rule.onSelectionContainer()
-            .performGesture { longClick(Offset(x = position, y = position)) }
+            .performTouchInput { longClick(Offset(x = position, y = position)) }
 
         log.entries.clear()
 
         // Act.
         rule.onSelectionContainer()
-            .performGesture { click(Offset(x = position, y = position)) }
+            .performTouchInput { click(Offset(x = position, y = position)) }
 
         // Assert.
         rule.runOnIdle {
@@ -173,7 +173,7 @@ class SelectionContainerTest {
 
             // Act.
             rule.onSelectionContainer()
-                .performGesture {
+                .performTouchInput {
                     longClick(
                         Offset(textContent.indexOf('m') * characterSize, 0.5f * characterSize)
                     )
@@ -220,7 +220,7 @@ class SelectionContainerTest {
 
             // Act.
             rule.onSelectionContainer()
-                .performGesture {
+                .performTouchInput {
                     longClick(
                         Offset(
                             rule.rootWidth().toSp().toPx() - ("xt Demo Text").length *

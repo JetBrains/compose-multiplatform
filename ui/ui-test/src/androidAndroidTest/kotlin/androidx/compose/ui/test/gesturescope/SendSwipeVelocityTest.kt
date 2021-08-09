@@ -130,6 +130,7 @@ class SendSwipeVelocityTest(private val config: TestConfig) {
             }
         }
 
+        @Suppress("DEPRECATION")
         rule.onNodeWithTag(tag).performGesture {
             swipeWithVelocity(start, end, velocity, duration)
         }
