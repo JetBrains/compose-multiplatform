@@ -78,8 +78,8 @@ suspend inline fun <R> MonotonicFrameClock.withFrameMillis(
  * completes it must not provide the same value again for a subsequent call.
  *
  * This function will invoke [MonotonicFrameClock.withFrameNanos] using the calling
- * [CoroutineContext]'s [MonotonicFrameClock] or a default frame clock if one is not present
- * in the [CoroutineContext].
+ * [CoroutineContext]'s [MonotonicFrameClock] and will throw an [IllegalStateException] if one is
+ * not present in the [CoroutineContext].
  */
 @OptIn(ExperimentalComposeApi::class)
 suspend fun <R> withFrameNanos(onFrame: (frameTimeMillis: Long) -> R): R =
@@ -100,8 +100,8 @@ suspend fun <R> withFrameNanos(onFrame: (frameTimeMillis: Long) -> R): R =
  * a subsequent call.
  *
  * This function will invoke [MonotonicFrameClock.withFrameNanos] using the calling
- * [CoroutineContext]'s [MonotonicFrameClock] or a default frame clock if one is not present
- * in the [CoroutineContext].
+ * [CoroutineContext]'s [MonotonicFrameClock] and will throw an [IllegalStateException] if one is
+ * not present in the [CoroutineContext].
  */
 @OptIn(ExperimentalComposeApi::class)
 suspend fun <R> withFrameMillis(onFrame: (frameTimeMillis: Long) -> R): R =
