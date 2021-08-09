@@ -6,5 +6,18 @@
     android:tint="?attr/colorControlNormal">
   <path
       android:fillColor="@android:color/white"
-      android:pathData="M15,8c0,-1.42 -0.5,-2.73 -1.33,-3.76C14.09,4.1 14.53,4 15,4c2.21,0 4,1.79 4,4s-1.79,4 -4,4c-0.43,0 -0.84,-0.09 -1.23,-0.21c-0.03,-0.01 -0.06,-0.02 -0.1,-0.03C14.5,10.73 15,9.42 15,8zM16.66,13.13C18.03,14.06 19,15.32 19,17v3h4v-3C23,14.82 19.42,13.53 16.66,13.13zM9,4c2.21,0 4,1.79 4,4s-1.79,4 -4,4s-4,-1.79 -4,-4S6.79,4 9,4zM9,13c2.67,0 8,1.34 8,4v3H1v-3C1,14.34 6.33,13 9,13z"/>
+      android:pathData="M16.67,13.13C18.04,14.06 19,15.32 19,17v3h3c0.55,0 1,-0.45 1,-1v-2C23,14.82 19.43,13.53 16.67,13.13z"
+      android:fillType="evenOdd"/>
+  <path
+      android:fillColor="@android:color/white"
+      android:pathData="M9,8m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0"
+      android:fillType="evenOdd"/>
+  <path
+      android:fillColor="@android:color/white"
+      android:pathData="M15,12c2.21,0 4,-1.79 4,-4c0,-2.21 -1.79,-4 -4,-4c-0.47,0 -0.91,0.1 -1.33,0.24C14.5,5.27 15,6.58 15,8s-0.5,2.73 -1.33,3.76C14.09,11.9 14.53,12 15,12z"
+      android:fillType="evenOdd"/>
+  <path
+      android:fillColor="@android:color/white"
+      android:pathData="M9,13c-2.67,0 -8,1.34 -8,4v2c0,0.55 0.45,1 1,1h14c0.55,0 1,-0.45 1,-1v-2C17,14.34 11.67,13 9,13z"
+      android:fillType="evenOdd"/>
 </vector>
