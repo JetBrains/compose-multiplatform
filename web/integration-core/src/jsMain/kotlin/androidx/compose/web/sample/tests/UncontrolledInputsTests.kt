@@ -122,4 +122,69 @@ class UncontrolledInputsTests {
         }
     }
 
+    val emailDefaultValueRemainsTheSameButValueCanBeChanged by testCase {
+        var typedValue by remember { mutableStateOf("None") }
+        TestText(value = "Value = $typedValue")
+
+        Input(type = InputType.Email) {
+            id("emailInput")
+            defaultValue("a@a.abc")
+            onInput {
+                typedValue = it.value
+            }
+        }
+    }
+
+    val passwordDefaultValueRemainsTheSameButValueCanBeChanged by testCase {
+        var typedValue by remember { mutableStateOf("None") }
+        TestText(value = "Value = $typedValue")
+
+        Input(type = InputType.Password) {
+            id("passwordInput")
+            defaultValue("1111")
+            onInput {
+                typedValue = it.value
+            }
+        }
+    }
+
+    val searchDefaultValueRemainsTheSameButValueCanBeChanged by testCase {
+        var typedValue by remember { mutableStateOf("None") }
+        TestText(value = "Value = $typedValue")
+
+        Input(type = InputType.Search) {
+            id("searchInput")
+            defaultValue("kotlin")
+            onInput {
+                typedValue = it.value
+            }
+        }
+    }
+
+    val telDefaultValueRemainsTheSameButValueCanBeChanged by testCase {
+        var typedValue by remember { mutableStateOf("None") }
+        TestText(value = typedValue)
+
+        Input(type = InputType.Tel) {
+            id("telInput")
+            defaultValue("123123")
+            onInput {
+                typedValue = it.value
+            }
+        }
+    }
+
+    val urlDefaultValueRemainsTheSameButValueCanBeChanged by testCase {
+        var typedValue by remember { mutableStateOf("None") }
+        TestText(value = typedValue)
+
+        Input(type = InputType.Url) {
+            id("urlInput")
+            defaultValue("www.site.com")
+            onInput {
+                typedValue = it.value
+            }
+        }
+    }
+
 }

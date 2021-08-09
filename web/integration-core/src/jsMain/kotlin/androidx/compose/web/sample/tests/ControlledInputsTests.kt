@@ -237,4 +237,124 @@ class ControlledInputsTests {
             }
         }
     }
+
+    val emailHardcodedNeverChanges by testCase {
+        var typedValue by remember { mutableStateOf("None") }
+        TestText(value = typedValue)
+
+        EmailInput(value = "a@a.abc") {
+            id("emailInput")
+            onInput {
+                typedValue = it.value
+            }
+        }
+    }
+
+    val emailMutableChanges by testCase {
+        var value by remember { mutableStateOf("") }
+        TestText(value = value)
+
+        EmailInput(value = value) {
+            id("emailInput")
+            onInput {
+                value = it.value
+            }
+        }
+    }
+
+    val passwordHardcodedNeverChanges by testCase {
+        var typeValue by remember { mutableStateOf("None") }
+        TestText(value = typeValue)
+
+        PasswordInput(value = "123456") {
+            id("passwordInput")
+            onInput {
+                typeValue = it.value
+            }
+        }
+    }
+
+    val passwordMutableChanges by testCase {
+        var value by remember { mutableStateOf("") }
+        TestText(value = value)
+
+        EmailInput(value = value) {
+            id("passwordInput")
+            onInput {
+                value = it.value
+            }
+        }
+    }
+
+    val searchHardcodedNeverChanges by testCase {
+        var typeValue by remember { mutableStateOf("None") }
+        TestText(value = typeValue)
+
+        SearchInput(value = "hardcoded") {
+            id("searchInput")
+            onInput {
+                typeValue = it.value
+            }
+        }
+    }
+
+    val searchMutableChanges by testCase {
+        var typeValue by remember { mutableStateOf("") }
+        TestText(value = typeValue)
+
+        SearchInput(value = typeValue) {
+            id("searchInput")
+            onInput {
+                typeValue = it.value
+            }
+        }
+    }
+
+    val telHardcodedNeverChanges by testCase {
+        var typedValue by remember { mutableStateOf("None") }
+        TestText(value = typedValue)
+
+        TelInput(value = "123456") {
+            id("telInput")
+            onInput {
+                typedValue = it.value
+            }
+        }
+    }
+
+    val telMutableChanges by testCase {
+        var value by remember { mutableStateOf("") }
+        TestText(value = value)
+
+        TelInput(value = value) {
+            id("telInput")
+            onInput {
+                value = it.value
+            }
+        }
+    }
+
+    val urlHardcodedNeverChanges by testCase {
+        var typedValue by remember { mutableStateOf("None") }
+        TestText(value = typedValue)
+
+        UrlInput(value = "www.site.com") {
+            id("urlInput")
+            onInput {
+                typedValue = it.value
+            }
+        }
+    }
+
+    val urlMutableChanges by testCase {
+        var value by remember { mutableStateOf("") }
+        TestText(value = value)
+
+        UrlInput(value = value) {
+            id("urlInput")
+            onInput {
+                value = it.value
+            }
+        }
+    }
 }

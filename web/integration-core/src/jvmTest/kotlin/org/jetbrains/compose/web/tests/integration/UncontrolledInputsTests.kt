@@ -122,4 +122,87 @@ class UncontrolledInputsTests : BaseIntegrationTests() {
         check(numberInput.getAttribute("value") == "9")
         check(driver.outerHtmlOfElementWithId("rangeInput").contains("value=\"7\""))
     }
+
+    @ResolveDrivers
+    fun emailDefaultValueRemainsTheSameButValueCanBeChanged(driver: WebDriver) {
+        driver.openTestPage("emailDefaultValueRemainsTheSameButValueCanBeChanged")
+        driver.waitTextToBe(value = "Value = None")
+
+        val emailInput = driver.findElement(By.id("emailInput"))
+        check(emailInput.getAttribute("value") == "a@a.abc")
+
+        emailInput.clear()
+        emailInput.sendKeys("u@u.com")
+
+        driver.waitTextToBe(value = "Value = u@u.com")
+        check(emailInput.getAttribute("value") == "u@u.com")
+
+        check(driver.outerHtmlOfElementWithId("emailInput").contains("value=\"a@a.abc\""))
+    }
+
+    @ResolveDrivers
+    fun passwordDefaultValueRemainsTheSameButValueCanBeChanged(driver: WebDriver) {
+        driver.openTestPage("passwordDefaultValueRemainsTheSameButValueCanBeChanged")
+        driver.waitTextToBe(value = "Value = None")
+
+        val passwordInput = driver.findElement(By.id("passwordInput"))
+        check(passwordInput.getAttribute("value") == "1111")
+
+        passwordInput.clear()
+        passwordInput.sendKeys("a")
+
+        driver.waitTextToBe(value = "Value = a")
+        check(passwordInput.getAttribute("value") == "a")
+
+        check(driver.outerHtmlOfElementWithId("passwordInput").contains("value=\"1111\""))
+    }
+
+    @ResolveDrivers
+    fun searchDefaultValueRemainsTheSameButValueCanBeChanged(driver: WebDriver) {
+        driver.openTestPage("searchDefaultValueRemainsTheSameButValueCanBeChanged")
+        driver.waitTextToBe(value = "Value = None")
+
+        val searchInput = driver.findElement(By.id("searchInput"))
+        check(searchInput.getAttribute("value") == "kotlin")
+
+        searchInput.clear()
+        searchInput.sendKeys("j")
+        driver.waitTextToBe(value = "Value = j")
+
+        check(searchInput.getAttribute("value") == "j")
+
+        check(driver.outerHtmlOfElementWithId("searchInput").contains("value=\"kotlin\""))
+    }
+
+    @ResolveDrivers
+    fun telDefaultValueRemainsTheSameButValueCanBeChanged(driver: WebDriver) {
+        driver.openTestPage("telDefaultValueRemainsTheSameButValueCanBeChanged")
+        driver.waitTextToBe(value = "None")
+
+        val telInput = driver.findElement(By.id("telInput"))
+        check(telInput.getAttribute("value") == "123123")
+
+        telInput.clear()
+        telInput.sendKeys("987654321")
+
+        driver.waitTextToBe(value = "987654321")
+        check(telInput.getAttribute("value") == "987654321")
+        check(driver.outerHtmlOfElementWithId("telInput").contains("value=\"123123\""))
+    }
+
+    @ResolveDrivers
+    fun urlDefaultValueRemainsTheSameButValueCanBeChanged(driver: WebDriver) {
+        driver.openTestPage("urlDefaultValueRemainsTheSameButValueCanBeChanged")
+        driver.waitTextToBe(value = "None")
+
+        val urlInput = driver.findElement(By.id("urlInput"))
+        check(urlInput.getAttribute("value") == "www.site.com")
+
+        urlInput.clear()
+        urlInput.sendKeys("google.com")
+
+        driver.waitTextToBe(value = "google.com")
+        check(urlInput.getAttribute("value") == "google.com")
+        check(driver.outerHtmlOfElementWithId("urlInput").contains("value=\"www.site.com\""))
+    }
 }

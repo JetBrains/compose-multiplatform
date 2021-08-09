@@ -278,4 +278,144 @@ class ControlledInputsTests : BaseIntegrationTests() {
         driver.waitTextToBe(value = "12")
         check(numberInput.getAttribute("value") == "12")
     }
+
+    @ResolveDrivers
+    fun emailHardcodedNeverChanges(driver: WebDriver) {
+        driver.openTestPage("emailHardcodedNeverChanges")
+        driver.waitTextToBe(value = "None")
+
+        val emailInput = driver.findElement(By.id("emailInput"))
+        check(emailInput.getAttribute("value") == "a@a.abc")
+
+        emailInput.sendKeys("@")
+        driver.waitTextToBe(value = "a@a.abc@")
+
+        check(emailInput.getAttribute("value") == "a@a.abc")
+    }
+
+    @ResolveDrivers
+    fun emailMutableChanges(driver: WebDriver) {
+        driver.openTestPage("emailMutableChanges")
+        driver.waitTextToBe(value = "")
+
+        val emailInput = driver.findElement(By.id("emailInput"))
+        check(emailInput.getAttribute("value") == "")
+
+        emailInput.sendKeys("a")
+        driver.waitTextToBe(value = "a")
+
+        check(emailInput.getAttribute("value") == "a")
+    }
+
+    @ResolveDrivers
+    fun passwordHardcodedNeverChanges(driver: WebDriver) {
+        driver.openTestPage("passwordHardcodedNeverChanges")
+        driver.waitTextToBe(value = "None")
+
+        val passwordInput = driver.findElement(By.id("passwordInput"))
+        check(passwordInput.getAttribute("value") == "123456")
+
+        passwordInput.sendKeys("a")
+        driver.waitTextToBe(value = "123456a")
+
+        check(passwordInput.getAttribute("value") == "123456")
+    }
+
+    @ResolveDrivers
+    fun passwordMutableChanges(driver: WebDriver) {
+        driver.openTestPage("passwordMutableChanges")
+        driver.waitTextToBe(value = "")
+
+        val passwordInput = driver.findElement(By.id("passwordInput"))
+        check(passwordInput.getAttribute("value") == "")
+
+        passwordInput.sendKeys("a")
+        driver.waitTextToBe(value = "a")
+
+        check(passwordInput.getAttribute("value") == "a")
+    }
+
+    @ResolveDrivers
+    fun searchHardcodedNeverChanges(driver: WebDriver) {
+        driver.openTestPage("searchHardcodedNeverChanges")
+        driver.waitTextToBe(value = "None")
+
+        val searchInput = driver.findElement(By.id("searchInput"))
+        check(searchInput.getAttribute("value") == "hardcoded")
+
+        searchInput.sendKeys("a")
+        driver.waitTextToBe(value = "hardcodeda")
+
+        check(searchInput.getAttribute("value") == "hardcoded")
+    }
+
+    @ResolveDrivers
+    fun searchMutableChanges(driver: WebDriver) {
+        driver.openTestPage("searchMutableChanges")
+        driver.waitTextToBe(value = "")
+
+        val searchInput = driver.findElement(By.id("searchInput"))
+        check(searchInput.getAttribute("value") == "")
+
+        searchInput.sendKeys("a")
+        driver.waitTextToBe(value = "a")
+
+        check(searchInput.getAttribute("value") == "a")
+    }
+
+    @ResolveDrivers
+    fun telHardcodedNeverChanges(driver: WebDriver) {
+        driver.openTestPage("telHardcodedNeverChanges")
+        driver.waitTextToBe(value = "None")
+
+        val telInput = driver.findElement(By.id("telInput"))
+        check(telInput.getAttribute("value") == "123456")
+
+        telInput.sendKeys("7")
+        driver.waitTextToBe(value = "1234567")
+
+        check(telInput.getAttribute("value") == "123456")
+    }
+
+    @ResolveDrivers
+    fun telMutableChanges(driver: WebDriver) {
+        driver.openTestPage("telMutableChanges")
+        driver.waitTextToBe(value = "")
+
+        val telInput = driver.findElement(By.id("telInput"))
+        check(telInput.getAttribute("value") == "")
+
+        telInput.sendKeys("1")
+        driver.waitTextToBe(value = "1")
+
+        check(telInput.getAttribute("value") == "1")
+    }
+
+    @ResolveDrivers
+    fun urlHardcodedNeverChanges(driver: WebDriver) {
+        driver.openTestPage("urlHardcodedNeverChanges")
+        driver.waitTextToBe(value = "None")
+
+        val urlInput = driver.findElement(By.id("urlInput"))
+        check(urlInput.getAttribute("value") == "www.site.com")
+
+        urlInput.sendKeys("a")
+        driver.waitTextToBe(value = "www.site.coma")
+
+        check(urlInput.getAttribute("value") == "www.site.com")
+    }
+
+    @ResolveDrivers
+    fun urlMutableChanges(driver: WebDriver) {
+        driver.openTestPage("urlMutableChanges")
+        driver.waitTextToBe(value = "")
+
+        val urlInput = driver.findElement(By.id("urlInput"))
+        check(urlInput.getAttribute("value") == "")
+
+        urlInput.sendKeys("w")
+        driver.waitTextToBe(value = "w")
+
+        check(urlInput.getAttribute("value") == "w")
+    }
 }

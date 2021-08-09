@@ -1,6 +1,6 @@
 package org.jetbrains.compose.web.attributes
 
-import org.jetbrains.compose.web.attributes.builders.controlledInputsValuesWeakMap
+import org.jetbrains.compose.web.attributes.builders.saveControlledInputState
 import org.jetbrains.compose.web.events.SyntheticSubmitEvent
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLButtonElement
@@ -300,7 +300,7 @@ fun AttrsBuilder<HTMLImageElement>.alt(value: String): AttrsBuilder<HTMLImageEle
 
 internal val setInputValue: (HTMLInputElement, String) -> Unit = { e, v ->
     e.value = v
-    controlledInputsValuesWeakMap.set(e, v)
+    saveControlledInputState(e, v)
 }
 
 internal val setTextAreaDefaultValue: (HTMLTextAreaElement, String) -> Unit = { e, v ->
@@ -309,7 +309,7 @@ internal val setTextAreaDefaultValue: (HTMLTextAreaElement, String) -> Unit = { 
 
 internal val setCheckedValue: (HTMLInputElement, Boolean) -> Unit = { e, v ->
     e.checked = v
-    controlledInputsValuesWeakMap.set(e, v)
+    saveControlledInputState(e, v)
 }
 
 /* Img attributes */

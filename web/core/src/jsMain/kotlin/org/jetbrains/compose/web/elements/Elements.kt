@@ -3,15 +3,12 @@ package org.jetbrains.compose.web.dom
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.remember
-import org.jetbrains.compose.web.attributes.builders.InputAttrsBuilder
 import androidx.compose.web.attributes.SelectAttrsBuilder
-import org.jetbrains.compose.web.attributes.builders.TextAreaAttrsBuilder
 import org.jetbrains.compose.web.DomApplier
 import org.jetbrains.compose.web.DomNodeWrapper
 import kotlinx.browser.document
 import org.jetbrains.compose.web.attributes.*
-import org.jetbrains.compose.web.attributes.builders.controlledInputsValuesWeakMap
-import org.jetbrains.compose.web.attributes.builders.controlledRadioGroups
+import org.jetbrains.compose.web.attributes.builders.*
 import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.StyleSheetBuilder
 import org.jetbrains.compose.web.css.StyleSheetBuilderImpl
@@ -673,10 +670,7 @@ fun TextArea(
             }
 
             taab.onInput {
-                val target = it.target
-                if (controlledInputsValuesWeakMap.has(target)) {
-                    target.value = controlledInputsValuesWeakMap.get(target).toString()
-                }
+                restoreControlledTextAreaState(it.target)
             }
 
             this.copyFrom(taab)
@@ -951,34 +945,13 @@ fun <K> Input(
             inputAttrsBuilder.attrs()
 
             inputAttrsBuilder.onInput {
-                if (controlledInputsValuesWeakMap.has(it.target)) {
-                    if (type == InputType.Radio) {
-                        controlledRadioGroups[it.target.name]?.forEach { radio ->
-                            radio.checked = controlledInputsValuesWeakMap.get(radio).toString().toBoolean()
-                        }
-                        it.target.checked = controlledInputsValuesWeakMap.get(it.target).toString().toBoolean()
-                        return@onInput
-                    }
-
-                    if (type == InputType.Checkbox) {
-                        it.target.checked = controlledInputsValuesWeakMap.get(it.target).toString().toBoolean()
-                    } else {
-                        it.target.value = controlledInputsValuesWeakMap.get(it.target).toString()
-                    }
-                }
+                restoreControlledInputState(type = type, inputElement = it.target)
             }
 
             this.copyFrom(inputAttrsBuilder)
         },
         content = {
-            DisposableRefEffect { ref ->
-                onDispose {
-                    controlledRadioGroups[ref.name]?.remove(ref)
-                    if (controlledRadioGroups[ref.name]?.isEmpty() == true) {
-                        controlledRadioGroups.remove(ref.name)
-                    }
-                }
-            }
+            DisposeRadioGroupEffect()
         }
     )
 }
