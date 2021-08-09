@@ -418,4 +418,18 @@ class ControlledInputsTests : BaseIntegrationTests() {
 
         check(urlInput.getAttribute("value") == "w")
     }
+
+    @ResolveDrivers
+    fun hardcodedDateInputNeverChanges(driver: WebDriver) {
+        driver.openTestPage("hardcodedDateInputNeverChanges")
+        driver.waitTextToBe(value = "None")
+
+        val dateInput = driver.findElement(By.id("dateInput"))
+        check(dateInput.getAttribute("value") == "")
+
+        driver.sendKeysForDateInput(dateInput, 2021, 10, 22)
+
+        driver.waitTextToBe(value = "onInput Caught")
+        check(dateInput.getAttribute("value") == "")
+    }
 }

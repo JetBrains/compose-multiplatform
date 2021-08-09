@@ -357,4 +357,17 @@ class ControlledInputsTests {
             }
         }
     }
+
+    val hardcodedDateInputNeverChanges by testCase {
+        var inputValue by remember { mutableStateOf("None") }
+
+        TestText(inputValue)
+
+        DateInput(value = "") {
+            id("dateInput")
+            onInput {
+                inputValue = "onInput Caught"
+            }
+        }
+    }
 }

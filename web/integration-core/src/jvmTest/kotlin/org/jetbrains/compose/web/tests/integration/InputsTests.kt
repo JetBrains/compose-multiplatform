@@ -99,17 +99,17 @@ class InputsTests : BaseIntegrationTests() {
         driver.waitTextToBe(value = "15:00")
     }
 
-//    @_root_ide_package_.org.jetbrains.compose.web.tests.integration.common.ResolveDrivers
-//    fun `date input updates the text`() {
-//        openTestPage("dateInputChangesText")
-//
-//        waitTextToBe(value = "")
-//
-//        val timeInput = driver.findElement(By.id("date"))
-//
-//        timeInput.sendKeys("12102021")
-//        waitTextToBe(value = "2021-10-12")
-//    }
+    @ResolveDrivers
+    fun `date input updates the text`(driver: WebDriver) {
+        driver.openTestPage("dateInputChangesText")
+
+        driver.waitTextToBe(value = "")
+
+        val dateInput = driver.findElement(By.id("date"))
+        driver.sendKeysForDateInput(dateInput, 2021, 10, 12)
+
+        driver.waitTextToBe(value = "2021-10-12")
+    }
 
 //    @_root_ide_package_.org.jetbrains.compose.web.tests.integration.common.ResolveDrivers
 //    fun `dateTimeLocal input updates the text`() { // WARNING: It's not supported in Firefox
