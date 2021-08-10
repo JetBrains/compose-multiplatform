@@ -105,4 +105,19 @@ class IdentityArrayMapTests {
             }
         }
     }
+
+    @Test // b/195621739
+    fun canRemoveWhenFull() {
+        val map = IdentityArrayMap<Key, String>()
+        repeat(16) {
+            map[keys[it]] = it.toString()
+        }
+        repeat(16) {
+            val key = keys[it]
+            val removed = map.remove(key)
+            assertTrue(removed)
+            assertFalse(map.contains(key))
+        }
+        assertTrue(map.isEmpty())
+    }
 }

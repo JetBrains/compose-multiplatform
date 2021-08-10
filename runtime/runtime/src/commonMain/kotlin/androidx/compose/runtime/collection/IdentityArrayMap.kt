@@ -97,9 +97,10 @@ internal class IdentityArrayMap<Key : Any, Value : Any?>(capacity: Int = 16) {
                 startIndex = index + 1,
                 endIndex = size
             )
-            keys[size] = null
-            values[size] = null
-            this.size = size - 1
+            val newSize = size - 1
+            keys[newSize] = null
+            values[newSize] = null
+            this.size = newSize
             return true
         }
         return false
