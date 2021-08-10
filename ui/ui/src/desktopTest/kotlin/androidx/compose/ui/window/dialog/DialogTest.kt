@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.window.window
+package androidx.compose.ui.window.dialog
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -29,7 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.awt.ComposeWindow
+import androidx.compose.ui.awt.ComposeDialog
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusTarget
@@ -40,10 +40,10 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.sendKey
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.WindowSize
 import androidx.compose.ui.window.launchApplication
-import androidx.compose.ui.window.rememberWindowState
+import androidx.compose.ui.window.rememberDialogState
 import androidx.compose.ui.window.runApplicationTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
@@ -53,15 +53,15 @@ import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
 @OptIn(ExperimentalComposeUiApi::class)
-class WindowTest {
+class DialogTest {
     @Test
-    fun `open and close custom window`() = runApplicationTest {
-        var window: ComposeWindow? = null
+    fun `open and close custom dialog`() = runApplicationTest {
+        var window: ComposeDialog? = null
 
         launchApplication {
             var isOpen by remember { mutableStateOf(true) }
 
-            fun createWindow() = ComposeWindow().apply {
+            fun createWindow() = ComposeDialog().apply {
                 size = Dimension(300, 200)
 
                 addWindowListener(object : WindowAdapter() {
@@ -72,9 +72,9 @@ class WindowTest {
             }
 
             if (isOpen) {
-                Window(
+                Dialog(
                     create = ::createWindow,
-                    dispose = ComposeWindow::dispose
+                    dispose = ComposeDialog::dispose
                 ) {
                     window = this.window
                     Box(Modifier.size(32.dp).background(Color.Red))
@@ -89,14 +89,14 @@ class WindowTest {
     }
 
     @Test
-    fun `update custom window`() = runApplicationTest {
-        var window: ComposeWindow? = null
+    fun `update custom dialog`() = runApplicationTest {
+        var window: ComposeDialog? = null
 
         var isOpen by mutableStateOf(true)
         var title by mutableStateOf("Title1")
 
         launchApplication {
-            fun createWindow() = ComposeWindow().apply {
+            fun createWindow() = ComposeDialog().apply {
                 size = Dimension(300, 200)
 
                 addWindowListener(object : WindowAdapter() {
@@ -107,9 +107,9 @@ class WindowTest {
             }
 
             if (isOpen) {
-                Window(
+                Dialog(
                     create = ::createWindow,
-                    dispose = ComposeWindow::dispose,
+                    dispose = ComposeDialog::dispose,
                     update = { it.title = title }
                 ) {
                     window = this.window
@@ -130,11 +130,11 @@ class WindowTest {
     }
 
     @Test
-    fun `open and close window`() = runApplicationTest {
-        var window: ComposeWindow? = null
+    fun `open and close dialog`() = runApplicationTest {
+        var window: ComposeDialog? = null
 
         launchApplication {
-            Window(onCloseRequest = ::exitApplication) {
+            Dialog(onCloseRequest = ::exitApplication) {
                 window = this.window
                 Box(Modifier.size(32.dp).background(Color.Red))
             }
@@ -147,14 +147,14 @@ class WindowTest {
     }
 
     @Test
-    fun `disable closing window`() = runApplicationTest {
+    fun `disable closing dialog`() = runApplicationTest {
         var isOpen by mutableStateOf(true)
         var isCloseCalled by mutableStateOf(false)
-        var window: ComposeWindow? = null
+        var window: ComposeDialog? = null
 
         launchApplication {
             if (isOpen) {
-                Window(
+                Dialog(
                     onCloseRequest = {
                         isCloseCalled = true
                     }
@@ -179,8 +179,8 @@ class WindowTest {
 
     @Test
     fun `show splash screen`() = runApplicationTest {
-        var window1: ComposeWindow? = null
-        var window2: ComposeWindow? = null
+        var window1: ComposeDialog? = null
+        var window2: ComposeDialog? = null
 
         var isOpen by mutableStateOf(true)
         var isLoading by mutableStateOf(true)
@@ -188,12 +188,12 @@ class WindowTest {
         launchApplication {
             if (isOpen) {
                 if (isLoading) {
-                    Window(onCloseRequest = {}) {
+                    Dialog(onCloseRequest = {}) {
                         window1 = this.window
                         Box(Modifier.size(32.dp).background(Color.Red))
                     }
                 } else {
-                    Window(onCloseRequest = {}) {
+                    Dialog(onCloseRequest = {}) {
                         window2 = this.window
                         Box(Modifier.size(32.dp).background(Color.Blue))
                     }
@@ -217,20 +217,20 @@ class WindowTest {
     }
 
     @Test
-    fun `open two windows`() = runApplicationTest {
-        var window1: ComposeWindow? = null
-        var window2: ComposeWindow? = null
+    fun `open two dialogs`() = runApplicationTest {
+        var window1: ComposeDialog? = null
+        var window2: ComposeDialog? = null
 
         var isOpen by mutableStateOf(true)
 
         launchApplication {
             if (isOpen) {
-                Window(onCloseRequest = {}) {
+                Dialog(onCloseRequest = {}) {
                     window1 = this.window
                     Box(Modifier.size(32.dp).background(Color.Red))
                 }
 
-                Window(onCloseRequest = {}) {
+                Dialog(onCloseRequest = {}) {
                     window2 = this.window
                     Box(Modifier.size(32.dp).background(Color.Blue))
                 }
@@ -248,8 +248,63 @@ class WindowTest {
     }
 
     @Test
-    fun `pass composition local to windows`() = runApplicationTest {
+    fun `open nested dialog`() = runApplicationTest {
+        var window1: ComposeDialog? = null
+        var window2: ComposeDialog? = null
+
+        var isOpen by mutableStateOf(true)
+        var isNestedOpen by mutableStateOf(true)
+
+        launchApplication {
+            if (isOpen) {
+                Dialog(
+                    onCloseRequest = {},
+                    state = rememberDialogState(
+                        size = WindowSize(600.dp, 600.dp),
+                    )
+                ) {
+                    window1 = this.window
+                    Box(Modifier.size(32.dp).background(Color.Red))
+
+                    if (isNestedOpen) {
+                        Dialog(
+                            onCloseRequest = {},
+                            state = rememberDialogState(
+                                size = WindowSize(300.dp, 300.dp),
+                            )
+                        ) {
+                            window2 = this.window
+                            Box(Modifier.size(32.dp).background(Color.Blue))
+                        }
+                    }
+                }
+            }
+        }
+
+        awaitIdle()
+        assertThat(window1?.isShowing).isTrue()
+        assertThat(window2?.isShowing).isTrue()
+
+        isNestedOpen = false
+        awaitIdle()
+        assertThat(window1?.isShowing).isTrue()
+        assertThat(window2?.isShowing).isFalse()
+
+        isNestedOpen = true
+        awaitIdle()
+        assertThat(window1?.isShowing).isTrue()
+        assertThat(window2?.isShowing).isTrue()
+
+        isOpen = false
+        awaitIdle()
+        assertThat(window1?.isShowing).isFalse()
+        assertThat(window2?.isShowing).isFalse()
+    }
+
+    @Test
+    fun `pass composition local to dialogs`() = runApplicationTest {
         var actualValue1: Int? = null
+        var actualValue2: Int? = null
 
         var isOpen by mutableStateOf(true)
         var testValue by mutableStateOf(0)
@@ -258,14 +313,24 @@ class WindowTest {
         launchApplication {
             if (isOpen) {
                 CompositionLocalProvider(localTestValue provides testValue) {
-                    Window(
+                    Dialog(
                         onCloseRequest = {},
-                        state = rememberWindowState(
+                        state = rememberDialogState(
                             size = WindowSize(600.dp, 600.dp),
                         )
                     ) {
                         actualValue1 = localTestValue.current
                         Box(Modifier.size(32.dp).background(Color.Red))
+
+                        Dialog(
+                            onCloseRequest = {},
+                            state = rememberDialogState(
+                                size = WindowSize(300.dp, 300.dp),
+                            )
+                        ) {
+                            actualValue2 = localTestValue.current
+                            Box(Modifier.size(32.dp).background(Color.Blue))
+                        }
                     }
                 }
             }
@@ -273,10 +338,12 @@ class WindowTest {
 
         awaitIdle()
         assertThat(actualValue1).isEqualTo(0)
+        assertThat(actualValue2).isEqualTo(0)
 
         testValue = 42
         awaitIdle()
         assertThat(actualValue1).isEqualTo(42)
+        assertThat(actualValue2).isEqualTo(42)
 
         isOpen = false
     }
@@ -290,7 +357,7 @@ class WindowTest {
 
         launchApplication {
             if (isOpen) {
-                Window(onCloseRequest = {}) {
+                Dialog(onCloseRequest = {}) {
                     DisposableEffect(Unit) {
                         initCount++
                         onDispose {
@@ -313,7 +380,7 @@ class WindowTest {
 
     @Test
     fun `catch key handlers`() = runApplicationTest {
-        var window: ComposeWindow? = null
+        var window: ComposeDialog? = null
         val onKeyEventKeys = mutableSetOf<Key>()
         val onPreviewKeyEventKeys = mutableSetOf<Key>()
 
@@ -323,7 +390,7 @@ class WindowTest {
         }
 
         launchApplication {
-            Window(
+            Dialog(
                 onCloseRequest = ::exitApplication,
                 onPreviewKeyEvent = {
                     onPreviewKeyEventKeys.add(it.key)
@@ -362,7 +429,7 @@ class WindowTest {
 
     @Test
     fun `catch key handlers with focused node`() = runApplicationTest {
-        var window: ComposeWindow? = null
+        var window: ComposeDialog? = null
         val onWindowKeyEventKeys = mutableSetOf<Key>()
         val onWindowPreviewKeyEventKeys = mutableSetOf<Key>()
         val onNodeKeyEventKeys = mutableSetOf<Key>()
@@ -376,7 +443,7 @@ class WindowTest {
         }
 
         launchApplication {
-            Window(
+            Dialog(
                 onCloseRequest = ::exitApplication,
                 onPreviewKeyEvent = {
                     onWindowPreviewKeyEventKeys.add(it.key)
