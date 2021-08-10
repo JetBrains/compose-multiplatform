@@ -4,31 +4,20 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.*
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.pointerIcon
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import java.awt.Cursor
 
 @OptIn(ExperimentalComposeUiApi::class)
-private fun Modifier.cursorForHorizontalResize(
-    isHorizontal: Boolean
-): Modifier = composed {
-    var isHover by remember { mutableStateOf(false) }
-
-    if (isHover) {
-        pointerIcon(PointerIcon(Cursor(if (isHorizontal) Cursor.E_RESIZE_CURSOR else Cursor.S_RESIZE_CURSOR)))
-    } else {
-        pointerIcon(PointerIcon(Cursor.getDefaultCursor()))
-    }
-    pointerMoveFilter(
-        onEnter = { isHover = true; true },
-        onExit = { isHover = false; true }
-    )
-}
+private fun Modifier.cursorForHorizontalResize(isHorizontal: Boolean): Modifier =
+    pointerIcon(PointerIcon(Cursor(if (isHorizontal) Cursor.E_RESIZE_CURSOR else Cursor.S_RESIZE_CURSOR)))
 
 @Composable
 private fun DesktopSplitPaneSeparator(
