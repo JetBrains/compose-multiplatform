@@ -614,6 +614,10 @@ private val hiddenPackages = listOf(
 private val hiddenPackagesJava = setOf(
     "androidx.compose.animation",
     "androidx.compose.animation.core",
+    "androidx.compose.animation.graphics",
+    "androidx.compose.animation.graphics.res",
+    "androidx.compose.animation.graphics.vector",
+    "androidx.compose.animation.graphics.vector.compat",
     "androidx.compose.foundation",
     "androidx.compose.foundation.gestures",
     "androidx.compose.foundation.interaction",
@@ -679,4 +683,11 @@ private val hiddenPackagesJava = setOf(
     "androidx.compose.ui.util",
     "androidx.compose.ui.viewinterop",
     "androidx.compose.ui.window",
+    "androidx.activity.compose",
+    "androidx.hilt.navigation.compose",
+    "androidx.navigation.compose",
+    "androidx.paging.compose",
+    "androidx.wear.compose",
+    "androidx.wear.compose.foundation",
+    "androidx.wear.compose.material",
 )
