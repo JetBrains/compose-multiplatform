@@ -112,7 +112,7 @@ object LibraryVersions {
     val SLICE_BENCHMARK = Version("1.1.0-alpha02")
     val SLICE_BUILDERS_KTX = Version("1.0.0-alpha08")
     val SLICE_REMOTECALLBACK = Version("1.0.0-alpha01")
-    val SLIDINGPANELAYOUT = Version("1.2.0-alpha03")
+    val SLIDINGPANELAYOUT = Version("1.2.0-alpha04")
     val STARTUP = Version("1.2.0-alpha01")
     val SQLITE = Version("2.2.0-alpha03")
     val SQLITE_INSPECTOR = Version("2.1.0-alpha01")
