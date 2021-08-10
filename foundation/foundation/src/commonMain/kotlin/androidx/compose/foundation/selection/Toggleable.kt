@@ -100,7 +100,7 @@ fun Modifier.toggleable(
  * current value from [LocalIndication] to show theme default
  * @param enabled whether or not this [toggleable] will handle input events and appear
  * enabled for semantics purposes
- * * @param role the type of user interface element. Accessibility services might use this
+ * @param role the type of user interface element. Accessibility services might use this
  * to describe the element or do customizations
  * @param onValueChange callback to be invoked when toggleable is clicked,
  * therefore the change of the state in requested.
