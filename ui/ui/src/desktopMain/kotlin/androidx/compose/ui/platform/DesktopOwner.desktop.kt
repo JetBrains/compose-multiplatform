@@ -188,9 +188,6 @@ internal class DesktopOwner(
 
     override val viewConfiguration: ViewConfiguration = DesktopViewConfiguration(density)
 
-    val keyboard: Keyboard?
-        get() = container.keyboard
-
     override fun sendKeyEvent(keyEvent: KeyEvent): Boolean {
         when {
             keyEvent.nativeKeyEvent.id == java.awt.event.KeyEvent.KEY_TYPED ->
@@ -199,8 +196,7 @@ internal class DesktopOwner(
                 container.platformInputService.charKeyPressed = false
         }
 
-        return keyInputModifier.processKeyInput(keyEvent) ||
-            keyboard?.processKeyInput(keyEvent) ?: false
+        return keyInputModifier.processKeyInput(keyEvent)
     }
 
     override var showLayoutBounds = false
