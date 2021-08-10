@@ -20,9 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.configureSwingGlobalsForCompose
-import androidx.compose.ui.platform.Keyboard
+import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.window.v1.MenuBar
@@ -458,7 +457,6 @@ class AppWindow : AppFrame {
         }
 
         onCreate(parentComposition) {
-            window.layer.owners.keyboard = keyboard
             content()
         }
 
@@ -532,9 +530,4 @@ class AppWindow : AppFrame {
     override fun removeMouseMotionListener(listener: MouseMotionListener) {
         window.layer.component.removeMouseMotionListener(listener)
     }
-
-    /**
-     * Gets the Keyboard object of the window.
-     */
-    val keyboard: Keyboard = Keyboard()
 }
