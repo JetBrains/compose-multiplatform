@@ -13,26 +13,31 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerIcon
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.singleWindowApplication
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.HorizontalSplitPane
 import org.jetbrains.compose.splitpane.VerticalSplitPane
 import org.jetbrains.compose.splitpane.rememberSplitPaneState
 import java.awt.Cursor
 
+@OptIn(ExperimentalComposeUiApi::class)
 private fun Modifier.cursorForHorizontalResize(
 ): Modifier = composed {
     var isHover by remember { mutableStateOf(false) }
 
     if (isHover) {
-        LocalAppWindow.current.window.cursor = Cursor(Cursor.E_RESIZE_CURSOR)
+        pointerIcon(PointerIcon(Cursor(Cursor.E_RESIZE_CURSOR)))
     } else {
-        LocalAppWindow.current.window.cursor = Cursor.getDefaultCursor()
+        pointerIcon(PointerIcon(Cursor.getDefaultCursor()))
     }
 
     pointerMoveFilter(
@@ -42,8 +47,8 @@ private fun Modifier.cursorForHorizontalResize(
 }
 
 @OptIn(ExperimentalSplitPaneApi::class)
-fun main() = Window(
-    "SplitPane demo"
+fun main() = singleWindowApplication(
+    title = "SplitPane demo"
 ) {
     MaterialTheme {
         DesktopTheme {
