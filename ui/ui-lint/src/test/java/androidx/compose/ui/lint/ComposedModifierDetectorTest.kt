@@ -23,7 +23,6 @@ import androidx.compose.lint.test.compiledStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -46,6 +45,7 @@ class ComposedModifierDetectorTest : LintDetectorTest() {
     private val composedStub = compiledStub(
         filename = "ComposedModifier.kt",
         filepath = "androidx/compose/ui",
+        checksum = 0xad91cb77,
         """
             package androidx.compose.ui
 
@@ -57,6 +57,12 @@ class ComposedModifierDetectorTest : LintDetectorTest() {
             ): Modifier = this
         """,
 """
+        META-INF/main.kotlin_module:
+        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcYlkZiXUpSfmVKhl5yfW5BfnKpX
+        VJpXkpmbKsQVlJqbmpuUWuRdwqXJJYyhrjRTSMgZwk7xzU/JTMsEK+XjYilJ
+        LS4RYgsBkt4lSgxaDACMRj6sewAAAA==
+        """,
+        """
         androidx/compose/ui/ComposedModifierKt＄composed＄1.class:
         H4sIAAAAAAAAAJVUWU8TURT+7nQfipRFWdy1YgvKtOCaNiSEQJxQMBFsYni6
         7Qxw6fSOmaXBN/6C/0Q0kUQTw7M/ynjutDW4gU4y956c831nn/n67dMXAA/w
@@ -96,16 +102,9 @@ class ComposedModifierDetectorTest : LintDetectorTest() {
         nzerS8vvURmSWSVJKBMRq8mISZr+Gfqcpcl6RnaOwGYjZjNYi5K+wHN6b9D6
         PYK/v4OEjQc2Fkhi0UYVSzaW8XAHLMAjWDvIBkgFuBFgKkCNehegFGAlwOMA
         T/4BiHoaCXoHAAA=
-        """,
-        """
-        META-INF/main.kotlin_module:
-        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcklnJiXUpSfmVKhl5yfW5BfnKpX
-        mikk5Axhp/jmp2SmZaYWeZdwKXKJY1Gql5afL8QWklpc4l2ixKDFAACfEiWG
-        ZgAAAA==
         """
     )
 
-    @Ignore // b/193270279
     @Test
     fun noComposableCalls() {
         lint().files(
@@ -167,8 +166,7 @@ src/test/test.kt:22: Warning: Unnecessary use of Modifier.composed [UnnecessaryC
 
                 import androidx.compose.ui.Modifier
                 import androidx.compose.ui.composed
-                import androidx.compose.runtime.Composable
-                import androidx.compose.runtime.remember
+                import androidx.compose.runtime.*
 
                 inline fun <T> scopingFunction(lambda: () -> T): T {
                     return lambda()
@@ -228,7 +226,6 @@ src/test/test.kt:22: Warning: Unnecessary use of Modifier.composed [UnnecessaryC
             Stubs.Modifier,
             Stubs.Remember
         )
-            .allowCompilationErrors(true) // b/193270279
             .run()
             .expectClean()
     }

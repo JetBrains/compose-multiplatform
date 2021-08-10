@@ -23,7 +23,6 @@ import androidx.compose.lint.test.kotlinAndCompiledStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -48,10 +47,11 @@ class ColorsDetectorTest : LintDetectorTest() {
     private val ColorsStub = kotlinAndCompiledStub(
         filename = "Colors.kt",
         filepath = "androidx/compose/material",
+        checksum = 0x2f84988c,
         """
             package androidx.compose.material
 
-            import androidx.compose.ui.graphics.Color
+            import androidx.compose.ui.graphics.*
 
             class Colors(
                 primary: Color,
@@ -127,6 +127,12 @@ class ColorsDetectorTest : LintDetectorTest() {
                 false
             )
         """,
+"""
+        META-INF/main.kotlin_module:
+        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcolmZiXUpSfmVKhl5yfW5BfnKqX
+        m1iSWpSZmCPE4Zyfk19U7F3Cpc4li1OZXlp+vhBbSGpxCVihDIbC0ky99KLE
+        gozM5GIhdrCR3iVKDFoMAMec7K6RAAAA
+        """,
         """
         androidx/compose/material/Colors.class:
         H4sIAAAAAAAAAJVUTW8TSRB9Pf6YeGzHdownNmGWrwBJgExA3LJCgrArBZnd
@@ -182,12 +188,6 @@ class ColorsDetectorTest : LintDetectorTest() {
         nCcn71K+iVN4l/IDnMbHlJ+TZV9SfsvIHyl9eMWpf4OVgAI7fon8yU6gKovB
         LIa4IpclSUayrHFlAsLES7g6gR0mRk1cMxEzcd3kH0vUm4ibtj1hImlCNrHT
         RMpEg4lGE70mgibGTAT+BZIgXWjiCwAA
-        """,
-        """
-        META-INF/main.kotlin_module:
-        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcolmZiXUpSfmVKhl5yfW5BfnKqX
-        m1iSWpSZmCPE4Zyfk19U7F3Cpc4li1OZXlp+vhBbSGpxCVihDIbC0ky99KLE
-        gozM5GIhdrCR3iVKDFoMAMec7K6RAAAA
         """
     )
 
@@ -257,7 +257,6 @@ class ColorsDetectorTest : LintDetectorTest() {
             Stubs.Color,
             ColorsStub.kotlin
         )
-            .allowCompilationErrors(true) // b/195443860
             .run()
             .expect(
                 """
@@ -333,7 +332,6 @@ src/androidx/compose/material/foo/test.kt:55: Error: Conflicting 'on' color for 
             Stubs.Color,
             ColorsStub.kotlin
         )
-            .allowCompilationErrors(true) // b/195443860
             .run()
             .expect(
                 """
@@ -383,7 +381,6 @@ src/androidx/compose/material/foo/test.kt:21: Error: Conflicting 'on' color for 
             Stubs.Color,
             ColorsStub.kotlin
         )
-            .allowCompilationErrors(true) // b/195443860
             .run()
             .expect(
                 """
@@ -445,7 +442,6 @@ src/androidx/compose/material/foo/test.kt:22: Error: Conflicting 'on' color for 
             Stubs.Color,
             ColorsStub.kotlin
         )
-            .allowCompilationErrors(true) // b/195443860
             .run()
             .expectClean()
     }
@@ -519,7 +515,6 @@ src/androidx/compose/material/foo/test.kt:22: Error: Conflicting 'on' color for 
             Stubs.Color,
             ColorsStub.kotlin
         )
-            .allowCompilationErrors(true) // b/195443860
             .run()
             .expectClean()
     }
@@ -596,7 +591,6 @@ src/androidx/compose/material/foo/test.kt:22: Error: Conflicting 'on' color for 
             .expectClean()
     }
 
-    @Ignore // b/193270279
     @Test
     fun lightColorsErrors_compiled() {
         lint().files(
@@ -636,7 +630,6 @@ src/androidx/compose/material/foo/test.kt:15: Error: Conflicting 'on' color for 
             )
     }
 
-    @Ignore // b/193270279
     @Test
     fun darkColorsErrors_compiled() {
         lint().files(
