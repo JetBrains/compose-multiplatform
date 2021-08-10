@@ -159,7 +159,7 @@ internal class InnerPlaceable(
         isTouchEvent: Boolean,
         nodeHitTest: LayoutNode.(Offset, HitTestResult<T>, Boolean) -> Unit
     ) {
-        if (withinLayerBounds(pointerPosition)) {
+        if (withinLayerBounds(pointerPosition, isTouchEvent)) {
             // Any because as soon as true is returned, we know we have found a hit path and we must
             // not add hit results on different paths so we should not even go looking.
             layoutNode.zSortedChildren.reversedAny { child ->

@@ -74,7 +74,7 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
         hitTestResult: HitTestResult<PointerInputFilter>,
         isTouchEvent: Boolean
     ) {
-        if (withinLayerBounds(pointerPosition)) {
+        if (withinLayerBounds(pointerPosition, isTouchEvent)) {
             val positionInWrapped = wrapped.fromParentPosition(pointerPosition)
             wrapped.hitTest(positionInWrapped, hitTestResult, isTouchEvent)
         }
@@ -84,7 +84,7 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
         pointerPosition: Offset,
         hitSemanticsWrappers: HitTestResult<SemanticsWrapper>
     ) {
-        if (withinLayerBounds(pointerPosition)) {
+        if (withinLayerBounds(pointerPosition, true)) {
             val positionInWrapped = wrapped.fromParentPosition(pointerPosition)
             wrapped.hitTestSemantics(positionInWrapped, hitSemanticsWrappers)
         }
@@ -168,15 +168,6 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
 
     override val parentData: Any? get() = wrapped.parentData
 
-    private fun offsetFromEdge(pointerPosition: Offset): Offset {
-        val x = pointerPosition.x
-        val horizontal = maxOf(0f, if (x < 0) -x else x - measuredWidth)
-        val y = pointerPosition.y
-        val vertical = maxOf(0f, if (y < 0) -y else y - measuredHeight)
-
-        return Offset(horizontal, vertical)
-    }
-
     /**
      * Returns the additional amount on the horizontal and vertical dimensions that
      * this extends beyond [width] and [height] on all sides. This takes into account
@@ -191,7 +182,7 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
     /**
      * Does a hit test, adding [content] as a [HitTestResult.hit] or
      * [HitTestResult.hitInMinimumTouchTarget] depending on whether or not it hit
-     * or hit in the [minimumTouchTargetSize] area. The newly-created [HitTestResult] is returned
+     * or hit in the minimum touch target size area. The newly-created [HitTestResult] is returned
      * if there was a hit or `null` is returned if it missed.
      */
     protected fun <T> hitTestInMinimumTouchTarget(
@@ -200,7 +191,7 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
         content: T,
         block: () -> Unit
     ) {
-        if (!withinLayerBounds(pointerPosition)) {
+        if (!withinLayerBounds(pointerPosition, true)) {
             return
         }
         if (isPointerInBounds(pointerPosition)) {
@@ -237,6 +228,7 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
         minimumTouchTargetSize: Size
     ): Boolean {
         val touchPadding = calculateMinimumTouchTargetPadding(minimumTouchTargetSize)
-        return offsetFromEdge.x < touchPadding.width && offsetFromEdge.y < touchPadding.height
+        return !touchPadding.isEmpty() &&
+            offsetFromEdge.x <= touchPadding.width && offsetFromEdge.y <= touchPadding.height
     }
 }
