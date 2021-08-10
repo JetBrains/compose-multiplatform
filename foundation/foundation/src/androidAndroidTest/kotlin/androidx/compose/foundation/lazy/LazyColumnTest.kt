@@ -17,6 +17,7 @@
 package androidx.compose.foundation.lazy
 
 import android.os.Build
+import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
@@ -201,6 +202,33 @@ class LazyColumnTest {
         }
     }
 
+    @Test
+    fun changeItemsCountAndScrollImmediately() {
+        lateinit var state: LazyListState
+        var count by mutableStateOf(100)
+        val composedIndexes = mutableListOf<Int>()
+        rule.setContent {
+            state = rememberLazyListState()
+            LazyColumn(Modifier.fillMaxWidth().height(10.dp), state) {
+                items(count) { index ->
+                    composedIndexes.add(index)
+                    Box(Modifier.size(20.dp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            composedIndexes.clear()
+            count = 10
+            runBlocking(AutoTestFrameClock()) {
+                state.scrollToItem(50)
+            }
+            composedIndexes.forEach {
+                assertThat(it).isLessThan(count)
+            }
+            assertThat(state.firstVisibleItemIndex).isEqualTo(9)
+        }
+    }
     @Test
     fun changingDataTest() {
         val dataLists = listOf(

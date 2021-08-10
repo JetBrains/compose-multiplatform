@@ -17,7 +17,8 @@
 package androidx.compose.foundation.lazy
 
 /**
- * Contains useful information about an individual item in lazy lists like [LazyColumn] or [LazyRow].
+ * Contains useful information about an individual item in lazy lists like [LazyColumn]
+ *  or [LazyRow].
  *
  * @see LazyListLayoutInfo
  */
@@ -26,6 +27,11 @@ interface LazyListItemInfo {
      * The index of the item in the list.
      */
     val index: Int
+
+    /**
+     * The key of the item which was passed to the item() or items() function.
+     */
+    val key: Any
 
     /**
      * The main axis offset of the item. It is relative to the start of the lazy list container.
@@ -37,9 +43,4 @@ interface LazyListItemInfo {
      * slot for the item then this size will be calculated as the sum of their sizes.
      */
     val size: Int
-
-    /**
-     * The key of the item which was passed to the item() or items() function.
-     */
-    val key: Any
 }

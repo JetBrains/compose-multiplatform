@@ -14,8 +14,21 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.lazy
+package androidx.compose.foundation.lazy.layout
 
-internal actual fun getDefaultLazyKeyFor(index: Int): Any = DefaultLazyKey(index)
+/**
+ * Contains useful information about an individual item in lazy layouts.
+ *
+ * @see LazyLayoutInfo
+ */
+internal interface LazyLayoutItemInfo {
+    /**
+     * The index of the item in the list.
+     */
+    val index: Int
 
-private data class DefaultLazyKey(private val index: Int)
+    /**
+     * The key of the item which was passed to the item() or items() function.
+     */
+    val key: Any
+}

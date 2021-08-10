@@ -17,6 +17,8 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
@@ -47,7 +49,8 @@ internal fun measureLazyList(
     horizontalArrangement: Arrangement.Horizontal?,
     reverseLayout: Boolean,
     density: Density,
-    layoutDirection: LayoutDirection
+    layoutDirection: LayoutDirection,
+    layout: (Int, Int, Placeable.PlacementScope.() -> Unit) -> MeasureResult
 ): LazyListMeasureResult {
     require(startContentPadding >= 0)
     require(endContentPadding >= 0)
@@ -59,9 +62,7 @@ internal fun measureLazyList(
             canScrollForward = false,
             consumedScroll = 0f,
             composedButNotVisibleItems = null,
-            layoutWidth = constraints.minWidth,
-            layoutHeight = constraints.minHeight,
-            placementBlock = {},
+            measureResult = layout(constraints.minWidth, constraints.minHeight) {},
             visibleItemsInfo = emptyList(),
             viewportStartOffset = -startContentPadding,
             viewportEndOffset = endContentPadding,
@@ -258,9 +259,7 @@ internal fun measureLazyList(
             canScrollForward = mainAxisUsed > maxOffset,
             consumedScroll = consumedScroll,
             composedButNotVisibleItems = notUsedButComposedItems,
-            layoutWidth = layoutWidth,
-            layoutHeight = layoutHeight,
-            placementBlock = {
+            measureResult = layout(layoutWidth, layoutHeight) {
                 visibleItems.fastForEach {
                     if (it !== headerItem) {
                         it.place(this, layoutWidth, layoutHeight)
