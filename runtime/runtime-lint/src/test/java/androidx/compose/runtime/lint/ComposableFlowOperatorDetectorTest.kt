@@ -24,7 +24,6 @@ import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.checks.infrastructure.TestFile
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -47,6 +46,7 @@ class ComposableFlowOperatorDetectorTest : LintDetectorTest() {
     private val flowStub: TestFile = compiledStub(
         filename = "Flow.kt",
         filepath = "kotlinx/coroutines/flow",
+        checksum = 0x8d13620c,
         """
         package kotlinx.coroutines.flow
 
@@ -59,6 +59,12 @@ class ComposableFlowOperatorDetectorTest : LintDetectorTest() {
         fun <T> Flow<T>.drop(count: Int): Flow<T> = this
         """,
 """
+        META-INF/main.kotlin_module:
+        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcYlk5iXUpSfmVKhl5yfW5BfnKpX
+        VJpXkpmbqpeWny/EFpJaXOJdwqXIJZ6dX5KTmQdSVpRfWpKZl1qsl5aTXy7E
+        5gYkvUuUGLQYABYJSb1jAAAA
+        """,
+        """
         kotlinx/coroutines/flow/Flow.class:
         H4sIAAAAAAAAAH1QPU8CQRSctwgH59fhJybGaGcsPCRWakxsSEgwJkJsqBZY
         yMKxm3B7SHm/y8Jc7Y8yvoNOE7eY2ZmdZPa9r++PTwC3OCacTq2LtFmGAzu3
@@ -107,16 +113,9 @@ class ComposableFlowOperatorDetectorTest : LintDetectorTest() {
         pXoz4VKlgCiZOuCy9nJpBVpcenGAwd2koAqTSAwL3rlSMDssCOL8hFaN7IWE
         60dx0Ad4SvJL8r9FR/P2MVJ13KujRCtW61jDeh3vYOMYTOA+rGPMC6wILAuU
         BUw6XIG0wJZAXuCBwEOBdwXeE3g/3lL+AdkMm1BrBwAA
-        """,
-        """
-        META-INF/main.kotlin_module:
-        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcYlk5iXUpSfmVKhl5yfW5BfnKpX
-        VJpXkpmbqpeWny/EFpJaXOJdwqXIJZ6dX5KTmQdSVpRfWpKZl1qsl5aTXy7E
-        5gYkvUuUGLQYABYJSb1jAAAA
         """
     )
 
-    @Ignore // b/193270279
     @Test
     fun errors() {
         lint().files(

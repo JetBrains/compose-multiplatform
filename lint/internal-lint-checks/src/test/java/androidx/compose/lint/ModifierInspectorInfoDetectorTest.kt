@@ -22,7 +22,6 @@ import androidx.compose.lint.test.Stubs
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -565,7 +564,6 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
             .expectClean()
     }
 
-    @Ignore // b/193270279
     @Test
     fun rememberModifierInfo() {
         lint().files(
@@ -577,7 +575,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
                 package androidx.compose.ui
 
-                import androidx.compose.runtime.remember
+                import androidx.compose.runtime.*
                 import androidx.compose.ui.Modifier
                 import androidx.compose.ui.platform.InspectorInfo
                 import androidx.compose.ui.platform.InspectorValueInfo
@@ -604,18 +602,18 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
             .expectClean()
     }
 
-    @Ignore // b/193270279
     @Test
     fun emptyModifier() {
         lint().files(
             Stubs.Modifier,
             Stubs.Remember,
             composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
 
-                import androidx.compose.runtime.remember
+                import androidx.compose.runtime.*
                 import androidx.compose.ui.Modifier
 
                 internal actual fun Modifier.width1(width: Int): Modifier = this

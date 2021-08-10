@@ -22,7 +22,6 @@ import androidx.compose.lint.test.Stubs
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -39,7 +38,6 @@ class UnrememberedMutableStateDetectorTest : LintDetectorTest() {
     override fun getIssues(): MutableList<Issue> =
         mutableListOf(UnrememberedMutableStateDetector.UnrememberedMutableState)
 
-    @Ignore // b/193270279
     @Test
     fun notRemembered() {
         lint().files(
@@ -193,7 +191,6 @@ src/androidx/compose/runtime/foo/{.kt:61: Error: Creating a state object during 
             )
     }
 
-    @Ignore // b/193270279
     @Test
     fun rememberedInsideComposableBody() {
         lint().files(
@@ -283,7 +280,6 @@ src/androidx/compose/runtime/foo/{.kt:61: Error: Creating a state object during 
             .expectClean()
     }
 
-    @Ignore // b/193270279
     @Test
     fun noErrors() {
         lint().files(
