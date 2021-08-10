@@ -1,28 +1,24 @@
 package org.jetbrainsc.compose.common.demo
 
 import androidx.compose.runtime.Composable
-import org.jetbrains.compose.common.foundation.layout.Box
-import org.jetbrains.compose.common.ui.Modifier
-import org.jetbrains.compose.common.ui.size
-import org.jetbrains.compose.common.ui.padding
-import org.jetbrains.compose.common.ui.unit.dp
-import org.jetbrains.compose.common.core.graphics.Color
-import org.jetbrains.compose.common.foundation.layout.Row
-import org.jetbrains.compose.common.foundation.layout.Column
-import org.jetbrains.compose.common.foundation.layout.Arrangement
-import org.jetbrains.compose.common.ui.Alignment
-import org.jetbrains.compose.common.foundation.border
-import org.jetbrains.compose.common.material.Text
-import org.jetbrains.compose.common.ui.unit.em
-import org.jetbrains.compose.common.material.Slider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import org.jetbrains.compose.common.material.Button
-import org.jetbrains.compose.common.foundation.layout.width
-import org.jetbrains.compose.common.foundation.clickable
-import org.jetbrains.compose.common.ui.draw.clip
 import jetbrains.compose.common.shapes.CircleShape
+import org.jetbrains.compose.common.core.graphics.Color
 import org.jetbrains.compose.common.foundation.background
+import org.jetbrains.compose.common.foundation.border
+import org.jetbrains.compose.common.foundation.clickable
+import org.jetbrains.compose.common.foundation.layout.*
+import org.jetbrains.compose.common.material.Button
+import org.jetbrains.compose.common.material.Slider
+import org.jetbrains.compose.common.material.Text
+import org.jetbrains.compose.common.ui.Alignment
+import org.jetbrains.compose.common.ui.Modifier
+import org.jetbrains.compose.common.ui.draw.clip
+import org.jetbrains.compose.common.ui.padding
+import org.jetbrains.compose.common.ui.size
+import org.jetbrains.compose.common.ui.unit.dp
+import org.jetbrains.compose.common.ui.unit.em
 
 object LayoutSamples {
     @Composable
@@ -123,9 +119,20 @@ object LayoutSamples {
             }
         }
     }
+
+    @Composable
+    fun AlphaTest() {
+        Column() {
+            Box(Modifier.background(Color(3, 169, 244)).size(64.dp)) {}
+            Box(Modifier.background(Color(3, 169, 244, .75f)).size(64.dp)) {}
+            Box(Modifier.background(Color(3, 169, 244, .5f)).size(64.dp)) {}
+            Box(Modifier.background(Color(3, 169, 244, .25f)).size(64.dp)) {}
+            Box(Modifier.background(Color(3, 169, 244, .0f)).size(64.dp)) {}
+        }
+    }
 }
 
 @Composable
 fun App() {
-    LayoutSamples.TwoTextsInColumn()
+    LayoutSamples.AlphaTest()
 }
