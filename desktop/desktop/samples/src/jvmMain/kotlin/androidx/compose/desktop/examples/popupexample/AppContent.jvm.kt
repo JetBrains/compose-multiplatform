@@ -19,6 +19,7 @@ package androidx.compose.desktop.examples.popupexample
 import androidx.compose.foundation.background
 import androidx.compose.foundation.BoxWithTooltip
 import androidx.compose.foundation.TooltipPlacement
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,12 +34,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.window.WindowDraggableArea
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Checkbox
 import androidx.compose.material.ContextMenu
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -70,6 +73,7 @@ import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import javax.swing.JButton
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun WindowScope.Content(
     windowState: WindowState,
@@ -175,6 +179,11 @@ fun WindowScope.Content(
                     }
                     Spacer(modifier = Modifier.height(30.dp))
                     CheckBox(
+                        text = "- alert dialog",
+                        state = AppState.alertDialog,
+                    )
+                    Spacer(modifier = Modifier.height(30.dp))
+                    CheckBox(
                         text = "- undecorated",
                         state = AppState.undecorated,
                     )
@@ -241,13 +250,39 @@ fun WindowScope.Content(
             dialogState.value = false
             println("Dialog window is dismissed.")
         }
-        Dialog(
-            onCloseRequest = dismiss
-        ) {
-            WindowContent(
-                AppState.amount,
-                onClose = dismiss
+        if (AppState.alertDialog.value) {
+            AlertDialog(
+                onDismissRequest = dismiss,
+                confirmButton = {
+                    Button(text = "OK", onClick = { AppState.amount.value++ })
+                },
+                dismissButton = {
+                    Button(text = "Cancel", onClick = dismiss)
+                },
+                title = {
+                    TextBox(text = "Alert Dialog")
+                },
+                text = {
+                    println("CompositionLocal value is ${LocalTest.current}.")
+                    TextBox(text = "Increment amount?")
+                    DisposableEffect(Unit) {
+                        onDispose {
+                            println("onDispose inside AlertDialog is called.")
+                        }
+                    }
+                },
+                shape = RoundedCornerShape(0.dp),
+                backgroundColor = Color(70, 70, 70)
             )
+        } else {
+            Dialog(
+                onCloseRequest = dismiss
+            ) {
+                WindowContent(
+                    AppState.amount,
+                    onClose = dismiss
+                )
+            }
         }
     }
 }

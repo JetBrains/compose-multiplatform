@@ -52,6 +52,11 @@ internal class ComposeWindowDelegate {
             super.remove(component)
         }
 
+        override fun addNotify() {
+            super.addNotify()
+            layer.wrapped.requestFocus()
+        }
+
         override fun getPreferredSize() = layer.wrapped.preferredSize
     }
 
@@ -93,12 +98,6 @@ internal class ComposeWindowDelegate {
         if (!isDisposed) {
             layer.dispose()
             isDisposed = true
-        }
-    }
-
-    fun setVisible(value: Boolean) {
-        if (value) {
-            layer.component.requestFocus()
         }
     }
 
