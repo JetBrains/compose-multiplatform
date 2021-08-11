@@ -81,13 +81,20 @@ val AnimationDemos = DemoCategory(
         ),
 
         DemoCategory(
+            "Visual Aid \uD83D\uDC40 \uD83D\uDC40",
+            listOf(
+                ComposableDemo("Column Arrangements Demo") { ColumnConfigurationDemo() },
+                ComposableDemo("Row Arrangements Demo (Landscape)") { RowConfigurationDemo() },
+            )
+        ),
+
+        DemoCategory(
             "\uD83C\uDF89 Fun Demos",
             listOf(
                 ComposableDemo("Animated clock") { AnimatedClockDemo() },
                 ComposableDemo("Animated dots") { AnimatedDotsDemo() },
                 ComposableDemo("Chat screen") { ChatScreen() },
                 ComposableDemo("Game of fling") { FlingGame() },
-                ComposableDemo("Row Configuration Demo (Landscape)") { RowConfigurationDemo() },
                 ComposableDemo("Spring chain") { SpringChainDemo() },
             )
         )
