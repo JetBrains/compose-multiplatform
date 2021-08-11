@@ -1,3 +1,4 @@
+@file:JvmName("PlatformColor")
 package org.jetbrains.compose.common.core.graphics
 
 import androidx.compose.ui.graphics.Color as JColor

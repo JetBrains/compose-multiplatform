@@ -17,6 +17,7 @@ kotlin {
         }
         binaries.executable()
     }
+    jvm()
 
     sourceSets {
         val commonMain by getting {
@@ -39,6 +40,12 @@ kotlin {
         val jsTest by getting {
             dependencies {
                 implementation(kotlin("test-js"))
+            }
+        }
+
+        val jvmMain by getting {
+            dependencies {
+                implementation(compose.desktop.currentOs)
             }
         }
     }

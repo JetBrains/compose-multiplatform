@@ -31,7 +31,7 @@ object LayoutSamples {
     fun TwoTextsInColumn() {
         val defaultFontSize = 0.79f
         val fontSize = remember { mutableStateOf(defaultFontSize) }
-        val subtitleColor = remember { mutableStateOf(Color(0, 0, 200)) }
+        val subtitleColor = remember { mutableStateOf(Color(0, 0, 200, 1f)) }
         Column {
             Text("Alfred Sisley")
             Text(
@@ -78,7 +78,7 @@ object LayoutSamples {
                         modifier = Modifier
                             .size(150.dp)
                             .padding(4.dp)
-                            .border(1.dp, Color(0, 0, 200))
+                            .border(1.dp, Color(0, 0, 200, 1f))
                             .background(Color.Yellow),
                         horizontalArrangement = horizontalArrangement,
                         verticalAlignment = verticalAlignment
@@ -102,7 +102,7 @@ object LayoutSamples {
                         modifier = Modifier
                             .size(150.dp)
                             .padding(4.dp)
-                            .border(1.dp, Color(0, 0, 200))
+                            .border(1.dp, Color(0, 0, 200, 1f))
                             .background(Color.Yellow),
                         horizontalArrangement = horizontalArrangement,
                         verticalAlignment = verticalAlignment
@@ -123,7 +123,7 @@ object LayoutSamples {
     @Composable
     fun AlphaTest() {
         Column() {
-            Box(Modifier.background(Color(3, 169, 244)).size(64.dp)) {}
+            Box(Modifier.background(Color(3, 169, 244, 1f)).size(64.dp)) {}
             Box(Modifier.background(Color(3, 169, 244, .75f)).size(64.dp)) {}
             Box(Modifier.background(Color(3, 169, 244, .5f)).size(64.dp)) {}
             Box(Modifier.background(Color(3, 169, 244, .25f)).size(64.dp)) {}
