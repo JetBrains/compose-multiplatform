@@ -148,7 +148,7 @@ private fun Project.removePreviouslyUploadedArchives(group: String) {
 }
 
 private fun Project.addInformativeMetadata(extension: AndroidXExtension, pom: MavenPom) {
-    pom.name.set(provider { extension.name })
+    pom.name.set(extension.name)
     pom.description.set(provider { extension.description })
     pom.url.set(
         provider {

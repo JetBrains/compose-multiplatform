@@ -20,6 +20,7 @@ import androidx.build.checkapi.shouldConfigureApiTasks
 import groovy.lang.Closure
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.provider.Property
 import java.util.ArrayList
 
 /**
@@ -27,7 +28,8 @@ import java.util.ArrayList
  */
 open class AndroidXExtension(val project: Project) {
 
-    var name: String? = null
+    var name: Property<String?> = project.objects.property(String::class.java)
+    fun setName(newName: String) { name.set(newName) }
     var mavenVersion: Version? = null
         set(value) {
             field = value
