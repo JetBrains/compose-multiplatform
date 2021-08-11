@@ -27,17 +27,10 @@ internal expect fun createInputDispatcher(
 ): InputDispatcher
 
 /**
- * Indicates that [InputDispatcher.currentTime] is not set
- */
-internal const val TimeNotSet = -1L
-
-/**
  * Dispatcher to inject full and partial gestures. An [InputDispatcher] is created at the
  * beginning of [performGesture], and disposed at the end of that method. If there is still a
  * [gesture going on][isGestureInProgress] when the dispatcher is disposed, the state of the
- * current gesture will be persisted and restored on the next invocation of [performGesture]. The
- * [current eventTime][currentTime] will be restored regardless, but will only be used when the
- * next invocation of [performGesture] has `resumeFinishedGesture = true`.
+ * current gesture will be persisted and restored on the next invocation of [performGesture].
  *
  * Dispatching input happens in two stages. In the first stage, all events are generated
  * (enqueued), using the `enqueue*` methods, and in the second stage all events are injected.
@@ -66,7 +59,7 @@ internal abstract class InputDispatcher(
 ) {
     companion object {
         /**
-         * The minimum time between two successive injected MotionEvents, 10 milliseconds.
+         * The default time between two successively injected events, 10 milliseconds.
          * Ideally, the value should reflect a realistic pointer input sample rate, but that
          * depends on too many factors. Instead, the value is chosen comfortably below the
          * targeted frame rate (60 fps, equating to a 16ms period).
@@ -76,10 +69,9 @@ internal abstract class InputDispatcher(
     }
 
     /**
-     * The eventTime of the next event. If [TimeNotSet], no gesture has been started yet, and
-     * enqueuing anything other than a down event will fail.
+     * The eventTime of the next event.
      */
-    protected var currentTime = TimeNotSet
+    protected var currentTime = testContext.currentTime
 
     /**
      * The state of the current gesture in progress. If `null`, no gesture is in progress. This
@@ -95,17 +87,9 @@ internal abstract class InputDispatcher(
     val isGestureInProgress: Boolean
         get() = partialGesture != null
 
-    /**
-     * The current wall clock time, in the time scale used by gesture events.
-     */
-    protected abstract val now: Long
-
     init {
         val state = testContext.states.remove(root)
         if (state != null) {
-            val elapsedTime = testContext.currentTime - state.clockTimeOnDispose
-            // current gesture time = time where last gesture left off + elapsed time
-            currentTime = state.currentTime + elapsedTime
             partialGesture = state.partialGesture
         }
     }
@@ -114,9 +98,7 @@ internal abstract class InputDispatcher(
         if (root != null) {
             testContext.states[root] =
                 InputDispatcherState(
-                    currentTime,
-                    partialGesture,
-                    testContext.currentTime
+                    partialGesture
                 )
         }
     }
@@ -125,27 +107,14 @@ internal abstract class InputDispatcher(
     private val TestContext.currentTime get() = testOwner.mainClock.currentTime
 
     /**
-     * Returns the time to use for the next downTime. If no event has been enqueued yet, will
-     * return the current wall clock time. Otherwise, will return the
-     * [current eventTime][currentTime].
+     * Increases the current event time by [durationMillis]. Note that [enqueueMove] and
+     * [enqueueCancel] also increase the current time by 10ms.
      *
-     * Call [increaseEventTime] each time the gesture progresses forward in time to make sure the
-     * current eventTime stays accurate.
+     * @param durationMillis The duration of the delay. Must be positive
      */
-    private fun generateDownTime(): Long {
-        return if (currentTime == TimeNotSet) {
-            now.also { currentTime = it }
-        } else {
-            currentTime
-        }
-    }
-
-    /**
-     * Moves the eventTime for the next event ahead by the given [durationMillis].
-     */
-    private fun increaseEventTime(durationMillis: Long) {
-        check(currentTime != TimeNotSet) {
-            "Can't adjust current event time when no gesture is in progress."
+    fun advanceEventTime(durationMillis: Long = eventPeriodMillis) {
+        require(durationMillis >= 0) {
+            "duration of a delay can only be positive, not $durationMillis"
         }
         currentTime += durationMillis
     }
@@ -304,21 +273,6 @@ internal abstract class InputDispatcher(
     }
 
     /**
-     * Adds an extra delay of [durationMillis] between the last and the next event. The delay is
-     * added on top of the delay that would already be added between the two events. The normal
-     * delay depends on the type of the next event: for [enqueueMove] and [enqueueCancel] move
-     * the eventTime by 10ms, and all other methods don't move the eventTime.
-     *
-     * @param durationMillis The duration of the delay. Must be positive
-     */
-    fun advanceEventTime(durationMillis: Long) {
-        require(durationMillis >= 0) {
-            "duration of a delay can only be positive, not $durationMillis"
-        }
-        increaseEventTime(durationMillis)
-    }
-
-    /**
      * Generates a down event at [position] for the pointer with the given [pointerId], starting
      * a new partial gesture. A partial gesture can only be started if none was currently ongoing
      * for that pointer. Pointer ids may be reused during the same gesture. The generated event
@@ -361,11 +315,12 @@ internal abstract class InputDispatcher(
             "Cannot send DOWN event, a gesture is already in progress for pointer $pointerId"
         }
 
+        // Send a MOVE event if pointers have changed since the last event
         gesture?.flushPointerUpdates()
 
         // Start a new gesture, or add the pointerId to the existing gesture
         if (gesture == null) {
-            gesture = PartialGesture(generateDownTime(), position, pointerId)
+            gesture = PartialGesture(currentTime, position, pointerId)
             partialGesture = gesture
         } else {
             gesture.lastPositions[pointerId] = position
@@ -395,7 +350,7 @@ internal abstract class InputDispatcher(
             "Cannot send MOVE event with a delay of $delay ms"
         }
 
-        increaseEventTime(delay)
+        advanceEventTime(delay)
         gesture.enqueueMove()
         gesture.hasPointerUpdates = false
     }
@@ -463,7 +418,7 @@ internal abstract class InputDispatcher(
         }
 
         gesture.flushPointerUpdates()
-        increaseEventTime(delay)
+        advanceEventTime(delay)
 
         // First send the UP event
         gesture.enqueueUp(pointerId)
@@ -498,9 +453,19 @@ internal abstract class InputDispatcher(
             "Cannot send CANCEL event with a delay of $delay ms"
         }
 
-        increaseEventTime(delay)
+        advanceEventTime(delay)
         gesture.enqueueCancel()
         partialGesture = null
+    }
+
+    /**
+     * Generates a move event with all pointer locations, if any of the pointers has been moved by
+     * [movePointer] since the last move event.
+     */
+    private fun PartialGesture.flushPointerUpdates() {
+        if (hasPointerUpdates) {
+            enqueueMove(eventPeriodMillis)
+        }
     }
 
     /**
@@ -508,16 +473,6 @@ internal abstract class InputDispatcher(
      * thrown during the process, all events that haven't yet been dispatched will be dropped.
      */
     abstract fun sendAllSynchronous()
-
-    /**
-     * Generates a MOVE event with all pointer locations, if any of the pointers has been moved by
-     * [movePointer] since the last MOVE event.
-     */
-    private fun PartialGesture.flushPointerUpdates() {
-        if (hasPointerUpdates) {
-            enqueueMove(eventPeriodMillis)
-        }
-    }
 
     protected abstract fun PartialGesture.enqueueDown(pointerId: Int)
 
@@ -535,14 +490,16 @@ internal abstract class InputDispatcher(
         onDispose()
     }
 
+    /**
+     * Override this method to take platform specific action when this dispatcher is disposed.
+     * E.g. to recycle event objects that the dispatcher still holds on to.
+     */
     protected open fun onDispose() {}
 }
 
 /**
  * The state of the current gesture. Contains the current position of all pointers and the
- * down time (start time) of the gesture. Does not contain the
- * [current time][InputDispatcher.currentTime], as the current time's lifecycle can span multiple
- * (chained) gestures.
+ * down time (start time) of the gesture. For the current time, see [InputDispatcher.currentTime].
  *
  * @param downTime The time of the first down event of this gesture
  * @param startPosition The position of the first down event of this gesture
@@ -557,15 +514,9 @@ internal class PartialGesture(val downTime: Long, startPosition: Offset, pointer
  * The state of an [InputDispatcher], saved when the [GestureScope] is disposed and restored
  * when the [GestureScope] is recreated.
  *
- * @param currentTime The current event time. Usually this is when the last event was injected,
- * unless [InputDispatcher.advanceEventTime] has been used after the last event. The current time
- * will only be restored if there was an incomplete gesture or [performGesture]'s
- * `resumeFinishedGesture` parameter was true.
  * @param partialGesture The state of an incomplete gesture. If no gesture was in progress
  * when the state of the [InputDispatcher] was saved, this will be `null`.
  */
 internal data class InputDispatcherState(
-    val currentTime: Long,
-    val partialGesture: PartialGesture?,
-    val clockTimeOnDispose: Long
+    val partialGesture: PartialGesture?
 )

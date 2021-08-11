@@ -182,21 +182,17 @@ fun SemanticsNodeInteraction.performScrollToKey(key: Any): SemanticsNodeInteract
 
 /**
  * Executes the (partial) gesture specified in the given [block]. The gesture doesn't need to be
- * complete and can be resumed in a later invocation of [performGesture]. If there was a previous
- * invocation of [performGesture], the first event time of the current invocation is equal to the
- * last event time of the previous gesture plus the elapsed time in between on the [MainTestClock].
+ * complete and can be resumed in a later invocation of [performGesture]. The event time is
+ * initialized to the current time of the [MainTestClock].
  *
  * Be aware that if you split a gesture over two invocations of [performGesture], everything that
  * happens in between will run as if the gesture is still ongoing (imagine a finger still
  * touching the screen).
  *
  * All events that are injected from the [block] are batched together and sent after [block] is
- * complete. This method blocks until all those events have been injected, which normally takes
- * as long as the duration of the gesture. If an error occurs during execution of [block] or
- * injection of the events, all (subsequent) events are dropped and the error is thrown here.
- *
- * This method must not be called from the main thread. The block will be executed on the same
- * thread as the caller.
+ * complete. This method blocks while the events are injected. If an error occurs during
+ * execution of [block] or injection of the events, all (subsequent) events are dropped and the
+ * error is thrown here.
  *
  * Example usage:
  * ```
