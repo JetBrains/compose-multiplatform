@@ -186,15 +186,24 @@ internal fun XmlPullParser.createVectorImageBuilder(
     val tintColor = if (
         vectorAttrs.hasValue(AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_TINT)
     ) {
-        // first check if is a simple color
         val value = TypedValue()
         vectorAttrs.getValue(AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_TINT, value)
-        if (value.type >= TypedValue.TYPE_FIRST_COLOR_INT &&
-            value.type <= TypedValue.TYPE_LAST_COLOR_INT
-        ) {
-            Color(value.data)
-        } else {
+        // Unable to parse theme attributes outside of the framework here.
+        // This is a similar limitation to VectorDrawableCompat's parsing logic within
+        // updateStateFromTypedArray as TypedArray#extractThemeAttrs is not a public API
+        // ignore tint colors provided from the theme itself.
+        if (value.type == TypedValue.TYPE_ATTRIBUTE) {
             Color.Unspecified
+        } else {
+            val tintColorStateList = TypedArrayUtils.getNamedColorStateList(
+                vectorAttrs, this, theme, "tint",
+                AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_TINT
+            )
+            if (tintColorStateList != null) {
+                Color(tintColorStateList.defaultColor)
+            } else {
+                Color.Unspecified
+            }
         }
     } else {
         Color.Unspecified
