@@ -28,7 +28,7 @@ plugins {
 AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin projectOrArtifact(":compose:compiler:compiler")
 
     if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         /* When updating dependencies, make sure to make the an an analogous update in the
@@ -43,11 +43,11 @@ dependencies {
         testImplementation(libs.testCore)
         testImplementation(libs.testRules)
 
-        androidTestImplementation project(':compose:ui:ui')
-        androidTestImplementation project(":compose:ui:ui-test-junit4")
-        androidTestImplementation project(":compose:test-utils")
+        androidTestImplementation projectOrArtifact(':compose:ui:ui')
+        androidTestImplementation projectOrArtifact(":compose:ui:ui-test-junit4")
+        androidTestImplementation projectOrArtifact(":compose:test-utils")
         androidTestImplementation "androidx.fragment:fragment:1.3.0"
-        androidTestImplementation project(":activity:activity-compose")
+        androidTestImplementation projectOrArtifact(":activity:activity-compose")
         androidTestImplementation(libs.testUiautomator)
         androidTestImplementation(libs.testCore)
         androidTestImplementation(libs.testRules)
