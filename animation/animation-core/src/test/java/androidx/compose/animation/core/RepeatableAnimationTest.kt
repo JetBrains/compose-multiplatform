@@ -173,6 +173,122 @@ class RepeatableAnimationTest {
         )
     }
 
+    @Test
+    fun testStartOffsetRepeatable() {
+        val duration = 600
+        val offset = duration / 2
+
+        val repeatable = TargetBasedAnimation(
+            repeatable<Float>(5, tween(duration, easing = LinearEasing), RepeatMode.Restart),
+            Float.VectorConverter,
+            0f,
+            1000f
+        )
+        val delayedRepeatable = TargetBasedAnimation(
+            repeatable<Float>(
+                5,
+                tween(duration, easing = LinearEasing),
+                RepeatMode.Restart, StartOffset(offset)
+            ),
+            Float.VectorConverter,
+            0f,
+            1000f
+        )
+        val fastForwardedRepeatable = TargetBasedAnimation(
+            repeatable<Float>(
+                5,
+                tween(duration, easing = LinearEasing),
+                RepeatMode.Restart, StartOffset(offset, StartOffsetType.FastForward)
+            ),
+            Float.VectorConverter,
+            0f,
+            1000f
+        )
+
+        assertEquals(
+            repeatable.durationNanos, delayedRepeatable.durationNanos - offset * 1_000_000L
+        )
+        assertEquals(
+            repeatable.durationNanos, fastForwardedRepeatable.durationNanos + offset * 1_000_000L
+        )
+
+        for (playtimeMillis in 0..duration * 3 step 17) {
+            assertEquals(
+                repeatable.getValueFromNanos(playtimeMillis * MillisToNanos),
+                delayedRepeatable.getValueFromNanos((playtimeMillis + offset) * MillisToNanos)
+            )
+        }
+
+        // Check that during the delayed time, the value is unchanged
+        for (playTimeMillis in 0..offset step 10) {
+            assertEquals(
+                repeatable.getValueFromNanos(0),
+                delayedRepeatable.getValueFromNanos(playTimeMillis * MillisToNanos)
+            )
+        }
+
+        for (playtimeMillis in 0..duration * 3 step 17) {
+            assertEquals(
+                repeatable.getValueFromNanos(playtimeMillis * MillisToNanos),
+                fastForwardedRepeatable.getValueFromNanos((playtimeMillis - offset) * MillisToNanos)
+            )
+        }
+    }
+
+    @Test
+    fun testStartOffsetInfiniteRepeatable() {
+        val duration = 600
+        val offset = 31
+
+        val repeatable = TargetBasedAnimation(
+            infiniteRepeatable(tween(duration), RepeatMode.Restart),
+            Float.VectorConverter,
+            0f,
+            1000f
+        )
+        val delayedRepeatable = TargetBasedAnimation(
+            infiniteRepeatable(tween(duration), RepeatMode.Restart, StartOffset(offset)),
+            Float.VectorConverter,
+            0f,
+            1000f
+        )
+        val fastForwardedRepeatable = TargetBasedAnimation(
+            infiniteRepeatable(
+                tween(duration),
+                RepeatMode.Restart, StartOffset(offset, StartOffsetType.FastForward)
+            ),
+            Float.VectorConverter,
+            0f,
+            1000f
+        )
+
+        // Duration should be infinite for delay or fast forward
+        assertEquals(repeatable.durationNanos, delayedRepeatable.durationNanos)
+        assertEquals(repeatable.durationNanos, fastForwardedRepeatable.durationNanos)
+
+        for (playtimeMillis in 0..duration * 3 step 17) {
+            assertEquals(
+                repeatable.getValueFromNanos(playtimeMillis * MillisToNanos),
+                delayedRepeatable.getValueFromNanos((playtimeMillis + offset) * MillisToNanos)
+            )
+        }
+
+        // Check that during the delayed time, the value is unchanged
+        for (playTimeMillis in 0..offset step 10) {
+            assertEquals(
+                repeatable.getValueFromNanos(0),
+                delayedRepeatable.getValueFromNanos(playTimeMillis * MillisToNanos)
+            )
+        }
+
+        for (playtimeMillis in 0..duration * 3 step 17) {
+            assertEquals(
+                repeatable.getValueFromNanos(playtimeMillis * MillisToNanos),
+                fastForwardedRepeatable.getValueFromNanos((playtimeMillis - offset) * MillisToNanos)
+            )
+        }
+    }
+
     private companion object {
         private val DelayDuration = 13
         private val Duration = 50
