@@ -34,7 +34,7 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 /**
- * Tests if [AndroidInputDispatcher.enqueueDown] works
+ * Tests if [AndroidInputDispatcher.enqueueTouchDown] works
  */
 @SmallTest
 class SendDownTest : InputDispatcherTest() {
@@ -57,7 +57,7 @@ class SendDownTest : InputDispatcherTest() {
 
     @Test
     fun onePointer() {
-        subject.generateDownAndCheck(pointer1, position1)
+        subject.generateTouchDownAndCheck(pointer1, position1)
         subject.sendAllSynchronous()
 
         val t = 0L
@@ -70,8 +70,8 @@ class SendDownTest : InputDispatcherTest() {
     @Test
     fun twoPointers_ascending() {
         // 2 fingers, sent in ascending order of pointerId (matters for actionIndex)
-        subject.generateDownAndCheck(pointer1, position1)
-        subject.generateDownAndCheck(pointer2, position2)
+        subject.generateTouchDownAndCheck(pointer1, position1)
+        subject.generateTouchDownAndCheck(pointer2, position2)
         subject.sendAllSynchronous()
 
         recorder.assertHasValidEventTimes()
@@ -91,8 +91,8 @@ class SendDownTest : InputDispatcherTest() {
     @Test
     fun twoPointers_descending() {
         // 2 fingers, sent in descending order of pointerId (matters for actionIndex)
-        subject.generateDownAndCheck(pointer2, position2)
-        subject.generateDownAndCheck(pointer1, position1)
+        subject.generateTouchDownAndCheck(pointer2, position2)
+        subject.generateTouchDownAndCheck(pointer1, position1)
         subject.sendAllSynchronous()
 
         recorder.assertHasValidEventTimes()
@@ -113,10 +113,10 @@ class SendDownTest : InputDispatcherTest() {
     fun fourPointers() {
         // 4 fingers, sent in non-trivial order of pointerId (matters for actionIndex)
 
-        subject.generateDownAndCheck(pointer3, position3)
-        subject.generateDownAndCheck(pointer1, position1)
-        subject.generateDownAndCheck(pointer4, position4)
-        subject.generateDownAndCheck(pointer2, position2)
+        subject.generateTouchDownAndCheck(pointer3, position3)
+        subject.generateTouchDownAndCheck(pointer1, position1)
+        subject.generateTouchDownAndCheck(pointer4, position4)
+        subject.generateTouchDownAndCheck(pointer2, position2)
         subject.sendAllSynchronous()
 
         recorder.assertHasValidEventTimes()
@@ -147,16 +147,16 @@ class SendDownTest : InputDispatcherTest() {
     @Test
     fun staggeredDown() {
         // 4 fingers, going down at different times
-        // Each [sendMove] increases the time by 10 milliseconds
+        // Each [enqueueTouchMove] increases the time by 10 milliseconds
 
-        subject.generateDownAndCheck(pointer3, position3)
-        subject.enqueueMove()
-        subject.generateDownAndCheck(pointer1, position1)
-        subject.generateDownAndCheck(pointer2, position2)
-        subject.enqueueMove()
-        subject.enqueueMove()
-        subject.enqueueMove()
-        subject.generateDownAndCheck(pointer4, position4)
+        subject.generateTouchDownAndCheck(pointer3, position3)
+        subject.enqueueTouchMove()
+        subject.generateTouchDownAndCheck(pointer1, position1)
+        subject.generateTouchDownAndCheck(pointer2, position2)
+        subject.enqueueTouchMove()
+        subject.enqueueTouchMove()
+        subject.enqueueTouchMove()
+        subject.generateTouchDownAndCheck(pointer4, position4)
         subject.sendAllSynchronous()
 
         recorder.assertHasValidEventTimes()
@@ -199,14 +199,14 @@ class SendDownTest : InputDispatcherTest() {
     @Test
     fun nonOverlappingPointers() {
         // 3 fingers, where the 1st finger goes up before the 3rd finger goes down (no overlap)
-        // Each [sendMove] increases the time by 10 milliseconds
+        // Each [enqueueTouchMove] increases the time by 10 milliseconds
 
-        subject.generateDownAndCheck(pointer1, position1)
-        subject.generateDownAndCheck(pointer2, position2)
-        subject.enqueueMove()
-        subject.generateUpAndCheck(pointer1)
-        subject.enqueueMove()
-        subject.generateDownAndCheck(pointer3, position3)
+        subject.generateTouchDownAndCheck(pointer1, position1)
+        subject.generateTouchDownAndCheck(pointer2, position2)
+        subject.enqueueTouchMove()
+        subject.generateTouchUpAndCheck(pointer1)
+        subject.enqueueTouchMove()
+        subject.generateTouchDownAndCheck(pointer3, position3)
         subject.sendAllSynchronous()
 
         recorder.assertHasValidEventTimes()
@@ -244,14 +244,14 @@ class SendDownTest : InputDispatcherTest() {
     fun pointerIdReuse() {
         // 3 fingers, where the 1st finger goes up before the 3rd finger goes down, and the 3rd
         // fingers reuses the pointerId of finger 1
-        // Each [sendMove] increases the time by 10 milliseconds
+        // Each [enqueueTouchMove] increases the time by 10 milliseconds
 
-        subject.generateDownAndCheck(pointer1, position1)
-        subject.generateDownAndCheck(pointer2, position2)
-        subject.enqueueMove()
-        subject.generateUpAndCheck(pointer1)
-        subject.enqueueMove()
-        subject.generateDownAndCheck(pointer1, position1_2)
+        subject.generateTouchDownAndCheck(pointer1, position1)
+        subject.generateTouchDownAndCheck(pointer2, position2)
+        subject.enqueueTouchMove()
+        subject.generateTouchUpAndCheck(pointer1)
+        subject.enqueueTouchMove()
+        subject.generateTouchDownAndCheck(pointer1, position1_2)
         subject.sendAllSynchronous()
 
         recorder.assertHasValidEventTimes()
@@ -287,9 +287,9 @@ class SendDownTest : InputDispatcherTest() {
 
     @Test
     fun downAfterDown() {
-        subject.enqueueDown(pointer1, position1)
+        subject.enqueueTouchDown(pointer1, position1)
         expectError<IllegalArgumentException> {
-            subject.enqueueDown(pointer1, position2)
+            subject.enqueueTouchDown(pointer1, position2)
         }
     }
 }

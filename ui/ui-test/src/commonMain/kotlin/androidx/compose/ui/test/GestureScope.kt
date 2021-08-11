@@ -713,7 +713,7 @@ private fun createFunctionForVelocity(
  */
 fun GestureScope.down(pointerId: Int, position: Offset) {
     val globalPosition = localToRoot(position)
-    inputDispatcher.enqueueDown(pointerId, globalPosition)
+    inputDispatcher.enqueueTouchDown(pointerId, globalPosition)
 }
 
 /**
@@ -772,7 +772,7 @@ fun GestureScope.moveTo(position: Offset) {
  */
 fun GestureScope.movePointerTo(pointerId: Int, position: Offset) {
     val globalPosition = localToRoot(position)
-    inputDispatcher.movePointer(pointerId, globalPosition)
+    inputDispatcher.updateTouchPointer(pointerId, globalPosition)
 }
 
 /**
@@ -819,8 +819,8 @@ fun GestureScope.moveBy(delta: Offset) {
 fun GestureScope.movePointerBy(pointerId: Int, delta: Offset) {
     // Ignore currentPosition of null here, let movePointer generate the error
     val globalPosition =
-        (inputDispatcher.getCurrentPosition(pointerId) ?: Offset.Zero) + delta
-    inputDispatcher.movePointer(pointerId, globalPosition)
+        (inputDispatcher.getCurrentTouchPosition(pointerId) ?: Offset.Zero) + delta
+    inputDispatcher.updateTouchPointer(pointerId, globalPosition)
 }
 
 /**
@@ -829,7 +829,7 @@ fun GestureScope.movePointerBy(pointerId: Int, delta: Offset) {
  * [movePointerBy].
  */
 fun GestureScope.move() {
-    inputDispatcher.enqueueMove()
+    inputDispatcher.enqueueTouchMove()
 }
 
 /**
@@ -841,7 +841,7 @@ fun GestureScope.move() {
  * @param pointerId The id of the pointer to lift up, as supplied in [down]
  */
 fun GestureScope.up(pointerId: Int = 0) {
-    inputDispatcher.enqueueUp(pointerId)
+    inputDispatcher.enqueueTouchUp(pointerId)
 }
 
 /**
@@ -849,7 +849,7 @@ fun GestureScope.up(pointerId: Int = 0) {
  * current position of all active pointers.
  */
 fun GestureScope.cancel() {
-    inputDispatcher.enqueueCancel()
+    inputDispatcher.enqueueTouchCancel()
 }
 
 /**

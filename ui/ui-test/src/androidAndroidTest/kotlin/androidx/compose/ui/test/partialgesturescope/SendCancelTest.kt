@@ -20,7 +20,7 @@ import androidx.compose.testutils.expectError
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.cancel
 import androidx.compose.ui.test.down
-import androidx.compose.ui.test.inputdispatcher.verifyNoGestureInProgress
+import androidx.compose.ui.test.inputdispatcher.verifyNoTouchGestureInProgress
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.partialgesturescope.Common.partialGesture
 import androidx.compose.ui.test.up
@@ -71,7 +71,7 @@ class SendCancelTest {
         }
 
         // And no gesture is in progress
-        rule.partialGesture { inputDispatcher.verifyNoGestureInProgress() }
+        rule.partialGesture { inputDispatcher.verifyNoTouchGestureInProgress() }
     }
 
     @Test
@@ -90,7 +90,7 @@ class SendCancelTest {
         }
 
         // And no gesture is in progress
-        rule.partialGesture { inputDispatcher.verifyNoGestureInProgress() }
+        rule.partialGesture { inputDispatcher.verifyNoTouchGestureInProgress() }
     }
 
     @Test

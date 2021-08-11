@@ -27,19 +27,19 @@ class IsGestureInProgressTest : InputDispatcherTest() {
 
     @Test
     fun downUp() {
-        assertThat(subject.isGestureInProgress).isFalse()
-        subject.enqueueDown(1, anyPosition)
-        assertThat(subject.isGestureInProgress).isTrue()
-        subject.enqueueUp(1)
-        assertThat(subject.isGestureInProgress).isFalse()
+        assertThat(subject.isTouchInProgress).isFalse()
+        subject.enqueueTouchDown(1, anyPosition)
+        assertThat(subject.isTouchInProgress).isTrue()
+        subject.enqueueTouchUp(1)
+        assertThat(subject.isTouchInProgress).isFalse()
     }
 
     @Test
     fun downCancel() {
-        assertThat(subject.isGestureInProgress).isFalse()
-        subject.enqueueDown(1, anyPosition)
-        assertThat(subject.isGestureInProgress).isTrue()
-        subject.enqueueCancel()
-        assertThat(subject.isGestureInProgress).isFalse()
+        assertThat(subject.isTouchInProgress).isFalse()
+        subject.enqueueTouchDown(1, anyPosition)
+        assertThat(subject.isTouchInProgress).isTrue()
+        subject.enqueueTouchCancel()
+        assertThat(subject.isTouchInProgress).isFalse()
     }
 }

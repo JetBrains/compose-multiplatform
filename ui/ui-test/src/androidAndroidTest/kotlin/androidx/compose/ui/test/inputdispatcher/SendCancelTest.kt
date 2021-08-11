@@ -33,7 +33,7 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 /**
- * Tests if [AndroidInputDispatcher.enqueueCancel] works
+ * Tests if [AndroidInputDispatcher.enqueueTouchCancel] works
  */
 @SmallTest
 class SendCancelTest : InputDispatcherTest() {
@@ -48,16 +48,16 @@ class SendCancelTest : InputDispatcherTest() {
     }
 
     private fun AndroidInputDispatcher.generateCancelAndCheckPointers(delay: Long? = null) {
-        generateCancelAndCheck(delay)
-        assertThat(getCurrentPosition(pointer1)).isNull()
-        assertThat(getCurrentPosition(pointer2)).isNull()
+        generateTouchCancelAndCheck(delay)
+        assertThat(getCurrentTouchPosition(pointer1)).isNull()
+        assertThat(getCurrentTouchPosition(pointer2)).isNull()
     }
 
     @Test
     fun onePointer() {
-        subject.generateDownAndCheck(pointer1, position1_1)
+        subject.generateTouchDownAndCheck(pointer1, position1_1)
         subject.generateCancelAndCheckPointers()
-        subject.verifyNoGestureInProgress()
+        subject.verifyNoTouchGestureInProgress()
         subject.sendAllSynchronous()
         recorder.assertHasValidEventTimes()
 
@@ -75,9 +75,9 @@ class SendCancelTest : InputDispatcherTest() {
 
     @Test
     fun onePointerWithDelay() {
-        subject.generateDownAndCheck(pointer1, position1_1)
+        subject.generateTouchDownAndCheck(pointer1, position1_1)
         subject.generateCancelAndCheckPointers(2 * eventPeriodMillis)
-        subject.verifyNoGestureInProgress()
+        subject.verifyNoTouchGestureInProgress()
         subject.sendAllSynchronous()
         recorder.assertHasValidEventTimes()
 
@@ -95,10 +95,10 @@ class SendCancelTest : InputDispatcherTest() {
 
     @Test
     fun multiplePointers() {
-        subject.generateDownAndCheck(pointer1, position1_1)
-        subject.generateDownAndCheck(pointer2, position2_1)
+        subject.generateTouchDownAndCheck(pointer1, position1_1)
+        subject.generateTouchDownAndCheck(pointer2, position2_1)
         subject.generateCancelAndCheckPointers()
-        subject.verifyNoGestureInProgress()
+        subject.verifyNoTouchGestureInProgress()
         subject.sendAllSynchronous()
         recorder.assertHasValidEventTimes()
 
@@ -122,25 +122,25 @@ class SendCancelTest : InputDispatcherTest() {
     @Test
     fun cancelWithoutDown() {
         expectError<IllegalStateException> {
-            subject.enqueueCancel()
+            subject.enqueueTouchCancel()
         }
     }
 
     @Test
     fun cancelAfterUp() {
-        subject.enqueueDown(pointer1, position1_1)
-        subject.enqueueUp(pointer1)
+        subject.enqueueTouchDown(pointer1, position1_1)
+        subject.enqueueTouchUp(pointer1)
         expectError<IllegalStateException> {
-            subject.enqueueCancel()
+            subject.enqueueTouchCancel()
         }
     }
 
     @Test
     fun cancelAfterCancel() {
-        subject.enqueueDown(pointer1, position1_1)
-        subject.enqueueCancel()
+        subject.enqueueTouchDown(pointer1, position1_1)
+        subject.enqueueTouchCancel()
         expectError<IllegalStateException> {
-            subject.enqueueCancel()
+            subject.enqueueTouchCancel()
         }
     }
 }
