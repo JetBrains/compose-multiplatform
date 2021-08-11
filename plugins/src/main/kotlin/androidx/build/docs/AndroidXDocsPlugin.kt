@@ -43,6 +43,7 @@ import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.DocsType
 import org.gradle.api.attributes.Usage
+import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.FileCollection
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.JavaBasePlugin
@@ -114,9 +115,15 @@ class AndroidXDocsPlugin : Plugin<Project> {
             docsSourcesConfiguration
         )
 
+        val unzippedSourcesForDackka = File(project.buildDir, "unzippedSourcesForDackka")
+        val unzipSourcesForDackkaTask = configureDackkaUnzipTask(
+            unzippedSourcesForDackka,
+            docsSourcesConfiguration
+        )
+
         configureDackka(
-            unzippedDocsSources,
-            unzipDocsTask,
+            unzippedSourcesForDackka,
+            unzipSourcesForDackkaTask,
             unzippedSamplesSources,
             unzipSamplesTask,
             dependencyClasspath,
@@ -175,6 +182,32 @@ class AndroidXDocsPlugin : Plugin<Project> {
             task.filter { line ->
                 regex.replace(line, "{@link $1attr#$3}")
             }
+        }
+    }
+
+    /**
+     * Creates and configures a task that will build a list of select sources from jars and places
+     * them in [destinationDirectory].
+     *
+     * This is a modified version of [configureUnzipTask], customized for Dackka usage.
+     */
+    private fun configureDackkaUnzipTask(
+        destinationDirectory: File,
+        docsConfiguration: Configuration
+    ): TaskProvider<Sync> {
+        return project.tasks.register("unzipSourcesForDackka", Sync::class.java) { task ->
+
+            val sources = docsConfiguration.incoming.artifactView { }.files
+
+            task.from(
+                sources.elements.map { jars ->
+                    jars.map {
+                        project.zipTree(it)
+                    }
+                }
+            )
+            task.into(destinationDirectory)
+            task.duplicatesStrategy = DuplicatesStrategy.INCLUDE
         }
     }
 
