@@ -23,7 +23,7 @@
         android:label="@string/compose_material_catalog"
         android:icon="@mipmap/ic_launcher"
         android:theme="@style/Theme.Catalog">
-        <activity android:name=".CatalogActivity">
+        <activity android:name=".CatalogActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

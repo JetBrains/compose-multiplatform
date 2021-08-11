@@ -57,6 +57,7 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
         androidTestImplementation(project(":compose:ui:ui-test-font"))
         androidTestImplementation(project(":compose:ui:ui-test-junit4"))
+        androidTestImplementation(libs.testCore)
         androidTestImplementation(libs.testRules)
         androidTestImplementation(libs.testRunner)
         androidTestImplementation(libs.espressoCore)

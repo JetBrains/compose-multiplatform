@@ -46,6 +46,7 @@ dependencies {
 
     implementation(libs.kotlinStdlib)
     implementation(libs.kotlinReflect)
+    implementation(libs.testCore)
     implementation(libs.testRules)
     implementation(libs.espressoCore)
     implementation(libs.junit)
