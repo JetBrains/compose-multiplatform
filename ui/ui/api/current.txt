@@ -1290,6 +1290,8 @@ package androidx.compose.ui.input.pointer {
     method public default long getExtendedTouchPadding();
     method public long getSize();
     method public androidx.compose.ui.platform.ViewConfiguration getViewConfiguration();
+    method public default suspend <T> Object? withTimeout(long timeMillis, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.AwaitPointerEventScope,? super kotlin.coroutines.Continuation<? super T>,?> block, kotlin.coroutines.Continuation<? super T> p);
+    method public default suspend <T> Object? withTimeoutOrNull(long timeMillis, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.AwaitPointerEventScope,? super kotlin.coroutines.Continuation<? super T>,?> block, kotlin.coroutines.Continuation<? super T> p);
     property public abstract androidx.compose.ui.input.pointer.PointerEvent currentEvent;
     property public default long extendedTouchPadding;
     property public abstract long size;
@@ -1347,6 +1349,10 @@ package androidx.compose.ui.input.pointer {
     enum_constant public static final androidx.compose.ui.input.pointer.PointerEventPass Final;
     enum_constant public static final androidx.compose.ui.input.pointer.PointerEventPass Initial;
     enum_constant public static final androidx.compose.ui.input.pointer.PointerEventPass Main;
+  }
+
+  public final class PointerEventTimeoutCancellationException extends java.util.concurrent.CancellationException {
+    ctor public PointerEventTimeoutCancellationException(long time);
   }
 
   public final class PointerEvent_androidKt {

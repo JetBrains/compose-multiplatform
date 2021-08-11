@@ -31,6 +31,12 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastAll
 import kotlinx.coroutines.CancellableContinuation
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.ContinuationInterceptor
@@ -39,10 +45,12 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension
 import kotlin.coroutines.createCoroutine
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.math.max
 
 /**
- * Receiver scope for awaiting pointer events in a call to [PointerInputScope.awaitPointerEventScope].
+ * Receiver scope for awaiting pointer events in a call to
+ * [PointerInputScope.awaitPointerEventScope].
  *
  * This is a restricted suspension scope. Code in this scope is always called undispatched and
  * may only suspend for calls to [awaitPointerEvent]. These functions
@@ -88,6 +96,24 @@ interface AwaitPointerEventScope : Density {
     suspend fun awaitPointerEvent(
         pass: PointerEventPass = PointerEventPass.Main
     ): PointerEvent
+
+    /**
+     * Runs [block] and returns the result of [block] or `null` if [timeMillis] has passed
+     * before [timeMillis].
+     */
+    suspend fun <T> withTimeoutOrNull(
+        timeMillis: Long,
+        block: suspend AwaitPointerEventScope.() -> T
+    ): T? = block()
+
+    /**
+     * Runs [block] and returns its results. An [PointerEventTimeoutCancellationException] is thrown
+     * if [timeMillis] has passed before [block] completes.
+     */
+    suspend fun <T> withTimeout(
+        timeMillis: Long,
+        block: suspend AwaitPointerEventScope.() -> T
+    ): T = block()
 }
 
 /**
@@ -179,7 +205,9 @@ fun Modifier.pointerInput(
     val density = LocalDensity.current
     val viewConfiguration = LocalViewConfiguration.current
     remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.apply {
+        val filter = this
         LaunchedEffect(this, key1) {
+            filter.coroutineScope = this
             block()
         }
     }
@@ -209,9 +237,10 @@ fun Modifier.pointerInput(
 ) {
     val density = LocalDensity.current
     val viewConfiguration = LocalViewConfiguration.current
-    remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.apply {
+    remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.also { filter ->
         LaunchedEffect(this, key1, key2) {
-            block()
+            filter.coroutineScope = this
+            filter.block()
         }
     }
 }
@@ -238,7 +267,9 @@ fun Modifier.pointerInput(
     val density = LocalDensity.current
     val viewConfiguration = LocalViewConfiguration.current
     remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.apply {
+        val filter = this
         LaunchedEffect(this, *keys) {
+            filter.coroutineScope = this
             block()
         }
     }
@@ -304,6 +335,12 @@ internal class SuspendingPointerInputFilter(
      * method.
      */
     private var boundsSize: IntSize = IntSize.Zero
+
+    /**
+     * This will be changed immediately on launching, but I always want it to be non-null.
+     */
+    @OptIn(DelicateCoroutinesApi::class)
+    var coroutineScope: CoroutineScope = GlobalScope
 
     override val extendedTouchPadding: Size
         get() {
@@ -484,5 +521,46 @@ internal class SuspendingPointerInputFilter(
             awaitPass = pass
             pointerAwaiter = continuation
         }
+
+        override suspend fun <T> withTimeoutOrNull(
+            timeMillis: Long,
+            block: suspend AwaitPointerEventScope.() -> T
+        ): T? {
+            return try {
+                withTimeout(timeMillis, block)
+            } catch (_: PointerEventTimeoutCancellationException) {
+                null
+            }
+        }
+
+        override suspend fun <T> withTimeout(
+            timeMillis: Long,
+            block: suspend AwaitPointerEventScope.() -> T
+        ): T {
+            if (timeMillis <= 0L) {
+                pointerAwaiter?.resumeWithException(
+                    PointerEventTimeoutCancellationException(timeMillis)
+                )
+            }
+            val job = coroutineScope.launch {
+                delay(timeMillis)
+                pointerAwaiter?.resumeWithException(
+                    PointerEventTimeoutCancellationException(timeMillis)
+                )
+            }
+            try {
+                return block()
+            } finally {
+                job.cancel()
+            }
+        }
     }
 }
+
+/**
+ * An exception thrown from [AwaitPointerEventScope.withTimeout] when the execution time
+ * of the coroutine is too long.
+ */
+class PointerEventTimeoutCancellationException(
+    time: Long
+) : CancellationException("Timed out waiting for $time ms")
