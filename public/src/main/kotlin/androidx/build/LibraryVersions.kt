@@ -25,7 +25,7 @@ object LibraryVersions {
     val ANNOTATION = Version("1.3.0-alpha01")
     val ANNOTATION_EXPERIMENTAL = Version("1.2.0-alpha01")
     val APPCOMPAT = Version("1.4.0-alpha03")
-    val APPSEARCH = Version("1.0.0-alpha01")
+    val APPSEARCH = Version("1.0.0-alpha03")
     val ARCH_CORE = Version("2.2.0-alpha01")
     val ASYNCLAYOUTINFLATER = Version("1.1.0-alpha01")
     val AUTOFILL = Version("1.2.0-beta02")
@@ -51,6 +51,7 @@ object LibraryVersions {
     val CORE_APPDIGEST = Version("1.0.0-alpha01")
     val CORE_GOOGLE_SHORTCUTS = Version("1.1.0-alpha02")
     val CORE_ROLE = Version("1.1.0-alpha02")
+    val CORE_SPLASHSCREEN = Version("1.0.0-alpha01")
     val CURSORADAPTER = Version("1.1.0-alpha01")
     val CUSTOMVIEW = Version("1.2.0-alpha01")
     val DATASTORE = Version("1.1.0-alpha01")
@@ -151,5 +152,5 @@ object LibraryVersions {
     val WINDOW = Version("1.0.0-alpha11")
     val WINDOW_EXTENSIONS = Version("1.0.0-alpha01")
     val WINDOW_SIDECAR = Version("0.1.0-alpha01")
-    val WORK = Version("2.6.0-beta02")
+    val WORK = Version("2.7.0-alpha05")
 }
