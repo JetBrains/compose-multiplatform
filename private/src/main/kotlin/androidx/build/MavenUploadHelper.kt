@@ -52,6 +52,10 @@ private fun Project.configureComponent(
 ) {
     if (extension.publish.shouldPublish() && component.isAndroidOrJavaReleaseComponent()) {
         val androidxGroup = validateCoordinatesAndGetGroup(extension)
+        val projectArchiveDir = File(
+            getRepositoryDirectory(),
+            "${androidxGroup.group.replace('.', '/')}/$name"
+        )
         group = androidxGroup.group
         configure<PublishingExtension> {
             repositories {
@@ -64,14 +68,14 @@ private fun Project.configureComponent(
                     // The 'java-gradle-plugin' will also add to the 'pluginMaven' publication
                     it.create<MavenPublication>("pluginMaven")
                     tasks.getByName("publishPluginMavenPublicationToMavenRepository").doFirst {
-                        removePreviouslyUploadedArchives(androidxGroup.group)
+                        removePreviouslyUploadedArchives(projectArchiveDir)
                     }
                 } else {
                     it.create<MavenPublication>("maven") {
                         from(component)
                     }
                     tasks.getByName("publishMavenPublicationToMavenRepository").doFirst {
-                        removePreviouslyUploadedArchives(androidxGroup.group)
+                        removePreviouslyUploadedArchives(projectArchiveDir)
                     }
                 }
             }
@@ -139,11 +143,7 @@ private fun Project.validateCoordinatesAndGetGroup(extension: AndroidXExtension)
  * Additionally, deleting old versions makes it more convenient to iterate
  * over all existing archives without visiting archives having old versions too
  */
-private fun Project.removePreviouslyUploadedArchives(group: String) {
-    val projectArchiveDir = File(
-        getRepositoryDirectory(),
-        "${group.replace('.', '/')}/${project.name}"
-    )
+private fun removePreviouslyUploadedArchives(projectArchiveDir: File) {
     projectArchiveDir.deleteRecursively()
 }
 
