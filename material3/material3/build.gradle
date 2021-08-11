@@ -28,6 +28,7 @@ plugins {
 AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
+
     kotlinPlugin(project(":compose:compiler:compiler"))
 
     if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
@@ -36,6 +37,10 @@ dependencies {
          * corresponding block below
          */
         implementation(libs.kotlinStdlibCommon)
+
+        api(project(":compose:runtime:runtime"))
+        api(project(":compose:ui:ui-graphics"))
+
     }
 }
 
@@ -51,6 +56,9 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         sourceSets {
             commonMain.dependencies {
                 implementation(libs.kotlinStdlibCommon)
+
+                api(project(":compose:runtime:runtime"))
+                api(project(":compose:ui:ui-graphics"))
             }
 
             androidMain.dependencies {
