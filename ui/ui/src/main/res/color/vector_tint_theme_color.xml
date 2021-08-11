@@ -14,16 +14,7 @@
   limitations under the License.
   -->
 
-<resources>
-    <style name="Theme.WithScrollbarAttrSet" parent="android:Theme.Material">
-        <!--
-         This property doesn't belong in a style used as a theme, but this reproduces an
-         issue where View will call onRtlPropertiesChanged from its constructor.
-         -->
-        <item name="android:scrollbars">vertical</item>
-    </style>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="VectorTestTheme" parent="android:Theme.Material">
-        <item name="android:colorAccent">#00FF00</item>
-    </style>
-</resources>
+    <item android:color="?android:colorAccent" />
+</selector>
