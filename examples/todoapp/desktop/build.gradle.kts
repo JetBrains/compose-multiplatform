@@ -41,8 +41,6 @@ compose.desktop {
 
             modules("java.sql")
 
-
-
             windows {
                 menuGroup = "Compose Examples"
                 // see https://wixtoolset.org/documentation/manual/v3/howtos/general/generate_guids.html
