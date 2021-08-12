@@ -26,10 +26,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -42,24 +44,27 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.InfiniteAnimationPolicy
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 
 @Composable
 fun RowConfigurationDemo() {
-    val width by produceState(240.dp) {
+    val width by produceState(250.dp) {
         // Skip the animations in tests.
         while (coroutineContext[InfiniteAnimationPolicy] == null) {
             animate(
-                Dp.VectorConverter, 240.dp, 500.dp,
-                animationSpec = spring(Spring.DampingRatioHighBouncy, Spring.StiffnessLow)
+                Dp.VectorConverter, 250.dp, 520.dp,
+                animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow)
             ) { value, _ ->
                 this.value = value
             }
+            delay(1000)
             animate(
-                Dp.VectorConverter, 500.dp, 240.dp,
-                animationSpec = tween(500)
+                Dp.VectorConverter, 520.dp, 250.dp,
+                animationSpec = tween(520)
             ) { value, _ ->
                 this.value = value
             }
+            delay(1000)
         }
     }
     ResizableLayout(width)
@@ -76,44 +81,42 @@ fun ResizableLayout(width: Dp) {
             Text(text = "Space Between", modifier = Modifier.padding(12.dp))
             Text(text = "Space Around", modifier = Modifier.padding(12.dp))
             Text(text = "Space Evenly", modifier = Modifier.padding(12.dp))
-            Text(text = "Align to End", modifier = Modifier.padding(12.dp))
+            Text(text = "End (LTR)", modifier = Modifier.padding(12.dp))
             Text(text = "Center", modifier = Modifier.padding(12.dp))
-            Text(text = "Align to Start", modifier = Modifier.padding(12.dp))
+            Text(text = "Start (LTR)", modifier = Modifier.padding(12.dp))
         }
         Column(Modifier.weight(1f).requiredWidth(width)) {
-            val rowModifier =
-                Modifier.padding(2.dp).background(Color.Blue, RoundedCornerShape(5.dp))
-            Row(rowModifier.fillMaxWidth()) {
-                RowItem(Modifier.weight(1f), "A")
-                RowItem(Modifier.weight(1f), "B")
-                RowItem(Modifier.weight(1f), "C")
+            Row(Modifier.default(androidBlue)) {
+                RowItem("A", fixedSize = false)
+                RowItem("B", fixedSize = false)
+                RowItem("C", fixedSize = false)
             }
-            Row(rowModifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(Modifier.default(androidDark), horizontalArrangement = Arrangement.SpaceBetween) {
                 RowItem(text = "A")
                 RowItem(text = "B")
                 RowItem(text = "C")
             }
-            Row(rowModifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+            Row(Modifier.default(androidGreen), horizontalArrangement = Arrangement.SpaceAround) {
                 RowItem(text = "A")
                 RowItem(text = "B")
                 RowItem(text = "C")
             }
-            Row(rowModifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+            Row(Modifier.default(androidBlue), horizontalArrangement = Arrangement.SpaceEvenly) {
                 RowItem(text = "A")
                 RowItem(text = "B")
                 RowItem(text = "C")
             }
-            Row(rowModifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            Row(Modifier.default(androidDark), horizontalArrangement = Arrangement.End) {
                 RowItem(text = "A")
                 RowItem(text = "B")
                 RowItem(text = "C")
             }
-            Row(rowModifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+            Row(Modifier.default(androidGreen), horizontalArrangement = Arrangement.Center) {
                 RowItem(text = "A")
                 RowItem(text = "B")
                 RowItem(text = "C")
             }
-            Row(rowModifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
+            Row(Modifier.default(androidBlue), horizontalArrangement = Arrangement.Start) {
                 RowItem(text = "A")
                 RowItem(text = "B")
                 RowItem(text = "C")
@@ -122,13 +125,21 @@ fun ResizableLayout(width: Dp) {
     }
 }
 
+private fun Modifier.default(background: Color) = this.padding(2.dp)
+    .background(background, RoundedCornerShape(5.dp)).padding(start = 3.dp, end = 3.dp)
+    .fillMaxWidth()
+
 @Composable
-fun RowItem(modifier: Modifier = Modifier, text: String, background: Color = Color.Yellow) {
+fun RowScope.RowItem(text: String, fixedSize: Boolean = true) {
+    val modifier = if (fixedSize) Modifier.width(80.dp) else Modifier.weight(1f)
     Box(
         modifier.padding(5.dp).shadow(10.dp)
-            .background(background, shape = RoundedCornerShape(5.dp))
-            .padding(start = 30.dp, end = 30.dp, top = 5.dp, bottom = 5.dp)
+            .background(Color.White, shape = RoundedCornerShape(5.dp))
+            .padding(top = 5.dp, bottom = 5.dp)
     ) {
-        Text(text, Modifier.align(Alignment.Center))
+        Text(text, Modifier.align(Alignment.Center), color = androidDark)
     }
 }
+
+internal val androidGreen = Color(0xff3ddb85)
+internal val androidDark = Color(0xff083042)
