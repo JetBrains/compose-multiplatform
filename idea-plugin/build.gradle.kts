@@ -3,14 +3,14 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
 plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "1.5.10"
-    id("org.jetbrains.intellij") version "0.7.2"
+    id("org.jetbrains.intellij") version "1.1.2"
     id("org.jetbrains.changelog") version "1.1.2"
 }
 
-fun properties(key: String) = project.findProperty(key).toString()
+val projectProperties = ProjectProperties(project)
 
 group = "org.jetbrains.compose.desktop.ide"
-version = properties("deploy.version")
+version = projectProperties.deployVersion
 
 repositories {
     mavenCentral()
@@ -21,15 +21,17 @@ dependencies {
 }
 
 intellij {
-    pluginName = "Compose Multiplatform IDE Support"
-    type = properties("platform.type")
-    version = properties("platform.version")
-    downloadSources = properties("platform.download.sources").toBoolean()
+    pluginName.set("Compose Multiplatform IDE Support")
+    type.set(projectProperties.platformType)
+    version.set(projectProperties.platformVersion)
+    downloadSources.set(projectProperties.platformDownloadSources)
 
-    setPlugins(
-        "java",
-        "com.intellij.gradle",
-        "org.jetbrains.kotlin"
+    plugins.set(
+        listOf(
+            "java",
+            "com.intellij.gradle",
+            "org.jetbrains.kotlin"
+        )
     )
 }
 
@@ -49,17 +51,32 @@ tasks {
     }
 
     publishPlugin {
-        token(System.getenv("IDE_PLUGIN_PUBLISH_TOKEN"))
-        channels(properties("plugin.channels"))
+        token.set(System.getenv("IDE_PLUGIN_PUBLISH_TOKEN"))
+        channels.set(projectProperties.pluginChannels)
     }
 
     patchPluginXml {
-        sinceBuild(properties("plugin.since.build"))
-        untilBuild(properties("plugin.until.build"))
+        sinceBuild.set(projectProperties.pluginSinceBuild)
+        untilBuild.set(projectProperties.pluginUntilBuild)
     }
 
     runPluginVerifier {
-        ideVersions(properties("plugin.verifier.ide.versions"))
-        downloadDirectory("${project.buildDir}/pluginVerifier/ides")
+        ideVersions.set(projectProperties.pluginVerifierIdeVersions)
     }
+}
+
+class ProjectProperties(private val project: Project) {
+    val deployVersion get() = stringProperty("deploy.version")
+    val platformType get() = stringProperty("platform.type")
+    val platformVersion get() = stringProperty("platform.version")
+    val platformDownloadSources get() = stringProperty("platform.download.sources").toBoolean()
+    val pluginChannels get() = listProperty("plugin.channels")
+    val pluginSinceBuild get() = stringProperty("plugin.since.build")
+    val pluginUntilBuild get() = stringProperty("plugin.until.build")
+    val pluginVerifierIdeVersions get() = listProperty("plugin.verifier.ide.versions")
+
+    private fun stringProperty(key: String): String =
+        project.findProperty(key)!!.toString()
+    private fun listProperty(key: String): List<String> =
+        stringProperty(key).split(",").map { it.trim() }
 }

@@ -7,6 +7,9 @@ import data.GameFrame
 import data.Tube
 import kotlin.js.Date
 
+/**
+ * Game logic
+ */
 class ComposeBirdGame : Game {
 
     companion object {
@@ -39,6 +42,9 @@ class ComposeBirdGame : Game {
         )
     }
 
+    /**
+     * To build a random level
+     */
     private fun buildLevel(): List<Tube> {
         return mutableListOf<Tube>().apply {
             var tubesAdded = 0
@@ -59,6 +65,9 @@ class ComposeBirdGame : Game {
     }
 
 
+    /**
+     * To build a random vertical tube/pipe
+     */
     private fun buildRandomTube(): List<Boolean> {
         // creating a full tube
         val tube = mutableListOf<Boolean>().apply {
@@ -130,6 +139,9 @@ class ComposeBirdGame : Game {
         }
     }
 
+    /**
+     * To check if the bird collided with the tube (collision-detection)
+     */
     private fun isCollidedWithTube(newBirdPos: Int, tubes: List<Tube>): Boolean {
         val birdTube = tubes.find { it.position == BIRD_COLUMN }
         return birdTube?.coordinates?.get(newBirdPos) ?: false

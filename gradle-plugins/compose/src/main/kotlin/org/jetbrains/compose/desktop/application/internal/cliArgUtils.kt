@@ -30,6 +30,10 @@ internal fun <T : Any?> MutableCollection<String>.cliArg(
     cliArg(name, value.orNull, fn)
 }
 
+internal fun MutableCollection<String>.javaOption(value: String) {
+    cliArg("--java-options", "'$value'")
+}
+
 private fun <T : Any?> defaultToString(): (T) -> String =
     {
         val asString = when (it) {

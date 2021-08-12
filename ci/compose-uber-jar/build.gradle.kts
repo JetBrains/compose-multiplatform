@@ -11,6 +11,7 @@ val properties = ComposeUberJarProperties()
 repositories {
     mavenCentral()
     maven(properties.composeRepoUrl)
+    google()
 }
 
 val composeVersion: String by lazy {
@@ -22,6 +23,7 @@ val composeVersion: String by lazy {
 }
 
 dependencies {
+    implementation("org.jetbrains.compose.desktop:desktop-jvm-macos-x64:$composeVersion")
     implementation("org.jetbrains.compose.desktop:desktop-jvm-linux-x64:$composeVersion")
 }
 

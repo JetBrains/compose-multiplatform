@@ -126,7 +126,7 @@ internal class PreviewHost(private val log: PreviewLogger, connection: RemoteCon
             val possibleCandidates = previewFacade.methods.filter { it.name == "render" }
             throw RuntimeException("Could not find method '$signature'. Possible candidates: \n${possibleCandidates.joinToString("\n") { "* ${it}" }}", e)
         }
-        val (fqName, frameConfig) = request
+        val (id, fqName, frameConfig) = request
         val scaledWidth = frameConfig.scaledWidth
         val scaledHeight = frameConfig.scaledHeight
         val scale = frameConfig.scale

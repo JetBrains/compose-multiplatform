@@ -13,12 +13,14 @@ import org.w3c.dom.get
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-object AppCSSVariables : CSSVariables {
+object AppCSSVariables {
     val width by variable<CSSUnitValue>()
     val height by variable<CSSUnitValue>()
 
     val stringWidth by variable<StylePropertyString>()
     val stringHeight by variable<StylePropertyString>()
+
+    val order by variable<StylePropertyNumber>()
 }
 
 object AppStylesheet : StyleSheet() {
@@ -35,8 +37,10 @@ object AppStylesheet : StyleSheet() {
     val classWithRawVariables by style {
         AppCSSVariables.stringWidth("150px")
         AppCSSVariables.stringHeight("170px")
+        AppCSSVariables.order(4)
         property("width", AppCSSVariables.stringWidth.value())
         property("height", AppCSSVariables.stringHeight.value())
+        property("order", AppCSSVariables.order.value())
     }
 
     val classWithTypedVariables by style {
@@ -47,18 +51,18 @@ object AppStylesheet : StyleSheet() {
     }
 
     val withMedia by style {
-        color("lime")
-        backgroundColor("lime")
+        color(Color.lime)
+        backgroundColor(Color.lime)
 
-        media(minWidth(20000.px)) {
+        media(mediaMinWidth(20000.px)) {
             self style {
-                color("red")
+                color(Color.red)
             }
         }
 
-        media(minWidth(20.px)) {
+        media(mediaMinWidth(20.px)) {
             self style {
-                backgroundColor("green")
+                backgroundColor(Color.green)
             }
         }
 
@@ -104,7 +108,9 @@ class CSSVariableTests {
             })
         }
 
-        val boundingRect = (root.children[1] as HTMLElement).getBoundingClientRect()
+        val el = root.children[1] as HTMLElement
+        val boundingRect = el.getBoundingClientRect()
+        assertEquals("4", window.getComputedStyle(el).order)
         assertEquals(150.toDouble(), boundingRect.width)
         assertEquals(170.toDouble(), boundingRect.height)
     }

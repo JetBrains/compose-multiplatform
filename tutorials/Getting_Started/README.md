@@ -1,9 +1,9 @@
-# Getting Started with Compose for Desktop
+# Getting Started with Compose Multiplatform
 
 ## What is covered
 
 In this tutorial we will create a simple desktop UI application
-using the Compose UI framework.
+using Compose Multiplatform UI framework.
 
 ## Prerequisites
 
@@ -12,7 +12,7 @@ and so any of these platforms can be used for this tutorial.
 
 The following software has to be preinstalled:
    * JDK 11 or later
-   * IntelliJ IDEA Community Edition or Ultimate Edition 20.2 or later (other editors could be used, but we assume you are using IntelliJ IDEA in this tutorial)
+   * IntelliJ IDEA Community Edition or Ultimate Edition 2020.3 or later (other editors could be used, but we assume you are using IntelliJ IDEA in this tutorial)
 
 ## Creating a new project
 
@@ -24,19 +24,27 @@ capable to create a Compose application automatically.
 Note that JDK must be at least JDK 11, and to use the native distribution
 packaging JDK 15 or later must be used.
 
-![Create new project 1](screen3.png)
+<img alt="Create new project 1" src="screen3.png" height="500" />
 
-![Create new project 2](screen4.png)
+<img alt="Create new project 2" src="screen4.png" height="500" />
 
-![Create new project 3](screen5.png)
+<img alt="Create new project 3" src="screen5.png" height="500" />
+
+### IDE plugin
+
+Compose Multiplatform [IDEA plugin](https://plugins.jetbrains.com/plugin/16541-compose-multiplatform-ide-support)
+can simplify compose development by adding support for `@Preview` annotation on argument-less
+`@Composable` functions. One could see how particular composable function looks like
+directly in IDE panel. This plugin could also be discovered via plugins marketplace,
+just search for "Compose Multiplatform".
 
 ### Update the wizard plugin
 
-The Сompose plugin version used in the wizard above may be not the last. Update the version of the plugin to the latest available by editing the `build.gradle.kts` file, finding and updating the version information as shown below. In this example the latest version of the plugin was 0.5.0-build225 and a compatible version of kotlin was 1.5.10. For the latest versions, see the [latest versions](https://github.com/JetBrains/compose-jb/releases) site and the [Kotlin](https://kotlinlang.org/) site.
+The Сompose plugin version used in the wizard above may be not the last. Update the version of the plugin to the latest available by editing the `build.gradle.kts` file, finding and updating the version information as shown below. In this example the latest version of the plugin was 1.0.0-alpha1 and a compatible version of kotlin was 1.5.21. For the latest versions, see the [latest versions](https://github.com/JetBrains/compose-jb/releases) site and the [Kotlin](https://kotlinlang.org/) site.
 ```
 plugins {
-    kotlin("jvm") version "1.5.10"
-    id("org.jetbrains.compose") version "0.5.0-build225"
+    kotlin("jvm") version "1.5.21"
+    id("org.jetbrains.compose") version "1.0.0-alpha1"
 }
 ```
 
@@ -71,13 +79,14 @@ Then create `build.gradle.kts` with the following content:
 import org.jetbrains.compose.compose
 
 plugins {
-    kotlin("jvm") version "1.5.10"
-    id("org.jetbrains.compose") version "0.5.0-build225"
+    kotlin("jvm") version "1.5.21"
+    id("org.jetbrains.compose") version "1.0.0-alpha1"
 }
 
 repositories {
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    google()
 }
 
 dependencies {
@@ -92,7 +101,6 @@ compose.desktop {
 ```
 Then create `src/main/kotlin/main.kt` and put the following code in there:
 ```kotlin
-import androidx.compose.desktop.Window
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -103,24 +111,32 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
 
-fun main() = Window(title = "Compose for Desktop", size = IntSize(300, 300)) {
-    val count = remember { mutableStateOf(0) }
-    MaterialTheme {
-        Column(Modifier.fillMaxSize(), Arrangement.spacedBy(5.dp)) {
-            Button(modifier = Modifier.align(Alignment.CenterHorizontally),
-                   onClick = {
-                       count.value++
-                   }) {
-                Text(if (count.value == 0) "Hello World" else "Clicked ${count.value}!")
-            }
-            Button(modifier = Modifier.align(Alignment.CenterHorizontally),
-                   onClick = {
-                       count.value = 0
+fun main() = application {
+    Window(
+        onCloseRequest = ::exitApplication,
+        title = "Compose for Desktop",
+        state = rememberWindowState(width = 300.dp, height = 300.dp)
+    ) {
+        val count = remember { mutableStateOf(0) }
+        MaterialTheme {
+            Column(Modifier.fillMaxSize(), Arrangement.spacedBy(5.dp)) {
+                Button(modifier = Modifier.align(Alignment.CenterHorizontally),
+                    onClick = {
+                        count.value++
                     }) {
-                Text("Reset")
+                    Text(if (count.value == 0) "Hello World" else "Clicked ${count.value}!")
+                }
+                Button(modifier = Modifier.align(Alignment.CenterHorizontally),
+                    onClick = {
+                        count.value = 0
+                    }) {
+                    Text("Reset")
+                }
             }
         }
     }
@@ -130,13 +146,17 @@ fun main() = Window(title = "Compose for Desktop", size = IntSize(300, 300)) {
 
 Open `build.gradle.kts` as a project in IntelliJ IDEA.
 
-![New project](screen1.png)
+<img alt="New project" src="screen1.png" height="500" />
 
 After you download the Compose for Desktop dependencies from the Maven repositories your new project is ready
 to go. Open the Gradle toolbar on the right, and select `sample/Tasks/compose desktop/run`.
 The first run may take some time, but afterwards the following dialog will be shown:
 
-![Application running](screen2.gif)
+<img alt="Application running" src="screen2.gif" height="500" />
 
 You can click on the button several times and see that the application reacts and
 updates the UI.
+
+Running and debugging the `main()` function using run gutter is also supported.
+
+<img alt="Application running" src="screen6.png" height="500" />

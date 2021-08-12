@@ -163,6 +163,52 @@ class InputsTests : BaseIntegrationTests() {
         driver.waitTextToBe(value = "None")
         driver.findElement(By.id("txt")).click() // to change the focus - triggers onChange
 
-        driver.waitTextToBe(value = "INPUT HAS CHANGED")
+        driver.waitTextToBe(value = "1")
+    }
+
+    @ResolveDrivers
+    fun `onChange in TextArea updates the text`(driver: WebDriver) {
+        driver.openTestPage("changeEventInTextAreaUpdatesText")
+        driver.waitTextToBe(value = "None")
+
+        val textArea = driver.findElement(By.id("textArea"))
+        textArea.sendKeys("NewText")
+
+        driver.waitTextToBe(value = "None")
+        driver.findElement(By.id("txt")).click() // to change the focus - triggers onChange
+
+        driver.waitTextToBe(value = "NoneNewText")
+    }
+
+    @ResolveDrivers
+    fun `onBeforeInput updates the text`(driver: WebDriver) {
+        driver.openTestPage("beforeInputEventUpdatesText")
+        driver.waitTextToBe(value = "None")
+
+        val input = driver.findElement(By.id("textInput"))
+
+        input.sendKeys("1")
+        driver.waitTextToBe(value = "1")
+        driver.waitTextToBe(value = "1", textId = "txt2")
+
+        input.sendKeys("2")
+        driver.waitTextToBe(value = "2")
+        driver.waitTextToBe(value = "12", textId = "txt2")
+    }
+
+    @ResolveDrivers
+    fun `onBeforeInput in TextArea updates the text`(driver: WebDriver) {
+        driver.openTestPage("beforeInputEventInTextAreaUpdatesText")
+        driver.waitTextToBe(value = "None")
+
+        val textArea = driver.findElement(By.id("textArea"))
+
+        textArea.sendKeys("1")
+        driver.waitTextToBe(value = "1")
+        driver.waitTextToBe(value = "1", textId = "txt2")
+
+        textArea.sendKeys("2")
+        driver.waitTextToBe(value = "2")
+        driver.waitTextToBe(value = "12", textId = "txt2")
     }
 }

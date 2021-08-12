@@ -1,0 +1,1 @@
+windows-arm64 only resource

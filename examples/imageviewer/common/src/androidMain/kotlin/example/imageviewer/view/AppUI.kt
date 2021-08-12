@@ -14,18 +14,18 @@ import example.imageviewer.model.ContentState
 import example.imageviewer.style.Gray
 
 @Composable
-fun BuildAppUI(content: ContentState) {
+fun AppUI(content: ContentState) {
 
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Gray
     ) {
         when (AppState.screenState()) {
-            ScreenType.Main -> {
-                setMainScreen(content)
+            ScreenType.MainScreen -> {
+                MainScreen(content)
             }
             ScreenType.FullscreenImage -> {
-                setImageFullScreen(content)
+                FullscreenImage(content)
             }
         }
     }

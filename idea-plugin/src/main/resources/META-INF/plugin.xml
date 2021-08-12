@@ -24,8 +24,6 @@
         <runLineMarkerContributor
                 language="kotlin"
                 implementationClass="org.jetbrains.compose.desktop.ide.preview.PreviewRunLineMarkerContributor"/>
-        <runConfigurationProducer
-                implementation="org.jetbrains.compose.desktop.ide.preview.PreviewRunConfigurationProducer"/>
         <deadCode implementation="org.jetbrains.compose.desktop.ide.preview.PreviewEntryPoint" />
 
         <runLineMarkerContributor
@@ -38,5 +36,17 @@
                 factoryClass="org.jetbrains.compose.desktop.ide.preview.PreviewToolWindow"
                 id="Desktop Preview" doNotActivateOnStart="true"
                 anchor="right" />
+
+        <lang.inspectionSuppressor language="kotlin" implementationClass="org.jetbrains.compose.inspections.ComposeSuppressor"/>
+
+        <notificationGroup id="Compose MPP Notifications" displayType="BALLOON"/>
+
+        <editorFloatingToolbarProvider implementation="org.jetbrains.compose.desktop.ide.preview.PreviewFloatingToolbarProvider"/>
     </extensions>
+
+    <actions>
+        <group id="Compose.Desktop.Preview.Editor.Toolbar">
+            <action class="org.jetbrains.compose.desktop.ide.preview.RefreshOrRunPreviewAction"/>
+        </group>
+    </actions>
 </idea-plugin>

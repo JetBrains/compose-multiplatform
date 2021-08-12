@@ -1,7 +1,8 @@
+val COMPOSE_CORE_VERSION: String by project
 val COMPOSE_WEB_VERSION: String by project
 val COMPOSE_REPO_USERNAME: String? by project
 val COMPOSE_REPO_KEY: String? by project
-val COMPOSE_WEB_BUILD_WITH_EXAMPLES = project.property("COMPOSE_WEB_BUILD_WITH_EXAMPLES")!!.toString()?.toBoolean()
+val COMPOSE_WEB_BUILD_WITH_SAMPLES = project.property("compose.web.buildSamples")!!.toString().toBoolean()
 
 apply<jetbrains.compose.web.gradle.SeleniumDriverPlugin>()
 
@@ -12,7 +13,7 @@ subprojects {
     version = COMPOSE_WEB_VERSION
 
     pluginManager.withPlugin("maven-publish") {
-        configure<PublishingExtension> { 
+        configure<PublishingExtension> {
             repositories {
                 maven {
                     name = "internal"
@@ -26,7 +27,7 @@ subprojects {
         }
     }
 
-    if (COMPOSE_WEB_BUILD_WITH_EXAMPLES) {
+    if (COMPOSE_WEB_BUILD_WITH_SAMPLES) {
         println("substituting published artifacts with projects ones in project $name")
         configurations.all {
             resolutionStrategy.dependencySubstitution {
@@ -42,13 +43,15 @@ subprojects {
 
     repositories {
         gradlePluginPortal()
+        mavenLocal()
         mavenCentral()
-        maven { 
-            url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev") 
+        maven {
+            url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         }
         maven {
             url = uri("https://packages.jetbrains.team/maven/p/ui/dev")
         }
+        google()
     }
 }
 

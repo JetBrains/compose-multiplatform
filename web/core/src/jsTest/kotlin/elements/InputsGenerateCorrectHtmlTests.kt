@@ -1,8 +1,14 @@
 package org.jetbrains.compose.web.core.tests.elements
 
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.core.tests.runTest
+import org.jetbrains.compose.web.core.tests.waitForAnimationFrame
 import org.jetbrains.compose.web.dom.*
 import org.w3c.dom.HTMLInputElement
+import org.w3c.dom.HTMLTextAreaElement
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -384,5 +390,117 @@ class InputsGenerateCorrectHtmlTests {
         assertEquals("week", textInput.getAttribute("type"))
         assertEquals(null, textInput.getAttribute("id"))
         assertEquals("", textInput.value)
+    }
+
+    @Test
+    fun textInputWithAutoComplete() = runTest {
+        composition {
+            TextInput {
+                autoComplete(AutoComplete.name)
+            }
+        }
+        assertEquals("""<input type="text" autocomplete="name">""", root.innerHTML)
+    }
+
+    @Test
+    fun textAreaWithAutoComplete() = runTest {
+        composition {
+            TextArea({
+                autoComplete(AutoComplete.email)
+            }, value = "")
+        }
+        assertEquals("""<textarea autocomplete="email"></textarea>""", root.innerHTML)
+    }
+
+    @Test
+    fun formWithAutoComplete() = runTest {
+        var autoCompleteEnabled by mutableStateOf(true)
+
+        composition {
+            Form(attrs = {
+                autoComplete(autoCompleteEnabled)
+            })
+        }
+
+        assertEquals("""<form autocomplete="on"></form>""", root.innerHTML)
+
+        autoCompleteEnabled = false
+        waitChanges()
+
+        assertEquals("""<form autocomplete="off"></form>""", root.innerHTML)
+    }
+
+    @Test
+    fun selectWithAutoComplete() = runTest {
+        composition {
+            Select({
+                autoComplete(AutoComplete.tel)
+            })
+        }
+        assertEquals("""<select autocomplete="tel"></select>""", root.innerHTML)
+    }
+
+    @Test
+    fun textInputChangesItsValueFromTextToEmpty() = runTest {
+        var state by mutableStateOf("text")
+
+        composition {
+            TextInput(value = state)
+        }
+
+        assertEquals("text", (root.firstChild as HTMLInputElement).value)
+
+        state = ""
+        waitForAnimationFrame()
+
+        assertEquals("", (root.firstChild as HTMLInputElement).value)
+    }
+
+    @Test
+    fun textInputChangesItsValueFromEmptyToText() = runTest {
+        var state by mutableStateOf("")
+
+        composition {
+            TextInput(value = state)
+        }
+
+        assertEquals("", (root.firstChild as HTMLInputElement).value)
+
+        state = "text"
+        waitForAnimationFrame()
+
+        assertEquals("text", (root.firstChild as HTMLInputElement).value)
+    }
+
+    @Test
+    fun textAreaChangesItsValueFromTextToEmpty() = runTest {
+        var state by mutableStateOf("text")
+
+        composition {
+            TextArea(value = state)
+        }
+
+        assertEquals("text", (root.firstChild as HTMLTextAreaElement).value)
+
+        state = ""
+        waitForAnimationFrame()
+
+        assertEquals("", (root.firstChild as HTMLTextAreaElement).value)
+    }
+
+    @Test
+    fun textAreaChangesItsValueFromEmptyToText() = runTest {
+        var state by mutableStateOf("")
+
+        composition {
+            TextArea(value = state)
+        }
+
+        assertEquals("", (root.firstChild as HTMLTextAreaElement).value)
+
+        state = "text"
+        waitForAnimationFrame()
+
+        assertEquals("text", (root.firstChild as HTMLTextAreaElement).value)
     }
 }

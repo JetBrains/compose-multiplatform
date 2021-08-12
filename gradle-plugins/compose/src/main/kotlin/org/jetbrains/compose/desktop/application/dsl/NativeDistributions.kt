@@ -13,7 +13,7 @@ import java.util.*
 import javax.inject.Inject
 
 internal val DEFAULT_RUNTIME_MODULES = arrayOf(
-    "java.base", "java.desktop", "java.logging"
+    "java.base", "java.desktop", "java.logging", "jdk.crypto.ec"
 )
 
 open class NativeDistributions @Inject constructor(
@@ -24,16 +24,8 @@ open class NativeDistributions @Inject constructor(
     var description: String? = null
     var copyright: String? = null
     var vendor: String? = null
-    @Deprecated(
-        "version is deprecated, use packageVersion instead",
-        replaceWith = ReplaceWith("packageVersion")
-    )
-    var version: String?
-        get() = packageVersion
-        set(value) {
-            packageVersion = value
-        }
     var packageVersion: String? = null
+    val appResourcesRootDir: DirectoryProperty = objects.directoryProperty()
 
     val outputBaseDir: DirectoryProperty = objects.directoryProperty().apply {
         set(layout.buildDirectory.dir("compose/binaries"))

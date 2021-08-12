@@ -37,6 +37,7 @@ tasks.register("publishComposeJb") {
         ":compose:ui:ui-test-junit4",
         ":compose:ui:ui-text",
         ":compose:ui:ui-tooling",
+        ":compose:ui:ui-tooling-preview",
         ":compose:ui:ui-unit",
         ":compose:ui:ui-util",
     ).forEach {
@@ -70,6 +71,9 @@ tasks.register("testComposeJbDesktop") {
     dependsOnComposeTask(":compose:desktop:desktop:jvmTest")
     dependsOnComposeTask(":compose:animation:animation:desktopTest")
     dependsOnComposeTask(":compose:animation:animation-core:desktopTest")
+    dependsOnComposeTask(":compose:ui:ui:desktopTest")
+    dependsOnComposeTask(":compose:ui:ui-graphics:desktopTest")
+    dependsOnComposeTask(":compose:ui:ui-text:desktopTest")
     dependsOnComposeTask(":compose:foundation:foundation:desktopTest")
     dependsOnComposeTask(":compose:foundation:foundation-layout:desktopTest")
     dependsOnComposeTask(":compose:material:material:desktopTest")
@@ -81,4 +85,12 @@ tasks.register("testComposeJbDesktop") {
 tasks.register("testComposeJbWeb") {
     dependsOnComposeTask(":compose:runtime:runtime:jsTest")
     dependsOnComposeTask(":compose:runtime:runtime:test")
+}
+
+tasks.register("buildNativeDemo") {
+    dependsOnComposeTask(":compose:native:demo:assemble")
+}
+
+tasks.register("testRuntimeNative") {
+    dependsOnComposeTask(":compose:runtime:runtime:macosX64Test")
 }

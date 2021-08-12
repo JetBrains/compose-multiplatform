@@ -24,7 +24,7 @@ kotlin {
         named("androidMain") {
             kotlin.srcDirs("src/jvmAndAndroidMain/kotlin")
             dependencies {
-                api("androidx.appcompat:appcompat:1.3.0-beta01")
+                api("androidx.appcompat:appcompat:1.3.1")
                 api("androidx.core:core-ktx:1.3.1")
             }
         }
@@ -40,13 +40,11 @@ apollo {
 }
 
 android {
-    compileSdkVersion(30)
+    compileSdk = 30
 
     defaultConfig {
-        minSdkVersion(26)
-        targetSdkVersion(30)
-        versionCode = 1
-        versionName = "1.0"
+        minSdk = 26
+        targetSdk = 30
     }
 
     compileOptions {
@@ -57,9 +55,6 @@ android {
     sourceSets {
         named("main") {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
-
-
-//            res.srcDirs("src/androidMain/res")
         }
     }
 }

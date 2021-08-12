@@ -216,7 +216,62 @@ class InputsTests {
         Div {
             Input(type = InputType.Number, attrs = {
                 id("numberInput")
-                onChange { state = "INPUT HAS CHANGED" }
+                onChange { state = it.value!!.toString() }
+            })
+        }
+    }
+
+    val changeEventInTextAreaUpdatesText by testCase {
+        var state by remember { mutableStateOf("None") }
+
+        P { TestText(state) }
+
+        Div {
+            TextArea(value = state, attrs = {
+                id("textArea")
+                onChange { state = it.value }
+            })
+        }
+    }
+
+    val beforeInputEventUpdatesText by testCase {
+        var inputState by remember { mutableStateOf("") }
+        var state by remember { mutableStateOf("None") }
+
+        P { TestText(state) }
+        P { TestText(inputState, id = "txt2") }
+
+
+        Div {
+            TextInput(value = "", attrs = {
+                id("textInput")
+                onBeforeInput {
+                    state = it.data ?: ""
+                }
+                onInput {
+                    inputState = it.value
+                }
+            })
+        }
+    }
+
+    val beforeInputEventInTextAreaUpdatesText by testCase {
+        var inputState by remember { mutableStateOf("") }
+        var state by remember { mutableStateOf("None") }
+
+        P { TestText(state) }
+        P { TestText(inputState, id = "txt2") }
+
+
+        Div {
+            TextArea(value = "", attrs = {
+                id("textArea")
+                onBeforeInput {
+                    state = it.data ?: ""
+                }
+                onInput {
+                    inputState = it.value
+                }
             })
         }
     }

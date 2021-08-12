@@ -8,72 +8,7 @@ package org.jetbrains.compose.web.core.tests.elements
 import androidx.compose.runtime.Composable
 import org.jetbrains.compose.web.attributes.AttrsBuilder
 import org.jetbrains.compose.web.core.tests.runTest
-import org.jetbrains.compose.web.dom.A
-import org.jetbrains.compose.web.dom.Address
-import org.jetbrains.compose.web.dom.Area
-import org.jetbrains.compose.web.dom.Article
-import org.jetbrains.compose.web.dom.Aside
-import org.jetbrains.compose.web.dom.Audio
-import org.jetbrains.compose.web.dom.B
-import org.jetbrains.compose.web.dom.Br
-import org.jetbrains.compose.web.dom.Button
-import org.jetbrains.compose.web.dom.Caption
-import org.jetbrains.compose.web.dom.Code
-import org.jetbrains.compose.web.dom.Col
-import org.jetbrains.compose.web.dom.Colgroup
-import org.jetbrains.compose.web.dom.ContentBuilder
-import org.jetbrains.compose.web.dom.Datalist
-import org.jetbrains.compose.web.dom.Div
-import org.jetbrains.compose.web.dom.Em
-import org.jetbrains.compose.web.dom.Embed
-import org.jetbrains.compose.web.dom.Fieldset
-import org.jetbrains.compose.web.dom.Footer
-import org.jetbrains.compose.web.dom.Form
-import org.jetbrains.compose.web.dom.H1
-import org.jetbrains.compose.web.dom.H2
-import org.jetbrains.compose.web.dom.H3
-import org.jetbrains.compose.web.dom.H4
-import org.jetbrains.compose.web.dom.H5
-import org.jetbrains.compose.web.dom.H6
-import org.jetbrains.compose.web.dom.HTMLMap
-import org.jetbrains.compose.web.dom.Header
-import org.jetbrains.compose.web.dom.Hr
-import org.jetbrains.compose.web.dom.I
-import org.jetbrains.compose.web.dom.Iframe
-import org.jetbrains.compose.web.dom.Img
-import org.jetbrains.compose.web.dom.Label
-import org.jetbrains.compose.web.dom.Legend
-import org.jetbrains.compose.web.dom.Main
-import org.jetbrains.compose.web.dom.Meter
-import org.jetbrains.compose.web.dom.Nav
-import org.jetbrains.compose.web.dom.Object
-import org.jetbrains.compose.web.dom.Ol
-import org.jetbrains.compose.web.dom.OptGroup
-import org.jetbrains.compose.web.dom.Option
-import org.jetbrains.compose.web.dom.Output
-import org.jetbrains.compose.web.dom.P
-import org.jetbrains.compose.web.dom.Param
-import org.jetbrains.compose.web.dom.Picture
-import org.jetbrains.compose.web.dom.Pre
-import org.jetbrains.compose.web.dom.Progress
-import org.jetbrains.compose.web.dom.Section
-import org.jetbrains.compose.web.dom.Select
-import org.jetbrains.compose.web.dom.Small
-import org.jetbrains.compose.web.dom.Source
-import org.jetbrains.compose.web.dom.Span
-import org.jetbrains.compose.web.dom.Table
-import org.jetbrains.compose.web.dom.TagElement
-import org.jetbrains.compose.web.dom.Tbody
-import org.jetbrains.compose.web.dom.Td
-import org.jetbrains.compose.web.dom.Text
-import org.jetbrains.compose.web.dom.TextArea
-import org.jetbrains.compose.web.dom.Tfoot
-import org.jetbrains.compose.web.dom.Th
-import org.jetbrains.compose.web.dom.Thead
-import org.jetbrains.compose.web.dom.Tr
-import org.jetbrains.compose.web.dom.Track
-import org.jetbrains.compose.web.dom.Ul
-import org.jetbrains.compose.web.dom.Video
+import org.jetbrains.compose.web.dom.*
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
 import kotlin.test.Test
@@ -129,7 +64,7 @@ class ElementsTests {
             Pair({ Ul() }, "UL"),
             Pair({ Ol() }, "OL"),
 
-            //Pair({ Tag.Li() }, "LI"),
+            Pair({ Li() }, "LI"),
             Pair({ Img(src="whatever") }, "IMG"),
 
             Pair({ Form() }, "FORM"),

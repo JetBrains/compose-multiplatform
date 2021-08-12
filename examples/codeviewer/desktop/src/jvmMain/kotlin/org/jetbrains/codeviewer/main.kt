@@ -1,23 +1,19 @@
 package org.jetbrains.codeviewer
 
-import androidx.compose.desktop.Window
-import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.res.loadImageBitmap
+import androidx.compose.ui.res.useResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.WindowState
+import androidx.compose.ui.window.singleWindowApplication
 import org.jetbrains.codeviewer.ui.MainView
-import java.awt.image.BufferedImage
-import javax.imageio.ImageIO
 
-fun main() = Window(
+@OptIn(ExperimentalComposeUiApi::class)
+fun main() = singleWindowApplication(
     title = "Code Viewer",
-    size = IntSize(1280, 768),
-    icon = loadImageResource("ic_launcher.png"),
+    state = WindowState(width = 1280.dp, height = 768.dp),
+    icon = BitmapPainter(useResource("ic_launcher.png", ::loadImageBitmap)),
 ) {
     MainView()
-}
-
-
-@Suppress("SameParameterValue")
-private fun loadImageResource(path: String): BufferedImage {
-    val resource = Thread.currentThread().contextClassLoader.getResource(path)
-    requireNotNull(resource) { "Resource $path not found" }
-    return resource.openStream().use(ImageIO::read)
 }

@@ -1,5 +1,5 @@
 # Compose for Web
-**The API is experimental, and breaking changes can be expected**
+**The API is not finalized, and breaking changes can be expected**
 
 ### Content:
 

@@ -116,7 +116,7 @@ The following formats available for the supported operating systems:
 By default, Apple does not allow users to execute unsigned applications downloaded from the internet.  Users attempting
 to run such applications will be faced with an error like this:
 
-![](attrs-error.png)
+<img alt="" src="attrs-error.png" height="462" />
 
 See [our tutorial](/tutorials/Signing_and_notarization_on_macOS/README.md) 
 on how to sign and notarize your application. 
@@ -256,6 +256,61 @@ compose.desktop {
 }
 ```
 
+## Packaging resources
+
+There are multiple ways to package and load resources with Compose for Desktop.
+
+### JVM resource loading
+
+Since Compose for Desktop uses JVM platform, you can load resources from a jar file using `java.lang.Class` API. Put a file under `src/main/resources`, 
+then access it using [Class::getResource](https://docs.oracle.com/en/java/javase/15/docs/api/java.base/java/lang/Class.html#getResource(java.lang.String))
+or [Class::getResourceAsStream](https://docs.oracle.com/en/java/javase/15/docs/api/java.base/java/lang/Class.html#getResourceAsStream(java.lang.String)).
+
+### Adding files to packaged application
+
+In some cases putting and reading resources from jar files might be inconvenient.
+Or you may want to include a target specific asset (e.g. a file, that is included only 
+into a macOS package, but not into a Windows one).
+
+Compose Gradle plugin can be configured to put additional
+resource files under an installation directory.
+
+To do so, specify a root resource directory via DSL:
+```
+compose.desktop {
+    application {
+        mainClass = "MainKt"
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageVersion = "1.0.0"
+
+            appResourcesRootDir.set(project.layout.projectDirectory.dir("resources"))
+        }
+    }
+}
+```
+In the example above a root resource directory is set to `<PROJECT_DIR>/resources`.
+
+Compose Gradle plugin will include all files under the following subdirectories:
+1. Files from `<RESOURCES_ROOT_DIR>/common` will be included into all packages.
+2. Files from `<RESOURCES_ROOT_DIR>/<OS_NAME>` will be included only into packages for 
+a specific OS. Possible values for `<OS_NAME>` are: `windows`, `macos`, `linux`.
+3. Files from `<RESOURCES_ROOT_DIR>/<OS_NAME>-<ARCH_NAME>` will be included only into packages for
+   a specific combination of OS and CPU architecture. Possible values for `<ARCH_NAME>` are: `x64` and `arm64`.
+For example, files from `<RESOURCES_ROOT_DIR>/macos-arm64` will be included only into packages built for Apple Silicon
+Macs.
+
+Included resources can be accessed via `compose.application.resources.dir` system property:
+```
+import java.io.File
+
+val resourcesDir = File(System.getProperty("compose.application.resources.dir"))
+
+fun main() {
+    println(resourcesDir.resolve("resource.txt").readText())
+}
+```
+
 ## Customizing content
 
 The plugin can configure itself, when either `org.jetbrains.kotlin.jvm` or `org.jetbrains.kotlin.multiplatform` plugins 
@@ -370,6 +425,7 @@ The following platform-specific options are available
       (see the section `Specifying package version` for details);
     * `pkgPackageVersion = "PKG_VERSION"` — a pkg-specific package version
       (see the section `Specifying package version` for details);
+    * `infoPlist` — see the section `Customizing Info.plist on macOS` for details;
 * Windows:
     * `console = true` adds a console launcher for the application;
     * `dirChooser = true` enables customizing the installation path during installation;
@@ -383,7 +439,7 @@ The following platform-specific options are available
           (see the section `Specifying package version` for details);
     * `exePackageVersion = "EXE_VERSION"` — a pkg-specific package version
     (see the section `Specifying package version` for details);
-    
+
 ## App icon
 
 The app icon needs to be provided in OS-specific formats:
@@ -408,3 +464,81 @@ compose.desktop {
     }
 }
 ```
+
+## Customizing Info.plist on macOS
+
+We aim to support important platform-specific customization use-cases via declarative DSL.
+However, the provided DSL is not enough sometimes. If you need to specify `Info.plist`
+values, that are not modeled in the DSL, you can work around by specifying a piece
+of raw XML, that will be appended to the application's `Info.plist`.
+
+### Example: deep linking into macOS apps
+
+1. Specify a custom URL scheme:
+``` kotlin
+// build.gradle.kts
+compose.desktop {
+    application {
+        mainClass = "MainKt"
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg)
+            packageName = "Deep Linking Example App"
+            macOS {
+                bundleID = "org.jetbrains.compose.examples.deeplinking"
+                infoPlist {
+                    extraKeysRawXml = macExtraPlistKeys
+                }
+            }
+        }
+    }
+}
+
+val macExtraPlistKeys: String
+    get() = """
+      <key>CFBundleURLTypes</key>
+      <array>
+        <dict>
+          <key>CFBundleURLName</key>
+          <string>Example deep link</string>
+          <key>CFBundleURLSchemes</key>
+          <array>
+            <string>compose</string>
+          </array>
+        </dict>
+      </array>
+    """
+"""
+```
+
+2. Use `java.awt.Desktop` to set up a URI handler:
+``` kotlin 
+// src/main/main.kt
+
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.window.singleWindowApplication
+import java.awt.Desktop
+
+fun main() {
+    var text by mutableStateOf("Hello, World!")
+
+    try {
+        Desktop.getDesktop().setOpenURIHandler { event ->
+            text = "Open URI: " + event.uri
+        }
+    } catch (e: UnsupportedOperationException) {
+        println("setOpenURIHandler is unsupported")
+    }
+
+    singleWindowApplication {
+        MaterialTheme {
+            Text(text)
+        }
+    }
+}
+```
+3. Run `./gradlew runDistributable`.
+4. Links like `compose://foo/bar` are now redirected from a browser to your application.

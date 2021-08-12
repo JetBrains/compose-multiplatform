@@ -1,4 +1,5 @@
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.MenuScope
@@ -14,7 +15,9 @@ fun NotepadApplication(state: NotepadApplicationState) {
     }
 
     for (window in state.windows) {
-        NotepadWindow(window)
+        key(window) {
+            NotepadWindow(window)
+        }
     }
 }
 
@@ -22,7 +25,7 @@ fun NotepadApplication(state: NotepadApplicationState) {
 @Composable
 private fun ApplicationTray(state: NotepadApplicationState) {
     Tray(
-        LocalAppResources.current.icon ?: return,
+        LocalAppResources.current.icon,
         state = state.tray,
         hint = "Notepad",
         menu = { ApplicationMenu(state) }

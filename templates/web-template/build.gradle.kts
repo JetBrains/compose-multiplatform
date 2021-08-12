@@ -3,14 +3,15 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     // __KOTLIN_COMPOSE_VERSION__
-    kotlin("multiplatform") version "1.5.10"
+    kotlin("multiplatform") version "1.5.21"
     // __LATEST_COMPOSE_RELEASE_VERSION__
-    id("org.jetbrains.compose") version ("0.5.0-build228")
+    id("org.jetbrains.compose") version ("1.0.0-alpha1")
 }
 
 repositories {
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    google()
 }
 
 kotlin {

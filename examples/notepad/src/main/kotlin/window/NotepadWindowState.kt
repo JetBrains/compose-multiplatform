@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.window.Notification
+import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowState
 import common.Settings
 import kotlinx.coroutines.CompletableDeferred
@@ -55,7 +56,11 @@ class NotepadWindowState(
         private set
 
     fun toggleFullscreen() {
-        window.isFullscreen = !window.isFullscreen
+        window.placement = if (window.placement == WindowPlacement.Fullscreen) {
+            WindowPlacement.Floating
+        } else {
+            WindowPlacement.Fullscreen
+        }
     }
 
     suspend fun run() {

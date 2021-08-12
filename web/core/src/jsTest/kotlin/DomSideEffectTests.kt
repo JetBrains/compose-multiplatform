@@ -1,9 +1,6 @@
 package org.jetbrains.compose.web.core.tests
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.renderComposable
 import kotlinx.browser.document
@@ -108,5 +105,42 @@ class DomSideEffectTests {
         waitChanges()
         assertEquals(1, onDisposeCalledTimes)
         assertEquals(expected = "<div></div>", actual = root.outerHTML)
+    }
+
+    @Test
+    fun sideEffectsOrder() = runTest {
+        var effectsList = mutableListOf<String>()
+
+        var key = 1
+        var recomposeScope: RecomposeScope? = null
+
+        composition {
+            recomposeScope = currentRecomposeScope
+
+            Div {
+                DomSideEffect(key) {
+                    effectsList.add("DomSideEffect")
+                }
+                DisposableRefEffect(key) {
+                    effectsList.add("DisposableRefEffect")
+                    onDispose {  }
+                }
+            }
+        }
+
+        assertEquals(2, effectsList.size)
+        assertEquals("DisposableRefEffect", effectsList[0])
+        assertEquals("DomSideEffect", effectsList[1])
+
+        key = 2
+        recomposeScope?.invalidate()
+
+        waitForAnimationFrame()
+
+        assertEquals(4, effectsList.size)
+        assertEquals("DisposableRefEffect", effectsList[0])
+        assertEquals("DomSideEffect", effectsList[1])
+        assertEquals("DisposableRefEffect", effectsList[2])
+        assertEquals("DomSideEffect", effectsList[3])
     }
 }

@@ -15,6 +15,7 @@ import example.imageviewer.style.Transparent
 fun Draggable(
     dragHandler: DragHandler,
     modifier: Modifier = Modifier,
+    onUpdate: (() -> Unit)? = null,
     children: @Composable() () -> Unit
 ) {
     Surface(
@@ -26,6 +27,7 @@ fun Draggable(
                 onDragCancel = { dragHandler.cancel() },
             ) { change, dragAmount ->
                 dragHandler.drag(dragAmount)
+                onUpdate?.invoke()
                 change.consumePositionChange()
             }
         }

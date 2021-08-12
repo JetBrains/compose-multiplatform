@@ -8,9 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.promise
 import kotlinx.dom.clear
-import org.w3c.dom.HTMLElement
-import org.w3c.dom.MutationObserver
-import org.w3c.dom.MutationObserverInit
+import org.w3c.dom.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -29,6 +27,11 @@ class TestScope : CoroutineScope by testScope {
             content()
         }
     }
+
+
+    private val childrenIterator = root.children.asList().listIterator()
+    fun nextChild() = childrenIterator.next() as HTMLElement
+    fun currentChild() = root.children[childrenIterator.previousIndex()] as HTMLElement
 
     suspend fun waitChanges() {
         waitForChanges(root)

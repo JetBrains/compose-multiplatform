@@ -4,7 +4,7 @@ Composite build of [Compose-jb sources](https://github.com/JetBrains/androidx)
 
 ## Download submodules after downloading the main project:
 ```
-git submodule update --init
+git submodule update --init --recursive
 ```
 Set this property to always update submodules on git checkout/pull/reset:
 ```
@@ -20,7 +20,7 @@ git config --global submodule.recurse true
   - CMake 3.10.2.4988404 (in folder $androidSdk/cmake, not in $androidSdk/cmake/$version)
 
 ## Requirements to develop in IDE
-- Android Studio Arctic Fox | 2020.3.1 Canary 15
+- Android Studio Arctic Fox
 - Custom Gradle 7.1 specified in `Settings -> Build, Execution, Deployment -> Build Tools -> Gradle` (because Android Studio will pick the wrong Gradle in the subproject instead of the Gradle in the root project)
 - Specified Gradle JDK 11 in `... -> Build Tools -> Gradle`
 - Environment variables:
@@ -35,6 +35,7 @@ export COMPOSE_CUSTOM_GROUP=org.jetbrains.compose
 androidx.compose.multiplatformEnabled=true
 androidx.compose.jsCompilerTestsEnabled=true
 ```
+(note that https://android.googlesource.com/platform/frameworks/support build doesn't work with androidx.compose.jsCompilerTestsEnabled)
 
 ## Scripts
 Publish artifacts to the local directory `out/androidx/build/support_repo/org/jetbrains/compose`:

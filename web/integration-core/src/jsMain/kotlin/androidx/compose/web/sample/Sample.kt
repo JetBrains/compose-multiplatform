@@ -38,24 +38,39 @@ class State {
 val globalState = State()
 val globalInt = mutableStateOf(1)
 
-object MyCSSVariables : CSSVariables {
-    val myVar by variable<Color>()
+object MyCSSVariables {
+    val myVar by variable<CSSColorValue>()
     val myVar2 by variable<StylePropertyString>()
 }
 
 object AppStyleSheet : StyleSheet() {
+    val bounce by keyframes {
+        from {
+            property("transform", "translateX(50%)")
+        }
+
+        to {
+            property("transform", "translateX(-50%)")
+        }
+    }
+
     val myClass by style {
-        color("green")
+        color(Color.green)
+        animation(bounce) {
+            duration(2.s)
+            timingFunction(AnimationTimingFunction.EaseIn)
+            direction(AnimationDirection.Alternate)
+        }
     }
 
     val classWithNested by style {
-        color("green")
+        color(Color.green)
 
         MyCSSVariables.myVar(Color("blue"))
         MyCSSVariables.myVar2("red")
 
         hover(self) style {
-            color("red")
+            color(Color.red)
         }
 
         border {
@@ -64,7 +79,7 @@ object AppStyleSheet : StyleSheet() {
             color(MyCSSVariables.myVar.value())
         }
 
-        media(maxWidth(640.px)) {
+        media(mediaMaxWidth(640.px)) {
             self style {
                 backgroundColor(MyCSSVariables.myVar.value())
                 property("color", MyCSSVariables.myVar2.value())
@@ -84,7 +99,7 @@ fun CounterApp(counter: MutableState<Int>) {
     Button(
         {
             style {
-                color(if (counter.value % 2 == 0) "green" else "red")
+                color(if (counter.value % 2 == 0) Color.green else Color.red)
                 width((counter.value + 200).px)
                 fontSize(if (counter.value % 2 == 0) 25.px else 30.px)
                 margin(15.px)
@@ -108,7 +123,7 @@ fun Counter(value: Int) {
             onDrag { println("DRAGGING NOW!!!!") }
 
             style {
-                color("red")
+                color(Color.red)
             }
         }
     ) {
@@ -162,10 +177,10 @@ fun main() {
             }
 
             ".${AppStyleSheet.myClass}:hover" {
-                color("red")
+                color(Color.red)
             }
 
-            media(minWidth(500.px) and maxWidth(700.px)) {
+            media(mediaMinWidth(500.px) and mediaMaxWidth(700.px)) {
                 className(MyClassName) style {
                     fontSize(40.px)
                 }
@@ -207,9 +222,9 @@ fun main() {
             attrs = {
                 classes(
                     Auto.css {
-                        color("pink")
+                        color(Color.pink)
                         hover(self) style {
-                            color("blue")
+                            color(Color.blue)
                         }
                     }
                 )
@@ -257,8 +272,8 @@ fun MyInputComponent(text: State<String>, onChange: (String) -> Unit) {
                 onKeyDown {
                     println("On keyDown key = : ${it.getNormalizedKey()}")
                 }
-                onTextInput {
-                    onChange(it.inputValue)
+                onInput {
+                    onChange(it.value)
                 }
                 onKeyUp {
                     println("On keyUp key = : ${it.getNormalizedKey()}")
@@ -268,8 +283,8 @@ fun MyInputComponent(text: State<String>, onChange: (String) -> Unit) {
     }
     Div {
         Input(type = InputType.Checkbox, attrs = {
-            onCheckboxInput {
-                println("From div - Checked: " + it.checked)
+            onInput {
+                println("From div - Checked: " + it.value)
             }
         })
         Input(type = InputType.Text, attrs = {
@@ -280,8 +295,8 @@ fun MyInputComponent(text: State<String>, onChange: (String) -> Unit) {
         Input(
             type = InputType.Radio,
             attrs = {
-                onRadioInput {
-                    println("Radio 1 - Checked: " + it.checked)
+                onInput {
+                    println("Radio 1 - Checked: " + it.value)
                 }
                 name("f1")
             }
@@ -289,8 +304,8 @@ fun MyInputComponent(text: State<String>, onChange: (String) -> Unit) {
         Input(
             type = InputType.Radio,
             attrs = {
-                onRadioInput {
-                    println("Radio 2 - Checked: " + it.checked)
+                onInput {
+                    println("Radio 2 - Checked: " + it.value)
                 }
                 name("f1")
             }
@@ -328,9 +343,9 @@ fun smallColoredText(text: String) {
 
                 style {
                     if (globalState.isDarkTheme) {
-                        color("black")
+                        color(Color.black)
                     } else {
-                        color("green")
+                        color(Color.green)
                     }
                 }
             },

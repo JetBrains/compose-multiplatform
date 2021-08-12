@@ -3,7 +3,7 @@ object Deps {
     object JetBrains {
         object Kotlin {
             // __KOTLIN_COMPOSE_VERSION__
-            private const val VERSION = "1.5.10"
+            private const val VERSION = "1.5.21"
             const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$VERSION"
             const val testCommon = "org.jetbrains.kotlin:kotlin-test-common:$VERSION"
             const val testJunit = "org.jetbrains.kotlin:kotlin-test-junit:$VERSION"
@@ -13,7 +13,7 @@ object Deps {
 
         object Compose {
             // __LATEST_COMPOSE_RELEASE_VERSION__
-            private const val VERSION = "0.5.0-build225"
+            private const val VERSION = "1.0.0-alpha2"
             const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
         }
     }
@@ -21,24 +21,24 @@ object Deps {
     object Android {
         object Tools {
             object Build {
-                const val gradlePlugin = "com.android.tools.build:gradle:4.0.1"
+                const val gradlePlugin = "com.android.tools.build:gradle:4.1.0"
             }
         }
     }
 
     object AndroidX {
         object AppCompat {
-            const val appCompat = "androidx.appcompat:appcompat:1.3.0-beta01"
+            const val appCompat = "androidx.appcompat:appcompat:1.3.0"
         }
 
         object Activity {
-            const val activityCompose = "androidx.activity:activity-compose:1.3.0-alpha02"
+            const val activityCompose = "androidx.activity:activity-compose:1.3.0"
         }
     }
 
     object ArkIvanov {
         object MVIKotlin {
-            private const val VERSION = "2.0.3"
+            private const val VERSION = "3.0.0-alpha01"
             const val rx = "com.arkivanov.mvikotlin:rx:$VERSION"
             const val mvikotlin = "com.arkivanov.mvikotlin:mvikotlin:$VERSION"
             const val mvikotlinMain = "com.arkivanov.mvikotlin:mvikotlin-main:$VERSION"
@@ -48,7 +48,7 @@ object Deps {
         }
 
         object Decompose {
-            private const val VERSION = "0.2.6"
+            private const val VERSION = "0.3.1"
             const val decompose = "com.arkivanov.decompose:decompose:$VERSION"
             const val extensionsCompose = "com.arkivanov.decompose:extensions-compose-jetbrains:$VERSION"
         }

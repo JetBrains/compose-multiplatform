@@ -16,10 +16,11 @@
 
 package org.jetbrains.compose.desktop.ide.preview
 
-import com.intellij.execution.lineMarker.ExecutorAction
 import com.intellij.execution.lineMarker.RunLineMarkerContributor
+import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
+import org.jetbrains.kotlin.idea.util.projectStructure.module
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtNamedFunction
 
@@ -34,14 +35,13 @@ class PreviewRunLineMarkerContributor : RunLineMarkerContributor() {
         if (element !is LeafPsiElement) return null
         if (element.node.elementType != KtTokens.IDENTIFIER) return null
 
-        val parent = element.parent
-        return when {
-            parent is KtNamedFunction && parent.isValidComposePreview() -> {
-                val actions = arrayOf(ExecutorAction.getActions(0).first())
+        return when (val parent = element.parent) {
+            is KtNamedFunction -> {
+                val previewFunction = parent.asPreviewFunctionOrNull() ?: return null
+                val actions = arrayOf(RunPreviewAction(previewFunction))
                 Info(PreviewIcons.COMPOSE, actions) { PreviewMessages.runPreview(parent.name!!) }
             }
             else -> null
         }
     }
 }
-

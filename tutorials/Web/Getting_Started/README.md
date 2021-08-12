@@ -1,6 +1,6 @@
 # Getting Started With Compose for Web
 
-**The API is experimental, and breaking changes can be expected**
+**The API is not finalized, and breaking changes can be expected**
 
 ## Introduction
 
@@ -25,7 +25,7 @@ The project wizard doesn't support Compose for web projects yet, so we need to p
 - Tick `Kotlin DSL build script`
 - Tick `Kotlin/Multiplatform`
 
-![](create-mpp.png)
+<img alt="" src="create-mpp.png" height="500" />
 
 
 #### 2. Update `settings.gradle.kts`:
@@ -42,14 +42,15 @@ pluginManagement {
 ``` kotlin
 // Add compose gradle plugin
 plugins {
-    kotlin("multiplatform") version "1.5.10"
-    id("org.jetbrains.compose") version "0.5.0-build228"
+    kotlin("multiplatform") version "1.5.21"
+    id("org.jetbrains.compose") version "0.5.0-build270"
 }
 
 // Add maven repositories
 repositories {
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    google()
 }
 
 // Enable JS(IR) target and add dependencies
@@ -134,8 +135,8 @@ Use the command line to run:
 
 Or run it from the IDE:
 
-![](run_project.png)
+<img alt="" src="run_project.png" height="500" />
 
 The browser will open `localhost:8080`:
 
-![](run_result.png)
+<img alt="" src="run_result.png" height="500" />

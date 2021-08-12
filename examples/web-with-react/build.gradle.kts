@@ -1,12 +1,13 @@
 plugins {
-	kotlin("multiplatform") version "1.5.10"
-	id("org.jetbrains.compose") version "0.5.0-build228"
+	kotlin("multiplatform") version "1.5.21"
+	id("org.jetbrains.compose") version "1.0.0-alpha1"
 }
 
 repositories {
 	mavenCentral()
 	maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 	maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-js-wrappers")
+    google()
 }
 
 kotlin {

@@ -1,7 +1,7 @@
 package example.imageviewer.utils
 
-import androidx.compose.desktop.AppManager
-import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.window.WindowSize
+import androidx.compose.ui.unit.dp
 import java.awt.Dimension
 import java.awt.Graphics2D
 import java.awt.Rectangle
@@ -14,6 +14,9 @@ import javax.imageio.ImageIO
 import java.awt.image.BufferedImageOp
 import java.awt.image.ConvolveOp
 import java.awt.image.Kernel
+import kotlin.math.pow
+import kotlin.math.roundToInt
+import example.imageviewer.view.DragHandler
 
 fun scaleBitmapAspectRatio(
     bitmap: BufferedImage,
@@ -38,10 +41,10 @@ fun scaleBitmapAspectRatio(
     return result
 }
 
-fun getDisplayBounds(bitmap: BufferedImage): Rectangle {
+fun getDisplayBounds(bitmap: BufferedImage, windowSize: WindowSize): Rectangle {
 
-    val boundW: Float = displayWidth().toFloat()
-    val boundH: Float = displayHeight().toFloat()
+    val boundW: Float = windowSize.width.value.toFloat()
+    val boundH: Float = windowSize.height.value.toFloat()
 
     val ratioX: Float = bitmap.width / boundW
     val ratioY: Float = bitmap.height / boundH
@@ -108,22 +111,6 @@ fun applyBlurFilter(bitmap: BufferedImage): BufferedImage {
     )
 }
 
-fun displayWidth(): Int {
-    val window = AppManager.focusedWindow
-    if (window != null) {
-        return window.width
-    }
-    return 0
-}
-
-fun displayHeight(): Int {
-    val window = AppManager.focusedWindow
-    if (window != null) {
-        return window.height
-    }
-    return 0
-}
-
 fun toByteArray(bitmap: BufferedImage) : ByteArray {
     val baos = ByteArrayOutputStream()
     ImageIO.write(bitmap, "png", baos)
@@ -134,11 +121,86 @@ fun cropImage(bitmap: BufferedImage, crop: Rectangle) : BufferedImage {
     return bitmap.getSubimage(crop.x, crop.y, crop.width, crop.height)
 }
 
-fun getPreferredWindowSize(desiredWidth: Int, desiredHeight: Int): IntSize {
+fun cropBitmapByScale(
+    bitmap: BufferedImage,
+    size: WindowSize,
+    scale: Float,
+    drag: DragHandler
+): BufferedImage {
+    val crop = cropBitmapByBounds(
+        bitmap,
+        getDisplayBounds(bitmap, size),
+        size,
+        scale,
+        drag
+    )
+    return cropImage(
+        bitmap,
+        Rectangle(crop.x, crop.y, crop.width - crop.x, crop.height - crop.y)
+    )
+}
+
+fun cropBitmapByBounds(
+    bitmap: BufferedImage,
+    bounds: Rectangle,
+    size: WindowSize,
+    scaleFactor: Float,
+    drag: DragHandler
+): Rectangle {
+
+    if (scaleFactor <= 1f) {
+        return Rectangle(0, 0, bitmap.width, bitmap.height)
+    }
+
+    var scale = scaleFactor.toDouble().pow(1.4)
+
+    var boundW = (bounds.width / scale).roundToInt()
+    var boundH = (bounds.height / scale).roundToInt()
+
+    scale *= size.width.value / bounds.width.toDouble()
+
+    val offsetX = drag.getAmount().x / scale
+    val offsetY = drag.getAmount().y / scale
+
+    if (boundW > bitmap.width) {
+        boundW = bitmap.width
+    }
+    if (boundH > bitmap.height) {
+        boundH = bitmap.height
+    }
+
+    val invisibleW = bitmap.width - boundW
+    var leftOffset = (invisibleW / 2.0 - offsetX).roundToInt()
+
+    if (leftOffset > invisibleW) {
+        leftOffset = invisibleW
+        drag.getAmount().x = -((invisibleW / 2.0) * scale).roundToInt().toFloat()
+    }
+    if (leftOffset < 0) {
+        drag.getAmount().x = ((invisibleW / 2.0) * scale).roundToInt().toFloat()
+        leftOffset = 0
+    }
+
+    val invisibleH = bitmap.height - boundH
+    var topOffset = (invisibleH / 2 - offsetY).roundToInt()
+
+    if (topOffset > invisibleH) {
+        topOffset = invisibleH
+        drag.getAmount().y = -((invisibleH / 2.0) * scale).roundToInt().toFloat()
+    }
+    if (topOffset < 0) {
+        drag.getAmount().y = ((invisibleH / 2.0) * scale).roundToInt().toFloat()
+        topOffset = 0
+    }
+
+    return Rectangle(leftOffset, topOffset, leftOffset + boundW, topOffset + boundH)
+}
+
+fun getPreferredWindowSize(desiredWidth: Int, desiredHeight: Int): WindowSize {
     val screenSize: Dimension = Toolkit.getDefaultToolkit().screenSize
     val preferredWidth: Int = (screenSize.width * 0.8f).toInt()
     val preferredHeight: Int = (screenSize.height * 0.8f).toInt()
     val width: Int = if (desiredWidth < preferredWidth) desiredWidth else preferredWidth
     val height: Int = if (desiredHeight < preferredHeight) desiredHeight else preferredHeight
-    return IntSize(width, height)
+    return WindowSize(width.dp, height.dp)
 }

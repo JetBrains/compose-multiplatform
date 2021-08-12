@@ -41,6 +41,15 @@ open class MacOSPlatformSettings @Inject constructor(objects: ObjectFactory): Pl
     fun notarization(fn: Action<MacOSNotarizationSettings>) {
         fn.execute(notarization)
     }
+
+    internal val infoPlistSettings = InfoPlistSettings()
+    fun infoPlist(fn: Action<InfoPlistSettings>) {
+        fn.execute(infoPlistSettings)
+    }
+}
+
+open class InfoPlistSettings {
+    var extraKeysRawXml: String? = null
 }
 
 open class LinuxPlatformSettings @Inject constructor(objects: ObjectFactory): PlatformSettings(objects) {

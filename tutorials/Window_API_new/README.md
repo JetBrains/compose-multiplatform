@@ -1,4 +1,4 @@
-# Top level windows management (new Composable API, experimental)
+# Top level windows management
 
 ## What is covered
 
@@ -13,11 +13,9 @@ Top-level windows can be conditionally created in other composable functions and
 The main function for creating windows is `Window`. This function should be used in a Composable scope. The easiest way to create a Composable scope is to use the `application` function:
 
 ```kotlin
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     Window(onCloseRequest = ::exitApplication) {
         // Content
@@ -33,11 +31,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     var fileName by remember { mutableStateOf("Untitled") }
 
@@ -48,7 +44,7 @@ fun main() = application {
     }
 }
 ```
-![](window_properties.gif)
+<img alt="Window properties" src="window_properties.gif" height="260" />
 
 You can also close/open windows using a simple `if` statement.
 
@@ -61,18 +57,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import kotlinx.coroutines.delay
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     var isPerformingTask by remember { mutableStateOf(true) }
+
     LaunchedEffect(Unit) {
         delay(2000) // Do some heavy lifting
         isPerformingTask = false
     }
+
     if (isPerformingTask) {
         Window(onCloseRequest = ::exitApplication) {
             Text("Performing some tasks. Please wait!")
@@ -84,7 +80,7 @@ fun main() = application {
     }
 }
 ```
-![](window_splash.gif)
+<img alt="Window splash" src="window_splash.gif" height="354" />
 
 If the window requires some custom logic on close (for example, to show a dialog), you can override the close action using `onCloseRequest`.
 
@@ -96,16 +92,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     var isOpen by remember { mutableStateOf(true) }
     var isAskingToClose by remember { mutableStateOf(false) }
-    
+
     if (isOpen) {
         Window(
             onCloseRequest = { isAskingToClose = true }
@@ -126,7 +120,7 @@ fun main() = application {
     }
 }
 ```
-![](ask_to_close.gif)
+<img alt="Ask to close" src="ask_to_close.gif" height="309" />
 
 If you don't need to close the window and just need to hide it (for example to the tray), you can change the `windowState.isVisible` state:
 ```kotlin
@@ -136,16 +130,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.window.Tray
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import androidx.compose.ui.window.rememberWindowState
 import kotlinx.coroutines.delay
-import java.awt.Color
-import java.awt.image.BufferedImage
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     var isVisible by remember { mutableStateOf(true) }
 
@@ -166,7 +159,7 @@ fun main() = application {
 
     if (!isVisible) {
         Tray(
-            remember { getTrayIcon() },
+            TrayIcon,
             hint = "Counter",
             onAction = { isVisible = true },
             menu = {
@@ -176,40 +169,39 @@ fun main() = application {
     }
 }
 
-fun getTrayIcon(): BufferedImage {
-    val size = 256
-    val image = BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB)
-    val graphics = image.createGraphics()
-    graphics.color = Color.orange
-    graphics.fillOval(0, 0, size, size)
-    graphics.dispose()
-    return image
+object TrayIcon : Painter() {
+    override val intrinsicSize = Size(256f, 256f)
+
+    override fun DrawScope.onDraw() {
+        drawOval(Color(0xFFFFA500))
+    }
 }
 ```
-![](hide_instead_of_close.gif)
+<img alt="Hide instead of closing" src="hide_instead_of_close.gif" height="308" />
 
 If an application has multiple windows, then it is better to put its state into a separate class and open/close window in response to `mutableStateListOf` changes (see [notepad example](https://github.com/JetBrains/compose-jb/tree/master/examples/notepad) for more complex use cases):
 ```kotlin
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     val applicationState = remember { MyApplicationState() }
 
     for (window in applicationState.windows) {
-        MyWindow(window)
+        key(window) {
+            MyWindow(window)
+        }
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun MyWindow(
+private fun ApplicationScope.MyWindow(
     state: MyWindowState
 ) = Window(onCloseRequest = state::close, title = state.title) {
     MenuBar {
@@ -254,7 +246,59 @@ private class MyWindowState(
     fun close() = close(this)
 }
 ```
-![](multiple_windows.gif)
+<img alt="Multiple windows" src="multiple_windows.gif" height="280" />
+
+## Function `singleWindowApplication`
+
+There is a simplified function for creating a single window application:
+```kotlin
+import androidx.compose.ui.window.singleWindowApplication
+
+fun main() = singleWindowApplication {
+    // Content
+}
+```
+Use it if:
+- your application has only one window
+- you don't need custom closing logic
+- you don't need to change the window parameters after it is already created
+
+## Adaptive window size
+
+Sometimes we want to show some content as a whole without knowing in advance what exactly will be shown, meaning that we don’t know the optimal window dimensions for it. By setting one or both dimensions of your window’s WindowSize to Dp.Unspecified, Compose for Desktop will automatically adjust the initial size of your window in that dimension to accommodate its content:
+```kotlin
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.Text
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
+
+fun main() = application {
+    Window(
+        onCloseRequest = ::exitApplication,
+        state = rememberWindowState(width = Dp.Unspecified, height = Dp.Unspecified),
+        title = "Adaptive",
+        resizable = false
+    ) {
+        Column(Modifier.background(Color(0xFFEEEEEE))) {
+            Row {
+                Text("label 1", Modifier.size(100.dp, 100.dp).padding(10.dp).background(Color.White))
+                Text("label 2", Modifier.size(150.dp, 200.dp).padding(5.dp).background(Color.White))
+                Text("label 3", Modifier.size(200.dp, 300.dp).padding(25.dp).background(Color.White))
+            }
+        }
+    }
+}
+```
+<img alt="Adaptive window size" src="adaptive.png" height="327" />
 
 ## Changing the state (maximized, minimized, fullscreen, size, position) of the window.
 
@@ -268,7 +312,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -277,7 +320,6 @@ import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     val state = rememberWindowState(placement = WindowPlacement.Maximized)
 
@@ -299,7 +341,7 @@ fun main() = application {
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
-                    state.placement == WindowPlacement.Fullscreen,
+                    state.placement == WindowPlacement.Maximized,
                     {
                         state.placement = if (it) {
                             WindowPlacement.Maximized
@@ -336,15 +378,14 @@ fun main() = application {
     }
 }
 ```
-![](state.gif)
+<img alt="Changing the state" src="state.gif" height="231" />
 
 ## Listening the state of the window
 Reading the state in composition is useful when you need to update UI, but there are cases when you need to react to the state changes and send a value to another non-composable level of your application (write it to the database, for example):
 
-```
+```kotlin
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowSize
@@ -354,20 +395,19 @@ import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     val state = rememberWindowState()
 
-    Window(state) {
+    Window(onCloseRequest = ::exitApplication, state) {
         // Content
-    
+
         LaunchedEffect(state) {
             snapshotFlow { state.size }
                 .onEach(::onWindowResize)
                 .launchIn(this)
 
             snapshotFlow { state.position }
-                .filterNot { it.isInitial }
+                .filterNot { it.isSpecified }
                 .onEach(::onWindowRelocate)
                 .launchIn(this)
         }
@@ -383,34 +423,6 @@ private fun onWindowRelocate(position: WindowPosition) {
 }
 ```
 
-## Handle window-level shortcuts
-```kotlin
-import androidx.compose.material.TextField
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
-
-@OptIn(ExperimentalComposeUiApi::class)
-fun main() = application {
-    Window(
-        onCloseRequest = ::exitApplication,
-        onPreviewKeyEvent = {
-            when (it.key) {
-                Key.Escape -> {
-                    exitApplication()
-                    true
-                }
-                else -> false
-            }
-        }
-    ) {
-        TextField("Text", {})
-    }
-}
-```
-
 ## Dialogs
 There are two types of window – modal and regular. Below are the functions for creating each:
 
@@ -423,19 +435,16 @@ You can see an example of both types of window below.
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogState
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberDialogState
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
@@ -449,7 +458,7 @@ fun main() = application {
         if (isDialogOpen) {
             Dialog(
                 onCloseRequest = { isDialogOpen = false },
-                state = DialogState(position = WindowPosition(Alignment.Center))
+                state = rememberDialogState(position = WindowPosition(Alignment.Center))
             ) {
                 // Dialog's content
             }
@@ -461,13 +470,11 @@ fun main() = application {
 ## Swing interoperability
 Because Compose for Desktop uses Swing under the hood, it is possible to create a window using Swing directly:
 ```kotlin
-import androidx.compose.desktop.ComposeWindow
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.awt.ComposeWindow
 import java.awt.Dimension
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = SwingUtilities.invokeLater {
     ComposeWindow().apply {
         size = Dimension(300, 300)
@@ -483,16 +490,23 @@ fun main() = SwingUtilities.invokeLater {
 You can also access ComposeWindow in the Composable `Window` scope:
 ```kotlin
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
-import java.awt.Cursor
+import androidx.compose.ui.window.singleWindowApplication
+import java.awt.datatransfer.DataFlavor
+import java.awt.dnd.DnDConstants
+import java.awt.dnd.DropTarget
+import java.awt.dnd.DropTargetAdapter
+import java.awt.dnd.DropTargetDropEvent
 
-@OptIn(ExperimentalComposeUiApi::class)
-fun main() = application {
-    Window(onCloseRequest = ::exitApplication) {
-        LaunchedEffect(Unit) {
-            window.cursor = Cursor(Cursor.CROSSHAIR_CURSOR)
+fun main() = singleWindowApplication {
+    LaunchedEffect(Unit) {
+        window.dropTarget = DropTarget().apply {
+            addDropTargetListener(object : DropTargetAdapter() {
+                override fun drop(event: DropTargetDropEvent) {
+                    event.acceptDrop(DnDConstants.ACTION_COPY);
+                    val fileName = event.transferable.getTransferData(DataFlavor.javaFileListFlavor)
+                    println(fileName)
+                }
+            })
         }
     }
 }
@@ -505,13 +519,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.AwtWindow
 import androidx.compose.ui.window.application
 import java.awt.FileDialog
 import java.awt.Frame
 
-@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     var isOpen by remember { mutableStateOf(true) }
 
@@ -525,7 +537,6 @@ fun main() = application {
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun FileDialog(
     parent: Frame? = null,
@@ -544,3 +555,54 @@ private fun FileDialog(
     dispose = FileDialog::dispose
 )
 ```
+
+## Draggable window area
+If you window is undecorated and you want to add a custom draggable titlebar to it (or make the whole window draggable), you can use `DraggableWindowArea`:
+```kotlin
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.window.WindowDraggableArea
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.application
+
+fun main() = application {
+    Window(onCloseRequest = ::exitApplication, undecorated = true) {
+        WindowDraggableArea {
+            Box(Modifier.fillMaxWidth().height(48.dp).background(Color.DarkGray))
+        }
+    }
+}
+```
+Note that `WindowDraggableArea` can be used only inside `singleWindowApplication`, `Window` and `Dialog`. If you need to use it in another Composable function, pass `WindowScope` as a receiver there:
+```kotlin
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.window.WindowDraggableArea
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowScope
+import androidx.compose.ui.window.application
+
+fun main() = application {
+    Window(onCloseRequest = ::exitApplication, undecorated = true) {
+        AppWindowTitleBar()
+    }
+}
+
+@Composable
+private fun WindowScope.AppWindowTitleBar() = WindowDraggableArea {
+    Box(Modifier.fillMaxWidth().height(48.dp).background(Color.DarkGray))
+}
+```
+<img alt="Draggable area" src="draggable_area.gif" height="239" />

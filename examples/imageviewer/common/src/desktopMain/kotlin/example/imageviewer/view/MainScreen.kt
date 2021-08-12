@@ -35,8 +35,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import example.imageviewer.ResString
@@ -59,51 +60,27 @@ import example.imageviewer.style.icRefresh
 import example.imageviewer.utils.toByteArray
 
 @Composable
-fun setMainScreen(content: ContentState) {
-    if (content.isContentReady()) {
-        Column {
-            setTopContent(content)
-            setScrollableArea(content)
-        }
-    } else {
-        setLoadingScreen(content)
+fun MainScreen(content: ContentState) {
+    Column {
+        TopContent(content)
+        ScrollableArea(content)
+    }
+    if (!content.isContentReady()) {
+        LoadingScreen(ResString.loading)
     }
 }
 
 @Composable
-private fun setLoadingScreen(content: ContentState) {
-    Box {
-        Column {
-            setTopContent(content)
-        }
-        Box(modifier = Modifier.align(Alignment.Center)) {
-            Surface(color = DarkGray, elevation = 4.dp, shape = CircleShape) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(50.dp).padding(3.dp, 3.dp, 4.dp, 4.dp),
-                    color = DarkGreen
-                )
-            }
-        }
-        Text(
-            text = ResString.loading,
-            modifier = Modifier.align(Alignment.Center).offset(0.dp, 70.dp),
-            style = MaterialTheme.typography.body1,
-            color = Foreground
-        )
-    }
+fun TopContent(content: ContentState) {
+    TitleBar(text = ResString.appName, content = content)
+    PreviewImage(content)
+    Spacer(modifier = Modifier.height(10.dp))
+    Divider()
+    Spacer(modifier = Modifier.height(5.dp))
 }
 
 @Composable
-fun setTopContent(content: ContentState) {
-    setTitleBar(text = ResString.appName, content = content)
-    setPreviewImageUI(content)
-    setSpacer(h = 10)
-    setDivider()
-    setSpacer(h = 5)
-}
-
-@Composable
-fun setTitleBar(text: String, content: ContentState) {
+fun TitleBar(text: String, content: ContentState) {
     val refreshButtonHover = remember { mutableStateOf(false) }
     TopAppBar(
         backgroundColor = DarkGreen,
@@ -119,29 +96,31 @@ fun setTitleBar(text: String, content: ContentState) {
                 modifier = Modifier.padding(end = 20.dp).align(Alignment.CenterVertically),
                 shape = CircleShape
             ) {
-                Clickable(
-                    modifier = Modifier.hover(
-                        onEnter = {
-                            refreshButtonHover.value = true
-                            false
-                        },
-                        onExit = {
-                            refreshButtonHover.value = false
-                            false
+                Tooltip(ResString.refresh) {
+                    Clickable(
+                        modifier = Modifier.hover(
+                            onEnter = {
+                                refreshButtonHover.value = true
+                                false
+                            },
+                            onExit = {
+                                refreshButtonHover.value = false
+                                false
+                            }
+                        )
+                        .background(color = if (refreshButtonHover.value) TranslucentBlack else Transparent),
+                        onClick = {
+                            if (content.isContentReady()) {
+                                content.refresh()
+                            }
                         }
-                    )
-                    .background(color = if (refreshButtonHover.value) TranslucentBlack else Transparent),
-                    onClick = {
-                        if (content.isContentReady()) {
-                            content.refresh()
-                        }
+                    ) {
+                        Image(
+                            icRefresh(),
+                            contentDescription = null,
+                            modifier = Modifier.size(35.dp)
+                        )
                     }
-                ) {
-                    Image(
-                        icRefresh(),
-                        contentDescription = null,
-                        modifier = Modifier.size(35.dp)
-                    )
                 }
             }
         }
@@ -149,7 +128,7 @@ fun setTitleBar(text: String, content: ContentState) {
 }
 
 @Composable
-fun setPreviewImageUI(content: ContentState) {
+fun PreviewImage(content: ContentState) {
     Clickable(
         modifier = Modifier.background(color = DarkGray),
         onClick = {
@@ -165,9 +144,8 @@ fun setPreviewImageUI(content: ContentState) {
             Image(
                 if (content.isMainImageEmpty())
                     icEmpty()
-                else org.jetbrains.skija.Image.makeFromEncoded(
-                    toByteArray(content.getSelectedImage())
-                ).asImageBitmap(),
+                else
+                    BitmapPainter(content.getSelectedImage()),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth().padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 5.dp),
@@ -178,7 +156,7 @@ fun setPreviewImageUI(content: ContentState) {
 }
 
 @Composable
-fun setMiniatureUI(
+fun Miniature(
     picture: Picture,
     content: ContentState
 ) {
@@ -265,7 +243,7 @@ fun setMiniatureUI(
 }
 
 @Composable
-fun setScrollableArea(content: ContentState) {
+fun ScrollableArea(content: ContentState) {
     Box(
         modifier = Modifier.fillMaxSize()
         .padding(end = 8.dp)
@@ -275,7 +253,7 @@ fun setScrollableArea(content: ContentState) {
             var index = 1
             Column {
                 for (picture in content.getMiniatures()) {
-                    setMiniatureUI(
+                    Miniature(
                         picture = picture,
                         content = content
                     )
@@ -293,16 +271,9 @@ fun setScrollableArea(content: ContentState) {
 }
 
 @Composable
-fun setDivider() {
-
+fun Divider() {
     Divider(
         color = LightGray,
         modifier = Modifier.padding(start = 10.dp, end = 10.dp)
     )
-}
-
-@Composable
-fun setSpacer(h: Int) {
-
-    Spacer(modifier = Modifier.height(h.dp))
 }

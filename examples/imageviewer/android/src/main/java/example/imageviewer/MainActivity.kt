@@ -3,7 +3,7 @@ package example.imageviewer
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
-import example.imageviewer.view.BuildAppUI
+import example.imageviewer.view.AppUI
 import example.imageviewer.model.ContentState
 import example.imageviewer.model.ImageRepository
 
@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         )
         
         setContent {
-            BuildAppUI(content)
+            AppUI(content)
         }
     }
 }
