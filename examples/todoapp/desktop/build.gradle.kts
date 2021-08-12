@@ -36,7 +36,7 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "ComoseDesktopTodo"
+            packageName = "ComposeDesktopTodo"
             packageVersion = "1.0.0"
 
             modules("java.sql")
