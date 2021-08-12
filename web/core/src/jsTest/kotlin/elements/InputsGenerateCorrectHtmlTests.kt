@@ -6,7 +6,6 @@ import androidx.compose.runtime.getValue
 import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.core.tests.asHtmlElement
 import org.jetbrains.compose.web.core.tests.runTest
-import org.jetbrains.compose.web.core.tests.waitForAnimationFrame
 import org.jetbrains.compose.web.dom.*
 import org.jetbrains.compose.web.renderComposable
 import org.w3c.dom.HTMLInputElement
@@ -427,7 +426,7 @@ class InputsGenerateCorrectHtmlTests {
         assertEquals("""<form autocomplete="on"></form>""", root.innerHTML)
 
         autoCompleteEnabled = false
-        waitChanges()
+        waitForChanges()
 
         assertEquals("""<form autocomplete="off"></form>""", root.innerHTML)
     }
@@ -453,7 +452,7 @@ class InputsGenerateCorrectHtmlTests {
         assertEquals("text", (root.firstChild as HTMLInputElement).value)
 
         state = ""
-        waitForAnimationFrame()
+        waitForRecompositionComplete()
 
         assertEquals("", (root.firstChild as HTMLInputElement).value)
     }
@@ -469,7 +468,7 @@ class InputsGenerateCorrectHtmlTests {
         assertEquals("", (root.firstChild as HTMLInputElement).value)
 
         state = "text"
-        waitForAnimationFrame()
+        waitForRecompositionComplete()
 
         assertEquals("text", (root.firstChild as HTMLInputElement).value)
     }
@@ -485,7 +484,7 @@ class InputsGenerateCorrectHtmlTests {
         assertEquals("text", (root.firstChild as HTMLTextAreaElement).value)
 
         state = ""
-        waitForAnimationFrame()
+        waitForRecompositionComplete()
 
         assertEquals("", (root.firstChild as HTMLTextAreaElement).value)
     }
@@ -501,7 +500,7 @@ class InputsGenerateCorrectHtmlTests {
         assertEquals("", (root.firstChild as HTMLTextAreaElement).value)
 
         state = "text"
-        waitForAnimationFrame()
+        waitForRecompositionComplete()
 
         assertEquals("text", (root.firstChild as HTMLTextAreaElement).value)
     }
