@@ -26,5 +26,6 @@ dependencies {
     implementation(libs.kotlinStdlib)
 
     api("androidx.activity:activity:1.2.0")
+    api("androidx.fragment:fragment-ktx:1.3.6")
     implementation(projectOrArtifact(":compose:runtime:runtime"))
 }

@@ -23,7 +23,6 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.view.Window
-import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
 import androidx.compose.integration.demos.common.ActivityDemo
@@ -48,6 +47,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.preference.PreferenceManager
@@ -55,7 +55,7 @@ import androidx.preference.PreferenceManager
 /**
  * Main [Activity] containing all Compose related demos.
  */
-class DemoActivity : ComponentActivity() {
+class DemoActivity : FragmentActivity() {
     lateinit var hostView: View
     lateinit var focusManager: FocusManager
 
