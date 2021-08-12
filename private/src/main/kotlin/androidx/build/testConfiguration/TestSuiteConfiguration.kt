@@ -145,22 +145,26 @@ fun Project.addAppApkToTestConfigGeneration(overrideProject: Project = this) {
 fun addToTestZips(project: Project, packageTask: PackageAndroidArtifact) {
     project.rootProject.tasks.named(ZIP_TEST_CONFIGS_WITH_APKS_TASK) { task ->
         task as Zip
+        val projectPath = project.path
+        val hasBenchmarkPlugin = project.providers.provider { project.hasBenchmarkPlugin() }
         task.from(packageTask.outputDirectory) {
             it.include("*.apk")
             it.duplicatesStrategy = DuplicatesStrategy.FAIL
             it.rename { fileName ->
-                fileName.renameApkForTesting(project.path, project.hasBenchmarkPlugin())
+                fileName.renameApkForTesting(projectPath, hasBenchmarkPlugin.get())
             }
         }
         task.dependsOn(packageTask)
     }
     project.rootProject.tasks.named(ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK) { task ->
         task as Zip
+        val projectPath = project.path
+        val hasBenchmarkPlugin = project.providers.provider { project.hasBenchmarkPlugin() }
         task.from(packageTask.outputDirectory) {
             it.include("*.apk")
             it.duplicatesStrategy = DuplicatesStrategy.FAIL
             it.rename { fileName ->
-                fileName.renameApkForTesting(project.path, project.hasBenchmarkPlugin())
+                fileName.renameApkForTesting(projectPath, hasBenchmarkPlugin.get())
             }
         }
         task.dependsOn(packageTask)

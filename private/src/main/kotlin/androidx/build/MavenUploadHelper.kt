@@ -52,7 +52,7 @@ private fun Project.configureComponent(
 ) {
     if (extension.publish.shouldPublish() && component.isAndroidOrJavaReleaseComponent()) {
         val androidxGroup = validateCoordinatesAndGetGroup(extension)
-        group = androidxGroup
+        group = androidxGroup.group
         configure<PublishingExtension> {
             repositories {
                 it.maven { repo ->
@@ -64,21 +64,21 @@ private fun Project.configureComponent(
                     // The 'java-gradle-plugin' will also add to the 'pluginMaven' publication
                     it.create<MavenPublication>("pluginMaven")
                     tasks.getByName("publishPluginMavenPublicationToMavenRepository").doFirst {
-                        removePreviouslyUploadedArchives(androidxGroup)
+                        removePreviouslyUploadedArchives(androidxGroup.group)
                     }
                 } else {
                     it.create<MavenPublication>("maven") {
                         from(component)
                     }
                     tasks.getByName("publishMavenPublicationToMavenRepository").doFirst {
-                        removePreviouslyUploadedArchives(androidxGroup)
+                        removePreviouslyUploadedArchives(androidxGroup.group)
                     }
                 }
             }
             publications.withType(MavenPublication::class.java).all {
                 it.pom { pom ->
                     addInformativeMetadata(extension, pom)
-                    tweakDependenciesMetadata(extension, pom)
+                    tweakDependenciesMetadata(androidxGroup, pom)
                 }
             }
         }
@@ -123,11 +123,11 @@ private fun Project.configureMultiplatformPublication() {
 private fun SoftwareComponent.isAndroidOrJavaReleaseComponent() =
     name == "release" || name == "java"
 
-private fun Project.validateCoordinatesAndGetGroup(extension: AndroidXExtension): String {
-    val mavenGroup = extension.mavenGroup?.group
+private fun Project.validateCoordinatesAndGetGroup(extension: AndroidXExtension): LibraryGroup {
+    val mavenGroup = extension.mavenGroup
         ?: throw Exception("You must specify mavenGroup for $name project")
-    val strippedGroupId = mavenGroup.substringAfterLast(".")
-    if (mavenGroup.startsWith("androidx") && !name.startsWith(strippedGroupId)) {
+    val strippedGroupId = mavenGroup.group.substringAfterLast(".")
+    if (mavenGroup.group.startsWith("androidx") && !name.startsWith(strippedGroupId)) {
         throw Exception("Your artifactId must start with '$strippedGroupId'. (currently is $name)")
     }
     return mavenGroup
@@ -148,7 +148,7 @@ private fun Project.removePreviouslyUploadedArchives(group: String) {
 }
 
 private fun Project.addInformativeMetadata(extension: AndroidXExtension, pom: MavenPom) {
-    pom.name.set(provider { extension.name })
+    pom.name.set(extension.name)
     pom.description.set(provider { extension.description })
     pom.url.set(
         provider {
@@ -185,14 +185,17 @@ private fun Project.addInformativeMetadata(extension: AndroidXExtension, pom: Ma
     }
 }
 
-private fun Project.tweakDependenciesMetadata(extension: AndroidXExtension, pom: MavenPom) {
+private fun Project.tweakDependenciesMetadata(
+    mavenGroup: LibraryGroup,
+    pom: MavenPom
+) {
     pom.withXml { xml ->
         // The following code depends on getProjectsMap which is only available late in
         // configuration at which point Java Library plugin's variants are not allowed to be
         // modified. TODO remove the use of getProjectsMap and move to earlier configuration.
         // For more context see:
         // https://android-review.googlesource.com/c/platform/frameworks/support/+/1144664/8/buildSrc/src/main/kotlin/androidx/build/MavenUploadHelper.kt#177
-        assignSingleVersionDependenciesInGroupForPom(xml, extension)
+        assignSingleVersionDependenciesInGroupForPom(xml, mavenGroup)
         assignAarTypes(xml)
     }
 }
@@ -239,10 +242,9 @@ private fun Project.assignAarTypes(xml: XmlProvider) {
  */
 private fun assignSingleVersionDependenciesInGroupForPom(
     xml: XmlProvider,
-    extension: AndroidXExtension
+    mavenGroup: LibraryGroup
 ) {
-    val group = extension.mavenGroup
-    if (group == null || !group.requireSameVersion) {
+    if (!mavenGroup.requireSameVersion) {
         return
     }
 
@@ -256,7 +258,7 @@ private fun assignSingleVersionDependenciesInGroupForPom(
         val groupId = dep.children().first {
             it is Node && it.name().toString().endsWith("groupId")
         } as Node
-        if (groupId.children()[0].toString() == group.group) {
+        if (groupId.children()[0].toString() == mavenGroup.group) {
             val versionNode = dep.children().first {
                 it is Node && it.name().toString().endsWith("version")
             } as Node
