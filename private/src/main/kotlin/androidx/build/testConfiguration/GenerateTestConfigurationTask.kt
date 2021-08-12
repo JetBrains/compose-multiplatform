@@ -153,9 +153,9 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
             configBuilder.tag("macrobenchmarks")
         } else {
             configBuilder.tag("androidx_unit_tests")
-            if (project.path.startsWith(":compose:")) {
+            if (testProjectPath.get().startsWith(":compose:")) {
                 configBuilder.tag("compose")
-            } else if (project.path.startsWith(":wear:")) {
+            } else if (testProjectPath.get().startsWith(":wear:")) {
                 configBuilder.tag("wear")
             }
         }
