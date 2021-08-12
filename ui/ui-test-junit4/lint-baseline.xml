@@ -4,12 +4,100 @@
     <issue
         id="VisibleForTests"
         message="This method should only be accessed from tests or within private scope"
+        errorLine1="            hadPendingMeasureLayout = composeRoots.any { it.hasPendingMeasureOrLayout }"
+        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/android/ComposeIdlingResource.android.kt"
+            line="69"
+            column="61"/>
+    </issue>
+
+    <issue
+        id="VisibleForTests"
+        message="This method should only be accessed from tests or within private scope"
+        errorLine1="        return view.rootView.parent != null &amp;&amp; !view.isAttachedToWindow"
+        errorLine2="               ~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/android/ComposeIdlingResource.android.kt"
+            line="113"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="VisibleForTests"
+        message="This method should only be accessed from tests or within private scope"
+        errorLine1="        return view.rootView.parent != null &amp;&amp; !view.isAttachedToWindow"
+        errorLine2="                                                ~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/android/ComposeIdlingResource.android.kt"
+            line="113"
+            column="49"/>
+    </issue>
+
+    <issue
+        id="VisibleForTests"
+        message="This method should only be accessed from tests or within private scope"
+        errorLine1="        get() = ViewRootForTest.onViewCreatedCallback == ::onViewRootCreated"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/android/ComposeRootRegistry.android.kt"
+            line="54"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="VisibleForTests"
+        message="This method should only be accessed from tests or within private scope"
+        errorLine1="        ViewRootForTest.onViewCreatedCallback = ::onViewRootCreated"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/android/ComposeRootRegistry.android.kt"
+            line="60"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VisibleForTests"
+        message="This method should only be accessed from tests or within private scope"
+        errorLine1="                root.view.addOnAttachStateChangeListener(StateChangeHandler(root))"
+        errorLine2="                     ~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/android/ComposeRootRegistry.android.kt"
+            line="88"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="VisibleForTests"
+        message="This method should only be accessed from tests or within private scope"
         errorLine1="            if (composeRoot == this.composeRoot &amp;&amp; !registered) {"
         errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/android/ComposeRootRegistry.android.kt"
             line="223"
             column="17"/>
+    </issue>
+
+    <issue
+        id="VisibleForTests"
+        message="This method should only be accessed from tests or within private scope"
+        errorLine1="        return composeRoots.filter { it.hasPendingMeasureOrLayout }"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/RobolectricIdlingStrategy.android.kt"
+            line="94"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="VisibleForTests"
+        message="This method should only be accessed from tests or within private scope"
+        errorLine1="            .onEach { it.view.requestLayout() }"
+        errorLine2="                         ~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/RobolectricIdlingStrategy.android.kt"
+            line="95"
+            column="26"/>
     </issue>
 
 </issues>
