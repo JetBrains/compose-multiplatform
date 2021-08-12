@@ -149,8 +149,8 @@ object LibraryVersions {
     val WEAR_WATCHFACE_EDITOR_GUAVA = WEAR_WATCHFACE_EDITOR
     val WEAR_WATCHFACE_STYLE = Version("1.0.0-alpha20")
     val WEBKIT = Version("1.5.0-alpha01")
-    val WINDOW = Version("1.0.0-alpha11")
+    val WINDOW = Version("1.0.0-beta01")
     val WINDOW_EXTENSIONS = Version("1.0.0-alpha01")
-    val WINDOW_SIDECAR = Version("0.1.0-alpha01")
+    val WINDOW_SIDECAR = Version("0.1.0-beta01")
     val WORK = Version("2.7.0-alpha05")
 }
