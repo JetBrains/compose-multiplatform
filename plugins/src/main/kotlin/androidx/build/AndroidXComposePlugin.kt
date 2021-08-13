@@ -67,9 +67,11 @@ class AndroidXComposePlugin : Plugin<Project> {
     }
 
     companion object {
+
         @JvmStatic
         fun Project.isMultiplatformEnabled(): Boolean {
-            return properties.get(COMPOSE_MPP_ENABLED)?.toString()?.toBoolean() ?: false
+            return properties.get(COMPOSE_MPP_ENABLED)?.toString()?.toBoolean()
+                ?: androidxExtension()?.multiplatform ?: false
         }
 
         /**
@@ -100,13 +102,16 @@ class AndroidXComposePlugin : Plugin<Project> {
             }
         }
 
+        private fun Project.androidxExtension(): AndroidXExtension? {
+            return extensions.findByType(AndroidXExtension::class.java)
+        }
+
         private fun Project.configureAndroidCommonOptions(testedExtension: TestedExtension) {
             testedExtension.defaultConfig.minSdk = 21
 
             @Suppress("UnstableApiUsage")
             extensions.findByType(AndroidComponentsExtension::class.java)!!.finalizeDsl {
-                val isPublished = extensions.findByType(AndroidXExtension::class.java)
-                    ?.type == LibraryType.PUBLISHED_LIBRARY
+                val isPublished = androidxExtension()?.type == LibraryType.PUBLISHED_LIBRARY
 
                 @Suppress("DEPRECATION") // lintOptions methods
                 testedExtension.lintOptions.apply {

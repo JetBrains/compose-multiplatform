@@ -159,6 +159,8 @@ open class AndroidXExtension(val project: Project) {
 
     var benchmarkRunAlsoInterpreted = false
 
+    var multiplatform = false
+
     fun shouldEnforceKotlinStrictApiMode(): Boolean {
         return !legacyDisableKotlinStrictApiMode &&
             shouldConfigureApiTasks()
