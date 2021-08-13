@@ -16,15 +16,14 @@
 
 package androidx.compose.ui.window
 
+import androidx.compose.ui.awt.ComposeDialog
+import androidx.compose.ui.awt.ComposePanel
+import androidx.compose.ui.awt.ComposeWindow
+import androidx.compose.runtime.compositionLocalOf
 import java.awt.Window
 
 /**
- * Scope that is created by [application], [Window] or [Dialog] and provides an owner window of
- * this scope
+ * Window-owner of the current composition (for example, [ComposeWindow] or [ComposeDialog]).
+ * If the composition is not inside Window (for example, [ComposePanel]), then return null
  */
-interface OwnerWindowScope {
-    /**
-     *  Owner window of this scope
-     */
-    val ownerWindow: Window?
-}
+internal val LocalWindow = compositionLocalOf<Window?> { null }

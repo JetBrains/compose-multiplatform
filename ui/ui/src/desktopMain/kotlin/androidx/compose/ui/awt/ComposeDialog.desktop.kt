@@ -36,7 +36,7 @@ class ComposeDialog(
     owner: Window? = null,
     modalityType: ModalityType = ModalityType.MODELESS
 ) : JDialog(owner, modalityType) {
-    private val delegate = ComposeWindowDelegate()
+    private val delegate = ComposeWindowDelegate(this)
     internal val layer get() = delegate.layer
 
     init {
