@@ -94,7 +94,7 @@ abstract class AndroidXRootPlugin : Plugin<Project> {
         val createArchiveTask = Release.getGlobalFullZipTask(this)
         buildOnServerTask.dependsOn(createArchiveTask)
         val partiallyDejetifyArchiveTask = partiallyDejetifyArchiveTask(
-            createArchiveTask.get().archiveFile
+            createArchiveTask.flatMap { it.archiveFile }
         )
         if (partiallyDejetifyArchiveTask != null)
             buildOnServerTask.dependsOn(partiallyDejetifyArchiveTask)

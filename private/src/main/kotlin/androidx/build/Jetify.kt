@@ -96,7 +96,9 @@ val archivesToDejetify = listOf(
     "m2repository/androidx/sharetarget/**"
 )
 
-fun Project.partiallyDejetifyArchiveTask(archiveFile: Provider<RegularFile>): TaskProvider<Exec>? {
+fun Project.partiallyDejetifyArchiveTask(
+    archiveFile: Provider<RegularFile>
+): TaskProvider<Exec>? {
     return findProject(":jetifier:jetifier-standalone")?.let { standaloneProject ->
         val stripTask = stripArchiveForPartialDejetificationTask(archiveFile)
 
@@ -105,10 +107,10 @@ fun Project.partiallyDejetifyArchiveTask(archiveFile: Provider<RegularFile>): Ta
                 "top-of-tree-m2repository-partially-dejetified-${getBuildId()}.zip"
             val jetifierBin = "${standaloneProject.buildDir}/install/jetifier-standalone/bin/" +
                 "jetifier-standalone"
-            val migrationConfig = "${standaloneProject.projectDir.getParentFile()}/migration.config"
+            val migrationConfig = "${standaloneProject.projectDir.parentFile}/migration.config"
 
             it.dependsOn(stripTask)
-            it.inputs.file(stripTask.get().archiveFile)
+            it.inputs.file(stripTask.flatMap { it.archiveFile })
             it.outputs.file(outputFileName)
 
             it.commandLine = listOf(
@@ -124,13 +126,14 @@ fun Project.partiallyDejetifyArchiveTask(archiveFile: Provider<RegularFile>): Ta
     }
 }
 
-fun Project.stripArchiveForPartialDejetificationTask(archiveFile: Provider<RegularFile>):
-    TaskProvider<Zip> {
-        return tasks.register("stripArchiveForPartialDejetification", Zip::class.java) {
-            it.dependsOn(rootProject.tasks.named(Release.FULL_ARCHIVE_TASK_NAME))
-            it.from(zipTree(archiveFile))
-            it.destinationDirectory.set(rootProject.buildDir)
-            it.archiveFileName.set("stripped_archive_partial.zip")
-            it.include(archivesToDejetify)
-        }
+fun Project.stripArchiveForPartialDejetificationTask(
+    archiveFile: Provider<RegularFile>
+): TaskProvider<Zip> {
+    return tasks.register("stripArchiveForPartialDejetification", Zip::class.java) {
+        it.dependsOn(rootProject.tasks.named(Release.FULL_ARCHIVE_TASK_NAME))
+        it.from(zipTree(archiveFile))
+        it.destinationDirectory.set(rootProject.buildDir)
+        it.archiveFileName.set("stripped_archive_partial.zip")
+        it.include(archivesToDejetify)
     }
+}
