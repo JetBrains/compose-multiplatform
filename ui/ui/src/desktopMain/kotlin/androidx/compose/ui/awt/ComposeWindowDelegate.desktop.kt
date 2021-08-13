@@ -20,16 +20,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.window.LocalWindow
 import org.jetbrains.skiko.ClipComponent
 import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.SkiaLayer
 import java.awt.Component
+import java.awt.Window
 import java.awt.event.MouseListener
 import java.awt.event.MouseMotionListener
 import java.awt.event.MouseWheelListener
 import javax.swing.JLayeredPane
 
-internal class ComposeWindowDelegate {
+internal class ComposeWindowDelegate(private val window: Window) {
     private var isDisposed = false
 
     val layer = ComposeLayer()
@@ -87,6 +89,7 @@ internal class ComposeWindowDelegate {
             onKeyEvent = onKeyEvent,
         ) {
             CompositionLocalProvider(
+                LocalWindow provides window,
                 LocalLayerContainer provides pane
             ) {
                 content()

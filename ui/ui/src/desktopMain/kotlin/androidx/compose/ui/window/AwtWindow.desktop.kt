@@ -60,7 +60,7 @@ import java.awt.Window
 @OptIn(DelicateCoroutinesApi::class)
 @Suppress("unused")
 @Composable
-fun <T : Window> OwnerWindowScope.AwtWindow(
+fun <T : Window> AwtWindow(
     visible: Boolean = true,
     create: () -> T,
     dispose: (T) -> Unit,

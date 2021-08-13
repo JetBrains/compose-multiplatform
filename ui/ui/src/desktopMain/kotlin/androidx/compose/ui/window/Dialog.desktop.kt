@@ -90,7 +90,7 @@ import javax.swing.JDialog
  * @param content content of the dialog
  */
 @Composable
-fun OwnerWindowScope.Dialog(
+fun Dialog(
     onCloseRequest: () -> Unit,
     state: DialogState = rememberDialogState(),
     visible: Boolean = true,
@@ -104,7 +104,7 @@ fun OwnerWindowScope.Dialog(
     onKeyEvent: ((KeyEvent) -> Boolean) = { false },
     content: @Composable DialogWindowScope.() -> Unit
 ) {
-    val owner = this.ownerWindow
+    val owner = LocalWindow.current
 
     val currentState by rememberUpdatedState(state)
     val currentTitle by rememberUpdatedState(title)
@@ -202,7 +202,7 @@ fun OwnerWindowScope.Dialog(
  */
 @Suppress("unused")
 @Composable
-fun OwnerWindowScope.Dialog(
+fun Dialog(
     visible: Boolean = true,
     onPreviewKeyEvent: ((KeyEvent) -> Boolean) = { false },
     onKeyEvent: ((KeyEvent) -> Boolean) = { false },

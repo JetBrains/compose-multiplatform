@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package androidx.compose.material
+@file:Suppress("DEPRECATION")
+
+package androidx.compose.material.v1
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.window.WindowDraggableArea
+import androidx.compose.material.AlertDialogContent
+import androidx.compose.material.AlertDialogFlowRow
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.rememberDialogState
-import androidx.compose.ui.window.Dialog as CoreDialog
+import androidx.compose.ui.window.v1.Dialog
+import androidx.compose.ui.window.v1.DialogProperties
 
 /**
- * Alert dialog is a Dialog which interrupts the user with urgent information, details or actions.
+ * Alert dialog is a [Dialog] which interrupts the user with urgent information, details or actions.
  *
  * The dialog will position its buttons based on the available space. By default it will try to
  * place them horizontally next to each other and fallback to horizontal placement if not enough
@@ -44,7 +44,8 @@ import androidx.compose.ui.window.Dialog as CoreDialog
  * Sample of dialog:
  * @sample androidx.compose.material.samples.AlertDialogSample
  *
- * @param onDismissRequest Callback that will be called when the user closes the dialog.
+ * @param onDismissRequest Executes when the user tries to dismiss the Dialog by clicking outside
+ * or pressing the back button. This is not called when the dismiss button is clicked.
  * @param confirmButton A button which is meant to confirm a proposed action, thus resolving
  * what triggered the dialog. The dialog does not set up any events for this button so they need
  * to be set up by the caller.
@@ -59,10 +60,13 @@ import androidx.compose.ui.window.Dialog as CoreDialog
  * @param shape Defines the Dialog's shape
  * @param backgroundColor The background color of the dialog.
  * @param contentColor The preferred content color provided by this dialog to its children.
- * @param dialogProvider Defines how to create dialog in which will be placed AlertDialog's content.
+ * @param properties Typically platform specific properties to further configure the dialog.
  */
+@Deprecated(
+    "Use another variant of AlertDialog for the new Composable Window API (https://github" +
+        ".com/JetBrains/compose-jb/tree/master/tutorials/Window_API_new)"
+)
 @Composable
-@ExperimentalMaterialApi
 fun AlertDialog(
     onDismissRequest: () -> Unit,
     confirmButton: @Composable () -> Unit,
@@ -73,7 +77,7 @@ fun AlertDialog(
     shape: Shape = MaterialTheme.shapes.medium,
     backgroundColor: Color = MaterialTheme.colors.surface,
     contentColor: Color = contentColorFor(backgroundColor),
-    dialogProvider: AlertDialogProvider = PopupAlertDialogProvider
+    properties: DialogProperties = DialogProperties()
 ) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
@@ -95,18 +99,19 @@ fun AlertDialog(
         shape = shape,
         backgroundColor = backgroundColor,
         contentColor = contentColor,
-        dialogProvider = dialogProvider
+        properties = properties
     )
 }
 
 /**
- * Alert dialog is a Dialog which interrupts the user with urgent information, details or actions.
+ * Alert dialog is a [Dialog] which interrupts the user with urgent information, details or actions.
  *
  * This function can be used to fully customize the button area, e.g. with:
  *
  * @sample androidx.compose.material.samples.CustomAlertDialogSample
  *
- * @param onDismissRequest Callback that will be called when the user closes the dialog.
+ * @param onDismissRequest Executes when the user tries to dismiss the Dialog by clicking outside
+ * or pressing the back button. This is not called when the dismiss button is clicked.
  * @param buttons Function that emits the layout with the buttons.
  * @param modifier Modifier to be applied to the layout of the dialog.
  * @param title The title of the Dialog which should specify the purpose of the Dialog. The title
@@ -117,10 +122,13 @@ fun AlertDialog(
  * @param shape Defines the Dialog's shape.
  * @param backgroundColor The background color of the dialog.
  * @param contentColor The preferred content color provided by this dialog to its children.
- * @param dialogProvider Defines how to create dialog in which will be placed AlertDialog's content.
+ * @param properties Typically platform specific properties to further configure the dialog.
  */
+@Deprecated(
+    "Use another variant of AlertDialog for the new Composable Window API (https://github" +
+        ".com/JetBrains/compose-jb/tree/master/tutorials/Window_API_new)"
+)
 @Composable
-@ExperimentalMaterialApi
 fun AlertDialog(
     onDismissRequest: () -> Unit,
     buttons: @Composable () -> Unit,
@@ -130,84 +138,20 @@ fun AlertDialog(
     shape: Shape = MaterialTheme.shapes.medium,
     backgroundColor: Color = MaterialTheme.colors.surface,
     contentColor: Color = contentColorFor(backgroundColor),
-    dialogProvider: AlertDialogProvider = PopupAlertDialogProvider
+    properties: DialogProperties = DialogProperties()
 ) {
-    with(dialogProvider) {
-        AlertDialog(onDismissRequest = onDismissRequest) {
-            AlertDialogContent(
-                buttons = buttons,
-                modifier = modifier.width(IntrinsicSize.Min),
-                title = title,
-                text = text,
-                shape = shape,
-                backgroundColor = backgroundColor,
-                contentColor = contentColor
-            )
-        }
-    }
-}
-
-/**
- * Defines how to create dialog in which will be placed AlertDialog's content.
- */
-@ExperimentalMaterialApi
-interface AlertDialogProvider {
-    /**
-     * Dialog which will be used to place AlertDialog's [content].
-     *
-     * @param onDismissRequest Callback that will be called when the user closes the dialog
-     * @param content Content of the dialog
-     */
-    @Composable
-    fun AlertDialog(
-        onDismissRequest: () -> Unit,
-        content: @Composable () -> Unit
-    )
-}
-
-// TODO(https://github.com/JetBrains/compose-jb/issues/933): is it right to use Popup to show a
-//  dialog?
-/**
- * Shows Alert dialog as popup in the middle of the window.
- */
-@ExperimentalMaterialApi
-object PopupAlertDialogProvider : AlertDialogProvider {
-    @Composable
-    override fun AlertDialog(
-        onDismissRequest: () -> Unit,
-        content: @Composable () -> Unit
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = properties
     ) {
-        Popup(
-            alignment = Alignment.Center,
-            focusable = true,
-            onDismissRequest = onDismissRequest,
-        ) {
-            Surface(elevation = 24.dp) {
-                content()
-            }
-        }
-    }
-}
-
-/**
- * Shows Alert dialog as undecorated draggable window.
- */
-@ExperimentalMaterialApi
-object UndecoratedWindowAlertDialogProvider : AlertDialogProvider {
-    @Composable
-    override fun AlertDialog(
-        onDismissRequest: () -> Unit,
-        content: @Composable () -> Unit
-    ) {
-        CoreDialog(
-            onCloseRequest = onDismissRequest,
-            state = rememberDialogState(width = Dp.Unspecified, height = Dp.Unspecified),
-            undecorated = true,
-            resizable = false
-        ) {
-            WindowDraggableArea {
-                content()
-            }
-        }
+        AlertDialogContent(
+            buttons = buttons,
+            modifier = modifier,
+            title = title,
+            text = text,
+            shape = shape,
+            backgroundColor = backgroundColor,
+            contentColor = contentColor
+        )
     }
 }

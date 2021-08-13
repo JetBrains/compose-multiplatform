@@ -33,7 +33,7 @@ import javax.swing.JFrame
  * ComposeWindow inherits javax.swing.JFrame.
  */
 class ComposeWindow : JFrame() {
-    private val delegate = ComposeWindowDelegate()
+    private val delegate = ComposeWindowDelegate(this)
     internal val layer get() = delegate.layer
 
     init {
