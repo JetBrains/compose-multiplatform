@@ -12,6 +12,7 @@ import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.StyleSheetBuilder
 import org.jetbrains.compose.web.css.StyleSheetBuilderImpl
+import org.jetbrains.compose.web.elements.SvgElementScope
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLAreaElement
@@ -60,6 +61,7 @@ import org.w3c.dom.HTMLUListElement
 import org.w3c.dom.HTMLVideoElement
 import org.w3c.dom.Text
 import org.w3c.dom.css.CSSStyleSheet
+import org.w3c.dom.svg.SVGElement
 
 typealias AttrBuilderContext<T> = AttrsBuilder<T>.() -> Unit
 typealias ContentBuilder<T> = @Composable ElementScope<T>.() -> Unit
@@ -948,5 +950,28 @@ fun <K> Input(type: InputType<K>) {
             this.copyFrom(inputAttrsBuilder)
         },
         content = null
+    )
+}
+
+/**
+ * https://developer.mozilla.org/en-US/docs/Web/SVG/Element/svg
+ */
+@Composable
+fun Svg(
+    width: Number? = null,
+    height: Number? = null,
+    viewBox: SvgElementScope.SvgViewBox,
+    attrs: (AttrsBuilder<SVGElement>.() -> Unit)? = null,
+    content: @Composable (SvgElementScope.() -> Unit)? = null
+) {
+    SVGElement(
+        name = "svg",
+        applyAttrs = {
+            if (attrs != null) attrs()
+            attr("viewBox", viewBox.toString())
+            if (width != null) attr("width", width.toString())
+            if (height != null) attr("height", height.toString())
+        },
+        content = content
     )
 }

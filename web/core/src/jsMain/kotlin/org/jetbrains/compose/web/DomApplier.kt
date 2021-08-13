@@ -9,7 +9,12 @@ import kotlinx.dom.clear
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
+import org.w3c.dom.css.ElementCSSInlineStyle
+import org.w3c.dom.events.Event
+import org.w3c.dom.events.EventListener
+import org.w3c.dom.events.EventTarget
 import org.w3c.dom.get
+import org.w3c.dom.svg.SVGElement
 
 class DomApplier(
     root: DomNodeWrapper
@@ -47,7 +52,7 @@ open class DomNodeWrapper(open val node: Node) {
     private var currentListeners = emptyList<SyntheticEventListener<*>>()
 
     fun updateEventListeners(list: List<SyntheticEventListener<*>>) {
-        val htmlElement = node as? HTMLElement ?: return
+        val htmlElement = node as? Element ?: return
 
         currentListeners.forEach {
             htmlElement.removeEventListener(it.event, it)
@@ -91,6 +96,40 @@ open class DomNodeWrapper(open val node: Node) {
     }
 }
 
+class SvgElementWrapper(override val node: SVGElement): DomNodeWrapper(node) {
+    private var currentAttrs: Map<String, String>? = null
+
+    fun updateAttrs(attrs: Map<String, String>) {
+        currentAttrs?.forEach {
+            node.removeAttribute(it.key)
+        }
+
+        attrs.forEach {
+            node.setAttribute(it.key, it.value)
+        }
+        currentAttrs = attrs
+    }
+
+    fun updateProperties(list: List<Pair<(Element, Any) -> Unit, Any>>) {
+        // https://developer.mozilla.org/en-US/docs/Web/API/SVGElement#properties
+        // node.className type is SVGAnimatedString for SvgElement, so we set attr `class` to an empty string instead
+        // if (node.className.isNotEmpty()) node.className = ""
+
+        node.setAttribute("class", "")
+        list.forEach { it.first(node, it.second) }
+    }
+
+    fun updateStyleDeclarations(style: StyleHolder?) {
+        node.removeAttribute("style")
+
+        style?.properties?.forEach { (name, value) ->
+            setProperty(node.style, name, value)
+        }
+        style?.variables?.forEach { (name, value) ->
+            setVariable(node.style, name, value)
+        }
+    }
+}
 
 class DomElementWrapper(override val node: HTMLElement): DomNodeWrapper(node) {
     private var currentAttrs: Map<String, String>? = null

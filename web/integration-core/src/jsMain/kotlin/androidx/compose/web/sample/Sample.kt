@@ -8,19 +8,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.web.sample.renderSampleWithSvg
 import org.jetbrains.compose.web.attributes.Draggable
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.attributes.name
 import org.jetbrains.compose.web.css.selectors.className
 import org.jetbrains.compose.web.css.selectors.hover
 import org.jetbrains.compose.web.css.selectors.plus
-import org.jetbrains.compose.web.dom.A
-import org.jetbrains.compose.web.dom.Button
-import org.jetbrains.compose.web.dom.Div
-import org.jetbrains.compose.web.dom.Input
-import org.jetbrains.compose.web.dom.Style
-import org.jetbrains.compose.web.dom.Text
-import org.jetbrains.compose.web.dom.TextArea
 import org.jetbrains.compose.web.renderComposableInBody
 import org.jetbrains.compose.web.sample.tests.launchTestCase
 import kotlinx.browser.window
@@ -29,6 +23,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.attributes.value
 import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.dom.*
 import org.w3c.dom.url.URLSearchParams
 
 class State {
@@ -139,7 +134,16 @@ fun main() {
         return
     }
 
+    if (urlParams.has("svgsample")) {
+        renderSampleWithSvg()
+        return
+    }
+
     renderComposableInBody {
+        A(href = "${window.location.href}?svgsample=1") {
+            Text("Open Svg Sample")
+        }
+
         println("renderComposable")
         val counter = remember { mutableStateOf(0) }
 

@@ -14,6 +14,9 @@ import org.jetbrains.compose.web.DomApplier
 import org.jetbrains.compose.web.DomElementWrapper
 import org.jetbrains.compose.web.attributes.AttrsBuilder
 import kotlinx.browser.document
+import org.jetbrains.compose.web.DomNodeWrapper
+import org.jetbrains.compose.web.SvgElementWrapper
+import org.jetbrains.compose.web.elements.SvgElementScope
 import org.w3c.dom.Audio
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLAnchorElement
@@ -61,6 +64,7 @@ import org.w3c.dom.HTMLTextAreaElement
 import org.w3c.dom.HTMLTrackElement
 import org.w3c.dom.HTMLUListElement
 import org.w3c.dom.HTMLVideoElement
+import org.w3c.dom.svg.SVGElement
 
 @OptIn(ComposeCompilerApi::class)
 @Composable
@@ -89,9 +93,46 @@ inline fun <TScope, T, reified E : Applier<*>> ComposeDomNode(
     currentComposer.endNode()
 }
 
-class DisposableEffectHolder<TElement: Element>(
+class DisposableEffectHolder<TElement : Element>(
     var effect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
 )
+
+@Composable
+fun SVGElement(
+    name: String,
+    applyAttrs: (AttrsBuilder<SVGElement>.() -> Unit)? = null,
+    content: @Composable (SvgElementScope.() -> Unit)? = null
+) {
+    ComposeDomNode<SvgElementScope, SvgElementWrapper, DomApplier>(
+        factory = {
+            SvgElementWrapper(
+                document.createElementNS(
+                    namespace = "http://www.w3.org/2000/svg",
+                    qualifiedName = name
+                ) as SVGElement
+            )
+        },
+        attrsSkippableUpdate = {
+            val attrsApplied = AttrsBuilder<SVGElement>().also {
+                if (applyAttrs != null) {
+                    it.applyAttrs()
+                }
+            }
+
+            val attrsCollected = attrsApplied.collect()
+            val events = attrsApplied.collectListeners()
+
+            update {
+                set(attrsCollected, SvgElementWrapper::updateAttrs)
+                set(events, SvgElementWrapper::updateEventListeners)
+                set(attrsApplied.propertyUpdates, SvgElementWrapper::updateProperties)
+                set(attrsApplied.styleBuilder, SvgElementWrapper::updateStyleDeclarations)
+            }
+        },
+        content = content,
+        elementScope = SvgElementScope()
+    )
+}
 
 @Composable
 fun <TElement : Element> TagElement(
