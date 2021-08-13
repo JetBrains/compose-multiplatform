@@ -31,16 +31,16 @@ android {
 }
 
 dependencies {
-    kotlinPlugin(project(":compose:compiler:compiler"))
+    kotlinPlugin(projectOrArtifact(":compose:compiler:compiler"))
 
-    androidTestImplementation(project(":compose:ui:ui"))
-    androidTestImplementation(project(":compose:ui:ui-test-junit4"))
-    androidTestImplementation(project(":compose:foundation:foundation"))
-    androidTestImplementation(project(":compose:foundation:foundation-layout"))
-    androidTestImplementation(project(":compose:material:material"))
-    androidTestImplementation(project(":compose:runtime:runtime"))
-    androidTestImplementation(project(":compose:ui:ui-text"))
-    androidTestImplementation(project(":compose:ui:ui-util"))
+    androidTestImplementation(projectOrArtifact(":compose:ui:ui"))
+    androidTestImplementation(projectOrArtifact(":compose:ui:ui-test-junit4"))
+    androidTestImplementation(projectOrArtifact(":compose:foundation:foundation"))
+    androidTestImplementation(projectOrArtifact(":compose:foundation:foundation-layout"))
+    androidTestImplementation(projectOrArtifact(":compose:material:material"))
+    androidTestImplementation(projectOrArtifact(":compose:runtime:runtime"))
+    androidTestImplementation(projectOrArtifact(":compose:ui:ui-text"))
+    androidTestImplementation(projectOrArtifact(":compose:ui:ui-util"))
 
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.testExtJunit)
@@ -49,9 +49,9 @@ dependencies {
     androidTestImplementation(libs.testRules)
     androidTestImplementation(libs.kotlinStdlib)
     androidTestImplementation(libs.kotlinReflect)
-    androidTestImplementation(project(":benchmark:benchmark-junit4"))
+    androidTestImplementation(projectOrArtifact(":benchmark:benchmark-junit4"))
     androidTestImplementation("androidx.activity:activity:1.2.0")
-    androidTestImplementation(project(":activity:activity-compose"))
+    androidTestImplementation(projectOrArtifact(":activity:activity-compose"))
 }
 
 androidx {
