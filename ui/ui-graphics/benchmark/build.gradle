@@ -32,6 +32,5 @@ dependencies {
     implementation(libs.kotlinStdlib)
 
     androidTestImplementation project(":benchmark:benchmark-junit4")
-    androidTestImplementation project(":benchmark:benchmark-macro-junit4")
     androidTestImplementation(libs.testRules)
 }
