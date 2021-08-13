@@ -29,7 +29,7 @@ plugins {
 AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
-    kotlinPlugin(project(":compose:compiler:compiler"))
+    kotlinPlugin(projectOrArtifact(":compose:compiler:compiler"))
 
     if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         /*
@@ -54,8 +54,8 @@ dependencies {
         androidTestImplementation(libs.junit)
         androidTestImplementation(libs.truth)
 
-        lintChecks(project(":compose:runtime:runtime-lint"))
-        lintPublish(project(":compose:runtime:runtime-lint"))
+        lintChecks(projectOrArtifact(":compose:runtime:runtime-lint"))
+        lintPublish(projectOrArtifact(":compose:runtime:runtime-lint"))
     }
 }
 

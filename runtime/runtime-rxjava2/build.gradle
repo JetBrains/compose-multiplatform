@@ -26,15 +26,15 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin(project(":compose:compiler:compiler"))
+    kotlinPlugin(projectOrArtifact(":compose:compiler:compiler"))
 
     implementation(libs.kotlinStdlib)
 
     api(project(":compose:runtime:runtime"))
     api(libs.rxjava2)
 
-    androidTestImplementation(project(":compose:ui:ui-test-junit4"))
-    androidTestImplementation(project(":compose:test-utils"))
+    androidTestImplementation(projectOrArtifact(":compose:ui:ui-test-junit4"))
+    androidTestImplementation(projectOrArtifact(":compose:test-utils"))
     androidTestImplementation(libs.testRunner)
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.truth)
