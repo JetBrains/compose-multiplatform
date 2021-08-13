@@ -18,6 +18,7 @@
    * [Keyboard navigation](tutorials/Tab_Navigation/README.md)
    * [Tray, menu bar and notifications](tutorials/Tray_Notifications_MenuBar_new/README.md)
    * [Window properties handling](tutorials/Window_API_new/README.md)
+   * [Context Menu](tutorials/Context_Menu/README.md)  
 
 ### Features currently available in Compose for Web
    * [Intro](tutorials/Web/Building_UI/README.md)
@@ -42,4 +43,4 @@ Following limitations apply to Alpha release.
 * M1 works only with Gradle 6.4 and 6.5;
 * M2 works only with Gradle 6.4 or later (6.7 is the latest tested version).
 * M3 works only with Gradle 6.4 or later (6.8 is the latest tested version).
-* Alpha works with Gralde 6.7 or later (7.1 is the latest tested version).
+* Alpha works with Gradle 6.7 or later (7.1 is the latest tested version).

@@ -75,8 +75,8 @@ fun main() = singleWindowApplication(title = "Context menu") {
 ```
 In this example Text/TextField context menus will be extended with two additional items. 
 
-## Context menu for arbitary area
-There is possibility to create a context menu for arbitary application window area. This is implemented using ContextMenuArea API that is 
+## Context menu for an arbitary area
+There is a possibility to create a context menu for an arbitary application window area. This is implemented using ContextMenuArea API that is 
 similar to ContextMenuDataProvider. 
 ```kotlin
 @OptIn(ExperimentalComposeUiApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
@@ -94,4 +94,4 @@ fun main() = singleWindowApplication(title = "Context menu") {
    }
 } 
 ```
-Right click on the Blue Square will show context menu with two items
+Right click on the Blue Square will show a context menu with two items
