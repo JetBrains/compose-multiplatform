@@ -37,6 +37,7 @@ object LibraryGroups {
     val CARDVIEW = LibraryGroup("androidx.cardview", LibraryVersions.CARDVIEW)
     val CAR_APP = LibraryGroup("androidx.car.app", LibraryVersions.CAR_APP)
     val COLLECTION = LibraryGroup("androidx.collection", LibraryVersions.COLLECTION)
+    val COLLECTION2 = LibraryGroup("androidx.collection2", LibraryVersions.COLLECTION2)
     val CONCURRENT = LibraryGroup("androidx.concurrent", LibraryVersions.FUTURES)
     val CONTENTPAGER = LibraryGroup("androidx.contentpager", LibraryVersions.CONTENTPAGER)
     val COORDINATORLAYOUT = LibraryGroup("androidx.coordinatorlayout", LibraryVersions.COORDINATORLAYOUT)
