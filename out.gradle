@@ -23,7 +23,11 @@ def chooseOutDir(subdir = "") {
      */
     def outDir = System.env.OUT_DIR
     if (outDir == null) {
-        outDir = new File("${buildscript.sourceFile.parent}/../../../out${subdir}")
+        def checkoutRoot = System.getProperty("CHECKOUT_ROOT")
+        if (checkoutRoot == null) {
+            checkoutRoot = new File("${buildscript.sourceFile.parent}/../../..")
+        }
+        outDir = new File("${checkoutRoot}/out${subdir}")
     } else {
         outDir = new File(outDir)
     }
