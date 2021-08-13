@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.graphics.benchmark
 
-import androidx.benchmark.macro.junit4.PerfettoRule
+import androidx.benchmark.junit4.PerfettoRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import org.junit.Rule
