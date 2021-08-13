@@ -18,6 +18,7 @@ package androidx.compose.ui.util
 
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.awt.ComposeWindow
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.asAwtImage
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.IntSize
@@ -145,6 +146,11 @@ internal fun Dialog.setUndecoratedSafely(value: Boolean) {
     }
 }
 
+// In fact, this size doesn't affect anything on Windows/Linux, and isn't used by macOs (macOs
+// doesn't have separate Window icons). We specify it to support Painter's with
+// Unspecified intrinsicSize
+private val iconSize = Size(32f, 32f)
+
 internal fun Window.setIcon(painter: Painter?) {
-    setIconImage(painter?.asAwtImage(density, layoutDirection))
+    setIconImage(painter?.asAwtImage(density, layoutDirection, iconSize))
 }
