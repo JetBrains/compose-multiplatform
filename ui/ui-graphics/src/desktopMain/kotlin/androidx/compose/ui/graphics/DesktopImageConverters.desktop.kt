@@ -20,6 +20,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
@@ -61,7 +62,8 @@ private class BufferedImagePainter(val image: BufferedImage) : Painter() {
 /**
  * Convert Compose [Painter] to AWT [Image]. The result will not be rasterized right now, it
  * will be rasterized when AWT will request the image with needed width and height, by calling
- * [AbstractMultiResolutionImage.getResolutionVariant]
+ * [AbstractMultiResolutionImage.getResolutionVariant] on Windows/Linux, or
+ * [AbstractMultiResolutionImage.getResolutionVariants] on macOs.
  *
  * At the rasterization moment, [density] and [layoutDirection] will be passed to the painter.
  * Usually most painters don't use them. Like the painters for svg/xml/raster resources:
@@ -90,10 +92,12 @@ private class PainterImage(
     private val painter: Painter,
     private val density: Density,
     private val layoutDirection: LayoutDirection,
-    private val size: Size,
+    size: Size,
 ) : Image(), MultiResolutionImage {
-    override fun getWidth(observer: ImageObserver?) = size.width.toInt()
-    override fun getHeight(observer: ImageObserver?) = size.height.toInt()
+    private val width = size.width.toInt()
+    private val height = size.height.toInt()
+    override fun getWidth(observer: ImageObserver?) = width
+    override fun getHeight(observer: ImageObserver?) = height
 
     override fun getResolutionVariant(
         destImageWidth: Double,
@@ -138,9 +142,20 @@ private class PainterImage(
         "getGraphics() not supported"
     )
 
-    override fun getResolutionVariants() = throw UnsupportedOperationException(
-        "getResolutionVariants() not supported"
-    )
+    // AWT only calls this field on macOs
+    private val _resolutionVariants by lazy {
+        // optimizations to avoid unnecessary rasterizations
+        when (painter) {
+            is BufferedImagePainter -> listOf(painter.image)
+            is BitmapPainter -> listOf(asBitmap(width, height).asAwtImage())
+            else -> listOf(
+                asBitmap(width, height).asAwtImage(), // for usual displays
+                asBitmap(width * 2, height * 2).asAwtImage(), // for retina displays
+            )
+        }
+    }
+
+    override fun getResolutionVariants() = _resolutionVariants
 }
 
 // TODO(demin): should we optimize toAwtImage/toBitmap? Currently we convert colors according to the
