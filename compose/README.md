@@ -13,7 +13,8 @@ git config --global submodule.recurse true
 
 ## General requirements
 - Java 11 (should be specified in JAVA_HOME)
-- Android SDK (should be specified in ANDROID_SDK_ROOT. Can be downloaded via `./scripts/downloadAndroidSdk` on Linux/macOS)
+- [macOs/Linux] Android SDK downloaded via `./scripts/downloadAndroidSdk`
+- [Windows] Android SDK downloaded from Android Studio and specified in ANDROID_SDK_ROOT. Required components:
   - Android 11
   - Build-Tools 30.0.3
   - NDK 21.3.6528147 (in folder $androidSdk/ndk, not in $androidSdk/ndk/$version)
