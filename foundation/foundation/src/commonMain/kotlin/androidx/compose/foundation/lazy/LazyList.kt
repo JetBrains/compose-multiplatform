@@ -88,6 +88,7 @@ internal fun LazyList(
                 coroutineScope = rememberCoroutineScope(),
                 isVertical = isVertical
             )
+            .clipScrollableContainer(isVertical)
             .scrollable(
                 orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
                 reverseDirection = reverseScrollDirection,
@@ -96,7 +97,6 @@ internal fun LazyList(
                 state = state,
                 overScrollController = overScrollController
             )
-            .clipScrollableContainer(isVertical)
             .padding(contentPadding)
             .then(state.remeasurementModifier)
     ) { constraints ->
