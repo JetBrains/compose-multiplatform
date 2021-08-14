@@ -58,6 +58,8 @@ fun Project.getDistributionDirectory(): File {
     } else {
         val subdir = System.getenv("DIST_SUBDIR") ?: ""
         File(getRootOutDirectory(), "dist$subdir")
+    }.also { distDir ->
+        distDir.mkdirs()
     }
 }
 
