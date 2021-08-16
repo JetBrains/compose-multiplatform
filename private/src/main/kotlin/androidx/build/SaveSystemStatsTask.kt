@@ -46,7 +46,12 @@ abstract class SaveSystemStatsTask : DefaultTask() {
     val outputFile: Property<File> = project.objects.property(File::class.java)
     @TaskAction
     fun exec() {
+        val outputFile = outputFile.get()
+        if (outputFile.exists()) {
+          // b/196115864 : make backup of file so we can know what changed
+          outputFile.copyTo(File(outputFile.path + ".prev"))
+        }
         val statsText = "num processors = ${getNumProcessors()}, total memory = ${getTotalMemory()}"
-        outputFile.get().writeText(statsText)
+        outputFile.writeText(statsText)
     }
 }
