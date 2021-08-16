@@ -153,6 +153,6 @@ object LibraryVersions {
     val WEBKIT = Version("1.5.0-alpha01")
     val WINDOW = Version("1.0.0-beta01")
     val WINDOW_EXTENSIONS = Version("1.0.0-alpha01")
-    val WINDOW_SIDECAR = Version("0.1.0-beta01")
+    val WINDOW_SIDECAR = Version("1.0.0-beta01")
     val WORK = Version("2.7.0-beta01")
 }
