@@ -67,7 +67,9 @@ fun main() = application {
         )
 
         Window(
-            onCloseRequest = ::exitApplication,
+            onCloseRequest = {
+                isOpen = false
+            },
             icon = MyAppIcon
         ) {
             // content
@@ -120,9 +122,7 @@ fun main() = application {
         menu = {
             Item(
                 "Exit",
-                onClick = {
-                    exitApplication()
-                }
+                onClick = ::exitApplication
             )
         }
     )
