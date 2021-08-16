@@ -23,8 +23,8 @@ import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.XmlProvider
 import org.gradle.api.artifacts.Dependency
-import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.component.SoftwareComponent
+import org.gradle.api.provider.Provider
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPom
 import org.gradle.api.publish.maven.MavenPublication
@@ -57,6 +57,27 @@ private fun Project.configureComponent(
             "${androidxGroup.group.replace('.', '/')}/$name"
         )
         group = androidxGroup.group
+
+        /*
+         * Provides a set of maven coordinates (groupId:artifactId) of artifacts in AndroidX
+         * that are Android Libraries.
+         */
+        val androidLibrariesSetProvider: Provider<Set<String>> = provider {
+            val androidxAndroidProjects = mutableSetOf<String>()
+            // Check every project is the project map to see if they are an Android Library
+            val projectModules = project.getProjectsMap()
+            for ((mavenCoordinates, projectPath) in projectModules) {
+                project.findProject(projectPath)?.plugins?.hasPlugin(
+                    LibraryPlugin::class.java
+                )?.let { hasLibraryPlugin ->
+                    if (hasLibraryPlugin) {
+                        androidxAndroidProjects.add(mavenCoordinates)
+                    }
+                }
+            }
+            androidxAndroidProjects
+        }
+
         configure<PublishingExtension> {
             repositories {
                 it.maven { repo ->
@@ -82,7 +103,7 @@ private fun Project.configureComponent(
             publications.withType(MavenPublication::class.java).all {
                 it.pom { pom ->
                     addInformativeMetadata(extension, pom)
-                    tweakDependenciesMetadata(androidxGroup, pom)
+                    tweakDependenciesMetadata(androidxGroup, pom, androidLibrariesSetProvider)
                 }
             }
         }
@@ -185,9 +206,10 @@ private fun Project.addInformativeMetadata(extension: AndroidXExtension, pom: Ma
     }
 }
 
-private fun Project.tweakDependenciesMetadata(
+private fun tweakDependenciesMetadata(
     mavenGroup: LibraryGroup,
-    pom: MavenPom
+    pom: MavenPom,
+    androidLibrariesSetProvider: Provider<Set<String>>
 ) {
     pom.withXml { xml ->
         // The following code depends on getProjectsMap which is only available late in
@@ -196,18 +218,16 @@ private fun Project.tweakDependenciesMetadata(
         // For more context see:
         // https://android-review.googlesource.com/c/platform/frameworks/support/+/1144664/8/buildSrc/src/main/kotlin/androidx/build/MavenUploadHelper.kt#177
         assignSingleVersionDependenciesInGroupForPom(xml, mavenGroup)
-        assignAarTypes(xml)
+        assignAarTypes(xml, androidLibrariesSetProvider)
     }
 }
 
 // TODO(aurimas): remove this when Gradle bug is fixed.
 // https://github.com/gradle/gradle/issues/3170
-private fun Project.assignAarTypes(xml: XmlProvider) {
-    val androidxDependencies = HashSet<Dependency>()
-    collectDependenciesForConfiguration(androidxDependencies, "api")
-    collectDependenciesForConfiguration(androidxDependencies, "implementation")
-    collectDependenciesForConfiguration(androidxDependencies, "compile")
-
+private fun assignAarTypes(
+    xml: XmlProvider,
+    androidLibrariesSetProvider: Provider<Set<String>>
+) {
     val dependencies = xml.asNode().children().find {
         it is Node && it.name().toString().endsWith("dependencies")
     } as Node?
@@ -222,9 +242,8 @@ private fun Project.assignAarTypes(xml: XmlProvider) {
         val artifactId = dep.children().first {
             it is Node && it.name().toString().endsWith("artifactId")
         } as Node
-        if (isAndroidProject(
-                groupId.children()[0] as String,
-                artifactId.children()[0] as String, androidxDependencies
+        if (androidLibrariesSetProvider.get().contains(
+                "${groupId.children()[0] as String}:${artifactId.children()[0] as String}"
             )
         ) {
             dep.appendNode("type", "aar")
@@ -293,25 +312,6 @@ private fun Project.collectDependenciesForConfiguration(
             androidxDependencies.add(dep)
         }
     }
-}
-
-private fun Project.isAndroidProject(
-    groupId: String,
-    artifactId: String,
-    deps: Set<Dependency>
-): Boolean {
-    for (dep in deps) {
-        if (dep is ProjectDependency) {
-            if (dep.group == groupId && dep.name == artifactId) {
-                return dep.dependencyProject.plugins.hasPlugin(LibraryPlugin::class.java)
-            }
-        }
-    }
-    val projectModules = project.getProjectsMap()
-    projectModules["$groupId:$artifactId"]?.let { module ->
-        return project.findProject(module)?.plugins?.hasPlugin(LibraryPlugin::class.java) ?: false
-    }
-    return false
 }
 
 private fun Project.appliesJavaGradlePluginPlugin() = pluginManager.hasPlugin("java-gradle-plugin")
