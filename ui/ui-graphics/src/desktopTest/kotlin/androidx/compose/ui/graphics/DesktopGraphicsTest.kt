@@ -23,7 +23,7 @@ import org.junit.Rule
 
 abstract class DesktopGraphicsTest {
     @get:Rule
-    val screenshotRule = DesktopScreenshotTestRule("ui/ui-desktop/graphics")
+    val screenshotRule = DesktopScreenshotTestRule("compose/ui/ui-desktop/graphics")
 
     private var _surface: Surface? = null
     protected val surface get() = _surface!!

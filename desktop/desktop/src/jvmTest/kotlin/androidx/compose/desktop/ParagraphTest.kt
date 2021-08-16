@@ -47,7 +47,7 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class ParagraphTest {
     @get:Rule
-    val screenshotRule = DesktopScreenshotTestRule("ui/ui-desktop/paragraph")
+    val screenshotRule = DesktopScreenshotTestRule("compose/ui/ui-desktop/paragraph")
 
     private val text1 =
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do" +
