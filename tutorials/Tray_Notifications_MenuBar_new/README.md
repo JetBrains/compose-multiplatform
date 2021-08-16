@@ -116,7 +116,7 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberTrayState
 
 @OptIn(ExperimentalComposeUiApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
-fun main() = application() {
+fun main() = application {
     Tray(
         icon = TrayIcon,
         menu = {
