@@ -5,7 +5,9 @@
 
 package org.jetbrains.compose.web.core.tests
 
+import androidx.compose.runtime.Composable
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class FailingTestCases {
@@ -21,6 +23,19 @@ class FailingTestCases {
             expectedErrorThrown = true
         }
         assertTrue(expectedErrorThrown)
+    }
+
+    data class DataClassTakesComposable(val c: @Composable () -> Unit)
+    class UsualClassTakesComposable(val c: @Composable () -> Unit)
+
+    @Test
+    fun passingComposableIntoConstructorOfDataClass() {
+        check(DataClassTakesComposable {}.c == null) // Expected behaviour: c != null
+    }
+
+    @Test
+    fun passingComposableIntoConstructorOfUsualClass() {
+        check(UsualClassTakesComposable {}.c == null) // Expected behaviour: c != null
     }
 }
 
