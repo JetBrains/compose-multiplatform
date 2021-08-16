@@ -61,8 +61,7 @@ import kotlinx.coroutines.flow.collect
  *
  * See [ExtendedFloatingActionButton] for an extended FAB that contains text and an optional icon.
  *
- * @param onClick will be called when user clicked on this FAB. The FAB will be disabled
- * when it is null.
+ * @param onClick callback invoked when this FAB is clicked
  * @param modifier [Modifier] to be applied to this FAB.
  * @param interactionSource the [MutableInteractionSource] representing the stream of
  * [Interaction]s for this FAB. You can create and pass in your own remembered
@@ -129,8 +128,7 @@ fun FloatingActionButton(
  * @sample androidx.compose.material.samples.FluidExtendedFab
  *
  * @param text Text label displayed inside this FAB
- * @param onClick will be called when user clicked on this FAB. The FAB will be disabled
- * when it is null.
+ * @param onClick callback invoked when this FAB is clicked
  * @param modifier [Modifier] to be applied to this FAB
  * @param icon Optional icon for this FAB, typically this will be a
  * [Icon].
