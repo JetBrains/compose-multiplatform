@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.LocalLayerContainer
 import androidx.compose.ui.geometry.Offset
@@ -33,9 +34,13 @@ import androidx.compose.ui.platform.DesktopOwner
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalDesktopOwners
 import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
 
 /**
@@ -99,8 +104,6 @@ fun Popup(
  * @param popupPositionProvider Provides the screen position of the popup.
  * @param onDismissRequest Executes when the user clicks outside of the popup.
  * @param focusable Indicates if the popup can grab the focus.
- * @property contextMenu Places the popup window below the lower-right rectangle of the mouse
- * cursor image (basic context menu behaviour).
  * @param onPreviewKeyEvent This callback is invoked when the user interacts with the hardware
  * keyboard. It gives ancestors of a focused component the chance to intercept a [KeyEvent].
  * Return true to stop propagation of this event. If you return false, the key event will be
@@ -118,13 +121,11 @@ fun Popup(
     onPreviewKeyEvent: ((KeyEvent) -> Boolean) = { false },
     onKeyEvent: ((KeyEvent) -> Boolean) = { false },
     focusable: Boolean = false,
-    contextMenu: Boolean = false,
     content: @Composable () -> Unit
 ) {
     PopupLayout(
         popupPositionProvider,
         focusable,
-        contextMenu,
         onDismissRequest,
         onPreviewKeyEvent,
         onKeyEvent,
@@ -136,7 +137,6 @@ fun Popup(
 private fun PopupLayout(
     popupPositionProvider: PopupPositionProvider,
     focusable: Boolean,
-    contextMenu: Boolean,
     onDismissRequest: (() -> Unit)?,
     onPreviewKeyEvent: ((KeyEvent) -> Boolean) = { false },
     onKeyEvent: ((KeyEvent) -> Boolean) = { false },
@@ -144,11 +144,9 @@ private fun PopupLayout(
 ) {
     val owners = LocalDesktopOwners.current
     val density = LocalDensity.current
-    val component = if (contextMenu) LocalLayerContainer.current else null
 
     var parentBounds by remember { mutableStateOf(IntRect.Zero) }
     var popupBounds by remember { mutableStateOf(IntRect.Zero) }
-    val pointClick = remember { component?.getMousePosition() }
 
     // getting parent bounds
     Layout(
@@ -191,20 +189,13 @@ private fun PopupLayout(
                     layout(constraints.maxWidth, constraints.maxHeight) {
                         measurables.forEach {
                             val placeable = it.measure(constraints)
-                            var position: IntOffset
-                            if (contextMenu) {
-                                position = IntOffset(
-                                    (pointClick!!.x * density.density).toInt(),
-                                    (pointClick.y * density.density).toInt()
-                                )
-                            } else {
-                                position = popupPositionProvider.calculatePosition(
-                                    anchorBounds = parentBounds,
-                                    windowSize = windowSize,
-                                    layoutDirection = layoutDirection,
-                                    popupContentSize = IntSize(placeable.width, placeable.height)
-                                )
-                            }
+                            val position = popupPositionProvider.calculatePosition(
+                                anchorBounds = parentBounds,
+                                windowSize = windowSize,
+                                layoutDirection = layoutDirection,
+                                popupContentSize = IntSize(placeable.width, placeable.height)
+                            )
+
                             popupBounds = IntRect(
                                 position,
                                 IntSize(placeable.width, placeable.height)
@@ -229,4 +220,105 @@ private fun PopupLayout(
 
 private fun isOutsideRectTap(rect: IntRect, point: Offset): Boolean {
     return !rect.contains(IntOffset(point.x.toInt(), point.y.toInt()))
+}
+
+/**
+ * Provides [PopupPositionProvider] relative to the current mouse cursor position.
+ *
+ * @param offset [DpOffset] to be added to the position of the popup.
+ * @param alignment The alignment of the popup relative to the current cursor position.
+ * @param windowMargin Defines the area within the window that limits the placement of the popup.
+ */
+@ExperimentalComposeUiApi
+@Composable
+fun rememberCursorPositionProvider(
+    offset: DpOffset = DpOffset.Zero,
+    alignment: Alignment = Alignment.BottomEnd,
+    windowMargin: Dp = 4.dp
+): PopupPositionProvider = with(LocalDensity.current) {
+    val component = LocalLayerContainer.current
+    val cursorPoint = remember {
+        val awtMousePosition = component.mousePosition
+        IntOffset(
+            (awtMousePosition.x * density).toInt(),
+            (awtMousePosition.y * density).toInt()
+        )
+    }
+    val offsetPx = IntOffset(offset.x.roundToPx(), offset.y.roundToPx())
+    val windowMarginPx = windowMargin.roundToPx()
+    object : PopupPositionProvider {
+        override fun calculatePosition(
+            anchorBounds: IntRect,
+            windowSize: IntSize,
+            layoutDirection: LayoutDirection,
+            popupContentSize: IntSize
+        ) = with(density) {
+            val anchor = IntRect(cursorPoint, IntSize.Zero)
+            val tooltipArea = IntRect(
+                IntOffset(
+                    anchor.left - popupContentSize.width,
+                    anchor.top - popupContentSize.height,
+                ),
+                IntSize(
+                    popupContentSize.width * 2,
+                    popupContentSize.height * 2
+                )
+            )
+            val position = alignment.align(popupContentSize, tooltipArea.size, layoutDirection)
+            var x = tooltipArea.left + position.x + offsetPx.x
+            var y = tooltipArea.top + position.y + offsetPx.y
+            if (x + popupContentSize.width > windowSize.width - windowMarginPx) {
+                x -= popupContentSize.width
+            }
+            if (y + popupContentSize.height > windowSize.height - windowMarginPx) {
+                y -= popupContentSize.height + anchor.height
+            }
+            if (x < windowMarginPx) {
+                x = windowMarginPx
+            }
+            if (y < windowMarginPx) {
+                y = windowMarginPx
+            }
+            IntOffset(x, y)
+        }
+    }
+}
+
+/**
+ * Provides [PopupPositionProvider] relative to the current component bounds.
+ *
+ * @param anchor The anchor point relative to the current component bounds.
+ * @param alignment The alignment of the popup relative to the [anchor] point.
+ * @param offset [DpOffset] to be added to the position of the popup.
+ */
+@ExperimentalComposeUiApi
+@Composable
+fun rememberComponentRectPositionProvider(
+    anchor: Alignment = Alignment.BottomCenter,
+    alignment: Alignment = Alignment.BottomCenter,
+    offset: DpOffset = DpOffset.Zero
+): PopupPositionProvider = with(LocalDensity.current) {
+    val offsetPx = IntOffset(offset.x.roundToPx(), offset.y.roundToPx())
+    return object : PopupPositionProvider {
+        override fun calculatePosition(
+            anchorBounds: IntRect,
+            windowSize: IntSize,
+            layoutDirection: LayoutDirection,
+            popupContentSize: IntSize
+        ): IntOffset {
+            val anchorPoint = anchor.align(IntSize.Zero, anchorBounds.size, layoutDirection)
+            val tooltipArea = IntRect(
+                IntOffset(
+                    anchorBounds.left + anchorPoint.x - popupContentSize.width,
+                    anchorBounds.top + anchorPoint.y - popupContentSize.height,
+                ),
+                IntSize(
+                    popupContentSize.width * 2,
+                    popupContentSize.height * 2
+                )
+            )
+            val position = alignment.align(popupContentSize, tooltipArea.size, layoutDirection)
+            return tooltipArea.topLeft + position + offsetPx
+        }
+    }
 }
