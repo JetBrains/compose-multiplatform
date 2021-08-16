@@ -80,7 +80,7 @@ import org.jetbrains.compose.compose
 
 plugins {
     kotlin("jvm") version "1.5.21"
-    id("org.jetbrains.compose") version "1.0.0-alpha1"
+    id("org.jetbrains.compose") version "1.0.0-alpha3"
 }
 
 repositories {

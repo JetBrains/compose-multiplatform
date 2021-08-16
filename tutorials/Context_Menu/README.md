@@ -109,6 +109,7 @@ In this example Text/TextField context menus will be extended with two additiona
 There is a possibility to create a context menu for an arbitary application window area. This is implemented using ContextMenuArea API that is 
 similar to ContextMenuDataProvider. 
 ```kotlin
+
 import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.background
