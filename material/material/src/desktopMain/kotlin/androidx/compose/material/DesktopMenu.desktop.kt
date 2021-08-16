@@ -22,14 +22,15 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.rememberCursorPositionProvider
 import androidx.compose.ui.window.Popup
 
 /**
@@ -138,21 +139,21 @@ fun DropdownMenuItem(
 
 /**
  *
- * A [ContextMenu] behaves similarly to [Popup] and will use the current position of the mouse
+ * A [CursorDropdownMenu] behaves similarly to [Popup] and will use the current position of the mouse
  * cursor to position itself on screen.
  *
- * The [content] of a [ContextMenu] will typically be [DropdownMenuItem]s, as well as custom
+ * The [content] of a [CursorDropdownMenu] will typically be [DropdownMenuItem]s, as well as custom
  * content. Using [DropdownMenuItem]s will result in a menu that matches the Material
  * specification for menus.
  *
  * @param expanded Whether the menu is currently open and visible to the user
  * @param onDismissRequest Called when the user requests to dismiss the menu, such as by
  * tapping outside the menu's bounds
- * @param offset [DpOffset] to be added to the position of the menu
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Suppress("ModifierParameter")
 @Composable
-fun ContextMenu(
+fun CursorDropdownMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
     focusable: Boolean = true,
@@ -164,19 +165,11 @@ fun ContextMenu(
 
     if (expandedStates.currentState || expandedStates.targetState) {
         val transformOriginState = remember { mutableStateOf(TransformOrigin.Center) }
-        val density = LocalDensity.current
-        val popupPositionProvider = DropdownMenuPositionProvider(
-            DpOffset(0.dp, 0.dp),
-            density
-        ) { parentBounds, menuBounds ->
-            transformOriginState.value = calculateTransformOrigin(parentBounds, menuBounds)
-        }
 
         Popup(
             focusable = focusable,
-            contextMenu = true,
             onDismissRequest = onDismissRequest,
-            popupPositionProvider = popupPositionProvider
+            popupPositionProvider = rememberCursorPositionProvider()
         ) {
             DropdownMenuContent(
                 expandedStates = expandedStates,

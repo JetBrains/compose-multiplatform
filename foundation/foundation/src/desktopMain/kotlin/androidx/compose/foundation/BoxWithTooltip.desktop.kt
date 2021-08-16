@@ -19,12 +19,12 @@ package androidx.compose.foundation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -34,14 +34,15 @@ import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
+import androidx.compose.ui.window.rememberCursorPositionProvider
+import androidx.compose.ui.window.rememberComponentRectPositionProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -54,10 +55,10 @@ import kotlinx.coroutines.launch
  * @param contentAlignment The default alignment inside the Box.
  * @param propagateMinConstraints Whether the incoming min constraints should be passed to content.
  * @param delay Delay in milliseconds.
- * @param offset Tooltip offset.
- * @param tooltipPlacement Alignment of the tooltip relative to the [content].
+ * @param tooltipPlacement Defines position of the tooltip.
  * @param content Composable content that the current tooltip is set to.
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun BoxWithTooltip(
     tooltip: @Composable () -> Unit,
@@ -65,10 +66,12 @@ fun BoxWithTooltip(
     contentAlignment: Alignment = Alignment.TopStart,
     propagateMinConstraints: Boolean = false,
     delay: Int = 500,
-    tooltipPlacement: TooltipPlacement = DefaultTooltipPlacement,
+    @ExperimentalComposeUiApi
+    tooltipPlacement: TooltipPlacement = TooltipPlacement.CursorPoint(
+        offset = DpOffset(0.dp, 16.dp)
+    ),
     content: @Composable () -> Unit
 ) {
-    val density = LocalDensity.current
     val mousePosition = remember { mutableStateOf(IntOffset.Zero) }
     var parentBounds by remember { mutableStateOf(IntRect.Zero) }
     var isVisible by remember { mutableStateOf(false) }
@@ -87,12 +90,6 @@ fun BoxWithTooltip(
         job?.cancel()
         isVisible = false
     }
-
-    val popupPositionProvider = TooltipPositionProvider(
-        point = mousePosition.value,
-        placement = tooltipPlacement,
-        density = density.density
-    )
 
     Box(
         modifier = modifier
@@ -131,8 +128,9 @@ fun BoxWithTooltip(
     ) {
         content()
         if (isVisible) {
+            @OptIn(ExperimentalComposeUiApi::class)
             Popup(
-                popupPositionProvider = popupPositionProvider,
+                popupPositionProvider = tooltipPlacement.positionProvider(),
                 onDismissRequest = { isVisible = false }
             ) {
                 tooltip()
@@ -153,68 +151,58 @@ private suspend fun PointerInputScope.detectDown(onDown: (Offset) -> Unit) {
     }
 }
 
-@Immutable
-internal data class TooltipPositionProvider(
-    val point: IntOffset,
-    val placement: TooltipPlacement,
-    val density: Float
-) : PopupPositionProvider {
-    override fun calculatePosition(
-        anchorBounds: IntRect,
-        windowSize: IntSize,
-        layoutDirection: LayoutDirection,
-        popupContentSize: IntSize
-    ): IntOffset {
-        val anchorRect = when (placement.anchor) {
-            TooltipPlacement.Anchor.Pointer -> IntRect(
-                point,
-                IntSize(
-                    (DefaultCursorSize * density).toInt(),
-                    (DefaultCursorSize * density).toInt()
-                )
-            )
-            TooltipPlacement.Anchor.Component -> anchorBounds
-        }
-        val area = IntSize(
-            popupContentSize.width * 2 + anchorRect.width,
-            popupContentSize.height * 2 + anchorRect.height
+/**
+ * An interface for providing a [PopupPositionProvider] for the tooltip.
+ */
+@ExperimentalComposeUiApi
+interface TooltipPlacement {
+    /**
+     * Returns [PopupPositionProvider] implementation.
+     */
+    @Composable
+    fun positionProvider(): PopupPositionProvider
+
+    /**
+     * [TooltipPlacement] implementation for providing a [PopupPositionProvider] that calculates
+     * the position of the popup relative to the current mouse cursor position.
+     *
+     * @param offset [DpOffset] to be added to the position of the popup.
+     * @param alignment The alignment of the popup relative to the current cursor position.
+     * @param windowMargin Defines the area within the window that limits the placement of the popup.
+     */
+    @ExperimentalComposeUiApi
+    class CursorPoint(
+        private val offset: DpOffset = DpOffset.Zero,
+        private val alignment: Alignment = Alignment.BottomEnd,
+        private val windowMargin: Dp = 4.dp
+    ) : TooltipPlacement {
+        @Composable
+        override fun positionProvider() = rememberCursorPositionProvider(
+            offset,
+            alignment,
+            windowMargin
         )
-        val anchor = IntOffset(
-            anchorRect.left - popupContentSize.width,
-            anchorRect.top - popupContentSize.height,
+    }
+
+    /**
+     * [TooltipPlacement] implementation for providing a [PopupPositionProvider] that calculates
+     * the position of the popup relative to the current component bounds.
+     *
+     * @param anchor The anchor point relative to the current component bounds.
+     * @param alignment The alignment of the popup relative to the [anchor] point.
+     * @param offset [DpOffset] to be added to the position of the popup.
+     */
+    @ExperimentalComposeUiApi
+    class ComponentRect(
+        private val anchor: Alignment = Alignment.BottomCenter,
+        private val alignment: Alignment = Alignment.BottomCenter,
+        private val offset: DpOffset = DpOffset.Zero
+    ) : TooltipPlacement {
+        @Composable
+        override fun positionProvider() = rememberComponentRectPositionProvider(
+            anchor,
+            alignment,
+            offset
         )
-        val position = placement.alignment.align(popupContentSize, area, layoutDirection)
-        var x = anchor.x + position.x + (placement.offset.x.value * density).toInt()
-        var y = anchor.y + position.y + (placement.offset.y.value * density).toInt()
-        if (placement.anchor == TooltipPlacement.Anchor.Pointer) {
-            if (x + popupContentSize.width > windowSize.width - TooltipMargin * density) {
-                x -= popupContentSize.width
-            }
-            if (y + popupContentSize.height > windowSize.height - TooltipMargin * density) {
-                y -= popupContentSize.height + anchorRect.height
-            }
-            if (x < TooltipMargin * density) {
-                x = (TooltipMargin * density).toInt()
-            }
-            if (y < TooltipMargin * density) {
-                y = (TooltipMargin * density).toInt()
-            }
-        }
-        return IntOffset(x, y)
     }
 }
-
-class TooltipPlacement(
-    val anchor: Anchor,
-    val alignment: Alignment,
-    val offset: DpOffset = DpOffset.Zero
-) {
-    enum class Anchor { Pointer, Component }
-}
-
-private val DefaultTooltipPlacement = TooltipPlacement(
-    anchor = TooltipPlacement.Anchor.Pointer,
-    alignment = Alignment.BottomStart
-)
-private val DefaultCursorSize = 16
-private val TooltipMargin = 4
