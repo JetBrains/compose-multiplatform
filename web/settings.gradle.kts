@@ -26,11 +26,11 @@ pluginManagement {
 
 fun module(name: String, path: String) {
     include(name)
-    val projectPath = file(path)
-    if (!projectPath.exists()) {
-        throw AssertionError("file $path does not exist")
+    val projectDir = file(path).absoluteFile
+    if (!projectDir .exists()) {
+        throw AssertionError("file $projectDir does not exist")
     }
-    project(name).projectDir = projectPath
+    project(name).projectDir = projectDir 
 }
 
 
