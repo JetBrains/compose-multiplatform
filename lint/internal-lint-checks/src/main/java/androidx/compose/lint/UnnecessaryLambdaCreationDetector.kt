@@ -34,6 +34,7 @@ import org.jetbrains.uast.kotlin.KotlinUBlockExpression
 import org.jetbrains.uast.kotlin.KotlinUFunctionCallExpression
 import org.jetbrains.uast.kotlin.KotlinUImplicitReturnExpression
 import org.jetbrains.uast.kotlin.UnknownKotlinExpression
+import org.jetbrains.uast.skipParenthesizedExprDown
 import org.jetbrains.uast.toUElement
 import org.jetbrains.uast.tryResolve
 
@@ -84,7 +85,7 @@ class UnnecessaryLambdaCreationDetector : Detector(), SourceCodeScanner {
 
             if (expressions.size != 1) return
 
-            val expression = when (val expr = expressions.first()) {
+            val expression = when (val expr = expressions.first().skipParenthesizedExprDown()) {
                 is KotlinUFunctionCallExpression -> expr
                 is KotlinUImplicitReturnExpression ->
                     expr.returnExpression as? KotlinUFunctionCallExpression

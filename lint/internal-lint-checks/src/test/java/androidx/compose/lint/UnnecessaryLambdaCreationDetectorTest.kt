@@ -25,10 +25,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.checks.infrastructure.TestFile
+import com.android.tools.lint.checks.infrastructure.TestMode
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
 import org.intellij.lang.annotations.Language
-import org.junit.Ignore
 import org.junit.runners.Parameterized
 
 /* ktlint-disable max-line-length */
@@ -109,10 +109,10 @@ class UnnecessaryLambdaCreationDetectorTest(
     private fun check(@Language("kotlin") code: String): TestLintResult {
         return lint()
             .files(kotlin(code.trimIndent()), stub, Stubs.Composable)
+            .skipTestModes(TestMode.TYPE_ALIAS)
             .run()
     }
 
-    @Ignore("b/196834589")
     @Test
     fun warnsForSingleExpressions() {
         check(
@@ -176,7 +176,6 @@ src/test/test.kt:25: Error: Creating an unnecessary lambda to emit a captured la
         )
     }
 
-    @Ignore("b/196834589")
     @Test
     fun warnsForMultipleLambdas() {
         check(

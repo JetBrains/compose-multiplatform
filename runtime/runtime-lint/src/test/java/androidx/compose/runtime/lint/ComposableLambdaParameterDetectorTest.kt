@@ -20,9 +20,9 @@ package androidx.compose.runtime.lint
 
 import androidx.compose.lint.test.Stubs
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
+import com.android.tools.lint.checks.infrastructure.TestMode
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -41,7 +41,6 @@ class ComposableLambdaParameterDetectorTest : LintDetectorTest() {
         ComposableLambdaParameterDetector.ComposableLambdaParameterPosition
     )
 
-    @Ignore("b/196834589")
     @Test
     fun incorrectNaming() {
         lint().files(
@@ -59,6 +58,7 @@ class ComposableLambdaParameterDetectorTest : LintDetectorTest() {
             ),
             Stubs.Composable
         )
+            .skipTestModes(TestMode.TYPE_ALIAS)
             .run()
             .expect(
                 """
@@ -78,7 +78,6 @@ Fix for src/androidx/compose/ui/foo/test.kt line 7: Rename text to content:
             )
     }
 
-    @Ignore("b/196834589")
     @Test
     fun notTrailing() {
         lint().files(
@@ -96,6 +95,7 @@ Fix for src/androidx/compose/ui/foo/test.kt line 7: Rename text to content:
             ),
             Stubs.Composable
         )
+            .skipTestModes(TestMode.TYPE_ALIAS)
             .run()
             .expect(
                 """
@@ -107,7 +107,6 @@ src/androidx/compose/ui/foo/test.kt:7: Warning: Composable lambda parameter shou
             )
     }
 
-    @Ignore("b/196834589")
     @Test
     fun incorrectNamingAndNotTrailing() {
         lint().files(
@@ -125,6 +124,7 @@ src/androidx/compose/ui/foo/test.kt:7: Warning: Composable lambda parameter shou
             ),
             Stubs.Composable
         )
+            .skipTestModes(TestMode.TYPE_ALIAS)
             .run()
             .expect(
                 """
@@ -206,7 +206,6 @@ Fix for src/androidx/compose/ui/foo/Foo.kt line 9: Rename text to content:
             .expectClean()
     }
 
-    @Ignore("b/196834589")
     @Test
     fun nullableComposableLambdas() {
         lint().files(
@@ -231,6 +230,7 @@ Fix for src/androidx/compose/ui/foo/Foo.kt line 9: Rename text to content:
             ),
             Stubs.Composable
         )
+            .skipTestModes(TestMode.TYPE_ALIAS)
             .run()
             .expect(
                 """
