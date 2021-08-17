@@ -174,13 +174,32 @@ class SemanticsNodeInteraction constructor(
                     errorMessage = finalErrorMessage,
                     foundNodes = result.selectedNodes,
                     expectedCount = 1,
-                    selector = selector
+                    selector = selector,
+                    foundNodesUnmerged = getNodesInUnmergedTree(errorMessageOnFail)
                 )
             )
         }
 
         lastSeenSemantics = result.selectedNodes.first().printToString()
         return result.selectedNodes.first()
+    }
+
+    /**
+     * If using the merged tree, performs the same search in the unmerged tree.
+     */
+    private fun getNodesInUnmergedTree(errorMessageOnFail: String?): List<SemanticsNode> {
+        return if (!useUnmergedTree) {
+            selector
+                .map(
+                    testContext.getAllSemanticsNodes(
+                        atLeastOneRootRequired = true,
+                        useUnmergedTree = true
+                    ),
+                    errorMessageOnFail.orEmpty()
+                ).selectedNodes
+        } else {
+            emptyList()
+        }
     }
 }
 
