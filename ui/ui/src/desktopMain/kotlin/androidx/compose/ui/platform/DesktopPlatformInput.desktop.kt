@@ -173,7 +173,9 @@ internal class DesktopPlatformInput(val component: DesktopComponent) :
             override fun getSelectedText(
                 attributes: Array<AttributedCharacterIterator.Attribute>?
             ): AttributedCharacterIterator {
-                needToDeletePreviousChar = charKeyPressed
+                if (charKeyPressed) {
+                    needToDeletePreviousChar = true
+                }
                 val str = input.value.text.substring(input.value.selection)
                 return AttributedString(str).iterator
             }

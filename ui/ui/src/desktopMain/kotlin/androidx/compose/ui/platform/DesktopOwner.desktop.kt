@@ -193,7 +193,7 @@ internal class DesktopOwner(
         when {
             keyEvent.nativeKeyEvent.id == java.awt.event.KeyEvent.KEY_TYPED ->
                 container.platformInputService.charKeyPressed = true
-            keyEvent.type == KeyEventType.KeyDown ->
+            keyEvent.type == KeyEventType.KeyUp ->
                 container.platformInputService.charKeyPressed = false
         }
 
