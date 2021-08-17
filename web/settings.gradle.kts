@@ -43,7 +43,7 @@ module(":compose-compiler-integration", "$rootDir/compose-compiler-integration")
 
 if (extra["compose.web.buildSamples"]!!.toString().toBoolean() == true) {
     println("building with examples")
-    module(":examples:falling_balls_with_web", "../examples/falling_balls_with_web")
+    module(":examples:falling-balls-web", "../examples/falling-balls-web")
     module(":examples:compose-web-lp", "../examples/web_landing")
     module(":examples:web-compose-bird", "../examples/web-compose-bird")
     module(":examples:web-with-react", "../examples/web-with-react")
