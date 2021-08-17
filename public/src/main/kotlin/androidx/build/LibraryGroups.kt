@@ -46,6 +46,7 @@ object LibraryGroups {
     val CUSTOMVIEW = LibraryGroup("androidx.customview", LibraryVersions.CUSTOMVIEW)
     val DATASTORE = LibraryGroup("androidx.datastore", LibraryVersions.DATASTORE)
     val DOCUMENTFILE = LibraryGroup("androidx.documentfile", LibraryVersions.DOCUMENTFILE)
+    val DRAGANDDROP = LibraryGroup("androidx.draganddrop", LibraryVersions.DRAGANDDROP)
     val DRAWERLAYOUT = LibraryGroup("androidx.drawerlayout", LibraryVersions.DRAWERLAYOUT)
     val DYNAMICANIMATION = LibraryGroup("androidx.dynamicanimation", null)
     val EMOJI = LibraryGroup("androidx.emoji", null)
