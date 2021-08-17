@@ -21,10 +21,13 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.SetProperty
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
 import org.gradle.workers.WorkAction
@@ -33,6 +36,7 @@ import org.gradle.workers.WorkerExecutor
 import java.io.File
 import javax.inject.Inject
 
+@CacheableTask
 abstract class DackkaTask @Inject constructor(
     private val workerExecutor: WorkerExecutor
 ) : DefaultTask() {
@@ -42,27 +46,27 @@ abstract class DackkaTask @Inject constructor(
     abstract val dackkaClasspath: ConfigurableFileCollection
 
     // Classpath containing dependencys of libraries needed to resolve types in docs
-    @InputFiles
+    @get:[InputFiles Classpath]
     lateinit var dependenciesClasspath: FileCollection
 
     // Directory containing the code samples from framework
-    @InputFiles
+    @get:[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
     lateinit var frameworkSamplesDir: File
 
     // Directory containing the code samples
-    @InputFiles
+    @get:[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
     lateinit var samplesDir: File
 
     // Directory containing the source code for Dackka to process
-    @InputFiles
+    @get:[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
     lateinit var sourcesDir: File
 
     // Directory containing the docs project and package-lists
-    @InputFiles
+    @get:[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
     lateinit var docsProjectDir: File
 
     // Location of generated reference docs
-    @OutputDirectory
+    @get:OutputDirectory
     lateinit var destinationDir: File
 
     // Set of packages to exclude for refdoc generation for all languages
