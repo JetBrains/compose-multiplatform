@@ -36,15 +36,17 @@ import androidx.compose.ui.platform.debugInspectorInfo
  * The [Column] layout is able to assign children heights according to their weights provided
  * using the [ColumnScope.weight] modifier. If a child is not provided a weight, it will be
  * asked for its preferred height before the sizes of the children with weights are calculated
- * proportionally to their weight based on the remaining available space.
+ * proportionally to their weight based on the remaining available space. Note that if the
+ * [Column] is vertically scrollable or part of a vertically scrollable container, any provided
+ * weights will be disregarded as the remaining available space will be infinite.
  *
  * When none of its children have weights, a [Column] will be as small as possible to fit its
  * children one on top of the other. In order to change the height of the [Column], use the
- * [Modifier.requiredHeight] modifiers; e.g. to make it fill the available height [Modifier.fillMaxHeight]
- * can be used. If at least one child of a [Column] has a [weight][ColumnScope.weight],
- * the [Column] will fill the available height, so there is no need for [Modifier.fillMaxHeight].
- * However, if [Column]'s size should be limited, the [Modifier.requiredHeight] or [Modifier.requiredSize] layout
- * modifiers should be applied.
+ * [Modifier.height] modifiers; e.g. to make it fill the available height [Modifier.fillMaxHeight]
+ * can be used. If at least one child of a [Column] has a [weight][ColumnScope.weight], the [Column]
+ * will fill the available height, so there is no need for [Modifier.fillMaxHeight]. However, if
+ * [Column]'s size should be limited, the [Modifier.height] or [Modifier.size] layout modifiers
+ * should be applied.
  *
  * When the size of the [Column] is larger than the sum of its children sizes, a
  * [verticalArrangement] can be specified to define the positioning of the children inside the
