@@ -554,7 +554,7 @@ class ImageTest {
                     } else {
                         painterId.value = R.drawable.ic_vector_square_asset_test
                     }
-                },
+                }.size(50.dp),
                 contentScale = ContentScale.FillBounds
             )
         }

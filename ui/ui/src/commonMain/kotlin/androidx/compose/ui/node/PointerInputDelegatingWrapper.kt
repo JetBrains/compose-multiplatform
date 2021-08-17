@@ -38,16 +38,34 @@ internal class PointerInputDelegatingWrapper(
 
     override fun hitTest(
         pointerPosition: Offset,
-        hitPointerInputFilters: MutableList<PointerInputFilter>
+        hitTestResult: HitTestResult<PointerInputFilter>,
+        isTouchEvent: Boolean
     ) {
-        if (isPointerInBounds(pointerPosition) && withinLayerBounds(pointerPosition)) {
-            // If the pointer is in bounds, we hit the pointer input filter, so add it!
-            hitPointerInputFilters.add(modifier.pointerInputFilter)
-
-            // Also, keep looking to see if we also might hit any children.
-            // This avoids checking layer bounds twice as when we call super.hitTest()
-            val positionInWrapped = wrapped.fromParentPosition(pointerPosition)
-            wrapped.hitTest(positionInWrapped, hitPointerInputFilters)
+        if (!isTouchEvent) {
+            if (isPointerInBounds(pointerPosition) && withinLayerBounds(pointerPosition)) {
+                hitTestResult.hit(modifier.pointerInputFilter) {
+                    hitTestChild(pointerPosition, hitTestResult, isTouchEvent)
+                }
+            }
+        } else {
+            hitTestInMinimumTouchTarget(
+                pointerPosition,
+                hitTestResult,
+                modifier.pointerInputFilter
+            ) {
+                hitTestChild(pointerPosition, hitTestResult, isTouchEvent)
+            }
         }
+    }
+
+    private fun hitTestChild(
+        pointerPosition: Offset,
+        hitTestResult: HitTestResult<PointerInputFilter>,
+        isTouchEvent: Boolean
+    ) {
+        // Also, keep looking to see if we also might hit any children.
+        // This avoids checking layer bounds twice as when we call super.hitTest()
+        val positionInWrapped = wrapped.fromParentPosition(pointerPosition)
+        wrapped.hitTest(positionInWrapped, hitTestResult, isTouchEvent)
     }
 }

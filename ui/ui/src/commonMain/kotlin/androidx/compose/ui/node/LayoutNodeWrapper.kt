@@ -24,6 +24,7 @@ import androidx.compose.ui.focus.findFocusableChildren
 import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isFinite
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Canvas
@@ -175,7 +176,7 @@ internal abstract class LayoutNodeWrapper(
     var isShallowPlacing = false
 
     private var _rectCache: MutableRect? = null
-    private val rectCache: MutableRect
+    protected val rectCache: MutableRect
         get() = _rectCache ?: MutableRect(0f, 0f, 0f, 0f).also {
             _rectCache = it
         }
@@ -352,25 +353,28 @@ internal abstract class LayoutNodeWrapper(
     override val isValid: Boolean
         get() = layer != null
 
+    protected val minimumTouchTargetSize: Size
+        get() = with(layerDensity) { layoutNode.viewConfiguration.minimumTouchTargetSize.toSize() }
+
     /**
      * Executes a hit test on any appropriate type associated with this [LayoutNodeWrapper].
      *
-     * Override appropriately to either add a [PointerInputFilter] to [hitPointerInputFilters] or
+     * Override appropriately to either add a [HitTestResult] to [hitTestResult] or
      * to pass the execution on.
      *
      * @param pointerPosition The tested pointer position, which is relative to
      * the [LayoutNodeWrapper].
-     * @param hitPointerInputFilters The collection that the hit [PointerInputFilter]s will be
-     * added to if hit.
+     * @param hitTestResult The parent [HitTestResult] that any hit should be added to.
      */
     abstract fun hitTest(
         pointerPosition: Offset,
-        hitPointerInputFilters: MutableList<PointerInputFilter>
+        hitTestResult: HitTestResult<PointerInputFilter>,
+        isTouchEvent: Boolean
     )
 
     abstract fun hitTestSemantics(
         pointerPosition: Offset,
-        hitSemanticsWrappers: MutableList<SemanticsWrapper>
+        hitSemanticsWrappers: HitTestResult<SemanticsWrapper>
     )
 
     override fun windowToLocal(relativeToWindow: Offset): Offset {
@@ -547,7 +551,7 @@ internal abstract class LayoutNodeWrapper(
      * Modifies bounds to be in the parent LayoutNodeWrapper's coordinates, including clipping,
      * if [clipBounds] is true.
      */
-    private fun rectInParent(bounds: MutableRect, clipBounds: Boolean) {
+    internal fun rectInParent(bounds: MutableRect, clipBounds: Boolean) {
         val layer = layer
         if (layer != null) {
             if (isClipping && clipBounds) {

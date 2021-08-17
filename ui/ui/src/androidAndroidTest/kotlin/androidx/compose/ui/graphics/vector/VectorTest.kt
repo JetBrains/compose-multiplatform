@@ -95,11 +95,11 @@ class VectorTest {
     @Test
     fun testVectorAlignment() {
         rule.setContent {
-            VectorTint(minimumSize = 500, alignment = Alignment.BottomEnd)
+            VectorTint(minimumSize = 450, alignment = Alignment.BottomEnd)
         }
 
-        takeScreenShot(500).apply {
-            assertEquals(getPixel(480, 480), Color.Cyan.toArgb())
+        takeScreenShot(450).apply {
+            assertEquals(getPixel(430, 430), Color.Cyan.toArgb())
         }
     }
 
@@ -191,8 +191,8 @@ class VectorTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun testImageVectorChangeOnStateChange() {
-        val defaultWidth = 24.dp
-        val defaultHeight = 24.dp
+        val defaultWidth = 48.dp
+        val defaultHeight = 48.dp
         val viewportWidth = 24f
         val viewportHeight = 24f
 

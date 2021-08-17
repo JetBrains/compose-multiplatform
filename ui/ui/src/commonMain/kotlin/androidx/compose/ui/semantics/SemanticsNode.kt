@@ -19,16 +19,15 @@ package androidx.compose.ui.semantics
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.AlignmentLine
-import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.LayoutInfo
-import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNodeWrapper
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastForEach
+import kotlin.math.roundToInt
 
 /**
  * A list of key/value pairs associated with a layout node or its subtree.
@@ -84,7 +83,10 @@ class SemanticsNode internal constructor(
     /**
      * The size of the bounding box for this node, with no clipping applied
      */
-    val size: IntSize get() = findWrapperToGetBounds().size
+    val size: IntSize get() {
+        val size = findWrapperToGetBounds().semanticsSize
+        return IntSize(size.width.roundToInt(), size.height.roundToInt())
+    }
 
     /**
      * The bounding box for this node relative to the root of this Compose hierarchy, with
@@ -94,7 +96,7 @@ class SemanticsNode internal constructor(
     val boundsInRoot: Rect
         get() {
             if (!layoutNode.isAttached) return Rect.Zero
-            return this.findWrapperToGetBounds().boundsInRoot()
+            return findWrapperToGetBounds().semanticsBoundsInRoot()
         }
 
     /**
@@ -104,7 +106,7 @@ class SemanticsNode internal constructor(
     val positionInRoot: Offset
         get() {
             if (!layoutNode.isAttached) return Offset.Zero
-            return findWrapperToGetBounds().positionInRoot()
+            return findWrapperToGetBounds().semanticsPositionInRoot()
         }
 
     /**
@@ -114,7 +116,7 @@ class SemanticsNode internal constructor(
     val boundsInWindow: Rect
         get() {
             if (!layoutNode.isAttached) return Rect.Zero
-            return findWrapperToGetBounds().boundsInWindow()
+            return findWrapperToGetBounds().semanticsBoundsInWindow()
         }
 
     /**
@@ -123,7 +125,7 @@ class SemanticsNode internal constructor(
     val positionInWindow: Offset
         get() {
             if (!layoutNode.isAttached) return Offset.Zero
-            return findWrapperToGetBounds().positionInWindow()
+            return findWrapperToGetBounds().semanticsPositionInWindow()
         }
 
     /**
@@ -319,7 +321,7 @@ class SemanticsNode internal constructor(
      * of use cases it means that accessibility bounds will be equal to the clickable area.
      * Otherwise the outermost semantics will be used to report bounds, size and position.
      */
-    private fun findWrapperToGetBounds(): LayoutNodeWrapper {
+    private fun findWrapperToGetBounds(): SemanticsWrapper {
         return if (unmergedConfig.isMergingSemanticsOfDescendants) {
             layoutNode.outerMergingSemantics ?: outerSemanticsNodeWrapper
         } else {

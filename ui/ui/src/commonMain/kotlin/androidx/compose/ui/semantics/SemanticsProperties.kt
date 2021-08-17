@@ -824,8 +824,7 @@ var SemanticsPropertyReceiver.collectionItemInfo by SemanticsProperties.Collecti
  *
  * The presence of this property indicates that the element is toggleable.
  */
-var SemanticsPropertyReceiver.toggleableState
-by SemanticsProperties.ToggleableState
+var SemanticsPropertyReceiver.toggleableState by SemanticsProperties.ToggleableState
 
 /**
  * The node is marked as a password.

@@ -142,7 +142,7 @@ private suspend fun AwaitPointerEventScope.waitForFirstInboundUp(): PointerEvent
         val event = awaitPointerEvent()
         val change = event.changes[0]
         if (change.changedToUp()) {
-            return if (change.isOutOfBounds(size)) {
+            return if (change.isOutOfBounds(size, extendedTouchPadding)) {
                 null
             } else {
                 event

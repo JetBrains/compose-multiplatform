@@ -65,6 +65,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.fastJoinToString
 import androidx.compose.ui.focus.requestFocus
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.node.HitTestResult
 import androidx.compose.ui.platform.accessibility.hasCollectionInfo
 import androidx.compose.ui.platform.accessibility.setCollectionInfo
 import androidx.compose.ui.platform.accessibility.setCollectionItemInfo
@@ -1439,7 +1440,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     internal fun hitTestSemanticsAt(x: Float, y: Float): Int {
         view.measureAndLayout()
 
-        val hitSemanticsWrappers: MutableList<SemanticsWrapper> = mutableListOf()
+        val hitSemanticsWrappers = HitTestResult<SemanticsWrapper>()
         view.root.hitTestSemantics(
             pointerPosition = Offset(x, y),
             hitSemanticsWrappers = hitSemanticsWrappers
