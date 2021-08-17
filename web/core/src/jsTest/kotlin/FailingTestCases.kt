@@ -24,19 +24,6 @@ class FailingTestCases {
         }
         assertTrue(expectedErrorThrown)
     }
-
-    data class DataClassTakesComposable(val c: @Composable () -> Unit)
-    class UsualClassTakesComposable(val c: @Composable () -> Unit)
-
-    @Test
-    fun passingComposableIntoConstructorOfDataClass() {
-        check(DataClassTakesComposable {}.c == null) // Expected behaviour: c != null
-    }
-
-    @Test
-    fun passingComposableIntoConstructorOfUsualClass() {
-        check(UsualClassTakesComposable {}.c == null) // Expected behaviour: c != null
-    }
 }
 
 @Suppress("Unused", "NOTHING_TO_INLINE", "NESTED_CLASS_IN_EXTERNAL_INTERFACE", "INLINE_EXTERNAL_DECLARATION", "WRONG_BODY_OF_EXTERNAL_DECLARATION", "NESTED_EXTERNAL_DECLARATION", "ClassName")
