@@ -34,6 +34,7 @@ fun module(name: String, path: String) {
 }
 
 
+println("===================== $rootDir =====================")
 module(":web-core", "core")
 module(":web-widgets", "widgets")
 module(":web-integration-core", "integration-core")
