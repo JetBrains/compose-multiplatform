@@ -6,7 +6,15 @@ val COMPOSE_WEB_BUILD_WITH_SAMPLES = project.property("compose.web.buildSamples"
 
 apply<jetbrains.compose.web.gradle.SeleniumDriverPlugin>()
 
-subprojects {
+fun Project.isSampleProject() = projectDir.parentFile.name == "examples"
+
+tasks.register("printBundleSize") {
+    dependsOn(
+       subprojects.filter { it.isSampleProject() }.map { ":examples:${it.name}:printBundleSize" } 
+    )
+}
+
+subprojects { 
     apply(plugin = "maven-publish")
 
     group = "org.jetbrains.compose.web"
@@ -24,6 +32,21 @@ subprojects {
                     }
                 }
             }
+        }
+    }
+
+    if (isSampleProject()) {
+        val printBundleSize by tasks.registering {
+            dependsOn(tasks.named("jsBrowserDistribution"))
+            doLast {
+                val jsFile = buildDir.resolve("distributions/${project.name}.js")
+                val size = jsFile.length()
+                println("##teamcity[buildStatisticValue key='bundleSize::${project.name}' value='$size']")
+            }
+        }
+
+        afterEvaluate {
+            tasks.named("build") { finalizedBy(printBundleSize) }
         }
     }
 
