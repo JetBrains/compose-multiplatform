@@ -25,11 +25,13 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.process.ExecOperations
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
 import org.gradle.workers.WorkerExecutor
+import java.io.ByteArrayOutputStream
 import java.io.File
 import javax.inject.Inject
 
@@ -66,15 +68,26 @@ abstract class MetalavaWorkAction @Inject constructor (
     private val execOperations: ExecOperations
 ) : WorkAction<MetalavaParams> {
     override fun execute() {
-        execOperations.javaexec {
-            // Intellij core reflects into java.util.ResourceBundle
-            it.jvmArgs = listOf(
-                "--add-opens",
-                "java.base/java.util=ALL-UNNAMED"
-            )
-            it.classpath(parameters.metalavaClasspath.get())
-            it.mainClass.set("com.android.tools.metalava.Driver")
-            it.args = parameters.args.get()
+        val outputStream = ByteArrayOutputStream()
+        var successful = false
+        try {
+            execOperations.javaexec {
+                // Intellij core reflects into java.util.ResourceBundle
+                it.jvmArgs = listOf(
+                    "--add-opens",
+                    "java.base/java.util=ALL-UNNAMED"
+                )
+                it.classpath(parameters.metalavaClasspath.get())
+                it.mainClass.set("com.android.tools.metalava.Driver")
+                it.args = parameters.args.get()
+                it.setStandardOutput(outputStream)
+                it.setErrorOutput(outputStream)
+            }
+            successful = true
+        } finally {
+            if (!successful) {
+                System.err.println(outputStream.toString(Charsets.UTF_8))
+            }
         }
     }
 }
