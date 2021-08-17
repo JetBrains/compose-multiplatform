@@ -28,9 +28,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.text
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.util.expectErrorMessage
 import androidx.compose.ui.test.util.expectErrorMessageStartsWith
+import androidx.compose.ui.text.AnnotatedString
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import org.junit.Rule
@@ -280,6 +283,59 @@ class ErrorMessagesTest {
         }
     }
 
+    @Test
+    fun findByTag_assertExists_noElementFoundButFoundInMerged() {
+        rule.setContent {
+            ComposeMerged()
+        }
+
+        expectErrorMessage(
+            """
+                Failed: assertExists.
+                Reason: Expected exactly '1' node but could not find any node that satisfies: (Text + EditableText contains 'Banana' (ignoreCase: false))
+                However, the unmerged tree contains '1' node that matches. Are you missing `useUnmergedNode = true` in your finder?
+            """.trimIndent()
+        ) {
+            rule.onNodeWithText("Banana")
+                .assertExists()
+        }
+    }
+    @Test
+    fun findByTag_assertExists_NoElementFoundButMultipleFoundInMerged() {
+        rule.setContent {
+            ComposeMerged(5)
+        }
+
+        expectErrorMessage(
+            """
+                Failed: assertExists.
+                Reason: Expected exactly '1' node but could not find any node that satisfies: (Text + EditableText contains 'Banana' (ignoreCase: false))
+                However, the unmerged tree contains '5' nodes that match. Are you missing `useUnmergedNode = true` in your finder?
+            """.trimIndent()
+        ) {
+            rule.onNodeWithText("Banana")
+                .assertExists()
+        }
+    }
+
+    @Test
+    fun findByTag_performAction_NoElementFoundButFoundInMerged() {
+        rule.setContent {
+            ComposeMerged()
+        }
+
+        expectErrorMessage(
+            """
+                Failed to perform a gesture.
+                Reason: Expected exactly '1' node but could not find any node that satisfies: (Text + EditableText contains 'Banana' (ignoreCase: false))
+                However, the unmerged tree contains '1' node that matches. Are you missing `useUnmergedNode = true` in your finder?
+            """.trimIndent()
+        ) {
+            rule.onNodeWithText("Banana")
+                .performClick()
+        }
+    }
+
     @Composable
     fun ComposeSimpleCase() {
         MaterialTheme {
@@ -307,6 +363,21 @@ class ErrorMessagesTest {
                 }
                 if (showText) {
                     Text("Hello")
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun ComposeMerged(numberOfTexts: Int = 1) {
+        Column {
+            TestButton(
+                modifier = Modifier
+                    .testTag("MyButton")
+                    .clearAndSetSemantics { text = AnnotatedString("Not Banana") }
+            ) {
+                repeat(numberOfTexts) {
+                    Text("Banana")
                 }
             }
         }
