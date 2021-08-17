@@ -48,5 +48,4 @@ if (extra["compose.web.buildSamples"]!!.toString().toBoolean() == true) {
     module(":examples:compose-web-lp", "../examples/web-landing")
     module(":examples:web-compose-bird", "../examples/web-compose-bird")
     module(":examples:web-with-react", "../examples/web-with-react")
-    module(":examples:web-getting-started", "../examples/web-getting-started")
 }
