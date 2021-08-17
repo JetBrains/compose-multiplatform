@@ -18,6 +18,7 @@ package androidx.compose.ui.node
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.input.pointer.PointerInputFilter
@@ -70,17 +71,18 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
 
     override fun hitTest(
         pointerPosition: Offset,
-        hitPointerInputFilters: MutableList<PointerInputFilter>
+        hitTestResult: HitTestResult<PointerInputFilter>,
+        isTouchEvent: Boolean
     ) {
         if (withinLayerBounds(pointerPosition)) {
             val positionInWrapped = wrapped.fromParentPosition(pointerPosition)
-            wrapped.hitTest(positionInWrapped, hitPointerInputFilters)
+            wrapped.hitTest(positionInWrapped, hitTestResult, isTouchEvent)
         }
     }
 
     override fun hitTestSemantics(
         pointerPosition: Offset,
-        hitSemanticsWrappers: MutableList<SemanticsWrapper>
+        hitSemanticsWrappers: HitTestResult<SemanticsWrapper>
     ) {
         if (withinLayerBounds(pointerPosition)) {
             val positionInWrapped = wrapped.fromParentPosition(pointerPosition)
@@ -165,4 +167,76 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
     override fun maxIntrinsicHeight(width: Int) = wrapped.maxIntrinsicHeight(width)
 
     override val parentData: Any? get() = wrapped.parentData
+
+    private fun offsetFromEdge(pointerPosition: Offset): Offset {
+        val x = pointerPosition.x
+        val horizontal = maxOf(0f, if (x < 0) -x else x - measuredWidth)
+        val y = pointerPosition.y
+        val vertical = maxOf(0f, if (y < 0) -y else y - measuredHeight)
+
+        return Offset(horizontal, vertical)
+    }
+
+    /**
+     * Returns the additional amount on the horizontal and vertical dimensions that
+     * this extends beyond [width] and [height] on all sides. This takes into account
+     * [minimumTouchTargetSize] and [measuredSize] vs. [width] and [height].
+     */
+    protected fun calculateMinimumTouchTargetPadding(minimumTouchTargetSize: Size): Size {
+        val widthDiff = minimumTouchTargetSize.width - measuredWidth.toFloat()
+        val heightDiff = minimumTouchTargetSize.height - measuredHeight.toFloat()
+        return Size(maxOf(0f, widthDiff / 2f), maxOf(0f, heightDiff / 2f))
+    }
+
+    /**
+     * Does a hit test, adding [content] as a [HitTestResult.hit] or
+     * [HitTestResult.hitInMinimumTouchTarget] depending on whether or not it hit
+     * or hit in the [minimumTouchTargetSize] area. The newly-created [HitTestResult] is returned
+     * if there was a hit or `null` is returned if it missed.
+     */
+    protected fun <T> hitTestInMinimumTouchTarget(
+        pointerPosition: Offset,
+        hitTestResult: HitTestResult<T>,
+        content: T,
+        block: () -> Unit
+    ) {
+        if (!withinLayerBounds(pointerPosition)) {
+            return
+        }
+        if (isPointerInBounds(pointerPosition)) {
+            hitTestResult.hit(content, block)
+        } else {
+            val offsetFromEdge = offsetFromEdge(pointerPosition)
+            val distanceFromEdge = maxOf(offsetFromEdge.x, offsetFromEdge.y)
+            val minimumTouchTargetSize = minimumTouchTargetSize
+
+            if (offsetFromEdge.x >= minimumTouchTargetSize.width / 2f ||
+                offsetFromEdge.y >= minimumTouchTargetSize.height / 2f ||
+                !hitTestResult.isHitInMinimumTouchTargetBetter(distanceFromEdge)
+            ) {
+                return // complete miss or the other hit was better
+            }
+
+            if (isHitInMinimumTouchTarget(offsetFromEdge, minimumTouchTargetSize)) {
+                // This was definitely closer than any other target and hit this
+                hitTestResult.hitInMinimumTouchTarget(content, distanceFromEdge, block)
+            } else {
+                // We have to consider anything that may be within the minimum touch target
+                // in case a child is within the minimum touch target. For example, a
+                // switch may have a thumb to one side. The switch's width may preclude
+                // it from receiving minimum touch target special treatment, but the thumb
+                // may be small enough to receive a minimum touch target outside the bounds
+                // of the switch.
+                hitTestResult.speculativeHit(content, distanceFromEdge, block)
+            }
+        }
+    }
+
+    private fun isHitInMinimumTouchTarget(
+        offsetFromEdge: Offset,
+        minimumTouchTargetSize: Size
+    ): Boolean {
+        val touchPadding = calculateMinimumTouchTargetPadding(minimumTouchTargetSize)
+        return offsetFromEdge.x < touchPadding.width && offsetFromEdge.y < touchPadding.height
+    }
 }

@@ -17,6 +17,7 @@
 package androidx.compose.ui.input.pointer
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.node.HitTestResult
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.util.fastForEach
@@ -34,7 +35,7 @@ internal class PointerInputEventProcessor(val root: LayoutNode) {
 
     private val hitPathTracker = HitPathTracker(root.coordinates)
     private val pointerInputChangeEventProducer = PointerInputChangeEventProducer()
-    private val hitResult: MutableList<PointerInputFilter> = mutableListOf()
+    private val hitResult = HitTestResult<PointerInputFilter>()
 
     /**
      * Receives [PointerInputEvent]s and process them through the tree rooted on [root].
@@ -58,10 +59,8 @@ internal class PointerInputEventProcessor(val root: LayoutNode) {
         // Add new hit paths to the tracker due to down events.
         internalPointerEvent.changes.values.forEach { pointerInputChange ->
             if (pointerInputChange.changedToDownIgnoreConsumed()) {
-                root.hitTest(
-                    pointerInputChange.position,
-                    hitResult
-                )
+                val isTouchEvent = pointerInputChange.type == PointerType.Touch
+                root.hitTest(pointerInputChange.position, hitResult, isTouchEvent)
                 if (hitResult.isNotEmpty()) {
                     hitPathTracker.addHitPath(pointerInputChange.id, hitResult)
                     hitResult.clear()

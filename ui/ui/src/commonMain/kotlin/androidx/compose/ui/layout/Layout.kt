@@ -31,6 +31,7 @@ import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.MeasureBlocks
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.simpleIdentityToString
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -71,12 +72,14 @@ import androidx.compose.ui.util.fastMap
 ) {
     val density = LocalDensity.current
     val layoutDirection = LocalLayoutDirection.current
+    val viewConfiguration = LocalViewConfiguration.current
     ReusableComposeNode<ComposeUiNode, Applier<Any>>(
         factory = ComposeUiNode.Constructor,
         update = {
             set(measurePolicy, ComposeUiNode.SetMeasurePolicy)
             set(density, ComposeUiNode.SetDensity)
             set(layoutDirection, ComposeUiNode.SetLayoutDirection)
+            set(viewConfiguration, ComposeUiNode.SetViewConfiguration)
         },
         skippableUpdate = materializerOf(modifier),
         content = content
@@ -191,6 +194,7 @@ fun MultiMeasureLayout(
     val materialized = currentComposer.materialize(modifier)
     val density = LocalDensity.current
     val layoutDirection = LocalLayoutDirection.current
+    val viewConfiguration = LocalViewConfiguration.current
 
     ReusableComposeNode<LayoutNode, Applier<Any>>(
         factory = LayoutNode.Constructor,
@@ -199,6 +203,7 @@ fun MultiMeasureLayout(
             set(measurePolicy, ComposeUiNode.SetMeasurePolicy)
             set(density, ComposeUiNode.SetDensity)
             set(layoutDirection, ComposeUiNode.SetLayoutDirection)
+            set(viewConfiguration, ComposeUiNode.SetViewConfiguration)
             @Suppress("DEPRECATION")
             init { this.canMultiMeasure = true }
         },

@@ -1287,9 +1287,11 @@ package androidx.compose.ui.input.pointer {
   @kotlin.coroutines.RestrictsSuspension public interface AwaitPointerEventScope extends androidx.compose.ui.unit.Density {
     method public suspend Object? awaitPointerEvent(optional androidx.compose.ui.input.pointer.PointerEventPass pass, optional kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerEvent> p);
     method public androidx.compose.ui.input.pointer.PointerEvent getCurrentEvent();
+    method public default long getExtendedTouchPadding();
     method public long getSize();
     method public androidx.compose.ui.platform.ViewConfiguration getViewConfiguration();
     property public abstract androidx.compose.ui.input.pointer.PointerEvent currentEvent;
+    property public default long extendedTouchPadding;
     property public abstract long size;
     property public abstract androidx.compose.ui.platform.ViewConfiguration viewConfiguration;
   }
@@ -1332,7 +1334,8 @@ package androidx.compose.ui.input.pointer {
     method public static void consumeAllChanges(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static void consumeDownChange(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static void consumePositionChange(androidx.compose.ui.input.pointer.PointerInputChange);
-    method public static boolean isOutOfBounds(androidx.compose.ui.input.pointer.PointerInputChange, long size);
+    method @Deprecated public static boolean isOutOfBounds(androidx.compose.ui.input.pointer.PointerInputChange, long size);
+    method public static boolean isOutOfBounds(androidx.compose.ui.input.pointer.PointerInputChange, long size, long extendedTouchPadding);
     method public static long positionChange(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static boolean positionChangeConsumed(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static long positionChangeIgnoreConsumed(androidx.compose.ui.input.pointer.PointerInputChange);
@@ -1415,8 +1418,10 @@ package androidx.compose.ui.input.pointer {
 
   public interface PointerInputScope extends androidx.compose.ui.unit.Density {
     method public suspend <R> Object? awaitPointerEventScope(kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.AwaitPointerEventScope,? super kotlin.coroutines.Continuation<? super R>,?> block, kotlin.coroutines.Continuation<? super R> p);
+    method public default long getExtendedTouchPadding();
     method public long getSize();
     method public androidx.compose.ui.platform.ViewConfiguration getViewConfiguration();
+    property public default long extendedTouchPadding;
     property public abstract long size;
     property public abstract androidx.compose.ui.platform.ViewConfiguration viewConfiguration;
   }
@@ -1797,14 +1802,17 @@ package androidx.compose.ui.node {
     method public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
     method public androidx.compose.ui.layout.MeasurePolicy getMeasurePolicy();
     method public androidx.compose.ui.Modifier getModifier();
+    method public androidx.compose.ui.platform.ViewConfiguration getViewConfiguration();
     method public void setDensity(androidx.compose.ui.unit.Density density);
     method public void setLayoutDirection(androidx.compose.ui.unit.LayoutDirection layoutDirection);
     method public void setMeasurePolicy(androidx.compose.ui.layout.MeasurePolicy measurePolicy);
     method public void setModifier(androidx.compose.ui.Modifier modifier);
+    method public void setViewConfiguration(androidx.compose.ui.platform.ViewConfiguration viewConfiguration);
     property public abstract androidx.compose.ui.unit.Density density;
     property public abstract androidx.compose.ui.unit.LayoutDirection layoutDirection;
     property public abstract androidx.compose.ui.layout.MeasurePolicy measurePolicy;
     property public abstract androidx.compose.ui.Modifier modifier;
+    property public abstract androidx.compose.ui.platform.ViewConfiguration viewConfiguration;
     field public static final androidx.compose.ui.node.ComposeUiNode.Companion Companion;
   }
 
@@ -1814,11 +1822,13 @@ package androidx.compose.ui.node {
     method public kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.unit.LayoutDirection,kotlin.Unit> getSetLayoutDirection();
     method public kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.layout.MeasurePolicy,kotlin.Unit> getSetMeasurePolicy();
     method public kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.Modifier,kotlin.Unit> getSetModifier();
+    method public kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.platform.ViewConfiguration,kotlin.Unit> getSetViewConfiguration();
     property public final kotlin.jvm.functions.Function0<androidx.compose.ui.node.ComposeUiNode> Constructor;
     property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.unit.Density,kotlin.Unit> SetDensity;
     property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.unit.LayoutDirection,kotlin.Unit> SetLayoutDirection;
     property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.layout.MeasurePolicy,kotlin.Unit> SetMeasurePolicy;
     property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.Modifier,kotlin.Unit> SetModifier;
+    property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.platform.ViewConfiguration,kotlin.Unit> SetViewConfiguration;
   }
 
   public final class LayoutNodeKt {
@@ -2095,10 +2105,12 @@ package androidx.compose.ui.platform {
     method public long getDoubleTapMinTimeMillis();
     method public long getDoubleTapTimeoutMillis();
     method public long getLongPressTimeoutMillis();
+    method public default long getMinimumTouchTargetSize();
     method public float getTouchSlop();
     property public abstract long doubleTapMinTimeMillis;
     property public abstract long doubleTapTimeoutMillis;
     property public abstract long longPressTimeoutMillis;
+    property public default long minimumTouchTargetSize;
     property public abstract float touchSlop;
   }
 

@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
+import androidx.compose.ui.unit.DpSize
 
 /**
  * A [ViewConfiguration] that can be used for testing. The default values are representative for
@@ -35,7 +36,8 @@ class TestViewConfiguration(
     override val longPressTimeoutMillis: Long = 500L,
     override val doubleTapTimeoutMillis: Long = 300L,
     override val doubleTapMinTimeMillis: Long = 40L,
-    override val touchSlop: Float = 18f
+    override val touchSlop: Float = 18f,
+    override val minimumTouchTargetSize: DpSize = DpSize.Zero
 ) : ViewConfiguration
 
 @Composable

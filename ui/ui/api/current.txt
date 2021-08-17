@@ -1287,9 +1287,11 @@ package androidx.compose.ui.input.pointer {
   @kotlin.coroutines.RestrictsSuspension public interface AwaitPointerEventScope extends androidx.compose.ui.unit.Density {
     method public suspend Object? awaitPointerEvent(optional androidx.compose.ui.input.pointer.PointerEventPass pass, optional kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerEvent> p);
     method public androidx.compose.ui.input.pointer.PointerEvent getCurrentEvent();
+    method public default long getExtendedTouchPadding();
     method public long getSize();
     method public androidx.compose.ui.platform.ViewConfiguration getViewConfiguration();
     property public abstract androidx.compose.ui.input.pointer.PointerEvent currentEvent;
+    property public default long extendedTouchPadding;
     property public abstract long size;
     property public abstract androidx.compose.ui.platform.ViewConfiguration viewConfiguration;
   }
@@ -1332,7 +1334,8 @@ package androidx.compose.ui.input.pointer {
     method public static void consumeAllChanges(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static void consumeDownChange(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static void consumePositionChange(androidx.compose.ui.input.pointer.PointerInputChange);
-    method public static boolean isOutOfBounds(androidx.compose.ui.input.pointer.PointerInputChange, long size);
+    method @Deprecated public static boolean isOutOfBounds(androidx.compose.ui.input.pointer.PointerInputChange, long size);
+    method public static boolean isOutOfBounds(androidx.compose.ui.input.pointer.PointerInputChange, long size, long extendedTouchPadding);
     method public static long positionChange(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static boolean positionChangeConsumed(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static long positionChangeIgnoreConsumed(androidx.compose.ui.input.pointer.PointerInputChange);
@@ -1415,8 +1418,10 @@ package androidx.compose.ui.input.pointer {
 
   public interface PointerInputScope extends androidx.compose.ui.unit.Density {
     method public suspend <R> Object? awaitPointerEventScope(kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.AwaitPointerEventScope,? super kotlin.coroutines.Continuation<? super R>,?> block, kotlin.coroutines.Continuation<? super R> p);
+    method public default long getExtendedTouchPadding();
     method public long getSize();
     method public androidx.compose.ui.platform.ViewConfiguration getViewConfiguration();
+    property public default long extendedTouchPadding;
     property public abstract long size;
     property public abstract androidx.compose.ui.platform.ViewConfiguration viewConfiguration;
   }
@@ -2065,10 +2070,12 @@ package androidx.compose.ui.platform {
     method public long getDoubleTapMinTimeMillis();
     method public long getDoubleTapTimeoutMillis();
     method public long getLongPressTimeoutMillis();
+    method public default long getMinimumTouchTargetSize();
     method public float getTouchSlop();
     property public abstract long doubleTapMinTimeMillis;
     property public abstract long doubleTapTimeoutMillis;
     property public abstract long longPressTimeoutMillis;
+    property public default long minimumTouchTargetSize;
     property public abstract float touchSlop;
   }
 

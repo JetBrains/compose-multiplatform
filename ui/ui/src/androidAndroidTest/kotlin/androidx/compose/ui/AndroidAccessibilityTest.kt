@@ -118,6 +118,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.core.view.ViewCompat
@@ -2276,8 +2277,8 @@ class AndroidAccessibilityTest {
     }
 
     @Test
-    fun testReportedBounds_clickableNode_includesPadding() {
-        val size = 100
+    fun testReportedBounds_clickableNode_includesPadding(): Unit = with(rule.density) {
+        val size = 100.dp.roundToPx()
         container.setContent {
             with(LocalDensity.current) {
                 Column {
@@ -2308,8 +2309,8 @@ class AndroidAccessibilityTest {
     }
 
     @Test
-    fun testReportedBounds_clickableNode_excludesPadding() {
-        val size = 100
+    fun testReportedBounds_clickableNode_excludesPadding(): Unit = with(rule.density) {
+        val size = 100.dp.roundToPx()
         val density = Density(2f)
         container.setContent {
             CompositionLocalProvider(LocalDensity provides density) {
@@ -2371,8 +2372,8 @@ class AndroidAccessibilityTest {
     }
 
     @Test
-    fun testReportedBounds_withTwoClickable_outermostWins() {
-        val size = 100
+    fun testReportedBounds_withTwoClickable_outermostWins(): Unit = with(rule.density) {
+        val size = 100.dp.roundToPx()
         container.setContent {
             with(LocalDensity.current) {
                 Column {

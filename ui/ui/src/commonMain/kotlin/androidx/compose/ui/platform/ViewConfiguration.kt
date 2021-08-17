@@ -16,6 +16,9 @@
 
 package androidx.compose.ui.platform
 
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
+
 /**
  * Contains methods to standard constants used in the UI for timeouts, sizes, and distances.
  */
@@ -41,4 +44,12 @@ interface ViewConfiguration {
      * Distance in pixels a touch can wander before we think the user is scrolling.
      */
     val touchSlop: Float
+
+    /**
+     * The minimum touch target size. If layout has reduced the pointer input bounds below this,
+     * the touch target will be expanded evenly around the layout to ensure that it is at least
+     * this big.
+     */
+    val minimumTouchTargetSize: DpSize
+        get() = DpSize(48.dp, 48.dp)
 }

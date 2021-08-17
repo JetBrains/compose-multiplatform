@@ -316,11 +316,19 @@ class SwitchTest {
         rule.onNodeWithTag("2").assertIsOff()
     }
 
-    private fun materialSizesTestForValue(checked: Boolean) {
+    private fun materialSizesTestForValue(checked: Boolean) = with(rule.density) {
+        // The padding should be 2 DP, but we round to pixels when determining layout
+        val paddingInPixels = 2.dp.roundToPx()
+
+        // Convert back to DP so that we have an exact DP value to work with. We don't
+        // want to multiply the error by two (one for each padding), so we get the exact
+        // padding based on the expected pixels consumed by the padding.
+        val paddingInDp = paddingInPixels.toDp()
+
         rule.setMaterialContentForSizeAssertions {
             Switch(checked = checked, onCheckedChange = {}, enabled = false)
         }
-            .assertWidthIsEqualTo(34.dp + 2.dp * 2)
-            .assertHeightIsEqualTo(20.dp + 2.dp * 2)
+            .assertWidthIsEqualTo(34.dp + paddingInDp * 2)
+            .assertHeightIsEqualTo(20.dp + paddingInDp * 2)
     }
 }

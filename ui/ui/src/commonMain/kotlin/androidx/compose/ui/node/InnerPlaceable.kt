@@ -140,31 +140,32 @@ internal class InnerPlaceable(
 
     override fun hitTest(
         pointerPosition: Offset,
-        hitPointerInputFilters: MutableList<PointerInputFilter>
+        hitTestResult: HitTestResult<PointerInputFilter>,
+        isTouchEvent: Boolean
     ) {
-        hitTestSubtree(pointerPosition, hitPointerInputFilters, LayoutNode::hitTest)
+        hitTestSubtree(pointerPosition, hitTestResult, isTouchEvent, LayoutNode::hitTest)
     }
 
     override fun hitTestSemantics(
         pointerPosition: Offset,
-        hitSemanticsWrappers: MutableList<SemanticsWrapper>
+        hitSemanticsWrappers: HitTestResult<SemanticsWrapper>
     ) {
-        hitTestSubtree(pointerPosition, hitSemanticsWrappers, LayoutNode::hitTestSemantics)
+        hitTestSubtree(pointerPosition, hitSemanticsWrappers, true, LayoutNode::hitTestSemantics)
     }
 
     private inline fun <T> hitTestSubtree(
         pointerPosition: Offset,
-        hitResult: MutableList<T>,
-        nodeHitTest: LayoutNode.(Offset, MutableList<T>) -> Unit
+        hitTestResult: HitTestResult<T>,
+        isTouchEvent: Boolean,
+        nodeHitTest: LayoutNode.(Offset, HitTestResult<T>, Boolean) -> Unit
     ) {
         if (withinLayerBounds(pointerPosition)) {
-            val originalSize = hitResult.size
             // Any because as soon as true is returned, we know we have found a hit path and we must
             // not add hit results on different paths so we should not even go looking.
             layoutNode.zSortedChildren.reversedAny { child ->
                 if (child.isPlaced) {
-                    child.nodeHitTest(pointerPosition, hitResult)
-                    hitResult.size > originalSize
+                    child.nodeHitTest(pointerPosition, hitTestResult, isTouchEvent)
+                    hitTestResult.isHit
                 } else {
                     false
                 }

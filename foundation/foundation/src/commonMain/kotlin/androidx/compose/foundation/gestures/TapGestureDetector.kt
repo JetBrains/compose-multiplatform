@@ -334,7 +334,9 @@ private suspend fun AwaitPointerEventScope.translatePointerEventsToChannel(
                 change.consumeDownChange()
                 channel.trySend(Up(change.position, change.uptimeMillis))
             } else if (
-                event.changes.fastAny { it.consumed.downChange || it.isOutOfBounds(size) }
+                event.changes.fastAny {
+                    it.consumed.downChange || it.isOutOfBounds(size, extendedTouchPadding)
+                }
             ) {
                 channel.trySend(Cancel)
             } else {
@@ -415,7 +417,10 @@ suspend fun AwaitPointerEventScope.waitForUpOrCancellation(): PointerInputChange
             return event.changes[0]
         }
 
-        if (event.changes.fastAny { it.consumed.downChange || it.isOutOfBounds(size) }) {
+        if (event.changes.fastAny {
+            it.consumed.downChange || it.isOutOfBounds(size, extendedTouchPadding)
+        }
+        ) {
             return null // Canceled
         }
 
