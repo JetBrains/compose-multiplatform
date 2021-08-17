@@ -38,8 +38,13 @@ module(":web-core", "core")
 module(":web-widgets", "widgets")
 module(":web-integration-core", "integration-core")
 module(":web-integration-widgets", "integration-widgets")
-module(":web-benchmark-core", "benchmark-core")
 module(":compose-compiler-integration", "compose-compiler-integration")
+
+if (extra["compose.web.tests.skip.benchmarks"]!!.toString().toBoolean() != true) {
+    module(":web-benchmark-core", "benchmark-core")
+} else {
+    println("skipping benchmarks")
+}
 
 if (extra["compose.web.buildSamples"]!!.toString().toBoolean() == true) {
     println("building with examples")
