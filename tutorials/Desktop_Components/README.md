@@ -90,7 +90,7 @@ fun TextBox(text: String = "Item") {
 }
 ```
 
-Scrollbars can be moved by dragging the bars and using the mouse wheel or the touchpad. Horizontal scrolling with the mouse wheel can be performed by side-clicking the whell or by holding down `Shift`.
+Scrollbars can be moved by dragging the bars and using the mouse wheel or the touchpad. Horizontal scrolling with the mouse wheel can be performed by side-clicking the wheel or by holding down `Shift`.
 
 <img alt="Scrollbars" src="scrollbars.gif" height="412" />
 
