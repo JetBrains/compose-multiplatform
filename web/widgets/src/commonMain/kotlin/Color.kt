@@ -1,5 +1,8 @@
 package org.jetbrains.compose.common.core.graphics
 
+import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgets
+
+@ExperimentalComposeWebWidgets
 public data class Color(val red: Int, val green: Int, val blue: Int) {
 
     companion object {
