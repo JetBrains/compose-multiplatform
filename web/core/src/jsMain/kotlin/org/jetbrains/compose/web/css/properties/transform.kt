@@ -40,6 +40,14 @@ fun skewTransform(ax: CSSAngleValue, ay: CSSAngleValue) = TransformFunction { "s
 fun skewXTransform(a: CSSAngleValue) = TransformFunction { "skewX($a)" }
 fun skewYTransform(a: CSSAngleValue) = TransformFunction { "skewY($a)" }
 
+fun translate(tx: CSSLengthValue) = TransformFunction { "translate($tx)" }
+fun translate(tx: CSSPercentageValue) = TransformFunction { "translate($tx)" }
+
+fun translate(tx: CSSLengthValue, ty: CSSLengthValue) = TransformFunction { "translate($tx, $ty)" }
+fun translate(tx: CSSLengthValue, ty: CSSPercentageValue) = TransformFunction { "translate($tx, $ty)" }
+fun translate(tx: CSSPercentageValue, ty: CSSLengthValue) = TransformFunction { "translate($tx, $ty)" }
+fun translate(tx: CSSPercentageValue, ty: CSSPercentageValue) = TransformFunction { "translate($tx, $ty)" }
+
 fun StyleBuilder.transform(transformFunction: TransformFunction) {
     property("transform", transformFunction.apply())
 }

@@ -171,4 +171,24 @@ class TransformTests {
 
         assertEquals("skewY(2rad)", nextChild().style.transform)
     }
+
+    @Test
+    fun translate() = runTest {
+        composition {
+            Div({ style { transform(translate(10.px)) } })
+            Div({ style { transform(translate(4.percent)) } })
+            Div({ style { transform(translate(2.percent, 10.px)) } })
+            Div({ style { transform(translate(10.px, 3.percent)) } })
+            Div({ style { transform(translate(20.px, 10.px)) } })
+            Div({ style { transform(translate(5.percent, 8.percent)) } })
+        }
+
+        assertEquals("translate(10px)", nextChild().style.transform)
+        assertEquals("translate(4%)", nextChild().style.transform)
+        assertEquals("translate(2%, 10px)", nextChild().style.transform)
+        assertEquals("translate(10px, 3%)", nextChild().style.transform)
+        assertEquals("translate(20px, 10px)", nextChild().style.transform)
+        assertEquals("translate(5%, 8%)", nextChild().style.transform)
+    }
+
 }
