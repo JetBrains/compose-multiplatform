@@ -48,6 +48,11 @@ fun translate(tx: CSSLengthValue, ty: CSSPercentageValue) = TransformFunction { 
 fun translate(tx: CSSPercentageValue, ty: CSSLengthValue) = TransformFunction { "translate($tx, $ty)" }
 fun translate(tx: CSSPercentageValue, ty: CSSPercentageValue) = TransformFunction { "translate($tx, $ty)" }
 
+fun translate3d(tx: CSSLengthValue, ty: CSSLengthValue, tz: CSSLengthValue) = TransformFunction { "translate3d($tx, $ty, $tz)" }
+fun translate3d(tx: CSSLengthValue, ty: CSSPercentageValue, tz: CSSLengthValue) = TransformFunction { "translate3d($tx, $ty, $tz)" }
+fun translate3d(tx: CSSPercentageValue, ty: CSSLengthValue, tz: CSSLengthValue) = TransformFunction { "translate3d($tx, $ty, $tz)" }
+fun translate3d(tx: CSSPercentageValue, ty: CSSPercentageValue, tz: CSSLengthValue) = TransformFunction { "translate3d($tx, $ty, $tz)" }
+
 fun translateXTransform(tx: CSSLengthValue) = TransformFunction { "translateX($tx)" }
 fun translateXTransform(tx: CSSPercentageValue) = TransformFunction { "translateX($tx)" }
 

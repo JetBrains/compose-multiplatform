@@ -192,6 +192,22 @@ class TransformTests {
     }
 
     @Test
+    fun translate3d() = runTest {
+        composition {
+            Div({ style { transform(translate3d(2.percent, 10.px, 1.em)) } })
+            Div({ style { transform(translate3d(10.px, 3.percent, 2.em)) } })
+            Div({ style { transform(translate3d(20.px, 10.px, 3.em)) } })
+            Div({ style { transform(translate3d(5.percent, 8.percent, 4.em)) } })
+        }
+
+        assertEquals("translate3d(2%, 10px, 1em)", nextChild().style.transform)
+        assertEquals("translate3d(10px, 3%, 2em)", nextChild().style.transform)
+        assertEquals("translate3d(20px, 10px, 3em)", nextChild().style.transform)
+        assertEquals("translate3d(5%, 8%, 4em)", nextChild().style.transform)
+    }
+
+
+    @Test
     fun translateX() = runTest {
         composition {
             Div({ style { transform(translateXTransform(10.px)) } })
