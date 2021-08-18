@@ -170,7 +170,7 @@ private fun AnimatedVisibilityWithEnterAndExit() {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalTransitionApi::class)
 @Composable
 private fun AnimatedVisibilityMutable() {
     // Create a MutableTransitionState<Boolean> for the AnimatedVisibility.

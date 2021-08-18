@@ -1695,32 +1695,32 @@ internal val interruptedVelocityEventData: List<PointerInputData> = listOf(
 // in velocity_tracker.dart.
 
     PointerInputData(
-        uptime = (216698374 + 40),
+        uptime = (216698374L + 40),
         down = true,
         position = createPxPosition(238.57142639160156f, 355.71429443359375f)
     ),
     PointerInputData(
-        uptime = (216698382 + 40),
+        uptime = (216698382L + 40),
         down = true,
         position = createPxPosition(236.2857208251953f, 374.28570556640625f)
     ),
     PointerInputData(
-        uptime = (216698390 + 40),
+        uptime = (216698390L + 40),
         down = true,
         position = createPxPosition(235.14285278320312f, 396.5714416503906f)
     ),
     PointerInputData(
-        uptime = (216698398 + 40),
+        uptime = (216698398L + 40),
         down = true,
         position = createPxPosition(236.57142639160156f, 421.4285583496094f)
     ),
     PointerInputData(
-        uptime = (216698406 + 40),
+        uptime = (216698406L + 40),
         down = true,
         position = createPxPosition(241.14285278320312f, 451.4285583496094f)
     ),
     PointerInputData(
-        uptime = (216698421 + 40),
+        uptime = (216698421L + 40),
         down = false,
         position = createPxPosition(241.14285278320312f, 451.4285583496094f)
     )
