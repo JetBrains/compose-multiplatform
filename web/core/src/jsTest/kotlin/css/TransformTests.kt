@@ -6,14 +6,12 @@
 package org.jetbrains.compose.web.core.tests.css
 
 import org.jetbrains.compose.web.core.tests.runTest
-import org.jetbrains.compose.web.css.matrix3dTransform
-import org.jetbrains.compose.web.css.matrixTransform
-import org.jetbrains.compose.web.css.transform
+import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class TransitionTests {
+class TransformTests {
     @Test
     fun matrix() = runTest {
         composition {
@@ -32,4 +30,12 @@ class TransitionTests {
         assertEquals("matrix3d(1, 0, 0, 0, 0, 1, 6, 0, 0, 0, 1, 0, 50, 100, 0, 1.1)", nextChild().style.transform)
     }
 
+    @Test
+    fun perspective() = runTest {
+        composition {
+            Div({ style { transform(perspectiveTransform(3.cm)) } })
+        }
+
+        assertEquals("perspective(3cm)", nextChild().style.transform)
+    }
 }

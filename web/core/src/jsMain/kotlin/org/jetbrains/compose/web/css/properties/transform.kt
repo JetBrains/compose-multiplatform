@@ -20,6 +20,8 @@ fun matrix3dTransform(
     a4: Number, b4: Number, c4: Number, d4: Number
 ) = TransformFunction { "matrix3d($a1, $b1, $c1, $d1, $a2, $b2, $c2, $d2, $a3, $b3, $c3, $d3, $a4, $b4, $c4, $d4)" }
 
+fun perspectiveTransform(d: CSSLengthValue) = TransformFunction { "perspective($d)" }
+
 fun StyleBuilder.transform(transformFunction: TransformFunction) {
     property("transform", transformFunction.apply())
 }
