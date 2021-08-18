@@ -165,8 +165,21 @@ package androidx.compose.ui.draw {
   }
 
   public final class BlurKt {
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier blur(androidx.compose.ui.Modifier, float radiusX, float radiusY, optional int edgeTreatment, optional boolean clip, optional androidx.compose.ui.graphics.Shape shape);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier blur(androidx.compose.ui.Modifier, float radius, optional int edgeTreatment, optional boolean clip, optional androidx.compose.ui.graphics.Shape shape);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier blur(androidx.compose.ui.Modifier, float radiusX, float radiusY, optional androidx.compose.ui.graphics.Shape edgeTreatment);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier blur(androidx.compose.ui.Modifier, float radius, optional androidx.compose.ui.graphics.Shape edgeTreatment);
+  }
+
+  @androidx.compose.runtime.Immutable public final inline class BlurredEdgeTreatment {
+    ctor public BlurredEdgeTreatment();
+    method public androidx.compose.ui.graphics.Shape? getShape();
+    property public final androidx.compose.ui.graphics.Shape? shape;
+  }
+
+  public static final class BlurredEdgeTreatment.Companion {
+    method public androidx.compose.ui.graphics.Shape getRectangle();
+    method public androidx.compose.ui.graphics.Shape getUnbounded();
+    property public final androidx.compose.ui.graphics.Shape Rectangle;
+    property public final androidx.compose.ui.graphics.Shape Unbounded;
   }
 
   public interface BuildDrawCacheParams {

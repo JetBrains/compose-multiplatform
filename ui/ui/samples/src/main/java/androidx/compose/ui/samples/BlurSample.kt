@@ -25,9 +25,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 
@@ -36,14 +36,10 @@ import androidx.compose.ui.unit.dp
 fun BlurSample() {
     Box(
         Modifier.size(300.dp)
-            // Disabling clipping here to ensure the blurred edges are not
-            // omitted.
-            // Using TileMode.Decal to ensure the region outside of the blur radius is
-            // blurred with transparent black instead of replicating the edge pixels
+            // Blur content allowing the result to extend beyond the bounds of the original content
             .blur(
                 30.dp,
-                clip = false,
-                edgeTreatment = TileMode.Decal
+                edgeTreatment = BlurredEdgeTreatment.Unbounded
             )
             .background(Color.Red, CircleShape)
     )
@@ -55,8 +51,7 @@ fun ImageBlurSample() {
     Image(
         painter = painterResource(R.drawable.circus),
         contentDescription = "sample blurred image",
-        // Leaving default clipping behavior to ensure the blurred result only renders
-        // within the original bounds of the composable
-        modifier = Modifier.blur(30.dp, shape = RoundedCornerShape(5.dp))
+        // Blur content within the original bounds, clipping the result to a rounded rectangle
+        modifier = Modifier.blur(30.dp, BlurredEdgeTreatment(RoundedCornerShape(5.dp)))
     )
 }

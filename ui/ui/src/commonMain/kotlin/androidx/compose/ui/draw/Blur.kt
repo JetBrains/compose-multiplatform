@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.draw
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.BlurEffect
@@ -25,6 +26,60 @@ import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+
+/**
+ * Determines the strategy used to render pixels in the blurred result that may extend beyond
+ * the bounds of the original input.
+ *
+ * [BlurredEdgeTreatment] will clip the blur result to the boundaries of the
+ * original content and specified [shape].
+ *
+ * Sampling of pixels outside of content bounds will have the same value as the pixels at the
+ * closest edge.
+ * This is recommended for blurring content that does not contain transparent pixels
+ * and ensuring the blurred result does not extend beyond the original bounds (ex. blurring
+ * an image)
+ *
+ * @see TileMode.Clamp
+ *
+ * Alternatively using [BlurredEdgeTreatment.Unbounded] will not clip the blur result to the
+ * boundaries of the original content. Sampling of pixels outside of the content bounds
+ * will sample transparent black instead.
+ * This is recommended for blurring content that is intended to render outside of the
+ * original bounds and may contain transparent pixels in the original bounds (ex. blurring
+ * an arbitrary shape or text)
+ *
+ * @see TileMode.Decal
+*/
+@Immutable
+@Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
+inline class BlurredEdgeTreatment(val shape: Shape?) {
+
+    /**
+     * Determines whether the [BlurredEdgeTreatment] should be clipped to the provided shape
+     */
+    fun isBounded() = this.shape != null
+
+    companion object {
+
+        /**
+         * Bounded [BlurredEdgeTreatment] that clips content bounds to a rectangular shape
+         */
+        val Rectangle = BlurredEdgeTreatment(RectangleShape)
+
+        /**
+         * Do not clip the blur result to the boundaries of the original content.
+         * boundaries of the original content. Sampling of pixels outside of the content bounds
+         * will sample transparent black instead.
+         * This is recommended for blurring content that is intended to render outside of the
+         * original bounds and may contain transparent pixels in the original bounds (ex. blurring
+         * an arbitrary shape or text)
+         *
+         * @see TileMode.Decal
+         */
+        val Unbounded = BlurredEdgeTreatment(null)
+    }
+}
 
 /**
  * Draw content blurred with the specified radii. Note this effect is only supported on Android 12
@@ -44,33 +99,39 @@ import androidx.compose.ui.unit.dp
  * @param radiusX Radius of the blur along the x axis
  * @param radiusY Radius of the blur along the y axis
  * @param edgeTreatment Strategy used to render pixels outside of bounds of the original input
- * @param clip Optional flag used to clip the blurred result. This is default to true as applying
- * a blur can render content outside the original bounds
- * @param shape Optional shape to clip content
  */
 @Stable
 fun Modifier.blur(
     radiusX: Dp,
     radiusY: Dp,
-    edgeTreatment: TileMode = TileMode.Clamp,
-    clip: Boolean = true,
-    shape: Shape = RectangleShape
-) = if ((radiusX > 0.dp && radiusY > 0.dp) || clip) {
-    graphicsLayer {
-        val horizontalBlurPixels = radiusX.toPx()
-        val verticalBlurPixels = radiusY.toPx()
-        this.renderEffect =
-            // Only non-zero blur radii are valid BlurEffect parameters
-            if (horizontalBlurPixels > 0f && verticalBlurPixels > 0f) {
-                BlurEffect(horizontalBlurPixels, verticalBlurPixels, edgeTreatment)
-            } else {
-                null
-            }
-        this.shape = shape
-        this.clip = clip
+    edgeTreatment: BlurredEdgeTreatment = BlurredEdgeTreatment.Rectangle,
+): Modifier {
+    val clip: Boolean
+    val tileMode: TileMode
+    if (edgeTreatment.isBounded()) {
+        clip = true
+        tileMode = TileMode.Clamp
+    } else {
+        clip = false
+        tileMode = TileMode.Decal
     }
-} else {
-    this
+    return if ((radiusX > 0.dp && radiusY > 0.dp) || clip) {
+        graphicsLayer {
+            val horizontalBlurPixels = radiusX.toPx()
+            val verticalBlurPixels = radiusY.toPx()
+            this.renderEffect =
+                // Only non-zero blur radii are valid BlurEffect parameters
+                if (horizontalBlurPixels > 0f && verticalBlurPixels > 0f) {
+                    BlurEffect(horizontalBlurPixels, verticalBlurPixels, tileMode)
+                } else {
+                    null
+                }
+            this.shape = edgeTreatment.shape ?: RectangleShape
+            this.clip = edgeTreatment.isBounded()
+        }
+    } else {
+        this
+    }
 }
 
 /**
@@ -90,14 +151,9 @@ fun Modifier.blur(
  *
  * @param radius Radius of the blur along both the x and y axis
  * @param edgeTreatment Strategy used to render pixels outside of bounds of the original input
- * @param clip Optional flag used to clip the blurred result. This is default to true as applying
- * a blur can render content outside the original bounds
- * @param shape Optional shape to clip content
  */
 @Stable
 fun Modifier.blur(
     radius: Dp,
-    edgeTreatment: TileMode = TileMode.Clamp,
-    clip: Boolean = true,
-    shape: Shape = RectangleShape
-) = blur(radius, radius, edgeTreatment, clip, shape)
+    edgeTreatment: BlurredEdgeTreatment = BlurredEdgeTreatment.Rectangle
+) = blur(radius, radius, edgeTreatment)
