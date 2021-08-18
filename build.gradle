@@ -30,7 +30,7 @@ allprojects {
 
     tasks.withType(KotlinCompile).configureEach {
         kotlinOptions {
-            jvmTarget = "1.8"
+            jvmTarget = "11"
             freeCompilerArgs += [
                     "-Werror",
                     "-Xskip-runtime-version-check",
