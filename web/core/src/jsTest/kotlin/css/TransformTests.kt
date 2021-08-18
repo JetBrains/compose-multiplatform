@@ -142,4 +142,33 @@ class TransformTests {
 
         assertEquals("scaleZ(0.12)", nextChild().style.transform)
     }
+
+    @Test
+    fun skew() = runTest {
+        composition {
+            Div({ style { transform(skewTransform(2.deg)) } })
+            Div({ style { transform(skewTransform(1.rad, 2.deg)) } })
+        }
+
+        assertEquals("skew(2deg)", nextChild().style.transform)
+        assertEquals("skew(1rad, 2deg)", nextChild().style.transform)
+    }
+
+    @Test
+    fun skewX() = runTest {
+        composition {
+            Div({ style { transform(skewXTransform(2.deg)) } })
+        }
+
+        assertEquals("skewX(2deg)", nextChild().style.transform)
+    }
+
+    @Test
+    fun skewY() = runTest {
+        composition {
+            Div({ style { transform(skewYTransform(2.rad)) } })
+        }
+
+        assertEquals("skewY(2rad)", nextChild().style.transform)
+    }
 }

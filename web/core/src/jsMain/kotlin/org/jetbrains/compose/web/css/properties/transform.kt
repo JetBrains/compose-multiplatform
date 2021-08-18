@@ -35,6 +35,10 @@ fun scaleXTransform(s: Number) = TransformFunction { "scaleX($s)" }
 fun scaleYTransform(s: Number) = TransformFunction { "scaleY($s)" }
 fun scaleZTransform(s: Number) = TransformFunction { "scaleZ($s)" }
 
+fun skewTransform(ax: CSSAngleValue) = TransformFunction { "skew($ax)" }
+fun skewTransform(ax: CSSAngleValue, ay: CSSAngleValue) = TransformFunction { "skew($ax, $ay)" }
+fun skewXTransform(a: CSSAngleValue) = TransformFunction { "skewX($a)" }
+fun skewYTransform(a: CSSAngleValue) = TransformFunction { "skewY($a)" }
 
 fun StyleBuilder.transform(transformFunction: TransformFunction) {
     property("transform", transformFunction.apply())
