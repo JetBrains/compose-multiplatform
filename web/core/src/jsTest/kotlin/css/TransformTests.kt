@@ -191,4 +191,34 @@ class TransformTests {
         assertEquals("translate(5%, 8%)", nextChild().style.transform)
     }
 
+    @Test
+    fun translateX() = runTest {
+        composition {
+            Div({ style { transform(translateXTransform(10.px)) } })
+            Div({ style { transform(translateXTransform(4.percent)) } })
+        }
+
+        assertEquals("translateX(10px)", nextChild().style.transform)
+        assertEquals("translateX(4%)", nextChild().style.transform)
+    }
+
+    @Test
+    fun translateY() = runTest {
+        composition {
+            Div({ style { transform(translateYTransform(12.px)) } })
+            Div({ style { transform(translateYTransform(3.percent)) } })
+        }
+
+        assertEquals("translateY(12px)", nextChild().style.transform)
+        assertEquals("translateY(3%)", nextChild().style.transform)
+    }
+
+    @Test
+    fun translateZ() = runTest {
+        composition {
+            Div({ style { transform(translateZTransform(7.px)) } })
+        }
+
+        assertEquals("translateZ(7px)", nextChild().style.transform)
+    }
 }

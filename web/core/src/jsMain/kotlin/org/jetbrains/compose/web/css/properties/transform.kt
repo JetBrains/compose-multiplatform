@@ -48,6 +48,14 @@ fun translate(tx: CSSLengthValue, ty: CSSPercentageValue) = TransformFunction { 
 fun translate(tx: CSSPercentageValue, ty: CSSLengthValue) = TransformFunction { "translate($tx, $ty)" }
 fun translate(tx: CSSPercentageValue, ty: CSSPercentageValue) = TransformFunction { "translate($tx, $ty)" }
 
+fun translateXTransform(tx: CSSLengthValue) = TransformFunction { "translateX($tx)" }
+fun translateXTransform(tx: CSSPercentageValue) = TransformFunction { "translateX($tx)" }
+
+fun translateYTransform(ty: CSSLengthValue) = TransformFunction { "translateY($ty)" }
+fun translateYTransform(ty: CSSPercentageValue) = TransformFunction { "translateY($ty)" }
+
+fun translateZTransform(tz: CSSLengthValue) = TransformFunction { "translateZ($tz)" }
+
 fun StyleBuilder.transform(transformFunction: TransformFunction) {
     property("transform", transformFunction.apply())
 }
