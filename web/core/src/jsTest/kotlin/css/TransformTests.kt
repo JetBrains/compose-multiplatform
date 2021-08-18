@@ -38,4 +38,14 @@ class TransformTests {
 
         assertEquals("perspective(3cm)", nextChild().style.transform)
     }
+
+    @Test
+    fun rotate() = runTest {
+        composition {
+            Div({ style { transform(rotateTransform(3.deg)) } })
+        }
+
+        assertEquals("rotate(3deg)", nextChild().style.transform)
+    }
+
 }
