@@ -237,4 +237,13 @@ class TransformTests {
 
         assertEquals("translateZ(7px)", nextChild().style.transform)
     }
+
+    @Test
+    fun mutlipleTransforms() = runTest {
+        composition {
+            Div({ style { transform(perspectiveTransform(3.cm), translate(10.px, 3.px), rotateYTransform(3.deg)) } })
+        }
+
+        assertEquals("perspective(3cm) translate(10px, 3px) rotateY(3deg)", nextChild().style.transform)
+    }
 }

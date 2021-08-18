@@ -61,6 +61,6 @@ fun translateYTransform(ty: CSSPercentageValue) = TransformFunction { "translate
 
 fun translateZTransform(tz: CSSLengthValue) = TransformFunction { "translateZ($tz)" }
 
-fun StyleBuilder.transform(transformFunction: TransformFunction) {
-    property("transform", transformFunction.apply())
+fun StyleBuilder.transform(vararg transformFunction: TransformFunction) {
+    property("transform", transformFunction.joinToString(" ") { it.apply() })
 }
