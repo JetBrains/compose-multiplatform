@@ -30,6 +30,7 @@ fun rotateZ(a: CSSAngleValue) = TransformFunction { "rotateZ($a)" }
 
 fun scaleTransform(sx: Number) = TransformFunction { "scale($sx)" }
 fun scaleTransform(sx: Number, sy: Number) = TransformFunction { "scale($sx, $sy)" }
+fun scale3dTransform(sx: Number, sy: Number, sz: Number) = TransformFunction { "scale3d($sx, $sy, $sz)" }
 
 fun StyleBuilder.transform(transformFunction: TransformFunction) {
     property("transform", transformFunction.apply())
