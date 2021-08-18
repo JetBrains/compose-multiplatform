@@ -36,14 +36,19 @@ fun module(name: String, path: String) {
 
 module(":web-core", "core")
 module(":web-widgets", "widgets")
-module(":web-integration-core", "integration-core")
-module(":web-integration-widgets", "integration-widgets")
 module(":compose-compiler-integration", "compose-compiler-integration")
 
 if (extra["compose.web.tests.skip.benchmarks"]!!.toString().toBoolean() != true) {
     module(":web-benchmark-core", "benchmark-core")
 } else {
-    println("skipping benchmarks")
+    println("skipping benchmarks tests")
+}
+
+if (extra["compose.web.tests.skip.integration"]!!.toString().toBoolean() != true) {
+    module(":web-integration-core", "integration-core")
+    module(":web-integration-widgets", "integration-widgets")
+} else {
+    println("skipping integration tests")
 }
 
 if (extra["compose.web.buildSamples"]!!.toString().toBoolean() == true) {
