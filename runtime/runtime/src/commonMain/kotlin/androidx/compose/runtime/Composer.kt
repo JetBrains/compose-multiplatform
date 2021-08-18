@@ -2978,7 +2978,9 @@ internal class ComposerImpl(
         override val effectCoroutineContext: CoroutineContext
             get() = parentContext.effectCoroutineContext
 
+        @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
         @OptIn(ExperimentalComposeApi::class)
+        @get:OptIn(ExperimentalComposeApi::class)
         override val recomposeCoroutineContext: CoroutineContext
             get() = composition.recomposeCoroutineContext
 
