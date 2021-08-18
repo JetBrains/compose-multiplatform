@@ -1,1 +1,8 @@
 // Signature format: 4.0
+package androidx.compose.material3 {
+
+  public final class DynamicTonalPalettesKt {
+  }
+
+}
+
