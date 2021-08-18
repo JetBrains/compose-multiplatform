@@ -24,6 +24,9 @@ fun perspectiveTransform(d: CSSLengthValue) = TransformFunction { "perspective($
 
 fun rotateTransform(a: CSSAngleValue) = TransformFunction { "rotate($a)" }
 fun rotate3dTransform(x: Number, y: Number, z: Number, a: CSSAngleValue) = TransformFunction { "rotate3d($x, $y, $z, $a)" }
+fun rotateX(a: CSSAngleValue) = TransformFunction { "rotateX($a)" }
+fun rotateY(a: CSSAngleValue) = TransformFunction { "rotateY($a)" }
+fun rotateZ(a: CSSAngleValue) = TransformFunction { "rotateZ($a)" }
 
 fun StyleBuilder.transform(transformFunction: TransformFunction) {
     property("transform", transformFunction.apply())

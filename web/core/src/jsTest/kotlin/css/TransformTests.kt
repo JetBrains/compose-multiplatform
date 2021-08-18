@@ -56,4 +56,44 @@ class TransformTests {
 
         assertEquals("rotate3d(1, 1, 0, 2deg)", nextChild().style.transform)
     }
+
+    @Test
+    fun rotateX() = runTest {
+        composition {
+            Div({ style { transform(rotateX(60.deg)) } })
+            Div({ style { transform(rotateX(-0.25.turn)) } })
+            Div({ style { transform(rotateX(3.14.rad)) } })
+        }
+
+        assertEquals("rotateX(60deg)", nextChild().style.transform)
+        assertEquals("rotateX(-0.25turn)", nextChild().style.transform)
+        assertEquals("rotateX(3.14rad)", nextChild().style.transform)
+    }
+
+    @Test
+    fun rotateY() = runTest {
+        composition {
+            Div({ style { transform(rotateY(60.deg)) } })
+            Div({ style { transform(rotateY(-0.25.turn)) } })
+            Div({ style { transform(rotateY(3.14.rad)) } })
+        }
+
+        assertEquals("rotateY(60deg)", nextChild().style.transform)
+        assertEquals("rotateY(-0.25turn)", nextChild().style.transform)
+        assertEquals("rotateY(3.14rad)", nextChild().style.transform)
+    }
+
+    @Test
+    fun rotateZ() = runTest {
+        composition {
+            Div({ style { transform(rotateZ(60.deg)) } })
+            Div({ style { transform(rotateZ(-0.25.turn)) } })
+            Div({ style { transform(rotateZ(3.14.rad)) } })
+        }
+
+        assertEquals("rotateZ(60deg)", nextChild().style.transform)
+        assertEquals("rotateZ(-0.25turn)", nextChild().style.transform)
+        assertEquals("rotateZ(3.14rad)", nextChild().style.transform)
+    }
+
 }
