@@ -96,4 +96,15 @@ class TransformTests {
         assertEquals("rotateZ(3.14rad)", nextChild().style.transform)
     }
 
+    @Test
+    fun scale() = runTest {
+        composition {
+            Div({ style { transform(scaleTransform(0.6)) } })
+            Div({ style { transform(scaleTransform(0.2, 0.3)) } })
+        }
+
+        assertEquals("scale(0.6)", nextChild().style.transform)
+        assertEquals("scale(0.2, 0.3)", nextChild().style.transform)
+    }
+
 }
