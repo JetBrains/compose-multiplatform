@@ -278,8 +278,8 @@ class AndroidXComposeImplPlugin : Plugin<Project> {
             multiplatformExtension.sourceSets.all {
                 // Allow all experimental APIs, since MPP projects are themselves experimental
                 it.languageSettings.apply {
-                    useExperimentalAnnotation("kotlin.Experimental")
-                    useExperimentalAnnotation("kotlin.ExperimentalMultiplatform")
+                    optIn("kotlin.Experimental")
+                    optIn("kotlin.ExperimentalMultiplatform")
                 }
             }
 
@@ -357,7 +357,6 @@ fun Project.configureComposeImplPluginForAndroidx() {
                             if (!kotlinPlugin.isEmpty) {
                                 compile.kotlinOptions.freeCompilerArgs +=
                                     listOf("-P", composeSourceOption)
-
                             }
                         }
                     }
