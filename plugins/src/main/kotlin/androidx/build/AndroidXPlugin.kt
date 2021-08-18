@@ -153,22 +153,23 @@ class AndroidXPlugin : Plugin<Project> {
                 // (which is higher than the current maximum granularity that Gradle offers (3))
                 minGranularity = 1000
             }
-            val htmlReport = task.reports.html
+            val testTaskName = task.name
+            val capitalizedTestTaskName = testTaskName.replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+            }
 
             val zipHtmlTask = project.tasks.register(
-                "zipHtmlResultsOf${task.name.replaceFirstChar {
-                    if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
-                }}",
+                "zipHtmlResultsOf$capitalizedTestTaskName",
                 Zip::class.java
             ) {
                 val destinationDirectory = File("$xmlReportDestDir-html")
                 it.destinationDirectory.set(destinationDirectory)
                 it.archiveFileName.set(archiveName)
-                it.doLast {
+                it.doLast { zip ->
                     // If the test itself didn't display output, then the report task should
                     // remind the user where to find its output
-                    project.logger.lifecycle(
-                        "Html results of ${task.name} zipped into " +
+                    zip.logger.lifecycle(
+                        "Html results of $testTaskName zipped into " +
                             "$destinationDirectory/$archiveName"
                     )
                 }
@@ -176,15 +177,13 @@ class AndroidXPlugin : Plugin<Project> {
             task.finalizedBy(zipHtmlTask)
             task.doFirst {
                 zipHtmlTask.configure {
-                    it.from(htmlReport.outputLocation)
+                    it.from(task.reports.html.outputLocation)
                 }
             }
             val xmlReport = task.reports.junitXml
             if (xmlReport.required.get()) {
                 val zipXmlTask = project.tasks.register(
-                    "zipXmlResultsOf${task.name.replaceFirstChar {
-                        if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
-                    }}",
+                    "zipXmlResultsOf$capitalizedTestTaskName",
                     Zip::class.java
                 ) {
                     it.destinationDirectory.set(xmlReportDestDir)
