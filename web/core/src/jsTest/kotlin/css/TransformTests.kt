@@ -116,5 +116,30 @@ class TransformTests {
         assertEquals("scale3d(0.2, 0.3, 0.1)", nextChild().style.transform)
     }
 
+    @Test
+    fun scaleX() = runTest {
+        composition {
+            Div({ style { transform(scaleXTransform(0.5)) } })
+        }
 
+        assertEquals("scaleX(0.5)", nextChild().style.transform)
+    }
+
+    @Test
+    fun scaleY() = runTest {
+        composition {
+            Div({ style { transform(scaleYTransform(0.7)) } })
+        }
+
+        assertEquals("scaleY(0.7)", nextChild().style.transform)
+    }
+
+    @Test
+    fun scaleZ() = runTest {
+        composition {
+            Div({ style { transform(scaleZTransform(0.12)) } })
+        }
+
+        assertEquals("scaleZ(0.12)", nextChild().style.transform)
+    }
 }
