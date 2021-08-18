@@ -1821,7 +1821,6 @@ private class MockOwner(
     override fun measureAndLayout() {
     }
 
-    @ExperimentalComposeUiApi
     override fun createLayer(
         drawBlock: (Canvas) -> Unit,
         invalidateParentLayer: () -> Unit

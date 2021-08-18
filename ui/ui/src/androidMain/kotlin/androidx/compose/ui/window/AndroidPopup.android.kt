@@ -105,6 +105,7 @@ class PopupProperties @ExperimentalComposeUiApi constructor(
     val securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit,
     val excludeFromSystemGesture: Boolean = true,
     val clippingEnabled: Boolean = true,
+    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
     @get:ExperimentalComposeUiApi
     val usePlatformDefaultWidth: Boolean = false
 ) {

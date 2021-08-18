@@ -117,7 +117,9 @@ class MutableTransitionState<S>(initialState: S) {
      *
      * @sample androidx.compose.animation.core.samples.TransitionStateIsIdleSample
      */
+    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
     @get:ExperimentalTransitionApi
+    @ExperimentalTransitionApi
     val isIdle: Boolean
         get() = (currentState == targetState) && !isRunning
 
@@ -228,6 +230,7 @@ class Transition<S> @PublishedApi internal constructor(
      * beginning of the transition and increment until all child animations have finished.
      * @suppress
      */
+    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
     @InternalAnimationApi
     var playTimeNanos by mutableStateOf(0L)
     private var startTimeNanos by mutableStateOf(AnimationConstants.UnspecifiedTime)

@@ -28,6 +28,7 @@ import androidx.compose.animation.Animatable
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.ExperimentalTransitionApi
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
@@ -151,6 +152,7 @@ fun AnimatedVisibilityWithEnterAndExit() {
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class, ExperimentalTransitionApi::class)
 @Composable
 fun AnimateContentSizeSimple() {
     var message by remember { mutableStateOf("Hello") }

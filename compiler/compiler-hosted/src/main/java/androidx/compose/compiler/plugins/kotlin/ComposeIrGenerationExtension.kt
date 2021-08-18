@@ -33,6 +33,7 @@ import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.serialization.DeclarationTable
 import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureSerializer
+import org.jetbrains.kotlin.backend.common.serialization.signature.PublicIdSignatureComputer
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsGlobalDeclarationTable
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsManglerIr
@@ -86,10 +87,16 @@ class ComposeIrGenerationExtension(
         // Memoize normal lambdas and wrap composable lambdas
         ComposerLambdaMemoization(pluginContext, symbolRemapper, bindingTrace).lower(moduleFragment)
 
+        val mangler = when {
+            pluginContext.platform.isJs() -> JsManglerIr
+            else -> null
+        }
+
         val idSignatureBuilder = when {
-            pluginContext.platform.isJs() -> IdSignatureSerializer(JsManglerIr).also {
-                it.table = DeclarationTable(JsGlobalDeclarationTable(it, pluginContext.irBuiltIns))
-            }
+            pluginContext.platform.isJs() -> IdSignatureSerializer(
+                PublicIdSignatureComputer(mangler!!),
+                DeclarationTable(JsGlobalDeclarationTable(pluginContext.irBuiltIns))
+            )
             else -> null
         }
         if (decoysEnabled) {
@@ -138,7 +145,8 @@ class ComposeIrGenerationExtension(
                 pluginContext,
                 symbolRemapper,
                 bindingTrace,
-                idSignatureBuilder
+                idSignatureBuilder,
+                mangler!!
             ).lower(moduleFragment)
         }
 

@@ -45,6 +45,7 @@ import io.reactivex.rxjava3.plugins.RxJavaPlugins
  * @param initial The initial value for the returned [State] which will be asynchronously updated
  * with the real one once we receive it from the stream
  */
+@Suppress("UPPER_BOUND_VIOLATED_BASED_ON_JAVA_ANNOTATIONS")
 @Composable
 fun <R, T : R> Observable<T>.subscribeAsState(initial: R): State<R> =
     asState(initial) { subscribe(it) }
@@ -65,6 +66,7 @@ fun <R, T : R> Observable<T>.subscribeAsState(initial: R): State<R> =
  * @param initial The initial value for the returned [State] which will be asynchronously updated
  * with the real one once we receive it from the stream
  */
+@Suppress("UPPER_BOUND_VIOLATED_BASED_ON_JAVA_ANNOTATIONS")
 @Composable
 fun <R, T : R> Flowable<T>.subscribeAsState(initial: R): State<R> =
     asState(initial) { subscribe(it) }
@@ -85,6 +87,7 @@ fun <R, T : R> Flowable<T>.subscribeAsState(initial: R): State<R> =
  * @param initial The initial value for the returned [State] which will be asynchronously updated
  * with the real one once we receive it from the stream
  */
+@Suppress("UPPER_BOUND_VIOLATED_BASED_ON_JAVA_ANNOTATIONS")
 @Composable
 fun <R, T : R> Single<T>.subscribeAsState(initial: R): State<R> =
     asState(initial) { subscribe(it) }

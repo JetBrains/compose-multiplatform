@@ -28,6 +28,7 @@ import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.DeepCopySymbolRemapper
 import org.jetbrains.kotlin.ir.util.IdSignature
+import org.jetbrains.kotlin.ir.util.KotlinMangler
 import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.util.getAnnotation
 import org.jetbrains.kotlin.resolve.BindingTrace
@@ -41,7 +42,8 @@ class RecordDecoySignaturesTransformer(
     pluginContext: IrPluginContext,
     symbolRemapper: DeepCopySymbolRemapper,
     bindingTrace: BindingTrace,
-    override val signatureBuilder: IdSignatureSerializer
+    override val signatureBuilder: IdSignatureSerializer,
+    val mangler: KotlinMangler.IrMangler
 ) : AbstractComposeLowering(
     context = pluginContext,
     symbolRemapper = symbolRemapper,
@@ -63,7 +65,7 @@ class RecordDecoySignaturesTransformer(
         val decoyFunction =
             symbolRemapper.getReferencedFunction(declaration.getComposableForDecoy())
         val sig =
-            signatureBuilder.composePublicIdSignature(decoyFunction.owner)
+            signatureBuilder.computeSignature(decoyFunction.owner)
                 as? IdSignature.PublicSignature
 
         if (sig != null) {
@@ -86,5 +88,5 @@ class RecordDecoySignaturesTransformer(
     }
 
     private fun IrDeclaration.canBeLinkedAgainst(): Boolean =
-        signatureBuilder.mangler.run { this@canBeLinkedAgainst.isExported() }
+        mangler.run { this@canBeLinkedAgainst.isExported() }
 }

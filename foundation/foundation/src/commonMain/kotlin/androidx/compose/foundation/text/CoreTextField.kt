@@ -658,6 +658,7 @@ private fun tapToFocus(
     }
 }
 
+@OptIn(InternalFoundationTextApi::class)
 private fun notifyTextInputServiceOnFocusChange(
     textInputService: TextInputService,
     state: TextFieldState,
