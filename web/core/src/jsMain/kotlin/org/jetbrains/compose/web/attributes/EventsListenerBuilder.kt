@@ -188,7 +188,7 @@ open class EventsListenerBuilder {
         listeners.add(SyntheticEventListener(SCROLL, options, listener))
     }
 
-    fun collectListeners(): List<SyntheticEventListener<*>> = listeners
+    internal fun collectListeners(): List<SyntheticEventListener<*>> = listeners
 
     /**
      * [addEventListener] used for adding arbitrary events to the element. It resembles the standard DOM addEventListener method

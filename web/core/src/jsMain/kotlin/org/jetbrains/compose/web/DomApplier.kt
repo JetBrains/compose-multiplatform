@@ -11,7 +11,7 @@ import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
 import org.w3c.dom.get
 
-class DomApplier(
+internal class DomApplier(
     root: DomNodeWrapper
 ) : AbstractApplier<DomNodeWrapper>(root) {
 
@@ -43,7 +43,7 @@ external interface EventListenerOptions {
     var capture: Boolean
 }
 
-open class DomNodeWrapper(open val node: Node) {
+internal open class DomNodeWrapper(open val node: Node) {
     private var currentListeners = emptyList<SyntheticEventListener<*>>()
 
     fun updateEventListeners(list: List<SyntheticEventListener<*>>) {
@@ -92,7 +92,7 @@ open class DomNodeWrapper(open val node: Node) {
 }
 
 
-class DomElementWrapper(override val node: HTMLElement): DomNodeWrapper(node) {
+internal class DomElementWrapper(override val node: HTMLElement): DomNodeWrapper(node) {
     private var currentAttrs: Map<String, String>? = null
 
     fun updateAttrs(attrs: Map<String, String>) {
