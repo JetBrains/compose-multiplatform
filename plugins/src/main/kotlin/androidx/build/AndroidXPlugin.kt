@@ -392,18 +392,13 @@ class AndroidXPlugin : Plugin<Project> {
     private fun Project.configureProjectStructureValidation(
         extension: AndroidXExtension
     ) {
-        val validateProjectStructure = tasks.register(
-            "validateProjectStructure",
-            ValidateProjectStructureTask::class.java,
-        )
-
         // AndroidXExtension.mavenGroup is not readable until afterEvaluate.
         afterEvaluate {
-            validateProjectStructure.configure { task ->
-                val type = extension.type
-                task.enabled = extension.mavenGroup != null &&
-                    (type == LibraryType.PUBLISHED_LIBRARY || type == LibraryType.UNSET)
-                task.libraryGroup.set(extension.mavenGroup)
+            val mavenGroup = extension.mavenGroup
+            val isProbablyPublished = extension.type == LibraryType.PUBLISHED_LIBRARY ||
+                extension.type == LibraryType.UNSET
+            if (mavenGroup != null && isProbablyPublished) {
+                validateProjectStructure(mavenGroup.group)
             }
         }
     }
@@ -878,4 +873,36 @@ internal fun Project.hasAndroidTestSourceCode(): Boolean {
     }
 
     return false
+}
+
+private const val GROUP_PREFIX = "androidx."
+
+/**
+ * Validates the project structure against Jetpack guidelines.
+ */
+fun Project.validateProjectStructure(groupId: String) {
+    val shortGroupId = if (groupId.startsWith(GROUP_PREFIX)) {
+        groupId.substring(GROUP_PREFIX.length)
+    } else {
+        groupId
+    }
+
+    // Fully-qualified Gradle project name should match the Maven coordinate.
+    val expectName = ":${shortGroupId.replace(".",":")}:${project.name}"
+    val actualName = project.path
+    if (expectName != actualName) {
+        throw GradleException(
+            "Invalid project structure! Expected $expectName as project name, found $actualName"
+        )
+    }
+
+    // Project directory should match the Maven coordinate.
+    val expectDir = shortGroupId.replace(".", File.separator) +
+        "${File.separator}${project.name}"
+    val actualDir = project.projectDir.toRelativeString(project.rootDir)
+    if (expectDir != actualDir) {
+        throw GradleException(
+            "Invalid project structure! Expected $expectDir as project directory, found $actualDir"
+        )
+    }
 }
