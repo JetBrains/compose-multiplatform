@@ -5,11 +5,14 @@ import androidx.compose.ui.unit.IntSize
 import org.jetbrains.compose.demo.falling.views.fallingBalls
 import org.jetbrains.compose.demo.falling.Game
 import androidx.compose.runtime.remember
+import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 
+@ExperimentalComposeWebWidgetsApi
 class JvmGame : Game() {
     override fun now() = System.nanoTime()
 }
 
+@ExperimentalComposeWebWidgetsApi
 fun main() {
     Window(title = "Demo", size = IntSize(600, 400)) {
         fallingBalls(

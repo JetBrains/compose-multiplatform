@@ -22,7 +22,9 @@ import org.jetbrains.compose.common.ui.size
 import org.jetbrains.compose.common.core.graphics.Color
 import org.jetbrains.compose.common.foundation.layout.fillMaxHeight
 import org.jetbrains.compose.common.foundation.layout.fillMaxWidth
+import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 
+@ExperimentalComposeWebWidgetsApi
 @Composable
 fun fallingBalls(game: Game) {
     Column(Modifier.fillMaxWidth().fillMaxHeight(1f)) {

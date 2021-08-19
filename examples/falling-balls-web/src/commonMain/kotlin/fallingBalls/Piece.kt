@@ -14,7 +14,9 @@ import org.jetbrains.compose.common.ui.draw.clip
 import org.jetbrains.compose.common.core.graphics.Color
 import jetbrains.compose.common.shapes.CircleShape
 import org.jetbrains.compose.common.demo.position
+import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 
+@ExperimentalComposeWebWidgetsApi
 @Composable
 fun Piece(index: Int, piece: PieceData) {
     val boxSize = 40.dp

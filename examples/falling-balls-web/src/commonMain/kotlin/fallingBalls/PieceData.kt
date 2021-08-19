@@ -4,7 +4,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import org.jetbrains.compose.common.core.graphics.Color
+import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 
+@ExperimentalComposeWebWidgetsApi
 data class PieceData(val game: Game, val velocity: Float, val color: Color) {
     var picked: Boolean by mutableStateOf(false)
     var position: Float by mutableStateOf(0f)

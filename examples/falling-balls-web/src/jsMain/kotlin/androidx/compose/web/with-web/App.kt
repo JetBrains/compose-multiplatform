@@ -7,13 +7,16 @@ import org.jetbrains.compose.demo.falling.views.fallingBalls
 import org.jetbrains.compose.demo.falling.Game
 import androidx.compose.runtime.remember
 import kotlinx.browser.window
+import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 import org.jetbrains.compose.web.css.Style
 import org.jetbrains.compose.web.ui.Styles
 
+@ExperimentalComposeWebWidgetsApi
 class JsGame : Game() {
     override fun now() = window.performance.now().toLong()
 }
 
+@ExperimentalComposeWebWidgetsApi
 fun main() {
     val root = document.getElementById("root") as HTMLElement
 
