@@ -2,16 +2,11 @@ package org.jetbrainsc.compose.common.demo
 
 import androidx.compose.runtime.Composable
 import org.jetbrains.compose.common.foundation.layout.Box
-import org.jetbrains.compose.common.ui.Modifier
-import org.jetbrains.compose.common.ui.size
-import org.jetbrains.compose.common.ui.background
-import org.jetbrains.compose.common.ui.padding
 import org.jetbrains.compose.common.ui.unit.dp
 import org.jetbrains.compose.common.core.graphics.Color
 import org.jetbrains.compose.common.foundation.layout.Row
 import org.jetbrains.compose.common.foundation.layout.Column
 import org.jetbrains.compose.common.foundation.layout.Arrangement
-import org.jetbrains.compose.common.ui.Alignment
 import org.jetbrains.compose.common.foundation.border
 import org.jetbrains.compose.common.material.Text
 import org.jetbrains.compose.common.ui.unit.em
@@ -23,7 +18,9 @@ import org.jetbrains.compose.common.foundation.layout.width
 import org.jetbrains.compose.common.foundation.clickable
 import org.jetbrains.compose.common.ui.draw.clip
 import jetbrains.compose.common.shapes.CircleShape
+import org.jetbrains.compose.common.ui.*
 
+@OptIn(ExperimentalComposeWebWidgetsApi::class)
 object LayoutSamples {
     @Composable
     fun TwoTexts() {
