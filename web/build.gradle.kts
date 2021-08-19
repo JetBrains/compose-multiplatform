@@ -35,21 +35,24 @@ subprojects {
         }
     }
 
-    val printTestBundleSize by tasks.registering {
-        doLast {
-            val bundlePath = buildDir.resolve(
-                "compileSync/test/testDevelopmentExecutable/kotlin/${rootProject.name}-${project.name}-test.js"
-            )
-            if (bundlePath.exists()) {
-                val size = bundlePath.length()
-                println("##teamcity[buildStatisticValue key='testBundleSize::${project.name}' value='$size']")
+    pluginManager.withPlugin("kotlin-multiplatform") {
+        val printTestBundleSize by tasks.registering {
+            doLast {
+                val bundlePath = buildDir.resolve(
+                    "compileSync/test/testDevelopmentExecutable/kotlin/${rootProject.name}-${project.name}-test.js"
+                )
+                if (bundlePath.exists()) {
+                    val size = bundlePath.length()
+                    println("##teamcity[buildStatisticValue key='testBundleSize::${project.name}' value='$size']")
+                }
             }
+        }
+
+        afterEvaluate {
+            tasks.named("jsTest") { finalizedBy(printTestBundleSize) }
         }
     }
 
-    afterEvaluate {
-        tasks.named("jsTest") { finalizedBy(printTestBundleSize) }
-    }
 
     if (isSampleProject()) {
         val printBundleSize by tasks.registering {
