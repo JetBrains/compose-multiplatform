@@ -83,7 +83,7 @@ class TransformBuilder {
     fun translateZ(tz: CSSLengthValue) = transformations.add { "translateZ($tz)" }
 
     override fun toString(): String {
-        return transformations.joinToString(", ") { it.apply() }
+        return transformations.joinToString(" ") { it.apply() }
     }
 }
 
