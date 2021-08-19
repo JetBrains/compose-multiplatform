@@ -6,6 +6,7 @@ import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.common.internal.castOrCreate
 
+@ExperimentalComposeWebWidgetsApi
 actual fun Modifier.size(width: Dp, height: Dp): Modifier = castOrCreate().apply {
     add {
         width(width.value.px)
