@@ -16,8 +16,8 @@
 
 package androidx.build
 
-import androidx.build.AndroidXPlugin.Companion.ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK
-import androidx.build.AndroidXPlugin.Companion.ZIP_TEST_CONFIGS_WITH_APKS_TASK
+import androidx.build.AndroidXImplPlugin.Companion.ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK
+import androidx.build.AndroidXImplPlugin.Companion.ZIP_TEST_CONFIGS_WITH_APKS_TASK
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.gradle.isRoot
 import androidx.build.license.CheckExternalDependencyLicensesTask
@@ -43,7 +43,7 @@ import java.io.File
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 
-abstract class AndroidXRootPlugin : Plugin<Project> {
+abstract class AndroidXRootImplPlugin : Plugin<Project> {
     @Suppress("UnstableApiUsage")
     @get:javax.inject.Inject
     abstract val registry: BuildEventsListenerRegistry
@@ -74,17 +74,17 @@ abstract class AndroidXRootPlugin : Plugin<Project> {
         }
 
         val buildOnServerTask = tasks.create(
-            AndroidXPlugin.BUILD_ON_SERVER_TASK,
+            BUILD_ON_SERVER_TASK,
             BuildOnServer::class.java
         )
         buildOnServerTask.dependsOn(
             tasks.register(
-                AndroidXPlugin.CREATE_AGGREGATE_BUILD_INFO_FILES_TASK,
+                AndroidXImplPlugin.CREATE_AGGREGATE_BUILD_INFO_FILES_TASK,
                 CreateAggregateLibraryBuildInfoFileTask::class.java
             )
         )
         buildOnServerTask.dependsOn(
-            tasks.register(AndroidXPlugin.CREATE_LIBRARY_BUILD_INFO_FILES_TASK)
+            tasks.register(AndroidXImplPlugin.CREATE_LIBRARY_BUILD_INFO_FILES_TASK)
         )
 
         VerifyPlaygroundGradlePropertiesTask.createIfNecessary(project)?.let {
@@ -176,7 +176,7 @@ abstract class AndroidXRootPlugin : Plugin<Project> {
             }
         }
 
-        tasks.register(AndroidXPlugin.BUILD_TEST_APKS_TASK)
+        tasks.register(AndroidXImplPlugin.BUILD_TEST_APKS_TASK)
 
         project.tasks.register(
             ZIP_TEST_CONFIGS_WITH_APKS_TASK, Zip::class.java

@@ -24,7 +24,7 @@ import org.gradle.api.provider.Property
 import java.util.ArrayList
 
 /**
- * Extension for [AndroidXPlugin] that's responsible for holding configuration options.
+ * Extension for [AndroidXImplPlugin] that's responsible for holding configuration options.
  */
 open class AndroidXExtension(val project: Project) {
 

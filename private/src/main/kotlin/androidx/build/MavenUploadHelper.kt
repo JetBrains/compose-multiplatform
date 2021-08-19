@@ -16,7 +16,7 @@
 
 package androidx.build
 
-import androidx.build.AndroidXComposePlugin.Companion.isMultiplatformEnabled
+import androidx.build.Multiplatform.Companion.isMultiplatformEnabled
 import com.android.build.gradle.LibraryPlugin
 import groovy.util.Node
 import org.gradle.api.GradleException
@@ -125,7 +125,7 @@ private fun Project.configureComponent(
             }
         }
 
-        if (isMultiplatformEnabled()) {
+        if (project.isMultiplatformEnabled()) {
             configureMultiplatformPublication()
         }
     }

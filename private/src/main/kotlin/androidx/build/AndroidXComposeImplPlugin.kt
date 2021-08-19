@@ -26,6 +26,7 @@ import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.android.build.gradle.internal.lint.AndroidLintTask
 import com.android.build.gradle.internal.lint.LintModelWriterTask
 import com.android.build.gradle.internal.lint.VariantInputs
+import kotlin.reflect.KFunction
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition
@@ -48,8 +49,10 @@ const val composeSourceOption =
 /**
  * Plugin to apply common configuration for Compose projects.
  */
-class AndroidXComposePlugin : Plugin<Project> {
+class AndroidXComposeImplPlugin : Plugin<Project> {
     override fun apply(project: Project) {
+        val f: KFunction<Unit> = AndroidXComposeImplPlugin.Companion::applyAndConfigureKotlinPlugin
+        project.extensions.add("applyAndConfigureKotlinPlugin", f)
         project.plugins.all { plugin ->
             when (plugin) {
                 is LibraryPlugin -> {
@@ -65,7 +68,7 @@ class AndroidXComposePlugin : Plugin<Project> {
                     project.configureAndroidCommonOptions(app)
                 }
                 is KotlinBasePluginWrapper -> {
-                    project.configureComposePluginForAndroidx()
+                    project.configureComposeImplPluginForAndroidx()
 
                     if (plugin is KotlinMultiplatformPluginWrapper) {
                         project.configureForMultiplatform()
@@ -77,35 +80,28 @@ class AndroidXComposePlugin : Plugin<Project> {
 
     companion object {
 
-        @JvmStatic
-        fun Project.isMultiplatformEnabled(): Boolean {
-            return properties.get(COMPOSE_MPP_ENABLED)?.toString()?.toBoolean()
-                ?: androidxExtension()?.multiplatform ?: false
-        }
-
         /**
          * @param isMultiplatformEnabled whether this module has a corresponding
          * multiplatform configuration, or whether it is Android only
          */
-        @JvmStatic
-        @JvmOverloads
-        fun Project.applyAndConfigureKotlinPlugin(
-            isMultiplatformEnabled: Boolean = isMultiplatformEnabled()
+        fun applyAndConfigureKotlinPlugin(
+            project: Project,
+            isMultiplatformEnabled: Boolean
         ) {
             if (isMultiplatformEnabled) {
-                apply(plugin = "kotlin-multiplatform")
+                project.apply(plugin = "kotlin-multiplatform")
             } else {
-                apply(plugin = "org.jetbrains.kotlin.android")
+                project.apply(plugin = "org.jetbrains.kotlin.android")
             }
 
-            configureManifests()
+            project.configureManifests()
             if (isMultiplatformEnabled) {
-                configureForMultiplatform()
+                project.configureForMultiplatform()
             } else {
-                configureForKotlinMultiplatformSourceStructure()
+                project.configureForKotlinMultiplatformSourceStructure()
             }
 
-            tasks.withType(KotlinCompile::class.java).configureEach { compile ->
+            project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
                 // Needed to enable `expect` and `actual` keywords
                 compile.kotlinOptions.freeCompilerArgs += "-Xmulti-platform"
             }
@@ -296,7 +292,7 @@ class AndroidXComposePlugin : Plugin<Project> {
     }
 }
 
-fun Project.configureComposePluginForAndroidx() {
+fun Project.configureComposeImplPluginForAndroidx() {
 
     val conf = project.configurations.create("kotlinPlugin")
     val kotlinPlugin = conf.incoming.artifactView { view ->

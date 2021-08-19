@@ -67,7 +67,7 @@ import javax.inject.Inject
 /**
  * Plugin that allows to build documentation for a given set of prebuilt and tip of tree projects.
  */
-class AndroidXDocsPlugin : Plugin<Project> {
+class AndroidXDocsImplPlugin : Plugin<Project> {
     lateinit var project: Project
     lateinit var docsType: String
     lateinit var docsSourcesConfiguration: Configuration
@@ -98,7 +98,7 @@ class AndroidXDocsPlugin : Plugin<Project> {
         createConfigurations()
         val buildOnServer = project.tasks.register<DocsBuildOnServer>("buildOnServer") {
             buildId = getBuildId()
-            docsType = this@AndroidXDocsPlugin.docsType
+            docsType = this@AndroidXDocsImplPlugin.docsType
             distributionDirectory = project.getDistributionDirectory()
         }
 

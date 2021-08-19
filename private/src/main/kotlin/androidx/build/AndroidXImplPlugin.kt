@@ -17,8 +17,8 @@
 package androidx.build
 
 import androidx.benchmark.gradle.BenchmarkPlugin
-import androidx.build.AndroidXPlugin.Companion.CHECK_RELEASE_READY_TASK
-import androidx.build.AndroidXPlugin.Companion.TASK_TIMEOUT_MINUTES
+import androidx.build.AndroidXImplPlugin.Companion.CHECK_RELEASE_READY_TASK
+import androidx.build.AndroidXImplPlugin.Companion.TASK_TIMEOUT_MINUTES
 import androidx.build.Release.DEFAULT_PUBLISH_CONFIG
 import androidx.build.SupportConfig.BUILD_TOOLS_VERSION
 import androidx.build.SupportConfig.COMPILE_SDK_VERSION
@@ -84,9 +84,9 @@ import java.util.concurrent.ConcurrentHashMap
  * A plugin which enables all of the Gradle customizations for AndroidX.
  * This plugin reacts to other plugins being added and adds required and optional functionality.
  */
-class AndroidXPlugin : Plugin<Project> {
+class AndroidXImplPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        if (project.isRoot) throw Exception("Root project should use AndroidXRootPlugin instead")
+        if (project.isRoot) throw Exception("Root project should use AndroidXRootImplPlugin instead")
         val extension = project.extensions.create<AndroidXExtension>(EXTENSION_NAME, project)
         // Perform different actions based on which plugins have been applied to the project.
         // Many of the actions overlap, ex. API tracking.
@@ -346,7 +346,7 @@ class AndroidXPlugin : Plugin<Project> {
         project.configureErrorProneForJava()
         project.configureSourceJarForJava()
 
-        // Force Java 1.8 source- and target-compatibilty for all Java libraries.
+        // Force Java 1.8 source- and target-compatibility for all Java libraries.
         val javaExtension = project.extensions.getByType<JavaPluginExtension>()
         javaExtension.apply {
             sourceCompatibility = VERSION_1_8
@@ -663,7 +663,6 @@ class AndroidXPlugin : Plugin<Project> {
     }
 
     companion object {
-        const val BUILD_ON_SERVER_TASK = "buildOnServer"
         const val BUILD_TEST_APKS_TASK = "buildTestApks"
         const val CHECK_RELEASE_READY_TASK = "checkReleaseReady"
         const val CREATE_LIBRARY_BUILD_INFO_FILES_TASK = "createLibraryBuildInfoFiles"

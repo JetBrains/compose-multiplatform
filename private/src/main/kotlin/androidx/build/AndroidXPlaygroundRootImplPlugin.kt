@@ -16,7 +16,7 @@
 
 package androidx.build
 
-import androidx.build.AndroidXRootPlugin.Companion.PROJECT_OR_ARTIFACT_EXT_NAME
+import androidx.build.AndroidXRootImplPlugin.Companion.PROJECT_OR_ARTIFACT_EXT_NAME
 import androidx.build.dependencyTracker.DependencyTracker
 import androidx.build.dependencyTracker.ProjectGraph
 import androidx.build.gradle.isRoot
@@ -38,7 +38,7 @@ import java.net.URL
  * artifacts instead of projects or allowing access to public maven repositories.
  */
 @Suppress("unused") // used in Playground Projects
-class AndroidXPlaygroundRootPlugin : Plugin<Project> {
+class AndroidXPlaygroundRootImplPlugin : Plugin<Project> {
     private lateinit var rootProject: Project
 
     /**
@@ -61,9 +61,9 @@ class AndroidXPlaygroundRootPlugin : Plugin<Project> {
         if (!target.isRoot) {
             throw GradleException("This plugin should only be applied to root project")
         }
-        if (!target.plugins.hasPlugin(AndroidXRootPlugin::class.java)) {
+        if (!target.plugins.hasPlugin(AndroidXRootImplPlugin::class.java)) {
             throw GradleException(
-                "Must apply AndroidXRootPlugin before applying AndroidXPlaygroundRootPlugin"
+                "Must apply AndroidXRootImplPlugin before applying AndroidXPlaygroundRootImplPlugin"
             )
         }
         rootProject = target
@@ -161,7 +161,7 @@ class AndroidXPlaygroundRootPlugin : Plugin<Project> {
                 val versionNodes = parsedMetadata.getElementsByTagName("latest")
                 if (versionNodes.length != 1) {
                     throw GradleException(
-                        "AndroidXPlaygroundRootPlugin#findSnapshotVersion expected exactly one " +
+                        "AndroidXPlaygroundRootImplPlugin#findSnapshotVersion expected exactly one " +
                             "latest version in $metadataUrl, but got ${versionNodes.length}"
                     )
                 }
