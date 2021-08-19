@@ -21,6 +21,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.selection.triStateToggleable
 import androidx.compose.foundation.text.BasicText
@@ -30,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
@@ -38,11 +41,14 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.center
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -51,6 +57,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.up
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -456,5 +463,65 @@ class ToggleableTest {
                 "onClick",
             )
         }
+    }
+
+    @Test
+    fun toggleable_minTouchTarget_clickOutsideLayoutBounds() {
+        var toggled by mutableStateOf(false)
+        val interactionSource = MutableInteractionSource()
+        testToggleableMinTouchTarget {
+            Modifier.toggleable(
+                value = toggled,
+                interactionSource = interactionSource,
+                indication = null,
+                onValueChange = { toggled = true }
+            )
+        }
+    }
+
+    @Test
+    fun triStateToggleable_minTouchTarget_clickOutsideLayoutBounds() {
+        var toggleableState by mutableStateOf(ToggleableState.Off)
+        val interactionSource = MutableInteractionSource()
+        testToggleableMinTouchTarget {
+            Modifier.triStateToggleable(
+                state = toggleableState,
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = { toggleableState = ToggleableState.On }
+            )
+        }
+    }
+
+    @Test
+    fun triStateToggleable_noInteractionSource_minTouchTarget_clickOutsideLayoutBounds() {
+        var toggleableState by mutableStateOf(ToggleableState.Off)
+        testToggleableMinTouchTarget {
+            Modifier.triStateToggleable(
+                state = toggleableState,
+                onClick = { toggleableState = ToggleableState.On }
+            )
+        }
+    }
+
+    private fun testToggleableMinTouchTarget(modifier: () -> Modifier): Unit = with(rule.density) {
+        val tag = "toggleable"
+        rule.setContent {
+            Box(Modifier.fillMaxSize()) {
+                Box(modifier().requiredSize(2.dp).testTag(tag)) {
+                    BasicText("ToggleableText")
+                }
+            }
+        }
+
+        val pokePoint = 48.dp.roundToPx().toFloat() - 1f
+
+        rule.onNodeWithTag(tag)
+            .assertIsOff()
+            .assertWidthIsEqualTo(48.dp)
+            .assertHeightIsEqualTo(48.dp)
+            .performGesture {
+                click(position = Offset(pokePoint, pokePoint))
+            }.assertIsOn()
     }
 }

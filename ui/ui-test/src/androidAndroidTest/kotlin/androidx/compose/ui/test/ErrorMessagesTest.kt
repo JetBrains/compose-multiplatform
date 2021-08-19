@@ -23,17 +23,22 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.testutils.TestViewConfiguration
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.text
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.util.expectErrorMessage
 import androidx.compose.ui.test.util.expectErrorMessageStartsWith
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.DpSize
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import org.junit.Rule
@@ -111,7 +116,7 @@ class ErrorMessagesTest {
 
     @Test
     fun findByText_doClick_butMoreThanOneElementFound() {
-        rule.setContent {
+        rule.setContentWithoutMinimumTouchTarget {
             ComposeSimpleCase()
         }
 
@@ -147,7 +152,7 @@ class ErrorMessagesTest {
 
     @Test
     fun findByTag_assertDoesNotExist_butElementFound() {
-        rule.setContent {
+        rule.setContentWithoutMinimumTouchTarget {
             ComposeSimpleCase()
         }
 
@@ -166,7 +171,7 @@ class ErrorMessagesTest {
 
     @Test
     fun findAll_assertMultiple_butIsDifferentAmount() {
-        rule.setContent {
+        rule.setContentWithoutMinimumTouchTarget {
             ComposeSimpleCase()
         }
 
@@ -394,5 +399,24 @@ class ErrorMessagesTest {
                 Box { content() }
             }
         }
+    }
+}
+
+fun ComposeContentTestRule.setContentWithoutMinimumTouchTarget(
+    composable: @Composable () -> Unit
+) {
+    setContent {
+        val oldViewConfiguration = LocalViewConfiguration.current
+        val viewConfiguration = TestViewConfiguration(
+            longPressTimeoutMillis = oldViewConfiguration.longPressTimeoutMillis,
+            doubleTapTimeoutMillis = oldViewConfiguration.doubleTapTimeoutMillis,
+            doubleTapMinTimeMillis = oldViewConfiguration.doubleTapMinTimeMillis,
+            touchSlop = oldViewConfiguration.touchSlop,
+            minimumTouchTargetSize = DpSize.Zero
+        )
+        CompositionLocalProvider(
+            LocalViewConfiguration provides viewConfiguration,
+            content = composable
+        )
     }
 }

@@ -19,13 +19,17 @@ package androidx.compose.material
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
@@ -41,6 +45,7 @@ import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertWidthIsEqualTo
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.isFocusable
 import androidx.compose.ui.test.isNotFocusable
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -54,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -330,5 +336,34 @@ class SwitchTest {
         }
             .assertWidthIsEqualTo(34.dp + paddingInDp * 2)
             .assertHeightIsEqualTo(20.dp + paddingInDp * 2)
+    }
+
+    /**
+     * A switch should have a minimum touch target of 48 DP x 48 DP and the reported size
+     * should match that, despite the fact that we force the size to be smaller.
+     */
+    @Test
+    fun switch_minTouchTargetArea(): Unit = with(rule.density) {
+        var checked by mutableStateOf(false)
+        rule.setMaterialContent {
+            // Box is needed because otherwise the control will be expanded to fill its parent
+            Box(Modifier.fillMaxSize()) {
+                Switch(
+                    modifier = Modifier.align(Alignment.Center)
+                        .testTag(defaultSwitchTag)
+                        .requiredSize(2.dp),
+                    checked = checked,
+                    onCheckedChange = { checked = it }
+                )
+            }
+        }
+        val pokePosition = 48.dp.roundToPx().toFloat() - 1f
+        rule.onNodeWithTag(defaultSwitchTag)
+            .assertIsOff()
+            .assertWidthIsEqualTo(48.dp)
+            .assertHeightIsEqualTo(48.dp)
+            .performGesture {
+                click(position = Offset(pokePosition, pokePosition))
+            }.assertIsOn()
     }
 }

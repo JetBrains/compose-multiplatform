@@ -22,8 +22,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.testutils.TestViewConfiguration
 import androidx.compose.testutils.assertPixelColor
 import androidx.compose.testutils.assertPixels
 import androidx.compose.testutils.assertShape
@@ -35,8 +38,10 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.toPixelMap
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextReplacement
@@ -45,6 +50,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
@@ -66,7 +72,7 @@ class TextFieldCursorTest {
         val width = 10.dp
         val height = 20.dp
         var isFocused = false
-        rule.setContent {
+        rule.setContentWithoutMinimumTouchTarget {
             BasicTextField(
                 value = "",
                 onValueChange = {},
@@ -97,7 +103,7 @@ class TextFieldCursorTest {
         val width = 10.dp
         val height = 20.dp
         var isFocused = false
-        rule.setContent {
+        rule.setContentWithoutMinimumTouchTarget {
             BasicTextField(
                 value = "",
                 onValueChange = {},
@@ -136,7 +142,7 @@ class TextFieldCursorTest {
         val width = 10.dp
         val height = 20.dp
         var isFocused = false
-        rule.setContent {
+        rule.setContentWithoutMinimumTouchTarget {
             // The padding helps if the test is run accidentally in landscape. Landscape makes
             // the cursor to be next to the navigation bar which affects the red color to be a bit
             // different - possibly anti-aliasing.
@@ -184,7 +190,7 @@ class TextFieldCursorTest {
         val width = 10.dp
         val height = 20.dp
         var isFocused = false
-        rule.setContent {
+        rule.setContentWithoutMinimumTouchTarget {
             // The padding helps if the test is run accidentally in landscape. Landscape makes
             // the cursor to be next to the navigation bar which affects the red color to be a bit
             // different - possibly anti-aliasing.
@@ -235,7 +241,7 @@ class TextFieldCursorTest {
         val width = 10.dp
         val height = 20.dp
         var isFocused = false
-        rule.setContent {
+        rule.setContentWithoutMinimumTouchTarget {
             // The padding helps if the test is run accidentally in landscape. Landscape makes
             // the cursor to be next to the navigation bar which affects the red color to be a bit
             // different - possibly anti-aliasing.
@@ -284,7 +290,7 @@ class TextFieldCursorTest {
         val height = 20.dp
         var isFocused = false
         val textValue = mutableStateOf(TextFieldValue("test", selection = TextRange(2)))
-        rule.setContent {
+        rule.setContentWithoutMinimumTouchTarget {
             // The padding helps if the test is run accidentally in landscape. Landscape makes
             // the cursor to be next to the navigation bar which affects the red color to be a bit
             // different - possibly anti-aliasing.
@@ -348,5 +354,24 @@ class TextFieldCursorTest {
                 Color.White
             }
         }
+    }
+}
+
+fun ComposeContentTestRule.setContentWithoutMinimumTouchTarget(
+    composable: @Composable () -> Unit
+) {
+    setContent {
+        val oldViewConfiguration = LocalViewConfiguration.current
+        val viewConfiguration = TestViewConfiguration(
+            longPressTimeoutMillis = oldViewConfiguration.longPressTimeoutMillis,
+            doubleTapTimeoutMillis = oldViewConfiguration.doubleTapTimeoutMillis,
+            doubleTapMinTimeMillis = oldViewConfiguration.doubleTapMinTimeMillis,
+            touchSlop = oldViewConfiguration.touchSlop,
+            minimumTouchTargetSize = DpSize.Zero
+        )
+        CompositionLocalProvider(
+            LocalViewConfiguration provides viewConfiguration,
+            content = composable
+        )
     }
 }

@@ -138,6 +138,19 @@ fun SemanticsNodeInteraction.getUnclippedBoundsInRoot(): DpRect {
 }
 
 /**
+ * Returns the bounds of the layout of this node as clipped to the root. The bounds are relative to
+ * the root composable.
+ */
+fun SemanticsNodeInteraction.getBoundsInRoot(): DpRect {
+    val node = fetchSemanticsNode("Failed to retrieve bounds of the node.")
+    return with(node.root!!.density) {
+        node.boundsInRoot.let {
+            DpRect(it.left.toDp(), it.top.toDp(), it.right.toDp(), it.bottom.toDp())
+        }
+    }
+}
+
+/**
  * Returns the position of an [alignment line][AlignmentLine], or [Dp.Unspecified] if the line is
  * not provided.
  */
@@ -209,7 +222,7 @@ private fun Dp.isWithinTolerance(reference: Dp, tolerance: Dp): Boolean {
  *
  * @throws AssertionError if comparison fails.
  */
-private fun Dp.assertIsEqualTo(expected: Dp, subject: String, tolerance: Dp = Dp(.5f)) {
+fun Dp.assertIsEqualTo(expected: Dp, subject: String, tolerance: Dp = Dp(.5f)) {
     if (!isWithinTolerance(expected, tolerance)) {
         // Comparison failed, report the error in DPs
         throw AssertionError(

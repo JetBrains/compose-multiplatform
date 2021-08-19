@@ -106,7 +106,7 @@ class PrintToStringTest {
 
     @Test
     fun printHierarchy() {
-        rule.setContent {
+        rule.setContentWithoutMinimumTouchTarget {
             Column(Modifier.semantics { this.disabled(); this.testTag = "column" }) {
                 Box(Modifier.semantics { this.disabled(); this.testTag = "box" }) {
                     Button(onClick = {}) {
