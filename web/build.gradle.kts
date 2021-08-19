@@ -37,6 +37,7 @@ subprojects {
 
     pluginManager.withPlugin("kotlin-multiplatform") {
         val printTestBundleSize by tasks.registering {
+            dependsOn(tasks.named("jsTest"))
             doLast {
                 val bundlePath = buildDir.resolve(
                     "compileSync/test/testDevelopmentExecutable/kotlin/${rootProject.name}-${project.name}-test.js"
