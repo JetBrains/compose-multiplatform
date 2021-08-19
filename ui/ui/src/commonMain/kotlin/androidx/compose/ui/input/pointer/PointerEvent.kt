@@ -79,6 +79,16 @@ abstract class PointerInputFilter {
         get() = layoutCoordinates?.size ?: IntSize.Zero
     internal val isAttached: Boolean
         get() = layoutCoordinates?.isAttached == true
+
+    /**
+     * Intercept pointer input that children receive even if the pointer is out of bounds.
+     *
+     * If `true`, and a child has been moved out of this layout and receives an event, this
+     * will receive that event. If `false`, a child receiving pointer input outside of the
+     * bounds of this layout will not trigger any events in this.
+     */
+    open val interceptOutOfBoundsChildEvents: Boolean
+        get() = false
 }
 
 /**
@@ -368,7 +378,12 @@ inline class PointerId(val value: Long)
  * @param downChange True if a change to down or up has been consumed.
  */
 class ConsumedData(
+    @Suppress("GetterSetterNames")
+    @get:Suppress("GetterSetterNames")
     var positionChange: Boolean = false,
+
+    @Suppress("GetterSetterNames")
+    @get:Suppress("GetterSetterNames")
     var downChange: Boolean = false
 )
 

@@ -131,6 +131,8 @@ interface GraphicsLayerScope : Density {
      * Set to `true` to clip the content to the [shape].
      * Default value is `false`
      */
+    @Suppress("GetterSetterNames")
+    @get:Suppress("GetterSetterNames")
     var clip: Boolean
 
     /**

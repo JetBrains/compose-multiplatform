@@ -41,22 +41,14 @@ internal class PointerInputDelegatingWrapper(
         hitTestResult: HitTestResult<PointerInputFilter>,
         isTouchEvent: Boolean
     ) {
-        if (!isTouchEvent) {
-            if (isPointerInBounds(pointerPosition) &&
-                withinLayerBounds(pointerPosition, isTouchEvent)
-            ) {
-                hitTestResult.hit(modifier.pointerInputFilter) {
-                    hitTestChild(pointerPosition, hitTestResult, isTouchEvent)
-                }
-            }
-        } else {
-            hitTestInMinimumTouchTarget(
-                pointerPosition,
-                hitTestResult,
-                modifier.pointerInputFilter
-            ) {
-                hitTestChild(pointerPosition, hitTestResult, isTouchEvent)
-            }
+        hitTestInMinimumTouchTarget(
+            pointerPosition,
+            hitTestResult,
+            modifier.pointerInputFilter.interceptOutOfBoundsChildEvents,
+            isTouchEvent,
+            modifier.pointerInputFilter
+        ) {
+            hitTestChild(pointerPosition, hitTestResult, isTouchEvent)
         }
     }
 
