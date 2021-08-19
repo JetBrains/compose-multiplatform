@@ -47,6 +47,10 @@ subprojects {
         }
     }
 
+    afterEvaluate {
+        tasks.named("jsTest") { finalizedBy(printTestBundleSize) }
+    }
+
     if (isSampleProject()) {
         val printBundleSize by tasks.registering {
             dependsOn(tasks.named("jsBrowserDistribution"))
