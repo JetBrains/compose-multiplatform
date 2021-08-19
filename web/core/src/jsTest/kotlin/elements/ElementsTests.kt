@@ -6,6 +6,7 @@
 package org.jetbrains.compose.web.core.tests.elements
 
 import androidx.compose.runtime.Composable
+import org.jetbrains.compose.web.ExperimentalComposeWebApi
 import org.jetbrains.compose.web.attributes.AttrsBuilder
 import org.jetbrains.compose.web.core.tests.runTest
 import org.jetbrains.compose.web.dom.*
@@ -65,7 +66,7 @@ class ElementsTests {
             Pair({ Ol() }, "OL"),
 
             Pair({ Li() }, "LI"),
-            Pair({ Img(src="whatever") }, "IMG"),
+            Pair({ Img(src = "whatever") }, "IMG"),
 
             Pair({ Form() }, "FORM"),
             Pair({ Select() }, "SELECT"),
@@ -106,6 +107,7 @@ class ElementsTests {
     }
 
     @Test
+    @OptIn(ExperimentalComposeWebApi::class)
     fun rawCreation() = runTest {
         @Composable
         fun CustomElement(

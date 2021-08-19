@@ -883,8 +883,8 @@ fun Tfoot(
  * Usually, it's [androidx.compose.web.css.StyleSheet] instance
  */
 @Composable
-inline fun Style(
-    noinline applyAttrs: (AttrsBuilder<HTMLStyleElement>.() -> Unit)? = null,
+fun Style(
+    applyAttrs: (AttrsBuilder<HTMLStyleElement>.() -> Unit)? = null,
     cssRules: CSSRuleDeclarationList
 ) {
     TagElement(
@@ -912,8 +912,8 @@ inline fun Style(
  * @param rulesBuild allows to define the style rules using [StyleSheetBuilder]
  */
 @Composable
-inline fun Style(
-    noinline applyAttrs: (AttrsBuilder<HTMLStyleElement>.() -> Unit)? = null,
+fun Style(
+    applyAttrs: (AttrsBuilder<HTMLStyleElement>.() -> Unit)? = null,
     rulesBuild: StyleSheetBuilder.() -> Unit
 ) {
     val builder = StyleSheetBuilderImpl()

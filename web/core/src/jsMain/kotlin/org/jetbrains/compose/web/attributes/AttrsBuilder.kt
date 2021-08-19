@@ -21,8 +21,8 @@ open class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
     internal val attributesMap = mutableMapOf<String, String>()
     val styleBuilder = StyleBuilderImpl()
 
-    val propertyUpdates = mutableListOf<Pair<(Element, Any) -> Unit, Any>>()
-    var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
+    internal val propertyUpdates = mutableListOf<Pair<(Element, Any) -> Unit, Any>>()
+    internal var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
 
     /**
      * [style] add inline CSS-style properties to the element via [StyleBuilder] context
@@ -103,7 +103,7 @@ open class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
         propertyUpdates.add((update to value) as Pair<(Element, Any) -> Unit, Any>)
     }
 
-    fun collect(): Map<String, String> {
+    internal fun collect(): Map<String, String> {
         return attributesMap
     }
 
@@ -131,6 +131,6 @@ open class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
     }
 }
 
-val setClassList: (HTMLElement, Array<out String>) -> Unit = { e, classList ->
+private val setClassList: (HTMLElement, Array<out String>) -> Unit = { e, classList ->
     e.classList.add(*classList)
 }
