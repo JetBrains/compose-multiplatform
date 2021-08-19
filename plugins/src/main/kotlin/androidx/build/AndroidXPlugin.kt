@@ -899,7 +899,7 @@ fun Project.validateProjectStructure(groupId: String) {
     // Project directory should match the Maven coordinate.
     val expectDir = shortGroupId.replace(".", File.separator) +
         "${File.separator}${project.name}"
-    val actualDir = project.projectDir.toRelativeString(project.rootDir)
+    val actualDir = project.projectDir.toRelativeString(project.getSupportRootFolder())
     if (expectDir != actualDir) {
         throw GradleException(
             "Invalid project structure! Expected $expectDir as project directory, found $actualDir"
