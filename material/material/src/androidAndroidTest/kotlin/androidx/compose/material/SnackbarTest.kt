@@ -18,12 +18,14 @@ package androidx.compose.material
 
 import android.os.Build
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.testutils.assertIsEqualTo
 import androidx.compose.testutils.assertIsNotEqualTo
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.layout.FirstBaseline
@@ -35,6 +37,7 @@ import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.getAlignmentLinePosition
+import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -42,6 +45,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.width
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -157,7 +161,7 @@ class SnackbarTest {
                 action = {
                     TextButton(
                         onClick = {},
-                        modifier = Modifier.testTag("button")
+                        modifier = Modifier.clipToBounds().testTag("button")
                     ) {
                         Text("Undo")
                     }
@@ -174,7 +178,7 @@ class SnackbarTest {
 
         val snackBounds = snackbar.getUnclippedBoundsInRoot()
         val textBounds = rule.onNodeWithText("Message").getUnclippedBoundsInRoot()
-        val buttonBounds = rule.onNodeWithText("Undo").getUnclippedBoundsInRoot()
+        val buttonBounds = rule.onNodeWithText("Undo").getBoundsInRoot()
 
         val buttonTopOffset = buttonBounds.top - snackBounds.top
         val textTopOffset = textBounds.top - snackBounds.top
@@ -298,14 +302,14 @@ class SnackbarTest {
         ) {
             Snackbar(
                 content = {
-                    Text("Message")
+                    Text("Message", Modifier.sizeIn(minWidth = 48.dp, minHeight = 48.dp))
                 },
                 action = {
                     TextButton(
                         onClick = {},
                         modifier = Modifier.testTag("button")
                     ) {
-                        Text("Undo")
+                        Text("Undo", Modifier.sizeIn(minWidth = 48.dp, minHeight = 48.dp))
                     }
                 },
                 actionOnNewLine = true
@@ -320,8 +324,11 @@ class SnackbarTest {
         rule.onNodeWithText("Message")
             .assertTopPositionInRootIsEqualTo(30.dp - textFirstBaseLine)
 
-        rule.onNodeWithTag("button")
-            .assertTopPositionInRootIsEqualTo(18.dp + textBounds.top + textLastBaseLine)
+        val lastBaselineToBottom = max(18.dp, 48.dp - textLastBaseLine)
+
+        rule.onNodeWithTag("button").assertTopPositionInRootIsEqualTo(
+            lastBaselineToBottom + textBounds.top + textLastBaseLine
+        )
 
         snackbar
             .assertHeightIsEqualTo(8.dp + buttonBounds.top + buttonBounds.height)

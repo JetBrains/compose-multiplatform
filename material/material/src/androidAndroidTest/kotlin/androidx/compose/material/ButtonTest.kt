@@ -37,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
@@ -52,11 +53,11 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertHeightIsAtLeast
-import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsEqualTo
 import androidx.compose.ui.test.assertIsNotEnabled
-import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -64,7 +65,9 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.width
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
@@ -200,20 +203,20 @@ class ButtonTest {
     }
 
     @Test
-    fun buttonHeightIsFromSpec() {
+    fun buttonHeightIsFromSpec(): Unit = with(rule.density) {
         if (rule.density.fontScale > 1f) {
             // This test can be reasonable failing on the non default font scales
             // so lets skip it.
             return
         }
         rule.setMaterialContent {
-            Button(onClick = {}) {
+            Button(modifier = Modifier.clipToBounds(), onClick = {}) {
                 Text("Test button")
             }
         }
 
         rule.onNode(hasClickAction())
-            .assertHeightIsEqualTo(36.dp)
+            .getBoundsInRoot().height.assertIsEqualTo(36.dp, "height")
     }
 
     @Test
@@ -565,8 +568,12 @@ class ButtonTest {
         }
 
         rule.onNodeWithTag("button")
-            .assertWidthIsEqualTo(20.dp)
-            .assertHeightIsEqualTo(15.dp)
+            .apply {
+                with(getBoundsInRoot()) {
+                    width.assertIsEqualTo(20.dp, "width")
+                    height.assertIsEqualTo(15.dp, "height")
+                }
+            }
     }
 
     @Test

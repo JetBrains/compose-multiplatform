@@ -1250,13 +1250,16 @@ class SwipeableTest {
             assertThat(state.direction).isEqualTo(0f)
         }
 
+        val largeSwipe = with(rule.density) { 125.dp.toPx() + slop }
+        val smallSwipe = with(rule.density) { 25.dp.toPx() + slop }
+
         rule.onNodeWithTag(swipeableTag).performGesture {
-            swipe(start = center, end = center + Offset(125f - slop, 0f))
+            swipe(start = center, end = center + Offset(largeSwipe, 0f))
         }
         // draggable needs to recompose to toggle startDragImmediately
         rule.mainClock.advanceTimeByFrame()
         rule.onNodeWithTag(swipeableTag).performGesture {
-            swipe(start = center, end = center - Offset(25f, 0f))
+            swipe(start = center, end = center - Offset(smallSwipe, 0f))
         }
 
         rule.runOnIdle {
@@ -1272,12 +1275,12 @@ class SwipeableTest {
         }
 
         rule.onNodeWithTag(swipeableTag).performGesture {
-            swipe(start = center, end = center - Offset(125f - slop, 0f))
+            swipe(start = center, end = center - Offset(largeSwipe, 0f))
         }
         // draggable needs to recompose to toggle startDragImmediately
         rule.mainClock.advanceTimeByFrame()
         rule.onNodeWithTag(swipeableTag).performGesture {
-            swipe(start = center, end = center + Offset(25f, 0f))
+            swipe(start = center, end = center + Offset(smallSwipe, 0f))
         }
 
         rule.runOnIdle {

@@ -19,9 +19,11 @@ package androidx.compose.material.samples
 import androidx.annotation.Sampled
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.Checkbox
@@ -70,8 +72,10 @@ fun TriStateCheckboxSample() {
                 checkedColor = MaterialTheme.colors.primary
             )
         )
+        Spacer(Modifier.size(25.dp))
         Column(Modifier.padding(10.dp, 0.dp, 0.dp, 0.dp)) {
             Checkbox(state, onStateChange)
+            Spacer(Modifier.size(25.dp))
             Checkbox(state2, onStateChange2)
         }
     }
