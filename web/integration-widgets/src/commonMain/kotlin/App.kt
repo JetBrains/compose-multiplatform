@@ -20,7 +20,7 @@ import org.jetbrains.compose.common.ui.draw.clip
 import jetbrains.compose.common.shapes.CircleShape
 import org.jetbrains.compose.common.ui.*
 
-@OptIn(ExperimentalComposeWebWidgets::class)
+@OptIn(ExperimentalComposeWebWidgetsApi::class)
 object LayoutSamples {
     @Composable
     fun TwoTexts() {

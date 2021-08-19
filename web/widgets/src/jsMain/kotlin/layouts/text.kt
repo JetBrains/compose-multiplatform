@@ -7,7 +7,7 @@ import org.jetbrains.compose.web.ui.Styles
 import org.jetbrains.compose.common.ui.Modifier
 import org.jetbrains.compose.common.ui.asAttributeBuilderApplier
 import org.jetbrains.compose.common.core.graphics.Color
-import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgets
+import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 import org.jetbrains.compose.web.css.color
 import org.jetbrains.compose.web.css.fontSize
 import org.jetbrains.compose.web.css.Color.RGB
@@ -17,7 +17,7 @@ import org.jetbrains.compose.web.css.em
 import org.jetbrains.compose.web.css.px
 
 @Composable
-@ExperimentalComposeWebWidgets
+@ExperimentalComposeWebWidgetsApi
 internal actual fun TextActual(
     text: String,
     modifier: Modifier,

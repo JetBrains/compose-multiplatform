@@ -8,16 +8,16 @@ import org.jetbrains.compose.common.core.graphics.implementation
 import org.jetbrains.compose.common.internal.castOrCreate
 import androidx.compose.foundation.layout.padding
 
-@ExperimentalComposeWebWidgets
+@ExperimentalComposeWebWidgetsApi
 actual fun Modifier.background(color: Color): Modifier = castOrCreate().apply {
     modifier = modifier.background(color.implementation)
 }
 
-@ExperimentalComposeWebWidgets
+@ExperimentalComposeWebWidgetsApi
 actual fun Modifier.padding(all: Dp): Modifier = castOrCreate().apply {
     modifier = modifier.padding(all.implementation)
 }
 
-@ExperimentalComposeWebWidgets
+@ExperimentalComposeWebWidgetsApi
 val Modifier.implementation
     get() = castOrCreate().modifier

@@ -9,14 +9,14 @@ import org.jetbrains.compose.web.css.Color.RGB
 import org.jetbrains.compose.common.internal.castOrCreate
 import org.jetbrains.compose.web.attributes.AttrsBuilder
 
-@ExperimentalComposeWebWidgets
+@ExperimentalComposeWebWidgetsApi
 actual fun Modifier.background(color: Color): Modifier = castOrCreate().apply {
     add {
         backgroundColor(RGB(color.red, color.green, color.blue))
     }
 }
 
-@ExperimentalComposeWebWidgets
+@ExperimentalComposeWebWidgetsApi
 fun Modifier.asAttributeBuilderApplier(
     passThroughHandler: (AttrsBuilder<*>.() -> Unit)? = null
 ): AttrsBuilder<*>.() -> Unit =
@@ -34,7 +34,7 @@ fun Modifier.asAttributeBuilderApplier(
         st
     }
 
-@ExperimentalComposeWebWidgets
+@ExperimentalComposeWebWidgetsApi
 actual fun Modifier.padding(all: Dp): Modifier = castOrCreate().apply {
     // yes, it's not a typo, what Modifier.padding does is actually adding margin
     add {

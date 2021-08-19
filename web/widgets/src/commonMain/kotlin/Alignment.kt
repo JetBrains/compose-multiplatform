@@ -1,6 +1,6 @@
 package org.jetbrains.compose.common.ui
 
-@ExperimentalComposeWebWidgets
+@ExperimentalComposeWebWidgetsApi
 interface Alignment {
     interface Vertical : Alignment
     interface Horizontal : Alignment

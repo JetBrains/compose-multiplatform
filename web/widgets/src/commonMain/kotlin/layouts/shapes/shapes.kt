@@ -1,9 +1,9 @@
 package jetbrains.compose.common.shapes
 
-import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgets
+import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 
-@ExperimentalComposeWebWidgets
+@ExperimentalComposeWebWidgetsApi
 interface Shape
 
-@ExperimentalComposeWebWidgets
+@ExperimentalComposeWebWidgetsApi
 object CircleShape : Shape

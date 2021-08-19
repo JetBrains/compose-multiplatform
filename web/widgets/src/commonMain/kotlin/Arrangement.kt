@@ -1,13 +1,13 @@
 package org.jetbrains.compose.common.foundation.layout
 
-import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgets
+import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 
-@ExperimentalComposeWebWidgets
+@ExperimentalComposeWebWidgetsApi
 object Arrangement {
-    @ExperimentalComposeWebWidgets
+    @ExperimentalComposeWebWidgetsApi
     interface Horizontal
 
-    @ExperimentalComposeWebWidgets
+    @ExperimentalComposeWebWidgetsApi
     interface Vertical
 
     val End = object : Horizontal {}

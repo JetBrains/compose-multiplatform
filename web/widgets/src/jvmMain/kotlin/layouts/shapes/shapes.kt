@@ -1,10 +1,10 @@
 package jetbrains.compose.common.shapes
 
-import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgets
+import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 import androidx.compose.ui.graphics.Shape as JShape
 import androidx.compose.foundation.shape.CircleShape as JCircleShape
 
-@ExperimentalComposeWebWidgets
+@ExperimentalComposeWebWidgetsApi
 val Shape.implementation: JShape
     get() = when (this) {
         CircleShape -> JCircleShape

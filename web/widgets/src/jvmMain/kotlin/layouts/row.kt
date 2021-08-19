@@ -5,7 +5,7 @@ import org.jetbrains.compose.common.ui.*
 import androidx.compose.foundation.layout.Row as JRow
 
 @Composable
-@ExperimentalComposeWebWidgets
+@ExperimentalComposeWebWidgetsApi
 internal actual fun RowActual(
     modifier: Modifier,
     horizontalArrangement: Arrangement.Horizontal,

@@ -1,15 +1,15 @@
 package org.jetbrains.compose.common.ui.unit
 
-import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgets
+import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 
-@ExperimentalComposeWebWidgets
+@ExperimentalComposeWebWidgetsApi
 enum class TextUnitType {
     Unspecified,
     Em,
     Sp
 }
 
-@ExperimentalComposeWebWidgets
+@ExperimentalComposeWebWidgetsApi
 data class TextUnit(val value: Float, val unitType: TextUnitType) {
     companion object {
         val Unspecified = TextUnit(Float.NaN, TextUnitType.Unspecified)

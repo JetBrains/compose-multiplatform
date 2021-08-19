@@ -1,13 +1,13 @@
 package org.jetbrains.compose.common.material
 
 import androidx.compose.runtime.Composable
-import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgets
+import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 import org.jetbrains.compose.common.ui.Modifier
 import androidx.compose.material.Slider as JSlider
 import org.jetbrains.compose.common.ui.implementation
 
 @Composable
-@ExperimentalComposeWebWidgets
+@ExperimentalComposeWebWidgetsApi
 internal actual fun SliderActual(
     value: Float,
     onValueChange: (Float) -> Unit,
