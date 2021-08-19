@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
+import androidx.build.BuildOnServerKt
 import androidx.build.SupportConfigKt
-
-import static androidx.build.AndroidXPlugin.BUILD_ON_SERVER_TASK
 
 plugins {
     id("AndroidXPlugin")
@@ -106,7 +105,4 @@ task run {
     dependsOn("run1")
 }
 
-def projectPath = project.path
-rootProject.tasks.named(BUILD_ON_SERVER_TASK).configure {
-    dependsOn("$projectPath:jvmJar")
-}
+BuildOnServerKt.addToBuildOnServer(project, "${project.path}:jvmJar")
