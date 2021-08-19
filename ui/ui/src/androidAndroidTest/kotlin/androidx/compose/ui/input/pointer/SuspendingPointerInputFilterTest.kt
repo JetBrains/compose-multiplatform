@@ -279,6 +279,33 @@ class SuspendingPointerInputFilterTest {
             )
         }
     }
+
+    @Test(expected = PointerEventTimeoutCancellationException::class)
+    fun testWithTimeout() = runBlockingTest {
+        val filter = SuspendingPointerInputFilter(TestViewConfiguration())
+        filter.coroutineScope = this
+        with(filter) {
+            awaitPointerEventScope {
+                withTimeout(10) {
+                    awaitPointerEvent()
+                }
+            }
+        }
+    }
+
+    @Test
+    fun testWithTimeoutOrNull() = runBlockingTest {
+        val filter = SuspendingPointerInputFilter(TestViewConfiguration())
+        filter.coroutineScope = this
+        val result: PointerEvent? = with(filter) {
+            awaitPointerEventScope {
+                withTimeoutOrNull(10) {
+                    awaitPointerEvent()
+                }
+            }
+        }
+        assertThat(result).isNull()
+    }
 }
 
 private fun PointerInputChange.toPointerEvent() = PointerEvent(listOf(this))
