@@ -210,8 +210,8 @@ class TransformTests {
     @Test
     fun translateX() = runTest {
         composition {
-            Div({ style { transform{translateX(10.px)} } })
-            Div({ style { transform{translateX(4.percent)} } })
+            Div({ style { transform { translateX(10.px) } } })
+            Div({ style { transform { translateX(4.percent) } } })
         }
 
         assertEquals("translateX(10px)", nextChild().style.transform)
