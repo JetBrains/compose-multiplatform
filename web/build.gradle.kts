@@ -35,6 +35,18 @@ subprojects {
         }
     }
 
+    val printTestBundleSize by tasks.registering {
+        doLast {
+            val bundlePath = buildDir.resolve(
+                "compileSync/test/testDevelopmentExecutable/kotlin/${rootProject.name}-${project.name}-test.js"
+            )
+            if (bundlePath.exists()) {
+                val size = bundlePath.length()
+                println("##teamcity[buildStatisticValue key='testBundleSize::${project.name}' value='$size']")
+            }
+        }
+    }
+
     if (isSampleProject()) {
         val printBundleSize by tasks.registering {
             dependsOn(tasks.named("jsBrowserDistribution"))
