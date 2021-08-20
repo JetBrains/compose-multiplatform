@@ -17,6 +17,7 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.runtime.InternalComposeApi
+import androidx.compose.ui.Modifier
 
 /**
  * An empty [InspectorInfo] DSL.
@@ -127,3 +128,63 @@ inline fun debugInspectorInfo(
 ): InspectorInfo.() -> Unit =
     @OptIn(InternalComposeApi::class)
     if (isDebugInspectorInfoEnabled) ({ definitions() }) else NoInspectorInfo
+
+/**
+ * Use this to group a common set of modifiers and provide [InspectorInfo] for the resulting
+ * modifier.
+ *
+ * @sample androidx.compose.ui.samples.InspectableModifierSample
+ */
+inline fun Modifier.inspectable(
+    noinline inspectorInfo: InspectorInfo.() -> Unit,
+    wrapped: Modifier.() -> Modifier
+): Modifier = inspectableWrapper(inspectorInfo, wrapped())
+
+/**
+ * Do not use this explicitly. Instead use [Modifier.inspectable].
+ */
+@PublishedApi
+internal fun Modifier.inspectableWrapper(
+    inspectorInfo: InspectorInfo.() -> Unit,
+    wrapped: Modifier
+): Modifier = this.then(InspectableModifierImpl(wrapped, inspectorInfo))
+
+/**
+ * Interface for a [Modifier] wrapped for inspector purposes.
+ *
+ * This gives tools access to the [wrapped] modifier in InspectableModifier.
+ * It is expected that the implementation of this interface implements [Modifier.foldIn]
+ * similar to [InspectableModifierImpl].
+ */
+interface InspectableModifier {
+    /**
+     * The actual modifier that [Modifier.inspectable] has wrapped with its own [InspectorInfo].
+     */
+    val wrapped: Modifier
+}
+
+private class InspectableModifierImpl(
+    override val wrapped: Modifier,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : Modifier.Element, InspectableModifier, InspectorValueInfo(inspectorInfo) {
+    override fun <R> foldIn(initial: R, operation: (R, Modifier.Element) -> R): R =
+        wrapped.foldIn(operation(initial, this), operation)
+
+    override fun <R> foldOut(initial: R, operation: (Modifier.Element, R) -> R): R =
+        operation(this, wrapped.foldOut(initial, operation))
+
+    override fun any(predicate: (Modifier.Element) -> Boolean): Boolean =
+        wrapped.any(predicate)
+
+    override fun all(predicate: (Modifier.Element) -> Boolean): Boolean =
+        wrapped.all(predicate)
+
+    override fun equals(other: Any?): Boolean =
+        other is InspectableModifier && wrapped == other.wrapped
+
+    override fun hashCode(): Int = wrapped.hashCode() + 31
+
+    override fun toString() = "[" + foldIn("") { acc, element ->
+        if (acc.isEmpty()) element.toString() else "$acc, $element"
+    } + "]"
+}
