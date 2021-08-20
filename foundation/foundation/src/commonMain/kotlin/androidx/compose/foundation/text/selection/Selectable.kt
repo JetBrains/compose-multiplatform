@@ -37,30 +37,33 @@ internal interface Selectable {
     val selectableId: Long
 
     /**
-     * Returns [Selection] information for a selectable composable. If no selection can be provided
-     * null should be returned.
+     * Updates the [Selection] information after a selection handle being moved. This method is
+     * expected to be called consecutively during the selection handle position update.
      *
-     * @param startPosition graphical position of the start of the selection
-     * @param endPosition graphical position of the end of the selection
-     * @param containerLayoutCoordinates [LayoutCoordinates] of the widget
+     * @param startHandlePosition graphical position of the start selection handle
+     * @param endHandlePosition graphical position of the end selection handle
+     * @param previousHandlePosition the previous position of the moving selection handle
+     * @param containerLayoutCoordinates [LayoutCoordinates] of the composable
      * @param adjustment [Selection] range is adjusted according to this param
      * @param previousSelection previous selection result on this [Selectable]
+     * @param isStartHandle whether the moving selection handle is the start selection handle
      *
      * @throws IllegalStateException when the given [previousSelection] doesn't belong to this
      * selectable. In other words, one of the [Selection.AnchorInfo] in the given
      * [previousSelection] has a selectableId that doesn't match to the [selectableId] of this
      * selectable.
-     * @return null if no selection will be applied for this composable, or [Selection] instance
-     *  if selection is applied to this composable.
+     * @return a pair consisting of the updated [Selection] and a boolean value representing
+     * whether the movement is consumed.
      */
-    fun getSelection(
-        startPosition: Offset,
-        endPosition: Offset,
+    fun updateSelection(
+        startHandlePosition: Offset,
+        endHandlePosition: Offset,
+        previousHandlePosition: Offset?,
+        isStartHandle: Boolean = true,
         containerLayoutCoordinates: LayoutCoordinates,
         adjustment: SelectionAdjustment,
-        previousSelection: Selection? = null,
-        isStartHandle: Boolean = true
-    ): Selection?
+        previousSelection: Selection? = null
+    ): Pair<Selection?, Boolean>
 
     /**
      * Returns selectAll [Selection] information for a selectable composable. If no selection can be

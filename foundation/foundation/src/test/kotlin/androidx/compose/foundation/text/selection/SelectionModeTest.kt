@@ -183,122 +183,40 @@ class SelectionModeTest {
     }
 
     @Test
-    fun areHandlesCrossed_Vertical_same_row_not_crossed() {
-        val start = Offset(x = smallerThanLeft, y = betweenTopAndBottom)
-        val end = Offset(x = largerThanRight, y = betweenTopAndBottom)
+    fun compare_Vertical() {
+        val listX = listOf(smallerThanLeft, betweenLeftAndRight, largerThanRight)
+        val listY = listOf(smallerThanTop, betweenTopAndBottom, largerThanBottom)
+        val results = listOf(
+            listOf(-1, -1, -1),
+            listOf(-1, 0, 1),
+            listOf(1, 1, 1)
+        )
 
-        val result =
-            SelectionMode.Vertical.areHandlesCrossed(
-                bounds = bounds,
-                start = start,
-                end = end
-            )
-
-        assertThat(result).isFalse()
+        for (i in listY.indices) {
+            for (j in listX.indices) {
+                val position = Offset(listX[j], listY[i])
+                val result = SelectionMode.Vertical.compare(position = position, bounds = bounds)
+                assertThat(result).isEqualTo(results[i][j])
+            }
+        }
     }
 
     @Test
-    fun areHandlesCrossed_Vertical_same_row_crossed() {
-        val start = Offset(x = largerThanRight, y = betweenTopAndBottom)
-        val end = Offset(x = smallerThanLeft, y = betweenTopAndBottom)
+    fun compare_Horizontal() {
+        val listX = listOf(smallerThanLeft, betweenLeftAndRight, largerThanRight)
+        val listY = listOf(smallerThanTop, betweenTopAndBottom, largerThanBottom)
+        val results = listOf(
+            listOf(-1, -1, 1),
+            listOf(-1, 0, 1),
+            listOf(-1, 1, 1)
+        )
 
-        val result =
-            SelectionMode.Vertical.areHandlesCrossed(
-                bounds = bounds,
-                start = start,
-                end = end
-            )
-
-        assertThat(result).isTrue()
-    }
-
-    @Test
-    fun areHandlesCrossed_Vertical_different_rows_not_crossed() {
-        val start = Offset(x = smallerThanLeft, y = smallerThanTop)
-        val end = Offset(x = smallerThanLeft, y = largerThanBottom)
-
-        val result =
-            SelectionMode.Vertical.areHandlesCrossed(
-                bounds = bounds,
-                start = start,
-                end = end
-            )
-
-        assertThat(result).isFalse()
-    }
-
-    @Test
-    fun areHandlesCrossed_Vertical_different_rows_crossed() {
-        val start = Offset(x = smallerThanLeft, y = largerThanBottom)
-        val end = Offset(x = largerThanRight, y = smallerThanTop)
-
-        val result =
-            SelectionMode.Vertical.areHandlesCrossed(
-                bounds = bounds,
-                start = start,
-                end = end
-            )
-
-        assertThat(result).isTrue()
-    }
-
-    @Test
-    fun areHandlesCrossed_Horizontal_same_column_not_crossed() {
-        val start = Offset(x = betweenLeftAndRight, y = smallerThanTop)
-        val end = Offset(x = betweenLeftAndRight, y = largerThanBottom)
-
-        val result =
-            SelectionMode.Horizontal.areHandlesCrossed(
-                bounds = bounds,
-                start = start,
-                end = end
-            )
-
-        assertThat(result).isFalse()
-    }
-
-    @Test
-    fun areHandlesCrossed_Horizontal_same_column_crossed() {
-        val start = Offset(x = betweenLeftAndRight, y = largerThanBottom)
-        val end = Offset(x = betweenLeftAndRight, y = smallerThanTop)
-
-        val result =
-            SelectionMode.Horizontal.areHandlesCrossed(
-                bounds = bounds,
-                start = start,
-                end = end
-            )
-
-        assertThat(result).isTrue()
-    }
-
-    @Test
-    fun areHandlesCrossed_Horizontal_different_columns_not_crossed() {
-        val start = Offset(x = smallerThanLeft, y = largerThanBottom)
-        val end = Offset(x = largerThanRight, y = smallerThanTop)
-
-        val result =
-            SelectionMode.Horizontal.areHandlesCrossed(
-                bounds = bounds,
-                start = start,
-                end = end
-            )
-
-        assertThat(result).isFalse()
-    }
-
-    @Test
-    fun areHandlesCrossed_Horizontal_different_columns_crossed() {
-        val start = Offset(x = largerThanRight, y = smallerThanTop)
-        val end = Offset(x = smallerThanLeft, y = largerThanBottom)
-
-        val result =
-            SelectionMode.Horizontal.areHandlesCrossed(
-                bounds = bounds,
-                start = start,
-                end = end
-            )
-
-        assertThat(result).isTrue()
+        for (i in listY.indices) {
+            for (j in listX.indices) {
+                val position = Offset(listX[j], listY[i])
+                val result = SelectionMode.Horizontal.compare(position = position, bounds = bounds)
+                assertThat(result).isEqualTo(results[i][j])
+            }
+        }
     }
 }

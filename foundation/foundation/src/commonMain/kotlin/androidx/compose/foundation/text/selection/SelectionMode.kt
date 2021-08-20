@@ -29,46 +29,19 @@ internal enum class SelectionMode {
      * lower rows.
      */
     Vertical {
-        override fun isSelected(
-            bounds: Rect,
-            start: Offset,
-            end: Offset
-        ): Boolean {
-            // When the end of the selection is above the top of the composable, the composable is outside
-            // of the selection range.
-            if (end.y < bounds.top) return false
+        override fun compare(position: Offset, bounds: Rect): Int {
+            if (bounds.contains(position)) return 0
 
-            // When the end of the selection is on the left of the composable, and not below the bottom
-            // of composable, the composable is outside of the selection range.
-            if (end.x < bounds.left && end.y < bounds.bottom) return false
+            // When the position of the selection handle is on the top of the composable, and the
+            // not on the right of the composable, it's considered as start.
+            if (position.y < bounds.top) return -1
 
-            // When the start of the selection is below the bottom of the composable, the composable is
-            // outside of the selection range.
-            if (start.y >= bounds.bottom) return false
+            // When the position of the selection handle is on the left of the composable, and not
+            // below the bottom of composable, it's considered as start.
+            if (position.x < bounds.left && position.y < bounds.bottom) return -1
 
-            // When the start of the selection is on the right of the composable, and not above the top
-            // of the composable, the composable is outside of the selection range.
-            if (start.x >= bounds.right && start.y >= bounds.top) return false
-
-            return true
-        }
-
-        override fun areHandlesCrossed(
-            bounds: Rect,
-            start: Offset,
-            end: Offset
-        ): Boolean {
-            return if (start.y >= bounds.top && start.y < bounds.bottom &&
-                end.y >= bounds.top && end.y < bounds.bottom
-            ) {
-                // When the start and end of the selection are in the same row of widgets, check if
-                // x coordinates of the start and end are crossed each other.
-                start.x > end.x
-            } else {
-                // When the start and end of the selection are not in the same row of widgets, check
-                // if y coordinates of the start and end are crossed each other.
-                start.y > end.y
-            }
+            // In all other cases, the selection handle is considered as the end.
+            return 1
         }
     },
 
@@ -78,48 +51,35 @@ internal enum class SelectionMode {
      * and the right rows.
      */
     Horizontal {
-        override fun isSelected(
-            bounds: Rect,
-            start: Offset,
-            end: Offset
-        ): Boolean {
-            // When the end of the selection is on the left of the composable, the composable is outside of
-            // the selection range.
-            if (end.x < bounds.left) return false
+        override fun compare(position: Offset, bounds: Rect): Int {
+            if (bounds.contains(position)) return 0
 
-            // When the end of the selection is on the top of the composable, and the not on the right
-            // of the composable, the composable is outside of the selection range.
-            if (end.y < bounds.top && end.x < bounds.right) return false
+            // When the end of the selection is on the left of the composable, the composable is
+            // outside of the selection range.
+            if (position.x < bounds.left) return -1
 
-            // When the start of the selection is on the right of the composable, the composable is outside
-            // of the selection range.
-            if (start.x >= bounds.right) return false
+            // When the end of the selection is on the top of the composable, and the not on the
+            // right of the composable, the composable is outside of the selection range.
+            if (position.y < bounds.top && position.x < bounds.right) return -1
 
-            // When the start of the selection is below the composable, and not on the left of the
-            // composable, the composable is outside of the selection range.
-            if (start.y >= bounds.bottom && start.x >= bounds.left) return false
-
-            return true
-        }
-
-        override fun areHandlesCrossed(
-            bounds: Rect,
-            start: Offset,
-            end: Offset
-        ): Boolean {
-            return if (start.x >= bounds.left && start.x < bounds.right &&
-                end.x >= bounds.left && end.x < bounds.right
-            ) {
-                // When the start and end of the selection are in the same column of widgets,
-                // check if y coordinates of the start and end are crossed each other.
-                start.y > end.y
-            } else {
-                // When the start and end of the selection are not in the same column of widgets,
-                // check if x coordinates of the start and end are crossed each other.
-                start.x > end.x
-            }
+            // In all other cases, the selection handle is considered as the end.
+            return 1
         }
     };
+
+    /**
+     * A compare a selection handle with a  [Selectable] boundary. This defines whether an out of
+     * boundary selection handle is treated as the start or the end of the Selectable. If the
+     * [Selectable] is a text selectable, then the start is the index 0, and end corresponds to
+     * the text length.
+     *
+     * @param position the position of the selection handle.
+     * @param bounds the boundary of the [Selectable].
+     * @return 0 if the selection handle [position] is within the [bounds]; a negative value if
+     * the selection handle is considered as "start" of the [Selectable]; a positive value if the
+     * selection handle is considered as the "end" of the [Selectable].
+     */
+    internal abstract fun compare(position: Offset, bounds: Rect): Int
 
     /**
      * Decides if Composable which has [bounds], should be accepted by the selection and
@@ -129,24 +89,19 @@ internal enum class SelectionMode {
      * @param start The start coordinates of the selection, in SelectionContainer range.
      * @param end The end coordinates of the selection, in SelectionContainer range.
      */
-    internal abstract fun isSelected(
+    internal fun isSelected(
         bounds: Rect,
         start: Offset,
         end: Offset
-    ): Boolean
-
-    /**
-     * Decides if the [start] and [end] handles of the selection are crossed around a Composable
-     * which has [bounds].
-     * When the end handle is visually crossed the start handle, return true.
-     *
-     * @param bounds Composable bounds of the widget to be checked.
-     * @param start The start coordinates of the selection, in SelectionContainer range.
-     * @param end The end coordinates of the selection, in SelectionContainer range.
-     */
-    internal abstract fun areHandlesCrossed(
-        bounds: Rect,
-        start: Offset,
-        end: Offset
-    ): Boolean
+    ): Boolean {
+        // If either of the start or end is contained by bounds, the composable is selected.
+        if (bounds.contains(start) || bounds.contains(end)) {
+            return true
+        }
+        // Compare the location of start and end to the bound. If both are on the same side, return
+        // false, otherwise return ture.
+        val compareStart = compare(start, bounds)
+        val compareEnd = compare(end, bounds)
+        return (compareStart > 0) xor (compareEnd > 0)
+    }
 }

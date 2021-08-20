@@ -56,13 +56,11 @@ class TextSelectionLongPressDragTest {
         start = Selection.AnchorInfo(
             direction = ResolvedTextDirection.Ltr,
             offset = 0,
-            rawOffset = 0,
             selectableId = selectableId
         ),
         end = Selection.AnchorInfo(
             direction = ResolvedTextDirection.Ltr,
             offset = 5,
-            rawOffset = 5,
             selectableId = selectableId
         )
     )
@@ -162,8 +160,10 @@ class TextSelectionLongPressDragTest {
         verify(selectionRegistrar, times(1))
             .notifySelectionUpdate(
                 layoutCoordinates = layoutCoordinates,
-                endPosition = beginPosition2 + dragDistance2,
-                adjustment = SelectionAdjustment.Character
+                newPosition = beginPosition2 + dragDistance2,
+                previousPosition = beginPosition2,
+                adjustment = SelectionAdjustment.CharacterWithWordAccelerate,
+                isStartHandle = false
             )
     }
 
@@ -182,8 +182,10 @@ class TextSelectionLongPressDragTest {
         verify(selectionRegistrar, times(1))
             .notifySelectionUpdate(
                 layoutCoordinates = layoutCoordinates,
-                endPosition = beginPosition + dragDistance,
-                adjustment = SelectionAdjustment.Character
+                newPosition = beginPosition + dragDistance,
+                previousPosition = beginPosition,
+                adjustment = SelectionAdjustment.CharacterWithWordAccelerate,
+                isStartHandle = false
             )
     }
 
@@ -202,8 +204,10 @@ class TextSelectionLongPressDragTest {
         verify(selectionRegistrar, times(0))
             .notifySelectionUpdate(
                 layoutCoordinates = layoutCoordinates,
-                endPosition = beginPosition + dragDistance,
-                adjustment = SelectionAdjustment.Character
+                newPosition = beginPosition + dragDistance,
+                previousPosition = beginPosition,
+                adjustment = SelectionAdjustment.Character,
+                isStartHandle = false
             )
     }
 

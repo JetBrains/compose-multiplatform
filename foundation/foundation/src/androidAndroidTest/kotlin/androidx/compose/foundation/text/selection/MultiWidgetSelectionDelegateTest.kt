@@ -957,9 +957,11 @@ class MultiWidgetSelectionDelegateTest {
         val end = start
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
-            selectionCoordinates = Pair(start, end),
+            startHandlePosition = end,
+            endHandlePosition = start,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.Word
         )
@@ -996,9 +998,11 @@ class MultiWidgetSelectionDelegateTest {
         val end = start
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
-            selectionCoordinates = Pair(start, end),
+            startHandlePosition = end,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.Word
         )
@@ -1037,9 +1041,11 @@ class MultiWidgetSelectionDelegateTest {
         val end = Offset((fontSizeInPx * rawEndOffset), (fontSizeInPx / 2))
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
-            selectionCoordinates = Pair(start, end),
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.Word
         )
@@ -1079,9 +1085,11 @@ class MultiWidgetSelectionDelegateTest {
         val end = Offset((fontSizeInPx * rawEndOffset), (fontSizeInPx / 2))
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
-            selectionCoordinates = Pair(start, end),
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.Word
         )
@@ -1120,17 +1128,21 @@ class MultiWidgetSelectionDelegateTest {
         val end = start
 
         // Act.
-        val textSelectionInfo1 = getTextSelectionInfo(
+        val (textSelectionInfo1, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
-            selectionCoordinates = Pair(start, end),
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.Word
         )
 
         // Drag downwards, after the drag the selection should remain the same.
-        val textSelectionInfo2 = getTextSelectionInfo(
+        val (textSelectionInfo2, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
-            selectionCoordinates = Pair(start, end + Offset(0f, fontSizeInPx / 4)),
+            startHandlePosition = end + Offset(0f, fontSizeInPx / 4),
+            endHandlePosition = start,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.Word,
             previousSelection = textSelectionInfo1,
@@ -1175,9 +1187,11 @@ class MultiWidgetSelectionDelegateTest {
         val end = Offset((fontSizeInPx * endOffset), (fontSizeInPx / 2))
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
-            selectionCoordinates = Pair(start, end),
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.None
         )
@@ -1223,9 +1237,11 @@ class MultiWidgetSelectionDelegateTest {
         )
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
-            selectionCoordinates = Pair(start, end),
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.None
         )
@@ -1273,9 +1289,11 @@ class MultiWidgetSelectionDelegateTest {
         )
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
-            selectionCoordinates = Pair(start, end),
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.None
         )
@@ -1312,9 +1330,11 @@ class MultiWidgetSelectionDelegateTest {
         val start = Offset((fontSizeInPx * startOffset), (fontSizeInPx / 2))
         val end = Offset((fontSizeInPx * endOffset), (fontSizeInPx / 2))
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
-            selectionCoordinates = Pair(start, end),
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.None
         )
@@ -1358,9 +1378,11 @@ class MultiWidgetSelectionDelegateTest {
         )
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
-            selectionCoordinates = Pair(start, end),
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.None
         )
@@ -1406,9 +1428,11 @@ class MultiWidgetSelectionDelegateTest {
         )
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
-            selectionCoordinates = Pair(start, end),
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.None
         )
@@ -1461,9 +1485,11 @@ class MultiWidgetSelectionDelegateTest {
         val end = Offset((fontSizeInPx * oldStartOffset), (fontSizeInPx / 2))
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
-            selectionCoordinates = Pair(start, end),
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
@@ -1522,9 +1548,11 @@ class MultiWidgetSelectionDelegateTest {
         )
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
-            selectionCoordinates = Pair(start, end),
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
@@ -1577,9 +1605,11 @@ class MultiWidgetSelectionDelegateTest {
         val end = Offset((fontSizeInPx * oldEndOffset), (fontSizeInPx / 2))
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
-            selectionCoordinates = Pair(start, end),
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
@@ -1633,9 +1663,11 @@ class MultiWidgetSelectionDelegateTest {
         val end = Offset((fontSizeInPx * oldEndOffset), (fontSizeInPx / 2))
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
-            selectionCoordinates = Pair(start, end),
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
@@ -1689,9 +1721,11 @@ class MultiWidgetSelectionDelegateTest {
         val end = Offset((fontSizeInPx * oldEndOffset), (fontSizeInPx / 2))
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
-            selectionCoordinates = Pair(start, end),
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
@@ -1736,9 +1770,11 @@ class MultiWidgetSelectionDelegateTest {
         val end = Offset((fontSizeInPx * oldEndOffset), (fontSizeInPx / 2))
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
-            selectionCoordinates = Pair(start, end),
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
@@ -1789,9 +1825,11 @@ class MultiWidgetSelectionDelegateTest {
         )
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
-            selectionCoordinates = Pair(start, end),
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
@@ -1836,9 +1874,11 @@ class MultiWidgetSelectionDelegateTest {
         val end = Offset((fontSizeInPx * oldEndOffset), (fontSizeInPx / 2))
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
-            selectionCoordinates = Pair(start, end),
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
@@ -1882,9 +1922,11 @@ class MultiWidgetSelectionDelegateTest {
         val end = Offset((fontSizeInPx * oldStartOffset), (fontSizeInPx / 2))
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
-            selectionCoordinates = Pair(start, end),
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
@@ -1938,9 +1980,11 @@ class MultiWidgetSelectionDelegateTest {
         val end = Offset((fontSizeInPx * oldStartOffset), (fontSizeInPx / 2))
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
-            selectionCoordinates = Pair(start, end),
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
@@ -1985,9 +2029,11 @@ class MultiWidgetSelectionDelegateTest {
         val end = Offset((fontSizeInPx * oldStartOffset), (fontSizeInPx / 2))
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
-            selectionCoordinates = Pair(start, end),
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
@@ -2038,9 +2084,11 @@ class MultiWidgetSelectionDelegateTest {
         )
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
-            selectionCoordinates = Pair(start, end),
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
@@ -2091,9 +2139,11 @@ class MultiWidgetSelectionDelegateTest {
         )
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
-            selectionCoordinates = Pair(start, end),
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.Character,
             previousSelection = previousSelection,
@@ -2121,9 +2171,11 @@ class MultiWidgetSelectionDelegateTest {
         val end = Offset((fontSizeInPx * endOffset), (fontSizeInPx / 2))
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
-            selectionCoordinates = Pair(start, end),
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.None
         )
@@ -2161,9 +2213,11 @@ class MultiWidgetSelectionDelegateTest {
         )
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
-            selectionCoordinates = Pair(start, end),
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.None
         )
@@ -2200,9 +2254,11 @@ class MultiWidgetSelectionDelegateTest {
         val end = Offset((fontSizeInPx * endOffset), (fontSizeInPx / 2))
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
-            selectionCoordinates = Pair(start, end),
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.None
         )
@@ -2240,9 +2296,11 @@ class MultiWidgetSelectionDelegateTest {
         val end = Offset(-50f, -50f)
 
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
-            selectionCoordinates = Pair(start, end),
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.None
         )
@@ -2275,13 +2333,130 @@ class MultiWidgetSelectionDelegateTest {
         val start = Offset(-50f, -50f)
         val end = Offset(-20f, -20f)
         // Act.
-        val textSelectionInfo = getTextSelectionInfo(
-            selectionCoordinates = Pair(start, end),
+        val (textSelectionInfo, _) = getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = null,
             selectableId = 1,
             adjustment = SelectionAdjustment.Word
         )
         assertThat(textSelectionInfo).isNull()
+    }
+
+    @Test
+    fun getTextSelectionInfo_handleNotMoved_selectionUpdated_consumed_isTrue() {
+        val text = "hello world\n"
+        val fontSize = 20.sp
+        val fontSizeInPx = with(defaultDensity) { fontSize.toPx() }
+        val textLayoutResult = simpleTextLayout(
+            text = text,
+            fontSize = fontSize,
+            density = defaultDensity
+        )
+        val start = Offset(0f, fontSizeInPx / 2)
+        val end = Offset(fontSizeInPx * 3, fontSizeInPx / 2)
+        // Act.
+        // Selection is updated but endHandlePosition is actually the same. Since selection is
+        // updated, the movement is consumed.
+        val (_, consumed) = getTextSelectionInfo(
+            textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = end,
+            selectableId = 1,
+            adjustment = SelectionAdjustment.Word,
+            previousSelection = null,
+            isStartHandle = false
+        )
+        assertThat(consumed).isTrue()
+    }
+
+    @Test
+    fun getTextSelectionInfo_handleMoved_selectionNotUpdated_consumed_isTrue() {
+        val text = "hello world\n"
+        val fontSize = 20.sp
+        val fontSizeInPx = with(defaultDensity) { fontSize.toPx() }
+        val textLayoutResult = simpleTextLayout(
+            text = text,
+            fontSize = fontSize,
+            density = defaultDensity
+        )
+        val start = Offset(0f, fontSizeInPx / 2)
+        val end = Offset(fontSizeInPx * 3, fontSizeInPx / 2)
+        val previousEnd = Offset(fontSizeInPx * 2, fontSizeInPx / 2)
+        val previousSelection = Selection(
+            start = Selection.AnchorInfo(
+                direction = ResolvedTextDirection.Ltr,
+                offset = 0,
+                selectableId = 1
+            ),
+            end = Selection.AnchorInfo(
+                direction = ResolvedTextDirection.Ltr,
+                offset = 5,
+                selectableId = 1
+            ),
+        )
+        // Act.
+        // End handle moved from offset 2 to 3. But we are using word based selection, so the
+        // selection is still [0, 5). However, since handle moved to a new offset, the movement
+        // is consumed.
+        val (textSelectionInfo, consumed) = getTextSelectionInfo(
+            textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = previousEnd,
+            selectableId = 1,
+            previousSelection = previousSelection,
+            adjustment = SelectionAdjustment.Word,
+            isStartHandle = false
+        )
+        // First check that Selection didn't update.
+        assertThat(textSelectionInfo).isEqualTo(previousSelection)
+        assertThat(consumed).isTrue()
+    }
+
+    @Test
+    fun getTextSelectionInfo_handleNotMoved_selectionNotUpdated_consumed_isFalse() {
+        val text = "hello world\n"
+        val fontSize = 20.sp
+        val fontSizeInPx = with(defaultDensity) { fontSize.toPx() }
+        val textLayoutResult = simpleTextLayout(
+            text = text,
+            fontSize = fontSize,
+            density = defaultDensity
+        )
+        val start = Offset(0f, fontSizeInPx / 2)
+        val end = Offset(fontSizeInPx * 2.8f, fontSizeInPx / 2)
+        val previousEnd = Offset(fontSizeInPx * 3f, fontSizeInPx / 2)
+        val previousSelection = Selection(
+            start = Selection.AnchorInfo(
+                direction = ResolvedTextDirection.Ltr,
+                offset = 0,
+                selectableId = 1
+            ),
+            end = Selection.AnchorInfo(
+                direction = ResolvedTextDirection.Ltr,
+                offset = 5,
+                selectableId = 1
+            ),
+        )
+        // Act.
+        // End handle moved, but is still at the offset 3. Selection is not updated either.
+        // So the movement is not consumed.
+        val (textSelectionInfo, consumed) = getTextSelectionInfo(
+            textLayoutResult = textLayoutResult,
+            startHandlePosition = start,
+            endHandlePosition = end,
+            previousHandlePosition = previousEnd,
+            selectableId = 1,
+            previousSelection = previousSelection,
+            adjustment = SelectionAdjustment.Word,
+            isStartHandle = false
+        )
+        // First check that Selection didn't update.
+        assertThat(textSelectionInfo).isEqualTo(previousSelection)
+        assertThat(consumed).isFalse()
     }
 
     @OptIn(InternalFoundationTextApi::class)

@@ -30,14 +30,15 @@ internal class MultiWidgetSelectionDelegate(
     private val layoutResultCallback: () -> TextLayoutResult?
 ) : Selectable {
 
-    override fun getSelection(
-        startPosition: Offset,
-        endPosition: Offset,
+    override fun updateSelection(
+        startHandlePosition: Offset,
+        endHandlePosition: Offset,
+        previousHandlePosition: Offset?,
+        isStartHandle: Boolean,
         containerLayoutCoordinates: LayoutCoordinates,
         adjustment: SelectionAdjustment,
-        previousSelection: Selection?,
-        isStartHandle: Boolean
-    ): Selection? {
+        previousSelection: Selection?
+    ): Pair<Selection?, Boolean> {
         require(
             previousSelection == null || (
                 selectableId == previousSelection.start.selectableId &&
@@ -46,18 +47,21 @@ internal class MultiWidgetSelectionDelegate(
         ) {
             "The given previousSelection doesn't belong to this selectable."
         }
-        val layoutCoordinates = getLayoutCoordinates() ?: return null
-        val textLayoutResult = layoutResultCallback() ?: return null
+        val layoutCoordinates = getLayoutCoordinates() ?: return Pair(null, false)
+        val textLayoutResult = layoutResultCallback() ?: return Pair(null, false)
 
         val relativePosition = containerLayoutCoordinates.localPositionOf(
             layoutCoordinates, Offset.Zero
         )
-        val startPx = startPosition - relativePosition
-        val endPx = endPosition - relativePosition
+        val localStartPosition = startHandlePosition - relativePosition
+        val localEndPosition = endHandlePosition - relativePosition
+        val localPreviousHandlePosition = previousHandlePosition?.let { it - relativePosition }
 
         return getTextSelectionInfo(
             textLayoutResult = textLayoutResult,
-            selectionCoordinates = Pair(startPx, endPx),
+            startHandlePosition = localStartPosition,
+            endHandlePosition = localEndPosition,
+            previousHandlePosition = localPreviousHandlePosition,
             selectableId = selectableId,
             adjustment = adjustment,
             previousSelection = previousSelection,
@@ -71,7 +75,6 @@ internal class MultiWidgetSelectionDelegate(
 
         return getAssembledSelectionInfo(
             newSelectionRange = newSelectionRange,
-            newRawSelectionRange = newSelectionRange,
             handlesCrossed = false,
             selectableId = selectableId,
             textLayoutResult = textLayoutResult
@@ -122,47 +125,27 @@ internal class MultiWidgetSelectionDelegate(
  * Return information about the current selection in the Text.
  *
  * @param textLayoutResult a result of the text layout.
- * @param selectionCoordinates The positions of the start and end of the selection in Text
- * composable coordinate system.
+ * @param startHandlePosition The new positions of the moving selection handle.
+ * @param previousHandlePosition The old position of the moving selection handle since the last update.
+ * @param endHandlePosition the position of the selection handle that is not moving.
+ * @param selectableId the id of this [Selectable].
+ * @param adjustment the [SelectionAdjustment] used to process the raw selection range.
+ * @param previousSelection the previous text selection.
+ * @param isStartHandle whether the moving selection is the start selection handle.
  *
- * @return [Selection] of the current composable, or null if the composable is not selected.
+ * @return a pair consistent of updated [Selection] and a boolean representing whether the
+ * movement is consumed.
  */
 internal fun getTextSelectionInfo(
     textLayoutResult: TextLayoutResult,
-    selectionCoordinates: Pair<Offset, Offset>,
+    startHandlePosition: Offset,
+    endHandlePosition: Offset,
+    previousHandlePosition: Offset?,
     selectableId: Long,
     adjustment: SelectionAdjustment,
     previousSelection: Selection? = null,
     isStartHandle: Boolean = true
-): Selection? {
-    val newRawSelectionRange =
-        getTextSelectionRange(textLayoutResult, selectionCoordinates) ?: return null
-    val previousRawSelection = previousSelection?.let {
-        TextRange(it.start.rawOffset, it.end.rawOffset)
-    }
-
-    val adjustedTextRange = adjustment.adjust(
-        textLayoutResult = textLayoutResult,
-        newRawSelectionRange = newRawSelectionRange,
-        previousRawSelectionRange = previousRawSelection,
-        previousAdjustedSelection = previousSelection?.toTextRange(),
-        isStartHandle = isStartHandle
-    )
-    return getAssembledSelectionInfo(
-        newSelectionRange = adjustedTextRange,
-        newRawSelectionRange = newRawSelectionRange,
-        handlesCrossed = adjustedTextRange.reversed,
-        selectableId = selectableId,
-        textLayoutResult = textLayoutResult
-    )
-}
-
-internal fun getTextSelectionRange(
-    textLayoutResult: TextLayoutResult,
-    selectionCoordinates: Pair<Offset, Offset>
-): TextRange? {
-    val startPosition = selectionCoordinates.first
-    val endPosition = selectionCoordinates.second
+): Pair<Selection?, Boolean> {
 
     val bounds = Rect(
         0.0f,
@@ -171,83 +154,59 @@ internal fun getTextSelectionRange(
         textLayoutResult.size.height.toFloat()
     )
 
-    val lastOffset = textLayoutResult.layoutInput.text.text.length
+    val isSelected =
+        SelectionMode.Vertical.isSelected(bounds, startHandlePosition, endHandlePosition)
 
-    val containsWholeSelectionStart =
-        bounds.contains(Offset(startPosition.x, startPosition.y))
+    if (!isSelected) {
+        return Pair(null, false)
+    }
 
-    val containsWholeSelectionEnd =
-        bounds.contains(Offset(endPosition.x, endPosition.y))
+    val rawStartHandleOffset = getOffsetForPosition(textLayoutResult, bounds, startHandlePosition)
+    val rawEndHandleOffset = getOffsetForPosition(textLayoutResult, bounds, endHandlePosition)
+    val rawPreviousHandleOffset = previousHandlePosition?.let {
+        getOffsetForPosition(textLayoutResult, bounds, it)
+    } ?: -1
 
-    val rawStartOffset =
-        if (containsWholeSelectionStart) {
-            textLayoutResult.getOffsetForPosition(startPosition).coerceIn(0, lastOffset)
-        } else {
-            // If the composable is selected, the start offset cannot be -1 for this composable. If the
-            // final start offset is still -1, it means this composable is not selected.
-            -1
-        }
-    val rawEndOffset =
-        if (containsWholeSelectionEnd) {
-            textLayoutResult.getOffsetForPosition(endPosition).coerceIn(0, lastOffset)
-        } else {
-            // If the composable is selected, the end offset cannot be -1 for this composable. If the
-            // final end offset is still -1, it means this composable is not selected.
-            -1
-        }
-
-    return getRefinedSelectionRange(
-        rawStartOffset = rawStartOffset,
-        rawEndOffset = rawEndOffset,
-        startPosition = startPosition,
-        endPosition = endPosition,
-        bounds = bounds,
-        lastOffset = lastOffset,
+    val adjustedTextRange = adjustment.adjust(
+        textLayoutResult = textLayoutResult,
+        newRawSelectionRange = TextRange(rawStartHandleOffset, rawEndHandleOffset),
+        previousHandleOffset = rawPreviousHandleOffset,
+        isStartHandle = isStartHandle,
+        previousSelectionRange = previousSelection?.toTextRange()
     )
+    val newSelection = getAssembledSelectionInfo(
+        newSelectionRange = adjustedTextRange,
+        handlesCrossed = adjustedTextRange.reversed,
+        selectableId = selectableId,
+        textLayoutResult = textLayoutResult
+    )
+
+    // Determine whether the movement is consumed by this Selectable.
+    // If the selection has  changed, the movement is consumed.
+    // And there are also cases where the selection stays the same but selection handle raw
+    // offset has changed.(Usually this happen because of adjustment like SelectionAdjustment.Word)
+    // In this case we also consider the movement being consumed.
+    val selectionUpdated = newSelection != previousSelection
+    val handleUpdated = if (isStartHandle) {
+        rawStartHandleOffset != rawPreviousHandleOffset
+    } else {
+        rawEndHandleOffset != rawPreviousHandleOffset
+    }
+    val consumed = handleUpdated || selectionUpdated
+    return Pair(newSelection, consumed)
 }
 
-/**
- * This method refines the selection info by processing the initial raw selection info.
- *
- * @param rawStartOffset unprocessed start offset calculated directly from input position.
- * A negative value of this parameter means that the start handle is not in this selectable.
- * @param rawEndOffset unprocessed end offset calculated directly from input position. A negative
- * value of this parameter means that the start handle is not in this selectable.
- * @param startPosition graphical position of the start of the selection, in composable's
- * coordinates.
- * @param endPosition graphical position of the end of the selection, in composable's coordinates.
- * @param bounds bounds of the current composable
- * @param lastOffset last offset of the text. It's actually the length of the text.
- *
- * @return [Selection] of the current composable, or null if the composable is not selected.
- */
-private fun getRefinedSelectionRange(
-    rawStartOffset: Int,
-    rawEndOffset: Int,
-    startPosition: Offset,
-    endPosition: Offset,
+internal fun getOffsetForPosition(
+    textLayoutResult: TextLayoutResult,
     bounds: Rect,
-    lastOffset: Int
-): TextRange? {
-    val containsWholeSelectionStart = rawStartOffset >= 0
-    val containsWholeSelectionEnd = rawEndOffset >= 0
-
-    val shouldProcessAsSinglecomposable =
-        containsWholeSelectionStart && containsWholeSelectionEnd
-
-    return if (shouldProcessAsSinglecomposable) {
-        TextRange(rawStartOffset, rawEndOffset)
+    position: Offset
+): Int {
+    val length = textLayoutResult.layoutInput.text.length
+    return if (bounds.contains(position)) {
+        textLayoutResult.getOffsetForPosition(position).coerceIn(0, length)
     } else {
-        processCrossComposable(
-            startPosition = startPosition,
-            endPosition = endPosition,
-            rawStartOffset = rawStartOffset,
-            rawEndOffset = rawEndOffset,
-            lastOffset = lastOffset,
-            bounds = bounds,
-            containsWholeSelectionStart = containsWholeSelectionStart,
-            containsWholeSelectionEnd = containsWholeSelectionEnd
-        )
+        val value = SelectionMode.Vertical.compare(position, bounds)
+        if (value < 0) 0 else length
     }
 }
 
@@ -256,7 +215,6 @@ private fun getRefinedSelectionRange(
  * class in a separate method.
  *
  * @param newSelectionRange the final new selection text range.
- * @param newRawSelectionRange the new unadjusted selection text range.
  * @param handlesCrossed true if the selection handles are crossed
  * @param selectableId the id of the current [Selectable] for which the [Selection] is being
  * calculated
@@ -266,7 +224,6 @@ private fun getRefinedSelectionRange(
  */
 private fun getAssembledSelectionInfo(
     newSelectionRange: TextRange,
-    newRawSelectionRange: TextRange,
     handlesCrossed: Boolean,
     selectableId: Long,
     textLayoutResult: TextLayoutResult
@@ -275,13 +232,11 @@ private fun getAssembledSelectionInfo(
         start = Selection.AnchorInfo(
             direction = textLayoutResult.getBidiRunDirection(newSelectionRange.start),
             offset = newSelectionRange.start,
-            rawOffset = newRawSelectionRange.start,
             selectableId = selectableId
         ),
         end = Selection.AnchorInfo(
             direction = textLayoutResult.getBidiRunDirection(max(newSelectionRange.end - 1, 0)),
             offset = newSelectionRange.end,
-            rawOffset = newRawSelectionRange.end,
             selectableId = selectableId
         ),
         handlesCrossed = handlesCrossed

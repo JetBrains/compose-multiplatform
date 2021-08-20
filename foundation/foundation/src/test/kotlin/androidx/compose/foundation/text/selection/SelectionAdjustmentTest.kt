@@ -45,9 +45,9 @@ class SelectionAdjustmentTest {
         val adjustedSelection = SelectionAdjustment.None.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = null,
-            previousAdjustedSelection = null,
-            isStartHandle = true
+            previousHandleOffset = -1,
+            isStartHandle = true,
+            previousSelectionRange = null
         )
 
         assertThat(adjustedSelection).isEqualTo(rawSelection)
@@ -60,9 +60,9 @@ class SelectionAdjustmentTest {
         val adjustedSelection = SelectionAdjustment.Character.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = null,
-            previousAdjustedSelection = null,
-            isStartHandle = true
+            previousHandleOffset = -1,
+            isStartHandle = true,
+            previousSelectionRange = null
         )
 
         assertThat(adjustedSelection).isEqualTo(rawSelection)
@@ -84,9 +84,9 @@ class SelectionAdjustmentTest {
         val adjustedSelection = SelectionAdjustment.Character.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = -1,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedSelection).isEqualTo(TextRange(1, 2))
@@ -102,9 +102,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.Character.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousTextRange,
-            previousAdjustedSelection = previousTextRange,
-            isStartHandle = isStartHandle
+            previousHandleOffset = -1,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousTextRange
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(2, 1))
@@ -121,9 +121,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.Word.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = null,
-            previousAdjustedSelection = null,
-            isStartHandle = false
+            previousHandleOffset = -1,
+            isStartHandle = false,
+            previousSelectionRange = null
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(0, 5))
@@ -140,9 +140,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.Word.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = null,
-            previousAdjustedSelection = null,
-            isStartHandle = false
+            previousHandleOffset = -1,
+            isStartHandle = false,
+            previousSelectionRange = null
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(6, 11))
@@ -159,9 +159,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.Word.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = null,
-            previousAdjustedSelection = null,
-            isStartHandle = false
+            previousHandleOffset = -1,
+            isStartHandle = false,
+            previousSelectionRange = null
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(0, 5))
@@ -178,9 +178,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.Word.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = null,
-            previousAdjustedSelection = null,
-            isStartHandle = false
+            previousHandleOffset = -1,
+            isStartHandle = false,
+            previousSelectionRange = null
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(0, 5))
@@ -198,9 +198,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.Word.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = null,
-            previousAdjustedSelection = null,
-            isStartHandle = false
+            previousHandleOffset = -1,
+            isStartHandle = false,
+            previousSelectionRange = null
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(6, 11))
@@ -218,9 +218,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.Word.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = null,
-            previousAdjustedSelection = null,
-            isStartHandle = false
+            previousHandleOffset = -1,
+            isStartHandle = false,
+            previousSelectionRange = null
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(6, 11))
@@ -237,9 +237,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.Word.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = null,
-            previousAdjustedSelection = null,
-            isStartHandle = false
+            previousHandleOffset = -1,
+            isStartHandle = false,
+            previousSelectionRange = null
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(0, 0))
@@ -257,9 +257,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.Word.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = null,
-            previousAdjustedSelection = null,
-            isStartHandle = false
+            previousHandleOffset = -1,
+            isStartHandle = false,
+            previousSelectionRange = null
         )
 
         // The raw selection
@@ -279,9 +279,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.Word.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = null,
-            previousAdjustedSelection = null,
-            isStartHandle = false
+            previousHandleOffset = -1,
+            isStartHandle = false,
+            previousSelectionRange = null
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(5, 0))
@@ -304,9 +304,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.Word.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = null,
-            previousAdjustedSelection = null,
-            isStartHandle = false
+            previousHandleOffset = -1,
+            isStartHandle = false,
+            previousSelectionRange = null
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(0, 11))
@@ -329,9 +329,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.Word.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = null,
-            previousAdjustedSelection = null,
-            isStartHandle = false
+            previousHandleOffset = -1,
+            isStartHandle = false,
+            previousSelectionRange = null
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(11, 0))
@@ -347,9 +347,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.Paragraph.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = null,
-            previousAdjustedSelection = null,
-            isStartHandle = isStartHandle
+            previousHandleOffset = -1,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = null
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(12, 23))
@@ -367,9 +367,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.Paragraph.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = null,
-            previousAdjustedSelection = null,
-            isStartHandle = isStartHandle
+            previousHandleOffset = -1,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = null
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(0, 11))
@@ -385,9 +385,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.Paragraph.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = null,
-            previousAdjustedSelection = null,
-            isStartHandle = isStartHandle
+            previousHandleOffset = -1,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = null
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(12, 23))
@@ -403,9 +403,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.Paragraph.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = null,
-            previousAdjustedSelection = null,
-            isStartHandle = isStartHandle
+            previousHandleOffset = -1,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = null
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(12, 23))
@@ -420,9 +420,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.Paragraph.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = null,
-            previousAdjustedSelection = null,
-            isStartHandle = isStartHandle
+            previousHandleOffset = -1,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = null
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(0, 0))
@@ -439,9 +439,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.Paragraph.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = null,
-            previousAdjustedSelection = null,
-            isStartHandle = isStartHandle
+            previousHandleOffset = -1,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = null
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(0, 11))
@@ -458,9 +458,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.Paragraph.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = null,
-            previousAdjustedSelection = null,
-            isStartHandle = isStartHandle
+            previousHandleOffset = -1,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = null
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(11, 0))
@@ -477,9 +477,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.Paragraph.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = null,
-            previousAdjustedSelection = null,
-            isStartHandle = isStartHandle
+            previousHandleOffset = -1,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = null
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(12, 35))
@@ -504,9 +504,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = null,
-            previousAdjustedSelection = null,
-            isStartHandle = isStartHandle
+            previousHandleOffset = -1,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = null
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(0, 5))
@@ -532,9 +532,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = -1,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(6, 8))
@@ -559,9 +559,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = -1,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(8, 6))
@@ -587,9 +587,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.start,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(8, 11))
@@ -614,9 +614,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.end,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(11, 8))
@@ -644,9 +644,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.end,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(6, 12))
@@ -671,9 +671,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.start,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(12, 6))
@@ -702,9 +702,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.start,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(5, 11))
@@ -729,9 +729,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.end,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(11, 5))
@@ -760,9 +760,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.end,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(6, 17))
@@ -787,9 +787,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.start,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(17, 6))
@@ -818,9 +818,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.start,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(0, 11))
@@ -840,14 +840,14 @@ class SelectionAdjustmentTest {
 
         val rawSelection = TextRange(11, 2)
         val previousSelection = TextRange(11, 6)
-        val isStartHandle = true
+        val isStartHandle = false
 
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.end,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(11, 0))
@@ -880,9 +880,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.end,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(3, 11))
@@ -908,9 +908,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.start,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(11, 3))
@@ -944,9 +944,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.start,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(5, 8))
@@ -972,9 +972,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.end,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(8, 5))
@@ -1008,9 +1008,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.end,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(3, 11))
@@ -1036,9 +1036,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.start,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(11, 3))
@@ -1073,9 +1073,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.start,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(16, 17))
@@ -1101,9 +1101,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.end,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(17, 16))
@@ -1129,9 +1129,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.end,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(0, 8))
@@ -1156,9 +1156,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.start,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(8, 0))
@@ -1184,9 +1184,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.end,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(2, 8))
@@ -1211,9 +1211,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.start,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(8, 2))
@@ -1246,9 +1246,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.end,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(2, 5))
@@ -1274,9 +1274,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.start,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(5, 2))
@@ -1304,14 +1304,14 @@ class SelectionAdjustmentTest {
         // be snap to 6.
         val rawSelection = TextRange(7, 8)
         val previousSelection = TextRange(2, 8)
-        val isStartHandle = false
+        val isStartHandle = true
 
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.start,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(6, 8))
@@ -1337,9 +1337,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.end,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(8, 6))
@@ -1376,9 +1376,9 @@ class SelectionAdjustmentTest {
         val adjustedTextRange = SelectionAdjustment.CharacterWithWordAccelerate.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = rawSelection,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = previousSelection.end,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(6, 11))

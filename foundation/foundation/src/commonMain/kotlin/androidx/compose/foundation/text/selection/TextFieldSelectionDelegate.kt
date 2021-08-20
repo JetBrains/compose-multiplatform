@@ -51,9 +51,9 @@ internal fun getTextFieldSelection(
         return adjustment.adjust(
             textLayoutResult = textLayoutResult,
             newRawSelectionRange = textRange,
-            previousRawSelectionRange = previousSelection,
-            previousAdjustedSelection = previousSelection,
-            isStartHandle = isStartHandle
+            previousHandleOffset = -1,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
         )
     }
     return TextRange(0, 0)

@@ -366,7 +366,7 @@ internal class TextController(val state: TextState) {
          * The beginning position of the drag gesture. Every time a new drag gesture starts, it wil be
          * recalculated.
          */
-        var dragBeginPosition = Offset.Zero
+        var lastPosition = Offset.Zero
 
         /**
          * The total distance being dragged of the drag gesture. Every time a new drag gesture starts,
@@ -390,7 +390,7 @@ internal class TextController(val state: TextState) {
                     )
                 }
 
-                dragBeginPosition = startPoint
+                lastPosition = startPoint
             }
             // selection never started
             if (!selectionRegistrar.hasSelection(state.selectableId)) return
@@ -405,18 +405,25 @@ internal class TextController(val state: TextState) {
                 if (!selectionRegistrar.hasSelection(state.selectableId)) return
 
                 dragTotalDistance += delta
+                val newPosition = lastPosition + dragTotalDistance
 
-                if (!outOfBoundary(dragBeginPosition, dragBeginPosition + dragTotalDistance)) {
+                if (!outOfBoundary(lastPosition, newPosition)) {
                     // Notice that only the end position needs to be updated here.
                     // Start position is left unchanged. This is typically important when
                     // long-press is using SelectionAdjustment.WORD or
                     // SelectionAdjustment.PARAGRAPH that updates the start handle position from
                     // the dragBeginPosition.
-                    selectionRegistrar?.notifySelectionUpdate(
+                    val consumed = selectionRegistrar?.notifySelectionUpdate(
                         layoutCoordinates = it,
-                        endPosition = dragBeginPosition + dragTotalDistance,
-                        adjustment = SelectionAdjustment.Character
+                        previousPosition = lastPosition,
+                        newPosition = newPosition,
+                        isStartHandle = false,
+                        adjustment = SelectionAdjustment.CharacterWithWordAccelerate
                     )
+                    if (consumed == true) {
+                        lastPosition = newPosition
+                        dragTotalDistance = Offset.Zero
+                    }
                 }
             }
         }
@@ -435,32 +442,46 @@ internal class TextController(val state: TextState) {
     }
 
     val mouseSelectionObserver = object : MouseSelectionObserver {
-        var dragBeginPosition = Offset.Zero
+        var lastPosition = Offset.Zero
 
         override fun onExtend(downPosition: Offset): Boolean {
-            state.layoutCoordinates?.let {
-                if (!it.isAttached) return false
-
-                selectionRegistrar?.notifySelectionUpdate(
-                    layoutCoordinates = it,
-                    endPosition = downPosition,
-                    adjustment = SelectionAdjustment.None
-                )
+            state.layoutCoordinates?.let { layoutCoordinates ->
+                if (!layoutCoordinates.isAttached) return false
+                selectionRegistrar?.let {
+                    val consumed = it.notifySelectionUpdate(
+                        layoutCoordinates = layoutCoordinates,
+                        newPosition = downPosition,
+                        previousPosition = lastPosition,
+                        isStartHandle = false,
+                        adjustment = SelectionAdjustment.None
+                    )
+                    if (consumed) {
+                        lastPosition = downPosition
+                    }
+                }
                 return selectionRegistrar.hasSelection(state.selectableId)
             }
             return false
         }
 
         override fun onExtendDrag(dragPosition: Offset): Boolean {
-            state.layoutCoordinates?.let {
-                if (!it.isAttached) return false
+            state.layoutCoordinates?.let { layoutCoordinates ->
+                if (!layoutCoordinates.isAttached) return false
                 if (!selectionRegistrar.hasSelection(state.selectableId)) return false
 
-                selectionRegistrar?.notifySelectionUpdate(
-                    layoutCoordinates = it,
-                    endPosition = dragPosition,
-                    adjustment = SelectionAdjustment.None
-                )
+                selectionRegistrar?. let {
+                    val consumed = it.notifySelectionUpdate(
+                        layoutCoordinates = layoutCoordinates,
+                        newPosition = dragPosition,
+                        previousPosition = lastPosition,
+                        isStartHandle = false,
+                        adjustment = SelectionAdjustment.None
+                    )
+
+                    if (consumed) {
+                        lastPosition = dragPosition
+                    }
+                }
             }
             return true
         }
@@ -478,7 +499,7 @@ internal class TextController(val state: TextState) {
                     adjustment = adjustment
                 )
 
-                dragBeginPosition = downPosition
+                lastPosition = downPosition
                 return selectionRegistrar.hasSelection(state.selectableId)
             }
 
@@ -490,12 +511,16 @@ internal class TextController(val state: TextState) {
                 if (!it.isAttached) return false
                 if (!selectionRegistrar.hasSelection(state.selectableId)) return false
 
-                selectionRegistrar?.notifySelectionUpdate(
+                val consumed = selectionRegistrar?.notifySelectionUpdate(
                     layoutCoordinates = it,
-                    startPosition = dragBeginPosition,
-                    endPosition = dragPosition,
+                    previousPosition = lastPosition,
+                    newPosition = dragPosition,
+                    isStartHandle = false,
                     adjustment = adjustment
                 )
+                if (consumed == true) {
+                    lastPosition = dragPosition
+                }
             }
             return true
         }
