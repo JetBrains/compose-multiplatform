@@ -128,6 +128,12 @@ abstract class StudioTask : DefaultTask() {
     @get:Internal
     protected abstract val studioArchiveCreator: StudioArchiveCreator
 
+    /**
+     * List of additional environment variables to pass into the Studio application.
+     */
+    @get:Internal
+    open val additionalEnvironmentProperties: Map<String, String> = emptyMap()
+
     private val licenseAcceptedFile: File by lazy {
         File("$studioInstallationDir/STUDIOW_LICENSE_ACCEPTED")
     }
@@ -199,7 +205,7 @@ abstract class StudioTask : DefaultTask() {
                 // Studio-initiated Gradle tasks are run against the same version of AGP that was
                 // used to start Studio, which prevents version mismatch after repo sync.
                 "EXPECTED_AGP_VERSION" to ANDROID_GRADLE_PLUGIN_VERSION
-            )
+            ) + additionalEnvironmentProperties
 
             // Append to the existing environment variables set by gradlew and the user.
             environment().putAll(additionalStudioEnvironmentProperties)
@@ -268,6 +274,8 @@ open class PlaygroundStudioTask : RootStudioTask() {
      */
     override val requiresProjectList get() = false
     override val installParentDir get() = supportRootFolder
+    override val additionalEnvironmentProperties: Map<String, String>
+        get() = mapOf("ALLOW_PUBLIC_REPOS" to "true")
     override val ideaProperties
         get() = supportRootFolder.resolve("../playground-common/idea.properties")
     override val vmOptions
