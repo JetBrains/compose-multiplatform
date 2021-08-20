@@ -1992,6 +1992,11 @@ package androidx.compose.ui.platform {
   public static final class InfiniteAnimationPolicy.Key implements kotlin.coroutines.CoroutineContext.Key<androidx.compose.ui.platform.InfiniteAnimationPolicy> {
   }
 
+  public interface InspectableModifier {
+    method public androidx.compose.ui.Modifier getWrapped();
+    property public abstract androidx.compose.ui.Modifier wrapped;
+  }
+
   public interface InspectableValue {
     method public default kotlin.sequences.Sequence<androidx.compose.ui.platform.ValueElement> getInspectableElements();
     method public default String? getNameFallback();
@@ -2004,6 +2009,8 @@ package androidx.compose.ui.platform {
   public final class InspectableValueKt {
     method public static inline kotlin.jvm.functions.Function1<androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> debugInspectorInfo(kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> definitions);
     method public static kotlin.jvm.functions.Function1<androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> getNoInspectorInfo();
+    method public static inline androidx.compose.ui.Modifier inspectable(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> inspectorInfo, kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier,? extends androidx.compose.ui.Modifier> wrapped);
+    method @kotlin.PublishedApi internal static androidx.compose.ui.Modifier inspectableWrapper(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> inspectorInfo, androidx.compose.ui.Modifier wrapped);
     method public static boolean isDebugInspectorInfoEnabled();
     method public static void setDebugInspectorInfoEnabled(boolean isDebugInspectorInfoEnabled);
   }
