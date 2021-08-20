@@ -153,41 +153,23 @@ package androidx.compose.animation.core {
 
   public final class AnimationVector1D extends androidx.compose.animation.core.AnimationVector {
     ctor public AnimationVector1D(float initVal);
-    method public float get$metalava_module(int index);
-    method public int getSize$metalava_module();
     method public float getValue();
-    method public androidx.compose.animation.core.AnimationVector1D newVector$metalava_module();
-    method public void reset$metalava_module();
-    method public void set$metalava_module(int index, float value);
-    property public int size;
     property public final float value;
   }
 
   public final class AnimationVector2D extends androidx.compose.animation.core.AnimationVector {
     ctor public AnimationVector2D(float v1, float v2);
-    method public float get$metalava_module(int index);
-    method public int getSize$metalava_module();
     method public float getV1();
     method public float getV2();
-    method public androidx.compose.animation.core.AnimationVector2D newVector$metalava_module();
-    method public void reset$metalava_module();
-    method public void set$metalava_module(int index, float value);
-    property public int size;
     property public final float v1;
     property public final float v2;
   }
 
   public final class AnimationVector3D extends androidx.compose.animation.core.AnimationVector {
     ctor public AnimationVector3D(float v1, float v2, float v3);
-    method public float get$metalava_module(int index);
-    method public int getSize$metalava_module();
     method public float getV1();
     method public float getV2();
     method public float getV3();
-    method public androidx.compose.animation.core.AnimationVector3D newVector$metalava_module();
-    method public void reset$metalava_module();
-    method public void set$metalava_module(int index, float value);
-    property public int size;
     property public final float v1;
     property public final float v2;
     property public final float v3;
@@ -195,16 +177,10 @@ package androidx.compose.animation.core {
 
   public final class AnimationVector4D extends androidx.compose.animation.core.AnimationVector {
     ctor public AnimationVector4D(float v1, float v2, float v3, float v4);
-    method public float get$metalava_module(int index);
-    method public int getSize$metalava_module();
     method public float getV1();
     method public float getV2();
     method public float getV3();
     method public float getV4();
-    method public androidx.compose.animation.core.AnimationVector4D newVector$metalava_module();
-    method public void reset$metalava_module();
-    method public void set$metalava_module(int index, float value);
-    property public int size;
     property public final float v1;
     property public final float v2;
     property public final float v3;

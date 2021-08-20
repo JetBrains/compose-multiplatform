@@ -475,21 +475,13 @@ package androidx.compose.runtime.snapshots {
 
   public class MutableSnapshot extends androidx.compose.runtime.snapshots.Snapshot {
     method public androidx.compose.runtime.snapshots.SnapshotApplyResult apply();
-    method public void close$metalava_module();
-    method public java.util.Set<androidx.compose.runtime.snapshots.StateObject>? getModified$metalava_module();
     method public kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? getReadObserver();
     method public boolean getReadOnly();
     method public androidx.compose.runtime.snapshots.Snapshot getRoot();
     method public kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? getWriteObserver();
     method public boolean hasPendingChanges();
-    method public void nestedActivated$metalava_module(androidx.compose.runtime.snapshots.Snapshot snapshot);
-    method public void nestedDeactivated$metalava_module(androidx.compose.runtime.snapshots.Snapshot snapshot);
-    method public void notifyObjectsInitialized$metalava_module();
-    method public void recordModified$metalava_module(androidx.compose.runtime.snapshots.StateObject state);
-    method public void setModified$metalava_module(java.util.Set<androidx.compose.runtime.snapshots.StateObject>? modified);
     method public androidx.compose.runtime.snapshots.MutableSnapshot takeNestedMutableSnapshot(optional kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver, optional kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? writeObserver);
     method public androidx.compose.runtime.snapshots.Snapshot takeNestedSnapshot(kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver);
-    property public java.util.Set<androidx.compose.runtime.snapshots.StateObject>? modified;
     property public kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver;
     property public boolean readOnly;
     property public androidx.compose.runtime.snapshots.Snapshot root;
