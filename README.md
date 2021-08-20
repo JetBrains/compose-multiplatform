@@ -21,7 +21,7 @@ Preview functionality (check your application UI without building/running it) fo
        * [imageviewer](examples/imageviewer) - Image Viewer application for Android and Desktop
        * [issues](examples/issues) - GitHub issue tracker with an adaptive UI and ktor-client
        * [game](examples/falling-balls) - Simple game
-       * [game](examples/falling-balls-with-web) - Simple game for web target
+       * [game](examples/falling-balls-web) - Simple game for web target
        * [compose-bird](examples/web-compose-bird) - A flappy bird clone using Compose for Web
        * [notepad](examples/notepad) - Notepad, using the new experimental Composable Window API
        * [todoapp](examples/todoapp) - TODO items tracker with persistence and multiple screens
