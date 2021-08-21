@@ -39,7 +39,7 @@ class KeyInputModifierTest {
     @Test
     fun testInspectorValueForKeyEvent() {
         val onKeyEvent: (KeyEvent) -> Boolean = { true }
-        val modifier = Modifier.onKeyEvent(onKeyEvent) as InspectableValue
+        val modifier = Modifier.onKeyEvent(onKeyEvent).first() as InspectableValue
         assertThat(modifier.nameFallback).isEqualTo("onKeyEvent")
         assertThat(modifier.valueOverride).isNull()
         assertThat(modifier.inspectableElements.asIterable()).containsExactly(
@@ -50,11 +50,17 @@ class KeyInputModifierTest {
     @Test
     fun testInspectorValueForPreviewKeyEvent() {
         val onPreviewKeyEvent: (KeyEvent) -> Boolean = { true }
-        val modifier = Modifier.onPreviewKeyEvent(onPreviewKeyEvent) as InspectableValue
+        val modifier = Modifier.onPreviewKeyEvent(onPreviewKeyEvent).first() as InspectableValue
         assertThat(modifier.nameFallback).isEqualTo("onPreviewKeyEvent")
         assertThat(modifier.valueOverride).isNull()
         assertThat(modifier.inspectableElements.asIterable()).containsExactly(
             ValueElement("onPreviewKeyEvent", onPreviewKeyEvent)
         )
     }
+
+    private fun Modifier.toList(): List<Modifier.Element> =
+        foldIn(mutableListOf()) { acc, e -> acc.apply { acc.add(e) } }
+
+    private fun Modifier.first(): Modifier.Element =
+        toList().first()
 }
