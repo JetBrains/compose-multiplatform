@@ -22,9 +22,9 @@ import androidx.compose.lint.test.Stubs
 import androidx.compose.lint.test.compiledStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.checks.infrastructure.TestFile
+import com.android.tools.lint.checks.infrastructure.TestMode
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -99,7 +99,6 @@ class ComposableCoroutineCreationDetectorTest : LintDetectorTest() {
         """
     )
 
-    @Ignore("b/196834589")
     @Test
     fun errors() {
         lint().files(
@@ -157,6 +156,7 @@ class ComposableCoroutineCreationDetectorTest : LintDetectorTest() {
             Stubs.Composable,
             coroutineBuildersStub
         )
+            .skipTestModes(TestMode.TYPE_ALIAS)
             .run()
             .expect(
                 """

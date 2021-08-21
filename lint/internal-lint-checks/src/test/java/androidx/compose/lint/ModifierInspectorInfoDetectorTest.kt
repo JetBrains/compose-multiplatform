@@ -20,9 +20,9 @@ package androidx.compose.lint
 
 import androidx.compose.lint.test.Stubs
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
+import com.android.tools.lint.checks.infrastructure.TestMode
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -149,7 +149,6 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
         """
     ).indented()
 
-    @Ignore("b/196834589")
     @Test
     fun existingInspectorInfo() {
         lint().files(
@@ -181,11 +180,11 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
 
-    @Ignore("b/196834589")
     @Test
     fun existingInspectorInfoWithStatementsBeforeDefinition() {
         lint().files(
@@ -232,11 +231,11 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
 
-    @Ignore("b/196834589")
     @Test
     fun existingInspectorInfoWithValue() {
         lint().files(
@@ -267,11 +266,11 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
 
-    @Ignore("b/196834589")
     @Test
     fun existingInspectorInfoViaSynonym() {
         lint().files(
@@ -312,11 +311,11 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
 
-    @Ignore("b/196834589")
     @Test
     fun existingInspectorInfoWithAnonymousClass() {
         lint().files(
@@ -337,11 +336,11 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
 
-    @Ignore("b/196834589")
     @Test
     fun existingInspectorInfoWithDataClassMemberValues() {
         lint().files(
@@ -406,11 +405,11 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
 
-    @Ignore("b/196834589")
     @Test
     fun existingInspectorInfoWithConditional() {
         lint().files(
@@ -457,11 +456,11 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
 
-    @Ignore("b/196834589")
     @Test
     fun existingInspectorInfoWithWhen() {
         lint().files(
@@ -499,11 +498,11 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
 
-    @Ignore("b/196834589")
     @Test
     fun existingInspectorInfoWithConditionals() {
         lint().files(
@@ -559,11 +558,11 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
 
-    @Ignore("b/196834589")
     @Test
     fun composedModifierWithInspectorInfo() {
         lint().files(
@@ -601,11 +600,11 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
 
-    @Ignore("b/196834589")
     @Test
     fun rememberModifierInfo() {
         lint().files(
@@ -640,6 +639,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
@@ -662,6 +662,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
@@ -690,6 +691,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
@@ -718,6 +720,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -753,6 +756,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -793,6 +797,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -804,7 +809,6 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
             )
     }
 
-    @Ignore("b/196834589")
     @Test
     fun inspectorInfoWithWrongName() {
         lint().files(
@@ -835,6 +839,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -846,7 +851,6 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
             )
     }
 
-    @Ignore("b/196834589")
     @Test
     fun inspectorInfoWithWrongValue() {
         lint().files(
@@ -877,6 +881,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -888,7 +893,6 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
             )
     }
 
-    @Ignore("b/196834589")
     @Test
     fun inspectorInfoWithWrongValueWhenMultipleAreAvailable() {
         lint().files(
@@ -919,6 +923,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -930,7 +935,6 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
             )
     }
 
-    @Ignore("b/196834589")
     @Test
     fun inspectorInfoWithWrongParameterNameInProperties() {
         lint().files(
@@ -962,6 +966,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -973,7 +978,6 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
             )
     }
 
-    @Ignore("b/196834589")
     @Test
     fun inspectorInfoWithMismatchInProperties() {
         lint().files(
@@ -1004,6 +1008,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -1015,7 +1020,6 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
             )
     }
 
-    @Ignore("b/196834589")
     @Test
     fun inspectorInfoWithMissingDebugSelector() {
         lint().files(
@@ -1047,6 +1051,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -1058,7 +1063,6 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
             )
     }
 
-    @Ignore("b/196834589")
     @Test
     fun inspectorInfoWithMissingName() {
         lint().files(
@@ -1088,6 +1092,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -1099,7 +1104,6 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
             )
     }
 
-    @Ignore("b/196834589")
     @Test
     fun inspectorInfoWithMissingVariables() {
         lint().files(
@@ -1136,6 +1140,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -1147,7 +1152,6 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
             )
     }
 
-    @Ignore("b/196834589")
     @Test
     fun inspectorInfoWithMissingDataClassMemberValues() {
         lint().files(
@@ -1183,6 +1187,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -1194,7 +1199,6 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
             )
     }
 
-    @Ignore("b/196834589")
     @Test
     fun missingInfoInConditionals() {
         lint().files(
@@ -1250,6 +1254,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -1267,7 +1272,6 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
             )
     }
 
-    @Ignore("b/196834589")
     @Test
     fun testInspectable() {
         lint().files(
@@ -1323,11 +1327,11 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
 
-    @Ignore("b/196834589")
     @Test
     fun testInspectableWithMissingParameter() {
         lint().files(
@@ -1382,6 +1386,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
