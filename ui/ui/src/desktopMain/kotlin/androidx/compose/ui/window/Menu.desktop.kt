@@ -435,6 +435,7 @@ private class SwingMenuScope : MenuScopeImpl {
                 set(awtIcon, JMenuItem::setIcon)
                 set(enabled, JMenuItem::setEnabled)
                 set(mnemonic, JMenuItem::setMnemonic)
+                set(shortcut, JMenuItem::setShortcut)
             }
         )
     }
