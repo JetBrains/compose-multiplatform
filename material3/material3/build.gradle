@@ -38,9 +38,10 @@ dependencies {
          */
         implementation(libs.kotlinStdlibCommon)
 
+        api(project(":compose:foundation:foundation"))
         api(project(":compose:runtime:runtime"))
         api(project(":compose:ui:ui-graphics"))
-
+        api(project(":compose:ui:ui-text"))
     }
 }
 
@@ -57,8 +58,10 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             commonMain.dependencies {
                 implementation(libs.kotlinStdlibCommon)
 
+                api(project(":compose:foundation:foundation"))
                 api(project(":compose:runtime:runtime"))
                 api(project(":compose:ui:ui-graphics"))
+                api(project(":compose:ui:ui-text"))
             }
 
             androidMain.dependencies {
