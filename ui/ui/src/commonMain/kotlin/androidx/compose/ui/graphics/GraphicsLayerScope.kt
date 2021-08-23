@@ -132,6 +132,19 @@ interface GraphicsLayerScope : Density {
      * Default value is `false`
      */
     var clip: Boolean
+
+    /**
+     * Configure the [RenderEffect] to apply to this [GraphicsLayerScope].
+     * This will apply a visual effect to the results of the [GraphicsLayerScope] before it is
+     * drawn. For example if [BlurEffect] is provided, the contents will be drawn in a separate
+     * layer, then this layer will be blurred when this [GraphicsLayerScope] is drawn.
+     *
+     * Note this parameter is only supported on Android 12
+     * and above. Attempts to use this Modifier on older Android versions will be ignored.
+     */
+    var renderEffect: RenderEffect?
+        get() = null
+        set(_) {}
 }
 
 /**
@@ -162,6 +175,8 @@ internal class ReusableGraphicsLayerScope : GraphicsLayerScope {
     override val fontScale: Float
         get() = graphicsDensity.fontScale
 
+    override var renderEffect: RenderEffect? = null
+
     fun reset() {
         scaleX = 1f
         scaleY = 1f
@@ -176,5 +191,6 @@ internal class ReusableGraphicsLayerScope : GraphicsLayerScope {
         transformOrigin = TransformOrigin.Center
         shape = RectangleShape
         clip = false
+        renderEffect = null
     }
 }

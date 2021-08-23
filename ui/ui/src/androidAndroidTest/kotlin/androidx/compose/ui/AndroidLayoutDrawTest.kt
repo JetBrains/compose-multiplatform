@@ -254,7 +254,8 @@ class AndroidLayoutDrawTest {
                 shape = RectangleShape,
                 clip = true,
                 layoutDirection = LayoutDirection.Ltr,
-                density = Density(1f)
+                density = Density(1f),
+                renderEffect = null
             )
         }
         // Verify that the camera distance is applied properly even after accounting for

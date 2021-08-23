@@ -47,6 +47,7 @@ class GraphicsLayerModifierTest {
         assertThat(modifier.nameFallback).isEqualTo("graphicsLayer")
         assertThat(modifier.valueOverride).isNull()
         assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+            ValueElement("renderEffect", null),
             ValueElement("scaleX", 1.0f),
             ValueElement("scaleY", 1.0f),
             ValueElement("alpha", 1.0f),

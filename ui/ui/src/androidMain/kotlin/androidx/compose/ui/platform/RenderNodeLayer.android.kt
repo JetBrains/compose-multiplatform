@@ -26,6 +26,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.nativeCanvas
@@ -109,6 +110,7 @@ internal class RenderNodeLayer(
         transformOrigin: TransformOrigin,
         shape: Shape,
         clip: Boolean,
+        renderEffect: RenderEffect?,
         layoutDirection: LayoutDirection,
         density: Density
     ) {
@@ -128,6 +130,7 @@ internal class RenderNodeLayer(
         renderNode.pivotY = transformOrigin.pivotFractionY * renderNode.height
         renderNode.clipToOutline = clip && shape !== RectangleShape
         renderNode.clipToBounds = clip && shape === RectangleShape
+        renderNode.renderEffect = renderEffect
         val shapeChanged = outlineResolver.update(
             shape,
             renderNode.alpha,
