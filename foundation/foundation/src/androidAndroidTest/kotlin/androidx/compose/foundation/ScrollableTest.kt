@@ -1388,6 +1388,7 @@ class ScrollableTest {
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
                 "orientation",
                 "state",
+                "overScrollController",
                 "enabled",
                 "reverseDirection",
                 "flingBehavior",

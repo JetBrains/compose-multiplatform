@@ -131,6 +131,9 @@ package androidx.compose.foundation {
 
 package androidx.compose.foundation.gestures {
 
+  public final class AndroidOverScrollKt {
+  }
+
   public final class AndroidScrollable_androidKt {
   }
 
@@ -180,6 +183,20 @@ package androidx.compose.foundation.gestures {
   public enum Orientation {
     enum_constant public static final androidx.compose.foundation.gestures.Orientation Horizontal;
     enum_constant public static final androidx.compose.foundation.gestures.Orientation Vertical;
+  }
+
+  @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public final class OverScrollConfiguration {
+    ctor public OverScrollConfiguration(optional long glowColor, optional boolean forceShowAlways, optional androidx.compose.foundation.layout.PaddingValues drawPadding);
+    method public androidx.compose.foundation.layout.PaddingValues getDrawPadding();
+    method public boolean getForceShowAlways();
+    method public long getGlowColor();
+    property public final androidx.compose.foundation.layout.PaddingValues drawPadding;
+    property public final boolean forceShowAlways;
+    property public final long glowColor;
+  }
+
+  public final class OverScrollConfigurationKt {
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.foundation.gestures.OverScrollConfiguration> getLocalOverScrollConfiguration();
   }
 
   public interface PressGestureScope extends androidx.compose.ui.unit.Density {
