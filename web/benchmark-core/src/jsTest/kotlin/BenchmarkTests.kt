@@ -65,8 +65,8 @@ class BenchmarkTests {
         return duration
     }
 
-    @Test // add1kItems overrides default `repeat` value (was - 5, now - 3) to avoid getting swallowed on CI
-    fun add1kItems() = runBenchmark(name = "add1000Items", repeat = 3) {
+    @Test // add1kItems overrides default `repeat` value (was - 5, now - 2) to avoid getting swallowed on CI
+    fun add1kItems() = runBenchmark(name = "add1000Items", repeat = 2) {
         addNItems(1000)
     }
 
