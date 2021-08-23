@@ -1000,7 +1000,9 @@ fun <K> Input(
             this.copyFrom(inputAttrsBuilder)
         },
         content = {
-            DisposeRadioGroupEffect()
+            if (type == InputType.Radio) {
+                DisposeRadioGroupEffect()
+            }
         }
     )
 }

@@ -15,7 +15,10 @@ private fun InputAttrsBuilder<String>.applyAttrsWithStringValue(
 
 /**
  * It's a controlled Input of [InputType.Checkbox].
+ * Controlled input means that its state is always equal [checked] value.
  * If you need an uncontrolled behaviour, see [Input].
+ *
+ * @see [Input] for more details on controlled and uncontrolled modes.
  */
 @Composable
 @NonRestartableComposable
@@ -31,7 +34,10 @@ fun CheckboxInput(checked: Boolean = false, attrs: InputAttrsBuilder<Boolean>.()
 
 /**
  * It's a controlled Input of [InputType.Date].
+ * Controlled input means that its state is always equal [value].
  * If you need an uncontrolled behaviour, see [Input].
+ *
+ * @see [Input] for more details on controlled and uncontrolled modes.
  */
 @Composable
 @NonRestartableComposable
@@ -41,7 +47,10 @@ fun DateInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = 
 
 /**
  * It's a controlled Input of [InputType.DateTimeLocal].
+ * Controlled input means that its state is always equal [value].
  * If you need an uncontrolled behaviour, see [Input].
+ *
+ * @see [Input] for more details on controlled and uncontrolled modes.
  */
 @Composable
 @NonRestartableComposable
@@ -51,7 +60,10 @@ fun DateTimeLocalInput(value: String = "", attrs: InputAttrsBuilder<String>.() -
 
 /**
  * It's a controlled Input of [InputType.Email].
+ * Controlled input means that its state is always equal [value].
  * If you need an uncontrolled behaviour, see [Input].
+ *
+ * @see [Input] for more details on controlled and uncontrolled modes.
  */
 @Composable
 @NonRestartableComposable
@@ -61,7 +73,10 @@ fun EmailInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit =
 
 /**
  * It's a controlled Input of [InputType.File].
+ * Controlled input means that its state is always equal [value].
  * If you need an uncontrolled behaviour, see [Input].
+ *
+ * @see [Input] for more details on controlled and uncontrolled modes.
  */
 @Composable
 @NonRestartableComposable
@@ -71,7 +86,10 @@ fun FileInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = 
 
 /**
  * It's a controlled Input of [InputType.Hidden].
+ * Controlled input means that its state is always equal [value].
  * If you need an uncontrolled behaviour, see [Input].
+ *
+ * @see [Input] for more details on controlled and uncontrolled modes.
  */
 @Composable
 @NonRestartableComposable
@@ -81,7 +99,10 @@ fun HiddenInput(attrs: InputAttrsBuilder<String>.() -> Unit = {}) {
 
 /**
  * It's a controlled Input of [InputType.Month].
+ * Controlled input means that its state is always equal [value].
  * If you need an uncontrolled behaviour, see [Input].
+ *
+ * @see [Input] for more details on controlled and uncontrolled modes.
  */
 @Composable
 @NonRestartableComposable
@@ -91,7 +112,10 @@ fun MonthInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit =
 
 /**
  * It's a controlled Input of [InputType.Number].
+ * Controlled input means that its state is always equal [value].
  * If you need an uncontrolled behaviour, see [Input].
+ *
+ * @see [Input] for more details on controlled and uncontrolled modes.
  */
 @Composable
 @NonRestartableComposable
@@ -114,7 +138,10 @@ fun NumberInput(
 
 /**
  * It's a controlled Input of [InputType.Password].
+ * Controlled input means that its state is always equal [value].
  * If you need an uncontrolled behaviour, see [Input].
+ *
+ * @see [Input] for more details on controlled and uncontrolled modes.
  */
 @Composable
 @NonRestartableComposable
@@ -124,7 +151,10 @@ fun PasswordInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Uni
 
 /**
  * It's a controlled Input of [InputType.Radio].
+ * Controlled input means that its state is always equal [checked] value.
  * If you need an uncontrolled behaviour, see [Input].
+ *
+ * @see [Input] for more details on controlled and uncontrolled modes.
  */
 @Composable
 @NonRestartableComposable
@@ -140,7 +170,10 @@ fun RadioInput(checked: Boolean = false, attrs: InputAttrsBuilder<Boolean>.() ->
 
 /**
  * It's a controlled Input of [InputType.Range].
+ * Controlled input means that its state is always equal [value].
  * If you need an uncontrolled behaviour, see [Input].
+ *
+ * @see [Input] for more details on controlled and uncontrolled modes.
  */
 @Composable
 @NonRestartableComposable
@@ -165,7 +198,10 @@ fun RangeInput(
 
 /**
  * It's a controlled Input of [InputType.Search].
+ * Controlled input means that its state is always equal [value].
  * If you need an uncontrolled behaviour, see [Input].
+ *
+ * @see [Input] for more details on controlled and uncontrolled modes.
  */
 @Composable
 @NonRestartableComposable
@@ -185,7 +221,10 @@ fun SubmitInput(attrs: InputAttrsBuilder<Unit>.() -> Unit = {}) {
 
 /**
  * It's a controlled Input of [InputType.Tel].
+ * Controlled input means that its state is always equal [value].
  * If you need an uncontrolled behaviour, see [Input].
+ *
+ * @see [Input] for more details on controlled and uncontrolled modes.
  */
 @Composable
 @NonRestartableComposable
@@ -195,7 +234,10 @@ fun TelInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = {
 
 /**
  * It's a controlled Input of [InputType.Text].
+ * Controlled input means that its state is always equal [value].
  * If you need an uncontrolled behaviour, see [Input].
+ *
+ * @see [Input] for more details on controlled and uncontrolled modes.
  */
 @Composable
 @NonRestartableComposable
@@ -205,7 +247,10 @@ fun TextInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = 
 
 /**
  * It's a controlled Input of [InputType.Time].
+ * Controlled input means that its state is always equal [value].
  * If you need an uncontrolled behaviour, see [Input].
+ *
+ * @see [Input] for more details on controlled and uncontrolled modes.
  */
 @Composable
 @NonRestartableComposable
@@ -215,7 +260,10 @@ fun TimeInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = 
 
 /**
  * It's a controlled Input of [InputType.Url].
+ * Controlled input means that its state is always equal [value].
  * If you need an uncontrolled behaviour, see [Input].
+ *
+ * @see [Input] for more details on controlled and uncontrolled modes.
  */
 @Composable
 @NonRestartableComposable
@@ -225,7 +273,10 @@ fun UrlInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = {
 
 /**
  * It's a controlled Input of [InputType.Week].
+ * Controlled input means that its state is always equal [value].
  * If you need an uncontrolled behaviour, see [Input].
+ *
+ * @see [Input] for more details on controlled and uncontrolled modes.
  */
 @Composable
 @NonRestartableComposable
