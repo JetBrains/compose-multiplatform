@@ -5,7 +5,7 @@ package org.jetbrains.compose.web.css.selectors
 import org.jetbrains.compose.web.css.LanguageCode
 
 sealed class Nth {
-    data class Functional(val a: Int? = null, val b: Int? = null) {
+    data class Functional(val a: Int? = null, val b: Int? = null) : Nth() {
         override fun toString(): String = when {
             a != null && b != null -> "${a}n+$b"
             a != null -> "${a}n"
