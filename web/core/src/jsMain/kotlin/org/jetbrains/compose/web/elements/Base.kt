@@ -68,12 +68,10 @@ fun <TElement : Element> TagElement(
             applyAttrs?.invoke(attrsBuilder)
 
             refEffect.effect = attrsBuilder.refEffect
-            val attrsCollected = attrsBuilder.collect()
-            val events = attrsBuilder.collectListeners()
 
             update {
-                set(attrsCollected, DomElementWrapper::updateAttrs)
-                set(events, DomElementWrapper::updateEventListeners)
+                set(attrsBuilder.collect(), DomElementWrapper::updateAttrs)
+                set(attrsBuilder.collectListeners(), DomElementWrapper::updateEventListeners)
                 set(attrsBuilder.propertyUpdates, DomElementWrapper::updateProperties)
                 set(attrsBuilder.styleBuilder, DomElementWrapper::updateStyleDeclarations)
             }
