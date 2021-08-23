@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.node.OwnedLayer
@@ -129,6 +130,7 @@ internal class ViewLayer(
         transformOrigin: TransformOrigin,
         shape: Shape,
         clip: Boolean,
+        renderEffect: RenderEffect?,
         layoutDirection: LayoutDirection,
         density: Density
     ) {
@@ -166,6 +168,9 @@ internal class ViewLayer(
             invalidateParentLayer()
         }
         matrixCache.invalidate()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ViewLayerVerificationHelper.setRenderEffect(this, renderEffect)
+        }
     }
 
     override fun isInLayer(position: Offset): Boolean {
@@ -367,5 +372,14 @@ internal class ViewLayer(
                 shouldUseDispatchDraw = true
             }
         }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.S)
+private object ViewLayerVerificationHelper {
+
+    @androidx.annotation.DoNotInline
+    fun setRenderEffect(view: View, target: RenderEffect?) {
+        view.setRenderEffect(target?.asAndroidRenderEffect())
     }
 }

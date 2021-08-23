@@ -128,11 +128,17 @@ package androidx.compose.ui.graphics {
     method public static androidx.compose.ui.graphics.Path asComposePath(android.graphics.Path);
   }
 
+  public final class AndroidRenderEffect_androidKt {
+    method public static androidx.compose.ui.graphics.RenderEffect asComposeRenderEffect(android.graphics.RenderEffect);
+  }
+
   public final class AndroidShader_androidKt {
   }
 
   public final class AndroidTileMode_androidKt {
+    method public static boolean isSupported(int);
     method public static android.graphics.Shader.TileMode toAndroidTileMode(int);
+    method public static int toComposeTileMode(android.graphics.Shader.TileMode);
   }
 
   public final class AndroidVertexMode_androidKt {
@@ -202,6 +208,11 @@ package androidx.compose.ui.graphics {
     property public final int SrcOut;
     property public final int SrcOver;
     property public final int Xor;
+  }
+
+  @androidx.compose.runtime.Immutable public final class BlurEffect extends androidx.compose.ui.graphics.RenderEffect {
+    ctor public BlurEffect(androidx.compose.ui.graphics.RenderEffect? renderEffect, float radiusX, float radiusY, int edgeTreatment);
+    method @RequiresApi(android.os.Build.VERSION_CODES.S) protected android.graphics.RenderEffect createRenderEffect();
   }
 
   @androidx.compose.runtime.Immutable public abstract sealed class Brush {
@@ -440,6 +451,11 @@ package androidx.compose.ui.graphics {
     method public static boolean isIdentity(float[]);
   }
 
+  @androidx.compose.runtime.Immutable public final class OffsetEffect extends androidx.compose.ui.graphics.RenderEffect {
+    ctor public OffsetEffect(androidx.compose.ui.graphics.RenderEffect? renderEffect, long offset);
+    method @RequiresApi(android.os.Build.VERSION_CODES.S) protected android.graphics.RenderEffect createRenderEffect();
+  }
+
   public abstract sealed class Outline {
     method public abstract androidx.compose.ui.geometry.Rect getBounds();
     property public abstract androidx.compose.ui.geometry.Rect bounds;
@@ -667,6 +683,17 @@ package androidx.compose.ui.graphics {
     method public static androidx.compose.ui.graphics.Shape getRectangleShape();
   }
 
+  @androidx.compose.runtime.Immutable public abstract sealed class RenderEffect {
+    method @RequiresApi(android.os.Build.VERSION_CODES.S) public final android.graphics.RenderEffect asAndroidRenderEffect();
+    method @RequiresApi(android.os.Build.VERSION_CODES.S) protected abstract android.graphics.RenderEffect createRenderEffect();
+    method public boolean isSupported();
+  }
+
+  public final class RenderEffectKt {
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.BlurEffect BlurEffect(float radiusX, float radiusY, optional int edgeTreatment);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.graphics.OffsetEffect OffsetEffect(float offsetX, float offsetY);
+  }
+
   @androidx.compose.runtime.Immutable public abstract class ShaderBrush extends androidx.compose.ui.graphics.Brush {
     ctor public ShaderBrush();
     method public final void applyTo(long size, androidx.compose.ui.graphics.Paint p, float alpha);
@@ -761,9 +788,11 @@ package androidx.compose.ui.graphics {
 
   public static final class TileMode.Companion {
     method public int getClamp();
+    method public int getDecal();
     method public int getMirror();
     method public int getRepeated();
     property public final int Clamp;
+    property public final int Decal;
     property public final int Mirror;
     property public final int Repeated;
   }
