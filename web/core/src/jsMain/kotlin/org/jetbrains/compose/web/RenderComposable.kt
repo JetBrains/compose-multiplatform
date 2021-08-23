@@ -3,6 +3,7 @@ package org.jetbrains.compose.web
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.ControlledComposition
+import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.DefaultMonotonicFrameClock
 import androidx.compose.runtime.Recomposer
 import org.jetbrains.compose.web.dom.DOMScope
@@ -23,11 +24,12 @@ import org.w3c.dom.get
  */
 fun <TElement : Element> renderComposable(
     root: TElement,
+    monotonicFrameClock: MonotonicFrameClock = DefaultMonotonicFrameClock,
     content: @Composable DOMScope<TElement>.() -> Unit
 ): Composition {
     GlobalSnapshotManager.ensureStarted()
 
-    val context = DefaultMonotonicFrameClock + JsMicrotasksDispatcher()
+    val context = monotonicFrameClock + JsMicrotasksDispatcher()
     val recomposer = Recomposer(context)
     val composition = ControlledComposition(
         applier = DomApplier(DomNodeWrapper(root)),

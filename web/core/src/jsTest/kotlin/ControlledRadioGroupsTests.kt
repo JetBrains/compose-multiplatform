@@ -29,21 +29,21 @@ class ControlledRadioGroupsTests {
         assertEquals(0, controlledRadioGroups.size)
 
         countOfRadio = 5
-        waitChanges()
+        waitForRecompositionComplete()
 
         assertEquals(1, controlledRadioGroups.size)
         assertTrue(controlledRadioGroups.keys.first() == "group1")
         assertEquals(5, controlledRadioGroups["group1"]!!.size)
 
         countOfRadio = 2
-        waitChanges()
+        waitForRecompositionComplete()
 
         assertEquals(1, controlledRadioGroups.size)
         assertTrue(controlledRadioGroups.keys.first() == "group1")
         assertEquals(2, controlledRadioGroups["group1"]!!.size)
 
         countOfRadio = 0
-        waitChanges()
+        waitForRecompositionComplete()
 
         assertEquals(0, controlledRadioGroups.size)
     }
@@ -81,27 +81,27 @@ class ControlledRadioGroupsTests {
 
         countOfRadioG1 = 5
         countOfRadioG2 = 10
-        waitChanges()
+        waitForRecompositionComplete()
 
         assertEquals(2, controlledRadioGroups.size)
         assertEquals(5, controlledRadioGroups["group1"]!!.size)
         assertEquals(10, controlledRadioGroups["group2"]!!.size)
 
         countOfRadioG2 = 2
-        waitChanges()
+        waitForRecompositionComplete()
 
         assertEquals(2, controlledRadioGroups.size)
         assertEquals(5, controlledRadioGroups["group1"]!!.size)
         assertEquals(2, controlledRadioGroups["group2"]!!.size)
 
         countOfRadioG1 = 0
-        waitChanges()
+        waitForRecompositionComplete()
 
         assertEquals(1, controlledRadioGroups.size)
         assertEquals(2, controlledRadioGroups["group2"]!!.size)
 
         countOfRadioG2 = 0
-        waitChanges()
+        waitForRecompositionComplete()
 
         assertEquals(0, controlledRadioGroups.size)
     }
