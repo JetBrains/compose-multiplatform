@@ -37,6 +37,7 @@ import androidx.compose.ui.demos.gestures.DoubleTapInTapDemo
 import androidx.compose.ui.demos.gestures.DragAndScaleGestureFilterDemo
 import androidx.compose.ui.demos.gestures.DragGestureFilterDemo
 import androidx.compose.ui.demos.gestures.DragSlopExceededGestureFilterDemo
+import androidx.compose.ui.demos.gestures.EventTypesDemo
 import androidx.compose.ui.demos.gestures.HorizontalScrollersInVerticalScrollersDemo
 import androidx.compose.ui.demos.gestures.LongPressDragGestureFilterDemo
 import androidx.compose.ui.demos.gestures.LongPressGestureDetectorDemo
@@ -77,7 +78,8 @@ private val GestureDemos = DemoCategory(
                 ComposableDemo("Drag") { DragGestureFilterDemo() },
                 ComposableDemo("Long Press Drag") { LongPressDragGestureFilterDemo() },
                 ComposableDemo("Scale") { ScaleGestureFilterDemo() },
-                ComposableDemo("Button/Meta State") { ButtonMetaStateDemo() }
+                ComposableDemo("Button/Meta State") { ButtonMetaStateDemo() },
+                ComposableDemo("Event Types") { EventTypesDemo() },
             )
         ),
         DemoCategory(

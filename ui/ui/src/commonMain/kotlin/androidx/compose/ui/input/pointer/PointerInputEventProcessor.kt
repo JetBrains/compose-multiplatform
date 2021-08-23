@@ -49,16 +49,19 @@ internal class PointerInputEventProcessor(val root: LayoutNode) {
      */
     fun process(
         pointerEvent: PointerInputEvent,
-        positionCalculator: PositionCalculator
+        positionCalculator: PositionCalculator,
+        isInBounds: Boolean = true
     ): ProcessResult {
 
         // Gets a new PointerInputChangeEvent with the PointerInputEvent.
         val internalPointerEvent =
             pointerInputChangeEventProducer.produce(pointerEvent, positionCalculator)
 
+        val isHover = !internalPointerEvent.changes.values.any { it.pressed || it.previousPressed }
+
         // Add new hit paths to the tracker due to down events.
         internalPointerEvent.changes.values.forEach { pointerInputChange ->
-            if (pointerInputChange.changedToDownIgnoreConsumed()) {
+            if (isHover || pointerInputChange.changedToDownIgnoreConsumed()) {
                 val isTouchEvent = pointerInputChange.type == PointerType.Touch
                 root.hitTest(pointerInputChange.position, hitResult, isTouchEvent)
                 if (hitResult.isNotEmpty()) {
@@ -73,16 +76,13 @@ internal class PointerInputEventProcessor(val root: LayoutNode) {
         hitPathTracker.removeDetachedPointerInputFilters()
 
         // Dispatch to PointerInputFilters
-        val dispatchedToSomething = hitPathTracker.dispatchChanges(internalPointerEvent)
+        val dispatchedToSomething = hitPathTracker.dispatchChanges(internalPointerEvent, isInBounds)
 
         var anyMovementConsumed = false
 
         // Remove hit paths from the tracker due to up events, and calculate if we have consumed
         // any movement
         internalPointerEvent.changes.values.forEach { pointerInputChange ->
-            if (pointerInputChange.changedToUpIgnoreConsumed()) {
-                hitPathTracker.removeHitPath(pointerInputChange.id)
-            }
             if (pointerInputChange.positionChangeConsumed()) {
                 anyMovementConsumed = true
             }
@@ -115,52 +115,54 @@ private class PointerInputChangeEventProducer {
     /**
      * Produces [InternalPointerEvent]s by tracking changes between [PointerInputEvent]s
      */
-    fun produce(pointerInputEvent: PointerInputEvent, positionCalculator: PositionCalculator):
-        InternalPointerEvent {
-            val changes: MutableMap<PointerId, PointerInputChange> =
-                // Set initial capacity to avoid resizing - we know the size the map will be.
-                LinkedHashMap(pointerInputEvent.pointers.size)
-            pointerInputEvent.pointers.fastForEach {
-                val previousTime: Long
-                val previousPosition: Offset
-                val previousDown: Boolean
+    fun produce(
+        pointerInputEvent: PointerInputEvent,
+        positionCalculator: PositionCalculator
+    ): InternalPointerEvent {
+        // Set initial capacity to avoid resizing - we know the size the map will be.
+        val changes: MutableMap<PointerId, PointerInputChange> =
+            LinkedHashMap(pointerInputEvent.pointers.size)
+        pointerInputEvent.pointers.fastForEach {
+            val previousTime: Long
+            val previousPosition: Offset
+            val previousDown: Boolean
 
-                val previousData = previousPointerInputData[it.id]
-                if (previousData == null) {
-                    previousTime = it.uptime
-                    previousPosition = it.position
-                    previousDown = false
-                } else {
-                    previousTime = previousData.uptime
-                    previousDown = previousData.down
-                    previousPosition =
-                        positionCalculator.screenToLocal(previousData.positionOnScreen)
-                }
-
-                changes[it.id] =
-                    PointerInputChange(
-                        it.id,
-                        it.uptime,
-                        it.position,
-                        it.down,
-                        previousTime,
-                        previousPosition,
-                        previousDown,
-                        ConsumedData(),
-                        it.type
-                    )
-                if (it.down) {
-                    previousPointerInputData[it.id] = PointerInputData(
-                        it.uptime,
-                        it.positionOnScreen,
-                        it.down
-                    )
-                } else {
-                    previousPointerInputData.remove(it.id)
-                }
+            val previousData = previousPointerInputData[it.id]
+            if (previousData == null) {
+                previousTime = it.uptime
+                previousPosition = it.position
+                previousDown = false
+            } else {
+                previousTime = previousData.uptime
+                previousDown = previousData.down
+                previousPosition =
+                    positionCalculator.screenToLocal(previousData.positionOnScreen)
             }
-            return InternalPointerEvent(changes, pointerInputEvent)
+
+            changes[it.id] =
+                PointerInputChange(
+                    it.id,
+                    it.uptime,
+                    it.position,
+                    it.down,
+                    previousTime,
+                    previousPosition,
+                    previousDown,
+                    ConsumedData(),
+                    it.type
+                )
+            if (it.down) {
+                previousPointerInputData[it.id] = PointerInputData(
+                    it.uptime,
+                    it.positionOnScreen,
+                    it.down
+                )
+            } else {
+                previousPointerInputData.remove(it.id)
+            }
         }
+        return InternalPointerEvent(changes, pointerInputEvent)
+    }
 
     /**
      * Clears all tracked information.

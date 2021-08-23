@@ -1749,12 +1749,11 @@ class AndroidAccessibilityTest {
             .fetchSemanticsNode("can't find node with tag $colTag")
         rule.runOnUiThread {
             val bounds = colSemanticsNode.replacedChildren[0].boundsInRoot
-            val hoverEnter = MotionEvent.obtain(
-                0 /* downTime */, 0 /* eventTime */,
-                ACTION_HOVER_ENTER, (bounds.left + bounds.right) / 2 /* x */,
-                (bounds.top + bounds.bottom) / 2/* y */, 0 /* metaState*/
+            val hoverEnter = createHoverMotionEvent(
+                action = ACTION_HOVER_ENTER,
+                x = (bounds.left + bounds.right) / 2f,
+                y = (bounds.top + bounds.bottom) / 2f
             )
-            hoverEnter.source = InputDevice.SOURCE_CLASS_POINTER
             assertTrue(androidComposeView.dispatchHoverEvent(hoverEnter))
             assertEquals(
                 AndroidComposeViewAccessibilityDelegateCompat.InvalidId,
@@ -1776,12 +1775,11 @@ class AndroidAccessibilityTest {
             .fetchSemanticsNode("can't find node with tag $textTag")
         rule.runOnUiThread {
             val bounds = textNode.boundsInRoot
-            val hoverEnter = MotionEvent.obtain(
-                0 /* downTime */, 0 /* eventTime */,
-                ACTION_HOVER_MOVE, (bounds.left + bounds.right) / 2 /* x */,
-                (bounds.top + bounds.bottom) / 2/* y */, 0 /* metaState*/
+            val hoverEnter = createHoverMotionEvent(
+                action = ACTION_HOVER_MOVE,
+                x = (bounds.left + bounds.right) / 2,
+                y = (bounds.top + bounds.bottom) / 2
             )
-            hoverEnter.source = InputDevice.SOURCE_CLASS_POINTER
             assertTrue(androidComposeView.dispatchHoverEvent(hoverEnter))
             assertEquals(
                 textNode.id,
@@ -1799,6 +1797,32 @@ class AndroidAccessibilityTest {
                 )
             )
         }
+    }
+
+    fun createHoverMotionEvent(action: Int, x: Float, y: Float): MotionEvent {
+        val pointerProperties = MotionEvent.PointerProperties().apply {
+            toolType = MotionEvent.TOOL_TYPE_FINGER
+        }
+        val pointerCoords = MotionEvent.PointerCoords().also {
+            it.x = x
+            it.y = y
+        }
+        return MotionEvent.obtain(
+            0L /* downTime */,
+            0L /* eventTime */,
+            action,
+            1 /* pointerCount */,
+            arrayOf(pointerProperties),
+            arrayOf(pointerCoords),
+            0 /* metaState */,
+            0 /* buttonState */,
+            0f /* xPrecision */,
+            0f /* yPrecision */,
+            0 /* deviceId */,
+            0 /* edgeFlags */,
+            InputDevice.SOURCE_TOUCHSCREEN,
+            0 /* flags */
+        )
     }
 
     @Test
