@@ -4,9 +4,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import org.jetbrains.compose.web.attributes.*
+import org.jetbrains.compose.web.core.tests.asHtmlElement
 import org.jetbrains.compose.web.core.tests.runTest
 import org.jetbrains.compose.web.core.tests.waitForAnimationFrame
 import org.jetbrains.compose.web.dom.*
+import org.jetbrains.compose.web.renderComposable
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLTextAreaElement
 import kotlin.test.Test
@@ -405,9 +407,9 @@ class InputsGenerateCorrectHtmlTests {
     @Test
     fun textAreaWithAutoComplete() = runTest {
         composition {
-            TextArea({
+            TextArea(attrs = {
                 autoComplete(AutoComplete.email)
-            }, value = "")
+            })
         }
         assertEquals("""<textarea autocomplete="email"></textarea>""", root.innerHTML)
     }
@@ -502,5 +504,19 @@ class InputsGenerateCorrectHtmlTests {
         waitForAnimationFrame()
 
         assertEquals("text", (root.firstChild as HTMLTextAreaElement).value)
+    }
+
+    @Test
+    fun textAreaWithDefaultValueAndWithoutIt() {
+        val root = "div".asHtmlElement()
+
+        renderComposable(root = root) {
+            TextArea()
+            TextArea {
+                defaultValue("not-empty-default-value")
+            }
+        }
+
+        assertEquals("<textarea></textarea><textarea>not-empty-default-value</textarea>", root.innerHTML)
     }
 }

@@ -5,7 +5,9 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.openqa.selenium.By
+import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.WebDriver
+import org.openqa.selenium.WebElement
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.firefox.FirefoxDriver
@@ -82,5 +84,24 @@ abstract class BaseIntegrationTests() {
     companion object {
         @JvmStatic
         fun resolveDrivers() = Drivers.activatedDrivers
+    }
+
+    fun WebDriver.outerHtmlOfElementWithId(id: String): String {
+        val script = """
+             var callback = arguments[arguments.length - 1];
+             callback(document.getElementById("$id").outerHTML);
+        """.trimIndent()
+
+        return (this as JavascriptExecutor).executeAsyncScript(script).toString()
+    }
+
+    fun WebDriver.sendKeysForDateInput(input: WebElement, year: Int, month: Int, day: Int) {
+        val keys = when (this) {
+            is ChromeDriver -> "${day}${month}${year}"
+            is FirefoxDriver -> "${year}-${month}-${day}"
+            else -> ""
+        }
+
+        input.sendKeys(keys)
     }
 }
