@@ -1,0 +1,9 @@
+import androidx.build.AndroidXRootImplPlugin
+
+buildscript {
+    dependencies {
+        classpath(project.files("${project.rootProject.ext["outDir"]}/buildSrc/build/buildSrc.jar"))
+    }
+}
+
+apply plugin: AndroidXRootImplPlugin

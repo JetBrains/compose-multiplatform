@@ -19,9 +19,9 @@
 package androidx.build.testConfiguration
 
 import androidx.build.AndroidXExtension
-import androidx.build.AndroidXPlugin
-import androidx.build.AndroidXPlugin.Companion.ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK
-import androidx.build.AndroidXPlugin.Companion.ZIP_TEST_CONFIGS_WITH_APKS_TASK
+import androidx.build.AndroidXImplPlugin
+import androidx.build.AndroidXImplPlugin.Companion.ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK
+import androidx.build.AndroidXImplPlugin.Companion.ZIP_TEST_CONFIGS_WITH_APKS_TASK
 import androidx.build.asFilenamePrefix
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.getConstrainedTestConfigDirectory
@@ -70,7 +70,7 @@ fun Project.createTestConfigurationGenerationTask(
         )
     }
     val generateTestConfigurationTask = overrideProject.tasks.register(
-        "${AndroidXPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName",
+        "${AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName",
         GenerateTestConfigurationTask::class.java
     ) { task ->
         task.testFolder.set(artifacts.get(SingleArtifact.APK))
@@ -128,7 +128,7 @@ fun Project.addAppApkToTestConfigGeneration(overrideProject: Project = this) {
     extensions.getByType<ApplicationAndroidComponentsExtension>().apply {
         onVariants(selector().withBuildType("debug")) { appVariant ->
             overrideProject.tasks.named(
-                "${AndroidXPlugin.GENERATE_TEST_CONFIGURATION_TASK}${appVariant.name}AndroidTest"
+                "${AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK}${appVariant.name}AndroidTest"
             ) { configTask ->
                 configTask as GenerateTestConfigurationTask
                 configTask.appFolder.set(appVariant.artifacts.get(SingleArtifact.APK))
@@ -178,12 +178,12 @@ private fun getOrCreateMediaTestConfigTask(project: Project, isMedia2: Boolean):
         if (!parentProject.tasks.withType(GenerateMediaTestConfigurationTask::class.java)
             .names.contains(
                     "support-$mediaPrefix-test${
-                    AndroidXPlugin.GENERATE_TEST_CONFIGURATION_TASK
+                    AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK
                     }"
                 )
         ) {
             val task = parentProject.tasks.register(
-                "support-$mediaPrefix-test${AndroidXPlugin.GENERATE_TEST_CONFIGURATION_TASK}",
+                "support-$mediaPrefix-test${AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK}",
                 GenerateMediaTestConfigurationTask::class.java
             ) { task ->
                 AffectedModuleDetector.configureTaskGuard(task)
@@ -204,7 +204,7 @@ private fun getOrCreateMediaTestConfigTask(project: Project, isMedia2: Boolean):
             return parentProject.tasks.withType(GenerateMediaTestConfigurationTask::class.java)
                 .named(
                     "support-$mediaPrefix-test${
-                    AndroidXPlugin.GENERATE_TEST_CONFIGURATION_TASK
+                    AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK
                     }"
                 )
         }
@@ -295,12 +295,12 @@ private fun Project.getOrCreateMacrobenchmarkConfigTask(variantName: String):
             parentProject.tasks.withType(GenerateTestConfigurationTask::class.java).isEmpty()
         ) {
             parentProject.tasks.register(
-                "${AndroidXPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName",
+                "${AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName",
                 GenerateTestConfigurationTask::class.java
             )
         } else {
             parentProject.tasks.withType(GenerateTestConfigurationTask::class.java)
-                .named("${AndroidXPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName")
+                .named("${AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName")
         }
     }
 

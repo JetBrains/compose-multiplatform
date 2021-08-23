@@ -16,7 +16,7 @@
 
 package androidx.build.resources
 
-import androidx.build.AndroidXPlugin.Companion.TASK_GROUP_API
+import androidx.build.AndroidXImplPlugin.Companion.TASK_GROUP_API
 import androidx.build.addToBuildOnServer
 import androidx.build.addToCheckTask
 import androidx.build.checkapi.ApiLocation

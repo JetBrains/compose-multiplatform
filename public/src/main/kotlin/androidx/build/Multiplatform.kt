@@ -16,18 +16,25 @@
 
 package androidx.build
 
-import org.gradle.api.Plugin
+import androidx.build.COMPOSE_MPP_ENABLED
+import androidx.build.AndroidXExtension
 import org.gradle.api.Project
 
 /**
- * This plugin needs to be applied to the root of an AndroidX build
- *
- * The actual implementation is in AndroidXRootImplPlugin.
- * This extracts this logic out of the classpath so that individual tasks can't access this logic
- * so Gradle can know that changes to this logic doesn't need to automatically invalidate every task
+ * Setting this property enables multiplatform builds of Compose
  */
-abstract class AndroidXRootPlugin : Plugin<Project> {
-    override fun apply(project: Project) {
-        project.apply(mapOf<String, String>("from" to "${project.getSupportRootFolder()}/buildSrc/apply/applyAndroidXRootImplPlugin.gradle"))
+const val COMPOSE_MPP_ENABLED = "androidx.compose.multiplatformEnabled"
+
+class Multiplatform {
+    companion object {
+        @JvmStatic
+        fun Project.isMultiplatformEnabled(): Boolean {
+            return properties.get(COMPOSE_MPP_ENABLED)?.toString()?.toBoolean()
+                ?: androidxExtension()?.multiplatform ?: false
+        }
+
+        private fun Project.androidxExtension(): AndroidXExtension? {
+            return extensions.findByType(AndroidXExtension::class.java)
+        }
     }
 }

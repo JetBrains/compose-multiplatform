@@ -1,0 +1,9 @@
+import androidx.build.AndroidXImplPlugin
+
+buildscript {
+    dependencies {
+        classpath(project.files("${project.rootProject.ext["outDir"]}/buildSrc/build/buildSrc.jar"))
+    }
+}
+
+apply plugin: AndroidXImplPlugin

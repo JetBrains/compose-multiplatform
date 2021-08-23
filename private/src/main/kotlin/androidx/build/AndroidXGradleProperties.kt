@@ -16,6 +16,7 @@
 
 package androidx.build
 
+import androidx.build.COMPOSE_MPP_ENABLED
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -47,11 +48,6 @@ const val ALTERNATIVE_PROJECT_URL = "androidx.alternativeProjectUrl"
  * (version is in format major.minor.patch-extra)
  */
 const val VERSION_EXTRA_CHECK_ENABLED = "androidx.versionExtraCheckEnabled"
-
-/**
- * Setting this property enables multiplatform builds of Compose
- */
-const val COMPOSE_MPP_ENABLED = "androidx.compose.multiplatformEnabled"
 
 /**
  * Returns whether the project should generate documentation.
