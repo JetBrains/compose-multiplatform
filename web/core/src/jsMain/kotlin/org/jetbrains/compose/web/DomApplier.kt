@@ -90,17 +90,18 @@ internal open class DomNodeWrapper(open val node: Node) {
 
 
 internal class DomElementWrapper(override val node: HTMLElement): DomNodeWrapper(node) {
-    private var currentAttrs: Map<String, String>? = null
 
     fun updateAttrs(attrs: Map<String, String>) {
-        currentAttrs?.forEach {
-            node.removeAttribute(it.key)
+        attrs.forEach { (name, value) ->
+            node.setAttribute(name, value)
         }
 
-        attrs.forEach {
-            node.setAttribute(it.key, it.value)
+        node.getAttributeNames().forEach { name ->
+            if (name == "style") return
+            if (!attrs.containsKey(name)) {
+                node.removeAttribute(name)
+            }
         }
-        currentAttrs = attrs
     }
 
     fun updateProperties(list: List<Pair<(Element, Any) -> Unit, Any>>) {
