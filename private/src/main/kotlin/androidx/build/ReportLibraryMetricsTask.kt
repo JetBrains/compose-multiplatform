@@ -100,7 +100,7 @@ abstract class ReportLibraryMetricsTask : DefaultTask() {
 
 fun Project.configureReportLibraryMetricsTask(): TaskProvider<ReportLibraryMetricsTask> {
     val task = tasks.register(
-        AndroidXPlugin.REPORT_LIBRARY_METRICS_TASK,
+        AndroidXImplPlugin.REPORT_LIBRARY_METRICS_TASK,
         ReportLibraryMetricsTask::class.java
     )
     task.configure {
