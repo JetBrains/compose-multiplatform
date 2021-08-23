@@ -18,9 +18,8 @@ import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import androidx.build.LibraryVersions
 import androidx.build.RunApiTasks
+import androidx.build.BuildOnServerKt
 import androidx.build.SupportConfigKt
-
-import static androidx.build.AndroidXPlugin.BUILD_ON_SERVER_TASK
 
 plugins {
     id("AndroidXPlugin")
@@ -129,7 +128,4 @@ afterEvaluate {
     }
 }
 
-def projectPath = project.path
-rootProject.tasks.named(BUILD_ON_SERVER_TASK).configure {
-    dependsOn("$projectPath:jvmJar")
-}
+BuildOnServerKt.addToBuildOnServer(project, "${project.path}:jvmJar")
