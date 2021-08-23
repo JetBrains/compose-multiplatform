@@ -178,7 +178,7 @@ fun Modifier.draggable(
     onDragStopped: suspend CoroutineScope.(velocity: Float) -> Unit = {},
     reverseDirection: Boolean = false
 ): Modifier = draggable(
-    state = state,
+    stateFactory = { remember(state) { IgnorePointerDraggableState(state) } },
     orientation = orientation,
     enabled = enabled,
     interactionSource = interactionSource,
@@ -190,7 +190,7 @@ fun Modifier.draggable(
 )
 
 internal fun Modifier.draggable(
-    state: DraggableState,
+    stateFactory: @Composable () -> PointerAwareDraggableState,
     canDrag: (PointerInputChange) -> Boolean,
     orientation: Orientation,
     enabled: Boolean = true,
@@ -210,9 +210,10 @@ internal fun Modifier.draggable(
         properties["startDragImmediately"] = startDragImmediately
         properties["onDragStarted"] = onDragStarted
         properties["onDragStopped"] = onDragStopped
-        properties["state"] = state
+        properties["stateFactory"] = stateFactory
     }
 ) {
+    val state = stateFactory.invoke()
     val draggedInteraction = remember { mutableStateOf<DragInteraction.Start?>(null) }
     DisposableEffect(interactionSource) {
         onDispose {
@@ -236,7 +237,9 @@ internal fun Modifier.draggable(
             try {
                 state.drag(MutatePriority.UserInput) {
                     while (event !is DragStopped && event !is DragCancelled) {
-                        (event as? DragDelta)?.let { dragBy(it.delta) }
+                        (event as? DragDelta)?.let {
+                            dragBy(it.delta, it.pointerPosition)
+                        }
                         event = channel.receive()
                     }
                 }
@@ -330,13 +333,23 @@ private suspend fun AwaitPointerEventScope.awaitDrag(
         sign(startEvent.position.toFloat(orientation))
     channel.trySend(DragStarted(adjustedStart))
 
-    channel.trySend(DragDelta(if (reverseDirection) initialDelta * -1 else initialDelta))
+    channel.trySend(
+        DragDelta(
+            if (reverseDirection) initialDelta * -1 else initialDelta,
+            adjustedStart
+        )
+    )
 
     val dragTick: (PointerInputChange) -> Unit = { event: PointerInputChange ->
         velocityTracker.addPosition(event.uptimeMillis, event.position)
         val delta = event.positionChange().toFloat(orientation)
         event.consumePositionChange()
-        channel.trySend(DragDelta(if (reverseDirection) delta * -1 else delta))
+        channel.trySend(
+            DragDelta(
+                if (reverseDirection) delta * -1 else delta,
+                event.position
+            )
+        )
     }
     return if (orientation == Orientation.Vertical) {
         verticalDrag(startEvent.id, dragTick)
@@ -403,7 +416,7 @@ private sealed class DragEvent {
     class DragStarted(val startPoint: Offset) : DragEvent()
     class DragStopped(val velocity: Float) : DragEvent()
     object DragCancelled : DragEvent()
-    class DragDelta(val delta: Float) : DragEvent()
+    class DragDelta(val delta: Float, val pointerPosition: Offset) : DragEvent()
 }
 
 private fun Float.toOffset(orientation: Orientation) =
@@ -414,3 +427,39 @@ private fun Offset.toFloat(orientation: Orientation) =
 
 private fun Velocity.toFloat(orientation: Orientation) =
     if (orientation == Orientation.Vertical) this.y else this.x
+
+internal interface PointerAwareDragScope {
+    fun dragBy(pixels: Float, pointerPosition: Offset): Unit
+}
+
+internal interface PointerAwareDraggableState {
+    suspend fun drag(
+        dragPriority: MutatePriority = MutatePriority.Default,
+        block: suspend PointerAwareDragScope.() -> Unit
+    )
+
+    fun dispatchRawDelta(delta: Float)
+}
+
+private class IgnorePointerDraggableState(val origin: DraggableState) :
+    PointerAwareDraggableState, PointerAwareDragScope {
+    var latestConsumptionScope: DragScope? = null
+
+    override fun dragBy(pixels: Float, pointerPosition: Offset) {
+        latestConsumptionScope?.dragBy(pixels)
+    }
+
+    override suspend fun drag(
+        dragPriority: MutatePriority,
+        block: suspend PointerAwareDragScope.() -> Unit
+    ) {
+        origin.drag(dragPriority) {
+            latestConsumptionScope = this
+            block()
+        }
+    }
+
+    override fun dispatchRawDelta(delta: Float) {
+        origin.dispatchRawDelta(delta)
+    }
+}

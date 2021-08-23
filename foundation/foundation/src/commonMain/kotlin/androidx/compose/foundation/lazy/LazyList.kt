@@ -20,6 +20,8 @@ import androidx.compose.foundation.assertNotNestingScrollableContainers
 import androidx.compose.foundation.clipScrollableContainer
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.OverScrollController
+import androidx.compose.foundation.gestures.rememberOverScrollController
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -32,6 +34,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.SubcomposeLayoutState
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -73,6 +77,8 @@ internal fun LazyList(
     val subcomposeLayoutState = remember { SubcomposeLayoutState(MaxItemsToRetainForReuse) }
     LazyListPrefetcher(state, stateOfItemsProvider, itemContentFactory, subcomposeLayoutState)
 
+    val overScrollController = rememberOverScrollController()
+
     SubcomposeLayout(
         subcomposeLayoutState,
         modifier
@@ -87,7 +93,8 @@ internal fun LazyList(
                 reverseDirection = reverseScrollDirection,
                 interactionSource = state.internalInteractionSource,
                 flingBehavior = flingBehavior,
-                state = state
+                state = state,
+                overScrollController = overScrollController
             )
             .clipScrollableContainer(isVertical)
             .padding(contentPadding)
@@ -170,6 +177,8 @@ internal fun LazyList(
 
         state.applyMeasureResult(measureResult)
 
+        refreshOverScrollInfo(overScrollController, measureResult, contentPadding)
+
         state.onPostMeasureListener?.apply {
             onPostMeasure(itemProvider.childConstraints, measureResult)
         }
@@ -195,3 +204,29 @@ internal expect fun LazyListPrefetcher(
     itemContentFactory: LazyListItemContentFactory,
     subcomposeLayoutState: SubcomposeLayoutState
 )
+
+private fun IntrinsicMeasureScope.refreshOverScrollInfo(
+    overScrollController: OverScrollController,
+    result: LazyListMeasureResult,
+    contentPadding: PaddingValues
+) {
+    val verticalPadding =
+        contentPadding.calculateTopPadding() +
+            contentPadding.calculateBottomPadding()
+
+    val horizontalPadding =
+        contentPadding.calculateLeftPadding(layoutDirection) +
+            contentPadding.calculateRightPadding(layoutDirection)
+
+    val canScrollForward = result.canScrollForward
+    val canScrollBackward = (result.firstVisibleItem?.index ?: 0) != 0 ||
+        result.firstVisibleItemScrollOffset != 0
+
+    overScrollController.refreshContainerInfo(
+        Size(
+            result.layoutWidth.toFloat() + horizontalPadding.roundToPx(),
+            result.layoutHeight.toFloat() + verticalPadding.roundToPx()
+        ),
+        canScrollForward || canScrollBackward
+    )
+}
