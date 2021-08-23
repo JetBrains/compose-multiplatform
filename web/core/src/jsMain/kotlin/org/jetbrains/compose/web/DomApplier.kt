@@ -103,11 +103,11 @@ internal class DomElementWrapper(override val node: HTMLElement): DomNodeWrapper
         currentAttrs = attrs
     }
 
-    fun updateProperties(list: List<Pair<(Element, Any) -> Unit, Any>>) {
+    fun updateProperties(propertyAppliers: List<Pair<(Element, Any) -> Unit, Any>>) {
         if (node.className.isNotEmpty()) node.className = ""
 
-        list.forEach {
-            it.first(node, it.second)
+        propertyAppliers.forEach { (propertyApplier, value) ->
+            propertyApplier(node, value)
         }
     }
 
