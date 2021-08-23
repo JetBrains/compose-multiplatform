@@ -20,7 +20,7 @@ import org.w3c.dom.HTMLElement
 @OptIn(ComposeCompilerApi::class)
 @Composable
 @ExplicitGroupsComposable
-inline fun <TScope, T, reified E : Applier<*>> ComposeDomNode(
+private inline fun <TScope, T, reified E : Applier<*>> ComposeDomNode(
     noinline factory: () -> T,
     elementScope: TScope,
     noinline attrsSkippableUpdate: @Composable SkippableUpdater<T>.() -> Unit,
