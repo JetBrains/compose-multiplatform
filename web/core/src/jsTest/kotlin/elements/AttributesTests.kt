@@ -170,7 +170,7 @@ class AttributesTests {
         assertEquals(null, btn.getAttribute("disabled"))
 
         disabled = true
-        waitChanges()
+        waitForChanges()
 
         assertEquals("", btn.getAttribute("disabled"))
     }
@@ -211,7 +211,7 @@ class AttributesTests {
         )
 
         addClassD.value = false
-        waitChanges()
+        waitForChanges()
 
         assertEquals(
             expected = "c a b",
@@ -239,7 +239,7 @@ class AttributesTests {
 
         flag = false
 
-        waitChanges()
+        waitForChanges()
         assertEquals("<div b=\"pp\" c=\"cc\"></div>", root.innerHTML)
     }
 
@@ -263,7 +263,7 @@ class AttributesTests {
         assertEquals("<div>Text set using ref {}</div>", root.innerHTML)
 
         flag = false
-        waitChanges()
+        waitForChanges()
 
         assertEquals("", root.innerHTML)
     }
@@ -290,7 +290,7 @@ class AttributesTests {
         assertEquals(false, disposed)
 
         flag = false
-        waitChanges()
+        waitForChanges()
 
         assertEquals("", root.innerHTML)
         assertEquals(true, disposed)
@@ -325,7 +325,7 @@ class AttributesTests {
         assertEquals(0, refDisposeCounter)
 
         counter++
-        waitChanges()
+        waitForChanges()
 
         assertEquals("2<div></div>", root.innerHTML)
         assertEquals(1, refInitCounter)
@@ -351,7 +351,7 @@ class AttributesTests {
         assertEquals("""<button style="color: red;">Button</button>""", root.innerHTML)
 
         hasValue = true
-        waitForAnimationFrame()
+        waitForRecompositionComplete()
 
         assertEquals("""<button style="color: red;" value="buttonValue">Button</button>""", root.innerHTML)
     }

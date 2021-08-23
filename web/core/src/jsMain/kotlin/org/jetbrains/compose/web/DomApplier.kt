@@ -6,10 +6,7 @@ import org.jetbrains.compose.web.css.StyleHolder
 import org.jetbrains.compose.web.dom.setProperty
 import org.jetbrains.compose.web.dom.setVariable
 import kotlinx.dom.clear
-import org.w3c.dom.Element
-import org.w3c.dom.HTMLElement
-import org.w3c.dom.Node
-import org.w3c.dom.get
+import org.w3c.dom.*
 
 internal class DomApplier(
     root: DomNodeWrapper
@@ -109,7 +106,9 @@ internal class DomElementWrapper(override val node: HTMLElement): DomNodeWrapper
     fun updateProperties(list: List<Pair<(Element, Any) -> Unit, Any>>) {
         if (node.className.isNotEmpty()) node.className = ""
 
-        list.forEach { it.first(node, it.second) }
+        list.forEach {
+            it.first(node, it.second)
+        }
     }
 
     fun updateStyleDeclarations(style: StyleHolder?) {

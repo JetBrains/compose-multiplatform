@@ -62,7 +62,7 @@ class DomSideEffectTests {
 
         i = 1
 
-        waitChanges()
+        waitForChanges()
         assertEquals(
             expected = 1,
             actual = disposeCalls.size,
@@ -102,7 +102,7 @@ class DomSideEffectTests {
 
         showDiv = false
 
-        waitChanges()
+        waitForChanges()
         assertEquals(1, onDisposeCalledTimes)
         assertEquals(expected = "<div></div>", actual = root.outerHTML)
     }
@@ -123,7 +123,7 @@ class DomSideEffectTests {
                 }
                 DisposableRefEffect(key) {
                     effectsList.add("DisposableRefEffect")
-                    onDispose {  }
+                    onDispose { }
                 }
             }
         }
@@ -135,7 +135,7 @@ class DomSideEffectTests {
         key = 2
         recomposeScope?.invalidate()
 
-        waitForAnimationFrame()
+        waitForRecompositionComplete()
 
         assertEquals(4, effectsList.size)
         assertEquals("DisposableRefEffect", effectsList[0])

@@ -38,7 +38,7 @@ class InlineStyleTests {
         )
 
         isRed = false
-        waitChanges()
+        waitForChanges()
 
         assertEquals(
             expected = "<span style=\"color: green;\">text</span>",
@@ -69,7 +69,7 @@ class InlineStyleTests {
         )
 
         isRed = true
-        waitChanges()
+        waitForChanges()
 
         assertEquals(
             expected = "<span style=\"color: red;\">text</span>",
@@ -100,7 +100,7 @@ class InlineStyleTests {
         )
 
         isRed = false
-        waitChanges()
+        waitForChanges()
 
         assertEquals(
             expected = "<span>text</span>",
@@ -132,7 +132,7 @@ class InlineStyleTests {
 
         repeat(4) {
             isRed = !isRed
-            waitChanges()
+            waitForChanges()
 
             val expected = if (isRed) {
                 "<span style=\"color: red;\">text</span>"

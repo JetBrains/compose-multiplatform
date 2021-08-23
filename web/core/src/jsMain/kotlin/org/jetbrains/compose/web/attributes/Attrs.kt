@@ -1,5 +1,6 @@
 package org.jetbrains.compose.web.attributes
 
+import org.jetbrains.compose.web.attributes.builders.saveControlledInputState
 import org.jetbrains.compose.web.events.SyntheticSubmitEvent
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLButtonElement
@@ -127,9 +128,6 @@ fun AttrsBuilder<HTMLInputElement>.autoFocus() =
 fun AttrsBuilder<HTMLInputElement>.capture(value: String) =
     attr("capture", value) // type: file only
 
-fun AttrsBuilder<HTMLInputElement>.checked() =
-    attr("checked", "") // radio, checkbox
-
 fun AttrsBuilder<HTMLInputElement>.dirName(value: String) =
     attr("dirname", value) // text, search
 
@@ -201,14 +199,6 @@ fun AttrsBuilder<HTMLInputElement>.src(value: String) =
 
 fun AttrsBuilder<HTMLInputElement>.step(value: Number) =
     attr("step", value.toString()) // numeric types only
-
-fun AttrsBuilder<HTMLInputElement>.valueAttr(value: String) =
-    attr("value", value)
-
-fun AttrsBuilder<HTMLInputElement>.value(value: String): AttrsBuilder<HTMLInputElement> {
-    prop(setInputValue, value)
-    return this
-}
 
 /* Option attributes */
 
@@ -299,11 +289,6 @@ fun AttrsBuilder<HTMLTextAreaElement>.rows(value: Int) =
 fun AttrsBuilder<HTMLTextAreaElement>.wrap(value: TextAreaWrap) =
     attr("wrap", value.str)
 
-fun AttrsBuilder<HTMLTextAreaElement>.value(value: String): AttrsBuilder<HTMLTextAreaElement> {
-    prop(setInputValue, value)
-    return this
-}
-
 /* Img attributes */
 
 fun AttrsBuilder<HTMLImageElement>.src(value: String): AttrsBuilder<HTMLImageElement> =
@@ -312,8 +297,19 @@ fun AttrsBuilder<HTMLImageElement>.src(value: String): AttrsBuilder<HTMLImageEle
 fun AttrsBuilder<HTMLImageElement>.alt(value: String): AttrsBuilder<HTMLImageElement> =
     attr("alt", value)
 
-private val setInputValue: (HTMLInputElement, String) -> Unit = { e, v ->
+
+internal val setInputValue: (HTMLInputElement, String) -> Unit = { e, v ->
     e.value = v
+    saveControlledInputState(e, v)
+}
+
+internal val setTextAreaDefaultValue: (HTMLTextAreaElement, String) -> Unit = { e, v ->
+    e.innerText = v
+}
+
+internal val setCheckedValue: (HTMLInputElement, Boolean) -> Unit = { e, v ->
+    e.checked = v
+    saveControlledInputState(e, v)
 }
 
 /* Img attributes */

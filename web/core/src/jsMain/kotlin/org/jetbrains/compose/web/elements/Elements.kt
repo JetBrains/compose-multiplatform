@@ -2,13 +2,13 @@ package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
-import org.jetbrains.compose.web.attributes.builders.InputAttrsBuilder
+import androidx.compose.runtime.remember
 import androidx.compose.web.attributes.SelectAttrsBuilder
-import org.jetbrains.compose.web.attributes.builders.TextAreaAttrsBuilder
 import org.jetbrains.compose.web.DomApplier
 import org.jetbrains.compose.web.DomNodeWrapper
 import kotlinx.browser.document
 import org.jetbrains.compose.web.attributes.*
+import org.jetbrains.compose.web.attributes.builders.*
 import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.StyleSheetBuilder
 import org.jetbrains.compose.web.css.StyleSheetBuilderImpl
@@ -650,22 +650,51 @@ fun Section(
     content = content
 )
 
+/**
+ * Adds <textarea> element.
+ * Same as [Input], [TextArea] has two modes: controlled and uncontrolled.
+ *
+ * Controlled mode means that <textarea> value can be changed only by passing a different [value].
+ * Uncontrolled mode means that <textarea> uses its default state management.
+ *
+ * To use controlled mode, simply pass non-null [value].
+ * By default [value] is null and [TextArea] will be in uncontrolled mode.
+ *
+ * Use `defaultValue("some default text")` in uncontrolled mode to set a default text if needed:
+ *
+ * ```
+ * TextArea {
+ *      defaultValue("Some Default Text")
+ * }
+ * ```
+ */
 @Composable
 fun TextArea(
-    attrs: (TextAreaAttrsBuilder.() -> Unit)? = null,
-    value: String
-) = TagElement(
-    elementBuilder = TextArea,
-    applyAttrs = {
-        val  taab = TextAreaAttrsBuilder()
-        if (attrs != null) {
-            taab.attrs()
-        }
-        taab.value(value)
-        this.copyFrom(taab)
-    }
+    value: String? = null,
+    attrs: (TextAreaAttrsBuilder.() -> Unit)? = null
 ) {
-    Text(value)
+    // if firstProvidedValueWasNotNull then TextArea behaves as controlled input
+    val firstProvidedValueWasNotNull = remember { value != null }
+
+    TagElement(
+        elementBuilder = TextArea,
+        applyAttrs = {
+            val  taab = TextAreaAttrsBuilder()
+            if (attrs != null) {
+                taab.attrs()
+            }
+            if (firstProvidedValueWasNotNull) {
+                taab.value(value ?: "")
+            }
+
+            taab.onInput {
+                restoreControlledTextAreaState(it.target)
+            }
+
+            this.copyFrom(taab)
+        },
+        content = null
+    )
 }
 
 @Composable
@@ -921,6 +950,37 @@ fun Style(
     Style(applyAttrs, builder.cssRules)
 }
 
+/**
+ * Adds <input> element of [type].
+ *
+ * Input has two modes: controlled and uncontrolled.
+ * Uncontrolled is a default mode. The input's state is managed by [HTMLInputElement] itself.
+ * Controlled mode means that the input's state is managed by compose state.
+ * To use Input in controlled mode, it's required to set its state by calling `value(String|Number)`.
+ *
+ * Consider using [TextInput], [CheckboxInput], [RadioInput], [NumberInput] etc. to use controlled mode.
+ *
+ * Code example of a controlled Input:
+ * ```
+ * val textInputState by remember { mutableStateOf("initial text") }
+ *
+ * Input(type = InputType.Text) {
+ *      value(textInputState)
+ *      onInput { event ->
+ *          textInputState = event.value // without updating the state, the <input> will keep showing an old value
+ *      }
+ * }
+ * ```
+ *
+ * Code example of an uncontrolled Input:
+ * ```
+ * Input(type = InputType.Text) {
+ *      defaultValue("someDefaultValue") // calling `defaultValue` is optional
+ *      // No value set explicitly.
+ *      // Whatever typed into the input will be immediately displayed in UI without handling any onInput events.
+ * }
+ * ```
+ */
 @Composable
 fun <K> Input(
     type: InputType<K>,
@@ -932,21 +992,22 @@ fun <K> Input(
             val inputAttrsBuilder = InputAttrsBuilder(type)
             inputAttrsBuilder.type(type)
             inputAttrsBuilder.attrs()
+
+            inputAttrsBuilder.onInput {
+                restoreControlledInputState(type = type, inputElement = it.target)
+            }
+
             this.copyFrom(inputAttrsBuilder)
         },
-        content = null
+        content = {
+            if (type == InputType.Radio) {
+                DisposeRadioGroupEffect()
+            }
+        }
     )
 }
 
 @Composable
 fun <K> Input(type: InputType<K>) {
-    TagElement(
-        elementBuilder = Input,
-        applyAttrs = {
-            val inputAttrsBuilder = InputAttrsBuilder(type)
-            inputAttrsBuilder.type(type)
-            this.copyFrom(inputAttrsBuilder)
-        },
-        content = null
-    )
+    Input(type) {}
 }

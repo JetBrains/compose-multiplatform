@@ -81,11 +81,10 @@ class EventTests {
 
         composition {
             TextArea(
-                {
-                    onInput { handled = true }
-                },
                 value = ""
-            )
+            ) {
+                onInput { handled = true }
+            }
         }
 
         val radio = root.firstChild as HTMLTextAreaElement
