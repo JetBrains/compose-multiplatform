@@ -25,7 +25,7 @@ import kotlin.test.assertNotEquals
 
 class CompoundHashKeyTests {
     @Test // b/157905524
-    @IgnoreJsTarget
+    //@IgnoreJsTarget
     fun testWithSubCompose() = compositionTest {
         val outerKeys = mutableListOf<Int>()
         val innerKeys = mutableListOf<Int>()
