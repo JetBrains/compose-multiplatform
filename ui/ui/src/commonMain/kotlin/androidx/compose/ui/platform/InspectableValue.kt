@@ -137,8 +137,8 @@ inline fun debugInspectorInfo(
  */
 inline fun Modifier.inspectable(
     noinline inspectorInfo: InspectorInfo.() -> Unit,
-    wrapped: Modifier.() -> Modifier
-): Modifier = inspectableWrapper(inspectorInfo, wrapped())
+    factory: Modifier.() -> Modifier
+): Modifier = inspectableWrapper(inspectorInfo, factory(Modifier))
 
 /**
  * Do not use this explicitly. Instead use [Modifier.inspectable].
