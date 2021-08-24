@@ -340,34 +340,30 @@ class AttributesTests {
 
         composition {
             Button(attrs = {
+                classes("a")
                 style {
                     color(Color.red)
                 }
-                if (hasValue) value("buttonValue")
+                if (hasValue) {
+                    classes("b")
+                    value("buttonValue")
+                }
             }) {
                 Text("Button")
             }
         }
 
         assertEquals(
-            expected = "color: red;",
-            actual = (root.firstChild as HTMLButtonElement).getAttribute("style")
-        )
-        assertEquals(
-            expected = null,
-            actual = (root.firstChild as HTMLButtonElement).getAttribute("value")
+            expected = "<button class=\"a\" style=\"color: red;\">Button</button>",
+            actual = nextChild().outerHTML
         )
 
         hasValue = true
         waitForRecompositionComplete()
 
         assertEquals(
-            expected = "color: red;",
-            actual = (root.firstChild as HTMLButtonElement).getAttribute("style")
-        )
-        assertEquals(
-            expected = "buttonValue",
-            actual = (root.firstChild as HTMLButtonElement).getAttribute("value")
+            expected = "<button class=\"a b\" style=\"color: red;\" value=\"buttonValue\">Button</button>",
+            actual = currentChild().outerHTML
         )
     }
 }
