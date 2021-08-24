@@ -52,7 +52,10 @@ import androidx.compose.ui.platform.debugInspectorInfo
  * When the size of the [Row] is larger than the sum of its children sizes, a
  * [horizontalArrangement] can be specified to define the positioning of the children inside
  * the [Row]. See [Arrangement] for available positioning behaviors; a custom arrangement can
- * also be defined using the constructor of [Arrangement].
+ * also be defined using the constructor of [Arrangement]. Below is an illustration of
+ * different horizontal arrangements:
+ *
+ * ![Row arrangements](https://developer.android.com/images/reference/androidx/compose/foundation/layout/row_arrangement_visualization.gif)
  *
  * Example usage:
  *
