@@ -4,14 +4,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import org.jetbrains.compose.web.attributes.*
-import org.jetbrains.compose.web.core.tests.asHtmlElement
-import org.jetbrains.compose.web.core.tests.runTest
 import org.jetbrains.compose.web.dom.*
 import org.jetbrains.compose.web.renderComposable
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLTextAreaElement
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import org.jetbrains.compose.web.testutils.*
 
 class InputsGenerateCorrectHtmlTests {
 

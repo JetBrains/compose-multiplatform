@@ -13,6 +13,7 @@ import org.w3c.dom.events.MouseEvent
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import org.jetbrains.compose.web.testutils.*
 
 class EventTests {
 

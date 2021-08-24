@@ -17,6 +17,7 @@ import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import org.jetbrains.compose.web.testutils.*
 
 class AttributesTests {
 
@@ -348,11 +349,25 @@ class AttributesTests {
             }
         }
 
-        assertEquals("""<button style="color: red;">Button</button>""", root.innerHTML)
+        assertEquals(
+            expected = "color: red;",
+            actual = (root.firstChild as HTMLButtonElement).getAttribute("style")
+        )
+        assertEquals(
+            expected = null,
+            actual = (root.firstChild as HTMLButtonElement).getAttribute("value")
+        )
 
         hasValue = true
         waitForRecompositionComplete()
 
-        assertEquals("""<button style="color: red;" value="buttonValue">Button</button>""", root.innerHTML)
+        assertEquals(
+            expected = "color: red;",
+            actual = (root.firstChild as HTMLButtonElement).getAttribute("style")
+        )
+        assertEquals(
+            expected = "buttonValue",
+            actual = (root.firstChild as HTMLButtonElement).getAttribute("value")
+        )
     }
 }

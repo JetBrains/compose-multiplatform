@@ -30,7 +30,7 @@ fun module(name: String, path: String) {
     if (!projectDir.exists()) {
         throw AssertionError("file $projectDir does not exist")
     }
-    project(name).projectDir = projectDir 
+    project(name).projectDir = projectDir
 }
 
 
@@ -39,6 +39,8 @@ module(":web-widgets", "widgets")
 module(":web-integration-core", "integration-core")
 module(":web-integration-widgets", "integration-widgets")
 module(":compose-compiler-integration", "compose-compiler-integration")
+module(":internal-web-core-runtime", "internal-web-core-runtime")
+module(":test-utils", "test-utils")
 
 if (extra["compose.web.tests.skip.benchmarks"]!!.toString().toBoolean() != true) {
     module(":web-benchmark-core", "benchmark-core")

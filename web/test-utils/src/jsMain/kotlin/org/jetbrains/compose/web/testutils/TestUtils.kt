@@ -1,17 +1,14 @@
-package org.jetbrains.compose.web.core.tests
+package org.jetbrains.compose.web.testutils
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MonotonicFrameClock
-import org.jetbrains.compose.web.renderComposable
+import androidx.compose.runtime.*
 import kotlinx.browser.document
 import kotlinx.browser.window
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.promise
 import kotlinx.dom.clear
+import org.jetbrains.compose.web.internal.runtime.*
 import org.w3c.dom.*
+import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlin.time.DurationUnit
@@ -23,6 +20,7 @@ import kotlin.time.toDuration
  * There is no need to create its instances manually.
  * @see [runTest]
  */
+@ComposeWebExperimentalTestsApi
 class TestScope : CoroutineScope by MainScope() {
 
     /**
@@ -31,7 +29,7 @@ class TestScope : CoroutineScope by MainScope() {
      */
     val root = "div".asHtmlElement()
 
-    private val recompositionCompleteEventsChannel = Channel<Unit>()
+    private var waitForRecompositionCompleteContinuation: Continuation<Unit>? = null
     private val childrenIterator = root.children.asList().listIterator()
 
     init {
@@ -39,26 +37,56 @@ class TestScope : CoroutineScope by MainScope() {
     }
 
     private fun onRecompositionComplete() {
-        launch {
-            recompositionCompleteEventsChannel.send(Unit)
-        }
+        waitForRecompositionCompleteContinuation?.resume(Unit)
+        waitForRecompositionCompleteContinuation = null
     }
 
     /**
      * Cleans up the [root] content.
      * Creates a new composition with a given Composable [content].
      */
+    @ComposeWebExperimentalTestsApi
     fun composition(content: @Composable () -> Unit) {
         root.clear()
 
-        renderComposable(
-            root = root,
-            monotonicFrameClock = TestMonotonicClockImpl(
-                onRecomposeComplete = this::onRecompositionComplete
-            )
-        ) {
+        renderTestComposable(root = root) {
             content()
         }
+    }
+
+    /**
+     * Use this method to test the composition mounted at [root]
+     *
+     * @param root - the [Element] that will be the root of the DOM tree managed by Compose
+     * @param content - the Composable lambda that defines the composition content
+     *
+     * @return the instance of the [Composition]
+     */
+    @OptIn(ComposeWebInternalApi::class)
+    @ComposeWebExperimentalTestsApi
+    fun <TElement : Element> renderTestComposable(
+        root: TElement,
+        content: @Composable () -> Unit
+    ): Composition {
+        GlobalSnapshotManager.ensureStarted()
+
+        val context = TestMonotonicClockImpl(
+            onRecomposeComplete = this::onRecompositionComplete
+        ) + JsMicrotasksDispatcher()
+
+        val recomposer = Recomposer(context)
+        val composition = ControlledComposition(
+            applier = DomApplier(DomNodeWrapper(root)),
+            parent = recomposer
+        )
+        composition.setContent @Composable {
+            content()
+        }
+
+        CoroutineScope(context).launch(start = CoroutineStart.UNDISPATCHED) {
+            recomposer.runRecomposeAndApplyChanges()
+        }
+        return composition
     }
 
     /**
@@ -104,7 +132,9 @@ class TestScope : CoroutineScope by MainScope() {
      * Suspends until recomposition completes.
      */
     suspend fun waitForRecompositionComplete() {
-        recompositionCompleteEventsChannel.receive()
+        suspendCoroutine<Unit> { continuation ->
+            waitForRecompositionCompleteContinuation = continuation
+        }
     }
 }
 
@@ -140,11 +170,13 @@ class TestScope : CoroutineScope by MainScope() {
  * }
  * ```
  */
+@ComposeWebExperimentalTestsApi
 fun runTest(block: suspend TestScope.() -> Unit): dynamic {
     val scope = TestScope()
     return scope.promise { block(scope) }
 }
 
+@ComposeWebExperimentalTestsApi
 fun String.asHtmlElement() = document.createElement(this) as HTMLElement
 
 private object MutationObserverOptions : MutationObserverInit {

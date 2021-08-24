@@ -10,10 +10,11 @@ import androidx.compose.runtime.ExplicitGroupsComposable
 import androidx.compose.runtime.SkippableUpdater
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
-import org.jetbrains.compose.web.DomApplier
-import org.jetbrains.compose.web.DomElementWrapper
 import org.jetbrains.compose.web.attributes.AttrsBuilder
 import org.jetbrains.compose.web.ExperimentalComposeWebApi
+import org.jetbrains.compose.web.internal.runtime.DomApplier
+import org.jetbrains.compose.web.internal.runtime.DomElementWrapper
+import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 
@@ -48,6 +49,7 @@ class DisposableEffectHolder<TElement : Element>(
     var effect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
 )
 
+@OptIn(ComposeWebInternalApi::class)
 @Composable
 fun <TElement : Element> TagElement(
     elementBuilder: ElementBuilder<TElement>,
