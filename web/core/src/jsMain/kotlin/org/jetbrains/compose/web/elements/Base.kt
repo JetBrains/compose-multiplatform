@@ -21,13 +21,12 @@ import org.w3c.dom.HTMLElement
 @OptIn(ComposeCompilerApi::class)
 @Composable
 @ExplicitGroupsComposable
-private inline fun <TScope, T, reified E : Applier<*>> ComposeDomNode(
+private inline fun <TScope, T> ComposeDomNode(
     noinline factory: () -> T,
     elementScope: TScope,
     noinline attrsSkippableUpdate: @Composable SkippableUpdater<T>.() -> Unit,
     noinline content: (@Composable TScope.() -> Unit)?
 ) {
-    if (currentComposer.applier !is E) error("Invalid applier")
     currentComposer.startNode()
     if (currentComposer.inserting) {
         currentComposer.createNode(factory)
@@ -59,7 +58,7 @@ fun <TElement : Element> TagElement(
     val scope = remember { ElementScopeImpl<TElement>() }
     val refEffect = remember { DisposableEffectHolder<TElement>() }
 
-    ComposeDomNode<ElementScope<TElement>, DomElementWrapper, DomApplier>(
+    ComposeDomNode<ElementScope<TElement>, DomElementWrapper>(
         factory = {
             DomElementWrapper(elementBuilder.create() as HTMLElement).also {
                 scope.element = it.node.unsafeCast<TElement>()
