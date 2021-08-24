@@ -70,6 +70,19 @@ private fun DomElementWrapper.updateStyleDeclarations(styleApplier: StyleHolder)
 }
 
 @OptIn(ComposeWebInternalApi::class)
+fun DomElementWrapper.updateAttrs(attrs: Map<String, String>) {
+    node.getAttributeNames().forEach { name ->
+        if (name == "style") return@forEach
+        node.removeAttribute(name)
+    }
+
+    attrs.forEach {
+        node.setAttribute(it.key, it.value)
+    }
+}
+
+
+@OptIn(ComposeWebInternalApi::class)
 @Composable
 fun <TElement : Element> TagElement(
     elementBuilder: ElementBuilder<TElement>,
