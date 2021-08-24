@@ -65,7 +65,7 @@ object LibraryGroups {
     val JETIFIER = LibraryGroup("com.android.tools.build.jetifier", null)
     val LEANBACK = LibraryGroup("androidx.leanback", null)
     val LEGACY = LibraryGroup("androidx.legacy", null)
-    val LIFECYCLE = LibraryGroup("androidx.lifecycle", null)
+    val LIFECYCLE = LibraryGroup("androidx.lifecycle", LibraryVersions.LIFECYCLE)
     val LOADER = LibraryGroup("androidx.loader", LibraryVersions.LOADER)
     val LOCALBROADCASTMANAGER = LibraryGroup("androidx.localbroadcastmanager", LibraryVersions.LOCALBROADCASTMANAGER)
     val MEDIA = LibraryGroup("androidx.media", null)
