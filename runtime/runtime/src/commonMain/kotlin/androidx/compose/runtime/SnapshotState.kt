@@ -43,6 +43,7 @@ import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.experimental.ExperimentalTypeInference
+import kotlin.jvm.JvmName
 import kotlin.reflect.KProperty
 
 /**
@@ -210,6 +211,15 @@ internal open class SnapshotMutableStateImpl<T>(
     override operator fun component1(): T = value
 
     override operator fun component2(): (T) -> Unit = { value = it }
+
+    /**
+     * A function used by the debugger to display the value of the current value of the mutable
+     * state object without triggering read observers.
+     */
+    @Suppress("unused")
+    val debuggerDisplayValue: T
+        @JvmName("getDebuggerDisplayValue")
+        get() = next.withCurrent { it }.value
 }
 
 /**
@@ -320,7 +330,7 @@ fun <T> mutableStateListOf(vararg elements: T) =
     SnapshotStateList<T>().also { it.addAll(elements.toList()) }
 
 /**
- * Create an instance of MutableList<T> from a collection that is observerable and can be snapshot.
+ * Create an instance of MutableList<T> from a collection that is observable and can be snapshot.
  */
 fun <T> Collection<T>.toMutableStateList() = SnapshotStateList<T>().also { it.addAll(this) }
 
@@ -460,7 +470,7 @@ private class DerivedSnapshotState<T>(
     override val value: T get() {
         // Unlike most state objects, the record list of a derived state can change during a read
         // because reading updates the cache. To account for this, instead of calling readable,
-        // which sends the read notification, the read observer is notfied directly and current
+        // which sends the read notification, the read observer is notified directly and current
         // value is used instead which doesn't notify. This allow the read observer to read the
         // value and only update the cache once.
         Snapshot.current.readObserver?.invoke(this)
@@ -481,6 +491,19 @@ private class DerivedSnapshotState<T>(
     override fun toString(): String = first.withCurrent {
         "DerivedState(value=${displayValue()})@${hashCode()}"
     }
+
+    /**
+     * A function used by the debugger to display the value of the current value of the mutable
+     * state object without triggering read observers.
+     */
+    @Suppress("unused")
+    val debuggerDisplayValue: T?
+        @JvmName("getDebuggerDisplayValue")
+        get() = first.withCurrent {
+            if (it.isValid(this, Snapshot.current))
+                it.result
+            else null
+        }
 
     private fun displayValue(): String {
         first.withCurrent {

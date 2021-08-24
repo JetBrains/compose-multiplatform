@@ -20,6 +20,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentMap
 import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentHashMapOf
 import androidx.compose.runtime.synchronized
+import kotlin.jvm.JvmName
 
 /**
  * An implementation of [MutableMap] that can be observed and snapshot. This is the result type
@@ -89,6 +90,15 @@ class SnapshotStateMap<K, V> : MutableMap<K, V>, StateObject {
         }
         return true
     }
+
+    /**
+     * An internal function used by the debugger to display the value of the current value of the
+     * mutable state object without triggering read observers.
+     */
+    @Suppress("unused")
+    internal val debuggerDisplayValue: Map<K, V>
+        @JvmName("getDebuggerDisplayValue")
+        get() = withCurrent { map }
 
     private inline fun <R> withCurrent(block: StateMapStateRecord<K, V>.() -> R): R =
         @Suppress("UNCHECKED_CAST")
