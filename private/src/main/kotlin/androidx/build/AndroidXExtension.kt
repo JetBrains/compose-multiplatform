@@ -16,13 +16,13 @@
 
 package androidx.build
 
+import androidx.build.Multiplatform.Companion.isMultiplatformEnabled
 import androidx.build.checkapi.shouldConfigureApiTasks
 import groovy.lang.Closure
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
 import java.util.ArrayList
-
 /**
  * Extension for [AndroidXImplPlugin] that's responsible for holding configuration options.
  */
@@ -159,7 +159,13 @@ open class AndroidXExtension(val project: Project) {
 
     var benchmarkRunAlsoInterpreted = false
 
-    var multiplatform = false
+    var multiplatform: Boolean
+        set(value) {
+            Multiplatform.setEnabledForProject(project, value)
+        }
+        get() {
+            return project.isMultiplatformEnabled()
+        }
 
     fun shouldEnforceKotlinStrictApiMode(): Boolean {
         return !legacyDisableKotlinStrictApiMode &&
