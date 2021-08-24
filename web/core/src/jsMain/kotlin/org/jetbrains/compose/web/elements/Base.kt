@@ -8,7 +8,6 @@ import androidx.compose.runtime.DisposableEffectScope
 import androidx.compose.runtime.ExplicitGroupsComposable
 import androidx.compose.runtime.SkippableUpdater
 import androidx.compose.runtime.currentComposer
-import androidx.compose.runtime.remember
 import org.jetbrains.compose.web.attributes.AttrsBuilder
 import org.jetbrains.compose.web.ExperimentalComposeWebApi
 import org.jetbrains.compose.web.css.StyleHolder
@@ -91,8 +90,8 @@ fun <TElement : Element> TagElement(
     applyAttrs: (AttrsBuilder<TElement>.() -> Unit)?,
     content: (@Composable ElementScope<TElement>.() -> Unit)?
 ) {
-    val scope = remember { ElementScopeImpl<TElement>() }
-    val refEffect = remember { DisposableEffectHolder<TElement>() }
+    val scope = ElementScopeImpl<TElement>()
+    val refEffect = DisposableEffectHolder<TElement>()
 
     val node = elementBuilder.create()
     scope.element = node
