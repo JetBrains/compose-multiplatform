@@ -11,6 +11,7 @@ import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
 import org.jetbrains.compose.web.attributes.AttrsBuilder
 import org.jetbrains.compose.web.ExperimentalComposeWebApi
+import org.jetbrains.compose.web.css.StyleHolder
 import org.jetbrains.compose.web.internal.runtime.DomElementWrapper
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.w3c.dom.Element
@@ -43,6 +44,30 @@ private inline fun <TScope, T> ComposeDomNode(
 class DisposableEffectHolder<TElement : Element>(
     var effect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
 )
+
+@OptIn(ComposeWebInternalApi::class)
+private fun DomElementWrapper.updateProperties(applicators: List<Pair<(Element, Any) -> Unit, Any>>) {
+    if (node.className.isNotEmpty()) node.className = ""
+
+    applicators.forEach { (applicator, item) ->
+        applicator(node, item)
+    }
+}
+
+@OptIn(ComposeWebInternalApi::class)
+private fun DomElementWrapper.updateStyleDeclarations(styleApplier: StyleHolder) {
+    node.removeAttribute("style")
+
+    val style = node.style
+
+    styleApplier.properties.forEach { (name, value) ->
+        style.setProperty(name, value.toString())
+    }
+
+    styleApplier. variables.forEach { (name, value) ->
+        style.setProperty(name, value.toString())
+    }
+}
 
 @OptIn(ComposeWebInternalApi::class)
 @Composable
@@ -83,16 +108,6 @@ fun <TElement : Element> TagElement(
         }
     }
 }
-
-@OptIn(ComposeWebInternalApi::class)
-private fun DomElementWrapper.updateProperties(applicators: List<Pair<(Element, Any) -> Unit, Any>>) {
-    if (node.className.isNotEmpty()) node.className = ""
-
-    applicators.forEach { (applicator, item) ->
-        applicator(node, item)
-    }
-}
-
 
 @Composable
 @ExperimentalComposeWebApi

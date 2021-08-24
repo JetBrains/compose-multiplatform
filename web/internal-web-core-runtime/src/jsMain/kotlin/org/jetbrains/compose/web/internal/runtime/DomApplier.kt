@@ -103,15 +103,4 @@ class DomElementWrapper(override val node: HTMLElement): DomNodeWrapper(node) {
         }
         currentAttrs = attrs
     }
-
-    @ComposeWebInternalApi
-    fun interface StyleDeclarationsApplier {
-        @ComposeWebInternalApi
-        fun applyToNodeStyle(nodeStyle: CSSStyleDeclaration)
-    }
-
-    fun updateStyleDeclarations(styleApplier: StyleDeclarationsApplier) {
-        node.removeAttribute("style")
-        styleApplier.applyToNodeStyle(node.style)
-    }
 }
