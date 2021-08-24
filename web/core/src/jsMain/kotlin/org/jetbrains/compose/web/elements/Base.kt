@@ -1,6 +1,5 @@
 package org.jetbrains.compose.web.dom
 
-import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeCompilerApi
 import androidx.compose.runtime.DisposableEffect
@@ -84,6 +83,16 @@ fun <TElement : Element> TagElement(
         }
     }
 }
+
+@OptIn(ComposeWebInternalApi::class)
+private fun DomElementWrapper.updateProperties(applicators: List<Pair<(Element, Any) -> Unit, Any>>) {
+    if (node.className.isNotEmpty()) node.className = ""
+
+    applicators.forEach { (applicator, item) ->
+        applicator(node, item)
+    }
+}
+
 
 @Composable
 @ExperimentalComposeWebApi
