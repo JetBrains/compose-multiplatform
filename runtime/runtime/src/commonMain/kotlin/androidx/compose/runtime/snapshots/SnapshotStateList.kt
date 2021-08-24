@@ -19,6 +19,7 @@ package androidx.compose.runtime.snapshots
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentList
 import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentListOf
+import androidx.compose.runtime.synchronized
 
 /**
  * An implementation of [MutableList] that can be observed and snapshot. This is the result type
@@ -54,9 +55,11 @@ class SnapshotStateList<T> : MutableList<T>, StateObject {
     ) : StateRecord() {
         internal var modification = 0
         override fun assign(value: StateRecord) {
-            @Suppress("UNCHECKED_CAST")
-            list = (value as StateListStateRecord<T>).list
-            modification = value.modification
+            synchronized(sync) {
+                @Suppress("UNCHECKED_CAST")
+                list = (value as StateListStateRecord<T>).list
+                modification = value.modification
+            }
         }
 
         override fun create(): StateRecord = StateListStateRecord(list)
@@ -78,15 +81,22 @@ class SnapshotStateList<T> : MutableList<T>, StateObject {
     }
     override fun add(element: T) = conditionalUpdate { it.add(element) }
     override fun add(index: Int, element: T) = update { it.add(index, element) }
-    override fun addAll(index: Int, elements: Collection<T>) = mutate {
+    override fun addAll(index: Int, elements: Collection<T>) = mutateBoolean {
         it.addAll(index, elements)
     }
     override fun addAll(elements: Collection<T>) = conditionalUpdate { it.addAll(elements) }
-    override fun clear() = writable { list = persistentListOf() }
+    override fun clear() {
+        synchronized(sync) {
+            writable {
+                list = persistentListOf()
+                modification++
+            }
+        }
+    }
     override fun remove(element: T) = conditionalUpdate { it.remove(element) }
     override fun removeAll(elements: Collection<T>) = conditionalUpdate { it.removeAll(elements) }
     override fun removeAt(index: Int): T = get(index).also { update { it.removeAt(index) } }
-    override fun retainAll(elements: Collection<T>) = mutate { it.retainAll(elements) }
+    override fun retainAll(elements: Collection<T>) = mutateBoolean { it.retainAll(elements) }
     override fun set(index: Int, element: T): T = get(index).also {
         update { it.set(index, element) }
     }
@@ -97,6 +107,14 @@ class SnapshotStateList<T> : MutableList<T>, StateObject {
         }
     }
 
+    internal fun retainAllInRange(elements: Collection<T>, start: Int, end: Int): Int {
+        val startSize = size
+        mutate<Unit> {
+            it.subList(start, end).retainAll(elements)
+        }
+        return startSize - size
+    }
+
     private inline fun <R> writable(block: StateListStateRecord<T>.() -> R): R =
         @Suppress("UNCHECKED_CAST")
         (firstStateRecord as StateListStateRecord<T>).writable(this, block)
@@ -105,36 +123,86 @@ class SnapshotStateList<T> : MutableList<T>, StateObject {
         @Suppress("UNCHECKED_CAST")
         (firstStateRecord as StateListStateRecord<T>).withCurrent(block)
 
-    private inline fun <R> mutate(block: (MutableList<T>) -> R): R =
-        withCurrent {
-            val builder = list.builder()
-            val result = block(builder)
+    private fun mutateBoolean(block: (MutableList<T>) -> Boolean): Boolean = mutate(block)
+
+    private inline fun <R> mutate(block: (MutableList<T>) -> R): R {
+        var result: R
+        while (true) {
+            var oldList: PersistentList<T>? = null
+            var currentModification = 0
+            synchronized(sync) {
+                val current = withCurrent { this }
+                currentModification = current.modification
+                oldList = current.list
+            }
+            val builder = oldList!!.builder()
+            result = block(builder)
             val newList = builder.build()
-            if (newList !== list) writable {
-                list = newList
-                modification++
+            if (newList == oldList || synchronized(sync) {
+                writable {
+                    if (modification == currentModification) {
+                        list = newList
+                        modification++
+                        true
+                    } else false
+                }
+            }
+            ) break
+        }
+        return result
+    }
+
+    private inline fun update(block: (PersistentList<T>) -> PersistentList<T>) {
+        conditionalUpdate(block)
+    }
+
+    private inline fun conditionalUpdate(block: (PersistentList<T>) -> PersistentList<T>) =
+        run {
+            val result: Boolean
+            while (true) {
+                var oldList: PersistentList<T>? = null
+                var currentModification = 0
+                synchronized(sync) {
+                    val current = withCurrent { this }
+                    currentModification = current.modification
+                    oldList = current.list
+                }
+                val newList = block(oldList!!)
+                if (newList == oldList) {
+                    result = false
+                    break
+                }
+                if (synchronized(sync) {
+                    writable {
+                        if (modification == currentModification) {
+                            list = newList
+                            modification++
+                            true
+                        } else false
+                    }
+                }
+                ) {
+                    result = true
+                    break
+                }
             }
             result
         }
-
-    private inline fun update(block: (PersistentList<T>) -> PersistentList<T>) = withCurrent {
-        val newList = block(list)
-        if (newList !== list) writable {
-            list = newList
-            modification++
-        }
-    }
-
-    private inline fun conditionalUpdate(block: (PersistentList<T>) -> PersistentList<T>): Boolean =
-        withCurrent {
-            val newList = block(list)
-            if (newList !== list) writable {
-                list = newList
-                modification++
-                true
-            } else false
-        }
 }
+
+/**
+ * This lock is used to ensure that the value of modification and the list in the state record,
+ * when used together, are atomically read and written.
+ *
+ * A global sync object is used to avoid having to allocate a sync object and initialize a monitor
+ * for each instance the list. This avoid additional allocations but introduces some contention
+ * between lists. As there is already contention on the global snapshot lock to write so the
+ * additional contention introduced by this lock is nominal.
+ *
+ * In code the requires this lock and calls `writable` (or other operation that acquires the
+ * snapshot global lock), this lock *MUST* be acquired first to avoid deadlocks.
+ */
+private val sync = Any()
 
 private fun modificationError(): Nothing =
     error("Cannot modify a state list through an iterator")
@@ -329,21 +397,12 @@ private class SubList<T>(
 
     override fun retainAll(elements: Collection<T>): Boolean {
         validateModification()
-        var index = offset + size - 1
-        var removed = false
-        while (index >= offset) {
-            if (parentList[index] !in elements) {
-                if (!removed) {
-                    removed = true
-                }
-                parentList.removeAt(index)
-                size--
-            }
-            index--
-        }
-        if (removed)
+        val removed = parentList.retainAllInRange(elements, offset, offset + size)
+        if (removed > 0) {
             modification = parentList.modification
-        return removed
+            size -= removed
+        }
+        return removed > 0
     }
 
     override fun set(index: Int, element: T): T {
