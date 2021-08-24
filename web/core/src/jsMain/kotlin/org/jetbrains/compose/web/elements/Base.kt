@@ -81,8 +81,10 @@ fun <TElement : Element> TagElement(
         content = content
     )
 
-    DisposableEffect(null) {
-        refEffect.effect?.invoke(this, scope.element) ?: onDispose {}
+    refEffect.effect?.let { refEffect ->
+        DisposableEffect(null) {
+            refEffect.invoke(this, scope.element)
+        }
     }
 }
 
