@@ -58,20 +58,16 @@ private fun DomElementWrapper.updateProperties(applicators: List<Pair<(Element, 
 
 @OptIn(ComposeWebInternalApi::class)
 private fun DomElementWrapper.updateStyleDeclarations(styleApplier: StyleHolder) {
-    when (node) {
-        is HTMLElement, is SVGElement -> {
-            node.removeAttribute("style")
+    node.removeAttribute("style")
 
-            val style = node.unsafeCast<ElementCSSInlineStyle>().style
+    val style = node.unsafeCast<ElementCSSInlineStyle>().style
 
-            styleApplier.properties.forEach { (name, value) ->
-                style.setProperty(name, value.toString())
-            }
+    styleApplier.properties.forEach { (name, value) ->
+        style.setProperty(name, value.toString())
+    }
 
-            styleApplier. variables.forEach { (name, value) ->
-                style.setProperty(name, value.toString())
-            }
-        }
+    styleApplier.variables.forEach { (name, value) ->
+        style.setProperty(name, value.toString())
     }
 }
 
@@ -98,12 +94,12 @@ fun <TElement : Element> TagElement(
     val scope = remember { ElementScopeImpl<TElement>() }
     val refEffect = remember { DisposableEffectHolder<TElement>() }
 
+    val node = elementBuilder.create()
+    scope.element = node
+    val domElementWrapper = DomElementWrapper(node)
+
     ComposeDomNode<ElementScope<TElement>, DomElementWrapper>(
-        factory = {
-            val node = elementBuilder.create()
-            scope.element = node
-            DomElementWrapper(node)
-        },
+        factory = { domElementWrapper },
         attrsSkippableUpdate = {
             val attrsBuilder = AttrsBuilder<TElement>()
             applyAttrs?.invoke(attrsBuilder)
@@ -114,7 +110,12 @@ fun <TElement : Element> TagElement(
                 set(attrsBuilder.collect(), DomElementWrapper::updateAttrs)
                 set(attrsBuilder.collectListeners(), DomElementWrapper::updateEventListeners)
                 set(attrsBuilder.propertyUpdates, DomElementWrapper::updateProperties)
-                set(attrsBuilder.styleBuilder, DomElementWrapper::updateStyleDeclarations)
+                when (node) {
+                    is HTMLElement, is SVGElement -> set(
+                        attrsBuilder.styleBuilder,
+                        DomElementWrapper::updateStyleDeclarations
+                    )
+                }
             }
         },
         elementScope = scope,
