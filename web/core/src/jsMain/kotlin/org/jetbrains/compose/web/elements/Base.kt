@@ -47,7 +47,7 @@ class DisposableEffectHolder<TElement : Element>(
 
 @OptIn(ComposeWebInternalApi::class)
 private fun DomElementWrapper.updateProperties(applicators: List<Pair<(Element, Any) -> Unit, Any>>) {
-    if (node.className.isNotEmpty()) node.className = ""
+    node.removeAttribute("class")
 
     applicators.forEach { (applicator, item) ->
         applicator(node, item)
