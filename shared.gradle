@@ -1,0 +1,166 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+apply plugin: "kotlin"
+apply from: "../kotlin-dsl-dependency.gradle"
+
+buildscript {
+    project.ext.supportRootFolder = project.projectDir.getParentFile().getParentFile()
+    apply from: "../repos.gradle"
+    repos.addMavenRepositories(repositories)
+    dependencies {
+        classpath(libs.kotlinGradlePluginz)
+    }
+}
+
+configurations {
+    // Dependencies added to these configurations get copied into the corresponding configuration
+    // (cacheableApi gets copied into api, etc).
+    // Because we cache the resolutions of these configurations, performance is faster when
+    // artifacts are put into these configurations than when those artifacts are put into their
+    // corresponding configuration.
+    cacheableApi
+    cacheableImplementation {
+        extendsFrom(project.configurations.cacheableApi)
+    }
+    cacheableRuntimeOnly
+}
+
+dependencies {
+    cacheableApi(libs.androidGradlePluginz)
+    cacheableImplementation(libs.dexMemberList)
+    cacheableApi(libs.kotlinGradlePluginz)
+    cacheableImplementation(gradleApi())
+    cacheableApi(libs.dokkaGradlePluginz)
+    // needed by inspection plugin
+    cacheableImplementation(libs.protobufGradlePluginz)
+    cacheableImplementation(libs.wireGradlePluginz)
+    cacheableImplementation(libs.shadow)
+    // dependencies that aren't used by buildSrc directly but that we resolve here so that the
+    // root project doesn't need to re-resolve them and their dependencies on every build
+    cacheableRuntimeOnly(libs.hiltAndroidGradlePluginz)
+    // room kotlintestapp uses the ksp plugin but it does not publish a plugin marker yet
+    cacheableApi(libs.kspGradlePluginz)
+    cacheableApi(libs.japicmpPluginz)
+    // dependencies whose resolutions we don't need to cache
+    compileOnly(findGradleKotlinDsl()) // Only one file in this configuration, no need to cache it
+    implementation(project(":jetpad-integration")) // Doesn't have a .pom, so not slow to load
+}
+
+// Exclude dokka coming from AGP. We don't need it and it conflicts with dackka: b/195305339
+configurations.configureEach { conf ->
+  conf.exclude(group:"org.jetbrains.dokka", module:"dokka-core")
+}
+
+apply plugin: "java-gradle-plugin"
+
+sourceSets {
+    main.java.srcDirs += "../public/src/main/kotlin"
+    main.resources.srcDirs += "../public/src/main/resources"
+
+
+    main.java.srcDirs += "${supportRootFolder}/benchmark/gradle-plugin/src/main/kotlin"
+    main.resources.srcDirs += "${supportRootFolder}/benchmark/gradle-plugin/src/main/resources"
+
+    main.java.srcDirs += "${supportRootFolder}/inspection/inspection-gradle-plugin/src/main/kotlin"
+    main.resources.srcDirs += "${supportRootFolder}/inspection/inspection-gradle-plugin/src/main" +
+            "/resources"
+
+    main.java.srcDirs += "${supportRootFolder}/compose/material/material/icons/generator/src/main" +
+            "/kotlin"
+}
+
+gradlePlugin {
+    plugins {
+        benchmark {
+            id = "androidx.benchmark"
+            implementationClass = "androidx.benchmark.gradle.BenchmarkPlugin"
+        }
+        inspection {
+            id = "androidx.inspection"
+            implementationClass = "androidx.inspection.gradle.InspectionPlugin"
+        }
+    }
+}
+
+// Saves configuration into destFile
+// Each line of destFile will be the absolute filepath of one of the files in configuration
+def saveConfigurationResolution(configuration, destFile) {
+    def resolvedConfiguration = configuration.resolvedConfiguration
+    def files = resolvedConfiguration.files
+    def paths = files.collect { f -> f.toString() }
+    def serialized = paths.join("\n")
+    destFile.text = serialized
+}
+
+// Parses a file into a list of Dependency objects representing a ResolvedConfiguration
+def parseConfigurationResolution(savedFile, throwOnError) {
+    def savedText = savedFile.text
+    def filenames = savedText.split("\n")
+    def valid = true
+    def dependencies = filenames.collect { filename ->
+        if (!project.file(filename).exists()) {
+            if (throwOnError) {
+                throw new GradleException("\nFile " + filename + " listed as a resolved dependency in " + savedFile + " does not exist!\n\nFor more information, see b/187075069")
+            } else {
+                valid = false
+            }
+        }
+        project.dependencies.create(project.files(filename))
+    }
+    if (!valid) {
+        return null
+    }
+    return dependencies
+}
+
+// Resolves a Configuration into a list of Dependency objects
+def resolveConfiguration(configuration) {
+    def resolvedName = configuration.name
+    def cacheDir = new File(project.buildDir, "/" + resolvedName)
+    def inputsFile = new File(cacheDir, "/deps")
+    def outputsFile = new File(cacheDir, "/result")
+
+    def inputText = fingerprintConfiguration(configuration)
+    def parsed = null
+    if (inputsFile.exists() && inputsFile.text == inputText) {
+        // Try to parse the previously resolved configuration, but don't give up if it mentions a
+        // nonexistent file. If something has since deleted one of the referenced files, we will
+        // try to reresolve that file later
+        parsed = parseConfigurationResolution(outputsFile, false)
+    }
+    // If the configuration has changed or if any of its files have been deleted, reresolve it
+    if (parsed == null) {
+        cacheDir.mkdirs()
+        saveConfigurationResolution(configuration, outputsFile)
+        inputsFile.text = inputText
+        // confirm that the resolved configuration parses successfully
+        parsed = parseConfigurationResolution(outputsFile, true)
+    }
+    return parsed
+}
+
+// Computes a unique string from a Configuration based on its dependencies
+// This is used for up-to-date checks
+def fingerprintConfiguration(configuration) {
+    def dependencies = configuration.allDependencies
+    def dependencyTexts = dependencies.collect { dep -> dep.group + ":" + dep.name + ":" + dep.version }
+    return dependencyTexts.join("\n")
+}
+
+// Imports the contents of fromConf into toConf
+// Uses caching to often short-circuit the resolution of fromConf
+def loadConfigurationQuicklyInto(fromConf, toConf) {
+    def resolved = resolveConfiguration(fromConf)
+    resolved.each { dep ->
+        project.dependencies.add(toConf.name, dep)
+    }
+}
+
+loadConfigurationQuicklyInto(configurations.cacheableApi, configurations.api)
+loadConfigurationQuicklyInto(configurations.cacheableImplementation, configurations.implementation)
+loadConfigurationQuicklyInto(configurations.cacheableRuntimeOnly, configurations.runtimeOnly)
+
+project.tasks.withType(Jar) { task ->
+    task.reproducibleFileOrder = true
+    task.preserveFileTimestamps = false
+}
