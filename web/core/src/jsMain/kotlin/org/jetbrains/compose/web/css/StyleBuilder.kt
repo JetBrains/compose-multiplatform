@@ -7,6 +7,9 @@
 
 package org.jetbrains.compose.web.css
 
+import org.jetbrains.compose.web.internal.runtime.DomElementWrapper
+import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
+import org.w3c.dom.css.CSSStyleDeclaration
 import kotlin.properties.ReadOnlyProperty
 
 /**
@@ -116,7 +119,7 @@ fun <TValue> CSSStyleVariable<TValue>.value(fallback: TValue? = null)
  *     property("width", AppCSSVariables.width.value())
  * }
  *```
- * 
+ *
  */
 fun <TValue : StylePropertyValue> variable() =
     ReadOnlyProperty<Any?, CSSStyleVariable<TValue>> { _, property ->
@@ -128,8 +131,9 @@ interface StyleHolder {
     val variables: StylePropertyList
 }
 
+@OptIn(ComposeWebInternalApi::class)
 @Suppress("EqualsOrHashCode")
-open class StyleBuilderImpl : StyleBuilder, StyleHolder {
+open class StyleBuilderImpl : StyleBuilder, StyleHolder, DomElementWrapper.StyleDeclarationsApplier {
     override val properties: MutableStylePropertyList = mutableListOf()
     override val variables: MutableStylePropertyList = mutableListOf()
 
@@ -152,6 +156,16 @@ open class StyleBuilderImpl : StyleBuilder, StyleHolder {
     internal fun copyFrom(sb: StyleBuilderImpl) {
         properties.addAll(sb.properties)
         variables.addAll(sb.variables)
+    }
+
+    override fun applyToNodeStyle(nodeStyle: CSSStyleDeclaration) {
+        properties.forEach { (name, value) ->
+            nodeStyle.setProperty(name, value.toString())
+        }
+
+        variables.forEach { (name, value) ->
+            nodeStyle.setProperty(name, value.toString())
+        }
     }
 }
 

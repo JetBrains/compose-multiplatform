@@ -1,14 +1,13 @@
-package org.jetbrains.compose.web
+package org.jetbrains.compose.web.internal.runtime
 
 import androidx.compose.runtime.AbstractApplier
-import org.jetbrains.compose.web.attributes.SyntheticEventListener
-import org.jetbrains.compose.web.css.StyleHolder
-import org.jetbrains.compose.web.dom.setProperty
-import org.jetbrains.compose.web.dom.setVariable
 import kotlinx.dom.clear
 import org.w3c.dom.*
+import org.w3c.dom.css.CSSStyleDeclaration
+import org.w3c.dom.events.EventListener
 
-internal class DomApplier(
+@ComposeWebInternalApi
+class DomApplier(
     root: DomNodeWrapper
 ) : AbstractApplier<DomNodeWrapper>(root) {
 
@@ -34,26 +33,28 @@ internal class DomApplier(
     }
 }
 
-external interface EventListenerOptions {
-    var once: Boolean
-    var passive: Boolean
-    var capture: Boolean
-}
 
-internal open class DomNodeWrapper(open val node: Node) {
-    private var currentListeners = emptyList<SyntheticEventListener<*>>()
+@ComposeWebInternalApi
+open class DomNodeWrapper(open val node: Node) {
 
-    fun updateEventListeners(list: List<SyntheticEventListener<*>>) {
+    @ComposeWebInternalApi
+    interface NamedEventListener : EventListener {
+        val name: String
+    }
+
+    private var currentListeners = emptyList<NamedEventListener>()
+
+    fun updateEventListeners(list: List<NamedEventListener>) {
         val htmlElement = node as? HTMLElement ?: return
 
         currentListeners.forEach {
-            htmlElement.removeEventListener(it.event, it)
+            htmlElement.removeEventListener(it.name, it)
         }
 
         currentListeners = list
 
         currentListeners.forEach {
-            htmlElement.addEventListener(it.event, it)
+            htmlElement.addEventListener(it.name, it)
         }
     }
 
@@ -88,8 +89,8 @@ internal open class DomNodeWrapper(open val node: Node) {
     }
 }
 
-
-internal class DomElementWrapper(override val node: HTMLElement): DomNodeWrapper(node) {
+@ComposeWebInternalApi
+class DomElementWrapper(override val node: HTMLElement): DomNodeWrapper(node) {
     private var currentAttrs: Map<String, String>? = null
 
     fun updateAttrs(attrs: Map<String, String>) {
@@ -111,14 +112,14 @@ internal class DomElementWrapper(override val node: HTMLElement): DomNodeWrapper
         }
     }
 
-    fun updateStyleDeclarations(style: StyleHolder?) {
-        node.removeAttribute("style")
+    @ComposeWebInternalApi
+    fun interface StyleDeclarationsApplier {
+        @ComposeWebInternalApi
+        fun applyToNodeStyle(nodeStyle: CSSStyleDeclaration)
+    }
 
-        style?.properties?.forEach { (name, value) ->
-            setProperty(node.style, name, value)
-        }
-        style?.variables?.forEach { (name, value) ->
-            setVariable(node.style, name, value)
-        }
+    fun updateStyleDeclarations(styleApplier: StyleDeclarationsApplier) {
+        node.removeAttribute("style")
+        styleApplier.applyToNodeStyle(node.style)
     }
 }

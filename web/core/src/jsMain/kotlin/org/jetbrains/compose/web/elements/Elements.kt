@@ -4,14 +4,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.remember
 import androidx.compose.web.attributes.SelectAttrsBuilder
-import org.jetbrains.compose.web.DomApplier
-import org.jetbrains.compose.web.DomNodeWrapper
 import kotlinx.browser.document
 import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.attributes.builders.*
 import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.StyleSheetBuilder
 import org.jetbrains.compose.web.css.StyleSheetBuilderImpl
+import org.jetbrains.compose.web.internal.runtime.DomApplier
+import org.jetbrains.compose.web.internal.runtime.DomNodeWrapper
+import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLAreaElement
@@ -414,6 +415,7 @@ fun Source(
     )
 }
 
+@OptIn(ComposeWebInternalApi::class)
 @Composable
 fun Text(value: String) {
     ComposeNode<DomNodeWrapper, DomApplier>(

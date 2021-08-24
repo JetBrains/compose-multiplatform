@@ -348,11 +348,25 @@ class AttributesTests {
             }
         }
 
-        assertEquals("""<button style="color: red;">Button</button>""", root.innerHTML)
+        assertEquals(
+            expected = "color: red;",
+            actual = (root.firstChild as HTMLButtonElement).getAttribute("style")
+        )
+        assertEquals(
+            expected = null,
+            actual = (root.firstChild as HTMLButtonElement).getAttribute("value")
+        )
 
         hasValue = true
         waitForRecompositionComplete()
 
-        assertEquals("""<button style="color: red;" value="buttonValue">Button</button>""", root.innerHTML)
+        assertEquals(
+            expected = "color: red;",
+            actual = (root.firstChild as HTMLButtonElement).getAttribute("style")
+        )
+        assertEquals(
+            expected = "buttonValue",
+            actual = (root.firstChild as HTMLButtonElement).getAttribute("value")
+        )
     }
 }
