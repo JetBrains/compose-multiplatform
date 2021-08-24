@@ -20,6 +20,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentList
 import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentListOf
 import androidx.compose.runtime.synchronized
+import kotlin.jvm.JvmName
 
 /**
  * An implementation of [MutableList] that can be observed and snapshot. This is the result type
@@ -79,11 +80,13 @@ class SnapshotStateList<T> : MutableList<T>, StateObject {
         require(fromIndex in 0..toIndex && toIndex <= size)
         return SubList(this, fromIndex, toIndex)
     }
+
     override fun add(element: T) = conditionalUpdate { it.add(element) }
     override fun add(index: Int, element: T) = update { it.add(index, element) }
     override fun addAll(index: Int, elements: Collection<T>) = mutateBoolean {
         it.addAll(index, elements)
     }
+
     override fun addAll(elements: Collection<T>) = conditionalUpdate { it.addAll(elements) }
     override fun clear() {
         synchronized(sync) {
@@ -114,6 +117,15 @@ class SnapshotStateList<T> : MutableList<T>, StateObject {
         }
         return startSize - size
     }
+
+    /**
+     * An internal function used by the debugger to display the value of the current list without
+     * triggering read observers.
+     */
+    @Suppress("unused")
+    internal val debuggerDisplayValue: List<T>
+        @JvmName("getDebuggerDisplayValue")
+        get() = withCurrent { list }
 
     private inline fun <R> writable(block: StateListStateRecord<T>.() -> R): R =
         @Suppress("UNCHECKED_CAST")
