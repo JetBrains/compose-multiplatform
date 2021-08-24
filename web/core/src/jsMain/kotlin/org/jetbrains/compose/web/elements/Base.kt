@@ -65,20 +65,16 @@ fun <TElement : Element> TagElement(
             }
         },
         attrsSkippableUpdate = {
-            val attrsApplied = AttrsBuilder<TElement>().also {
-                if (applyAttrs != null) {
-                    it.applyAttrs()
-                }
-            }
-            refEffect.effect = attrsApplied.refEffect
-            val attrsCollected = attrsApplied.collect()
-            val events = attrsApplied.collectListeners()
+            val attrsBuilder = AttrsBuilder<TElement>()
+            applyAttrs?.invoke(attrsBuilder)
+
+            refEffect.effect = attrsBuilder.refEffect
 
             update {
-                set(attrsCollected, DomElementWrapper::updateAttrs)
-                set(events, DomElementWrapper::updateEventListeners)
-                set(attrsApplied.propertyUpdates, DomElementWrapper::updateProperties)
-                set(attrsApplied.styleBuilder, DomElementWrapper::updateStyleDeclarations)
+                set(attrsBuilder.collect(), DomElementWrapper::updateAttrs)
+                set(attrsBuilder.collectListeners(), DomElementWrapper::updateEventListeners)
+                set(attrsBuilder.propertyUpdates, DomElementWrapper::updateProperties)
+                set(attrsBuilder.styleBuilder, DomElementWrapper::updateStyleDeclarations)
             }
         },
         elementScope = scope,
