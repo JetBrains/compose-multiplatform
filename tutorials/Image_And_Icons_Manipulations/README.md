@@ -157,7 +157,7 @@ import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.singleWindowApplication
 import org.xml.sax.InputSource
 
-fun main() = singleWindowApplication(state = WindowState(width = 1024.dp, height = 768.dp)) {
+fun main() = singleWindowApplication {
     val density = LocalDensity.current // to calculate the intrinsic size of vector images (SVG, XML)
 
     val sample = remember {
