@@ -10,6 +10,7 @@ import org.w3c.dom.get
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import org.jetbrains.compose.web.testutils.*
 
 class StaticComposableTests {
     @Test

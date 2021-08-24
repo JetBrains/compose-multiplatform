@@ -5,9 +5,7 @@
 
 package org.jetbrains.compose.web.core.tests
 
-import androidx.compose.runtime.Composable
 import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class FailingTestCases {

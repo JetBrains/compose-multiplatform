@@ -40,6 +40,7 @@ module(":web-integration-core", "integration-core")
 module(":web-integration-widgets", "integration-widgets")
 module(":compose-compiler-integration", "compose-compiler-integration")
 module(":internal-web-core-runtime", "internal-web-core-runtime")
+module(":test-utils", "test-utils")
 
 if (extra["compose.web.tests.skip.benchmarks"]!!.toString().toBoolean() != true) {
     module(":web-benchmark-core", "benchmark-core")
