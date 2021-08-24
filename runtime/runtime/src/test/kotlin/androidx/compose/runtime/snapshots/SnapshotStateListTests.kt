@@ -17,6 +17,10 @@
 package androidx.compose.runtime.snapshots
 
 import androidx.compose.runtime.mutableStateListOf
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -526,6 +530,44 @@ class SnapshotStateListTests {
             snapshot.dispose()
         }
         expected(mutableList, list)
+    }
+
+    @Test
+    fun concurrentGlobalModification_add(): Unit = runBlocking {
+        repeat(100) {
+            val list = mutableStateListOf<Int>()
+            coroutineScope {
+                repeat(100) { index ->
+                    launch(Dispatchers.Default) {
+                        list.add(index)
+                    }
+                }
+            }
+
+            repeat(100) {
+                assertTrue(list.contains(it))
+            }
+        }
+    }
+
+    @Test
+    fun concurrentGlobalModifications_addAll(): Unit = runBlocking {
+        repeat(100) {
+            val list = mutableStateListOf<Int>()
+            coroutineScope {
+                repeat(100) { index ->
+                    launch(Dispatchers.Default) {
+                        list.addAll(0, Array(10) { index * 100 + it }.toList())
+                    }
+                }
+            }
+
+            repeat(100) { index ->
+                repeat(10) {
+                    assertTrue(list.contains(index * 100 + it))
+                }
+            }
+        }
     }
 
     private fun <T> validate(list: MutableList<T>, block: (list: MutableList<T>) -> Unit) {
