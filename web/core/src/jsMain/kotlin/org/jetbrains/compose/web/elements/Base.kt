@@ -12,7 +12,6 @@ import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
 import org.jetbrains.compose.web.attributes.AttrsBuilder
 import org.jetbrains.compose.web.ExperimentalComposeWebApi
-import org.jetbrains.compose.web.internal.runtime.DomApplier
 import org.jetbrains.compose.web.internal.runtime.DomElementWrapper
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.w3c.dom.Element
@@ -34,9 +33,7 @@ private inline fun <TScope, T> ComposeDomNode(
         currentComposer.useNode()
     }
 
-    SkippableUpdater<T>(currentComposer).apply {
-        attrsSkippableUpdate()
-    }
+    attrsSkippableUpdate.invoke(SkippableUpdater(currentComposer))
 
     currentComposer.startReplaceableGroup(0x7ab4aae9)
     content?.invoke(elementScope)
