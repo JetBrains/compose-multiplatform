@@ -35,28 +35,12 @@ class DomApplier(
 
 
 @ComposeWebInternalApi
+interface NamedEventListener : EventListener {
+    val name: String
+}
+
+@ComposeWebInternalApi
 open class DomNodeWrapper(open val node: Node) {
-
-    @ComposeWebInternalApi
-    interface NamedEventListener : EventListener {
-        val name: String
-    }
-
-    private var currentListeners = emptyList<NamedEventListener>()
-
-    fun updateEventListeners(list: List<NamedEventListener>) {
-        val htmlElement = node as? HTMLElement ?: return
-
-        currentListeners.forEach {
-            htmlElement.removeEventListener(it.name, it)
-        }
-
-        currentListeners = list
-
-        currentListeners.forEach {
-            htmlElement.addEventListener(it.name, it)
-        }
-    }
 
     fun insert(index: Int, nodeWrapper: DomNodeWrapper) {
         val length = node.childNodes.length
@@ -90,4 +74,18 @@ open class DomNodeWrapper(open val node: Node) {
 }
 
 @ComposeWebInternalApi
-class DomElementWrapper(override val node: Element): DomNodeWrapper(node)
+class DomElementWrapper(override val node: Element): DomNodeWrapper(node) {
+    private var currentListeners = emptyList<NamedEventListener>()
+
+    fun updateEventListeners(list: List<NamedEventListener>) {
+        currentListeners.forEach {
+            node.removeEventListener(it.name, it)
+        }
+
+        currentListeners = list
+
+        currentListeners.forEach {
+            node.addEventListener(it.name, it)
+        }
+    }
+}
