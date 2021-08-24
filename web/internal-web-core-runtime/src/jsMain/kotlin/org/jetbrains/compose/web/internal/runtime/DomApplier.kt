@@ -90,5 +90,4 @@ open class DomNodeWrapper(open val node: Node) {
 }
 
 @ComposeWebInternalApi
-class DomElementWrapper(override val node: HTMLElement): DomNodeWrapper(node) {
-}
+class DomElementWrapper(override val node: Element): DomNodeWrapper(node)

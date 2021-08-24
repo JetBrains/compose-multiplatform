@@ -16,6 +16,8 @@ import org.jetbrains.compose.web.internal.runtime.DomElementWrapper
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.css.ElementCSSInlineStyle
+import org.w3c.dom.svg.SVGElement
 
 @OptIn(ComposeCompilerApi::class)
 @Composable
@@ -56,16 +58,20 @@ private fun DomElementWrapper.updateProperties(applicators: List<Pair<(Element, 
 
 @OptIn(ComposeWebInternalApi::class)
 private fun DomElementWrapper.updateStyleDeclarations(styleApplier: StyleHolder) {
-    node.removeAttribute("style")
+    when (node) {
+        is HTMLElement, is SVGElement -> {
+            node.removeAttribute("style")
 
-    val style = node.style
+            val style = node.unsafeCast<ElementCSSInlineStyle>().style
 
-    styleApplier.properties.forEach { (name, value) ->
-        style.setProperty(name, value.toString())
-    }
+            styleApplier.properties.forEach { (name, value) ->
+                style.setProperty(name, value.toString())
+            }
 
-    styleApplier. variables.forEach { (name, value) ->
-        style.setProperty(name, value.toString())
+            styleApplier. variables.forEach { (name, value) ->
+                style.setProperty(name, value.toString())
+            }
+        }
     }
 }
 
