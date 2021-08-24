@@ -100,9 +100,9 @@ fun <TElement : Element> TagElement(
 
     ComposeDomNode<ElementScope<TElement>, DomElementWrapper>(
         factory = {
-            DomElementWrapper(elementBuilder.create() as HTMLElement).also {
-                scope.element = it.node.unsafeCast<TElement>()
-            }
+            val node = elementBuilder.create()
+            scope.element = node
+            DomElementWrapper(node)
         },
         attrsSkippableUpdate = {
             val attrsBuilder = AttrsBuilder<TElement>()
