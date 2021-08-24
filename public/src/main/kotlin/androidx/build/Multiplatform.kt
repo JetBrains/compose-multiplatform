@@ -17,8 +17,8 @@
 package androidx.build
 
 import androidx.build.COMPOSE_MPP_ENABLED
-import androidx.build.AndroidXExtension
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.extra
 
 /**
  * Setting this property enables multiplatform builds of Compose
@@ -27,14 +27,12 @@ const val COMPOSE_MPP_ENABLED = "androidx.compose.multiplatformEnabled"
 
 class Multiplatform {
     companion object {
-        @JvmStatic
         fun Project.isMultiplatformEnabled(): Boolean {
-            return properties.get(COMPOSE_MPP_ENABLED)?.toString()?.toBoolean()
-                ?: androidxExtension()?.multiplatform ?: false
+            return properties.get(COMPOSE_MPP_ENABLED)?.toString()?.toBoolean() ?: false
         }
 
-        private fun Project.androidxExtension(): AndroidXExtension? {
-            return extensions.findByType(AndroidXExtension::class.java)
+        fun setEnabledForProject(project: Project, enabled: Boolean) {
+            project.extra.set(COMPOSE_MPP_ENABLED, enabled)
         }
     }
 }
