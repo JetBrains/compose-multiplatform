@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
  * the bounds of the original input.
  *
  * [BlurredEdgeTreatment] will clip the blur result to the boundaries of the
- * original content and specified [shape].
+ * original content and optionally specified [shape].
  *
  * Sampling of pixels outside of content bounds will have the same value as the pixels at the
  * closest edge.
@@ -55,11 +55,6 @@ import androidx.compose.ui.unit.dp
 @Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 inline class BlurredEdgeTreatment(val shape: Shape?) {
 
-    /**
-     * Determines whether the [BlurredEdgeTreatment] should be clipped to the provided shape
-     */
-    fun isBounded() = this.shape != null
-
     companion object {
 
         /**
@@ -69,8 +64,7 @@ inline class BlurredEdgeTreatment(val shape: Shape?) {
 
         /**
          * Do not clip the blur result to the boundaries of the original content.
-         * boundaries of the original content. Sampling of pixels outside of the content bounds
-         * will sample transparent black instead.
+         * Sampling of pixels outside of the content bounds will sample transparent black instead.
          * This is recommended for blurring content that is intended to render outside of the
          * original bounds and may contain transparent pixels in the original bounds (ex. blurring
          * an arbitrary shape or text)
@@ -108,7 +102,7 @@ fun Modifier.blur(
 ): Modifier {
     val clip: Boolean
     val tileMode: TileMode
-    if (edgeTreatment.isBounded()) {
+    if (edgeTreatment.shape != null) {
         clip = true
         tileMode = TileMode.Clamp
     } else {
@@ -127,7 +121,7 @@ fun Modifier.blur(
                     null
                 }
             this.shape = edgeTreatment.shape ?: RectangleShape
-            this.clip = edgeTreatment.isBounded()
+            this.clip = clip
         }
     } else {
         this
