@@ -1590,12 +1590,15 @@ internal class ComposerImpl(
             writer.update(value)
             if (value is RememberObserver) {
                 record { _, _, rememberManager -> rememberManager.remembering(value) }
+                abandonSet.add(value)
             }
         } else {
             val groupSlotIndex = reader.groupSlotIndex - 1
+            if (value is RememberObserver) {
+                abandonSet.add(value)
+            }
             recordSlotTableOperation(forParent = true) { _, slots, rememberManager ->
                 if (value is RememberObserver) {
-                    abandonSet.add(value)
                     rememberManager.remembering(value)
                 }
                 when (val previous = slots.set(groupSlotIndex, value)) {
@@ -1621,9 +1624,6 @@ internal class ComposerImpl(
     @PublishedApi
     @OptIn(InternalComposeApi::class)
     internal fun updateCachedValue(value: Any?) {
-        if (inserting && value is RememberObserver) {
-            abandonSet.add(value)
-        }
         updateValue(value)
     }
 
