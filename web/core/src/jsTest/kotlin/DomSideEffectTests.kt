@@ -5,6 +5,7 @@ import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.renderComposable
 import kotlinx.browser.document
 import kotlinx.dom.clear
+import org.jetbrains.compose.web.testutils.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

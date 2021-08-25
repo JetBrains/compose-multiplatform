@@ -1,8 +1,8 @@
-package org.jetbrains.compose.web
+package org.jetbrains.compose.web.internal.runtime
 
 import androidx.compose.runtime.snapshots.ObserverHandle
 import androidx.compose.runtime.snapshots.Snapshot
-import org.jetbrains.compose.web.GlobalSnapshotManager.ensureStarted
+import org.jetbrains.compose.web.internal.runtime.GlobalSnapshotManager.ensureStarted
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
@@ -16,7 +16,8 @@ import kotlinx.coroutines.launch
  * Composition bootstrapping mechanisms for a particular platform/framework should call
  * [ensureStarted] during setup to initialize periodic global snapshot notifications.
  */
-internal object GlobalSnapshotManager {
+@ComposeWebInternalApi
+object GlobalSnapshotManager {
     private var started = false
     private var commitPending = false
     private var removeWriteObserver: (ObserverHandle)? = null

@@ -11,6 +11,7 @@ import kotlinx.browser.document
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.web.internal.runtime.*
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLBodyElement
 import org.w3c.dom.get
@@ -22,6 +23,7 @@ import org.w3c.dom.get
  *
  * @return the instance of the [Composition]
  */
+@OptIn(ComposeWebInternalApi::class)
 fun <TElement : Element> renderComposable(
     root: TElement,
     monotonicFrameClock: MonotonicFrameClock = DefaultMonotonicFrameClock,

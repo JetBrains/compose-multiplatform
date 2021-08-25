@@ -10,6 +10,7 @@ import org.w3c.dom.get
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import org.jetbrains.compose.web.testutils.*
 
 class StaticComposableTests {
     @Test
@@ -184,12 +185,10 @@ class StaticComposableTests {
     }
 
     @Test
-    fun stylesPosition() {
-        val root = "div".asHtmlElement()
+    fun stylesPosition() = runTest {
         val enumValues = Position.values()
-        renderComposable(
-            root = root
-        ) {
+
+        composition {
             enumValues.forEach { position ->
                 Span(
                     {
@@ -197,14 +196,14 @@ class StaticComposableTests {
                             position(position)
                         }
                     }
-                ) { }
+                )
             }
         }
 
         enumValues.forEachIndexed { index, position ->
             assertEquals(
                 "position: ${position.value};",
-                (root.children[index] as HTMLElement).style.cssText
+                nextChild().style.cssText
             )
         }
     }

@@ -8,6 +8,7 @@ import org.jetbrains.compose.web.dom.RadioInput
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import org.jetbrains.compose.web.testutils.*
 
 class ControlledRadioGroupsTests {
 

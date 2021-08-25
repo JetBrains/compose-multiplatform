@@ -19,7 +19,7 @@ import androidx.compose.ui.window.singleWindowApplication
 
 fun main() = singleWindowApplication {
     Image(
-        painter = painterResource("sample.png"), // ImageBitmap
+        painter = painterResource("sample.png"),
         contentDescription = "Sample",
         modifier = Modifier.fillMaxSize()
     )
@@ -135,70 +135,66 @@ fun loadXmlImageVector(file: File, density: Density): ImageVector =
 
 [XML vector drawable](../../artwork/compose-logo.xml)
 
-## Drawing raw image data using native canvas
-
-You may want to draw raw image data, in which case you can use `Canvas` and` drawIntoCanvas`.
-
+## Drawing images using Canvas
 ```kotlin
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.graphics.withSave
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.loadImageBitmap
+import androidx.compose.ui.res.loadSvgPainter
+import androidx.compose.ui.res.loadXmlImageVector
 import androidx.compose.ui.res.useResource
 import androidx.compose.ui.window.singleWindowApplication
-import org.jetbrains.skija.Bitmap
-import org.jetbrains.skija.ColorAlphaType
-import org.jetbrains.skija.ImageInfo
-
-private val sample = useResource("sample.png", ::loadImageBitmap)
+import org.xml.sax.InputSource
 
 fun main() = singleWindowApplication {
-    val bitmap = remember { bitmapFromByteArray(sample.getBytes(), sample.width, sample.height) }
+    val density = LocalDensity.current // to calculate the intrinsic size of vector images (SVG, XML)
+
+    val sample = remember {
+        useResource("sample.png", ::loadImageBitmap)
+    }
+    val ideaLogo = remember {
+        useResource("idea-logo.svg") { loadSvgPainter(it, density) }
+    }
+    val composeLogo = rememberVectorPainter(
+        remember {
+            useResource("compose-logo.xml") { loadXmlImageVector(InputSource(it), density) }
+        }
+    )
+
     Canvas(
         modifier = Modifier.fillMaxSize()
     ) {
         drawIntoCanvas { canvas ->
-            canvas.drawImage(bitmap, Offset.Zero, Paint())
+            canvas.withSave {
+                canvas.drawImage(sample, Offset.Zero, Paint())
+                canvas.translate(sample.width.toFloat(), 0f)
+                with(ideaLogo) {
+                    draw(ideaLogo.intrinsicSize)
+                }
+                canvas.translate(ideaLogo.intrinsicSize.width, 0f)
+                with(composeLogo) {
+                    draw(Size(100f, 100f))
+                }
+            }
         }
     }
-}
-
-fun bitmapFromByteArray(pixels: ByteArray, width: Int, height: Int): ImageBitmap {
-    val bitmap = Bitmap()
-    bitmap.allocPixels(ImageInfo.makeS32(width, height, ColorAlphaType.PREMUL))
-    bitmap.installPixels(bitmap.imageInfo, pixels, (width * 4).toLong())
-    return bitmap.asImageBitmap()
-}
-
-// creating byte array from BufferedImage
-private fun ImageBitmap.getBytes(): ByteArray {
-    val buffer = IntArray(width * height)
-    readPixels(buffer)
-
-    val pixels = ByteArray(width * height * 4)
-
-    var index = 0
-    for (y in 0 until height) {
-        for (x in 0 until width) {
-            val pixel = buffer[y * width + x]
-            pixels[index++] = ((pixel and 0xFF)).toByte() // Blue component
-            pixels[index++] = (((pixel shr 8) and 0xFF)).toByte() // Green component
-            pixels[index++] = (((pixel shr 16) and 0xFF)).toByte() // Red component
-            pixels[index++] = (((pixel shr 24) and 0xFF)).toByte() // Alpha component
-        }
-    }
-
-    return pixels
 }
 ```
 
-<img alt="Drawing raw images" src="draw_image_into_canvas.png" height="496" />
+[PNG](sample.png)
+
+[SVG](../../artwork/idea-logo.svg)
+
+[XML vector drawable](../../artwork/compose-logo.xml)
 
 ## Setting the application window icon
 

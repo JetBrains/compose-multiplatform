@@ -19,6 +19,7 @@ import org.jetbrains.compose.web.dom.Tr
 import org.w3c.dom.HTMLElement
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import org.jetbrains.compose.web.testutils.*
 
 class TableTests {
 
