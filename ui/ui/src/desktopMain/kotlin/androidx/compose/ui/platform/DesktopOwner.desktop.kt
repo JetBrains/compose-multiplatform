@@ -49,12 +49,10 @@ import androidx.compose.ui.input.mouse.MouseScrollEventFilter
 import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventProcessor
 import androidx.compose.ui.input.pointer.PointerInputFilter
-import androidx.compose.ui.input.pointer.PointerMoveEventFilter
 import androidx.compose.ui.input.pointer.PositionCalculator
 import androidx.compose.ui.input.pointer.ProcessResult
 import androidx.compose.ui.input.pointer.TestPointerInputEventData
 import androidx.compose.ui.layout.RootMeasurePolicy
-import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.node.HitTestResult
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
@@ -320,7 +318,14 @@ internal class DesktopOwner(
 
     internal fun processPointerInput(event: PointerInputEvent): ProcessResult {
         measureAndLayout()
-        return pointerInputEventProcessor.process(event, this)
+        return pointerInputEventProcessor.process(
+            event,
+            this,
+            isInBounds = event.pointers.all {
+                it.position.x in 0f..root.width.toFloat() &&
+                    it.position.y in 0f..root.height.toFloat()
+            }
+        )
     }
 
     override fun processPointerInput(nanoTime: Long, pointers: List<TestPointerInputEventData>) {
@@ -349,79 +354,5 @@ internal class DesktopOwner(
             val isConsumed = filter.onMouseScroll(event)
             if (isConsumed) break
         }
-    }
-
-    private var oldMoveFilters = listOf<PointerMoveEventFilter>()
-    private val newMoveFilters = HitTestResult<PointerInputFilter>()
-
-    internal fun onPointerMove(position: Offset) {
-        // TODO: do we actually need that?
-        measureAndLayout()
-
-        root.hitTest(position, newMoveFilters)
-        // Optimize fastpath, where no pointer move event listeners are there.
-        if (newMoveFilters.isEmpty() && oldMoveFilters.isEmpty()) return
-
-        // For elements in `newMoveFilters` we call on `onMoveHandler`.
-        // For elements in `oldMoveFilters` but not in `newMoveFilters` we call `onExitHandler`.
-        // For elements not in `oldMoveFilters` but in `newMoveFilters` we call `onEnterHandler`.
-
-        var onMoveConsumed = false
-        var onEnterConsumed = false
-        var onExitConsumed = false
-
-        for (
-            filter in newMoveFilters
-                .asReversed()
-                .asSequence()
-                .filterIsInstance<PointerMoveEventFilter>()
-        ) {
-            if (!onMoveConsumed) {
-                val relative = position - filter.layoutCoordinates!!.boundsInWindow().topLeft
-                onMoveConsumed = filter.onMoveHandler(relative)
-            }
-            if (!onEnterConsumed && !oldMoveFilters.contains(filter))
-                onEnterConsumed = filter.onEnterHandler()
-        }
-
-        // TODO: is this quadratic algorithm (by number of matching filters) a problem?
-        //  Unlikely we'll have significant number of filters.
-        for (filter in oldMoveFilters.asReversed()) {
-            if (!onExitConsumed && !newMoveFilters.contains(filter))
-                onExitConsumed = filter.onExitHandler()
-        }
-
-        oldMoveFilters = newMoveFilters.filterIsInstance<PointerMoveEventFilter>()
-        newMoveFilters.clear()
-    }
-
-    internal fun onPointerEnter(position: Offset) {
-        var onEnterConsumed = false
-        // TODO: do we actually need that?
-        measureAndLayout()
-        root.hitTest(position, newMoveFilters)
-        for (
-            filter in newMoveFilters
-                .asReversed()
-                .asSequence()
-                .filterIsInstance<PointerMoveEventFilter>()
-        ) {
-            if (!onEnterConsumed) {
-                onEnterConsumed = filter.onEnterHandler()
-            }
-        }
-        oldMoveFilters = newMoveFilters.filterIsInstance<PointerMoveEventFilter>()
-        newMoveFilters.clear()
-    }
-
-    internal fun onPointerExit() {
-        var onExitConsumed = false
-        for (filter in oldMoveFilters.asReversed()) {
-            if (!onExitConsumed) {
-                onExitConsumed = filter.onExitHandler()
-            }
-        }
-        oldMoveFilters = listOf()
-        newMoveFilters.clear()
     }
 }

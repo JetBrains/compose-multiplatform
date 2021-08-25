@@ -30,10 +30,10 @@ import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.DpOffset
@@ -101,23 +101,28 @@ fun BoxWithTooltip(
                 )
                 parentBounds = IntRect(position, size)
             }
-            .pointerMoveFilter(
-                onMove = {
-                    mousePosition.value = IntOffset(
-                        it.x.toInt() + parentBounds.left,
-                        it.y.toInt() + parentBounds.top
-                    )
-                    false
-                },
-                onEnter = {
-                    startShowing()
-                    false
-                },
-                onExit = {
-                    hide()
-                    false
+            .pointerInput(Unit) {
+                awaitPointerEventScope {
+                    while (true) {
+                        val event = awaitPointerEvent()
+                        val position = event.changes.first().position
+                        when (event.type) {
+                            PointerEventType.Move -> {
+                                mousePosition.value = IntOffset(
+                                    position.x.toInt() + parentBounds.left,
+                                    position.y.toInt() + parentBounds.top
+                                )
+                            }
+                            PointerEventType.Enter -> {
+                                startShowing()
+                            }
+                            PointerEventType.Exit -> {
+                                hide()
+                            }
+                        }
+                    }
                 }
-            )
+            }
             .pointerInput(Unit) {
                 detectDown {
                     hide()

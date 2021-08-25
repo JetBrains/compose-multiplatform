@@ -91,7 +91,8 @@ import androidx.compose.ui.input.key.isMetaPressed
 import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.input.pointer.pointerMoveFilter
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.Placeholder
@@ -346,20 +347,25 @@ private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
                     "   }\n" +
                     "}",
                 fontFamily = italicFont,
-                modifier = Modifier.padding(10.dp).pointerMoveFilter(
-                    onMove = {
-                        overText = "Move position: $it"
-                        false
-                    },
-                    onEnter = {
-                        overText = "Over enter"
-                        false
-                    },
-                    onExit = {
-                        overText = "Over exit"
-                        false
+                modifier = Modifier.padding(10.dp).pointerInput(Unit) {
+                    awaitPointerEventScope {
+                        while (true) {
+                            val event = awaitPointerEvent()
+                            val position = event.changes.first().position
+                            when (event.type) {
+                                PointerEventType.Move -> {
+                                    overText = "Move position: $position"
+                                }
+                                PointerEventType.Enter -> {
+                                    overText = "Over enter"
+                                }
+                                PointerEventType.Exit -> {
+                                    overText = "Over exit"
+                                }
+                            }
+                        }
                     }
-                )
+                }
             )
         }
 

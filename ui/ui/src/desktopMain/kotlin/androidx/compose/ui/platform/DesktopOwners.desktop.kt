@@ -192,13 +192,8 @@ internal class DesktopOwners(
 
     fun onMouseMoved(x: Int, y: Int, nativeEvent: MouseEvent? = null) {
         pointLocation = IntOffset(x, y)
-        val currentOwner = hoveredOwner
         val event = pointerInputEvent(nativeEvent, x, y, isMousePressed)
-        val result = currentOwner?.processPointerInput(event)
-        if (result?.anyMovementConsumed != true) {
-            val position = Offset(x.toFloat(), y.toFloat())
-            currentOwner?.onPointerMove(position)
-        }
+        hoveredOwner?.processPointerInput(event)
     }
 
     fun onMouseScroll(x: Int, y: Int, event: MouseScrollEvent) {
@@ -206,13 +201,14 @@ internal class DesktopOwners(
         hoveredOwner?.onMouseScroll(position, event)
     }
 
-    fun onMouseEntered(x: Int, y: Int) {
-        val position = Offset(x.toFloat(), y.toFloat())
-        hoveredOwner?.onPointerEnter(position)
+    fun onMouseEntered(x: Int, y: Int, nativeEvent: MouseEvent? = null) {
+        val event = pointerInputEvent(nativeEvent, x, y, isMousePressed)
+        hoveredOwner?.processPointerInput(event)
     }
 
-    fun onMouseExited() {
-        hoveredOwner?.onPointerExit()
+    fun onMouseExited(x: Int, y: Int, nativeEvent: MouseEvent? = null) {
+        val event = pointerInputEvent(nativeEvent, x, y, isMousePressed)
+        hoveredOwner?.processPointerInput(event)
     }
 
     private fun consumeKeyEvent(event: KeyEvent): Boolean {

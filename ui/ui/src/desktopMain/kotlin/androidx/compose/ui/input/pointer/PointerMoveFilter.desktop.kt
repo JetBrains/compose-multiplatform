@@ -16,11 +16,8 @@
 
 package androidx.compose.ui.input.pointer
 
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.unit.IntSize
 
 /**
  * Modifier allowing to track pointer (i.e. mouse or trackpad) move events.
@@ -33,28 +30,25 @@ fun Modifier.pointerMoveFilter(
     onMove: (position: Offset) -> Boolean = { false },
     onExit: () -> Boolean = { false },
     onEnter: () -> Boolean = { false },
-): Modifier = composed {
-    val filter = remember(::PointerMoveEventFilter)
-    filter.onEnterHandler = onEnter
-    filter.onExitHandler = onExit
-    filter.onMoveHandler = onMove
-    MovePointerInputModifierImpl(filter)
+): Modifier = pointerInput(onMove, onExit, onEnter) {
+    awaitPointerEventScope {
+        while (true) {
+            val event = awaitPointerEvent()
+            val consumed = when (event.type) {
+                PointerEventType.Move -> {
+                    onMove(event.changes.first().position)
+                }
+                PointerEventType.Enter -> {
+                    onEnter()
+                }
+                PointerEventType.Exit -> {
+                    onExit()
+                }
+                else -> false
+            }
+            if (consumed) {
+                event.changes.forEach { it.consumeAllChanges() }
+            }
+        }
+    }
 }
-
-internal class PointerMoveEventFilter : PointerInputFilter() {
-    lateinit var onEnterHandler: () -> Boolean
-    lateinit var onExitHandler: () -> Boolean
-    lateinit var onMoveHandler: (position: Offset) -> Boolean
-
-    override fun onPointerEvent(
-        pointerEvent: PointerEvent,
-        pass: PointerEventPass,
-        bounds: IntSize
-    ) = Unit
-
-    override fun onCancel() = Unit
-}
-
-private data class MovePointerInputModifierImpl(
-    override val pointerInputFilter: PointerInputFilter
-) : PointerInputModifier
