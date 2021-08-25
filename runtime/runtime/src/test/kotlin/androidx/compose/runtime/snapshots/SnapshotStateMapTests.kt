@@ -501,6 +501,19 @@ class SnapshotStateMapTests {
         }
     }
 
+    @Test
+    fun modificationAcrossSnapshots() {
+        val map = mutableStateMapOf<Int, Int>()
+        repeat(100) {
+            Snapshot.withMutableSnapshot {
+                map[it] = it
+            }
+        }
+        repeat(100) {
+            assertEquals(it, map[it])
+        }
+    }
+
     private fun validateRead(
         initialMap: MutableMap<Int, Float> = defaultMap(),
         block: (Map<Int, Float>, Map<Int, Float>) -> Unit
