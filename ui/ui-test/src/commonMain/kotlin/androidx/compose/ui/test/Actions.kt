@@ -133,7 +133,6 @@ fun SemanticsNodeInteraction.performScrollTo(): SemanticsNodeInteraction {
  * @param index The index of the item to scroll to
  * @see hasScrollToIndexAction
  */
-@ExperimentalTestApi
 fun SemanticsNodeInteraction.performScrollToIndex(index: Int): SemanticsNodeInteraction {
     val node = fetchSemanticsNode("Failed: performScrollToIndex($index)")
     requireSemantics(node, ScrollToIndex) {
@@ -160,7 +159,6 @@ fun SemanticsNodeInteraction.performScrollToIndex(index: Int): SemanticsNodeInte
  * @param key The key of the item to scroll to
  * @see hasScrollToKeyAction
  */
-@ExperimentalTestApi
 fun SemanticsNodeInteraction.performScrollToKey(key: Any): SemanticsNodeInteraction {
     val node = fetchSemanticsNode("Failed: performScrollToKey(\"$key\")")
     requireSemantics(node, IndexForKey, ScrollToIndex) {

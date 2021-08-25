@@ -390,7 +390,6 @@ fun hasSetTextAction() =
  * [scrollable][androidx.compose.foundation.gestures.scrollable] doesn't have items with an
  * index, while [LazyColumn][androidx.compose.foundation.lazy.LazyColumn] does.
  */
-@ExperimentalTestApi
 fun hasScrollToIndexAction() =
     SemanticsMatcher.keyIsDefined(SemanticsActions.ScrollToIndex)
 
@@ -399,7 +398,6 @@ fun hasScrollToIndexAction() =
  * [LazyColumn][androidx.compose.foundation.lazy.LazyColumn] or
  * [LazyRow][androidx.compose.foundation.lazy.LazyRow].
  */
-@ExperimentalTestApi
 fun hasScrollToKeyAction() =
     SemanticsMatcher.keyIsDefined(SemanticsActions.ScrollToIndex)
         .and(SemanticsMatcher.keyIsDefined(SemanticsProperties.IndexForKey))
