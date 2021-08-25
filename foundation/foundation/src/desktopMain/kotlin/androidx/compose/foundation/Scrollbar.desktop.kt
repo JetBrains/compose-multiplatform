@@ -25,6 +25,7 @@ import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -46,7 +47,6 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
@@ -190,7 +190,6 @@ fun HorizontalScrollbar(
 )
 
 // TODO(demin): do we need to stop dragging if cursor is beyond constraints?
-// TODO(demin): add Interaction.Hovered to interactionSource
 @Composable
 private fun Scrollbar(
     adapter: ScrollbarAdapter,
@@ -211,7 +210,7 @@ private fun Scrollbar(
     }
 
     var containerSize by remember { mutableStateOf(0) }
-    var isHovered by remember { mutableStateOf(false) }
+    val isHovered by interactionSource.collectIsHoveredAsState()
 
     val isHighlighted by remember {
         derivedStateOf {
@@ -253,21 +252,7 @@ private fun Scrollbar(
             )
         },
         modifier
-            .pointerInput(Unit) {
-                awaitPointerEventScope {
-                    while (true) {
-                        val event = awaitPointerEvent()
-                        when (event.type) {
-                            PointerEventType.Enter -> {
-                                isHovered = true
-                            }
-                            PointerEventType.Exit -> {
-                                isHovered = false
-                            }
-                        }
-                    }
-                }
-            }
+            .hoverable(interactionSource = interactionSource)
             .scrollOnPressOutsideSlider(isVertical, sliderAdapter, adapter, containerSize),
         measurePolicy
     )
