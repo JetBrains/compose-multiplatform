@@ -2,7 +2,7 @@ import androidx.build.AndroidXPlaygroundRootImplPlugin
 
 buildscript {
     dependencies {
-        classpath(project.files("${project.rootProject.ext["outDir"]}/buildSrc/private/build/libs/private.jar"))
+        classpath(project.files("${project.rootProject.ext["buildSrcOut"]}/private/build/libs/private.jar"))
     }
 }
 
