@@ -1,13 +1,6 @@
 package org.jetbrains.compose.web.dom
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposeCompilerApi
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.DisposableEffectResult
-import androidx.compose.runtime.DisposableEffectScope
-import androidx.compose.runtime.ExplicitGroupsComposable
-import androidx.compose.runtime.SkippableUpdater
-import androidx.compose.runtime.currentComposer
+import androidx.compose.runtime.*
 import org.jetbrains.compose.web.attributes.AttrsBuilder
 import org.jetbrains.compose.web.ExperimentalComposeWebApi
 import org.jetbrains.compose.web.css.StyleHolder
@@ -57,16 +50,20 @@ private fun DomElementWrapper.updateProperties(applicators: List<Pair<(Element, 
 
 @OptIn(ComposeWebInternalApi::class)
 private fun DomElementWrapper.updateStyleDeclarations(styleApplier: StyleHolder) {
-    node.removeAttribute("style")
+    when (node) {
+        is HTMLElement, is SVGElement -> {
+            node.removeAttribute("style")
 
-    val style = node.unsafeCast<ElementCSSInlineStyle>().style
+            val style = node.unsafeCast<ElementCSSInlineStyle>().style
 
-    styleApplier.properties.forEach { (name, value) ->
-        style.setProperty(name, value.toString())
-    }
+            styleApplier.properties.forEach { (name, value) ->
+                style.setProperty(name, value.toString())
+            }
 
-    styleApplier.variables.forEach { (name, value) ->
-        style.setProperty(name, value.toString())
+            styleApplier.variables.forEach { (name, value) ->
+                style.setProperty(name, value.toString())
+            }
+        }
     }
 }
 
@@ -90,15 +87,15 @@ fun <TElement : Element> TagElement(
     applyAttrs: (AttrsBuilder<TElement>.() -> Unit)?,
     content: (@Composable ElementScope<TElement>.() -> Unit)?
 ) {
-    val scope = ElementScopeImpl<TElement>()
-    val refEffect = DisposableEffectHolder<TElement>()
-
-    val node = elementBuilder.create()
-    scope.element = node
-    val domElementWrapper = DomElementWrapper(node)
+    val scope = remember {  ElementScopeImpl<TElement>() }
+    val refEffect = remember { DisposableEffectHolder<TElement>() }
 
     ComposeDomNode<ElementScope<TElement>, DomElementWrapper>(
-        factory = { domElementWrapper },
+        factory = {
+            val node = elementBuilder.create()
+            scope.element = node
+            DomElementWrapper(node)
+        },
         attrsSkippableUpdate = {
             val attrsBuilder = AttrsBuilder<TElement>()
             applyAttrs?.invoke(attrsBuilder)
@@ -109,12 +106,7 @@ fun <TElement : Element> TagElement(
                 set(attrsBuilder.collect(), DomElementWrapper::updateAttrs)
                 set(attrsBuilder.collectListeners(), DomElementWrapper::updateEventListeners)
                 set(attrsBuilder.propertyUpdates, DomElementWrapper::updateProperties)
-                when (node) {
-                    is HTMLElement, is SVGElement -> set(
-                        attrsBuilder.styleBuilder,
-                        DomElementWrapper::updateStyleDeclarations
-                    )
-                }
+                set(attrsBuilder.styleBuilder, DomElementWrapper::updateStyleDeclarations)
             }
         },
         elementScope = scope,
