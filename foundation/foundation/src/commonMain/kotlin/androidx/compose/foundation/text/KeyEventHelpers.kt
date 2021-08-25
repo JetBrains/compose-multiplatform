@@ -29,3 +29,9 @@ import androidx.compose.ui.input.key.KeyEvent
  * @return true if selection should be cancelled based on this KeyEvent
  */
 internal expect fun KeyEvent.cancelsTextSelection(): Boolean
+
+/**
+ * macOS has a character/emoji palette, which has to be ordered by application. This
+ * platform-specific helper implements this action on MacOS and noop on other platforms.
+ */
+internal expect fun showCharacterPalette()
