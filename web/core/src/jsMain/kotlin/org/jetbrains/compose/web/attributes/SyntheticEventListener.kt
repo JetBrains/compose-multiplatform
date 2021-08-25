@@ -9,8 +9,8 @@ import org.jetbrains.compose.web.attributes.EventsListenerBuilder.Companion.CHAN
 import org.jetbrains.compose.web.attributes.EventsListenerBuilder.Companion.INPUT
 import org.jetbrains.compose.web.attributes.EventsListenerBuilder.Companion.SELECT
 import org.jetbrains.compose.web.events.*
-import org.jetbrains.compose.web.internal.runtime.DomNodeWrapper
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
+import org.jetbrains.compose.web.internal.runtime.NamedEventListener
 import org.w3c.dom.DragEvent
 import org.w3c.dom.TouchEvent
 import org.w3c.dom.clipboard.ClipboardEvent
@@ -21,7 +21,7 @@ open class SyntheticEventListener<T : SyntheticEvent<*>> internal constructor(
     val event: String,
     val options: Options,
     val listener: (T) -> Unit
-) : EventListener, DomNodeWrapper.NamedEventListener {
+) : EventListener, NamedEventListener {
 
     override val name: String = event
 

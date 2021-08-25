@@ -35,28 +35,12 @@ class DomApplier(
 
 
 @ComposeWebInternalApi
+interface NamedEventListener : EventListener {
+    val name: String
+}
+
+@ComposeWebInternalApi
 open class DomNodeWrapper(open val node: Node) {
-
-    @ComposeWebInternalApi
-    interface NamedEventListener : EventListener {
-        val name: String
-    }
-
-    private var currentListeners = emptyList<NamedEventListener>()
-
-    fun updateEventListeners(list: List<NamedEventListener>) {
-        val htmlElement = node as? HTMLElement ?: return
-
-        currentListeners.forEach {
-            htmlElement.removeEventListener(it.name, it)
-        }
-
-        currentListeners = list
-
-        currentListeners.forEach {
-            htmlElement.addEventListener(it.name, it)
-        }
-    }
 
     fun insert(index: Int, nodeWrapper: DomNodeWrapper) {
         val length = node.childNodes.length
@@ -90,36 +74,18 @@ open class DomNodeWrapper(open val node: Node) {
 }
 
 @ComposeWebInternalApi
-class DomElementWrapper(override val node: HTMLElement): DomNodeWrapper(node) {
-    private var currentAttrs: Map<String, String>? = null
+class DomElementWrapper(override val node: Element): DomNodeWrapper(node) {
+    private var currentListeners = emptyList<NamedEventListener>()
 
-    fun updateAttrs(attrs: Map<String, String>) {
-        currentAttrs?.forEach {
-            node.removeAttribute(it.key)
+    fun updateEventListeners(list: List<NamedEventListener>) {
+        currentListeners.forEach {
+            node.removeEventListener(it.name, it)
         }
 
-        attrs.forEach {
-            node.setAttribute(it.key, it.value)
+        currentListeners = list
+
+        currentListeners.forEach {
+            node.addEventListener(it.name, it)
         }
-        currentAttrs = attrs
-    }
-
-    fun updateProperties(list: List<Pair<(Element, Any) -> Unit, Any>>) {
-        if (node.className.isNotEmpty()) node.className = ""
-
-        list.forEach {
-            it.first(node, it.second)
-        }
-    }
-
-    @ComposeWebInternalApi
-    fun interface StyleDeclarationsApplier {
-        @ComposeWebInternalApi
-        fun applyToNodeStyle(nodeStyle: CSSStyleDeclaration)
-    }
-
-    fun updateStyleDeclarations(styleApplier: StyleDeclarationsApplier) {
-        node.removeAttribute("style")
-        styleApplier.applyToNodeStyle(node.style)
     }
 }

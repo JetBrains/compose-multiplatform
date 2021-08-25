@@ -133,7 +133,7 @@ interface StyleHolder {
 
 @OptIn(ComposeWebInternalApi::class)
 @Suppress("EqualsOrHashCode")
-open class StyleBuilderImpl : StyleBuilder, StyleHolder, DomElementWrapper.StyleDeclarationsApplier {
+open class StyleBuilderImpl : StyleBuilder, StyleHolder {
     override val properties: MutableStylePropertyList = mutableListOf()
     override val variables: MutableStylePropertyList = mutableListOf()
 
@@ -156,16 +156,6 @@ open class StyleBuilderImpl : StyleBuilder, StyleHolder, DomElementWrapper.Style
     internal fun copyFrom(sb: StyleBuilderImpl) {
         properties.addAll(sb.properties)
         variables.addAll(sb.variables)
-    }
-
-    override fun applyToNodeStyle(nodeStyle: CSSStyleDeclaration) {
-        properties.forEach { (name, value) ->
-            nodeStyle.setProperty(name, value.toString())
-        }
-
-        variables.forEach { (name, value) ->
-            nodeStyle.setProperty(name, value.toString())
-        }
     }
 }
 

@@ -400,7 +400,7 @@ class AttributesTests {
         waitForRecompositionComplete()
 
         assertEquals(
-            expected = "<button class=\"a b\" style=\"color: red;\" value=\"buttonValue\">Button</button>",
+            expected = "<button style=\"color: red;\" value=\"buttonValue\" class=\"a b\">Button</button>",
             actual = currentChild().outerHTML
         )
     }
