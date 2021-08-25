@@ -16,15 +16,31 @@
 
 package androidx.compose.material
 
+import android.os.Build
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.testutils.assertPixels
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.filters.SdkSuppress
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.math.roundToInt
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -67,5 +83,27 @@ class DividerUiTest {
             }
             .assertHeightIsEqualTo(height)
             .assertWidthIsEqualTo(rule.rootWidth())
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun divider_HairlineThickness() {
+        val size = 5.dp
+        val testTag = "testTag"
+        var sizePx = 0
+        rule.setContent {
+            sizePx = with(LocalDensity.current) { size.toPx().roundToInt() }
+            Box(modifier = Modifier.size(size).background(Color.Black)) {
+                Divider(
+                    modifier = Modifier.testTag(testTag).fillMaxWidth(),
+                    color = Color.Blue,
+                    thickness = Dp.Hairline
+                )
+            }
+        }
+
+        rule.onNodeWithTag(testTag).captureToImage().assertPixels(IntSize(sizePx, 1)) {
+            Color.Blue
+        }
     }
 }
