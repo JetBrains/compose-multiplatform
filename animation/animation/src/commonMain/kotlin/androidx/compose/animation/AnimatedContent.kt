@@ -426,16 +426,16 @@ class AnimatedContentScope<S> internal constructor(
         ),
         targetOffset: (offsetForFullSlide: Int) -> Int = { it }
     ): ExitTransition {
-        return when (towards) {
+        return when {
             // Note: targetSize could be 0 for empty composables
-            Left -> slideOutHorizontally(
+            towards.isLeft -> slideOutHorizontally(
                 {
                     val targetSize = targetSizeMap[transition.targetState]?.value ?: IntSize.Zero
                     targetOffset.invoke(-calculateOffset(IntSize(it, it), targetSize).x - it)
                 },
                 animationSpec
             )
-            Right -> slideOutHorizontally(
+            towards.isRight -> slideOutHorizontally(
                 {
                     val targetSize = targetSizeMap[transition.targetState]?.value ?: IntSize.Zero
                     targetOffset.invoke(
@@ -444,14 +444,14 @@ class AnimatedContentScope<S> internal constructor(
                 },
                 animationSpec
             )
-            Up -> slideOutVertically(
+            towards == Up -> slideOutVertically(
                 {
                     val targetSize = targetSizeMap[transition.targetState]?.value ?: IntSize.Zero
                     targetOffset.invoke(-calculateOffset(IntSize(it, it), targetSize).y - it)
                 },
                 animationSpec
             )
-            Down -> slideOutVertically(
+            towards == Down -> slideOutVertically(
                 {
                     val targetSize = targetSizeMap[transition.targetState]?.value ?: IntSize.Zero
                     targetOffset.invoke(
