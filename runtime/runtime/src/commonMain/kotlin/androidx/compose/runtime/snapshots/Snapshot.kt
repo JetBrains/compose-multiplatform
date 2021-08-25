@@ -1565,7 +1565,7 @@ internal fun <T : StateRecord> T.writableRecord(state: StateObject, snapshot: Sn
 
     // Otherwise, make a copy of the readable data and mark it as born in this snapshot, making it
     // writable.
-    val newData = newWritableRecord(state, snapshot)
+    val newData = readData.newWritableRecord(state, snapshot)
 
     snapshot.recordModified(state)
 

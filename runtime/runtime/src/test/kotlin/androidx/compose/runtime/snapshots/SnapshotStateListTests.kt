@@ -570,6 +570,19 @@ class SnapshotStateListTests {
         }
     }
 
+    @Test
+    fun modificationAcrossSnapshots() {
+        val list = mutableStateListOf<Int>()
+        repeat(100) {
+            Snapshot.withMutableSnapshot {
+                list.add(it)
+            }
+        }
+        repeat(100) {
+            assertEquals(it, list[it])
+        }
+    }
+
     private fun <T> validate(list: MutableList<T>, block: (list: MutableList<T>) -> Unit) {
         val normalList = list.toMutableList()
         block(normalList)
