@@ -29,6 +29,12 @@ import kotlin.math.roundToInt
 /**
  * Used to specify the arrangement of the layout's children in layouts like [Row] or [Column] in
  * the main axis direction (horizontal and vertical, respectively).
+ *
+ * Below is an illustration of different horizontal arrangements in [Row]s:
+ * ![Row arrangements](https://developer.android.com/images/reference/androidx/compose/foundation/layout/row_arrangement_visualization.gif)
+ *
+ * Different vertical arrangements in [Column]s:
+ * ![Column arrangements](https://developer.android.com/images/reference/androidx/compose/foundation/layout/column_arrangement_visualization.gif)
  */
 @Immutable
 object Arrangement {
