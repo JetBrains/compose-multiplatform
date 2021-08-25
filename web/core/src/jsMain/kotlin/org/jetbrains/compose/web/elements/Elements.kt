@@ -943,8 +943,8 @@ fun Style(
  * @param rulesBuild allows to define the style rules using [StyleSheetBuilder]
  */
 @Composable
-fun Style(
-    applyAttrs: (AttrsBuilder<HTMLStyleElement>.() -> Unit)? = null,
+inline fun Style(
+    noinline applyAttrs: (AttrsBuilder<HTMLStyleElement>.() -> Unit)? = null,
     rulesBuild: StyleSheetBuilder.() -> Unit
 ) {
     val builder = StyleSheetBuilderImpl()
