@@ -3,6 +3,8 @@ package org.jetbrains.compose.web.core.tests
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import kotlinx.browser.document
+import kotlinx.dom.clear
 import org.jetbrains.compose.web.attributes.AttrsBuilder
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.attributes.forId
@@ -332,6 +334,42 @@ class AttributesTests {
         assertEquals(1, refInitCounter)
         assertEquals(2, attrsCallCounter)
         assertEquals(0, refDisposeCounter)
+    }
+
+    @Test
+    fun disposableRefEffectWithChangingKey() = runTest {
+        var key by mutableStateOf(0)
+
+        composition {
+            val readKey = key // read key here to recompose an entire scope
+            Div(
+                attrs = {
+                    id("id$readKey")
+                }
+            ) {
+                DisposableRefEffect(readKey) {
+                    val p = document.createElement("p").also { it.innerHTML = "Key=$readKey" }
+                    it.appendChild(p)
+
+                    onDispose {
+                        it.clear()
+                    }
+                }
+            }
+        }
+
+        assertEquals(
+            expected = "<div><div id=\"id0\"><p>Key=0</p></div></div>",
+            actual = root.outerHTML
+        )
+
+        key = 1
+        waitForRecompositionComplete()
+
+        assertEquals(
+            expected = "<div><div id=\"id1\"><p>Key=1</p></div></div>",
+            actual = root.outerHTML
+        )
     }
 
     @Test // issue: https://github.com/JetBrains/compose-jb/issues/981
