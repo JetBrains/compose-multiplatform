@@ -44,6 +44,8 @@ import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.assertTouchHeightIsEqualTo
+import androidx.compose.ui.test.assertTouchWidthIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.isFocusable
@@ -357,13 +359,14 @@ class SwitchTest {
                 )
             }
         }
-        val pokePosition = 48.dp.roundToPx().toFloat() - 1f
         rule.onNodeWithTag(defaultSwitchTag)
             .assertIsOff()
-            .assertWidthIsEqualTo(48.dp)
-            .assertHeightIsEqualTo(48.dp)
+            .assertWidthIsEqualTo(2.dp)
+            .assertHeightIsEqualTo(2.dp)
+            .assertTouchWidthIsEqualTo(48.dp)
+            .assertTouchHeightIsEqualTo(48.dp)
             .performGesture {
-                click(position = Offset(pokePosition, pokePosition))
+                click(position = Offset(-1f, -1f))
             }.assertIsOn()
     }
 }

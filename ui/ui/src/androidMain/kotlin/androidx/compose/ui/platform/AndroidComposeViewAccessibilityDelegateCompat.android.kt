@@ -2457,7 +2457,7 @@ internal fun SemanticsOwner
         ) {
             return
         }
-        val boundsInRoot = currentNode.boundsInRoot.toAndroidRect()
+        val boundsInRoot = currentNode.touchBoundsInRoot.toAndroidRect()
         val region = Region().also { it.set(boundsInRoot) }
         val virtualViewId = if (currentNode.id == root.id) {
             AccessibilityNodeProviderCompat.HOST_VIEW_ID
