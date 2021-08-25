@@ -33,6 +33,11 @@ internal actual val platformDefaultKeyMapping: KeyMapping =
             object : KeyMapping {
                 override fun map(event: KeyEvent): KeyCommand? {
                     return when {
+                        event.isMetaPressed && event.isCtrlPressed ->
+                            when (event.key) {
+                                MappedKeys.Space -> KeyCommand.CHARACTER_PALETTE
+                                else -> null
+                            }
                         event.isShiftPressed && event.isAltPressed ->
                             when (event.key) {
                                 MappedKeys.DirectionLeft -> KeyCommand.SELECT_LEFT_WORD
@@ -160,4 +165,5 @@ internal actual object MappedKeys {
     actual val Cut: Key = Key(AwtKeyEvent.VK_CUT)
     val Copy: Key = Key(AwtKeyEvent.VK_COPY)
     actual val Tab: Key = Key(AwtKeyEvent.VK_TAB)
+    val Space: Key = Key(AwtKeyEvent.VK_SPACE)
 }

@@ -176,6 +176,7 @@ internal class TextFieldKeyInput(
                 KeyCommand.REDO -> {
                     undoManager?.redo()?.let { this@TextFieldKeyInput.state.onValueChange(it) }
                 }
+                KeyCommand.CHARACTER_PALETTE -> { showCharacterPalette() }
             }
         }
         undoManager?.forceNextSnapshot()
