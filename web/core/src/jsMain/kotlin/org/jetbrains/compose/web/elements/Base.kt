@@ -35,9 +35,6 @@ private inline fun <TScope, T> ComposeDomNode(
     currentComposer.endNode()
 }
 
-class DisposableEffectHolder<TElement : Element>(
-    var effect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
-)
 
 @OptIn(ComposeWebInternalApi::class)
 private fun DomElementWrapper.updateProperties(applicators: List<Pair<(Element, Any) -> Unit, Any>>) {
@@ -88,7 +85,7 @@ fun <TElement : Element> TagElement(
     content: (@Composable ElementScope<TElement>.() -> Unit)?
 ) {
     val scope = remember {  ElementScopeImpl<TElement>() }
-    val refEffect = remember { DisposableEffectHolder<TElement>() }
+    var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
 
     ComposeDomNode<ElementScope<TElement>, DomElementWrapper>(
         factory = {
@@ -100,7 +97,7 @@ fun <TElement : Element> TagElement(
             val attrsBuilder = AttrsBuilder<TElement>()
             applyAttrs?.invoke(attrsBuilder)
 
-            refEffect.effect = attrsBuilder.refEffect
+            refEffect = attrsBuilder.refEffect
 
             update {
                 set(attrsBuilder.collect(), DomElementWrapper::updateAttrs)
@@ -113,7 +110,7 @@ fun <TElement : Element> TagElement(
         content = content
     )
 
-    refEffect.effect?.let { effect ->
+    refEffect?.let { effect ->
         DisposableEffect(null) {
             effect.invoke(this, scope.element)
         }
