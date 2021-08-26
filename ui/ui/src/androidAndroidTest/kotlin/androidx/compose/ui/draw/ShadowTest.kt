@@ -22,6 +22,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.testutils.first
 import androidx.compose.ui.AtLeastSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
@@ -226,7 +227,7 @@ class ShadowTest {
     @Test
     fun testInspectorValue() {
         rule.runOnUiThreadIR {
-            val modifier = Modifier.shadow(4.0.dp).toList().first() as InspectableValue
+            val modifier = Modifier.shadow(4.0.dp).first() as InspectableValue
             assertThat(modifier.nameFallback).isEqualTo("shadow")
             assertThat(modifier.valueOverride).isNull()
             assertThat(modifier.inspectableElements.asIterable()).containsExactly(
@@ -344,7 +345,4 @@ class ShadowTest {
         assertEquals(height, bitmap.height)
         return bitmap
     }
-
-    private fun Modifier.toList(): List<Modifier.Element> =
-        foldIn(mutableListOf()) { acc, e -> acc.apply { acc.add(e) } }
 }
