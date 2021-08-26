@@ -113,6 +113,7 @@ class AndroidXImplPlugin : Plugin<Project> {
         project.configureMavenArtifactUpload(extension)
         project.configureExternalDependencyLicenseCheck()
         project.configureProjectStructureValidation(extension)
+        project.configureProjectVersionValidation(extension)
     }
 
     /**
@@ -400,6 +401,15 @@ class AndroidXImplPlugin : Plugin<Project> {
             if (mavenGroup != null && isProbablyPublished) {
                 validateProjectStructure(mavenGroup.group)
             }
+        }
+    }
+
+    private fun Project.configureProjectVersionValidation(
+        extension: AndroidXExtension
+    ) {
+        // AndroidXExtension.mavenGroup is not readable until afterEvaluate.
+        afterEvaluate {
+            extension.validateMavenVersion()
         }
     }
 
@@ -909,6 +919,28 @@ fun Project.validateProjectStructure(groupId: String) {
     if (expectDir != actualDir) {
         throw GradleException(
             "Invalid project structure! Expected $expectDir as project directory, found $actualDir"
+        )
+    }
+}
+
+/**
+ * Validates the Maven version against Jetpack guidelines.
+ */
+fun AndroidXExtension.validateMavenVersion() {
+    val mavenGroup = mavenGroup
+    val mavenVersion = mavenVersion
+    val forcedVersion = mavenGroup?.forcedVersion
+    if (forcedVersion != null && forcedVersion == mavenVersion) {
+        throw GradleException(
+            """
+            Unnecessary override of same-group library version
+
+            Project version is already set to $forcedVersion by same-version group
+            ${mavenGroup.group}.
+
+            To fix this error, remove "mavenVersion = ..." from your build.gradle
+            configuration.
+            """.trimIndent()
         )
     }
 }
