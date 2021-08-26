@@ -4,5 +4,19 @@ package androidx.compose.material3 {
   public final class DynamicTonalPalettesKt {
   }
 
+  @androidx.compose.runtime.Immutable public final class Shapes {
+    ctor public Shapes(optional androidx.compose.foundation.shape.CornerBasedShape small, optional androidx.compose.foundation.shape.CornerBasedShape medium, optional androidx.compose.foundation.shape.CornerBasedShape large);
+    method public androidx.compose.material3.Shapes copy(optional androidx.compose.foundation.shape.CornerBasedShape small, optional androidx.compose.foundation.shape.CornerBasedShape medium, optional androidx.compose.foundation.shape.CornerBasedShape large);
+    method public androidx.compose.foundation.shape.CornerBasedShape getLarge();
+    method public androidx.compose.foundation.shape.CornerBasedShape getMedium();
+    method public androidx.compose.foundation.shape.CornerBasedShape getSmall();
+    property public final androidx.compose.foundation.shape.CornerBasedShape large;
+    property public final androidx.compose.foundation.shape.CornerBasedShape medium;
+    property public final androidx.compose.foundation.shape.CornerBasedShape small;
+  }
+
+  public final class ShapesKt {
+  }
+
 }
 
