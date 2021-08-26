@@ -23,137 +23,113 @@ import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Color
 
-/** Dynamic colors in Material3. */
+/** Dynamic colors in Material. */
 @RequiresApi(Build.VERSION_CODES.S)
 internal fun dynamicTonalPalettes(context: Context): TonalPalettes =
     TonalPalettes(
         // The neutral tonal palette from the generated dynamic color palettes.
-        neutral0 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_0),
-        neutral10 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_10),
-        neutral50 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_50),
-        neutral100 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_100),
-        neutral200 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_200),
-        neutral300 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_300),
-        neutral400 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_400),
-        neutral500 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_500),
-        neutral600 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_600),
-        neutral700 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_700),
-        neutral800 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_800),
-        neutral900 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_900),
-        neutral1000 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_1000),
+        neutral100 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_0),
+        neutral99 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_10),
+        neutral95 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_50),
+        neutral90 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_100),
+        neutral80 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_200),
+        neutral70 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_300),
+        neutral60 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_400),
+        neutral50 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_500),
+        neutral40 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_600),
+        neutral30 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_700),
+        neutral20 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_800),
+        neutral10 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_900),
+        neutral0 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_1000),
 
         // The neutral variant tonal palette, sometimes called "neutral 2",  from the
         // generated dynamic color palettes.
-        neutralVariant0 = ColorResourceHelper.getColor(context, android.R.color.system_neutral2_0),
-        neutralVariant10 =
-            ColorResourceHelper.getColor(context, android.R.color.system_neutral2_10),
-        neutralVariant50 =
-            ColorResourceHelper.getColor(context, android.R.color.system_neutral2_50),
-        neutralVariant100 =
-            ColorResourceHelper.getColor(context, android.R.color.system_neutral2_100),
-        neutralVariant200 =
-            ColorResourceHelper.getColor(context, android.R.color.system_neutral2_200),
-        neutralVariant300 =
-            ColorResourceHelper.getColor(context, android.R.color.system_neutral2_300),
-        neutralVariant400 =
-            ColorResourceHelper.getColor(context, android.R.color.system_neutral2_400),
-        neutralVariant500 =
-            ColorResourceHelper.getColor(context, android.R.color.system_neutral2_500),
-        neutralVariant600 =
-            ColorResourceHelper.getColor(context, android.R.color.system_neutral2_600),
-        neutralVariant700 =
-            ColorResourceHelper.getColor(context, android.R.color.system_neutral2_700),
-        neutralVariant800 =
-            ColorResourceHelper.getColor(context, android.R.color.system_neutral2_800),
-        neutralVariant900 =
-            ColorResourceHelper.getColor(context, android.R.color.system_neutral2_900),
-        neutralVariant1000 =
-            ColorResourceHelper.getColor(context, android.R.color.system_neutral2_1000),
+        neutralVariant100 = ColorResourceHelper.getColor(
+            context,
+            android.R.color.system_neutral2_0
+        ),
+        neutralVariant99 = ColorResourceHelper.getColor(
+            context,
+            android.R.color.system_neutral2_10
+        ),
+        neutralVariant95 = ColorResourceHelper.getColor(
+            context, android.R.color.system_neutral2_50
+        ),
+        neutralVariant90 = ColorResourceHelper.getColor(
+            context, android.R.color.system_neutral2_100
+        ),
+        neutralVariant80 = ColorResourceHelper.getColor(
+            context, android.R.color.system_neutral2_200
+        ),
+        neutralVariant70 = ColorResourceHelper.getColor(
+            context, android.R.color.system_neutral2_300
+        ),
+        neutralVariant60 = ColorResourceHelper.getColor(
+            context, android.R.color.system_neutral2_400
+        ),
+        neutralVariant50 = ColorResourceHelper.getColor(
+            context, android.R.color.system_neutral2_500
+        ),
+        neutralVariant40 = ColorResourceHelper.getColor(
+            context, android.R.color.system_neutral2_600
+        ),
+        neutralVariant30 = ColorResourceHelper.getColor(
+            context, android.R.color.system_neutral2_700
+        ),
+        neutralVariant20 = ColorResourceHelper.getColor(
+            context, android.R.color.system_neutral2_800
+        ),
+        neutralVariant10 = ColorResourceHelper.getColor(
+            context, android.R.color.system_neutral2_900
+        ),
+        neutralVariant0 = ColorResourceHelper.getColor(
+            context, android.R.color.system_neutral2_1000
+        ),
 
         // The primary tonal palette from the generated dynamic color palettes.
-        primary0 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent1_0),
-        primary10 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent1_10),
-        primary50 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent1_50),
-        primary100 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent1_100),
-        primary200 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent1_200),
-        primary300 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent1_300),
-        primary400 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent1_400),
-        primary500 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent1_500),
-        primary600 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent1_600),
-        primary700 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent1_700),
-        primary800 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent1_800),
-        primary900 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent1_900),
-        primary1000 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent1_1000),
+        primary100 = ColorResourceHelper.getColor(context, android.R.color.system_accent1_0),
+        primary99 = ColorResourceHelper.getColor(context, android.R.color.system_accent1_10),
+        primary95 = ColorResourceHelper.getColor(context, android.R.color.system_accent1_50),
+        primary90 = ColorResourceHelper.getColor(context, android.R.color.system_accent1_100),
+        primary80 = ColorResourceHelper.getColor(context, android.R.color.system_accent1_200),
+        primary70 = ColorResourceHelper.getColor(context, android.R.color.system_accent1_300),
+        primary60 = ColorResourceHelper.getColor(context, android.R.color.system_accent1_400),
+        primary50 = ColorResourceHelper.getColor(context, android.R.color.system_accent1_500),
+        primary40 = ColorResourceHelper.getColor(context, android.R.color.system_accent1_600),
+        primary30 = ColorResourceHelper.getColor(context, android.R.color.system_accent1_700),
+        primary20 = ColorResourceHelper.getColor(context, android.R.color.system_accent1_800),
+        primary10 = ColorResourceHelper.getColor(context, android.R.color.system_accent1_900),
+        primary0 = ColorResourceHelper.getColor(context, android.R.color.system_accent1_1000),
 
         // The secondary tonal palette from the generated dynamic color palettes.
-        secondary0 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent2_0),
-        secondary10 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent2_10),
-        secondary50 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent2_50),
-        secondary100 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent2_100),
-        secondary200 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent2_200),
-        secondary300 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent2_300),
-        secondary400 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent2_400),
-        secondary500 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent2_500),
-        secondary600 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent2_600),
-        secondary700 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent2_700),
-        secondary800 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent2_800),
-        secondary900 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent2_900),
-        secondary1000 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent2_1000),
+        secondary100 = ColorResourceHelper.getColor(context, android.R.color.system_accent2_0),
+        secondary99 = ColorResourceHelper.getColor(context, android.R.color.system_accent2_10),
+        secondary95 = ColorResourceHelper.getColor(context, android.R.color.system_accent2_50),
+        secondary90 = ColorResourceHelper.getColor(context, android.R.color.system_accent2_100),
+        secondary80 = ColorResourceHelper.getColor(context, android.R.color.system_accent2_200),
+        secondary70 = ColorResourceHelper.getColor(context, android.R.color.system_accent2_300),
+        secondary60 = ColorResourceHelper.getColor(context, android.R.color.system_accent2_400),
+        secondary50 = ColorResourceHelper.getColor(context, android.R.color.system_accent2_500),
+        secondary40 = ColorResourceHelper.getColor(context, android.R.color.system_accent2_600),
+        secondary30 = ColorResourceHelper.getColor(context, android.R.color.system_accent2_700),
+        secondary20 = ColorResourceHelper.getColor(context, android.R.color.system_accent2_800),
+        secondary10 = ColorResourceHelper.getColor(context, android.R.color.system_accent2_900),
+        secondary0 = ColorResourceHelper.getColor(context, android.R.color.system_accent2_1000),
 
         // The tertiary tonal palette from the generated dynamic color palettes.
-        tertiary0 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent3_0),
-        tertiary10 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent3_10),
-        tertiary50 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent3_50),
-        tertiary100 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent3_100),
-        tertiary200 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent3_200),
-        tertiary300 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent3_300),
-        tertiary400 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent3_400),
-        tertiary500 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent3_500),
-        tertiary600 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent3_600),
-        tertiary700 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent3_700),
-        tertiary800 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent3_800),
-        tertiary900 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent3_900),
-
-        tertiary1000 =
-            ColorResourceHelper.getColor(context, android.R.color.system_accent3_1000),
+        tertiary100 = ColorResourceHelper.getColor(context, android.R.color.system_accent3_0),
+        tertiary99 = ColorResourceHelper.getColor(context, android.R.color.system_accent3_10),
+        tertiary95 = ColorResourceHelper.getColor(context, android.R.color.system_accent3_50),
+        tertiary90 = ColorResourceHelper.getColor(context, android.R.color.system_accent3_100),
+        tertiary80 = ColorResourceHelper.getColor(context, android.R.color.system_accent3_200),
+        tertiary70 = ColorResourceHelper.getColor(context, android.R.color.system_accent3_300),
+        tertiary60 = ColorResourceHelper.getColor(context, android.R.color.system_accent3_400),
+        tertiary50 = ColorResourceHelper.getColor(context, android.R.color.system_accent3_500),
+        tertiary40 = ColorResourceHelper.getColor(context, android.R.color.system_accent3_600),
+        tertiary30 = ColorResourceHelper.getColor(context, android.R.color.system_accent3_700),
+        tertiary20 = ColorResourceHelper.getColor(context, android.R.color.system_accent3_800),
+        tertiary10 = ColorResourceHelper.getColor(context, android.R.color.system_accent3_900),
+        tertiary0 = ColorResourceHelper.getColor(context, android.R.color.system_accent3_1000),
     )
 
 @RequiresApi(23)
