@@ -2,6 +2,7 @@ package org.jetbrains.compose.web.sample.tests
 
 import androidx.compose.runtime.Composable
 import androidx.compose.web.sample.tests.ControlledInputsTests
+import androidx.compose.web.sample.tests.RadioGroupTestCases
 import androidx.compose.web.sample.tests.SelectElementTests
 import androidx.compose.web.sample.tests.UncontrolledInputsTests
 import org.jetbrains.compose.web.dom.Span
@@ -37,7 +38,8 @@ fun launchTestCase(testCaseId: String) {
     // this makes test cases get initialised:
     listOf<Any>(
         TestCases1(), InputsTests(), EventsTests(),
-        SelectElementTests(), ControlledInputsTests(), UncontrolledInputsTests()
+        SelectElementTests(), ControlledInputsTests(), UncontrolledInputsTests(),
+        RadioGroupTestCases()
     )
 
     if (testCaseId !in testCases) error("Test Case '$testCaseId' not found")
