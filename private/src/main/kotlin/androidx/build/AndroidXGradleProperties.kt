@@ -50,6 +50,11 @@ const val ALTERNATIVE_PROJECT_URL = "androidx.alternativeProjectUrl"
 const val VERSION_EXTRA_CHECK_ENABLED = "androidx.versionExtraCheckEnabled"
 
 /**
+ * Setting this property enables multiplatform builds of Compose
+ */
+const val ENABLE_COMPOSE_COMPILER_METRICS = "androidx.enableComposeCompilerMetrics"
+
+/**
  * Returns whether the project should generate documentation.
  */
 const val ENABLE_DOCUMENTATION = "androidx.enableDocumentation"
@@ -119,6 +124,7 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     ALTERNATIVE_PROJECT_URL,
     VERSION_EXTRA_CHECK_ENABLED,
     COMPOSE_MPP_ENABLED,
+    ENABLE_COMPOSE_COMPILER_METRICS,
     DISPLAY_TEST_OUTPUT,
     ENABLE_DOCUMENTATION,
     PROJECT_SUBSET,
