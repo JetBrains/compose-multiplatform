@@ -42,8 +42,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.matchers.MSSIMMatcher
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -171,12 +171,12 @@ class BlurTest {
     }
 
     @Test
-    fun testRectangleBlurredEdgeTreatmentIsBounded() {
-        assertTrue(BlurredEdgeTreatment.Rectangle.isBounded())
+    fun testRectangleBlurredEdgeTreatmentHasShape() {
+        assertNotNull(BlurredEdgeTreatment.Rectangle.shape)
     }
 
     @Test
-    fun testUnboundedBlurredEdgeTreatmentIsNotBounded() {
-        assertFalse(BlurredEdgeTreatment.Unbounded.isBounded())
+    fun testUnboundedBlurredEdgeTreatmentDoesNotHaveShape() {
+        assertNull(BlurredEdgeTreatment.Unbounded.shape)
     }
 }
