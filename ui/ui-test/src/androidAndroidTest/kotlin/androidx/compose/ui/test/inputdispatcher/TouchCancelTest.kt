@@ -19,16 +19,16 @@ package androidx.compose.ui.test.inputdispatcher
 import android.view.MotionEvent.ACTION_CANCEL
 import android.view.MotionEvent.ACTION_DOWN
 import android.view.MotionEvent.ACTION_POINTER_DOWN
-import androidx.compose.ui.geometry.Offset
-import androidx.test.filters.SmallTest
-import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
-import androidx.compose.ui.test.AndroidInputDispatcher
-import androidx.compose.ui.test.util.assertHasValidEventTimes
 import androidx.compose.testutils.expectError
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.test.AndroidInputDispatcher
+import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.test.util.Finger
 import androidx.compose.ui.test.util.Touchscreen
+import androidx.compose.ui.test.util.assertHasValidEventTimes
 import androidx.compose.ui.test.util.verifyEvent
 import androidx.compose.ui.test.util.verifyPointer
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
@@ -36,7 +36,7 @@ import org.junit.Test
  * Tests if [AndroidInputDispatcher.enqueueTouchCancel] works
  */
 @SmallTest
-class SendCancelTest : InputDispatcherTest() {
+class TouchCancelTest : InputDispatcherTest() {
     companion object {
         // pointerIds
         private const val pointer1 = 11
@@ -56,6 +56,7 @@ class SendCancelTest : InputDispatcherTest() {
     @Test
     fun onePointer() {
         subject.generateTouchDownAndCheck(pointer1, position1_1)
+        subject.advanceEventTime()
         subject.generateCancelAndCheckPointers()
         subject.verifyNoTouchGestureInProgress()
         subject.sendAllSynchronous()
@@ -74,29 +75,10 @@ class SendCancelTest : InputDispatcherTest() {
     }
 
     @Test
-    fun onePointerWithDelay() {
-        subject.generateTouchDownAndCheck(pointer1, position1_1)
-        subject.generateCancelAndCheckPointers(2 * eventPeriodMillis)
-        subject.verifyNoTouchGestureInProgress()
-        subject.sendAllSynchronous()
-        recorder.assertHasValidEventTimes()
-
-        recorder.events.apply {
-            var t = 0L
-            assertThat(this).hasSize(2)
-            this[0].verifyEvent(1, ACTION_DOWN, 0, t, Touchscreen) // pointer1
-            this[0].verifyPointer(pointer1, position1_1, Finger)
-
-            t += 2 * eventPeriodMillis
-            this[1].verifyEvent(1, ACTION_CANCEL, 0, t, Touchscreen)
-            this[1].verifyPointer(pointer1, position1_1, Finger)
-        }
-    }
-
-    @Test
     fun multiplePointers() {
         subject.generateTouchDownAndCheck(pointer1, position1_1)
         subject.generateTouchDownAndCheck(pointer2, position2_1)
+        subject.advanceEventTime()
         subject.generateCancelAndCheckPointers()
         subject.verifyNoTouchGestureInProgress()
         subject.sendAllSynchronous()
@@ -120,14 +102,14 @@ class SendCancelTest : InputDispatcherTest() {
     }
 
     @Test
-    fun cancelWithoutDown() {
+    fun enqueueTouchCancel_withoutDown() {
         expectError<IllegalStateException> {
             subject.enqueueTouchCancel()
         }
     }
 
     @Test
-    fun cancelAfterUp() {
+    fun enqueueTouchCancel_afterUp() {
         subject.enqueueTouchDown(pointer1, position1_1)
         subject.enqueueTouchUp(pointer1)
         expectError<IllegalStateException> {
@@ -136,7 +118,7 @@ class SendCancelTest : InputDispatcherTest() {
     }
 
     @Test
-    fun cancelAfterCancel() {
+    fun enqueueTouchCancel_afterCancel() {
         subject.enqueueTouchDown(pointer1, position1_1)
         subject.enqueueTouchCancel()
         expectError<IllegalStateException> {

@@ -169,7 +169,7 @@ internal class AndroidInputDispatcher(
                 sendAndRecycleEvent(event)
             }
         }
-        // Each invocation of performGesture (Actions.kt) uses a new instance of an input
+        // Each invocation of perform.*Input (Actions.kt) uses a new instance of an input
         // dispatcher, so we don't have to reset firstEventTime after use
     }
 

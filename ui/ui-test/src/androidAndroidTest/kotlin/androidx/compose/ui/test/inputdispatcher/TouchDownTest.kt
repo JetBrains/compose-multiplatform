@@ -20,16 +20,16 @@ import android.view.MotionEvent.ACTION_DOWN
 import android.view.MotionEvent.ACTION_MOVE
 import android.view.MotionEvent.ACTION_POINTER_DOWN
 import android.view.MotionEvent.ACTION_POINTER_UP
-import androidx.compose.ui.geometry.Offset
-import androidx.test.filters.SmallTest
-import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
-import androidx.compose.ui.test.AndroidInputDispatcher
-import androidx.compose.ui.test.util.assertHasValidEventTimes
 import androidx.compose.testutils.expectError
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.test.AndroidInputDispatcher
+import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.test.util.Finger
 import androidx.compose.ui.test.util.Touchscreen
+import androidx.compose.ui.test.util.assertHasValidEventTimes
 import androidx.compose.ui.test.util.verifyEvent
 import androidx.compose.ui.test.util.verifyPointer
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
@@ -37,7 +37,7 @@ import org.junit.Test
  * Tests if [AndroidInputDispatcher.enqueueTouchDown] works
  */
 @SmallTest
-class SendDownTest : InputDispatcherTest() {
+class TouchDownTest : InputDispatcherTest() {
     companion object {
         // Pointer ids
         private const val pointer1 = 11
@@ -147,14 +147,17 @@ class SendDownTest : InputDispatcherTest() {
     @Test
     fun staggeredDown() {
         // 4 fingers, going down at different times
-        // Each [enqueueTouchMove] increases the time by 10 milliseconds
 
         subject.generateTouchDownAndCheck(pointer3, position3)
+        subject.advanceEventTime()
         subject.enqueueTouchMove()
         subject.generateTouchDownAndCheck(pointer1, position1)
         subject.generateTouchDownAndCheck(pointer2, position2)
+        subject.advanceEventTime()
         subject.enqueueTouchMove()
+        subject.advanceEventTime()
         subject.enqueueTouchMove()
+        subject.advanceEventTime()
         subject.enqueueTouchMove()
         subject.generateTouchDownAndCheck(pointer4, position4)
         subject.sendAllSynchronous()
@@ -199,12 +202,13 @@ class SendDownTest : InputDispatcherTest() {
     @Test
     fun nonOverlappingPointers() {
         // 3 fingers, where the 1st finger goes up before the 3rd finger goes down (no overlap)
-        // Each [enqueueTouchMove] increases the time by 10 milliseconds
 
         subject.generateTouchDownAndCheck(pointer1, position1)
         subject.generateTouchDownAndCheck(pointer2, position2)
+        subject.advanceEventTime()
         subject.enqueueTouchMove()
         subject.generateTouchUpAndCheck(pointer1)
+        subject.advanceEventTime()
         subject.enqueueTouchMove()
         subject.generateTouchDownAndCheck(pointer3, position3)
         subject.sendAllSynchronous()
@@ -244,12 +248,13 @@ class SendDownTest : InputDispatcherTest() {
     fun pointerIdReuse() {
         // 3 fingers, where the 1st finger goes up before the 3rd finger goes down, and the 3rd
         // fingers reuses the pointerId of finger 1
-        // Each [enqueueTouchMove] increases the time by 10 milliseconds
 
         subject.generateTouchDownAndCheck(pointer1, position1)
         subject.generateTouchDownAndCheck(pointer2, position2)
+        subject.advanceEventTime()
         subject.enqueueTouchMove()
         subject.generateTouchUpAndCheck(pointer1)
+        subject.advanceEventTime()
         subject.enqueueTouchMove()
         subject.generateTouchDownAndCheck(pointer1, position1_2)
         subject.sendAllSynchronous()
@@ -286,7 +291,7 @@ class SendDownTest : InputDispatcherTest() {
     }
 
     @Test
-    fun downAfterDown() {
+    fun enqueueTouchDown_afterDown() {
         subject.enqueueTouchDown(pointer1, position1)
         expectError<IllegalArgumentException> {
             subject.enqueueTouchDown(pointer1, position2)
