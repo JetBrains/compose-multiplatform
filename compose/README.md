@@ -15,13 +15,13 @@ git config --global submodule.recurse true
 - Java 11 (should be specified in JAVA_HOME)
 - [macOs/Linux] Android SDK downloaded via `./scripts/downloadAndroidSdk`
 - [Windows] Android SDK downloaded from Android Studio and specified in ANDROID_SDK_ROOT. Required components:
-  - Android 11
+  - Android 12
   - Build-Tools 30.0.3
   - NDK 21.3.6528147 (in folder $androidSdk/ndk, not in $androidSdk/ndk/$version)
   - CMake 3.10.2.4988404 (in folder $androidSdk/cmake, not in $androidSdk/cmake/$version)
 
 ## Requirements to develop in IDE
-- Android Studio Arctic Fox
+- Android Studio 2021.1.1 Canary 8 (https://developer.android.com/studio/archive)
 - Custom Gradle 7.1 specified in `Settings -> Build, Execution, Deployment -> Build Tools -> Gradle` (because Android Studio will pick the wrong Gradle in the subproject instead of the Gradle in the root project)
 - Specified Gradle JDK 11 in `... -> Build Tools -> Gradle`
 - Environment variables:
@@ -29,7 +29,6 @@ git config --global submodule.recurse true
 export ALLOW_PUBLIC_REPOS=1
 export JAVA_TOOLS_JAR=$PWD/external/tools.jar
 export ANDROIDX_PROJECTS=COMPOSE
-export COMPOSE_CUSTOM_GROUP=org.jetbrains.compose
 ```
 - Gradle properties in ~/.gradle/gradle.properties:
 ```
