@@ -56,11 +56,14 @@ class InspectableValueTest {
 
     @Test
     fun simpleLayoutTest() {
-        val modifier = Modifier.simple(10, 3.dp) as InspectableValue
+        val modifier = Modifier.simple(10, 3.dp).toList().first() as InspectableValue
         assertThat(modifier.nameFallback).isEqualTo("simple")
         assertThat(modifier.inspectableElements.asIterable()).containsExactly(
             ValueElement("padding", 10),
             ValueElement("border", 3.0.dp)
         )
     }
+
+    private fun Modifier.toList(): List<Modifier.Element> =
+        foldIn(mutableListOf()) { acc, e -> acc.apply { acc.add(e) } }
 }

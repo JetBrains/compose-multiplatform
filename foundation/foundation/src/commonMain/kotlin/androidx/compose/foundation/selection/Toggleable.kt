@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.platform.inspectable
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.onClick
@@ -105,8 +106,6 @@ fun Modifier.toggleable(
  * @param onValueChange callback to be invoked when toggleable is clicked,
  * therefore the change of the state in requested.
  */
-// TODO: b/191017532 remove Modifier.composed
-@Suppress("UnnecessaryComposedModifier")
 fun Modifier.toggleable(
     value: Boolean,
     interactionSource: MutableInteractionSource,
@@ -114,14 +113,14 @@ fun Modifier.toggleable(
     enabled: Boolean = true,
     role: Role? = null,
     onValueChange: (Boolean) -> Unit
-) = composed(
+) = inspectable(
     inspectorInfo = debugInspectorInfo {
         name = "toggleable"
         properties["value"] = value
-        properties["enabled"] = enabled
-        properties["role"] = role
         properties["interactionSource"] = interactionSource
         properties["indication"] = indication
+        properties["enabled"] = enabled
+        properties["role"] = role
         properties["onValueChange"] = onValueChange
     },
     factory = {
@@ -208,8 +207,6 @@ fun Modifier.triStateToggleable(
  * to describe the element or do customizations
  * @param onClick will be called when user clicks the toggleable.
  */
-// TODO: b/191017532 remove Modifier.composed
-@Suppress("UnnecessaryComposedModifier")
 fun Modifier.triStateToggleable(
     state: ToggleableState,
     interactionSource: MutableInteractionSource,
@@ -217,7 +214,7 @@ fun Modifier.triStateToggleable(
     enabled: Boolean = true,
     role: Role? = null,
     onClick: () -> Unit
-) = composed(
+) = inspectable(
     inspectorInfo = debugInspectorInfo {
         name = "triStateToggleable"
         properties["state"] = state

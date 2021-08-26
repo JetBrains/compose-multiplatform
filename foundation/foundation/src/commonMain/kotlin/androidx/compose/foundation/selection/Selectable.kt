@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.platform.inspectable
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
@@ -102,8 +103,6 @@ fun Modifier.selectable(
  * to describe the element or do customizations
  * @param onClick callback to invoke when this item is clicked
  */
-// TODO: b/191017532 remove Modifier.composed
-@Suppress("UnnecessaryComposedModifier")
 fun Modifier.selectable(
     selected: Boolean,
     interactionSource: MutableInteractionSource,
@@ -111,7 +110,16 @@ fun Modifier.selectable(
     enabled: Boolean = true,
     role: Role? = null,
     onClick: () -> Unit
-) = composed(
+) = inspectable(
+    inspectorInfo = debugInspectorInfo {
+        name = "selectable"
+        properties["selected"] = selected
+        properties["interactionSource"] = interactionSource
+        properties["indication"] = indication
+        properties["enabled"] = enabled
+        properties["role"] = role
+        properties["onClick"] = onClick
+    },
     factory = {
         Modifier.clickable(
             enabled = enabled,
@@ -122,14 +130,5 @@ fun Modifier.selectable(
         ).semantics {
             this.selected = selected
         }
-    },
-    inspectorInfo = debugInspectorInfo {
-        name = "selectable"
-        properties["selected"] = selected
-        properties["enabled"] = enabled
-        properties["role"] = role
-        properties["interactionSource"] = interactionSource
-        properties["indication"] = indication
-        properties["onClick"] = onClick
     }
 )

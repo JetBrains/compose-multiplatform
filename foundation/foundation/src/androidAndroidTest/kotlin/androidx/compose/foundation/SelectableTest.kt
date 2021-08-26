@@ -317,7 +317,7 @@ class SelectableTest {
                 false,
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
-            ) {} as InspectableValue
+            ) {}.toList().first() as InspectableValue
             assertThat(modifier.nameFallback).isEqualTo("selectable")
             assertThat(modifier.valueOverride).isNull()
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
@@ -330,4 +330,7 @@ class SelectableTest {
             )
         }
     }
+
+    private fun Modifier.toList(): List<Modifier.Element> =
+        foldIn(mutableListOf()) { acc, e -> acc.apply { acc.add(e) } }
 }

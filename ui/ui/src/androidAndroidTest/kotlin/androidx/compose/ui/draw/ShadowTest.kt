@@ -226,7 +226,7 @@ class ShadowTest {
     @Test
     fun testInspectorValue() {
         rule.runOnUiThreadIR {
-            val modifier = Modifier.shadow(4.0.dp) as InspectableValue
+            val modifier = Modifier.shadow(4.0.dp).toList().first() as InspectableValue
             assertThat(modifier.nameFallback).isEqualTo("shadow")
             assertThat(modifier.valueOverride).isNull()
             assertThat(modifier.inspectableElements.asIterable()).containsExactly(
@@ -344,4 +344,7 @@ class ShadowTest {
         assertEquals(height, bitmap.height)
         return bitmap
     }
+
+    private fun Modifier.toList(): List<Modifier.Element> =
+        foldIn(mutableListOf()) { acc, e -> acc.apply { acc.add(e) } }
 }

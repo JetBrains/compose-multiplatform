@@ -412,7 +412,7 @@ class ToggleableTest {
                 onValueChange = {},
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
-            ) as InspectableValue
+            ).toList().first() as InspectableValue
             assertThat(modifier.nameFallback).isEqualTo("toggleable")
             assertThat(modifier.valueOverride).isNull()
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
@@ -450,8 +450,7 @@ class ToggleableTest {
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClick = {}
-            )
-                as InspectableValue
+            ).toList().first() as InspectableValue
             assertThat(modifier.nameFallback).isEqualTo("triStateToggleable")
             assertThat(modifier.valueOverride).isNull()
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
@@ -524,4 +523,7 @@ class ToggleableTest {
                 click(position = Offset(pokePoint, pokePoint))
             }.assertIsOn()
     }
+
+    private fun Modifier.toList(): List<Modifier.Element> =
+        foldIn(mutableListOf()) { acc, e -> acc.apply { acc.add(e) } }
 }

@@ -90,8 +90,6 @@ fun Modifier.border(width: Dp, color: Color, shape: Shape = RectangleShape) =
  * @param brush brush to paint the border with
  * @param shape shape of the border
  */
-// TODO: b/191017532 remove Modifier.composed
-@Suppress("UnnecessaryComposedModifier")
 fun Modifier.border(width: Dp, brush: Brush, shape: Shape): Modifier = composed(
     factory = {
         // BorderCache object that is lazily allocated depending on the type of shape
