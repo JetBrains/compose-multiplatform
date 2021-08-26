@@ -4,11 +4,13 @@ package androidx.compose.ui.test {
   public final class ActionsKt {
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performClick(androidx.compose.ui.test.SemanticsNodeInteraction);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performGesture(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.GestureScope,kotlin.Unit> block);
+    method public static androidx.compose.ui.test.SemanticsNodeInteraction performMultiModalInput(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.MultiModalInjectionScope,kotlin.Unit> block);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performScrollTo(androidx.compose.ui.test.SemanticsNodeInteraction);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performScrollToIndex(androidx.compose.ui.test.SemanticsNodeInteraction, int index);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performScrollToKey(androidx.compose.ui.test.SemanticsNodeInteraction, Object key);
     method public static <T extends kotlin.Function<? extends java.lang.Boolean>> void performSemanticsAction(androidx.compose.ui.test.SemanticsNodeInteraction, androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<T>> key, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> invocation);
     method public static void performSemanticsAction(androidx.compose.ui.test.SemanticsNodeInteraction, androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> key);
+    method public static androidx.compose.ui.test.SemanticsNodeInteraction performTouchInput(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.TouchInjectionScope,kotlin.Unit> block);
   }
 
   public final class AndroidAssertions_androidKt {
@@ -125,6 +127,7 @@ package androidx.compose.ui.test {
     ctor public GestureScope(androidx.compose.ui.semantics.SemanticsNode node, androidx.compose.ui.test.TestContext testContext);
     method public long getVisibleSize();
     property public final long visibleSize;
+    field @kotlin.PublishedApi internal final androidx.compose.ui.test.MultiModalInjectionScope delegateScope;
   }
 
   public final class GestureScopeKt {
@@ -175,6 +178,49 @@ package androidx.compose.ui.test {
     property public abstract boolean isIdleNow;
   }
 
+  public interface InjectionScope {
+    method public void advanceEventTime(optional long durationMillis);
+    method public default float getBottom();
+    method public default long getBottomCenter();
+    method public default long getBottomLeft();
+    method public default long getBottomRight();
+    method public default long getCenter();
+    method public default long getCenterLeft();
+    method public default long getCenterRight();
+    method public default float getCenterX();
+    method public default float getCenterY();
+    method public default long getEventPeriodMillis();
+    method public default int getHeight();
+    method public default float getLeft();
+    method public default float getRight();
+    method public default float getTop();
+    method public default long getTopCenter();
+    method public default long getTopLeft();
+    method public default long getTopRight();
+    method public long getVisibleSize();
+    method public default int getWidth();
+    method public default long percentOffset(optional float x, optional float y);
+    property public default float bottom;
+    property public default long bottomCenter;
+    property public default long bottomLeft;
+    property public default long bottomRight;
+    property public default long center;
+    property public default long centerLeft;
+    property public default long centerRight;
+    property public default float centerX;
+    property public default float centerY;
+    property public default long eventPeriodMillis;
+    property public default int height;
+    property public default float left;
+    property public default float right;
+    property public default float top;
+    property public default long topCenter;
+    property public default long topLeft;
+    property public default long topRight;
+    property public abstract long visibleSize;
+    property public default int width;
+  }
+
   public final class KeyInputHelpersKt {
     method public static boolean performKeyPress(androidx.compose.ui.test.SemanticsNodeInteraction, android.view.KeyEvent keyEvent);
   }
@@ -188,6 +234,15 @@ package androidx.compose.ui.test {
     method public void setAutoAdvance(boolean autoAdvance);
     property public abstract boolean autoAdvance;
     property public abstract long currentTime;
+  }
+
+  public final class MultiModalInjectionScope implements androidx.compose.ui.test.InjectionScope {
+    ctor public MultiModalInjectionScope(androidx.compose.ui.semantics.SemanticsNode node, androidx.compose.ui.test.TestContext testContext);
+    method public void advanceEventTime(long durationMillis);
+    method public androidx.compose.ui.test.TouchInjectionScope getTouch();
+    method public long getVisibleSize();
+    property public final androidx.compose.ui.test.TouchInjectionScope Touch;
+    property public long visibleSize;
   }
 
   public final class OutputKt {
@@ -281,6 +336,35 @@ package androidx.compose.ui.test {
     method public static void performTextClearance(androidx.compose.ui.test.SemanticsNodeInteraction);
     method public static void performTextInput(androidx.compose.ui.test.SemanticsNodeInteraction, String text);
     method public static void performTextReplacement(androidx.compose.ui.test.SemanticsNodeInteraction, String text);
+  }
+
+  public interface TouchInjectionScope extends androidx.compose.ui.test.InjectionScope {
+    method public void cancel(optional long delayMillis);
+    method public androidx.compose.ui.geometry.Offset? currentPosition(optional int pointerId);
+    method public void down(int pointerId, long position);
+    method public default void down(long position);
+    method public void move(optional long delayMillis);
+    method public default void moveBy(int pointerId, long delta, optional long delayMillis);
+    method public default void moveBy(long delta, optional long delayMillis);
+    method public default void moveTo(int pointerId, long position, optional long delayMillis);
+    method public default void moveTo(long position, optional long delayMillis);
+    method public void up(optional int pointerId);
+    method public void updatePointerBy(int pointerId, long delta);
+    method public void updatePointerTo(int pointerId, long position);
+  }
+
+  public final class TouchInjectionScopeKt {
+    method public static void click(androidx.compose.ui.test.TouchInjectionScope, optional long position);
+    method public static void doubleClick(androidx.compose.ui.test.TouchInjectionScope, optional long position, optional long delayMillis);
+    method public static void longClick(androidx.compose.ui.test.TouchInjectionScope, optional long position, optional long durationMillis);
+    method public static void pinch(androidx.compose.ui.test.TouchInjectionScope, long start0, long end0, long start1, long end1, optional long durationMillis);
+    method public static void swipe(androidx.compose.ui.test.TouchInjectionScope, long start, long end, optional long durationMillis);
+    method public static void swipe(androidx.compose.ui.test.TouchInjectionScope, kotlin.jvm.functions.Function1<? super java.lang.Long,androidx.compose.ui.geometry.Offset> curve, long durationMillis, optional java.util.List<java.lang.Long> keyTimes);
+    method public static void swipeDown(androidx.compose.ui.test.TouchInjectionScope, optional float startY, optional float endY, optional long durationMillis);
+    method public static void swipeLeft(androidx.compose.ui.test.TouchInjectionScope, optional float startX, optional float endX, optional long durationMillis);
+    method public static void swipeRight(androidx.compose.ui.test.TouchInjectionScope, optional float startX, optional float endX, optional long durationMillis);
+    method public static void swipeUp(androidx.compose.ui.test.TouchInjectionScope, optional float startY, optional float endY, optional long durationMillis);
+    method public static void swipeWithVelocity(androidx.compose.ui.test.TouchInjectionScope, long start, long end, float endVelocity, optional long durationMillis);
   }
 
   public final class UtilsKt {
