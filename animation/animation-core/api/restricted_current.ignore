@@ -1,4 +1,12 @@
 // Baseline format: 1.0
+ParameterNameChange: androidx.compose.animation.core.TransitionKt#createChildTransitionInternal(androidx.compose.animation.core.Transition<S>, T, T, String) parameter #3:
+    Attempted to change parameter name from label to childLabel in method androidx.compose.animation.core.TransitionKt.createChildTransitionInternal
+
+
+RemovedField: androidx.compose.animation.core.Transition#isSeeking$delegate:
+    Removed field androidx.compose.animation.core.Transition.isSeeking$delegate
+
+
 RemovedInterface: androidx.compose.animation.core.InfiniteAnimationPolicy:
     Removed class androidx.compose.animation.core.InfiniteAnimationPolicy
 

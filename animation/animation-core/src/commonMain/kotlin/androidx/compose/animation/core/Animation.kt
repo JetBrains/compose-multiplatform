@@ -266,6 +266,11 @@ class TargetBasedAnimation<T, V : AnimationVector> internal constructor(
             endVelocity
         }
     }
+
+    override fun toString(): String {
+        return "TargetBasedAnimation: $initialValue -> $targetValue," +
+            "initial velocity: $initialVelocityVector, duration: $durationMillis ms"
+    }
 }
 
 /**
