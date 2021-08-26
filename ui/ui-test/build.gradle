@@ -50,7 +50,7 @@ dependencies {
         implementation("androidx.annotation:annotation:1.1.0")
         implementation(libs.espressoCore)
 
-        androidTestImplementation(project(":activity:activity-compose"))
+        androidTestImplementation("androidx.activity:activity-compose:1.3.1")
         androidTestImplementation(project(":compose:material:material"))
         androidTestImplementation(project(":compose:test-utils"))
         androidTestImplementation(project(":compose:ui:ui-test-junit4"))
@@ -95,7 +95,7 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(project(":compose:material:material"))
                 implementation(project(":compose:test-utils"))
                 implementation(project(":compose:ui:ui-test-junit4"))
-                implementation(project(":activity:activity-compose"))
+                implementation("androidx.activity:activity-compose:1.3.1")
                 implementation(libs.truth)
                 implementation(libs.mockitoCore)
                 implementation(libs.dexmakerMockito)
