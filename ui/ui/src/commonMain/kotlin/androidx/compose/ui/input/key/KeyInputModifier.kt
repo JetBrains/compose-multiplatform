@@ -17,10 +17,10 @@
 package androidx.compose.ui.input.key
 
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.focus.findActiveFocusNode
 import androidx.compose.ui.node.ModifiedKeyInputNode
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.platform.inspectable
 
 /**
  * Adding this [modifier][Modifier] to the [modifier][Modifier] parameter of a component will
@@ -32,9 +32,7 @@ import androidx.compose.ui.platform.debugInspectorInfo
  *
  * @sample androidx.compose.ui.samples.KeyEventSample
  */
-// TODO: b/191017532 remove Modifier.composed
-@Suppress("UnnecessaryComposedModifier")
-fun Modifier.onKeyEvent(onKeyEvent: (KeyEvent) -> Boolean): Modifier = composed(
+fun Modifier.onKeyEvent(onKeyEvent: (KeyEvent) -> Boolean): Modifier = inspectable(
     inspectorInfo = debugInspectorInfo {
         name = "onKeyEvent"
         properties["onKeyEvent"] = onKeyEvent
@@ -55,9 +53,7 @@ fun Modifier.onKeyEvent(onKeyEvent: (KeyEvent) -> Boolean): Modifier = composed(
  *
  * @sample androidx.compose.ui.samples.KeyEventSample
  */
-// TODO: b/191017532 remove Modifier.composed
-@Suppress("UnnecessaryComposedModifier")
-fun Modifier.onPreviewKeyEvent(onPreviewKeyEvent: (KeyEvent) -> Boolean): Modifier = composed(
+fun Modifier.onPreviewKeyEvent(onPreviewKeyEvent: (KeyEvent) -> Boolean): Modifier = inspectable(
     inspectorInfo = debugInspectorInfo {
         name = "onPreviewKeyEvent"
         properties["onPreviewKeyEvent"] = onPreviewKeyEvent
