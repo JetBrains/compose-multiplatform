@@ -54,7 +54,7 @@ fun Project.writeSdkPathToLocalPropertiesFile() {
  * Returns the root project's platform-specific SDK path as a file.
  */
 fun Project.getSdkPath(): File {
-    if (rootProject.plugins.hasPlugin("androix.build.AndroidXPlaygroundRootImplPlugin") ||
+    if (rootProject.plugins.hasPlugin("AndroidXPlaygroundRootPlugin") ||
         System.getenv("COMPOSE_DESKTOP_GITHUB_BUILD") != null
     ) {
         // This is not full checkout, use local settings instead.
