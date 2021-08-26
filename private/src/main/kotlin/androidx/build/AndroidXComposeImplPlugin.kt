@@ -33,6 +33,7 @@ import org.gradle.api.artifacts.type.ArtifactTypeDefinition
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.tasks.ClasspathNormalizer
+import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.withType
@@ -42,9 +43,13 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.io.File
 
 const val composeSourceOption =
     "plugin:androidx.compose.compiler.plugins.kotlin:sourceInformation=true"
+const val composeMetricsOption =
+    "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination"
+const val enableMetricsArg = "androidx.enableComposeCompilerMetrics"
 
 /**
  * Plugin to apply common configuration for Compose projects.
@@ -314,6 +319,29 @@ fun Project.configureComposeImplPluginForAndroidx() {
             if (!kotlinPlugin.isEmpty) {
                 compile.kotlinOptions.freeCompilerArgs +=
                     "-Xplugin=${kotlinPlugin.first()}"
+
+                val enableMetrics = project
+                    .findProperty(enableMetricsArg) == "true"
+
+                // since metrics reports in compose compiler are a new feature, we only want to
+                // pass in this parameter for modules that are using the tip of tree compose
+                // compiler, or else we will run into an exception since the parameter will not
+                // be recognized.
+                val isTipOfTreeComposeCompiler = conf
+                    .dependencies.first() !is ExternalModuleDependency
+
+                if (isTipOfTreeComposeCompiler && enableMetrics) {
+                    val libMetrics = project
+                        .rootProject
+                        .getLibraryMetricsDirectory()
+                    val metricsDest = File(libMetrics, "compose")
+                        .absolutePath
+                    compile.kotlinOptions.freeCompilerArgs +=
+                        listOf(
+                            "-P",
+                            "$composeMetricsOption=$metricsDest"
+                        )
+                }
             }
         }
     }
@@ -329,6 +357,7 @@ fun Project.configureComposeImplPluginForAndroidx() {
                             if (!kotlinPlugin.isEmpty) {
                                 compile.kotlinOptions.freeCompilerArgs +=
                                     listOf("-P", composeSourceOption)
+
                             }
                         }
                     }

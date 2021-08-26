@@ -33,7 +33,6 @@ import java.io.File
 
 private const val BYTECODE_SIZE = "bytecode_size"
 private const val METHOD_COUNT = "method_count"
-private const val METRICS_DIRECTORY = "librarymetrics"
 private const val JSON_FILE_EXTENSION = ".json"
 private const val JAR_FILE_EXTENSION = ".jar"
 private const val LINT_JAR = "lint$JAR_FILE_EXTENSION"
@@ -104,7 +103,7 @@ fun Project.configureReportLibraryMetricsTask(): TaskProvider<ReportLibraryMetri
         ReportLibraryMetricsTask::class.java
     )
     task.configure {
-        val outputDir = File(project.rootProject.getDistributionDirectory(), METRICS_DIRECTORY)
+        val outputDir = project.rootProject.getLibraryMetricsDirectory()
         it.outputFile.set(
             task.map {
                 File(outputDir, "${project.group}_${project.name}$JSON_FILE_EXTENSION")

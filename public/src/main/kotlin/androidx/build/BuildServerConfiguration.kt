@@ -103,6 +103,12 @@ fun Project.getHostTestResultDirectory(): File =
     File(getDistributionDirectory(), "host-test-reports")
 
 /**
+ * Directory to put json metrics so they can be consumed by the metrics dashboards.
+ */
+fun Project.getLibraryMetricsDirectory(): File =
+    File(getDistributionDirectory(), "librarymetrics")
+
+/**
  * Whether the build should force all versions to be snapshots.
  */
 fun isSnapshotBuild() = System.getenv("SNAPSHOT") != null
