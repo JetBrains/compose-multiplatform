@@ -35,6 +35,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -138,9 +139,8 @@ private object LibrariesSnippet6 {
             navigation(startDestination = innerStartRoute, route = "Parent") {
                 // ...
                 composable("exampleWithRoute") { backStackEntry ->
-                    val parentViewModel = hiltViewModel<ParentViewModel>(
-                        navController.getBackStackEntry("Parent")
-                    )
+                    val parentEntry = remember { navController.getBackStackEntry("Parent") }
+                    val parentViewModel = hiltViewModel<ParentViewModel>(parentEntry)
                     ExampleWithRouteScreen(parentViewModel)
                 }
             }
