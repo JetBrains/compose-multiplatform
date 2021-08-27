@@ -69,6 +69,7 @@ class OverScrollConfiguration(
  * Composition local to provide configuration for scrolling containers down the
  * hierarchy. `null` means there will be no overscroll at all.
  */
+@Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
 @ExperimentalFoundationApi
 @get:ExperimentalFoundationApi
 val LocalOverScrollConfiguration = compositionLocalOf<OverScrollConfiguration?> {

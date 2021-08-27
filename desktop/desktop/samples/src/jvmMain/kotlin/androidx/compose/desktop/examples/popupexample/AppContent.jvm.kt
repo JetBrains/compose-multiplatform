@@ -345,6 +345,7 @@ fun WindowContent(amount: MutableState<Int>, onClose: () -> Unit) {
 }
 
 @Composable
+@OptIn(ExperimentalComposeUiApi::class)
 fun Button(
     text: String = "",
     onClick: () -> Unit = {},
