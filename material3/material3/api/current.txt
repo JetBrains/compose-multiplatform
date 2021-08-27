@@ -18,5 +18,43 @@ package androidx.compose.material3 {
   public final class ShapesKt {
   }
 
+  @androidx.compose.runtime.Immutable public final class Typography {
+    ctor public Typography(optional androidx.compose.ui.text.TextStyle displayLarge, optional androidx.compose.ui.text.TextStyle displayMedium, optional androidx.compose.ui.text.TextStyle displaySmall, optional androidx.compose.ui.text.TextStyle headlineLarge, optional androidx.compose.ui.text.TextStyle headlineMedium, optional androidx.compose.ui.text.TextStyle headlineSmall, optional androidx.compose.ui.text.TextStyle titleLarge, optional androidx.compose.ui.text.TextStyle titleMedium, optional androidx.compose.ui.text.TextStyle titleSmall, optional androidx.compose.ui.text.TextStyle bodyLarge, optional androidx.compose.ui.text.TextStyle bodyMedium, optional androidx.compose.ui.text.TextStyle bodySmall, optional androidx.compose.ui.text.TextStyle labelLarge, optional androidx.compose.ui.text.TextStyle labelMedium, optional androidx.compose.ui.text.TextStyle labelSmall);
+    method public androidx.compose.material3.Typography copy(optional androidx.compose.ui.text.TextStyle displayLarge, optional androidx.compose.ui.text.TextStyle displayMedium, optional androidx.compose.ui.text.TextStyle displaySmall, optional androidx.compose.ui.text.TextStyle headlineLarge, optional androidx.compose.ui.text.TextStyle headlineMedium, optional androidx.compose.ui.text.TextStyle headlineSmall, optional androidx.compose.ui.text.TextStyle titleLarge, optional androidx.compose.ui.text.TextStyle titleMedium, optional androidx.compose.ui.text.TextStyle titleSmall, optional androidx.compose.ui.text.TextStyle bodyLarge, optional androidx.compose.ui.text.TextStyle bodyMedium, optional androidx.compose.ui.text.TextStyle bodySmall, optional androidx.compose.ui.text.TextStyle labelLarge, optional androidx.compose.ui.text.TextStyle labelMedium, optional androidx.compose.ui.text.TextStyle labelSmall);
+    method public androidx.compose.ui.text.TextStyle getBodyLarge();
+    method public androidx.compose.ui.text.TextStyle getBodyMedium();
+    method public androidx.compose.ui.text.TextStyle getBodySmall();
+    method public androidx.compose.ui.text.TextStyle getDisplayLarge();
+    method public androidx.compose.ui.text.TextStyle getDisplayMedium();
+    method public androidx.compose.ui.text.TextStyle getDisplaySmall();
+    method public androidx.compose.ui.text.TextStyle getHeadlineLarge();
+    method public androidx.compose.ui.text.TextStyle getHeadlineMedium();
+    method public androidx.compose.ui.text.TextStyle getHeadlineSmall();
+    method public androidx.compose.ui.text.TextStyle getLabelLarge();
+    method public androidx.compose.ui.text.TextStyle getLabelMedium();
+    method public androidx.compose.ui.text.TextStyle getLabelSmall();
+    method public androidx.compose.ui.text.TextStyle getTitleLarge();
+    method public androidx.compose.ui.text.TextStyle getTitleMedium();
+    method public androidx.compose.ui.text.TextStyle getTitleSmall();
+    property public final androidx.compose.ui.text.TextStyle bodyLarge;
+    property public final androidx.compose.ui.text.TextStyle bodyMedium;
+    property public final androidx.compose.ui.text.TextStyle bodySmall;
+    property public final androidx.compose.ui.text.TextStyle displayLarge;
+    property public final androidx.compose.ui.text.TextStyle displayMedium;
+    property public final androidx.compose.ui.text.TextStyle displaySmall;
+    property public final androidx.compose.ui.text.TextStyle headlineLarge;
+    property public final androidx.compose.ui.text.TextStyle headlineMedium;
+    property public final androidx.compose.ui.text.TextStyle headlineSmall;
+    property public final androidx.compose.ui.text.TextStyle labelLarge;
+    property public final androidx.compose.ui.text.TextStyle labelMedium;
+    property public final androidx.compose.ui.text.TextStyle labelSmall;
+    property public final androidx.compose.ui.text.TextStyle titleLarge;
+    property public final androidx.compose.ui.text.TextStyle titleMedium;
+    property public final androidx.compose.ui.text.TextStyle titleSmall;
+  }
+
+  public final class TypographyKt {
+  }
+
 }
 
