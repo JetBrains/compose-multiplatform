@@ -60,6 +60,7 @@ To enable additional context menu items for TextField and Text components, Conte
 ```kotlin
 import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.foundation.ContextMenuDataProvider
+import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -70,14 +71,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ContextMenuItem
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.singleWindowApplication
 
 @OptIn(ExperimentalComposeUiApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 fun main() = singleWindowApplication(title = "Context menu") {
-   DesktopMaterialTheme { //it is mandatory for Context Menu
-       val text = remember {mutableStateOf("Hello!")}
+    DesktopMaterialTheme { //it is mandatory for Context Menu
+        val text = remember {mutableStateOf("Hello!")}
         Column {
             ContextMenuDataProvider(
                 items = {
@@ -100,7 +100,7 @@ fun main() = singleWindowApplication(title = "Context menu") {
                 }
             }
         }
-   }
+    }
 } 
 ```
 In this example Text/TextField context menus will be extended with two additional items. 
@@ -109,9 +109,9 @@ In this example Text/TextField context menus will be extended with two additiona
 There is a possibility to create a context menu for an arbitrary application window area. This is implemented using ContextMenuArea API that is 
 similar to ContextMenuDataProvider. 
 ```kotlin
-
 import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.foundation.ContextMenuArea
+import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
@@ -119,13 +119,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ContextMenuItem
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.singleWindowApplication
 
 @OptIn(ExperimentalComposeUiApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 fun main() = singleWindowApplication(title = "Context menu") {
-   DesktopMaterialTheme { //it is mandatory for Context Menu
+    DesktopMaterialTheme { //it is mandatory for Context Menu
         ContextMenuArea(items = {
             listOf(
                 ContextMenuItem("User-defined Action") {/*do something here*/},
@@ -135,7 +134,7 @@ fun main() = singleWindowApplication(title = "Context menu") {
             Box(modifier = Modifier.background(Color.Blue).height(100.dp).width(100.dp)) {
             }
         }
-   }
+    }
 } 
 ```
 Right click on the Blue Square will show a context menu with two items
