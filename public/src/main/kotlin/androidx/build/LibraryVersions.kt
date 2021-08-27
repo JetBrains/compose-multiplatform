@@ -68,6 +68,7 @@ object LibraryVersions {
     val FRAGMENT = Version("1.4.0-alpha09")
     val FUTURES = Version("1.2.0-alpha01")
     val GLANCE = Version("1.0.0-alpha01")
+    val GRAPHICS = Version("1.0.0-alpha01")
     val GRIDLAYOUT = Version("1.1.0-alpha01")
     val HEALTH_SERVICES_CLIENT = Version("1.0.0-alpha02")
     val HEIFWRITER = Version("1.1.0-alpha02")
