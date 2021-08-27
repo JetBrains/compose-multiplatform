@@ -17,14 +17,11 @@ RUN dpkg --add-architecture i386 && apt-get update -yqq && apt-get install -y \
 ARG CHROME_VERSION="google-chrome-stable"
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
 
-RUN echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A6DCF7707EBC211F \
+    && echo "deb http://ppa.launchpad.net/ubuntu-mozilla-security/ppa/ubuntu focal main" >> /etc/apt/sources.list.d/mozilla.list \
+    && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
     && apt-get update -yqq \
-    && apt-get install -y ${CHROME_VERSION:-google-chrome-stable}
-
-ARG FIREFOX_VERSION="92.0b9"
-RUN wget https://ftp.mozilla.org/pub/firefox/releases/${FIREFOX_VERSION}/linux-x86_64/en-US/firefox-${FIREFOX_VERSION}.tar.bz2 \
-    && tar xvf firefox-${FIREFOX_VERSION}.tar.bz2 \
-    && mv firefox/ /usr/bin/firefox
+    && apt-get install -y firefox ${CHROME_VERSION:-google-chrome-stable}
 
 RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.29.1/geckodriver-v0.29.1-linux64.tar.gz \
     && tar -xvzf geckodriver-v0.29.1-linux64.tar.gz && mkdir -p /root/.gradle/selenium/gecko  &&mv geckodriver /root/.gradle/selenium/gecko
