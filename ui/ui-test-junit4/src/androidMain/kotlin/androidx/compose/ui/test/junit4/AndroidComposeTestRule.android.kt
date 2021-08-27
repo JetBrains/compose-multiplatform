@@ -152,7 +152,7 @@ fun createEmptyComposeRule(): ComposeTestRule =
  * @param activityRule Test rule to use to launch the Activity.
  * @param activityProvider Function to retrieve the Activity from the given [activityRule].
  */
-@OptIn(InternalTestApi::class)
+@OptIn(InternalTestApi::class, ExperimentalCoroutinesApi::class)
 class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
     val activityRule: R,
     private val activityProvider: (R) -> A,
@@ -175,7 +175,6 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
     private val idlingStrategy: IdlingStrategy by lazy { idlingStrategyFactory.invoke() }
 
     private val recomposer: Recomposer
-    @OptIn(ExperimentalCoroutinesApi::class)
     private val testCoroutineDispatcher: TestCoroutineDispatcher
     private val recomposerApplyCoroutineScope: CoroutineScope
     private val frameCoroutineScope: CoroutineScope
@@ -185,10 +184,8 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
         get() = mainClockImpl
 
     init {
-        @OptIn(ExperimentalCoroutinesApi::class)
         testCoroutineDispatcher = TestCoroutineDispatcher()
         frameCoroutineScope = CoroutineScope(testCoroutineDispatcher)
-        @OptIn(ExperimentalCoroutinesApi::class)
         val frameClock = TestMonotonicFrameClock(frameCoroutineScope)
         mainClockImpl = MainTestClockImpl(testCoroutineDispatcher, frameClock)
         val infiniteAnimationPolicy = object : InfiniteAnimationPolicy {
@@ -199,7 +196,6 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
                 return block()
             }
         }
-        @OptIn(ExperimentalCoroutinesApi::class)
         recomposerApplyCoroutineScope = CoroutineScope(
             testCoroutineDispatcher + frameClock + infiniteAnimationPolicy +
                 coroutineExceptionHandler + Job()
