@@ -1,5 +1,4 @@
 plugins {
-    //id("kotlin-multiplatform")
     kotlin("multiplatform")
     id("org.jetbrains.compose")
 }
@@ -13,7 +12,7 @@ kotlin {
                 testLogging.showStandardStreams = true
                 useKarma {
                     useChromeHeadless()
-                    useFirefox()
+                    //useFirefox()
                 }
             }
         }
