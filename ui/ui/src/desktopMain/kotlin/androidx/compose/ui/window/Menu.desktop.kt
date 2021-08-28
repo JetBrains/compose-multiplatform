@@ -17,6 +17,7 @@
 package androidx.compose.ui.window
 
 import androidx.compose.runtime.AbstractApplier
+import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.Composition
@@ -94,7 +95,7 @@ fun Menu.setContent(
     parentComposition: CompositionContext,
     content: @Composable (MenuScope.() -> Unit)
 ): Composition {
-    val applier = MutableListApplier(asMutableList())
+    val applier = MenuItemApplier(this)
     val composition = Composition(applier, parentComposition)
     val scope = MenuScope(AwtMenuScope())
     composition.setContent {
@@ -126,32 +127,6 @@ fun JMenu.setContent(
         scope.content()
     }
     return composition
-}
-
-// This menu is used by Tray
-@Composable
-private fun AwtMenu(
-    text: String,
-    enabled: Boolean,
-    content: @Composable MenuScope.() -> Unit
-) {
-    val menu = remember(::Menu)
-    val compositionContext = rememberCompositionContext()
-
-    DisposableEffect(Unit) {
-        val composition = menu.setContent(compositionContext, content)
-        onDispose {
-            composition.dispose()
-        }
-    }
-
-    ComposeNode<Menu, MutableListApplier<MenuItem>>(
-        factory = { menu },
-        update = {
-            set(text, Menu::setLabel)
-            set(enabled, Menu::setEnabled)
-        }
-    )
 }
 
 // TODO(demin): consider making MenuBarScope/MenuScope as an interface
@@ -263,16 +238,22 @@ private class AwtMenuScope : MenuScopeImpl {
             throw UnsupportedOperationException("java.awt.Menu doesn't support mnemonic")
         }
 
-        AwtMenu(
-            text,
-            enabled,
-            content
+        ComposeNode<Menu, MenuItemApplier>(
+            factory = { Menu() },
+            update = {
+                set(text, Menu::setLabel)
+                set(enabled, Menu::setEnabled)
+            },
+            content = {
+                val scope = MenuScope(this)
+                scope.content()
+            }
         )
     }
 
     @Composable
     override fun Separator() {
-        ComposeNode<MenuItem, MutableListApplier<MenuItem>>(
+        ComposeNode<MenuItem, MenuItemApplier>(
             // item with name "-" has different look
             factory = { MenuItem("-") },
             update = {}
@@ -300,7 +281,7 @@ private class AwtMenuScope : MenuScopeImpl {
 
         val currentOnClick by rememberUpdatedState(onClick)
 
-        ComposeNode<MenuItem, MutableListApplier<MenuItem>>(
+        ComposeNode<MenuItem, MenuItemApplier>(
             factory = {
                 MenuItem().apply {
                     addActionListener {
@@ -342,7 +323,7 @@ private class AwtMenuScope : MenuScopeImpl {
             CheckboxMenuItem::getState
         )
 
-        ComposeNode<CheckboxMenuItem, MutableListApplier<JComponent>>(
+        ComposeNode<CheckboxMenuItem, MenuItemApplier>(
             factory = {
                 CheckboxMenuItem().apply {
                     addItemListener {
@@ -726,27 +707,65 @@ internal class JMenuItemApplier(root: JMenu) : JComponentApplier(root) {
     }
 }
 
+internal class MenuItemApplier(private val root: Menu) : Applier<MenuItem> {
+    override var current: MenuItem = root
+
+    override fun up() {
+        check(current != root)
+        current = current.parent as MenuItem
+    }
+
+    override fun down(node: MenuItem) {
+        check(current == node.parent)
+        current = node
+    }
+
+    override fun clear() {
+        current = root
+        root.removeAll()
+    }
+
+    override fun insertBottomUp(index: Int, instance: MenuItem) {
+        // Ignored as the tree is built top-down.
+    }
+
+    override fun insertTopDown(index: Int, instance: MenuItem) {
+        val menu = current.asMenu()
+        menu.insert(instance, index)
+    }
+
+    override fun move(from: Int, to: Int, count: Int) {
+        val menu = current.asMenu()
+
+        performMove(
+            from, to, count,
+            getItem = { menu.getItem(it) },
+            removeItem = { menu.remove(it) },
+            insertItem = { item, idx -> menu.insert(item, idx) }
+        )
+    }
+
+    override fun remove(index: Int, count: Int) {
+        val menu = current.asMenu()
+        for (i in index + count - 1 downTo index) {
+            menu.remove(i)
+        }
+    }
+
+    private fun MenuItem.asMenu(): Menu {
+        return when (this) {
+            is Menu -> this
+            else -> error("Can only insert MenuItem into Menu, not ${this::class}")
+        }
+    }
+}
+
 private fun JMenuBar.asMutableList(): MutableList<JComponent> {
     return object : AddRemoveMutableList<JComponent>() {
         override val size: Int get() = this@asMutableList.menuCount
         override fun get(index: Int) = this@asMutableList.getMenu(index)
 
         override fun performAdd(element: JComponent) {
-            this@asMutableList.add(element)
-        }
-
-        override fun performRemove(index: Int) {
-            this@asMutableList.remove(index)
-        }
-    }
-}
-
-private fun Menu.asMutableList(): MutableList<MenuItem> {
-    return object : AddRemoveMutableList<MenuItem>() {
-        override val size: Int get() = this@asMutableList.itemCount
-        override fun get(index: Int) = this@asMutableList.getItem(index)
-
-        override fun performAdd(element: MenuItem) {
             this@asMutableList.add(element)
         }
 
