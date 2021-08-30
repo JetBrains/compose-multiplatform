@@ -12,36 +12,24 @@ import kotlin.test.assertTrue
 
 class ModifierTests {
     @Test
-    fun backgroundModifier() {
-        val root = "div".asHtmlElement()
-        renderComposable(
-            root = root
-        ) {
+    fun backgroundModifier() = runTest {
+         {
             Box(
                 Modifier.background(Color(255, 0, 0))
             ) { }
         }
 
-        val el = root.firstChild
-        assertTrue(el is HTMLElement, "element not found")
-
-        assertEquals("background-color: rgb(255, 0, 0);", el.style.cssText)
+        assertEquals("background-color: rgb(255, 0, 0);", nextChild().style.cssText)
     }
 
     @Test
-    fun size() {
-        val root = "div".asHtmlElement()
-        renderComposable(
-            root = root
-        ) {
+    fun size() = runTest {
+        composition {
             Box(
                 Modifier.size(40.dp)
             ) { }
         }
 
-        val el = root.firstChild
-        assertTrue(el is HTMLElement, "element not found")
-
-        assertEquals("width: 40px; height: 40px;", el.style.cssText)
+        assertEquals("width: 40px; height: 40px;", nextChild().style.cssText)
     }
 }

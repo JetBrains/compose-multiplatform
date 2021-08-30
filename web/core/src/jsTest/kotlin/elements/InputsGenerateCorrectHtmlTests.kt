@@ -505,10 +505,8 @@ class InputsGenerateCorrectHtmlTests {
     }
 
     @Test
-    fun textAreaWithDefaultValueAndWithoutIt() {
-        val root = "div".asHtmlElement()
-
-        renderComposable(root = root) {
+    fun textAreaWithDefaultValueAndWithoutIt() = runTest {
+        composition {
             TextArea()
             TextArea {
                 defaultValue("not-empty-default-value")

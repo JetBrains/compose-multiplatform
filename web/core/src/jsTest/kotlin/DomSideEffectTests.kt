@@ -12,12 +12,8 @@ import kotlin.test.assertEquals
 class DomSideEffectTests {
 
     @Test
-    fun canCreateElementsInDomSideEffect() {
-        val root = "div".asHtmlElement()
-
-        renderComposable(
-            root = root
-        ) {
+    fun canCreateElementsInDomSideEffect() = runTest {
+        composition {
             Div {
                 DomSideEffect {
                     it.appendChild(
@@ -28,6 +24,7 @@ class DomSideEffectTests {
                 }
             }
         }
+
         assertEquals(
             expected = "<div><div><p>Hello World!</p></div></div>",
             actual = root.outerHTML
