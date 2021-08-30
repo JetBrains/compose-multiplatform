@@ -42,6 +42,23 @@ dependencies {
         api("androidx.compose.runtime:runtime:1.0.1")
         api("androidx.compose.ui:ui-graphics:1.0.1")
         api("androidx.compose.ui:ui-text:1.0.1")
+
+        testImplementation(libs.testRules)
+        testImplementation(libs.testRunner)
+        testImplementation(libs.junit)
+        testImplementation(libs.truth)
+
+        // TODO: Enable when Material 3 samples are in place.
+        // implementation(project(":compose:material3:material3:material3-samples"))
+        androidTestImplementation(project(":compose:test-utils"))
+        androidTestImplementation(project(":test:screenshot:screenshot"))
+        androidTestImplementation(libs.testRules)
+        androidTestImplementation(libs.testRunner)
+        androidTestImplementation(libs.junit)
+        androidTestImplementation(libs.truth)
+        androidTestImplementation(libs.dexmakerMockito)
+        androidTestImplementation(libs.mockitoCore)
+        androidTestImplementation(libs.mockitoKotlin)
     }
 }
 
@@ -71,6 +88,28 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             desktopMain.dependencies {
                 implementation(libs.kotlinStdlib)
             }
+
+            test.dependencies {
+                implementation(libs.testRules)
+                implementation(libs.testRunner)
+                implementation(libs.junit)
+                implementation(libs.truth)
+            }
+
+            androidAndroidTest.dependencies {
+                // TODO: Enable when Material 3 samples are in place.
+                // implementation(project(":compose:material3:material3:material3-samples"))
+                implementation(project(":compose:test-utils"))
+                implementation(project(":test:screenshot:screenshot"))
+
+                implementation(libs.testRules)
+                implementation(libs.testRunner)
+                implementation(libs.junit)
+                implementation(libs.truth)
+                implementation(libs.dexmakerMockito)
+                implementation(libs.mockitoCore)
+                implementation(libs.mockitoKotlin)
+            }
         }
     }
 }
@@ -83,4 +122,10 @@ androidx {
     mavenGroup = LibraryGroups.Compose.MATERIAL3
     inceptionYear = "2021"
     description = "Compose Material You Design Components library"
+}
+
+// Screenshot tests related setup
+android {
+    sourceSets.androidTest.assets.srcDirs +=
+            project.rootDir.absolutePath + "/../../golden/compose/material3/material3"
 }
