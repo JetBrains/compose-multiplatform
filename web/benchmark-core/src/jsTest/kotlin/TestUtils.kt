@@ -17,35 +17,6 @@ import org.w3c.dom.MutationObserverInit
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-private val testScope = MainScope()
-
-class TestScope : CoroutineScope by testScope {
-
-    val root = "div".asHtmlElement()
-
-    fun composition(content: @Composable () -> Unit): Composition {
-        root.clear()
-        return renderComposable(root) {
-            content()
-        }
-    }
-
-    suspend fun waitChanges() {
-        waitForChanges(root)
-    }
-}
-
-internal fun runTest(block: suspend TestScope.() -> Unit): dynamic {
-    val scope = TestScope()
-    return scope.promise { block(scope) }
-}
-
-internal fun runBlockingTest(
-    block: suspend CoroutineScope.() -> Unit
-): dynamic = testScope.promise { this.block() }
-
-internal fun String.asHtmlElement() = document.createElement(this) as HTMLElement
-
 /* Currently, the recompositionRunner relies on AnimationFrame to run the recomposition and
 applyChanges. Therefore we can use this method after updating the state and before making
 assertions.

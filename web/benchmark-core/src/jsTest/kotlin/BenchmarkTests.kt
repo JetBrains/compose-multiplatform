@@ -4,6 +4,9 @@ import kotlinx.browser.window
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.toList
+import org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi
+import org.jetbrains.compose.web.testutils.TestScope
+import org.jetbrains.compose.web.testutils.runTest
 import org.w3c.dom.get
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -13,6 +16,7 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
 @OptIn(ExperimentalTime::class)
+@ComposeWebExperimentalTestsApi
 class BenchmarkTests {
 
     private fun flowRepeat(count: Int, calculate: suspend () -> Duration): Flow<Duration> {
@@ -48,7 +52,7 @@ class BenchmarkTests {
     suspend private fun TestScope.addNItems(n: Int): Duration {
         val addItemsCount = mutableStateOf(0)
 
-        val composition = composition {
+        composition {
             AddItems(addItemsCount.value)
         }
 
@@ -60,7 +64,6 @@ class BenchmarkTests {
         }
 
         assertEquals(n, root.childElementCount)
-        composition.dispose()
 
         return duration
     }
@@ -89,7 +92,7 @@ class BenchmarkTests {
     fun remove1000Items() = runBenchmark("remove1000Items") {
         val addItemsCount = mutableStateOf(1000)
 
-        val composition = composition {
+        composition {
             AddItems(addItemsCount.value)
         }
 
@@ -101,7 +104,6 @@ class BenchmarkTests {
         }
 
         assertEquals(0, root.childElementCount)
-        composition.dispose()
 
         duration
     }
@@ -111,7 +113,7 @@ class BenchmarkTests {
         val items = mutableStateListOf<String>()
         items.addAll(generateSequence(0) { it + 1 }.map { it.toString() }.take(1000))
 
-        val composition = composition {
+        composition {
             AddItems(items)
         }
 
@@ -129,13 +131,12 @@ class BenchmarkTests {
         repeat(items.size) {
             if (it % 10 == 0) items[it] = "${items[it]}-$it"
         }
+
         waitForAnimationFrame()
 
         assertEquals(1000, root.childElementCount)
         assertEquals("1", root.children[1]!!.firstChild!!.textContent)
         assertEquals("10-10", root.children[10]!!.firstChild!!.textContent)
-
-        composition.dispose()
 
         duration
     }
