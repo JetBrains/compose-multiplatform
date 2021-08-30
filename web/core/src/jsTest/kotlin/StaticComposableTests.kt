@@ -2,43 +2,29 @@ package org.jetbrains.compose.web.core.tests
 
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
-import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
-import org.jetbrains.compose.web.renderComposable
-import org.w3c.dom.HTMLElement
-import org.w3c.dom.get
+import org.jetbrains.compose.web.testutils.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
-import org.jetbrains.compose.web.testutils.*
 
 class StaticComposableTests {
     @Test
-    fun emptyComposable() {
-        val root = "div".asHtmlElement()
-        renderComposable(
-            root = root
-        ) {}
+    fun emptyComposable() = runTest {
+        composition {}
         assertEquals("<div></div>", root.outerHTML)
     }
 
     @Test
-    fun textChild() {
-        val root = "div".asHtmlElement()
-        renderComposable(
-            root = root
-        ) {
+    fun textChild() = runTest {
+        composition {
             Text("inner text")
         }
         assertEquals("<div>inner text</div>", root.outerHTML)
     }
 
     @Test
-    fun attrs() {
-        val root = "div".asHtmlElement()
-        renderComposable(
-            root = root
-        ) {
+    fun attrs() = runTest {
+        composition {
             Div(
                 attrs = {
                     classes("some", "simple", "classes")
@@ -50,8 +36,7 @@ class StaticComposableTests {
             )
         }
 
-        val el = root.firstChild
-        assertTrue(el is HTMLElement, "element not found")
+        val el = nextChild()
 
         assertEquals("verySpecial", el.getAttribute("id"))
         assertEquals("some simple classes", el.getAttribute("class"))
@@ -59,11 +44,8 @@ class StaticComposableTests {
     }
 
     @Test
-    fun styles() {
-        val root = "div".asHtmlElement()
-        renderComposable(
-            root = root
-        ) {
+    fun styles() = runTest {
+        composition {
             Div(
                 {
                     style {
@@ -76,135 +58,6 @@ class StaticComposableTests {
             )
         }
 
-        assertEquals("opacity: 0.2; color: green;", (root.children[0] as HTMLElement).style.cssText)
-    }
-
-
-    @Test
-    fun stylesTop() {
-        val root = "div".asHtmlElement()
-        renderComposable(
-            root = root
-        ) {
-            Div(
-                {
-                    style {
-                        top(100.px)
-                    }
-                }
-            )
-            Div(
-                {
-                    style {
-                        top(100.percent)
-                    }
-                }
-            )
-        }
-
-        assertEquals("top: 100px;", (root.children[0] as HTMLElement).style.cssText)
-        assertEquals("top: 100%;", (root.children[1] as HTMLElement).style.cssText)
-    }
-
-    @Test
-    fun stylesBottom() {
-        val root = "div".asHtmlElement()
-        renderComposable(
-            root = root
-        ) {
-            Div(
-                {
-                    style {
-                        bottom(100.px)
-                    }
-                }
-            )
-            Div(
-                {
-                    style {
-                        bottom(100.percent)
-                    }
-                }
-            )
-        }
-
-        assertEquals("bottom: 100px;", (root.children[0] as HTMLElement).style.cssText)
-        assertEquals("bottom: 100%;", (root.children[1] as HTMLElement).style.cssText)
-    }
-
-    @Test
-    fun stylesLeft() {
-        val root = "div".asHtmlElement()
-        renderComposable(
-            root = root
-        ) {
-            Div(
-                {
-                    style {
-                        left(100.px)
-                    }
-                }
-            )
-            Div(
-                {
-                    style {
-                        left(100.percent)
-                    }
-                }
-            )
-        }
-
-        assertEquals("left: 100px;", (root.children[0] as HTMLElement).style.cssText)
-        assertEquals("left: 100%;", (root.children[1] as HTMLElement).style.cssText)
-    }
-
-    @Test
-    fun stylesRight() {
-        val root = "div".asHtmlElement()
-        renderComposable(
-            root = root
-        ) {
-            Div(
-                {
-                    style {
-                        right(100.px)
-                    }
-                }
-            )
-            Div(
-                {
-                    style {
-                        right(100.percent)
-                    }
-                }
-            )
-        }
-
-        assertEquals("right: 100px;", (root.children[0] as HTMLElement).style.cssText)
-        assertEquals("right: 100%;", (root.children[1] as HTMLElement).style.cssText)
-    }
-
-    @Test
-    fun stylesPosition() = runTest {
-        val enumValues = Position.values()
-
-        composition {
-            enumValues.forEach { position ->
-                Span(
-                    {
-                        style {
-                            position(position)
-                        }
-                    }
-                )
-            }
-        }
-
-        enumValues.forEachIndexed { index, position ->
-            assertEquals(
-                "position: ${position.value};",
-                nextChild().style.cssText
-            )
-        }
+        assertEquals("opacity: 0.2; color: green;", nextChild().style.cssText)
     }
 }
