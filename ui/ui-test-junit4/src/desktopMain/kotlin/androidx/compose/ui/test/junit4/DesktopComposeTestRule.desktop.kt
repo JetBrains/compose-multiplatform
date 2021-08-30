@@ -18,9 +18,12 @@ package androidx.compose.ui.test.junit4
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.ui.ComposeScene
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.node.RootForTest
-import androidx.compose.ui.platform.TestComposeWindow
+import androidx.compose.ui.platform.InfiniteAnimationPolicy
 import androidx.compose.ui.semantics.SemanticsNode
+import androidx.compose.ui.test.ComposeTimeoutException
 import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.MainTestClock
@@ -31,71 +34,90 @@ import androidx.compose.ui.test.TestOwner
 import androidx.compose.ui.test.createTestContext
 import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntSize
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.yield
+import org.jetbrains.skia.Surface
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
-import java.util.concurrent.ExecutionException
-import java.util.concurrent.FutureTask
-import javax.swing.SwingUtilities.invokeAndWait
-import javax.swing.SwingUtilities.isEventDispatchThread
+import kotlin.coroutines.cancellation.CancellationException
 
 @OptIn(InternalTestApi::class)
 actual fun createComposeRule(): ComposeContentTestRule = DesktopComposeTestRule()
 
 @InternalTestApi
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalCoroutinesApi::class)
 class DesktopComposeTestRule : ComposeContentTestRule {
 
-    override val density: Density
-        get() = Density(1f, 1f)
+    override val density = Density(1f, 1f)
 
-    override val mainClock: MainTestClock
-        get() = TODO()
-
-    internal val testDisplaySize: IntSize get() = IntSize(1024, 768)
-
+    private val coroutineDispatcher = TestCoroutineDispatcher()
+    override val mainClock: MainTestClock =
+        MainTestClockImpl(coroutineDispatcher, frameDelayMillis = 16L)
     private var uncaughtExceptionHandler = UncaughtExceptionHandler()
-    lateinit var window: TestComposeWindow
+    private val infiniteAnimationPolicy = object : InfiniteAnimationPolicy {
+        override suspend fun <R> onInfiniteOperation(block: suspend () -> R): R {
+            if (mainClock.autoAdvance) {
+                throw CancellationException()
+            }
+            return block()
+        }
+    }
+    private val coroutineContext =
+        coroutineDispatcher + uncaughtExceptionHandler + infiniteAnimationPolicy
+    private val surface = Surface.makeRasterN32Premul(1024, 768)
 
-    private val testOwner = DesktopTestOwner(this)
+    lateinit var scene: ComposeScene
+
+    private val testOwner = DesktopTestOwner()
     private val testContext = createTestContext(testOwner)
 
     override fun apply(base: Statement, description: Description?): Statement {
         return object : Statement() {
             override fun evaluate() {
-                window = runOnUiThread(::createWindow)
+                scene = runOnUiThread(::createUi)
 
                 try {
                     base.evaluate()
                 } finally {
-                    runOnUiThread(window::dispose)
+                    runOnUiThread(scene::dispose)
                 }
 
+                coroutineDispatcher.cleanupTestCoroutines()
                 uncaughtExceptionHandler.throwUncaught()
             }
         }
     }
 
-    private fun createWindow() = TestComposeWindow(
-        width = testDisplaySize.width,
-        height = testDisplaySize.height,
+    private fun renderNextFrame() = runOnUiThread {
+        scene.render(
+            surface.canvas,
+            mainClock.currentTime * 1_000_000
+        )
+        if (mainClock.autoAdvance) {
+            mainClock.advanceTimeByFrame()
+        }
+    }
+
+    private fun createUi() = ComposeScene(
         density = density,
-        nanoTime = System::nanoTime, // TODO(demin): use mainClock?
-        coroutineContext = Dispatchers.Swing + uncaughtExceptionHandler
-    )
+        coroutineContext = coroutineContext,
+        invalidate = { }
+    ).apply {
+        constraints = Constraints(maxWidth = surface.width, maxHeight = surface.height)
+    }
 
     private fun isIdle() =
         !Snapshot.current.hasPendingChanges() &&
-            !window.hasInvalidations()
+            !scene.hasInvalidations()
 
     override fun waitForIdle() {
         // always check even if we are idle
         uncaughtExceptionHandler.throwUncaught()
         while (!isIdle()) {
-            Thread.sleep(10)
+            renderNextFrame()
             uncaughtExceptionHandler.throwUncaught()
         }
     }
@@ -104,36 +126,34 @@ class DesktopComposeTestRule : ComposeContentTestRule {
         // always check even if we are idle
         uncaughtExceptionHandler.throwUncaught()
         while (!isIdle()) {
-            delay(10)
+            renderNextFrame()
             uncaughtExceptionHandler.throwUncaught()
+            yield()
         }
     }
 
     override fun <T> runOnUiThread(action: () -> T): T {
-        return if (isEventDispatchThread()) {
-            action()
-        } else {
-            val task: FutureTask<T> = FutureTask(action)
-            invokeAndWait(task)
-            try {
-                return task.get()
-            } catch (e: ExecutionException) { // Expose the original exception
-                throw e.cause!!
-            }
-        }
+        return androidx.compose.ui.test.junit4.runOnUiThread(action)
     }
 
     override fun <T> runOnIdle(action: () -> T): T {
         // We are waiting for idle before and AFTER `action` to guarantee that changes introduced
         // in `action` are propagated to components. In Android's version, it's executed in the
-        // Main thread which has similar effects. This code could be reconsidered after
-        // stabilization of the new rendering/dispatching model
+        // Main thread which has similar effects.
         waitForIdle()
         return action().also { waitForIdle() }
     }
 
     override fun waitUntil(timeoutMillis: Long, condition: () -> Boolean) {
-        // TODO: implement
+        val startTime = System.nanoTime()
+        while (!condition()) {
+            renderNextFrame()
+            if (System.nanoTime() - startTime > timeoutMillis * 1_000_000) {
+                throw ComposeTimeoutException(
+                    "Condition still not satisfied after $timeoutMillis ms"
+                )
+            }
+        }
     }
 
     override fun registerIdlingResource(idlingResource: IdlingResource) {
@@ -145,11 +165,11 @@ class DesktopComposeTestRule : ComposeContentTestRule {
     }
 
     override fun setContent(composable: @Composable () -> Unit) {
-        if (isEventDispatchThread()) {
-            window.setContent(composable)
+        if (isOnUiThread()) {
+            scene.setContent(content = composable)
         } else {
             runOnUiThread {
-                window.setContent(composable)
+                scene.setContent(content = composable)
             }
 
             // Only wait for idleness if not on the UI thread. If we are on the UI thread, the
@@ -173,7 +193,7 @@ class DesktopComposeTestRule : ComposeContentTestRule {
         return SemanticsNodeInteractionCollection(testContext, useUnmergedTree, matcher)
     }
 
-    private class DesktopTestOwner(val rule: DesktopComposeTestRule) : TestOwner {
+    private inner class DesktopTestOwner : TestOwner {
         override fun sendTextInputCommand(node: SemanticsNode, command: List<EditCommand>) {
             TODO()
         }
@@ -183,30 +203,14 @@ class DesktopComposeTestRule : ComposeContentTestRule {
         }
 
         override fun <T> runOnUiThread(action: () -> T): T {
-            return rule.runOnUiThread(action)
+            return this@DesktopComposeTestRule.runOnUiThread(action)
         }
 
         override fun getRoots(atLeastOneRootExpected: Boolean): Set<RootForTest> {
-            return rule.window.roots
+            return this@DesktopComposeTestRule.scene.roots
         }
 
-        // TODO(https://github.com/JetBrains/compose-jb/issues/637): support MainTestClock
-        override val mainClock = object : MainTestClock {
-            override val currentTime: Long
-                get() = 0
-            override var autoAdvance: Boolean = false
-
-            override fun advanceTimeByFrame() {
-                TODO()
-            }
-
-            override fun advanceTimeBy(milliseconds: Long, ignoreFrameDuration: Boolean) {
-                TODO()
-            }
-
-            override fun advanceTimeUntil(timeoutMillis: Long, condition: () -> Boolean) {
-                TODO()
-            }
-        }
+        override val mainClock get() =
+            this@DesktopComposeTestRule.mainClock
     }
 }

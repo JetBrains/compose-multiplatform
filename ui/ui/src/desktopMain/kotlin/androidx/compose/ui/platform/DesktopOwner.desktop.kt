@@ -331,11 +331,11 @@ internal class DesktopOwner(
         )
     }
 
-    override fun processPointerInput(nanoTime: Long, pointers: List<TestPointerInputEventData>) {
+    override fun processPointerInput(timeMillis: Long, pointers: List<TestPointerInputEventData>) {
         processPointerInput(
             PointerInputEvent(
                 PointerEventType.Unknown,
-                nanoTime,
+                timeMillis,
                 pointers.map { it.toPointerInputEventData() }
             )
         )
