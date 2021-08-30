@@ -49,7 +49,7 @@ class BenchmarkTests {
         println("#$name[$browserName]:$avgMs;")
     }
 
-    suspend private fun TestScope.addNItems(n: Int): Duration {
+    private suspend fun TestScope.addNItems(n: Int): Duration {
         val addItemsCount = mutableStateOf(0)
 
         composition {
@@ -60,7 +60,7 @@ class BenchmarkTests {
 
         val duration = measureTime {
             addItemsCount.value = n
-            waitForAnimationFrame()
+            waitForRecompositionComplete()
         }
 
         assertEquals(n, root.childElementCount)
@@ -100,7 +100,7 @@ class BenchmarkTests {
 
         val duration = measureTime {
             addItemsCount.value = 0
-            waitForAnimationFrame()
+            waitForRecompositionComplete()
         }
 
         assertEquals(0, root.childElementCount)
