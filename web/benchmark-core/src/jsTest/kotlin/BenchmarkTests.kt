@@ -125,14 +125,8 @@ class BenchmarkTests {
             repeat(items.size) {
                 if (it % 10 == 0) items[it] = "${items[it]}-$it"
             }
-            waitForAnimationFrame()
+            waitForRecompositionComplete()
         }
-
-        repeat(items.size) {
-            if (it % 10 == 0) items[it] = "${items[it]}-$it"
-        }
-
-        waitForAnimationFrame()
 
         assertEquals(1000, root.childElementCount)
         assertEquals("1", root.children[1]!!.firstChild!!.textContent)
