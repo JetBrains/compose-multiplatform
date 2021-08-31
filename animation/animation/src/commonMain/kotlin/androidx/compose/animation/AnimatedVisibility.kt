@@ -37,8 +37,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasurePolicy
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMaxBy
@@ -759,7 +766,7 @@ private inline fun AnimatedEnterExitImpl(
     modifier: Modifier,
     enter: EnterTransition,
     exit: ExitTransition,
-    content: @Composable() AnimatedVisibilityScope.() -> Unit
+    content: @Composable AnimatedVisibilityScope.() -> Unit
 ) {
     // TODO: Get some feedback on whether there's a need to observe this state change in user
     //  code. If there is, this if check will need to be moved to measure stage, along with some
@@ -770,20 +777,51 @@ private inline fun AnimatedEnterExitImpl(
         val scope = remember(transition) { AnimatedVisibilityScopeImpl(transition) }
         Layout(
             content = { scope.content() },
-            modifier = modifier.then(transition.createModifier(enter, exit, "Built-in"))
-        ) { measureables, constraints ->
-            val placeables = measureables.map { it.measure(constraints) }
-            val maxWidth: Int = placeables.fastMaxBy { it.width }?.width ?: 0
-            val maxHeight = placeables.fastMaxBy { it.height }?.height ?: 0
-            // Position the children.
-            scope.targetSize.value = IntSize(maxWidth, maxHeight)
-            layout(maxWidth, maxHeight) {
-                placeables.fastForEach {
-                    it.place(0, 0)
-                }
+            modifier = modifier.then(transition.createModifier(enter, exit, "Built-in")),
+            measurePolicy = remember { AnimatedEnterExitMeasurePolicy(scope) }
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+private class AnimatedEnterExitMeasurePolicy(
+    val scope: AnimatedVisibilityScopeImpl
+) : MeasurePolicy {
+    override fun MeasureScope.measure(
+        measurables: List<Measurable>,
+        constraints: Constraints
+    ): MeasureResult {
+        val placeables = measurables.map { it.measure(constraints) }
+        val maxWidth: Int = placeables.fastMaxBy { it.width }?.width ?: 0
+        val maxHeight = placeables.fastMaxBy { it.height }?.height ?: 0
+        // Position the children.
+        scope.targetSize.value = IntSize(maxWidth, maxHeight)
+        return layout(maxWidth, maxHeight) {
+            placeables.fastForEach {
+                it.place(0, 0)
             }
         }
     }
+
+    override fun IntrinsicMeasureScope.minIntrinsicWidth(
+        measurables: List<IntrinsicMeasurable>,
+        height: Int
+    ) = measurables.asSequence().map { it.minIntrinsicWidth(height) }.maxOrNull() ?: 0
+
+    override fun IntrinsicMeasureScope.minIntrinsicHeight(
+        measurables: List<IntrinsicMeasurable>,
+        width: Int
+    ) = measurables.asSequence().map { it.minIntrinsicHeight(width) }.maxOrNull() ?: 0
+
+    override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+        measurables: List<IntrinsicMeasurable>,
+        height: Int
+    ) = measurables.asSequence().map { it.maxIntrinsicWidth(height) }.maxOrNull() ?: 0
+
+    override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+        measurables: List<IntrinsicMeasurable>,
+        width: Int
+    ) = measurables.asSequence().map { it.maxIntrinsicHeight(width) }.maxOrNull() ?: 0
 }
 
 // This converts Boolean visible to EnterExitState
