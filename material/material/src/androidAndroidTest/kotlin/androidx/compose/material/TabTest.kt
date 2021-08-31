@@ -49,6 +49,7 @@ import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertPositionInRootIsEqualTo
+import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.isSelectable
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -290,6 +291,42 @@ class TabTest {
     }
 
     @Test
+    fun fixedTabRow_dividerHeight() {
+        rule.setMaterialContent {
+            val titles = listOf("TAB 1", "TAB 2")
+            val tabRowHeight = 100.dp
+
+            val divider = @Composable { TabRowDefaults.Divider(Modifier.testTag("divider")) }
+
+            Box(Modifier.testTag("tabRow")) {
+                TabRow(
+                    modifier = Modifier.height(tabRowHeight),
+                    selectedTabIndex = 0,
+                    divider = divider
+                ) {
+                    titles.forEachIndexed { index, title ->
+                        Tab(
+                            modifier = Modifier.height(tabRowHeight),
+                            text = { Text(title) },
+                            selected = index == 0,
+                            onClick = {}
+                        )
+                    }
+                }
+            }
+        }
+
+        val tabRowBounds = rule.onNodeWithTag("tabRow").getBoundsInRoot()
+
+        rule.onNodeWithTag("divider", true)
+            .assertPositionInRootIsEqualTo(
+                expectedLeft = 0.dp,
+                expectedTop = tabRowBounds.height - TabRowDefaults.DividerThickness
+            )
+            .assertHeightIsEqualTo(TabRowDefaults.DividerThickness)
+    }
+
+    @Test
     fun singleLineTab_textPosition() {
         rule.setMaterialContent {
             var state by remember { mutableStateOf(0) }
@@ -490,6 +527,42 @@ class TabTest {
                 expectedLeft = TabRowDefaults.ScrollableTabRowPadding + minimumTabWidth,
                 expectedTop = tabRowBounds.height - indicatorHeight
             )
+    }
+
+    @Test
+    fun scrollableTabRow_dividerHeight() {
+        rule.setMaterialContent {
+            val titles = listOf("TAB 1", "TAB 2")
+            val tabRowHeight = 100.dp
+
+            val divider = @Composable { TabRowDefaults.Divider(Modifier.testTag("divider")) }
+
+            Box(Modifier.testTag("tabRow")) {
+                ScrollableTabRow(
+                    modifier = Modifier.height(tabRowHeight),
+                    selectedTabIndex = 0,
+                    divider = divider
+                ) {
+                    titles.forEachIndexed { index, title ->
+                        Tab(
+                            modifier = Modifier.height(tabRowHeight),
+                            text = { Text(title) },
+                            selected = index == 0,
+                            onClick = {}
+                        )
+                    }
+                }
+            }
+        }
+
+        val tabRowBounds = rule.onNodeWithTag("tabRow").getBoundsInRoot()
+
+        rule.onNodeWithTag("divider", true)
+            .assertPositionInRootIsEqualTo(
+                expectedLeft = 0.dp,
+                expectedTop = tabRowBounds.height - TabRowDefaults.DividerThickness,
+            )
+            .assertHeightIsEqualTo(TabRowDefaults.DividerThickness)
     }
 
     @Test
