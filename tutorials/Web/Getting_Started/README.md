@@ -16,7 +16,7 @@ You need to have the following software installed before you begin:
 
 ## Creating a new project
 
-If you don't want to create the project manually, you can [download the example here](https://github.com/JetBrains/compose-jb/tree/master/examples/web-getting-started)
+If you don't want to create the project manually, you can [download the template here](https://github.com/JetBrains/compose-jb/tree/master/templates/web-template)
 
 The project wizard doesn't support Compose for web projects yet, so we need to perform the following steps:
 
