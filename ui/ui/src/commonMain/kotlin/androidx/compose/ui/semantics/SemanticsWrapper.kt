@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.semantics
 
-import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.toRect
@@ -81,11 +80,7 @@ internal class SemanticsWrapper(
         if (!useMinimumTouchTarget) {
             return boundsInRoot()
         }
-        return calculateBoundsInRoot().toRect()
-    }
 
-    private fun calculateBoundsInRoot(): MutableRect {
-        check(isAttached) { ExpectAttachedLayoutCoordinates }
         val root = findRoot()
 
         val bounds = rectCache
@@ -97,14 +92,13 @@ internal class SemanticsWrapper(
 
         var wrapper: LayoutNodeWrapper = this
         while (wrapper !== root) {
-            wrapper.rectInParent(bounds, true)
+            wrapper.rectInParent(bounds, clipBounds = false, clipToMinimumTouchTargetSize = true)
             if (bounds.isEmpty) {
-                bounds.set(0f, 0f, 0f, 0f)
-                return bounds
+                return Rect.Zero
             }
 
             wrapper = wrapper.wrappedBy!!
         }
-        return bounds
+        return bounds.toRect()
     }
 }

@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHeightIsEqualTo
@@ -66,8 +67,8 @@ class RestrictedSizeTest {
                 click(Offset.Zero)
             }
 
-        assertThat(point.x).isEqualTo(15.dp.roundToPx().toFloat())
-        assertThat(point.y).isEqualTo(15.dp.roundToPx().toFloat())
+        assertThat(point.x).isWithin(1f).of(15.dp.toPx())
+        assertThat(point.y).isWithin(1f).of(15.dp.toPx())
     }
 
     @Test
@@ -97,8 +98,8 @@ class RestrictedSizeTest {
                 click(Offset(-5f, -2f))
             }
 
-        assertThat(point.x).isEqualTo(15.dp.roundToPx().toFloat() - 5f)
-        assertThat(point.y).isEqualTo(15.dp.roundToPx().toFloat() - 2f)
+        assertThat(point.x).isWithin(1f).of(15.dp.toPx() - 5f)
+        assertThat(point.y).isWithin(1f).of(15.dp.toPx() - 2f)
         assertThat(isOutOfBounds).isFalse()
     }
 
@@ -117,5 +118,33 @@ class RestrictedSizeTest {
         rule.onNodeWithTag(tag)
             .assertWidthIsEqualTo(80.dp)
             .assertHeightIsEqualTo(80.dp)
+    }
+
+    @Test
+    fun clippedTouchInMinimumTouchTarget(): Unit = with(rule.density) {
+        var point = Offset.Zero
+        rule.setContent {
+            Box(Modifier.fillMaxSize()) {
+                Box(Modifier.requiredSize(20.dp).clipToBounds().testTag(tag)) {
+                    Box(
+                        Modifier.requiredSize(40.dp).pointerInput(Unit) {
+                            awaitPointerEventScope {
+                                val event = awaitPointerEvent()
+                                point = event.changes[0].position
+                            }
+                        }
+                    )
+                }
+            }
+        }
+
+        rule.onNodeWithTag(tag)
+            .performGesture {
+                click(Offset(-1f, -3f))
+            }
+
+        val innerPos = 10.dp.roundToPx().toFloat()
+        assertThat(point.x).isWithin(1f).of(innerPos - 1f)
+        assertThat(point.y).isWithin(1f).of(innerPos - 3f)
     }
 }
