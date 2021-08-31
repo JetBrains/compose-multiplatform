@@ -22,8 +22,10 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
+import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.TextInputService
@@ -66,11 +68,13 @@ val LocalClipboardManager = staticCompositionLocalOf<ClipboardManager> {
 
 /**
  * Provides the [Density] to be used to transform between [density-independent pixel
- * units (DP)][androidx.compose.ui.unit.Dp] and [pixel units][androidx.compose.ui.unit.Px] or
+ * units (DP)][androidx.compose.ui.unit.Dp] and pixel units or
  * [scale-independent pixel units (SP)][androidx.compose.ui.unit.TextUnit] and
- * [pixel units][androidx.compose.ui.unit.Px]. This is typically used when a
- * [DP][androidx.compose.ui.unit.Dp] is provided and it must be converted in the body of [Layout]
- * or [DrawModifier].
+ * pixel units. This is typically used when a
+ * [DP][androidx.compose.ui.unit.Dp] is provided and it must be converted in the body of
+ * [Layout] or [DrawModifier].
+ *
+ * @sample androidx.compose.ui.unit.samples.WithDensitySample
  */
 val LocalDensity = staticCompositionLocalOf<Density> {
     noLocalProvidedFor("LocalDensity")

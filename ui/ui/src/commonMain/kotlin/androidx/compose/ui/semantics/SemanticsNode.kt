@@ -21,13 +21,15 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.LayoutInfo
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNodeWrapper
 import androidx.compose.ui.node.RootForTest
+import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastForEach
-import kotlin.math.roundToInt
 
 /**
  * A list of key/value pairs associated with a layout node or its subtree.
@@ -81,12 +83,19 @@ class SemanticsNode internal constructor(
     // GEOMETRY
 
     /**
+     * The rectangle of the touchable area.
+     *
+     * If this is a clickable region, this is the rectangle that accepts touch input. This can
+     * be larger than [size] when the layout is less than
+     * [ViewConfiguration.minimumTouchTargetSize]
+     */
+    val touchBoundsInRoot: Rect
+        get() = findWrapperToGetBounds().touchBoundsInRoot()
+
+    /**
      * The size of the bounding box for this node, with no clipping applied
      */
-    val size: IntSize get() {
-        val size = findWrapperToGetBounds().semanticsSize
-        return IntSize(size.width.roundToInt(), size.height.roundToInt())
-    }
+    val size: IntSize get() = findWrapperToGetBounds().size
 
     /**
      * The bounding box for this node relative to the root of this Compose hierarchy, with
@@ -96,7 +105,7 @@ class SemanticsNode internal constructor(
     val boundsInRoot: Rect
         get() {
             if (!layoutNode.isAttached) return Rect.Zero
-            return findWrapperToGetBounds().semanticsBoundsInRoot()
+            return findWrapperToGetBounds().boundsInRoot()
         }
 
     /**
@@ -106,7 +115,7 @@ class SemanticsNode internal constructor(
     val positionInRoot: Offset
         get() {
             if (!layoutNode.isAttached) return Offset.Zero
-            return findWrapperToGetBounds().semanticsPositionInRoot()
+            return findWrapperToGetBounds().positionInRoot()
         }
 
     /**
@@ -116,7 +125,7 @@ class SemanticsNode internal constructor(
     val boundsInWindow: Rect
         get() {
             if (!layoutNode.isAttached) return Rect.Zero
-            return findWrapperToGetBounds().semanticsBoundsInWindow()
+            return findWrapperToGetBounds().boundsInWindow()
         }
 
     /**
@@ -125,7 +134,7 @@ class SemanticsNode internal constructor(
     val positionInWindow: Offset
         get() {
             if (!layoutNode.isAttached) return Offset.Zero
-            return findWrapperToGetBounds().semanticsPositionInWindow()
+            return findWrapperToGetBounds().positionInWindow()
         }
 
     /**
