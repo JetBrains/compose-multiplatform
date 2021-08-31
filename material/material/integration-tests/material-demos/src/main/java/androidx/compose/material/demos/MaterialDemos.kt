@@ -71,7 +71,13 @@ val MaterialDemos = DemoCategory(
             )
         ),
         ComposableDemo("Material Theme") { MaterialThemeDemo() },
-        ComposableDemo("Menus") { MenuDemo() },
+        DemoCategory(
+            "Menus",
+            listOf(
+                ComposableDemo("Dropdown Menu positioning") { MenuDemo() },
+                ComposableDemo("Menu variations") { DropdownMenuVariationsDemo() },
+            )
+        ),
         ComposableDemo("Navigation Rail") { NavigationRailDemo() },
         DemoCategory(
             "Playground",
