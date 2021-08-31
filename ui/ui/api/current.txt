@@ -2381,6 +2381,7 @@ package androidx.compose.ui.semantics {
     method public long getPositionInWindow();
     method public androidx.compose.ui.node.RootForTest? getRoot();
     method public long getSize();
+    method public androidx.compose.ui.geometry.Rect getTouchBoundsInRoot();
     method public boolean isRoot();
     property public final androidx.compose.ui.geometry.Rect boundsInRoot;
     property public final androidx.compose.ui.geometry.Rect boundsInWindow;
@@ -2395,6 +2396,7 @@ package androidx.compose.ui.semantics {
     property public final long positionInWindow;
     property public final androidx.compose.ui.node.RootForTest? root;
     property public final long size;
+    property public final androidx.compose.ui.geometry.Rect touchBoundsInRoot;
   }
 
   public final class SemanticsNodeKt {

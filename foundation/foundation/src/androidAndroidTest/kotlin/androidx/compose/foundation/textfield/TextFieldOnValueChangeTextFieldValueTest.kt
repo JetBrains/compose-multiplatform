@@ -69,7 +69,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
         val platformTextInputService = mock<PlatformTextInputService>()
         val textInputService = TextInputService(platformTextInputService)
 
-        rule.setContentWithoutMinimumTouchTarget {
+        rule.setContent {
             CompositionLocalProvider(
                 LocalTextInputService provides textInputService
             ) {
