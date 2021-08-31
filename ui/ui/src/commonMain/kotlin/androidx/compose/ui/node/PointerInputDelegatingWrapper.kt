@@ -42,7 +42,9 @@ internal class PointerInputDelegatingWrapper(
         isTouchEvent: Boolean
     ) {
         if (!isTouchEvent) {
-            if (isPointerInBounds(pointerPosition) && withinLayerBounds(pointerPosition)) {
+            if (isPointerInBounds(pointerPosition) &&
+                withinLayerBounds(pointerPosition, isTouchEvent)
+            ) {
                 hitTestResult.hit(modifier.pointerInputFilter) {
                     hitTestChild(pointerPosition, hitTestResult, isTouchEvent)
                 }

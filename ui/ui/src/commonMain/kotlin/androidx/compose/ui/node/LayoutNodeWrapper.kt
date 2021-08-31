@@ -550,13 +550,27 @@ internal abstract class LayoutNodeWrapper(
 
     /**
      * Modifies bounds to be in the parent LayoutNodeWrapper's coordinates, including clipping,
-     * if [clipBounds] is true.
+     * if [clipBounds] is true. If [clipToMinimumTouchTargetSize] is true and the layer clips,
+     * then the clip bounds are extended to allow minimum touch target extended area.
      */
-    internal fun rectInParent(bounds: MutableRect, clipBounds: Boolean) {
+    internal fun rectInParent(
+        bounds: MutableRect,
+        clipBounds: Boolean,
+        clipToMinimumTouchTargetSize: Boolean = false
+    ) {
         val layer = layer
         if (layer != null) {
-            if (isClipping && clipBounds) {
-                bounds.intersect(0f, 0f, size.width.toFloat(), size.height.toFloat())
+            if (isClipping) {
+                if (clipToMinimumTouchTargetSize) {
+                    val minTouch = minimumTouchTargetSize
+                    val horz = minTouch.width / 2f
+                    val vert = minTouch.height / 2f
+                    bounds.intersect(
+                        -horz, -vert, size.width.toFloat() + horz, size.height.toFloat() + vert
+                    )
+                } else if (clipBounds) {
+                    bounds.intersect(0f, 0f, size.width.toFloat(), size.height.toFloat())
+                }
                 if (bounds.isEmpty) {
                     return
                 }
@@ -598,17 +612,27 @@ internal abstract class LayoutNodeWrapper(
         }
     }
 
-    protected fun withinLayerBounds(pointerPosition: Offset): Boolean {
+    protected fun withinLayerBounds(pointerPosition: Offset, isTouchEvent: Boolean): Boolean {
         if (!pointerPosition.isFinite) {
             return false
         }
         val layer = layer
         if (layer != null && isClipping) {
+            if (isTouchEvent) {
+                val minimumTouchTargetSize = minimumTouchTargetSize
+                if (!minimumTouchTargetSize.isEmpty()) {
+                    val offsetFromEdge = offsetFromEdge(pointerPosition)
+                    val minTouchTargetSize = with(layerDensity) {
+                        layoutNode.viewConfiguration.minimumTouchTargetSize.toSize()
+                    }
+                    return offsetFromEdge.x <= minTouchTargetSize.width / 2f &&
+                        offsetFromEdge.y <= minTouchTargetSize.height / 2f
+                }
+            }
             return layer.isInLayer(pointerPosition)
         }
 
-        // If we are here, either we aren't clipping to bounds or we are and the pointer was in
-        // bounds.
+        // If we are here, we aren't clipping or there is no layer
         return true
     }
 
@@ -849,6 +873,15 @@ internal abstract class LayoutNodeWrapper(
         val focusableChildren = mutableListOf<ModifiedFocusNode>()
         layoutNode.children.fastForEach { it.findFocusableChildren(focusableChildren) }
         return focusableChildren
+    }
+
+    protected fun offsetFromEdge(pointerPosition: Offset): Offset {
+        val x = pointerPosition.x
+        val horizontal = maxOf(0f, if (x < 0) -x else x - measuredWidth)
+        val y = pointerPosition.y
+        val vertical = maxOf(0f, if (y < 0) -y else y - measuredHeight)
+
+        return Offset(horizontal, vertical)
     }
 
     internal companion object {
