@@ -1,3 +1,5 @@
+package org.jetbrains.compose.web.tests.benchmarks
+
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.browser.window

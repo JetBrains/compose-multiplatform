@@ -1,3 +1,5 @@
+package org.jetbrains.compose.web.tests.benchmarks
+
 import androidx.compose.runtime.Composable
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.selectors.*
@@ -6,7 +8,7 @@ import org.jetbrains.compose.web.dom.*
 import org.jetbrains.compose.web.*
 
 @Composable
-fun AddItems(count: Int) {
+internal fun AddItems(count: Int) {
     repeat(count) {
         Div {
             P {
@@ -25,7 +27,7 @@ fun AddItems(count: Int) {
 }
 
 @Composable
-fun AddItems(list: List<String>) {
+internal fun AddItems(list: List<String>) {
     list.forEach {
         Div {
             P {
