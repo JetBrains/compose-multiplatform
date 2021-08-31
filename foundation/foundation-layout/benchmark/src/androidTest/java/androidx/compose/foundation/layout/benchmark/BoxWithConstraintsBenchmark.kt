@@ -39,31 +39,34 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
+/**
+ * Simple benchmark for [BoxWithConstraints] / subcomposition behavior.
+ */
 class BoxWithConstraintsBenchmark {
 
     @get:Rule
     val benchmarkRule = ComposeBenchmarkRule()
 
     @Test
-    fun no_withconstraints_inner_recompose() {
+    fun no_boxwithconstraints_inner_recompose() {
         benchmarkRule.toggleStateBenchmarkComposeMeasureLayout({ NoWithConstraintsTestCase() })
     }
 
     @Test
-    fun withconstraints_inner_recompose() {
+    fun boxwithconstraints_inner_recompose() {
         benchmarkRule.toggleStateBenchmarkComposeMeasureLayout({ BoxWithConstraintsTestCase() })
     }
 
     @Test
-    fun withconstraints_changing_constraints() {
+    fun boxwithconstraints_changing_constraints() {
         benchmarkRule.toggleStateBenchmarkMeasureLayout({ ChangingConstraintsTestCase() })
     }
 }
