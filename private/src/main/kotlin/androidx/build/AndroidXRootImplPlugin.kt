@@ -137,8 +137,8 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
                     if (!project.usingMaxDepVersions()) {
                         project.agpVariants.all { variant ->
                             // in AndroidX, release and debug variants are essentially the same,
-                            // so we don't run the lintRelease task on the build server
-                            if (!variant.name.lowercase(Locale.getDefault()).contains("release")) {
+                            // so we don't run the lintDebug task on the build server
+                            if (!variant.name.lowercase(Locale.getDefault()).contains("debug")) {
                                 val taskName = "lint${variant.name.replaceFirstChar {
                                     if (it.isLowerCase()) {
                                         it.titlecase(Locale.getDefault())

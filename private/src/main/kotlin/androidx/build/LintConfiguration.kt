@@ -60,7 +60,7 @@ fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
         it.dependsOn(lintTask)
         it.enabled = false
     }
-    tasks.register("lintAnalyzeDebug") {
+    tasks.register("lintAnalyzeRelease") {
         it.dependsOn(lintTask)
         it.enabled = false
     }
@@ -76,16 +76,16 @@ fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
 
 fun Project.configureAndroidProjectForLint(lintOptions: LintOptions, extension: AndroidXExtension) {
     project.afterEvaluate {
-        // makes sure that the lintDebug task will exist, so we can find it by name
-        setUpLintDebugIfNeeded()
+        // makes sure that the lintRelease task will exist, so we can find it by name
+        setUpLintReleaseIfNeeded()
     }
     tasks.register("lintAnalyze") {
-        it.dependsOn("lintDebug")
+        it.dependsOn("lintRelease")
         it.enabled = false
     }
     configureLint(lintOptions, extension)
     tasks.named("lint").configure { task ->
-        // We already run lintDebug, we don't need to run lint which lints the release variant
+        // We already run lintRelease, we don't need to run lint which lints the debug variant
         task.enabled = false
     }
     afterEvaluate {
@@ -112,13 +112,13 @@ fun Project.configureAndroidProjectForLint(lintOptions: LintOptions, extension: 
     }
 }
 
-private fun Project.setUpLintDebugIfNeeded() {
+private fun Project.setUpLintReleaseIfNeeded() {
     val variants = project.agpVariants
     val variantNames = variants.map { v -> v.name }
-    if (!variantNames.contains("debug")) {
-        tasks.register("lintDebug") {
+    if (!variantNames.contains("release")) {
+        tasks.register("lintRelease") {
             for (variantName in variantNames) {
-                if (variantName.lowercase(Locale.US).contains("debug")) {
+                if (variantName.lowercase(Locale.US).contains("release")) {
                     it.dependsOn(
                         tasks.named(
                             "lint${variantName.replaceFirstChar {
