@@ -42,7 +42,6 @@ internal enum class ColorSchemeKey {
     PrimaryContainer,
     Secondary,
     SecondaryContainer,
-    Shadow,
     Surface,
     SurfaceVariant,
     Tertiary,
