@@ -25,9 +25,9 @@ import androidx.compose.ui.graphics.Color
 
 /** Dynamic colors in Material. */
 @RequiresApi(Build.VERSION_CODES.S)
-internal fun dynamicTonalPalettes(context: Context): TonalPalettes =
-    TonalPalettes(
-        // The neutral tonal palette from the generated dynamic color palettes.
+internal fun dynamicTonalPalette(context: Context): TonalPalette =
+    TonalPalette(
+        // The neutral tonal range from the generated dynamic color palette.
         neutral100 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_0),
         neutral99 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_10),
         neutral95 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_50),
@@ -42,8 +42,8 @@ internal fun dynamicTonalPalettes(context: Context): TonalPalettes =
         neutral10 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_900),
         neutral0 = ColorResourceHelper.getColor(context, android.R.color.system_neutral1_1000),
 
-        // The neutral variant tonal palette, sometimes called "neutral 2",  from the
-        // generated dynamic color palettes.
+        // The neutral variant tonal range, sometimes called "neutral 2",  from the
+        // generated dynamic color palette.
         neutralVariant100 = ColorResourceHelper.getColor(
             context,
             android.R.color.system_neutral2_0
@@ -86,7 +86,7 @@ internal fun dynamicTonalPalettes(context: Context): TonalPalettes =
             context, android.R.color.system_neutral2_1000
         ),
 
-        // The primary tonal palette from the generated dynamic color palettes.
+        // The primary tonal range from the generated dynamic color palette.
         primary100 = ColorResourceHelper.getColor(context, android.R.color.system_accent1_0),
         primary99 = ColorResourceHelper.getColor(context, android.R.color.system_accent1_10),
         primary95 = ColorResourceHelper.getColor(context, android.R.color.system_accent1_50),
@@ -101,7 +101,7 @@ internal fun dynamicTonalPalettes(context: Context): TonalPalettes =
         primary10 = ColorResourceHelper.getColor(context, android.R.color.system_accent1_900),
         primary0 = ColorResourceHelper.getColor(context, android.R.color.system_accent1_1000),
 
-        // The secondary tonal palette from the generated dynamic color palettes.
+        // The secondary tonal range from the generated dynamic color palette.
         secondary100 = ColorResourceHelper.getColor(context, android.R.color.system_accent2_0),
         secondary99 = ColorResourceHelper.getColor(context, android.R.color.system_accent2_10),
         secondary95 = ColorResourceHelper.getColor(context, android.R.color.system_accent2_50),
@@ -116,7 +116,7 @@ internal fun dynamicTonalPalettes(context: Context): TonalPalettes =
         secondary10 = ColorResourceHelper.getColor(context, android.R.color.system_accent2_900),
         secondary0 = ColorResourceHelper.getColor(context, android.R.color.system_accent2_1000),
 
-        // The tertiary tonal palette from the generated dynamic color palettes.
+        // The tertiary tonal range from the generated dynamic color palette.
         tertiary100 = ColorResourceHelper.getColor(context, android.R.color.system_accent3_0),
         tertiary99 = ColorResourceHelper.getColor(context, android.R.color.system_accent3_10),
         tertiary95 = ColorResourceHelper.getColor(context, android.R.color.system_accent3_50),

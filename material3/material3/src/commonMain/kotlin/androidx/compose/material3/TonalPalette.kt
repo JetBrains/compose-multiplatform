@@ -19,9 +19,21 @@ package androidx.compose.material3
 import androidx.compose.material3.tokens.Palette
 import androidx.compose.ui.graphics.Color
 
-/** Tonal Palette structure in Material. */
-internal class TonalPalettes(
-    // The neutral tonal palette from the generated dynamic color palettes.
+/**
+ * Tonal Palette structure in Material.
+ *
+ * A tonal palette is comprised of 5 tonal ranges. Each tonal range includes the 13 stops, or
+ * tonal swatches.
+ *
+ * Tonal range names are:
+ * - Neutral (N)
+ * - Neutral variant (NV)
+ * - Primary (P)
+ * - Secondary (S)
+ * - Tertiary (T)
+ */
+internal class TonalPalette(
+    // The neutral tonal range from the generated dynamic color palette.
     // Ordered from the lightest shade [neutral100] to the darkest shade [neutral0].
     val neutral100: Color,
     val neutral99: Color,
@@ -37,8 +49,8 @@ internal class TonalPalettes(
     val neutral10: Color,
     val neutral0: Color,
 
-    // The neutral variant tonal palette, sometimes called "neutral 2",  from the
-    // generated dynamic color palettes.
+    // The neutral variant tonal range, sometimes called "neutral 2",  from the
+    // generated dynamic color palette.
     // Ordered from the lightest shade [neutralVariant100] to the darkest shade [neutralVariant0].
     val neutralVariant100: Color,
     val neutralVariant99: Color,
@@ -54,7 +66,7 @@ internal class TonalPalettes(
     val neutralVariant10: Color,
     val neutralVariant0: Color,
 
-    // The primary tonal palette from the generated dynamic color palettes.
+    // The primary tonal range from the generated dynamic color palette.
     // Ordered from the lightest shade [primary100] to the darkest shade [primary0].
     val primary100: Color,
     val primary99: Color,
@@ -70,7 +82,7 @@ internal class TonalPalettes(
     val primary10: Color,
     val primary0: Color,
 
-    // The secondary tonal palette from the generated dynamic color palettes.
+    // The secondary tonal range from the generated dynamic color palette.
     // Ordered from the lightest shade [secondary100] to the darkest shade [secondary0].
     val secondary100: Color,
     val secondary99: Color,
@@ -86,7 +98,7 @@ internal class TonalPalettes(
     val secondary10: Color,
     val secondary0: Color,
 
-    // The tertiary tonal palette from the generated dynamic color palettes.
+    // The tertiary tonal range from the generated dynamic color palette.
     // Ordered from the lightest shade [tertiary100] to the darkest shade [tertiary0].
     val tertiary100: Color,
     val tertiary99: Color,
@@ -106,8 +118,8 @@ internal class TonalPalettes(
 /**
  * Baseline colors in Material.
  */
-internal val BaselineTonalPalettes =
-    TonalPalettes(
+internal val BaselineTonalPalette =
+    TonalPalette(
         neutral100 = Palette.Neutral100,
         neutral99 = Palette.Neutral99,
         neutral95 = Palette.Neutral95,
