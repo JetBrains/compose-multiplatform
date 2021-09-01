@@ -59,6 +59,7 @@ dependencies {
         androidTestImplementation(project(":compose:test-utils"))
         androidTestImplementation(project(":compose:ui:ui-test-font"))
         androidTestImplementation(project(":test:screenshot:screenshot"))
+        androidTestImplementation(project(":internal-testutils-runtime"))
         androidTestImplementation(libs.testUiautomator)
         androidTestImplementation(libs.testRules)
         androidTestImplementation(libs.testRunner)

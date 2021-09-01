@@ -46,6 +46,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
+import androidx.testutils.AnimationDurationScaleRule
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -62,11 +63,16 @@ class OverScrollScreenshotTest {
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_UI)
 
+    @get:Rule
+    val animationScaleRule: AnimationDurationScaleRule =
+        AnimationDurationScaleRule.createForAllTests(1f)
+
     val overScrollTag = "overScrollTag"
 
     @Test
-    @Ignore
+    @Ignore("b/197325932 no animations in screenshot tests")
     fun overscroll_dragTop() {
+        animationScaleRule.setAnimationDurationScale(1f)
         rule.setContent {
             VerticalScrollable()
         }
@@ -86,8 +92,9 @@ class OverScrollScreenshotTest {
     }
 
     @Test
-    @Ignore
+    @Ignore("b/197325932 no animations in screenshot tests")
     fun overscroll_dragBottom() {
+        animationScaleRule.setAnimationDurationScale(1f)
         rule.setContent {
             VerticalScrollable()
         }
@@ -107,8 +114,9 @@ class OverScrollScreenshotTest {
     }
 
     @Test
-    @Ignore
+    @Ignore("b/197325932 no animations in screenshot tests")
     fun overscroll_dragLeft() {
+        animationScaleRule.setAnimationDurationScale(1f)
         rule.setContent {
             HorizontalScrollable()
         }
@@ -128,8 +136,9 @@ class OverScrollScreenshotTest {
     }
 
     @Test
-    @Ignore
+    @Ignore("b/197325932 no animations in screenshot tests")
     fun overscroll_dragRight() {
+        animationScaleRule.setAnimationDurationScale(1f)
         rule.setContent {
             HorizontalScrollable()
         }
