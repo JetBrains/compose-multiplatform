@@ -307,7 +307,7 @@ private fun Modifier.scroll(
         )
         val layout =
             ScrollingLayoutModifier(state, reverseScrolling, isVertical, overScrollController)
-        semantics.then(scrolling).clipScrollableContainer(isVertical).then(layout)
+        semantics.clipScrollableContainer(isVertical).then(scrolling).then(layout)
     },
     inspectorInfo = debugInspectorInfo {
         name = "scroll"

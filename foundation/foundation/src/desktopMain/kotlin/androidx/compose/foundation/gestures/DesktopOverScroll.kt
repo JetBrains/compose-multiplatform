@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.unit.Velocity
 
 @Composable
@@ -36,20 +37,8 @@ internal actual fun Modifier.overScroll(
 ): Modifier = Modifier
 
 private class DesktopEdgeEffectOverScrollController() : OverScrollController {
-    override fun release(): Boolean {
-        return false
-    }
 
-    override fun processDragDelta(
-        initialDragDelta: Offset,
-        overScrollDelta: Offset,
-        pointerPosition: Offset?
-    ): Boolean {
-        return false
-    }
-
-    override fun processVelocity(velocity: Velocity): Boolean {
-        return false
+    override fun release() {
     }
 
     override fun refreshContainerInfo(size: Size, isContentScrolls: Boolean) {
@@ -57,4 +46,27 @@ private class DesktopEdgeEffectOverScrollController() : OverScrollController {
     }
 
     override fun DrawScope.drawOverScroll() {}
+
+    override fun stopOverscrollAnimation(): Boolean = false
+
+    override fun consumePreScroll(
+        scrollDelta: Offset,
+        pointerPosition: Offset?,
+        source: NestedScrollSource
+    ): Offset = Offset.Zero
+
+    override fun consumePostScroll(
+        initialDragDelta: Offset,
+        overScrollDelta: Offset,
+        pointerPosition: Offset?,
+        source: NestedScrollSource
+    ) {
+    }
+
+    override fun consumePreFling(
+        velocity: Velocity
+    ): Velocity = Velocity.Zero
+
+    override fun consumePostFling(velocity: Velocity) {
+    }
 }
