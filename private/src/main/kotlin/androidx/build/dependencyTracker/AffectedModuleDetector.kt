@@ -83,7 +83,7 @@ abstract class AffectedModuleDetector(
     /**
      * Returns whether this task was affected by current changes.
      */
-    fun shouldInclude(task: Task): Boolean {
+    open fun shouldInclude(task: Task): Boolean {
         val include = shouldInclude(task.project.path)
         val inclusionVerb = if (include) "Including" else "Excluding"
         logger?.info(
@@ -236,6 +236,9 @@ class AffectedModuleDetectorWrapper : AffectedModuleDetector(logger = null) {
     }
     override fun shouldInclude(project: String): Boolean {
         return getOrThrow().shouldInclude(project)
+    }
+    override fun shouldInclude(task: Task): Boolean {
+        return getOrThrow().shouldInclude(task)
     }
 }
 
