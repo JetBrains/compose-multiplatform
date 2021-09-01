@@ -16,7 +16,6 @@
 
 package androidx.build
 
-import androidx.build.COMPOSE_MPP_ENABLED
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import org.gradle.api.GradleException
 import org.gradle.api.Project

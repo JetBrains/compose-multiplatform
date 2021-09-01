@@ -161,8 +161,8 @@ class AndroidXPlaygroundRootImplPlugin : Plugin<Project> {
                 val versionNodes = parsedMetadata.getElementsByTagName("latest")
                 if (versionNodes.length != 1) {
                     throw GradleException(
-                        "AndroidXPlaygroundRootImplPlugin#findSnapshotVersion expected exactly one " +
-                            "latest version in $metadataUrl, but got ${versionNodes.length}"
+                        "AndroidXPlaygroundRootImplPlugin#findSnapshotVersion expected exactly " +
+                            " one latest version in $metadataUrl, but got ${versionNodes.length}"
                     )
                 }
                 val snapshotVersion = versionNodes.item(0).textContent

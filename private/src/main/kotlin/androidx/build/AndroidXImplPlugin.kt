@@ -86,7 +86,8 @@ import java.util.concurrent.ConcurrentHashMap
  */
 class AndroidXImplPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        if (project.isRoot) throw Exception("Root project should use AndroidXRootImplPlugin instead")
+        if (project.isRoot)
+            throw Exception("Root project should use AndroidXRootImplPlugin instead")
         val extension = project.extensions.create<AndroidXExtension>(EXTENSION_NAME, project)
         // Perform different actions based on which plugins have been applied to the project.
         // Many of the actions overlap, ex. API tracking.

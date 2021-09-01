@@ -75,7 +75,7 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
 
         val buildOnServerTask = tasks.create(
             BUILD_ON_SERVER_TASK,
-            BuildOnServer::class.java
+            BuildOnServerTask::class.java
         )
         buildOnServerTask.dependsOn(
             tasks.register(

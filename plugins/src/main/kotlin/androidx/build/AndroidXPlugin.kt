@@ -29,7 +29,11 @@ import org.gradle.api.Project
  */
 class AndroidXPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        project.apply(mapOf<String, String>("from" to "${project.getSupportRootFolder()}/buildSrc/apply/applyAndroidXImplPlugin.gradle"))
+        val supportRoot = project.getSupportRootFolder()
+        project.apply(
+            mapOf<String, String>(
+                "from" to "$supportRoot/buildSrc/apply/applyAndroidXImplPlugin.gradle"
+            )
+        )
     }
 }
-

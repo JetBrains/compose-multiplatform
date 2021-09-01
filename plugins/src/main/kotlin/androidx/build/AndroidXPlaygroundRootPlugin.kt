@@ -30,6 +30,11 @@ import org.gradle.api.Project
 @Suppress("unused") // used in Playground Projects
 class AndroidXPlaygroundRootPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        project.apply(mapOf<String, String>("from" to "${project.getSupportRootFolder()}/buildSrc/apply/applyAndroidXPlaygroundRootImplPlugin.gradle"))
+        val supportRoot = project.getSupportRootFolder()
+        project.apply(
+            mapOf<String, String>(
+                "from" to "$supportRoot/buildSrc/apply/applyAndroidXPlaygroundRootImplPlugin.gradle"
+            )
+        )
     }
 }

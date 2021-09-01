@@ -29,6 +29,11 @@ import org.gradle.api.Project
  */
 class AndroidXDocsPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        project.apply(mapOf<String, String>("from" to "${project.getSupportRootFolder()}/buildSrc/apply/applyAndroidXDocsImplPlugin.gradle"))
+        val supportRoot = project.getSupportRootFolder()
+        project.apply(
+            mapOf<String, String>(
+                "from" to "$supportRoot/buildSrc/apply/applyAndroidXDocsImplPlugin.gradle"
+            )
+        )
     }
 }

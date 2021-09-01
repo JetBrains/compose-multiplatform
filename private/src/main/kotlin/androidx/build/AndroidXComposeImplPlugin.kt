@@ -357,7 +357,6 @@ fun Project.configureComposeImplPluginForAndroidx() {
                             if (!kotlinPlugin.isEmpty) {
                                 compile.kotlinOptions.freeCompilerArgs +=
                                     listOf("-P", composeSourceOption)
-
                             }
                         }
                     }
