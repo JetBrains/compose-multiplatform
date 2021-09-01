@@ -53,7 +53,7 @@ object LibraryVersions {
     val CORE_GOOGLE_SHORTCUTS = Version("1.1.0-alpha02")
     val CORE_REMOTEVIEWS = Version("1.0.0-alpha01")
     val CORE_ROLE = Version("1.1.0-alpha02")
-    val CORE_SPLASHSCREEN = Version("1.0.0-alpha01")
+    val CORE_SPLASHSCREEN = Version("1.0.0-alpha02")
     val CURSORADAPTER = Version("1.1.0-alpha01")
     val CUSTOMVIEW = Version("1.2.0-alpha01")
     val DATASTORE = Version("1.1.0-alpha01")
