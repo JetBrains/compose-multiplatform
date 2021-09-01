@@ -172,7 +172,7 @@ val currentRecomposeScope: RecomposeScope
  * example, this is used by saved instance state to preserve state across activity lifetime
  * boundaries.
  *
- * This value is not likely to be unique but is not guaranteed unique. There are known cases,
+ * This value is likely to be unique but is not guaranteed unique. There are known cases,
  * such as for loops without a [key], where the runtime does not have enough information to
  * make the compound key hash unique.
  */
