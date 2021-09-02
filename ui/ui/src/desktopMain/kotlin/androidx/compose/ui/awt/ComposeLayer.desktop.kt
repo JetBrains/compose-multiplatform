@@ -19,9 +19,11 @@ package androidx.compose.ui.awt
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.input.mouse.MouseScrollEvent
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.mouse.MouseScrollOrientation
 import androidx.compose.ui.input.mouse.MouseScrollUnit
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.platform.DesktopComponent
 import androidx.compose.ui.platform.DesktopOwners
 import androidx.compose.ui.unit.Constraints
@@ -151,101 +153,50 @@ internal class ComposeLayer {
             override fun mouseClicked(event: MouseEvent) = Unit
 
             override fun mousePressed(event: MouseEvent) = events.post {
-                owners.onMousePressed(
-                    (event.x * density).toInt(),
-                    (event.y * density).toInt(),
-                    event
-                )
+                owners.onMouseEvent(density, event)
             }
 
             override fun mouseReleased(event: MouseEvent) = events.post {
-                owners.onMouseReleased(
-                    (event.x * density).toInt(),
-                    (event.y * density).toInt(),
-                    event
-                )
+                owners.onMouseEvent(density, event)
             }
 
             override fun mouseEntered(event: MouseEvent) = events.post {
-                owners.onMouseEntered(
-                    (event.x * density).toInt(),
-                    (event.y * density).toInt(),
-                    event
-                )
+                owners.onMouseEvent(density, event)
             }
 
             override fun mouseExited(event: MouseEvent) = events.post {
-                owners.onMouseExited(
-                    (event.x * density).toInt(),
-                    (event.y * density).toInt(),
-                    event
-                )
+                owners.onMouseEvent(density, event)
             }
         })
         _component.addMouseMotionListener(object : MouseMotionAdapter() {
             override fun mouseDragged(event: MouseEvent) = events.post {
-                owners.onMouseMoved(
-                    (event.x * density).toInt(),
-                    (event.y * density).toInt(),
-                    event
-                )
+                owners.onMouseEvent(density, event)
             }
 
             override fun mouseMoved(event: MouseEvent) = events.post {
-                owners.onMouseMoved(
-                    (event.x * density).toInt(),
-                    (event.y * density).toInt(),
-                    event
-                )
+                owners.onMouseEvent(density, event)
             }
         })
         _component.addMouseWheelListener { event ->
             events.post {
-                @OptIn(ExperimentalComposeUiApi::class)
-                owners.onMouseScroll(
-                    (event.x * density).toInt(),
-                    (event.y * density).toInt(),
-                    event.toComposeEvent()
-                )
+                owners.onMouseWheelEvent(density, event)
             }
         }
         _component.focusTraversalKeysEnabled = false
         _component.addKeyListener(object : KeyAdapter() {
             override fun keyPressed(event: KeyEvent) {
-                if (owners.onKeyPressed(event)) {
-                    event.consume()
-                }
+                owners.sendKeyEvent(event)
             }
 
             override fun keyReleased(event: KeyEvent) {
-                if (owners.onKeyReleased(event)) {
-                    event.consume()
-                }
+                owners.sendKeyEvent(event)
             }
 
             override fun keyTyped(event: KeyEvent) {
-                if (owners.onKeyTyped(event)) {
-                    event.consume()
-                }
+                owners.sendKeyEvent(event)
             }
         })
     }
-
-    @OptIn(ExperimentalComposeUiApi::class)
-    private fun MouseWheelEvent.toComposeEvent() = MouseScrollEvent(
-        delta = if (scrollType == MouseWheelEvent.WHEEL_BLOCK_SCROLL) {
-            MouseScrollUnit.Page((scrollAmount * preciseWheelRotation).toFloat())
-        } else {
-            MouseScrollUnit.Line((scrollAmount * preciseWheelRotation).toFloat())
-        },
-
-        // There are no other way to detect horizontal scrolling in AWT
-        orientation = if (isShiftDown) {
-            MouseScrollOrientation.Horizontal
-        } else {
-            MouseScrollOrientation.Vertical
-        }
-    )
 
     fun dispose() {
         check(!isDisposed)
@@ -284,4 +235,58 @@ internal class ComposeLayer {
             _initContent = null
         }
     }
+}
+
+@Suppress("ControlFlowWithEmptyBody")
+@OptIn(ExperimentalComposeUiApi::class)
+private fun DesktopOwners.onMouseEvent(
+    density: Float,
+    event: MouseEvent
+) {
+    val eventType = when (event.id) {
+        MouseEvent.MOUSE_PRESSED -> PointerEventType.Press
+        MouseEvent.MOUSE_RELEASED -> PointerEventType.Release
+        MouseEvent.MOUSE_DRAGGED -> PointerEventType.Move
+        MouseEvent.MOUSE_MOVED -> PointerEventType.Move
+        MouseEvent.MOUSE_ENTERED -> PointerEventType.Enter
+        MouseEvent.MOUSE_EXITED -> PointerEventType.Exit
+        else -> PointerEventType.Unknown
+    }
+    sendPointerEvent(
+        eventType = eventType,
+        position = Offset(event.x.toFloat(), event.y.toFloat()) * density,
+        timeMillis = event.`when`,
+        type = PointerType.Mouse,
+        mouseEvent = event
+    )
+}
+
+@Suppress("ControlFlowWithEmptyBody")
+@OptIn(ExperimentalComposeUiApi::class)
+private fun DesktopOwners.onMouseWheelEvent(
+    density: Float,
+    event: MouseWheelEvent
+) = with(event) {
+    sendPointerScrollEvent(
+        position = Offset(event.x.toFloat(), event.y.toFloat()) * density,
+        delta = if (scrollType == MouseWheelEvent.WHEEL_BLOCK_SCROLL) {
+            MouseScrollUnit.Page((scrollAmount * preciseWheelRotation).toFloat())
+        } else {
+            MouseScrollUnit.Line((scrollAmount * preciseWheelRotation).toFloat())
+        },
+        // There are no other way to detect horizontal scrolling in AWT
+        orientation = if (isShiftDown) {
+            MouseScrollOrientation.Horizontal
+        } else {
+            MouseScrollOrientation.Vertical
+        },
+        timeMillis = event.`when`,
+        type = PointerType.Mouse,
+        mouseEvent = event
+    )
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+private fun DesktopOwners.sendKeyEvent(event: KeyEvent) {
+    sendKeyEvent(ComposeKeyEvent(event))
 }

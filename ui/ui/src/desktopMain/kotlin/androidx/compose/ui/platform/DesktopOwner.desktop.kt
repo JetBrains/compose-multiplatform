@@ -47,6 +47,7 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.mouse.MouseScrollEventFilter
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventProcessor
 import androidx.compose.ui.input.pointer.PointerInputFilter
@@ -90,8 +91,9 @@ internal class DesktopOwner(
     private val onKeyEvent: (KeyEvent) -> Boolean = { false },
 ) : Owner, RootForTest, DesktopRootForTest, PositionCalculator {
 
-    internal fun isHovered(point: IntOffset): Boolean {
-        return bounds.contains(point)
+    internal fun isHovered(point: Offset): Boolean {
+        val intOffset = IntOffset(point.x.toInt(), point.y.toInt())
+        return bounds.contains(intOffset)
     }
 
     internal var bounds by mutableStateOf(IntRect.Zero)
@@ -332,6 +334,7 @@ internal class DesktopOwner(
     override fun processPointerInput(nanoTime: Long, pointers: List<TestPointerInputEventData>) {
         processPointerInput(
             PointerInputEvent(
+                PointerEventType.Unknown,
                 nanoTime,
                 pointers.map { it.toPointerInputEventData() }
             )

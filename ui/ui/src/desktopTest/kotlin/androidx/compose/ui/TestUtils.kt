@@ -25,10 +25,13 @@ import androidx.compose.ui.graphics.painter.Painter
 import java.awt.Image
 import java.awt.Window
 import java.awt.event.KeyEvent
+import java.awt.event.MouseEvent
+import java.awt.event.MouseWheelEvent
 import java.awt.image.BufferedImage
 import java.awt.image.MultiResolutionImage
 import javax.swing.Icon
 import javax.swing.ImageIcon
+import javax.swing.JFrame
 
 fun testImage(color: Color): Painter = run {
     val bitmap = ImageBitmap(100, 100)
@@ -49,11 +52,11 @@ internal val isLinux = os.startsWith("linux")
 internal val isWindows = os.startsWith("win")
 internal val isMacOs = os.startsWith("mac")
 
-fun Window.sendKey(
+fun Window.sendKeyEvent(
     code: Int,
     modifiers: Int = 0
-) = dispatchEvent(
-    KeyEvent(
+): Boolean {
+    val event = KeyEvent(
         focusOwner,
         KeyEvent.KEY_PRESSED,
         0,
@@ -62,4 +65,57 @@ fun Window.sendKey(
         code.toChar(),
         KeyEvent.KEY_LOCATION_STANDARD
     )
-)
+    dispatchEvent(event)
+    return event.isConsumed
+}
+
+fun JFrame.sendMouseEvent(
+    id: Int,
+    x: Int,
+    y: Int,
+    modifiers: Int = 0
+): Boolean {
+    // we use width and height instead of x and y because we can send (-1, -1), but still need
+    // the component inside window
+    val component = findComponentAt(width / 2, height / 2)
+    val event = MouseEvent(
+        component,
+        id,
+        0,
+        modifiers,
+        x,
+        y,
+        1,
+        false
+    )
+    component.dispatchEvent(event)
+    return event.isConsumed
+}
+
+fun JFrame.sendMouseWheelEvent(
+    id: Int,
+    x: Int,
+    y: Int,
+    scrollType: Int,
+    scrollAmount: Int,
+    modifiers: Int = 0,
+): Boolean {
+    // we use width and height instead of x and y because we can send (-1, -1), but still need
+    // the component inside window
+    val component = findComponentAt(width / 2, height / 2)
+    val event = MouseWheelEvent(
+        component,
+        id,
+        0,
+        modifiers,
+        x,
+        y,
+        1,
+        false,
+        scrollType,
+        scrollAmount,
+        1
+    )
+    component.dispatchEvent(event)
+    return event.isConsumed
+}
