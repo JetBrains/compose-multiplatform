@@ -227,8 +227,8 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
         offsetFromEdge: Offset,
         minimumTouchTargetSize: Size
     ): Boolean {
-        val touchPadding = calculateMinimumTouchTargetPadding(minimumTouchTargetSize)
-        return !touchPadding.isEmpty() &&
-            offsetFromEdge.x <= touchPadding.width && offsetFromEdge.y <= touchPadding.height
+        val (width, height) = calculateMinimumTouchTargetPadding(minimumTouchTargetSize)
+        return (width > 0f || height > 0f) &&
+            offsetFromEdge.x <= width && offsetFromEdge.y <= height
     }
 }
