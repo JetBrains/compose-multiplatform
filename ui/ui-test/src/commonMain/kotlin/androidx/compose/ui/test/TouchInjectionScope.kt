@@ -19,13 +19,9 @@ package androidx.compose.ui.test
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.lerp
 import androidx.compose.ui.util.lerp
-import kotlin.math.atan2
 import kotlin.math.ceil
-import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.roundToInt
-import kotlin.math.sign
-import kotlin.math.sin
 
 /**
  * The time between the last event of the first click and the first event of the second click in
@@ -508,17 +504,26 @@ fun TouchInjectionScope.pinch(
 /**
  * Performs a swipe gesture on the associated node such that it ends with the given [endVelocity].
  *
- * The MotionEvents are linearly interpolated between [start] and [end]. The coordinates are in
- * the node's local coordinate system, where (0, 0) is the top left corner of the node. The
- * default duration is 200 milliseconds. Due to imprecision, no guarantees can be made for the
- * actual velocity at the end of the gesture, but generally it is within 0.1% of the desired
- * velocity.
+ * The swipe will go through [start] at t=0 and through [end] at t=[durationMillis]. In between,
+ * the swipe will go monotonically from [start] and [end], but not strictly. Due to imprecision,
+ * no guarantees can be made for the actual velocity at the end of the gesture, but generally it
+ * is within 0.1 of the desired velocity.
+ *
+ * When a swipe cannot be created that results in the desired velocity (because the input is too
+ * restrictive), an exception will be thrown with suggestions to fix the input.
+ *
+ * The coordinates are in the node's local coordinate system, where (0, 0) is the top left corner
+ * of the node. The default duration is 200 milliseconds.
  *
  * @param start The start position of the gesture, in the node's local coordinate system
  * @param end The end position of the gesture, in the node's local coordinate system
  * @param endVelocity The velocity of the gesture at the moment it ends. Must be positive.
  * @param durationMillis The duration of the gesture in milliseconds. Must be long enough that at
  * least 3 input events are generated, which happens with a duration of 25ms or more.
+ *
+ * @throws IllegalStateException When no swipe can be generated that will result in the desired
+ * velocity. The error message will suggest changes to the input parameters such that a swipe
+ * will become feasible.
  */
 fun TouchInjectionScope.swipeWithVelocity(
     start: Offset,
@@ -539,91 +544,8 @@ fun TouchInjectionScope.swipeWithVelocity(
             "velocity requires at least 3 input events"
     }
 
-    // Decompose v into it's x and y components
-    val delta = end - start
-    val theta = atan2(delta.y, delta.x)
-    // VelocityTracker internally calculates px/s, not px/ms
-    val vx = cos(theta) * endVelocity / 1000
-    val vy = sin(theta) * endVelocity / 1000
-
-    // Note: it would be more precise to do `theta = atan2(-y, x)`, because atan2 expects a
-    // coordinate system where positive y goes up and in our coordinate system positive y goes
-    // down. However, in that case we would also have to inverse `vy` to convert the velocity
-    // back to our own coordinate system. But then it's just a double negation, so we can skip
-    // both conversions entirely.
-
-    // To get the desired velocity, generate fx and fy such that VelocityTracker calculates
-    // the right velocity. VelocityTracker makes a polynomial fit through the points
-    // (-age, x) and (-age, y) for vx and vy respectively, which is accounted for in
-    // f(Long, Long, Float, Float, Float).
-    val fx = createFunctionForVelocity(durationMillis, start.x, end.x, vx)
-    val fy = createFunctionForVelocity(durationMillis, start.y, end.y, vy)
-
-    swipe({ t -> Offset(fx(t), fy(t)) }, durationMillis)
-}
-
-/**
- * Generate a function of the form `f(t) = a*(t-T)^2 + b*(t-T) + c` that satisfies
- * `f(0) = [start]`, `f([duration]) = [end]`, `T = [duration]` and `b = [velocity]`.
- *
- * Filling in `f([duration]) = [end]`, `T = [duration]` and `b = [velocity]` gives:
- * * `a * ([duration] - [duration])^2 + [velocity] * ([duration] - [duration]) + c = [end]`
- * * `c = [end]`
- *
- * Filling in `f(0) = [start]`, `T = [duration]` and `b = [velocity]` gives:
- * * `a * (0 - [duration])^2 + [velocity] * (0 - [duration]) + c = [start]`
- * * `a * [duration]^2 - [velocity] * [duration] + [end] = [start]`
- * * `a * [duration]^2 = [start] - [end] + [velocity] * [duration]`
- * * `a = ([start] - [end] + [velocity] * [duration]) / [duration]^2`
- *
- * @param duration The duration of the fling
- * @param start The start x or y position
- * @param end The end x or y position
- * @param velocity The desired velocity in the x or y direction at the [end] position
- */
-private fun createFunctionForVelocity(
-    duration: Long,
-    start: Float,
-    end: Float,
-    velocity: Float
-): (Long) -> Float {
-    val a = (start - end + velocity * duration) / (duration * duration)
-    val b = velocity
-    val c = end
-    val T = duration
-    val function = { t: Long ->
-        // `f(t) = a*(t-T)^2 + b*(t-T) + c`
-        a * (t - T) * (t - T) + b * (t - T) + c
-    }
-
-    // High velocities often result in curves that start off in the wrong direction, like a bow
-    // being strung, to reach a high velocity at the end coordinate. For a gesture, that is not
-    // desirable, and can be mitigated by using the fact that VelocityTracker only uses the last
-    // 100 ms of the gesture. Anything before that doesn't need to follow the curve.
-
-    // Does the function go in the correct direction at the start?
-    if (sign(function(1) - start) == sign(end - start)) {
-        return function
-    } else {
-        // If not, lerp between 0 and `duration - 100` in an attempt to prevent the function from
-        // going in the wrong direction. This does not affect the velocity at f(duration), as
-        // VelocityTracker only uses the last 100ms. This only works if f(duration - 100) is
-        // between from and to, log a warning if this is not the case.
-        val cutOffTime = duration - 100
-        val cutOffValue = function(cutOffTime)
-        require(sign(cutOffValue - start) == sign(end - start)) {
-            "Creating a gesture between $start and $end with a duration of $duration and a " +
-                "resulting velocity of $velocity results in a movement that goes outside " +
-                "of the range [$start..$end]"
-        }
-        return { t ->
-            if (t < cutOffTime) {
-                lerp(start, cutOffValue, t / cutOffTime.toFloat())
-            } else {
-                function(t)
-            }
-        }
-    }
+    val pathFinder = VelocityPathFinder(start, end, endVelocity, durationMillis)
+    swipe(pathFinder.generateFunction(), durationMillis)
 }
 
 /**

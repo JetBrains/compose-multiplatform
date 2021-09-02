@@ -22,13 +22,13 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.test.TouchInjectionScope
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeWithVelocity
 import androidx.compose.ui.test.util.ClickableTestBox
-import androidx.compose.ui.test.util.InputDispatcherTestRule
 import androidx.compose.ui.test.util.SinglePointerInputRecorder
 import androidx.compose.ui.test.util.assertOnlyLastEventIsUp
 import androidx.compose.ui.test.util.assertSinglePointer
@@ -42,51 +42,31 @@ import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TestRule
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import kotlin.math.max
 
 /**
  * Test for [TouchInjectionScope.swipeWithVelocity] to see if we can generate gestures that end
- * with a specific velocity
+ * with a specific velocity. Note that the "engine" is already extensively tested in
+ * [VelocityPathFinderTest], so all we need to do here is verify a few swipes.
  */
 @MediumTest
 @RunWith(Parameterized::class)
 class SwipeWithVelocityTest(private val config: TestConfig) {
     data class TestConfig(
-        val direction: Direction,
         val durationMillis: Long,
-        val velocity: Float,
-        val eventPeriod: Long
+        val velocity: Float
     )
-
-    enum class Direction(val from: Offset, val to: Offset) {
-        LeftToRight(Offset(boxStart, boxMiddle), Offset(boxEnd, boxMiddle)),
-        RightToLeft(Offset(boxEnd, boxMiddle), Offset(boxStart, boxMiddle)),
-        TopToBottom(Offset(boxMiddle, boxStart), Offset(boxMiddle, boxEnd)),
-        BottomToTop(Offset(boxMiddle, boxEnd), Offset(boxMiddle, boxStart))
-    }
 
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
         fun createTestSet(): List<TestConfig> {
             return mutableListOf<TestConfig>().apply {
-                for (period in listOf(10L, 7L, 16L)) {
-                    for (direction in Direction.values()) {
-                        for (duration in listOf(100, 500, 1000)) {
-                            for (velocity in listOf(79f, 200f, 1500f, 4691f)) {
-                                add(
-                                    TestConfig(
-                                        direction,
-                                        duration.toLong(),
-                                        velocity,
-                                        period
-                                    )
-                                )
-                            }
-                        }
+                for (duration in listOf(100, 500, 1000)) {
+                    for (velocity in listOf(100f, 999f, 5000f)) {
+                        add(TestConfig(duration.toLong(), velocity))
                     }
                 }
             }
@@ -94,35 +74,17 @@ class SwipeWithVelocityTest(private val config: TestConfig) {
 
         private const val tag = "widget"
 
-        private val boxSize = 500.0f
-        private val boxStart = 1.0f
-        private val boxMiddle = boxSize / 2
-        private val boxEnd = boxSize - 1.0f
-    }
+        private const val boxSize = 500.0f
+        private const val boxStart = 1.0f
+        private const val boxMiddle = boxSize / 2
+        private const val boxEnd = boxSize - 1.0f
 
-    private val start get() = config.direction.from
-    private val end get() = config.direction.to
-    private val duration get() = config.durationMillis
-    private val velocity get() = config.velocity
-    private val eventPeriod get() = config.eventPeriod
-
-    private val expectedXVelocity = when (config.direction) {
-        Direction.LeftToRight -> velocity
-        Direction.RightToLeft -> -velocity
-        else -> 0f
-    }
-
-    private val expectedYVelocity = when (config.direction) {
-        Direction.TopToBottom -> velocity
-        Direction.BottomToTop -> -velocity
-        else -> 0f
+        private val start = Offset(boxStart, boxMiddle)
+        private val end = Offset(boxEnd, boxMiddle)
     }
 
     @get:Rule
     val rule = createComposeRule()
-
-    @get:Rule
-    val inputDispatcherRule: TestRule = InputDispatcherTestRule(eventPeriodOverride = eventPeriod)
 
     private val recorder = SinglePointerInputRecorder()
 
@@ -135,13 +97,13 @@ class SwipeWithVelocityTest(private val config: TestConfig) {
         }
 
         rule.onNodeWithTag(tag).performTouchInput {
-            swipeWithVelocity(start, end, velocity, duration)
+            swipeWithVelocity(start, end, config.velocity, config.durationMillis)
         }
 
         rule.runOnIdle {
             recorder.run {
-                val durationMs = duration
-                val minimumEventSize = max(2, (durationMs / eventPeriod).toInt())
+                val durationMs = config.durationMillis
+                val minimumEventSize = max(2, (durationMs / eventPeriodMillis).toInt())
                 assertThat(events.size).isAtLeast(minimumEventSize)
                 assertOnlyLastEventIsUp()
                 assertUpSameAsLastMove()
@@ -154,11 +116,12 @@ class SwipeWithVelocityTest(private val config: TestConfig) {
 
                 // Check timestamps
                 assertTimestampsAreIncreasing()
-                assertThat(recordedDurationMillis).isEqualTo(duration)
+                assertThat(recordedDurationMillis).isEqualTo(config.durationMillis)
 
                 // Check velocity
-                assertThat(recordedVelocity.x).isWithin(.1f).of(expectedXVelocity)
-                assertThat(recordedVelocity.y).isWithin(.1f).of(expectedYVelocity)
+                // Swipe goes from left to right, so vx = velocity and vy = 0
+                assertThat(recordedVelocity.x).isWithin(.1f).of(config.velocity)
+                assertThat(recordedVelocity.y).isWithin(.1f).of(0f)
             }
         }
     }
