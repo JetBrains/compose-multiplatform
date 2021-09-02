@@ -27,13 +27,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.center
-import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.moveBy
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performGesture
-import androidx.compose.ui.test.up
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -70,7 +66,7 @@ class StretchOverscrollTest {
         var now = timeNowMillis()
         rule.waitUntil(10000) { timeNowMillis() - now > 3000 }
 
-        rule.onNodeWithTag(OverscrollBox).performGesture {
+        rule.onNodeWithTag(OverscrollBox).performTouchInput {
             down(center)
             moveBy(Offset(200f, 0f))
             moveBy(Offset(200f, 0f))
@@ -80,7 +76,7 @@ class StretchOverscrollTest {
         now = timeNowMillis()
         rule.waitUntil(10000) { timeNowMillis() - now > 3000 }
 
-        rule.onNodeWithTag(OverscrollBox).performGesture {
+        rule.onNodeWithTag(OverscrollBox).performTouchInput {
             // pull in the opposite direction. Since we pulled overscroll with positive delta
             // it will consume negative delta before scroll happens
             // assert in the ScrollableState lambda will check it

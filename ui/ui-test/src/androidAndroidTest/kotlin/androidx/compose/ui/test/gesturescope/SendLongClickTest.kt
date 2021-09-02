@@ -97,6 +97,7 @@ class SendLongClickTest(private val config: TestConfig) {
         }
 
         // When we inject a long click
+        @Suppress("DEPRECATION")
         rule.onNodeWithTag(defaultTag).performGesture {
             if (config.position != null && config.durationMillis != null) {
                 longClick(config.position, config.durationMillis)

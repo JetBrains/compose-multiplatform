@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+// Suppress on a file level because we can't suppress the warning for the import statement
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.ui.test.partialgesturescope
 
 import androidx.compose.ui.test.junit4.ComposeTestRule

@@ -41,7 +41,7 @@ import org.junit.Test
  * Tests if [moveTo] and [movePointerTo] work
  */
 @MediumTest
-class SendMoveToTest() {
+class SendMoveToTest {
     companion object {
         private val downPosition1 = Offset(10f, 10f)
         private val downPosition2 = Offset(20f, 20f)
@@ -62,6 +62,7 @@ class SendMoveToTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun onePointer() {
         // When we inject a down event followed by a move event
@@ -85,6 +86,7 @@ class SendMoveToTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun twoPointers_separateMoveEvents() {
         // When we inject two down events followed by two move events
@@ -116,6 +118,7 @@ class SendMoveToTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun twoPointers_oneMoveEvent() {
         // When we inject two down events followed by one move events
@@ -144,6 +147,7 @@ class SendMoveToTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun moveToWithoutDown() {
         expectError<IllegalStateException> {
@@ -151,6 +155,7 @@ class SendMoveToTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun moveToWrongPointerId() {
         rule.partialGesture { down(1, downPosition1) }
@@ -159,6 +164,7 @@ class SendMoveToTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun moveToAfterUp() {
         rule.partialGesture { down(downPosition1) }
@@ -168,6 +174,7 @@ class SendMoveToTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun moveToAfterCancel() {
         rule.partialGesture { down(downPosition1) }
@@ -177,6 +184,7 @@ class SendMoveToTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun movePointerToWithoutDown() {
         expectError<IllegalStateException> {
@@ -184,6 +192,7 @@ class SendMoveToTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun movePointerToWrongPointerId() {
         rule.partialGesture { down(1, downPosition1) }
@@ -192,6 +201,7 @@ class SendMoveToTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun movePointerToAfterUp() {
         rule.partialGesture { down(1, downPosition1) }
@@ -201,6 +211,7 @@ class SendMoveToTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun movePointerToAfterCancel() {
         rule.partialGesture { down(1, downPosition1) }

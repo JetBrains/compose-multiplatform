@@ -77,7 +77,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardType
@@ -197,7 +197,7 @@ class OutlinedTextFieldTest {
         }
 
         // Click on (2, 2) which is a background area and outside input area
-        rule.onNodeWithTag(TextfieldTag).performGesture {
+        rule.onNodeWithTag(TextfieldTag).performTouchInput {
             click(Offset(2f, 2f))
         }
 

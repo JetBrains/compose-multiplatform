@@ -122,6 +122,7 @@ class SendClickTest(private val config: TestConfig) {
     }
 
     private fun ComposeTestRule.click(tag: String) {
+        @Suppress("DEPRECATION")
         onNodeWithTag(tag).performGesture {
             if (config.position != null) {
                 click(config.position)

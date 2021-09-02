@@ -87,7 +87,7 @@ class ErrorMessagesTest {
 
         expectErrorMessage(
             """
-                Failed to perform a gesture.
+                Failed to inject touch input.
                 Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'MyButton3')
             """.trimIndent()
 
@@ -105,7 +105,7 @@ class ErrorMessagesTest {
 
         expectErrorMessage(
             """
-                Failed to perform a gesture.
+                Failed to inject touch input.
                 Reason: Expected exactly '1' node but could not find any node that satisfies: ((TestTag = 'MyButton3') && (OnClick is defined))
             """.trimIndent()
         ) {
@@ -122,7 +122,7 @@ class ErrorMessagesTest {
 
         expectErrorMessageStartsWith(
             """
-                Failed to perform a gesture.
+                Failed to inject touch input.
                 Reason: Expected exactly '1' node but found '2' nodes that satisfy: (Text + EditableText contains 'Toggle' (ignoreCase: false))
                 Nodes found:
                 1) Node #X at (l=X, t=X, r=X, b=X)px, Tag: 'MyButton'
@@ -219,7 +219,7 @@ class ErrorMessagesTest {
 
         expectErrorMessage(
             """
-                Failed to perform a gesture.
+                Failed to inject touch input.
                 The node is no longer in the tree, last known semantics:
                 Node #X at (l=X, t=X, r=X, b=X)px
                 Text = '[Hello]'
@@ -331,7 +331,7 @@ class ErrorMessagesTest {
 
         expectErrorMessage(
             """
-                Failed to perform a gesture.
+                Failed to inject touch input.
                 Reason: Expected exactly '1' node but could not find any node that satisfies: (Text + EditableText contains 'Banana' (ignoreCase: false))
                 However, the unmerged tree contains '1' node that matches. Are you missing `useUnmergedNode = true` in your finder?
             """.trimIndent()

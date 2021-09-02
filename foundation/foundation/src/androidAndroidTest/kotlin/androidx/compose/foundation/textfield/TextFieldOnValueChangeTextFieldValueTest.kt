@@ -26,7 +26,7 @@ import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.CommitTextCommand
 import androidx.compose.ui.text.input.DeleteSurroundingTextCommand
@@ -93,7 +93,7 @@ class TextFieldOnValueChangeTextFieldValueTest {
 
         // Perform click to focus in.
         rule.onNode(hasSetTextAction())
-            .performGesture { click(Offset(1f, 1f)) }
+            .performTouchInput { click(Offset(1f, 1f)) }
 
         rule.runOnIdle {
             // Verify startInput is called and capture the callback.

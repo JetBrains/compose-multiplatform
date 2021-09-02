@@ -25,7 +25,7 @@ import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.util.ClickableTestBox
 import androidx.compose.ui.test.util.SinglePointerInputRecorder
 import androidx.compose.ui.test.util.verify
@@ -106,7 +106,7 @@ class ClickTest(private val config: TestConfig) {
     }
 
     private fun ComposeTestRule.click(tag: String) {
-        onNodeWithTag(tag).performGesture {
+        onNodeWithTag(tag).performTouchInput {
             if (config.position != null) {
                 click(config.position)
             } else {

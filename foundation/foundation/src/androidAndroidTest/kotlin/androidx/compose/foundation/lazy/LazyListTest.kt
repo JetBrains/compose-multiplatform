@@ -64,21 +64,17 @@ import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.center
-import androidx.compose.ui.test.down
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.moveBy
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.test.swipeWithVelocity
-import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -424,7 +420,7 @@ class LazyListTest(private val orientation: Orientation) {
             .that(composed).isFalse()
 
         rule.onNodeWithTag(LazyListTag)
-            .performGesture { if (vertical) swipeUp() else swipeLeft() }
+            .performTouchInput { if (vertical) swipeUp() else swipeLeft() }
 
         rule.waitForIdle()
 
@@ -1192,7 +1188,7 @@ class LazyListTest(private val orientation: Orientation) {
         }
 
         rule.onNodeWithTag(LazyListTag)
-            .performGesture {
+            .performTouchInput {
                 // we do move manually and not with swipe() utility because we want to have one
                 // drag gesture, not multiple smaller ones
                 down(center)
@@ -1631,7 +1627,7 @@ internal fun ComposeContentTestRule.setContentWithTestViewConfiguration(
 }
 
 internal fun SemanticsNodeInteraction.scrollBy(x: Dp = 0.dp, y: Dp = 0.dp, density: Density) =
-    performGesture {
+    performTouchInput {
         with(density) {
             val touchSlop = TestTouchSlop.toInt()
             val xPx = x.roundToPx()

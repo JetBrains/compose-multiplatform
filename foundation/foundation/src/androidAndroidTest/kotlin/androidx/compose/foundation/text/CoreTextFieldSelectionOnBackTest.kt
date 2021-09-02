@@ -27,7 +27,7 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.performKeyPress
 import androidx.compose.ui.test.performTextInputSelection
 import androidx.compose.ui.text.TextRange
@@ -80,7 +80,7 @@ class CoreTextFieldSelectionOnBackTest {
             )
         }
         val textNode = rule.onNodeWithTag(Tag)
-        textNode.performGesture { longClick() }
+        textNode.performTouchInput { longClick() }
         textNode.performTextInputSelection(TextRange(0, 3))
         textNode.performKeyPress(backKeyDown)
         rule.waitUntil { results.any { it.selection == TextRange(0, 3) } }
@@ -111,7 +111,7 @@ class CoreTextFieldSelectionOnBackTest {
         }
         val expected = TextRange(0, 3)
         val textNode = rule.onNodeWithTag(Tag)
-        textNode.performGesture { longClick() }
+        textNode.performTouchInput { longClick() }
         textNode.performTextInputSelection(expected)
         rule.waitUntil { results.any { it.selection == expected } }
         // should have no effect

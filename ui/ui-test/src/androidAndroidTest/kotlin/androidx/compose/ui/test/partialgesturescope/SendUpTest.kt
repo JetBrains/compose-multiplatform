@@ -38,6 +38,7 @@ import org.junit.Test
 /**
  * Tests if [up] works
  */
+@Suppress("DEPRECATION")
 @MediumTest
 class SendUpTest {
     companion object {

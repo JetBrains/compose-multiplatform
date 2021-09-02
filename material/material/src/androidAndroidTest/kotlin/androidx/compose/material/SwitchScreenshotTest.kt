@@ -31,14 +31,10 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.center
-import androidx.compose.ui.test.down
 import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.move
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performGesture
-import androidx.compose.ui.test.up
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -147,7 +143,7 @@ class SwitchScreenshotTest {
             }
         }
 
-        rule.onNode(isToggleable()).performGesture {
+        rule.onNode(isToggleable()).performTouchInput {
             down(center)
         }
 
@@ -197,8 +193,8 @@ class SwitchScreenshotTest {
 
         rule.onNode(isToggleable())
             // split click into (down) and (move, up) to enforce a composition in between
-            .performGesture { down(center) }
-            .performGesture { move(); up() }
+            .performTouchInput { down(center) }
+            .performTouchInput { move(); up() }
 
         rule.waitForIdle()
         rule.mainClock.advanceTimeBy(milliseconds = 96)
@@ -226,8 +222,8 @@ class SwitchScreenshotTest {
 
         rule.onNode(isToggleable())
             // split click into (down) and (move, up) to enforce a composition in between
-            .performGesture { down(center) }
-            .performGesture { move(); up() }
+            .performTouchInput { down(center) }
+            .performTouchInput { move(); up() }
 
         rule.waitForIdle()
         rule.mainClock.advanceTimeBy(milliseconds = 96)

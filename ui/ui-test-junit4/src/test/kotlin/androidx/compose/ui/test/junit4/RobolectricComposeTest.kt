@@ -48,15 +48,10 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.bottomCenter
-import androidx.compose.ui.test.down
-import androidx.compose.ui.test.moveTo
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.percentOffset
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performGesture
-import androidx.compose.ui.test.up
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.test.espresso.AppNotIdleException
 import androidx.test.espresso.IdlingPolicies
@@ -221,7 +216,7 @@ class RobolectricComposeTest {
         // Stop auto advancing and perform a swipe. The list will "freeze" in the position where
         // it was at the end of the swipe
         rule.mainClock.autoAdvance = false
-        rule.onNodeWithTag("list").performGesture {
+        rule.onNodeWithTag("list").performTouchInput {
             down(bottomCenter)
             repeat(10) {
                 moveTo(bottomCenter - percentOffset(y = (it + 1) / 10f))

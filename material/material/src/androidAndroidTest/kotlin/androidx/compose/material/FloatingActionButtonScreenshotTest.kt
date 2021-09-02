@@ -25,12 +25,10 @@ import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.center
-import androidx.compose.ui.test.down
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -108,7 +106,7 @@ class FloatingActionButtonScreenshotTest {
 
         // Start ripple
         rule.onNode(hasClickAction())
-            .performGesture { down(center) }
+            .performTouchInput { down(center) }
 
         // Advance past the tap timeout
         rule.mainClock.advanceTimeBy(100)

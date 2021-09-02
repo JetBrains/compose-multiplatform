@@ -58,7 +58,7 @@ import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipe
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeLeft
@@ -284,7 +284,7 @@ class TextFieldScrollTest {
         }
 
         rule.onNodeWithTag(TextfieldTag)
-            .performGesture { swipeLeft() }
+            .performTouchInput { swipeLeft() }
 
         val firstSwipePosition = rule.runOnIdle {
             scrollerPosition.offset
@@ -292,7 +292,7 @@ class TextFieldScrollTest {
         assertThat(firstSwipePosition).isGreaterThan(0f)
 
         rule.onNodeWithTag(TextfieldTag)
-            .performGesture { swipeRight() }
+            .performTouchInput { swipeRight() }
         rule.runOnIdle {
             assertThat(scrollerPosition.offset).isLessThan(firstSwipePosition)
         }
@@ -313,7 +313,7 @@ class TextFieldScrollTest {
         }
 
         rule.onNodeWithTag(TextfieldTag)
-            .performGesture { swipeUp() }
+            .performTouchInput { swipeUp() }
 
         val firstSwipePosition = rule.runOnIdle {
             scrollerPosition.offset
@@ -321,7 +321,7 @@ class TextFieldScrollTest {
         assertThat(firstSwipePosition).isGreaterThan(0f)
 
         rule.onNodeWithTag(TextfieldTag)
-            .performGesture { swipeDown() }
+            .performTouchInput { swipeDown() }
         rule.runOnIdle {
             assertThat(scrollerPosition.offset).isLessThan(firstSwipePosition)
         }
@@ -347,7 +347,7 @@ class TextFieldScrollTest {
         }
 
         rule.onNodeWithTag(TextfieldTag)
-            .performGesture { swipeLeft() }
+            .performTouchInput { swipeLeft() }
 
         val swipePosition = rule.runOnIdle {
             scrollerPosition!!.offset
@@ -429,7 +429,7 @@ class TextFieldScrollTest {
             val slopStart = Offset(x, slopStartY)
             val end = Offset(x, 0f)
             rule.onNodeWithTag(TextfieldTag)
-                .performGesture {
+                .performTouchInput {
                     swipe(slopStart, end)
                 }
         }

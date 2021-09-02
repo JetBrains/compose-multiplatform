@@ -55,6 +55,7 @@ class SendDownTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun onePointer() {
         // When we put a pointer down
@@ -71,6 +72,7 @@ class SendDownTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun twoPointers() {
         // When we put two pointers down
@@ -100,6 +102,7 @@ class SendDownTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun duplicatePointers() {
         // When we inject two down events with the same pointer id

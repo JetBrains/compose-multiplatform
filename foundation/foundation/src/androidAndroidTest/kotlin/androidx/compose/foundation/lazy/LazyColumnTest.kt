@@ -46,14 +46,12 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertPositionInRootIsEqualTo
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.center
-import androidx.compose.ui.test.down
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -326,7 +324,7 @@ class LazyColumnTest {
 
         rule.mainClock.autoAdvance = false
         rule.onNodeWithTag(LazyListTag)
-            .performGesture { swipeUp() }
+            .performTouchInput { swipeUp() }
         rule.mainClock.advanceTimeBy(100)
 
         val itemIndexWhenInterrupting = state.firstVisibleItemIndex
@@ -336,7 +334,7 @@ class LazyColumnTest {
         assertThat(itemOffsetWhenInterrupting).isNotEqualTo(0)
 
         rule.onNodeWithTag(LazyListTag)
-            .performGesture { down(center) }
+            .performTouchInput { down(center) }
         rule.mainClock.advanceTimeBy(100)
 
         assertThat(state.firstVisibleItemIndex).isEqualTo(itemIndexWhenInterrupting)

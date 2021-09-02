@@ -27,14 +27,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.center
-import androidx.compose.ui.test.down
 import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.move
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performGesture
-import androidx.compose.ui.test.up
+import androidx.compose.ui.test.performTouchInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
@@ -88,7 +84,7 @@ class CheckboxScreenshotTest {
                 Checkbox(modifier = wrap, checked = false, onCheckedChange = { })
             }
         }
-        rule.onNodeWithTag(wrapperTestTag).performGesture {
+        rule.onNodeWithTag(wrapperTestTag).performTouchInput {
             down(center)
         }
         assertToggeableAgainstGolden("checkbox_pressed")
@@ -160,8 +156,8 @@ class CheckboxScreenshotTest {
 
         rule.onNode(isToggleable())
             // split click into (down) and (move, up) to enforce a composition in between
-            .performGesture { down(center) }
-            .performGesture { move(); up() }
+            .performTouchInput { down(center) }
+            .performTouchInput { move(); up() }
 
         rule.mainClock.advanceTimeByFrame()
         rule.waitForIdle() // Wait for measure
@@ -187,8 +183,8 @@ class CheckboxScreenshotTest {
 
         rule.onNode(isToggleable())
             // split click into (down) and (move, up) to enforce a composition in between
-            .performGesture { down(center) }
-            .performGesture { move(); up() }
+            .performTouchInput { down(center) }
+            .performTouchInput { move(); up() }
 
         rule.mainClock.advanceTimeByFrame()
         rule.waitForIdle() // Wait for measure
