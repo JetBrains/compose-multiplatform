@@ -14,40 +14,36 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.lazy
+package androidx.compose.foundation.lazy.layout
 
 import android.view.Choreographer
 import android.view.Display
 import android.view.View
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.RememberObserver
-import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.ui.layout.SubcomposeLayoutState
 import androidx.compose.ui.layout.SubcomposeLayoutState.PrecomposedSlotHandle
 import androidx.compose.ui.layout.SubcomposeMeasureScope
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.trace
 import java.util.concurrent.TimeUnit
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-internal actual fun LazyListPrefetcher(
-    lazyListState: LazyListState,
-    stateOfItemsProvider: State<LazyListItemsProvider>,
-    itemContentFactory: LazyListItemContentFactory,
+internal actual fun LazyLayoutPrefetcher(
+    prefetchPolicy: LazyLayoutPrefetchPolicy,
+    state: LazyLayoutState,
+    itemContentFactory: LazyLayoutItemContentFactory,
     subcomposeLayoutState: SubcomposeLayoutState
 ) {
     val view = LocalView.current
-    remember(subcomposeLayoutState, lazyListState, view) {
-        LazyListPrefetcher(
+    remember(subcomposeLayoutState, prefetchPolicy, view) {
+        LazyLayoutPrefetcher(
+            prefetchPolicy,
+            state,
             subcomposeLayoutState,
-            lazyListState,
-            stateOfItemsProvider,
             itemContentFactory,
             view
         )
@@ -109,29 +105,24 @@ internal actual fun LazyListPrefetcher(
  *    so critical given that we don't need to calculate the deadline.
  *    Tracking bug: 187393922
  */
-private class LazyListPrefetcher(
+internal class LazyLayoutPrefetcher(
+    private val prefetchPolicy: LazyLayoutPrefetchPolicy,
+    private val state: LazyLayoutState,
     private val subcomposeLayoutState: SubcomposeLayoutState,
-    private val lazyListState: LazyListState,
-    private val stateOfItemsProvider: State<LazyListItemsProvider>,
-    private val itemContentFactory: LazyListItemContentFactory,
+    private val itemContentFactory: LazyLayoutItemContentFactory,
     private val view: View
 ) : RememberObserver,
-    LazyListOnScrolledListener,
-    LazyListOnPostMeasureListener,
+    LazyLayoutOnPostMeasureListener,
+    LazyLayoutPrefetchPolicy.Subscriber,
     Runnable,
     Choreographer.FrameCallback {
 
     /**
-     * Keeps the scrolling direction during the previous calculation in order to be able to
-     * detect the scrolling direction change.
-     */
-    private var wasScrollingForward: Boolean = false
-
-    /**
      * The index scheduled to be prefetched (or the last prefetched index if the prefetch is
-     * done, in this case [precomposedSlotHandle] is not null and associated with this index.
+     * done, in this case [precomposedSlotHandle] is not null and associated with this index).
+     * TODO(popam): probably this should be a queue rather than one element
      */
-    private var indexToPrefetch: Int = -1
+    private var indexToPrefetch = -1
 
     /**
      * Non-null when the item with [indexToPrefetch] index was prefetched.
@@ -175,11 +166,11 @@ private class LazyListPrefetcher(
                 val beforeNs = System.nanoTime()
                 if (beforeNs > nextFrameNs || beforeNs + averagePrecomposeTimeNs < nextFrameNs) {
                     val index = indexToPrefetch
-                    val itemProvider = stateOfItemsProvider.value
+                    val itemsProvider = state.itemsProvider()
                     if (view.windowVisibility == View.VISIBLE &&
-                        index in 0 until itemProvider.itemsCount
+                        index in 0 until itemsProvider.itemsCount
                     ) {
-                        precomposedSlotHandle = precompose(itemProvider, index)
+                        precomposedSlotHandle = precompose(itemsProvider, index)
                         averagePrecomposeTimeNs = calculateAverageTime(
                             System.nanoTime() - beforeNs,
                             averagePrecomposeTimeNs
@@ -204,7 +195,7 @@ private class LazyListPrefetcher(
                 if (beforeNs > nextFrameNs || beforeNs + averagePremeasureTimeNs < nextFrameNs) {
                     if (view.windowVisibility == View.VISIBLE) {
                         premeasuringIsNeeded = true
-                        lazyListState.remeasurement.forceRemeasure()
+                        state.remeasure()
                         averagePremeasureTimeNs = calculateAverageTime(
                             System.nanoTime() - beforeNs,
                             averagePremeasureTimeNs
@@ -232,10 +223,10 @@ private class LazyListPrefetcher(
     }
 
     private fun precompose(
-        itemProvider: LazyListItemsProvider,
+        itemsProvider: LazyLayoutItemsProvider,
         index: Int
     ): PrecomposedSlotHandle {
-        val key = itemProvider.getKey(index)
+        val key = itemsProvider.getKey(index)
         val content = itemContentFactory.getContent(index, key)
         return subcomposeLayoutState.precompose(key, content)
     }
@@ -251,67 +242,40 @@ private class LazyListPrefetcher(
         }
     }
 
-    /**
-     * The callback to be executed on every scroll.
-     */
-    override fun onScrolled(delta: Float) {
-        if (!lazyListState.prefetchingEnabled) {
-            return
-        }
-        val info = lazyListState.layoutInfo
-        if (info.visibleItemsInfo.isNotEmpty()) {
-            check(isActive)
-            val scrollingForward = delta < 0
-            val indexToPrefetch = if (scrollingForward) {
-                info.visibleItemsInfo.last().index + 1
-            } else {
-                info.visibleItemsInfo.first().index - 1
-            }
-            if (indexToPrefetch != this.indexToPrefetch &&
-                indexToPrefetch in 0 until info.totalItemsCount
-            ) {
-                val precomposedSlot = precomposedSlotHandle
-                if (precomposedSlot != null) {
-                    if (wasScrollingForward != scrollingForward) {
-                        // the scrolling direction has been changed which means the last prefetched
-                        // is not going to be reached anytime soon so it is safer to dispose it.
-                        // if this item is already visible it is safe to call the method anyway
-                        // as it will be no-op
-                        precomposedSlot.dispose()
-                    }
-                }
-                this.wasScrollingForward = scrollingForward
-                this.indexToPrefetch = indexToPrefetch
-                this.precomposedSlotHandle = null
-                premeasuringIsNeeded = false
-                if (!prefetchScheduled) {
-                    prefetchScheduled = true
-                    // schedule the prefetching
-                    view.post(this)
-                }
-            }
+    override fun scheduleForPrefetch(index: Int) {
+        indexToPrefetch = index
+        precomposedSlotHandle = null
+        premeasuringIsNeeded = false
+        if (!prefetchScheduled) {
+            prefetchScheduled = true
+            // schedule the prefetching
+            view.post(this)
         }
     }
 
-    override fun SubcomposeMeasureScope.onPostMeasure(
-        childConstraints: Constraints,
-        result: LazyListMeasureResult
-    ) {
+    override fun removeFromPrefetch(index: Int) {
+        if (index == indexToPrefetch) {
+            precomposedSlotHandle?.dispose()
+            indexToPrefetch = -1
+        }
+    }
+
+    override fun SubcomposeMeasureScope.onPostMeasure(result: LazyLayoutMeasureResult) {
         val index = indexToPrefetch
         if (premeasuringIsNeeded && index != -1) {
             check(isActive)
-            val itemProvider = stateOfItemsProvider.value
-            if (index < itemProvider.itemsCount) {
+            val itemsProvider = state.itemsProvider()
+            if (index < itemsProvider.itemsCount) {
                 val isVisibleAlready = result.visibleItemsInfo.fastAny { it.index == index }
-                val composedButNotVisible = result.composedButNotVisibleItems != null &&
-                    result.composedButNotVisibleItems.fastAny { it.index == index }
+                val composedButNotVisible = result.composedButNotVisibleItemsIndices != null &&
+                    result.composedButNotVisibleItemsIndices!!.fastAny { it == index }
                 if (isVisibleAlready || composedButNotVisible) {
                     premeasuringIsNeeded = false
                 } else {
-                    val key = itemProvider.getKey(index)
+                    val key = itemsProvider.getKey(index)
                     val content = itemContentFactory.getContent(index, key)
                     subcompose(key, content).fastForEach {
-                        it.measure(childConstraints)
+                        it.measure(prefetchPolicy.constraints)
                     }
                 }
             }
@@ -319,15 +283,15 @@ private class LazyListPrefetcher(
     }
 
     override fun onRemembered() {
-        lazyListState.onScrolledListener = this
-        lazyListState.onPostMeasureListener = this
+        prefetchPolicy.prefetcher = this
+        state.onPostMeasureListener = this
         isActive = true
     }
 
     override fun onForgotten() {
         isActive = false
-        lazyListState.onScrolledListener = null
-        lazyListState.onPostMeasureListener = null
+        prefetchPolicy.prefetcher = null
+        state.onPostMeasureListener = null
         view.removeCallbacks(this)
         choreographer.removeFrameCallback(this)
     }

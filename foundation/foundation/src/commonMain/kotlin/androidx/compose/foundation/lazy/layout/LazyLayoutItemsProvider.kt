@@ -14,8 +14,17 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.lazy
+package androidx.compose.foundation.lazy.layout
 
-internal actual fun getDefaultLazyKeyFor(index: Int): Any = DefaultLazyKey(index)
+import androidx.compose.runtime.Composable
 
-private data class DefaultLazyKey(private val index: Int)
+internal interface LazyLayoutItemsProvider {
+    /** Returns the content lambda for the given index and scope object */
+    fun getContent(index: Int): @Composable () -> Unit
+
+    /** The total number of items in the lazy layout (visible or not). */
+    val itemsCount: Int
+
+    /** Returns the key for the item on this index */
+    fun getKey(index: Int): Any
+}

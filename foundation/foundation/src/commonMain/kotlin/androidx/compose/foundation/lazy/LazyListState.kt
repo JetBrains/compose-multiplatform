@@ -22,15 +22,14 @@ import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchPolicy
+import androidx.compose.foundation.lazy.layout.LazyLayoutState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.layout.Remeasurement
-import androidx.compose.ui.layout.RemeasurementModifier
-import androidx.compose.ui.layout.SubcomposeMeasureScope
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import kotlin.math.abs
@@ -59,7 +58,7 @@ fun rememberLazyListState(
 }
 
 /**
- * A state object that can be hoisted to control and observe scrolling
+ * A state object that can be hoisted to control and observe scrolling.
  *
  * In most cases, this will be created via [rememberLazyListState].
  *
@@ -141,12 +140,6 @@ class LazyListState constructor(
     private val scrollableState = ScrollableState { -onScroll(-it) }
 
     /**
-     * The [Remeasurement] object associated with our layout. It allows us to remeasure
-     * synchronously during scroll.
-     */
-    internal lateinit var remeasurement: Remeasurement
-
-    /**
      * Only used for testing to confirm that we're not making too many measure passes
      */
     /*@VisibleForTesting*/
@@ -160,13 +153,20 @@ class LazyListState constructor(
     internal var prefetchingEnabled: Boolean = true
 
     /**
-     * The modifier which provides [remeasurement].
+     * The index scheduled to be prefetched (or the last prefetched index if the prefetch is done).
      */
-    internal val remeasurementModifier = object : RemeasurementModifier {
-        override fun onRemeasurementAvailable(remeasurement: Remeasurement) {
-            this@LazyListState.remeasurement = remeasurement
-        }
-    }
+    private var indexToPrefetch = -1
+
+    /**
+     * Keeps the scrolling direction during the previous calculation in order to be able to
+     * detect the scrolling direction change.
+     */
+    private var wasScrollingForward = false
+
+    /**
+     * The state of the inner LazyLayout.
+     */
+    internal lateinit var innerState: LazyLayoutState
 
     /**
      * Instantly brings the item at [index] to the top of the viewport, offset by [scrollOffset]
@@ -185,13 +185,15 @@ class LazyListState constructor(
         index: Int,
         /*@IntRange(from = 0)*/
         scrollOffset: Int = 0
-    ) = scrollableState.scroll {
-        snapToItemIndexInternal(index, scrollOffset)
+    ) {
+        return scrollableState.scroll {
+            snapToItemIndexInternal(index, scrollOffset)
+        }
     }
 
     internal fun snapToItemIndexInternal(index: Int, scrollOffset: Int) {
         scrollPosition.requestPosition(DataIndex(index), scrollOffset)
-        remeasurement.forceRemeasure()
+        innerState.remeasure()
     }
 
     /**
@@ -217,9 +219,6 @@ class LazyListState constructor(
     override val isScrollInProgress: Boolean
         get() = scrollableState.isScrollInProgress
 
-    internal var onScrolledListener: LazyListOnScrolledListener? = null
-    internal var onPostMeasureListener: LazyListOnPostMeasureListener? = null
-
     private var canScrollBackward: Boolean = false
     private var canScrollForward: Boolean = false
 
@@ -240,8 +239,10 @@ class LazyListState constructor(
         // we have less than 0.5 pixels
         if (abs(scrollToBeConsumed) > 0.5f) {
             val preScrollToBeConsumed = scrollToBeConsumed
-            remeasurement.forceRemeasure()
-            onScrolledListener?.onScrolled(preScrollToBeConsumed - scrollToBeConsumed)
+            innerState.remeasure()
+            if (prefetchingEnabled && prefetchPolicy != null) {
+                notifyPrefetch(preScrollToBeConsumed - scrollToBeConsumed)
+            }
         }
 
         // here scrollToBeConsumed is already consumed during the forceRemeasure invocation
@@ -257,6 +258,38 @@ class LazyListState constructor(
             return scrollConsumed
         }
     }
+
+    private fun notifyPrefetch(delta: Float) {
+        if (!prefetchingEnabled) {
+            return
+        }
+        val info = layoutInfo
+        if (info.visibleItemsInfo.isNotEmpty()) {
+            // check(isActive)
+            val scrollingForward = delta < 0
+            val indexToPrefetch = if (scrollingForward) {
+                info.visibleItemsInfo.last().index + 1
+            } else {
+                info.visibleItemsInfo.first().index - 1
+            }
+            if (indexToPrefetch != this.indexToPrefetch &&
+                indexToPrefetch in 0 until info.totalItemsCount
+            ) {
+                if (wasScrollingForward != scrollingForward) {
+                    // the scrolling direction has been changed which means the last prefetched
+                    // is not going to be reached anytime soon so it is safer to dispose it.
+                    // if this item is already visible it is safe to call the method anyway
+                    // as it will be no-op
+                    prefetchPolicy?.removeFromPrefetch(this.indexToPrefetch)
+                }
+                this.wasScrollingForward = scrollingForward
+                this.indexToPrefetch = indexToPrefetch
+                prefetchPolicy?.scheduleForPrefetch(indexToPrefetch)
+            }
+        }
+    }
+
+    internal var prefetchPolicy: LazyLayoutPrefetchPolicy? = null
 
     /**
      * Animate (smooth scroll) to the given item.
@@ -314,6 +347,12 @@ class LazyListState constructor(
                 )
             }
         )
+
+        /**
+         * Pre-allocated initial value for [LazyItemScopeImpl] to not have it nullable and
+         * avoid using late init.
+         */
+        private val InitialLazyItemsScopeImpl = LazyItemScopeImpl(Density(0f, 0f), Constraints())
     }
 }
 
@@ -322,15 +361,4 @@ private object EmptyLazyListLayoutInfo : LazyListLayoutInfo {
     override val viewportStartOffset = 0
     override val viewportEndOffset = 0
     override val totalItemsCount = 0
-}
-
-internal interface LazyListOnScrolledListener {
-    fun onScrolled(delta: Float)
-}
-
-internal interface LazyListOnPostMeasureListener {
-    fun SubcomposeMeasureScope.onPostMeasure(
-        childConstraints: Constraints,
-        result: LazyListMeasureResult
-    )
 }
