@@ -221,7 +221,7 @@ internal class DesktopOwner(
     var onNeedsRender: (() -> Unit)? = null
     var onDispatchCommand: ((Command) -> Unit)? = null
 
-    fun render(canvas: org.jetbrains.skija.Canvas, width: Int, height: Int) {
+    fun render(canvas: org.jetbrains.skia.Canvas, width: Int, height: Int) {
         needsLayout = false
         setSize(width, height)
         measureAndLayout()
@@ -272,7 +272,7 @@ internal class DesktopOwner(
     override fun createLayer(
         drawBlock: (Canvas) -> Unit,
         invalidateParentLayer: () -> Unit
-    ) = SkijaLayer(
+    ) = SkiaLayer(
         density,
         invalidateParentLayer = {
             invalidateParentLayer()
@@ -314,7 +314,7 @@ internal class DesktopOwner(
         measureAndLayoutDelegate.updateRootConstraints(constraints)
     }
 
-    fun draw(canvas: org.jetbrains.skija.Canvas) {
+    fun draw(canvas: org.jetbrains.skia.Canvas) {
         root.draw(DesktopCanvas(canvas))
     }
 

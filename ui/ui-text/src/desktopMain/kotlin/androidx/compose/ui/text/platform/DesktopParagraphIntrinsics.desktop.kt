@@ -28,7 +28,7 @@ import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.Density
-import org.jetbrains.skija.paragraph.Paragraph
+import org.jetbrains.skia.paragraph.Paragraph
 import kotlin.math.ceil
 
 internal actual fun ActualParagraphIntrinsics(

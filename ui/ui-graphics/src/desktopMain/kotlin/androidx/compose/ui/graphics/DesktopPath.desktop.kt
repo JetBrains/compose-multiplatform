@@ -19,26 +19,26 @@ package androidx.compose.ui.graphics
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.RoundRect
-import org.jetbrains.skija.Matrix33
-import org.jetbrains.skija.PathDirection
-import org.jetbrains.skija.PathFillMode
-import org.jetbrains.skija.PathOp
+import org.jetbrains.skia.Matrix33
+import org.jetbrains.skia.PathDirection
+import org.jetbrains.skia.PathFillMode
+import org.jetbrains.skia.PathOp
 
 actual fun Path(): Path = DesktopPath()
 
 /**
- * @Throws UnsupportedOperationException if this Path is not backed by an org.jetbrains.skija.Path
+ * @Throws UnsupportedOperationException if this Path is not backed by an org.jetbrains.skia.Path
  */
 @Suppress("NOTHING_TO_INLINE")
-inline fun Path.asDesktopPath(): org.jetbrains.skija.Path =
+inline fun Path.asDesktopPath(): org.jetbrains.skia.Path =
     if (this is DesktopPath) {
         internalPath
     } else {
-        throw UnsupportedOperationException("Unable to obtain org.jetbrains.skija.Path")
+        throw UnsupportedOperationException("Unable to obtain org.jetbrains.skia.Path")
     }
 
 class DesktopPath(
-    internalPath: org.jetbrains.skija.Path = org.jetbrains.skija.Path()
+    internalPath: org.jetbrains.skia.Path = org.jetbrains.skia.Path()
 ) : Path {
     var internalPath = internalPath
         private set
@@ -115,7 +115,7 @@ class DesktopPath(
         forceMoveTo: Boolean
     ) {
         internalPath.arcTo(
-            rect.toSkijaRect(),
+            rect.toSkiaRect(),
             startAngleDegrees,
             sweepAngleDegrees,
             forceMoveTo
@@ -123,11 +123,11 @@ class DesktopPath(
     }
 
     override fun addRect(rect: Rect) {
-        internalPath.addRect(rect.toSkijaRect(), PathDirection.COUNTER_CLOCKWISE)
+        internalPath.addRect(rect.toSkiaRect(), PathDirection.COUNTER_CLOCKWISE)
     }
 
     override fun addOval(oval: Rect) {
-        internalPath.addOval(oval.toSkijaRect(), PathDirection.COUNTER_CLOCKWISE)
+        internalPath.addOval(oval.toSkiaRect(), PathDirection.COUNTER_CLOCKWISE)
     }
 
     override fun addArcRad(oval: Rect, startAngleRadians: Float, sweepAngleRadians: Float) {
@@ -135,11 +135,11 @@ class DesktopPath(
     }
 
     override fun addArc(oval: Rect, startAngleDegrees: Float, sweepAngleDegrees: Float) {
-        internalPath.addArc(oval.toSkijaRect(), startAngleDegrees, sweepAngleDegrees)
+        internalPath.addArc(oval.toSkiaRect(), startAngleDegrees, sweepAngleDegrees)
     }
 
     override fun addRoundRect(roundRect: RoundRect) {
-        internalPath.addRRect(roundRect.toSkijaRRect(), PathDirection.COUNTER_CLOCKWISE)
+        internalPath.addRRect(roundRect.toSkiaRRect(), PathDirection.COUNTER_CLOCKWISE)
     }
 
     override fun addPath(path: Path, offset: Offset) {
@@ -177,17 +177,17 @@ class DesktopPath(
         path2: Path,
         operation: PathOperation
     ): Boolean {
-        val path = org.jetbrains.skija.Path.makeCombining(
+        val path = org.jetbrains.skia.Path.makeCombining(
             path1.asDesktopPath(),
             path2.asDesktopPath(),
-            operation.toSkijaOperation()
+            operation.toSkiaOperation()
         )
 
         internalPath = path ?: internalPath
         return path != null
     }
 
-    private fun PathOperation.toSkijaOperation() = when (this) {
+    private fun PathOperation.toSkiaOperation() = when (this) {
         PathOperation.Difference -> PathOp.DIFFERENCE
         PathOperation.Intersect -> PathOp.INTERSECT
         PathOperation.Union -> PathOp.UNION

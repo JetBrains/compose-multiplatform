@@ -29,13 +29,13 @@ import androidx.compose.ui.graphics.vector.DrawCache
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
-import org.jetbrains.skija.Data
-import org.jetbrains.skija.Rect
-import org.jetbrains.skija.svg.SVGDOM
-import org.jetbrains.skija.svg.SVGLength
-import org.jetbrains.skija.svg.SVGLengthUnit
-import org.jetbrains.skija.svg.SVGPreserveAspectRatio
-import org.jetbrains.skija.svg.SVGPreserveAspectRatioAlign
+import org.jetbrains.skia.Data
+import org.jetbrains.skia.Rect
+import org.jetbrains.skia.svg.SVGDOM
+import org.jetbrains.skia.svg.SVGLength
+import org.jetbrains.skia.svg.SVGLengthUnit
+import org.jetbrains.skia.svg.SVGPreserveAspectRatio
+import org.jetbrains.skia.svg.SVGPreserveAspectRatioAlign
 import java.io.InputStream
 import kotlin.math.ceil
 
@@ -109,7 +109,7 @@ private class SVGPainter(
 
     init {
         if (root?.viewBox == null && defaultSizePx.isSpecified) {
-            root?.setViewBox(Rect.makeXYWH(0f, 0f, defaultSizePx.width, defaultSizePx.height))
+            root?.viewBox = Rect.makeXYWH(0f, 0f, defaultSizePx.width, defaultSizePx.height)
         }
     }
 

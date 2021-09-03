@@ -17,7 +17,7 @@
 package androidx.compose.ui.graphics
 
 import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
-import org.jetbrains.skija.Surface
+import org.jetbrains.skia.Surface
 import org.junit.After
 import org.junit.Rule
 

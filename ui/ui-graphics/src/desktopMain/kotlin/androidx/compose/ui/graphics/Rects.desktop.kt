@@ -18,8 +18,8 @@ package androidx.compose.ui.graphics
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.RoundRect
 
-fun Rect.toSkijaRect(): org.jetbrains.skija.Rect {
-    return org.jetbrains.skija.Rect.makeLTRB(
+fun Rect.toSkiaRect(): org.jetbrains.skia.Rect {
+    return org.jetbrains.skia.Rect.makeLTRB(
         left,
         top,
         right,
@@ -27,10 +27,10 @@ fun Rect.toSkijaRect(): org.jetbrains.skija.Rect {
     )
 }
 
-fun org.jetbrains.skija.Rect.toComposeRect() =
+fun org.jetbrains.skia.Rect.toComposeRect() =
     androidx.compose.ui.geometry.Rect(left, top, right, bottom)
 
-fun RoundRect.toSkijaRRect(): org.jetbrains.skija.RRect {
+fun RoundRect.toSkiaRRect(): org.jetbrains.skia.RRect {
     val radii = FloatArray(8)
 
     radii[0] = topLeftCornerRadius.x
@@ -45,5 +45,5 @@ fun RoundRect.toSkijaRRect(): org.jetbrains.skija.RRect {
     radii[6] = bottomLeftCornerRadius.x
     radii[7] = bottomLeftCornerRadius.y
 
-    return org.jetbrains.skija.RRect.makeComplexLTRB(left, top, right, bottom, radii)
+    return org.jetbrains.skia.RRect.makeComplexLTRB(left, top, right, bottom, radii)
 }

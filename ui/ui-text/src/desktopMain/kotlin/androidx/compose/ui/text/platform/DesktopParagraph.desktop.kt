@@ -50,32 +50,32 @@ import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.sp
-import org.jetbrains.skija.Paint
-import org.jetbrains.skija.Typeface
-import org.jetbrains.skija.paragraph.Alignment as SkAlignment
-import org.jetbrains.skija.paragraph.BaselineMode
-import org.jetbrains.skija.paragraph.Direction as SkDirection
-import org.jetbrains.skija.paragraph.LineMetrics
-import org.jetbrains.skija.paragraph.ParagraphBuilder
-import org.jetbrains.skija.paragraph.ParagraphStyle
-import org.jetbrains.skija.paragraph.PlaceholderAlignment
-import org.jetbrains.skija.paragraph.PlaceholderStyle
-import org.jetbrains.skija.paragraph.RectHeightMode
-import org.jetbrains.skija.paragraph.RectWidthMode
-import org.jetbrains.skija.paragraph.StrutStyle
-import org.jetbrains.skija.paragraph.TextBox
+import org.jetbrains.skia.Paint
+import org.jetbrains.skia.Typeface
+import org.jetbrains.skia.paragraph.Alignment as SkAlignment
+import org.jetbrains.skia.paragraph.BaselineMode
+import org.jetbrains.skia.paragraph.Direction as SkDirection
+import org.jetbrains.skia.paragraph.LineMetrics
+import org.jetbrains.skia.paragraph.ParagraphBuilder
+import org.jetbrains.skia.paragraph.ParagraphStyle
+import org.jetbrains.skia.paragraph.PlaceholderAlignment
+import org.jetbrains.skia.paragraph.PlaceholderStyle
+import org.jetbrains.skia.paragraph.RectHeightMode
+import org.jetbrains.skia.paragraph.RectWidthMode
+import org.jetbrains.skia.paragraph.StrutStyle
+import org.jetbrains.skia.paragraph.TextBox
 import java.lang.IllegalStateException
 import java.lang.UnsupportedOperationException
 import java.util.WeakHashMap
 import kotlin.math.floor
-import org.jetbrains.skija.Rect as SkRect
-import org.jetbrains.skija.paragraph.Paragraph as SkParagraph
-import org.jetbrains.skija.paragraph.TextStyle as SkTextStyle
-import org.jetbrains.skija.FontStyle as SkFontStyle
-import org.jetbrains.skija.Font as SkFont
-import org.jetbrains.skija.paragraph.DecorationLineStyle as SkDecorationLineStyle
-import org.jetbrains.skija.paragraph.DecorationStyle as SkDecorationStyle
-import org.jetbrains.skija.paragraph.Shadow as SkShadow
+import org.jetbrains.skia.Rect as SkRect
+import org.jetbrains.skia.paragraph.Paragraph as SkParagraph
+import org.jetbrains.skia.paragraph.TextStyle as SkTextStyle
+import org.jetbrains.skia.FontStyle as SkFontStyle
+import org.jetbrains.skia.Font as SkFont
+import org.jetbrains.skia.paragraph.DecorationLineStyle as SkDecorationLineStyle
+import org.jetbrains.skia.paragraph.DecorationStyle as SkDecorationStyle
+import org.jetbrains.skia.paragraph.Shadow as SkShadow
 
 private val DefaultFontSize = 16.sp
 
@@ -145,7 +145,7 @@ internal class DesktopParagraph(
         get() = paragraphIntrinsics.text
 
     override val height: Float
-        get() = para.getHeight()
+        get() = para.height
 
     override val minIntrinsicWidth: Float
         get() = paragraphIntrinsics.minIntrinsicWidth
@@ -298,7 +298,8 @@ internal class DesktopParagraph(
                 )
             )
         } else {
-            para.lineMetrics
+            @Suppress("UNCHECKED_CAST")
+            para.lineMetrics as Array<LineMetrics>
         }
 
     private fun getBoxForwardByOffset(offset: Int): TextBox? {
@@ -341,8 +342,8 @@ internal class DesktopParagraph(
 
     override fun getBidiRunDirection(offset: Int): ResolvedTextDirection =
         when (getBoxForwardByOffset(offset)?.direction) {
-            org.jetbrains.skija.paragraph.Direction.RTL -> ResolvedTextDirection.Rtl
-            org.jetbrains.skija.paragraph.Direction.LTR -> ResolvedTextDirection.Ltr
+            org.jetbrains.skia.paragraph.Direction.RTL -> ResolvedTextDirection.Rtl
+            org.jetbrains.skia.paragraph.Direction.LTR -> ResolvedTextDirection.Ltr
             null -> ResolvedTextDirection.Ltr
         }
 
@@ -446,7 +447,7 @@ private data class ComputedStyle(
         }
         fontFamily?.let {
             val fontFamilies = fontLoader.ensureRegistered(it)
-            res.setFontFamilies(fontFamilies.toTypedArray())
+            res.fontFamilies = fontFamilies.toTypedArray()
         }
         fontStyle?.let {
             res.fontStyle = it.toSkFontStyle()
@@ -796,8 +797,8 @@ private fun SpanStyle.withDefaultFontSize(): SpanStyle {
 
 fun FontStyle.toSkFontStyle(): SkFontStyle {
     return when (this) {
-        FontStyle.Italic -> org.jetbrains.skija.FontStyle.ITALIC
-        else -> org.jetbrains.skija.FontStyle.NORMAL
+        FontStyle.Italic -> org.jetbrains.skia.FontStyle.ITALIC
+        else -> org.jetbrains.skia.FontStyle.NORMAL
     }
 }
 
@@ -859,7 +860,7 @@ internal fun ResolvedTextDirection.toSkDirection(): SkDirection {
 
 internal fun TextBox.cursorHorizontalPosition(opposite: Boolean = false): Float {
     return when (direction) {
-        SkDirection.LTR, null -> if (opposite) rect.left else rect.right
+        SkDirection.LTR -> if (opposite) rect.left else rect.right
         SkDirection.RTL -> if (opposite) rect.right else rect.left
     }
 }

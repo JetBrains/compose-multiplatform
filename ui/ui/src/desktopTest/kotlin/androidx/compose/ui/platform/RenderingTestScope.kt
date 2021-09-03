@@ -27,8 +27,8 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.yield
-import org.jetbrains.skija.Canvas
-import org.jetbrains.skija.Surface
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.FrameDispatcher
 import kotlin.coroutines.CoroutineContext
 

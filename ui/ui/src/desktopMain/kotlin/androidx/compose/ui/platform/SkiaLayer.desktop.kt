@@ -35,7 +35,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.asDesktopPath
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.graphics.toSkijaRect
+import androidx.compose.ui.graphics.toSkiaRect
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
@@ -43,12 +43,12 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import org.jetbrains.skija.Picture
-import org.jetbrains.skija.PictureRecorder
-import org.jetbrains.skija.Point3
-import org.jetbrains.skija.ShadowUtils
+import org.jetbrains.skia.Picture
+import org.jetbrains.skia.PictureRecorder
+import org.jetbrains.skia.Point3
+import org.jetbrains.skia.ShadowUtils
 
-internal class SkijaLayer(
+internal class SkiaLayer(
     private var density: Density,
     private val invalidateParentLayer: () -> Unit,
     private val drawBlock: (Canvas) -> Unit,
@@ -212,7 +212,7 @@ internal class SkijaLayer(
     override fun drawLayer(canvas: Canvas) {
         if (picture == null) {
             val bounds = size.toSize().toRect()
-            val pictureCanvas = pictureRecorder.beginRecording(bounds.toSkijaRect())
+            val pictureCanvas = pictureRecorder.beginRecording(bounds.toSkiaRect())
             performDrawLayer(DesktopCanvas(pictureCanvas), bounds)
             picture = pictureRecorder.finishRecordingAsPicture()
         }
@@ -244,7 +244,7 @@ internal class SkijaLayer(
                 canvas.saveLayer(
                     bounds,
                     Paint().apply {
-                        alpha = this@SkijaLayer.alpha
+                        alpha = this@SkiaLayer.alpha
                         asFrameworkPaint().imageFilter = currentRenderEffect?.asDesktopImageFilter()
                     }
                 )
