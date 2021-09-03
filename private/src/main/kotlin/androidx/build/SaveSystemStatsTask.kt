@@ -48,8 +48,8 @@ abstract class SaveSystemStatsTask : DefaultTask() {
     fun exec() {
         val outputFile = outputFile.get()
         if (outputFile.exists()) {
-          // b/196115864 : make backup of file so we can know what changed
-          outputFile.copyTo(target = File(outputFile.path + ".prev"), overwrite = true)
+            // b/196115864 : make backup of file so we can know what changed
+            outputFile.copyTo(target = File(outputFile.path + ".prev"), overwrite = true)
         }
         val statsText = "num processors = ${getNumProcessors()}, total memory = ${getTotalMemory()}"
         outputFile.writeText(statsText)
