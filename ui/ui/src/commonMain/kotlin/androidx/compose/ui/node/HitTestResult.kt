@@ -39,8 +39,10 @@ internal class HitTestResult<T> : List<T> {
      * `true` when there has been a direct hit within touch bounds ([hit] called) or
      * `false` otherwise.
      */
-    val isHit: Boolean get() =
-        hitDepth < lastIndex && values[hitDepth + 1] != null && distancesFromEdge[hitDepth + 1] < 0f
+    fun hasHit(): Boolean {
+        val distance = findBestHitDistance()
+        return distance < 0f
+    }
 
     private fun resizeToHitDepth() {
         for (i in (hitDepth + 1)..lastIndex) {
@@ -54,9 +56,22 @@ internal class HitTestResult<T> : List<T> {
      * [hitInMinimumTouchTarget] or [speculativeHit].
      */
     fun isHitInMinimumTouchTargetBetter(distanceFromEdge: Float): Boolean {
-        return hitDepth == lastIndex ||
-            values[hitDepth + 1] == null ||
-            distanceFromEdge < distancesFromEdge[hitDepth + 1]
+        if (hitDepth == lastIndex) {
+            return true
+        }
+        val bestDistance = findBestHitDistance()
+        return bestDistance > distanceFromEdge
+    }
+
+    private fun findBestHitDistance(): Float {
+        var bestDistance = Float.POSITIVE_INFINITY
+        for (i in hitDepth + 1..lastIndex) {
+            bestDistance = minOf(distancesFromEdge[i], bestDistance)
+            if (bestDistance < 0f) {
+                return bestDistance
+            }
+        }
+        return bestDistance
     }
 
     /**
@@ -99,11 +114,12 @@ internal class HitTestResult<T> : List<T> {
         }
 
         // We have to tack the speculation to the end of the array
+        val previousDistance = findBestHitDistance()
         val previousHitDepth = hitDepth
         hitDepth = lastIndex
 
         hitInMinimumTouchTarget(node, distanceFromEdge, childHitTest)
-        if (hitDepth + 1 < lastIndex) {
+        if (hitDepth + 1 < lastIndex && previousDistance > findBestHitDistance()) {
             // This was a successful hit, so we should move this to the previous hit depth
             val fromIndex = hitDepth + 1
             val toIndex = previousHitDepth + 1

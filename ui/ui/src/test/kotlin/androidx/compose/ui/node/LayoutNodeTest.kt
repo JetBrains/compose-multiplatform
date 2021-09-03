@@ -892,6 +892,50 @@ class LayoutNodeTest {
     }
 
     @Test
+    fun hitTest_pointerInputFilterHit_outsideParent() {
+        val outerPointerInputFilter: PointerInputFilter = mockPointerInputFilter()
+        val outerNode = LayoutNode(
+            0, 0, 10, 10,
+            PointerInputModifierImpl(outerPointerInputFilter)
+        ).apply { attach(MockOwner()) }
+        val pointerInputFilter: PointerInputFilter = mockPointerInputFilter()
+        val layoutNode = LayoutNode(
+            20, 20, 30, 30,
+            PointerInputModifierImpl(pointerInputFilter)
+        )
+        outerNode.add(layoutNode)
+        layoutNode.onNodePlaced()
+        val hit = mutableListOf<PointerInputFilter>()
+
+        outerNode.hitTest(Offset(25f, 25f), hit)
+
+        assertThat(hit).isEqualTo(listOf(pointerInputFilter))
+    }
+
+    @Test
+    fun hitTest_pointerInputFilterHit_outsideParent_interceptOutOfBoundsChildEvents() {
+        val outerPointerInputFilter: PointerInputFilter = mockPointerInputFilter(
+            interceptChildEvents = true
+        )
+        val outerNode = LayoutNode(
+            0, 0, 10, 10,
+            PointerInputModifierImpl(outerPointerInputFilter)
+        ).apply { attach(MockOwner()) }
+        val pointerInputFilter: PointerInputFilter = mockPointerInputFilter()
+        val layoutNode = LayoutNode(
+            20, 20, 30, 30,
+            PointerInputModifierImpl(pointerInputFilter)
+        )
+        outerNode.add(layoutNode)
+        layoutNode.onNodePlaced()
+        val hit = mutableListOf<PointerInputFilter>()
+
+        outerNode.hitTest(Offset(25f, 25f), hit)
+
+        assertThat(hit).isEqualTo(listOf(outerPointerInputFilter, pointerInputFilter))
+    }
+
+    @Test
     fun hitTest_pointerInMinimumTouchTarget_closestHit() {
         val pointerInputFilter1: PointerInputFilter = mockPointerInputFilter()
         val layoutNode1 = LayoutNode(
@@ -993,7 +1037,8 @@ class LayoutNodeTest {
             DpSize(48.dp, 48.dp)
         )
 
-        val pointerInputFilter2: PointerInputFilter = mockPointerInputFilter()
+        val pointerInputFilter2: PointerInputFilter =
+            mockPointerInputFilter(interceptChildEvents = true)
         val layoutNode2 = LayoutNode(
             0, 0, 10, 10,
             PointerInputModifierImpl(pointerInputFilter2),
@@ -2357,7 +2402,9 @@ private fun LayoutNode(
     detach()
 }
 
-private fun mockPointerInputFilter(): PointerInputFilter = object : PointerInputFilter() {
+private fun mockPointerInputFilter(
+    interceptChildEvents: Boolean = false
+): PointerInputFilter = object : PointerInputFilter() {
     override fun onPointerEvent(
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
@@ -2367,4 +2414,7 @@ private fun mockPointerInputFilter(): PointerInputFilter = object : PointerInput
 
     override fun onCancel() {
     }
+
+    override val interceptOutOfBoundsChildEvents: Boolean
+        get() = interceptChildEvents
 }

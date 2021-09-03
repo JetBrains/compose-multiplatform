@@ -64,7 +64,9 @@ internal class SemanticsWrapper(
         hitTestInMinimumTouchTarget(
             pointerPosition,
             hitSemanticsWrappers,
-            this
+            forceParentIntercept = false,
+            useTouchSize = true,
+            content = this
         ) {
             // Also, keep looking to see if we also might hit any children.
             // This avoids checking layer bounds twice as when we call super.hitTest()
