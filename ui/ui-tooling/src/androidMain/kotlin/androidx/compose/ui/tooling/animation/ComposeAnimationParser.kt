@@ -17,6 +17,7 @@
 package androidx.compose.ui.tooling.animation
 
 import android.util.Log
+import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.tooling.ComposeAnimation
 import androidx.compose.animation.tooling.ComposeAnimationType
@@ -33,6 +34,14 @@ internal fun Transition<Any>.parse(): TransitionComposeAnimation {
 }
 
 /**
+ * Parses this [Transition] into an [AnimatedVisibilityComposeAnimation].
+ */
+internal fun Transition<Any>.parseAnimatedVisibility(): AnimatedVisibilityComposeAnimation {
+    Log.d("ComposeAnimationParser", "AnimatedVisibility transition subscribed")
+    return AnimatedVisibilityComposeAnimation(this, this.label ?: "AnimatedVisibility")
+}
+
+/**
  * [ComposeAnimation] of type [ComposeAnimationType.TRANSITION_ANIMATION].
  */
 internal class TransitionComposeAnimation(
@@ -44,4 +53,35 @@ internal class TransitionComposeAnimation(
     override val animationObject: Transition<Any> = transition
     override val states = transitionStates
     override val label = transitionLabel
+}
+
+/**
+ * [ComposeAnimation] of type [ComposeAnimationType.ANIMATED_VISIBILITY].
+ */
+@OptIn(InternalAnimationApi::class)
+internal class AnimatedVisibilityComposeAnimation(parent: Transition<Any>, parentLabel: String?) :
+    ComposeAnimation {
+    override val type = ComposeAnimationType.ANIMATED_VISIBILITY
+    override val animationObject: Transition<Any> = parent
+    override val states = setOf(AnimatedVisibilityState.Enter, AnimatedVisibilityState.Exit)
+    override val label = parentLabel
+    // Important assumption: AnimatedVisibility has a single child transition, which is a
+    // Transition<EnterExitState>.
+    @Suppress("UNCHECKED_CAST")
+    val childTransition: Transition<Any>?
+        get() = animationObject.transitions.getOrNull(0) as? Transition<Any>
+}
+
+/**
+ * Represents the states of [AnimatedVisibilityComposeAnimation]s.
+ */
+@Suppress("INLINE_CLASS_DEPRECATED")
+internal inline class AnimatedVisibilityState private constructor(val value: String) {
+
+    override fun toString() = value
+
+    companion object {
+        val Enter = AnimatedVisibilityState("Enter")
+        val Exit = AnimatedVisibilityState("Exit")
+    }
 }
