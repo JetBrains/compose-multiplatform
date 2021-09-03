@@ -135,6 +135,8 @@ fun shouldVerifyConfiguration(configuration: Configuration): Boolean {
     // Don't check any compile-only configurations
     if (name.startsWith("compile")) return false
 
+    // allow tip of tree compose compiler
+    if (name.startsWith("kotlinPlugin")) return false
     return true
 }
 
