@@ -838,6 +838,42 @@ class LayoutNodeTest {
     }
 
     @Test
+    fun hitTest_pointerInMinimumTouchTarget_pointerInputFilterHit_horizontal() {
+        val pointerInputFilter: PointerInputFilter = mockPointerInputFilter()
+        val layoutNode =
+            LayoutNode(
+                0, 0, 1000, 1,
+                PointerInputModifierImpl(pointerInputFilter),
+                DpSize(48.dp, 48.dp)
+            ).apply {
+                attach(MockOwner())
+            }
+        val hit = mutableListOf<PointerInputFilter>()
+
+        layoutNode.hitTest(Offset(0f, 3f), hit, true)
+
+        assertThat(hit).isEqualTo(listOf(pointerInputFilter))
+    }
+
+    @Test
+    fun hitTest_pointerInMinimumTouchTarget_pointerInputFilterHit_vertical() {
+        val pointerInputFilter: PointerInputFilter = mockPointerInputFilter()
+        val layoutNode =
+            LayoutNode(
+                0, 0, 1, 1000,
+                PointerInputModifierImpl(pointerInputFilter),
+                DpSize(48.dp, 48.dp)
+            ).apply {
+                attach(MockOwner())
+            }
+        val hit = mutableListOf<PointerInputFilter>()
+
+        layoutNode.hitTest(Offset(3f, 0f), hit, true)
+
+        assertThat(hit).isEqualTo(listOf(pointerInputFilter))
+    }
+
+    @Test
     fun hitTest_pointerInMinimumTouchTarget_pointerInputFilterHit_nestedNodes() {
         val pointerInputFilter: PointerInputFilter = mockPointerInputFilter()
         val outerNode = LayoutNode(0, 0, 1, 1).apply { attach(MockOwner()) }
