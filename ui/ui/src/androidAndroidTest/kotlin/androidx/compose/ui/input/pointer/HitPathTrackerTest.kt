@@ -16,15 +16,48 @@
 
 package androidx.compose.ui.input.pointer
 
+import android.view.MotionEvent.ACTION_HOVER_ENTER
+import android.view.MotionEvent.ACTION_HOVER_EXIT
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.autofill.Autofill
+import androidx.compose.ui.autofill.AutofillTree
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.RenderEffect
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.node.InternalCoreApi
+import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.node.LayoutNodeDrawScope
+import androidx.compose.ui.node.OwnedLayer
+import androidx.compose.ui.node.Owner
+import androidx.compose.ui.node.OwnerSnapshotObserver
+import androidx.compose.ui.node.RootForTest
+import androidx.compose.ui.platform.AccessibilityManager
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.TextToolbar
+import androidx.compose.ui.platform.ViewConfiguration
+import androidx.compose.ui.platform.WindowInfo
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.toOffset
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.assertWithMessage
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,10 +67,13 @@ import org.junit.runner.RunWith
 class HitPathTrackerTest {
 
     private lateinit var hitPathTracker: HitPathTracker
+    private val layoutNode = LayoutNode(0, 0, 100, 100).also {
+        it.attach(MockOwner())
+    }
 
     @Before
     fun setup() {
-        hitPathTracker = HitPathTracker(LayoutCoordinatesStub())
+        hitPathTracker = HitPathTracker(layoutNode.outerLayoutNodeWrapper)
     }
 
     @Test
@@ -2424,11 +2460,9 @@ class HitPathTrackerTest {
         val middle: PointerInputFilter = PointerInputFilterMock()
         val leaf: PointerInputFilter = PointerInputFilterMock()
 
-        val pointerId = PointerId(3)
-
         hitPathTracker.addHitPath(PointerId(3), listOf(root, middle, leaf))
 
-        hitPathTracker.removeHitPath(pointerId)
+        hitPathTracker.dispatchChanges(internalPointerEventOf(down(3).up(1L)))
 
         val expectedRoot = NodeParent()
 
@@ -2445,11 +2479,12 @@ class HitPathTrackerTest {
         val leaf: PointerInputFilter = PointerInputFilterMock()
 
         val pointerId1 = PointerId(3)
-        val pointerId2 = PointerId(99)
 
         hitPathTracker.addHitPath(pointerId1, listOf(root, middle, leaf))
 
-        hitPathTracker.removeHitPath(pointerId2)
+        hitPathTracker.dispatchChanges(
+            internalPointerEventOf(down(99).up(1L), down(3))
+        )
 
         val expectedRoot = NodeParent().apply {
             children.add(
@@ -2497,7 +2532,9 @@ class HitPathTrackerTest {
         hitPathTracker.addHitPath(pointerId1, listOf(root1, middle1, leaf1))
         hitPathTracker.addHitPath(pointerId2, listOf(root2, middle2, leaf2))
 
-        hitPathTracker.removeHitPath(pointerId2)
+        hitPathTracker.dispatchChanges(
+            internalPointerEventOf(down(5).up(1L), down(3))
+        )
 
         val expectedRoot = NodeParent().apply {
             children.add(
@@ -2535,7 +2572,9 @@ class HitPathTrackerTest {
         hitPathTracker.addHitPath(pointerId1, listOf(root, middle, leaf))
         hitPathTracker.addHitPath(pointerId2, listOf(root, middle, leaf))
 
-        hitPathTracker.removeHitPath(pointerId1)
+        hitPathTracker.dispatchChanges(
+            internalPointerEventOf(down(3).up(1L), down(5))
+        )
 
         val expectedRoot = NodeParent().apply {
             children.add(
@@ -2573,7 +2612,9 @@ class HitPathTrackerTest {
         hitPathTracker.addHitPath(pointerId1, listOf(root, middle, leaf))
         hitPathTracker.addHitPath(pointerId2, listOf(root, middle))
 
-        hitPathTracker.removeHitPath(pointerId1)
+        hitPathTracker.dispatchChanges(
+            internalPointerEventOf(down(3).up(1L), down(5))
+        )
 
         val expectedRoot = NodeParent().apply {
             children.add(
@@ -2606,7 +2647,9 @@ class HitPathTrackerTest {
         hitPathTracker.addHitPath(pointerId1, listOf(root, middle, leaf))
         hitPathTracker.addHitPath(pointerId2, listOf(root, middle))
 
-        hitPathTracker.removeHitPath(pointerId2)
+        hitPathTracker.dispatchChanges(
+            internalPointerEventOf(down(5).up(1L), down(3))
+        )
 
         val expectedRoot = NodeParent().apply {
             children.add(
@@ -2644,7 +2687,9 @@ class HitPathTrackerTest {
         hitPathTracker.addHitPath(pointerId1, listOf(root, middle, leaf))
         hitPathTracker.addHitPath(pointerId2, listOf(root))
 
-        hitPathTracker.removeHitPath(pointerId1)
+        hitPathTracker.dispatchChanges(
+            internalPointerEventOf(down(3).up(1L), down(5))
+        )
 
         val expectedRoot = NodeParent().apply {
             children.add(
@@ -2672,7 +2717,9 @@ class HitPathTrackerTest {
         hitPathTracker.addHitPath(pointerId1, listOf(root, middle, leaf))
         hitPathTracker.addHitPath(pointerId2, listOf(root))
 
-        hitPathTracker.removeHitPath(pointerId2)
+        hitPathTracker.dispatchChanges(
+            internalPointerEventOf(down(5).up(1L), down(3))
+        )
 
         val expectedRoot = NodeParent().apply {
             children.add(
@@ -3109,6 +3156,345 @@ class HitPathTrackerTest {
         )
     }
 
+    @Test
+    fun addHitPath_hoverMove_noChange() {
+        val log = mutableListOf<LogEntry>()
+        val parentLayoutCoordinates = LayoutCoordinatesStub(true)
+        val pif1: PointerInputFilter = PointerInputFilterMock(
+            log = log,
+            layoutCoordinates = parentLayoutCoordinates
+        )
+        val pif2: PointerInputFilter = PointerInputFilterMock(
+            log = log,
+            layoutCoordinates = parentLayoutCoordinates
+        )
+        val pif3: PointerInputFilter = PointerInputFilterMock(
+            log = log,
+            layoutCoordinates = parentLayoutCoordinates
+        )
+        val pointerId = PointerId(0)
+
+        hitPathTracker.addHitPath(pointerId, listOf(pif1, pif2, pif3))
+
+        val expectedRoot = NodeParent().apply {
+            children.add(
+                Node(pif1).apply {
+                    pointerIds.add(pointerId)
+                    children.add(
+                        Node(pif2).apply {
+                            pointerIds.add(pointerId)
+                            children.add(
+                                Node(pif3).apply {
+                                    pointerIds.add(pointerId)
+                                }
+                            )
+                        }
+                    )
+                }
+            )
+        }
+
+        hitPathTracker.dispatchChanges(hoverInternalPointerEvent())
+
+        assertThat(areEqual(hitPathTracker.root, expectedRoot)).isTrue()
+
+        assertHoverEvent(
+            log,
+            pif1 to PointerEventType.Enter,
+            pif2 to PointerEventType.Enter,
+            pif3 to PointerEventType.Enter,
+        )
+
+        log.clear()
+
+        hitPathTracker.addHitPath(pointerId, listOf(pif1, pif2, pif3))
+
+        hitPathTracker.dispatchChanges(hoverInternalPointerEvent())
+
+        assertThat(areEqual(hitPathTracker.root, expectedRoot)).isTrue()
+
+        assertHoverEvent(
+            log,
+            pif1 to PointerEventType.Move,
+            pif2 to PointerEventType.Move,
+            pif3 to PointerEventType.Move,
+        )
+    }
+
+    private fun assertHoverEvent(
+        log: List<LogEntry>,
+        vararg filterAndTypes: Pair<PointerInputFilter, PointerEventType>
+    ) {
+        assertThat(log).hasSize(filterAndTypes.size * 3)
+        log.forEachIndexed { index, logEntry ->
+            val pass = when {
+                index < filterAndTypes.size -> PointerEventPass.Initial
+                index < filterAndTypes.size * 2 -> PointerEventPass.Main
+                else -> PointerEventPass.Final
+            }
+            val filterIndex = when {
+                index < filterAndTypes.size -> index
+                index < filterAndTypes.size * 2 -> filterAndTypes.size * 2 - index - 1
+                else -> index - (filterAndTypes.size * 2)
+            }
+
+            val (filter, type) = filterAndTypes[filterIndex]
+
+            assertOnPointerEventEntry(logEntry, "LogEntry[$index]", pass, type, filter)
+        }
+    }
+
+    private fun assertOnPointerEventEntry(
+        logEntry: LogEntry,
+        message: String,
+        pass: PointerEventPass,
+        pointerEventType: PointerEventType,
+        pointerInputFilter: PointerInputFilter
+    ) {
+        assertThat(logEntry).isInstanceOf(OnPointerEventEntry::class.java)
+        logEntry as OnPointerEventEntry
+        assertWithMessage(message).that(logEntry.pass).isEqualTo(pass)
+        assertWithMessage(message).that(logEntry.pointerEvent.type).isEqualTo(pointerEventType)
+        assertWithMessage(message).that(logEntry.pointerInputFilter).isEqualTo(pointerInputFilter)
+    }
+
+    @Test
+    fun addHitPath_hoverMove_enterExit() {
+        val log = mutableListOf<LogEntry>()
+        val layoutCoordinates = layoutNode.outerLayoutNodeWrapper
+        val pif1: PointerInputFilter = PointerInputFilterMock(
+            log = log,
+            layoutCoordinates = layoutCoordinates
+        )
+        val pif2: PointerInputFilter = PointerInputFilterMock(
+            log = log,
+            layoutCoordinates = layoutCoordinates
+        )
+        val pif3: PointerInputFilter = PointerInputFilterMock(
+            log = log,
+            layoutCoordinates = layoutCoordinates
+        )
+        val pointerId = PointerId(0)
+
+        hitPathTracker.addHitPath(pointerId, listOf(pif1, pif2))
+
+        hitPathTracker.dispatchChanges(hoverInternalPointerEvent())
+
+        assertHoverEvent(
+            log,
+            pif1 to PointerEventType.Enter,
+            pif2 to PointerEventType.Enter
+        )
+
+        log.clear()
+
+        hitPathTracker.addHitPath(pointerId, listOf(pif1, pif3))
+
+        val expectedRoot = NodeParent().apply {
+            children.add(
+                Node(pif1).apply {
+                    pointerIds.add(pointerId)
+                    children.add(
+                        Node(pif2).apply {
+                            pointerIds.add(pointerId)
+                        }
+                    )
+                    children.add(
+                        Node(pif3).apply {
+                            pointerIds.add(pointerId)
+                        }
+                    )
+                }
+            )
+        }
+        assertThat(areEqual(hitPathTracker.root, expectedRoot)).isTrue()
+
+        hitPathTracker.dispatchChanges(hoverInternalPointerEvent())
+
+        // These have some that appear out of order because of the different branches
+        assertThat(log).hasSize(9)
+        assertOnPointerEventEntry(
+            log[0], "LogEntry[0]", PointerEventPass.Initial, PointerEventType.Move, pif1
+        )
+        assertOnPointerEventEntry(
+            log[1], "LogEntry[1]", PointerEventPass.Initial, PointerEventType.Exit, pif2
+        )
+        assertOnPointerEventEntry(
+            log[2], "LogEntry[2]", PointerEventPass.Main, PointerEventType.Exit, pif2
+        )
+        assertOnPointerEventEntry(
+            log[3], "LogEntry[3]", PointerEventPass.Initial, PointerEventType.Enter, pif3
+        )
+        assertOnPointerEventEntry(
+            log[4], "LogEntry[3]", PointerEventPass.Main, PointerEventType.Enter, pif3
+        )
+        assertOnPointerEventEntry(
+            log[5], "LogEntry[5]", PointerEventPass.Main, PointerEventType.Move, pif1
+        )
+        assertOnPointerEventEntry(
+            log[6], "LogEntry[6]", PointerEventPass.Final, PointerEventType.Move, pif1
+        )
+        assertOnPointerEventEntry(
+            log[7], "LogEntry[7]", PointerEventPass.Final, PointerEventType.Exit, pif2
+        )
+        assertOnPointerEventEntry(
+            log[8], "LogEntry[8]", PointerEventPass.Final, PointerEventType.Enter, pif3
+        )
+
+        val expectedAfterDispatch = NodeParent().apply {
+            children.add(
+                Node(pif1).apply {
+                    pointerIds.add(pointerId)
+                    children.add(
+                        Node(pif3).apply {
+                            pointerIds.add(pointerId)
+                        }
+                    )
+                }
+            )
+        }
+        assertThat(areEqual(hitPathTracker.root, expectedAfterDispatch)).isTrue()
+    }
+
+    @Test
+    fun addHitPath_hoverExit() {
+        val log = mutableListOf<LogEntry>()
+        val layoutCoordinates = layoutNode.outerLayoutNodeWrapper
+        val pif1: PointerInputFilter = PointerInputFilterMock(
+            log = log,
+            layoutCoordinates = layoutCoordinates
+        )
+        val pif2: PointerInputFilter = PointerInputFilterMock(
+            log = log,
+            layoutCoordinates = layoutCoordinates
+        )
+        val pif3: PointerInputFilter = PointerInputFilterMock(
+            log = log,
+            layoutCoordinates = layoutCoordinates
+        )
+        val pointerId = PointerId(0)
+
+        hitPathTracker.addHitPath(pointerId, listOf(pif1, pif2, pif3))
+
+        hitPathTracker.dispatchChanges(hoverInternalPointerEvent())
+
+        log.clear()
+
+        hitPathTracker.addHitPath(pointerId, listOf())
+
+        val expectedRoot = NodeParent().apply {
+            children.add(
+                Node(pif1).apply {
+                    pointerIds.add(pointerId)
+                    children.add(
+                        Node(pif2).apply {
+                            pointerIds.add(pointerId)
+                            children.add(
+                                Node(pif3).apply {
+                                    pointerIds.add(pointerId)
+                                }
+                            )
+                        }
+                    )
+                }
+            )
+        }
+        assertThat(areEqual(hitPathTracker.root, expectedRoot)).isTrue()
+
+        hitPathTracker.dispatchChanges(hoverInternalPointerEvent(ACTION_HOVER_EXIT))
+
+        assertHoverEvent(
+            log,
+            pif1 to PointerEventType.Exit,
+            pif2 to PointerEventType.Exit,
+            pif3 to PointerEventType.Exit,
+        )
+
+        val expectedAfterDispatch = NodeParent()
+        assertThat(areEqual(hitPathTracker.root, expectedAfterDispatch)).isTrue()
+    }
+
+    @Test
+    fun dispatchChangesClearsStaleIds() {
+        val layoutCoordinates = LayoutCoordinatesStub(isAttached = true)
+        val pif1: PointerInputFilter = PointerInputFilterMock(
+            layoutCoordinates = layoutCoordinates
+        )
+        val pif2: PointerInputFilter = PointerInputFilterMock(
+            layoutCoordinates = layoutCoordinates
+        )
+        val pif3: PointerInputFilter = PointerInputFilterMock(
+            layoutCoordinates = layoutCoordinates
+        )
+        val pointerId = PointerId(0)
+
+        hitPathTracker.addHitPath(pointerId, listOf(pif1, pif2, pif3))
+
+        val expectedRoot = NodeParent().apply {
+            children.add(
+                Node(pif1).apply {
+                    pointerIds.add(pointerId)
+                    children.add(
+                        Node(pif2).apply {
+                            pointerIds.add(pointerId)
+                            children.add(
+                                Node(pif3).apply {
+                                    pointerIds.add(pointerId)
+                                }
+                            )
+                        }
+                    )
+                }
+            )
+        }
+
+        assertThat(areEqual(hitPathTracker.root, expectedRoot)).isTrue()
+
+        hitPathTracker.dispatchChanges(hoverInternalPointerEvent(ACTION_HOVER_ENTER))
+
+        assertThat(areEqual(hitPathTracker.root, expectedRoot)).isTrue()
+
+        hitPathTracker.dispatchChanges(internalPointerEventOf(down(5)))
+
+        val expectedAfterDispatch = NodeParent()
+        assertThat(areEqual(hitPathTracker.root, expectedAfterDispatch)).isTrue()
+    }
+
+    @Test
+    fun dispatchChangesClearsStaleIdsPartialHit() {
+        val parentLayoutCoordinates = LayoutCoordinatesStub(true)
+        val pif1: PointerInputFilter = PointerInputFilterMock(
+            layoutCoordinates = parentLayoutCoordinates
+        )
+        val pif2: PointerInputFilter = PointerInputFilterMock(
+            layoutCoordinates = parentLayoutCoordinates
+        )
+        val pif3: PointerInputFilter = PointerInputFilterMock(
+            layoutCoordinates = parentLayoutCoordinates
+        )
+        val pointerId1 = PointerId(0)
+        val pointerId2 = PointerId(5)
+
+        hitPathTracker.addHitPath(pointerId1, listOf(pif1, pif2, pif3))
+        hitPathTracker.addHitPath(pointerId2, listOf(pif1, pif2))
+
+        hitPathTracker.dispatchChanges(internalPointerEventOf(down(5)))
+
+        val expectedAfterDispatch = NodeParent().apply {
+            children.add(
+                Node(pif1).apply {
+                    pointerIds.add(pointerId2)
+                    children.add(
+                        Node(pif2).apply {
+                            pointerIds.add(pointerId2)
+                        }
+                    )
+                }
+            )
+        }
+        assertThat(areEqual(hitPathTracker.root, expectedAfterDispatch)).isTrue()
+    }
+
     private fun areEqual(actualNode: NodeParent, expectedNode: NodeParent): Boolean {
         var check = true
 
@@ -3191,4 +3577,152 @@ class LayoutCoordinatesStub(
     override fun get(alignmentLine: AlignmentLine): Int {
         TODO("not implemented")
     }
+}
+
+@OptIn(InternalCoreApi::class)
+private class MockOwner(
+    val position: IntOffset = IntOffset.Zero,
+    override val root: LayoutNode = LayoutNode()
+) : Owner {
+    val onRequestMeasureParams = mutableListOf<LayoutNode>()
+    val onAttachParams = mutableListOf<LayoutNode>()
+    val onDetachParams = mutableListOf<LayoutNode>()
+    var layoutChangeCount = 0
+
+    override val rootForTest: RootForTest
+        get() = TODO("Not yet implemented")
+    override val hapticFeedBack: HapticFeedback
+        get() = TODO("Not yet implemented")
+    override val clipboardManager: ClipboardManager
+        get() = TODO("Not yet implemented")
+    override val accessibilityManager: AccessibilityManager
+        get() = TODO("Not yet implemented")
+    override val textToolbar: TextToolbar
+        get() = TODO("Not yet implemented")
+    @OptIn(ExperimentalComposeUiApi::class)
+    override val autofillTree: AutofillTree
+        get() = TODO("Not yet implemented")
+    @OptIn(ExperimentalComposeUiApi::class)
+    override val autofill: Autofill?
+        get() = TODO("Not yet implemented")
+    override val density: Density
+        get() = Density(1f)
+    override val textInputService: TextInputService
+        get() = TODO("Not yet implemented")
+    override val focusManager: FocusManager
+        get() = TODO("Not yet implemented")
+    override val windowInfo: WindowInfo
+        get() = TODO("Not yet implemented")
+    override val fontLoader: Font.ResourceLoader
+        get() = TODO("Not yet implemented")
+    override val layoutDirection: LayoutDirection
+        get() = LayoutDirection.Ltr
+    override var showLayoutBounds: Boolean = false
+    override val snapshotObserver = OwnerSnapshotObserver { it.invoke() }
+
+    override fun onRequestMeasure(layoutNode: LayoutNode) {
+        onRequestMeasureParams += layoutNode
+        layoutNode.layoutState = LayoutNode.LayoutState.NeedsRemeasure
+    }
+
+    override fun onRequestRelayout(layoutNode: LayoutNode) {
+        layoutNode.layoutState = LayoutNode.LayoutState.NeedsRelayout
+    }
+
+    override fun onAttach(node: LayoutNode) {
+        onAttachParams += node
+    }
+
+    override fun onDetach(node: LayoutNode) {
+        onDetachParams += node
+    }
+
+    override fun calculatePositionInWindow(localPosition: Offset): Offset =
+        localPosition + position.toOffset()
+
+    override fun calculateLocalPosition(positionInWindow: Offset): Offset =
+        positionInWindow - position.toOffset()
+
+    override fun requestFocus(): Boolean = false
+
+    override fun measureAndLayout() {
+    }
+
+    override fun createLayer(
+        drawBlock: (Canvas) -> Unit,
+        invalidateParentLayer: () -> Unit
+    ): OwnedLayer {
+        return object : OwnedLayer {
+            override val layerId: Long
+                get() = 0
+
+            @OptIn(ExperimentalComposeUiApi::class)
+            @get:OptIn(ExperimentalComposeUiApi::class)
+            override val ownerViewId: Long
+                get() = 0
+
+            override fun updateLayerProperties(
+                scaleX: Float,
+                scaleY: Float,
+                alpha: Float,
+                translationX: Float,
+                translationY: Float,
+                shadowElevation: Float,
+                rotationX: Float,
+                rotationY: Float,
+                rotationZ: Float,
+                cameraDistance: Float,
+                transformOrigin: TransformOrigin,
+                shape: Shape,
+                clip: Boolean,
+                renderEffect: RenderEffect?,
+                layoutDirection: LayoutDirection,
+                density: Density
+            ) {
+            }
+
+            override fun isInLayer(position: Offset) = true
+
+            override fun move(position: IntOffset) {
+            }
+
+            override fun resize(size: IntSize) {
+            }
+
+            override fun drawLayer(canvas: Canvas) {
+                drawBlock(canvas)
+            }
+
+            override fun updateDisplayList() {
+            }
+
+            override fun invalidate() {
+            }
+
+            override fun destroy() {
+            }
+
+            override fun mapBounds(rect: MutableRect, inverse: Boolean) {
+            }
+
+            override fun mapOffset(point: Offset, inverse: Boolean) = point
+        }
+    }
+
+    override fun onSemanticsChange() {
+    }
+
+    override fun onLayoutChange(layoutNode: LayoutNode) {
+        layoutChangeCount++
+    }
+
+    override fun getFocusDirection(keyEvent: KeyEvent): FocusDirection? {
+        TODO("Not yet implemented")
+    }
+
+    override var measureIteration: Long = 0
+    override val viewConfiguration: ViewConfiguration
+        get() = TODO("Not yet implemented")
+
+    override val sharedDrawScope = LayoutNodeDrawScope()
 }

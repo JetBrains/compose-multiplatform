@@ -7,6 +7,8 @@ RemovedClass: androidx.compose.ui.graphics.vector.compat.XmlAnimatorParser_andro
     Removed class androidx.compose.ui.graphics.vector.compat.XmlAnimatorParser_androidKt
 RemovedClass: androidx.compose.ui.graphics.vector.compat.XmlPullParserUtils_androidKt:
     Removed class androidx.compose.ui.graphics.vector.compat.XmlPullParserUtils_androidKt
+RemovedClass: androidx.compose.ui.input.pointer.MotionEventAdapter_androidKt:
+    Removed class androidx.compose.ui.input.pointer.MotionEventAdapter_androidKt
 RemovedClass: androidx.compose.ui.res.AnimatedVectorResources_androidKt:
     Removed class androidx.compose.ui.res.AnimatedVectorResources_androidKt
 RemovedClass: androidx.compose.ui.res.AnimatorResources_androidKt:

@@ -18,6 +18,13 @@ package androidx.compose.ui.input.pointer
 
 import android.content.Context
 import android.view.MotionEvent
+import android.view.MotionEvent.ACTION_DOWN
+import android.view.MotionEvent.ACTION_HOVER_ENTER
+import android.view.MotionEvent.ACTION_HOVER_EXIT
+import android.view.MotionEvent.ACTION_HOVER_MOVE
+import android.view.MotionEvent.ACTION_MOVE
+import android.view.MotionEvent.ACTION_POINTER_INDEX_SHIFT
+import android.view.MotionEvent.ACTION_UP
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
@@ -35,22 +42,27 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.AbsoluteAlignment
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.OpenComposeView
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.findAndroidComposeView
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.PointerCoords
 import androidx.compose.ui.gesture.PointerProperties
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.findRoot
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.scale
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -115,7 +127,7 @@ class AndroidPointerInputTest {
         rule.runOnUiThread {
             val motionEvent = MotionEvent(
                 0,
-                MotionEvent.ACTION_DOWN,
+                ACTION_DOWN,
                 1,
                 0,
                 arrayOf(PointerProperties(0)),
@@ -150,7 +162,7 @@ class AndroidPointerInputTest {
         rule.runOnUiThread {
             val motionEvent = MotionEvent(
                 0,
-                MotionEvent.ACTION_DOWN,
+                ACTION_DOWN,
                 1,
                 0,
                 arrayOf(PointerProperties(0)),
@@ -189,7 +201,7 @@ class AndroidPointerInputTest {
 
             val motionEvent = MotionEvent(
                 0,
-                MotionEvent.ACTION_DOWN,
+                ACTION_DOWN,
                 1,
                 0,
                 arrayOf(PointerProperties(0)),
@@ -258,7 +270,7 @@ class AndroidPointerInputTest {
 
             val motionEvent = MotionEvent(
                 0,
-                MotionEvent.ACTION_DOWN,
+                ACTION_DOWN,
                 1,
                 0,
                 arrayOf(PointerProperties(0)),
@@ -317,7 +329,7 @@ class AndroidPointerInputTest {
 
             val motionEvent = MotionEvent(
                 0,
-                MotionEvent.ACTION_DOWN,
+                ACTION_DOWN,
                 1,
                 0,
                 arrayOf(PointerProperties(0)),
@@ -366,7 +378,7 @@ class AndroidPointerInputTest {
 
             val down = MotionEvent(
                 0,
-                MotionEvent.ACTION_DOWN,
+                ACTION_DOWN,
                 1,
                 0,
                 arrayOf(PointerProperties(0)),
@@ -375,7 +387,7 @@ class AndroidPointerInputTest {
 
             val move = MotionEvent(
                 0,
-                MotionEvent.ACTION_MOVE,
+                ACTION_MOVE,
                 1,
                 0,
                 arrayOf(PointerProperties(0)),
@@ -433,7 +445,7 @@ class AndroidPointerInputTest {
             // Create a motion event that is also offset.
             val motionEvent = MotionEvent(
                 0,
-                MotionEvent.ACTION_DOWN,
+                ACTION_DOWN,
                 1,
                 0,
                 arrayOf(PointerProperties(0)),
@@ -488,12 +500,12 @@ class AndroidPointerInputTest {
             // Get the current location in window.
             container.getLocationInWindow(locationInWindow)
 
-            val downEvent = createPointerEventAt(0, MotionEvent.ACTION_DOWN, locationInWindow)
+            val downEvent = createPointerEventAt(0, ACTION_DOWN, locationInWindow)
             findRootView(container).dispatchTouchEvent(downEvent)
         }
 
         rule.runOnUiThread {
-            val upEvent = createPointerEventAt(200, MotionEvent.ACTION_UP, locationInWindow)
+            val upEvent = createPointerEventAt(200, ACTION_UP, locationInWindow)
             findRootView(container).dispatchTouchEvent(upEvent)
         }
 
@@ -505,14 +517,14 @@ class AndroidPointerInputTest {
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
 
         rule.runOnUiThread {
-            val downEvent = createPointerEventAt(1000, MotionEvent.ACTION_DOWN, locationInWindow)
+            val downEvent = createPointerEventAt(1000, ACTION_DOWN, locationInWindow)
             findRootView(container).dispatchTouchEvent(downEvent)
         }
         // Need to wait for long press timeout (at least)
         rule.runOnUiThread {
             val upEvent = createPointerEventAt(
                 1030,
-                MotionEvent.ACTION_UP,
+                ACTION_UP,
                 locationInWindow
             )
             findRootView(container).dispatchTouchEvent(upEvent)
@@ -524,11 +536,11 @@ class AndroidPointerInputTest {
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
 
         rule.runOnUiThread {
-            val downEvent = createPointerEventAt(2000, MotionEvent.ACTION_DOWN, locationInWindow)
+            val downEvent = createPointerEventAt(2000, ACTION_DOWN, locationInWindow)
             findRootView(container).dispatchTouchEvent(downEvent)
         }
         rule.runOnUiThread {
-            val upEvent = createPointerEventAt(2200, MotionEvent.ACTION_UP, locationInWindow)
+            val upEvent = createPointerEventAt(2200, ACTION_UP, locationInWindow)
             findRootView(container).dispatchTouchEvent(upEvent)
         }
         assertTrue(tapLatch.await(1, TimeUnit.SECONDS))
@@ -574,7 +586,7 @@ class AndroidPointerInputTest {
         assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
         rule.runOnUiThread { }
 
-        val down = createPointerEventAt(0, MotionEvent.ACTION_DOWN, intArrayOf(105, 205))
+        val down = createPointerEventAt(0, ACTION_DOWN, intArrayOf(105, 205))
         down.offsetLocation(-100f, -200f)
         val composeView = findAndroidComposeView(container) as AndroidComposeView
         composeView.dispatchTouchEvent(down)
@@ -625,13 +637,398 @@ class AndroidPointerInputTest {
         assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
         rule.runOnUiThread { }
 
-        val down = createPointerEventAt(0, MotionEvent.ACTION_DOWN, intArrayOf(5, 5))
+        val down = createPointerEventAt(0, ACTION_DOWN, intArrayOf(5, 5))
         val composeView = findAndroidComposeView(container) as AndroidComposeView
         composeView.dispatchTouchEvent(down)
 
         assertTrue(tapLatch.await(1, TimeUnit.SECONDS))
         rule.runOnUiThread {
             assertEquals(0, insideTap)
+        }
+    }
+
+    private fun assertHoverEvent(
+        event: PointerEvent,
+        isEnter: Boolean = false,
+        isExit: Boolean = false
+    ) {
+        assertThat(event.changes).hasSize(1)
+        val change = event.changes[0]
+        assertThat(change.pressed).isFalse()
+        assertThat(change.previousPressed).isFalse()
+        val expectedHoverType = when {
+            isEnter -> PointerEventType.Enter
+            isExit -> PointerEventType.Exit
+            else -> PointerEventType.Move
+        }
+        assertThat(event.type).isEqualTo(expectedHoverType)
+    }
+
+    private fun dispatchMouseEvent(
+        action: Int = ACTION_HOVER_ENTER,
+        layoutCoordinates: LayoutCoordinates,
+        offset: Offset = Offset.Zero
+    ) {
+        rule.runOnUiThread {
+            val root = layoutCoordinates.findRoot()
+            val pos = root.localPositionOf(layoutCoordinates, offset)
+            val event = MotionEvent(
+                0,
+                action,
+                1,
+                0,
+                arrayOf(PointerProperties(0).also { it.toolType = MotionEvent.TOOL_TYPE_MOUSE }),
+                arrayOf(PointerCoords(pos.x, pos.y))
+            )
+
+            val androidComposeView = findAndroidComposeView(container) as AndroidComposeView
+            when (action) {
+                ACTION_HOVER_ENTER, ACTION_HOVER_MOVE, ACTION_HOVER_EXIT ->
+                    androidComposeView.dispatchHoverEvent(event)
+                else -> androidComposeView.dispatchTouchEvent(event)
+            }
+        }
+    }
+
+    @Test
+    fun dispatchHoverEnter() {
+        var layoutCoordinates: LayoutCoordinates? = null
+        val latch = CountDownLatch(1)
+        val events = mutableListOf<PointerEvent>()
+        rule.runOnUiThread {
+            container.setContent {
+                Box(
+                    Modifier.fillMaxSize().onGloballyPositioned {
+                        layoutCoordinates = it
+                        latch.countDown()
+                    }.pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                val event = awaitPointerEvent()
+                                event.changes[0].consumeAllChanges()
+                                events += event
+                            }
+                        }
+                    }
+                )
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        dispatchMouseEvent(ACTION_HOVER_ENTER, layoutCoordinates!!)
+        rule.runOnUiThread {
+            assertThat(events).hasSize(1)
+            assertHoverEvent(events[0], isEnter = true)
+        }
+    }
+
+    @Test
+    fun dispatchHoverExit() {
+        var layoutCoordinates: LayoutCoordinates? = null
+        val latch = CountDownLatch(1)
+        val events = mutableListOf<PointerEvent>()
+        rule.runOnUiThread {
+            container.setContent {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .onGloballyPositioned {
+                            layoutCoordinates = it
+                            latch.countDown()
+                        }.pointerInput(Unit) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    val event = awaitPointerEvent()
+                                    event.changes[0].consumeAllChanges()
+                                    events += event
+                                }
+                            }
+                        }
+                )
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        dispatchMouseEvent(ACTION_HOVER_ENTER, layoutCoordinates!!)
+        dispatchMouseEvent(ACTION_HOVER_EXIT, layoutCoordinates!!, Offset(-1f, -1f))
+
+        rule.runOnUiThread {
+            assertThat(events).hasSize(2)
+            assertHoverEvent(events[0], isEnter = true)
+            assertHoverEvent(events[1], isExit = true)
+        }
+    }
+
+    @Test
+    fun dispatchHoverMove() {
+        var layoutCoordinates: LayoutCoordinates? = null
+        var layoutCoordinates2: LayoutCoordinates? = null
+        val latch = CountDownLatch(1)
+        val eventLatch = CountDownLatch(1)
+        var anyOtherEvent = false
+
+        var move1 = false
+        var move2 = false
+        var move3 = false
+
+        var enter: PointerEvent? = null
+        var move: PointerEvent? = null
+        var exit: PointerEvent? = null
+
+        rule.runOnUiThread {
+            container.setContent {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .onGloballyPositioned {
+                            layoutCoordinates = it
+                            latch.countDown()
+                        }.pointerInput(Unit) {
+                            awaitPointerEventScope {
+                                awaitPointerEvent() // enter
+                                assertHoverEvent(awaitPointerEvent()) // move
+                                move1 = true
+                                assertHoverEvent(awaitPointerEvent()) // move
+                                move2 = true
+                                assertHoverEvent(awaitPointerEvent()) // move
+                                move3 = true
+                                awaitPointerEvent() // exit
+                                eventLatch.countDown()
+                            }
+                        }
+                ) {
+                    Box(
+                        Modifier
+                            .align(Alignment.Center)
+                            .size(50.dp)
+                            .onGloballyPositioned {
+                                layoutCoordinates2 = it
+                            }.pointerInput(Unit) {
+                                awaitPointerEventScope {
+                                    enter = awaitPointerEvent()
+                                    move = awaitPointerEvent()
+                                    exit = awaitPointerEvent()
+                                    awaitPointerEvent()
+                                    anyOtherEvent = true
+                                }
+                            }
+                    )
+                }
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        // Enter outer Box
+        dispatchMouseEvent(ACTION_HOVER_ENTER, layoutCoordinates!!)
+
+        // Move to inner Box
+        dispatchMouseEvent(ACTION_HOVER_MOVE, layoutCoordinates2!!)
+        rule.runOnUiThread {
+            assertThat(move1).isTrue()
+            assertThat(enter).isNotNull()
+            assertHoverEvent(enter!!, isEnter = true)
+        }
+
+        // Move within inner Box
+        dispatchMouseEvent(ACTION_HOVER_MOVE, layoutCoordinates2!!, Offset(1f, 1f))
+        rule.runOnUiThread {
+            assertThat(move2).isTrue()
+            assertThat(move).isNotNull()
+            assertHoverEvent(move!!)
+        }
+
+        // Move to outer Box
+        dispatchMouseEvent(ACTION_HOVER_MOVE, layoutCoordinates!!)
+        rule.runOnUiThread {
+            assertThat(move3).isTrue()
+            assertThat(exit).isNotNull()
+            assertHoverEvent(exit!!, isExit = true)
+        }
+
+        // Leave outer Box
+        dispatchMouseEvent(ACTION_HOVER_EXIT, layoutCoordinates!!)
+
+        rule.runOnUiThread {
+            assertThat(anyOtherEvent).isFalse()
+        }
+        assertTrue(eventLatch.await(1, TimeUnit.SECONDS))
+    }
+
+    @Test
+    fun hoverEnterPressExitEnterExitRelease() {
+        var outerCoordinates: LayoutCoordinates? = null
+        var innerCoordinates: LayoutCoordinates? = null
+        val latch = CountDownLatch(1)
+        val eventLog = mutableListOf<PointerEvent>()
+        rule.runOnUiThread {
+            container.setContent {
+                Box(
+                    Modifier.fillMaxSize().onGloballyPositioned {
+                        outerCoordinates = it
+                        latch.countDown()
+                    }
+                ) {
+                    Box(
+                        Modifier.align(Alignment.Center).size(50.dp).pointerInput(Unit) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    val event = awaitPointerEvent()
+                                    event.changes[0].consumeAllChanges()
+                                    eventLog += event
+                                }
+                            }
+                        }.onGloballyPositioned { innerCoordinates = it }
+                    )
+                }
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        dispatchMouseEvent(ACTION_HOVER_ENTER, outerCoordinates!!)
+        dispatchMouseEvent(ACTION_HOVER_MOVE, innerCoordinates!!)
+        dispatchMouseEvent(ACTION_DOWN, innerCoordinates!!)
+        dispatchMouseEvent(ACTION_MOVE, outerCoordinates!!)
+        dispatchMouseEvent(ACTION_MOVE, innerCoordinates!!)
+        dispatchMouseEvent(ACTION_MOVE, outerCoordinates!!)
+        dispatchMouseEvent(ACTION_UP, outerCoordinates!!)
+        rule.runOnUiThread {
+            assertThat(eventLog).hasSize(6)
+            assertThat(eventLog[0].type).isEqualTo(PointerEventType.Enter)
+            assertThat(eventLog[1].type).isEqualTo(PointerEventType.Press)
+            assertThat(eventLog[2].type).isEqualTo(PointerEventType.Exit)
+            assertThat(eventLog[3].type).isEqualTo(PointerEventType.Enter)
+            assertThat(eventLog[4].type).isEqualTo(PointerEventType.Exit)
+            assertThat(eventLog[5].type).isEqualTo(PointerEventType.Release)
+        }
+    }
+
+    @Test
+    fun hoverPressEnterRelease() {
+        var outerCoordinates: LayoutCoordinates? = null
+        var innerCoordinates: LayoutCoordinates? = null
+        val latch = CountDownLatch(1)
+        val eventLog = mutableListOf<PointerEvent>()
+        rule.runOnUiThread {
+            container.setContent {
+                Box(
+                    Modifier.fillMaxSize().onGloballyPositioned {
+                        outerCoordinates = it
+                        latch.countDown()
+                    }
+                ) {
+                    Box(
+                        Modifier.align(Alignment.Center).size(50.dp).pointerInput(Unit) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    val event = awaitPointerEvent()
+                                    event.changes[0].consumeAllChanges()
+                                    eventLog += event
+                                }
+                            }
+                        }.onGloballyPositioned { innerCoordinates = it }
+                    )
+                }
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        dispatchMouseEvent(ACTION_HOVER_ENTER, outerCoordinates!!)
+        dispatchMouseEvent(ACTION_HOVER_EXIT, outerCoordinates!!)
+        dispatchMouseEvent(ACTION_DOWN, outerCoordinates!!)
+        dispatchMouseEvent(ACTION_MOVE, innerCoordinates!!)
+        dispatchMouseEvent(ACTION_UP, innerCoordinates!!)
+        dispatchMouseEvent(ACTION_HOVER_ENTER, innerCoordinates!!)
+        rule.runOnUiThread {
+            assertThat(eventLog).hasSize(1)
+            assertThat(eventLog[0].type).isEqualTo(PointerEventType.Enter)
+        }
+    }
+
+    @Test
+    fun pressInsideExitWindow() {
+        var innerCoordinates: LayoutCoordinates? = null
+        val latch = CountDownLatch(1)
+        val eventLog = mutableListOf<PointerEvent>()
+        rule.runOnUiThread {
+            container.setContent {
+                Box(Modifier.fillMaxSize()) {
+                    Box(
+                        Modifier
+                            .align(Alignment.BottomCenter)
+                            .size(50.dp)
+                            .graphicsLayer { translationY = 25.dp.toPx() }
+                            .pointerInput(Unit) {
+                                awaitPointerEventScope {
+                                    while (true) {
+                                        val event = awaitPointerEvent()
+                                        event.changes[0].consumeAllChanges()
+                                        eventLog += event
+                                    }
+                                }
+                            }.onGloballyPositioned {
+                                innerCoordinates = it
+                                latch.countDown()
+                            }
+                    )
+                }
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        val coords = innerCoordinates!!
+        dispatchMouseEvent(ACTION_HOVER_ENTER, coords)
+        dispatchMouseEvent(ACTION_DOWN, coords)
+        dispatchMouseEvent(ACTION_MOVE, coords, Offset(0f, coords.size.height / 2f - 1f))
+        dispatchMouseEvent(ACTION_MOVE, coords, Offset(0f, coords.size.height - 1f))
+        dispatchMouseEvent(ACTION_UP, coords, Offset(0f, coords.size.height - 1f))
+        rule.runOnUiThread {
+            assertThat(eventLog).hasSize(5)
+            assertThat(eventLog[0].type).isEqualTo(PointerEventType.Enter)
+            assertThat(eventLog[1].type).isEqualTo(PointerEventType.Press)
+            assertThat(eventLog[2].type).isEqualTo(PointerEventType.Move)
+            assertThat(eventLog[3].type).isEqualTo(PointerEventType.Exit)
+            assertThat(eventLog[4].type).isEqualTo(PointerEventType.Release)
+        }
+    }
+
+    @Test
+    fun pressInsideClippedContent() {
+        var innerCoordinates: LayoutCoordinates? = null
+        val latch = CountDownLatch(1)
+        val eventLog = mutableListOf<PointerEvent>()
+        rule.runOnUiThread {
+            container.setContent {
+                Box(Modifier.fillMaxSize()) {
+                    Box(Modifier.align(Alignment.TopCenter).requiredSize(50.dp).clipToBounds()) {
+                        Box(
+                            Modifier
+                                .requiredSize(50.dp)
+                                .graphicsLayer { translationY = 25.dp.toPx() }
+                                .pointerInput(Unit) {
+                                    awaitPointerEventScope {
+                                        while (true) {
+                                            val event = awaitPointerEvent()
+                                            event.changes[0].consumeAllChanges()
+                                            eventLog += event
+                                        }
+                                    }
+                                }.onGloballyPositioned {
+                                    innerCoordinates = it
+                                    latch.countDown()
+                                }
+                        )
+                    }
+                }
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        val coords = innerCoordinates!!
+        dispatchMouseEvent(ACTION_HOVER_ENTER, coords)
+        dispatchMouseEvent(ACTION_DOWN, coords)
+        dispatchMouseEvent(ACTION_MOVE, coords, Offset(0f, coords.size.height - 1f))
+        dispatchMouseEvent(ACTION_UP, coords, Offset(0f, coords.size.height - 1f))
+        dispatchMouseEvent(ACTION_HOVER_ENTER, coords, Offset(0f, coords.size.height - 1f))
+        rule.runOnUiThread {
+            assertThat(eventLog).hasSize(5)
+            assertThat(eventLog[0].type).isEqualTo(PointerEventType.Enter)
+            assertThat(eventLog[1].type).isEqualTo(PointerEventType.Press)
+            assertThat(eventLog[2].type).isEqualTo(PointerEventType.Move)
+            assertThat(eventLog[3].type).isEqualTo(PointerEventType.Release)
+            assertThat(eventLog[4].type).isEqualTo(PointerEventType.Exit)
         }
     }
 
@@ -756,22 +1153,31 @@ private fun MotionEvent(
     actionIndex: Int,
     pointerProperties: Array<MotionEvent.PointerProperties>,
     pointerCoords: Array<MotionEvent.PointerCoords>
-) = MotionEvent.obtain(
-    0,
-    eventTime.toLong(),
-    action + (actionIndex shl MotionEvent.ACTION_POINTER_INDEX_SHIFT),
-    numPointers,
-    pointerProperties,
-    pointerCoords,
-    0,
-    0,
-    0f,
-    0f,
-    0,
-    0,
-    0,
-    0
-)
+): MotionEvent {
+    val buttonState = if (pointerProperties[0].toolType == MotionEvent.TOOL_TYPE_MOUSE &&
+        (action == ACTION_DOWN || action == ACTION_MOVE)
+    ) {
+        MotionEvent.BUTTON_PRIMARY
+    } else {
+        0
+    }
+    return MotionEvent.obtain(
+        0,
+        eventTime.toLong(),
+        action + (actionIndex shl ACTION_POINTER_INDEX_SHIFT),
+        numPointers,
+        pointerProperties,
+        pointerCoords,
+        0,
+        buttonState,
+        0f,
+        0f,
+        0,
+        0,
+        0,
+        0
+    )
+}
 
 internal fun findRootView(view: View): View {
     val parent = view.parent

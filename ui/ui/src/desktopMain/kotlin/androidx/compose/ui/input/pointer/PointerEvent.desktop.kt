@@ -53,6 +53,8 @@ actual data class PointerEvent internal constructor(
      */
     actual constructor(changes: List<PointerInputChange>) : this(changes, mouseEvent = null)
 
+    actual var type: PointerEventType = calculatePointerEventType()
+
     private fun createPointerKeyboardModifiers(modifiersEx: Int): PointerKeyboardModifiers {
         val toolkit = Toolkit.getDefaultToolkit()
         val capsLockBits = toolkit.getMaskForLockingKeyState(KeyEvent.VK_CAPS_LOCK, CapsLockMask)
@@ -62,6 +64,19 @@ actual data class PointerEvent internal constructor(
 
         val packed = (modifiersEx and ClearMask) or capsLockBits or numLockBits or scrollLockBits
         return PointerKeyboardModifiers(packed)
+    }
+
+    private fun calculatePointerEventType(): PointerEventType {
+        val event = mouseEvent ?: return PointerEventType.Unknown
+        return when (event.getID()) {
+            MouseEvent.MOUSE_PRESSED -> PointerEventType.Press
+            MouseEvent.MOUSE_RELEASED -> PointerEventType.Release
+            MouseEvent.MOUSE_MOVED,
+            MouseEvent.MOUSE_DRAGGED -> PointerEventType.Move
+            MouseEvent.MOUSE_ENTERED -> PointerEventType.Enter
+            MouseEvent.MOUSE_EXITED -> PointerEventType.Exit
+            else -> PointerEventType.Unknown
+        }
     }
 }
 

@@ -1493,9 +1493,6 @@ package androidx.compose.ui.input.pointer {
     property public final boolean positionChange;
   }
 
-  public final class MotionEventAdapter_androidKt {
-  }
-
   public final inline class PointerButtons {
     ctor public PointerButtons();
   }
@@ -1507,9 +1504,11 @@ package androidx.compose.ui.input.pointer {
     method public int getButtons();
     method public java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> getChanges();
     method public int getKeyboardModifiers();
+    method public int getType();
     property public final int buttons;
     property public final java.util.List<androidx.compose.ui.input.pointer.PointerInputChange> changes;
     property public final int keyboardModifiers;
+    property public final int type;
   }
 
   public final class PointerEventKt {
@@ -1538,6 +1537,25 @@ package androidx.compose.ui.input.pointer {
 
   public final class PointerEventTimeoutCancellationException extends java.util.concurrent.CancellationException {
     ctor public PointerEventTimeoutCancellationException(long time);
+  }
+
+  public final inline class PointerEventType {
+    ctor public PointerEventType();
+  }
+
+  public static final class PointerEventType.Companion {
+    method public int getEnter();
+    method public int getExit();
+    method public int getMove();
+    method public int getPress();
+    method public int getRelease();
+    method public int getUnknown();
+    property public final int Enter;
+    property public final int Exit;
+    property public final int Move;
+    property public final int Press;
+    property public final int Release;
+    property public final int Unknown;
   }
 
   public final class PointerEvent_androidKt {

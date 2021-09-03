@@ -3161,7 +3161,7 @@ class PointerInputEventProcessorTest {
 private class PointerInputModifierImpl2(override val pointerInputFilter: PointerInputFilter) :
     PointerInputModifier
 
-private fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Modifier) =
+internal fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Modifier) =
     LayoutNode().apply {
         this.modifier = Modifier.layout { measurable, constraints ->
             val placeable = measurable.measure(constraints)
