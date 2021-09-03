@@ -50,7 +50,7 @@ internal fun LazyList(
     modifier: Modifier,
     /** State controlling the scroll position */
     state: LazyListState,
-    /** The inner padding to be added for the whole content(nor for each individual item) */
+    /** The inner padding to be added for the whole content(not for each individual item) */
     contentPadding: PaddingValues,
     /** reverse the direction of scrolling and layout */
     reverseLayout: Boolean,
