@@ -1614,9 +1614,11 @@ package androidx.compose.ui.input.pointer {
 
   public abstract class PointerInputFilter {
     ctor public PointerInputFilter();
+    method public boolean getInterceptOutOfBoundsChildEvents();
     method public final long getSize();
     method public abstract void onCancel();
     method public abstract void onPointerEvent(androidx.compose.ui.input.pointer.PointerEvent pointerEvent, androidx.compose.ui.input.pointer.PointerEventPass pass, long bounds);
+    property public boolean interceptOutOfBoundsChildEvents;
     property public final long size;
   }
 
@@ -1628,9 +1630,12 @@ package androidx.compose.ui.input.pointer {
   public interface PointerInputScope extends androidx.compose.ui.unit.Density {
     method public suspend <R> Object? awaitPointerEventScope(kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.AwaitPointerEventScope,? super kotlin.coroutines.Continuation<? super R>,?> block, kotlin.coroutines.Continuation<? super R> p);
     method public default long getExtendedTouchPadding();
+    method public default boolean getInterceptOutOfBoundsChildEvents();
     method public long getSize();
     method public androidx.compose.ui.platform.ViewConfiguration getViewConfiguration();
+    method public default void setInterceptOutOfBoundsChildEvents(boolean _);
     property public default long extendedTouchPadding;
+    property public default boolean interceptOutOfBoundsChildEvents;
     property public abstract long size;
     property public abstract androidx.compose.ui.platform.ViewConfiguration viewConfiguration;
   }

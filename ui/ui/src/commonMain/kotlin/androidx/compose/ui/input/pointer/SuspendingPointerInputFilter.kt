@@ -147,6 +147,19 @@ interface PointerInputScope : Density {
     val viewConfiguration: ViewConfiguration
 
     /**
+     * Intercept pointer input that children receive even if the pointer is out of bounds.
+     *
+     * If `true`, and a child has been moved out of this layout and receives an event, this
+     * will receive that event. If `false`, a child receiving pointer input outside of the
+     * bounds of this layout will not trigger any events in this.
+     */
+    @Suppress("GetterSetterNames")
+    @get:Suppress("GetterSetterNames")
+    var interceptOutOfBoundsChildEvents: Boolean
+        get() = false
+        set(_) {}
+
+    /**
      * Suspend and install a pointer input [block] that can await input events and respond to
      * them immediately. A call to [awaitPointerEventScope] will resume with [block]'s result after
      * it completes.
@@ -350,6 +363,8 @@ internal class SuspendingPointerInputFilter(
             val vertical = max(0f, minimumTouchTargetSize.height - size.height) / 2f
             return Size(horizontal, vertical)
         }
+
+    override var interceptOutOfBoundsChildEvents: Boolean = false
 
     /**
      * Snapshot the current [pointerHandlers] and run [block] on each one.

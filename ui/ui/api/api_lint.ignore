@@ -1,9 +1,0 @@
-// Baseline format: 1.0
-GetterSetterNames: androidx.compose.ui.graphics.GraphicsLayerScope#getClip():
-    Symmetric method for `setClip` must be named `isClip`; was `getClip`
-GetterSetterNames: androidx.compose.ui.input.pointer.ConsumedData#getDownChange():
-    Symmetric method for `setDownChange` must be named `isDownChange`; was `getDownChange`
-GetterSetterNames: androidx.compose.ui.input.pointer.ConsumedData#getPositionChange():
-    Symmetric method for `setPositionChange` must be named `isPositionChange`; was `getPositionChange`
-GetterSetterNames: androidx.compose.ui.platform.AbstractComposeView#getShowLayoutBounds():
-    Symmetric method for `setShowLayoutBounds` must be named `isShowLayoutBounds`; was `getShowLayoutBounds`

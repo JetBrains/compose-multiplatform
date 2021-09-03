@@ -153,6 +153,8 @@ abstract class AbstractComposeView @JvmOverloads constructor(
      */
     @OptIn(InternalCoreApi::class)
     @InternalComposeUiApi
+    @Suppress("GetterSetterNames")
+    @get:Suppress("GetterSetterNames")
     var showLayoutBounds: Boolean = false
         set(value) {
             field = value

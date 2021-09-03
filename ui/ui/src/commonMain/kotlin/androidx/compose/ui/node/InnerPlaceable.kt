@@ -165,7 +165,7 @@ internal class InnerPlaceable(
             layoutNode.zSortedChildren.reversedAny { child ->
                 if (child.isPlaced) {
                     child.nodeHitTest(pointerPosition, hitTestResult, isTouchEvent)
-                    hitTestResult.isHit
+                    hitTestResult.hasHit()
                 } else {
                     false
                 }
