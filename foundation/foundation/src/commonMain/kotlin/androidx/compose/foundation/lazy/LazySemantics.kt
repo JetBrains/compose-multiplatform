@@ -18,7 +18,6 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.animateScrollBy
-import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.CollectionInfo
@@ -76,9 +75,9 @@ internal fun Modifier.lazyListSemantics(
         }
 
         scrollToIndex { index ->
-            require(index >= 0 && index < stateOfItemsProvider.value.itemsCount) {
-                "Can't scroll to index $index, it is out of bounds [0, ${stateOfItemsProvider
-                    .value.itemsCount})"
+            require(index >= 0 && index < state.layoutInfo.totalItemsCount) {
+                "Can't scroll to index $index, it is out of " +
+                    "bounds [0, ${state.layoutInfo.totalItemsCount})"
             }
             coroutineScope.launch {
                 state.scrollToItem(index)

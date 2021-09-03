@@ -22,10 +22,6 @@ import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -164,73 +160,6 @@ inline fun <T> LazyListScope.itemsIndexed(
     itemContent(it, items[it])
 }
 
-private class IntervalContent(
-    val key: ((index: Int) -> Any)?,
-    val content: LazyItemScope.(index: Int) -> @Composable() () -> Unit
-)
-
-private class LazyListScopeImpl : LazyListScope, LazyListItemsProvider {
-    private val intervals = IntervalList<IntervalContent>()
-    override val itemsCount get() = intervals.totalSize
-    private var _headerIndexes: MutableList<Int>? = null
-    override val headerIndexes: List<Int> get() = _headerIndexes ?: emptyList()
-
-    override fun getKey(index: Int): Any {
-        val interval = intervals.intervalForIndex(index)
-        val localIntervalIndex = index - interval.startIndex
-        val key = interval.content.key?.invoke(localIntervalIndex)
-        return key ?: getDefaultLazyKeyFor(index)
-    }
-
-    override fun getContent(index: Int, scope: LazyItemScope): @Composable () -> Unit {
-        val interval = intervals.intervalForIndex(index)
-        val localIntervalIndex = index - interval.startIndex
-        return interval.content.content.invoke(scope, localIntervalIndex)
-    }
-
-    override fun items(
-        count: Int,
-        key: ((index: Int) -> Any)?,
-        itemContent: @Composable LazyItemScope.(index: Int) -> Unit
-    ) {
-        intervals.add(
-            count,
-            IntervalContent(
-                key = key,
-                content = { index -> @Composable { itemContent(index) } }
-            )
-        )
-    }
-
-    override fun item(key: Any?, content: @Composable LazyItemScope.() -> Unit) {
-        intervals.add(
-            1,
-            IntervalContent(
-                key = if (key != null) { _: Int -> key } else null,
-                content = { @Composable { content() } }
-            )
-        )
-    }
-
-    @ExperimentalFoundationApi
-    override fun stickyHeader(key: Any?, content: @Composable LazyItemScope.() -> Unit) {
-        val headersIndexes = _headerIndexes ?: mutableListOf<Int>().also {
-            _headerIndexes = it
-        }
-        headersIndexes.add(itemsCount)
-
-        item(key, content)
-    }
-}
-
-/**
- * This should create an object meeting following requirements:
- * 1) objects created for the same index are equals and never equals for different indexes
- * 2) this class is saveable via a default SaveableStateRegistry on the platform
- * 3) this objects can't be equals to any object which could be provided by a user as a custom key
- */
-internal expect fun getDefaultLazyKeyFor(index: Int): Any
-
 /**
  * The horizontally scrolling list that only composes and lays out the currently visible items.
  * The [content] block defines a DSL which allows you to emit items of different types. For
@@ -269,7 +198,6 @@ fun LazyRow(
     content: LazyListScope.() -> Unit
 ) {
     LazyList(
-        stateOfItemsProvider = rememberStateOfItemsProvider(content),
         modifier = modifier,
         state = state,
         contentPadding = contentPadding,
@@ -277,7 +205,8 @@ fun LazyRow(
         horizontalArrangement = horizontalArrangement,
         isVertical = false,
         flingBehavior = flingBehavior,
-        reverseLayout = reverseLayout
+        reverseLayout = reverseLayout,
+        content = content
     )
 }
 
@@ -319,7 +248,6 @@ fun LazyColumn(
     content: LazyListScope.() -> Unit
 ) {
     LazyList(
-        stateOfItemsProvider = rememberStateOfItemsProvider(content),
         modifier = modifier,
         state = state,
         contentPadding = contentPadding,
@@ -327,16 +255,15 @@ fun LazyColumn(
         horizontalAlignment = horizontalAlignment,
         verticalArrangement = verticalArrangement,
         isVertical = true,
-        reverseLayout = reverseLayout
+        reverseLayout = reverseLayout,
+        content = content
     )
 }
 
-@Composable
-private fun rememberStateOfItemsProvider(
-    content: LazyListScope.() -> Unit
-): State<LazyListItemsProvider> {
-    val latestContent = rememberUpdatedState(content)
-    return remember {
-        derivedStateOf { LazyListScopeImpl().apply(latestContent.value) }
-    }
-}
+/**
+ * This should create an object meeting following requirements:
+ * 1) objects created for the same index are equals and never equals for different indexes
+ * 2) this class is saveable via a default SaveableStateRegistry on the platform
+ * 3) this objects can't be equals to any object which could be provided by a user as a custom key
+ */
+internal expect fun getDefaultLazyKeyFor(index: Int): Any

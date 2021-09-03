@@ -412,9 +412,6 @@ package androidx.compose.foundation.lazy {
   public final class LazyListHeadersKt {
   }
 
-  public final class LazyListItemContentFactoryKt {
-  }
-
   public interface LazyListItemInfo {
     method public int getIndex();
     method public Object getKey();
@@ -441,9 +438,6 @@ package androidx.compose.foundation.lazy {
   }
 
   public final class LazyListMeasureKt {
-  }
-
-  public final class LazyListPrefetcher_androidKt {
   }
 
   @androidx.compose.foundation.lazy.LazyScopeMarker public interface LazyListScope {
@@ -490,6 +484,25 @@ package androidx.compose.foundation.lazy {
   }
 
   public final class Lazy_androidKt {
+  }
+
+}
+
+package androidx.compose.foundation.lazy.layout {
+
+  public final class LazyLayoutItemContentFactoryKt {
+  }
+
+  public final class LazyLayoutKt {
+  }
+
+  public final class LazyLayoutPrefetchPolicyKt {
+  }
+
+  public final class LazyLayoutPrefetcher_androidKt {
+  }
+
+  public final class LazyLayoutStateKt {
   }
 
 }

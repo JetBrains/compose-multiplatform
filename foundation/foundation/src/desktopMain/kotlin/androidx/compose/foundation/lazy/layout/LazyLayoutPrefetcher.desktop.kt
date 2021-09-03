@@ -14,8 +14,17 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.lazy
+package androidx.compose.foundation.lazy.layout
 
-internal actual fun getDefaultLazyKeyFor(index: Int): Any = DefaultLazyKey(index)
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.layout.SubcomposeLayoutState
 
-private data class DefaultLazyKey(private val index: Int)
+@Composable
+internal actual fun LazyLayoutPrefetcher(
+    prefetchPolicy: LazyLayoutPrefetchPolicy,
+    state: LazyLayoutState,
+    itemContentFactory: LazyLayoutItemContentFactory,
+    subcomposeLayoutState: SubcomposeLayoutState
+) {
+    // there is no prefetch implementation on desktop yet
+}
