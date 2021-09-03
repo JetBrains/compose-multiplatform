@@ -618,3 +618,8 @@ internal fun ColorScheme.fromToken(value: ColorSchemeKey): Color {
  * [MaterialTheme.colorScheme].
  */
 internal val LocalColorScheme = staticCompositionLocalOf { lightColorScheme() }
+
+/**
+ * A low level of alpha used to represent disabled components, such as text in a disabled Button.
+ */
+internal const val DisabledAlpha = 0.38f
