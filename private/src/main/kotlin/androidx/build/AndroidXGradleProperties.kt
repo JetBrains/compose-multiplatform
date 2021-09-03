@@ -49,6 +49,11 @@ const val ALTERNATIVE_PROJECT_URL = "androidx.alternativeProjectUrl"
 const val VERSION_EXTRA_CHECK_ENABLED = "androidx.versionExtraCheckEnabled"
 
 /**
+ * Validate the project structure against Jetpack guidelines
+ */
+const val VALIDATE_PROJECT_STRUCTURE = "androidx.validateProjectStructure"
+
+/**
  * Setting this property enables multiplatform builds of Compose
  */
 const val ENABLE_COMPOSE_COMPILER_METRICS = "androidx.enableComposeCompilerMetrics"
@@ -122,6 +127,7 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     ALL_WARNINGS_AS_ERRORS,
     ALTERNATIVE_PROJECT_URL,
     VERSION_EXTRA_CHECK_ENABLED,
+    VALIDATE_PROJECT_STRUCTURE,
     COMPOSE_MPP_ENABLED,
     ENABLE_COMPOSE_COMPILER_METRICS,
     DISPLAY_TEST_OUTPUT,
@@ -157,6 +163,12 @@ fun Project.getAlternativeProjectUrl(): String? =
  */
 fun Project.isVersionExtraCheckEnabled(): Boolean =
     (project.findProperty(VERSION_EXTRA_CHECK_ENABLED) as? String)?.toBoolean() ?: true
+
+/**
+ * Validate the project structure against Jetpack guidelines
+ */
+fun Project.isValidateProjectStructureEnabled(): Boolean =
+    (project.findProperty(VALIDATE_PROJECT_STRUCTURE) as? String)?.toBoolean() ?: true
 
 /**
  * Validates that all properties passed by the user of the form "-Pandroidx.*" are not misspelled

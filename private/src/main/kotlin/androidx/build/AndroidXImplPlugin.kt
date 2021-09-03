@@ -894,7 +894,7 @@ fun Project.validateProjectStructure(groupId: String) {
     // TODO(b/197253160): Re-enable this check for playground. For unknown reasons in playground
     //  builds, automatically generated parent projects such as :activity are incorrectly
     //  inheriting their children's build file which causes the AndroidXPlugin to get applied.
-    if (studioType() == StudioType.PLAYGROUND) {
+    if (studioType() == StudioType.PLAYGROUND || !project.isValidateProjectStructureEnabled()) {
         return
     }
 
