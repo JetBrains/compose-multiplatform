@@ -354,7 +354,7 @@ internal abstract class LayoutNodeWrapper(
     override val isValid: Boolean
         get() = layer != null
 
-    protected val minimumTouchTargetSize: Size
+    val minimumTouchTargetSize: Size
         get() = with(layerDensity) { layoutNode.viewConfiguration.minimumTouchTargetSize.toSize() }
 
     /**

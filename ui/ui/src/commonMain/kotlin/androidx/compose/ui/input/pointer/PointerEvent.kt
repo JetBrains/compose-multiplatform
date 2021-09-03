@@ -107,6 +107,12 @@ expect class PointerEvent @OptIn(InternalCoreApi::class) internal constructor(
      * The state of modifier keys during this event.
      */
     val keyboardModifiers: PointerKeyboardModifiers
+
+    /**
+     * The primary reason the [PointerEvent] was sent.
+     */
+    var type: PointerEventType
+        internal set
 }
 
 // TODO mark internal once https://youtrack.jetbrains.com/issue/KT-36695 is fixed
@@ -268,6 +274,61 @@ inline class PointerType internal constructor(private val value: Int) {
          * An eraser or an inverted stylus.
          */
         val Eraser = PointerType(4)
+    }
+}
+
+/**
+ * Indicates the primary reason that the [PointerEvent] was sent.
+ */
+inline class PointerEventType(internal val value: Int) {
+    companion object {
+        /**
+         * An unknown reason for the event.
+         */
+        val Unknown = PointerEventType(0)
+
+        /**
+         * A button on the device was pressed or a new pointer was detected.
+         */
+        val Press = PointerEventType(1)
+
+        /**
+         * A button on the device was released or a pointer was raised.
+         */
+        val Release = PointerEventType(2)
+
+        /**
+         * The cursor or one or more touch pointers was moved.
+         */
+        val Move = PointerEventType(3)
+
+        /**
+         * The cursor has entered the input region. This will only be sent after the cursor is
+         * hovering when in the input region.
+         *
+         * For example, the user's cursor is outside the input region and presses the button
+         * prior to entering the input region. The [Enter] event will be sent when the button
+         * is released inside the input region.
+         */
+        val Enter = PointerEventType(4)
+
+        /**
+         * A cursor device or elevated stylus exited the input region. This will only follow
+         * an [Enter] event, so if a cursor with the button pressed enters and exits region,
+         * neither [Enter] nor [Exit] will be sent for the input region. However, if a cursor
+         * enters the input region, then a button is pressed, then the cursor exits and reenters,
+         * [Enter], [Exit], and [Enter] will be received.
+         */
+        val Exit = PointerEventType(5)
+    }
+
+    override fun toString(): String = when (this) {
+        Press -> "Press"
+        Release -> "Release"
+        Move -> "Move"
+        Enter -> "Enter"
+        Exit -> "Exit"
+        else -> "Unknown"
     }
 }
 
