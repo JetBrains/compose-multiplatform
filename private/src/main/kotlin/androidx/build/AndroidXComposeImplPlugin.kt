@@ -309,6 +309,10 @@ fun Project.configureComposeImplPluginForAndroidx() {
         }
     }.files
 
+    val isTipOfTreeComposeCompilerProvider = project.provider({
+        conf.dependencies.first() !is ExternalModuleDependency
+    })
+
     project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
         // TODO(b/157230235): remove when this is enabled by default
         compile.kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
@@ -327,10 +331,7 @@ fun Project.configureComposeImplPluginForAndroidx() {
                 // pass in this parameter for modules that are using the tip of tree compose
                 // compiler, or else we will run into an exception since the parameter will not
                 // be recognized.
-                val isTipOfTreeComposeCompiler = conf
-                    .dependencies.first() !is ExternalModuleDependency
-
-                if (isTipOfTreeComposeCompiler && enableMetrics) {
+                if (isTipOfTreeComposeCompilerProvider.get() && enableMetrics) {
                     val libMetrics = project
                         .rootProject
                         .getLibraryMetricsDirectory()
