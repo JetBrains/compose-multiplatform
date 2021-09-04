@@ -1,13 +1,11 @@
 package org.jetbrains.compose.common.foundation.layout
 
-import org.jetbrains.compose.common.ui.Modifier
 import androidx.compose.runtime.Composable
+import org.jetbrains.compose.common.ui.*
 import androidx.compose.foundation.layout.Row as JRow
-import org.jetbrains.compose.common.ui.implementation
-import org.jetbrains.compose.common.ui.implementation
-import org.jetbrains.compose.common.ui.Alignment
 
 @Composable
+@ExperimentalComposeWebWidgetsApi
 internal actual fun RowActual(
     modifier: Modifier,
     horizontalArrangement: Arrangement.Horizontal,

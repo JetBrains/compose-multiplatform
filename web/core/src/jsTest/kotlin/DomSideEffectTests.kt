@@ -5,18 +5,15 @@ import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.renderComposable
 import kotlinx.browser.document
 import kotlinx.dom.clear
+import org.jetbrains.compose.web.testutils.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class DomSideEffectTests {
 
     @Test
-    fun canCreateElementsInDomSideEffect() {
-        val root = "div".asHtmlElement()
-
-        renderComposable(
-            root = root
-        ) {
+    fun canCreateElementsInDomSideEffect() = runTest {
+        composition {
             Div {
                 DomSideEffect {
                     it.appendChild(
@@ -27,6 +24,7 @@ class DomSideEffectTests {
                 }
             }
         }
+
         assertEquals(
             expected = "<div><div><p>Hello World!</p></div></div>",
             actual = root.outerHTML
@@ -62,7 +60,7 @@ class DomSideEffectTests {
 
         i = 1
 
-        waitChanges()
+        waitForChanges()
         assertEquals(
             expected = 1,
             actual = disposeCalls.size,
@@ -102,7 +100,7 @@ class DomSideEffectTests {
 
         showDiv = false
 
-        waitChanges()
+        waitForChanges()
         assertEquals(1, onDisposeCalledTimes)
         assertEquals(expected = "<div></div>", actual = root.outerHTML)
     }
@@ -123,7 +121,7 @@ class DomSideEffectTests {
                 }
                 DisposableRefEffect(key) {
                     effectsList.add("DisposableRefEffect")
-                    onDispose {  }
+                    onDispose { }
                 }
             }
         }
@@ -135,7 +133,7 @@ class DomSideEffectTests {
         key = 2
         recomposeScope?.invalidate()
 
-        waitForAnimationFrame()
+        waitForRecompositionComplete()
 
         assertEquals(4, effectsList.size)
         assertEquals("DisposableRefEffect", effectsList[0])

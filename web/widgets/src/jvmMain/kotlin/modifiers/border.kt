@@ -7,7 +7,9 @@ import org.jetbrains.compose.common.internal.castOrCreate
 import org.jetbrains.compose.common.core.graphics.implementation
 import org.jetbrains.compose.common.ui.unit.implementation
 import androidx.compose.foundation.border
+import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 
+@ExperimentalComposeWebWidgetsApi
 actual fun Modifier.border(size: Dp, color: Color): Modifier = castOrCreate().apply {
     modifier = modifier.border(size.implementation, color.implementation)
 }

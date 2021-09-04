@@ -27,10 +27,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.window.Notification
 import androidx.compose.ui.window.Tray
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberNotification
 import androidx.compose.ui.window.rememberTrayState
 
 fun main() = application {
@@ -38,37 +38,40 @@ fun main() = application {
     var isOpen by remember { mutableStateOf(true) }
 
     if (isOpen) {
+        val trayState = rememberTrayState()
+        val notification = rememberNotification("Notification", "Message from MyApp!")
+
+        Tray(
+            state = trayState,
+            icon = TrayIcon,
+            menu = {
+                Item(
+                    "Increment value",
+                    onClick = {
+                        count++
+                    }
+                )
+                Item(
+                    "Send notification",
+                    onClick = {
+                        trayState.sendNotification(notification)
+                    }
+                )
+                Item(
+                    "Exit",
+                    onClick = {
+                        isOpen = false
+                    }
+                )
+            }
+        )
+
         Window(
-            onCloseRequest = ::exitApplication,
+            onCloseRequest = {
+                isOpen = false
+            },
             icon = MyAppIcon
         ) {
-            val trayState = rememberTrayState()
-            val notification = Notification("Notification", "Message from MyApp!")
-            Tray(
-                state = trayState,
-                icon = TrayIcon,
-                menu = {
-                    Item(
-                        "Increment value",
-                        onClick = {
-                            count++
-                        }
-                    )
-                    Item(
-                        "Send notification",
-                        onClick = {
-                            trayState.sendNotification(notification)
-                        }
-                    )
-                    Item(
-                        "Exit",
-                        onClick = {
-                            isOpen = false
-                        }
-                    )
-                }
-            )
-
             // content
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -100,6 +103,39 @@ object TrayIcon : Painter() {
 ```
 
 <img alt="Tray" src="tray.gif" height="266" />
+
+Please note, that it is possible to create a Tray application without Window: 
+
+```kotlin
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.window.Tray
+import androidx.compose.ui.window.application
+
+@OptIn(ExperimentalComposeUiApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
+fun main() = application {
+    Tray(
+        icon = TrayIcon,
+        menu = {
+            Item(
+                "Exit",
+                onClick = ::exitApplication
+            )
+        }
+    )
+}
+
+object TrayIcon : Painter() {
+    override val intrinsicSize = Size(256f, 256f)
+
+    override fun DrawScope.onDraw() {
+        drawOval(Color(0xFFFFA500))
+    }
+}
+```
 
 ## MenuBar
 

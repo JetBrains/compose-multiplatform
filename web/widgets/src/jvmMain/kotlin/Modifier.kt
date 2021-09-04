@@ -9,9 +9,11 @@ import org.jetbrains.compose.common.internal.castOrCreate
 import androidx.compose.foundation.layout.padding
 
 
+@ExperimentalComposeWebWidgetsApi
 actual fun Modifier.padding(all: Dp): Modifier = castOrCreate().apply {
     modifier = modifier.padding(all.implementation)
 }
 
+@ExperimentalComposeWebWidgetsApi
 val Modifier.implementation
     get() = castOrCreate().modifier

@@ -4,13 +4,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import org.jetbrains.compose.web.attributes.*
-import org.jetbrains.compose.web.core.tests.runTest
-import org.jetbrains.compose.web.core.tests.waitForAnimationFrame
 import org.jetbrains.compose.web.dom.*
+import org.jetbrains.compose.web.renderComposable
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLTextAreaElement
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import org.jetbrains.compose.web.testutils.*
 
 class InputsGenerateCorrectHtmlTests {
 
@@ -405,9 +405,9 @@ class InputsGenerateCorrectHtmlTests {
     @Test
     fun textAreaWithAutoComplete() = runTest {
         composition {
-            TextArea({
+            TextArea(attrs = {
                 autoComplete(AutoComplete.email)
-            }, value = "")
+            })
         }
         assertEquals("""<textarea autocomplete="email"></textarea>""", root.innerHTML)
     }
@@ -425,7 +425,7 @@ class InputsGenerateCorrectHtmlTests {
         assertEquals("""<form autocomplete="on"></form>""", root.innerHTML)
 
         autoCompleteEnabled = false
-        waitChanges()
+        waitForChanges()
 
         assertEquals("""<form autocomplete="off"></form>""", root.innerHTML)
     }
@@ -451,7 +451,7 @@ class InputsGenerateCorrectHtmlTests {
         assertEquals("text", (root.firstChild as HTMLInputElement).value)
 
         state = ""
-        waitForAnimationFrame()
+        waitForRecompositionComplete()
 
         assertEquals("", (root.firstChild as HTMLInputElement).value)
     }
@@ -467,7 +467,7 @@ class InputsGenerateCorrectHtmlTests {
         assertEquals("", (root.firstChild as HTMLInputElement).value)
 
         state = "text"
-        waitForAnimationFrame()
+        waitForRecompositionComplete()
 
         assertEquals("text", (root.firstChild as HTMLInputElement).value)
     }
@@ -483,7 +483,7 @@ class InputsGenerateCorrectHtmlTests {
         assertEquals("text", (root.firstChild as HTMLTextAreaElement).value)
 
         state = ""
-        waitForAnimationFrame()
+        waitForRecompositionComplete()
 
         assertEquals("", (root.firstChild as HTMLTextAreaElement).value)
     }
@@ -499,8 +499,20 @@ class InputsGenerateCorrectHtmlTests {
         assertEquals("", (root.firstChild as HTMLTextAreaElement).value)
 
         state = "text"
-        waitForAnimationFrame()
+        waitForRecompositionComplete()
 
         assertEquals("text", (root.firstChild as HTMLTextAreaElement).value)
+    }
+
+    @Test
+    fun textAreaWithDefaultValueAndWithoutIt() = runTest {
+        composition {
+            TextArea()
+            TextArea {
+                defaultValue("not-empty-default-value")
+            }
+        }
+
+        assertEquals("<textarea></textarea><textarea>not-empty-default-value</textarea>", root.innerHTML)
     }
 }

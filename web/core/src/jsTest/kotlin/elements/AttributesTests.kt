@@ -3,6 +3,8 @@ package org.jetbrains.compose.web.core.tests
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import kotlinx.browser.document
+import kotlinx.dom.clear
 import org.jetbrains.compose.web.attributes.AttrsBuilder
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.attributes.forId
@@ -17,6 +19,7 @@ import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import org.jetbrains.compose.web.testutils.*
 
 class AttributesTests {
 
@@ -170,7 +173,7 @@ class AttributesTests {
         assertEquals(null, btn.getAttribute("disabled"))
 
         disabled = true
-        waitChanges()
+        waitForChanges()
 
         assertEquals("", btn.getAttribute("disabled"))
     }
@@ -211,7 +214,7 @@ class AttributesTests {
         )
 
         addClassD.value = false
-        waitChanges()
+        waitForChanges()
 
         assertEquals(
             expected = "c a b",
@@ -239,7 +242,7 @@ class AttributesTests {
 
         flag = false
 
-        waitChanges()
+        waitForChanges()
         assertEquals("<div b=\"pp\" c=\"cc\"></div>", root.innerHTML)
     }
 
@@ -263,7 +266,7 @@ class AttributesTests {
         assertEquals("<div>Text set using ref {}</div>", root.innerHTML)
 
         flag = false
-        waitChanges()
+        waitForChanges()
 
         assertEquals("", root.innerHTML)
     }
@@ -290,7 +293,7 @@ class AttributesTests {
         assertEquals(false, disposed)
 
         flag = false
-        waitChanges()
+        waitForChanges()
 
         assertEquals("", root.innerHTML)
         assertEquals(true, disposed)
@@ -325,12 +328,48 @@ class AttributesTests {
         assertEquals(0, refDisposeCounter)
 
         counter++
-        waitChanges()
+        waitForChanges()
 
         assertEquals("2<div></div>", root.innerHTML)
         assertEquals(1, refInitCounter)
         assertEquals(2, attrsCallCounter)
         assertEquals(0, refDisposeCounter)
+    }
+
+    @Test
+    fun disposableRefEffectWithChangingKey() = runTest {
+        var key by mutableStateOf(0)
+
+        composition {
+            val readKey = key // read key here to recompose an entire scope
+            Div(
+                attrs = {
+                    id("id$readKey")
+                }
+            ) {
+                DisposableRefEffect(readKey) {
+                    val p = document.createElement("p").also { it.innerHTML = "Key=$readKey" }
+                    it.appendChild(p)
+
+                    onDispose {
+                        it.clear()
+                    }
+                }
+            }
+        }
+
+        assertEquals(
+            expected = "<div><div id=\"id0\"><p>Key=0</p></div></div>",
+            actual = root.outerHTML
+        )
+
+        key = 1
+        waitForRecompositionComplete()
+
+        assertEquals(
+            expected = "<div><div id=\"id1\"><p>Key=1</p></div></div>",
+            actual = root.outerHTML
+        )
     }
 
     @Test // issue: https://github.com/JetBrains/compose-jb/issues/981
@@ -339,20 +378,30 @@ class AttributesTests {
 
         composition {
             Button(attrs = {
+                classes("a")
                 style {
                     color(Color.red)
                 }
-                if (hasValue) value("buttonValue")
+                if (hasValue) {
+                    classes("b")
+                    value("buttonValue")
+                }
             }) {
                 Text("Button")
             }
         }
 
-        assertEquals("""<button style="color: red;">Button</button>""", root.innerHTML)
+        assertEquals(
+            expected = "<button class=\"a\" style=\"color: red;\">Button</button>",
+            actual = nextChild().outerHTML
+        )
 
         hasValue = true
-        waitForAnimationFrame()
+        waitForRecompositionComplete()
 
-        assertEquals("""<button style="color: red;" value="buttonValue">Button</button>""", root.innerHTML)
+        assertEquals(
+            expected = "<button style=\"color: red;\" value=\"buttonValue\" class=\"a b\">Button</button>",
+            actual = currentChild().outerHTML
+        )
     }
 }

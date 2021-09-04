@@ -1,5 +1,4 @@
 plugins {
-    //id("kotlin-multiplatform")
     kotlin("multiplatform")
     id("org.jetbrains.compose")
 }
@@ -13,7 +12,7 @@ kotlin {
                 testLogging.showStandardStreams = true
                 useKarma {
                     useChromeHeadless()
-                    useFirefox()
+                    //useFirefox()
                 }
             }
         }
@@ -30,12 +29,14 @@ kotlin {
 
         val jsMain by getting {
             dependencies {
+                implementation(project(":internal-web-core-runtime"))
                 implementation(kotlin("stdlib-js"))
             }
         }
 
         val jsTest by getting {
             dependencies {
+                implementation(project(":test-utils"))
                 implementation(kotlin("test-js"))
             }
         }
@@ -43,6 +44,12 @@ kotlin {
         val jvmMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
+            }
+        }
+
+        all {
+            languageSettings {
+                useExperimentalAnnotation("org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi")
             }
         }
     }

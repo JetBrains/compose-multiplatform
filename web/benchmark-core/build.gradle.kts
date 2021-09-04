@@ -35,15 +35,18 @@ kotlin {
 
         val jsTest by getting {
             dependencies {
+                implementation(project(":test-utils"))
                 implementation(kotlin("test-js"))
             }
         }
     }
 }
 
+val BENCHMARKS_PATH = "reports/tests/jsTest/classes/org.jetbrains.compose.web.tests.benchmarks.BenchmarkTests.html"
+
 val printBenchmarkResults by tasks.registering {
     doLast {
-        val report = buildDir.resolve("reports/tests/jsTest/classes/BenchmarkTests.html").readText()
+        val report = buildDir.resolve(BENCHMARKS_PATH).readText()
         val stdout = "#.*;".toRegex().findAll(report).map { it.value }.firstOrNull()
 
         val benchmarks = stdout?.split(";")?.mapNotNull {

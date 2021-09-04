@@ -1,11 +1,10 @@
-import kotlinx.browser.document
+import org.jetbrains.compose.web.renderComposable
 import org.jetbrains.compose.common.core.graphics.Color
-import org.jetbrains.compose.common.foundation.background
 import org.jetbrains.compose.common.foundation.layout.Box
 import org.jetbrains.compose.common.ui.Modifier
+import org.jetbrains.compose.common.ui.background
 import org.jetbrains.compose.common.ui.size
 import org.jetbrains.compose.common.ui.unit.dp
-import org.jetbrains.compose.web.renderComposable
 import org.w3c.dom.HTMLElement
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -13,38 +12,24 @@ import kotlin.test.assertTrue
 
 class ModifierTests {
     @Test
-    fun backgroundModifier() {
-        val root = "div".asHtmlElement()
-        renderComposable(
-            root = root
-        ) {
+    fun backgroundModifier() = runTest {
+        composition {
             Box(
                 Modifier.background(Color(0, 255, 0, 0.5f))
             ) { }
         }
 
-        val el = root.firstChild
-        assertTrue(el is HTMLElement, "element not found")
-
-        assertEquals("background-color: rgba(0, 255, 0, 0.5);", el.style.cssText)
+        assertEquals("background-color: rgba(0, 255, 0, 0.5);", nextChild().style.cssText)
     }
 
     @Test
-    fun size() {
-        val root = "div".asHtmlElement()
-        renderComposable(
-            root = root
-        ) {
+    fun size() = runTest {
+        composition {
             Box(
                 Modifier.size(40.dp)
             ) { }
         }
 
-        val el = root.firstChild
-        assertTrue(el is HTMLElement, "element not found")
-
-        assertEquals("width: 40px; height: 40px;", el.style.cssText)
+        assertEquals("width: 40px; height: 40px;", nextChild().style.cssText)
     }
 }
-
-internal fun String.asHtmlElement() = document.createElement(this) as HTMLElement

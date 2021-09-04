@@ -21,11 +21,11 @@ Preview functionality (check your application UI without building/running it) fo
        * [imageviewer](examples/imageviewer) - Image Viewer application for Android and Desktop
        * [issues](examples/issues) - GitHub issue tracker with an adaptive UI and ktor-client
        * [game](examples/falling-balls) - Simple game
-       * [game](examples/falling-balls-with-web) - Simple game for web target
+       * [game](examples/falling-balls-web) - Simple game for web target
        * [compose-bird](examples/web-compose-bird) - A flappy bird clone using Compose for Web
        * [notepad](examples/notepad) - Notepad, using the new experimental Composable Window API
        * [todoapp](examples/todoapp) - TODO items tracker with persistence and multiple screens
-       * [widgets gallery](examples/widgetsgallery) - Gallery of standard widgets
+       * [widgets gallery](examples/widgets-gallery) - Gallery of standard widgets
        * [IDEA plugin](examples/intellij-plugin) - Plugin for IDEA using Compose for Desktop
    * [gradle-plugins](gradle-plugins) - a plugin, simplifying usage of Compose Multiplatform with Gradle
    * [templates](templates) - new application templates (see `desktop-template/build_and_run_from_cli_example.sh` for using without Gradle)

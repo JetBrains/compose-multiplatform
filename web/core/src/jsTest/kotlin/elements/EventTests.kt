@@ -13,6 +13,7 @@ import org.w3c.dom.events.MouseEvent
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import org.jetbrains.compose.web.testutils.*
 
 class EventTests {
 
@@ -81,11 +82,10 @@ class EventTests {
 
         composition {
             TextArea(
-                {
-                    onInput { handled = true }
-                },
                 value = ""
-            )
+            ) {
+                onInput { handled = true }
+            }
         }
 
         val radio = root.firstChild as HTMLTextAreaElement

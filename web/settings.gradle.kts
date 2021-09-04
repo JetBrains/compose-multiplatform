@@ -18,7 +18,7 @@ pluginManagement {
                 println("[build] compose core version: ${extra["COMPOSE_CORE_VERSION"]}")
                 useModule("org.jetbrains.compose:org.jetbrains.compose.gradle.plugin:${extra["COMPOSE_CORE_VERSION"]}")
             } else if (requested.id.id == "org.jetbrains.kotlin.multiplatform") {
-                useModule("org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin:1.5.21")
+                useModule("org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin:1.5.30")
             }
         }
     }
@@ -26,22 +26,32 @@ pluginManagement {
 
 fun module(name: String, path: String) {
     include(name)
-    project(name).projectDir = file(path)
+    val projectDir = rootDir.resolve(path).normalize().absoluteFile
+    if (!projectDir.exists()) {
+        throw AssertionError("file $projectDir does not exist")
+    }
+    project(name).projectDir = projectDir
 }
 
 
-module(":web-core", "$rootDir/core")
-module(":web-widgets", "$rootDir/widgets")
-module(":web-integration-core", "$rootDir/integration-core")
-module(":web-integration-widgets", "$rootDir/integration-widgets")
-module(":web-benchmark-core", "$rootDir/benchmark-core")
-module(":compose-compiler-integration", "$rootDir/compose-compiler-integration")
+module(":web-core", "core")
+module(":web-widgets", "widgets")
+module(":web-integration-core", "integration-core")
+module(":web-integration-widgets", "integration-widgets")
+module(":compose-compiler-integration", "compose-compiler-integration")
+module(":internal-web-core-runtime", "internal-web-core-runtime")
+module(":test-utils", "test-utils")
+
+if (extra["compose.web.tests.skip.benchmarks"]!!.toString().toBoolean() != true) {
+    module(":web-benchmark-core", "benchmark-core")
+} else {
+    println("skipping benchmarks")
+}
 
 if (extra["compose.web.buildSamples"]!!.toString().toBoolean() == true) {
     println("building with examples")
-    module(":examples:falling_balls_with_web", "../examples/falling_balls_with_web")
-    module(":examples:compose-web-lp", "../examples/web_landing")
+    module(":examples:falling-balls-web", "../examples/falling-balls-web")
+    module(":examples:compose-web-lp", "../examples/web-landing")
     module(":examples:web-compose-bird", "../examples/web-compose-bird")
     module(":examples:web-with-react", "../examples/web-with-react")
-    module(":examples:web-getting-started", "../examples/web-getting-started")
 }

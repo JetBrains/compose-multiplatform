@@ -13,7 +13,11 @@ fun main() {
     ) {
         MaterialTheme {
             DesktopTheme {
-                VideoPlayer("/System/Library/Compositions/Yosemite.mov", 640, 480)
+                VideoPlayer(
+                    url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+                    width = 640,
+                    height = 480
+                )
             }
         }
     }

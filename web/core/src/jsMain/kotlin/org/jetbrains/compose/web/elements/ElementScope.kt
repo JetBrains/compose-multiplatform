@@ -113,7 +113,7 @@ abstract class ElementScopeBase<out TElement : Element> : ElementScope<TElement>
     }
 }
 
-open class ElementScopeImpl<TElement : Element> : ElementScopeBase<TElement>() {
+internal open class ElementScopeImpl<TElement : Element> : ElementScopeBase<TElement>() {
     public override lateinit var element: TElement
 }
 

@@ -7,13 +7,13 @@ import org.w3c.dom.css.CSSStyleRule
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.css.CSSStyleSheet
 
-fun clearCSSRules(sheet: CSSStyleSheet) {
+internal fun clearCSSRules(sheet: CSSStyleSheet) {
     repeat(sheet.cssRules.length) {
         sheet.deleteRule(0)
     }
 }
 
-fun setCSSRules(sheet: CSSStyleSheet, cssRules: CSSRuleDeclarationList) {
+internal fun setCSSRules(sheet: CSSStyleSheet, cssRules: CSSRuleDeclarationList) {
     cssRules.forEach { cssRule ->
         sheet.addRule(cssRule)
     }
@@ -81,7 +81,7 @@ private fun fillRule(
     }
 }
 
-fun setProperty(
+internal fun setProperty(
     style: CSSStyleDeclaration,
     name: String,
     value: StylePropertyValue
@@ -89,7 +89,7 @@ fun setProperty(
     style.setProperty(name, value.toString())
 }
 
-fun setVariable(
+internal fun setVariable(
     style: CSSStyleDeclaration,
     name: String,
     value: StylePropertyValue

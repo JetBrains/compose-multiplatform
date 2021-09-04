@@ -6,6 +6,7 @@ import org.jetbrains.compose.web.attributes.AttrsBuilder
 import org.jetbrains.compose.web.css.margin
 import org.jetbrains.compose.web.css.px
 
+@ExperimentalComposeWebWidgetsApi
 fun Modifier.asAttributeBuilderApplier(
     passThroughHandler: (AttrsBuilder<*>.() -> Unit)? = null
 ): AttrsBuilder<*>.() -> Unit =
@@ -23,6 +24,7 @@ fun Modifier.asAttributeBuilderApplier(
         st
     }
 
+@ExperimentalComposeWebWidgetsApi
 actual fun Modifier.padding(all: Dp): Modifier = castOrCreate().apply {
     // yes, it's not a typo, what Modifier.padding does is actually adding margin
     add {

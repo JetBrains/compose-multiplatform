@@ -6,8 +6,11 @@
 package org.jetbrains.compose.web.core.tests.elements
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import kotlinx.browser.document
+import org.jetbrains.compose.web.ExperimentalComposeWebApi
 import org.jetbrains.compose.web.attributes.AttrsBuilder
-import org.jetbrains.compose.web.core.tests.runTest
+import org.jetbrains.compose.web.testutils.*
 import org.jetbrains.compose.web.dom.*
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
@@ -65,7 +68,7 @@ class ElementsTests {
             Pair({ Ol() }, "OL"),
 
             Pair({ Li() }, "LI"),
-            Pair({ Img(src="whatever") }, "IMG"),
+            Pair({ Img(src = "whatever") }, "IMG"),
 
             Pair({ Form() }, "FORM"),
             Pair({ Select() }, "SELECT"),
@@ -106,6 +109,7 @@ class ElementsTests {
     }
 
     @Test
+    @OptIn(ExperimentalComposeWebApi::class)
     fun rawCreation() = runTest {
         @Composable
         fun CustomElement(
@@ -128,5 +132,31 @@ class ElementsTests {
         }
 
         assertEquals("<div><custom id=\"container\">CUSTOM</custom></div>", root.outerHTML)
+    }
+
+    @Test
+    fun elementBuilderShouldBeCalledOnce() = runTest {
+        var counter = 0
+        var flag = false
+
+        composition {
+            TagElement({
+                counter++
+                document.createElement("div")
+            }, null,
+                if (flag) {
+                    { Div() { Text("ON") } }
+                } else null
+            )
+
+        }
+
+        assertEquals(1, counter, )
+
+        flag = true
+        waitForRecompositionComplete()
+
+        assertEquals(1, counter)
+        assertEquals("<div><div>ON</div></div>", nextChild().outerHTML)
     }
 }

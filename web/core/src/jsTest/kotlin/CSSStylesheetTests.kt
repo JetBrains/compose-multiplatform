@@ -12,6 +12,7 @@ import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import org.jetbrains.compose.web.testutils.*
 
 object AppCSSVariables {
     val width by variable<CSSUnitValue>()

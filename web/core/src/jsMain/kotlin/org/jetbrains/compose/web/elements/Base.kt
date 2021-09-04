@@ -1,77 +1,25 @@
 package org.jetbrains.compose.web.dom
 
-import androidx.compose.runtime.Applier
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposeCompilerApi
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.DisposableEffectResult
-import androidx.compose.runtime.DisposableEffectScope
-import androidx.compose.runtime.ExplicitGroupsComposable
-import androidx.compose.runtime.SkippableUpdater
-import androidx.compose.runtime.currentComposer
-import androidx.compose.runtime.remember
-import org.jetbrains.compose.web.DomApplier
-import org.jetbrains.compose.web.DomElementWrapper
+import androidx.compose.runtime.*
 import org.jetbrains.compose.web.attributes.AttrsBuilder
-import kotlinx.browser.document
-import org.w3c.dom.Audio
+import org.jetbrains.compose.web.ExperimentalComposeWebApi
+import org.jetbrains.compose.web.css.StyleHolder
+import org.jetbrains.compose.web.internal.runtime.DomElementWrapper
+import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.w3c.dom.Element
-import org.w3c.dom.HTMLAnchorElement
-import org.w3c.dom.HTMLAreaElement
-import org.w3c.dom.HTMLAudioElement
-import org.w3c.dom.HTMLBRElement
-import org.w3c.dom.HTMLButtonElement
-import org.w3c.dom.HTMLDataListElement
-import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.HTMLEmbedElement
-import org.w3c.dom.HTMLFieldSetElement
-import org.w3c.dom.HTMLFormElement
-import org.w3c.dom.HTMLHRElement
-import org.w3c.dom.HTMLHeadingElement
-import org.w3c.dom.HTMLIFrameElement
-import org.w3c.dom.HTMLImageElement
-import org.w3c.dom.HTMLInputElement
-import org.w3c.dom.HTMLLIElement
-import org.w3c.dom.HTMLLabelElement
-import org.w3c.dom.HTMLLegendElement
-import org.w3c.dom.HTMLMapElement
-import org.w3c.dom.HTMLMeterElement
-import org.w3c.dom.HTMLOListElement
-import org.w3c.dom.HTMLObjectElement
-import org.w3c.dom.HTMLOptGroupElement
-import org.w3c.dom.HTMLOptionElement
-import org.w3c.dom.HTMLOutputElement
-import org.w3c.dom.HTMLParagraphElement
-import org.w3c.dom.HTMLParamElement
-import org.w3c.dom.HTMLPictureElement
-import org.w3c.dom.HTMLPreElement
-import org.w3c.dom.HTMLProgressElement
-import org.w3c.dom.HTMLSelectElement
-import org.w3c.dom.HTMLSourceElement
-import org.w3c.dom.HTMLSpanElement
-import org.w3c.dom.HTMLStyleElement
-import org.w3c.dom.HTMLTableCaptionElement
-import org.w3c.dom.HTMLTableCellElement
-import org.w3c.dom.HTMLTableColElement
-import org.w3c.dom.HTMLTableElement
-import org.w3c.dom.HTMLTableRowElement
-import org.w3c.dom.HTMLTableSectionElement
-import org.w3c.dom.HTMLTextAreaElement
-import org.w3c.dom.HTMLTrackElement
-import org.w3c.dom.HTMLUListElement
-import org.w3c.dom.HTMLVideoElement
+import org.w3c.dom.css.ElementCSSInlineStyle
+import org.w3c.dom.svg.SVGElement
 
 @OptIn(ComposeCompilerApi::class)
 @Composable
 @ExplicitGroupsComposable
-inline fun <TScope, T, reified E : Applier<*>> ComposeDomNode(
+private inline fun <TScope, T> ComposeDomNode(
     noinline factory: () -> T,
     elementScope: TScope,
     noinline attrsSkippableUpdate: @Composable SkippableUpdater<T>.() -> Unit,
     noinline content: (@Composable TScope.() -> Unit)?
 ) {
-    if (currentComposer.applier !is E) error("Invalid applier")
     currentComposer.startNode()
     if (currentComposer.inserting) {
         currentComposer.createNode(factory)
@@ -79,9 +27,7 @@ inline fun <TScope, T, reified E : Applier<*>> ComposeDomNode(
         currentComposer.useNode()
     }
 
-    SkippableUpdater<T>(currentComposer).apply {
-        attrsSkippableUpdate()
-    }
+    attrsSkippableUpdate.invoke(SkippableUpdater(currentComposer))
 
     currentComposer.startReplaceableGroup(0x7ab4aae9)
     content?.invoke(elementScope)
@@ -89,52 +35,90 @@ inline fun <TScope, T, reified E : Applier<*>> ComposeDomNode(
     currentComposer.endNode()
 }
 
-class DisposableEffectHolder<TElement: Element>(
-    var effect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
-)
 
+@OptIn(ComposeWebInternalApi::class)
+private fun DomElementWrapper.updateProperties(applicators: List<Pair<(Element, Any) -> Unit, Any>>) {
+    node.removeAttribute("class")
+
+    applicators.forEach { (applicator, item) ->
+        applicator(node, item)
+    }
+}
+
+@OptIn(ComposeWebInternalApi::class)
+private fun DomElementWrapper.updateStyleDeclarations(styleApplier: StyleHolder) {
+    when (node) {
+        is HTMLElement, is SVGElement -> {
+            node.removeAttribute("style")
+
+            val style = node.unsafeCast<ElementCSSInlineStyle>().style
+
+            styleApplier.properties.forEach { (name, value) ->
+                style.setProperty(name, value.toString())
+            }
+
+            styleApplier.variables.forEach { (name, value) ->
+                style.setProperty(name, value.toString())
+            }
+        }
+    }
+}
+
+@OptIn(ComposeWebInternalApi::class)
+fun DomElementWrapper.updateAttrs(attrs: Map<String, String>) {
+    node.getAttributeNames().forEach { name ->
+        if (name == "style") return@forEach
+        node.removeAttribute(name)
+    }
+
+    attrs.forEach {
+        node.setAttribute(it.key, it.value)
+    }
+}
+
+
+@OptIn(ComposeWebInternalApi::class)
 @Composable
 fun <TElement : Element> TagElement(
     elementBuilder: ElementBuilder<TElement>,
     applyAttrs: (AttrsBuilder<TElement>.() -> Unit)?,
     content: (@Composable ElementScope<TElement>.() -> Unit)?
 ) {
-    val scope = remember { ElementScopeImpl<TElement>() }
-    val refEffect = remember { DisposableEffectHolder<TElement>() }
+    val scope = remember {  ElementScopeImpl<TElement>() }
+    var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
 
-    ComposeDomNode<ElementScope<TElement>, DomElementWrapper, DomApplier>(
+    ComposeDomNode<ElementScope<TElement>, DomElementWrapper>(
         factory = {
-            DomElementWrapper(elementBuilder.create() as HTMLElement).also {
-                scope.element = it.node.unsafeCast<TElement>()
-            }
+            val node = elementBuilder.create()
+            scope.element = node
+            DomElementWrapper(node)
         },
         attrsSkippableUpdate = {
-            val attrsApplied = AttrsBuilder<TElement>().also {
-                if (applyAttrs != null) {
-                    it.applyAttrs()
-                }
-            }
-            refEffect.effect = attrsApplied.refEffect
-            val attrsCollected = attrsApplied.collect()
-            val events = attrsApplied.collectListeners()
+            val attrsBuilder = AttrsBuilder<TElement>()
+            applyAttrs?.invoke(attrsBuilder)
+
+            refEffect = attrsBuilder.refEffect
 
             update {
-                set(attrsCollected, DomElementWrapper::updateAttrs)
-                set(events, DomElementWrapper::updateEventListeners)
-                set(attrsApplied.propertyUpdates, DomElementWrapper::updateProperties)
-                set(attrsApplied.styleBuilder, DomElementWrapper::updateStyleDeclarations)
+                set(attrsBuilder.collect(), DomElementWrapper::updateAttrs)
+                set(attrsBuilder.collectListeners(), DomElementWrapper::updateEventListeners)
+                set(attrsBuilder.propertyUpdates, DomElementWrapper::updateProperties)
+                set(attrsBuilder.styleBuilder, DomElementWrapper::updateStyleDeclarations)
             }
         },
         elementScope = scope,
         content = content
     )
 
-    DisposableEffect(null) {
-        refEffect.effect?.invoke(this, scope.element) ?: onDispose {}
+    refEffect?.let { effect ->
+        DisposableEffect(null) {
+            effect.invoke(this, scope.element)
+        }
     }
 }
 
 @Composable
+@ExperimentalComposeWebApi
 fun <TElement : Element> TagElement(
     tagName: String,
     applyAttrs: AttrsBuilder<TElement>.() -> Unit,
