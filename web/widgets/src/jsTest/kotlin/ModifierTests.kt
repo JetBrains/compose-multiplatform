@@ -1,15 +1,14 @@
-import org.jetbrains.compose.web.renderComposable
 import org.jetbrains.compose.common.core.graphics.Color
+import org.jetbrains.compose.common.foundation.background
 import org.jetbrains.compose.common.foundation.layout.Box
+import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 import org.jetbrains.compose.common.ui.Modifier
-import org.jetbrains.compose.common.ui.background
 import org.jetbrains.compose.common.ui.size
 import org.jetbrains.compose.common.ui.unit.dp
-import org.w3c.dom.HTMLElement
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
+@ExperimentalComposeWebWidgetsApi
 class ModifierTests {
     @Test
     fun backgroundModifier() = runTest {
