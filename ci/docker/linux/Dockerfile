@@ -17,7 +17,7 @@ ENV PATH=/usr/lib/binutils-2.26/bin:$PATH
 ENV DEPOT_TOOLS=/usr/depot_tools
 ENV PATH=$DEPOT_TOOLS:$PATH
 RUN apt-get install git python wget -y && \
-    apt-get install fontconfig libfontconfig1-dev libglu1-mesa-dev curl zip -y && \
+    apt-get install fontconfig libfontconfig1-dev libglu1-mesa-dev libxrandr-dev curl zip -y && \
     git clone 'https://chromium.googlesource.com/chromium/tools/depot_tools.git' $DEPOT_TOOLS
 
 # Install Java
