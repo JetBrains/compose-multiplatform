@@ -1487,6 +1487,34 @@ class LazyListTest(private val orientation: Orientation) {
         rule.onNodeWithTag("0").assertDoesNotExist()
     }
 
+    @Test
+    fun scrollingByExactlyTheItemSize_switchesTheFirstVisibleItem() {
+        val itemSize = with(rule.density) { 30.toDp() }
+        lateinit var state: LazyListState
+        rule.setContentWithTestViewConfiguration {
+            LazyColumnOrRow(
+                Modifier.mainAxisSize(itemSize * 3),
+                state = rememberLazyListState().also { state = it },
+            ) {
+                items(5) {
+                    Spacer(
+                        Modifier.size(itemSize).testTag("$it")
+                    )
+                }
+            }
+        }
+
+        state.scrollBy(itemSize)
+
+        rule.onNodeWithTag("0")
+            .assertIsNotDisplayed()
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(1)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+        }
+    }
+
     // ********************* END OF TESTS *********************
     // Helper functions, etc. live below here
 

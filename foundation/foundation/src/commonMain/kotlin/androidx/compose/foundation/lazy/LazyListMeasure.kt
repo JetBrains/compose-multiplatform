@@ -146,7 +146,7 @@ internal fun measureLazyList(
             val measuredItem = itemProvider.getAndMeasure(index)
             mainAxisUsed += measuredItem.sizeWithSpacings
 
-            if (mainAxisUsed < minOffset) {
+            if (mainAxisUsed <= minOffset) {
                 // this item is offscreen and will not be placed. advance firstVisibleItemIndex
                 currentFirstItemIndex = index + 1
                 currentFirstItemScrollOffset -= measuredItem.sizeWithSpacings
