@@ -2187,6 +2187,33 @@ class LayoutNodeTest {
         assertEquals(3, node.getModifierInfo().size)
     }
 
+    @Test
+    fun layoutNodeWrapper_alpha() {
+        val root = LayoutNode().apply { this.modifier = Modifier.drawBehind {} }
+        val layoutNode1 = LayoutNode().apply {
+            this.modifier = Modifier.graphicsLayer { }.graphicsLayer { }.drawBehind {}
+        }
+        val layoutNode2 = LayoutNode().apply { this.modifier = Modifier.drawBehind {} }
+        val owner = MockOwner()
+
+        root.insertAt(0, layoutNode1)
+        layoutNode1.insertAt(0, layoutNode2)
+        root.attach(owner)
+
+        // provide alpha to the graphics layer
+        layoutNode1.outerLayoutNodeWrapper.wrapped!!.onLayerBlockUpdated {
+            alpha = 0f
+        }
+        layoutNode1.outerLayoutNodeWrapper.wrapped!!.wrapped!!.onLayerBlockUpdated {
+            alpha = 0.5f
+        }
+
+        assertFalse(layoutNode1.outerLayoutNodeWrapper.isTransparent())
+        assertTrue(layoutNode1.innerLayoutNodeWrapper.isTransparent())
+        assertTrue(layoutNode2.outerLayoutNodeWrapper.isTransparent())
+        assertTrue(layoutNode2.innerLayoutNodeWrapper.isTransparent())
+    }
+
     private fun createSimpleLayout(): Triple<LayoutNode, LayoutNode, LayoutNode> {
         val layoutNode = ZeroSizedLayoutNode()
         val child1 = ZeroSizedLayoutNode()

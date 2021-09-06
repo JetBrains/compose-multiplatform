@@ -459,8 +459,19 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 info.addAction(AccessibilityNodeInfoCompat.ACTION_FOCUS)
             }
         }
-        info.isVisibleToUser =
-            (semanticsNode.unmergedConfig.getOrNull(SemanticsProperties.InvisibleToUser) == null)
+
+        // Mark invisible nodes
+        val wrapperToCheckTransparency = if (semanticsNode.isFake) {
+            // when node is fake, its parent that is the original semantics node should define the
+            // alpha value
+            semanticsNode.parent?.findWrapperToGetBounds()
+        } else {
+            semanticsNode.findWrapperToGetBounds()
+        }
+        val isTransparent = wrapperToCheckTransparency?.isTransparent() ?: false
+        info.isVisibleToUser = !isTransparent &&
+            semanticsNode.unmergedConfig.getOrNull(SemanticsProperties.InvisibleToUser) == null
+
         semanticsNode.unmergedConfig.getOrNull(SemanticsProperties.LiveRegion)?.let {
             info.liveRegion = when (it) {
                 LiveRegionMode.Polite -> ACCESSIBILITY_LIVE_REGION_POLITE
@@ -1436,6 +1447,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
      * Hit test the layout tree for semantics wrappers.
      * The return value is a virtual view id, or InvalidId if an embedded Android View was hit.
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     @VisibleForTesting
     internal fun hitTestSemanticsAt(x: Float, y: Float): Int {
         view.measureAndLayout()
@@ -1449,9 +1461,21 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         val wrapper = hitSemanticsWrappers.lastOrNull()?.layoutNode?.outerSemantics
         var virtualViewId = InvalidId
         if (wrapper != null) {
-            val androidView = view.androidViewsHandler.layoutNodeToHolder[wrapper.layoutNode]
-            if (androidView == null) {
-                virtualViewId = semanticsNodeIdToAccessibilityVirtualNodeId(wrapper.modifier.id)
+
+            // The node below is not added to the tree; it's a wrapper around outer semantics to
+            // use the methods available to the SemanticsNode
+            val semanticsNode = SemanticsNode(wrapper, false)
+            val wrapperToCheckAlpha = semanticsNode.findWrapperToGetBounds()
+
+            // Do not 'find' invisible nodes when exploring by touch. This will prevent us from
+            // sending events for invisible nodes
+            if (!semanticsNode.unmergedConfig.contains(SemanticsProperties.InvisibleToUser) &&
+                !wrapperToCheckAlpha.isTransparent()
+            ) {
+                val androidView = view.androidViewsHandler.layoutNodeToHolder[wrapper.layoutNode]
+                if (androidView == null) {
+                    virtualViewId = semanticsNodeIdToAccessibilityVirtualNodeId(wrapper.modifier.id)
+                }
             }
         }
         return virtualViewId
