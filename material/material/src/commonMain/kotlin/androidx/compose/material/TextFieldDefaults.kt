@@ -364,11 +364,7 @@ private class DefaultTextFieldColors(
             focused -> focusedLabelColor
             else -> unfocusedLabelColor
         }
-        return if (enabled) {
-            animateColorAsState(targetValue, tween(durationMillis = AnimationDuration))
-        } else {
-            rememberUpdatedState(targetValue)
-        }
+        return rememberUpdatedState(targetValue)
     }
 
     @Composable
