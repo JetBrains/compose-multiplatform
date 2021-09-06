@@ -197,13 +197,75 @@ class SwitchTest {
     }
 
     @Test
-    fun switch_materialSizes_whenChecked() {
-        materialSizesTestForValue(true)
+    fun switch_materialSizes_whenChecked_minimumTouchTarget() {
+        materialSizesTestForValue(
+            checked = true,
+            clickable = true,
+            minimumTouchTarget = true
+        )
     }
 
     @Test
-    fun switch_materialSizes_whenUnchecked() {
-        materialSizesTestForValue(false)
+    fun switch_materialSizes_whenChecked_withoutMinimumTouchTarget() {
+        materialSizesTestForValue(
+            checked = true,
+            clickable = true,
+            minimumTouchTarget = false
+        )
+    }
+
+    @Test
+    fun switch_materialSizes_whenUnchecked_minimumTouchTarget() {
+        materialSizesTestForValue(
+            checked = false,
+            clickable = true,
+            minimumTouchTarget = true
+        )
+    }
+
+    @Test
+    fun switch_materialSizes_whenUnchecked_withoutMinimumTouchTarget() {
+        materialSizesTestForValue(
+            checked = false,
+            clickable = true,
+            minimumTouchTarget = false
+        )
+    }
+
+    @Test
+    fun switch_materialSizes_whenChecked_notClickable_minimumTouchTarget() {
+        materialSizesTestForValue(
+            checked = true,
+            clickable = false,
+            minimumTouchTarget = true
+        )
+    }
+
+    @Test
+    fun switch_materialSizes_whenChecked_notClickable_withoutMinimumTouchTarget() {
+        materialSizesTestForValue(
+            checked = true,
+            clickable = false,
+            minimumTouchTarget = false
+        )
+    }
+
+    @Test
+    fun switch_materialSizes_whenUnchecked_notClickable_minimumTouchTarget() {
+        materialSizesTestForValue(
+            checked = false,
+            clickable = false,
+            minimumTouchTarget = true
+        )
+    }
+
+    @Test
+    fun switch_materialSizes_whenUnchecked_notClickable_withoutMinimumTouchTarget() {
+        materialSizesTestForValue(
+            checked = false,
+            clickable = false,
+            minimumTouchTarget = false
+        )
     }
 
     @Test
@@ -323,20 +385,37 @@ class SwitchTest {
         rule.onNodeWithTag("2").assertIsOff()
     }
 
-    private fun materialSizesTestForValue(checked: Boolean) = with(rule.density) {
-        // The padding should be 2 DP, but we round to pixels when determining layout
-        val paddingInPixels = 2.dp.roundToPx()
-
-        // Convert back to DP so that we have an exact DP value to work with. We don't
-        // want to multiply the error by two (one for each padding), so we get the exact
-        // padding based on the expected pixels consumed by the padding.
-        val paddingInDp = paddingInPixels.toDp()
-
+    @OptIn(ExperimentalMaterialApi::class)
+    private fun materialSizesTestForValue(
+        checked: Boolean,
+        clickable: Boolean,
+        minimumTouchTarget: Boolean
+    ) = with(rule.density) {
         rule.setMaterialContentForSizeAssertions {
-            Switch(checked = checked, onCheckedChange = {}, enabled = false)
+            CompositionLocalProvider(
+                LocalMinimumTouchTargetEnforcement provides minimumTouchTarget
+            ) {
+                Switch(
+                    checked = checked,
+                    onCheckedChange = if (clickable) { {} } else null,
+                    enabled = false
+                )
+            }
+        }.run {
+            if (clickable && minimumTouchTarget) {
+                assertIsSquareWithSize(48.dp)
+            } else {
+                // The padding should be 2 DP, but we round to pixels when determining layout
+                val paddingInPixels = 2.dp.roundToPx()
+
+                // Convert back to DP so that we have an exact DP value to work with. We don't
+                // want to multiply the error by two (one for each padding), so we get the exact
+                // padding based on the expected pixels consumed by the padding.
+                val paddingInDp = paddingInPixels.toDp()
+                assertWidthIsEqualTo(34.dp + paddingInDp * 2)
+                assertHeightIsEqualTo(20.dp + paddingInDp * 2)
+            }
         }
-            .assertWidthIsEqualTo(34.dp + paddingInDp * 2)
-            .assertHeightIsEqualTo(20.dp + paddingInDp * 2)
     }
 
     /**

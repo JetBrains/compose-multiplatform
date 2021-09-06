@@ -587,6 +587,9 @@ package androidx.compose.material {
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.text.TextStyle> getLocalTextStyle();
   }
 
+  public final class TouchTargetKt {
+  }
+
   @androidx.compose.runtime.Immutable public final class Typography {
     ctor public Typography(optional androidx.compose.ui.text.font.FontFamily defaultFontFamily, optional androidx.compose.ui.text.TextStyle h1, optional androidx.compose.ui.text.TextStyle h2, optional androidx.compose.ui.text.TextStyle h3, optional androidx.compose.ui.text.TextStyle h4, optional androidx.compose.ui.text.TextStyle h5, optional androidx.compose.ui.text.TextStyle h6, optional androidx.compose.ui.text.TextStyle subtitle1, optional androidx.compose.ui.text.TextStyle subtitle2, optional androidx.compose.ui.text.TextStyle body1, optional androidx.compose.ui.text.TextStyle body2, optional androidx.compose.ui.text.TextStyle button, optional androidx.compose.ui.text.TextStyle caption, optional androidx.compose.ui.text.TextStyle overline);
     method public androidx.compose.material.Typography copy(optional androidx.compose.ui.text.TextStyle h1, optional androidx.compose.ui.text.TextStyle h2, optional androidx.compose.ui.text.TextStyle h3, optional androidx.compose.ui.text.TextStyle h4, optional androidx.compose.ui.text.TextStyle h5, optional androidx.compose.ui.text.TextStyle h6, optional androidx.compose.ui.text.TextStyle subtitle1, optional androidx.compose.ui.text.TextStyle subtitle2, optional androidx.compose.ui.text.TextStyle body1, optional androidx.compose.ui.text.TextStyle body2, optional androidx.compose.ui.text.TextStyle button, optional androidx.compose.ui.text.TextStyle caption, optional androidx.compose.ui.text.TextStyle overline);
