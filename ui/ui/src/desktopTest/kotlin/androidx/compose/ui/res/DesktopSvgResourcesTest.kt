@@ -32,7 +32,7 @@ import org.junit.Test
 
 class DesktopSvgResourcesTest {
     @get:Rule
-    val screenshotRule = DesktopScreenshotTestRule("ui/ui-desktop/res")
+    val screenshotRule = DesktopScreenshotTestRule("compose/ui/ui-desktop/res")
 
     @Test
     fun `load SVG with specified size`() {

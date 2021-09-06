@@ -35,7 +35,7 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class GraphicsLayerTest {
     @get:Rule
-    val screenshotRule = DesktopScreenshotTestRule("ui/ui-desktop/core")
+    val screenshotRule = DesktopScreenshotTestRule("compose/ui/ui-desktop/platform")
 
     @Test
     fun scale() {
