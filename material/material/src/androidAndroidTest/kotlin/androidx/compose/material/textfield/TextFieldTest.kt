@@ -49,6 +49,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TextFieldPadding
+import androidx.compose.material.Typography
 import androidx.compose.material.getString
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -1335,6 +1336,178 @@ class TextFieldTest {
 
         rule.onNodeWithTag(TextfieldTag).captureToImage().assertPixels {
             Color.White
+        }
+    }
+
+    @Test
+    fun testTextField_labelStyle() {
+        val unfocusedLabelColor = Color.Blue
+        val focusedLabelColor = Color.Red
+        var textStyle = TextStyle()
+        var contentColor = Color.Unspecified
+
+        val focusRequester = FocusRequester()
+
+        rule.setMaterialContent {
+            TextField(
+                value = "",
+                onValueChange = {},
+                label = {
+                    textStyle = LocalTextStyle.current
+                    contentColor = LocalContentColor.current
+                },
+                modifier = Modifier.focusRequester(focusRequester),
+                colors = TextFieldDefaults.textFieldColors(
+                    unfocusedLabelColor = unfocusedLabelColor, focusedLabelColor = focusedLabelColor
+                )
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(contentColor).isEqualTo(unfocusedLabelColor)
+            assertThat(textStyle.color).isEqualTo(Color.Unspecified)
+        }
+
+        rule.runOnUiThread {
+            focusRequester.requestFocus()
+        }
+
+        rule.runOnIdle {
+            assertThat(contentColor).isEqualTo(focusedLabelColor)
+            assertThat(textStyle.color).isEqualTo(Color.Unspecified)
+        }
+    }
+
+    @Test
+    fun testTextField_labelStyle_whenCaptionStyleColorProvided() {
+        val unfocusedLabelColor = Color.Blue
+        val focusedLabelColor = Color.Red
+        val captionColor = Color.Green
+        var textStyle = TextStyle()
+        var contentColor = Color.Unspecified
+
+        val focusRequester = FocusRequester()
+
+        rule.setMaterialContent {
+            val caption = MaterialTheme.typography.caption.copy(color = captionColor)
+            MaterialTheme(typography = Typography(caption = caption)) {
+                TextField(
+                    value = "",
+                    onValueChange = {},
+                    label = {
+                        textStyle = LocalTextStyle.current
+                        contentColor = LocalContentColor.current
+                    },
+                    modifier = Modifier.focusRequester(focusRequester),
+                    colors = TextFieldDefaults.textFieldColors(
+                        unfocusedLabelColor = unfocusedLabelColor,
+                        focusedLabelColor = focusedLabelColor
+                    )
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(textStyle.color).isEqualTo(unfocusedLabelColor)
+            assertThat(contentColor).isEqualTo(unfocusedLabelColor)
+        }
+
+        rule.runOnUiThread {
+            focusRequester.requestFocus()
+        }
+
+        rule.runOnIdle {
+            assertThat(textStyle.color).isEqualTo(captionColor)
+            assertThat(contentColor).isEqualTo(focusedLabelColor)
+        }
+    }
+
+    @Test
+    fun testTextField_labelStyle_middle_whenCaptionStyleColorProvided() {
+        val expectedLabelColor = Color.Blue
+        val focusedLabelColor = Color.Red
+        var textStyle = TextStyle()
+        var contentColor = Color.Unspecified
+        val focusRequester = FocusRequester()
+
+        rule.mainClock.autoAdvance = false
+        rule.setMaterialContent {
+            val caption = MaterialTheme.typography.caption.copy(color = expectedLabelColor)
+            MaterialTheme(typography = Typography(caption = caption)) {
+                TextField(
+                    value = "",
+                    onValueChange = {},
+                    label = {
+                        textStyle = LocalTextStyle.current
+                        contentColor = LocalContentColor.current
+                    },
+                    modifier = Modifier.focusRequester(focusRequester),
+                    colors = TextFieldDefaults.textFieldColors(
+                        unfocusedLabelColor = expectedLabelColor,
+                        focusedLabelColor = focusedLabelColor
+                    )
+                )
+            }
+        }
+
+        rule.runOnUiThread {
+            focusRequester.requestFocus()
+        }
+
+        // animation duration is 150, advancing by 75 to get into middle of animation
+        rule.mainClock.advanceTimeBy(75)
+
+        rule.runOnIdle {
+            assertThat(textStyle.color).isEqualTo(expectedLabelColor)
+            // color should be a lerp between 'start' and 'end' colors. We check here that it's
+            // not equal to either of them
+            assertThat(contentColor).isNotEqualTo(expectedLabelColor)
+            assertThat(contentColor).isNotEqualTo(focusedLabelColor)
+        }
+    }
+
+    @Test
+    fun testTextField_labelStyle_whenBothTypographiesColorProvided() {
+        val unfocusedLabelColor = Color.Blue
+        val focusedLabelColor = Color.Red
+        val captionColor = Color.Green
+        val subtitleColor = Color.Black
+        var textStyle = TextStyle()
+        var contentColor = Color.Unspecified
+        val focusRequester = FocusRequester()
+
+        rule.setMaterialContent {
+            val caption = MaterialTheme.typography.caption.copy(color = captionColor)
+            val subtitle1 = MaterialTheme.typography.subtitle1.copy(color = subtitleColor)
+            MaterialTheme(typography = Typography(caption = caption, subtitle1 = subtitle1)) {
+                TextField(
+                    value = "",
+                    onValueChange = {},
+                    label = {
+                        textStyle = LocalTextStyle.current
+                        contentColor = LocalContentColor.current
+                    },
+                    modifier = Modifier.focusRequester(focusRequester),
+                    colors = TextFieldDefaults.textFieldColors(
+                        unfocusedLabelColor = unfocusedLabelColor,
+                        focusedLabelColor = focusedLabelColor
+                    )
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(textStyle.color).isEqualTo(subtitleColor)
+            assertThat(contentColor).isEqualTo(unfocusedLabelColor)
+        }
+
+        rule.runOnUiThread {
+            focusRequester.requestFocus()
+        }
+
+        rule.runOnIdle {
+            assertThat(textStyle.color).isEqualTo(captionColor)
+            assertThat(contentColor).isEqualTo(focusedLabelColor)
         }
     }
 }

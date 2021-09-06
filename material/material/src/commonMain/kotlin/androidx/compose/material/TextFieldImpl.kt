@@ -16,6 +16,7 @@
 
 package androidx.compose.material
 
+import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
@@ -94,32 +95,48 @@ internal fun TextFieldImpl(
         else -> InputPhase.UnfocusedNotEmpty
     }
 
-    TextFieldTransitionScope.Transition(
-        inputState = inputState, showLabel = label != null
-    ) { labelProgress, indicatorWidth, placeholderAlphaProgress ->
+    val labelColor: @Composable (InputPhase) -> Color = {
+        colors.labelColor(
+            enabled,
+            // if label is used as a placeholder (aka not as a small header
+            // at the top), we don't use an error color
+            if (it == InputPhase.UnfocusedEmpty) false else isError,
+            interactionSource
+        ).value
+    }
 
-        val decoratedLabel: @Composable (() -> Unit)? =
-            if (label != null) {
-                @Composable {
-                    val labelAnimatedStyle = lerp(
-                        MaterialTheme.typography.subtitle1,
-                        MaterialTheme.typography.caption,
-                        labelProgress
-                    )
-                    Decoration(
-                        contentColor = colors
-                            .labelColor(
-                                enabled,
-                                // if label is used as a placeholder (aka not as a small header
-                                // at the top), we don't use an error color
-                                if (inputState == InputPhase.UnfocusedEmpty) false else isError,
-                                interactionSource
-                            ).value,
-                        typography = labelAnimatedStyle,
-                        content = label
-                    )
+    val typography = MaterialTheme.typography
+    val subtitle1 = typography.subtitle1
+    val caption = typography.caption
+    val shouldOverrideTextStyleColor =
+        (subtitle1.color == Color.Unspecified && caption.color != Color.Unspecified) ||
+            (subtitle1.color != Color.Unspecified && caption.color == Color.Unspecified)
+
+    TextFieldTransitionScope.Transition(
+        inputState = inputState,
+        focusedTextStyleColor = with(MaterialTheme.typography.caption.color) {
+            if (shouldOverrideTextStyleColor) this.takeOrElse { labelColor(inputState) } else this
+        },
+        unfocusedTextStyleColor = with(MaterialTheme.typography.subtitle1.color) {
+            if (shouldOverrideTextStyleColor) this.takeOrElse { labelColor(inputState) } else this
+        },
+        contentColor = labelColor,
+        showLabel = label != null
+    ) { labelProgress, labelTextStyleColor, labelContentColor, indicatorWidth,
+        placeholderAlphaProgress ->
+
+        val decoratedLabel: @Composable (() -> Unit)? = label?.let {
+            @Composable {
+                val labelTextStyle = lerp(
+                    MaterialTheme.typography.subtitle1,
+                    MaterialTheme.typography.caption,
+                    labelProgress
+                ).let {
+                    if (shouldOverrideTextStyleColor) it.copy(color = labelTextStyleColor) else it
                 }
-            } else null
+                Decoration(labelContentColor, labelTextStyle, null, it)
+            }
+        }
 
         val decoratedPlaceholder: @Composable ((Modifier) -> Unit)? =
             if (placeholder != null && transformedText.isEmpty()) {
@@ -230,7 +247,6 @@ internal fun Decoration(
     if (typography != null) ProvideTextStyle(typography, colorAndEmphasis) else colorAndEmphasis()
 }
 
-private val Placeable.nonZero: Boolean get() = this.width != 0 || this.height != 0
 internal fun widthOrZero(placeable: Placeable?) = placeable?.width ?: 0
 internal fun heightOrZero(placeable: Placeable?) = placeable?.height ?: 0
 
@@ -238,9 +254,14 @@ private object TextFieldTransitionScope {
     @Composable
     fun Transition(
         inputState: InputPhase,
+        focusedTextStyleColor: Color,
+        unfocusedTextStyleColor: Color,
+        contentColor: @Composable (InputPhase) -> Color,
         showLabel: Boolean,
         content: @Composable (
             labelProgress: Float,
+            labelTextStyleColor: Color,
+            labelContentColor: Color,
             indicatorWidth: Dp,
             placeholderOpacity: Float
         ) -> Unit
@@ -248,9 +269,10 @@ private object TextFieldTransitionScope {
         // Transitions from/to InputPhase.Focused are the most critical in the transition below.
         // UnfocusedEmpty <-> UnfocusedNotEmpty are needed when a single state is used to control
         // multiple text fields.
-        val transition = updateTransition(inputState)
+        val transition = updateTransition(inputState, label = "TextFieldInputState")
 
         val labelProgress by transition.animateFloat(
+            label = "LabelProgress",
             transitionSpec = { tween(durationMillis = AnimationDuration) }
         ) {
             when (it) {
@@ -261,6 +283,7 @@ private object TextFieldTransitionScope {
         }
 
         val indicatorWidth by transition.animateDp(
+            label = "IndicatorWidth",
             transitionSpec = { tween(durationMillis = AnimationDuration) }
         ) {
             when (it) {
@@ -271,6 +294,7 @@ private object TextFieldTransitionScope {
         }
 
         val placeholderOpacity by transition.animateFloat(
+            label = "PlaceholderOpacity",
             transitionSpec = {
                 if (InputPhase.Focused isTransitioningTo InputPhase.UnfocusedEmpty) {
                     tween(
@@ -297,8 +321,26 @@ private object TextFieldTransitionScope {
             }
         }
 
+        val labelTextStyleColor by transition.animateColor(
+            transitionSpec = { tween(durationMillis = AnimationDuration) },
+            label = "LabelTextStyleColor"
+        ) {
+            when (it) {
+                InputPhase.Focused -> focusedTextStyleColor
+                else -> unfocusedTextStyleColor
+            }
+        }
+
+        val labelContentColor by transition.animateColor(
+            transitionSpec = { tween(durationMillis = AnimationDuration) },
+            label = "LabelContentColor",
+            targetValueByState = contentColor
+        )
+
         content(
             labelProgress,
+            labelTextStyleColor,
+            labelContentColor,
             indicatorWidth,
             placeholderOpacity
         )
