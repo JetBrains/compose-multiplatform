@@ -20,7 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import org.jetbrains.skija.Image
+import org.jetbrains.skia.Image
 import java.io.InputStream
 
 /**

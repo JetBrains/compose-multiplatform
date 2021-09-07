@@ -16,70 +16,70 @@
 
 package androidx.compose.ui.graphics
 
-import org.jetbrains.skija.PaintMode as SkijaPaintMode
-import org.jetbrains.skija.PaintStrokeCap as SkijaPaintStrokeCap
-import org.jetbrains.skija.PaintStrokeJoin as SkijaPaintStrokeJoin
+import org.jetbrains.skia.PaintMode as SkiaPaintMode
+import org.jetbrains.skia.PaintStrokeCap as SkiaPaintStrokeCap
+import org.jetbrains.skia.PaintStrokeJoin as SkiaPaintStrokeJoin
 
-actual typealias NativePaint = org.jetbrains.skija.Paint
+actual typealias NativePaint = org.jetbrains.skia.Paint
 
 actual fun Paint(): Paint = DesktopPaint()
 
 class DesktopPaint : Paint {
-    internal val skija = org.jetbrains.skija.Paint()
+    internal val skia = org.jetbrains.skia.Paint()
 
-    override fun asFrameworkPaint(): NativePaint = skija
+    override fun asFrameworkPaint(): NativePaint = skia
 
     override var alpha: Float
-        get() = Color(skija.color).alpha
+        get() = Color(skia.color).alpha
         set(value) {
-            skija.color = Color(skija.color).copy(alpha = value).toArgb()
+            skia.color = Color(skia.color).copy(alpha = value).toArgb()
         }
 
     override var isAntiAlias: Boolean
-        get() = skija.isAntiAlias
+        get() = skia.isAntiAlias
         set(value) {
-            skija.isAntiAlias = value
+            skia.isAntiAlias = value
         }
 
     override var color: Color
-        get() = Color(skija.color)
+        get() = Color(skia.color)
         set(color) {
-            skija.color = color.toArgb()
+            skia.color = color.toArgb()
         }
 
     override var blendMode: BlendMode = BlendMode.SrcOver
         set(value) {
-            skija.blendMode = value.toSkija()
+            skia.blendMode = value.toSkia()
             field = value
         }
 
     override var style: PaintingStyle = PaintingStyle.Fill
         set(value) {
-            skija.mode = value.toSkija()
+            skia.mode = value.toSkia()
             field = value
         }
 
     override var strokeWidth: Float
-        get() = skija.strokeWidth
+        get() = skia.strokeWidth
         set(value) {
-            skija.strokeWidth = value
+            skia.strokeWidth = value
         }
 
     override var strokeCap: StrokeCap = StrokeCap.Butt
         set(value) {
-            skija.strokeCap = value.toSkija()
+            skia.strokeCap = value.toSkia()
             field = value
         }
 
     override var strokeJoin: StrokeJoin = StrokeJoin.Round
         set(value) {
-            skija.strokeJoin = value.toSkija()
+            skia.strokeJoin = value.toSkia()
             field = value
         }
 
     override var strokeMiterLimit: Float = 0f
         set(value) {
-            skija.strokeMiter = value
+            skia.strokeMiter = value
             field = value
         }
 
@@ -87,40 +87,40 @@ class DesktopPaint : Paint {
 
     override var shader: Shader? = null
         set(value) {
-            skija.shader = value
+            skia.shader = value
             field = value
         }
 
     override var colorFilter: ColorFilter? = null
         set(value) {
-            skija.colorFilter = value?.asDesktopColorFilter()
+            skia.colorFilter = value?.asDesktopColorFilter()
             field = value
         }
 
     override var pathEffect: PathEffect? = null
         set(value) {
-            skija.pathEffect = (value as DesktopPathEffect?)?.asDesktopPathEffect()
+            skia.pathEffect = (value as DesktopPathEffect?)?.asDesktopPathEffect()
             field = value
         }
 
-    private fun PaintingStyle.toSkija() = when (this) {
-        PaintingStyle.Fill -> SkijaPaintMode.FILL
-        PaintingStyle.Stroke -> SkijaPaintMode.STROKE
-        else -> SkijaPaintMode.FILL
+    private fun PaintingStyle.toSkia() = when (this) {
+        PaintingStyle.Fill -> SkiaPaintMode.FILL
+        PaintingStyle.Stroke -> SkiaPaintMode.STROKE
+        else -> SkiaPaintMode.FILL
     }
 
-    private fun StrokeCap.toSkija() = when (this) {
-        StrokeCap.Butt -> SkijaPaintStrokeCap.BUTT
-        StrokeCap.Round -> SkijaPaintStrokeCap.ROUND
-        StrokeCap.Square -> SkijaPaintStrokeCap.SQUARE
-        else -> SkijaPaintStrokeCap.BUTT
+    private fun StrokeCap.toSkia() = when (this) {
+        StrokeCap.Butt -> SkiaPaintStrokeCap.BUTT
+        StrokeCap.Round -> SkiaPaintStrokeCap.ROUND
+        StrokeCap.Square -> SkiaPaintStrokeCap.SQUARE
+        else -> SkiaPaintStrokeCap.BUTT
     }
 
-    private fun StrokeJoin.toSkija() = when (this) {
-        StrokeJoin.Miter -> SkijaPaintStrokeJoin.MITER
-        StrokeJoin.Round -> SkijaPaintStrokeJoin.ROUND
-        StrokeJoin.Bevel -> SkijaPaintStrokeJoin.BEVEL
-        else -> SkijaPaintStrokeJoin.MITER
+    private fun StrokeJoin.toSkia() = when (this) {
+        StrokeJoin.Miter -> SkiaPaintStrokeJoin.MITER
+        StrokeJoin.Round -> SkiaPaintStrokeJoin.ROUND
+        StrokeJoin.Bevel -> SkiaPaintStrokeJoin.BEVEL
+        else -> SkiaPaintStrokeJoin.MITER
     }
 }
 

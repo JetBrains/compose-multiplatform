@@ -15,7 +15,7 @@
  */
 package androidx.compose.ui.test.junit4
 
-import org.jetbrains.skija.Surface
+import org.jetbrains.skia.Surface
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
@@ -48,7 +48,7 @@ data class GoldenConfig(
     val modulePrefix: String
 )
 
-class SkijaTestAlbum(val config: GoldenConfig) {
+class SkiaTestAlbum(val config: GoldenConfig) {
     data class Report(val screenshots: Map<String, ScreenshotResultProto>)
 
     private val screenshots: MutableMap<String, ScreenshotResultProto> = mutableMapOf()
@@ -165,14 +165,14 @@ fun DesktopScreenshotTestRule(
 
 class ScreenshotTestRule internal constructor(val config: GoldenConfig) : TestRule {
     private lateinit var testIdentifier: String
-    private lateinit var album: SkijaTestAlbum
+    private lateinit var album: SkiaTestAlbum
 
     val executionQueue = LinkedList<() -> Unit>()
 
     override fun apply(base: Statement, description: Description?): Statement {
         return object : Statement() {
             override fun evaluate() {
-                album = SkijaTestAlbum(config)
+                album = SkiaTestAlbum(config)
                 testIdentifier = "${description!!.className}_${description.methodName}"
                     .replace(".", "_").replace(",", "_").replace(" ", "_").replace("__", "_")
                 base.evaluate()
@@ -193,7 +193,7 @@ class ScreenshotTestRule internal constructor(val config: GoldenConfig) : TestRu
         album.snap(surface, id)
     }
 
-    private fun handleReport(report: SkijaTestAlbum.Report) {
+    private fun handleReport(report: SkiaTestAlbum.Report) {
         report.screenshots.forEach { (_, sReport) ->
             when (sReport.result) {
                 ScreenshotResultProto.Status.PASSED -> {
