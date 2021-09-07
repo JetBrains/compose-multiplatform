@@ -22,10 +22,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.text.timeNowMillis
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalViewConfiguration
+import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -34,11 +35,12 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
+import androidx.testutils.AnimationDurationScaleRule
 import com.google.common.truth.Truth.assertThat
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.math.abs
 
 @MediumTest
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.S)
@@ -47,12 +49,18 @@ class StretchOverscrollTest {
     @get:Rule
     val rule = createComposeRule()
 
+    @get:Rule
+    val animationScaleRule: AnimationDurationScaleRule =
+        AnimationDurationScaleRule.createForAllTests(1f)
+
     @Test
-    @Ignore("platform animaiton are turned off. Figure this out in b/197325932")
     fun stretchOverscroll_whenPulled_consumesOppositePreScroll() {
         val color = listOf(Color.Red, Color.Yellow, Color.Blue, Color.Green)
         val lazyState = LazyListState()
+        animationScaleRule.setAnimationDurationScale(1f)
+        var viewConfiguration: ViewConfiguration? = null
         rule.setContent {
+            viewConfiguration = LocalViewConfiguration.current
             LazyRow(
                 state = lazyState,
                 modifier = Modifier.size(300.dp).testTag(OverscrollBox)
@@ -63,29 +71,19 @@ class StretchOverscrollTest {
             }
         }
 
-        var now = timeNowMillis()
-        rule.waitUntil(10000) { timeNowMillis() - now > 3000 }
-
         rule.onNodeWithTag(OverscrollBox).performTouchInput {
             down(center)
             moveBy(Offset(200f, 0f))
-            moveBy(Offset(200f, 0f))
-            moveBy(Offset(200f, 0f))
-        }
-
-        now = timeNowMillis()
-        rule.waitUntil(10000) { timeNowMillis() - now > 3000 }
-
-        rule.onNodeWithTag(OverscrollBox).performTouchInput {
             // pull in the opposite direction. Since we pulled overscroll with positive delta
             // it will consume negative delta before scroll happens
             // assert in the ScrollableState lambda will check it
-            moveBy(Offset(-30f, 0f))
+            moveBy(Offset(-200f + (viewConfiguration?.touchSlop ?: 0f), 0f))
             up()
         }
+
         rule.runOnIdle {
             // no scroll happened as it was consumed by the overscroll logic
-            assertThat(lazyState.firstVisibleItemScrollOffset).isEqualTo(0)
+            assertThat(abs(lazyState.firstVisibleItemScrollOffset)).isLessThan(2) // round error
             assertThat(lazyState.firstVisibleItemIndex).isEqualTo(0)
         }
     }
