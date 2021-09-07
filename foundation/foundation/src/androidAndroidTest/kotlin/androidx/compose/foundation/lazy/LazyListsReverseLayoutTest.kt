@@ -19,6 +19,9 @@ package androidx.compose.foundation.lazy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
@@ -438,5 +441,63 @@ class LazyListsReverseLayoutTest {
             .assertLeftPositionInRootIsEqualTo(itemSize - scrolled)
         rule.onNodeWithTag("2")
             .assertLeftPositionInRootIsEqualTo(itemSize * 2 - scrolled)
+    }
+
+    @Test
+    fun column_whenParameterChanges() {
+        var reverse by mutableStateOf(true)
+        rule.setContentWithTestViewConfiguration {
+            LazyColumn(
+                reverseLayout = reverse
+            ) {
+                item {
+                    Box(Modifier.requiredSize(itemSize).testTag("0"))
+                    Box(Modifier.requiredSize(itemSize).testTag("1"))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertTopPositionInRootIsEqualTo(0.dp)
+        rule.onNodeWithTag("0")
+            .assertTopPositionInRootIsEqualTo(itemSize)
+
+        rule.runOnIdle {
+            reverse = false
+        }
+
+        rule.onNodeWithTag("0")
+            .assertTopPositionInRootIsEqualTo(0.dp)
+        rule.onNodeWithTag("1")
+            .assertTopPositionInRootIsEqualTo(itemSize)
+    }
+
+    @Test
+    fun row_whenParameterChanges() {
+        var reverse by mutableStateOf(true)
+        rule.setContentWithTestViewConfiguration {
+            LazyRow(
+                reverseLayout = reverse
+            ) {
+                item {
+                    Box(Modifier.requiredSize(itemSize).testTag("0"))
+                    Box(Modifier.requiredSize(itemSize).testTag("1"))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertLeftPositionInRootIsEqualTo(0.dp)
+        rule.onNodeWithTag("0")
+            .assertLeftPositionInRootIsEqualTo(itemSize)
+
+        rule.runOnIdle {
+            reverse = false
+        }
+
+        rule.onNodeWithTag("0")
+            .assertLeftPositionInRootIsEqualTo(0.dp)
+        rule.onNodeWithTag("1")
+            .assertLeftPositionInRootIsEqualTo(itemSize)
     }
 }
