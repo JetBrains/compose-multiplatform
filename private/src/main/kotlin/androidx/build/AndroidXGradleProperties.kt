@@ -123,6 +123,11 @@ const val VERIFY_UP_TO_DATE = "androidx.verifyUpToDate"
  */
 const val KMP_GITHUB_BUILD = "androidx.github.build"
 
+/**
+ * If true, include mac targets when building KMP
+ */
+const val KMP_ENABLE_MAC = "androidx.kmp.mac.enabled"
+
 val ALL_ANDROIDX_PROPERTIES = setOf(
     ALL_WARNINGS_AS_ERRORS,
     ALTERNATIVE_PROJECT_URL,
@@ -145,7 +150,8 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     PLAYGROUND_SNAPSHOT_BUILD_ID,
     PLAYGROUND_METALAVA_BUILD_ID,
     PLAYGROUND_DOKKA_BUILD_ID,
-    KMP_GITHUB_BUILD
+    KMP_GITHUB_BUILD,
+    KMP_ENABLE_MAC
 )
 
 /**
