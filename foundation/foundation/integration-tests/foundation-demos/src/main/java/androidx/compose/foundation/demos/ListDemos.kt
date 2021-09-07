@@ -27,6 +27,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,13 +37,16 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
@@ -53,11 +57,13 @@ import androidx.compose.foundation.samples.StickyHeaderSample
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.material.Button
+import androidx.compose.material.Checkbox
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.OutlinedButton
+import androidx.compose.material.RadioButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -98,7 +104,7 @@ val LazyListDemos = listOf(
     ComposableDemo("LazyRow DSL") { LazyRowScope() },
     ComposableDemo("LazyColumn with sticky headers") { StickyHeaderSample() },
     ComposableDemo("Arrangements") { LazyListArrangements() },
-    ComposableDemo("Reverse scroll direction") { ReverseLayout() },
+    ComposableDemo("ReverseLayout and RTL") { ReverseLayoutAndRtlDemo() },
     ComposableDemo("Nested lazy lists") { NestedLazyDemo() },
     ComposableDemo("LazyGrid") { LazyGridDemo() },
     ComposableDemo("LazyGrid with Spacing") { LazyGridWithSpacingDemo() },
@@ -436,70 +442,142 @@ private val Arrangements = listOf(
 )
 
 @Composable
-fun ReverseLayout() {
+private fun ReverseLayoutAndRtlDemo() {
+    val backgroundColor = Color(1f, .8f, .8f)
     Column {
         val scrollState = rememberScrollState()
         val lazyState = rememberLazyListState()
-        var count by remember { mutableStateOf(3) }
-        var reverse by remember { mutableStateOf(true) }
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Button(onClick = { count -= 5 }) {
+        var count by remember { mutableStateOf(10) }
+        var reverse by remember { mutableStateOf(false) }
+        var rtl by remember { mutableStateOf(false) }
+        var column by remember { mutableStateOf(true) }
+        val direction = if (rtl) LayoutDirection.Rtl else LayoutDirection.Ltr
+
+        Row(
+            modifier = Modifier.padding(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(onClick = { count = max(0, count - 5) }) {
                 Text("--")
             }
             Button(onClick = { count += 5 }) {
                 Text("++")
             }
-            Button(onClick = { reverse = !reverse }) {
-                Text("=!")
-            }
-            Text("Scroll=${scrollState.value.toInt()}")
-            Text(
-                "Lazy=${lazyState.firstVisibleItemIndex}; " +
-                    "${lazyState.firstVisibleItemScrollOffset}"
-            )
-        }
-        Row {
-            val item1 = @Composable { index: Int ->
-                Text(
-                    "$index",
-                    Modifier
-                        .requiredHeight(200.dp)
-                        .fillMaxWidth()
-                        .background(Color.Red)
-                        .border(1.dp, Color.Cyan)
-                )
-            }
-            val item2 = @Composable { index: Int ->
-                Text("After $index")
-            }
-            Column(
-                verticalArrangement = if (reverse) Arrangement.Bottom else Arrangement.Top,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .verticalScroll(scrollState, reverseScrolling = reverse)
-            ) {
-                if (reverse) {
-                    (count - 1 downTo 0).forEach {
-                        item2(it)
-                        item1(it)
-                    }
-                } else {
-                    (0 until count).forEach {
-                        item1(it)
-                        item2(it)
-                    }
+            Column {
+                Row {
+                    Checkbox(checked = reverse, onCheckedChange = { reverse = it })
+                    Text("reverse")
+                }
+                Row {
+                    Checkbox(checked = rtl, onCheckedChange = { rtl = it })
+                    Text("RTL")
                 }
             }
-            LazyColumn(
-                reverseLayout = reverse,
-                state = lazyState,
-                modifier = Modifier.weight(1f).fillMaxHeight()
-            ) {
-                items(count) {
+            Column {
+                Row {
+                    RadioButton(selected = column, { column = true })
+                    Text("Cols")
+                }
+                Row {
+                    RadioButton(selected = !column, { column = false })
+                    Text("Rows")
+                }
+            }
+        }
+
+        val itemModifier = if (column) {
+            Modifier.heightIn(200.dp).fillMaxWidth()
+        } else {
+            Modifier.widthIn(200.dp).fillMaxHeight()
+        }
+        val item1 = @Composable { index: Int ->
+            Text(
+                "${index}A",
+                itemModifier
+                    .background(backgroundColor)
+                    .border(1.dp, Color.Cyan)
+            )
+        }
+        val item2 = @Composable { index: Int ->
+            Text("${index}B")
+        }
+
+        @Composable
+        fun NonLazyContent() {
+            if (reverse) {
+                (count - 1 downTo 0).forEach {
+                    item2(it)
+                    item1(it)
+                }
+            } else {
+                (0 until count).forEach {
                     item1(it)
                     item2(it)
                 }
+            }
+        }
+        val lazyContent: LazyListScope.() -> Unit = {
+            items(count) {
+                item1(it)
+                item2(it)
+            }
+        }
+
+        if (column) {
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text("Column: scroll=${scrollState.value}", Modifier.weight(1f))
+                Text(
+                    "LazyColumn: index=${lazyState.firstVisibleItemIndex}, " +
+                        "offset=${lazyState.firstVisibleItemScrollOffset}",
+                    Modifier.weight(1f)
+                )
+            }
+            Row {
+                CompositionLocalProvider(LocalLayoutDirection provides direction) {
+                    Column(
+                        verticalArrangement = if (reverse) Arrangement.Bottom else Arrangement.Top,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .verticalScroll(scrollState, reverseScrolling = reverse)
+                    ) {
+                        NonLazyContent()
+                    }
+                }
+                CompositionLocalProvider(LocalLayoutDirection provides direction) {
+                    LazyColumn(
+                        reverseLayout = reverse,
+                        state = lazyState,
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                        content = lazyContent
+                    )
+                }
+            }
+        } else {
+            Text("Row: scroll=${scrollState.value}")
+            CompositionLocalProvider(LocalLayoutDirection provides direction) {
+                Row(
+                    horizontalArrangement = if (reverse) Arrangement.End else Arrangement.Start,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .horizontalScroll(scrollState, reverseScrolling = reverse)
+                ) {
+                    NonLazyContent()
+                }
+            }
+            Text(
+                "LazyRow: index=${lazyState.firstVisibleItemIndex}, " +
+                    "offset=${lazyState.firstVisibleItemScrollOffset}"
+            )
+            CompositionLocalProvider(LocalLayoutDirection provides direction) {
+                LazyRow(
+                    state = lazyState,
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    reverseLayout = reverse,
+                    content = lazyContent
+                )
             }
         }
     }
