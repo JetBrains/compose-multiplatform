@@ -121,13 +121,6 @@ class MultiModalInjectionScope(node: SemanticsNode, testContext: TestContext) : 
             inputDispatcher.updateTouchPointer(pointerId, globalPosition)
         }
 
-        override fun updatePointerBy(pointerId: Int, delta: Offset) {
-            // Ignore currentPosition of null here, let movePointer generate the error
-            val globalPosition =
-                (inputDispatcher.getCurrentTouchPosition(pointerId) ?: Offset.Zero) + delta
-            inputDispatcher.updateTouchPointer(pointerId, globalPosition)
-        }
-
         override fun move(delayMillis: Long) {
             advanceEventTime(delayMillis)
             inputDispatcher.enqueueTouchMove()

@@ -353,7 +353,7 @@ package androidx.compose.ui.test {
     method public default void moveTo(int pointerId, long position, optional long delayMillis);
     method public default void moveTo(long position, optional long delayMillis);
     method public void up(optional int pointerId);
-    method public void updatePointerBy(int pointerId, long delta);
+    method public default void updatePointerBy(int pointerId, long delta);
     method public void updatePointerTo(int pointerId, long position);
   }
 
