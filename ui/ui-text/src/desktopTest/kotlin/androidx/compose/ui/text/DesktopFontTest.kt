@@ -24,8 +24,8 @@ import androidx.compose.ui.text.platform.FontLoader
 import androidx.compose.ui.text.platform.GenericFontFamiliesMapping
 import androidx.compose.ui.text.platform.Typeface
 import com.google.common.truth.Truth
-import org.jetbrains.skija.Data
-import org.jetbrains.skija.Typeface
+import org.jetbrains.skia.Data
+import org.jetbrains.skia.Typeface
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test

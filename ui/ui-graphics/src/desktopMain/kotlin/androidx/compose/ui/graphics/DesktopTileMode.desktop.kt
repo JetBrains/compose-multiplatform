@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.graphics
 
-import org.jetbrains.skija.FilterTileMode
+import org.jetbrains.skia.FilterTileMode
 
 actual fun TileMode.isSupported(): Boolean = true
 

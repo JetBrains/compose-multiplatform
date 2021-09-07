@@ -18,7 +18,7 @@ package androidx.compose.ui.graphics
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.geometry.Offset
-import org.jetbrains.skija.ImageFilter
+import org.jetbrains.skia.ImageFilter
 
 /**
  * Convert the [ImageFilter] instance into a compose compatible [RenderEffect]

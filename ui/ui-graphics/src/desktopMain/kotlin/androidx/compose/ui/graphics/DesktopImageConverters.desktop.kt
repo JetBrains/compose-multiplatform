@@ -25,9 +25,9 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import org.jetbrains.skija.Bitmap
-import org.jetbrains.skija.ColorAlphaType
-import org.jetbrains.skija.ImageInfo
+import org.jetbrains.skia.Bitmap
+import org.jetbrains.skia.ColorAlphaType
+import org.jetbrains.skia.ImageInfo
 import java.awt.Image
 import java.awt.Point
 import java.awt.image.AbstractMultiResolutionImage

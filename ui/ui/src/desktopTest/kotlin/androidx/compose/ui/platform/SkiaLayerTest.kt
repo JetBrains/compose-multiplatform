@@ -34,11 +34,11 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.roundToInt
 
-class SkijaLayerTest {
+class SkiaLayerTest {
     @get:Rule
     val rule = createComposeRule()
 
-    private val layer = TestSkijaLayer()
+    private val layer = TestSkiaLayer()
     private val cos45 = cos(PI / 4)
 
     @Test
@@ -312,13 +312,13 @@ class SkijaLayerTest {
         assertEquals(IntOffset(-10 * 4 + 60, 100 * 2 + 7), matrix.map(Offset(100f, 10f)).round())
     }
 
-    private fun TestSkijaLayer() = SkijaLayer(
+    private fun TestSkiaLayer() = SkiaLayer(
         Density(1f, 1f),
         invalidateParentLayer = {},
         drawBlock = {}
     )
 
-    private fun SkijaLayer.updateProperties(
+    private fun SkiaLayer.updateProperties(
         scaleX: Float = 1f,
         scaleY: Float = 1f,
         alpha: Float = 1f,

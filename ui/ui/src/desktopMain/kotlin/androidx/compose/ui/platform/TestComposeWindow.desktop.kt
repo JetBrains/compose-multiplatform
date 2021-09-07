@@ -27,7 +27,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.cancel
-import org.jetbrains.skija.Surface
+import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.FrameDispatcher
 import kotlin.coroutines.CoroutineContext
 

@@ -23,11 +23,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.GenericFontFamily
 import androidx.compose.ui.text.font.LoadedFontFamily
 import androidx.compose.ui.util.fastForEach
-import org.jetbrains.skija.Data
-import org.jetbrains.skija.FontMgr
-import org.jetbrains.skija.Typeface as SkTypeface
-import org.jetbrains.skija.paragraph.FontCollection
-import org.jetbrains.skija.paragraph.TypefaceFontProvider
+import org.jetbrains.skia.Data
+import org.jetbrains.skia.FontMgr
+import org.jetbrains.skia.Typeface as SkTypeface
+import org.jetbrains.skia.paragraph.FontCollection
+import org.jetbrains.skia.paragraph.TypefaceFontProvider
 import java.io.File
 import java.security.MessageDigest
 import androidx.compose.ui.text.font.Font
@@ -272,7 +272,7 @@ internal class DesktopTypeface(
 }
 
 /**
- * Returns a Compose [Typeface] from Skija [SkTypeface].
+ * Returns a Compose [Typeface] from Skia [SkTypeface].
  *
  * @param typeface Android Typeface instance
  */
@@ -299,7 +299,7 @@ class FontLoader : Font.ResourceLoader {
     private val fontProvider = TypefaceFontProvider()
 
     init {
-        fonts.setDefaultFontManager(FontMgr.getDefault())
+        fonts.setDefaultFontManager(FontMgr.default)
         fonts.setAssetFontManager(fontProvider)
     }
 

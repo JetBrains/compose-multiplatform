@@ -17,9 +17,9 @@
 package androidx.compose.ui.graphics
 
 import androidx.compose.ui.geometry.Offset
-import org.jetbrains.skija.GradientStyle
+import org.jetbrains.skia.GradientStyle
 
-actual typealias Shader = org.jetbrains.skija.Shader
+actual typealias Shader = org.jetbrains.skia.Shader
 
 internal actual fun ActualLinearGradientShader(
     from: Offset,

@@ -17,10 +17,10 @@
 package androidx.compose.ui.graphics
 
 internal class DesktopPathMeasure : PathMeasure {
-    private val skija = org.jetbrains.skija.PathMeasure()
+    private val skia = org.jetbrains.skia.PathMeasure()
 
     override fun setPath(path: Path?, forceClosed: Boolean) {
-        skija.setPath(path?.asDesktopPath(), forceClosed)
+        skia.setPath(path?.asDesktopPath(), forceClosed)
     }
 
     override fun getSegment(
@@ -28,7 +28,7 @@ internal class DesktopPathMeasure : PathMeasure {
         stopDistance: Float,
         destination: Path,
         startWithMoveTo: Boolean
-    ) = skija.getSegment(
+    ) = skia.getSegment(
         startDistance,
         stopDistance,
         destination.asDesktopPath(),
@@ -36,7 +36,7 @@ internal class DesktopPathMeasure : PathMeasure {
     )
 
     override val length: Float
-        get() = skija.length
+        get() = skia.length
 }
 
 actual fun PathMeasure(): PathMeasure =

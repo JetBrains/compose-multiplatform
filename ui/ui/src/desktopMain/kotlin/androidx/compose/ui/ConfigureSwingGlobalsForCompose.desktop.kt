@@ -15,7 +15,7 @@
  */
 package androidx.compose.ui
 
-import org.jetbrains.skija.impl.Library
+import org.jetbrains.skia.impl.Library
 
 /**
  * Override global configuration for Swing that is needed for stand-alone Compose application.
