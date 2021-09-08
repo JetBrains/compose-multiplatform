@@ -17,7 +17,9 @@
 package androidx.compose.ui.window
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.currentCompositionLocalContext
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
@@ -305,12 +307,16 @@ fun Window(
     update: (ComposeWindow) -> Unit = {},
     content: @Composable FrameWindowScope.() -> Unit
 ) {
-    val composition = rememberCompositionContext()
+    val currentLocals by rememberUpdatedState(currentCompositionLocalContext)
     AwtWindow(
         visible = visible,
         create = {
             create().apply {
-                setContent(composition, onPreviewKeyEvent, onKeyEvent, content)
+                setContent(onPreviewKeyEvent, onKeyEvent) {
+                    CompositionLocalProvider(currentLocals) {
+                        content()
+                    }
+                }
             }
         },
         dispose = dispose,
