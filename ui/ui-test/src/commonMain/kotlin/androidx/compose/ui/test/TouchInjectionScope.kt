@@ -235,7 +235,11 @@ interface TouchInjectionScope : InjectionScope {
      * pointer. For example, `delta = Offset(10.px, -10.px) will add 10.px to the pointer's
      * x-position, and subtract 10.px from the pointer's y-position.
      */
-    fun updatePointerBy(pointerId: Int, delta: Offset)
+    fun updatePointerBy(pointerId: Int, delta: Offset) {
+        // Ignore currentPosition of null here, let updatePointerTo generate the error
+        val position = (currentPosition(pointerId) ?: Offset.Zero) + delta
+        updatePointerTo(pointerId, position)
+    }
 
     /**
      * Sends a move event [delayMillis] after the last sent event without updating any of the
