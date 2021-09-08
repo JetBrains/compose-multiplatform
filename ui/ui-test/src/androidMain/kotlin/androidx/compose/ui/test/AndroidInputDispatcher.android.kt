@@ -67,7 +67,7 @@ internal actual fun createInputDispatcher(
 
 internal class AndroidInputDispatcher(
     private val testContext: TestContext,
-    private val root: ViewRootForTest?,
+    private val root: ViewRootForTest,
     private val sendEvent: (MotionEvent) -> Unit
 ) : InputDispatcher(testContext, root) {
 
@@ -118,20 +118,30 @@ internal class AndroidInputDispatcher(
 
     override fun MouseInputState.enqueuePress(buttonId: Int) {
         enqueueMouseEvent(if (hasOneButtonPressed) ACTION_DOWN else ACTION_MOVE)
-        enqueueMouseEvent(ACTION_BUTTON_PRESS)
+        if (isWithinRootBounds(currentMousePosition)) {
+            enqueueMouseEvent(ACTION_BUTTON_PRESS)
+        }
     }
 
     override fun MouseInputState.enqueueMove() {
-        enqueueMouseEvent(if (isEntered) ACTION_HOVER_MOVE else ACTION_MOVE)
+        if (isWithinRootBounds(currentMousePosition)) {
+            enqueueMouseEvent(if (isEntered) ACTION_HOVER_MOVE else ACTION_MOVE)
+        } else if (hasAnyButtonPressed) {
+            enqueueMouseEvent(ACTION_MOVE)
+        }
     }
 
     override fun MouseInputState.enqueueRelease(buttonId: Int) {
-        enqueueMouseEvent(ACTION_BUTTON_RELEASE)
+        if (isWithinRootBounds(currentMousePosition)) {
+            enqueueMouseEvent(ACTION_BUTTON_RELEASE)
+        }
         enqueueMouseEvent(if (hasNoButtonsPressed) ACTION_UP else ACTION_MOVE)
     }
 
     override fun MouseInputState.enqueueEnter() {
-        enqueueMouseEvent(ACTION_HOVER_ENTER)
+        if (isWithinRootBounds(currentMousePosition)) {
+            enqueueMouseEvent(ACTION_HOVER_ENTER)
+        }
     }
 
     override fun MouseInputState.enqueueExit() {
@@ -206,11 +216,11 @@ internal class AndroidInputDispatcher(
                     "eventTimes=$eventTimes, " +
                     "coordinates=$coordinates)"
             }
-            val positionInScreen = root?.let {
+            val positionInScreen = run {
                 val array = intArrayOf(0, 0)
-                it.view.getLocationOnScreen(array)
+                root.view.getLocationOnScreen(array)
                 Offset(array[0].toFloat(), array[1].toFloat())
-            } ?: Offset.Zero
+            }
             val motionEvent = MotionEvent.obtain(
                 /* downTime = */ downTime,
                 /* eventTime = */ eventTimes[0],
@@ -291,11 +301,11 @@ internal class AndroidInputDispatcher(
                     "axis=$axis, " +
                     "axisDelta=$axisDelta)"
             }
-            val positionInScreen = root?.let {
+            val positionInScreen = run {
                 val array = intArrayOf(0, 0)
                 root.view.getLocationOnScreen(array)
                 Offset(array[0].toFloat(), array[1].toFloat())
-            } ?: Offset.Zero
+            }
             batchedEvents.add(
                 MotionEvent.obtain(
                     /* downTime = */ downTime,

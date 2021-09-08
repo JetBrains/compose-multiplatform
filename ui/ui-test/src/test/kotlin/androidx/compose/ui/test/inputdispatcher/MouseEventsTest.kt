@@ -63,6 +63,8 @@ class MouseEventsTest : InputDispatcherTest() {
         private val position2 = Offset(2f, 2f)
         private val position3 = Offset(3f, 3f)
         private val position4 = Offset(4f, 4f)
+        private val positionMin1 = Offset(-1f, -1f)
+        private val positionMin2 = Offset(-2f, -2f)
     }
 
     @Test
@@ -181,6 +183,128 @@ class MouseEventsTest : InputDispatcherTest() {
         buttonState = 0
         events.removeFirst(1).let { (cancelEvent) ->
             cancelEvent.verifyMouseEvent(ACTION_CANCEL, t, Offset.Zero, buttonState)
+        }
+    }
+
+    @Test
+    fun hoverOutOfRootBounds() {
+        // Scenario:
+        // move mouse within bounds
+        // move mouse out of bounds
+        // move mouse out of bounds again
+        // move mouse into bounds
+
+        var expectedEvents = 0
+        subject.verifyMousePosition(Offset.Zero)
+        subject.enqueueMouseMove(position1)
+        subject.verifyMousePosition(position1)
+        expectedEvents += 2 // enter + hover
+        subject.advanceEventTime()
+        subject.enqueueMouseMove(positionMin1)
+        subject.verifyMousePosition(positionMin1)
+        expectedEvents += 1 // exit (suppressed move)
+        subject.advanceEventTime()
+        subject.enqueueMouseMove(positionMin2)
+        subject.verifyMousePosition(positionMin2)
+        expectedEvents += 0 // nothing (suppressed move)
+        subject.advanceEventTime()
+        subject.enqueueMouseMove(position2)
+        subject.verifyMousePosition(position2)
+        expectedEvents += 2 // enter + hover
+        subject.flush()
+
+        recorder.assertHasValidEventTimes()
+        assertThat(recorder.events).hasSize(expectedEvents)
+        val events = recorder.events.toMutableList()
+
+        // enter + hover
+        var t = 0L
+        events.removeFirst(2).let { (enterEvent, hoverEvent) ->
+            enterEvent.verifyMouseEvent(ACTION_HOVER_ENTER, t, position1, 0)
+            hoverEvent.verifyMouseEvent(ACTION_HOVER_MOVE, t, position1, 0)
+        }
+
+        // exit (suppressed move)
+        t += eventPeriodMillis
+        events.removeFirst(1).let { (exitEvent) ->
+            exitEvent.verifyMouseEvent(ACTION_HOVER_EXIT, t, positionMin1, 0)
+        }
+
+        // nothing (suppressed move)
+        t += eventPeriodMillis
+
+        // enter + hover
+        t += eventPeriodMillis
+        events.removeFirst(2).let { (enterEvent, hoverEvent) ->
+            enterEvent.verifyMouseEvent(ACTION_HOVER_ENTER, t, position2, 0)
+            hoverEvent.verifyMouseEvent(ACTION_HOVER_MOVE, t, position2, 0)
+        }
+    }
+
+    @Test
+    fun moveOutOfRootBounds() {
+        // Scenario:
+        // press primary button within bounds
+        // move mouse out of bounds
+        // press secondary button
+        // release secondary button
+        // release primary button
+
+        var expectedEvents = 0
+        subject.verifyMousePosition(Offset.Zero)
+        subject.enqueueMousePress(MouseButton.Primary.buttonId)
+        expectedEvents += 2 // down + press
+        subject.advanceEventTime()
+        subject.enqueueMouseMove(positionMin1)
+        subject.verifyMousePosition(positionMin1)
+        expectedEvents += 1 // move
+        subject.advanceEventTime()
+        subject.enqueueMousePress(MouseButton.Secondary.buttonId)
+        expectedEvents += 1 // move (suppressed press)
+        subject.advanceEventTime()
+        subject.enqueueMouseRelease(MouseButton.Secondary.buttonId)
+        expectedEvents += 1 // move (suppressed release)
+        subject.advanceEventTime()
+        subject.enqueueMouseRelease(MouseButton.Primary.buttonId)
+        expectedEvents += 1 // up (suppressed release)
+        subject.flush()
+
+        recorder.assertHasValidEventTimes()
+        assertThat(recorder.events).hasSize(expectedEvents)
+        val events = recorder.events.toMutableList()
+
+        // enter + hover
+        var t = 0L
+        var buttonState = BUTTON_PRIMARY
+        events.removeFirst(2).let { (downEvent, pressEvent) ->
+            downEvent.verifyMouseEvent(ACTION_DOWN, t, Offset.Zero, buttonState)
+            pressEvent.verifyMouseEvent(ACTION_BUTTON_PRESS, t, Offset.Zero, buttonState)
+        }
+
+        // move
+        t += eventPeriodMillis
+        events.removeFirst(1).let { (moveEvent) ->
+            moveEvent.verifyMouseEvent(ACTION_MOVE, t, positionMin1, buttonState)
+        }
+
+        // move (suppressed press)
+        t += eventPeriodMillis
+        buttonState = BUTTON_PRIMARY or BUTTON_SECONDARY
+        events.removeFirst(1).let { (moveEvent) ->
+            moveEvent.verifyMouseEvent(ACTION_MOVE, t, positionMin1, buttonState)
+        }
+
+        // move (suppressed release)
+        t += eventPeriodMillis
+        buttonState = BUTTON_PRIMARY
+        events.removeFirst(1).let { (moveEvent) ->
+            moveEvent.verifyMouseEvent(ACTION_MOVE, t, positionMin1, buttonState)
+        }
+
+        // up (suppressed release)
+        t += eventPeriodMillis
+        events.removeFirst(1).let { (moveEvent) ->
+            moveEvent.verifyMouseEvent(ACTION_UP, t, positionMin1, 0)
         }
     }
 
@@ -618,6 +742,17 @@ class MouseEventsTest : InputDispatcherTest() {
     }
 
     @Test
+    fun enqueueMouseDown_outOfBounds() {
+        subject.updateMousePosition(positionMin1)
+        expectError<IllegalStateException>(
+            expectedMessage = "Cannot start a mouse gesture outside the Compose root bounds, " +
+                "mouse position is .* and bounds are .*"
+        ) {
+            subject.enqueueMousePress(1)
+        }
+    }
+
+    @Test
     fun enqueueMouseUp_withoutDown() {
         expectError<IllegalStateException>(
             expectedMessage = "Cannot send mouse button up event, button 1 is not pressed"
@@ -643,6 +778,16 @@ class MouseEventsTest : InputDispatcherTest() {
             expectedMessage = "Cannot send mouse hover enter event, mouse buttons are down"
         ) {
             subject.enqueueMouseEnter(position1)
+        }
+    }
+
+    @Test
+    fun enqueueMouseEnter_outOfBounds() {
+        expectError<IllegalStateException>(
+            expectedMessage = "Cannot send mouse hover enter event, " +
+                "Offset\\(-1\\.0, -1\\.0\\) is out of bounds"
+        ) {
+            subject.enqueueMouseEnter(positionMin1)
         }
     }
 
