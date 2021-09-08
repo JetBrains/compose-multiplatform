@@ -318,14 +318,16 @@ package androidx.compose.runtime {
     method public void cancel();
     method public void close();
     method public long getChangeCount();
+    method public kotlinx.coroutines.flow.StateFlow<androidx.compose.runtime.Recomposer.State> getCurrentState();
     method public boolean getHasPendingWork();
-    method public kotlinx.coroutines.flow.Flow<androidx.compose.runtime.Recomposer.State> getState();
+    method @Deprecated public kotlinx.coroutines.flow.Flow<androidx.compose.runtime.Recomposer.State> getState();
     method public suspend Object? join(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public suspend Object? runRecomposeAndApplyChanges(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method @androidx.compose.runtime.ExperimentalComposeApi public suspend Object? runRecomposeConcurrentlyAndApplyChanges(kotlin.coroutines.CoroutineContext recomposeCoroutineContext, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     property public final long changeCount;
+    property public final kotlinx.coroutines.flow.StateFlow<androidx.compose.runtime.Recomposer.State> currentState;
     property public final boolean hasPendingWork;
-    property public final kotlinx.coroutines.flow.Flow<androidx.compose.runtime.Recomposer.State> state;
+    property @Deprecated public final kotlinx.coroutines.flow.Flow<androidx.compose.runtime.Recomposer.State> state;
     field public static final androidx.compose.runtime.Recomposer.Companion Companion;
   }
 

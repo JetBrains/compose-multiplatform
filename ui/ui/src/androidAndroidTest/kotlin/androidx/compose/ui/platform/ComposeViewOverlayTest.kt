@@ -137,6 +137,6 @@ class ComposeViewOverlayTest {
     }
 
     private fun Recomposer.waitForIdle() = runBlocking {
-        state.filter { it == Recomposer.State.Idle }.first()
+        currentState.filter { it == Recomposer.State.Idle }.first()
     }
 }
