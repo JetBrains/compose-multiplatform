@@ -89,9 +89,9 @@ internal fun LazyList(
         reverseLayout,
         isVertical,
         horizontalAlignment,
-        verticalArrangement,
         verticalAlignment,
-        horizontalArrangement
+        horizontalArrangement,
+        verticalArrangement
     )
 
     state.prefetchPolicy = rememberLazyLayoutPrefetchPolicy()
@@ -218,13 +218,23 @@ private fun rememberLazyListMeasurePolicy(
     isVertical: Boolean,
     /** The alignment to align items horizontally. Required when isVertical is true */
     horizontalAlignment: Alignment.Horizontal? = null,
-    /** The vertical arrangement for items. Required when isVertical is true */
-    verticalArrangement: Arrangement.Vertical? = null,
     /** The alignment to align items vertically. Required when isVertical is false */
     verticalAlignment: Alignment.Vertical? = null,
     /** The horizontal arrangement for items. Required when isVertical is false */
-    horizontalArrangement: Arrangement.Horizontal? = null
-) = remember {
+    horizontalArrangement: Arrangement.Horizontal? = null,
+    /** The vertical arrangement for items. Required when isVertical is true */
+    verticalArrangement: Arrangement.Vertical? = null
+) = remember(
+    state,
+    overScrollController,
+    contentPadding,
+    reverseLayout,
+    isVertical,
+    horizontalAlignment,
+    verticalAlignment,
+    horizontalArrangement,
+    verticalArrangement
+) {
     LazyMeasurePolicy { measurables, constraints ->
         constraints.assertNotNestingScrollableContainers(isVertical)
 
