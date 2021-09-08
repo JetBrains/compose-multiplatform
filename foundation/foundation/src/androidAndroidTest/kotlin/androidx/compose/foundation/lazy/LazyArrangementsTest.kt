@@ -24,6 +24,9 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
@@ -460,6 +463,52 @@ class LazyArrangementsTest {
         assertArrangementForTwoItems(
             Arrangement.End, LayoutDirection.Ltr, reverseLayout = true
         )
+    }
+
+    @Test
+    fun column_whenArrangementChanges() {
+        var arrangement by mutableStateOf(Arrangement.Top)
+        rule.setContent {
+            LazyColumn(
+                modifier = Modifier.requiredSize(containerSize),
+                verticalArrangement = arrangement
+            ) {
+                items(2) {
+                    Item(it)
+                }
+            }
+        }
+
+        assertArrangementForTwoItems(Arrangement.Top)
+
+        rule.runOnIdle {
+            arrangement = Arrangement.Bottom
+        }
+
+        assertArrangementForTwoItems(Arrangement.Bottom)
+    }
+
+    @Test
+    fun row_whenArrangementChanges() {
+        var arrangement by mutableStateOf(Arrangement.Start)
+        rule.setContent {
+            LazyRow(
+                modifier = Modifier.requiredSize(containerSize),
+                horizontalArrangement = arrangement
+            ) {
+                items(2) {
+                    Item(it)
+                }
+            }
+        }
+
+        assertArrangementForTwoItems(Arrangement.Start, LayoutDirection.Ltr)
+
+        rule.runOnIdle {
+            arrangement = Arrangement.End
+        }
+
+        assertArrangementForTwoItems(Arrangement.End, LayoutDirection.Ltr)
     }
 
     fun composeColumnWith(arrangement: Arrangement.Vertical) {
