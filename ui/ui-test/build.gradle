@@ -27,6 +27,13 @@ plugins {
 AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 android {
+    sourceSets {
+        if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
+            test.java.srcDirs += "src/androidCommonTest/kotlin"
+            androidTest.java.srcDirs += "src/androidCommonTest/kotlin"
+        }
+    }
+
     lintOptions {
         disable("InvalidPackage")
     }
@@ -49,6 +56,12 @@ dependencies {
         implementation(project(":compose:ui:ui-util"))
         implementation("androidx.annotation:annotation:1.1.0")
         implementation(libs.espressoCore)
+
+        testImplementation(project(":compose:test-utils"))
+        testImplementation(libs.truth)
+        testImplementation(libs.robolectric)
+        testImplementation(libs.mockitoCore)
+        testImplementation(libs.mockitoKotlin)
 
         androidTestImplementation("androidx.activity:activity-compose:1.3.1")
         androidTestImplementation(project(":compose:material:material"))
@@ -91,6 +104,14 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.espressoCore)
             }
 
+            test.dependencies {
+                implementation(project(":compose:test-utils"))
+                implementation(libs.truth)
+                implementation(libs.robolectric)
+                implementation(libs.mockitoCore)
+                implementation(libs.mockitoKotlin)
+            }
+
             androidAndroidTest.dependencies {
                 implementation(project(":compose:material:material"))
                 implementation(project(":compose:test-utils"))
@@ -111,6 +132,11 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             androidMain.dependsOn(jvmMain)
             desktopMain.dependsOn(jvmMain)
             jvmMain.dependsOn(commonMain)
+
+            def androidCommonTest = create("androidCommonTest")
+            androidCommonTest.dependsOn(commonTest)
+            test.dependsOn(androidCommonTest)
+            androidAndroidTest.dependsOn(androidCommonTest)
         }
     }
 }

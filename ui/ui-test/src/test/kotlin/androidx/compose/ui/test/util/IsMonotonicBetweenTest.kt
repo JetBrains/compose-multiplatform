@@ -17,22 +17,16 @@
 package androidx.compose.ui.test.util
 
 import androidx.compose.testutils.expectAssertionError
-import androidx.test.filters.SmallTest
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-
-// To satisfy ktlint
-@Suppress("unused")
-private class TruthTest
 
 /**
  * Tests for `List<Float>.`[isMonotonicBetween]. See documentation of that method for expected
  * results.
  */
-@SmallTest
 @RunWith(Parameterized::class)
-class ListFloatIsMonotonicBetweenTest(private val config: TestConfig) {
+class IsMonotonicBetweenTest(private val config: TestConfig) {
     data class TestConfig(
         val values: List<Float>,
         val a: Float,

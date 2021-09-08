@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,22 +37,24 @@ import androidx.compose.ui.test.AndroidInputDispatcher
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.test.MouseButton
+import androidx.compose.ui.test.RobolectricMinSdk
 import androidx.compose.ui.test.ScrollWheel
-import androidx.compose.ui.test.util.Touchscreen
-import androidx.compose.ui.test.util.Finger
 import androidx.compose.ui.test.util.assertHasValidEventTimes
-import androidx.compose.ui.test.util.verifyEvent
 import androidx.compose.ui.test.util.verifyMouseEvent
-import androidx.compose.ui.test.util.verifyPointer
-import androidx.test.filters.SmallTest
+import androidx.compose.ui.test.util.verifyTouchEvent
+import androidx.compose.ui.test.util.verifyTouchPointer
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 
 /**
  * Tests if [AndroidInputDispatcher.enqueueTouchDown] works
  */
-@SmallTest
+@RunWith(AndroidJUnit4::class)
+@Config(minSdk = RobolectricMinSdk)
 @OptIn(ExperimentalTestApi::class)
 class MouseEventsTest : InputDispatcherTest() {
     companion object {
@@ -506,15 +508,15 @@ class MouseEventsTest : InputDispatcherTest() {
         // down
         var t = 0L
         events.removeFirst(1).let { (downEvent) ->
-            downEvent.verifyEvent(1, ACTION_DOWN, 0, t, Touchscreen)
-            downEvent.verifyPointer(1, position1, Finger)
+            downEvent.verifyTouchEvent(1, ACTION_DOWN, 0, t)
+            downEvent.verifyTouchPointer(1, position1)
         }
 
         // cancel
         t += eventPeriodMillis
         events.removeFirst(1).let { (cancelEvent) ->
-            cancelEvent.verifyEvent(1, ACTION_CANCEL, 0, t, Touchscreen)
-            cancelEvent.verifyPointer(1, position1, Finger)
+            cancelEvent.verifyTouchEvent(1, ACTION_CANCEL, 0, t)
+            cancelEvent.verifyTouchPointer(1, position1)
         }
 
         // down + press
@@ -547,15 +549,15 @@ class MouseEventsTest : InputDispatcherTest() {
         // down
         var t = 0L
         events.removeFirst(1).let { (downEvent) ->
-            downEvent.verifyEvent(1, ACTION_DOWN, 0, t, Touchscreen)
-            downEvent.verifyPointer(1, position1, Finger)
+            downEvent.verifyTouchEvent(1, ACTION_DOWN, 0, t)
+            downEvent.verifyTouchPointer(1, position1)
         }
 
         // cancel
         t += eventPeriodMillis
         events.removeFirst(1).let { (cancelEvent) ->
-            cancelEvent.verifyEvent(1, ACTION_CANCEL, 0, t, Touchscreen)
-            cancelEvent.verifyPointer(1, position1, Finger)
+            cancelEvent.verifyTouchEvent(1, ACTION_CANCEL, 0, t)
+            cancelEvent.verifyTouchPointer(1, position1)
         }
 
         // enter + hover
@@ -586,15 +588,15 @@ class MouseEventsTest : InputDispatcherTest() {
         // down
         var t = 0L
         events.removeFirst(1).let { (downEvent) ->
-            downEvent.verifyEvent(1, ACTION_DOWN, 0, t, Touchscreen)
-            downEvent.verifyPointer(1, position1, Finger)
+            downEvent.verifyTouchEvent(1, ACTION_DOWN, 0, t)
+            downEvent.verifyTouchPointer(1, position1)
         }
 
         // cancel
         t += eventPeriodMillis
         events.removeFirst(1).let { (cancelEvent) ->
-            cancelEvent.verifyEvent(1, ACTION_CANCEL, 0, t, Touchscreen)
-            cancelEvent.verifyPointer(1, position1, Finger)
+            cancelEvent.verifyTouchEvent(1, ACTION_CANCEL, 0, t)
+            cancelEvent.verifyTouchPointer(1, position1)
         }
 
         // enter + hover + scroll
