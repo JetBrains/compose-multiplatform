@@ -332,7 +332,7 @@ class FontLoader : Font.ResourceLoader {
                 listOf(alias)
             }
             is GenericFontFamily -> mapGenericFontFamily(fontFamily)
-            FontFamily.Default -> listOf()
+            FontFamily.Default -> mapGenericFontFamily(FontFamily.SansSerif)
             else -> throw IllegalArgumentException("Unknown font family type: $fontFamily")
         }
 
@@ -359,14 +359,9 @@ class FontLoader : Font.ResourceLoader {
         fontWeight: FontWeight = FontWeight.Normal,
         fontStyle: FontStyle = FontStyle.Normal
     ): SkTypeface? {
-        return when (fontFamily) {
-            FontFamily.Default -> fonts.defaultFallback()
-            else -> {
-                val aliases = ensureRegistered(fontFamily)
-                val style = fontStyle.toSkFontStyle().withWeight(fontWeight.weight)
-                fonts.findTypefaces(aliases.toTypedArray(), style).first()
-            }
-        }
+        val aliases = ensureRegistered(fontFamily)
+        val style = fontStyle.toSkFontStyle().withWeight(fontWeight.weight)
+        return fonts.findTypefaces(aliases.toTypedArray(), style).first()
     }
 }
 
