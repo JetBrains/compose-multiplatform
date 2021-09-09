@@ -23,7 +23,4 @@ internal interface LazyLayoutMeasureResult : MeasureResult, LazyLayoutInfo {
      * The list of [LazyLayoutItemInfo] representing all the currently visible items.
      */
     override val visibleItemsInfo: List<LazyLayoutItemInfo>
-
-    // TODO(popam): this should really be removed / derived implicitly from the placement block.
-    val composedButNotVisibleItemsIndices: List<Int>?
 }
