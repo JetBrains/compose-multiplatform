@@ -32,6 +32,7 @@ import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
@@ -4155,6 +4156,22 @@ class RowColumnTest : LayoutTest() {
         }
 
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
+    }
+
+    @Test
+    fun scenarioShouldNotCrash() {
+        val latch = CountDownLatch(1)
+
+        show {
+            Column(modifier = Modifier.width(IntrinsicSize.Max)) {
+                Row(Modifier.width(200.dp)) {
+                    Box(Modifier.weight(0.8f))
+                    Box(Modifier.weight(0.2f).onSizeChanged { latch.countDown() })
+                }
+            }
+        }
+
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
     }
 
     // endregion
