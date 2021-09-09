@@ -46,7 +46,6 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
@@ -980,7 +979,7 @@ private class SlideModifier(
     val lazyAnimation: Transition<EnterExitState>.DeferredAnimation<IntOffset, AnimationVector2D>,
     val slideIn: State<Slide?>,
     val slideOut: State<Slide?>
-) : LayoutModifier {
+) : LayoutModifierWithPassThroughIntrinsics() {
     val transitionSpec: Transition.Segment<EnterExitState>.() -> FiniteAnimationSpec<IntOffset> =
         {
             when {
@@ -1097,7 +1096,7 @@ private class ExpandShrinkModifier(
     val expand: State<ChangeSize?>,
     val shrink: State<ChangeSize?>,
     val alignment: State<Alignment?>
-) : LayoutModifier {
+) : LayoutModifierWithPassThroughIntrinsics() {
     var currentAlignment: Alignment? = null
     val sizeTransitionSpec: Transition.Segment<EnterExitState>.() -> FiniteAnimationSpec<IntSize> =
         {
