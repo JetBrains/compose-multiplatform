@@ -102,7 +102,7 @@ fun <T : Window> AwtWindow(
         // which will handle all the future Swing events while dialog is visible.
         //
         // We can't use LaunchedEffect or rememberCoroutineScope, because they have a dispatcher
-        // which is controlled by the Compose rendering loop (DesktopOwners.dispatcher) and we
+        // which is controlled by the Compose rendering loop (ComposeScene.dispatcher) and we
         // will block coroutine.
         //
         // 2.
