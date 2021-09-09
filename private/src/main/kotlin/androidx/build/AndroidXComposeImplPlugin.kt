@@ -310,7 +310,7 @@ fun Project.configureComposeImplPluginForAndroidx() {
     }.files
 
     val isTipOfTreeComposeCompilerProvider = project.provider({
-        conf.dependencies.first() !is ExternalModuleDependency
+        (!conf.isEmpty) && (conf.dependencies.first() !is ExternalModuleDependency)
     })
 
     project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
