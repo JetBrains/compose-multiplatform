@@ -48,9 +48,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.ParentDataModifier
@@ -513,7 +515,7 @@ class AnimatedContentScope<S> internal constructor(
     private inner class SizeModifier(
         val sizeAnimation: Transition<S>.DeferredAnimation<IntSize, AnimationVector2D>,
         val sizeTransform: State<SizeTransform?>,
-    ) : LayoutModifier {
+    ) : LayoutModifierWithPassThroughIntrinsics() {
 
         override fun MeasureScope.measure(
             measurable: Measurable,
@@ -677,8 +679,17 @@ fun <S> Transition<S>.AnimatedContent(
                     contentMap[it]?.invoke()
                 }
             }
-        }
-    ) { measurables, constraints ->
+        },
+        measurePolicy = remember { AnimatedContentMeasurePolicy(rootScope) }
+    )
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+private class AnimatedContentMeasurePolicy(val rootScope: AnimatedContentScope<*>) : MeasurePolicy {
+    override fun MeasureScope.measure(
+        measurables: List<Measurable>,
+        constraints: Constraints
+    ): MeasureResult {
         val placeables = arrayOfNulls<Placeable>(measurables.size)
         // Measure the target composable first (but place it on top unless zIndex is specified)
         measurables.fastForEachIndexed { index, measurable ->
@@ -698,7 +709,7 @@ fun <S> Transition<S>.AnimatedContent(
         val maxHeight = placeables.maxByOrNull { it?.height ?: 0 }?.height ?: 0
         rootScope.measuredSize = IntSize(maxWidth, maxHeight)
         // Position the children.
-        layout(maxWidth, maxHeight) {
+        return layout(maxWidth, maxHeight) {
             placeables.forEach { placeable ->
                 placeable?.let {
                     val offset = rootScope.contentAlignment.align(
@@ -711,4 +722,24 @@ fun <S> Transition<S>.AnimatedContent(
             }
         }
     }
+
+    override fun IntrinsicMeasureScope.minIntrinsicWidth(
+        measurables: List<IntrinsicMeasurable>,
+        height: Int
+    ) = measurables.asSequence().map { it.minIntrinsicWidth(height) }.maxOrNull() ?: 0
+
+    override fun IntrinsicMeasureScope.minIntrinsicHeight(
+        measurables: List<IntrinsicMeasurable>,
+        width: Int
+    ) = measurables.asSequence().map { it.minIntrinsicHeight(width) }.maxOrNull() ?: 0
+
+    override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+        measurables: List<IntrinsicMeasurable>,
+        height: Int
+    ) = measurables.asSequence().map { it.maxIntrinsicWidth(height) }.maxOrNull() ?: 0
+
+    override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+        measurables: List<IntrinsicMeasurable>,
+        width: Int
+    ) = measurables.asSequence().map { it.maxIntrinsicHeight(width) }.maxOrNull() ?: 0
 }

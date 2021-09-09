@@ -28,6 +28,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
@@ -86,7 +88,7 @@ fun Modifier.animateContentSize(
 private class SizeAnimationModifier(
     val animSpec: AnimationSpec<IntSize>,
     val scope: CoroutineScope,
-) : LayoutModifier {
+) : LayoutModifierWithPassThroughIntrinsics() {
     var listener: ((startSize: IntSize, endSize: IntSize) -> Unit)? = null
 
     data class AnimData(
@@ -132,4 +134,26 @@ private class SizeAnimationModifier(
         animData = data
         return data.anim.value
     }
+}
+
+internal abstract class LayoutModifierWithPassThroughIntrinsics : LayoutModifier {
+    final override fun IntrinsicMeasureScope.minIntrinsicWidth(
+        measurable: IntrinsicMeasurable,
+        height: Int
+    ) = measurable.minIntrinsicWidth(height)
+
+    final override fun IntrinsicMeasureScope.minIntrinsicHeight(
+        measurable: IntrinsicMeasurable,
+        width: Int
+    ) = measurable.minIntrinsicHeight(width)
+
+    final override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+        measurable: IntrinsicMeasurable,
+        height: Int
+    ) = measurable.maxIntrinsicWidth(height)
+
+    final override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+        measurable: IntrinsicMeasurable,
+        width: Int
+    ) = measurable.maxIntrinsicHeight(width)
 }
