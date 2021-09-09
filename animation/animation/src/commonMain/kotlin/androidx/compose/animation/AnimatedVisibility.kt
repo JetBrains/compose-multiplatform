@@ -108,7 +108,6 @@ import kotlinx.coroutines.flow.collect
  * @see shrinkOut
  * @see AnimatedVisibilityScope
  */
-@ExperimentalAnimationApi
 @Composable
 fun AnimatedVisibility(
     visible: Boolean,
@@ -184,7 +183,6 @@ fun AnimatedVisibility(
  * @see ColumnScope.AnimatedVisibility
  * @see AnimatedVisibilityScope
  */
-@ExperimentalAnimationApi
 @Composable
 fun RowScope.AnimatedVisibility(
     visible: Boolean,
@@ -258,7 +256,6 @@ fun RowScope.AnimatedVisibility(
  * @see AnimatedVisibility
  * @see AnimatedVisibilityScope
  */
-@ExperimentalAnimationApi
 @Composable
 fun ColumnScope.AnimatedVisibility(
     visible: Boolean,
@@ -365,7 +362,6 @@ enum class EnterExitState {
  * @see Transition.AnimatedVisibility
  * @see AnimatedVisibilityScope
  */
-@ExperimentalAnimationApi
 @Composable
 fun AnimatedVisibility(
     visibleState: MutableTransitionState<Boolean>,
@@ -441,7 +437,6 @@ fun AnimatedVisibility(
  * @see Transition.AnimatedVisibility
  * @see AnimatedVisibilityScope
  */
-@ExperimentalAnimationApi
 @Composable
 fun RowScope.AnimatedVisibility(
     visibleState: MutableTransitionState<Boolean>,
@@ -518,7 +513,6 @@ fun RowScope.AnimatedVisibility(
  * @see Transition.AnimatedVisibility
  * @see AnimatedVisibilityScope
  */
-@ExperimentalAnimationApi
 @Composable
 fun ColumnScope.AnimatedVisibility(
     visibleState: MutableTransitionState<Boolean>,
@@ -618,12 +612,14 @@ fun <T> Transition<T>.AnimatedVisibility(
  *
  * @sample androidx.compose.animation.samples.AVScopeAnimateEnterExit
  */
-@ExperimentalAnimationApi
 interface AnimatedVisibilityScope {
     /**
      * [transition] allows custom enter/exit animations to be specified. It will run simultaneously
      * with the built-in enter/exit transitions specified in [AnimatedVisibility].
      */
+    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @get:ExperimentalAnimationApi
+    @ExperimentalAnimationApi
     val transition: Transition<EnterExitState>
 
     /**
@@ -652,6 +648,7 @@ interface AnimatedVisibilityScope {
      *
      * @sample androidx.compose.animation.samples.AnimateEnterExitPartialContent
      */
+    @ExperimentalAnimationApi
     fun Modifier.animateEnterExit(
         enter: EnterTransition = fadeIn() + expandIn(),
         exit: ExitTransition = fadeOut() + shrinkOut(),
@@ -712,8 +709,11 @@ fun AnimatedVisibility(
 
 // RowScope and ColumnScope AnimatedEnterExit extensions and AnimatedEnterExit without a receiver
 // converge here.
-@OptIn(ExperimentalTransitionApi::class, InternalAnimationApi::class)
-@ExperimentalAnimationApi
+@OptIn(
+    ExperimentalTransitionApi::class,
+    InternalAnimationApi::class,
+    ExperimentalAnimationApi::class
+)
 @Composable
 private fun <T> AnimatedEnterExitImpl(
     transition: Transition<T>,
@@ -751,8 +751,7 @@ private fun <T> AnimatedEnterExitImpl(
     }
 }
 
-@OptIn(ExperimentalTransitionApi::class)
-@ExperimentalAnimationApi
+@OptIn(ExperimentalTransitionApi::class, ExperimentalAnimationApi::class)
 @Composable
 private inline fun AnimatedEnterExitImpl(
     transition: Transition<EnterExitState>,
@@ -787,8 +786,7 @@ private inline fun AnimatedEnterExitImpl(
 }
 
 // This converts Boolean visible to EnterExitState
-@OptIn(InternalAnimationApi::class)
-@ExperimentalAnimationApi
+@OptIn(InternalAnimationApi::class, ExperimentalAnimationApi::class)
 @Composable
 private fun <T> Transition<T>.targetEnterExit(
     visible: (T) -> Boolean,

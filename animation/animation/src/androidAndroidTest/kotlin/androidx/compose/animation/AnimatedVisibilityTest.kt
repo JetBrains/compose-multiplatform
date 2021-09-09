@@ -83,15 +83,16 @@ class AnimatedVisibilityTest {
                 AnimatedVisibility(
                     visible, testModifier,
                     enter = expandIn(
-                        Alignment.BottomEnd,
-                        { fullSize -> IntSize(fullSize.width / 4, fullSize.height / 2) },
-                        tween(160, easing = LinearOutSlowInEasing)
-                    ),
+                        tween(160, easing = LinearOutSlowInEasing),
+                        Alignment.BottomEnd
+                    ) { fullSize ->
+                        IntSize(fullSize.width / 4, fullSize.height / 2)
+                    },
+
                     exit = shrinkOut(
-                        Alignment.CenterStart,
-                        { fullSize -> IntSize(fullSize.width / 10, fullSize.height / 5) },
-                        tween(160, easing = FastOutSlowInEasing)
-                    )
+                        tween(160, easing = FastOutSlowInEasing),
+                        Alignment.CenterStart
+                    ) { fullSize -> IntSize(fullSize.width / 10, fullSize.height / 5) },
                 ) {
                     Box(
                         Modifier.requiredSize(100.dp, 100.dp)
@@ -196,13 +197,11 @@ class AnimatedVisibilityTest {
             AnimatedVisibility(
                 visible, testModifier,
                 enter = slideIn(
-                    { fullSize -> IntOffset(fullSize.width / 4, -fullSize.height / 2) },
                     tween(160, easing = LinearOutSlowInEasing)
-                ),
+                ) { fullSize -> IntOffset(fullSize.width / 4, -fullSize.height / 2) },
                 exit = slideOut(
-                    { fullSize -> IntOffset(-fullSize.width / 10, fullSize.height / 5) },
                     tween(160, easing = FastOutSlowInEasing)
-                )
+                ) { fullSize -> IntOffset(-fullSize.width / 10, fullSize.height / 5) },
             ) {
                 Box(
                     Modifier.requiredSize(100.dp, 100.dp)
@@ -598,7 +597,7 @@ class AnimatedVisibilityTest {
                 }.AnimatedVisibility(
                     { it },
                     enter = fadeIn(animationSpec = spec()) +
-                        slideInVertically({ 200 }, animationSpec = spec()),
+                        slideInVertically(animationSpec = spec()) { 200 },
                     exit = scaleOut(animationSpec = spec()) +
                         shrinkHorizontally(animationSpec = spec())
                 ) {

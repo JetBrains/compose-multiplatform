@@ -379,8 +379,10 @@ package androidx.compose.animation.core {
     ctor public MutableTransitionState(S? initialState);
     method public S! getCurrentState();
     method public S! getTargetState();
+    method public boolean isIdle();
     method public void setTargetState(S! targetState);
     property public final S! currentState;
+    property public final boolean isIdle;
     property public final S! targetState;
   }
 
