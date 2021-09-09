@@ -1130,7 +1130,7 @@ internal class GlobalSnapshot(id: Int, invalid: SnapshotIdSet) :
                     globalWriteObservers.toMutableList()
                 } else null
                 )?.let {
-                it.firstOrNull() ?: { state: Any ->
+                it.singleOrNull() ?: { state: Any ->
                     it.fastForEach { it(state) }
                 }
             }
