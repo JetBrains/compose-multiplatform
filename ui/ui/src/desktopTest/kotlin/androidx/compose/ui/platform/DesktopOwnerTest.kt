@@ -71,7 +71,7 @@ import java.awt.event.KeyEvent
 
 class DesktopOwnerTest {
     @get:Rule
-    val screenshotRule = DesktopScreenshotTestRule("ui/ui-desktop/ui")
+    val screenshotRule = DesktopScreenshotTestRule("compose/ui/ui-desktop/ui")
     @get:Rule
     val composeRule = createComposeRule()
 
