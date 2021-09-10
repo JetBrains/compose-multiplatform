@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
+
 plugins {
     kotlin("multiplatform") version "1.5.21"
     id("org.jetbrains.compose") version "1.0.0-alpha1"
@@ -26,3 +28,9 @@ kotlin {
     }
 }
 
+// a temporary workaround for a bug in jsRun invocation - see https://youtrack.jetbrains.com/issue/KT-48273
+afterEvaluate {
+    extensions.configure<NodeJsRootExtension> {
+        versions.webpackDevServer.version = "4.0.0"
+    }
+}

@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
 import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
@@ -71,5 +72,12 @@ compose.desktop {
                 iconFile.set(iconsRoot.resolve("icon-linux.png"))
             }
         }
+    }
+}
+
+// a temporary workaround for a bug in jsRun invocation - see https://youtrack.jetbrains.com/issue/KT-48273
+afterEvaluate {
+    extensions.configure<NodeJsRootExtension> {
+        versions.webpackDevServer.version = "4.0.0"
     }
 }
