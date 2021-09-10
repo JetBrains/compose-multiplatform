@@ -558,7 +558,13 @@ internal class SuspendingPointerInputFilter(
                 )
             }
             val job = coroutineScope.launch {
-                delay(timeMillis)
+                // Delay twice because the timeout continuation needs to be lower-priority than
+                // input events, not treated fairly in FIFO order. The second
+                // micro-delay reposts it to the back of the queue, after any input events
+                // that were posted but not processed during the first delay.
+                delay(timeMillis - 1)
+                delay(1)
+
                 pointerAwaiter?.resumeWithException(
                     PointerEventTimeoutCancellationException(timeMillis)
                 )

@@ -17,6 +17,8 @@
 package androidx.compose.ui.input.pointer
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_DOWN
 import android.view.MotionEvent.ACTION_HOVER_ENTER
@@ -73,6 +75,7 @@ import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Ignore
@@ -464,6 +467,75 @@ class AndroidPointerInputTest {
             assertThat(log).hasSize(1)
             assertThat(log[0]).hasSize(1)
             assertThat(log[0][0].position).isEqualTo(Offset(0f, 0f))
+        }
+    }
+
+    @Test
+    fun detectTapGestures_blockedMainThread() {
+        var didLongPress = false
+        var didTap = false
+        var inputLatch = CountDownLatch(1)
+        var positionedLatch = CountDownLatch(1)
+
+        rule.runOnUiThread {
+            container.setContent {
+                FillLayout(
+                    Modifier
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onLongPress = { didLongPress = true; inputLatch.countDown() },
+                                onTap = { didTap = true; inputLatch.countDown() }
+                            )
+                        }
+                        .onGloballyPositioned { positionedLatch.countDown() }
+                )
+            }
+        }
+
+        assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
+        val locationInWindow = IntArray(2)
+        container.getLocationInWindow(locationInWindow)
+
+        val handler = Handler(Looper.getMainLooper())
+
+        val touchUpDelay = 100
+        val sleepTime = android.view.ViewConfiguration.getLongPressTimeout() + 100L
+
+        repeat(5) { iteration ->
+            rule.runOnUiThread {
+                val downEvent = createPointerEventAt(
+                    iteration * sleepTime.toInt(),
+                    ACTION_DOWN,
+                    locationInWindow
+                )
+                findRootView(container).dispatchTouchEvent(downEvent)
+            }
+
+            rule.runOnUiThread {
+                val upEvent = createPointerEventAt(
+                    touchUpDelay + iteration * sleepTime.toInt(),
+                    ACTION_UP,
+                    locationInWindow
+                )
+                handler.postDelayed(
+                    Runnable {
+                        findRootView(container).dispatchTouchEvent(upEvent)
+                    },
+                    touchUpDelay.toLong()
+                )
+
+                // Block the UI thread from now until past the long-press
+                // timeout. This tests that even in pathological situations,
+                // the upEvent is still processed before the long-press timeout.
+                Thread.sleep(sleepTime)
+            }
+
+            assertTrue(inputLatch.await(1, TimeUnit.SECONDS))
+            assertFalse(didLongPress)
+            assertTrue(didTap)
+
+            didTap = false
+            inputLatch = CountDownLatch(1)
         }
     }
 
