@@ -22,7 +22,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
-import androidx.compose.ui.layout.SubcomposeMeasureScope
 
 /**
  * Creates a [LazyLayoutState] that is remembered across recompositions.
@@ -90,7 +89,10 @@ private object EmptyLazyLayoutInfo : LazyLayoutInfo {
 }
 
 internal interface LazyLayoutOnPostMeasureListener {
-    fun SubcomposeMeasureScope.onPostMeasure(result: LazyLayoutMeasureResult)
+    fun onPostMeasure(
+        result: LazyLayoutMeasureResult,
+        placeablesProvider: LazyLayoutPlaceablesProvider
+    )
 }
 
 private object NoItemsProvider : LazyLayoutItemsProvider {

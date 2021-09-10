@@ -30,7 +30,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import kotlin.math.abs
 
@@ -347,12 +346,6 @@ class LazyListState constructor(
                 )
             }
         )
-
-        /**
-         * Pre-allocated initial value for [LazyItemScopeImpl] to not have it nullable and
-         * avoid using late init.
-         */
-        private val InitialLazyItemsScopeImpl = LazyItemScopeImpl(Density(0f, 0f), Constraints())
     }
 }
 
