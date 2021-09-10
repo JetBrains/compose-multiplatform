@@ -117,9 +117,6 @@ class MutableTransitionState<S>(initialState: S) {
      *
      * @sample androidx.compose.animation.core.samples.TransitionStateIsIdleSample
      */
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
-    @get:ExperimentalTransitionApi
-    @ExperimentalTransitionApi
     val isIdle: Boolean
         get() = (currentState == targetState) && !isRunning
 

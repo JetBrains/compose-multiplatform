@@ -77,13 +77,11 @@ fun AnimateIncrementDecrementSample() {
                 if (targetState > initialState) {
                     // If the incoming number is larger, new number slides up and fades in while
                     // the previous (smaller) number slides up to make room and fades out.
-                    slideInVertically({ it }) + fadeIn() with
-                        slideOutVertically({ -it }) + fadeOut()
+                    slideInVertically { it } + fadeIn() with slideOutVertically { -it } + fadeOut()
                 } else {
                     // If the incoming number is smaller, new number slides down and fades in while
                     // the previous number slides down and fades out.
-                    slideInVertically({ -it }) + fadeIn() with
-                        slideOutVertically({ it }) + fadeOut()
+                    slideInVertically { -it } + fadeIn() with slideOutVertically { it } + fadeOut()
                     // Disable clipping since the faded slide-out is desired out of bounds, but
                     // the size transform is still needed from number getting longer
                 }.using(SizeTransform(clip = false)) // Using default spring for the size change.
@@ -114,13 +112,19 @@ fun AnimateIncrementDecrementSample() {
 fun SimpleAnimatedContentSample() {
     // enum class ContentState { Foo, Bar, Baz }
     @Composable
-    fun Foo() { Box(Modifier.size(200.dp).background(Color(0xffffdb00))) }
+    fun Foo() {
+        Box(Modifier.size(200.dp).background(Color(0xffffdb00)))
+    }
 
     @Composable
-    fun Bar() { Box(Modifier.size(40.dp).background(Color(0xffff8100))) }
+    fun Bar() {
+        Box(Modifier.size(40.dp).background(Color(0xffff8100)))
+    }
 
     @Composable
-    fun Baz() { Box(Modifier.size(80.dp, 20.dp).background(Color(0xffff4400))) }
+    fun Baz() {
+        Box(Modifier.size(80.dp, 20.dp).background(Color(0xffff4400)))
+    }
 
     var contentState: ContentState by remember { mutableStateOf(ContentState.Foo) }
     AnimatedContent(contentState) {
@@ -176,9 +180,12 @@ fun AnimatedContentTransitionSpecSample() {
 @OptIn(ExperimentalAnimationApi::class)
 fun TransitionExtensionAnimatedContentSample() {
     @Composable
-    fun CollapsedCart() { /* Some content here */ }
+    fun CollapsedCart() { /* Some content here */
+    }
+
     @Composable
-    fun ExpandedCart() { /* Some content here */ }
+    fun ExpandedCart() { /* Some content here */
+    }
 
     // enum class CartState { Expanded, Collapsed }
     var cartState by remember { mutableStateOf(CartState.Collapsed) }
@@ -273,19 +280,16 @@ fun SlideIntoContainerSample() {
                 // out of the bounds. This creates a sense of child menu catching up. Since
                 // the child menu has a higher z-order, it will cover the parent meu as it
                 // comes in.
-                slideOutOfContainer(
-                    towards = SlideDirection.Left,
-                    targetOffset = { offsetForFullSlide -> offsetForFullSlide / 2 }
-                )
+                slideOutOfContainer(towards = SlideDirection.Left) { offsetForFullSlide ->
+                    offsetForFullSlide / 2
+                }
         } else {
             // Going from child menu to parent menu, slide towards right.
             // Slide parent by half amount compared to child menu to create an interesting
             // parallax visual effect.
-            slideIntoContainer(
-                towards = SlideDirection.Right,
-                initialOffset = { offsetForFullSlide -> offsetForFullSlide / 2 }
-            ) with
-                slideOutOfContainer(towards = SlideDirection.Right)
+            slideIntoContainer(towards = SlideDirection.Right) { offsetForFullSlide ->
+                offsetForFullSlide / 2
+            } with slideOutOfContainer(towards = SlideDirection.Right)
         }.apply {
             // Here we can specify the zIndex for the target (i.e. incoming) content.
             targetContentZIndex = when (targetState) {

@@ -23,7 +23,6 @@ import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColor
-import androidx.compose.animation.core.ExperimentalTransitionApi
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.MutableTransitionState
@@ -96,60 +95,54 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.collect
 
-@OptIn(ExperimentalAnimationApi::class)
 @Sampled
 @Composable
 fun HorizontalTransitionSample() {
     var visible by remember { mutableStateOf(true) }
     AnimatedVisibility(
         visible = visible,
-        enter = expandHorizontally(
-            // Set the start width to 20 (pixels), 0 by default
-            initialWidth = { 20 }
-        ),
+        // Set the start width to 20 (pixels), 0 by default
+        enter = expandHorizontally { 20 },
         exit = shrinkHorizontally(
+            // Overwrites the default animation with tween for this shrink animation.
+            animationSpec = tween(),
             // Shrink towards the end (i.e. right edge for LTR, left edge for RTL). The default
             // direction for the shrink is towards [Alignment.Start]
             shrinkTowards = Alignment.End,
+        ) { fullWidth ->
             // Set the end width for the shrink animation to a quarter of the full width.
-            targetWidth = { fullWidth -> fullWidth / 4 },
-            // Overwrites the default animation with tween for this shrink animation.
-            animationSpec = tween()
-        )
+            fullWidth / 4
+        }
     ) {
         // Content that needs to appear/disappear goes here:
         Box(Modifier.fillMaxWidth().requiredHeight(200.dp))
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Sampled
 @Composable
 fun SlideTransition() {
     var visible by remember { mutableStateOf(true) }
     AnimatedVisibility(
         visible = visible,
-        enter = slideInHorizontally(
+        enter = slideInHorizontally(animationSpec = tween(durationMillis = 200)) { fullWidth ->
             // Offsets the content by 1/3 of its width to the left, and slide towards right
-            initialOffsetX = { fullWidth -> -fullWidth / 3 },
             // Overwrites the default animation with tween for this slide animation.
-            animationSpec = tween(durationMillis = 200)
-        ) + fadeIn(
+            -fullWidth / 3
+        } + fadeIn(
             // Overwrites the default animation with tween
             animationSpec = tween(durationMillis = 200)
         ),
-        exit = slideOutHorizontally(
+        exit = slideOutHorizontally(animationSpec = spring(stiffness = Spring.StiffnessHigh)) {
             // Overwrites the ending position of the slide-out to 200 (pixels) to the right
-            targetOffsetX = { 200 },
-            animationSpec = spring(stiffness = Spring.StiffnessHigh)
-        ) + fadeOut()
+            200
+        } + fadeOut()
     ) {
         // Content that needs to appear/disappear goes here:
         Box(Modifier.fillMaxWidth().requiredHeight(200.dp)) {}
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Sampled
 @Composable
 fun FadeTransition() {
@@ -252,34 +245,30 @@ fun ColumnScope.AnimatedFloatingActionButton() {
     Spacer(Modifier.requiredHeight(20.dp))
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Sampled
 @Composable
 fun SlideInOutSample() {
     var visible by remember { mutableStateOf(true) }
     AnimatedVisibility(
         visible,
-        enter = slideIn(
+        enter = slideIn(tween(100, easing = LinearOutSlowInEasing)) { fullSize ->
             // Specifies the starting offset of the slide-in to be 1/4 of the width to the right,
             // 100 (pixels) below the content position, which results in a simultaneous slide up
             // and slide left.
-            { fullSize -> IntOffset(fullSize.width / 4, 100) },
-            tween(100, easing = LinearOutSlowInEasing)
-        ),
-        exit = slideOut(
+            IntOffset(fullSize.width / 4, 100)
+        },
+        exit = slideOut(tween(100, easing = FastOutSlowInEasing)) {
             // The offset can be entirely independent of the size of the content. This specifies
             // a target offset 180 pixels to the left of the content, and 50 pixels below. This will
             // produce a slide-left combined with a slide-down.
-            { IntOffset(-180, 50) },
-            tween(100, easing = FastOutSlowInEasing)
-        )
+            IntOffset(-180, 50)
+        },
     ) {
         // Content that needs to appear/disappear goes here:
         Text("Content to appear/disappear", Modifier.fillMaxWidth().requiredHeight(200.dp))
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Sampled
 @Composable
 fun ExpandShrinkVerticallySample() {
@@ -289,22 +278,17 @@ fun ExpandShrinkVerticallySample() {
         visible,
         // Sets the initial height of the content to 20, revealing only the top of the content at
         // the beginning of the expanding animation.
-        enter = expandVertically(
-            expandFrom = Alignment.Top,
-            initialHeight = { 20 }
-        ),
+        enter = expandVertically(expandFrom = Alignment.Top) { 20 },
         // Shrinks the content to half of its full height via an animation.
-        exit = shrinkVertically(
-            targetHeight = { fullHeight -> fullHeight / 2 },
-            animationSpec = tween()
-        )
+        exit = shrinkVertically(animationSpec = tween()) { fullHeight ->
+            fullHeight / 2
+        },
     ) {
         // Content that needs to appear/disappear goes here:
         Text("Content to appear/disappear", Modifier.fillMaxWidth().requiredHeight(200.dp))
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Sampled
 @Composable
 fun ExpandInShrinkOutSample() {
@@ -313,23 +297,25 @@ fun ExpandInShrinkOutSample() {
     AnimatedVisibility(
         visible,
         enter = expandIn(
-            // Overwrites the corner of the content that is first revealed
-            expandFrom = Alignment.BottomStart,
-            // Overwrites the initial size to 50 pixels by 50 pixels
-            initialSize = { IntSize(50, 50) },
             // Overwrites the default spring animation with tween
-            animationSpec = tween(100, easing = LinearOutSlowInEasing)
-        ),
+            animationSpec = tween(100, easing = LinearOutSlowInEasing),
+            // Overwrites the corner of the content that is first revealed
+            expandFrom = Alignment.BottomStart
+        ) {
+            // Overwrites the initial size to 50 pixels by 50 pixels
+            IntSize(50, 50)
+        },
         exit = shrinkOut(
+            tween(100, easing = FastOutSlowInEasing),
             // Overwrites the area of the content that the shrink animation will end on. The
             // following parameters will shrink the content's clip bounds from the full size of the
             // content to 1/10 of the width and 1/5 of the height. The shrinking clip bounds will
             // always be aligned to the CenterStart of the full-content bounds.
-            shrinkTowards = Alignment.CenterStart,
+            shrinkTowards = Alignment.CenterStart
+        ) { fullSize ->
             // Overwrites the target size of the shrinking animation.
-            targetSize = { fullSize -> IntSize(fullSize.width / 10, fullSize.height / 5) },
-            animationSpec = tween(100, easing = FastOutSlowInEasing)
-        )
+            IntSize(fullSize.width / 10, fullSize.height / 5)
+        }
     ) {
         // Content that needs to appear/disappear goes here:
         Text("Content to appear/disappear", Modifier.fillMaxWidth().requiredHeight(200.dp))
@@ -337,7 +323,6 @@ fun ExpandInShrinkOutSample() {
 }
 
 @Sampled
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ColumnAnimatedVisibilitySample() {
     var itemIndex by remember { mutableStateOf(0) }
@@ -358,7 +343,6 @@ fun ColumnAnimatedVisibilitySample() {
 }
 
 @Sampled
-@OptIn(ExperimentalAnimationApi::class, ExperimentalTransitionApi::class)
 @Composable
 fun AVScopeAnimateEnterExit() {
     @OptIn(ExperimentalAnimationApi::class)
@@ -398,7 +382,6 @@ fun AVScopeAnimateEnterExit() {
         }
     }
 
-    @OptIn(ExperimentalAnimationApi::class, ExperimentalTransitionApi::class)
     @Composable
     fun AnimateMainContent(mainContentVisible: MutableTransitionState<Boolean>) {
         Box {
@@ -457,8 +440,14 @@ fun AddAnimatedVisibilityToGenericTransitionSample() {
                     .background(Color(0xffcdb7f6), CircleShape)
             )
             Column(Modifier.align(Alignment.CenterVertically)) {
-                Box(Modifier.height(30.dp).width(300.dp).padding(5.dp).background(Color.LightGray))
-                Box(Modifier.height(30.dp).width(300.dp).padding(5.dp).background(Color.LightGray))
+                Box(
+                    Modifier.height(30.dp).width(300.dp).padding(5.dp)
+                        .background(Color.LightGray)
+                )
+                Box(
+                    Modifier.height(30.dp).width(300.dp).padding(5.dp)
+                        .background(Color.LightGray)
+                )
             }
         }
     }
@@ -519,7 +508,6 @@ fun AddAnimatedVisibilityToGenericTransitionSample() {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalTransitionApi::class)
 @Sampled
 @Composable
 fun AnimatedVisibilityLazyColumnSample() {
@@ -542,7 +530,10 @@ fun AnimatedVisibilityLazyColumnSample() {
         // visibility. When the MutableTransitionState's targetState changes, corresponding
         // transition will be fired. MutableTransitionState allows animation lifecycle to be
         // observed through it's [currentState] and [isIdle]. See below for details.
-        inner class ColoredItem(val visible: MutableTransitionState<Boolean>, val itemId: Int) {
+        inner class ColoredItem(
+            val visible: MutableTransitionState<Boolean>,
+            val itemId: Int
+        ) {
             val color: Color
                 get() = turquoiseColors.let {
                     it[itemId % it.size]
@@ -568,7 +559,6 @@ fun AnimatedVisibilityLazyColumnSample() {
             item.visible.targetState = false
         }
 
-        @OptIn(ExperimentalTransitionApi::class)
         fun pruneItems() {
             // Inspect the animation status through MutableTransitionState. If isIdle == true,
             // all animations have finished for the transition.
@@ -588,13 +578,15 @@ fun AnimatedVisibilityLazyColumnSample() {
         }
     }
 
-    @OptIn(ExperimentalAnimationApi::class, ExperimentalTransitionApi::class)
     @Composable
     fun AnimatedVisibilityInLazyColumn() {
         Column {
             val model = remember { MyModel() }
             Row(Modifier.fillMaxWidth()) {
-                Button({ model.addNewItem() }, modifier = Modifier.padding(15.dp).weight(1f)) {
+                Button(
+                    { model.addNewItem() },
+                    modifier = Modifier.padding(15.dp).weight(1f)
+                ) {
                     Text("Add")
                 }
             }
@@ -617,10 +609,14 @@ fun AnimatedVisibilityLazyColumnSample() {
                         enter = expandVertically(),
                         exit = shrinkVertically()
                     ) {
-                        Box(Modifier.fillMaxWidth().requiredHeight(90.dp).background(item.color)) {
+                        Box(
+                            Modifier.fillMaxWidth().requiredHeight(90.dp)
+                                .background(item.color)
+                        ) {
                             Button(
                                 { model.removeItem(item) },
-                                modifier = Modifier.align(Alignment.CenterEnd).padding(15.dp)
+                                modifier = Modifier.align(Alignment.CenterEnd)
+                                    .padding(15.dp)
                             ) {
                                 Text("Remove")
                             }
@@ -640,11 +636,11 @@ fun AnimatedVisibilityLazyColumnSample() {
 }
 
 @Sampled
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AVColumnScopeWithMutableTransitionState() {
     var visible by remember { mutableStateOf(true) }
-    val colors = remember { listOf(Color(0xff2a9d8f), Color(0xffe9c46a), Color(0xfff4a261)) }
+    val colors =
+        remember { listOf(Color(0xff2a9d8f), Color(0xffe9c46a), Color(0xfff4a261)) }
     Column {
         repeat(3) {
             AnimatedVisibility(
@@ -667,7 +663,6 @@ fun AVColumnScopeWithMutableTransitionState() {
 }
 
 @Sampled
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AnimateEnterExitPartialContent() {
     @OptIn(ExperimentalAnimationApi::class)
