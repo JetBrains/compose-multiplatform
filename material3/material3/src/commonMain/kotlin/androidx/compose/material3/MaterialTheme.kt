@@ -16,8 +16,13 @@
 
 package androidx.compose.material3
 
+import androidx.compose.material.ripple.LocalRippleTheme
+import androidx.compose.material.ripple.RippleAlpha
+import androidx.compose.material.ripple.RippleTheme
+import androidx.compose.material3.tokens.State
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 
@@ -62,6 +67,7 @@ fun MaterialTheme(
     CompositionLocalProvider(
         LocalColorScheme provides rememberedColorScheme,
         LocalTypography provides typography,
+        LocalRippleTheme provides MaterialRippleTheme,
         LocalShapes provides shapes,
     ) {
         ProvideTextStyle(value = typography.bodyLarge, content = content)
@@ -97,3 +103,19 @@ object MaterialTheme {
         @ReadOnlyComposable
         get() = LocalShapes.current
 }
+
+@Immutable
+private object MaterialRippleTheme : RippleTheme {
+    @Composable
+    override fun defaultColor() = LocalContentColor.current
+
+    @Composable
+    override fun rippleAlpha() = DefaultRippleAlpha
+}
+
+private val DefaultRippleAlpha = RippleAlpha(
+    pressedAlpha = State.PressedStateLayerOpacity,
+    focusedAlpha = State.FocusStateLayerOpacity,
+    draggedAlpha = State.DraggedStateLayerOpacity,
+    hoveredAlpha = State.HoverStateLayerOpacity
+)
