@@ -15,4 +15,19 @@
   ~ limitations under the License
   -->
 
-<manifest package="androidx.compose.material.catalog.library" />
+<manifest
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        package="androidx.compose.material.catalog">
+
+    <application
+        android:label="@string/compose_material_catalog"
+        android:icon="@mipmap/ic_launcher"
+        android:theme="@style/Theme.Catalog">
+        <activity android:name=".CatalogActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

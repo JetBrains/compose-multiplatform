@@ -17,23 +17,13 @@
 
 <resources>
 
-    <string name="compose_material">Compose Material</string>
+    <string name="compose_material_you">Compose Material You</string>
 
     <string name="description">Description</string>
     <string name="examples">Examples</string>
     <string name="no_examples">No examples</string>
 
     <string name="theming_options">Theming options</string>
-    <string name="primary_color">Primary color</string>
-    <string name="secondary_color">Secondary color</string>
-    <string name="font_family">Font family</string>
-    <string name="shape_corner_family">Shape corner family</string>
-    <string name="small_shape_corner_size">Small shape corner size</string>
-    <string name="medium_shape_corner_size">Medium shape corner size</string>
-    <string name="large_shape_corner_size">Large shape corner size</string>
-    <string name="dp">%ddp</string>
-    <string name="apply">Apply</string>
-    <string name="reset">Reset</string>
 
     <string name="view_design_guidelines">View design guidelines</string>
     <string name="view_developer_docs">View developer docs</string>
