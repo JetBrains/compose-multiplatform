@@ -56,6 +56,7 @@ internal enum class TextFieldType {
 /**
  * Implementation of the [TextField] and [OutlinedTextField]
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun TextFieldImpl(
     type: TextFieldType,
@@ -156,6 +157,19 @@ internal fun TextFieldImpl(
         // it.
         val defaultErrorMessage = getString(DefaultErrorMessage)
         val textFieldModifier = modifier.semantics { if (isError) error(defaultErrorMessage) }
+
+        val leadingIconColor = if (colors is TextFieldColorsWithIcons) {
+            colors.leadingIconColor(enabled, isError, interactionSource).value
+        } else {
+            colors.leadingIconColor(enabled, isError).value
+        }
+
+        val trailingIconColor = if (colors is TextFieldColorsWithIcons) {
+            colors.trailingIconColor(enabled, isError, interactionSource).value
+        } else {
+            colors.trailingIconColor(enabled, isError).value
+        }
+
         when (type) {
             TextFieldType.Filled -> {
                 TextFieldLayout(
@@ -175,8 +189,8 @@ internal fun TextFieldImpl(
                     decoratedLabel = decoratedLabel,
                     leading = leading,
                     trailing = trailing,
-                    leadingColor = colors.leadingIconColor(enabled, isError).value,
-                    trailingColor = colors.trailingIconColor(enabled, isError).value,
+                    leadingColor = leadingIconColor,
+                    trailingColor = trailingIconColor,
                     labelProgress = labelProgress,
                     indicatorWidth = indicatorWidth,
                     indicatorColor =
@@ -204,8 +218,8 @@ internal fun TextFieldImpl(
                     decoratedLabel = decoratedLabel,
                     leading = leading,
                     trailing = trailing,
-                    leadingColor = colors.leadingIconColor(enabled, isError).value,
-                    trailingColor = colors.trailingIconColor(enabled, isError).value,
+                    leadingColor = leadingIconColor,
+                    trailingColor = trailingIconColor,
                     labelProgress = labelProgress,
                     indicatorWidth = indicatorWidth,
                     indicatorColor =

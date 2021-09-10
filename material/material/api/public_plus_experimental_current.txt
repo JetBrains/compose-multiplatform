@@ -751,6 +751,11 @@ package androidx.compose.material {
     method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> trailingIconColor(boolean enabled, boolean isError);
   }
 
+  @androidx.compose.material.ExperimentalMaterialApi public interface TextFieldColorsWithIcons extends androidx.compose.material.TextFieldColors {
+    method @androidx.compose.runtime.Composable public default androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> leadingIconColor(boolean enabled, boolean isError, androidx.compose.foundation.interaction.InteractionSource interactionSource);
+    method @androidx.compose.runtime.Composable public default androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> trailingIconColor(boolean enabled, boolean isError, androidx.compose.foundation.interaction.InteractionSource interactionSource);
+  }
+
   public final class TextFieldDefaults {
     method public float getMinHeight();
     method public float getMinWidth();

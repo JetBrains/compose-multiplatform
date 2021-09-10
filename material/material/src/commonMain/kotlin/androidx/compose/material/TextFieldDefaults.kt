@@ -123,6 +123,48 @@ interface TextFieldColors {
 }
 
 /**
+ * Temporary experimental interface, to expose interactionSource to
+ * leadingIconColor and trailingIconColor.
+ * TODO: Should be removed when b/198571248 is fixed.
+ */
+@ExperimentalMaterialApi
+interface TextFieldColorsWithIcons : TextFieldColors {
+    /**
+     * Represents the color used for the leading icon of this text field.
+     *
+     * @param enabled whether the text field is enabled
+     * @param isError whether the text field's current value is in error
+     * @param interactionSource the [InteractionSource] of this text field. Helps to determine if
+     * the text field is in focus or not
+     */
+    @Composable
+    fun leadingIconColor(
+        enabled: Boolean,
+        isError: Boolean,
+        interactionSource: InteractionSource
+    ): State<Color> {
+        return leadingIconColor(enabled, isError)
+    }
+
+    /**
+     * Represents the color used for the trailing icon of this text field.
+     *
+     * @param enabled whether the text field is enabled
+     * @param isError whether the text field's current value is in error
+     * @param interactionSource the [InteractionSource] of this text field. Helps to determine if
+     * the text field is in focus or not
+     */
+    @Composable
+    fun trailingIconColor(
+        enabled: Boolean,
+        isError: Boolean,
+        interactionSource: InteractionSource
+    ): State<Color> {
+        return trailingIconColor(enabled, isError)
+    }
+}
+
+/**
  * Contains the default values used by [TextField] and [OutlinedTextField].
  */
 object TextFieldDefaults {
