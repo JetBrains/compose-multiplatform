@@ -34,6 +34,7 @@ export ANDROIDX_PROJECTS=COMPOSE
 ```
 androidx.compose.multiplatformEnabled=true
 androidx.compose.jsCompilerTestsEnabled=true
+androidx.validateProjectStructure=false
 ```
 (note that https://android.googlesource.com/platform/frameworks/support build doesn't work with androidx.compose.jsCompilerTestsEnabled)
 
