@@ -30,7 +30,7 @@ import org.jetbrains.skia.Image
 import org.jetbrains.skia.Matrix44
 import org.jetbrains.skia.MipmapMode
 import org.jetbrains.skia.SamplingMode
-import org.jetbrains.skia.impl.Native
+import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.ClipMode as SkiaClipMode
 import org.jetbrains.skia.RRect as SkiaRRect
 import org.jetbrains.skia.Rect as SkiaRect
@@ -346,7 +346,7 @@ class DesktopCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
             vertices.textureCoordinates,
             vertices.indices,
             blendMode.toSkia().ordinal,
-            Native.getPtr(paint.asFrameworkPaint())
+            getPtr(paint.asFrameworkPaint())
         )
     }
 
