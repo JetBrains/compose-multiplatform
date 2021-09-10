@@ -231,16 +231,13 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
         if (trackedTransitions.contains(animation)) {
             val transition = (animation as TransitionComposeAnimation).animationObject
             // In case the transition have child transitions, make sure to return their
-            // animations as well.
-            // TODO(b/187962923): support indirect descendants, e.g. grandchildren animations.
-            val animations =
-                transition.animations + transition.transitions.flatMap { it.animations }
-            return animations.mapNotNull {
+            // descendant animations as well.
+            return transition.allAnimations().mapNotNull {
                 ComposeAnimatedProperty(it.label, it.value ?: return@mapNotNull null)
             }
         } else if (trackedAnimatedVisibility.contains(animation)) {
             (animation as AnimatedVisibilityComposeAnimation).childTransition?.let { child ->
-                return child.animations.mapNotNull {
+                return child.allAnimations().mapNotNull {
                     ComposeAnimatedProperty(it.label, it.value ?: return@mapNotNull null)
                 }
             }
@@ -293,4 +290,13 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
 
     private fun AnimatedVisibilityState.toCurrentTargetPair() =
         if (this == AnimatedVisibilityState.Enter) false to true else true to false
+
+    /**
+     * Return all the animations of a [Transition], as well as all the animations of its every
+     * descendant [Transition]s.
+     */
+    private fun Transition<*>.allAnimations(): List<Transition<*>.TransitionAnimationState<*, *>> {
+        val descendantAnimations = transitions.flatMap { it.allAnimations() }
+        return animations + descendantAnimations
+    }
 }
