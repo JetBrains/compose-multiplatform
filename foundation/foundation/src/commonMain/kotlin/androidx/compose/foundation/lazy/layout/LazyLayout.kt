@@ -47,14 +47,14 @@ internal fun LazyLayout(
     ) { constraints ->
         itemContentFactory.onBeforeMeasure(this, constraints)
 
-        val measurables = LazyMeasurablesProvider(
+        val placeablesProvider = LazyLayoutPlaceablesProvider(
             state.itemsProvider(),
             itemContentFactory,
             this
         )
-        val measureResult = with(measurePolicy) { measure(measurables, constraints) }
+        val measureResult = with(measurePolicy) { measure(placeablesProvider, constraints) }
 
-        state.onPostMeasureListener?.apply { onPostMeasure(measureResult) }
+        state.onPostMeasureListener?.apply { onPostMeasure(measureResult, placeablesProvider) }
         state.layoutInfoState.value = measureResult
         state.layoutInfoNonObservable = measureResult
 

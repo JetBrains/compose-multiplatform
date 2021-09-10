@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.ui.util.fastFirstOrNull
 import androidx.compose.ui.util.fastForEach
 
 /**
@@ -24,15 +23,12 @@ import androidx.compose.ui.util.fastForEach
  *
  * @param composedVisibleItems list of items already composed and expected to be visible. if the
  * header wasn't in this list but is needed the header will be added as the first item in this list.
- * @param notUsedButComposedItems list of items already composed, but not going to be visible as
- * their position is not within the viewport. in some conditions the header could be in this list.
  * @param itemProvider the provider so we can compose a header if it wasn't composed already
  * @param headerIndexes list of indexes of headers. Must be sorted.
  * @param startContentPadding the padding before the first item in the list
  */
 internal fun findOrComposeLazyListHeader(
     composedVisibleItems: MutableList<LazyMeasuredItem>,
-    notUsedButComposedItems: List<LazyMeasuredItem>?,
     itemProvider: LazyMeasuredItemProvider,
     headerIndexes: List<Int>,
     startContentPadding: Int
@@ -73,10 +69,6 @@ internal fun findOrComposeLazyListHeader(
     }
 
     val headerItem = alreadyVisibleHeaderItem
-        ?: notUsedButComposedItems?.fastFirstOrNull { it.index == currentHeaderListPosition }
-            ?.also {
-                composedVisibleItems.add(0, it)
-            }
         ?: itemProvider.getAndMeasure(DataIndex(currentHeaderListPosition)).also {
             composedVisibleItems.add(0, it)
         }

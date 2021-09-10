@@ -17,8 +17,8 @@
 package androidx.compose.foundation.lazy.layout
 
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.SubcomposeMeasureScope
 import androidx.compose.ui.unit.Constraints
 
@@ -28,21 +28,40 @@ import androidx.compose.ui.unit.Constraints
 @Stable
 internal fun interface LazyMeasurePolicy {
     fun MeasureScope.measure(
-        measurables: LazyMeasurablesProvider,
+        placeablesProvider: LazyLayoutPlaceablesProvider,
         constraints: Constraints
     ): LazyLayoutMeasureResult
 }
 
-/** A lazily evaluated "list" of [Measurable]s. */
 @Stable
-internal class LazyMeasurablesProvider internal constructor(
+internal class LazyLayoutPlaceablesProvider internal constructor(
     private val itemsProvider: LazyLayoutItemsProvider,
     private val itemContentFactory: LazyLayoutItemContentFactory,
     private val subcomposeMeasureScope: SubcomposeMeasureScope
 ) {
-    operator fun get(index: Int): List<Measurable> {
-        val key = itemsProvider.getKey(index)
-        val itemContent = itemContentFactory.getContent(index, key)
-        return subcomposeMeasureScope.subcompose(key, itemContent)
+
+    /**
+     * A cache of the previously composed items. It allows us to support [get]
+     * re-executions with the same index during the same measure pass.
+     */
+    private val placeablesCache = hashMapOf<Int, Array<Placeable>>()
+
+    /**
+     * Used to subcompose and measure the items of lazy layout.
+     */
+    fun getAndMeasure(index: Int, constraints: Constraints): Array<Placeable> {
+        val cachedPlaceable = placeablesCache[index]
+        return if (cachedPlaceable != null) {
+            cachedPlaceable
+        } else {
+            val key = itemsProvider.getKey(index)
+            val itemContent = itemContentFactory.getContent(index, key)
+            val measurables = subcomposeMeasureScope.subcompose(key, itemContent)
+            Array(measurables.size) {
+                measurables[it].measure(constraints)
+            }.also {
+                placeablesCache[index] = it
+            }
+        }
     }
 }

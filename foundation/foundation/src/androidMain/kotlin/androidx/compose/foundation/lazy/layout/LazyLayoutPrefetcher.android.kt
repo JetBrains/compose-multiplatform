@@ -24,10 +24,8 @@ import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.remember
 import androidx.compose.ui.layout.SubcomposeLayoutState
 import androidx.compose.ui.layout.SubcomposeLayoutState.PrecomposedSlotHandle
-import androidx.compose.ui.layout.SubcomposeMeasureScope
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.util.fastAny
-import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.trace
 import java.util.concurrent.TimeUnit
 
@@ -260,23 +258,20 @@ internal class LazyLayoutPrefetcher(
         }
     }
 
-    override fun SubcomposeMeasureScope.onPostMeasure(result: LazyLayoutMeasureResult) {
+    override fun onPostMeasure(
+        result: LazyLayoutMeasureResult,
+        placeablesProvider: LazyLayoutPlaceablesProvider
+    ) {
         val index = indexToPrefetch
         if (premeasuringIsNeeded && index != -1) {
             check(isActive)
             val itemsProvider = state.itemsProvider()
             if (index < itemsProvider.itemsCount) {
                 val isVisibleAlready = result.visibleItemsInfo.fastAny { it.index == index }
-                val composedButNotVisible = result.composedButNotVisibleItemsIndices != null &&
-                    result.composedButNotVisibleItemsIndices!!.fastAny { it == index }
-                if (isVisibleAlready || composedButNotVisible) {
+                if (isVisibleAlready) {
                     premeasuringIsNeeded = false
                 } else {
-                    val key = itemsProvider.getKey(index)
-                    val content = itemContentFactory.getContent(index, key)
-                    subcompose(key, content).fastForEach {
-                        it.measure(prefetchPolicy.constraints)
-                    }
+                    placeablesProvider.getAndMeasure(index, prefetchPolicy.constraints)
                 }
             }
         }

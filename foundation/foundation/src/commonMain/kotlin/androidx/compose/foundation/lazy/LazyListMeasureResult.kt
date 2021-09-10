@@ -34,11 +34,9 @@ internal class LazyListMeasureResult(
     val canScrollForward: Boolean,
     /** The amount of scroll consumed during the measure pass.*/
     val consumedScroll: Float,
-    /** List of items which were composed, but are not a part of [visibleItemsInfo].*/
-    val composedButNotVisibleItems: List<LazyMeasuredItem>?,
-    // MeasureResult defining the layout
+    /** MeasureResult defining the layout.*/
     val measureResult: MeasureResult,
-    // properties representing the info needed for LazyListLayoutInfo
+    // properties representing the info needed for LazyListLayoutInfo:
     /** see [LazyListLayoutInfo.visibleItemsInfo] */
     override val visibleItemsInfo: List<LazyListItemInfo>,
     /** see [LazyListLayoutInfo.viewportStartOffset] */
@@ -57,7 +55,5 @@ internal class LazyListMeasureResult(
                         override val key: Any get() = it.key
                     }
                 }
-            override val composedButNotVisibleItemsIndices: List<Int>?
-                get() = composedButNotVisibleItems?.fastMap { it.index }
         }
 }

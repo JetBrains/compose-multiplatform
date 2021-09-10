@@ -235,7 +235,7 @@ private fun rememberLazyListMeasurePolicy(
     horizontalArrangement,
     verticalArrangement
 ) {
-    LazyMeasurePolicy { measurables, constraints ->
+    LazyMeasurePolicy { placeablesProvider, constraints ->
         constraints.assertNotNestingScrollableContainers(isVertical)
 
         val itemsProvider = stateOfItemsProvider.value
@@ -271,7 +271,7 @@ private fun rememberLazyListMeasurePolicy(
             constraints,
             isVertical,
             itemsProvider,
-            measurables
+            placeablesProvider
         ) { index, key, placeables ->
             // we add spaceBetweenItems as an extra spacing for all items apart from the last one so
             // the lazy list measuring logic will take it into account.
