@@ -315,38 +315,36 @@ fun Project.configureComposeImplPluginForAndroidx() {
     val isTipOfTreeComposeCompilerProvider = project.provider({
         (!conf.isEmpty) && (conf.dependencies.first() !is ExternalModuleDependency)
     })
+    val enableMetricsProvider = project.providers.gradleProperty(enableMetricsArg)
+    val enableReportsProvider = project.providers.gradleProperty(enableReportsArg)
 
+    val libraryMetricsDirectory = project.rootProject.getLibraryMetricsDirectory()
+    val libraryReportsDirectory = project.rootProject.getLibraryReportsDirectory()
     project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
         // TODO(b/157230235): remove when this is enabled by default
         compile.kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
         compile.inputs.files({ kotlinPlugin })
             .withPropertyName("composeCompilerExtension")
             .withNormalizer(ClasspathNormalizer::class.java)
-        compile.doFirst {
+        compile.onlyIf {
             if (!kotlinPlugin.isEmpty) {
                 compile.kotlinOptions.freeCompilerArgs +=
                     "-Xplugin=${kotlinPlugin.first()}"
 
-                val enableMetrics = project
-                    .findProperty(enableMetricsArg) == "true"
+                val enableMetrics = (enableMetricsProvider.getOrNull() == "true")
 
-                val enableReports = project
-                    .findProperty(enableReportsArg) == "true"
+                val enableReports = (enableReportsProvider.getOrNull() == "true")
 
                 // since metrics reports in compose compiler are a new feature, we only want to
                 // pass in this parameter for modules that are using the tip of tree compose
                 // compiler, or else we will run into an exception since the parameter will not
                 // be recognized.
                 if (isTipOfTreeComposeCompilerProvider.get() && enableMetrics) {
-                    val libMetrics = project
-                        .rootProject
-                        .getLibraryMetricsDirectory()
-                    val metricsDest = File(libMetrics, "compose")
-                        .absolutePath
+                    val metricsDest = File(libraryMetricsDirectory, "compose")
                     compile.kotlinOptions.freeCompilerArgs +=
                         listOf(
                             "-P",
-                            "$composeMetricsOption=$metricsDest"
+                            "$composeMetricsOption=${metricsDest.absolutePath}"
                         )
                 }
 
@@ -355,18 +353,15 @@ fun Project.configureComposeImplPluginForAndroidx() {
                 // compiler, or else we will run into an exception since the parameter will not
                 // be recognized.
                 if (isTipOfTreeComposeCompilerProvider.get() && enableReports) {
-                    val libReports = project
-                        .rootProject
-                        .getLibraryReportsDirectory()
-                    val reportsDest = File(libReports, "compose")
-                        .absolutePath
+                    val reportsDest = File(libraryReportsDirectory, "compose")
                     compile.kotlinOptions.freeCompilerArgs +=
                         listOf(
                             "-P",
-                            "$composeReportsOption=$reportsDest"
+                            "$composeReportsOption=${reportsDest.absolutePath}"
                         )
                 }
             }
+            true
         }
     }
 
