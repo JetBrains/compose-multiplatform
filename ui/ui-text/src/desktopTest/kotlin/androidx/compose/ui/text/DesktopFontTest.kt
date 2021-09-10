@@ -75,7 +75,7 @@ class DesktopFontTest {
             .isEqualTo(GenericFontFamiliesMapping[FontFamily.Cursive.name])
 
         Truth.assertThat(fontLoader.ensureRegistered(FontFamily.Default))
-            .isEqualTo(emptyList<String>())
+            .isEqualTo(GenericFontFamiliesMapping[FontFamily.SansSerif.name])
 
         Truth.assertThat(fontLoader.ensureRegistered(loadedFontFamily))
             .isEqualTo(listOf("Sample Font"))
