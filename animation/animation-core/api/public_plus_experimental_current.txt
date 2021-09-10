@@ -385,10 +385,10 @@ package androidx.compose.animation.core {
     ctor public MutableTransitionState(S? initialState);
     method public S! getCurrentState();
     method public S! getTargetState();
-    method @androidx.compose.animation.core.ExperimentalTransitionApi public boolean isIdle();
+    method public boolean isIdle();
     method public void setTargetState(S! targetState);
     property public final S! currentState;
-    property @androidx.compose.animation.core.ExperimentalTransitionApi public final boolean isIdle;
+    property public final boolean isIdle;
     property public final S! targetState;
   }
 
