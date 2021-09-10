@@ -29,8 +29,6 @@ import android.os.Bundle
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
@@ -38,13 +36,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.LiveData
@@ -126,41 +122,20 @@ private object InteropArchitectureSnippet2 {
 
 private object InteropArchitectureSnippet3 {
     @Composable
-    fun BackHandler(
-        enabled: Boolean,
-        backDispatcher: OnBackPressedDispatcher,
-        onBack: () -> Unit
-    ) {
-
-        // Safely update the current `onBack` lambda when a new one is provided
-        val currentOnBack by rememberUpdatedState(onBack)
-
-        // Remember in Composition a back callback that calls the `onBack` lambda
-        val backCallback = remember {
-            // Always intercept back events. See the SideEffect for a more complete version
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    currentOnBack()
-                }
-            }
+    fun rememberAnalytics(user: User): FirebaseAnalytics {
+        val analytics: FirebaseAnalytics = remember {
+            // START - DO NOT COPY IN CODE SNIPPET
+            FirebaseAnalytics()
+            // END - DO NOT COPY IN CODE SNIPPET, just use /* ... */
         }
 
-        // On every successful composition, update the callback with the `enabled` value
-        // to tell `backCallback` whether back events should be intercepted or not
+        // On every successful composition, update FirebaseAnalytics with
+        // the userType from the current User, ensuring that future analytics
+        // events have this metadata attached
         SideEffect {
-            backCallback.isEnabled = enabled
+            analytics.setUserProperty("userType", user.userType)
         }
-
-        // If `backDispatcher` changes, dispose and reset the effect
-        DisposableEffect(backDispatcher) {
-            // Add callback to the backDispatcher
-            backDispatcher.addCallback(backCallback)
-
-            // When the effect leaves the Composition, remove the callback
-            onDispose {
-                backCallback.remove()
-            }
-        }
+        return analytics
     }
 }
 
@@ -214,4 +189,9 @@ private class GreetingViewModelFactory(private val userId: String) : ViewModelPr
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return GreetingViewModel(userId) as T
     }
+}
+
+private class User(val userType: String = "user")
+private class FirebaseAnalytics {
+    fun setUserProperty(name: String, value: String) {}
 }
