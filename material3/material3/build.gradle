@@ -40,6 +40,7 @@ dependencies {
 
         api("androidx.compose.foundation:foundation:1.0.1")
         api("androidx.compose.runtime:runtime:1.0.1")
+        api("androidx.compose.material:material-ripple:1.0.0")
         api("androidx.compose.ui:ui-graphics:1.0.1")
         api("androidx.compose.ui:ui-text:1.0.1")
 
@@ -76,6 +77,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.kotlinStdlibCommon)
 
                 api(project(":compose:foundation:foundation"))
+                api(project(":compose:material:material-ripple"))
                 api(project(":compose:runtime:runtime"))
                 api(project(":compose:ui:ui-graphics"))
                 api(project(":compose:ui:ui-text"))
