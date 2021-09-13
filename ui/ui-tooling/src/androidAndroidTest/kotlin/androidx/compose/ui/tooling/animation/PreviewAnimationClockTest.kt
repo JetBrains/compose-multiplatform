@@ -20,10 +20,13 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.ExperimentalTransitionApi
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.Transition
+import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.createChildTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeIn
@@ -41,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -95,7 +99,7 @@ class PreviewAnimationClockTest {
         assertEquals(72f, rotation.value as Float, eps)
 
         animatedProperties = testClock.getAnimatedProperties(offsetAnimation!!)
-        val offset = animatedProperties.single()
+        val offset = animatedProperties.single { it.label == "myOffset" }
         // We're animating from O1 (0) to O2 (100). There is a transition of 800ms defined for
         // the offset, and we set the clock to 25% of this time.
         assertEquals(25f, offset.value as Float, eps)
@@ -119,6 +123,24 @@ class PreviewAnimationClockTest {
         // We're animating from invisible (Built-in alpha 0f) to visible (Built-in alpha 1f),
         // 1000ms being the animation duration.
         assertEquals(1f, alpha.value)
+    }
+
+    @Test
+    fun getAnimatedPropertiesReturnsAllDescendantAnimations() {
+        var transitionAnimation: ComposeAnimation? = null
+
+        composeRule.setContent {
+            transitionAnimation = setUpOffsetScenario()
+        }
+        composeRule.waitForIdle()
+
+        val animatedProperties = testClock.getAnimatedProperties(transitionAnimation!!)
+        // getAnimatedProperties should return all the transition animations as well as the
+        // animations of all descendant transitions
+        assertNotNull(animatedProperties.single { it.label == "myOffset" })
+        assertNotNull(animatedProperties.single { it.label == "child1 scale" })
+        assertNotNull(animatedProperties.single { it.label == "child2 color" })
+        assertNotNull(animatedProperties.single { it.label == "grandchild" })
     }
 
     @Test
@@ -357,6 +379,9 @@ class PreviewAnimationClockTest {
     }
 
     // Sets up a transition animation scenario, going from from Offset.O1 to Offset.O2.
+    // The main transition in this scenario also has 2 child animations. One of them has a child
+    // animation of its own.
+    @OptIn(ExperimentalTransitionApi::class)
     @Suppress("UNCHECKED_CAST")
     @Composable
     private fun setUpOffsetScenario(): ComposeAnimation {
@@ -372,6 +397,21 @@ class PreviewAnimationClockTest {
                 Offset.O2 -> 100f
             }
         }
+
+        val child1 = transition.createChildTransition { it == Offset.O1 }
+        child1.animateFloat(label = "child1 scale") { pressed ->
+            if (pressed) 1f else 3f
+        }
+
+        child1.createChildTransition { it }
+            .animateDp(label = "grandchild") { parentState ->
+                if (parentState) 1.dp else 3.dp
+            }
+
+        transition.createChildTransition { it }
+            .animateColor(label = "child2 color") { state ->
+                if (state == Offset.O1) Color.Red else Color.Blue
+            }
 
         testClock.trackTransition(transition as Transition<Any>)
         val animation = testClock.trackedTransitions.single { it.states.contains(Offset.O1) }
