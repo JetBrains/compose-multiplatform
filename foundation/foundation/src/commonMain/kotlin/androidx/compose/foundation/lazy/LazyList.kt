@@ -95,7 +95,7 @@ internal fun LazyList(
     )
 
     state.prefetchPolicy = rememberLazyLayoutPrefetchPolicy()
-    state.innerState = rememberLazyLayoutState()
+    val innerState = rememberLazyLayoutState().also { state.innerState = it }
 
     val itemsProvider = stateOfItemsProvider.value
     if (itemsProvider.itemsCount > 0) {
@@ -121,7 +121,7 @@ internal fun LazyList(
                 overScrollController = overScrollController
             )
             .padding(contentPadding),
-        state = state.innerState,
+        state = innerState,
         prefetchPolicy = state.prefetchPolicy,
         measurePolicy = measurePolicy,
         itemsProvider = { stateOfItemsProvider.value }
