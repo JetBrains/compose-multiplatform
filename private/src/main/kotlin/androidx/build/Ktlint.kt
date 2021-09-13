@@ -16,13 +16,19 @@
 
 package androidx.build
 
-import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.file.FileTree
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.JavaExec
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.options.Option
+import java.io.File
 
 private fun Project.getKtlintConfiguration(): Configuration {
     return configurations.findByName("ktlint") ?: configurations.create("ktlint") {
@@ -42,7 +48,7 @@ private const val excludeTestDataFiles = "**/test-data/**/*.kt"
 private const val excludeExternalFiles = "**/external/**/*.kt"
 
 fun Project.configureKtlint() {
-    val outputDir = "${project.buildDir}/reports/ktlint/"
+    val outputDir = "${buildDir.relativeTo(projectDir)}/reports/ktlint/"
     val inputDir = "src"
     val includeFiles = "**/*.kt"
     val inputFiles = project.fileTree(
@@ -53,13 +59,10 @@ fun Project.configureKtlint() {
     )
     val outputFile = "${outputDir}ktlint-checkstyle-report.xml"
 
-    val lintProvider = tasks.register("ktlint", JavaExec::class.java) { task ->
-        task.inputs.files(inputFiles)
-        task.cacheEvenIfNoOutputs()
-        task.description = "Check Kotlin code style."
-        task.group = "Verification"
+    val lintProvider = tasks.register("ktlint", KtlintCheckTask::class.java) { task ->
+        task.inputFiles = inputFiles
+        task.report = File(outputFile)
         task.classpath = getKtlintConfiguration()
-        task.mainClass.set("com.pinterest.ktlint.Main")
         task.args = listOf(
             "--android",
             "--disabled_rules",
@@ -78,13 +81,14 @@ fun Project.configureKtlint() {
     }
     addToBuildOnServer(lintProvider)
 
+    val outputFileFormat = "${outputDir}ktlint-format-checkstyle-report.xml"
     tasks.register("ktlintFormat", JavaExec::class.java) { task ->
         task.inputs.files(
             inputFiles.apply {
                 setExcludes(listOf(excludeTestDataFiles, excludeExternalFiles))
             }
         )
-        task.outputs.file(outputFile)
+        task.outputs.file(outputFileFormat)
         task.description = "Fix Kotlin code style deviations."
         task.group = "formatting"
         task.classpath = getKtlintConfiguration()
@@ -95,12 +99,27 @@ fun Project.configureKtlint() {
             "--disabled_rules",
             DisabledRules,
             "--reporter=plain",
-            "--reporter=checkstyle,output=$outputFile",
+            "--reporter=checkstyle,output=$outputFileFormat",
             "$inputDir/$includeFiles",
             "!$inputDir/$excludeTestDataFiles",
             "!$inputDir/$excludeExternalFiles"
         )
     }
+}
+
+@CacheableTask
+open class KtlintCheckTask : JavaExec() {
+    init {
+        description = "Check Kotlin code style."
+        group = "Verification"
+        mainClass.set("com.pinterest.ktlint.Main")
+    }
+
+    @get:[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
+    lateinit var inputFiles: FileTree
+
+    @get:OutputFile
+    lateinit var report: File
 }
 
 open class KtlintCheckFileTask : JavaExec() {
