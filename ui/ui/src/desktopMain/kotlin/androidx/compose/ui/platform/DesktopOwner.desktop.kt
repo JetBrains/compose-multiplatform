@@ -81,7 +81,7 @@ private typealias Command = () -> Unit
     InternalComposeUiApi::class
 )
 internal class DesktopOwner(
-    val container: DesktopOwners,
+    private val platformInputService: DesktopPlatformInput,
     density: Density = Density(1f, 1f),
     val isPopup: Boolean = false,
     val isFocusable: Boolean = true,
@@ -135,6 +135,18 @@ internal class DesktopOwner(
         onPreviewKeyEvent = null
     )
 
+    var constraints: Constraints = Constraints()
+        set(value) {
+            field = value
+
+            if (!isPopup) {
+                this.bounds = IntRect(
+                    IntOffset(bounds.left, bounds.top),
+                    IntSize(constraints.maxWidth, constraints.maxHeight)
+                )
+            }
+        }
+
     override val root = LayoutNode().also {
         it.measurePolicy = RootMeasurePolicy
         it.modifier = semanticsModifier
@@ -157,7 +169,6 @@ internal class DesktopOwner(
     private val measureAndLayoutDelegate = MeasureAndLayoutDelegate(root)
 
     init {
-        container.register(this)
         snapshotObserver.startObserving()
         root.attach(this)
         _focusManager.takeFocus()
@@ -165,11 +176,10 @@ internal class DesktopOwner(
 
     fun dispose() {
         snapshotObserver.stopObserving()
-        container.unregister(this)
         // we don't need to call root.detach() because root will be garbage collected
     }
 
-    override val textInputService = TextInputService(container.platformInputService)
+    override val textInputService = TextInputService(platformInputService)
 
     override val fontLoader = FontLoader()
 
@@ -192,9 +202,9 @@ internal class DesktopOwner(
     override fun sendKeyEvent(keyEvent: KeyEvent): Boolean {
         when {
             keyEvent.nativeKeyEvent.id == java.awt.event.KeyEvent.KEY_TYPED ->
-                container.platformInputService.charKeyPressed = true
+                platformInputService.charKeyPressed = true
             keyEvent.type == KeyEventType.KeyUp ->
-                container.platformInputService.charKeyPressed = false
+                platformInputService.charKeyPressed = false
         }
 
         return keyInputModifier.processKeyInput(keyEvent)
@@ -221,9 +231,8 @@ internal class DesktopOwner(
     var onNeedsRender: (() -> Unit)? = null
     var onDispatchCommand: ((Command) -> Unit)? = null
 
-    fun render(canvas: org.jetbrains.skia.Canvas, width: Int, height: Int) {
+    fun render(canvas: org.jetbrains.skia.Canvas) {
         needsLayout = false
-        setSize(width, height)
         measureAndLayout()
         needsDraw = false
         draw(canvas)
@@ -251,6 +260,7 @@ internal class DesktopOwner(
     }
 
     override fun measureAndLayout() {
+        measureAndLayoutDelegate.updateRootConstraints(constraints)
         if (measureAndLayoutDelegate.measureAndLayout()) {
             requestDraw()
         }
@@ -302,17 +312,6 @@ internal class DesktopOwner(
     override fun localToScreen(localPosition: Offset): Offset = localPosition
 
     override fun screenToLocal(positionOnScreen: Offset): Offset = positionOnScreen
-
-    fun setSize(width: Int, height: Int) {
-        val constraints = Constraints(0, width, 0, height)
-        if (!isPopup) {
-            this.bounds = IntRect(
-                IntOffset(bounds.left, bounds.top),
-                IntSize(width, height)
-            )
-        }
-        measureAndLayoutDelegate.updateRootConstraints(constraints)
-    }
 
     fun draw(canvas: org.jetbrains.skia.Canvas) {
         root.draw(DesktopCanvas(canvas))

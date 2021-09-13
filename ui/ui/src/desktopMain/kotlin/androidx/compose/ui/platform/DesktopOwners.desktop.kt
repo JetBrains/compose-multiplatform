@@ -16,45 +16,95 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.runtime.BroadcastFrameClock
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Composition
+import androidx.compose.runtime.CompositionContext
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Recomposer
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventData
 import androidx.compose.ui.input.pointer.PointerType
+import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.node.RootForTest
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.Canvas
 import java.awt.event.InputMethodEvent
 import java.awt.event.KeyEvent
 import java.awt.event.MouseEvent
+import kotlin.coroutines.CoroutineContext
 import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
 
 internal val LocalDesktopOwners = staticCompositionLocalOf<DesktopOwners> {
-    error("CompositionLocal DesktopOwnersAmbient not provided")
+    error("CompositionLocal LocalDesktopOwners not provided")
 }
 
-internal class DesktopOwners(
-    private val coroutineScope: CoroutineScope,
-    component: DesktopComponent = DummyDesktopComponent,
-    private val invalidate: () -> Unit = {},
+/**
+ * Virtual container that encapsulates Compose UI content. UI content can be constructed via
+ * [setContent] method and with any Composable that manipulates [LayoutNode] tree.
+ *
+ * To draw content on [Canvas], you can use [render] method.
+ *
+ * To specify available size for the content, you should use [constraints].
+ *
+ * After [DesktopOwners] will no longer needed, you should call [dispose] method, so all resources
+ * and subscriptions will be properly closed. Otherwise there can be a memory leak.
+ */
+internal class DesktopOwners internal constructor(
+    coroutineContext: CoroutineContext,
+    component: DesktopComponent,
+    density: Density,
+    private val invalidate: () -> Unit
 ) {
+    /**
+     * Constructs [DesktopOwners]
+     *
+     * @param coroutineContext Context which will be used to launch effects ([LaunchedEffect],
+     * [rememberCoroutineScope]) and run recompositions.
+     * @param density Initial density of the content which will be used to convert [dp] units.
+     * @param invalidate Callback which will be called when the content need to be recomposed or
+     * rerendered. If you draw your content using [render] method, in this callback you should
+     * schedule the next [render] in your rendering loop.
+     */
+    constructor(
+        coroutineContext: CoroutineContext = EmptyDispatcher,
+        density: Density = Density(1f),
+        invalidate: () -> Unit = {}
+    ) : this(
+        coroutineContext,
+        DummyDesktopComponent,
+        density,
+        invalidate
+    )
+
     private var isInvalidationDisabled = false
 
     @Volatile
     private var hasPendingDraws = true
-    private inline fun disableInvalidation(block: () -> Unit) {
+    private inline fun postponeInvalidation(block: () -> Unit) {
         isInvalidationDisabled = true
         try {
             block()
         } finally {
             isInvalidationDisabled = false
         }
+        invalidateIfNeeded()
     }
 
     private fun invalidateIfNeeded() {
@@ -64,54 +114,100 @@ internal class DesktopOwners(
         }
     }
 
-    val list = LinkedHashSet<DesktopOwner>()
+    private val list = LinkedHashSet<DesktopOwner>()
     private val listCopy = mutableListOf<DesktopOwner>()
+
+    private inline fun forEachOwner(action: (DesktopOwner) -> Unit) {
+        listCopy.addAll(list)
+        listCopy.forEach(action)
+        listCopy.clear()
+    }
+
+    /**
+     * All currently registered [DesktopRootForTest]s. After calling [setContent] the first root
+     * will be added. If there is an any [Popup] is present in the content, it will be added as
+     * another [DesktopRootForTest]
+     */
+    val roots: Set<RootForTest> get() = list
 
     private var pointerId = 0L
     private var isMousePressed = false
 
-    private val dispatcher = FlushCoroutineDispatcher(coroutineScope)
+    private val job = Job()
+    private val dispatcher = FlushCoroutineDispatcher(CoroutineScope(coroutineContext + job))
     private val frameClock = BroadcastFrameClock(onNewAwaiters = ::invalidateIfNeeded)
-    private val coroutineContext = coroutineScope.coroutineContext + dispatcher + frameClock
+    private val coroutineScope = CoroutineScope(coroutineContext + job + dispatcher + frameClock)
 
-    internal val recomposer = Recomposer(coroutineContext)
+    private val recomposer = Recomposer(coroutineScope.coroutineContext)
     internal val platformInputService: DesktopPlatformInput = DesktopPlatformInput(component)
 
+    private var mainOwner: DesktopOwner? = null
+    private var composition: Composition? = null
+
+    /**
+     * Density of the content which will be used to convert [dp] units.
+     */
+    var density: Density = density
+        set(value) {
+            check(!isDisposed) { "DesktopOwners is disposed" }
+            field = value
+            mainOwner?.density = value
+        }
+
+    private var isDisposed = false
+
     init {
-        coroutineScope.launch(coroutineContext, start = CoroutineStart.UNDISPATCHED) {
+        GlobalSnapshotManager.ensureStarted()
+        coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
             recomposer.runRecomposeAndApplyChanges()
         }
     }
 
+    /**
+     * Close all resources and subscriptions. Not calling this method when [DesktopOwners] is no
+     * longer needed will cause a memory leak.
+     *
+     * All effects launched via [LaunchedEffect] or [rememberCoroutineScope] will be cancelled
+     * (but not immediately).
+     *
+     * After calling this method, you cannot call any other method of this [DesktopOwners].
+     */
     fun dispose() {
+        composition?.dispose()
+        mainOwner?.dispose()
         recomposer.cancel()
+        job.cancel()
+        isDisposed = true
     }
 
     private fun dispatchCommand(command: () -> Unit) {
-        coroutineScope.launch(coroutineContext) {
+        coroutineScope.launch {
             command()
         }
     }
 
     /**
-     * Returns true if there are pending recompositions, draws or dispatched tasks.
+     * Returns true if there are pending recompositions, renders or dispatched tasks.
      * Can be called from any thread.
      */
     fun hasInvalidations() = hasPendingDraws ||
         recomposer.hasPendingWork ||
         dispatcher.hasTasks()
 
-    fun register(desktopOwner: DesktopOwner) {
+    internal fun attach(desktopOwner: DesktopOwner) {
+        check(!isDisposed) { "DesktopOwners is disposed" }
         list.add(desktopOwner)
         desktopOwner.onNeedsRender = ::invalidateIfNeeded
         desktopOwner.onDispatchCommand = ::dispatchCommand
+        desktopOwner.constraints = constraints
         invalidateIfNeeded()
         if (desktopOwner.isFocusable) {
             focusedOwner = desktopOwner
         }
     }
 
-    fun unregister(desktopOwner: DesktopOwner) {
+    internal fun detach(desktopOwner: DesktopOwner) {
+        check(!isDisposed) { "DesktopOwners is disposed" }
         list.remove(desktopOwner)
         desktopOwner.onDispatchCommand = null
         desktopOwner.onNeedsRender = null
@@ -121,37 +217,106 @@ internal class DesktopOwners(
         }
     }
 
-    fun onFrame(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-        disableInvalidation {
+    /**
+     * Update the composition with the content described by the [content] composable. After this
+     * has been called the changes to produce the initial composition has been calculated and
+     * applied to the composition.
+     *
+     * Will throw an [IllegalStateException] if the composition has been disposed.
+     *
+     * @param content Content of the [DesktopOwners]
+     */
+    fun setContent(
+        content: @Composable () -> Unit
+    ) = setContent(
+        parentComposition = null,
+        content = content
+    )
+
+    // TODO(demin): We should configure routing of key events if there
+    //  are any popups/root present:
+    //   - DesktopOwners.sendKeyEvent
+    //   - DesktopOwners.onPreviewKeyEvent (or Window.onPreviewKeyEvent)
+    //   - Popup.onPreviewKeyEvent
+    //   - NestedPopup.onPreviewKeyEvent
+    //   - NestedPopup.onKeyEvent
+    //   - Popup.onKeyEvent
+    //   - DesktopOwners.onKeyEvent
+    //  Currently we have this routing:
+    //   - [active Popup or the main content].onPreviewKeyEvent
+    //   - [active Popup or the main content].onKeyEvent
+    //   After we change routing, we can remove onPreviewKeyEvent/onKeyEvent from this method
+    internal fun setContent(
+        parentComposition: CompositionContext? = null,
+        onPreviewKeyEvent: (ComposeKeyEvent) -> Boolean = { false },
+        onKeyEvent: (ComposeKeyEvent) -> Boolean = { false },
+        content: @Composable () -> Unit
+    ) {
+        check(!isDisposed) { "DesktopOwners is disposed" }
+        composition?.dispose()
+        mainOwner?.dispose()
+        val mainOwner = DesktopOwner(
+            platformInputService,
+            density,
+            onPreviewKeyEvent = onPreviewKeyEvent,
+            onKeyEvent = onKeyEvent
+        )
+        attach(mainOwner)
+        composition = mainOwner.setContent(parentComposition ?: recomposer) {
+            CompositionLocalProvider(
+                LocalDesktopOwners provides this,
+                content = content
+            )
+        }
+        this.mainOwner = mainOwner
+
+        // to perform all pending work synchronously. to start LaunchedEffect for example
+        dispatcher.flush()
+    }
+
+    /**
+     * Set constraints, which will be used to measure and layout content.
+     */
+    var constraints: Constraints = Constraints()
+        set(value) {
+            field = value
+            forEachOwner {
+                it.constraints = constraints
+            }
+        }
+
+    /**
+     * Returns the current content size
+     */
+    val contentSize: IntSize
+        get() {
+            check(!isDisposed) { "DesktopOwners is disposed" }
+            val mainOwner = mainOwner ?: return IntSize.Zero
+            mainOwner.measureAndLayout()
+            return IntSize(mainOwner.root.width, mainOwner.root.height)
+        }
+
+    /**
+     * Render the current content on [canvas]. Passed [nanoTime] will be used to drive all
+     * animations in the content (or any other code, which uses [withFrameNanos]
+     */
+    fun render(canvas: Canvas, nanoTime: Long) {
+        check(!isDisposed) { "DesktopOwners is disposed" }
+        postponeInvalidation {
             // We must see the actual state before we will render the frame
             Snapshot.sendApplyNotifications()
             dispatcher.flush()
             frameClock.sendFrame(nanoTime)
 
-            listCopy.addAll(list)
-            for (owner in listCopy) {
-                owner.render(canvas, width, height)
+            forEachOwner {
+                it.render(canvas)
             }
-            listCopy.clear()
         }
-
-        invalidateIfNeeded()
     }
 
     private var focusedOwner: DesktopOwner? = null
     private val hoveredOwner: DesktopOwner?
-        get() {
-            listCopy.addAll(list)
-            for (i in (listCopy.size - 1) downTo 0) {
-                val owner = listCopy[i]
-                if (owner.isHovered(pointLocation)) {
-                    listCopy.clear()
-                    return owner
-                }
-            }
-            listCopy.clear()
-            return list.lastOrNull()
-        }
+        get() = list.lastOrNull { it.isHovered(pointLocation) } ?: list.lastOrNull()
 
     private fun DesktopOwner?.isAbove(
         targetOwner: DesktopOwner?
