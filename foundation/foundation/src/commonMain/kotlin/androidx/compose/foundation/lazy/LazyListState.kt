@@ -166,7 +166,7 @@ class LazyListState constructor(
     /**
      * The state of the inner LazyLayout.
      */
-    internal lateinit var innerState: LazyLayoutState
+    internal var innerState: LazyLayoutState? = null
 
     /**
      * Instantly brings the item at [index] to the top of the viewport, offset by [scrollOffset]
@@ -193,7 +193,7 @@ class LazyListState constructor(
 
     internal fun snapToItemIndexInternal(index: Int, scrollOffset: Int) {
         scrollPosition.requestPosition(DataIndex(index), scrollOffset)
-        innerState.remeasure()
+        innerState?.remeasure()
     }
 
     /**
@@ -239,7 +239,7 @@ class LazyListState constructor(
         // we have less than 0.5 pixels
         if (abs(scrollToBeConsumed) > 0.5f) {
             val preScrollToBeConsumed = scrollToBeConsumed
-            innerState.remeasure()
+            innerState?.remeasure()
             if (prefetchingEnabled && prefetchPolicy != null) {
                 notifyPrefetch(preScrollToBeConsumed - scrollToBeConsumed)
             }
