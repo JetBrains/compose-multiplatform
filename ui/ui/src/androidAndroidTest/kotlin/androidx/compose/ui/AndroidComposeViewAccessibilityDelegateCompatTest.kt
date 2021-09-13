@@ -56,6 +56,7 @@ import androidx.compose.ui.semantics.cutText
 import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.dismiss
 import androidx.compose.ui.semantics.error
+import androidx.compose.ui.semantics.editableText
 import androidx.compose.ui.semantics.expand
 import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.getTextLayoutResult
@@ -71,7 +72,6 @@ import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.semantics.setSelection
 import androidx.compose.ui.semantics.setText
 import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.semantics.text
 import androidx.compose.ui.semantics.textSelectionRange
 import androidx.compose.ui.semantics.verticalScrollAxisRange
 import androidx.compose.ui.test.TestActivity
@@ -240,7 +240,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
 
         val semanticsNode = createSemanticsNodeWithProperties(1, true) {
             disabled()
-            text = AnnotatedString("text")
+            editableText = AnnotatedString("text")
             horizontalScrollAxisRange = ScrollAxisRange({ 0f }, { 5f })
             onClick { true }
             onLongClick { true }
@@ -437,7 +437,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         val setTextActionLabel = "setText"
         val text = "hello"
         val semanticsNode = createSemanticsNodeWithProperties(1, true) {
-            this.text = AnnotatedString(text)
+            this.editableText = AnnotatedString(text)
             this.textSelectionRange = TextRange(1)
             this.focused = true
             getTextLayoutResult { true }
@@ -493,7 +493,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     @Test
     fun testMovementGranularities_textField_focused() {
         val semanticsNode = createSemanticsNodeWithProperties(1, true) {
-            this.text = AnnotatedString("text")
+            this.editableText = AnnotatedString("text")
             this.textSelectionRange = TextRange(1)
             this.focused = true
             getTextLayoutResult { true }
@@ -515,7 +515,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     @Test
     fun testMovementGranularities_textField_notFocused() {
         val semanticsNode = createSemanticsNodeWithProperties(1, true) {
-            this.text = AnnotatedString("text")
+            this.editableText = AnnotatedString("text")
             this.textSelectionRange = TextRange(1)
             getTextLayoutResult { true }
             setText { true }

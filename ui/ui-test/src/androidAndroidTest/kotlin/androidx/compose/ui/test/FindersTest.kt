@@ -30,6 +30,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.test.filters.MediumTest
 import androidx.compose.testutils.expectError
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.editableText
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -83,6 +84,15 @@ class FindersTest {
     fun findByText_matches() {
         rule.setContent {
             BoundaryNode { text = AnnotatedString("Hello World") }
+        }
+
+        rule.onNodeWithText("Hello World").assertExists()
+    }
+
+    @Test
+    fun findByText_withEditableText_matches() {
+        rule.setContent {
+            BoundaryNode { editableText = AnnotatedString("Hello World") }
         }
 
         rule.onNodeWithText("Hello World").assertExists()

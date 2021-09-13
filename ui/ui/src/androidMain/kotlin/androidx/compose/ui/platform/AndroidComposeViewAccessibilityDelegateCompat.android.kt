@@ -65,6 +65,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.ScrollAxisRange
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsActions.CustomActions
+import androidx.compose.ui.semantics.SemanticsConfiguration
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -875,7 +876,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         info: AccessibilityNodeInfoCompat
     ) {
         val editableTextToAssign = trimToSize(
-            node.unmergedConfig.getOrNull(SemanticsProperties.EditableText)
+            node.unmergedConfig.getTextForTextField()
                 ?.toAccessibilitySpannableString(density = view.density, view.fontLoader),
             ParcelSafeTextLength
         )
@@ -1834,12 +1835,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     SemanticsProperties.EditableText -> {
                         // TODO(b/160184953) Add test for SemanticsProperty Text change event
                         if (newNode.isTextField) {
-                            val oldText = oldNode.unmergedConfig.getOrNull(
-                                SemanticsProperties.EditableText
-                            )?.text ?: ""
-                            val newText = newNode.unmergedConfig.getOrNull(
-                                SemanticsProperties.EditableText
-                            )?.text ?: ""
+                            val oldText = oldNode.unmergedConfig.getTextForTextField() ?: ""
+                            val newText = newNode.unmergedConfig.getTextForTextField() ?: ""
                             var startCount = 0
                             // endCount records how many characters are the same from the end.
                             var endCount = 0
@@ -1884,7 +1881,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     }
                     // do we need to overwrite TextRange equals?
                     SemanticsProperties.TextSelectionRange -> {
-                        val newText = getTextForTextField(newNode) ?: ""
+                        val newText = newNode.unmergedConfig.getTextForTextField()?.text ?: ""
                         val textRange =
                             newNode.unmergedConfig[SemanticsProperties.TextSelectionRange]
                         val event = createTextSelectionChangedEvent(
@@ -2140,6 +2137,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             accessibilityCursorPosition = AccessibilityCursorPositionUndefined
             previousTraversedNode = node.id
         }
+
         val text = getIterableTextForAccessibility(node)
         if (text.isNullOrEmpty()) {
             return false
@@ -2244,6 +2242,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         return true
     }
 
+    /** Returns selection start and end indices in original text */
     private fun getAccessibilitySelectionStart(node: SemanticsNode): Int {
         // If there is ContentDescription, it will be used instead of text during traversal.
         if (!node.unmergedConfig.contains(SemanticsProperties.ContentDescription) &&
@@ -2350,25 +2349,14 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
 
         if (node.isTextField) {
-            return getTextForTextField(node)
+            return node.unmergedConfig.getTextForTextField()?.text
         }
 
         return node.unmergedConfig.getOrNull(SemanticsProperties.Text)?.firstOrNull()?.text
     }
 
-    /**
-     * If there is an "editable" text inside text field, it is reported as a text. Otherwise
-     * label's text is used
-     */
-    private fun getTextForTextField(node: SemanticsNode?): String? {
-        if (node == null) return null
-
-        val editableText = node.unmergedConfig.getOrNull(SemanticsProperties.EditableText)
-        return if (editableText.isNullOrEmpty()) {
-            node.unmergedConfig.getOrNull(SemanticsProperties.Text)?.firstOrNull()?.text
-        } else {
-            editableText.text
-        }
+    private fun SemanticsConfiguration.getTextForTextField(): AnnotatedString? {
+        return getOrNull(SemanticsProperties.EditableText)
     }
 
     // TODO(b/160820721): use AccessibilityNodeProviderCompat instead of AccessibilityNodeProvider
