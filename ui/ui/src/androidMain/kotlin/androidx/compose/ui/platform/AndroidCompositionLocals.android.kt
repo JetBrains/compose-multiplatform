@@ -16,12 +16,14 @@
 
 package androidx.compose.ui.platform
 
+import android.content.ComponentCallbacks2
 import android.content.Context
 import android.content.res.Configuration
 import android.view.View
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,6 +33,7 @@ import androidx.compose.runtime.saveable.LocalSaveableStateRegistry
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.res.ImageVectorCache
 import androidx.lifecycle.LifecycleOwner
 import androidx.savedstate.SavedStateRegistryOwner
 
@@ -49,6 +52,10 @@ val LocalConfiguration = compositionLocalOf<Configuration>(
  */
 val LocalContext = staticCompositionLocalOf<Context> {
     noLocalProvidedFor("LocalContext")
+}
+
+internal val LocalImageVectorCache = staticCompositionLocalOf<ImageVectorCache> {
+    noLocalProvidedFor("LocalImageVectorCache")
 }
 
 /**
@@ -103,13 +110,15 @@ internal fun ProvideAndroidCompositionLocals(
         }
     }
 
+    val imageVectorCache = obtainImageVectorCache(context, configuration)
     CompositionLocalProvider(
         LocalConfiguration provides configuration,
         LocalContext provides context,
         LocalLifecycleOwner provides viewTreeOwners.lifecycleOwner,
         LocalSavedStateRegistryOwner provides viewTreeOwners.savedStateRegistryOwner,
         LocalSaveableStateRegistry provides saveableStateRegistry,
-        LocalView provides owner.view
+        LocalView provides owner.view,
+        LocalImageVectorCache provides imageVectorCache
     ) {
         ProvideCommonCompositionLocals(
             owner = owner,
@@ -117,6 +126,41 @@ internal fun ProvideAndroidCompositionLocals(
             content = content
         )
     }
+}
+
+@Stable
+@Composable
+private fun obtainImageVectorCache(
+    context: Context,
+    configuration: Configuration?
+): ImageVectorCache {
+    val imageVectorCache = remember { ImageVectorCache() }
+    var currentConfiguration = remember { configuration }
+    val callbacks = remember {
+        object : ComponentCallbacks2 {
+            override fun onConfigurationChanged(configuration: Configuration) {
+                // If there is no configuration, assume all flags have changed.
+                val changedFlags = currentConfiguration?.updateFrom(configuration) ?: -0x1
+                imageVectorCache.prune(changedFlags)
+                currentConfiguration = configuration
+            }
+
+            override fun onLowMemory() {
+                imageVectorCache.clear()
+            }
+
+            override fun onTrimMemory(level: Int) {
+                imageVectorCache.clear()
+            }
+        }
+    }
+    DisposableEffect(imageVectorCache) {
+        context.applicationContext.registerComponentCallbacks(callbacks)
+        onDispose {
+            context.applicationContext.unregisterComponentCallbacks(callbacks)
+        }
+    }
+    return imageVectorCache
 }
 
 private fun noLocalProvidedFor(name: String): Nothing {
