@@ -261,6 +261,7 @@ internal class ComposeLayer {
         check(!isDisposed)
         composition?.dispose()
         owner?.dispose()
+        owners.dispose()
         events.cancel()
         coroutineScope.cancel()
         wrapped.dispose()
