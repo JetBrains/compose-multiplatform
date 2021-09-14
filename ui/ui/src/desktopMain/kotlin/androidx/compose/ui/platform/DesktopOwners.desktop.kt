@@ -83,6 +83,10 @@ internal class DesktopOwners(
         }
     }
 
+    fun dispose() {
+        recomposer.cancel()
+    }
+
     private fun dispatchCommand(command: () -> Unit) {
         coroutineScope.launch(coroutineContext) {
             command()

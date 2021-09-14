@@ -18,6 +18,7 @@ package androidx.compose.ui.platform
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
@@ -27,8 +28,13 @@ import kotlin.coroutines.CoroutineContext
  * Without a flush all tasks are dispatched in the dispatcher provided by [scope]
  */
 internal class FlushCoroutineDispatcher(
-    private val scope: CoroutineScope
+    scope: CoroutineScope
 ) : CoroutineDispatcher() {
+    // Dispatcher should always be alive, even if Job is cancelled. Otherwise coroutines which
+    // use this dispatcher won't be properly cancelled.
+    // TODO replace it by scope.coroutineContext[Dispatcher] when it will be no longer experimental
+    private val scope = CoroutineScope(scope.coroutineContext.minusKey(Job))
+
     private val tasks = ArrayList<Runnable>()
     private val tasksCopy = ArrayList<Runnable>()
 

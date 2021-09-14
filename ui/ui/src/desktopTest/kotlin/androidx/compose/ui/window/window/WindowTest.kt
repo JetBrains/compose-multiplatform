@@ -19,15 +19,19 @@ package androidx.compose.ui.window.window
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.Button
+import androidx.compose.material.Slider
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.LeakDetector
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.focus.FocusRequester
@@ -46,6 +50,10 @@ import androidx.compose.ui.window.launchApplication
 import androidx.compose.ui.window.rememberWindowState
 import androidx.compose.ui.window.runApplicationTest
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.swing.Swing
 import org.junit.Test
 import java.awt.Dimension
 import java.awt.event.KeyEvent
@@ -519,5 +527,32 @@ class WindowTest {
         assertThat(onWindowKeyEventKeys).isEqualTo(setOf(Key.T))
 
         exitApplication()
+    }
+
+    @Test(timeout = 30000)
+    fun `window dispose should not cause a memory leak`() {
+        val leakDetector = LeakDetector()
+
+        val oldRecomposers = Recomposer.runningRecomposers.value
+
+        runBlocking(Dispatchers.Swing) {
+            repeat(10) {
+                val window = ComposeWindow()
+                window.size = Dimension(200, 200)
+                window.isVisible = true
+                window.setContent {
+                    Button({}) {}
+                    Slider(0f, {})
+                }
+                window.dispose()
+                leakDetector.observeObject(window)
+            }
+
+            while (Recomposer.runningRecomposers.value != oldRecomposers) {
+                delay(100)
+            }
+
+            assertThat(leakDetector.noLeak()).isTrue()
+        }
     }
 }
