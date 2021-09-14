@@ -26,7 +26,7 @@ import kotlin.math.sign
  * Checks if the subject is within [tolerance] of [f]. Shorthand for
  * `isWithin([tolerance]).of([f])`.
  */
-fun FloatSubject.isAlmostEqualTo(f: Float, tolerance: Float) {
+fun FloatSubject.isAlmostEqualTo(f: Float, tolerance: Float = 1e-3f) {
     isWithin(tolerance).of(f)
 }
 
