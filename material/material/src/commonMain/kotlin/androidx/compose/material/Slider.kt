@@ -118,7 +118,7 @@ import kotlin.math.abs
  * coerced to this range.
  * @param onValueChange lambda in which value should be updated
  * @param modifier modifiers for the Slider layout
- * @param enabled whether or not component is enabled and can we interacted with or not
+ * @param enabled whether or not component is enabled and can be interacted with or not
  * @param valueRange range of values that Slider value can take. Passed [value] will be coerced to
  * this range
  * @param steps if greater than 0, specifies the amounts of discrete values, evenly distributed
