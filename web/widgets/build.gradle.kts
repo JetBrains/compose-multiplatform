@@ -39,6 +39,7 @@ kotlin {
         val jsTest by getting {
             dependencies {
                 implementation(kotlin("test-js"))
+                implementation(project(":test-utils"))
             }
         }
 

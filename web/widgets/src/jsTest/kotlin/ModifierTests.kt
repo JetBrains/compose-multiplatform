@@ -5,9 +5,12 @@ import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 import org.jetbrains.compose.common.ui.Modifier
 import org.jetbrains.compose.common.ui.size
 import org.jetbrains.compose.common.ui.unit.dp
+import org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi
+import org.jetbrains.compose.web.testutils.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@ComposeWebExperimentalTestsApi
 @ExperimentalComposeWebWidgetsApi
 class ModifierTests {
     @Test
