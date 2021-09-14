@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.vector.VectorPainter
 import androidx.compose.ui.graphics.vector.compat.seekToStartTag
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalImageVectorCache
 
 /**
  * Create a [Painter] from an Android resource id. This can load either an instance of
@@ -61,9 +62,7 @@ fun painterResource(@DrawableRes id: Int): Painter {
     val path = value.string
     // Assume .xml suffix implies loading a VectorDrawable resource
     return if (path?.endsWith(".xml") == true) {
-        val imageVector = remember(path, id) {
-            loadVectorResource(context.theme, res, id)
-        }
+        val imageVector = loadVectorResource(context.theme, res, id)
         rememberVectorPainter(imageVector)
     } else {
         // Otherwise load the bitmap resource
@@ -79,12 +78,24 @@ fun painterResource(@DrawableRes id: Int): Painter {
  * the ImageVector. Because this throws exceptions we cannot have this implementation as part of
  * the composable implementation it is invoked in.
  */
-private fun loadVectorResource(theme: Resources.Theme, res: Resources, id: Int): ImageVector {
-    @Suppress("ResourceType") val parser = res.getXml(id)
-    if (parser.seekToStartTag().name != "vector") {
-        throw IllegalArgumentException(errorMessage)
+@Composable
+private fun loadVectorResource(
+    theme: Resources.Theme,
+    res: Resources,
+    id: Int
+): ImageVector {
+    val imageVectorCache = LocalImageVectorCache.current
+    val key = ImageVectorCache.Key(theme, id)
+    var imageVectorEntry = imageVectorCache[key]
+    if (imageVectorEntry == null) {
+        @Suppress("ResourceType") val parser = res.getXml(id)
+        if (parser.seekToStartTag().name != "vector") {
+            throw IllegalArgumentException(errorMessage)
+        }
+        imageVectorEntry = loadVectorResourceInner(theme, res, parser)
+        imageVectorCache[key] = imageVectorEntry
     }
-    return loadVectorResourceInner(theme, res, parser)
+    return imageVectorEntry.imageVector
 }
 
 /**
