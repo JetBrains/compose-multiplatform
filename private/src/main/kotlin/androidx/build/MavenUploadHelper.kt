@@ -92,11 +92,13 @@ private fun Project.configureComponent(
                         removePreviouslyUploadedArchives(projectArchiveDir)
                     }
                 } else {
-                    it.create<MavenPublication>("maven") {
-                        from(component)
-                    }
-                    tasks.getByName("publishMavenPublicationToMavenRepository").doFirst {
-                        removePreviouslyUploadedArchives(projectArchiveDir)
+                    if (!project.isMultiplatformPublicationEnabled()) {
+                        it.create<MavenPublication>("maven") {
+                            from(component)
+                        }
+                        tasks.getByName("publishMavenPublicationToMavenRepository").doFirst {
+                            removePreviouslyUploadedArchives(projectArchiveDir)
+                        }
                     }
                 }
             }
@@ -125,18 +127,20 @@ private fun Project.configureComponent(
             }
         }
 
-        if (project.isMultiplatformEnabled()) {
+        if (project.isMultiplatformPublicationEnabled()) {
             configureMultiplatformPublication()
         }
     }
 }
 
-private fun Project.configureMultiplatformPublication() {
-    val multiplatformExtension = extensions.findByType<KotlinMultiplatformExtension>() ?: return
+private fun Project.isMultiplatformPublicationEnabled(): Boolean {
+    if (!project.isMultiplatformEnabled())
+        return false
+    return extensions.findByType<KotlinMultiplatformExtension>() != null
+}
 
-    // publishMavenPublicationToMavenRepository will produce conflicting artifacts with the same
-    // name as the artifacts producing by publishKotlinMultiplatformPublicationToMavenRepository
-    project.tasks.findByName("publishMavenPublicationToMavenRepository")?.enabled = false
+private fun Project.configureMultiplatformPublication() {
+    val multiplatformExtension = extensions.findByType<KotlinMultiplatformExtension>()!!
 
     multiplatformExtension.targets.all { target ->
         if (target is KotlinAndroidTarget) {
