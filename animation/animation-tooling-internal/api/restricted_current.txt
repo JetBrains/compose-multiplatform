@@ -29,5 +29,19 @@ package androidx.compose.animation.tooling {
     enum_constant public static final androidx.compose.animation.tooling.ComposeAnimationType TRANSITION_ANIMATION;
   }
 
+  public final class TransitionInfo {
+    ctor public TransitionInfo(String label, String specType, long startTimeMillis, long endTimeMillis, java.util.Map<java.lang.Long,?> values);
+    method public long getEndTimeMillis();
+    method public String getLabel();
+    method public String getSpecType();
+    method public long getStartTimeMillis();
+    method public java.util.Map<java.lang.Long,java.lang.Object> getValues();
+    property public final long endTimeMillis;
+    property public final String label;
+    property public final String specType;
+    property public final long startTimeMillis;
+    property public final java.util.Map<java.lang.Long,java.lang.Object> values;
+  }
+
 }
 

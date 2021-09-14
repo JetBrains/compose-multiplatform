@@ -46,6 +46,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertArrayEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -166,6 +167,87 @@ class PreviewAnimationClockTest {
         // Animation duration is 1000ms, so we're at 50%.
         val alpha = animatedProperties.single { it.label == "Built-in alpha" }
         assertEquals(0.5f, alpha.value as Float, 0.0001f)
+    }
+
+    @Test
+    fun getTransitions() {
+        var rotationAnimation: ComposeAnimation? = null
+        var offsetAnimation: ComposeAnimation? = null
+        var animatedVisibility: Transition<Any>? = null
+
+        composeRule.setContent {
+            rotationAnimation = setUpRotationColorScenario()
+            offsetAnimation = setUpOffsetScenario()
+            animatedVisibility = createAnimationVisibility(1000)
+        }
+
+        composeRule.waitForIdle()
+        testClock.trackAnimatedVisibility(animatedVisibility!!)
+        testClock.setClockTime(200)
+        composeRule.waitForIdle()
+
+        var transitions = testClock.getTransitions(rotationAnimation!!, 100)
+
+        val rotation = transitions.single { it.label == "myRotation" }
+        // We're animating from RC1 (0 degrees) to RC3 (360 degrees),
+        // 1000ms being the animation duration.
+        assertEquals("myRotation", rotation.label)
+        assertEquals(0, rotation.startTimeMillis)
+        assertEquals(1000, rotation.endTimeMillis)
+        assertEquals("androidx.compose.animation.core.TweenSpec", rotation.specType)
+        assertArrayEquals(
+            arrayOf(0L, 100L, 200L, 300L, 400L, 500L, 600L, 700L, 800L, 900L, 1000L),
+            rotation.values.keys.sorted().toTypedArray()
+        )
+
+        val color = transitions.single { it.label == "borderColor" }
+        // We're animating from RC1 (Red) to RC3 (Green), 1000ms being the animation duration.
+        assertEquals("borderColor", color.label)
+        assertEquals(0, color.startTimeMillis)
+        assertEquals(1000, color.endTimeMillis)
+        assertEquals("androidx.compose.animation.core.TweenSpec", color.specType)
+        assertArrayEquals(
+            arrayOf(0L, 100L, 200L, 300L, 400L, 500L, 600L, 700L, 800L, 900L, 1000L),
+            color.values.keys.sorted().toTypedArray()
+        )
+
+        transitions = testClock.getTransitions(offsetAnimation!!, 200)
+        val offset = transitions.single()
+        // We're animating from O1 (0) to O2 (100), 800ms being the animation duration.
+        assertEquals("myOffset", offset.label)
+        assertEquals(0, offset.startTimeMillis)
+        assertEquals(800, offset.endTimeMillis)
+        assertEquals("androidx.compose.animation.core.TweenSpec", offset.specType)
+        assertArrayEquals(
+            arrayOf(0L, 200L, 400L, 600L, 800L),
+            offset.values.keys.sorted().toTypedArray()
+        )
+
+        val animatedVisibilityComposeAnimation = testClock.trackedAnimatedVisibility.single()
+        transitions = testClock.getTransitions(animatedVisibilityComposeAnimation, 450)
+        val scale = transitions.single() { it.label == "box scale" }
+        // We're animating from invisible to visible, which means PreEnter (scale 0.5f) to
+        // Visible (scale 1f). Animation duration is 1000ms, so we're at 50%.
+        assertEquals("box scale", scale.label)
+        assertEquals(0, scale.startTimeMillis)
+        assertEquals(1000, scale.endTimeMillis)
+        assertEquals("androidx.compose.animation.core.TweenSpec", scale.specType)
+        assertArrayEquals(
+            arrayOf(0L, 450L, 900L, 1000L),
+            scale.values.keys.sorted().toTypedArray()
+        )
+
+        val alpha = transitions.single() { it.label == "Built-in alpha" }
+        // We're animating from invisible (Built-in alpha 0f) to visible (Built-in alpha 1f).
+        // Animation duration is 1000ms, so we're at 50%.
+        assertEquals("Built-in alpha", alpha.label)
+        assertEquals(0, alpha.startTimeMillis)
+        assertEquals(1000, alpha.endTimeMillis)
+        assertEquals("androidx.compose.animation.core.TweenSpec", alpha.specType)
+        assertArrayEquals(
+            arrayOf(0L, 450L, 900L, 1000L),
+            alpha.values.keys.sorted().toTypedArray()
+        )
     }
 
     @Test

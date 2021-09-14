@@ -21,9 +21,18 @@ import androidx.annotation.VisibleForTesting
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.Transition
+import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.SnapSpec
+import androidx.compose.animation.core.RepeatableSpec
+import androidx.compose.animation.core.InfiniteRepeatableSpec
+import androidx.compose.animation.core.KeyframesSpec
+import androidx.compose.animation.core.AnimationVector
+import androidx.compose.animation.core.StartOffsetType
+import androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec
 import androidx.compose.animation.tooling.ComposeAnimatedProperty
 import androidx.compose.animation.tooling.ComposeAnimation
 import androidx.compose.animation.tooling.ComposeAnimationType
+import androidx.compose.animation.tooling.TransitionInfo
 import java.util.concurrent.TimeUnit
 
 /**
@@ -246,6 +255,27 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
     }
 
     /**
+     * Returns a list of the given [Transition]'s animated properties. The properties animation is
+     * wrapped into a [TransitionInfo] object containing the property label, start and time
+     * of animation and values of the animation.
+     */
+    fun getTransitions(animation: ComposeAnimation, stepMillis: Long): List<TransitionInfo> {
+        if (trackedTransitions.contains(animation)) {
+            val transition = (animation as TransitionComposeAnimation).animationObject
+            return transition.animations.mapNotNull {
+                it.createTransitionInfo(stepMillis)
+            }
+        } else if (trackedAnimatedVisibility.contains(animation)) {
+            (animation as AnimatedVisibilityComposeAnimation).childTransition?.let { child ->
+                return child.animations.mapNotNull {
+                    it.createTransitionInfo(stepMillis)
+                }
+            }
+        }
+        return emptyList()
+    }
+
+    /**
      * Seeks each animation being tracked to the given [animationTimeMs]. Expected to be called
      * via reflection from Android Studio.
      */
@@ -284,9 +314,65 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
     internal data class TransitionState(val current: Any, val target: Any)
 
     /**
+     * Creates [TransitionInfo] from [Transition.TransitionAnimationState].
+     * * [TransitionInfo.startTimeMillis] is an animation delay if it has one.
+     * * [TransitionInfo.endTimeMillis] is an animation duration as it's already includes the delay.
+     * * [TransitionInfo.specType] is a java class name of the spec.
+     * * [TransitionInfo.values] a map of animation values from [TransitionInfo.startTimeMillis]
+     * to [TransitionInfo.endTimeMillis] with [stepMs] sampling.
+     */
+    private fun <T, V : AnimationVector, S>
+    Transition<S>.TransitionAnimationState<T, V>.createTransitionInfo(stepMs: Long = 1):
+        TransitionInfo {
+            val endTimeMs = nanosToMillis(this.animation.durationNanos)
+            val startTimeMs: Long by lazy {
+                val animationSpec = this.animationSpec
+                when (animationSpec) {
+                    is TweenSpec<*> -> animationSpec.delay
+                    is SnapSpec<*> -> animationSpec.delay
+                    is KeyframesSpec<*> -> animationSpec.config.delayMillis
+                    is RepeatableSpec<*> -> {
+                        if (animationSpec.initialStartOffset.offsetType == StartOffsetType.Delay)
+                            animationSpec.initialStartOffset.offsetMillis
+                        else 0L
+                    }
+                    is InfiniteRepeatableSpec<*> -> {
+                        if (animationSpec.initialStartOffset.offsetType == StartOffsetType.Delay)
+                            animationSpec.initialStartOffset.offsetMillis
+                        else 0L
+                    }
+                    is VectorizedDurationBasedAnimationSpec<*> -> animationSpec.delayMillis
+                    else -> 0L
+                }.toLong()
+            }
+            val values: Map<Long, T> by lazy {
+                val values: MutableMap<Long, T> = mutableMapOf()
+                // Always add start and end points.
+                values[startTimeMs] = this.animation.getValueFromNanos(
+                    millisToNanos(startTimeMs)
+                )
+                values[endTimeMs] = this.animation.getValueFromNanos(millisToNanos(endTimeMs))
+
+                for (millis in startTimeMs..endTimeMs step stepMs) {
+                    values[millis] = this.animation.getValueFromNanos(millisToNanos(millis))
+                }
+                values
+            }
+            return TransitionInfo(
+                this.label, this.animationSpec.javaClass.name,
+                startTimeMs, endTimeMs, values
+            )
+        }
+
+    /**
      * Converts the given time in nanoseconds to milliseconds, rounding up when needed.
      */
     private fun nanosToMillis(timeNs: Long) = (timeNs + 999_999) / 1_000_000
+
+    /**
+     * Converts the given time in milliseconds to nanoseconds.
+     */
+    private fun millisToNanos(timeMs: Long) = timeMs * 1_000_000L
 
     private fun AnimatedVisibilityState.toCurrentTargetPair() =
         if (this == AnimatedVisibilityState.Enter) false to true else true to false
