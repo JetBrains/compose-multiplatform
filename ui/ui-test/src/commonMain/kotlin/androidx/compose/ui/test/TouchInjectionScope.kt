@@ -563,7 +563,8 @@ fun TouchInjectionScope.pinch(
  *
  * @param start The start position of the gesture, in the node's local coordinate system
  * @param end The end position of the gesture, in the node's local coordinate system
- * @param endVelocity The velocity of the gesture at the moment it ends. Must be positive.
+ * @param endVelocity The velocity of the gesture at the moment it ends in px/second. Must be
+ * positive.
  * @param durationMillis The duration of the gesture in milliseconds. Must be long enough that at
  * least 3 input events are generated, which happens with a duration of 25ms or more.
  *
