@@ -39,8 +39,8 @@ dependencies {
         implementation(libs.kotlinStdlibCommon)
 
         api("androidx.compose.foundation:foundation:1.0.1")
-        api("androidx.compose.runtime:runtime:1.0.1")
         api("androidx.compose.material:material-ripple:1.0.0")
+        api("androidx.compose.runtime:runtime:1.0.1")
         api("androidx.compose.ui:ui-graphics:1.0.1")
         api("androidx.compose.ui:ui-text:1.0.1")
 
