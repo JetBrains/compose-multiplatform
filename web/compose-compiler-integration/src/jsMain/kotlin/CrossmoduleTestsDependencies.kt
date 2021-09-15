@@ -1,6 +1,7 @@
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import kotlinx.browser.document
+import org.jetbrains.compose.web.dom.Text
 
 data class DataClassTakesValComposable(val c: @Composable () -> Unit)
 data class DataClassTakesValComposableTyped<T>(val c: @Composable (T) -> Unit)
@@ -85,4 +86,8 @@ class ClassSavesStringAndComposableIntoVar(
 ) {
     var composableVar: @Composable ClassSavesStringAndComposableIntoVar.() -> Unit = c
     var stringVar: String = s
+}
+
+val GlobalComposableLambdaToShowText: @Composable (text: () -> String) -> Unit = {
+    Text(it())
 }
