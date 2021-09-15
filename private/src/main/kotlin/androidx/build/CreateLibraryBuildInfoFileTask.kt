@@ -76,25 +76,10 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
     abstract val projectZipPath: Property<String>
 
     /**
-     * Returns the local project directory without the full framework/support root directory path
-     * <p>
-     * Note: `project.projectDir.toString().removePrefix(project.rootDir.toString())` does not work
-     * because the project rootDir is not guaranteed to be a substring of the projectDir
+     * the local project directory without the full framework/support root directory path
      */
-    private fun getProjectSpecificDirectory(): String {
-        return project.projectDir.absolutePath.removePrefix(
-            project.getSupportRootFolder().absolutePath
-        )
-    }
-
-    /**
-     * Returns whether or not the groupId of the project requires the same version for all
-     * artifactIds.
-     */
-    private fun requiresSameVersion(): Boolean {
-        val library = project.extensions.findByType(AndroidXExtension::class.java)
-        return library?.mavenGroup?.requireSameVersion ?: false
-    }
+    @get:Input
+    abstract val projectSpecificDirectory: Property<String>
 
     private fun writeJsonToFile(info: LibraryBuildInfoFile) {
         val resolvedOutputFile: File = outputFile.get()
@@ -103,7 +88,7 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
             if (!outputDir.mkdirs()) {
                 throw RuntimeException(
                     "Failed to create " +
-                        "output directory: ${project.getBuildInfoDirectory()}"
+                        "output directory: $outputDir"
                 )
             }
         }
@@ -227,6 +212,16 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
                     it.groupIdRequiresSameVersion.set(extension.mavenGroup?.requireSameVersion)
                     it.groupZipPath.set(project.getGroupZipPath())
                     it.projectZipPath.set(project.getProjectZipPath())
+
+                    // Note:
+                    // `project.projectDir.toString().removePrefix(project.rootDir.toString())`
+                    // does not work because the project rootDir is not guaranteed to be a
+                    // substring of the projectDir
+                    it.projectSpecificDirectory.set(
+                        project.projectDir.absolutePath.removePrefix(
+                            project.getSupportRootFolder().absolutePath
+                        )
+                    )
                 }
             }
 
