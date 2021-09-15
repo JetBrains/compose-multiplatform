@@ -640,7 +640,9 @@ class AndroidXImplPlugin : Plugin<Project> {
             val taskProvider = tasks.register(
                 "verifyDependencyVersions",
                 VerifyDependencyVersionsTask::class.java
-            )
+            ) { task ->
+                task.version.set(project.version.toString())
+            }
             addToBuildOnServer(taskProvider)
             return taskProvider
         }
