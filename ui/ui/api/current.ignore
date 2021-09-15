@@ -1,4 +1,10 @@
 // Baseline format: 1.0
+AddedAbstractMethod: androidx.compose.ui.layout.LayoutInfo#getDensity():
+    Added method androidx.compose.ui.layout.LayoutInfo.getDensity()
+AddedAbstractMethod: androidx.compose.ui.layout.LayoutInfo#getLayoutDirection():
+    Added method androidx.compose.ui.layout.LayoutInfo.getLayoutDirection()
+
+
 RemovedClass: androidx.compose.ui.graphics.vector.AnimatorKt:
     Removed class androidx.compose.ui.graphics.vector.AnimatorKt
 RemovedClass: androidx.compose.ui.graphics.vector.compat.XmlAnimatedVectorParser_androidKt:
