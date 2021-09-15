@@ -6,10 +6,12 @@ import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.attributes.builders.InputAttrsBuilder
 import org.jetbrains.compose.web.attributes.name
 
+typealias RadioInputAttrsBuilder = (InputAttrsBuilder<Boolean>.() -> Unit)
+
 /**
- * @param [value] - sets `value` attribute
- * @param [id] - sets `id` attribute
- * @param [attrs] - builder to set any eligible attribute
+ * @param value - sets `value` attribute
+ * @param id - sets `id` attribute
+ * @param attrs - builder to set any eligible attribute
  */
 @Composable
 @NonRestartableComposable
@@ -17,7 +19,7 @@ import org.jetbrains.compose.web.attributes.name
 fun <T> RadioGroupScope<T>.RadioInput(
     value: T,
     id: String? = null,
-    attrs: (InputAttrsBuilder<Boolean>.() -> Unit)? = null
+    attrs: RadioInputAttrsBuilder? = null
 ) {
     val checkedValue = getCompositionLocalRadioGroupCheckedValue()
     val radioGroupName = getCompositionLocalRadioGroupName()
@@ -37,10 +39,10 @@ fun <T> RadioGroupScope<T>.RadioInput(
 }
 
 /**
- * @param [checkedValue] - value of a radio input that has to be checked
- * @param [name] - radio group name. It has to be unique among all radio groups.
+ * @param checkedValue - value of a radio input that has to be checked
+ * @param name - radio group name. It has to be unique among all radio groups.
  * If it's null during first composition, radio group will use a generated name.
- * @param [content] - is a composable lambda that contains any number of [RadioInput]
+ * @param content - is a composable lambda that contains any number of [RadioInput]
  */
 @Composable
 @NonRestartableComposable
@@ -58,16 +60,16 @@ fun <E, T : Enum<E>?> RadioGroup(
         content = {
             // normal cast would fail here!
             // this is to specify the type of the values for radio inputs
-            content(RadioGroupScopeImpl.unsafeCast<RadioGroupScope<T>>())
+            content(radioGroupScopeImpl.unsafeCast<RadioGroupScope<T>>())
         }
     )
 }
 
 /**
- * @param [checkedValue] - value of a radio input that has to be checked
- * @param [name] - radio group name. It has to be unique among all radio groups.
+ * @param checkedValue - value of a radio input that has to be checked
+ * @param name - radio group name. It has to be unique among all radio groups.
  * If it's null during first composition, radio group will use a generated name.
- * @param [content] - is a composable lambda that contains any number of [RadioInput]
+ * @param content - is a composable lambda that contains any number of [RadioInput]
  */
 @Composable
 @NonRestartableComposable
@@ -85,16 +87,16 @@ fun RadioGroup(
         content = {
             // normal cast would fail here!
             // this is to specify the type of the values for radio inputs
-            content(RadioGroupScopeImpl.unsafeCast<RadioGroupScope<String>>())
+            content(radioGroupScopeImpl.unsafeCast<RadioGroupScope<String>>())
         }
     )
 }
 
 @ExperimentalComposeWebApi
-open class RadioGroupScope<T> internal constructor()
+class RadioGroupScope<T> internal constructor()
 
 @OptIn(ExperimentalComposeWebApi::class)
-private object RadioGroupScopeImpl : RadioGroupScope<Any>()
+private val radioGroupScopeImpl = RadioGroupScope<Any>()
 
 private var generatedRadioGroupNamesCounter = 0
 

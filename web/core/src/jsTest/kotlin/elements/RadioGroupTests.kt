@@ -29,15 +29,16 @@ class RadioGroupTests {
             }
         }
 
-        assertEquals(
-            "<div>" +
-                    "<input type=\"radio\" id=\"id1\" name=\"\$compose\$generated\$radio\$group-0\" value=\"v1\">" +
-                    "<input type=\"radio\" id=\"id2\" name=\"\$compose\$generated\$radio\$group-0\" value=\"v2\">" +
-                    "<input type=\"radio\" id=\"id2_1\" name=\"\$compose\$generated\$radio\$group-1\" value=\"v2_1\">" +
-                    "<input type=\"radio\" id=\"id2_2\" name=\"\$compose\$generated\$radio\$group-1\" value=\"v2_2\">" +
-                    "</div>",
-            root.outerHTML
-        )
+        val expectedHtml = """
+            |<div>
+                |<input type="radio" id="id1" name="${'$'}compose${'$'}generated${'$'}radio${'$'}group-0" value="v1">
+                |<input type="radio" id="id2" name="${'$'}compose${'$'}generated${'$'}radio${'$'}group-0" value="v2">
+                |<input type="radio" id="id2_1" name="${'$'}compose${'$'}generated${'$'}radio${'$'}group-1" value="v2_1">
+                |<input type="radio" id="id2_2" name="${'$'}compose${'$'}generated${'$'}radio${'$'}group-1" value="v2_2">
+            |</div>
+        """.trimMargin().replace("\n", "")
+
+        assertEquals(expectedHtml, root.outerHTML)
 
         repeat(4) {
             assertEquals(false, (root.childNodes.item(it) as HTMLInputElement).checked)
@@ -53,13 +54,14 @@ class RadioGroupTests {
             }
         }
 
-        assertEquals(
-            "<div>" +
-                    "<input type=\"radio\" id=\"id1\" name=\"g1\" value=\"v1\">" +
-                    "<input type=\"radio\" id=\"id2\" name=\"g1\" value=\"v2\">" +
-                    "</div>",
-            root.outerHTML
-        )
+        val expectedHtml = """
+            |<div>
+                |<input type="radio" id="id1" name="g1" value="v1">
+                |<input type="radio" id="id2" name="g1" value="v2">
+            |</div>
+        """.trimMargin().replace("\n", "")
+
+        assertEquals(expectedHtml, root.outerHTML)
 
         repeat(2) {
             assertEquals(false, (root.childNodes.item(it) as HTMLInputElement).checked)
@@ -81,12 +83,16 @@ class RadioGroupTests {
             }
         }
 
+        val expectedHtml = """
+            |<div>
+                |<input type="radio" name="g1" value="V1">
+                |<input type="radio" name="g1" value="V2">
+                |<input type="radio" name="g1" value="V3">
+            |</div>
+        """.trimMargin().replace("\n", "")
+
         assertEquals(
-            "<div>" +
-                    "<input type=\"radio\" name=\"g1\" value=\"V1\">" +
-                    "<input type=\"radio\" name=\"g1\" value=\"V2\">" +
-                    "<input type=\"radio\" name=\"g1\" value=\"V3\">" +
-                    "</div>",
+            expectedHtml,
             root.outerHTML
         )
 
@@ -107,11 +113,13 @@ class RadioGroupTests {
             }
         }
 
-        val expectedHtml = "<div>" +
-                "<input type=\"radio\" name=\"g1\" value=\"V1\">" +
-                "<input type=\"radio\" name=\"g1\" value=\"V2\">" +
-                "<input type=\"radio\" name=\"g1\" value=\"V3\">" +
-                "</div>"
+        val expectedHtml = """
+            |<div>
+                |<input type="radio" name="g1" value="V1">
+                |<input type="radio" name="g1" value="V2">
+                |<input type="radio" name="g1" value="V3">
+            |</div>
+        """.trimMargin().replace("\n", "")
 
         assertEquals(expectedHtml, root.outerHTML)
         repeat(3) {
@@ -149,11 +157,13 @@ class RadioGroupTests {
             }
         }
 
-        val expectedHtml = "<div>" +
-                "<div><input type=\"radio\" name=\"g1\" value=\"V1\"></div>" +
-                "<div><input type=\"radio\" name=\"g1\" value=\"V2\"></div>" +
-                "<div><input type=\"radio\" name=\"g1\" value=\"V3\"></div>" +
-                "</div>"
+        val expectedHtml = """
+            |<div>
+                |<div><input type="radio" name="g1" value="V1"></div>
+                |<div><input type="radio" name="g1" value="V2"></div>
+                |<div><input type="radio" name="g1" value="V3"></div>
+            |</div>
+        """.trimMargin().replace("\n", "")
 
         assertEquals(expectedHtml, root.outerHTML)
         repeat(3) {
