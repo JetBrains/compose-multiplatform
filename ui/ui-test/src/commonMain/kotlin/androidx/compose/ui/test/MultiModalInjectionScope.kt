@@ -40,23 +40,16 @@ import kotlin.math.roundToInt
  * onNodeWithTag("myWidget")
  *    .performMultiModalInput {
  *        Touch.click(center)
- *    }
- *
- * onNodeWithTag("myWidget")
- *    // TODO(fresen): add multi modal example
- *    .performMultiModalInput {
- *        Touch.down(topLeft)
- *        Touch.move(topLeft + percentOffset(0f, .1f))
- *        Keyboard.press(Keyboard.Ctrl)
- *        Touch.move(center)
- *        Touch.up()
- *        Keyboard.release(Keyboard.Ctrl)
+ *        advanceEventTime(500)
+ *        @OptIn(ExperimentalTestApi::class)
+ *        Mouse.dragAndDrop(topLeft, bottomRight)
  *    }
  * ```
  *
  * @see InjectionScope
  * @see TouchInjectionScope
  */
+// TODO(fresen): add better multi modal example when we have keyboard support
 class MultiModalInjectionScope(node: SemanticsNode, testContext: TestContext) : InjectionScope {
     // TODO(b/133217292): Better error: explain which gesture couldn't be performed
     private var _semanticsNode: SemanticsNode? = node
@@ -117,6 +110,9 @@ class MultiModalInjectionScope(node: SemanticsNode, testContext: TestContext) : 
         _inputDispatcher = null
     }
 
+    /**
+     * The receiver scope for touch input injection. See [TouchInjectionScope].
+     */
     val Touch: TouchInjectionScope = object : TouchInjectionScope, InjectionScope by this {
         override fun currentPosition(pointerId: Int): Offset? {
             val positionInRoot = inputDispatcher.getCurrentTouchPosition(pointerId) ?: return null
@@ -148,6 +144,9 @@ class MultiModalInjectionScope(node: SemanticsNode, testContext: TestContext) : 
         }
     }
 
+    /**
+     * The receiver scope for mouse input injection. See [MouseInjectionScope].
+     */
     @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
     @get:ExperimentalTestApi // Required to annotate Java-facing APIs
     @ExperimentalTestApi
