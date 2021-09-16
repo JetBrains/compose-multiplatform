@@ -12,13 +12,15 @@ tasks.register("publishComposeJb") {
     dependsOnComposeTask(":compose:compiler:compiler-hosted:publishMavenPublicationToMavenRepository")
     dependsOnComposeTask(":compose:ui:ui-tooling-data:publishMavenPublicationToMavenRepository")
 
-    dependsOnComposeTask(":compose:desktop:desktop:publishKotlinMultiplatformPublicationToMavenRepository")
-    dependsOnComposeTask(":compose:desktop:desktop:publishJvmPublicationToMavenRepository")
-    dependsOnComposeTask(":compose:desktop:desktop:publishJvmlinux-x64PublicationToMavenRepository")
-    dependsOnComposeTask(":compose:desktop:desktop:publishJvmlinux-arm64PublicationToMavenRepository")
-    dependsOnComposeTask(":compose:desktop:desktop:publishJvmmacos-x64PublicationToMavenRepository")
-    dependsOnComposeTask(":compose:desktop:desktop:publishJvmmacos-arm64PublicationToMavenRepository")
-    dependsOnComposeTask(":compose:desktop:desktop:publishJvmwindows-x64PublicationToMavenRepository")
+    if (findProperty("androidx.compose.openExpectLiteMode") != "androidx") {
+        dependsOnComposeTask(":compose:desktop:desktop:publishKotlinMultiplatformPublicationToMavenRepository")
+        dependsOnComposeTask(":compose:desktop:desktop:publishJvmPublicationToMavenRepository")
+        dependsOnComposeTask(":compose:desktop:desktop:publishJvmlinux-x64PublicationToMavenRepository")
+        dependsOnComposeTask(":compose:desktop:desktop:publishJvmlinux-arm64PublicationToMavenRepository")
+        dependsOnComposeTask(":compose:desktop:desktop:publishJvmmacos-x64PublicationToMavenRepository")
+        dependsOnComposeTask(":compose:desktop:desktop:publishJvmmacos-arm64PublicationToMavenRepository")
+        dependsOnComposeTask(":compose:desktop:desktop:publishJvmwindows-x64PublicationToMavenRepository")
+    }
 
     listOf(
         ":compose:animation:animation",
@@ -42,9 +44,13 @@ tasks.register("publishComposeJb") {
         ":compose:ui:ui-util",
     ).forEach {
         dependsOnComposeTask("$it:publishKotlinMultiplatformPublicationToMavenRepository")
-        dependsOnComposeTask("$it:publishDesktopPublicationToMavenRepository")
-        dependsOnComposeTask("$it:publishAndroidDebugPublicationToMavenRepository")
-        dependsOnComposeTask("$it:publishAndroidReleasePublicationToMavenRepository")
+        if (findProperty("androidx.compose.openExpectLiteMode") != "androidx") {
+            dependsOnComposeTask("$it:publishDesktopPublicationToMavenRepository")
+        }
+        if (findProperty("androidx.compose.openExpectLiteMode") != "org_jetbrains") {
+            dependsOnComposeTask("$it:publishAndroidDebugPublicationToMavenRepository")
+            dependsOnComposeTask("$it:publishAndroidReleasePublicationToMavenRepository")
+        }
     }
 
     listOf(
