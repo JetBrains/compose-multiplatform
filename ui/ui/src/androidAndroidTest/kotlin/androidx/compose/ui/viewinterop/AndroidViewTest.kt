@@ -37,6 +37,7 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,6 +51,8 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.findViewTreeCompositionContext
 import androidx.compose.ui.platform.testTag
@@ -63,6 +66,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.savedstate.SavedStateRegistry
+import androidx.savedstate.SavedStateRegistryOwner
+import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
@@ -377,7 +386,7 @@ class AndroidViewTest {
     }
 
     @Test
-    fun androidView_propagatesAmbientsToComposeViewChildren() {
+    fun androidView_propagatesLocalsToComposeViewChildren() {
         val ambient = compositionLocalOf { "unset" }
         var childComposedAmbientValue = "uncomposed"
         rule.setContent {
@@ -433,6 +442,83 @@ class AndroidViewTest {
         rule.runOnIdle {
             assertThat(childViewLayoutDirection).isEqualTo(android.util.LayoutDirection.RTL)
             assertThat(childCompositionLayoutDirection).isEqualTo(LayoutDirection.Ltr)
+        }
+    }
+
+    @Test
+    fun androidView_propagatesLocalLifecycleOwnerAsViewTreeOwner() {
+        lateinit var parentLifecycleOwner: LifecycleOwner
+        // We don't actually need to ever get the actual lifecycle.
+        val compositionLifecycleOwner = LifecycleOwner { throw UnsupportedOperationException() }
+        var childViewTreeLifecycleOwner: LifecycleOwner? = null
+
+        rule.setContent {
+            LocalLifecycleOwner.current.also {
+                SideEffect {
+                    parentLifecycleOwner = it
+                }
+            }
+
+            CompositionLocalProvider(LocalLifecycleOwner provides compositionLifecycleOwner) {
+                AndroidView(
+                    factory = {
+                        object : FrameLayout(it) {
+                            override fun onAttachedToWindow() {
+                                super.onAttachedToWindow()
+                                childViewTreeLifecycleOwner = ViewTreeLifecycleOwner.get(this)
+                            }
+                        }
+                    }
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(childViewTreeLifecycleOwner).isSameInstanceAs(compositionLifecycleOwner)
+            assertThat(childViewTreeLifecycleOwner).isNotSameInstanceAs(parentLifecycleOwner)
+        }
+    }
+
+    @Test
+    fun androidView_propagatesLocalSavedStateRegistryOwnerAsViewTreeOwner() {
+        lateinit var parentSavedStateRegistryOwner: SavedStateRegistryOwner
+        val compositionSavedStateRegistryOwner = object : SavedStateRegistryOwner {
+            // We don't actually need to ever get actual instances.
+            override fun getLifecycle(): Lifecycle = throw UnsupportedOperationException()
+            override fun getSavedStateRegistry(): SavedStateRegistry =
+                throw UnsupportedOperationException()
+        }
+        var childViewTreeSavedStateRegistryOwner: SavedStateRegistryOwner? = null
+
+        rule.setContent {
+            LocalSavedStateRegistryOwner.current.also {
+                SideEffect {
+                    parentSavedStateRegistryOwner = it
+                }
+            }
+
+            CompositionLocalProvider(
+                LocalSavedStateRegistryOwner provides compositionSavedStateRegistryOwner
+            ) {
+                AndroidView(
+                    factory = {
+                        object : FrameLayout(it) {
+                            override fun onAttachedToWindow() {
+                                super.onAttachedToWindow()
+                                childViewTreeSavedStateRegistryOwner =
+                                    ViewTreeSavedStateRegistryOwner.get(this)
+                            }
+                        }
+                    }
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(childViewTreeSavedStateRegistryOwner)
+                .isSameInstanceAs(compositionSavedStateRegistryOwner)
+            assertThat(childViewTreeSavedStateRegistryOwner)
+                .isNotSameInstanceAs(parentSavedStateRegistryOwner)
         }
     }
 
