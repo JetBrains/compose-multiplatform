@@ -29,6 +29,8 @@ import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.cancel
 import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.FrameDispatcher
+import java.awt.Component
+import java.awt.event.MouseEvent
 import kotlin.coroutines.CoroutineContext
 
 private val emptyDispatcher = object : CoroutineDispatcher() {
@@ -104,9 +106,7 @@ class TestComposeWindow(
         owner.setContent {
             content()
         }
-        owner.setSize(width, height)
-        owner.measureAndLayout()
-        owner.draw(canvas)
+        owners.onFrame(surface.canvas, width, height, 0)
         this.owner = owner
     }
 
@@ -121,20 +121,36 @@ class TestComposeWindow(
      * Process mouse move event
      */
     fun onMouseMoved(x: Int, y: Int) {
-        owners.onMouseMoved(x, y)
+        owners.onMouseMoved(
+            x,
+            y,
+            MouseEvent(EventComponent, MouseEvent.MOUSE_MOVED, 0, 0, x, y, 1, false)
+        )
     }
 
     /**
      * Process mouse enter event
      */
     fun onMouseEntered(x: Int, y: Int) {
-        owners.onMouseEntered(x, y)
+        owners.onMouseEntered(
+            x,
+            y,
+            MouseEvent(EventComponent, MouseEvent.MOUSE_MOVED, 0, 0, x, y, 1, false)
+        )
     }
 
     /**
      * Process mouse exit event
      */
     fun onMouseExited() {
-        owners.onMouseExited()
+        owners.onMouseExited(
+            -1,
+            -1,
+            MouseEvent(EventComponent, MouseEvent.MOUSE_MOVED, 0, 0, -1, -1, 1, false)
+        )
+    }
+
+    companion object {
+        private val EventComponent = object : Component() {}
     }
 }
