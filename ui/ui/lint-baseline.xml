@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.1.0-alpha02" type="baseline" client="cli" name="Lint" variant="all" version="7.1.0-alpha02">
+<issues format="6" by="lint 7.1.0-dev" type="baseline" client="gradle" dependencies="false" name="AGP (7.1.0-dev)" variant="all" version="7.1.0-dev">
 
     <issue
         id="NewApi"
@@ -21,6 +21,17 @@
             file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
             line="224"
             column="9"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 29 (current min is 21): `setCameraDistance`"
+        errorLine1="            this.cameraDistance = cameraDistance"
+        errorLine2="                 ~~~~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
+            line="225"
+            column="18"/>
     </issue>
 
     <issue
@@ -47,6 +58,17 @@
 
     <issue
         id="NewApi"
+        message="Call requires API level 23 (current min is 21): `setCameraDistance`"
+        errorLine1="            this.cameraDistance = cameraDistance"
+        errorLine2="                 ~~~~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
+            line="232"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="NewApi"
         message="Call requires API level 23 (current min is 21): `dumpRenderNodeData`"
         errorLine1="        }.dumpRenderNodeData().cameraDistance == -cameraDistance // Camera distance is negative"
         errorLine2="          ~~~~~~~~~~~~~~~~~~">
@@ -63,7 +85,7 @@
         errorLine2="                 ~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
-            line="3707"
+            line="3758"
             column="18"/>
     </issue>
 
@@ -223,6 +245,17 @@
 
     <issue
         id="NewApi"
+        message="Call requires API level 26 (current min is 21): `setAutofillType`"
+        errorLine1="                        setAutofillType(View.AUTOFILL_TYPE_TEXT)"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="87"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="NewApi"
         message="Call requires API level 26 (current min is 21): `setAutofillHints`"
         errorLine1="                        setAutofillHints(arrayOf(AUTOFILL_HINT_PERSON_NAME))"
         errorLine2="                        ~~~~~~~~~~~~~~~~">
@@ -230,6 +263,17 @@
             file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
             line="88"
             column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `setAutofillHints`"
+        errorLine1="                        setAutofillHints(arrayOf(AUTOFILL_HINT_PERSON_NAME))"
+        errorLine2="                                         ~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="88"
+            column="42"/>
     </issue>
 
     <issue
@@ -300,6 +344,17 @@
 
     <issue
         id="NewApi"
+        message="Call requires API level 26 (current min is 21): `setAutofillType`"
+        errorLine1="                        setAutofillType(View.AUTOFILL_TYPE_TEXT)"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="124"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="NewApi"
         message="Call requires API level 26 (current min is 21): `setAutofillHints`"
         errorLine1="                        setAutofillHints(arrayOf(AUTOFILL_HINT_PERSON_NAME))"
         errorLine2="                        ~~~~~~~~~~~~~~~~">
@@ -307,6 +362,17 @@
             file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
             line="125"
             column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `setAutofillHints`"
+        errorLine1="                        setAutofillHints(arrayOf(AUTOFILL_HINT_PERSON_NAME))"
+        errorLine2="                                         ~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="125"
+            column="42"/>
     </issue>
 
     <issue
@@ -344,6 +410,17 @@
 
     <issue
         id="NewApi"
+        message="Call requires API level 26 (current min is 21): `setAutofillType`"
+        errorLine1="                        setAutofillType(View.AUTOFILL_TYPE_TEXT)"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="133"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="NewApi"
         message="Call requires API level 26 (current min is 21): `setAutofillHints`"
         errorLine1="                        setAutofillHints(arrayOf(View.AUTOFILL_HINT_EMAIL_ADDRESS))"
         errorLine2="                        ~~~~~~~~~~~~~~~~">
@@ -351,6 +428,17 @@
             file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
             line="134"
             column="25"/>
+    </issue>
+
+    <issue
+        id="NewApi"
+        message="Call requires API level 26 (current min is 21): `setAutofillHints`"
+        errorLine1="                        setAutofillHints(arrayOf(View.AUTOFILL_HINT_EMAIL_ADDRESS))"
+        errorLine2="                                         ~~~~~~~">
+        <location
+            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
+            line="134"
+            column="42"/>
     </issue>
 
     <issue
@@ -492,7 +580,7 @@
         errorLine2="                                                     ~~~~~~~~~~~~~~">
         <location
             file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/DrawModifierTest.kt"
-            line="638"
+            line="632"
             column="54"/>
     </issue>
 
@@ -514,7 +602,7 @@
         errorLine2="                          ~~~~~~~~~~~~~~">
         <location
             file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/PainterModifierTest.kt"
-            line="720"
+            line="755"
             column="27"/>
     </issue>
 
@@ -536,7 +624,7 @@
         errorLine2="                                   ~~~~~~~~~~~~~~">
         <location
             file="src/androidAndroidTest/kotlin/androidx/compose/ui/graphics/vector/VectorTest.kt"
-            line="481"
+            line="590"
             column="36"/>
     </issue>
 
