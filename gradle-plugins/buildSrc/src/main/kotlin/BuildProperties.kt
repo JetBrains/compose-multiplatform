@@ -14,6 +14,9 @@ object BuildProperties {
     fun composeVersion(project: Project): String =
         System.getenv("COMPOSE_GRADLE_PLUGIN_COMPOSE_VERSION")
             ?: project.findProperty("compose.version") as String
+    fun composeAndroidxVersion(project: Project): String =
+        System.getenv("COMPOSE_ANDROIDX_VERSION")
+            ?: project.findProperty("compose.androidx.version") as String
     fun deployVersion(project: Project): String =
         System.getenv("COMPOSE_GRADLE_PLUGIN_VERSION")
             ?: project.findProperty("deploy.version") as String
