@@ -65,6 +65,8 @@ dependencies {
         androidTestImplementation(libs.testUiautomator)
 
         lintPublish project(":compose:material:material-lint")
+
+        samples(project(":compose:material:material:material-samples"))
     }
 }
 

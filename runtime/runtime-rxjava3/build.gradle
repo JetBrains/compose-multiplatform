@@ -38,6 +38,8 @@ dependencies {
     androidTestImplementation(libs.testRunner)
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.truth)
+
+    samples(projectOrArtifact(":compose:runtime:runtime-rxjava3:runtime-rxjava3-samples"))
 }
 
 androidx {

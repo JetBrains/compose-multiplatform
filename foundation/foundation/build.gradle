@@ -70,6 +70,8 @@ dependencies {
         androidTestImplementation(libs.dexmakerMockito)
         androidTestImplementation(libs.mockitoCore)
         androidTestImplementation(libs.mockitoKotlin)
+
+        samples(project(":compose:foundation:foundation:foundation-samples"))
     }
 }
 

@@ -39,6 +39,8 @@ dependencies {
     androidTestImplementation(libs.testRunner)
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.truth)
+
+    samples(projectOrArtifact(":compose:runtime:runtime-livedata:runtime-livedata-samples"))
 }
 
 androidx {
