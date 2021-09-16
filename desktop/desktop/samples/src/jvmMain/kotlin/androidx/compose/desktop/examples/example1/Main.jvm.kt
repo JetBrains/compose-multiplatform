@@ -18,7 +18,6 @@ package androidx.compose.desktop.examples.example1
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.foundation.ExperimentalDesktopApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -144,7 +143,7 @@ fun main() = singleWindowApplication(
 @Composable
 private fun FrameWindowScope.App() {
     val uriHandler = LocalUriHandler.current
-    DesktopMaterialTheme {
+    MaterialTheme {
         Scaffold(
             topBar = {
                 TopAppBar(
