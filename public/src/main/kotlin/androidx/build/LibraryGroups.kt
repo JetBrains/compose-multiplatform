@@ -105,6 +105,7 @@ object LibraryGroups {
     val WEAR = LibraryGroup("androidx.wear", null)
     val WEAR_COMPOSE = LibraryGroup("androidx.wear.compose", LibraryVersions.WEAR_COMPOSE)
     val WEAR_TILES = LibraryGroup("androidx.wear.tiles", LibraryVersions.WEAR_TILES)
+    val WEAR_WATCHFACE = LibraryGroup("androidx.wear.watchface", LibraryVersions.WEAR_WATCHFACE)
     val WEBKIT = LibraryGroup("androidx.webkit", LibraryVersions.WEBKIT)
     val WINDOW = LibraryGroup("androidx.window", null)
     val WORK = LibraryGroup("androidx.work", LibraryVersions.WORK)

@@ -134,9 +134,6 @@ object LibraryVersions {
     val VIEWPAGER = Version("1.1.0-alpha02")
     val VIEWPAGER2 = Version("1.1.0-beta02")
     val WEAR = Version("1.3.0-alpha01")
-    val WEAR_COMPLICATIONS_DATA = Version("1.0.0-alpha23")
-    val WEAR_COMPLICATIONS_DATA_SOURCE = Version("1.0.0-alpha23")
-    val WEAR_COMPLICATIONS_DATA_SOURCE_KTX = Version("1.0.0-alpha23")
     val WEAR_COMPOSE = Version("1.0.0-alpha07")
     val WEAR_INPUT = Version("1.2.0-alpha02")
     val WEAR_INPUT_TESTING = WEAR_INPUT
@@ -145,13 +142,6 @@ object LibraryVersions {
     val WEAR_REMOTE_INTERACTIONS = Version("1.1.0-alpha01")
     val WEAR_TILES = Version("1.0.0-alpha12")
     val WEAR_WATCHFACE = Version("1.0.0-alpha23")
-    val WEAR_WATCHFACE_CLIENT = Version("1.0.0-alpha23")
-    val WEAR_WATCHFACE_CLIENT_GUAVA = WEAR_WATCHFACE_CLIENT
-    val WEAR_WATCHFACE_COMPLICATIONS_RENDERING = Version("1.0.0-alpha23")
-    val WEAR_WATCHFACE_DATA = Version("1.0.0-alpha23")
-    val WEAR_WATCHFACE_EDITOR = Version("1.0.0-alpha23")
-    val WEAR_WATCHFACE_EDITOR_GUAVA = WEAR_WATCHFACE_EDITOR
-    val WEAR_WATCHFACE_STYLE = Version("1.0.0-alpha23")
     val WEBKIT = Version("1.5.0-alpha01")
     val WINDOW = Version("1.0.0-beta03")
     val WINDOW_EXTENSIONS = Version("1.0.0-alpha01")
