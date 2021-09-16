@@ -42,6 +42,15 @@ internal expect fun createInputDispatcher(
  * * [enqueueTouchUp]
  * * [enqueueTouchCancel]
  *
+ * Mouse input:
+ * * [currentMousePosition]
+ * * [enqueueMousePress]
+ * * [enqueueMouseMove]
+ * * [updateMousePosition]
+ * * [enqueueMouseRelease]
+ * * [enqueueMouseCancel]
+ * * [enqueueMouseScroll]
+ *
  * Chaining methods:
  * * [advanceEventTime]
  */
@@ -71,6 +80,12 @@ internal abstract class InputDispatcher(
     protected var partialGesture: PartialGesture? = null
 
     /**
+     * The state of the mouse. The mouse state is always available. It starts at [Offset.Zero] in
+     * not-entered state.
+     */
+    protected var mouseInputState: MouseInputState = MouseInputState()
+
+    /**
      * Indicates if a gesture is in progress or not. A gesture is in progress if at least one
      * finger is (still) touching the screen.
      */
@@ -81,6 +96,7 @@ internal abstract class InputDispatcher(
         val state = testContext.states.remove(root)
         if (state != null) {
             partialGesture = state.partialGesture
+            mouseInputState = state.mouseInputState
         }
     }
 
@@ -88,7 +104,8 @@ internal abstract class InputDispatcher(
         if (root != null) {
             testContext.states[root] =
                 InputDispatcherState(
-                    partialGesture
+                    partialGesture,
+                    mouseInputState
                 )
         }
     }
@@ -121,6 +138,12 @@ internal abstract class InputDispatcher(
     }
 
     /**
+     * The current position of the mouse. If no mouse event has been sent yet, will be
+     * [Offset.Zero].
+     */
+    val currentMousePosition: Offset get() = mouseInputState.lastPosition
+
+    /**
      * Generates a down touch event at [position] for the pointer with the given [pointerId].
      * Starts a new touch gesture if no other [pointerId]s are down. Only possible if the
      * [pointerId] is not currently being used, although pointer ids may be reused during a touch
@@ -140,6 +163,14 @@ internal abstract class InputDispatcher(
         // Check if this pointer is not already down
         require(gesture == null || !gesture.lastPositions.containsKey(pointerId)) {
             "Cannot send DOWN event, a gesture is already in progress for pointer $pointerId"
+        }
+
+        if (mouseInputState.hasAnyButtonPressed) {
+            // If mouse buttons are down, a touch gesture cancels the mouse gesture
+            mouseInputState.enqueueCancel()
+        } else if (mouseInputState.isEntered) {
+            // If no mouse buttons were down, we may have been in hovered state
+            mouseInputState.exitHover()
         }
 
         // Send a MOVE event if pointers have changed since the last event
@@ -239,7 +270,8 @@ internal abstract class InputDispatcher(
     }
 
     /**
-     * Generates a cancel touch event for the current touch gesture.
+     * Generates a cancel touch event for the current touch gesture. Sent automatically when
+     * mouse events are sent while a touch gesture is in progress.
      *
      * @see enqueueTouchDown
      * @see updateTouchPointer
@@ -265,6 +297,175 @@ internal abstract class InputDispatcher(
     }
 
     /**
+     * Generates a mouse button pressed event for the given [buttonId]. This will generate all
+     * required associated events as well, such as a down event if it is the first button being
+     * pressed and an optional hover exit event.
+     *
+     * @param buttonId The id of the mouse button. This is platform dependent, use the values
+     * defined by [MouseButton.buttonId].
+     */
+    fun enqueueMousePress(buttonId: Int) {
+        val mouse = mouseInputState
+
+        check(!mouse.isButtonPressed(buttonId)) {
+            "Cannot send mouse button down event, button $buttonId is already pressed"
+        }
+        if (partialGesture != null) {
+            enqueueTouchCancel()
+        }
+
+        val nothingWasPressed = mouse.hasNoButtonsPressed
+        mouse.setButtonBit(buttonId)
+
+        // Down time is when the _first_ button was pressed
+        if (nothingWasPressed) {
+            mouse.downTime = currentTime
+        }
+        // Exit hovering if necessary
+        if (mouse.isEntered) {
+            mouse.exitHover()
+        }
+        // down/move + press
+        mouse.enqueuePress(buttonId)
+    }
+
+    /**
+     * Generates a mouse move or hover event to the given [position]. If buttons are pressed, a
+     * move event is generated, otherwise generates a hover event.
+     *
+     * @param position The new mouse position
+     */
+    fun enqueueMouseMove(position: Offset) {
+        val mouse = mouseInputState
+
+        // TODO(fresen): synthesize ENTER and EXIT events
+        //  when the mouse enters/exits the Compose host.
+
+        if (partialGesture != null) {
+            enqueueTouchCancel()
+        }
+        updateMousePosition(position)
+        // If not yet hovering and no buttons pressed, enter hover state
+        if (!mouse.isEntered && mouse.hasNoButtonsPressed) {
+            mouse.enterHover()
+        }
+        mouse.enqueueMove()
+    }
+
+    /**
+     * Updates the mouse position without sending an event. Useful if down, up or scroll events
+     * need to be injected on a different location than the preceding move event.
+     *
+     * @param position The new mouse position
+     */
+    fun updateMousePosition(position: Offset) {
+        mouseInputState.lastPosition = position
+        // Contrary to touch input, we don't need to store that the position has changed, because
+        // all events that are affected send the current position regardless.
+    }
+
+    /**
+     * Generates a mouse button released event for the given [buttonId]. This will generate all
+     * required associated events as well, such as an up and hover enter event if it is the last
+     * button being released.
+     *
+     * @param buttonId The id of the mouse button. This is platform dependent, use the values
+     * defined by [MouseButton.buttonId].
+     */
+    fun enqueueMouseRelease(buttonId: Int) {
+        val mouse = mouseInputState
+
+        check(mouse.isButtonPressed(buttonId)) {
+            "Cannot send mouse button up event, button $buttonId is not pressed"
+        }
+        check(partialGesture == null) {
+            "Touch gesture can't be in progress, mouse buttons are down"
+        }
+
+        mouse.unsetButtonBit(buttonId)
+        mouse.enqueueRelease(buttonId)
+
+        // When no buttons remaining, enter hover state immediately
+        if (mouse.hasNoButtonsPressed) {
+            mouse.enterHover()
+            mouse.enqueueMove()
+        }
+    }
+
+    /**
+     * Generates a mouse hover enter event on the given [position].
+     *
+     * @param position The new mouse position
+     */
+    fun enqueueMouseEnter(position: Offset) {
+        val mouse = mouseInputState
+
+        check(!mouse.isEntered) {
+            "Cannot send mouse hover enter event, mouse is already hovering"
+        }
+        check(mouse.hasNoButtonsPressed) {
+            "Cannot send mouse hover enter event, mouse buttons are down"
+        }
+
+        updateMousePosition(position)
+        mouse.enterHover()
+    }
+
+    /**
+     * Generates a mouse hover exit event on the given [position].
+     *
+     * @param position The new mouse position
+     */
+    fun enqueueMouseExit(position: Offset) {
+        val mouse = mouseInputState
+
+        check(mouse.isEntered) {
+            "Cannot send mouse hover exit event, mouse is not hovering"
+        }
+
+        updateMousePosition(position)
+        mouse.exitHover()
+    }
+
+    /**
+     * Generates a mouse cancel event. Can only be done if no mouse buttons are currently
+     * pressed. Sent automatically if a touch event is sent while mouse buttons are down.
+     */
+    fun enqueueMouseCancel() {
+        val mouse = mouseInputState
+        check(mouse.hasAnyButtonPressed) {
+            "Cannot send mouse cancel event, no mouse buttons are pressed"
+        }
+        mouse.clearButtonState()
+        mouse.enqueueCancel()
+    }
+
+    /**
+     * Generates a scroll event on [scrollWheel] by [delta]. Negative values correspond to
+     * rotating the scroll wheel leftward or downward, positive values correspond to rotating the
+     * scroll wheel rightward or upward.
+     */
+    // TODO(fresen): verify the sign of the horizontal scroll axis (is left negative or positive?)
+    @OptIn(ExperimentalTestApi::class)
+    fun enqueueMouseScroll(delta: Float, scrollWheel: ScrollWheel) {
+        val mouse = mouseInputState
+
+        // A scroll is always preceded by a move(/hover) event
+        enqueueMouseMove(mouse.lastPosition)
+        mouse.enqueueScroll(delta, scrollWheel)
+    }
+
+    private fun MouseInputState.enterHover() {
+        enqueueEnter()
+        isEntered = true
+    }
+
+    private fun MouseInputState.exitHover() {
+        enqueueExit()
+        isEntered = false
+    }
+
+    /**
      * Sends all enqueued events and blocks while they are dispatched. If an exception is
      * thrown during the process, all events that haven't yet been dispatched will be dropped.
      */
@@ -277,6 +478,21 @@ internal abstract class InputDispatcher(
     protected abstract fun PartialGesture.enqueueUp(pointerId: Int)
 
     protected abstract fun PartialGesture.enqueueCancel()
+
+    protected abstract fun MouseInputState.enqueuePress(buttonId: Int)
+
+    protected abstract fun MouseInputState.enqueueMove()
+
+    protected abstract fun MouseInputState.enqueueRelease(buttonId: Int)
+
+    protected abstract fun MouseInputState.enqueueEnter()
+
+    protected abstract fun MouseInputState.enqueueExit()
+
+    protected abstract fun MouseInputState.enqueueCancel()
+
+    @OptIn(ExperimentalTestApi::class)
+    protected abstract fun MouseInputState.enqueueScroll(delta: Float, scrollWheel: ScrollWheel)
 
     /**
      * Called when this [InputDispatcher] is about to be discarded, from
@@ -308,12 +524,46 @@ internal class PartialGesture(val downTime: Long, startPosition: Offset, pointer
 }
 
 /**
+ * The current mouse state. Contains the current mouse position, which buttons are pressed, if it
+ * is hovering over the current node and the down time of the mouse (which is the time of the
+ * last mouse down event).
+ */
+internal class MouseInputState {
+    var downTime: Long = 0
+    val pressedButtons: MutableSet<Int> = mutableSetOf()
+    var lastPosition: Offset = Offset.Zero
+    var isEntered: Boolean = false
+
+    val hasAnyButtonPressed get() = pressedButtons.isNotEmpty()
+    val hasOneButtonPressed get() = pressedButtons.size == 1
+    val hasNoButtonsPressed get() = pressedButtons.isEmpty()
+
+    fun isButtonPressed(buttonId: Int): Boolean {
+        return pressedButtons.contains(buttonId)
+    }
+
+    fun setButtonBit(buttonId: Int) {
+        pressedButtons.add(buttonId)
+    }
+
+    fun unsetButtonBit(buttonId: Int) {
+        pressedButtons.remove(buttonId)
+    }
+
+    fun clearButtonState() {
+        pressedButtons.clear()
+    }
+}
+
+/**
  * The state of an [InputDispatcher], saved when the [GestureScope] is disposed and restored
  * when the [GestureScope] is recreated.
  *
  * @param partialGesture The state of an incomplete gesture. If no gesture was in progress
  * when the state of the [InputDispatcher] was saved, this will be `null`.
+ * @param mouseInputState The state of the mouse.
  */
 internal data class InputDispatcherState(
-    val partialGesture: PartialGesture?
+    val partialGesture: PartialGesture?,
+    val mouseInputState: MouseInputState,
 )

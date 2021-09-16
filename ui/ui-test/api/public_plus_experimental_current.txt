@@ -4,6 +4,7 @@ package androidx.compose.ui.test {
   public final class ActionsKt {
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performClick(androidx.compose.ui.test.SemanticsNodeInteraction);
     method @Deprecated public static androidx.compose.ui.test.SemanticsNodeInteraction performGesture(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.GestureScope,kotlin.Unit> block);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static androidx.compose.ui.test.SemanticsNodeInteraction performMouseInput(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.MouseInjectionScope,kotlin.Unit> block);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performMultiModalInput(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.MultiModalInjectionScope,kotlin.Unit> block);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performScrollTo(androidx.compose.ui.test.SemanticsNodeInteraction);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performScrollToIndex(androidx.compose.ui.test.SemanticsNodeInteraction, int index);
@@ -251,11 +252,56 @@ package androidx.compose.ui.test {
     property public abstract long currentTime;
   }
 
+  @androidx.compose.ui.test.ExperimentalTestApi public final inline class MouseButton {
+    ctor public MouseButton();
+    method public int getButtonId();
+    property public final int buttonId;
+  }
+
+  @androidx.compose.ui.test.ExperimentalTestApi public static final class MouseButton.Companion {
+    method public int getPrimary();
+    method public int getSecondary();
+    method public int getTertiary();
+    property public final int Primary;
+    property public final int Secondary;
+    property public final int Tertiary;
+  }
+
+  @androidx.compose.ui.test.ExperimentalTestApi public interface MouseInjectionScope extends androidx.compose.ui.test.InjectionScope {
+    method public void cancel(optional long delayMillis);
+    method public void enter(optional long position, optional long delayMillis);
+    method public void exit(optional long position, optional long delayMillis);
+    method public long getCurrentPosition();
+    method public default void moveBy(long delta, optional long delayMillis);
+    method public void moveTo(long position, optional long delayMillis);
+    method public void press(optional int button);
+    method public void release(optional int button);
+    method public void scroll(float delta, optional int scrollWheel);
+    method public default void updatePointerBy(long delta);
+    method public void updatePointerTo(long position);
+    property public abstract long currentPosition;
+  }
+
+  public final class MouseInjectionScopeKt {
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void animateAlong(androidx.compose.ui.test.MouseInjectionScope, kotlin.jvm.functions.Function1<? super java.lang.Long,androidx.compose.ui.geometry.Offset> curve, optional long durationMillis);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void animateBy(androidx.compose.ui.test.MouseInjectionScope, long delta, optional long durationMillis);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void animateTo(androidx.compose.ui.test.MouseInjectionScope, long position, optional long durationMillis);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void click(androidx.compose.ui.test.MouseInjectionScope, optional long position);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void doubleClick(androidx.compose.ui.test.MouseInjectionScope, optional long position);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void dragAndDrop(androidx.compose.ui.test.MouseInjectionScope, long start, long end, optional long durationMillis);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void longClick(androidx.compose.ui.test.MouseInjectionScope, optional long position);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void rightClick(androidx.compose.ui.test.MouseInjectionScope, optional long position);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void smoothScroll(androidx.compose.ui.test.MouseInjectionScope, float scrollAmount, optional long durationMillis, optional int scrollWheel);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void tripleClick(androidx.compose.ui.test.MouseInjectionScope, optional long position);
+  }
+
   public final class MultiModalInjectionScope implements androidx.compose.ui.test.InjectionScope {
     ctor public MultiModalInjectionScope(androidx.compose.ui.semantics.SemanticsNode node, androidx.compose.ui.test.TestContext testContext);
     method public void advanceEventTime(long durationMillis);
+    method @androidx.compose.ui.test.ExperimentalTestApi public androidx.compose.ui.test.MouseInjectionScope getMouse();
     method public androidx.compose.ui.test.TouchInjectionScope getTouch();
     method public long getVisibleSize();
+    property @androidx.compose.ui.test.ExperimentalTestApi public final androidx.compose.ui.test.MouseInjectionScope Mouse;
     property public final androidx.compose.ui.test.TouchInjectionScope Touch;
     property public long visibleSize;
   }
@@ -265,6 +311,19 @@ package androidx.compose.ui.test {
     method public static void printToLog(androidx.compose.ui.test.SemanticsNodeInteractionCollection, String tag, optional int maxDepth);
     method public static String printToString(androidx.compose.ui.test.SemanticsNodeInteraction, optional int maxDepth);
     method public static String printToString(androidx.compose.ui.test.SemanticsNodeInteractionCollection, optional int maxDepth);
+  }
+
+  @androidx.compose.ui.test.ExperimentalTestApi public final inline class ScrollWheel {
+    ctor public ScrollWheel();
+    method public int getValue();
+    property public final int value;
+  }
+
+  @androidx.compose.ui.test.ExperimentalTestApi public static final class ScrollWheel.Companion {
+    method public int getHorizontal();
+    method public int getVertical();
+    property public final int Horizontal;
+    property public final int Vertical;
   }
 
   public final class SelectionResult {

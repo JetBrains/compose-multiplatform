@@ -241,6 +241,9 @@ package androidx.compose.ui.test {
     property public abstract long currentTime;
   }
 
+  public final class MouseInjectionScopeKt {
+  }
+
   public final class MultiModalInjectionScope implements androidx.compose.ui.test.InjectionScope {
     ctor public MultiModalInjectionScope(androidx.compose.ui.semantics.SemanticsNode node, androidx.compose.ui.test.TestContext testContext);
     method public void advanceEventTime(long durationMillis);
