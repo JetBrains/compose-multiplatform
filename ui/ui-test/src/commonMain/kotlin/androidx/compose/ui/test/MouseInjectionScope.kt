@@ -358,16 +358,6 @@ fun MouseInjectionScope.longClick(position: Offset = center) {
  * @param position The position where to move the mouse to, in the node's local coordinate system
  * @param durationMillis The duration of the gesture. By default 300 milliseconds.
  */
-// Other considered names:
-// instant change | path change
-// ---------------+------------
-// moveTo         | animateTo
-// moveTo         | progressTo
-// moveTo         | slideTo
-// moveTo         | pushTo
-// jumpTo         | moveTo
-// changeTo       | moveTo
-// forceTo        | moveTo
 @ExperimentalTestApi
 fun MouseInjectionScope.animateTo(
     position: Offset,
