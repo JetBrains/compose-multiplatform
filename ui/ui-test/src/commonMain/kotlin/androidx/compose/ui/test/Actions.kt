@@ -292,6 +292,61 @@ fun SemanticsNodeInteraction.performTouchInput(
 }
 
 /**
+ * Executes the mouse gesture specified in the given [block]. The gesture doesn't need to be
+ * complete and can be resumed in a later invocation of one of the `perform.*Input` methods. The
+ * event time is initialized to the current time of the [MainTestClock].
+ *
+ * Be aware that if you split a gesture over multiple invocations of `perform.*Input`, everything
+ * that happens in between will run as if the gesture is still ongoing (imagine a mouse button
+ * still being pressed).
+ *
+ * All events that are injected from the [block] are batched together and sent after [block] is
+ * complete. This method blocks while the events are injected. If an error occurs during
+ * execution of [block] or injection of the events, all (subsequent) events are dropped and the
+ * error is thrown here.
+ *
+ * Example usage:
+ * ```
+ * onNodeWithTag("myWidget")
+ *    .performMouseInput {
+ *        click(center)
+ *    }
+ *
+ * onNodeWithTag("myWidget")
+ *    // Scroll down while the primary mouse button is down:
+ *    .performMouseInput {
+ *        down()
+ *        repeat(6) {
+ *            advanceEventTime()
+ *            scroll(-1f)
+ *        }
+ *        advanceEventTime()
+ *        up()
+ *    }
+ * ```
+ *
+ * @see MouseInjectionScope
+ */
+@ExperimentalTestApi
+fun SemanticsNodeInteraction.performMouseInput(
+    block: MouseInjectionScope.() -> Unit
+): SemanticsNodeInteraction {
+    val node = fetchSemanticsNode("Failed to inject mouse input.")
+    with(MultiModalInjectionScope(node, testContext)) {
+        try {
+            block.invoke(Mouse)
+        } finally {
+            try {
+                inputDispatcher.sendAllSynchronous()
+            } finally {
+                dispose()
+            }
+        }
+    }
+    return this
+}
+
+/**
  * Executes the multi-modal gesture specified in the given [block]. The gesture doesn't need to be
  * complete and can be resumed in a later invocation of one of the `perform.*Input` methods. The
  * event time is initialized to the current time of the [MainTestClock]. If only a single
