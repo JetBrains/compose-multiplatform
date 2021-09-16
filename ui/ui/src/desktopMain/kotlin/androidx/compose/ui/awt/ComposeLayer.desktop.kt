@@ -186,12 +186,17 @@ internal class ComposeLayer {
             override fun mouseEntered(event: MouseEvent) = events.post {
                 owners.onMouseEntered(
                     (event.x * density.density).toInt(),
-                    (event.y * density.density).toInt()
+                    (event.y * density.density).toInt(),
+                    event
                 )
             }
 
             override fun mouseExited(event: MouseEvent) = events.post {
-                owners.onMouseExited()
+                owners.onMouseExited(
+                    (event.x * density.density).toInt(),
+                    (event.y * density.density).toInt(),
+                    event
+                )
             }
         })
         wrapped.addMouseMotionListener(object : MouseMotionAdapter() {

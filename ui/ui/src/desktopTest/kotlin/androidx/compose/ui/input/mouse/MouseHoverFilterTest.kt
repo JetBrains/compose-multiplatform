@@ -58,7 +58,10 @@ class MouseHoverFilterTest {
                     .size(10.dp, 20.dp)
             )
         }
-
+        window.onMouseEntered(
+            x = 0,
+            y = 0
+        )
         window.onMouseMoved(
             x = 10,
             y = 20
