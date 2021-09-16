@@ -31,7 +31,3 @@ NoByteOrShort: androidx.compose.runtime.Composer#changed(byte) parameter #0:
     Should avoid odd sized primitives; use `int` instead of `byte` in parameter value in androidx.compose.runtime.Composer.changed(byte value)
 NoByteOrShort: androidx.compose.runtime.Composer#changed(short) parameter #0:
     Should avoid odd sized primitives; use `int` instead of `short` in parameter value in androidx.compose.runtime.Composer.changed(short value)
-
-
-NullableCollection: androidx.compose.runtime.snapshots.MutableSnapshot#getModified$metalava_module():
-    Return type of method androidx.compose.runtime.snapshots.MutableSnapshot.getModified$metalava_module() is a nullable collection (`java.util.Set`); must be non-null
