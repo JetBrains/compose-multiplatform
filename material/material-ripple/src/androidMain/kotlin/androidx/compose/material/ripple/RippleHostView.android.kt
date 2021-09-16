@@ -376,7 +376,7 @@ private class UnprojectedRipple(private val bounded: Boolean) : RippleDrawable(
             // Note: above 28 the ripple alpha is clamped to 50%, so this might not be the
             // _actual_ alpha that is used in the ripple.
             alpha
-        }
+        }.coerceAtMost(1f)
         return color.copy(alpha = transformedAlpha)
     }
 
