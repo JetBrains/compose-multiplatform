@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.1.0-dev" type="baseline" client="gradle" dependencies="false" name="AGP (7.1.0-dev)" variant="all" version="7.1.0-dev">
+<issues format="6" by="lint 7.2.0-dev" type="baseline" client="gradle" dependencies="false" name="AGP (7.2.0-dev)" variant="all" version="7.2.0-dev">
 
     <issue
         id="VisibleForTests"
@@ -52,8 +52,19 @@
         errorLine2="                    ~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/test/AndroidInputDispatcher.android.kt"
-            line="40"
+            line="48"
             column="21"/>
+    </issue>
+
+    <issue
+        id="VisibleForTests"
+        message="This method should only be accessed from tests or within private scope"
+        errorLine1="                it.view.getLocationOnScreen(array)"
+        errorLine2="                   ~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/test/AndroidInputDispatcher.android.kt"
+            line="183"
+            column="20"/>
     </issue>
 
     <issue
@@ -63,7 +74,7 @@
         errorLine2="                     ~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/test/AndroidInputDispatcher.android.kt"
-            line="120"
+            line="254"
             column="22"/>
     </issue>
 
