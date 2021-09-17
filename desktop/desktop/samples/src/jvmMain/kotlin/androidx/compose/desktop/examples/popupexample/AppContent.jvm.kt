@@ -16,10 +16,10 @@
 
 package androidx.compose.desktop.examples.popupexample
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.BoxWithTooltip
+import androidx.compose.foundation.TooltipArea
 import androidx.compose.foundation.TooltipPlacement
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -74,7 +74,6 @@ import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import javax.swing.JButton
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun WindowScope.Content(
     windowState: WindowState,
@@ -251,6 +250,7 @@ fun WindowScope.Content(
             dialogState.value = false
             println("Dialog window is dismissed.")
         }
+        @OptIn(ExperimentalMaterialApi::class)
         if (AppState.alertDialog.value) {
             AlertDialog(
                 onDismissRequest = dismiss,
@@ -352,7 +352,8 @@ fun Button(
     color: Color = Color(10, 162, 232),
     size: IntSize = IntSize(200, 35)
 ) {
-    BoxWithTooltip(
+    @OptIn(ExperimentalFoundationApi::class)
+    TooltipArea(
         tooltip = {
             Surface(
                 color = Color(210, 210, 210),
@@ -388,14 +389,16 @@ fun TextBox(text: String = "", modifier: Modifier = Modifier.height(30.dp)) {
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
+@OptIn(
+    ExperimentalFoundationApi::class
+)
 fun ContextMenu() {
     val items = listOf("Item A", "Item B", "Item C", "Item D", "Item E", "Item F")
     val showMenu = remember { mutableStateOf(false) }
     val selectedIndex = remember { mutableStateOf(0) }
-    BoxWithTooltip(
-        delay = 100,
+    TooltipArea(
+        delayMillis = 100,
         tooltipPlacement = TooltipPlacement.ComponentRect(
             anchor = Alignment.TopStart,
             alignment = Alignment.TopEnd

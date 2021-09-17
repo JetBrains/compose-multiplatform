@@ -18,7 +18,6 @@ package androidx.compose.desktop.examples.example1
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.foundation.ExperimentalDesktopApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
@@ -197,10 +196,7 @@ private fun FrameWindowScope.LeftColumn(modifier: Modifier) = Box(modifier.fillM
     )
 }
 
-@OptIn(
-    ExperimentalComposeUiApi::class,
-    ExperimentalDesktopApi::class
-)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
     val amount = remember { mutableStateOf(0f) }
@@ -379,7 +375,7 @@ private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
             }
 
             var clickableText by remember { mutableStateOf("Click me!") }
-
+            @OptIn(ExperimentalFoundationApi::class)
             Text(
                 modifier = Modifier.mouseClickable(
                     onClick = {

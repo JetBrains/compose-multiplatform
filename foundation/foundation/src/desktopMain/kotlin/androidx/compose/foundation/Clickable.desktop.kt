@@ -41,13 +41,13 @@ import kotlinx.coroutines.coroutineScope
 // TODO: b/168524931 - should this depend on the input device?
 internal actual val TapIndicationDelay: Long = 0L
 
-@Immutable @ExperimentalDesktopApi
+@Immutable @ExperimentalFoundationApi
 class MouseClickScope constructor(
     val buttons: PointerButtons,
     val keyboardModifiers: PointerKeyboardModifiers
 )
 
-@ExperimentalDesktopApi
+@ExperimentalFoundationApi
 internal val EmptyClickContext = MouseClickScope(
     PointerButtons(0), PointerKeyboardModifiers(0)
 )
@@ -57,7 +57,7 @@ internal val EmptyClickContext = MouseClickScope(
  * information about pressed buttons and keyboard modifiers
  *
  */
-@ExperimentalDesktopApi
+@ExperimentalFoundationApi
 fun Modifier.mouseClickable(
     enabled: Boolean = true,
     onClickLabel: String? = null,
@@ -104,7 +104,7 @@ fun Modifier.mouseClickable(
     }
 )
 
-@OptIn(ExperimentalDesktopApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 internal suspend fun PointerInputScope.detectTapWithContext(
     onTap: ((PointerEvent, PointerEvent) -> Unit)? = null
 ) {
@@ -126,7 +126,7 @@ internal suspend fun PointerInputScope.detectTapWithContext(
     }
 }
 
-@ExperimentalDesktopApi
+@ExperimentalFoundationApi
 suspend fun AwaitPointerEventScope.awaitEventFirstDown(): PointerEvent {
     var event: PointerEvent
     do {
