@@ -36,15 +36,16 @@ dependencies {
     implementation("androidx.compose.foundation:foundation:1.0.0")
     implementation("androidx.compose.foundation:foundation-layout:1.0.0")
     implementation(project(":compose:material:material"))
+    implementation(project(":compose:material3:material3"))
     implementation(project(":compose:runtime:runtime"))
     implementation("androidx.compose.ui:ui:1.0.0")
     implementation("androidx.compose.ui:ui-text:1.0.0")
 }
 
 androidx {
-    name = "AndroidX Compose Material Components Samples"
+    name = "AndroidX Compose Material3 Components Samples"
     type = LibraryType.SAMPLES
-    mavenGroup = LibraryGroups.Compose.MATERIAL
-    inceptionYear = "2019"
-    description = "Contains the sample code for the AndroidX Compose Material components."
+    mavenGroup = LibraryGroups.Compose.MATERIAL3
+    inceptionYear = "2021"
+    description = "Contains the sample code for the AndroidX Compose Material You components."
 }
