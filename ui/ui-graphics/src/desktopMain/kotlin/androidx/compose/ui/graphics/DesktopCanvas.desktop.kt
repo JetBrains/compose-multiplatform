@@ -30,7 +30,6 @@ import org.jetbrains.skia.Image
 import org.jetbrains.skia.Matrix44
 import org.jetbrains.skia.MipmapMode
 import org.jetbrains.skia.SamplingMode
-import org.jetbrains.skia.impl.getPtr
 import org.jetbrains.skia.ClipMode as SkiaClipMode
 import org.jetbrains.skia.RRect as SkiaRRect
 import org.jetbrains.skia.Rect as SkiaRect
@@ -338,15 +337,14 @@ class DesktopCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
     }
 
     override fun drawVertices(vertices: Vertices, blendMode: BlendMode, paint: Paint) {
-        org.jetbrains.skia.Canvas._nDrawVertices(
-            skia._ptr,
+        skia.drawVertices(
             vertices.vertexMode.toDesktopVertexMode(),
             vertices.positions,
             vertices.colors,
             vertices.textureCoordinates,
             vertices.indices,
-            blendMode.toSkia().ordinal,
-            getPtr(paint.asFrameworkPaint())
+            blendMode.toSkia(),
+            paint.asFrameworkPaint()
         )
     }
 

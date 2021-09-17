@@ -16,9 +16,11 @@
 
 package androidx.compose.ui.graphics
 
-fun VertexMode.toDesktopVertexMode(): Int = when (this) {
-    VertexMode.Triangles -> 0
-    VertexMode.TriangleStrip -> 1
-    VertexMode.TriangleFan -> 2
-    else -> 0
+import org.jetbrains.skia.VertexMode as SkVertexMode
+
+fun VertexMode.toDesktopVertexMode(): SkVertexMode = when (this) {
+    VertexMode.Triangles -> SkVertexMode.TRIANGLES
+    VertexMode.TriangleStrip -> SkVertexMode.TRIANGLE_STRIP
+    VertexMode.TriangleFan -> SkVertexMode.TRIANGLE_FAN
+    else -> SkVertexMode.TRIANGLES
 }
