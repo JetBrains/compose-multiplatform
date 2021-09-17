@@ -94,12 +94,14 @@ androidx {
 PublicationContainer.metaClass.jvmOs = { name, skikoDeps ->
     delegate.create("jvm$name", MavenPublication) {
         artifactId = "${project.name}-jvm-$name"
+        def projectGroup = project.group
+        def projectName = project.name
         pom {
             withXml {
                 def dependenciesNode = asNode().appendNode("dependencies")
                 def desktopDependency = dependenciesNode.appendNode("dependency")
-                desktopDependency.appendNode("groupId", group)
-                desktopDependency.appendNode("artifactId", project.name)
+                desktopDependency.appendNode("groupId", projectGroup)
+                desktopDependency.appendNode("artifactId", projectName)
                 desktopDependency.appendNode("version", LibraryVersions.COMPOSE)
                 desktopDependency.appendNode("scope", "compile")
                 for (skiko in skikoDeps) {
