@@ -292,10 +292,8 @@ fun Project.createOrUpdateMediaTestConfigurationGenerationTask(
 private fun Project.getOrCreateMacrobenchmarkConfigTask(variantName: String):
     TaskProvider<GenerateTestConfigurationTask> {
         val parentProject = this.parent!!
-        val taskCollection = parentProject.tasks.withType(GenerateTestConfigurationTask::class.java)
-        val taskNames = taskCollection.getNames()
         return if (
-            "${AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName" !in taskNames
+            parentProject.tasks.withType(GenerateTestConfigurationTask::class.java).isEmpty()
         ) {
             parentProject.tasks.register(
                 "${AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName",
