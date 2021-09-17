@@ -43,6 +43,7 @@ import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.DocsType
 import org.gradle.api.attributes.Usage
+import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.FileCollection
 import org.gradle.api.model.ObjectFactory
@@ -67,12 +68,15 @@ import javax.inject.Inject
 /**
  * Plugin that allows to build documentation for a given set of prebuilt and tip of tree projects.
  */
-class AndroidXDocsImplPlugin : Plugin<Project> {
+abstract class AndroidXDocsImplPlugin : Plugin<Project> {
     lateinit var project: Project
     lateinit var docsType: String
     lateinit var docsSourcesConfiguration: Configuration
     lateinit var samplesSourcesConfiguration: Configuration
     lateinit var dependencyClasspath: FileCollection
+
+    @get:javax.inject.Inject
+    abstract val archiveOperations: ArchiveOperations
 
     override fun apply(project: Project) {
         this.project = project
@@ -163,7 +167,7 @@ class AndroidXDocsImplPlugin : Plugin<Project> {
             task.from(
                 sources.elements.map { jars ->
                     jars.map {
-                        project.zipTree(it).matching {
+                        archiveOperations.zipTree(it).matching {
                             // Filter out files that documentation tools cannot process.
                             it.exclude("**/*.MF")
                             it.exclude("**/*.aidl")
@@ -202,7 +206,7 @@ class AndroidXDocsImplPlugin : Plugin<Project> {
             task.from(
                 sources.elements.map { jars ->
                     jars.map {
-                        project.zipTree(it)
+                        archiveOperations.zipTree(it)
                     }
                 }
             )
