@@ -23,6 +23,7 @@ import androidx.benchmark.macro.FrameTimingGfxInfoMetric
 import androidx.benchmark.macro.FrameTimingMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.filters.LargeTest
+import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
@@ -35,6 +36,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 @LargeTest
+@SdkSuppress(minSdkVersion = 29)
 @RunWith(Parameterized::class)
 class NestedListsScrollBenchmark(
     private val compilationMode: CompilationMode
