@@ -277,7 +277,7 @@ fun SemanticsNodeInteraction.performTouchInput(
     block: TouchInjectionScope.() -> Unit
 ): SemanticsNodeInteraction {
     val node = fetchSemanticsNode("Failed to inject touch input.")
-    with(MultiModalInjectionScope(node, testContext)) {
+    with(MultiModalInjectionScopeImpl(node, testContext)) {
         try {
             block.invoke(Touch)
         } finally {
@@ -332,7 +332,7 @@ fun SemanticsNodeInteraction.performMouseInput(
     block: MouseInjectionScope.() -> Unit
 ): SemanticsNodeInteraction {
     val node = fetchSemanticsNode("Failed to inject mouse input.")
-    with(MultiModalInjectionScope(node, testContext)) {
+    with(MultiModalInjectionScopeImpl(node, testContext)) {
         try {
             block.invoke(Mouse)
         } finally {
@@ -374,7 +374,7 @@ fun SemanticsNodeInteraction.performMultiModalInput(
     block: MultiModalInjectionScope.() -> Unit
 ): SemanticsNodeInteraction {
     val node = fetchSemanticsNode("Failed to inject multi-modal input.")
-    with(MultiModalInjectionScope(node, testContext)) {
+    with(MultiModalInjectionScopeImpl(node, testContext)) {
         try {
             block.invoke(this)
         } finally {

@@ -52,7 +52,7 @@ class TouchUpTest : InputDispatcherTest() {
     fun onePointer() {
         subject.generateTouchDownAndCheck(pointer1, position1_1)
         subject.generateTouchUpAndCheck(pointer1)
-        subject.verifyNoTouchGestureInProgress()
+        subject.assertNoTouchGestureInProgress()
         subject.sendAllSynchronous()
 
         recorder.assertHasValidEventTimes()
@@ -72,7 +72,7 @@ class TouchUpTest : InputDispatcherTest() {
     fun onePointerWithDelay() {
         subject.generateTouchDownAndCheck(pointer1, position1_1)
         subject.generateTouchUpAndCheck(pointer1, 2 * eventPeriodMillis)
-        subject.verifyNoTouchGestureInProgress()
+        subject.assertNoTouchGestureInProgress()
         subject.sendAllSynchronous()
 
         recorder.assertHasValidEventTimes()
@@ -95,7 +95,7 @@ class TouchUpTest : InputDispatcherTest() {
         subject.generateTouchDownAndCheck(pointer2, position2_1)
         subject.generateTouchUpAndCheck(pointer1)
         subject.generateTouchUpAndCheck(pointer2)
-        subject.verifyNoTouchGestureInProgress()
+        subject.assertNoTouchGestureInProgress()
         subject.sendAllSynchronous()
 
         recorder.assertHasValidEventTimes()
@@ -125,7 +125,7 @@ class TouchUpTest : InputDispatcherTest() {
         subject.generateTouchDownAndCheck(pointer2, position2_1)
         subject.generateTouchUpAndCheck(pointer2)
         subject.generateTouchUpAndCheck(pointer1)
-        subject.verifyNoTouchGestureInProgress()
+        subject.assertNoTouchGestureInProgress()
         subject.sendAllSynchronous()
 
         recorder.assertHasValidEventTimes()
