@@ -41,6 +41,7 @@ import androidx.compose.ui.input.mouse.MouseScrollOrientation
 import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.TouchInjectionScope
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.junit4.ComposeTestRule
@@ -428,12 +429,14 @@ class ScrollbarTest {
         }
     }
 
+    @OptIn(InternalTestApi::class)
     private fun ComposeTestRule.performMouseScroll(x: Int, y: Int, delta: Float) {
         (this as DesktopComposeTestRule).window.onMouseScroll(
             x, y, MouseScrollEvent(MouseScrollUnit.Line(delta), MouseScrollOrientation.Vertical)
         )
     }
 
+    @OptIn(InternalTestApi::class)
     private fun ComposeTestRule.performMouseMove(x: Int, y: Int) {
         (this as DesktopComposeTestRule).window.onMouseMoved(x, y)
     }

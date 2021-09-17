@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.platform
 
+import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.input.pointer.TestPointerInputEventData
 import androidx.compose.ui.node.RootForTest
 
@@ -23,6 +24,7 @@ import androidx.compose.ui.node.RootForTest
  * The marker interface to be implemented by the desktop root backing the composition.
  * To be used in tests.
  */
+@InternalComposeUiApi
 interface DesktopRootForTest : RootForTest {
     /**
      * Process pointer event
