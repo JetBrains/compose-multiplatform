@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 import androidx.build.Publish
 
 plugins {
@@ -31,14 +30,15 @@ dependencies {
     implementation project(":compose:runtime:runtime")
     implementation project(":compose:ui:ui")
     implementation project(":compose:material:material")
-    implementation project(":compose:material:material:material-samples")
+    implementation project(":compose:material3:material3")
+    implementation project(":compose:material3:material3:material3-samples")
     implementation project(":navigation:navigation-compose")
     implementation "com.google.accompanist:accompanist-insets:0.18.0"
 }
 
 androidx {
-    name = "Compose Material Catalog"
+    name = "Compose Material3 Catalog"
     publish = Publish.NONE
     inceptionYear = "2021"
-    description = "This is a project for the Compose Material Catalog."
+    description = "This is a project for the Compose Material You Catalog."
 }

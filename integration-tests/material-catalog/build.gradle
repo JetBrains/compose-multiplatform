@@ -1,0 +1,81 @@
+/*
+ * Copyright 2021 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+import androidx.build.BuildOnServerKt
+import androidx.build.BuildServerConfigurationKt
+import androidx.build.Publish
+
+plugins {
+    id("AndroidXPlugin")
+    id("com.android.application")
+    id("AndroidXComposePlugin")
+    id("org.jetbrains.kotlin.android")
+}
+
+android {
+    defaultConfig {
+        applicationId "androidx.compose.material.catalog"
+        versionCode 1001
+        versionName "1.0.1"
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
+        }
+    }
+}
+
+dependencies {
+    kotlinPlugin project(":compose:compiler:compiler")
+    implementation(libs.kotlinStdlib)
+    implementation project(":compose:runtime:runtime")
+    implementation project(":compose:ui:ui")
+    implementation project(":compose:material:material")
+    implementation project(":compose:material3:material3")
+    implementation project(":compose:material:material:integration-tests:material-catalog")
+    implementation project(":compose:material3:material3:integration-tests:material3-catalog")
+    implementation "androidx.activity:activity-compose:1.3.1"
+    implementation project(":navigation:navigation-compose")
+    implementation "com.google.accompanist:accompanist-insets:0.18.0"
+}
+
+// We want to publish a release APK of this project for the Compose Material Catalog
+def copyReleaseApk = tasks.register("copyReleaseApk", Copy) { task ->
+    android.applicationVariants.all { variant ->
+        if (variant.buildType.name == "release") {
+            task.from(variant.packageApplicationProvider.get().outputDirectory)
+        }
+    }
+    task.include("*.apk")
+    task.rename { fileName ->
+        "${project.path.substring(1).replace(':', '-')}_$fileName"
+    }
+    task.destinationDir =
+            new File(BuildServerConfigurationKt.getDistributionDirectory(project), "apks")
+    task.dependsOn(project.path + ":assembleRelease")
+}
+
+BuildOnServerKt.addToBuildOnServer(project, copyReleaseApk)
+
+androidx {
+    name = "Compose Material Catalog app"
+    publish = Publish.NONE
+    inceptionYear = "2021"
+    description = "This is a project for the Compose Material Catalog app."
+}
