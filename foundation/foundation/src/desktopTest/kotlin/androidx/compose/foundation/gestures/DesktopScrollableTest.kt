@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.mouse.MouseScrollOrientation
@@ -34,6 +35,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import kotlin.math.sqrt
 
+@OptIn(ExperimentalComposeUiApi::class)
 @RunWith(JUnit4::class)
 class DesktopScrollableTest {
     private val density = 2f

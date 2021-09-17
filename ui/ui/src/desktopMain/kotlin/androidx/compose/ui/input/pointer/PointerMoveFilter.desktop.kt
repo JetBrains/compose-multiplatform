@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.input.pointer
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 
@@ -26,6 +27,7 @@ import androidx.compose.ui.geometry.Offset
  *  @param onEnter The callback invoked when pointer enters the component
  *  @param onExit The callback invoked when pointer leaves the component
  */
+@ExperimentalComposeUiApi
 fun Modifier.pointerMoveFilter(
     onMove: (position: Offset) -> Boolean = { false },
     onExit: () -> Boolean = { false },

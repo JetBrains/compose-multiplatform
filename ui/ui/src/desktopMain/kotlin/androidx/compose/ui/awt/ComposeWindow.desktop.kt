@@ -17,6 +17,7 @@ package androidx.compose.ui.awt
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.UndecoratedWindowResizer
@@ -47,6 +48,21 @@ class ComposeWindow : JFrame() {
     /**
      * Composes the given composable into the ComposeWindow.
      *
+     * @param content Composable content of the ComposeWindow.
+     */
+    @OptIn(ExperimentalComposeUiApi::class)
+    fun setContent(
+        content: @Composable FrameWindowScope.() -> Unit
+    ) = setContent(
+        parentComposition = null,
+        onPreviewKeyEvent = { false },
+        onKeyEvent = { false },
+        content = content
+    )
+
+    /**
+     * Composes the given composable into the ComposeWindow.
+     *
      * The new composition can be logically "linked" to an existing one, by providing a
      * [parentComposition]. This will ensure that invalidations and CompositionLocals will flow
      * through the two compositions as if they were not separate.
@@ -64,6 +80,7 @@ class ComposeWindow : JFrame() {
      * If you return false, the key event will be sent to this [onKeyEvent]'s parent.
      * @param content Composable content of the ComposeWindow.
      */
+    @ExperimentalComposeUiApi
     fun setContent(
         parentComposition: CompositionContext? = null,
         onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
@@ -164,7 +181,7 @@ class ComposeWindow : JFrame() {
 
     /**
      * Retrieve underlying platform-specific operating system handle for the root window where
-     * ComposeWindow is rendered. Currently returns HWND on Windows, Display on X11 and NSWindow
+     * ComposeWindow is rendered. Currently returns HWND on Windows, Window on X11 and NSWindow
      * on macOS.
      */
     val windowHandle: Long get() = delegate.windowHandle

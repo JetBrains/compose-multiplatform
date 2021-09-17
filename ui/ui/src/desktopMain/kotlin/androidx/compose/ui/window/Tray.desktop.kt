@@ -68,7 +68,7 @@ val isTraySupported: Boolean get() = SystemTray.isSupported()
  *
  * @param icon Icon of the tray
  * @param state State to control tray and show notifications
- * @param hint Hint/tooltip that will be shown to the user
+ * @param tooltip Hint/tooltip that will be shown to the user
  * @param menu Context menu of the tray that will be shown to the user on the mouse click (right
  * click on Windows, left click on macOs).
  * If it doesn't contain any items then context menu will not be shown.
@@ -80,7 +80,7 @@ val isTraySupported: Boolean get() = SystemTray.isSupported()
 fun ApplicationScope.Tray(
     icon: Painter,
     state: TrayState = rememberTrayState(),
-    hint: String? = null,
+    tooltip: String? = null,
     onAction: () -> Unit = {},
     menu: @Composable MenuScope.() -> Unit = {}
 ) {
@@ -127,7 +127,7 @@ fun ApplicationScope.Tray(
 
     SideEffect {
         if (tray.image != awtIcon) tray.image = awtIcon
-        if (tray.toolTip != hint) tray.toolTip = hint
+        if (tray.toolTip != tooltip) tray.toolTip = tooltip
     }
 
     val composition = rememberCompositionContext()

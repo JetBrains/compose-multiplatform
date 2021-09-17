@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalComposeUiApi::class)
+
 package androidx.compose.ui.input.mouse
 
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.input.pointer.PointerInputModifier
@@ -28,6 +31,7 @@ import androidx.compose.ui.unit.IntSize
 /**
  * Indicates distance by which we should scroll some container.
  */
+@ExperimentalComposeUiApi
 sealed class MouseScrollUnit {
     /**
      * Indicates that scrolling should be performed by [value] lines.
@@ -38,6 +42,7 @@ sealed class MouseScrollUnit {
      * dependent on the container's bounds (in which scroll event occurs),
      * or by one real text line in some document.
      */
+    @ExperimentalComposeUiApi
     data class Line(val value: Float) : MouseScrollUnit()
 
     /**
@@ -48,12 +53,14 @@ sealed class MouseScrollUnit {
      * Scrolling by one page usually means that we should scroll by one container's height
      * (in which scroll event occurs), or by one real page in some document.
      */
+    @ExperimentalComposeUiApi
     data class Page(val value: Float) : MouseScrollUnit()
 }
 
 /**
  * Mouse wheel or touchpad event.
  */
+@ExperimentalComposeUiApi
 class MouseScrollEvent(
     /**
      * Change of mouse scroll.
@@ -80,6 +87,7 @@ class MouseScrollEvent(
  * While implementing this callback, return true to stop propagation of this event. If you return
  * false, the scroll event will be sent to this [mouseScrollFilter]'s parent.
  */
+@ExperimentalComposeUiApi
 fun Modifier.mouseScrollFilter(
     onMouseScroll: (
         /**
@@ -118,6 +126,7 @@ private data class MousePointerInputModifierImpl(
     override val pointerInputFilter: PointerInputFilter
 ) : PointerInputModifier
 
+@ExperimentalComposeUiApi
 enum class MouseScrollOrientation {
     Vertical, Horizontal
 }

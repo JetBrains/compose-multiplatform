@@ -43,9 +43,9 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.sendKey
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowSize
 import androidx.compose.ui.window.launchApplication
 import androidx.compose.ui.window.rememberWindowState
 import androidx.compose.ui.window.runApplicationTest
@@ -270,7 +270,7 @@ class WindowTest {
                 Window(
                     onCloseRequest = {},
                     state = rememberWindowState(
-                        size = WindowSize(600.dp, 600.dp),
+                        size = DpSize(600.dp, 600.dp),
                     )
                 ) {
                     window1 = this.window
@@ -280,7 +280,7 @@ class WindowTest {
                         Window(
                             onCloseRequest = {},
                             state = rememberWindowState(
-                                size = WindowSize(300.dp, 300.dp),
+                                size = DpSize(300.dp, 300.dp),
                             )
                         ) {
                             window2 = this.window
@@ -326,7 +326,7 @@ class WindowTest {
                     Window(
                         onCloseRequest = {},
                         state = rememberWindowState(
-                            size = WindowSize(600.dp, 600.dp),
+                            size = DpSize(600.dp, 600.dp),
                         )
                     ) {
                         actualValue1 = localTestValue.current
@@ -335,7 +335,7 @@ class WindowTest {
                         Window(
                             onCloseRequest = {},
                             state = rememberWindowState(
-                                size = WindowSize(300.dp, 300.dp),
+                                size = DpSize(300.dp, 300.dp),
                             )
                         ) {
                             actualValue2 = localTestValue.current

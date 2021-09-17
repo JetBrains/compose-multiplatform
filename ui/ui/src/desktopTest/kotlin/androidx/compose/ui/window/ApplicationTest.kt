@@ -28,6 +28,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CompletableDeferred
@@ -84,7 +85,7 @@ class ApplicationTest {
                 Window(
                     onCloseRequest = {},
                     state = rememberWindowState(
-                        size = WindowSize(600.dp, 600.dp),
+                        size = DpSize(600.dp, 600.dp),
                     )
                 ) {
                     window1 = this.window
@@ -98,7 +99,7 @@ class ApplicationTest {
                 Window(
                     onCloseRequest = {},
                     state = rememberWindowState(
-                        size = WindowSize(300.dp, 300.dp),
+                        size = DpSize(300.dp, 300.dp),
                     )
                 ) {
                     window2 = this.window
