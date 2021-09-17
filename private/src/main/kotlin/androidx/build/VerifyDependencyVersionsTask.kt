@@ -20,18 +20,23 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 
 /**
  * Task for verifying the androidx dependency-stability-suffix rule
  * (A library is only as stable as its lease stable dependency)
  */
-open class VerifyDependencyVersionsTask : DefaultTask() {
+abstract class VerifyDependencyVersionsTask : DefaultTask() {
 
     init {
         group = "Verification"
         description = "Task for verifying the androidx dependency-stability-suffix rule"
     }
+
+    @get:Input
+    abstract val version: Property<String>
 
     /**
      * Iterate through the dependencies of the project and ensure none of them are of an inferior
@@ -53,12 +58,12 @@ open class VerifyDependencyVersionsTask : DefaultTask() {
         // If the version is unspecified then treat as an alpha version. If the depending project's
         // version is unspecified then it won't matter, and if the dependency's version is
         // unspecified then any non alpha project won't be able to depend on it to ensure safety.
-        val projectVersionExtra = if (project.version ==
+        val projectVersionExtra = if (version.get() ==
             AndroidXExtension.DEFAULT_UNSPECIFIED_VERSION
         ) {
             "-alpha01"
         } else {
-            Version(project.version.toString()).extra ?: ""
+            Version(version.get()).extra ?: ""
         }
         val dependencyVersionExtra = if (dependency.version!! ==
             AndroidXExtension.DEFAULT_UNSPECIFIED_VERSION
@@ -70,7 +75,7 @@ open class VerifyDependencyVersionsTask : DefaultTask() {
         val projectReleasePhase = releasePhase(projectVersionExtra)
         if (projectReleasePhase < 0) {
             throw GradleException(
-                "Project ${project.name} has unexpected release phase " + projectVersionExtra
+                "Project has unexpected release phase " + projectVersionExtra
             )
         }
         val dependencyReleasePhase = releasePhase(dependencyVersionExtra)
@@ -82,7 +87,7 @@ open class VerifyDependencyVersionsTask : DefaultTask() {
         }
         if (dependencyReleasePhase < projectReleasePhase) {
             throw GradleException(
-                "Project ${project.name} with version ${project.version} may " +
+                "Project with version ${version.get()} may " +
                     "not take a dependency on less-stable artifact ${dependency.group}:" +
                     "${dependency.name}:${dependency.version} for configuration " +
                     "${configuration.name}. Dependency versions must be at least as stable as " +

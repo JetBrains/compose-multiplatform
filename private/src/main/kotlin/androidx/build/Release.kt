@@ -143,6 +143,8 @@ object Release {
     const val GROUP_ZIPS_FOLDER = "per-group-zips"
     const val PROJECT_ZIPS_FOLDER = "per-project-zips"
     const val GROUP_ZIP_PREFIX = "gmaven"
+    const val GLOBAL_ZIP_PREFIX = "top-of-tree-m2repository"
+
     // lazily created config action params so that we don't keep re-creating them
     private var configActionParams: GMavenZipTask.ConfigAction.Params? = null
 
@@ -257,7 +259,7 @@ object Release {
                     getParams(
                         project,
                         project.getDistributionDirectory(),
-                        "top-of-tree-m2repository"
+                        Release.GLOBAL_ZIP_PREFIX
                     ).copy(
                         includeMetadata = true
                     )
@@ -377,8 +379,14 @@ fun Project.getProjectZipPath(): String {
         getZipName(projectZipPrefix(), "") + "-${project.version}.zip"
 }
 
-fun Project.getGroupZipPath():
-    String {
-        return Release.GROUP_ZIPS_FOLDER + "/" +
-            getZipName(Release.GROUP_ZIP_PREFIX, project.group.toString()) + ".zip"
-    }
+fun Project.getGroupZipPath(): String {
+    return Release.GROUP_ZIPS_FOLDER + "/" +
+        getZipName(Release.GROUP_ZIP_PREFIX, project.group.toString()) + ".zip"
+}
+
+fun Project.getGlobalZipFile(): File {
+    return File(
+        project.getDistributionDirectory(),
+        getZipName(Release.GLOBAL_ZIP_PREFIX, "") + ".zip"
+    )
+}

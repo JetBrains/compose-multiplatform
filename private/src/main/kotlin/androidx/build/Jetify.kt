@@ -16,9 +16,8 @@
 
 package androidx.build
 
+import java.io.File
 import org.gradle.api.Project
-import org.gradle.api.file.RegularFile
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Zip
@@ -97,7 +96,7 @@ val archivesToDejetify = listOf(
 )
 
 fun Project.partiallyDejetifyArchiveTask(
-    archiveFile: Provider<RegularFile>
+    archiveFile: File
 ): TaskProvider<Exec>? {
     return findProject(":jetifier:jetifier-standalone")?.let { standaloneProject ->
         val stripTask = stripArchiveForPartialDejetificationTask(archiveFile)
@@ -127,7 +126,7 @@ fun Project.partiallyDejetifyArchiveTask(
 }
 
 fun Project.stripArchiveForPartialDejetificationTask(
-    archiveFile: Provider<RegularFile>
+    archiveFile: File
 ): TaskProvider<Zip> {
     return tasks.register("stripArchiveForPartialDejetification", Zip::class.java) {
         it.dependsOn(rootProject.tasks.named(Release.FULL_ARCHIVE_TASK_NAME))
