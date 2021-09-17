@@ -87,6 +87,24 @@ internal class AndroidInputDispatcher(
         enqueueTouchEvent(ACTION_MOVE, 0)
     }
 
+    override fun PartialGesture.enqueueMoves(
+        relativeHistoricalTimes: List<Long>,
+        historicalCoordinates: List<List<Offset>>
+    ) {
+        val entries = lastPositions.entries.sortedBy { it.key }
+        val absoluteHistoricalTimes = relativeHistoricalTimes.map { currentTime + it }
+        enqueueTouchEvent(
+            downTime = downTime,
+            action = ACTION_MOVE,
+            actionIndex = 0,
+            pointerIds = List(entries.size) { entries[it].key },
+            eventTimes = absoluteHistoricalTimes + listOf(currentTime),
+            coordinates = List(entries.size) {
+                historicalCoordinates[it] + listOf(entries[it].value)
+            }
+        )
+    }
+
     override fun PartialGesture.enqueueUp(pointerId: Int) {
         enqueueTouchEvent(
             if (lastPositions.size == 1) ACTION_UP else ACTION_POINTER_UP,
@@ -148,11 +166,11 @@ internal class AndroidInputDispatcher(
         val entries = lastPositions.entries.sortedBy { it.key }
         enqueueTouchEvent(
             downTime = downTime,
-            eventTime = currentTime,
             action = action,
             actionIndex = actionIndex,
-            coordinates = List(entries.size) { entries[it].value },
-            pointerIds = List(entries.size) { entries[it].key }
+            pointerIds = List(entries.size) { entries[it].key },
+            eventTimes = listOf(currentTime),
+            coordinates = List(entries.size) { listOf(entries[it].value) }
         )
     }
 
@@ -161,20 +179,31 @@ internal class AndroidInputDispatcher(
      */
     private fun enqueueTouchEvent(
         downTime: Long,
-        eventTime: Long,
         action: Int,
         actionIndex: Int,
-        coordinates: List<Offset>,
-        pointerIds: List<Int>
+        pointerIds: List<Int>,
+        eventTimes: List<Long>,
+        coordinates: List<List<Offset>>
     ) {
+        check(coordinates.size == pointerIds.size) {
+            "Coordinates size should equal pointerIds size " +
+                "(was: ${coordinates.size}, ${pointerIds.size})"
+        }
+        repeat(pointerIds.size) { pointerIndex ->
+            check(eventTimes.size == coordinates[pointerIndex].size) {
+                "Historical eventTimes size should equal coordinates[$pointerIndex] size " +
+                    "(was: ${eventTimes.size}, ${coordinates[pointerIndex].size})"
+            }
+        }
+
         synchronized(batchLock) {
             check(acceptEvents) {
                 "Can't enqueue touch event (" +
                     "downTime=$downTime, " +
-                    "eventTime=$eventTime, " +
                     "action=$action, " +
                     "actionIndex=$actionIndex, " +
                     "pointerIds=$pointerIds, " +
+                    "eventTimes=$eventTimes, " +
                     "coordinates=$coordinates" +
                     "), events have already been (or are being) dispatched or disposed"
             }
@@ -183,36 +212,51 @@ internal class AndroidInputDispatcher(
                 it.view.getLocationOnScreen(array)
                 Offset(array[0].toFloat(), array[1].toFloat())
             } ?: Offset.Zero
-            batchedEvents.add(
-                MotionEvent.obtain(
-                    /* downTime = */ downTime,
-                    /* eventTime = */ eventTime,
-                    /* action = */ action + (actionIndex shl ACTION_POINTER_INDEX_SHIFT),
-                    /* pointerCount = */ coordinates.size,
-                    /* pointerProperties = */ Array(coordinates.size) {
-                        MotionEvent.PointerProperties().apply {
-                            id = pointerIds[it]
-                            toolType = MotionEvent.TOOL_TYPE_FINGER
-                        }
-                    },
-                    /* pointerCoords = */ Array(coordinates.size) {
-                        MotionEvent.PointerCoords().apply {
-                            x = positionInScreen.x + coordinates[it].x
-                            y = positionInScreen.y + coordinates[it].y
-                        }
-                    },
-                    /* metaState = */ 0,
-                    /* buttonState = */ 0,
-                    /* xPrecision = */ 1f,
-                    /* yPrecision = */ 1f,
-                    /* deviceId = */ 0,
-                    /* edgeFlags = */ 0,
-                    /* source = */ InputDevice.SOURCE_TOUCHSCREEN,
-                    /* flags = */ 0
-                ).apply {
-                    offsetLocation(-positionInScreen.x, -positionInScreen.y)
+            val motionEvent = MotionEvent.obtain(
+                /* downTime = */ downTime,
+                /* eventTime = */ eventTimes[0],
+                /* action = */ action + (actionIndex shl ACTION_POINTER_INDEX_SHIFT),
+                /* pointerCount = */ coordinates.size,
+                /* pointerProperties = */ Array(coordinates.size) { pointerIndex ->
+                    MotionEvent.PointerProperties().apply {
+                        id = pointerIds[pointerIndex]
+                        toolType = MotionEvent.TOOL_TYPE_FINGER
+                    }
+                },
+                /* pointerCoords = */ Array(coordinates.size) { pointerIndex ->
+                    MotionEvent.PointerCoords().apply {
+                        x = positionInScreen.x + coordinates[pointerIndex][0].x
+                        y = positionInScreen.y + coordinates[pointerIndex][0].y
+                    }
+                },
+                /* metaState = */ 0,
+                /* buttonState = */ 0,
+                /* xPrecision = */ 1f,
+                /* yPrecision = */ 1f,
+                /* deviceId = */ 0,
+                /* edgeFlags = */ 0,
+                /* source = */ InputDevice.SOURCE_TOUCHSCREEN,
+                /* flags = */ 0
+            ).apply {
+                // The current time & coordinates are the last element in the lists, and need to
+                // be passed into the final addBatch call. If there are no historical events,
+                // the list sizes are 1 and we don't need to call addBatch at all.
+                for (timeIndex in 1 until eventTimes.size) {
+                    addBatch(
+                        /* eventTime = */ eventTimes[timeIndex],
+                        /* pointerCoords = */ Array(coordinates.size) { pointerIndex ->
+                            MotionEvent.PointerCoords().apply {
+                                x = positionInScreen.x + coordinates[pointerIndex][timeIndex].x
+                                y = positionInScreen.y + coordinates[pointerIndex][timeIndex].y
+                            }
+                        },
+                        /* metaState = */ 0
+                    )
                 }
-            )
+                offsetLocation(-positionInScreen.x, -positionInScreen.y)
+            }
+
+            batchedEvents.add(motionEvent)
         }
     }
 

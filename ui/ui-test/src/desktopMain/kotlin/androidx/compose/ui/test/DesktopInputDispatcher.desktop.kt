@@ -18,6 +18,7 @@ package androidx.compose.ui.test
 
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.TestPointerInputEventData
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.DesktopRootForTest
 
@@ -46,6 +47,14 @@ internal class DesktopInputDispatcher(
     }
     override fun PartialGesture.enqueueMove() {
         enqueueEvent(pointerInputEvent(isMousePressed))
+    }
+
+    override fun PartialGesture.enqueueMoves(
+        relativeHistoricalTimes: List<Long>,
+        historicalCoordinates: List<List<Offset>>
+    ) {
+        // TODO: add support for historical events
+        enqueueMove()
     }
 
     override fun PartialGesture.enqueueUp(pointerId: Int) {

@@ -18,6 +18,7 @@ package androidx.compose.ui.input.pointer
 
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.util.fastForEach
@@ -327,12 +328,23 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
 
         coordinates = pointerInputFilter.layoutCoordinates
 
+        @OptIn(ExperimentalComposeUiApi::class)
         for ((key, change) in changes) {
             // Filter for changes that are associated with pointer ids that are relevant to this
             // node
             if (key in pointerIds) {
                 // And translate their position relative to the parent coordinates, to give us a
                 // change local to the PointerInputFilter's coordinates
+                val historical = mutableListOf<HistoricalChange>()
+                change.historical.fastForEach {
+                    historical.add(
+                        HistoricalChange(
+                            it.uptimeMillis,
+                            coordinates!!.localPositionOf(parentCoordinates, it.position)
+                        )
+                    )
+                }
+
                 relevantChanges[key] = change.copy(
                     previousPosition = coordinates!!.localPositionOf(
                         parentCoordinates,
@@ -341,7 +353,8 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
                     currentPosition = coordinates!!.localPositionOf(
                         parentCoordinates,
                         change.position
-                    )
+                    ),
+                    historical = historical
                 )
             }
         }

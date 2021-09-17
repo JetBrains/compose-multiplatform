@@ -248,6 +248,52 @@ interface TouchInjectionScope : InjectionScope {
     fun move(delayMillis: Long = eventPeriodMillis)
 
     /**
+     * Sends a move event [delayMillis] after the last sent event without updating any of the
+     * pointer positions.
+     *
+     * This overload supports gestures with multiple pointers.
+     *
+     * @param relativeHistoricalTimes Time of each historical event, as a millisecond relative to
+     * the time the actual event is sent. For example, -10L means 10ms earlier.
+     * @param historicalCoordinates Coordinates of each historical event, in the same coordinate
+     * space as [moveTo]. The outer list must have the same size as the number of pointers in the
+     * event, and each inner list must have the same size as [relativeHistoricalTimes].
+     * @param delayMillis The time between the last sent event and this event.
+     * [eventPeriodMillis] by default.
+     */
+    @ExperimentalTestApi
+    fun moveWithHistoryMultiPointer(
+        relativeHistoricalTimes: List<Long>,
+        historicalCoordinates: List<List<Offset>>,
+        delayMillis: Long = eventPeriodMillis
+    )
+
+    /**
+     * Sends a move event [delayMillis] after the last sent event without updating any of the
+     * pointer positions.
+     *
+     * This overload is a convenience method for the common case where the gesture only has one
+     * pointer.
+     *
+     * @param relativeHistoricalTimes Time of each historical event, as a millisecond relative to
+     * the time the actual event is sent. For example, -10L means 10ms earlier.
+     * @param historicalCoordinates Coordinates of each historical event, in the same coordinate
+     * space as [moveTo]. The list must have the same size as [relativeHistoricalTimes].
+     * @param delayMillis The time between the last sent event and this event.
+     * [eventPeriodMillis] by default.
+     */
+    @ExperimentalTestApi
+    fun moveWithHistory(
+        relativeHistoricalTimes: List<Long>,
+        historicalCoordinates: List<Offset>,
+        delayMillis: Long = eventPeriodMillis
+    ) = moveWithHistoryMultiPointer(
+        relativeHistoricalTimes,
+        listOf(historicalCoordinates),
+        delayMillis
+    )
+
+    /**
      * Sends an up event for the pointer with the given [pointerId], or the default pointer if
      * [pointerId] is omitted, on the associated node.
      *

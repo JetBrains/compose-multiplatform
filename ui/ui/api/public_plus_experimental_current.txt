@@ -1493,6 +1493,14 @@ package androidx.compose.ui.input.pointer {
     property public final boolean positionChange;
   }
 
+  @androidx.compose.runtime.Immutable @androidx.compose.ui.ExperimentalComposeUiApi public final class HistoricalChange {
+    ctor public HistoricalChange(long uptimeMillis, long position);
+    method public long getPosition();
+    method public long getUptimeMillis();
+    property public final long position;
+    property public final long uptimeMillis;
+  }
+
   public final inline class PointerButtons {
     ctor public PointerButtons();
   }
@@ -1588,8 +1596,11 @@ package androidx.compose.ui.input.pointer {
 
   @androidx.compose.runtime.Immutable public final class PointerInputChange {
     ctor public PointerInputChange(long id, long uptimeMillis, long position, boolean pressed, long previousUptimeMillis, long previousPosition, boolean previousPressed, androidx.compose.ui.input.pointer.ConsumedData consumed, optional int type);
+    ctor @androidx.compose.ui.ExperimentalComposeUiApi public PointerInputChange(long id, long uptimeMillis, long position, boolean pressed, long previousUptimeMillis, long previousPosition, boolean previousPressed, androidx.compose.ui.input.pointer.ConsumedData consumed, int type, java.util.List<androidx.compose.ui.input.pointer.HistoricalChange> historical);
     method public androidx.compose.ui.input.pointer.PointerInputChange copy(optional long id, optional long currentTime, optional long currentPosition, optional boolean currentPressed, optional long previousTime, optional long previousPosition, optional boolean previousPressed, optional androidx.compose.ui.input.pointer.ConsumedData consumed, optional int type);
+    method @androidx.compose.ui.ExperimentalComposeUiApi public androidx.compose.ui.input.pointer.PointerInputChange copy(optional long id, optional long currentTime, optional long currentPosition, optional boolean currentPressed, optional long previousTime, optional long previousPosition, optional boolean previousPressed, optional androidx.compose.ui.input.pointer.ConsumedData consumed, optional int type, java.util.List<androidx.compose.ui.input.pointer.HistoricalChange> historical);
     method public androidx.compose.ui.input.pointer.ConsumedData getConsumed();
+    method @androidx.compose.ui.ExperimentalComposeUiApi public java.util.List<androidx.compose.ui.input.pointer.HistoricalChange> getHistorical();
     method public long getId();
     method public long getPosition();
     method public boolean getPressed();
@@ -1599,6 +1610,7 @@ package androidx.compose.ui.input.pointer {
     method public int getType();
     method public long getUptimeMillis();
     property public final androidx.compose.ui.input.pointer.ConsumedData consumed;
+    property @androidx.compose.ui.ExperimentalComposeUiApi public final java.util.List<androidx.compose.ui.input.pointer.HistoricalChange> historical;
     property public final long id;
     property public final long position;
     property public final boolean pressed;
@@ -1695,6 +1707,7 @@ package androidx.compose.ui.input.pointer.util {
   }
 
   public final class VelocityTrackerKt {
+    method public static void addPointerInputChange(androidx.compose.ui.input.pointer.util.VelocityTracker, androidx.compose.ui.input.pointer.PointerInputChange event);
   }
 
 }

@@ -444,6 +444,8 @@ package androidx.compose.ui.test {
     method public default void moveBy(long delta, optional long delayMillis);
     method public default void moveTo(int pointerId, long position, optional long delayMillis);
     method public default void moveTo(long position, optional long delayMillis);
+    method @androidx.compose.ui.test.ExperimentalTestApi public default void moveWithHistory(java.util.List<java.lang.Long> relativeHistoricalTimes, java.util.List<androidx.compose.ui.geometry.Offset> historicalCoordinates, optional long delayMillis);
+    method @androidx.compose.ui.test.ExperimentalTestApi public void moveWithHistoryMultiPointer(java.util.List<java.lang.Long> relativeHistoricalTimes, java.util.List<? extends java.util.List<androidx.compose.ui.geometry.Offset>> historicalCoordinates, optional long delayMillis);
     method public void up(optional int pointerId);
     method public default void updatePointerBy(int pointerId, long delta);
     method public void updatePointerTo(int pointerId, long position);

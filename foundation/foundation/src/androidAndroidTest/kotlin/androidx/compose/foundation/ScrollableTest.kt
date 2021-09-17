@@ -376,7 +376,6 @@ class ScrollableTest {
             up()
         }
         val expected = prevAfterSomeFling + 115
-        rule.mainClock.advanceTimeBy(1000)
         assertThat(total).isEqualTo(expected)
     }
 
@@ -1189,7 +1188,8 @@ class ScrollableTest {
             up()
         }
         assertThat(flingCalled).isEqualTo(1)
-        assertThat(flingVelocity).isEqualTo(0f)
+        assertThat(flingVelocity).isLessThan(0.01f)
+        assertThat(flingVelocity).isGreaterThan(-0.01f)
     }
 
     @Test

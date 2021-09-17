@@ -197,12 +197,32 @@ internal abstract class InputDispatcher(
      * @see updateTouchPointer
      * @see enqueueTouchUp
      * @see enqueueTouchCancel
+     * @see enqueueTouchMoves
      */
     fun enqueueTouchMove() {
         val gesture = checkNotNull(partialGesture) {
             "Cannot send MOVE event, no gesture is in progress"
         }
         gesture.enqueueMove()
+        gesture.hasPointerUpdates = false
+    }
+
+    /**
+     * Enqueue the current time+coordinates as a move event, with the historical parameters
+     * preceding it (so that they are ultimately available from methods like
+     * MotionEvent.getHistoricalX).
+     *
+     * @see enqueueTouchMove
+     * @see TouchInjectionScope.moveWithHistory
+     */
+    fun enqueueTouchMoves(
+        relativeHistoricalTimes: List<Long>,
+        historicalCoordinates: List<List<Offset>>
+    ) {
+        val gesture = checkNotNull(partialGesture) {
+            "Cannot send MOVE event, no gesture is in progress"
+        }
+        gesture.enqueueMoves(relativeHistoricalTimes, historicalCoordinates)
         gesture.hasPointerUpdates = false
     }
 
@@ -474,6 +494,11 @@ internal abstract class InputDispatcher(
     protected abstract fun PartialGesture.enqueueDown(pointerId: Int)
 
     protected abstract fun PartialGesture.enqueueMove()
+
+    protected abstract fun PartialGesture.enqueueMoves(
+        relativeHistoricalTimes: List<Long>,
+        historicalCoordinates: List<List<Offset>>
+    )
 
     protected abstract fun PartialGesture.enqueueUp(pointerId: Int)
 
