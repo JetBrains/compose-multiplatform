@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright (C) 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,39 +16,26 @@
 
 plugins {
     id("AndroidXPlugin")
-    id("com.android.test")
+    id("com.android.library")
     id("kotlin-android")
 }
 
-android {
-    targetProjectPath = ":compose:integration-tests:macrobenchmark-target"
-    experimentalProperties["android.experimental.self-instrumenting"] = true
-
-    buildTypes {
-        release {
-            debuggable = true
-        }
-    }
-
-    defaultConfig {
-        minSdkVersion 28
-        testInstrumentationRunnerArgument "androidx.benchmark.output.enable", "true"
-    }
-}
-
-androidComponents {
-    beforeVariants(selector().all()) {
-        enabled = buildType == 'release'
-    }
+android.defaultConfig {
+    minSdkVersion 28
+    testInstrumentationRunnerArgument "androidx.benchmark.output.enable", "true"
 }
 
 dependencies {
-    implementation(project(":benchmark:benchmark-junit4"))
-    implementation(project(":benchmark:benchmark-macro-junit4"))
-    implementation(project(":internal-testutils-macrobenchmark"))
-    implementation(libs.testRules)
-    implementation(libs.testExtJunit)
-    implementation(libs.testCore)
-    implementation(libs.testRunner)
-    implementation(libs.testUiautomator)
+    androidTestImplementation(project(":benchmark:benchmark-junit4"))
+    androidTestImplementation(project(":benchmark:benchmark-macro-junit4"))
+    androidTestImplementation(project(":internal-testutils-macrobenchmark"))
+    androidTestImplementation(libs.testRules)
+    androidTestImplementation(libs.testExtJunit)
+    androidTestImplementation(libs.testCore)
+    androidTestImplementation(libs.testRunner)
+    androidTestImplementation(libs.testUiautomator)
 }
+
+// Define a task dependency so the app is installed before we run macro benchmarks.
+tasks.getByPath(":compose:integration-tests:macrobenchmark:connectedCheck")
+    .dependsOn(tasks.getByPath(":compose:integration-tests:macrobenchmark-target:installRelease"))
