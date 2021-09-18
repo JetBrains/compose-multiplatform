@@ -52,7 +52,6 @@ import androidx.compose.ui.autofill.AutofillCallback
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.autofill.performAutofill
 import androidx.compose.ui.autofill.populateViewStructure
-import androidx.compose.ui.focus.FocusTag
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusDirection.Companion.Down
 import androidx.compose.ui.focus.FocusDirection.Companion.In
@@ -64,6 +63,7 @@ import androidx.compose.ui.focus.FocusDirection.Companion.Right
 import androidx.compose.ui.focus.FocusDirection.Companion.Up
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusManagerImpl
+import androidx.compose.ui.focus.FocusTag
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
@@ -132,6 +132,13 @@ import androidx.compose.ui.geometry.Rect as ComposeRect
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 internal class AndroidComposeView(context: Context) :
     ViewGroup(context), Owner, ViewRootForTest, PositionCalculator, DefaultLifecycleObserver {
+
+    /**
+     * Remembers the position of the last pointer input event that was down. This position will be
+     * used to calculate whether this view is considered scrollable via [canScrollHorizontally]/
+     * [canScrollVertically].
+     */
+    private var lastDownPointerPosition: Offset = Offset.Unspecified
 
     /**
      * Signal that AndroidComposeView's superclass constructors have finished running.
@@ -883,6 +890,15 @@ internal class AndroidComposeView(context: Context) :
                 val pointerInputEvent =
                     motionEventAdapter.convertToPointerInputEvent(motionEvent, this)
                 if (pointerInputEvent != null) {
+                    // Cache the last position of the last pointer to go down so we can check if
+                    // it's in a scrollable region in canScroll{Vertically|Horizontally}. Those
+                    // methods use semantics data, and because semantics coordinates are local to
+                    // this view, the pointer _position_, not _positionOnScreen_, is the offset that
+                    // needs to be cached.
+                    pointerInputEvent.pointers.lastOrNull { it.down }?.position?.let {
+                        lastDownPointerPosition = it
+                    }
+
                     pointerInputEventProcessor.process(
                         pointerInputEvent,
                         this,
@@ -902,6 +918,22 @@ internal class AndroidComposeView(context: Context) :
             forceUseMatrixCache = false
         }
     }
+
+    /**
+     * This method is required to correctly support swipe-to-dismiss layouts on WearOS, which search
+     * their children for scrollable views to determine whether or not to intercept touch events –
+     * a sort of simplified nested scrolling mechanism.
+     *
+     * Because a composition may contain many scrollable and non-scrollable areas, and this method
+     * doesn't know which part of the view the caller cares about, it uses the
+     * [lastDownPointerPosition] as the location to check.
+     */
+    override fun canScrollHorizontally(direction: Int): Boolean =
+        accessibilityDelegate.canScroll(vertical = false, direction, lastDownPointerPosition)
+
+    /** See [canScrollHorizontally]. */
+    override fun canScrollVertically(direction: Int): Boolean =
+        accessibilityDelegate.canScroll(vertical = true, direction, lastDownPointerPosition)
 
     private fun isInBounds(motionEvent: MotionEvent): Boolean {
         val x = motionEvent.x

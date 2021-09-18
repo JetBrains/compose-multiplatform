@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.structuralEqualityPolicy
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.toAndroidRect
 import androidx.compose.ui.node.InnerPlaceable
@@ -54,13 +55,13 @@ import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.cutText
 import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.dismiss
+import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.expand
 import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.getTextLayoutResult
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.horizontalScrollAxisRange
 import androidx.compose.ui.semantics.liveRegion
-import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.pasteText
@@ -920,6 +921,323 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
             this.contentDescription = "Hello" // To trigger content description casting
         }
         accessibilityDelegate.sendSemanticsPropertyChangeEvents(newNodes)
+    }
+
+    @Test
+    fun canScroll_returnsFalse_whenPositionInvalid() {
+        val semanticsNode = createSemanticsNodeWithAdjustedBoundsWithProperties(
+            id = 1,
+            mergeDescendants = true
+        ) {
+            horizontalScrollAxisRange = ScrollAxisRange(
+                value = { 0f },
+                maxValue = { 1f },
+                reverseScrolling = false
+            )
+        }.apply {
+            adjustedBounds.set(0, 0, 100, 100)
+        }
+
+        assertFalse(
+            accessibilityDelegate.canScroll(
+                currentSemanticsNodes = listOf(semanticsNode),
+                vertical = false,
+                direction = 1,
+                position = Offset.Unspecified
+            )
+        )
+        assertFalse(
+            accessibilityDelegate.canScroll(
+                currentSemanticsNodes = listOf(semanticsNode),
+                vertical = false,
+                direction = -1,
+                position = Offset.Unspecified
+            )
+        )
+        assertFalse(
+            accessibilityDelegate.canScroll(
+                currentSemanticsNodes = listOf(semanticsNode),
+                vertical = false,
+                direction = 0,
+                position = Offset.Unspecified
+            )
+        )
+    }
+
+    @Test
+    fun canScroll_returnsTrue_whenHorizontalScrollableNotAtLimit() {
+        val semanticsNode = createSemanticsNodeWithAdjustedBoundsWithProperties(
+            id = 1,
+            mergeDescendants = true
+        ) {
+            horizontalScrollAxisRange = ScrollAxisRange(
+                value = { 0.5f },
+                maxValue = { 1f },
+                reverseScrolling = false
+            )
+        }.apply {
+            adjustedBounds.set(0, 0, 100, 100)
+        }
+
+        // Should be scrollable in both directions.
+        assertTrue(
+            accessibilityDelegate.canScroll(
+                currentSemanticsNodes = listOf(semanticsNode),
+                vertical = false,
+                direction = 1,
+                position = Offset(50f, 50f)
+            )
+        )
+        assertTrue(
+            accessibilityDelegate.canScroll(
+                currentSemanticsNodes = listOf(semanticsNode),
+                vertical = false,
+                direction = 0,
+                position = Offset(50f, 50f)
+            )
+        )
+        assertTrue(
+            accessibilityDelegate.canScroll(
+                currentSemanticsNodes = listOf(semanticsNode),
+                vertical = false,
+                direction = -1,
+                position = Offset(50f, 50f)
+            )
+        )
+    }
+
+    @Test
+    fun canScroll_returnsTrue_whenVerticalScrollableNotAtLimit() {
+        val semanticsNode = createSemanticsNodeWithAdjustedBoundsWithProperties(
+            id = 1,
+            mergeDescendants = true
+        ) {
+            verticalScrollAxisRange = ScrollAxisRange(
+                value = { 0.5f },
+                maxValue = { 1f },
+                reverseScrolling = false
+            )
+        }.apply {
+            adjustedBounds.set(0, 0, 100, 100)
+        }
+
+        // Should be scrollable in both directions.
+        assertTrue(
+            accessibilityDelegate.canScroll(
+                currentSemanticsNodes = listOf(semanticsNode),
+                vertical = true,
+                direction = -1,
+                position = Offset(50f, 50f)
+            )
+        )
+        assertTrue(
+            accessibilityDelegate.canScroll(
+                currentSemanticsNodes = listOf(semanticsNode),
+                vertical = true,
+                direction = 0,
+                position = Offset(50f, 50f)
+            )
+        )
+        assertTrue(
+            accessibilityDelegate.canScroll(
+                currentSemanticsNodes = listOf(semanticsNode),
+                vertical = true,
+                direction = 1,
+                position = Offset(50f, 50f)
+            )
+        )
+    }
+
+    @Test
+    fun canScroll_returnsFalse_whenHorizontalScrollable_whenScrolledRightAndAtLimit() {
+        val semanticsNode = createSemanticsNodeWithAdjustedBoundsWithProperties(
+            id = 1,
+            mergeDescendants = true
+        ) {
+            horizontalScrollAxisRange = ScrollAxisRange(
+                value = { 1f },
+                maxValue = { 1f },
+                reverseScrolling = false
+            )
+        }.apply {
+            adjustedBounds.set(0, 0, 100, 100)
+        }
+
+        assertFalse(
+            accessibilityDelegate.canScroll(
+                currentSemanticsNodes = listOf(semanticsNode),
+                vertical = false,
+                direction = 1,
+                position = Offset(50f, 50f)
+            )
+        )
+        assertFalse(
+            accessibilityDelegate.canScroll(
+                currentSemanticsNodes = listOf(semanticsNode),
+                vertical = false,
+                direction = 0,
+                position = Offset(50f, 50f)
+            )
+        )
+    }
+
+    @Test
+    fun canScroll_returnsFalse_whenHorizontalScrollable_whenScrolledLeftAndAtLimit() {
+        val semanticsNode = createSemanticsNodeWithAdjustedBoundsWithProperties(
+            id = 1,
+            mergeDescendants = true
+        ) {
+            horizontalScrollAxisRange = ScrollAxisRange(
+                value = { 0f },
+                maxValue = { 1f },
+                reverseScrolling = false
+            )
+        }.apply {
+            adjustedBounds.set(0, 0, 100, 100)
+        }
+
+        assertFalse(
+            accessibilityDelegate.canScroll(
+                currentSemanticsNodes = listOf(semanticsNode),
+                vertical = false,
+                direction = -1,
+                position = Offset(50f, 50f)
+            )
+        )
+    }
+
+    @Test
+    fun canScroll_returnsFalse_whenVerticalScrollable_whenScrolledDownAndAtLimit() {
+        val semanticsNode = createSemanticsNodeWithAdjustedBoundsWithProperties(
+            id = 1,
+            mergeDescendants = true
+        ) {
+            verticalScrollAxisRange = ScrollAxisRange(
+                value = { 1f },
+                maxValue = { 1f },
+                reverseScrolling = false
+            )
+        }.apply {
+            adjustedBounds.set(0, 0, 100, 100)
+        }
+
+        assertFalse(
+            accessibilityDelegate.canScroll(
+                currentSemanticsNodes = listOf(semanticsNode),
+                vertical = true,
+                direction = 1,
+                position = Offset(50f, 50f)
+            )
+        )
+        assertFalse(
+            accessibilityDelegate.canScroll(
+                currentSemanticsNodes = listOf(semanticsNode),
+                vertical = true,
+                direction = 0,
+                position = Offset(50f, 50f)
+            )
+        )
+    }
+
+    @Test
+    fun canScroll_returnsFalse_whenVerticalScrollable_whenScrolledUpAndAtLimit() {
+        val semanticsNode = createSemanticsNodeWithAdjustedBoundsWithProperties(
+            id = 1,
+            mergeDescendants = true
+        ) {
+            verticalScrollAxisRange = ScrollAxisRange(
+                value = { 0f },
+                maxValue = { 1f },
+                reverseScrolling = false
+            )
+        }.apply {
+            adjustedBounds.set(0, 0, 100, 100)
+        }
+
+        assertFalse(
+            accessibilityDelegate.canScroll(
+                currentSemanticsNodes = listOf(semanticsNode),
+                vertical = true,
+                direction = -1,
+                position = Offset(50f, 50f)
+            )
+        )
+    }
+
+    @Test
+    fun canScroll_respectsReverseDirection() {
+        val semanticsNode = createSemanticsNodeWithAdjustedBoundsWithProperties(
+            id = 1,
+            mergeDescendants = true
+        ) {
+            horizontalScrollAxisRange = ScrollAxisRange(
+                value = { 0f },
+                maxValue = { 1f },
+                reverseScrolling = true
+            )
+        }.apply {
+            adjustedBounds.set(0, 0, 100, 100)
+        }
+
+        assertTrue(
+            accessibilityDelegate.canScroll(
+                currentSemanticsNodes = listOf(semanticsNode),
+                vertical = false,
+                // Scroll left, even though value is 0.
+                direction = -1,
+                position = Offset(50f, 50f)
+            )
+        )
+    }
+
+    @Test
+    fun canScroll_returnsFalse_forVertical_whenScrollableIsHorizontal() {
+        val semanticsNode = createSemanticsNodeWithAdjustedBoundsWithProperties(
+            id = 1,
+            mergeDescendants = true
+        ) {
+            horizontalScrollAxisRange = ScrollAxisRange(
+                value = { 0.5f },
+                maxValue = { 1f },
+                reverseScrolling = true
+            )
+        }.apply {
+            adjustedBounds.set(0, 0, 100, 100)
+        }
+
+        assertFalse(
+            accessibilityDelegate.canScroll(
+                currentSemanticsNodes = listOf(semanticsNode),
+                vertical = true,
+                direction = 1,
+                position = Offset(50f, 50f)
+            )
+        )
+    }
+
+    @Test
+    fun canScroll_returnsFalse_whenTouchIsOutsideBounds() {
+        val semanticsNode = createSemanticsNodeWithAdjustedBoundsWithProperties(
+            id = 1,
+            mergeDescendants = true
+        ) {
+            horizontalScrollAxisRange = ScrollAxisRange(
+                value = { 0.5f },
+                maxValue = { 1f },
+                reverseScrolling = true
+            )
+        }.apply {
+            adjustedBounds.set(0, 0, 50, 50)
+        }
+
+        assertFalse(
+            accessibilityDelegate.canScroll(
+                currentSemanticsNodes = listOf(semanticsNode),
+                vertical = false,
+                direction = 1,
+                position = Offset(100f, 100f)
+            )
+        )
     }
 
     private fun createSemanticsNodeWithProperties(

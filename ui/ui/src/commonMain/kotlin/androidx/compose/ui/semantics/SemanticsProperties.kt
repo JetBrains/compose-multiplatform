@@ -530,7 +530,11 @@ class ScrollAxisRange(
     val value: () -> Float,
     val maxValue: () -> Float,
     val reverseScrolling: Boolean = false
-)
+) {
+    override fun toString(): String =
+        "ScrollAxisRange(value=${value()}, maxValue=${maxValue()}, " +
+            "reverseScrolling=$reverseScrolling)"
+}
 
 /**
  * The type of user interface element. Accessibility services might use this to describe the
