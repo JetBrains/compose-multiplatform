@@ -28,10 +28,12 @@ import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
-import java.io.PrintWriter
+import java.util.Properties
 
 abstract class SdkResourceGenerator : DefaultTask() {
     @get:Input
@@ -73,31 +75,38 @@ abstract class SdkResourceGenerator : DefaultTask() {
     @get:Input
     val rootProjectPath: String = project.rootProject.rootDir.absolutePath
 
-    @get:Input
-    lateinit var gradleVersion: String
+    @get:PathSensitive(PathSensitivity.NONE)
+    @get:InputFile
+    abstract val gradleWrapperProperties: RegularFileProperty
 
     @get:OutputFile
     abstract val outputFile: RegularFileProperty
 
     @TaskAction
     fun generateFile() {
-        val writer = PrintWriter(outputFile.get().asFile)
-        writer.write("prebuiltsRoot=$prebuiltsRoot\n")
-        writer.write("localSupportRepo=$localSupportRepo\n")
-        writer.write("compileSdkVersion=$compileSdkVersion\n")
-        writer.write("buildToolsVersion=$buildToolsVersion\n")
-        writer.write("minSdkVersion=$minSdkVersion\n")
-        writer.write("debugKeystore=${debugKeystore.get().asFile.canonicalPath}\n")
-        writer.write("agpDependency=$agpDependency\n")
-        writer.write("navigationRuntime=$navigationRuntime\n")
-        writer.write("kotlinStdlib=$kotlinStdlib\n")
-        writer.write("gradleVersion=$gradleVersion\n")
-        writer.write("kotlinVersion=$kotlinVersion\n")
-        writer.write("kspVersion=$kspVersion\n")
-        writer.write("rootProjectPath=$rootProjectPath\n")
-        val encodedRepositoryUrls = repositoryUrls.joinToString(",")
-        writer.write("repositoryUrls=$encodedRepositoryUrls\n")
-        writer.close()
+        outputFile.get().asFile.writer().use { writer ->
+            writer.write("prebuiltsRoot=$prebuiltsRoot\n")
+            writer.write("localSupportRepo=$localSupportRepo\n")
+            writer.write("compileSdkVersion=$compileSdkVersion\n")
+            writer.write("buildToolsVersion=$buildToolsVersion\n")
+            writer.write("minSdkVersion=$minSdkVersion\n")
+            writer.write("debugKeystore=${debugKeystore.get().asFile.canonicalPath}\n")
+            writer.write("agpDependency=$agpDependency\n")
+            writer.write("navigationRuntime=$navigationRuntime\n")
+            writer.write("kotlinStdlib=$kotlinStdlib\n")
+
+            val gradlewPropFile = gradleWrapperProperties.asFile.get()
+            val distributionUrl = gradlewPropFile.reader().use {
+                Properties().apply { load(it) }.getProperty("distributionUrl")
+            }.let { File(gradlewPropFile.parentFile, it).canonicalPath }
+
+            writer.write("gradleDistributionUrl=$distributionUrl\n")
+            writer.write("kotlinVersion=$kotlinVersion\n")
+            writer.write("kspVersion=$kspVersion\n")
+            writer.write("rootProjectPath=$rootProjectPath\n")
+            val encodedRepositoryUrls = repositoryUrls.joinToString(",")
+            writer.write("repositoryUrls=$encodedRepositoryUrls\n")
+        }
     }
 
     companion object {
@@ -111,7 +120,9 @@ abstract class SdkResourceGenerator : DefaultTask() {
                 it.prebuiltsRoot = project.getPrebuiltsRoot().canonicalPath
                 it.debugKeystore.set(project.getKeystore())
                 it.localSupportRepo = project.getRepositoryDirectory().canonicalPath
-                it.gradleVersion = project.gradle.gradleVersion
+                it.gradleWrapperProperties.set(
+                    File(project.rootDir, "gradle/wrapper/gradle-wrapper.properties")
+                )
                 it.outputFile.set(File(generatedDirectory, "sdk.prop"))
                 // Copy repositories used for the library project so that it can replicate the same
                 // maven structure in test.
