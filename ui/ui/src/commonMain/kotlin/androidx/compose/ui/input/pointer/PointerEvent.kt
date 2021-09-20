@@ -399,8 +399,11 @@ class PointerInputChange(
     // With these experimental annotations, the API can be either cleanly removed or
     // stabilized. It doesn't appear in current.txt; and in experimental_current.txt,
     // it has the same effect as a primary constructor val.
+    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @ExperimentalComposeUiApi
+    @get:ExperimentalComposeUiApi
     val historical: List<HistoricalChange>
-        @ExperimentalComposeUiApi get() = _historical ?: listOf()
+        get() = _historical ?: listOf()
     private var _historical: List<HistoricalChange>? = null
 
     @ExperimentalComposeUiApi
