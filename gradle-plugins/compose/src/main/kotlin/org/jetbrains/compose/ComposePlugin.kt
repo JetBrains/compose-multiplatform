@@ -16,7 +16,6 @@ import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.internal.configureApplicationImpl
 import org.jetbrains.compose.desktop.application.internal.currentTarget
 import org.jetbrains.compose.desktop.preview.internal.initializePreview
-import org.jetbrains.compose.internal.checkAndWarnAboutComposeWithSerialization
 import org.jetbrains.compose.web.internal.initializeWeb
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -107,8 +106,6 @@ class ComposePlugin : Plugin<Project> {
                 useIR = true
             }
         }
-
-        project.checkAndWarnAboutComposeWithSerialization()
     }
 
     object Dependencies {
