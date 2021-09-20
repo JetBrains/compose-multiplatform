@@ -49,7 +49,10 @@ const val composeSourceOption =
     "plugin:androidx.compose.compiler.plugins.kotlin:sourceInformation=true"
 const val composeMetricsOption =
     "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination"
+const val composeReportsOption =
+    "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination"
 const val enableMetricsArg = "androidx.enableComposeCompilerMetrics"
+const val enableReportsArg = "androidx.enableComposeCompilerReports"
 
 /**
  * Plugin to apply common configuration for Compose projects.
@@ -327,6 +330,9 @@ fun Project.configureComposeImplPluginForAndroidx() {
                 val enableMetrics = project
                     .findProperty(enableMetricsArg) == "true"
 
+                val enableReports = project
+                    .findProperty(enableReportsArg) == "true"
+
                 // since metrics reports in compose compiler are a new feature, we only want to
                 // pass in this parameter for modules that are using the tip of tree compose
                 // compiler, or else we will run into an exception since the parameter will not
@@ -341,6 +347,23 @@ fun Project.configureComposeImplPluginForAndroidx() {
                         listOf(
                             "-P",
                             "$composeMetricsOption=$metricsDest"
+                        )
+                }
+
+                // since metrics reports in compose compiler are a new feature, we only want to
+                // pass in this parameter for modules that are using the tip of tree compose
+                // compiler, or else we will run into an exception since the parameter will not
+                // be recognized.
+                if (isTipOfTreeComposeCompilerProvider.get() && enableReports) {
+                    val libReports = project
+                        .rootProject
+                        .getLibraryReportsDirectory()
+                    val reportsDest = File(libReports, "compose")
+                        .absolutePath
+                    compile.kotlinOptions.freeCompilerArgs +=
+                        listOf(
+                            "-P",
+                            "$composeReportsOption=$reportsDest"
                         )
                 }
             }
