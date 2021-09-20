@@ -153,6 +153,10 @@ class ComposePlugin : Plugin<Project> {
         val widgets by lazy {
             composeDependency("org.jetbrains.compose.web:web-widgets")
         }
+
+        val testUtils by lazy {
+            composeDependency("org.jetbrains.compose.web:test-utils")
+        }
     }
 }
 
