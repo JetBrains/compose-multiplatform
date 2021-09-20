@@ -24,6 +24,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 internal val composeVersion get() = ComposeBuildConfig.composeVersion
+internal val androidxComposeVersion get() = ComposeBuildConfig.androidxComposeVersion
 
 class ComposePlugin : Plugin<Project> {
     override fun apply(project: Project) {
@@ -116,14 +117,14 @@ class ComposePlugin : Plugin<Project> {
 
     object Dependencies {
         val desktop = DesktopDependencies
-        val animation get() = composeDependency("org.jetbrains.compose.animation:animation")
-        val foundation get() = composeDependency("org.jetbrains.compose.foundation:foundation")
-        val material get() = composeDependency("org.jetbrains.compose.material:material")
-        val runtime get() = composeDependency("org.jetbrains.compose.runtime:runtime")
-        val ui get() = composeDependency("org.jetbrains.compose.ui:ui")
-        val uiTooling get() = composeDependency("org.jetbrains.compose.ui:ui-tooling")
-        val preview get() = composeDependency("org.jetbrains.compose.ui:ui-tooling-preview")
-        val materialIconsExtended get() = composeDependency("org.jetbrains.compose.material:material-icons-extended")
+        val animation get() = androidxComposeDependency("androidx.compose.animation:animation")
+        val foundation get() = androidxComposeDependency("androidx.compose.foundation:foundation")
+        val material get() = androidxComposeDependency("androidx.compose.material:material")
+        val runtime get() = androidxComposeDependency("androidx.compose.runtime:runtime")
+        val ui get() = androidxComposeDependency("androidx.compose.ui:ui")
+        val uiTooling get() = androidxComposeDependency("androidx.compose.ui:ui-tooling")
+        val preview get() = androidxComposeDependency("androidx.compose.ui:ui-tooling-preview")
+        val materialIconsExtended get() = androidxComposeDependency("androidx.compose.material:material-icons-extended")
         val web: WebDependencies get() =
             if (ComposeBuildConfig.isComposeWithWeb) WebDependencies
             else error("This version of Compose plugin does not support 'compose.web.*' dependencies")
@@ -166,3 +167,4 @@ fun DependencyHandler.compose(groupWithArtifact: String) = composeDependency(gro
 val DependencyHandler.compose get() = ComposePlugin.Dependencies
 
 private fun composeDependency(groupWithArtifact: String) = "$groupWithArtifact:$composeVersion"
+private fun androidxComposeDependency(groupWithArtifact: String) = "$groupWithArtifact:$androidxComposeVersion"
