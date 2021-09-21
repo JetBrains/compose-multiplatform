@@ -77,7 +77,7 @@ fun AlertDialog(
         onDismissRequest = onDismissRequest,
         buttons = {
             // TODO: move the modifiers to FlowRow when it supports a modifier parameter
-            Box(Modifier.fillMaxWidth().padding(all = 8.dp)) {
+            Box(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 2.dp)) {
                 AlertDialogFlowRow(
                     mainAxisSpacing = 8.dp,
                     crossAxisSpacing = 12.dp
