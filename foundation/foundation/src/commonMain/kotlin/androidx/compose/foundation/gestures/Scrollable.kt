@@ -225,6 +225,9 @@ private class ScrollingLogic(
     fun Velocity.toFloat(): Float =
         if (orientation == Horizontal) this.x else this.y
 
+    fun Velocity.update(newValue: Float): Velocity =
+        if (orientation == Horizontal) copy(x = newValue) else copy(y = newValue)
+
     fun Float.reverseIfNeeded(): Float = if (reverseDirection) this * -1 else this
 
     fun ScrollScope.dispatchScroll(
@@ -294,8 +297,9 @@ private class ScrollingLogic(
             }
             with(scope) {
                 with(flingBehavior) {
-                    result = performFling(available.toFloat().reverseIfNeeded())
-                        .reverseIfNeeded().toVelocity()
+                    result = result.update(
+                        performFling(available.toFloat().reverseIfNeeded()).reverseIfNeeded()
+                    )
                 }
             }
         }

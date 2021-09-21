@@ -982,6 +982,65 @@ class ScrollableTest {
     }
 
     @Test
+    fun scrollable_bothOrientations_proxiesPostFling() {
+        val velocityFlung = 5000f
+        val outerState = ScrollableState(consumeScrollDelta = { 0f })
+        val innerState = ScrollableState(consumeScrollDelta = { 0f })
+        val innerFlingBehavior = object : FlingBehavior {
+            override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
+                return initialVelocity
+            }
+        }
+        val parent = object : NestedScrollConnection {
+            override suspend fun onPostFling(
+                consumed: Velocity,
+                available: Velocity
+            ): Velocity {
+                assertThat(consumed.x).isEqualTo(0f)
+                assertThat(available.x).isWithin(0.1f).of(velocityFlung)
+                return available
+            }
+        }
+
+        rule.setContentAndGetScope {
+            Box {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(300.dp)
+                        .nestedScroll(parent)
+                        .scrollable(
+                            state = outerState,
+                            orientation = Orientation.Vertical
+                        )
+                ) {
+                    Box(
+                        modifier = Modifier.size(300.dp)
+                            .testTag(scrollableBoxTag)
+                            .scrollable(
+                                state = innerState,
+                                flingBehavior = innerFlingBehavior,
+                                orientation = Orientation.Horizontal
+                            )
+                    )
+                }
+            }
+        }
+
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
+            this.swipeWithVelocity(
+                start = this.center,
+                end = Offset(this.center.x + 500f, this.center.y),
+                durationMillis = 300,
+                endVelocity = velocityFlung
+            )
+        }
+
+        // all assertions in callback above
+        rule.waitForIdle()
+    }
+
+    @Test
     fun scrollable_interactionSource() {
         val interactionSource = MutableInteractionSource()
         var total = 0f
