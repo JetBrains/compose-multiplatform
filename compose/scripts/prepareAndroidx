@@ -1,0 +1,3 @@
+#!/bin/bash
+export COMPOSE_CUSTOM_GROUP=androidx.compose
+export COMPOSE_DEFAULT_GRADLE_ARGS="-Pandroidx.compose.openExpectLiteMode=androidx $COMPOSE_DEFAULT_GRADLE_ARGS"

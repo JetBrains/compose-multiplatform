@@ -6,3 +6,10 @@ cd "$(dirname "$0")"
 pushd ..
 ./gradlew publishComposeJb $COMPOSE_DEFAULT_GRADLE_ARGS "$@" || exit 1
 popd
+
+
+. ./prepareAndroidx
+
+pushd ..
+./gradlew publishComposeJb $COMPOSE_DEFAULT_GRADLE_ARGS "$@" || exit 1
+popd

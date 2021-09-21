@@ -14,9 +14,9 @@ object BuildProperties {
     fun composeVersion(project: Project): String =
         System.getenv("COMPOSE_GRADLE_PLUGIN_COMPOSE_VERSION")
             ?: project.findProperty("compose.version") as String
-    fun composeAndroidxVersion(project: Project): String =
-        System.getenv("COMPOSE_ANDROIDX_VERSION")
-            ?: project.findProperty("compose.androidx.version") as String
+    fun composeAndroidxVersion(project: Project): String = composeVersion(project) // temporaly use the same version until we merge it to jb-main
+//        System.getenv("COMPOSE_ANDROIDX_VERSION")
+//            ?: project.findProperty("compose.androidx.version") as String
     fun deployVersion(project: Project): String =
         System.getenv("COMPOSE_GRADLE_PLUGIN_VERSION")
             ?: project.findProperty("deploy.version") as String
