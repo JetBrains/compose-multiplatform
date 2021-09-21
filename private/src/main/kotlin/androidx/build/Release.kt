@@ -18,14 +18,14 @@ package androidx.build
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.plugin.devel.GradlePluginDevelopmentExtension
 import java.io.File
 import java.util.Locale
-import java.util.TreeSet
 
 /**
  * Simple description for an artifact that is released from this project.
@@ -42,27 +42,53 @@ data class Artifact(
 }
 
 /**
- * Zip task that zips all artifacts from given [candidates].
+ * Zip task that zips all artifacts from given candidates.
  */
 open class GMavenZipTask : Zip() {
+
+    init {
+        // multiple artifacts in the same group might have the same maven-metadata.xml
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
     /**
      * Set to true to include maven-metadata.xml
      */
     @get:Input
     var includeMetadata: Boolean = false
-    /**
-     * List of artifacts that might be included in the generated zip.
-     */
-    @get:Nested
-    val candidates = TreeSet<Artifact>(compareBy { it.toString() })
 
+    /**
+     * Repository containing artifacts to include
+     */
+    @get:Internal
+    lateinit var androidxRepoOut: File
+
+    fun addCandidate(artifact: Artifact) {
+        val groupSubdir = artifact.mavenGroup.replace('.', '/')
+        val projectSubdir = File("$groupSubdir/${artifact.projectName}")
+        val includes = listOfNotNull(
+            "${artifact.version}/**",
+            if (includeMetadata)
+                "maven-metadata.*"
+            else
+                null
+        )
+        // We specifically pass the subdirectory into 'from' so that changes in other artifacts
+        // won't cause this task to become out of date
+        from("$androidxRepoOut/$projectSubdir") { spec ->
+            spec.into("m2repository/$projectSubdir")
+            for (inclusion in includes) {
+                include(inclusion)
+            }
+        }
+    }
     /**
      * Config action that configures the task when necessary.
      */
     class ConfigAction(private val params: Params) : Action<GMavenZipTask> {
         data class Params(
             /**
-             * Maven group for the task. "" if for all projects
+             * Maven group for the task. "" if multiple groups or only one project
              */
             val mavenGroup: String,
             /**
@@ -70,9 +96,9 @@ open class GMavenZipTask : Zip() {
              */
             var includeMetadata: Boolean,
             /**
-             * The out folder for publishing libraries.
+             * The root of the repository where built libraries can be found
              */
-            val supportRepoOut: File,
+            val androidxRepoOut: File,
             /**
              * The out folder where the zip will be created
              */
@@ -95,39 +121,12 @@ open class GMavenZipTask : Zip() {
                     this project.
                     Group: ${if (mavenGroup != "") mavenGroup else "All"}
                     """.trimIndent()
-                task.from(supportRepoOut)
+                task.androidxRepoOut = androidxRepoOut
                 task.destinationDirectory.set(distDir)
                 task.includeMetadata = params.includeMetadata
-                task.into("m2repository")
                 task.archiveBaseName.set(getZipName(fileNamePrefix, mavenGroup))
-                task.onlyIf {
-                    // always run top diff zip as it is required by build on server task
-                    task.setupIncludes()
-                }
             }
         }
-    }
-
-    /**
-     * Decides which files should be included in the zip. Should be invoked right before task
-     * runs as an `onlyIf` block. Returns `false` if there is nothing to zip.
-     */
-    private fun setupIncludes(): Boolean {
-        // have 1 default include so that by default, nothing is included
-        val includes = candidates.flatMap {
-            val mavenGroupPath = it.mavenGroup.replace('.', '/')
-            listOfNotNull(
-                "$mavenGroupPath/${it.projectName}/${it.version}" + "/**",
-                if (includeMetadata)
-                    "$mavenGroupPath/${it.projectName}" + "/maven-metadata.*"
-                else
-                    null
-            )
-        }
-        includes.forEach {
-            include(it)
-        }
-        return includes.isNotEmpty()
     }
 }
 
@@ -197,14 +196,14 @@ object Release {
         val publishTask = project.tasks.named("publish")
         zipTasks.forEach {
             it.configure { zipTask ->
-                zipTask.candidates.add(artifact)
+                zipTask.addCandidate(artifact)
 
                 // Add additional artifacts needed for Gradle Plugins
                 if (extension.type == LibraryType.GRADLE_PLUGIN) {
                     project.extensions.getByType(
                         GradlePluginDevelopmentExtension::class.java
                     ).plugins.forEach { plugin ->
-                        zipTask.candidates.add(
+                        zipTask.addCandidate(
                             Artifact(
                                 mavenGroup = plugin.id,
                                 projectName = "${plugin.id}.gradle.plugin",
@@ -229,10 +228,11 @@ object Release {
         fileNamePrefix: String = "",
         group: String? = null
     ): GMavenZipTask.ConfigAction.Params {
+        // Make base params or reuse if already created
         val params = configActionParams ?: GMavenZipTask.ConfigAction.Params(
             mavenGroup = "",
             includeMetadata = false,
-            supportRepoOut = project.getRepositoryDirectory(),
+            androidxRepoOut = project.getRepositoryDirectory(),
             distDir = distDir,
             fileNamePrefix = fileNamePrefix,
             buildNumber = getBuildId()
@@ -241,6 +241,7 @@ object Release {
         }
         distDir.mkdirs()
 
+        // Copy base params and apply any specific differences
         return params.copy(
             mavenGroup = group ?: "",
             distDir = distDir,
@@ -259,7 +260,7 @@ object Release {
                     getParams(
                         project,
                         project.getDistributionDirectory(),
-                        Release.GLOBAL_ZIP_PREFIX
+                        fileNamePrefix = Release.GLOBAL_ZIP_PREFIX
                     ).copy(
                         includeMetadata = true
                     )
