@@ -154,6 +154,7 @@ fun Slider(
     }
     BoxWithConstraints(
         modifier
+            .minimumTouchTargetSize()
             .requiredSizeIn(minWidth = ThumbRadius * 2, minHeight = ThumbRadius * 2)
             .sliderSemantics(value, tickFractions, enabled, onValueChange, valueRange, steps)
             .focusable(enabled, interactionSource)

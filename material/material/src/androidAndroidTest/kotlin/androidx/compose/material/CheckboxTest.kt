@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -62,7 +63,7 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class CheckboxUiTest {
+class CheckboxTest {
 
     @get:Rule
     val rule = createComposeRule()
@@ -160,26 +161,138 @@ class CheckboxUiTest {
     }
 
     @Test
-    fun checkBoxTest_MaterialSize_WhenChecked() {
-        materialSizeTestForValue(On)
+    fun checkBoxTest_MaterialSize_WhenChecked_minimumTouchTarget() {
+        materialSizeTestForValue(
+            checkboxValue = On,
+            clickable = true,
+            minimumTouchTarget = true
+        )
     }
 
     @Test
-    fun checkBoxTest_MaterialSize_WhenUnchecked() {
-        materialSizeTestForValue(Off)
+    fun checkBoxTest_MaterialSize_WhenChecked_withoutMinimumTouchTarget() {
+        materialSizeTestForValue(
+            checkboxValue = On,
+            clickable = true,
+            minimumTouchTarget = false
+        )
     }
 
     @Test
-    fun checkBoxTest_MaterialSize_WhenIndeterminate() {
-        materialSizeTestForValue(Indeterminate)
+    fun checkBoxTest_MaterialSize_WhenUnchecked_minimumTouchTarget() {
+        materialSizeTestForValue(
+            checkboxValue = Off,
+            clickable = true,
+            minimumTouchTarget = true
+        )
     }
 
-    private fun materialSizeTestForValue(checkboxValue: ToggleableState) {
+    @Test
+    fun checkBoxTest_MaterialSize_WhenUnchecked_withoutMinimumTouchTarget() {
+        materialSizeTestForValue(
+            checkboxValue = Off,
+            clickable = true,
+            minimumTouchTarget = false
+        )
+    }
+
+    @Test
+    fun checkBoxTest_MaterialSize_WhenIndeterminate_minimumTouchTarget() {
+        materialSizeTestForValue(
+            checkboxValue = Indeterminate,
+            clickable = true,
+            minimumTouchTarget = true
+        )
+    }
+
+    @Test
+    fun checkBoxTest_MaterialSize_WhenIndeterminate_withoutMinimumTouchTarget() {
+        materialSizeTestForValue(
+            checkboxValue = Indeterminate,
+            clickable = true,
+            minimumTouchTarget = false
+        )
+    }
+
+    @Test
+    fun checkBoxTest_MaterialSize_WhenChecked_notClickable_minimumTouchTarget() {
+        materialSizeTestForValue(
+            checkboxValue = On,
+            clickable = false,
+            minimumTouchTarget = true
+        )
+    }
+
+    @Test
+    fun checkBoxTest_MaterialSize_WhenChecked_notClickable_withoutMinimumTouchTarget() {
+        materialSizeTestForValue(
+            checkboxValue = On,
+            clickable = false,
+            minimumTouchTarget = false
+        )
+    }
+
+    @Test
+    fun checkBoxTest_MaterialSize_WhenUnchecked_notClickable_minimumTouchTarget() {
+        materialSizeTestForValue(
+            checkboxValue = Off,
+            clickable = false,
+            minimumTouchTarget = true
+        )
+    }
+
+    @Test
+    fun checkBoxTest_MaterialSize_WhenUnchecked_notClickable_withoutMinimumTouchTarget() {
+        materialSizeTestForValue(
+            checkboxValue = Off,
+            clickable = false,
+            minimumTouchTarget = false
+        )
+    }
+
+    @Test
+    fun checkBoxTest_MaterialSize_WhenIndeterminate_notClickable_minimumTouchTarget() {
+        materialSizeTestForValue(
+            checkboxValue = Indeterminate,
+            clickable = false,
+            minimumTouchTarget = true
+        )
+    }
+
+    @Test
+    fun checkBoxTest_MaterialSize_WhenIndeterminate_notClickable_withoutMinimumTouchTarget() {
+        materialSizeTestForValue(
+            checkboxValue = Indeterminate,
+            clickable = false,
+            minimumTouchTarget = false
+        )
+    }
+
+    @OptIn(ExperimentalMaterialApi::class)
+    private fun materialSizeTestForValue(
+        checkboxValue: ToggleableState,
+        clickable: Boolean,
+        minimumTouchTarget: Boolean
+    ) {
         rule
             .setMaterialContentForSizeAssertions {
-                TriStateCheckbox(state = checkboxValue, onClick = {}, enabled = false)
+                CompositionLocalProvider(
+                    LocalMinimumTouchTargetEnforcement provides minimumTouchTarget
+                ) {
+                    TriStateCheckbox(
+                        state = checkboxValue,
+                        onClick = if (clickable) { {} } else null,
+                        enabled = false
+                    )
+                }
             }
-            .assertIsSquareWithSize(2.dp * 2 + 20.dp)
+            .run {
+                if (clickable && minimumTouchTarget) {
+                    assertIsSquareWithSize(48.dp)
+                } else {
+                    assertIsSquareWithSize(2.dp * 2 + 20.dp)
+                }
+            }
     }
 
     @Test

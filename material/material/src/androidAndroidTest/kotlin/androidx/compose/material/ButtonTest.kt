@@ -24,11 +24,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredHeightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.requiredWidthIn
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -47,8 +46,8 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
@@ -364,28 +363,23 @@ class ButtonTest {
     fun containedButtonDisabledBackgroundIsCorrect() {
         var surface = Color.Transparent
         var onSurface = Color.Transparent
-        val padding = 8.dp
         rule.setMaterialContent {
             surface = MaterialTheme.colors.surface
             onSurface = MaterialTheme.colors.onSurface
-            Box(Modifier.testTag("myButton")) {
-                // stack allows to verify there is no shadow
-                Box(Modifier.padding(padding)) {
-                    Button(
-                        onClick = {},
-                        enabled = false,
-                        shape = RectangleShape
-                    ) {}
-                }
-            }
+            Button(
+                modifier = Modifier.testTag("myButton"),
+                onClick = {},
+                enabled = false,
+                shape = RectangleShape
+            ) {}
         }
 
         rule.onNodeWithTag("myButton")
             .captureToImage()
             .assertShape(
                 density = rule.density,
-                horizontalPadding = padding,
-                verticalPadding = padding,
+                horizontalPadding = 0.dp,
+                verticalPadding = 0.dp,
                 backgroundColor = surface,
                 shapeColor = onSurface.copy(alpha = 0.12f).compositeOver(surface)
             )
@@ -397,31 +391,26 @@ class ButtonTest {
     fun containedButtonWithCustomColorDisabledBackgroundIsCorrect() {
         var surface = Color.Transparent
         var onSurface = Color.Transparent
-        val padding = 8.dp
         rule.setMaterialContent {
             surface = MaterialTheme.colors.surface
             onSurface = MaterialTheme.colors.onSurface
-            Box(Modifier.testTag("myButton")) {
-                // stack allows to verify there is no shadow
-                Box(Modifier.padding(padding)) {
-                    Button(
-                        onClick = {},
-                        enabled = false,
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color.Red
-                        ),
-                        shape = RectangleShape
-                    ) {}
-                }
-            }
+            Button(
+                modifier = Modifier.testTag("myButton"),
+                onClick = {},
+                enabled = false,
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.Red
+                ),
+                shape = RectangleShape
+            ) {}
         }
 
         rule.onNodeWithTag("myButton")
             .captureToImage()
             .assertShape(
                 density = rule.density,
-                horizontalPadding = padding,
-                verticalPadding = padding,
+                horizontalPadding = 0.dp,
+                verticalPadding = 0.dp,
                 backgroundColor = surface,
                 shapeColor = onSurface.copy(alpha = 0.12f).compositeOver(surface)
             )
@@ -432,25 +421,23 @@ class ButtonTest {
     @LargeTest
     fun outlinedButtonDisabledBackgroundIsCorrect() {
         var surface = Color.Transparent
-        val padding = 8.dp
         rule.setMaterialContent {
             surface = MaterialTheme.colors.surface
-            // stack allows to verify there is no shadow
-            Box(Modifier.padding(padding)) {
-                OutlinedButton(
-                    modifier = Modifier.testTag("myButton"),
-                    onClick = {},
-                    enabled = false,
-                    shape = RectangleShape,
-                    border = null
-                ) {}
-            }
+            OutlinedButton(
+                modifier = Modifier.testTag("myButton"),
+                onClick = {},
+                enabled = false,
+                shape = RectangleShape,
+                border = null
+            ) {}
         }
 
         rule.onNodeWithTag("myButton")
             .captureToImage()
             .assertShape(
                 density = rule.density,
+                horizontalPadding = 0.dp,
+                verticalPadding = 0.dp,
                 shape = RectangleShape,
                 shapeColor = surface,
                 backgroundColor = surface
@@ -464,21 +451,20 @@ class ButtonTest {
         var surface = Color.Transparent
         rule.setMaterialContent {
             surface = MaterialTheme.colors.surface
-            // stack allows to verify there is no shadow
-            Box(Modifier.padding(8.dp)) {
-                TextButton(
-                    modifier = Modifier.testTag("myButton"),
-                    onClick = {},
-                    enabled = false,
-                    shape = RectangleShape
-                ) {}
-            }
+            TextButton(
+                modifier = Modifier.testTag("myButton"),
+                onClick = {},
+                enabled = false,
+                shape = RectangleShape
+            ) {}
         }
 
         rule.onNodeWithTag("myButton")
             .captureToImage()
             .assertShape(
                 density = rule.density,
+                horizontalPadding = 0.dp,
+                verticalPadding = 0.dp,
                 shape = RectangleShape,
                 shapeColor = surface,
                 backgroundColor = surface

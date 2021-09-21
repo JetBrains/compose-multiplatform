@@ -184,7 +184,7 @@ class LayoutInspectorTreeTest {
             node(
                 name = "Column",
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 0.0.dp, top = 0.0.dp, width = 72.0.dp, height = 78.9.dp,
+                left = 0.0.dp, top = 0.0.dp, width = 72.0.dp, height = 90.6.dp,
                 children = listOf("Text", "Icon", "Surface")
             )
             node(
@@ -203,21 +203,21 @@ class LayoutInspectorTreeTest {
                 name = "Surface",
                 fileName = "LayoutInspectorTreeTest.kt",
                 isRenderNode = true,
-                left = 0.0.dp, top = 42.9.dp, width = 64.0.dp, height = 36.0.dp,
+                left = 0.0.dp, top = 42.9.dp, width = 64.0.dp, height = 48.0.dp,
                 children = listOf("Button")
             )
             node(
                 name = "Button",
                 fileName = "LayoutInspectorTreeTest.kt",
                 isRenderNode = true,
-                left = 0.0.dp, top = 42.9.dp, width = 64.0.dp, height = 36.0.dp,
+                left = 0.0.dp, top = 48.3.dp, width = 64.0.dp, height = 36.0.dp,
                 children = listOf("Text")
             )
             node(
                 name = "Text",
                 isRenderNode = true,
                 fileName = "LayoutInspectorTreeTest.kt",
-                left = 21.7.dp, top = 51.5.dp, width = 20.9.dp, height = 18.9.dp,
+                left = 21.7.dp, top = 57.dp, width = 20.9.dp, height = 18.9.dp,
             )
         }
     }
