@@ -134,6 +134,27 @@ class MultiModalInjectionScope(node: SemanticsNode, testContext: TestContext) : 
             inputDispatcher.enqueueTouchMove()
         }
 
+        @ExperimentalTestApi
+        override fun moveWithHistoryMultiPointer(
+            relativeHistoricalTimes: List<Long>,
+            historicalCoordinates: List<List<Offset>>,
+            delayMillis: Long
+        ) {
+            repeat(relativeHistoricalTimes.size) {
+                check(relativeHistoricalTimes[it] < 0) {
+                    "Relative historical times should be negative, in order to be in the past" +
+                        "(offset $it was: ${relativeHistoricalTimes[it]})"
+                }
+                check(relativeHistoricalTimes[it] >= -delayMillis) {
+                    "Relative historical times should not be earlier than the previous event " +
+                        "(offset $it was: ${relativeHistoricalTimes[it]}, ${-delayMillis})"
+                }
+            }
+
+            advanceEventTime(delayMillis)
+            inputDispatcher.enqueueTouchMoves(relativeHistoricalTimes, historicalCoordinates)
+        }
+
         override fun up(pointerId: Int) {
             inputDispatcher.enqueueTouchUp(pointerId)
         }

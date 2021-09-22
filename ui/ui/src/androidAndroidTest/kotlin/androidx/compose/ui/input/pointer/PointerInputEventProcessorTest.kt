@@ -111,6 +111,7 @@ class PointerInputEventProcessorTest {
     }
 
     @Test
+    @OptIn(ExperimentalComposeUiApi::class)
     fun pointerTypePassed() {
         val pointerTypes = listOf(
             PointerType.Unknown,
