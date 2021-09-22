@@ -102,19 +102,29 @@ internal fun LazyList(
         state.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
     }
 
-    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     LazyLayout(
         modifier = modifier
             .lazyListSemantics(
                 stateOfItemsProvider = stateOfItemsProvider,
                 state = state,
                 coroutineScope = rememberCoroutineScope(),
-                isVertical = isVertical
+                isVertical = isVertical,
+                reverseScrolling = reverseLayout
             )
             .clipScrollableContainer(isVertical)
             .scrollable(
                 orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
-                reverseDirection = if (!isVertical && isRtl) reverseLayout else !reverseLayout,
+                reverseDirection = run {
+                    // A finger moves with the content, not with the viewport. Therefore,
+                    // always reverse once to have "natural" gesture that goes reversed to layout
+                    var reverseDirection = !reverseLayout
+                    // But if rtl and horizontal, things move the other way around
+                    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+                    if (isRtl && !isVertical) {
+                        reverseDirection = !reverseDirection
+                    }
+                    reverseDirection
+                },
                 interactionSource = state.internalInteractionSource,
                 flingBehavior = flingBehavior,
                 state = state,

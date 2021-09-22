@@ -36,7 +36,8 @@ internal fun Modifier.lazyListSemantics(
     stateOfItemsProvider: State<LazyListItemsProvider>,
     state: LazyListState,
     coroutineScope: CoroutineScope,
-    isVertical: Boolean
+    isVertical: Boolean,
+    reverseScrolling: Boolean
 ): Modifier {
     return semantics {
         indexForKey { needle ->
@@ -57,7 +58,8 @@ internal fun Modifier.lazyListSemantics(
                 // rather than the actual offset in pixels.
                 state.firstVisibleItemIndex + state.firstVisibleItemScrollOffset / 100_000f
             },
-            maxValue = { Float.POSITIVE_INFINITY }
+            maxValue = { Float.POSITIVE_INFINITY },
+            reverseScrolling = reverseScrolling
         )
         if (isVertical) {
             verticalScrollAxisRange = accessibilityScrollState
