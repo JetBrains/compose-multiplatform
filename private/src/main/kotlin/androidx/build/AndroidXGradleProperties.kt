@@ -59,6 +59,11 @@ const val VALIDATE_PROJECT_STRUCTURE = "androidx.validateProjectStructure"
 const val ENABLE_COMPOSE_COMPILER_METRICS = "androidx.enableComposeCompilerMetrics"
 
 /**
+ * Setting this property enables multiplatform builds of Compose
+ */
+const val ENABLE_COMPOSE_COMPILER_REPORTS = "androidx.enableComposeCompilerReports"
+
+/**
  * Returns whether the project should generate documentation.
  */
 const val ENABLE_DOCUMENTATION = "androidx.enableDocumentation"
@@ -135,6 +140,7 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     VALIDATE_PROJECT_STRUCTURE,
     COMPOSE_MPP_ENABLED,
     ENABLE_COMPOSE_COMPILER_METRICS,
+    ENABLE_COMPOSE_COMPILER_REPORTS,
     DISPLAY_TEST_OUTPUT,
     ENABLE_DOCUMENTATION,
     PROJECT_SUBSET,

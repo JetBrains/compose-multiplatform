@@ -109,6 +109,12 @@ fun Project.getLibraryMetricsDirectory(): File =
     File(getDistributionDirectory(), "librarymetrics")
 
 /**
+ * Directory to put json metrics so they can be consumed by the metrics dashboards.
+ */
+fun Project.getLibraryReportsDirectory(): File =
+    File(getDistributionDirectory(), "libraryreports")
+
+/**
  * Whether the build should force all versions to be snapshots.
  */
 fun isSnapshotBuild() = System.getenv("SNAPSHOT") != null
