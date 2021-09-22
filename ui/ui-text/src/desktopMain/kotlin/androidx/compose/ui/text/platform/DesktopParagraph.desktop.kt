@@ -298,7 +298,7 @@ internal class DesktopParagraph(
                 )
             )
         } else {
-            @Suppress("UNCHECKED_CAST")
+            @Suppress("UNCHECKED_CAST", "USELESS_CAST")
             para.lineMetrics as Array<LineMetrics>
         }
 
@@ -550,7 +550,7 @@ internal class ParagraphBuilder(
         val ps = textStyleToParagraphStyle(textStyle)
 
         if (maxLines != Int.MAX_VALUE) {
-            ps.maxLinesCount = maxLines.toLong()
+            ps.maxLinesCount = maxLines
             ps.ellipsis = ellipsis
         }
 
