@@ -19,6 +19,7 @@
 package androidx.compose.ui.input.pointer
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -379,6 +380,7 @@ inline class PointerEventType(internal val value: Int) {
  * or [touch][PointerType.Touch].git
  */
 @Immutable
+@OptIn(ExperimentalComposeUiApi::class)
 class PointerInputChange(
     val id: PointerId,
     val uptimeMillis: Long,
@@ -390,6 +392,43 @@ class PointerInputChange(
     val consumed: ConsumedData,
     val type: PointerType = PointerType.Touch
 ) {
+    /**
+     * Optional high-frequency pointer moves in between the last two dispatched events.
+     * Can be used for extra accuracy when touchscreen rate exceeds framerate.
+     */
+    // With these experimental annotations, the API can be either cleanly removed or
+    // stabilized. It doesn't appear in current.txt; and in experimental_current.txt,
+    // it has the same effect as a primary constructor val.
+    val historical: List<HistoricalChange>
+        @ExperimentalComposeUiApi get() = _historical ?: listOf()
+    private var _historical: List<HistoricalChange>? = null
+
+    @ExperimentalComposeUiApi
+    constructor(
+        id: PointerId,
+        uptimeMillis: Long,
+        position: Offset,
+        pressed: Boolean,
+        previousUptimeMillis: Long,
+        previousPosition: Offset,
+        previousPressed: Boolean,
+        consumed: ConsumedData,
+        type: PointerType,
+        historical: List<HistoricalChange>
+    ) : this(
+        id,
+        uptimeMillis,
+        position,
+        pressed,
+        previousUptimeMillis,
+        previousPosition,
+        previousPressed,
+        consumed,
+        type
+    ) {
+        _historical = historical
+    }
+
     fun copy(
         id: PointerId = this.id,
         currentTime: Long = this.uptimeMillis,
@@ -409,7 +448,33 @@ class PointerInputChange(
         previousPosition,
         previousPressed,
         consumed,
-        type
+        type,
+        this.historical
+    )
+
+    @ExperimentalComposeUiApi
+    fun copy(
+        id: PointerId = this.id,
+        currentTime: Long = this.uptimeMillis,
+        currentPosition: Offset = this.position,
+        currentPressed: Boolean = this.pressed,
+        previousTime: Long = this.previousUptimeMillis,
+        previousPosition: Offset = this.previousPosition,
+        previousPressed: Boolean = this.previousPressed,
+        consumed: ConsumedData = this.consumed,
+        type: PointerType = this.type,
+        historical: List<HistoricalChange>
+    ): PointerInputChange = PointerInputChange(
+        id,
+        currentTime,
+        currentPosition,
+        currentPressed,
+        previousTime,
+        previousPosition,
+        previousPressed,
+        consumed,
+        type,
+        historical
     )
 
     override fun toString(): String {
@@ -421,7 +486,31 @@ class PointerInputChange(
             "previousPosition=$previousPosition, " +
             "previousPressed=$previousPressed, " +
             "consumed=$consumed, " +
-            "type=$type)"
+            "type=$type, " +
+            "historical=$historical)"
+    }
+}
+
+/**
+ * Data structure for "historical" pointer moves.
+ *
+ * Optional high-frequency pointer moves in between the last two dispatched events:
+ * can be used for extra accuracy when touchscreen rate exceeds framerate.
+ *
+ * @param uptimeMillis The time of the historical pointer event, in milliseconds. In between
+ * the current and previous pointer event times.
+ * @param position The [Offset] of the historical pointer event, relative to the containing
+ * element.
+ */
+@Immutable
+@ExperimentalComposeUiApi
+class HistoricalChange(
+    val uptimeMillis: Long,
+    val position: Offset
+) {
+    override fun toString(): String {
+        return "HistoricalChange(uptimeMillis=$uptimeMillis, " +
+            "position=$position)"
     }
 }
 

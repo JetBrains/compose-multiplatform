@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.input.pointer
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.node.HitTestResult
 import androidx.compose.ui.node.InternalCoreApi
@@ -108,7 +109,7 @@ internal class PointerInputEventProcessor(val root: LayoutNode) {
 /**
  * Produces [InternalPointerEvent]s by tracking changes between [PointerInputEvent]s
  */
-@OptIn(InternalCoreApi::class)
+@OptIn(InternalCoreApi::class, ExperimentalComposeUiApi::class)
 private class PointerInputChangeEventProducer {
     private val previousPointerInputData: MutableMap<PointerId, PointerInputData> = mutableMapOf()
 
@@ -149,7 +150,8 @@ private class PointerInputChangeEventProducer {
                     previousPosition,
                     previousDown,
                     ConsumedData(),
-                    it.type
+                    it.type,
+                    it.historical
                 )
             if (it.down) {
                 previousPointerInputData[it.id] = PointerInputData(

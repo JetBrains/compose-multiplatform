@@ -41,6 +41,7 @@ import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.input.pointer.util.addPointerInputChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Velocity
@@ -261,7 +262,12 @@ internal fun Modifier.draggable(
             forEachGesture {
                 awaitPointerEventScope {
                     val velocityTracker = VelocityTracker()
-                    awaitDownAndSlop(canDragState, startImmediatelyState, orientation)?.let {
+                    awaitDownAndSlop(
+                        canDragState,
+                        startImmediatelyState,
+                        velocityTracker,
+                        orientation
+                    )?.let {
                         var isDragSuccessful = false
                         try {
                             isDragSuccessful = awaitDrag(
@@ -294,9 +300,11 @@ internal fun Modifier.draggable(
 private suspend fun AwaitPointerEventScope.awaitDownAndSlop(
     canDrag: State<(PointerInputChange) -> Boolean>,
     startDragImmediately: State<() -> Boolean>,
+    velocityTracker: VelocityTracker,
     orientation: Orientation
 ): Pair<PointerInputChange, Float>? {
     val down = awaitFirstDown(requireUnconsumed = false)
+    velocityTracker.addPointerInputChange(down)
     return if (!canDrag.value.invoke(down)) {
         null
     } else if (startDragImmediately.value.invoke()) {
@@ -305,6 +313,7 @@ private suspend fun AwaitPointerEventScope.awaitDownAndSlop(
     } else {
         var initialDelta = 0f
         val postPointerSlop = { event: PointerInputChange, offset: Float ->
+            velocityTracker.addPointerInputChange(event)
             event.consumePositionChange()
             initialDelta = offset
         }
@@ -326,7 +335,6 @@ private suspend fun AwaitPointerEventScope.awaitDrag(
 ): Boolean {
     val initialDelta = dragStart.second
     val startEvent = dragStart.first
-    velocityTracker.addPosition(startEvent.uptimeMillis, startEvent.position)
 
     val overSlopOffset = initialDelta.toOffset(orientation)
     val adjustedStart = startEvent.position - overSlopOffset *
@@ -340,8 +348,8 @@ private suspend fun AwaitPointerEventScope.awaitDrag(
         )
     )
 
-    val dragTick: (PointerInputChange) -> Unit = { event: PointerInputChange ->
-        velocityTracker.addPosition(event.uptimeMillis, event.position)
+    val dragTick: (PointerInputChange) -> Unit = { event ->
+        velocityTracker.addPointerInputChange(event)
         val delta = event.positionChange().toFloat(orientation)
         event.consumePositionChange()
         channel.trySend(

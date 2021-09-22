@@ -1525,6 +1525,7 @@ package androidx.compose.ui.input.pointer.util {
   }
 
   public final class VelocityTrackerKt {
+    method public static void addPointerInputChange(androidx.compose.ui.input.pointer.util.VelocityTracker, androidx.compose.ui.input.pointer.PointerInputChange event);
   }
 
 }

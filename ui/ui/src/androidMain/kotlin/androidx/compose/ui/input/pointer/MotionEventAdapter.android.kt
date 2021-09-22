@@ -30,6 +30,7 @@ import android.view.MotionEvent.ACTION_UP
 import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Offset
 
 /**
@@ -194,6 +195,7 @@ internal class MotionEventAdapter {
     /**
      * Creates a new PointerInputEventData.
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     private fun createPointerInputEventData(
         positionCalculator: PositionCalculator,
         motionEvent: MotionEvent,
@@ -232,13 +234,25 @@ internal class MotionEventAdapter {
             else -> PointerType.Unknown
         }
 
+        val historical = mutableListOf<HistoricalChange>()
+        with(motionEvent) {
+            repeat(getHistorySize()) { pos ->
+                val historicalChange = HistoricalChange(
+                    getHistoricalEventTime(pos),
+                    Offset(getHistoricalX(index, pos), getHistoricalY(index, pos))
+                )
+                historical.add(historicalChange)
+            }
+        }
+
         return PointerInputEventData(
             pointerId,
             motionEvent.eventTime,
             rawPosition,
             position,
             pressed,
-            toolType
+            toolType,
+            historical
         )
     }
 }

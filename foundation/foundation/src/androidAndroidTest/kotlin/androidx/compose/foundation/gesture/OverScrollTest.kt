@@ -231,10 +231,11 @@ class OverScrollTest {
             up()
         }
 
+        // ignores touch slop if overscroll animation is on progress while pointer goes down
+        assertThat(acummulatedScroll - lastAccScroll).isEqualTo(500f)
+
         rule.runOnIdle {
             assertThat(controller.stopAnimationCallsCount).isEqualTo(2)
-            // ignores touch slop if overscroll animation is on progress while pointer goes down
-            assertThat(acummulatedScroll - lastAccScroll).isEqualTo(500f)
         }
     }
 
