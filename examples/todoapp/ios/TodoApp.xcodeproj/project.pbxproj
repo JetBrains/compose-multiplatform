@@ -11,8 +11,6 @@
 		1F00F38F257599D800CFAF97 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F00F38E257599D800CFAF97 /* ContentView.swift */; };
 		1F00F391257599DA00CFAF97 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F00F390257599DA00CFAF97 /* Assets.xcassets */; };
 		1F00F394257599DA00CFAF97 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F00F393257599DA00CFAF97 /* Preview Assets.xcassets */; };
-		1F00F3A425759FEC00CFAF97 /* Todo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F00F3A325759FEC00CFAF97 /* Todo.framework */; };
-		1F00F3A525759FEC00CFAF97 /* Todo.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1F00F3A325759FEC00CFAF97 /* Todo.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1F00F3A82575A16400CFAF97 /* ObservableValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F00F3A72575A16400CFAF97 /* ObservableValue.swift */; };
 		1F00F3AA2575A71000CFAF97 /* MutableStateBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F00F3A92575A71000CFAF97 /* MutableStateBuilder.swift */; };
 		1F00F3AC2575AA4500CFAF97 /* ListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F00F3AB2575AA4500CFAF97 /* ListView.swift */; };
@@ -23,20 +21,6 @@
 		1F00F3B62575B41900CFAF97 /* SimpleRouterState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F00F3B52575B41900CFAF97 /* SimpleRouterState.swift */; };
 		1F00F3B82575B4F800CFAF97 /* ComponentHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F00F3B72575B4F800CFAF97 /* ComponentHolder.swift */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		1F00F3A625759FEC00CFAF97 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				1F00F3A525759FEC00CFAF97 /* Todo.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		1F00F389257599D800CFAF97 /* TodoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TodoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -62,7 +46,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F00F3A425759FEC00CFAF97 /* Todo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -134,7 +117,6 @@
 				1F00F385257599D800CFAF97 /* Sources */,
 				1F00F386257599D800CFAF97 /* Frameworks */,
 				1F00F387257599D800CFAF97 /* Resources */,
-				1F00F3A625759FEC00CFAF97 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -205,7 +187,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd $SRCROOT/..\n./gradlew :common:root:packForXCode -PXCODE_CONFIGURATION=${CONFIGURATION}\ncd $SRCROOT\n";
+			shellScript = "cd $SRCROOT/..\n./gradlew :common:root:embedAndSignAppleFrameworkForXcode\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -355,12 +337,17 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"ios/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
-				FRAMEWORK_SEARCH_PATHS = "$SRCROOT/../common/root/build/xcode-frameworks";
+				FRAMEWORK_SEARCH_PATHS = "$SRCROOT/../common/root/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)";
 				INFOPLIST_FILE = ios/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					Todo,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.jetbrains.todoapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -377,12 +364,17 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"ios/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
-				FRAMEWORK_SEARCH_PATHS = "$SRCROOT/../common/root/build/xcode-frameworks";
+				FRAMEWORK_SEARCH_PATHS = "$SRCROOT/../common/root/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)";
 				INFOPLIST_FILE = ios/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					Todo,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.jetbrains.todoapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
