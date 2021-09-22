@@ -50,6 +50,8 @@ import androidx.compose.ui.layout.RelocationModifier
 import androidx.compose.ui.layout.RelocationRequesterModifier
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
+import androidx.compose.ui.modifier.ModifierLocalConsumer
+import androidx.compose.ui.modifier.ModifierLocalProvider
 import androidx.compose.ui.node.LayoutNode.LayoutState.LayingOut
 import androidx.compose.ui.node.LayoutNode.LayoutState.Measuring
 import androidx.compose.ui.node.LayoutNode.LayoutState.NeedsRelayout
@@ -86,7 +88,7 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
     // but just a holder for its children - allows us to combine some children into something we
     // can subcompose in(LayoutNode) without being required to define it as a real layout - we
     // don't want to define the layout strategy for such nodes, instead the children of the
-    // virtual nodes will be threated as the direct children of the virtual node parent.
+    // virtual nodes will be treated as the direct children of the virtual node parent.
     // This whole concept will be replaced with a proper subcomposition logic which allows to
     // subcompose multiple times into the same LayoutNode and define offsets.
 
@@ -676,6 +678,13 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
                     // DrawModifier block should be before the LayoutModifier block so that a
                     // Modifier that implements both DrawModifier and LayoutModifier will have
                     // it's draw bounds reflect the dimensions defined by the LayoutModifier.
+                    // Please ensure that ModifierLocalProvider is the first item here so that
+                    // other layoutNodeWrappers don't accidentally use values that they provided.
+                    // Also ensure that ModifierLocalConsumer is the last item here, so that the
+                    // other modifiers can access ModifierLocals read by the ModifierLocalConsumer.
+                    if (mod is ModifierLocalProvider<*>) {
+                        wrapper = ModifierLocalProviderNode(wrapper, mod).assignChained(toWrap)
+                    }
                     if (mod is DrawModifier) {
                         wrapper = ModifiedDrawNode(wrapper, mod)
                     }
@@ -724,6 +733,9 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
                         wrapper =
                             OnGloballyPositionedModifierWrapper(wrapper, mod).assignChained(toWrap)
                         getOrCreateOnPositionedCallbacks() += wrapper
+                    }
+                    if (mod is ModifierLocalConsumer) {
+                        wrapper = ModifierLocalConsumerNode(wrapper, mod).assignChained(toWrap)
                     }
                 }
                 wrapper
