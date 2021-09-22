@@ -29,9 +29,10 @@ import androidx.compose.ui.semantics.SemanticsProperties.IndexForKey
 import androidx.compose.ui.semantics.SemanticsProperties.VerticalScrollAxisRange
 import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.getOrNull
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.toSize
-import kotlin.math.max
-import kotlin.math.min
+import kotlin.math.abs
+import kotlin.math.sign
 
 internal expect fun SemanticsNodeInteraction.performClickImpl(): SemanticsNodeInteraction
 
@@ -67,42 +68,29 @@ fun SemanticsNodeInteraction.performScrollTo(): SemanticsNodeInteraction {
     // Figure out the (clipped) bounds of the viewPort in its direct parent's content area, in
     // root coordinates. We only want the clipping from the direct parent on the scrollable, not
     // from any other ancestors.
-    val viewPortInParent = scrollableNode.layoutInfo.coordinates.boundsInParent()
+    val viewportInParent = scrollableNode.layoutInfo.coordinates.boundsInParent()
     val parentInRoot = scrollableNode.layoutInfo.coordinates.parentLayoutCoordinates
         ?.positionInRoot() ?: Offset.Zero
-
-    val viewPort = viewPortInParent.translate(parentInRoot)
+    val viewport = viewportInParent.translate(parentInRoot)
     val target = Rect(node.positionInRoot, node.size.toSize())
 
-    val mustScrollUp = target.bottom > viewPort.bottom
-    val mustScrollDown = target.top < viewPort.top
-    val mustScrollLeft = target.right > viewPort.right
-    val mustScrollRight = target.left < viewPort.left
+    // Given the desired scroll value to align either side of the target with the
+    // viewport, what delta should we go with?
+    // If we need to scroll in opposite directions for both sides, don't scroll at all.
+    // Otherwise, take the delta that scrolls the least amount.
+    fun scrollDelta(a: Float, b: Float): Float =
+        if (sign(a) == sign(b)) if (abs(a) < abs(b)) a else b else 0f
 
-    val rawDx = if (mustScrollLeft && !mustScrollRight) {
-        // scroll left: positive dx
-        min(target.left - viewPort.left, target.right - viewPort.right)
-    } else if (mustScrollRight && !mustScrollLeft) {
-        // scroll right: negative dx
-        max(target.left - viewPort.left, target.right - viewPort.right)
-    } else {
-        // already in viewport
-        0f
-    }
+    // Get the desired delta X
+    var dx = scrollDelta(target.left - viewport.left, target.right - viewport.right)
+    // And adjust for reversing properties
+    if (scrollableNode.isReversedHorizontally) dx = -dx
+    if (node.isRtl) dx = -dx
 
-    val rawDy = if (mustScrollUp && !mustScrollDown) {
-        // scroll up: positive dy
-        min(target.top - viewPort.top, target.bottom - viewPort.bottom)
-    } else if (mustScrollDown && !mustScrollUp) {
-        // scroll down: negative dy
-        max(target.top - viewPort.top, target.bottom - viewPort.bottom)
-    } else {
-        // already in viewport
-        0f
-    }
-
-    val dx = if (scrollableNode.isReversedHorizontally) -rawDx else rawDx
-    val dy = if (scrollableNode.isReversedVertically) -rawDy else rawDy
+    // Get the desired delta Y
+    var dy = scrollDelta(target.top - viewport.top, target.bottom - viewport.bottom)
+    // And adjust for reversing properties
+    if (scrollableNode.isReversedVertically) dy = -dy
 
     @OptIn(InternalTestApi::class)
     testContext.testOwner.runOnUiThread {
@@ -442,6 +430,9 @@ private val SemanticsNode.isReversedHorizontally: Boolean
 
 private val SemanticsNode.isReversedVertically: Boolean
     get() = config.getOrNull(VerticalScrollAxisRange)?.reverseScrolling == true
+
+private val SemanticsNode.isRtl: Boolean
+    get() = layoutInfo.layoutDirection == LayoutDirection.Rtl
 
 private fun SemanticsNodeInteraction.requireSemantics(
     node: SemanticsNode,

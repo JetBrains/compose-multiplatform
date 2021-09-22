@@ -264,16 +264,12 @@ private fun Modifier.scroll(
     factory = {
         val overScrollController = rememberOverScrollController()
         val coroutineScope = rememberCoroutineScope()
-        val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-        // Add RTL to the mix: if horizontal and RTL, reverse reverseScrolling
-        val resolvedReverseScrolling =
-            if (!isVertical && isRtl) !reverseScrolling else reverseScrolling
         val semantics = Modifier.semantics {
             if (isScrollable) {
                 val accessibilityScrollState = ScrollAxisRange(
                     value = { state.value.toFloat() },
                     maxValue = { state.maxValue.toFloat() },
-                    reverseScrolling = resolvedReverseScrolling
+                    reverseScrolling = reverseScrolling
                 )
                 if (isVertical) {
                     this.verticalScrollAxisRange = accessibilityScrollState
@@ -297,8 +293,17 @@ private fun Modifier.scroll(
         }
         val scrolling = Modifier.scrollable(
             orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
-            // reverse scroll to have a "natural" gesture that goes reversed to layout
-            reverseDirection = !resolvedReverseScrolling,
+            reverseDirection = run {
+                // A finger moves with the content, not with the viewport. Therefore,
+                // always reverse once to have "natural" gesture that goes reversed to layout
+                var reverseDirection = !reverseScrolling
+                // But if rtl and horizontal, things move the other way around
+                val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+                if (isRtl && !isVertical) {
+                    reverseDirection = !reverseDirection
+                }
+                reverseDirection
+            },
             enabled = isScrollable,
             interactionSource = state.internalInteractionSource,
             flingBehavior = flingBehavior,
