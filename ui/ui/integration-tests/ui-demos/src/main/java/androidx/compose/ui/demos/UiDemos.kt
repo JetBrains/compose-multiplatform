@@ -54,6 +54,7 @@ import androidx.compose.ui.demos.gestures.ScrollGestureFilterDemo
 import androidx.compose.ui.demos.gestures.VerticalScrollerInDrawerDemo
 import androidx.compose.ui.demos.scroll.BringIntoViewDemo
 import androidx.compose.ui.demos.keyinput.KeyInputDemo
+import androidx.compose.ui.demos.modifier.CommunicatingModifierDemo
 import androidx.compose.ui.demos.scroll.BringRectangleIntoViewDemo
 import androidx.compose.ui.demos.scroll.RequestRectangleOnScreenDemo
 import androidx.compose.ui.demos.viewinterop.AndroidInComposeDemos
@@ -162,9 +163,17 @@ private val ViewInteropDemos = DemoCategory(
     )
 )
 
+private val ModifierDemos = DemoCategory(
+    "Modifiers",
+    listOf(
+        ComposableDemo("Inter-Modifier Communication") { CommunicatingModifierDemo() }
+    )
+)
+
 val CoreDemos = DemoCategory(
     "Framework",
     listOf(
+        ModifierDemos,
         ComposableDemo("Explicit autofill types") { ExplicitAutofillTypesDemo() },
         FocusDemos,
         ComposableDemo("KeyInput") { KeyInputDemo() },

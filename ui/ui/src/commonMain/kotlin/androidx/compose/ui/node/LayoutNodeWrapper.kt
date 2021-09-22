@@ -42,6 +42,7 @@ import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.layout.findRoot
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.modifier.ModifierLocal
 import androidx.compose.ui.semantics.SemanticsWrapper
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -822,6 +823,16 @@ internal abstract class LayoutNodeWrapper(
      */
     open fun onModifierChanged() {
         layer?.invalidate()
+    }
+
+    /**
+     * Called when a [ModifierLocalConsumer][androidx.compose.ui.modifier.ModifierLocalConsumer]
+     * reads a value. Ths function walks up the tree and reads any value provided by a parent. If
+     * no value is available it returns the default value associated with the specified
+     * [ModifierLocal].
+     */
+    open fun <T> onModifierLocalRead(modifierLocal: ModifierLocal<T>): T {
+        return wrappedBy?.onModifierLocalRead(modifierLocal) ?: modifierLocal.defaultFactory()
     }
 
     internal fun findCommonAncestor(other: LayoutNodeWrapper): LayoutNodeWrapper {

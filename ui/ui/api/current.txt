@@ -1848,6 +1848,43 @@ package androidx.compose.ui.layout {
 
 }
 
+package androidx.compose.ui.modifier {
+
+  @androidx.compose.runtime.Stable public abstract sealed class ModifierLocal<T> {
+  }
+
+  @androidx.compose.runtime.Stable public interface ModifierLocalConsumer extends androidx.compose.ui.Modifier.Element {
+    method public void onModifierLocalsUpdated(androidx.compose.ui.modifier.ModifierLocalReadScope scope);
+  }
+
+  public final class ModifierLocalConsumerKt {
+  }
+
+  public final class ModifierLocalKt {
+    method public static <T> androidx.compose.ui.modifier.ProvidableModifierLocal<T> modifierLocalOf(kotlin.jvm.functions.Function0<? extends T> defaultFactory);
+  }
+
+  @androidx.compose.runtime.Stable public interface ModifierLocalProvider<T> extends androidx.compose.ui.Modifier.Element {
+    method public androidx.compose.ui.modifier.ProvidableModifierLocal<T> getKey();
+    method public T! getValue();
+    property public abstract androidx.compose.ui.modifier.ProvidableModifierLocal<T> key;
+    property public abstract T! value;
+  }
+
+  public final class ModifierLocalProviderKt {
+  }
+
+  public interface ModifierLocalReadScope {
+    method public <T> T! getCurrent(androidx.compose.ui.modifier.ModifierLocal<T>);
+    property public abstract T! current;
+  }
+
+  @androidx.compose.runtime.Stable public final class ProvidableModifierLocal<T> extends androidx.compose.ui.modifier.ModifierLocal<T> {
+    ctor public ProvidableModifierLocal(kotlin.jvm.functions.Function0<? extends T> defaultFactory);
+  }
+
+}
+
 package androidx.compose.ui.node {
 
   public final class LayoutNodeKt {
