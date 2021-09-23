@@ -58,7 +58,7 @@ class TouchCancelTest : InputDispatcherTest() {
         subject.generateTouchDownAndCheck(pointer1, position1_1)
         subject.advanceEventTime()
         subject.generateCancelAndCheckPointers()
-        subject.verifyNoTouchGestureInProgress()
+        subject.assertNoTouchGestureInProgress()
         subject.sendAllSynchronous()
         recorder.assertHasValidEventTimes()
 
@@ -80,7 +80,7 @@ class TouchCancelTest : InputDispatcherTest() {
         subject.generateTouchDownAndCheck(pointer2, position2_1)
         subject.advanceEventTime()
         subject.generateCancelAndCheckPointers()
-        subject.verifyNoTouchGestureInProgress()
+        subject.assertNoTouchGestureInProgress()
         subject.sendAllSynchronous()
         recorder.assertHasValidEventTimes()
 

@@ -21,6 +21,8 @@ import androidx.compose.ui.test.AndroidInputDispatcher
 import androidx.compose.ui.test.InputDispatcher
 import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.MainTestClock
+import androidx.compose.ui.test.MultiModalInjectionScopeImpl
+import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.TestOwner
 import androidx.compose.ui.test.createTestContext
 import androidx.compose.ui.test.util.InputDispatcherTestRule
@@ -83,9 +85,16 @@ internal fun AndroidInputDispatcher.generateTouchCancelAndCheck(delay: Long? = n
         advanceEventTime(delay)
     }
     enqueueTouchCancel()
-    verifyNoTouchGestureInProgress()
+    assertNoTouchGestureInProgress()
 }
 
-internal fun InputDispatcher.verifyNoTouchGestureInProgress() {
+internal fun SemanticsNodeInteraction.assertNoTouchGestureInProgress() {
+    val failMessage = "Can't verify if a touch is in progress: failed to create an injection scope"
+    val node = fetchSemanticsNode(failMessage)
+    val scope = MultiModalInjectionScopeImpl(node, testContext)
+    assertThat(scope.inputDispatcher.isTouchInProgress).isFalse()
+}
+
+internal fun InputDispatcher.assertNoTouchGestureInProgress() {
     assertThat((this as AndroidInputDispatcher).isTouchInProgress).isFalse()
 }
