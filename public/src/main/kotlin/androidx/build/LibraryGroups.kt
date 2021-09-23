@@ -72,6 +72,7 @@ object LibraryGroups {
     val MEDIA = LibraryGroup("androidx.media", null)
     val MEDIA2 = LibraryGroup("androidx.media2", LibraryVersions.MEDIA2)
     val MEDIAROUTER = LibraryGroup("androidx.mediarouter", LibraryVersions.MEDIAROUTER)
+    val METRICS = LibraryGroup("androidx.metrics", LibraryVersions.METRICS)
     val NAVIGATION = LibraryGroup("androidx.navigation", LibraryVersions.NAVIGATION)
     val PAGING = LibraryGroup("androidx.paging", LibraryVersions.PAGING)
     val PALETTE = LibraryGroup("androidx.palette", LibraryVersions.PALETTE)
