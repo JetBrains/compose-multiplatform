@@ -19,6 +19,7 @@ package androidx.compose.ui.test
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.semantics.SemanticsNode
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import kotlin.math.roundToInt
 
@@ -65,7 +66,7 @@ sealed interface MultiModalInjectionScope : InjectionScope {
 }
 
 internal class MultiModalInjectionScopeImpl(node: SemanticsNode, testContext: TestContext) :
-    MultiModalInjectionScope {
+    MultiModalInjectionScope, Density by node.layoutInfo.density {
     // TODO(b/133217292): Better error: explain which gesture couldn't be performed
     private var _semanticsNode: SemanticsNode? = node
     private val semanticsNode

@@ -183,7 +183,7 @@ package androidx.compose.ui.test {
     property public abstract boolean isIdleNow;
   }
 
-  public interface InjectionScope {
+  public interface InjectionScope extends androidx.compose.ui.unit.Density {
     method public void advanceEventTime(optional long durationMillis);
     method public default float getBottom();
     method public default long getBottomCenter();
