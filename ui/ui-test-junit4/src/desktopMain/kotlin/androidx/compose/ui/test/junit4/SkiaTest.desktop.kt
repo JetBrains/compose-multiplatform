@@ -15,6 +15,7 @@
  */
 package androidx.compose.ui.test.junit4
 
+import androidx.compose.ui.test.InternalTestApi
 import org.jetbrains.skia.Surface
 import org.junit.rules.TestRule
 import org.junit.runner.Description
@@ -24,6 +25,7 @@ import java.security.MessageDigest
 import java.util.LinkedList
 
 // TODO: replace with androidx.test.screenshot.proto.ScreenshotResultProto after MPP
+@InternalTestApi
 data class ScreenshotResultProto(
     val result: Status,
     val comparisonStatistics: String,
@@ -42,12 +44,14 @@ data class ScreenshotResultProto(
     }
 }
 
+@InternalTestApi
 data class GoldenConfig(
     val fsGoldenPath: String,
     val repoGoldenPath: String,
     val modulePrefix: String
 )
 
+@InternalTestApi
 class SkiaTestAlbum(val config: GoldenConfig) {
     data class Report(val screenshots: Map<String, ScreenshotResultProto>)
 
@@ -155,6 +159,7 @@ class SkiaTestAlbum(val config: GoldenConfig) {
     }
 }
 
+@InternalTestApi
 fun DesktopScreenshotTestRule(
     modulePath: String,
     fsGoldenPath: String = System.getProperty("GOLDEN_PATH"),
@@ -163,6 +168,7 @@ fun DesktopScreenshotTestRule(
     return ScreenshotTestRule(GoldenConfig(fsGoldenPath, repoGoldenPath, modulePath))
 }
 
+@InternalTestApi
 class ScreenshotTestRule internal constructor(val config: GoldenConfig) : TestRule {
     private lateinit var testIdentifier: String
     private lateinit var album: SkiaTestAlbum

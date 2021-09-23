@@ -56,6 +56,7 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.keyEvent
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
@@ -69,6 +70,7 @@ import org.junit.Rule
 import org.junit.Test
 import java.awt.event.KeyEvent
 
+@OptIn(InternalTestApi::class)
 class DesktopOwnerTest {
     @get:Rule
     val screenshotRule = DesktopScreenshotTestRule("compose/ui/ui-desktop/ui")

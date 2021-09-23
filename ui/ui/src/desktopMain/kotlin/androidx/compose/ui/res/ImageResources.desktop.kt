@@ -16,29 +16,10 @@
 
 package androidx.compose.ui.res
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import org.jetbrains.skia.Image
 import java.io.InputStream
-
-/**
- * Synchronously load an image file stored in resources for the application.
- *
- * @param resourcePath path to the image file
- * @return the decoded image data associated with the resource
- */
-@Composable
-@Deprecated(
-    "Use painterResource(resourcePath)",
-    replaceWith = ReplaceWith("painterResource(resourcePath)")
-)
-fun imageResource(resourcePath: String): ImageBitmap {
-    return remember(resourcePath) {
-        useResource(resourcePath, ::loadImageBitmap)
-    }
-}
 
 /**
  * Load and decode [ImageBitmap] from the given [inputStream]. [inputStream] should contain encoded

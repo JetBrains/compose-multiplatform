@@ -67,30 +67,6 @@ internal actual fun ActualImageBitmap(
 }
 
 /**
- * Create an [ImageBitmap] from an image file stored in resources for the application
- *
- * @param path path to the image file
- *
- * @return Loaded image file represented as an [ImageBitmap]
- */
-@Deprecated(
-    "Use useResource(path, ::loadImageBitmap)",
-    replaceWith = ReplaceWith(
-        "useResource(path) { loadImageBitmap(it) }",
-        "androidx.compose.ui.res.useResource",
-        "androidx.compose.ui.res.loadImageBitmap"
-    )
-)
-fun imageFromResource(path: String): ImageBitmap =
-    Image.makeFromEncoded(loadResource(path)).asImageBitmap()
-
-private fun loadResource(path: String): ByteArray {
-    val resource = Thread.currentThread().contextClassLoader.getResource(path)
-    requireNotNull(resource) { "Resource $path not found" }
-    return resource.readBytes()
-}
-
-/**
  * @Throws UnsupportedOperationException if this [ImageBitmap] is not backed by an
  * org.jetbrains.skia.Image
  */

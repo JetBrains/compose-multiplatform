@@ -18,9 +18,11 @@ package androidx.compose.ui.graphics
 
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.test.InternalTestApi
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
+@OptIn(InternalTestApi::class)
 class DesktopPathTest : DesktopGraphicsTest() {
     private val canvas: Canvas = initCanvas(widthPx = 16, heightPx = 16)
 

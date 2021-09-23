@@ -32,10 +32,12 @@ import androidx.compose.ui.graphics.Vertices
 import androidx.compose.ui.graphics.loadResourceBitmap
 import androidx.compose.ui.graphics.withSave
 import androidx.compose.ui.graphics.withSaveLayer
+import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import org.junit.Test
 
+@OptIn(InternalTestApi::class)
 class DesktopCanvasTest : DesktopGraphicsTest() {
     private val canvas: Canvas = initCanvas(widthPx = 16, heightPx = 16)
 

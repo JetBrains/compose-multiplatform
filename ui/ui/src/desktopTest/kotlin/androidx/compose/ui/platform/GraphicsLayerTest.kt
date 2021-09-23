@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
 import androidx.compose.ui.unit.dp
 import org.junit.Rule
@@ -33,6 +34,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
+@OptIn(InternalTestApi::class)
 class GraphicsLayerTest {
     @get:Rule
     val screenshotRule = DesktopScreenshotTestRule("compose/ui/ui-desktop/platform")

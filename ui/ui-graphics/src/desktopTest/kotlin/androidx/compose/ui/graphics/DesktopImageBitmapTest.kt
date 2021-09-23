@@ -18,11 +18,13 @@ package androidx.compose.ui.graphics
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
+import androidx.compose.ui.test.InternalTestApi
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+@OptIn(InternalTestApi::class)
 class DesktopImageBitmapTest : DesktopGraphicsTest() {
     private val canvas: Canvas = initCanvas(widthPx = 16, heightPx = 16)
 

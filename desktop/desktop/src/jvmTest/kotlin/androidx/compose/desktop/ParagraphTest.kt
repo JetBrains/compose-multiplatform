@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.TestComposeWindow
+import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -45,6 +46,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
+@OptIn(InternalTestApi::class)
 class ParagraphTest {
     @get:Rule
     val screenshotRule = DesktopScreenshotTestRule("compose/ui/ui-desktop/paragraph")
