@@ -42,6 +42,8 @@ internal expect fun SemanticsNodeInteraction.performClickImpl(): SemanticsNodeIn
  * Performs a click action on the element represented by the given semantics node. Depending on
  * the platform this may be implemented by a touch click (tap), a mouse click, or another more
  * appropriate method for that platform.
+ *
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
  */
 fun SemanticsNodeInteraction.performClick(): SemanticsNodeInteraction {
     return performClickImpl()
@@ -58,6 +60,8 @@ fun SemanticsNodeInteraction.performClick(): SemanticsNodeInteraction {
  * scrollable content, not on the scrollable container.
  *
  * Throws an [AssertionError] if there is no scroll parent.
+ *
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
  */
 fun SemanticsNodeInteraction.performScrollTo(): SemanticsNodeInteraction {
     @OptIn(InternalTestApi::class)
@@ -119,6 +123,8 @@ private fun SemanticsNode.scrollToNode(testOwner: TestOwner) {
  * Throws an [AssertionError] if the node doesn't have [ScrollToIndex] defined.
  *
  * @param index The index of the item to scroll to
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
+ *
  * @see hasScrollToIndexAction
  */
 fun SemanticsNodeInteraction.performScrollToIndex(index: Int): SemanticsNodeInteraction {
@@ -151,6 +157,8 @@ private fun SemanticsNode.scrollToIndex(index: Int, nodeInteraction: SemanticsNo
  * Throws an [AssertionError] if the node doesn't have [IndexForKey] or [ScrollToIndex] defined.
  *
  * @param key The key of the item to scroll to
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
+ *
  * @see hasScrollToKeyAction
  */
 fun SemanticsNodeInteraction.performScrollToKey(key: Any): SemanticsNodeInteraction {
@@ -284,6 +292,10 @@ fun SemanticsNodeInteraction.performScrollToNode(
  * testRule.onNodeWithTag("myWidget")
  *     .performGesture(true) { swipeUp() }
  * ```
+ *
+ * @param block A lambda with [GestureScope] as receiver that describes the gesture by
+ * sending all touch events.
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
  */
 @Deprecated(
     message = "Replaced by performTouchInput",
@@ -311,7 +323,6 @@ fun SemanticsNodeInteraction.performGesture(
     return this
 }
 
-// TODO(fresen): create sample module like in the rest of Compose
 /**
  * Executes the touch gesture specified in the given [block]. The gesture doesn't need to be
  * complete and can be resumed in a later invocation of one of the `perform.*Input` methods. The
@@ -349,6 +360,10 @@ fun SemanticsNodeInteraction.performGesture(
  *     swipeUp()
  * }
  * ```
+ *
+ * @param block A lambda with [TouchInjectionScope] as receiver that describes the gesture by
+ * sending all touch events.
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
  *
  * @see TouchInjectionScope
  */
@@ -404,6 +419,10 @@ fun SemanticsNodeInteraction.performTouchInput(
  *    }
  * ```
  *
+ * @param block A lambda with [MouseInjectionScope] as receiver that describes the gesture by
+ * sending all mouse events.
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
+ *
  * @see MouseInjectionScope
  */
 @ExperimentalTestApi
@@ -444,6 +463,10 @@ fun SemanticsNodeInteraction.performMouseInput(
  * complete. This method blocks while the events are injected. If an error occurs during
  * execution of [block] or injection of the events, all (subsequent) events are dropped and the
  * error is thrown here.
+ *
+ * @param block A lambda with [MultiModalInjectionScope] as receiver that describes the gesture
+ * by sending all multi modal events.
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
  *
  * @see MultiModalInjectionScope
  */
