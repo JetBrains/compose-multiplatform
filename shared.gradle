@@ -67,6 +67,9 @@ sourceSets {
 
     main.java.srcDirs += "${supportRootFolder}/compose/material/material/icons/generator/src/main" +
             "/kotlin"
+
+    main.java.srcDirs += "${supportRootFolder}/glance/glance-appwidget/glance-layout-generator/" +
+            "src/main/kotlin"
 }
 
 gradlePlugin {
