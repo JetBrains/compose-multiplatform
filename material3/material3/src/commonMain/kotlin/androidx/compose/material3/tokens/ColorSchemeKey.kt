@@ -46,9 +46,4 @@ internal enum class ColorSchemeKey {
     SurfaceVariant,
     Tertiary,
     TertiaryContainer,
-    Surface1,
-    Surface2,
-    Surface3,
-    Surface4,
-    Surface5,
 }

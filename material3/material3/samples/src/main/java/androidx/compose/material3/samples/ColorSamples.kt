@@ -67,12 +67,7 @@ fun ColorSchemeSample() {
                     )
                 },
             )
-            ColorTile(text = "Surface 0", color = colorScheme.surface)
-            ColorTile(text = "Surface 1", color = colorScheme.surface1)
-            ColorTile(text = "Surface 2", color = colorScheme.surface2)
-            ColorTile(text = "Surface 3", color = colorScheme.surface3)
-            ColorTile(text = "Surface 4", color = colorScheme.surface4)
-            ColorTile(text = "Surface 5", color = colorScheme.surface5)
+            ColorTile(text = "Surface", color = colorScheme.surface)
             Spacer(modifier = Modifier.height(16.dp))
             DoubleTile(
                 leftTile = {
@@ -171,7 +166,12 @@ fun ColorSchemeSample() {
                         color = colorScheme.onTertiaryContainer,
                     )
                 },
-                rightTile = { Box(Modifier.fillMaxWidth()) },
+                rightTile = {
+                    ColorTile(
+                        text = "On Tertiary",
+                        color = colorScheme.onTertiary,
+                    )
+                },
             )
             DoubleTile(
                 leftTile = {
@@ -180,7 +180,12 @@ fun ColorSchemeSample() {
                         color = colorScheme.tertiaryContainer,
                     )
                 },
-                rightTile = { Box(Modifier.fillMaxWidth()) },
+                rightTile = {
+                    ColorTile(
+                        text = "Tertiary",
+                        color = colorScheme.tertiary,
+                    )
+                },
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text("Utility", style = MaterialTheme.typography.bodyLarge)

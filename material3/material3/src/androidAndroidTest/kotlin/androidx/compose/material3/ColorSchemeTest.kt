@@ -109,11 +109,6 @@ private fun ColorScheme.contentEquals(other: ColorScheme): Boolean {
     if (background != other.background) return false
     if (onBackground != other.onBackground) return false
     if (surface != other.surface) return false
-    if (surface1 != other.surface1) return false
-    if (surface2 != other.surface2) return false
-    if (surface3 != other.surface3) return false
-    if (surface4 != other.surface4) return false
-    if (surface5 != other.surface5) return false
     if (onSurface != other.onSurface) return false
     if (surfaceVariant != other.surfaceVariant) return false
     if (onSurfaceVariant != other.onSurfaceVariant) return false
