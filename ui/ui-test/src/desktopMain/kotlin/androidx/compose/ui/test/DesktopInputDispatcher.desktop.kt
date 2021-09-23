@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
+@file:OptIn(InternalComposeUiApi::class)
+
 package androidx.compose.ui.test
 
+import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.TestPointerInputEventData
 import androidx.compose.ui.geometry.Offset

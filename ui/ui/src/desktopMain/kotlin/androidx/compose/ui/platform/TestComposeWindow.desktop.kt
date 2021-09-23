@@ -17,6 +17,7 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.mouse.MouseScrollEvent
@@ -79,7 +80,8 @@ class TestComposeWindow(
     /**
      * All currently registered [RootForTest]s
      */
-    val roots: Set<DesktopRootForTest> get() = owners.list
+    @OptIn(InternalComposeUiApi::class)
+    val roots: Set<RootForTest> get() = owners.list
 
     /**
      * Clear-up all acquired resources and stop all pending work

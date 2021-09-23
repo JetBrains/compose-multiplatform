@@ -359,28 +359,6 @@ fun rememberScrollbarAdapter(
 
 /**
  * Create and [remember] [ScrollbarAdapter] for lazy scrollable container and current instance of
- * [scrollState] and item configuration
- */
-@Suppress("UNUSED_PARAMETER")
-@ExperimentalFoundationApi
-@Composable
-@Deprecated(
-    "itemCount and averageItemSize are calculated automatically. Use " +
-        "another overload rememberScrollbarAdapter without passing them",
-    ReplaceWith("rememberScrollbarAdapter(scrollState)")
-)
-fun rememberScrollbarAdapter(
-    scrollState: LazyListState,
-    itemCount: Int,
-    averageItemSize: Dp
-): ScrollbarAdapter {
-    return remember(scrollState) {
-        ScrollbarAdapter(scrollState)
-    }
-}
-
-/**
- * Create and [remember] [ScrollbarAdapter] for lazy scrollable container and current instance of
  * [scrollState]
  */
 @Composable

@@ -23,8 +23,10 @@ import androidx.compose.ui.graphics.DesktopGraphicsTest
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.test.InternalTestApi
 import org.junit.Test
 
+@OptIn(InternalTestApi::class)
 class DesktopCanvasPointsTest : DesktopGraphicsTest() {
     private val canvas: Canvas = initCanvas(widthPx = 16, heightPx = 16)
 

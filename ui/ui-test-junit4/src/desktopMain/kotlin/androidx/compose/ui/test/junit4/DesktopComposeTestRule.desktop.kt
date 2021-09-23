@@ -43,9 +43,10 @@ import java.util.concurrent.FutureTask
 import javax.swing.SwingUtilities.invokeAndWait
 import javax.swing.SwingUtilities.isEventDispatchThread
 
+@OptIn(InternalTestApi::class)
 actual fun createComposeRule(): ComposeContentTestRule = DesktopComposeTestRule()
 
-@OptIn(InternalTestApi::class)
+@InternalTestApi
 class DesktopComposeTestRule : ComposeContentTestRule {
 
     override val density: Density

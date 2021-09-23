@@ -22,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.focus.FocusDirection
@@ -76,7 +77,8 @@ private typealias Command = () -> Unit
 
 @OptIn(
     ExperimentalComposeUiApi::class,
-    InternalCoreApi::class
+    InternalCoreApi::class,
+    InternalComposeUiApi::class
 )
 internal class DesktopOwner(
     val container: DesktopOwners,
