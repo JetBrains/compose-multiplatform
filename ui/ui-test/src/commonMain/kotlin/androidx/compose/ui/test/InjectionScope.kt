@@ -17,6 +17,7 @@
 package androidx.compose.ui.test
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 
 /**
@@ -26,15 +27,21 @@ import androidx.compose.ui.unit.IntSize
  * This scope offers several properties that allow you to get [coordinates][Offset] within the
  * node you're interacting on, like the [topLeft] corner, its [center], or some percentage of the
  * size ([percentOffset]).
+ *
+ * All positional properties are expressed in pixels. [InjectionScope] implements [Density] so
+ * you can convert between px and dp as you wish. The density used is taken from the
+ * [SemanticsNode][androidx.compose.ui.semantics.SemanticsNode] from the
+ * [SemanticsNodeInteraction] on which the input injection method is called.
  */
-interface InjectionScope {
+interface InjectionScope : Density {
     /**
      * The default time between two successive events.
      */
     val eventPeriodMillis get() = InputDispatcher.eventPeriodMillis
 
     /**
-     * The size of the visible part of the node we're interacting with, i.e. its clipped bounds.
+     * The size of the visible part of the node we're interacting with in px, i.e. its clipped
+     * bounds.
      */
     val visibleSize: IntSize
 
@@ -45,41 +52,41 @@ interface InjectionScope {
     fun advanceEventTime(durationMillis: Long = eventPeriodMillis)
 
     /**
-     * Shorthand for `visibleSize.width`
+     * The width of the node in px. Shorthand for [visibleSize.width][visibleSize].
      */
     val width: Int get() = visibleSize.width
 
     /**
-     * Shorthand for `visibleSize.height`
+     * The height of the node in px. Shorthand for [visibleSize.height][visibleSize].
      */
     val height: Int get() = visibleSize.height
 
     /**
-     * The x-coordinate for the left edge of the node we're interacting with, in the
+     * The x-coordinate for the left edge of the node we're interacting with in px, in the
      * node's local coordinate system, where (0, 0) is the top left corner of the node.
      */
     val left: Float get() = 0f
 
     /**
-     * The y-coordinate for the bottom of the node we're interacting with, in the
+     * The y-coordinate for the bottom of the node we're interacting with in px, in the
      * node's local coordinate system, where (0, 0) is the top left corner of the node.
      */
     val top: Float get() = 0f
 
     /**
-     * The x-coordinate for the center of the node we're interacting with, in the
+     * The x-coordinate for the center of the node we're interacting with in px, in the
      * node's local coordinate system, where (0, 0) is the top left corner of the node.
      */
     val centerX: Float get() = width / 2f
 
     /**
-     * The y-coordinate for the center of the node we're interacting with, in the
+     * The y-coordinate for the center of the node we're interacting with in px, in the
      * node's local coordinate system, where (0, 0) is the top left corner of the node.
      */
     val centerY: Float get() = height / 2f
 
     /**
-     * The x-coordinate for the right edge of the node we're interacting with, in the
+     * The x-coordinate for the right edge of the node we're interacting with in px, in the
      * node's local coordinate system, where (0, 0) is the top left corner of the node.
      *
      * Note that, unless `width == 0`, `right != width`. In particular, `right == width - 1f`,
@@ -88,7 +95,7 @@ interface InjectionScope {
     val right: Float get() = width.let { if (it == 0) 0f else it - 1f }
 
     /**
-     * The y-coordinate for the bottom of the node we're interacting with, in the
+     * The y-coordinate for the bottom of the node we're interacting with in px, in the
      * node's local coordinate system, where (0, 0) is the top left corner of the node.
      *
      * Note that, unless `height == 0`, `bottom != height`. In particular, `bottom == height - 1f`,
