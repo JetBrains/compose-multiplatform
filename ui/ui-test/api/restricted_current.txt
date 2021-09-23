@@ -244,13 +244,9 @@ package androidx.compose.ui.test {
   public final class MouseInjectionScopeKt {
   }
 
-  public final class MultiModalInjectionScope implements androidx.compose.ui.test.InjectionScope {
-    ctor public MultiModalInjectionScope(androidx.compose.ui.semantics.SemanticsNode node, androidx.compose.ui.test.TestContext testContext);
-    method public void advanceEventTime(long durationMillis);
+  public sealed interface MultiModalInjectionScope extends androidx.compose.ui.test.InjectionScope {
     method public androidx.compose.ui.test.TouchInjectionScope getTouch();
-    method public long getVisibleSize();
-    property public final androidx.compose.ui.test.TouchInjectionScope Touch;
-    property public long visibleSize;
+    property public abstract androidx.compose.ui.test.TouchInjectionScope Touch;
   }
 
   public final class OutputKt {

@@ -295,15 +295,11 @@ package androidx.compose.ui.test {
     method @androidx.compose.ui.test.ExperimentalTestApi public static void tripleClick(androidx.compose.ui.test.MouseInjectionScope, optional long position);
   }
 
-  public final class MultiModalInjectionScope implements androidx.compose.ui.test.InjectionScope {
-    ctor public MultiModalInjectionScope(androidx.compose.ui.semantics.SemanticsNode node, androidx.compose.ui.test.TestContext testContext);
-    method public void advanceEventTime(long durationMillis);
+  public sealed interface MultiModalInjectionScope extends androidx.compose.ui.test.InjectionScope {
     method @androidx.compose.ui.test.ExperimentalTestApi public androidx.compose.ui.test.MouseInjectionScope getMouse();
     method public androidx.compose.ui.test.TouchInjectionScope getTouch();
-    method public long getVisibleSize();
-    property @androidx.compose.ui.test.ExperimentalTestApi public final androidx.compose.ui.test.MouseInjectionScope Mouse;
-    property public final androidx.compose.ui.test.TouchInjectionScope Touch;
-    property public long visibleSize;
+    property @androidx.compose.ui.test.ExperimentalTestApi public abstract androidx.compose.ui.test.MouseInjectionScope Mouse;
+    property public abstract androidx.compose.ui.test.TouchInjectionScope Touch;
   }
 
   public final class OutputKt {

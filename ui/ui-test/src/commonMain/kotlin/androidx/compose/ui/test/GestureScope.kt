@@ -19,7 +19,6 @@
 package androidx.compose.ui.test
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.unit.IntSize
 import kotlin.math.roundToInt
@@ -42,7 +41,7 @@ private const val doubleClickDelayMillis = 145L
 private const val LongPressTimeoutMillis: Long = 500L
 
 /**
- * The receiver scope for injecting gestures on the [semanticsNode] identified by the
+ * The receiver scope for injecting gestures on the SemanticsNode identified by the
  * corresponding [SemanticsNodeInteraction]. Gestures can be injected by calling methods defined
  * on [GestureScope], such as [click] or [swipe]. The [SemanticsNodeInteraction] can be found by
  * one of the finder methods such as
@@ -93,18 +92,11 @@ private const val LongPressTimeoutMillis: Long = 500L
     message = "Replaced by TouchInjectionScope"
 )
 class GestureScope(node: SemanticsNode, testContext: TestContext) {
+    private val _delegateScope = MultiModalInjectionScopeImpl(node, testContext)
     @PublishedApi
-    internal val delegateScope = MultiModalInjectionScope(node, testContext)
+    internal val delegateScope: MultiModalInjectionScope = _delegateScope
 
-    internal val semanticsNode get() = delegateScope.semanticsNode
-    internal val inputDispatcher get() = delegateScope.inputDispatcher
-
-    /**
-     * Returns and stores the visible bounds of the [semanticsNode] we're interacting with. This
-     * applies clipping, which is almost always the correct thing to do when injecting gestures,
-     * as gestures operate on visible UI.
-     */
-    internal val boundsInRoot: Rect by lazy { semanticsNode.boundsInRoot }
+    internal val inputDispatcher get() = _delegateScope.inputDispatcher
 
     /**
      * Returns the size of the visible part of the node we're interacting with. This is contrary
@@ -112,7 +104,7 @@ class GestureScope(node: SemanticsNode, testContext: TestContext) {
      */
     val visibleSize: IntSize = delegateScope.visibleSize
 
-    internal fun dispose() = delegateScope.dispose()
+    internal fun dispose() = _delegateScope.dispose()
 }
 
 /**
