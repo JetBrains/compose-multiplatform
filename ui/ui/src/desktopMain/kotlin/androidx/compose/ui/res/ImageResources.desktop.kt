@@ -17,7 +17,7 @@
 package androidx.compose.ui.res
 
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import org.jetbrains.skia.Image
 import java.io.InputStream
 
@@ -30,4 +30,4 @@ import java.io.InputStream
  * @return the decoded SVG image associated with the resource
  */
 fun loadImageBitmap(inputStream: InputStream): ImageBitmap =
-    Image.makeFromEncoded(inputStream.readAllBytes()).asImageBitmap()
+    Image.makeFromEncoded(inputStream.readAllBytes()).toComposeImageBitmap()

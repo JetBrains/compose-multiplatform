@@ -34,7 +34,7 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusManagerImpl
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
-import androidx.compose.ui.graphics.DesktopCanvas
+import androidx.compose.ui.graphics.asComposeCanvas
 import androidx.compose.ui.input.key.Key.Companion.Back
 import androidx.compose.ui.input.key.Key.Companion.DirectionCenter
 import androidx.compose.ui.input.key.Key.Companion.Tab
@@ -315,7 +315,7 @@ internal class DesktopOwner(
     }
 
     fun draw(canvas: org.jetbrains.skia.Canvas) {
-        root.draw(DesktopCanvas(canvas))
+        root.draw(canvas.asComposeCanvas())
     }
 
     internal fun processPointerInput(event: PointerInputEvent): ProcessResult {

@@ -16,11 +16,23 @@
 
 package androidx.compose.ui.graphics
 
-internal class DesktopPathMeasure : PathMeasure {
-    private val skia = org.jetbrains.skia.PathMeasure()
+/**
+ * Convert the [org.jetbrains.skia.PathMeasure] instance into a Compose-compatible PathMeasure
+ */
+fun org.jetbrains.skia.PathMeasure.asComposePathEffect(): PathMeasure = DesktopPathMeasure(this)
+
+/**
+ * Obtain a reference to the desktop PathMeasure type
+ */
+fun PathMeasure.asSkiaPathMeasure(): org.jetbrains.skia.PathMeasure =
+    (this as DesktopPathMeasure).skia
+
+internal class DesktopPathMeasure(
+    internal val skia: org.jetbrains.skia.PathMeasure = org.jetbrains.skia.PathMeasure()
+) : PathMeasure {
 
     override fun setPath(path: Path?, forceClosed: Boolean) {
-        skia.setPath(path?.asDesktopPath(), forceClosed)
+        skia.setPath(path?.asSkiaPath(), forceClosed)
     }
 
     override fun getSegment(
@@ -31,7 +43,7 @@ internal class DesktopPathMeasure : PathMeasure {
     ) = skia.getSegment(
         startDistance,
         stopDistance,
-        destination.asDesktopPath(),
+        destination.asSkiaPath(),
         startWithMoveTo
     )
 
