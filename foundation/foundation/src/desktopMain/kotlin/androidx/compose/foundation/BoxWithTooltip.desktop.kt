@@ -66,7 +66,6 @@ fun BoxWithTooltip(
     contentAlignment: Alignment = Alignment.TopStart,
     propagateMinConstraints: Boolean = false,
     delay: Int = 500,
-    @ExperimentalComposeUiApi
     tooltipPlacement: TooltipPlacement = TooltipPlacement.CursorPoint(
         offset = DpOffset(0.dp, 16.dp)
     ),
