@@ -16,6 +16,7 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.CommitTextCommand
 import androidx.compose.ui.text.input.DeleteSurroundingTextInCodePointsCommand
 import androidx.compose.ui.text.input.EditCommand
@@ -118,7 +119,7 @@ internal class DesktopPlatformInput(val component: DesktopComponent) :
             val composing = event.text.toStringFrom(event.committedCharacterCount)
             val ops = mutableListOf<EditCommand>()
 
-            if (needToDeletePreviousChar && isMac) {
+            if (needToDeletePreviousChar && isMac && input.value.selection.min > 0) {
                 needToDeletePreviousChar = false
                 ops.add(DeleteSurroundingTextInCodePointsCommand(1, 0))
             }
@@ -198,24 +199,17 @@ internal class DesktopPlatformInput(val component: DesktopComponent) :
 
                 val comp = input.value.composition
                 val text = input.value.text
+                val range = TextRange(beginIndex, endIndex)
                 if (comp == null) {
-                    val res = text.substring(beginIndex, endIndex)
+                    val res = text.substring(range)
                     return AttributedString(res).iterator
                 }
-
-                val composedStartIndex = comp.start
-                val composedEndIndex = comp.end
-
-                val committed: String
-                if (beginIndex < composedStartIndex) {
-                    val end = min(endIndex, composedStartIndex)
-                    committed = text.substring(beginIndex, end)
-                } else if (composedEndIndex <= endIndex) {
-                    val begin = max(composedEndIndex, beginIndex)
-                    committed = text.substring(begin, endIndex)
-                } else {
-                    committed = ""
-                }
+                val committed = text.substring(
+                    TextRange(
+                        min(range.min, comp.min),
+                        max(range.max, comp.max).coerceAtMost(text.length)
+                    )
+                )
                 return AttributedString(committed).iterator
             }
         }
