@@ -18,6 +18,7 @@ package androidx.build
 
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
@@ -32,7 +33,11 @@ import java.io.File
 
 private fun Project.getKtlintConfiguration(): Configuration {
     return configurations.findByName("ktlint") ?: configurations.create("ktlint") {
-        val dependency = dependencies.create("com.pinterest:ktlint:0.39.0")
+        val version = project.extensions.getByType(
+            VersionCatalogsExtension::class.java
+        ).find("libs").get().findVersion("ktlint").get().requiredVersion
+
+        val dependency = dependencies.create("com.pinterest:ktlint:$version")
         it.dependencies.add(dependency)
     }
 }
@@ -42,6 +47,8 @@ private val DisabledRules = listOf(
     "import-ordering",
     // not useful for our projects
     "final-newline",
+    // TODO: reenable when https://github.com/pinterest/ktlint/issues/1221 is resolved
+    "indent",
 ).joinToString(",")
 
 private const val excludeTestDataFiles = "**/test-data/**/*.kt"
