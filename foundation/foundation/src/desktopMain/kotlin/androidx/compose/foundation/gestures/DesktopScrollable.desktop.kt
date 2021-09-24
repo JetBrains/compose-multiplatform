@@ -49,7 +49,7 @@ internal actual fun Modifier.mouseScrollable(
     val config = LocalMouseScrollConfig.current
 
     mouseScrollFilter { event, bounds ->
-        if (isOrientationMatches(orientation, event.orientation)) {
+        if (isOrientationEqual(orientation, event.orientation)) {
             val scrollBounds = when (orientation) {
                 Orientation.Vertical -> bounds.height
                 Orientation.Horizontal -> bounds.width
@@ -63,7 +63,7 @@ internal actual fun Modifier.mouseScrollable(
     }
 }
 
-fun isOrientationMatches(
+private fun isOrientationEqual(
     orientation: Orientation,
     mouseOrientation: MouseScrollOrientation
 ): Boolean {
