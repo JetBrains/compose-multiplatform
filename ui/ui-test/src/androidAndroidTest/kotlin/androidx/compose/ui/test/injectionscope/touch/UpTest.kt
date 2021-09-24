@@ -21,11 +21,11 @@ import androidx.compose.testutils.expectError
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.TouchInjectionScope
 import androidx.compose.ui.test.injectionscope.touch.Common.performTouchInput
-import androidx.compose.ui.test.inputdispatcher.assertNoTouchGestureInProgress
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.util.ClickableTestBox
 import androidx.compose.ui.test.util.MultiPointerInputRecorder
+import androidx.compose.ui.test.util.assertNoTouchGestureInProgress
 import androidx.compose.ui.test.util.assertTimestampsAreIncreasing
 import androidx.compose.ui.test.util.verify
 import androidx.test.filters.MediumTest

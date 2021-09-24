@@ -18,15 +18,13 @@ package androidx.compose.ui.test.inputdispatcher
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.AndroidInputDispatcher
-import androidx.compose.ui.test.InputDispatcher
 import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.MainTestClock
-import androidx.compose.ui.test.MultiModalInjectionScopeImpl
-import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.TestOwner
 import androidx.compose.ui.test.createTestContext
 import androidx.compose.ui.test.util.InputDispatcherTestRule
 import androidx.compose.ui.test.util.MotionEventRecorder
+import androidx.compose.ui.test.util.assertNoTouchGestureInProgress
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
@@ -44,14 +42,17 @@ open class InputDispatcherTest(eventPeriodOverride: Long? = null) {
     )
 
     internal val recorder = MotionEventRecorder()
-    private val testClock: MainTestClock = mock()
+
     private val testOwner: TestOwner = mock {
+        val testClock: MainTestClock = mock()
         on { mainClock } doReturn testClock
         on { runOnUiThread(any<() -> Any>()) }.then {
             it.getArgument<() -> Any>(0).invoke()
         }
     }
+
     private val testContext = createTestContext(testOwner)
+
     internal val subject = AndroidInputDispatcher(testContext, null, recorder::recordEvent)
 
     @After
@@ -86,15 +87,4 @@ internal fun AndroidInputDispatcher.generateTouchCancelAndCheck(delay: Long? = n
     }
     enqueueTouchCancel()
     assertNoTouchGestureInProgress()
-}
-
-internal fun SemanticsNodeInteraction.assertNoTouchGestureInProgress() {
-    val failMessage = "Can't verify if a touch is in progress: failed to create an injection scope"
-    val node = fetchSemanticsNode(failMessage)
-    val scope = MultiModalInjectionScopeImpl(node, testContext)
-    assertThat(scope.inputDispatcher.isTouchInProgress).isFalse()
-}
-
-internal fun InputDispatcher.assertNoTouchGestureInProgress() {
-    assertThat((this as AndroidInputDispatcher).isTouchInProgress).isFalse()
 }

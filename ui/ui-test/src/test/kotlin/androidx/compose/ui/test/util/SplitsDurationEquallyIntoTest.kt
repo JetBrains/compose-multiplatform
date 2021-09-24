@@ -18,24 +18,21 @@ package androidx.compose.ui.test.util
 
 import android.view.MotionEvent
 import androidx.compose.testutils.expectAssertionError
-import androidx.test.filters.SmallTest
+import androidx.compose.ui.test.RobolectricMinSdk
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
-
-// To satisfy ktlint
-@Suppress("unused")
-private class MotionEventsTest
+import org.robolectric.ParameterizedRobolectricTestRunner
+import org.robolectric.annotation.Config
 
 /**
  * Tests for `List<MotionEvent>.`[splitsDurationEquallyInto]. See documentation of that method
  * for expected results.
  */
-@SmallTest
-@RunWith(Parameterized::class)
-class ListMotionEventSplitsDurationEquallyIntoTest(private val config: TestConfig) {
+@RunWith(ParameterizedRobolectricTestRunner::class)
+@Config(minSdk = RobolectricMinSdk)
+class SplitsDurationEquallyIntoTest(private val config: TestConfig) {
     data class TestConfig(
         val timestamps: List<Long>,
         val duration: Long,
@@ -46,7 +43,7 @@ class ListMotionEventSplitsDurationEquallyIntoTest(private val config: TestConfi
 
     companion object {
         @JvmStatic
-        @Parameterized.Parameters(name = "{0}")
+        @ParameterizedRobolectricTestRunner.Parameters(name = "{0}")
         fun createTestSet(): List<TestConfig> {
             return listOf(
                 // 1/1: ideally  [1.0]
