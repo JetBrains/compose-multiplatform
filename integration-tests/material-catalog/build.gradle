@@ -63,12 +63,13 @@ def copyReleaseApk = tasks.register("copyReleaseApk", Copy) { task ->
         }
     }
     task.include("*.apk")
+    String projectPath = project.path
     task.rename { fileName ->
-        "${project.path.substring(1).replace(':', '-')}_$fileName"
+        "${projectPath.substring(1).replace(':', '-')}_$fileName"
     }
     task.destinationDir =
             new File(BuildServerConfigurationKt.getDistributionDirectory(project), "apks")
-    task.dependsOn(project.path + ":assembleRelease")
+    task.dependsOn(projectPath + ":assembleRelease")
 }
 
 BuildOnServerKt.addToBuildOnServer(project, copyReleaseApk)
