@@ -20,6 +20,7 @@ import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.input.ImeAction
@@ -31,7 +32,7 @@ import androidx.compose.ui.util.fastAny
  * @see SemanticsProperties.Disabled
  */
 fun isEnabled(): SemanticsMatcher =
-    !SemanticsMatcher.keyIsDefined(SemanticsProperties.Disabled)
+    !hasKey(SemanticsProperties.Disabled)
 
 /**
  * Returns whether the node is not enabled.
@@ -39,7 +40,7 @@ fun isEnabled(): SemanticsMatcher =
  * @see SemanticsProperties.Disabled
  */
 fun isNotEnabled(): SemanticsMatcher =
-    SemanticsMatcher.keyIsDefined(SemanticsProperties.Disabled)
+    hasKey(SemanticsProperties.Disabled)
 
 /**
  * Return whether the node is checkable.
@@ -47,7 +48,7 @@ fun isNotEnabled(): SemanticsMatcher =
  * @see SemanticsProperties.ToggleableState
  */
 fun isToggleable(): SemanticsMatcher =
-    SemanticsMatcher.keyIsDefined(SemanticsProperties.ToggleableState)
+    hasKey(SemanticsProperties.ToggleableState)
 
 /**
  * Returns whether the node is toggled.
@@ -73,7 +74,7 @@ fun isOff(): SemanticsMatcher = SemanticsMatcher.expectValue(
  * @see SemanticsProperties.Selected
  */
 fun isSelectable(): SemanticsMatcher =
-    SemanticsMatcher.keyIsDefined(SemanticsProperties.Selected)
+    hasKey(SemanticsProperties.Selected)
 
 /**
  * Returns whether the node is selected.
@@ -97,7 +98,7 @@ fun isNotSelected(): SemanticsMatcher =
  * @see SemanticsProperties.Focused
  */
 fun isFocusable(): SemanticsMatcher =
-    SemanticsMatcher.keyIsDefined(SemanticsProperties.Focused)
+    hasKey(SemanticsProperties.Focused)
 
 /**
  * Return whether the node is not able to receive focus.
@@ -129,7 +130,7 @@ fun isNotFocused(): SemanticsMatcher =
  * @see SemanticsActions.OnClick
  */
 fun hasClickAction(): SemanticsMatcher =
-    SemanticsMatcher.keyIsDefined(SemanticsActions.OnClick)
+    hasKey(SemanticsActions.OnClick)
 
 /**
  * Return whether the node has no semantics click action defined.
@@ -145,7 +146,7 @@ fun hasNoClickAction(): SemanticsMatcher =
  * @see SemanticsActions.ScrollBy
  */
 fun hasScrollAction(): SemanticsMatcher =
-    SemanticsMatcher.keyIsDefined(SemanticsActions.ScrollBy)
+    hasKey(SemanticsActions.ScrollBy)
 
 /**
  * Return whether the node has no semantics scrollable action defined.
@@ -321,7 +322,7 @@ fun hasStateDescription(value: String): SemanticsMatcher = SemanticsMatcher.expe
  * @see SemanticsProperties.Heading
  */
 fun isHeading(): SemanticsMatcher =
-    SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading)
+    hasKey(SemanticsProperties.Heading)
 
 /**
  * Returns whether the node's range info matches exactly to the given accessibility range info.
@@ -352,7 +353,7 @@ fun hasTestTag(testTag: String): SemanticsMatcher =
  * @see SemanticsProperties.IsDialog
  */
 fun isDialog(): SemanticsMatcher =
-    SemanticsMatcher.keyIsDefined(SemanticsProperties.IsDialog)
+    hasKey(SemanticsProperties.IsDialog)
 
 /**
  * Returns whether the node is a popup.
@@ -363,7 +364,7 @@ fun isDialog(): SemanticsMatcher =
  * @see SemanticsProperties.IsPopup
  */
 fun isPopup(): SemanticsMatcher =
-    SemanticsMatcher.keyIsDefined(SemanticsProperties.IsPopup)
+    hasKey(SemanticsProperties.IsPopup)
 
 /**
  * Returns whether the node defines the given IME action.
@@ -381,7 +382,7 @@ fun hasImeAction(actionType: ImeAction) =
  * @see SemanticsActions.SetText
  */
 fun hasSetTextAction() =
-    SemanticsMatcher.keyIsDefined(SemanticsActions.SetText)
+    hasKey(SemanticsActions.SetText)
 
 /**
  * Returns whether the node defines the ability to scroll to an item index.
@@ -391,7 +392,7 @@ fun hasSetTextAction() =
  * index, while [LazyColumn][androidx.compose.foundation.lazy.LazyColumn] does.
  */
 fun hasScrollToIndexAction() =
-    SemanticsMatcher.keyIsDefined(SemanticsActions.ScrollToIndex)
+    hasKey(SemanticsActions.ScrollToIndex)
 
 /**
  * Returns whether the node defines the ability to scroll to an item identified by a key, such as
@@ -399,8 +400,19 @@ fun hasScrollToIndexAction() =
  * [LazyRow][androidx.compose.foundation.lazy.LazyRow].
  */
 fun hasScrollToKeyAction() =
-    SemanticsMatcher.keyIsDefined(SemanticsActions.ScrollToIndex)
-        .and(SemanticsMatcher.keyIsDefined(SemanticsProperties.IndexForKey))
+    hasKey(SemanticsActions.ScrollToIndex)
+        .and(hasKey(SemanticsProperties.IndexForKey))
+
+/**
+ * Returns whether the node defines the ability to scroll to content identified by a matcher.
+ */
+fun hasScrollToNodeAction() =
+    hasKey(SemanticsActions.ScrollToIndex)
+        .and(hasKey(SemanticsActions.ScrollBy))
+        .and(
+            hasKey(SemanticsProperties.HorizontalScrollAxisRange)
+                .or(hasKey(SemanticsProperties.VerticalScrollAxisRange))
+        )
 
 /**
  * Return whether the node is the root semantics node.
@@ -512,3 +524,6 @@ internal val SemanticsNode.ancestors: Iterable<SemanticsNode>
             }
         }
     }
+
+private fun hasKey(key: SemanticsPropertyKey<*>): SemanticsMatcher =
+    SemanticsMatcher.keyIsDefined(key)

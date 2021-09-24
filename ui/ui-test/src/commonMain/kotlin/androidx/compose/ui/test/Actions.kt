@@ -21,7 +21,9 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.semantics.AccessibilityAction
+import androidx.compose.ui.semantics.ScrollAxisRange
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsActions.ScrollBy
 import androidx.compose.ui.semantics.SemanticsActions.ScrollToIndex
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties.HorizontalScrollAxisRange
@@ -40,6 +42,8 @@ internal expect fun SemanticsNodeInteraction.performClickImpl(): SemanticsNodeIn
  * Performs a click action on the element represented by the given semantics node. Depending on
  * the platform this may be implemented by a touch click (tap), a mouse click, or another more
  * appropriate method for that platform.
+ *
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
  */
 fun SemanticsNodeInteraction.performClick(): SemanticsNodeInteraction {
     return performClickImpl()
@@ -56,12 +60,21 @@ fun SemanticsNodeInteraction.performClick(): SemanticsNodeInteraction {
  * scrollable content, not on the scrollable container.
  *
  * Throws an [AssertionError] if there is no scroll parent.
+ *
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
  */
 fun SemanticsNodeInteraction.performScrollTo(): SemanticsNodeInteraction {
-    // Find a parent node with a scroll action
-    val errorMessageOnFail = "Action performScrollTo() failed."
-    val node = fetchSemanticsNode(errorMessageOnFail)
-    val scrollableNode = node.findClosestParentNode {
+    @OptIn(InternalTestApi::class)
+    fetchSemanticsNode("Action performScrollTo() failed.").scrollToNode(testContext.testOwner)
+    return this
+}
+
+/**
+ * Implementation of [performScrollTo]
+ */
+@OptIn(InternalTestApi::class)
+private fun SemanticsNode.scrollToNode(testOwner: TestOwner) {
+    val scrollableNode = findClosestParentNode {
         hasScrollAction().matches(it)
     } ?: throw AssertionError("Semantic Node has no parent layout with a Scroll SemanticsAction")
 
@@ -72,7 +85,7 @@ fun SemanticsNodeInteraction.performScrollTo(): SemanticsNodeInteraction {
     val parentInRoot = scrollableNode.layoutInfo.coordinates.parentLayoutCoordinates
         ?.positionInRoot() ?: Offset.Zero
     val viewport = viewportInParent.translate(parentInRoot)
-    val target = Rect(node.positionInRoot, node.size.toSize())
+    val target = Rect(positionInRoot, size.toSize())
 
     // Given the desired scroll value to align either side of the target with the
     // viewport, what delta should we go with?
@@ -85,19 +98,16 @@ fun SemanticsNodeInteraction.performScrollTo(): SemanticsNodeInteraction {
     var dx = scrollDelta(target.left - viewport.left, target.right - viewport.right)
     // And adjust for reversing properties
     if (scrollableNode.isReversedHorizontally) dx = -dx
-    if (node.isRtl) dx = -dx
+    if (scrollableNode.isRtl) dx = -dx
 
     // Get the desired delta Y
     var dy = scrollDelta(target.top - viewport.top, target.bottom - viewport.bottom)
     // And adjust for reversing properties
     if (scrollableNode.isReversedVertically) dy = -dy
 
-    @OptIn(InternalTestApi::class)
-    testContext.testOwner.runOnUiThread {
-        scrollableNode.config[SemanticsActions.ScrollBy].action?.invoke(dx, dy)
+    testOwner.runOnUiThread {
+        scrollableNode.config[ScrollBy].action?.invoke(dx, dy)
     }
-
-    return this
 }
 
 /**
@@ -113,19 +123,27 @@ fun SemanticsNodeInteraction.performScrollTo(): SemanticsNodeInteraction {
  * Throws an [AssertionError] if the node doesn't have [ScrollToIndex] defined.
  *
  * @param index The index of the item to scroll to
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
+ *
  * @see hasScrollToIndexAction
  */
 fun SemanticsNodeInteraction.performScrollToIndex(index: Int): SemanticsNodeInteraction {
-    val node = fetchSemanticsNode("Failed: performScrollToIndex($index)")
-    requireSemantics(node, ScrollToIndex) {
+    fetchSemanticsNode("Failed: performScrollToIndex($index)").scrollToIndex(index, this)
+    return this
+}
+
+/**
+ * Implementation of [performScrollToIndex]
+ */
+private fun SemanticsNode.scrollToIndex(index: Int, nodeInteraction: SemanticsNodeInteraction) {
+    nodeInteraction.requireSemantics(this, ScrollToIndex) {
         "Failed to scroll to index $index"
     }
 
     @OptIn(InternalTestApi::class)
-    testContext.testOwner.runOnUiThread {
-        node.config[ScrollToIndex].action!!.invoke(index)
+    nodeInteraction.testContext.testOwner.runOnUiThread {
+        config[ScrollToIndex].action!!.invoke(index)
     }
-    return this
 }
 
 /**
@@ -139,6 +157,8 @@ fun SemanticsNodeInteraction.performScrollToIndex(index: Int): SemanticsNodeInte
  * Throws an [AssertionError] if the node doesn't have [IndexForKey] or [ScrollToIndex] defined.
  *
  * @param key The key of the item to scroll to
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
+ *
  * @see hasScrollToKeyAction
  */
 fun SemanticsNodeInteraction.performScrollToKey(key: Any): SemanticsNodeInteraction {
@@ -158,6 +178,85 @@ fun SemanticsNodeInteraction.performScrollToKey(key: Any): SemanticsNodeInteract
     }
 
     return this
+}
+
+/**
+ * Scrolls a scrollable container to the content that matches the given [matcher]. If the content
+ * isn't yet visible, the scrollable container will be scrolled from the start till the end till
+ * it finds the content we're looking for. It is not defined where in the viewport the content
+ * will be on success of this function, but it will be either fully within the viewport if it is
+ * smaller than the viewport, or it will cover the whole viewport if it is larger than the
+ * viewport. If it doesn't find the content, the scrollable will be left at the end of the
+ * content and an [AssertionError] is thrown.
+ *
+ * This action should be performed on a [node][SemanticsNodeInteraction] that is a scrollable
+ * container, not on a node that is part of the content of that container. If the container is a
+ * lazy container, it must support the semantics actions [ScrollToIndex], [ScrollBy], and either
+ * [HorizontalScrollAxisRange] or [VerticalScrollAxisRange], for example
+ * [LazyColumn][androidx.compose.foundation.lazy.LazyColumn] and
+ * [LazyRow][androidx.compose.foundation.lazy.LazyRow]. If the container is not lazy, it must
+ * support the semantics action [ScrollBy], for example,
+ * [Row][androidx.compose.foundation.layout.Row] or
+ * [Column][androidx.compose.foundation.layout.Column].
+ *
+ * Throws an [AssertionError] if the scrollable node doesn't support the necessary semantics
+ * actions.
+ *
+ * @param matcher A matcher that identifies the content where the scrollable container needs to
+ * scroll to
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method. Note that this is
+ * _not_ an interaction for the node that is identified by the [matcher].
+ *
+ * @see hasScrollToNodeAction
+ */
+fun SemanticsNodeInteraction.performScrollToNode(
+    matcher: SemanticsMatcher
+): SemanticsNodeInteraction {
+    var node = fetchSemanticsNode("Failed: performScrollToNode(${matcher.description})")
+    matcher.findMatchInDescendants(node)?.also {
+        @OptIn(InternalTestApi::class)
+        it.scrollToNode(testContext.testOwner)
+        return this
+    }
+
+    // If this is NOT a lazy list, but we haven't found the node above ..
+    if (!node.isLazyList) {
+        // .. throw an error that the node doesn't exist
+        val msg = "No node found that matches ${matcher.description} in scrollable container"
+        throw AssertionError(buildGeneralErrorMessage(msg, selector, node))
+    }
+
+    // Go to start of the list
+    if (!node.horizontalScrollAxis.isAtStart || !node.verticalScrollAxis.isAtStart) {
+        node.scrollToIndex(0, this)
+    }
+
+    while (true) {
+        // Fetch the node again
+        node = fetchSemanticsNode("Failed: performScrollToNode(${matcher.description})")
+        matcher.findMatchInDescendants(node)?.also {
+            @OptIn(InternalTestApi::class)
+            it.scrollToNode(testContext.testOwner)
+            return this
+        }
+
+        // Are we there yet? Are we there yet? Are we there yet?
+        if (node.horizontalScrollAxis.isAtEnd && node.verticalScrollAxis.isAtEnd) {
+            // If we're finished and we haven't found the node
+            val msg = "No node found that matches ${matcher.description} in scrollable container"
+            throw AssertionError(buildGeneralErrorMessage(msg, selector, node))
+        }
+
+        val viewPortSize = node.layoutInfo.coordinates.boundsInParent().size
+        val dx = node.horizontalScrollAxis?.let { viewPortSize.width } ?: 0f
+        val dy = node.verticalScrollAxis?.let { viewPortSize.height } ?: 0f
+
+        // Scroll one screen
+        @OptIn(InternalTestApi::class)
+        testContext.testOwner.runOnUiThread {
+            node.config[ScrollBy].action?.invoke(dx, dy)
+        }
+    }
 }
 
 /**
@@ -193,6 +292,10 @@ fun SemanticsNodeInteraction.performScrollToKey(key: Any): SemanticsNodeInteract
  * testRule.onNodeWithTag("myWidget")
  *     .performGesture(true) { swipeUp() }
  * ```
+ *
+ * @param block A lambda with [GestureScope] as receiver that describes the gesture by
+ * sending all touch events.
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
  */
 @Deprecated(
     message = "Replaced by performTouchInput",
@@ -220,7 +323,6 @@ fun SemanticsNodeInteraction.performGesture(
     return this
 }
 
-// TODO(fresen): create sample module like in the rest of Compose
 /**
  * Executes the touch gesture specified in the given [block]. The gesture doesn't need to be
  * complete and can be resumed in a later invocation of one of the `perform.*Input` methods. The
@@ -258,6 +360,10 @@ fun SemanticsNodeInteraction.performGesture(
  *     swipeUp()
  * }
  * ```
+ *
+ * @param block A lambda with [TouchInjectionScope] as receiver that describes the gesture by
+ * sending all touch events.
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
  *
  * @see TouchInjectionScope
  */
@@ -313,6 +419,10 @@ fun SemanticsNodeInteraction.performTouchInput(
  *    }
  * ```
  *
+ * @param block A lambda with [MouseInjectionScope] as receiver that describes the gesture by
+ * sending all mouse events.
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
+ *
  * @see MouseInjectionScope
  */
 @ExperimentalTestApi
@@ -353,6 +463,10 @@ fun SemanticsNodeInteraction.performMouseInput(
  * complete. This method blocks while the events are injected. If an error occurs during
  * execution of [block] or injection of the events, all (subsequent) events are dropped and the
  * error is thrown here.
+ *
+ * @param block A lambda with [MultiModalInjectionScope] as receiver that describes the gesture
+ * by sending all multi modal events.
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
  *
  * @see MultiModalInjectionScope
  */
@@ -425,11 +539,27 @@ fun SemanticsNodeInteraction.performSemanticsAction(
     performSemanticsAction(key) { it.invoke() }
 }
 
+// TODO(200928505): get a more accurate indication if it is a lazy list
+private val SemanticsNode.isLazyList: Boolean
+    get() = ScrollBy in config && ScrollToIndex in config
+
+private val SemanticsNode.horizontalScrollAxis: ScrollAxisRange?
+    get() = config.getOrNull(HorizontalScrollAxisRange)
+
+private val SemanticsNode.verticalScrollAxis: ScrollAxisRange?
+    get() = config.getOrNull(VerticalScrollAxisRange)
+
 private val SemanticsNode.isReversedHorizontally: Boolean
-    get() = config.getOrNull(HorizontalScrollAxisRange)?.reverseScrolling == true
+    get() = horizontalScrollAxis?.reverseScrolling ?: false
 
 private val SemanticsNode.isReversedVertically: Boolean
-    get() = config.getOrNull(VerticalScrollAxisRange)?.reverseScrolling == true
+    get() = verticalScrollAxis?.reverseScrolling ?: false
+
+private val ScrollAxisRange?.isAtStart: Boolean
+    get() = this?.let { value() == 0f } ?: true
+
+private val ScrollAxisRange?.isAtEnd: Boolean
+    get() = this?.let { value() == maxValue() } ?: true
 
 private val SemanticsNode.isRtl: Boolean
     get() = layoutInfo.layoutDirection == LayoutDirection.Rtl
@@ -444,4 +574,13 @@ private fun SemanticsNodeInteraction.requireSemantics(
         val msg = "${errorMessage()}, the node is missing [${missingProperties.joinToString()}]"
         throw AssertionError(buildGeneralErrorMessage(msg, selector, node))
     }
+}
+
+@Suppress("NOTHING_TO_INLINE") // Avoids doubling the stack depth for recursive search
+private inline fun SemanticsMatcher.findMatchInDescendants(root: SemanticsNode): SemanticsNode? {
+    return root.children.firstOrNull { it.layoutInfo.isPlaced && findMatchInHierarchy(it) != null }
+}
+
+private fun SemanticsMatcher.findMatchInHierarchy(node: SemanticsNode): SemanticsNode? {
+    return if (matches(node)) node else findMatchInDescendants(node)
 }

@@ -8,6 +8,7 @@ package androidx.compose.ui.test {
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performScrollTo(androidx.compose.ui.test.SemanticsNodeInteraction);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performScrollToIndex(androidx.compose.ui.test.SemanticsNodeInteraction, int index);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performScrollToKey(androidx.compose.ui.test.SemanticsNodeInteraction, Object key);
+    method public static androidx.compose.ui.test.SemanticsNodeInteraction performScrollToNode(androidx.compose.ui.test.SemanticsNodeInteraction, androidx.compose.ui.test.SemanticsMatcher matcher);
     method public static <T extends kotlin.Function<? extends java.lang.Boolean>> void performSemanticsAction(androidx.compose.ui.test.SemanticsNodeInteraction, androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<T>> key, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> invocation);
     method public static void performSemanticsAction(androidx.compose.ui.test.SemanticsNodeInteraction, androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> key);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performTouchInput(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.TouchInjectionScope,kotlin.Unit> block);
@@ -95,6 +96,7 @@ package androidx.compose.ui.test {
     method public static androidx.compose.ui.test.SemanticsMatcher hasScrollAction();
     method public static androidx.compose.ui.test.SemanticsMatcher hasScrollToIndexAction();
     method public static androidx.compose.ui.test.SemanticsMatcher hasScrollToKeyAction();
+    method public static androidx.compose.ui.test.SemanticsMatcher hasScrollToNodeAction();
     method public static androidx.compose.ui.test.SemanticsMatcher hasSetTextAction();
     method public static androidx.compose.ui.test.SemanticsMatcher hasStateDescription(String value);
     method public static androidx.compose.ui.test.SemanticsMatcher hasTestTag(String testTag);
