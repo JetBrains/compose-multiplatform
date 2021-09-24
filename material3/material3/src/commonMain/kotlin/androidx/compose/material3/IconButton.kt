@@ -43,6 +43,8 @@ import androidx.compose.ui.unit.dp
  * [androidx.compose.material.icons.Icons]. If using a custom icon, note that the typical size for
  * the internal icon is 24 x 24 dp.
  *
+ * @sample androidx.compose.material3.samples.IconButtonSample
+ *
  * @param onClick the lambda to be invoked when this icon is pressed
  * @param modifier optional [Modifier] for this IconButton
  * @param enabled whether or not this IconButton will handle input events and appear enabled for
@@ -87,6 +89,8 @@ fun IconButton(
 /**
  * An [IconButton] with two states, for icons that can be toggled 'on' and 'off', such as a bookmark
  * icon, or a navigation icon that opens a drawer.
+ *
+ * @sample androidx.compose.material3.samples.IconToggleButtonSample
  *
  * @param checked whether this IconToggleButton is currently checked
  * @param onCheckedChange callback to be invoked when this icon is selected
