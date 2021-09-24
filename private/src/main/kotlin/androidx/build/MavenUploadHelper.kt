@@ -223,6 +223,7 @@ private fun tweakDependenciesMetadata(
         // https://android-review.googlesource.com/c/platform/frameworks/support/+/1144664/8/buildSrc/src/main/kotlin/androidx/build/MavenUploadHelper.kt#177
         assignSingleVersionDependenciesInGroupForPom(xml, mavenGroup)
         assignAarTypes(xml, androidLibrariesSetProvider)
+        ensureConsistentJvmSuffix(xml)
     }
 }
 
@@ -314,6 +315,35 @@ private fun Project.collectDependenciesForConfiguration(
     config?.dependencies?.forEach { dep ->
         if (dep.group?.startsWith("androidx.") == true) {
             androidxDependencies.add(dep)
+        }
+    }
+}
+
+/**
+ * Ensures that artifactIds are consistent when using configuration caching.
+ * A workaround for https://github.com/gradle/gradle/issues/18369
+ */
+private fun ensureConsistentJvmSuffix(
+    xml: XmlProvider
+) {
+    val dependencies = xml.asNode().children().find {
+        it is Node && it.name().toString().endsWith("dependencies")
+    } as Node?
+    dependencies?.children()?.forEach { dep ->
+        if (dep !is Node) {
+            return@forEach
+        }
+        val artifactIdNode = dep.children().first {
+            it is Node && it.name().toString().endsWith("artifactId")
+        } as Node
+        val artifactId = artifactIdNode.children()[0].toString()
+        // kotlinx-coroutines-core is only a .pom and only depends on kotlinx-coroutines-core-jvm,
+        // so the two artifacts should be approximately equivalent. However,
+        // when loading from configuration cache, Gradle often returns a different resolution.
+        // We replace it here to ensure consistency and predictability, and
+        // to avoid having to rerun any zip tasks that include it
+        if (artifactId == "kotlinx-coroutines-core-jvm") {
+            artifactIdNode.setValue("kotlinx-coroutines-core")
         }
     }
 }
