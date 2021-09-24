@@ -27,6 +27,7 @@ internal inline class Strings private constructor(@Suppress("unused") private va
         val CloseDrawer = Strings(1)
         val CloseSheet = Strings(2)
         val DefaultErrorMessage = Strings(3)
+        val ExposedDropdownMenu = Strings(4)
     }
 }
 

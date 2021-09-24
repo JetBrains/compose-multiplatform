@@ -185,7 +185,7 @@ object MenuDefaults {
 
 // Size defaults.
 private val MenuElevation = 8.dp
-private val MenuVerticalMargin = 48.dp
+internal val MenuVerticalMargin = 48.dp
 private val DropdownMenuItemHorizontalPadding = 16.dp
 internal val DropdownMenuVerticalPadding = 8.dp
 private val DropdownMenuItemDefaultMinWidth = 112.dp
