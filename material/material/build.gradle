@@ -62,6 +62,7 @@ dependencies {
         androidTestImplementation(libs.dexmakerMockito)
         androidTestImplementation(libs.mockitoCore)
         androidTestImplementation(libs.mockitoKotlin)
+        androidTestImplementation(libs.testUiautomator)
 
         lintPublish project(":compose:material:material-lint")
     }
