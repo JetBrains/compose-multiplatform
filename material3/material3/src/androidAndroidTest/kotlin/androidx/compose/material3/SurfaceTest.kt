@@ -72,7 +72,41 @@ class SurfaceTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
-    fun tonalElevationColorIsSetOnSurfaceColor() {
+    fun noTonalElevationColorIsSetOnNonElevatedSurfaceColor() {
+        var absoluteTonalElevation: Dp = 0.dp
+        var surfaceColor: Color = Color.Unspecified
+        rule.setMaterialContent {
+            surfaceColor = MaterialTheme.colorScheme.surface
+            Box(
+                Modifier
+                    .size(10.dp, 10.dp)
+                    .semantics(mergeDescendants = true) {}
+                    .testTag("box")
+            ) {
+                Surface(color = surfaceColor, tonalElevation = 0.dp) {
+                    absoluteTonalElevation = LocalAbsoluteTonalElevation.current
+                    Box(Modifier.fillMaxSize())
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            Truth.assertThat(absoluteTonalElevation).isEqualTo(0.dp)
+        }
+
+        rule.onNodeWithTag("box")
+            .captureToImage()
+            .assertShape(
+                density = rule.density,
+                shape = RectangleShape,
+                shapeColor = surfaceColor,
+                backgroundColor = Color.White
+            )
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun tonalElevationColorIsSetOnElevatedSurfaceColor() {
         var absoluteTonalElevation: Dp = 0.dp
         var surfaceTonalColor: Color = Color.Unspecified
         var surfaceColor: Color
