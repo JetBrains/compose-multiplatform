@@ -19,35 +19,31 @@ package androidx.compose.ui.test.util
 import android.view.InputDevice
 import android.view.MotionEvent
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.test.InputDispatcher
+import androidx.compose.ui.test.MultiModalInjectionScopeImpl
+import androidx.compose.ui.test.SemanticsNodeInteraction
+import com.google.common.collect.Ordering
+import com.google.common.truth.FloatSubject
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import kotlin.math.abs
+import kotlin.math.sign
 
-const val Finger = MotionEvent.TOOL_TYPE_FINGER
-const val Touchscreen = InputDevice.SOURCE_TOUCHSCREEN
+const val TypeFinger = MotionEvent.TOOL_TYPE_FINGER
 const val TypeMouse = MotionEvent.TOOL_TYPE_MOUSE
+const val SourceTouchscreen = InputDevice.SOURCE_TOUCHSCREEN
 const val SourceMouse = InputDevice.SOURCE_MOUSE
 
-internal class MotionEventRecorder {
-
-    private val _events = mutableListOf<MotionEvent>()
-    val events get() = _events as List<MotionEvent>
-
-    fun disposeEvents() {
-        _events.removeAll { it.recycle(); true }
-    }
-
-    fun recordEvent(event: MotionEvent) {
-        _events.add(MotionEvent.obtain(event))
-    }
+internal fun SemanticsNodeInteraction.assertNoTouchGestureInProgress() {
+    val failMessage = "Can't verify if a touch is in progress: failed to create an injection scope"
+    val node = fetchSemanticsNode(failMessage)
+    val scope = MultiModalInjectionScopeImpl(node, testContext)
+    assertThat(scope.inputDispatcher.isTouchInProgress).isFalse()
 }
 
-val MotionEvent.relativeTime get() = eventTime - downTime
-
-val List<MotionEvent>.relativeEventTimes get() = map { it.relativeTime }
-
-val List<MotionEvent>.moveEvents
-    get() = filter { it.action == MotionEvent.ACTION_MOVE }
+internal fun InputDispatcher.assertNoTouchGestureInProgress() {
+    assertThat(isTouchInProgress).isFalse()
+}
 
 /**
  * Asserts that all event times are after their corresponding down time, and that the event
@@ -65,48 +61,22 @@ internal fun MotionEventRecorder.assertHasValidEventTimes() {
     }
 }
 
-internal fun MotionEvent.verify(
-    curve: (Long) -> Offset,
-    expectedAction: Int,
-    expectedRelativeTime: Long,
-    expectedSource: Int,
-    expectedToolType: Int
-) {
-    verifyEvent(1, expectedAction, 0, expectedRelativeTime, expectedSource)
-    // x and y can just be taken from the function. We're not testing the function, we're
-    // testing if the MotionEvent sampled the function at the correct point
-    verifyPointer(0, curve(expectedRelativeTime), expectedToolType)
-}
-
-internal fun MotionEvent.verify(
-    expectedPosition: Offset,
-    expectedAction: Int,
-    expectedRelativeTime: Long,
-    expectedSource: Int,
-    expectedToolType: Int
-) {
-    verifyEvent(1, expectedAction, 0, expectedRelativeTime, expectedSource)
-    verifyPointer(0, expectedPosition, expectedToolType)
-}
-
-internal fun MotionEvent.verifyEvent(
+internal fun MotionEvent.verifyTouchEvent(
     expectedPointerCount: Int,
     expectedAction: Int,
     expectedActionIndex: Int,
-    expectedRelativeTime: Long,
-    expectedSource: Int
+    expectedRelativeTime: Long
 ) {
     assertThat(pointerCount).isEqualTo(expectedPointerCount)
     assertThat(actionMasked).isEqualTo(expectedAction)
     assertThat(actionIndex).isEqualTo(expectedActionIndex)
     assertThat(relativeTime).isEqualTo(expectedRelativeTime)
-    assertThat(source).isEqualTo(expectedSource)
+    assertThat(source).isEqualTo(SourceTouchscreen)
 }
 
-internal fun MotionEvent.verifyPointer(
+internal fun MotionEvent.verifyTouchPointer(
     expectedPointerId: Int,
-    expectedPosition: Offset,
-    expectedToolType: Int
+    expectedPosition: Offset
 ) {
     var index = -1
     for (i in 0 until pointerCount) {
@@ -118,7 +88,7 @@ internal fun MotionEvent.verifyPointer(
     assertThat(index).isAtLeast(0)
     assertThat(getX(index)).isEqualTo(expectedPosition.x)
     assertThat(getY(index)).isEqualTo(expectedPosition.y)
-    assertThat(getToolType(index)).isEqualTo(expectedToolType)
+    assertThat(getToolType(index)).isEqualTo(TypeFinger)
 }
 
 internal fun MotionEvent.verifyMouseEvent(
@@ -188,4 +158,70 @@ fun List<MotionEvent>.splitsDurationEquallyInto(t0: Long, t1: Long, desiredDurat
             ((i + 1) / size.toDouble() * totalDuration).toFloat()
         )
     }
+}
+
+private val MotionEvent.relativeTime get() = eventTime - downTime
+
+/**
+ * Checks if the subject is within [tolerance] of [f]. Shorthand for
+ * `isWithin([tolerance]).of([f])`.
+ */
+fun FloatSubject.isAlmostEqualTo(f: Float, tolerance: Float = 1e-3f) {
+    isWithin(tolerance).of(f)
+}
+
+/**
+ * Verifies that the [Offset] is equal to the given position with some tolerance. The default
+ * tolerance is 0.001.
+ */
+fun Offset.isAlmostEqualTo(position: Offset, tolerance: Float = 1e-3f) {
+    assertThat(x).isAlmostEqualTo(position.x, tolerance)
+    assertThat(y).isAlmostEqualTo(position.y, tolerance)
+}
+
+/**
+ * Checks that the values are progressing in a monotonic direction between [a] and [b].
+ * If [a] and [b] are equal, all values in the list should be that value too. The edges [a] and
+ * [b] allow a [tolerance] for floating point imprecision, which is by default `0.001`.
+ */
+fun List<Float>.isMonotonicBetween(a: Float, b: Float, tolerance: Float = 1e-3f) {
+    val expectedSign = sign(b - a)
+    if (expectedSign == 0f) {
+        forEach { assertThat(it).isAlmostEqualTo(a, tolerance) }
+    } else {
+        forEach { assertThat(it).isAlmostBetween(a, b, tolerance) }
+        zipWithNext { curr, next -> sign(next - curr) }.forEach {
+            if (it != 0f) assertThat(it).isEqualTo(expectedSign)
+        }
+    }
+}
+
+fun List<Float>.assertSame(tolerance: Float = 0f) {
+    if (size <= 1) {
+        return
+    }
+    assertThat(minOrNull()!!).isWithin(2 * tolerance).of(maxOrNull()!!)
+}
+
+/**
+ * Checks that the float value is between [a] and [b], allowing a [tolerance] on either side.
+ * The order of [a] and [b] doesn't matter, the float value must be _between_ them. The default
+ * tolerance is `0.001`.
+ */
+fun FloatSubject.isAlmostBetween(a: Float, b: Float, tolerance: Float = 1e-3f) {
+    if (a < b) {
+        isAtLeast(a - tolerance)
+        isAtMost(b + tolerance)
+    } else {
+        isAtLeast(b - tolerance)
+        isAtMost(a + tolerance)
+    }
+}
+
+fun <E : Comparable<E>> List<E>.assertIncreasing() {
+    assertThat(this).isInOrder(Ordering.natural<E>())
+}
+
+fun <E : Comparable<E>> List<E>.assertDecreasing() {
+    assertThat(this).isInOrder(Ordering.natural<E>().reverse<E>())
 }

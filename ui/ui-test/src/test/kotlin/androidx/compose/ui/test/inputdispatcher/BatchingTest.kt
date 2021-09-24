@@ -18,9 +18,15 @@ package androidx.compose.ui.test.inputdispatcher
 
 import androidx.compose.testutils.expectError
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.test.RobolectricMinSdk
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 
+@RunWith(AndroidJUnit4::class)
+@Config(minSdk = RobolectricMinSdk)
 class BatchingTest : InputDispatcherTest() {
 
     companion object {

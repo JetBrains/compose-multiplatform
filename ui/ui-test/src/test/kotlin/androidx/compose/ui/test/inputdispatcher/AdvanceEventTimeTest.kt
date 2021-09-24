@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,18 +18,21 @@ package androidx.compose.ui.test.inputdispatcher
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.AndroidInputDispatcher
+import androidx.compose.ui.test.RobolectricMinSdk
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
+import org.robolectric.ParameterizedRobolectricTestRunner
+import org.robolectric.annotation.Config
 
 /**
  * Tests if [AndroidInputDispatcher.advanceEventTime] works by sending three events with a
  * delay in between them.
  */
 @SmallTest
-@RunWith(Parameterized::class)
+@RunWith(ParameterizedRobolectricTestRunner::class)
+@Config(minSdk = RobolectricMinSdk)
 class AdvanceEventTimeTest(private val config: TestConfig) : InputDispatcherTest() {
     data class TestConfig(
         val firstDelayMillis: Long,
@@ -40,7 +43,7 @@ class AdvanceEventTimeTest(private val config: TestConfig) : InputDispatcherTest
         private val anyPosition = Offset.Zero
 
         @JvmStatic
-        @Parameterized.Parameters(name = "{0}")
+        @ParameterizedRobolectricTestRunner.Parameters(name = "{0}")
         fun createTestSet(): List<TestConfig> {
             return mutableListOf<TestConfig>().apply {
                 for (delay1 in listOf(0L, 23L)) {
