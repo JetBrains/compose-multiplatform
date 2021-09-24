@@ -219,7 +219,8 @@ class LazyListState constructor(
         get() = scrollableState.isScrollInProgress
 
     private var canScrollBackward: Boolean = false
-    private var canScrollForward: Boolean = false
+    internal var canScrollForward: Boolean = false
+        private set
 
     // TODO: Coroutine scrolling APIs will allow this to be private again once we have more
     //  fine-grained control over scrolling
