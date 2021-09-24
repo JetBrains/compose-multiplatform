@@ -257,6 +257,9 @@ package androidx.compose.material {
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.material.ElevationOverlay> getLocalElevationOverlay();
   }
 
+  public final class ExposedDropdownMenuKt {
+  }
+
   public final inline class FabPosition {
     ctor public FabPosition();
   }

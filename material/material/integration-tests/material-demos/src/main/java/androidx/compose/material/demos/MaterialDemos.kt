@@ -35,6 +35,7 @@ import androidx.compose.material.samples.SimpleScaffoldWithTopBar
 val MaterialDemos = DemoCategory(
     "Material",
     listOf(
+        ComposableDemo("ExposedDropdownMenu") { ExposedDropdownMenuDemo() },
         DemoCategory(
             "AlertDialog",
             listOf(
@@ -71,7 +72,13 @@ val MaterialDemos = DemoCategory(
             )
         ),
         ComposableDemo("Material Theme") { MaterialThemeDemo() },
-        ComposableDemo("Menus") { MenuDemo() },
+        DemoCategory(
+            "Menus",
+            listOf(
+                ComposableDemo("Dropdown Menu positioning") { MenuDemo() },
+                ComposableDemo("Menu variations") { DropdownMenuVariationsDemo() },
+            )
+        ),
         ComposableDemo("Navigation Rail") { NavigationRailDemo() },
         DemoCategory(
             "Playground",
