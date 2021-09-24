@@ -187,11 +187,6 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
     "lintWithoutExpandProjectionRelease",
     "lintWithKaptRelease",
     "lintWithKspRelease",
-
-    // https://github.com/johnrengelman/shadow/issues/707
-    "embeddedPlugin",
-    "repackageBundledJars",
-    "shadowJar"
 )
 
 abstract class TaskUpToDateValidator :
