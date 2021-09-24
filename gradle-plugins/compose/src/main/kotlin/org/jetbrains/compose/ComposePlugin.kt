@@ -9,9 +9,12 @@ package org.jetbrains.compose
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ComponentMetadataContext
+import org.gradle.api.artifacts.ComponentMetadataRule
 import org.gradle.api.artifacts.dsl.ComponentModuleMetadataHandler
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.plugins.ExtensionAware
+import org.jetbrains.compose.android.AndroidExtension
 import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.internal.configureApplicationImpl
 import org.jetbrains.compose.desktop.application.internal.currentTarget
@@ -26,6 +29,7 @@ class ComposePlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val composeExtension = project.extensions.create("compose", ComposeExtension::class.java)
         val desktopExtension = composeExtension.extensions.create("desktop", DesktopExtension::class.java)
+        val androidExtension = composeExtension.extensions.create("android", AndroidExtension::class.java)
 
         if (!project.buildFile.endsWith(".gradle.kts")) {
             // add compose extension for Groovy DSL to work
@@ -50,54 +54,92 @@ class ComposePlugin : Plugin<Project> {
                 // we want to avoid creating tasks like package, run, etc. to avoid conflicts with other plugins
                 configureApplicationImpl(project, desktopExtension.application)
             }
-        }
 
-        fun ComponentModuleMetadataHandler.replaceAndroidx(original: String, replacement: String) {
-            module(original) {
-                it.replacedBy(replacement, "org.jetbrains.compose isn't compatible with androidx.compose, because it is the same library published with different maven coordinates")
+            if (androidExtension.useAndroidX) {
+                println("useAndroidX is an axperimental feature at the moment!")
+                RedirectAndroidVariants.androidxVersion = androidExtension.androidxVersion
+                listOf(
+                    RedirectAndroidVariants::class.java,
+                ).forEach(project.dependencies.components::all)
             }
-        }
 
-        project.dependencies.modules {
-            // Replace 'androidx.compose' artifacts by 'org.jetbrains.compose' artifacts.
-            // It is needed, because 'org.jetbrains.compose' artifacts are the same artifacts as 'androidx.compose'
-            // (but with different version).
-            // And Gradle will throw an error when it cannot determine which class from which artifact should it use.
-            //
-            // Note that we don't provide a configuration parameter to disable dependency replacement,
-            // because without replacement, gradle will fail anyway because classpath contains two incompatible artifacts.
-            //
-            // We should define all replacements, even for transient dependencies.
-            // For example, a library can depend on androidx.compose.foundation:foundation-layout
-            //
-            // List of all org.jetbrains.compose libraries is here:
-            // https://maven.pkg.jetbrains.space/public/p/compose/dev/org/jetbrains/compose/
-            //
-            // (use ./gradle printAllAndroidxReplacements to know what dependencies should be here)
-            //
-            // It is temporarily solution until we will be publishing all MPP artifacts in Google Maven repository.
-            // Or align versions with androidx artifacts and point MPP-android artifacts to androidx artifacts (is it possible?)
+            fun ComponentModuleMetadataHandler.replaceAndroidx(original: String, replacement: String) {
+                module(original) {
+                    it.replacedBy(replacement, "org.jetbrains.compose isn't compatible with androidx.compose, because it is the same library published with different maven coordinates")
+                }
+            }
 
-            it.replaceAndroidx("androidx.compose.animation:animation", "org.jetbrains.compose.animation:animation")
-            it.replaceAndroidx("androidx.compose.animation:animation-core", "org.jetbrains.compose.animation:animation-core")
-            it.replaceAndroidx("androidx.compose.compiler:compiler", "org.jetbrains.compose.compiler:compiler")
-            it.replaceAndroidx("androidx.compose.compiler:compiler-hosted", "org.jetbrains.compose.compiler:compiler-hosted")
-            it.replaceAndroidx("androidx.compose.foundation:foundation", "org.jetbrains.compose.foundation:foundation")
-            it.replaceAndroidx("androidx.compose.foundation:foundation-layout", "org.jetbrains.compose.foundation:foundation-layout")
-            it.replaceAndroidx("androidx.compose.material:material", "org.jetbrains.compose.material:material")
-            it.replaceAndroidx("androidx.compose.material:material-icons-core", "org.jetbrains.compose.material:material-icons-core")
-            it.replaceAndroidx("androidx.compose.material:material-icons-extended", "org.jetbrains.compose.material:material-icons-extended")
-            it.replaceAndroidx("androidx.compose.material:material-ripple", "org.jetbrains.compose.material:material-ripple")
-            it.replaceAndroidx("androidx.compose.runtime:runtime", "org.jetbrains.compose.runtime:runtime")
-            it.replaceAndroidx("androidx.compose.runtime:runtime-saveable", "org.jetbrains.compose.runtime:runtime-saveable")
-            it.replaceAndroidx("androidx.compose.ui:ui", "org.jetbrains.compose.ui:ui")
-            it.replaceAndroidx("androidx.compose.ui:ui-geometry", "org.jetbrains.compose.ui:ui-geometry")
-            it.replaceAndroidx("androidx.compose.ui:ui-graphics", "org.jetbrains.compose.ui:ui-graphics")
-            it.replaceAndroidx("androidx.compose.ui:ui-test", "org.jetbrains.compose.ui:ui-test")
-            it.replaceAndroidx("androidx.compose.ui:ui-test-junit4", "org.jetbrains.compose.ui:ui-test-junit4")
-            it.replaceAndroidx("androidx.compose.ui:ui-text", "org.jetbrains.compose.ui:ui-text")
-            it.replaceAndroidx("androidx.compose.ui:ui-unit", "org.jetbrains.compose.ui:ui-unit")
-            it.replaceAndroidx("androidx.compose.ui:ui-util", "org.jetbrains.compose.ui:ui-util")
+            //redirecting all android artifacts to androidx.compose
+            project.dependencies.modules {
+                if (!androidExtension.useAndroidX) {
+                    // Replace 'androidx.compose' artifacts by 'org.jetbrains.compose' artifacts.
+                    // It is needed, because 'org.jetbrains.compose' artifacts are the same artifacts as 'androidx.compose'
+                    // (but with different version).
+                    // And Gradle will throw an error when it cannot determine which class from which artifact should it use.
+                    //
+                    // Note that we don't provide a configuration parameter to disable dependency replacement,
+                    // because without replacement, gradle will fail anyway because classpath contains two incompatible artifacts.
+                    //
+                    // We should define all replacements, even for transient dependencies.
+                    // For example, a library can depend on androidx.compose.foundation:foundation-layout
+                    //
+                    // List of all org.jetbrains.compose libraries is here:
+                    // https://maven.pkg.jetbrains.space/public/p/compose/dev/org/jetbrains/compose/
+                    //
+                    // (use ./gradle printAllAndroidxReplacements to know what dependencies should be here)
+                    //
+                    // It is temporarily solution until we will be publishing all MPP artifacts in Google Maven repository.
+                    // Or align versions with androidx artifacts and point MPP-android artifacts to androidx artifacts (is it possible?)
+                    it.replaceAndroidx(
+                        "androidx.compose.animation:animation",
+                        "org.jetbrains.compose.animation:animation"
+                    )
+                    it.replaceAndroidx(
+                        "androidx.compose.animation:animation-core",
+                        "org.jetbrains.compose.animation:animation-core"
+                    )
+                    it.replaceAndroidx("androidx.compose.compiler:compiler", "org.jetbrains.compose.compiler:compiler")
+                    it.replaceAndroidx(
+                        "androidx.compose.compiler:compiler-hosted",
+                        "org.jetbrains.compose.compiler:compiler-hosted"
+                    )
+                    it.replaceAndroidx(
+                        "androidx.compose.foundation:foundation",
+                        "org.jetbrains.compose.foundation:foundation"
+                    )
+                    it.replaceAndroidx(
+                        "androidx.compose.foundation:foundation-layout",
+                        "org.jetbrains.compose.foundation:foundation-layout"
+                    )
+                    it.replaceAndroidx("androidx.compose.material:material", "org.jetbrains.compose.material:material")
+                    it.replaceAndroidx(
+                        "androidx.compose.material:material-icons-core",
+                        "org.jetbrains.compose.material:material-icons-core"
+                    )
+                    it.replaceAndroidx(
+                        "androidx.compose.material:material-icons-extended",
+                        "org.jetbrains.compose.material:material-icons-extended"
+                    )
+                    it.replaceAndroidx(
+                        "androidx.compose.material:material-ripple",
+                        "org.jetbrains.compose.material:material-ripple"
+                    )
+                    it.replaceAndroidx("androidx.compose.runtime:runtime", "org.jetbrains.compose.runtime:runtime")
+                    it.replaceAndroidx(
+                        "androidx.compose.runtime:runtime-saveable",
+                        "org.jetbrains.compose.runtime:runtime-saveable"
+                    )
+                    it.replaceAndroidx("androidx.compose.ui:ui", "org.jetbrains.compose.ui:ui")
+                    it.replaceAndroidx("androidx.compose.ui:ui-geometry", "org.jetbrains.compose.ui:ui-geometry")
+                    it.replaceAndroidx("androidx.compose.ui:ui-graphics", "org.jetbrains.compose.ui:ui-graphics")
+                    it.replaceAndroidx("androidx.compose.ui:ui-test", "org.jetbrains.compose.ui:ui-test")
+                    it.replaceAndroidx("androidx.compose.ui:ui-test-junit4", "org.jetbrains.compose.ui:ui-test-junit4")
+                    it.replaceAndroidx("androidx.compose.ui:ui-text", "org.jetbrains.compose.ui:ui-text")
+                    it.replaceAndroidx("androidx.compose.ui:ui-unit", "org.jetbrains.compose.ui:ui-unit")
+                    it.replaceAndroidx("androidx.compose.ui:ui-util", "org.jetbrains.compose.ui:ui-util")
+                }
+            }
+
         }
 
         project.tasks.withType(KotlinCompile::class.java) {
@@ -105,6 +147,32 @@ class ComposePlugin : Plugin<Project> {
                 jvmTarget = "1.8".takeIf { jvmTarget.toDouble() < 1.8 } ?: jvmTarget
                 useIR = true
             }
+        }
+    }
+
+    class RedirectAndroidVariants : ComponentMetadataRule {
+        override fun execute(context: ComponentMetadataContext) = with(context.details) {
+            if (id.group.startsWith("org.jetbrains.compose")) {
+                val group = id.group.replaceFirst("org.jetbrains.compose", "androidx.compose")
+                val newReference = "$group:${id.module.name}:$androidxVersion"
+                listOf(
+                    "debugApiElements-published",
+                    "debugRuntimeElements-published",
+                    "releaseApiElements-published",
+                    "releaseRuntimeElements-published"
+                ).forEach { variantNameToAlter ->
+                    withVariant(variantNameToAlter) { variantMetadata ->
+                        variantMetadata.withDependencies { dependencies ->
+                            dependencies.removeAll { true } //there are references to org.jetbrains artifacts now
+                            dependencies.add(newReference)
+                        }
+                    }
+                }
+            }
+        }
+
+        companion object {
+            var androidxVersion: String? = null
         }
     }
 
