@@ -52,6 +52,7 @@ import androidx.compose.ui.demos.gestures.RawDragGestureFilterDemo
 import androidx.compose.ui.demos.gestures.ScaleGestureFilterDemo
 import androidx.compose.ui.demos.gestures.ScrollGestureFilterDemo
 import androidx.compose.ui.demos.gestures.VerticalScrollerInDrawerDemo
+import androidx.compose.ui.demos.input.TouchModeDemo
 import androidx.compose.ui.demos.scroll.BringIntoViewDemo
 import androidx.compose.ui.demos.keyinput.KeyInputDemo
 import androidx.compose.ui.demos.modifier.CommunicatingModifierDemo
@@ -177,6 +178,7 @@ val CoreDemos = DemoCategory(
         ComposableDemo("Explicit autofill types") { ExplicitAutofillTypesDemo() },
         FocusDemos,
         ComposableDemo("KeyInput") { KeyInputDemo() },
+        ComposableDemo("TouchMode") { TouchModeDemo() },
         ComposableDemo("Multiple collects measure") { MultipleCollectTest() },
         ComposableDemo("Dialog") { DialogDemo() },
         ComposableDemo("Popup") { PopupDemo() },

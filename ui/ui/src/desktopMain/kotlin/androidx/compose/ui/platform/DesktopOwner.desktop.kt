@@ -35,6 +35,9 @@ import androidx.compose.ui.focus.FocusManagerImpl
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.asComposeCanvas
+import androidx.compose.ui.input.InputModeManager
+import androidx.compose.ui.input.InputModeManagerImpl
+import androidx.compose.ui.input.InputMode.Companion.Keyboard
 import androidx.compose.ui.input.key.Key.Companion.Back
 import androidx.compose.ui.input.key.Key.Companion.DirectionCenter
 import androidx.compose.ui.input.key.Key.Companion.Tab
@@ -118,6 +121,18 @@ internal class DesktopOwner(
     }
     override val focusManager: FocusManager
         get() = _focusManager
+
+    // TODO: Set the input mode. For now we don't support touch mode, (always in Key mode).
+    private val _inputModeManager = InputModeManagerImpl(
+        initialInputMode = Keyboard,
+        onRequestInputModeChange = {
+            // TODO: Change the input mode programmatically. For now we just return true if the
+            //  requested input mode is Keyboard mode.
+            it == Keyboard
+        }
+    )
+    override val inputModeManager: InputModeManager
+        get() = _inputModeManager
 
     // TODO: set/clear _windowInfo.isWindowFocused when the window gains/loses focus.
     private val _windowInfo: WindowInfoImpl = WindowInfoImpl()
