@@ -114,14 +114,14 @@ private val PsiParameter.isComposable: Boolean
         // The parameter is in a class file. Currently type annotations aren't currently added to
         // the underlying type (https://youtrack.jetbrains.com/issue/KT-45307), so instead we use
         // the metadata annotation.
-        this is ClsParameterImpl
+        this is ClsParameterImpl ||
             // In some cases when a method is defined in bytecode and the call fails to resolve
             // to the ClsMethodImpl, we will instead get a LightParameter. Note that some Kotlin
             // declarations too will also appear as a LightParameter, so we can check to see if
             // the source language is Java, which means that this is a LightParameter for
             // bytecode, as opposed to for a Kotlin declaration.
             // https://youtrack.jetbrains.com/issue/KT-46883
-            || (this is LightParameter && this.language is JavaLanguage) -> {
+            (this is LightParameter && this.language is JavaLanguage) -> {
             // Find the containing method, so we can get metadata from the containing class
             val containingMethod = getParentOfType<PsiMethod>(true)
             val kmFunction = containingMethod!!.toKmFunction()
