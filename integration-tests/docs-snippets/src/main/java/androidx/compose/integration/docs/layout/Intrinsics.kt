@@ -70,7 +70,6 @@ private object IntrinsicsSnippet1 {
             Text(
                 modifier = Modifier
                     .weight(1f)
-
                     .padding(end = 4.dp)
                     .wrapContentWidth(Alignment.End),
 
