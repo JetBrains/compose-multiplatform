@@ -26,6 +26,8 @@
     <string name="in_progress" msgid="6827826412747255547">"En cours…"</string>
     <string name="tab" msgid="1672349317127674378">"Onglet"</string>
     <string name="navigation_menu" msgid="542007171693138492">"Menu de navigation"</string>
+    <!-- no translation found for dropdown_menu (1890207353314751437) -->
+    <skip />
     <string name="close_drawer" msgid="406453423630273620">"Fermer le menu de navigation"</string>
     <string name="close_sheet" msgid="7573152094250666567">"Fermer la feuille"</string>
     <string name="default_error_message" msgid="8038256446254964252">"Entrée incorrecte"</string>
