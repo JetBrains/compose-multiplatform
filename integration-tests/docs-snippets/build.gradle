@@ -15,6 +15,7 @@
  */
 
 import androidx.build.Publish
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("AndroidXPlugin")
@@ -61,3 +62,13 @@ androidx {
 
 android.defaultConfig.minSdkVersion 21
 android.buildFeatures.viewBinding true
+
+// needed only while https://youtrack.jetbrains.com/issue/KT-47000 isn't resolved which is
+// targeted to 1.6
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += [
+                "-Xjvm-default=enable",
+        ]
+    }
+}
