@@ -26,6 +26,8 @@
     <string name="in_progress" msgid="6827826412747255547">"ප්‍රගතියේ පවතී"</string>
     <string name="tab" msgid="1672349317127674378">"ටැබය"</string>
     <string name="navigation_menu" msgid="542007171693138492">"සංචාලන මෙනුව"</string>
+    <!-- no translation found for dropdown_menu (1890207353314751437) -->
+    <skip />
     <string name="close_drawer" msgid="406453423630273620">"සංචාලන මෙනුව වසන්න"</string>
     <string name="close_sheet" msgid="7573152094250666567">"පත්‍රය වසන්න"</string>
     <string name="default_error_message" msgid="8038256446254964252">"වලංගු නොවන ආදානයකි"</string>
