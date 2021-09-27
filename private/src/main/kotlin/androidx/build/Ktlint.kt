@@ -19,6 +19,7 @@ package androidx.build
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
@@ -31,14 +32,16 @@ import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.options.Option
 import java.io.File
 
+val bundlingAttribute = Attribute.of("org.gradle.dependency.bundling", String::class.java)
+
 private fun Project.getKtlintConfiguration(): Configuration {
     return configurations.findByName("ktlint") ?: configurations.create("ktlint") {
         val version = project.extensions.getByType(
             VersionCatalogsExtension::class.java
         ).find("libs").get().findVersion("ktlint").get().requiredVersion
-
         val dependency = dependencies.create("com.pinterest:ktlint:$version")
         it.dependencies.add(dependency)
+        it.attributes.attribute(bundlingAttribute, "external")
     }
 }
 
