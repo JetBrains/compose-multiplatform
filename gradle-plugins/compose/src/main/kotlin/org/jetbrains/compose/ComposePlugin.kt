@@ -56,7 +56,7 @@ class ComposePlugin : Plugin<Project> {
             }
 
             if (androidExtension.useAndroidX) {
-                println("useAndroidX is an axperimental feature at the moment!")
+                println("useAndroidX is an experimental feature at the moment!")
                 RedirectAndroidVariants.androidxVersion = androidExtension.androidxVersion
                 listOf(
                     RedirectAndroidVariants::class.java,
@@ -90,53 +90,34 @@ class ComposePlugin : Plugin<Project> {
                     //
                     // It is temporarily solution until we will be publishing all MPP artifacts in Google Maven repository.
                     // Or align versions with androidx artifacts and point MPP-android artifacts to androidx artifacts (is it possible?)
-                    it.replaceAndroidx(
+
+                    listOf(
                         "androidx.compose.animation:animation",
-                        "org.jetbrains.compose.animation:animation"
-                    )
-                    it.replaceAndroidx(
                         "androidx.compose.animation:animation-core",
-                        "org.jetbrains.compose.animation:animation-core"
-                    )
-                    it.replaceAndroidx("androidx.compose.compiler:compiler", "org.jetbrains.compose.compiler:compiler")
-                    it.replaceAndroidx(
+                        "androidx.compose.compiler:compiler",
                         "androidx.compose.compiler:compiler-hosted",
-                        "org.jetbrains.compose.compiler:compiler-hosted"
-                    )
-                    it.replaceAndroidx(
                         "androidx.compose.foundation:foundation",
-                        "org.jetbrains.compose.foundation:foundation"
-                    )
-                    it.replaceAndroidx(
                         "androidx.compose.foundation:foundation-layout",
-                        "org.jetbrains.compose.foundation:foundation-layout"
-                    )
-                    it.replaceAndroidx("androidx.compose.material:material", "org.jetbrains.compose.material:material")
-                    it.replaceAndroidx(
+                        "androidx.compose.material:material",
                         "androidx.compose.material:material-icons-core",
-                        "org.jetbrains.compose.material:material-icons-core"
-                    )
-                    it.replaceAndroidx(
                         "androidx.compose.material:material-icons-extended",
-                        "org.jetbrains.compose.material:material-icons-extended"
-                    )
-                    it.replaceAndroidx(
                         "androidx.compose.material:material-ripple",
-                        "org.jetbrains.compose.material:material-ripple"
-                    )
-                    it.replaceAndroidx("androidx.compose.runtime:runtime", "org.jetbrains.compose.runtime:runtime")
-                    it.replaceAndroidx(
+                        "androidx.compose.runtime:runtime",
                         "androidx.compose.runtime:runtime-saveable",
-                        "org.jetbrains.compose.runtime:runtime-saveable"
-                    )
-                    it.replaceAndroidx("androidx.compose.ui:ui", "org.jetbrains.compose.ui:ui")
-                    it.replaceAndroidx("androidx.compose.ui:ui-geometry", "org.jetbrains.compose.ui:ui-geometry")
-                    it.replaceAndroidx("androidx.compose.ui:ui-graphics", "org.jetbrains.compose.ui:ui-graphics")
-                    it.replaceAndroidx("androidx.compose.ui:ui-test", "org.jetbrains.compose.ui:ui-test")
-                    it.replaceAndroidx("androidx.compose.ui:ui-test-junit4", "org.jetbrains.compose.ui:ui-test-junit4")
-                    it.replaceAndroidx("androidx.compose.ui:ui-text", "org.jetbrains.compose.ui:ui-text")
-                    it.replaceAndroidx("androidx.compose.ui:ui-unit", "org.jetbrains.compose.ui:ui-unit")
-                    it.replaceAndroidx("androidx.compose.ui:ui-util", "org.jetbrains.compose.ui:ui-util")
+                        "androidx.compose.ui:ui",
+                        "androidx.compose.ui:ui-geometry",
+                        "androidx.compose.ui:ui-graphics",
+                        "androidx.compose.ui:ui-test",
+                        "androidx.compose.ui:ui-test-junit4",
+                        "androidx.compose.ui:ui-text",
+                        "androidx.compose.ui:ui-unit",
+                        "androidx.compose.ui:ui-util"
+                    ).forEach() { module ->
+                        it.replaceAndroidx(
+                            module,
+                            module.replace("androidx.compose", "org.jetbrains.compose")
+                        )
+                    }
                 }
             }
 
