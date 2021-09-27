@@ -159,7 +159,7 @@ fun main() = singleWindowApplication {
 Compose for Desktop contains desktop-only `Modifier.mouseClickable`, where data about pressed mouse buttons and keyboard modifiers is available. This is an experimental API, which means that it's likely to be changed before release.
 
 ```kotlin
-import androidx.compose.foundation.ExperimentalDesktopApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.mouseClickable
 import androidx.compose.material.Text
 import androidx.compose.runtime.getValue
@@ -176,7 +176,7 @@ import androidx.compose.ui.input.pointer.isShiftPressed
 import androidx.compose.ui.input.pointer.isTertiaryPressed
 import androidx.compose.ui.window.singleWindowApplication
 
-@OptIn(ExperimentalDesktopApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 fun main() = singleWindowApplication {
     var clickableText by remember { mutableStateOf("Click me!") }
 

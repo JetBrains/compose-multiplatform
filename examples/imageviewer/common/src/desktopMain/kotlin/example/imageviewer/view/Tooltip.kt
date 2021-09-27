@@ -1,6 +1,7 @@
 package example.imageviewer.view
 
 import androidx.compose.foundation.BoxWithTooltip
+import androidx.compose.foundation.TooltipArea
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -16,7 +17,7 @@ fun Tooltip(
     text: String = "Tooltip",
     content: @Composable () -> Unit
 ) {
-    BoxWithTooltip(
+    TooltipArea(
         tooltip = {
             Surface(
                 color = Color(210, 210, 210),

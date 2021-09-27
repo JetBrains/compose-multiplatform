@@ -20,12 +20,12 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import org.jetbrains.skija.Image.makeFromEncoded
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import org.jetbrains.skia.Image
 
 object ContentState {
     val drag = DragHandler()
@@ -241,7 +241,7 @@ object ContentState {
     }
 
     fun updateMainImage() {
-        MainImageWrapper.mainImageAsImageBitmap.value = makeFromEncoded(
+        MainImageWrapper.mainImageAsImageBitmap.value = Image.makeFromEncoded(
             toByteArray(
                 cropBitmapByScale(
                     mainImage.value,

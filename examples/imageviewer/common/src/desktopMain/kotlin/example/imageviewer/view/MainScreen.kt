@@ -186,7 +186,7 @@ fun Miniature(
                 }
             ) {
                 Image(
-                    org.jetbrains.skija.Image.makeFromEncoded(
+                    org.jetbrains.skia.Image.makeFromEncoded(
                         toByteArray(picture.image)
                     ).asImageBitmap(),
                     contentDescription = null,

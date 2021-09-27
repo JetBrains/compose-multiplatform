@@ -264,7 +264,8 @@ The main arguments of the `BoxWithTooltip` function:
  - delay - time delay in milliseconds after which the tooltip will be shown (default is 500 ms)
 
 ```kotlin
-import androidx.compose.foundation.BoxWithTooltip
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.TooltipArea
 import androidx.compose.foundation.TooltipPlacement
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -285,7 +286,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
@@ -296,8 +297,7 @@ fun main() = application {
         Column(Modifier.fillMaxSize(), Arrangement.spacedBy(5.dp)) {
             buttons.forEachIndexed { index, name ->
                 // wrap button in BoxWithTooltip
-                BoxWithTooltip(
-                    modifier = Modifier.padding(start = 40.dp),
+                TooltipArea(
                     tooltip = {
                         // composable tooltip content
                         Surface(
@@ -311,7 +311,8 @@ fun main() = application {
                             )
                         }
                     },
-                    delay = 600, // in milliseconds
+                    modifier = Modifier.padding(start = 40.dp),
+                    delayMillis = 600, // in milliseconds
                     tooltipPlacement = TooltipPlacement.CursorPoint(
                         alignment = Alignment.BottomEnd,
                         offset = if (index % 2 == 0) DpOffset(-16.dp, 0.dp) else DpOffset.Zero // tooltip offset
