@@ -107,7 +107,7 @@ class MouseEventsTest : InputDispatcherTest() {
         subject.enqueueMouseMove(position3)
         subject.verifyMousePosition(position3)
         expectedEvents += 1 // hover
-        subject.sendAllSynchronous()
+        subject.flush()
 
         recorder.assertHasValidEventTimes()
         assertThat(recorder.events).hasSize(expectedEvents)
@@ -162,7 +162,7 @@ class MouseEventsTest : InputDispatcherTest() {
         subject.advanceEventTime()
         subject.enqueueMouseCancel()
         expectedEvents += 1 // cancel
-        subject.sendAllSynchronous()
+        subject.flush()
 
         recorder.assertHasValidEventTimes()
         assertThat(recorder.events).hasSize(expectedEvents)
@@ -229,7 +229,7 @@ class MouseEventsTest : InputDispatcherTest() {
         subject.advanceEventTime()
         subject.enqueueMousePress(MouseButton.Tertiary.buttonId)
         expectedEvents += 3 // exit + down + press
-        subject.sendAllSynchronous()
+        subject.flush()
 
         recorder.assertHasValidEventTimes()
         assertThat(recorder.events).hasSize(expectedEvents)
@@ -322,7 +322,7 @@ class MouseEventsTest : InputDispatcherTest() {
         subject.enqueueMouseExit(position3)
         subject.verifyMousePosition(position3)
         expectedEvents += 1 // exit
-        subject.sendAllSynchronous()
+        subject.flush()
 
         recorder.assertHasValidEventTimes()
         assertThat(recorder.events).hasSize(expectedEvents)
@@ -386,7 +386,7 @@ class MouseEventsTest : InputDispatcherTest() {
         subject.advanceEventTime()
         subject.enqueueMouseScroll(3f, scrollWheel)
         expectedEvents += 2 // hover + scroll
-        subject.sendAllSynchronous()
+        subject.flush()
 
         recorder.assertHasValidEventTimes()
         assertThat(recorder.events).hasSize(expectedEvents)
@@ -457,7 +457,7 @@ class MouseEventsTest : InputDispatcherTest() {
         subject.advanceEventTime()
         subject.enqueueMouseCancel()
         expectedEvents += 1 // cancel
-        subject.sendAllSynchronous()
+        subject.flush()
 
         recorder.assertHasValidEventTimes()
         assertThat(recorder.events).hasSize(expectedEvents)
@@ -499,7 +499,7 @@ class MouseEventsTest : InputDispatcherTest() {
         subject.advanceEventTime()
         subject.enqueueMousePress(MouseButton.Primary.buttonId)
         expectedEvents += 3 // cancel + down + press
-        subject.sendAllSynchronous()
+        subject.flush()
 
         recorder.assertHasValidEventTimes()
         assertThat(recorder.events).hasSize(expectedEvents)
@@ -540,7 +540,7 @@ class MouseEventsTest : InputDispatcherTest() {
         subject.advanceEventTime()
         subject.enqueueMouseMove(position2)
         expectedEvents += 3 // cancel + enter + hover
-        subject.sendAllSynchronous()
+        subject.flush()
 
         recorder.assertHasValidEventTimes()
         assertThat(recorder.events).hasSize(expectedEvents)
@@ -579,7 +579,7 @@ class MouseEventsTest : InputDispatcherTest() {
         subject.advanceEventTime()
         subject.enqueueMouseScroll(1f, ScrollWheel.Vertical)
         expectedEvents += 4 // cancel + enter + hover + scroll
-        subject.sendAllSynchronous()
+        subject.flush()
 
         recorder.assertHasValidEventTimes()
         assertThat(recorder.events).hasSize(expectedEvents)

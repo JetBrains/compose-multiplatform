@@ -117,7 +117,7 @@ internal class DesktopInputDispatcher(
         return event
     }
 
-    override fun sendAllSynchronous() {
+    override fun flush() {
         val copy = batchedEvents.toList()
         batchedEvents.clear()
         copy.forEach {

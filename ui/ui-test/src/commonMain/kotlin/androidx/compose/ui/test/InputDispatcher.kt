@@ -111,7 +111,8 @@ internal abstract class InputDispatcher(
     }
 
     @OptIn(InternalTestApi::class)
-    private val TestContext.currentTime get() = testOwner.mainClock.currentTime
+    private val TestContext.currentTime
+        get() = testOwner.mainClock.currentTime
 
     /**
      * Increases the current event time by [durationMillis].
@@ -489,7 +490,7 @@ internal abstract class InputDispatcher(
      * Sends all enqueued events and blocks while they are dispatched. If an exception is
      * thrown during the process, all events that haven't yet been dispatched will be dropped.
      */
-    abstract fun sendAllSynchronous()
+    abstract fun flush()
 
     protected abstract fun PartialGesture.enqueueDown(pointerId: Int)
 
@@ -521,7 +522,7 @@ internal abstract class InputDispatcher(
 
     /**
      * Called when this [InputDispatcher] is about to be discarded, from
-     * [MultiModalInjectionScope.dispose].
+     * [InjectionScope.dispose].
      */
     fun dispose() {
         saveState(root)

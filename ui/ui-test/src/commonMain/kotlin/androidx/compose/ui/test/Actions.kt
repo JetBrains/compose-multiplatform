@@ -313,11 +313,7 @@ fun SemanticsNodeInteraction.performGesture(
         try {
             block()
         } finally {
-            try {
-                inputDispatcher.sendAllSynchronous()
-            } finally {
-                dispose()
-            }
+            delegateScope.dispose()
         }
     }
     return this
@@ -375,11 +371,7 @@ fun SemanticsNodeInteraction.performTouchInput(
         try {
             block.invoke(Touch)
         } finally {
-            try {
-                inputDispatcher.sendAllSynchronous()
-            } finally {
-                dispose()
-            }
+            dispose()
         }
     }
     return this
@@ -434,11 +426,7 @@ fun SemanticsNodeInteraction.performMouseInput(
         try {
             block.invoke(Mouse)
         } finally {
-            try {
-                inputDispatcher.sendAllSynchronous()
-            } finally {
-                dispose()
-            }
+            dispose()
         }
     }
     return this
@@ -480,11 +468,7 @@ fun SemanticsNodeInteraction.performMultiModalInput(
         try {
             block.invoke(this)
         } finally {
-            try {
-                inputDispatcher.sendAllSynchronous()
-            } finally {
-                dispose()
-            }
+            dispose()
         }
     }
     return this

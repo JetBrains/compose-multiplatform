@@ -70,7 +70,7 @@ class TouchEventsTest : InputDispatcherTest() {
     @Test
     fun onePointer_down() {
         subject.generateTouchDownAndCheck(pointer1, position1)
-        subject.sendAllSynchronous()
+        subject.flush()
 
         val t = 0L
         recorder.assertHasValidEventTimes()
@@ -84,7 +84,7 @@ class TouchEventsTest : InputDispatcherTest() {
         subject.generateTouchDownAndCheck(pointer1, position1)
         subject.generateTouchUpAndCheck(pointer1)
         subject.assertNoTouchGestureInProgress()
-        subject.sendAllSynchronous()
+        subject.flush()
 
         recorder.assertHasValidEventTimes()
         recorder.events.apply {
@@ -104,7 +104,7 @@ class TouchEventsTest : InputDispatcherTest() {
         subject.generateTouchDownAndCheck(pointer1, position1_1)
         subject.generateTouchUpAndCheck(pointer1, 2 * eventPeriodMillis)
         subject.assertNoTouchGestureInProgress()
-        subject.sendAllSynchronous()
+        subject.flush()
 
         recorder.assertHasValidEventTimes()
         recorder.events.apply {
@@ -126,7 +126,7 @@ class TouchEventsTest : InputDispatcherTest() {
         subject.updateTouchPointerAndCheck(pointer1, position1_2)
         subject.advanceEventTime()
         subject.enqueueTouchMove()
-        subject.sendAllSynchronous()
+        subject.flush()
 
         var t = 0L
         recorder.assertHasValidEventTimes()
@@ -145,7 +145,7 @@ class TouchEventsTest : InputDispatcherTest() {
         subject.advanceEventTime()
         subject.generateCancelAndCheckPointers()
         subject.assertNoTouchGestureInProgress()
-        subject.sendAllSynchronous()
+        subject.flush()
         recorder.assertHasValidEventTimes()
 
         recorder.events.apply {
@@ -171,7 +171,7 @@ class TouchEventsTest : InputDispatcherTest() {
         subject.updateTouchPointerAndCheck(pointer2, position2_2)
         subject.advanceEventTime()
         subject.enqueueTouchMove()
-        subject.sendAllSynchronous()
+        subject.flush()
 
         recorder.assertHasValidEventTimes()
         recorder.events.apply {
@@ -208,7 +208,7 @@ class TouchEventsTest : InputDispatcherTest() {
         subject.updateTouchPointerAndCheck(pointer2, position2_2)
         subject.advanceEventTime()
         subject.enqueueTouchMove()
-        subject.sendAllSynchronous()
+        subject.flush()
 
         recorder.assertHasValidEventTimes()
         recorder.events.apply {
@@ -242,7 +242,7 @@ class TouchEventsTest : InputDispatcherTest() {
         subject.updateTouchPointerAndCheck(pointer2, position2_2)
         subject.advanceEventTime()
         subject.enqueueTouchMove()
-        subject.sendAllSynchronous()
+        subject.flush()
 
         recorder.assertHasValidEventTimes()
         recorder.events.apply {
@@ -270,7 +270,7 @@ class TouchEventsTest : InputDispatcherTest() {
         subject.generateTouchUpAndCheck(pointer2)
         subject.generateTouchUpAndCheck(pointer1)
         subject.assertNoTouchGestureInProgress()
-        subject.sendAllSynchronous()
+        subject.flush()
 
         recorder.assertHasValidEventTimes()
         recorder.events.apply {
@@ -300,7 +300,7 @@ class TouchEventsTest : InputDispatcherTest() {
         subject.generateTouchUpAndCheck(pointer1)
         subject.generateTouchUpAndCheck(pointer2)
         subject.assertNoTouchGestureInProgress()
-        subject.sendAllSynchronous()
+        subject.flush()
 
         recorder.assertHasValidEventTimes()
         recorder.events.apply {
@@ -330,7 +330,7 @@ class TouchEventsTest : InputDispatcherTest() {
         subject.advanceEventTime()
         subject.generateCancelAndCheckPointers()
         subject.assertNoTouchGestureInProgress()
-        subject.sendAllSynchronous()
+        subject.flush()
         recorder.assertHasValidEventTimes()
 
         recorder.events.apply {
@@ -362,7 +362,7 @@ class TouchEventsTest : InputDispatcherTest() {
         subject.advanceEventTime()
         subject.enqueueTouchMove()
         subject.generateTouchDownAndCheck(pointer3, position3)
-        subject.sendAllSynchronous()
+        subject.flush()
 
         recorder.assertHasValidEventTimes()
         recorder.events.apply {
@@ -408,7 +408,7 @@ class TouchEventsTest : InputDispatcherTest() {
         subject.advanceEventTime()
         subject.enqueueTouchMove()
         subject.generateTouchDownAndCheck(pointer1, position1_2)
-        subject.sendAllSynchronous()
+        subject.flush()
 
         recorder.assertHasValidEventTimes()
         recorder.events.apply {
@@ -447,7 +447,7 @@ class TouchEventsTest : InputDispatcherTest() {
         subject.generateTouchDownAndCheck(pointer1, position1)
         subject.generateTouchDownAndCheck(pointer4, position4)
         subject.generateTouchDownAndCheck(pointer2, position2)
-        subject.sendAllSynchronous()
+        subject.flush()
 
         recorder.assertHasValidEventTimes()
         recorder.events.apply {
@@ -490,7 +490,7 @@ class TouchEventsTest : InputDispatcherTest() {
         subject.advanceEventTime()
         subject.enqueueTouchMove()
         subject.generateTouchDownAndCheck(pointer4, position4)
-        subject.sendAllSynchronous()
+        subject.flush()
 
         recorder.assertHasValidEventTimes()
         recorder.events.apply {
@@ -538,7 +538,7 @@ class TouchEventsTest : InputDispatcherTest() {
         subject.updateTouchPointerAndCheck(pointer1, position1_3)
         subject.advanceEventTime()
         subject.generateTouchDownAndCheck(pointer3, position3_1)
-        subject.sendAllSynchronous()
+        subject.flush()
 
         recorder.assertHasValidEventTimes()
         recorder.events.apply {
@@ -573,7 +573,7 @@ class TouchEventsTest : InputDispatcherTest() {
         subject.updateTouchPointerAndCheck(pointer1, position1_3)
         subject.advanceEventTime()
         subject.generateTouchUpAndCheck(pointer1)
-        subject.sendAllSynchronous()
+        subject.flush()
 
         recorder.assertHasValidEventTimes()
         recorder.events.apply {
@@ -604,7 +604,7 @@ class TouchEventsTest : InputDispatcherTest() {
         subject.updateTouchPointerAndCheck(pointer2, position2_2)
         subject.advanceEventTime()
         subject.generateCancelAndCheckPointers()
-        subject.sendAllSynchronous()
+        subject.flush()
 
         recorder.assertHasValidEventTimes()
         recorder.events.apply {
