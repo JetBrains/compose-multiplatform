@@ -1064,7 +1064,7 @@ internal class ReadonlySnapshot internal constructor(
     }
 
     override fun recordModified(state: StateObject) {
-        error("Cannot modify a state object in a read-only snapshot")
+        reportReadonlySnapshotWrite()
     }
 }
 
@@ -1106,7 +1106,7 @@ internal class NestedReadonlySnapshot(
 
     override val modified: HashSet<StateObject>? get() = null
     override val writeObserver: ((Any) -> Unit)? get() = null
-    override fun recordModified(state: StateObject) = parent.recordModified(state)
+    override fun recordModified(state: StateObject) = reportReadonlySnapshotWrite()
 
     override fun nestedDeactivated(snapshot: Snapshot) = unsupported()
     override fun nestedActivated(snapshot: Snapshot) = unsupported()
@@ -1748,6 +1748,10 @@ private fun optimisticMerges(
         }
     }
     return result
+}
+
+private fun reportReadonlySnapshotWrite(): Nothing {
+    error("Cannot modify a state object in a read-only snapshot")
 }
 
 /**
