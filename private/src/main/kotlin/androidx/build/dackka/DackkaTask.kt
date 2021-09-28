@@ -184,6 +184,7 @@ abstract class DackkaWorkAction @Inject constructor (
 ) : WorkAction<DackkaParams> {
     override fun execute() {
         execOperations.javaexec {
+            it.mainClass.set("org.jetbrains.dokka.MainKt")
             it.args = parameters.args.get()
             it.classpath(parameters.classpath.get())
             // b/183989795 tracks moving these away from an environment variables
