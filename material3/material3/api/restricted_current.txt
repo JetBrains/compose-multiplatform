@@ -89,33 +89,17 @@ package androidx.compose.material3 {
 
   public final class MaterialTheme {
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public androidx.compose.material3.ColorScheme getColorScheme();
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public androidx.compose.material3.Shapes getShapes();
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public androidx.compose.material3.Typography getTypography();
     property @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public final androidx.compose.material3.ColorScheme colorScheme;
-    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public final androidx.compose.material3.Shapes shapes;
     property @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public final androidx.compose.material3.Typography typography;
     field public static final androidx.compose.material3.MaterialTheme INSTANCE;
   }
 
   public final class MaterialThemeKt {
-    method @androidx.compose.runtime.Composable public static void MaterialTheme(optional androidx.compose.material3.ColorScheme colorScheme, optional androidx.compose.material3.Typography typography, optional androidx.compose.material3.Shapes shapes, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void MaterialTheme(optional androidx.compose.material3.ColorScheme colorScheme, optional androidx.compose.material3.Typography typography, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
   public final class ScaffoldKt {
-  }
-
-  @androidx.compose.runtime.Immutable public final class Shapes {
-    ctor public Shapes(optional androidx.compose.foundation.shape.CornerBasedShape small, optional androidx.compose.foundation.shape.CornerBasedShape medium, optional androidx.compose.foundation.shape.CornerBasedShape large);
-    method public androidx.compose.material3.Shapes copy(optional androidx.compose.foundation.shape.CornerBasedShape small, optional androidx.compose.foundation.shape.CornerBasedShape medium, optional androidx.compose.foundation.shape.CornerBasedShape large);
-    method public androidx.compose.foundation.shape.CornerBasedShape getLarge();
-    method public androidx.compose.foundation.shape.CornerBasedShape getMedium();
-    method public androidx.compose.foundation.shape.CornerBasedShape getSmall();
-    property public final androidx.compose.foundation.shape.CornerBasedShape large;
-    property public final androidx.compose.foundation.shape.CornerBasedShape medium;
-    property public final androidx.compose.foundation.shape.CornerBasedShape small;
-  }
-
-  public final class ShapesKt {
   }
 
   public final class SurfaceKt {

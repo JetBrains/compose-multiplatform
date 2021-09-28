@@ -38,7 +38,7 @@ import androidx.compose.runtime.remember
  * default values.
  *
  * All values may be set by providing this component with the [colorScheme][ColorScheme],
- * [typography][Typography], and [shapes][Shapes] attributes. Use this to configure the overall
+ * [typography][Typography] attributes. Use this to configure the overall
  * theme of elements within this MaterialTheme.
  *
  * Any values that are not set will inherit the current value from the theme, falling back to the
@@ -48,13 +48,12 @@ import androidx.compose.runtime.remember
  *
  * @param colorScheme A complete definition of the Material Color theme for this hierarchy
  * @param typography A set of text styles to be used as this hierarchy's typography system
- * @param shapes A set of shapes to be used by the components in this hierarchy
  */
+
 @Composable
 fun MaterialTheme(
     colorScheme: ColorScheme = MaterialTheme.colorScheme,
     typography: Typography = MaterialTheme.typography,
-    shapes: Shapes = MaterialTheme.shapes,
     content: @Composable () -> Unit
 ) {
     val rememberedColorScheme = remember {
@@ -68,7 +67,6 @@ fun MaterialTheme(
         LocalColorScheme provides rememberedColorScheme,
         LocalTypography provides typography,
         LocalRippleTheme provides MaterialRippleTheme,
-        LocalShapes provides shapes,
     ) {
         ProvideTextStyle(value = typography.bodyLarge, content = content)
     }
@@ -94,14 +92,6 @@ object MaterialTheme {
         @Composable
         @ReadOnlyComposable
         get() = LocalTypography.current
-
-    /**
-     * Retrieves the current [Shapes] at the call site's position in the hierarchy.
-     */
-    val shapes: Shapes
-        @Composable
-        @ReadOnlyComposable
-        get() = LocalShapes.current
 }
 
 @Immutable
