@@ -1,14 +1,14 @@
 package org.jetbrains.compose.videoplayer.demo
 
 import androidx.compose.material.MaterialTheme
-import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.singleWindowApplication
 import org.jetbrains.compose.videoplayer.VideoPlayer
 
 fun main() {
     singleWindowApplication(
         title = "Video Player",
-        size = IntSize(800, 800)
+        state = WindowState(width = 800, height = 800)
     ) {
         MaterialTheme {
             VideoPlayer(
