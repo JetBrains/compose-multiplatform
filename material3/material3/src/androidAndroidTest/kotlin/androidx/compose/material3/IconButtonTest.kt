@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.samples.IconButtonSample
 import androidx.compose.material3.samples.IconToggleButtonSample
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -68,6 +69,21 @@ class IconButtonTest {
         rule
             .setMaterialContentForSizeAssertions {
                 IconButtonSample()
+            }
+            .assertWidthIsEqualTo(width)
+            .assertHeightIsEqualTo(height)
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun iconButton_size_withoutMinimumTouchTarget() {
+        val width = 24.dp
+        val height = 24.dp
+        rule
+            .setMaterialContentForSizeAssertions {
+                CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
+                    IconButtonSample()
+                }
             }
             .assertWidthIsEqualTo(width)
             .assertHeightIsEqualTo(height)
@@ -135,6 +151,21 @@ class IconButtonTest {
         rule
             .setMaterialContentForSizeAssertions {
                 IconToggleButtonSample()
+            }
+            .assertWidthIsEqualTo(width)
+            .assertHeightIsEqualTo(height)
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun iconToggleButton_size_withoutMinimumTouchTarget() {
+        val width = 24.dp
+        val height = 24.dp
+        rule
+            .setMaterialContentForSizeAssertions {
+                CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
+                    IconToggleButtonSample()
+                }
             }
             .assertWidthIsEqualTo(width)
             .assertHeightIsEqualTo(height)

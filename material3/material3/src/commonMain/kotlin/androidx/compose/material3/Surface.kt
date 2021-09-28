@@ -198,7 +198,7 @@ fun Surface(
     content: @Composable () -> Unit
 ) {
     Surface(
-        modifier = modifier,
+        modifier = modifier.minimumTouchTargetSize(),
         shape = shape,
         color = color,
         contentColor = contentColor,
