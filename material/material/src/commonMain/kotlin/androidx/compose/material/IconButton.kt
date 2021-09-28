@@ -20,7 +20,6 @@ import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
@@ -66,14 +65,14 @@ fun IconButton(
 ) {
     Box(
         modifier = modifier
+            .minimumTouchTargetSize()
             .clickable(
                 onClick = onClick,
                 enabled = enabled,
                 role = Role.Button,
                 interactionSource = interactionSource,
                 indication = rememberRipple(bounded = false, radius = RippleRadius)
-            )
-            .then(IconButtonSizeModifier),
+            ),
         contentAlignment = Alignment.Center
     ) {
         val contentAlpha = if (enabled) LocalContentAlpha.current else ContentAlpha.disabled
@@ -109,14 +108,16 @@ fun IconToggleButton(
     content: @Composable () -> Unit
 ) {
     Box(
-        modifier = modifier.toggleable(
+        modifier = modifier
+            .minimumTouchTargetSize()
+            .toggleable(
             value = checked,
             onValueChange = onCheckedChange,
             enabled = enabled,
             role = Role.Checkbox,
             interactionSource = interactionSource,
             indication = rememberRipple(bounded = false, radius = RippleRadius)
-        ).then(IconButtonSizeModifier),
+        ),
         contentAlignment = Alignment.Center
     ) {
         val contentAlpha = if (enabled) LocalContentAlpha.current else ContentAlpha.disabled
@@ -126,8 +127,3 @@ fun IconToggleButton(
 
 // Default radius of an unbounded ripple in an IconButton
 private val RippleRadius = 24.dp
-
-// TODO: b/149691127 investigate our strategy around accessibility touch targets, and remove
-// per-component definitions of this size.
-// Diameter of the IconButton, to allow for correct minimum touch target size for accessibility
-private val IconButtonSizeModifier = Modifier.size(48.dp)

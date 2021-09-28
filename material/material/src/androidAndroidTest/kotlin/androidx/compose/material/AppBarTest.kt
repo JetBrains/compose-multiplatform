@@ -17,6 +17,7 @@
 package androidx.compose.material
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -258,11 +259,12 @@ class AppBarTest {
     }
 
     /**
-     * [IconButton] that just draws a red box, to simulate a real icon for testing positions.
+     * A 48.dp box with a red box inside, to simulate an [IconButton] with a real icon inside for
+     * testing positions.
      */
     private val FakeIcon = @Composable { modifier: Modifier ->
-        IconButton(onClick = {}, modifier = modifier) {
-            Icon(ColorPainter(Color.Red), null)
+        Box(Modifier.size(48.dp)) {
+            Icon(ColorPainter(Color.Red), null, modifier)
         }
     }
 
