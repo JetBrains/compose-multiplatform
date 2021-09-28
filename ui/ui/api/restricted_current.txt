@@ -1650,6 +1650,7 @@ package androidx.compose.ui.layout {
     method public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
     method public java.util.List<androidx.compose.ui.layout.ModifierInfo> getModifierInfo();
     method public androidx.compose.ui.layout.LayoutInfo? getParentInfo();
+    method public androidx.compose.ui.platform.ViewConfiguration getViewConfiguration();
     method public int getWidth();
     method public boolean isAttached();
     method public boolean isPlaced();
@@ -1660,6 +1661,7 @@ package androidx.compose.ui.layout {
     property public abstract boolean isPlaced;
     property public abstract androidx.compose.ui.unit.LayoutDirection layoutDirection;
     property public abstract androidx.compose.ui.layout.LayoutInfo? parentInfo;
+    property public abstract androidx.compose.ui.platform.ViewConfiguration viewConfiguration;
     property public abstract int width;
   }
 

@@ -18,6 +18,7 @@ package androidx.compose.ui.layout
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 
@@ -67,6 +68,11 @@ interface LayoutInfo {
      * The layout direction in use for this layout.
      */
     val layoutDirection: LayoutDirection
+
+    /**
+     * The [ViewConfiguration] in use for this layout.
+     */
+    val viewConfiguration: ViewConfiguration
 
     /**
      * Returns true if this layout is currently a part of the layout tree.

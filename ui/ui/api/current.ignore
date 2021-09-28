@@ -3,6 +3,8 @@ AddedAbstractMethod: androidx.compose.ui.layout.LayoutInfo#getDensity():
     Added method androidx.compose.ui.layout.LayoutInfo.getDensity()
 AddedAbstractMethod: androidx.compose.ui.layout.LayoutInfo#getLayoutDirection():
     Added method androidx.compose.ui.layout.LayoutInfo.getLayoutDirection()
+AddedAbstractMethod: androidx.compose.ui.layout.LayoutInfo#getViewConfiguration():
+    Added method androidx.compose.ui.layout.LayoutInfo.getViewConfiguration()
 
 
 RemovedClass: androidx.compose.ui.graphics.vector.AnimatorKt:

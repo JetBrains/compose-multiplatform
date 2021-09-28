@@ -203,6 +203,7 @@ package androidx.compose.ui.test {
     method public default long getTopCenter();
     method public default long getTopLeft();
     method public default long getTopRight();
+    method public androidx.compose.ui.platform.ViewConfiguration getViewConfiguration();
     method public long getVisibleSize();
     method public default int getWidth();
     method public default long percentOffset(optional float x, optional float y);
@@ -223,6 +224,7 @@ package androidx.compose.ui.test {
     property public default long topCenter;
     property public default long topLeft;
     property public default long topRight;
+    property public abstract androidx.compose.ui.platform.ViewConfiguration viewConfiguration;
     property public abstract long visibleSize;
     property public default int width;
   }
