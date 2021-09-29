@@ -56,6 +56,8 @@ dependencies {
 
         lintChecks(projectOrArtifact(":compose:runtime:runtime-lint"))
         lintPublish(projectOrArtifact(":compose:runtime:runtime-lint"))
+
+        samples(projectOrArtifact(":compose:runtime:runtime:runtime-samples"))
     }
 }
 

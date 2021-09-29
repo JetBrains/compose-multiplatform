@@ -102,6 +102,8 @@ dependencies {
 
         lintChecks(project(":compose:ui:ui-lint"))
         lintPublish(project(":compose:ui:ui-lint"))
+
+        samples(project(":compose:ui:ui:ui-samples"))
     }
 }
 

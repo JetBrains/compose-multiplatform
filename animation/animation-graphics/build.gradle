@@ -29,7 +29,6 @@ AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
     kotlinPlugin(project(":compose:compiler:compiler"))
-
     if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
@@ -58,6 +57,8 @@ dependencies {
         androidTestImplementation(libs.testRunner)
         androidTestImplementation(libs.junit)
         androidTestImplementation(libs.truth)
+
+        samples(project(":compose:animation:animation-graphics:animation-graphics-samples"))
     }
 }
 
