@@ -16,19 +16,17 @@
 
 package androidx.compose.ui.graphics
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
-@RunWith(JUnit4::class)
-class TileModeTest {
+class ImageBitmapConfigTest {
 
     @Test
     fun testToString() {
-        assertEquals("Clamp", TileMode.Clamp.toString())
-        assertEquals("Mirror", TileMode.Mirror.toString())
-        assertEquals("Repeated", TileMode.Repeated.toString())
-        assertEquals("Decal", TileMode.Decal.toString())
+        assertEquals("Argb8888", ImageBitmapConfig.Argb8888.toString())
+        assertEquals("Alpha8", ImageBitmapConfig.Alpha8.toString())
+        assertEquals("Rgb565", ImageBitmapConfig.Rgb565.toString())
+        assertEquals("F16", ImageBitmapConfig.F16.toString())
+        assertEquals("Gpu", ImageBitmapConfig.Gpu.toString())
     }
 }

@@ -16,17 +16,15 @@
 
 package androidx.compose.ui.graphics
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
-@RunWith(JUnit4::class)
-class PaintingStyleTest {
+class StampedPathEffectStyleTest {
 
     @Test
     fun testToString() {
-        assertEquals("Fill", PaintingStyle.Fill.toString())
-        assertEquals("Stroke", PaintingStyle.Stroke.toString())
+        assertEquals("Translate", StampedPathEffectStyle.Translate.toString())
+        assertEquals("Rotate", StampedPathEffectStyle.Rotate.toString())
+        assertEquals("Morph", StampedPathEffectStyle.Morph.toString())
     }
 }

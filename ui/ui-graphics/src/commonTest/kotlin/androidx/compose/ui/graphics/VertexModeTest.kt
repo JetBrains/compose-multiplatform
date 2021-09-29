@@ -16,20 +16,15 @@
 
 package androidx.compose.ui.graphics
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
-@RunWith(JUnit4::class)
-class PathOperationTest {
+class VertexModeTest {
 
     @Test
     fun testToString() {
-        assertEquals("Intersect", PathOperation.Intersect.toString())
-        assertEquals("Difference", PathOperation.Difference.toString())
-        assertEquals("Union", PathOperation.Union.toString())
-        assertEquals("Xor", PathOperation.Xor.toString())
-        assertEquals("ReverseDifference", PathOperation.ReverseDifference.toString())
+        assertEquals("TriangleFan", VertexMode.TriangleFan.toString())
+        assertEquals("TriangleStrip", VertexMode.TriangleStrip.toString())
+        assertEquals("Triangles", VertexMode.Triangles.toString())
     }
 }

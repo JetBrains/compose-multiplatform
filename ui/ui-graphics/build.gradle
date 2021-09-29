@@ -42,6 +42,7 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
         testImplementation(libs.testRules)
         testImplementation(libs.testRunner)
+        testImplementation(libs.kotlinTestJunit)
         testImplementation(libs.junit)
         testImplementation(libs.truth)
 
@@ -98,6 +99,12 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 dependencies {
                     implementation(libs.kotlinStdlib)
                     implementation(libs.kotlinStdlibJdk8)
+                }
+            }
+
+            commonTest {
+                dependencies {
+                    implementation(kotlin("test"))
                 }
             }
 

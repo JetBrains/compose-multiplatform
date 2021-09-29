@@ -16,19 +16,15 @@
 
 package androidx.compose.ui.graphics
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
-@RunWith(JUnit4::class)
-class FilterQualityTest {
+class StrokeCapTest {
 
     @Test
     fun testToString() {
-        assertEquals("None", FilterQuality.None.toString())
-        assertEquals("Low", FilterQuality.Low.toString())
-        assertEquals("Medium", FilterQuality.Medium.toString())
-        assertEquals("High", FilterQuality.High.toString())
+        assertEquals("Butt", StrokeCap.Butt.toString())
+        assertEquals("Round", StrokeCap.Round.toString())
+        assertEquals("Square", StrokeCap.Square.toString())
     }
 }

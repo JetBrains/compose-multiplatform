@@ -16,14 +16,11 @@
 
 package androidx.compose.ui.graphics
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import kotlin.test.BeforeTest
+import kotlin.test.assertEquals
+import kotlin.test.Test
+import kotlin.test.assertTrue
 
-@RunWith(JUnit4::class)
 class ColorMatrixTest {
 
     private val tolerance = 0.0000001f
@@ -53,7 +50,7 @@ class ColorMatrixTest {
 
     private var colorMatrix = ColorMatrix(source)
 
-    @Before
+    @BeforeTest
     fun setup() {
         colorMatrix = ColorMatrix(source)
     }
@@ -201,9 +198,9 @@ class ColorMatrixTest {
         )
         for (i in ret.indices) {
             assertEquals(
-                "Expected: $expected[i] at index: $i received: $ret[i]",
                 expected[i],
-                ret[i]
+                ret[i],
+                "Expected: $expected[i] at index: $i received: $ret[i]"
             )
         }
     }
