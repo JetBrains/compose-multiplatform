@@ -115,6 +115,8 @@ class AndroidXImplPlugin : Plugin<Project> {
         project.configureExternalDependencyLicenseCheck()
         project.configureProjectStructureValidation(extension)
         project.configureProjectVersionValidation(extension)
+
+        project.configurations.create("samples")
     }
 
     /**
