@@ -92,7 +92,7 @@ object LibraryVersions {
     val MEDIAROUTER = Version("1.3.0-alpha01")
     val METRICS = Version("1.0.0-alpha01")
     val NAVIGATION = Version("2.4.0-alpha11")
-    val PAGING = Version("3.1.0-alpha05")
+    val PAGING = Version("3.1.0-beta01")
     val PAGING_COMPOSE = Version("1.0.0-alpha14")
     val PALETTE = Version("1.1.0-alpha01")
     val PRINT = Version("1.1.0-beta01")
