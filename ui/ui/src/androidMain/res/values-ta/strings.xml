@@ -26,8 +26,7 @@
     <string name="in_progress" msgid="6827826412747255547">"செயலிலுள்ளது"</string>
     <string name="tab" msgid="1672349317127674378">"பிரிவு"</string>
     <string name="navigation_menu" msgid="542007171693138492">"வழிசெலுத்தல் மெனு"</string>
-    <!-- no translation found for dropdown_menu (1890207353314751437) -->
-    <skip />
+    <string name="dropdown_menu" msgid="1890207353314751437">"கீழ்த்தோன்றல் மெனு"</string>
     <string name="close_drawer" msgid="406453423630273620">"வழிசெலுத்தல் மெனுவை மூடும்"</string>
     <string name="close_sheet" msgid="7573152094250666567">"ஷீட்டை மூடும்"</string>
     <string name="default_error_message" msgid="8038256446254964252">"தவறான உள்ளீடு"</string>

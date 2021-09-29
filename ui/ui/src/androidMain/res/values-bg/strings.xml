@@ -26,8 +26,7 @@
     <string name="in_progress" msgid="6827826412747255547">"В ход"</string>
     <string name="tab" msgid="1672349317127674378">"Раздел"</string>
     <string name="navigation_menu" msgid="542007171693138492">"Меню за навигация"</string>
-    <!-- no translation found for dropdown_menu (1890207353314751437) -->
-    <skip />
+    <string name="dropdown_menu" msgid="1890207353314751437">"Падащо меню"</string>
     <string name="close_drawer" msgid="406453423630273620">"Затваряне на менюто за навигация"</string>
     <string name="close_sheet" msgid="7573152094250666567">"Затваряне на таблицата"</string>
     <string name="default_error_message" msgid="8038256446254964252">"Въведеното е невалидно"</string>
