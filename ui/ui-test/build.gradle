@@ -28,10 +28,8 @@ AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 android {
     sourceSets {
-        if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-            test.java.srcDirs += "src/androidCommonTest/kotlin"
-            androidTest.java.srcDirs += "src/androidCommonTest/kotlin"
-        }
+        test.java.srcDirs += "src/androidCommonTest/kotlin"
+        androidTest.java.srcDirs += "src/androidCommonTest/kotlin"
     }
 
     lintOptions {
