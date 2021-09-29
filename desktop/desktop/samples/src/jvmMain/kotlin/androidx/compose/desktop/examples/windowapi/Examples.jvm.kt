@@ -35,7 +35,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.asPainter
+import androidx.compose.ui.graphics.toPainter
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.input.key.key
@@ -346,7 +346,7 @@ fun setAwtIcon() = GlobalScope.launchApplication {
     var icon: Painter? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
-        icon = loadAwtIcon()?.asPainter()
+        icon = loadAwtIcon().toPainter()
     }
 
     Window(onCloseRequest = ::exitApplication, icon = icon) {}

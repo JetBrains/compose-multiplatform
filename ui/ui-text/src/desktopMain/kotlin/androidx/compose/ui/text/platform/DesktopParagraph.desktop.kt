@@ -19,9 +19,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.DesktopPath
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.asSkiaPath
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
@@ -183,9 +183,9 @@ internal class DesktopParagraph(
             RectHeightMode.MAX,
             RectWidthMode.MAX
         )
-        val path = DesktopPath()
+        val path = Path()
         for (b in boxes) {
-            path.internalPath.addRect(b.rect)
+            path.asSkiaPath().addRect(b.rect)
         }
         return path
     }

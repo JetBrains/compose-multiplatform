@@ -23,7 +23,7 @@ import androidx.compose.ui.geometry.RoundRect
 actual fun Path(): Path = AndroidPath()
 
 /**
- * Convert the [android.graphics.Path] instance into a compose compatible Path
+ * Convert the [android.graphics.Path] instance into a Compose-compatible Path
  */
 fun android.graphics.Path.asComposePath(): Path = AndroidPath(this)
 

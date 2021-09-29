@@ -31,7 +31,7 @@ internal actual fun ActualLinearGradientShader(
     validateColorStops(colors, colorStops)
     return Shader.makeLinearGradient(
         from.x, from.y, to.x, to.y, colors.toIntArray(), colorStops?.toFloatArray(),
-        GradientStyle(tileMode.toDesktopTileMode(), true, identityMatrix33())
+        GradientStyle(tileMode.toSkiaTileMode(), true, identityMatrix33())
     )
 }
 
@@ -49,7 +49,7 @@ internal actual fun ActualRadialGradientShader(
         radius,
         colors.toIntArray(),
         colorStops?.toFloatArray(),
-        GradientStyle(tileMode.toDesktopTileMode(), true, identityMatrix33())
+        GradientStyle(tileMode.toSkiaTileMode(), true, identityMatrix33())
     )
 }
 
@@ -72,9 +72,9 @@ internal actual fun ActualImageShader(
     tileModeX: TileMode,
     tileModeY: TileMode
 ): Shader {
-    return image.asDesktopBitmap().makeShader(
-        tileModeX.toDesktopTileMode(),
-        tileModeY.toDesktopTileMode()
+    return image.asSkiaBitmap().makeShader(
+        tileModeX.toSkiaTileMode(),
+        tileModeY.toSkiaTileMode()
     )
 }
 

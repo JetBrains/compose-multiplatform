@@ -21,7 +21,7 @@ import androidx.compose.ui.geometry.Offset
 import org.jetbrains.skia.ImageFilter
 
 /**
- * Convert the [ImageFilter] instance into a compose compatible [RenderEffect]
+ * Convert the [ImageFilter] instance into a Compose-compatible [RenderEffect]
  */
 fun ImageFilter.asComposeRenderEffect(): RenderEffect =
     DesktopRenderEffect(this)
@@ -36,7 +36,10 @@ actual sealed class RenderEffect actual constructor() {
 
     private var internalImageFilter: ImageFilter? = null
 
-    fun asDesktopImageFilter(): ImageFilter =
+    @Deprecated("Use asSkiaImageFilter()", replaceWith = ReplaceWith("asSkiaImageFilter()"))
+    fun asDesktopImageFilter(): ImageFilter = asSkiaImageFilter()
+
+    fun asSkiaImageFilter(): ImageFilter =
         internalImageFilter ?: createImageFilter().also { internalImageFilter = it }
 
     protected abstract fun createImageFilter(): ImageFilter
@@ -68,14 +71,14 @@ actual class BlurEffect actual constructor(
             ImageFilter.makeBlur(
                 convertRadiusToSigma(radiusX),
                 convertRadiusToSigma(radiusY),
-                edgeTreatment.toDesktopTileMode()
+                edgeTreatment.toSkiaTileMode()
             )
         } else {
             ImageFilter.makeBlur(
                 convertRadiusToSigma(radiusX),
                 convertRadiusToSigma(radiusY),
-                edgeTreatment.toDesktopTileMode(),
-                renderEffect.asDesktopImageFilter(),
+                edgeTreatment.toSkiaTileMode(),
+                renderEffect.asSkiaImageFilter(),
                 null
             )
         }
@@ -129,7 +132,7 @@ actual class OffsetEffect actual constructor(
 ) : RenderEffect() {
 
     override fun createImageFilter(): ImageFilter =
-        ImageFilter.makeOffset(offset.x, offset.y, renderEffect?.asDesktopImageFilter(), null)
+        ImageFilter.makeOffset(offset.x, offset.y, renderEffect?.asSkiaImageFilter(), null)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

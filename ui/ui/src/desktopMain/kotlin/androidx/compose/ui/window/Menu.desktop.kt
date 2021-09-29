@@ -29,7 +29,7 @@ import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.asAwtImage
+import androidx.compose.ui.graphics.toAwtImage
 import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.input.key.toSwingKeyStroke
 import androidx.compose.ui.node.Ref
@@ -790,7 +790,7 @@ private fun rememberAwtIcon(painter: Painter?): Icon? {
 
     return remember(painter, density, layoutDirection) {
         painter
-            ?.asAwtImage(density, layoutDirection, DefaultIconSize)
+            ?.toAwtImage(density, layoutDirection, DefaultIconSize)
             ?.let(::ImageIcon)
     }
 }

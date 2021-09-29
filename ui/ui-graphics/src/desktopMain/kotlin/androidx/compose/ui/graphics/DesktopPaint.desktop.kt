@@ -24,9 +24,14 @@ actual typealias NativePaint = org.jetbrains.skia.Paint
 
 actual fun Paint(): Paint = DesktopPaint()
 
-class DesktopPaint : Paint {
-    internal val skia = org.jetbrains.skia.Paint()
+/**
+ * Convert the [org.jetbrains.skia.Paint] instance into a Compose-compatible Paint
+ */
+fun org.jetbrains.skia.Paint.asComposePaint(): Paint = DesktopPaint(this)
 
+internal class DesktopPaint(
+    val skia: org.jetbrains.skia.Paint = org.jetbrains.skia.Paint()
+) : Paint {
     override fun asFrameworkPaint(): NativePaint = skia
 
     override var alpha: Float
@@ -93,13 +98,13 @@ class DesktopPaint : Paint {
 
     override var colorFilter: ColorFilter? = null
         set(value) {
-            skia.colorFilter = value?.asDesktopColorFilter()
+            skia.colorFilter = value?.asSkiaColorFilter()
             field = value
         }
 
     override var pathEffect: PathEffect? = null
         set(value) {
-            skia.pathEffect = (value as DesktopPathEffect?)?.asDesktopPathEffect()
+            skia.pathEffect = (value as DesktopPathEffect?)?.asSkiaPathEffect()
             field = value
         }
 

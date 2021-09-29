@@ -26,7 +26,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.asAwtImage
+import androidx.compose.ui.graphics.toAwtImage
 import androidx.compose.ui.platform.DesktopPlatform
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -110,7 +110,7 @@ fun ApplicationScope.Tray(
         // (see MultiResolutionImage.getResolutionVariant). Resources like svg/xml should look okay
         // because they don't use absolute '.dp' values to draw, they use values which are
         // relative to their viewport.
-        icon.asAwtImage(GlobalDensity, GlobalLayoutDirection, iconSize)
+        icon.toAwtImage(GlobalDensity, GlobalLayoutDirection, iconSize)
     }
 
     val tray = remember {

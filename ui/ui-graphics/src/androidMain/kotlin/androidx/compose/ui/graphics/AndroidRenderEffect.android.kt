@@ -22,7 +22,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.geometry.Offset
 
 /**
- * Convert the [android.graphics.RenderEffect] instance into a compose compatible [RenderEffect]
+ * Convert the [android.graphics.RenderEffect] instance into a Compose-compatible [RenderEffect]
  */
 fun android.graphics.RenderEffect.asComposeRenderEffect(): RenderEffect =
     AndroidRenderEffect(this)

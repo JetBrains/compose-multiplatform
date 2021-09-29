@@ -33,12 +33,26 @@ import kotlin.math.abs
  * not create a copy of the original [Bitmap] and changes to it
  * will modify the returned [ImageBitmap]
  */
+@Deprecated("Use asComposeImageBitmap", replaceWith = ReplaceWith("asComposeImageBitmap()"))
 fun Bitmap.asImageBitmap(): ImageBitmap = DesktopImageBitmap(this)
 
 /**
  * Create an [ImageBitmap] from the given [Image].
  */
+@Deprecated("Use toComposeImageBitmap", replaceWith = ReplaceWith("toComposeImageBitmap()"))
 fun Image.asImageBitmap(): ImageBitmap = DesktopImageBitmap(toBitmap())
+
+/**
+ * Create an [ImageBitmap] from the given [Bitmap]. Note this does
+ * not create a copy of the original [Bitmap] and changes to it
+ * will modify the returned [ImageBitmap]
+ */
+fun Bitmap.asComposeImageBitmap(): ImageBitmap = DesktopImageBitmap(this)
+
+/**
+ * Create an [ImageBitmap] from the given [Image].
+ */
+fun Image.toComposeImageBitmap(): ImageBitmap = DesktopImageBitmap(toBitmap())
 
 private fun Image.toBitmap(): Bitmap {
     val bitmap = Bitmap()
@@ -70,7 +84,16 @@ internal actual fun ActualImageBitmap(
  * @Throws UnsupportedOperationException if this [ImageBitmap] is not backed by an
  * org.jetbrains.skia.Image
  */
-fun ImageBitmap.asDesktopBitmap(): Bitmap =
+@Deprecated("Use asSkiaBitmap()", replaceWith = ReplaceWith("asSkiaBitmap()"))
+fun ImageBitmap.asDesktopBitmap(): Bitmap = asSkiaBitmap()
+
+/**
+ * Obtain a reference to the [org.jetbrains.skia.Bitmap]
+ *
+ * @Throws UnsupportedOperationException if this [ImageBitmap] is not backed by an
+ * org.jetbrains.skia.Image
+ */
+fun ImageBitmap.asSkiaBitmap(): Bitmap =
     when (this) {
         is DesktopImageBitmap -> bitmap
         else -> throw UnsupportedOperationException("Unable to obtain org.jetbrains.skia.Image")
