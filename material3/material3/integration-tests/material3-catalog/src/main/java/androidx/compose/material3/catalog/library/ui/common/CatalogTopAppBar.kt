@@ -16,30 +16,30 @@
 
 package androidx.compose.material3.catalog.library.ui.common
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.primarySurface
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.catalog.library.R
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -63,18 +63,19 @@ fun CatalogTopAppBar(
     onLicensesClick: () -> Unit = {}
 ) {
     var moreMenuExpanded by remember { mutableStateOf(false) }
+    val backgroundColor = MaterialTheme.colorScheme.background
     // Wrapping in a Surface to handle window insets
     // https://issuetracker.google.com/issues/183161866
     Surface(
-        color = MaterialTheme.colors.primarySurface,
-        elevation = AppBarDefaults.TopAppBarElevation
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = AppBarDefaults.TopAppBarElevation,
     ) {
         TopAppBar(
             title = {
                 Text(
                     text = title,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
             },
             actions = {
@@ -139,7 +140,8 @@ fun CatalogTopAppBar(
             } else {
                 null
             },
-            backgroundColor = Color.Transparent,
+            backgroundColor = backgroundColor,
+            contentColor = contentColorFor(backgroundColor),
             elevation = 0.dp,
             modifier = Modifier
                 .statusBarsPadding()
@@ -162,7 +164,8 @@ private fun MoreMenu(
 ) {
     DropdownMenu(
         expanded = expanded,
-        onDismissRequest = onDismissRequest
+        onDismissRequest = onDismissRequest,
+        modifier = Modifier.background(MaterialTheme.colorScheme.background),
     ) {
         DropdownMenuItem(onClick = onGuidelinesClick) {
             Text(stringResource(id = R.string.view_design_guidelines))

@@ -33,4 +33,8 @@
     <string name="privacy_policy">Privacy policy</string>
     <string name="open_source_licenses">Open source licenses</string>
 
+    <string name="theme" description="Theme. [CHAR_LIMIT=NONE]">Theme</string>
+    <string name="color_mode" description=" Material 3 Color Mode. [CHAR_LIMIT=NONE]">Color Mode</string>
+    <string name="text_scale" description="Text scale. [CHAR_LIMIT=NONE]">Text Scale</string>
+    <string name="text_direction" description="Text direction. [CHAR_LIMIT=NONE]">Text Direction</string>
 </resources>
