@@ -27,6 +27,7 @@ import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.DpSize
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("ModifierInspectorInfo")
@@ -68,8 +69,8 @@ private class MinimumTouchTargetModifier(val size: DpSize) : LayoutModifier {
         val height = maxOf(placeable.height, size.height.roundToPx())
 
         return layout(width, height) {
-            val centerX = (width - placeable.width) / 2
-            val centerY = (height - placeable.height) / 2
+            val centerX = ((width - placeable.width) / 2f).roundToInt()
+            val centerY = ((height - placeable.height) / 2f).roundToInt()
             placeable.place(centerX, centerY)
         }
     }
