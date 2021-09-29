@@ -61,6 +61,8 @@ dependencies {
         androidTestImplementation(project(":compose:test-utils"))
 
         lintPublish project(":compose:animation:animation-core-lint")
+
+        samples(project(":compose:animation:animation-core:animation-core-samples"))
     }
 }
 

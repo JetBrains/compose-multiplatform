@@ -55,6 +55,8 @@ dependencies {
         androidTestImplementation(libs.testRunner)
         androidTestImplementation(libs.junit)
         androidTestImplementation(libs.truth)
+
+        samples(project(":compose:foundation:foundation-layout:foundation-layout-samples"))
     }
 }
 

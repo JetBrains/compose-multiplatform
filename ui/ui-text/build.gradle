@@ -66,6 +66,8 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         androidTestImplementation(libs.mockitoCore)
         androidTestImplementation(libs.truth)
         androidTestImplementation(libs.mockitoKotlin)
+
+        samples(projectOrArtifact(":compose:ui:ui-text:ui-text-samples"))
     }
 
     android {
