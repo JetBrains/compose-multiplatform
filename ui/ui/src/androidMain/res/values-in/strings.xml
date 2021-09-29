@@ -26,8 +26,7 @@
     <string name="in_progress" msgid="6827826412747255547">"Dalam proses"</string>
     <string name="tab" msgid="1672349317127674378">"Tab"</string>
     <string name="navigation_menu" msgid="542007171693138492">"Menu navigasi"</string>
-    <!-- no translation found for dropdown_menu (1890207353314751437) -->
-    <skip />
+    <string name="dropdown_menu" msgid="1890207353314751437">"Menu dropdown"</string>
     <string name="close_drawer" msgid="406453423630273620">"Tutup menu navigasi"</string>
     <string name="close_sheet" msgid="7573152094250666567">"Tutup sheet"</string>
     <string name="default_error_message" msgid="8038256446254964252">"Input tidak valid"</string>
