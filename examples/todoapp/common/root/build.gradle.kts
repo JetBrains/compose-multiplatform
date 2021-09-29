@@ -48,21 +48,3 @@ kotlin {
         }
     }
 }
-
-fun getIosTarget(): String {
-    val sdkName = System.getenv("SDK_NAME") ?: "iphonesimulator"
-
-    return if (sdkName.startsWith("iphoneos")) "iosArm64" else "iosX64"
-}
-
-val packForXcode by tasks.creating(Sync::class) {
-    group = "build"
-    val mode = System.getenv("CONFIGURATION") ?: "DEBUG"
-    val targetName = getIosTarget()
-    val framework = kotlin.targets.getByName<KotlinNativeTarget>(targetName).binaries.getFramework(mode)
-    inputs.property("mode", mode)
-    dependsOn(framework.linkTask)
-    val targetDir = File(buildDir, "xcode-frameworks")
-    from(framework.outputDirectory)
-    into(targetDir)
-}
