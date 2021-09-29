@@ -92,6 +92,8 @@ class DesktopComposeTestRule : ComposeContentTestRule {
             !window.hasInvalidations()
 
     override fun waitForIdle() {
+        // always check even if we are idle
+        uncaughtExceptionHandler.throwUncaught()
         while (!isIdle()) {
             Thread.sleep(10)
             uncaughtExceptionHandler.throwUncaught()
@@ -99,6 +101,8 @@ class DesktopComposeTestRule : ComposeContentTestRule {
     }
 
     override suspend fun awaitIdle() {
+        // always check even if we are idle
+        uncaughtExceptionHandler.throwUncaught()
         while (!isIdle()) {
             delay(10)
             uncaughtExceptionHandler.throwUncaught()

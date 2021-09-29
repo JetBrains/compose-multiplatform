@@ -54,8 +54,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
+import org.junit.Assume.assumeFalse
 import org.junit.Test
 import java.awt.Dimension
+import java.awt.GraphicsEnvironment
 import java.awt.event.KeyEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
@@ -531,6 +533,8 @@ class WindowTest {
 
     @Test(timeout = 30000)
     fun `window dispose should not cause a memory leak`() {
+        assumeFalse(GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance)
+
         val leakDetector = LeakDetector()
 
         val oldRecomposers = Recomposer.runningRecomposers.value
