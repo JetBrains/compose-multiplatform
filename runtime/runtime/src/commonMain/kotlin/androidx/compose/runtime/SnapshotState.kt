@@ -799,6 +799,7 @@ fun <T> rememberUpdatedState(newValue: T): State<T> = remember {
  *
  * @param context [CoroutineContext] to use for collecting.
  */
+@Suppress("StateFlowValueCalledInComposition")
 @Composable
 fun <T> StateFlow<T>.collectAsState(
     context: CoroutineContext = EmptyCoroutineContext

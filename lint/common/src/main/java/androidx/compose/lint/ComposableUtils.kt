@@ -32,6 +32,7 @@ import org.jetbrains.uast.UAnonymousClass
 import org.jetbrains.uast.UCallExpression
 import org.jetbrains.uast.UDeclaration
 import org.jetbrains.uast.UElement
+import org.jetbrains.uast.UExpression
 import org.jetbrains.uast.ULambdaExpression
 import org.jetbrains.uast.UMethod
 import org.jetbrains.uast.UParameter
@@ -63,13 +64,13 @@ fun UCallExpression.invokedInComposableBodyAndNotRemembered(): Boolean {
 }
 
 /**
- * Returns whether this [UCallExpression] is invoked within the body of a Composable function or
+ * Returns whether this [UExpression] is invoked within the body of a Composable function or
  * lambda.
  *
  * This searches parent declarations until we find a lambda expression or a function, and looks
  * to see if these are Composable.
  */
-fun UCallExpression.isInvokedWithinComposable(): Boolean {
+fun UExpression.isInvokedWithinComposable(): Boolean {
     return ComposableBodyVisitor(this).isComposable()
 }
 
@@ -157,15 +158,15 @@ val ULambdaExpression.isComposable: Boolean
     }
 
 /**
- * Helper class that visits parent declarations above the provided [callExpression], until it
+ * Helper class that visits parent declarations above the provided [expression], until it
  * finds a lambda or method. This 'boundary' is used as the indicator for whether this
- * [callExpression] can be considered to be inside a Composable body or not.
+ * [expression] can be considered to be inside a Composable body or not.
  *
  * @see isComposable
  * @see parentUElements
  */
 private class ComposableBodyVisitor(
-    private val callExpression: UCallExpression
+    private val expression: UExpression
 ) {
     /**
      * @return whether the body can be considered Composable or not
@@ -183,7 +184,7 @@ private class ComposableBodyVisitor(
 
     /**
      * The outermost UElement that corresponds to the surrounding UDeclaration that contains
-     * [callExpression], with the following special cases:
+     * [expression], with the following special cases:
      *
      * - if the containing UDeclaration is a local property, we ignore it and search above as
      * it still could be created in the context of a Composable body
@@ -192,7 +193,7 @@ private class ComposableBodyVisitor(
      */
     private val boundaryUElement by lazy {
         // The nearest property / function / etc declaration that contains this call expression
-        var containingDeclaration = callExpression.getContainingDeclaration()
+        var containingDeclaration = expression.getContainingDeclaration()
 
         fun UDeclaration.isLocalProperty() = (sourcePsi as? KtProperty)?.isLocal == true
         fun UDeclaration.isAnonymousClass() = this is UAnonymousClass
@@ -217,7 +218,7 @@ private class ComposableBodyVisitor(
         val elements = mutableListOf<UElement>()
 
         // Look through containing elements until we find a lambda or a method
-        for (element in callExpression.withContainingElements) {
+        for (element in expression.withContainingElements) {
             elements += element
             when (element) {
                 // TODO: consider handling the case of a lambda inside an inline function call,
