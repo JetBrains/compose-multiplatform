@@ -73,6 +73,8 @@ val LocalClipboardManager = staticCompositionLocalOf<ClipboardManager> {
  * pixel units. This is typically used when a
  * [DP][androidx.compose.ui.unit.Dp] is provided and it must be converted in the body of
  * [Layout] or [DrawModifier].
+ *
+ * @sample androidx.compose.ui.unit.samples.WithDensitySample
  */
 val LocalDensity = staticCompositionLocalOf<Density> {
     noLocalProvidedFor("LocalDensity")
