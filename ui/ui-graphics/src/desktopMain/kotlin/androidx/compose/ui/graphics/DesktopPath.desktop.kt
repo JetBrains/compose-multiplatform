@@ -27,17 +27,27 @@ import org.jetbrains.skia.PathOp
 actual fun Path(): Path = DesktopPath()
 
 /**
+ * Convert the [org.jetbrains.skia.Path] instance into a Compose-compatible Path
+ */
+fun org.jetbrains.skia.Path.asComposePath(): Path = DesktopPath(this)
+
+@Suppress("NOTHING_TO_INLINE")
+@Deprecated("Use asSkiaPath()", replaceWith = ReplaceWith("asSkiaPath()"))
+inline fun Path.asDesktopPath(): org.jetbrains.skia.Path = asSkiaPath()
+
+/**
+ * Obtain a reference to the [org.jetbrains.skia.Path]
+ *
  * @Throws UnsupportedOperationException if this Path is not backed by an org.jetbrains.skia.Path
  */
-@Suppress("NOTHING_TO_INLINE")
-inline fun Path.asDesktopPath(): org.jetbrains.skia.Path =
+fun Path.asSkiaPath(): org.jetbrains.skia.Path =
     if (this is DesktopPath) {
         internalPath
     } else {
         throw UnsupportedOperationException("Unable to obtain org.jetbrains.skia.Path")
     }
 
-class DesktopPath(
+internal class DesktopPath(
     internalPath: org.jetbrains.skia.Path = org.jetbrains.skia.Path()
 ) : Path {
     var internalPath = internalPath
@@ -143,7 +153,7 @@ class DesktopPath(
     }
 
     override fun addPath(path: Path, offset: Offset) {
-        internalPath.addPath(path.asDesktopPath(), offset.x, offset.y)
+        internalPath.addPath(path.asSkiaPath(), offset.x, offset.y)
     }
 
     override fun close() {
@@ -178,8 +188,8 @@ class DesktopPath(
         operation: PathOperation
     ): Boolean {
         val path = org.jetbrains.skia.Path.makeCombining(
-            path1.asDesktopPath(),
-            path2.asDesktopPath(),
+            path1.asSkiaPath(),
+            path2.asSkiaPath(),
             operation.toSkiaOperation()
         )
 

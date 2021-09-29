@@ -20,10 +20,11 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.DesktopCanvas
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Paint
@@ -32,9 +33,11 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.graphics.asDesktopPath
+import androidx.compose.ui.graphics.asComposeCanvas
+import androidx.compose.ui.graphics.asSkiaPath
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.toSkiaRRect
 import androidx.compose.ui.graphics.toSkiaRect
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.unit.Density
@@ -43,6 +46,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
+import org.jetbrains.skia.ClipMode
 import org.jetbrains.skia.Picture
 import org.jetbrains.skia.PictureRecorder
 import org.jetbrains.skia.Point3
@@ -213,7 +217,7 @@ internal class SkiaLayer(
         if (picture == null) {
             val bounds = size.toSize().toRect()
             val pictureCanvas = pictureRecorder.beginRecording(bounds.toSkiaRect())
-            performDrawLayer(DesktopCanvas(pictureCanvas), bounds)
+            performDrawLayer(pictureCanvas.asComposeCanvas(), bounds)
             picture = pictureRecorder.finishRecordingAsPicture()
         }
 
@@ -224,7 +228,7 @@ internal class SkiaLayer(
         canvas.restore()
     }
 
-    private fun performDrawLayer(canvas: DesktopCanvas, bounds: Rect) {
+    private fun performDrawLayer(canvas: Canvas, bounds: Rect) {
         if (alpha > 0) {
             if (shadowElevation > 0) {
                 drawShadow(canvas)
@@ -245,7 +249,7 @@ internal class SkiaLayer(
                     bounds,
                     Paint().apply {
                         alpha = this@SkiaLayer.alpha
-                        asFrameworkPaint().imageFilter = currentRenderEffect?.asDesktopImageFilter()
+                        asFrameworkPaint().imageFilter = currentRenderEffect?.asSkiaImageFilter()
                     }
                 )
             } else {
@@ -260,10 +264,21 @@ internal class SkiaLayer(
         }
     }
 
+    private fun Canvas.clipRoundRect(rect: RoundRect, clipOp: ClipOp = ClipOp.Intersect) {
+        val antiAlias = true
+        nativeCanvas.clipRRect(rect.toSkiaRRect(), clipOp.toSkia(), antiAlias)
+    }
+
+    private fun ClipOp.toSkia() = when (this) {
+        ClipOp.Difference -> ClipMode.DIFFERENCE
+        ClipOp.Intersect -> ClipMode.INTERSECT
+        else -> ClipMode.INTERSECT
+    }
+
     override fun updateDisplayList() = Unit
 
     @OptIn(ExperimentalUnsignedTypes::class)
-    fun drawShadow(canvas: DesktopCanvas) = with(density) {
+    fun drawShadow(canvas: Canvas) = with(density) {
         val path = when (val outline = outlineCache.outline) {
             is Outline.Rectangle -> Path().apply { addRect(outline.rect) }
             is Outline.Rounded -> Path().apply { addRoundRect(outline.roundRect) }
@@ -284,7 +299,7 @@ internal class SkiaLayer(
         val spotColor = Color.Black.copy(alpha = spotAlpha)
 
         ShadowUtils.drawShadow(
-            canvas.nativeCanvas, path.asDesktopPath(), zParams, lightPos,
+            canvas.nativeCanvas, path.asSkiaPath(), zParams, lightPos,
             lightRad,
             ambientColor.toArgb(),
             spotColor.toArgb(), alpha < 1f, false

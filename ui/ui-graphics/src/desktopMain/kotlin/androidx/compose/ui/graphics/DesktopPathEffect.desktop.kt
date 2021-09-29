@@ -21,9 +21,20 @@ import org.jetbrains.skia.PathEffect as SkiaPathEffect
 internal class DesktopPathEffect(val nativePathEffect: SkiaPathEffect) : PathEffect
 
 /**
+ * Convert the [org.jetbrains.skia.PathEffect] instance into a Compose-compatible PathEffect
+ */
+fun SkiaPathEffect.asComposePathEffect(): PathEffect = DesktopPathEffect(this)
+
+/**
  * Obtain a reference to the desktop PathEffect type
  */
-fun PathEffect.asDesktopPathEffect(): SkiaPathEffect =
+@Deprecated("Use asSkiaPathEffect()", replaceWith = ReplaceWith("asSkiaPathEffect()"))
+fun PathEffect.asDesktopPathEffect(): SkiaPathEffect = asSkiaPathEffect()
+
+/**
+ * Obtain a reference to the desktop PathEffect type
+ */
+fun PathEffect.asSkiaPathEffect(): SkiaPathEffect =
     (this as DesktopPathEffect).nativePathEffect
 
 internal actual fun actualCornerPathEffect(radius: Float): PathEffect =
@@ -35,7 +46,7 @@ internal actual fun actualDashPathEffect(
 ): PathEffect = DesktopPathEffect(SkiaPathEffect.makeDash(intervals, phase))
 
 internal actual fun actualChainPathEffect(outer: PathEffect, inner: PathEffect): PathEffect =
-    DesktopPathEffect(outer.asDesktopPathEffect().makeCompose(inner.asDesktopPathEffect()))
+    DesktopPathEffect(outer.asSkiaPathEffect().makeCompose(inner.asSkiaPathEffect()))
 
 internal actual fun actualStampedPathEffect(
     shape: Path,
@@ -45,7 +56,7 @@ internal actual fun actualStampedPathEffect(
 ): PathEffect =
     DesktopPathEffect(
         SkiaPathEffect.makePath1D(
-            shape.asDesktopPath(),
+            shape.asSkiaPath(),
             advance,
             phase,
             style.toSkiaStampedPathEffectStyle()

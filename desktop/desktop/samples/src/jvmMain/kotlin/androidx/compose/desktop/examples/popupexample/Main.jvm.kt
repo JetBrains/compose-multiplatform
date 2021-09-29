@@ -18,7 +18,7 @@ package androidx.compose.desktop.examples.popupexample
 
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.key
-import androidx.compose.ui.graphics.asPainter
+import androidx.compose.ui.graphics.toPainter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Tray
 import androidx.compose.ui.window.Window
@@ -37,7 +37,7 @@ fun main() = application {
     if (AppState.isMainWindowOpen) {
         Tray(
             state = trayState,
-            icon = AppState.image().asPainter(),
+            icon = AppState.image().toPainter(),
             menu = {
                 ActionItems(trayState)
             }
@@ -47,7 +47,7 @@ fun main() = application {
             onCloseRequest = AppState::closeMainWindow,
             title = AppState.wndTitle.value,
             state = windowState,
-            icon = AppState.image().asPainter(),
+            icon = AppState.image().toPainter(),
         ) {
             MainMenuBar(windowState, trayState)
 

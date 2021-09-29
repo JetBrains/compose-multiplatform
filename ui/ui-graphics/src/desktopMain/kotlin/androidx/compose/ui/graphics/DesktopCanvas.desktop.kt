@@ -18,7 +18,6 @@ package androidx.compose.ui.graphics
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -37,16 +36,21 @@ import org.jetbrains.skia.Rect as SkiaRect
 actual typealias NativeCanvas = org.jetbrains.skia.Canvas
 
 internal actual fun ActualCanvas(image: ImageBitmap): Canvas {
-    val skiaBitmap = image.asDesktopBitmap()
+    val skiaBitmap = image.asSkiaBitmap()
     require(!skiaBitmap.isImmutable) {
         "Cannot draw on immutable ImageBitmap"
     }
     return DesktopCanvas(org.jetbrains.skia.Canvas(skiaBitmap))
 }
 
+/**
+ * Convert the [org.jetbrains.skia.Canvas] instance into a Compose-compatible Canvas
+ */
+fun org.jetbrains.skia.Canvas.asComposeCanvas(): Canvas = DesktopCanvas(this)
+
 actual val Canvas.nativeCanvas: NativeCanvas get() = (this as DesktopCanvas).skia
 
-class DesktopCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
+internal class DesktopCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
     private val Paint.skia get() = (this as DesktopPaint).skia
 
     override fun save() {
@@ -94,14 +98,9 @@ class DesktopCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
         skia.clipRect(SkiaRect.makeLTRB(left, top, right, bottom), clipOp.toSkia(), antiAlias)
     }
 
-    fun clipRoundRect(rect: RoundRect, clipOp: ClipOp = ClipOp.Intersect) {
-        val antiAlias = true
-        skia.clipRRect(rect.toSkiaRRect(), clipOp.toSkia(), antiAlias)
-    }
-
     override fun clipPath(path: Path, clipOp: ClipOp) {
         val antiAlias = true
-        skia.clipPath(path.asDesktopPath(), clipOp.toSkia(), antiAlias)
+        skia.clipPath(path.asSkiaPath(), clipOp.toSkia(), antiAlias)
     }
 
     override fun drawLine(p1: Offset, p2: Offset, paint: Paint) {
@@ -165,7 +164,7 @@ class DesktopCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
     }
 
     override fun drawPath(path: Path, paint: Paint) {
-        skia.drawPath(path.asDesktopPath(), paint.skia)
+        skia.drawPath(path.asSkiaPath(), paint.skia)
     }
 
     override fun drawImage(image: ImageBitmap, topLeftOffset: Offset, paint: Paint) {
@@ -200,7 +199,7 @@ class DesktopCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
         dstSize: Size,
         paint: Paint
     ) {
-        val bitmap = image.asDesktopBitmap()
+        val bitmap = image.asSkiaBitmap()
         Image.makeFromBitmap(bitmap).use { skiaImage ->
             skia.drawImageRect(
                 skiaImage,
@@ -338,7 +337,7 @@ class DesktopCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
 
     override fun drawVertices(vertices: Vertices, blendMode: BlendMode, paint: Paint) {
         skia.drawVertices(
-            vertices.vertexMode.toDesktopVertexMode(),
+            vertices.vertexMode.toSkiaVertexMode(),
             vertices.positions,
             vertices.colors,
             vertices.textureCoordinates,
