@@ -18,6 +18,7 @@ package androidx.compose.ui.test
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
@@ -110,6 +111,9 @@ internal class MultiModalInjectionScopeImpl(node: SemanticsNode, testContext: Te
     private fun rootToLocal(position: Offset): Offset {
         return position - boundsInRoot.topLeft
     }
+
+    override val viewConfiguration: ViewConfiguration
+        get() = semanticsNode.layoutInfo.viewConfiguration
 
     /**
      * Adds the given [durationMillis] to the current event time, delaying the next event by that

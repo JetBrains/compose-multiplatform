@@ -18,27 +18,11 @@ package androidx.compose.ui.test
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.lerp
+import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.util.lerp
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.roundToInt
-
-/**
- * The time between the last event of the first click and the first event of the second click in
- * a double click gesture. 145 milliseconds: both median and average of empirical data (33 samples)
- */
-private const val DoubleClickDelayMillis = 145L
-
-/** The time before a long press gesture attempts to win. */
-// remove after b/179281066
-private const val LongPressTimeoutMillis: Long = 500L
-
-/**
- * The maximum time from the start of the first tap to the start of the second
- * tap in a double-tap gesture.
- */
-// remove after b/179281066
-private const val DoubleTapTimeoutMillis: Long = 300L
 
 /**
  * The receiver scope of the touch input injection lambda from [performTouchInput].
@@ -331,9 +315,9 @@ fun TouchInjectionScope.click(position: Offset = center) {
  * Performs a long click gesture (aka a long press) on the associated node.
  *
  * The long click is done at the given [position], or in the [center] if the [position] is
- * omitted. By default, the [durationMillis] of the press is [LongPressTimeoutMillis] + 100
- * milliseconds. The [position] is in the node's local coordinate system, where (0, 0) is the top
- * left corner of the node.
+ * omitted. By default, the [durationMillis] of the press is 100ms longer than the minimum
+ * required duration for a long press. The [position] is in the node's local coordinate system,
+ * where (0, 0) is the top left corner of the node.
  *
  * @param position The position of the long click, in the node's local coordinate system. If
  * omitted, the [center] of the node will be used.
@@ -341,21 +325,25 @@ fun TouchInjectionScope.click(position: Offset = center) {
  */
 fun TouchInjectionScope.longClick(
     position: Offset = center,
-    durationMillis: Long = LongPressTimeoutMillis + 100
+    durationMillis: Long = viewConfiguration.longPressTimeoutMillis + 100
 ) {
-    require(durationMillis >= LongPressTimeoutMillis) {
-        "Long click must have a duration of at least ${LongPressTimeoutMillis}ms"
+    require(durationMillis >= viewConfiguration.longPressTimeoutMillis) {
+        "Long click must have a duration of at least ${viewConfiguration.longPressTimeoutMillis}ms"
     }
     swipe(position, position, durationMillis)
 }
+
+// The average of min and max is a safe default
+private val ViewConfiguration.defaultDoubleTapDelayMillis: Long
+    get() = (doubleTapMinTimeMillis + doubleTapTimeoutMillis) / 2
 
 /**
  * Performs a double click gesture (aka a double tap) on the associated node.
  *
  * The double click is done at the given [position] or in the [center] if the [position] is
- * omitted. By default, the [delayMillis] between the first and the second click is 145
- * milliseconds. The [position] is in the node's local coordinate system, where (0, 0) is the top
- * left corner of the node.
+ * omitted. By default, the [delayMillis] between the first and the second click is half way in
+ * between the minimum and maximum required delay for a double click. The [position] is in the
+ * node's local coordinate system, where (0, 0) is the top left corner of the node.
  *
  * @param position The position of the double click, in the node's local coordinate system.
  * If omitted, the [center] position will be used.
@@ -364,10 +352,15 @@ fun TouchInjectionScope.longClick(
  */
 fun TouchInjectionScope.doubleClick(
     position: Offset = center,
-    delayMillis: Long = DoubleClickDelayMillis
+    delayMillis: Long = viewConfiguration.defaultDoubleTapDelayMillis
 ) {
-    require(delayMillis <= DoubleTapTimeoutMillis - 10) {
-        "Time between clicks in double click can be at most ${DoubleTapTimeoutMillis - 10}ms"
+    require(delayMillis >= viewConfiguration.doubleTapMinTimeMillis) {
+        "Time between clicks in double click must be at least " +
+            "${viewConfiguration.doubleTapMinTimeMillis}ms"
+    }
+    require(delayMillis < viewConfiguration.doubleTapTimeoutMillis) {
+        "Time between clicks in double click must be smaller than " +
+            "${viewConfiguration.doubleTapTimeoutMillis}ms"
     }
     click(position)
     advanceEventTime(delayMillis)

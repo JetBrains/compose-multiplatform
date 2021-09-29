@@ -17,6 +17,7 @@
 package androidx.compose.ui.test
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 
@@ -40,16 +41,23 @@ interface InjectionScope : Density {
     val eventPeriodMillis get() = InputDispatcher.eventPeriodMillis
 
     /**
+     * Adds the given [durationMillis] to the current event time, delaying the next event by that
+     * time.
+     */
+    fun advanceEventTime(durationMillis: Long = eventPeriodMillis)
+
+    /**
      * The size of the visible part of the node we're interacting with in px, i.e. its clipped
      * bounds.
      */
     val visibleSize: IntSize
 
     /**
-     * Adds the given [durationMillis] to the current event time, delaying the next event by that
-     * time.
+     * The [ViewConfiguration] in use by the
+     * [SemanticsNode][androidx.compose.ui.semantics.SemanticsNode] from the
+     * [SemanticsNodeInteraction] on which the input injection method is called.
      */
-    fun advanceEventTime(durationMillis: Long = eventPeriodMillis)
+    val viewConfiguration: ViewConfiguration
 
     /**
      * The width of the node in px. Shorthand for [visibleSize.width][visibleSize].

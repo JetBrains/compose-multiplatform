@@ -19,30 +19,16 @@ package androidx.compose.ui.test
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.geometry.lerp
+import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.util.lerp
 import kotlin.math.max
 import kotlin.math.roundToInt
-
-// TODO(fresen): Remove constants after b/179281066
 
 /**
  * The time between the button pressed and button released event in a mouse click. Determined by
  * empirical sampling.
  */
 private const val SingleClickDelayMillis = 60L
-
-/**
- * The time between the last event of the first click and the first event of the second click in
- * a double click gesture. Copied from double tap delay.
- */
-private const val DoubleClickDelayMillis = 145L
-
-/**
- * The time before a long press gesture attempts to win. Copied from the equivalent in touch
- * input.
- */
-// TODO(fresen): Verify value after mouse input is added to Compose, it may be different for mouse.
-private const val LongPressTimeoutMillis: Long = 500L
 
 /**
  * The default duration of mouse gestures with configurable time (e.g. [animateTo]).
@@ -295,6 +281,10 @@ fun MouseInjectionScope.rightClick(position: Offset = center) {
     release(MouseButton.Secondary)
 }
 
+// The average of min and max is a safe default
+private val ViewConfiguration.defaultDoubleTapDelayMillis: Long
+    get() = (doubleTapMinTimeMillis + doubleTapTimeoutMillis) / 2
+
 /**
  * Double-click on [position], or on the current mouse position if [position] is
  * [unspecified][Offset.Unspecified]. The [position] is in the node's local coordinate system,
@@ -307,7 +297,7 @@ fun MouseInjectionScope.rightClick(position: Offset = center) {
 @ExperimentalTestApi
 fun MouseInjectionScope.doubleClick(position: Offset = center) {
     click(position)
-    advanceEventTime(DoubleClickDelayMillis)
+    advanceEventTime(viewConfiguration.defaultDoubleTapDelayMillis)
     click(position)
 }
 
@@ -323,9 +313,9 @@ fun MouseInjectionScope.doubleClick(position: Offset = center) {
 @ExperimentalTestApi
 fun MouseInjectionScope.tripleClick(position: Offset = center) {
     click(position)
-    advanceEventTime(DoubleClickDelayMillis)
+    advanceEventTime(viewConfiguration.defaultDoubleTapDelayMillis)
     click(position)
-    advanceEventTime(DoubleClickDelayMillis)
+    advanceEventTime(viewConfiguration.defaultDoubleTapDelayMillis)
     click(position)
 }
 
@@ -344,7 +334,7 @@ fun MouseInjectionScope.longClick(position: Offset = center) {
         updatePointerTo(position)
     }
     press(MouseButton.Primary)
-    advanceEventTime(LongPressTimeoutMillis + 100L)
+    advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100L)
     release(MouseButton.Primary)
 }
 

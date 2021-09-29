@@ -20,6 +20,8 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.testutils.TestViewConfiguration
+import androidx.compose.testutils.WithViewConfiguration
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -55,6 +57,11 @@ class LongClickTest(private val config: TestConfig) {
     data class TestConfig(val position: Offset?, val durationMillis: Long?)
 
     companion object {
+        private const val LongPressTimeoutMillis = 300L
+        private val testViewConfiguration = TestViewConfiguration(
+            longPressTimeoutMillis = LongPressTimeoutMillis
+        )
+
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
         fun createTestSet(): List<TestConfig> {
@@ -73,7 +80,7 @@ class LongClickTest(private val config: TestConfig) {
     private val recordedLongClicks = mutableListOf<Offset>()
     private val expectedClickPosition =
         config.position ?: Offset(defaultSize / 2, defaultSize / 2)
-    private val expectedDuration = config.durationMillis ?: 600L
+    private val expectedDuration = config.durationMillis ?: LongPressTimeoutMillis + 100L
 
     private fun recordLongPress(position: Offset) {
         recordedLongClicks.add(position)
@@ -92,14 +99,16 @@ class LongClickTest(private val config: TestConfig) {
         // Given some content
         val recorder = SinglePointerInputRecorder()
         rule.setContent {
-            Box(Modifier.fillMaxSize().wrapContentSize(Alignment.BottomEnd)) {
-                ClickableTestBox(
-                    Modifier
-                        .pointerInput(Unit) {
-                            detectTapGestures(onLongPress = ::recordLongPress)
-                        }
-                        .then(recorder)
-                )
+            WithViewConfiguration(testViewConfiguration) {
+                Box(Modifier.fillMaxSize().wrapContentSize(Alignment.BottomEnd)) {
+                    ClickableTestBox(
+                        Modifier
+                            .pointerInput(Unit) {
+                                detectTapGestures(onLongPress = ::recordLongPress)
+                            }
+                            .then(recorder)
+                    )
+                }
             }
         }
 

@@ -17,6 +17,8 @@
 package androidx.compose.ui.test.injectionscope.touch
 
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.testutils.TestViewConfiguration
+import androidx.compose.testutils.WithViewConfiguration
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
@@ -46,6 +48,14 @@ class DoubleClickTest(private val config: TestConfig) {
     data class TestConfig(val position: Offset?, val delayMillis: Long?)
 
     companion object {
+        private const val DoubleTapMin = 40L
+        private const val DoubleTapMax = 200L
+        private const val DefaultDoubleTapTimeMillis = (DoubleTapMin + DoubleTapMax) / 2
+        private val testViewConfiguration = TestViewConfiguration(
+            doubleTapMinTimeMillis = DoubleTapMin,
+            doubleTapTimeoutMillis = DoubleTapMax
+        )
+
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
         fun createTestSet(): List<TestConfig> {
@@ -65,7 +75,7 @@ class DoubleClickTest(private val config: TestConfig) {
 
     private val expectedClickPosition =
         config.position ?: Offset(defaultSize / 2, defaultSize / 2)
-    private val expectedDelay = config.delayMillis ?: 145L
+    private val expectedDelay = config.delayMillis ?: DefaultDoubleTapTimeMillis
 
     private fun recordDoubleClick(position: Offset) {
         recordedDoubleClicks.add(position)
@@ -76,11 +86,13 @@ class DoubleClickTest(private val config: TestConfig) {
         // Given some content
         val recorder = SinglePointerInputRecorder()
         rule.setContent {
-            ClickableTestBox(
-                Modifier
-                    .pointerInput(Unit) { detectTapGestures(onDoubleTap = ::recordDoubleClick) }
-                    .then(recorder)
-            )
+            WithViewConfiguration(testViewConfiguration) {
+                ClickableTestBox(
+                    Modifier
+                        .pointerInput(Unit) { detectTapGestures(onDoubleTap = ::recordDoubleClick) }
+                        .then(recorder)
+                )
+            }
         }
 
         // When we inject a double click

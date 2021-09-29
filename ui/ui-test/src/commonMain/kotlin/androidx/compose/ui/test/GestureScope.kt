@@ -37,7 +37,6 @@ private const val edgeFuzzFactor = 0.083f
 private const val doubleClickDelayMillis = 145L
 
 /** The time before a long press gesture attempts to win. */
-// remove after b/179281066
 private const val LongPressTimeoutMillis: Long = 500L
 
 /**
