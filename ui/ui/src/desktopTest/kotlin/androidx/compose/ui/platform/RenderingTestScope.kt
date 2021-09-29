@@ -19,9 +19,9 @@ package androidx.compose.ui.platform
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.runBlocking
@@ -53,7 +53,6 @@ internal class RenderingTestScope(
 ) {
     var currentTimeMillis = 0L
 
-    private val coroutineScope = CoroutineScope(coroutineContext)
     private val frameDispatcher = FrameDispatcher(coroutineContext) {
         onRender(currentTimeMillis * 1_000_000)
     }
@@ -61,37 +60,34 @@ internal class RenderingTestScope(
     val surface: Surface = Surface.makeRasterN32Premul(width, height)
     val canvas: Canvas = surface.canvas
     val owners = DesktopOwners(
-        coroutineScope = coroutineScope,
+        coroutineContext = coroutineContext,
         invalidate = frameDispatcher::scheduleFrame
-    )
-    private var owner: DesktopOwner? = null
+    ).apply {
+        constraints = Constraints(maxWidth = width, maxHeight = height)
+    }
 
     var density: Float
-        get() = owner!!.density.density
+        get() = owners.density.density
         set(value) {
-            owner!!.density = Density(value, owner!!.density.fontScale)
+            owners.density = Density(value, owners.density.fontScale)
         }
 
     fun dispose() {
-        owner?.dispose()
+        owners.dispose()
         frameDispatcher.cancel()
-        coroutineScope.cancel()
     }
 
     private var onRender = CompletableDeferred<Unit>()
 
     fun setContent(content: @Composable () -> Unit) {
-        owner?.dispose()
-        val owner = DesktopOwner(owners)
-        owner.setContent {
+        owners.setContent {
             content()
         }
-        this.owner = owner
     }
 
     private fun onRender(timeNanos: Long) {
         canvas.clear(Color.Transparent.toArgb())
-        owners.onFrame(canvas, width, height, timeNanos)
+        owners.render(canvas, timeNanos)
         onRender.complete(Unit)
     }
 

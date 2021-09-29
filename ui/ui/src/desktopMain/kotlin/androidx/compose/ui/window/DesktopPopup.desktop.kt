@@ -166,7 +166,7 @@ private fun PopupLayout(
     val parentComposition = rememberCompositionContext()
     val (owner, composition) = remember {
         val owner = DesktopOwner(
-            container = owners,
+            platformInputService = owners.platformInputService,
             density = density,
             isPopup = true,
             isFocusable = focusable,
@@ -174,6 +174,7 @@ private fun PopupLayout(
             onPreviewKeyEvent = onPreviewKeyEvent,
             onKeyEvent = onKeyEvent
         )
+        owners.attach(owner)
         val composition = owner.setContent(parent = parentComposition) {
             Layout(
                 content = content,
@@ -212,14 +213,11 @@ private fun PopupLayout(
     owner.density = density
     DisposableEffect(Unit) {
         onDispose {
+            owners.detach(owner)
             composition.dispose()
             owner.dispose()
         }
     }
-}
-
-private fun isOutsideRectTap(rect: IntRect, point: Offset): Boolean {
-    return !rect.contains(IntOffset(point.x.toInt(), point.y.toInt()))
 }
 
 /**

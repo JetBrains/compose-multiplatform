@@ -43,11 +43,11 @@ class ComposePanel : JLayeredPane() {
     private var content: (@Composable () -> Unit)? = null
 
     override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
-        layer?.wrapped?.setSize(width, height)
+        layer?.component?.setSize(width, height)
         super.setBounds(x, y, width, height)
     }
 
-    override fun getPreferredSize() = layer?.wrapped?.preferredSize
+    override fun getPreferredSize() = layer?.component?.preferredSize
 
     /**
      * Sets Compose content of the ComposePanel.
@@ -80,12 +80,12 @@ class ComposePanel : JLayeredPane() {
         }
         val clipComponent = ClipComponent(component)
         clipMap.put(component, clipComponent)
-        layer!!.wrapped.clipComponents.add(clipComponent)
+        layer!!.component.clipComponents.add(clipComponent)
         return super.add(component, Integer.valueOf(0))
     }
 
     override fun remove(component: Component) {
-        layer!!.wrapped.clipComponents.remove(clipMap.get(component)!!)
+        layer!!.component.clipComponents.remove(clipMap.get(component)!!)
         clipMap.remove(component)
         super.remove(component)
     }
@@ -96,7 +96,7 @@ class ComposePanel : JLayeredPane() {
         // After [super.addNotify] is called we can safely initialize the layer and composable
         // content.
         layer = ComposeLayer().apply {
-            wrapped.setSize(width, height)
+            component.setSize(width, height)
         }
         initContent()
         super.add(layer!!.component, Integer.valueOf(1))

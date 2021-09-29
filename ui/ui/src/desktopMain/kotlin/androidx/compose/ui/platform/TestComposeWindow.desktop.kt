@@ -22,21 +22,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.node.RootForTest
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.cancel
 import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.FrameDispatcher
 import java.awt.Component
 import java.awt.event.MouseEvent
 import kotlin.coroutines.CoroutineContext
-
-private val emptyDispatcher = object : CoroutineDispatcher() {
-    override fun dispatch(context: CoroutineContext, block: Runnable) = Unit
-}
 
 /**
  * A virtual window for testing purposes.
@@ -51,7 +46,7 @@ class TestComposeWindow(
     val height: Int,
     val density: Density = Density(1f, 1f),
     private val nanoTime: () -> Long = System::nanoTime,
-    coroutineContext: CoroutineContext = emptyDispatcher
+    coroutineContext: CoroutineContext = EmptyDispatcher
 ) {
     /**
      * Virtual surface on which the content will be drawn
@@ -59,7 +54,6 @@ class TestComposeWindow(
     val surface = Surface.makeRasterN32Premul(width, height)
 
     private val canvas = surface.canvas
-    private var owner: DesktopOwner? = null
 
     private val coroutineScope = CoroutineScope(coroutineContext + Job())
     private val frameDispatcher: FrameDispatcher = FrameDispatcher(
@@ -69,25 +63,28 @@ class TestComposeWindow(
 
     private fun onFrame() {
         canvas.clear(Color.Transparent.toArgb())
-        owners.onFrame(canvas, width, height, nanoTime())
+        owners.render(canvas, nanoTime())
     }
 
     private val owners = DesktopOwners(
-        coroutineScope = coroutineScope,
+        coroutineScope.coroutineContext,
+        density,
         invalidate = frameDispatcher::scheduleFrame
-    )
+    ).apply {
+        constraints = Constraints(maxWidth = width, maxHeight = height)
+    }
 
     /**
      * All currently registered [RootForTest]s
      */
     @OptIn(InternalComposeUiApi::class)
-    val roots: Set<RootForTest> get() = owners.list
+    val roots: Set<RootForTest> get() = owners.roots
 
     /**
      * Clear-up all acquired resources and stop all pending work
      */
     fun dispose() {
-        owner?.dispose()
+        owners.dispose()
         coroutineScope.cancel()
     }
 
@@ -100,16 +97,8 @@ class TestComposeWindow(
      * Compose [content] immediately and draw it on a [surface]
      */
     fun setContent(content: @Composable () -> Unit) {
-        check(owner == null) {
-            "Cannot call setContent twice!"
-        }
-
-        val owner = DesktopOwner(owners, density)
-        owner.setContent {
-            content()
-        }
-        owners.onFrame(surface.canvas, width, height, 0)
-        this.owner = owner
+        owners.setContent(content = content)
+        owners.render(canvas, nanoTime = nanoTime())
     }
 
     /**

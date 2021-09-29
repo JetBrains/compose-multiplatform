@@ -23,6 +23,11 @@ import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
+@PublishedApi
+internal val EmptyDispatcher = object : CoroutineDispatcher() {
+    override fun dispatch(context: CoroutineContext, block: Runnable) = Unit
+}
+
 /**
  * Dispatcher with the ability to immediately perform (flush) all pending tasks.
  * Without a flush all tasks are dispatched in the dispatcher provided by [scope]
@@ -35,15 +40,19 @@ internal class FlushCoroutineDispatcher(
     // TODO replace it by scope.coroutineContext[Dispatcher] when it will be no longer experimental
     private val scope = CoroutineScope(scope.coroutineContext.minusKey(Job))
 
-    private val tasks = ArrayList<Runnable>()
-    private val tasksCopy = ArrayList<Runnable>()
+    private val tasks = mutableSetOf<Runnable>()
+    private val tasksCopy = mutableSetOf<Runnable>()
 
     override fun dispatch(context: CoroutineContext, block: Runnable) {
         synchronized(tasks) {
-            val isFlushScheduled = tasks.isNotEmpty()
             tasks.add(block)
-            if (!isFlushScheduled) {
-                scope.launch { flush() }
+        }
+        scope.launch {
+            val isTaskAlive = synchronized(tasks) {
+                tasks.remove(block)
+            }
+            if (isTaskAlive) {
+                block.run()
             }
         }
     }
