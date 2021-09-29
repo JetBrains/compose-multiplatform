@@ -26,8 +26,7 @@
     <string name="in_progress" msgid="6827826412747255547">"მუშავდება"</string>
     <string name="tab" msgid="1672349317127674378">"ჩანართი"</string>
     <string name="navigation_menu" msgid="542007171693138492">"ნავიგაციის მენიუ"</string>
-    <!-- no translation found for dropdown_menu (1890207353314751437) -->
-    <skip />
+    <string name="dropdown_menu" msgid="1890207353314751437">"ჩამოსაშლელი მენიუ"</string>
     <string name="close_drawer" msgid="406453423630273620">"ნავიგაციის მენიუს დახურვა"</string>
     <string name="close_sheet" msgid="7573152094250666567">"ფურცლის დახურვა"</string>
     <string name="default_error_message" msgid="8038256446254964252">"შენატანი არასწორია"</string>
