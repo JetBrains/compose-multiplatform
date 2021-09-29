@@ -127,11 +127,13 @@ internal class DesktopParagraph(
 
     private val paragraphIntrinsics = intrinsics as DesktopParagraphIntrinsics
 
+    private val layouter = paragraphIntrinsics.layouter()
+
     /**
      * Paragraph isn't always immutable, it could be changed via [paint] method without
      * rerunning layout
      */
-    private var para = paragraphIntrinsics.layoutParagraph(
+    private var para = layouter.layoutParagraph(
         width = width,
         maxLines = maxLines,
         ellipsis = ellipsisChar
@@ -290,7 +292,7 @@ internal class DesktopParagraph(
     // workaround for https://bugs.chromium.org/p/skia/issues/detail?id=11321 :(
     private val lineMetrics: Array<LineMetrics>
         get() = if (text == "") {
-            val height = paragraphIntrinsics.defaultHeight.toDouble()
+            val height = layouter.defaultHeight.toDouble()
             arrayOf(
                 LineMetrics(
                     0, 0, 0, 0, true,
@@ -375,7 +377,7 @@ internal class DesktopParagraph(
         shadow: Shadow?,
         textDecoration: TextDecoration?
     ) {
-        para = paragraphIntrinsics.layoutParagraph(
+        para = layouter.layoutParagraph(
             width = width,
             maxLines = maxLines,
             ellipsis = ellipsisChar,
