@@ -55,6 +55,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.keyEvent
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
@@ -71,7 +72,7 @@ import org.junit.Rule
 import org.junit.Test
 import java.awt.event.KeyEvent
 
-@OptIn(InternalTestApi::class)
+@OptIn(InternalTestApi::class, ExperimentalComposeUiApi::class)
 class DesktopOwnerTest {
     @get:Rule
     val screenshotRule = DesktopScreenshotTestRule("compose/ui/ui-desktop/ui")
@@ -277,20 +278,20 @@ class DesktopOwnerTest {
         screenshotRule.snap(surface, "frame1_initial")
         assertFalse(hasRenders())
 
-        owners.onMousePressed(2, 2)
+        owners.sendPointerEvent(PointerEventType.Press, Offset(2f, 2f))
         awaitNextRender()
         screenshotRule.snap(surface, "frame2_onMousePressed")
         assertFalse(hasRenders())
 
-        owners.onMouseMoved(1, 1)
+        owners.sendPointerEvent(PointerEventType.Move, Offset(1f, 1f))
         assertFalse(hasRenders())
 
-        owners.onMouseReleased(1, 1)
+        owners.sendPointerEvent(PointerEventType.Release, Offset(1f, 1f))
         awaitNextRender()
         screenshotRule.snap(surface, "frame3_onMouseReleased")
 
-        owners.onMouseMoved(1, 1)
-        owners.onMousePressed(3, 3)
+        owners.sendPointerEvent(PointerEventType.Move, Offset(1f, 1f))
+        owners.sendPointerEvent(PointerEventType.Press, Offset(3f, 3f))
         awaitNextRender()
         screenshotRule.snap(surface, "frame4_onMouseMoved_onMousePressed")
         assertFalse(hasRenders())

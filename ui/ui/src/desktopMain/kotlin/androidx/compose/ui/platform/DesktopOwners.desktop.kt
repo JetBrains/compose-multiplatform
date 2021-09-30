@@ -28,7 +28,11 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.mouse.MouseScrollEvent
+import androidx.compose.ui.input.mouse.MouseScrollOrientation
+import androidx.compose.ui.input.mouse.MouseScrollUnit
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventData
@@ -37,7 +41,6 @@ import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
@@ -47,7 +50,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.Canvas
 import java.awt.event.InputMethodEvent
-import java.awt.event.KeyEvent
 import java.awt.event.MouseEvent
 import kotlin.coroutines.CoroutineContext
 import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
@@ -323,72 +325,115 @@ internal class DesktopOwners internal constructor(
         targetOwner: DesktopOwner?
     ) = list.indexOf(this) > list.indexOf(targetOwner)
 
-    fun onMousePressed(x: Int, y: Int, nativeEvent: MouseEvent? = null) {
-        isMousePressed = true
+    // TODO(demin): return Boolean (when it is consumed).
+    //  see ComposeLayer todo about AWTDebounceEventQueue
+    /**
+     * Send pointer event to the content.
+     *
+     * @param eventType Indicates the primary reason that the event was sent.
+     * @param position The [Offset] of the current pointer event, relative to the content.
+     * @param timeMillis The time of the current pointer event, in milliseconds. The start (`0`) time
+     * is platform-dependent.
+     * @param type The device type that produced the event, such as [mouse][PointerType.Mouse],
+     * or [touch][PointerType.Touch].
+     * @param mouseEvent The original native event.
+     */
+    @OptIn(ExperimentalComposeUiApi::class)
+    fun sendPointerEvent(
+        eventType: PointerEventType,
+        position: Offset,
+        timeMillis: Long = System.nanoTime() / 1_000_000L,
+        type: PointerType = PointerType.Mouse,
+        mouseEvent: MouseEvent? = null,
+        // TODO(demin): support PointerButtons, PointerKeyboardModifiers
+//        buttons: PointerButtons? = null,
+//        keyboardModifiers: PointerKeyboardModifiers? = null,
+    ) {
+        check(!isDisposed) { "ComposeScene is disposed" }
+        when (eventType) {
+            PointerEventType.Press -> isMousePressed = true
+            PointerEventType.Release -> isMousePressed = false
+        }
+        val event = pointerInputEvent(
+            eventType, position, timeMillis, mouseEvent, type, isMousePressed, pointerId
+        )
+        when (eventType) {
+            PointerEventType.Press -> onMousePressed(event)
+            PointerEventType.Release -> onMouseReleased(event)
+            PointerEventType.Move -> {
+                pointLocation = position
+                hoveredOwner?.processPointerInput(event)
+            }
+            PointerEventType.Enter -> hoveredOwner?.processPointerInput(event)
+            PointerEventType.Exit -> hoveredOwner?.processPointerInput(event)
+        }
+    }
+
+    // TODO(demin): remove/change when we will have scroll event support in the common code
+    // TODO(demin): return Boolean (when it is consumed).
+    //  see ComposeLayer todo about AWTDebounceEventQueue
+    /**
+     * Send pointer scroll event to the content.
+     *
+     * @param position The [Offset] of the current pointer event, relative to the content
+     * @param delta Change of mouse scroll.
+     * Positive if scrolling down, negative if scrolling up.
+     * @param orientation Orientation in which scrolling event occurs.
+     * Up/down wheel scrolling causes events in vertical orientation.
+     * Left/right wheel scrolling causes events in horizontal orientation.
+     * @param timeMillis The time of the current pointer event, in milliseconds. The start (`0`) time
+     * is platform-dependent.
+     * @param type The device type that produced the event, such as [mouse][PointerType.Mouse],
+     * or [touch][PointerType.Touch].
+     * @param mouseEvent The original native event
+     */
+    @OptIn(ExperimentalComposeUiApi::class)
+    @Suppress("UNUSED_PARAMETER")
+    fun sendPointerScrollEvent(
+        position: Offset,
+        delta: MouseScrollUnit,
+        orientation: MouseScrollOrientation = MouseScrollOrientation.Vertical,
+        timeMillis: Long = System.nanoTime() / 1_000_000L,
+        type: PointerType = PointerType.Mouse,
+        mouseEvent: MouseEvent? = null,
+//        buttons: PointerButtons? = null,
+//        keyboardModifiers: PointerKeyboardModifiers? = null,
+    ) {
+        check(!isDisposed) { "ComposeScene is disposed" }
+        hoveredOwner?.onMouseScroll(position, MouseScrollEvent(delta, orientation))
+    }
+
+    private fun onMousePressed(event: PointerInputEvent) {
         val currentOwner = hoveredOwner
         if (currentOwner != null) {
             if (focusedOwner.isAbove(currentOwner)) {
                 focusedOwner?.onDismissRequest?.invoke()
-                return
             } else {
-                currentOwner.processPointerInput(
-                    pointerInputEvent(nativeEvent, x, y, isMousePressed)
-                )
-                return
+                currentOwner.processPointerInput(event)
             }
+        } else {
+            focusedOwner?.processPointerInput(event)
         }
-        focusedOwner?.processPointerInput(pointerInputEvent(nativeEvent, x, y, isMousePressed))
     }
 
-    fun onMouseReleased(x: Int, y: Int, nativeEvent: MouseEvent? = null) {
-        isMousePressed = false
-        val currentOwner = hoveredOwner
-        if (currentOwner != null) {
-            currentOwner.processPointerInput(
-                pointerInputEvent(nativeEvent, x, y, isMousePressed)
-            )
-            pointerId += 1
-            return
-        }
-        focusedOwner?.processPointerInput(pointerInputEvent(nativeEvent, x, y, isMousePressed))
+    private fun onMouseReleased(event: PointerInputEvent) {
+        val owner = hoveredOwner ?: focusedOwner
+        owner?.processPointerInput(event)
         pointerId += 1
     }
 
-    private var pointLocation = IntOffset.Zero
+    private var pointLocation = Offset.Zero
 
-    fun onMouseMoved(x: Int, y: Int, nativeEvent: MouseEvent? = null) {
-        pointLocation = IntOffset(x, y)
-        val event = pointerInputEvent(nativeEvent, x, y, isMousePressed)
-        hoveredOwner?.processPointerInput(event)
+    /**
+     * Send [KeyEvent] to the content.
+     * @return true if the event was consumed by the content
+     */
+    fun sendKeyEvent(event: ComposeKeyEvent): Boolean {
+        return focusedOwner?.sendKeyEvent(event) == true
     }
 
-    @OptIn(ExperimentalComposeUiApi::class)
-    fun onMouseScroll(x: Int, y: Int, event: MouseScrollEvent) {
-        val position = Offset(x.toFloat(), y.toFloat())
-        hoveredOwner?.onMouseScroll(position, event)
-    }
-
-    fun onMouseEntered(x: Int, y: Int, nativeEvent: MouseEvent? = null) {
-        val event = pointerInputEvent(nativeEvent, x, y, isMousePressed)
-        hoveredOwner?.processPointerInput(event)
-    }
-
-    fun onMouseExited(x: Int, y: Int, nativeEvent: MouseEvent? = null) {
-        val event = pointerInputEvent(nativeEvent, x, y, isMousePressed)
-        hoveredOwner?.processPointerInput(event)
-    }
-
-    private fun consumeKeyEvent(event: KeyEvent): Boolean {
-        return focusedOwner?.sendKeyEvent(ComposeKeyEvent(event)) == true
-    }
-
-    fun onKeyPressed(event: KeyEvent): Boolean = consumeKeyEvent(event)
-
-    fun onKeyReleased(event: KeyEvent): Boolean = consumeKeyEvent(event)
-
-    fun onKeyTyped(event: KeyEvent): Boolean = consumeKeyEvent(event)
-
-    fun onInputMethodEvent(event: InputMethodEvent) {
+    internal fun onInputMethodEvent(event: InputMethodEvent) {
+        check(!isDisposed) { "ComposeScene is disposed" }
         if (!event.isConsumed) {
             when (event.id) {
                 InputMethodEvent.INPUT_METHOD_TEXT_CHANGED -> {
@@ -402,28 +447,30 @@ internal class DesktopOwners internal constructor(
             }
         }
     }
+}
 
-    private fun pointerInputEvent(
-        nativeEvent: MouseEvent?,
-        x: Int,
-        y: Int,
-        down: Boolean
-    ): PointerInputEvent {
-        val time = System.nanoTime() / 1_000_000L
-        val position = Offset(x.toFloat(), y.toFloat())
-        return PointerInputEvent(
-            time,
-            listOf(
-                PointerInputEventData(
-                    PointerId(pointerId),
-                    time,
-                    position,
-                    position,
-                    down,
-                    PointerType.Mouse
-                )
-            ),
-            nativeEvent
-        )
-    }
+private fun pointerInputEvent(
+    eventType: PointerEventType,
+    position: Offset,
+    timeMillis: Long,
+    nativeEvent: MouseEvent?,
+    type: PointerType,
+    isMousePressed: Boolean,
+    pointerId: Long
+): PointerInputEvent {
+    return PointerInputEvent(
+        eventType,
+        timeMillis,
+        listOf(
+            PointerInputEventData(
+                PointerId(pointerId),
+                timeMillis,
+                position,
+                position,
+                isMousePressed,
+                type
+            )
+        ),
+        nativeEvent
+    )
 }
