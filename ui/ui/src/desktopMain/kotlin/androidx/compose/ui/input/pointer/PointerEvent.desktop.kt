@@ -42,7 +42,9 @@ actual data class PointerEvent internal constructor(
     internal actual constructor(
         changes: List<PointerInputChange>,
         internalPointerEvent: InternalPointerEvent?
-    ) : this(changes, internalPointerEvent?.mouseEvent)
+    ) : this(changes, internalPointerEvent?.mouseEvent) {
+        this.type = internalPointerEvent?.type ?: PointerEventType.Unknown
+    }
 
     actual val buttons = PointerButtons(mouseEvent?.modifiersEx ?: 0)
 
@@ -53,7 +55,8 @@ actual data class PointerEvent internal constructor(
      */
     actual constructor(changes: List<PointerInputChange>) : this(changes, mouseEvent = null)
 
-    actual var type: PointerEventType = calculatePointerEventType()
+    actual var type: PointerEventType = PointerEventType.Unknown
+        internal set
 
     private fun createPointerKeyboardModifiers(modifiersEx: Int): PointerKeyboardModifiers {
         val toolkit = Toolkit.getDefaultToolkit()
@@ -64,19 +67,6 @@ actual data class PointerEvent internal constructor(
 
         val packed = (modifiersEx and ClearMask) or capsLockBits or numLockBits or scrollLockBits
         return PointerKeyboardModifiers(packed)
-    }
-
-    private fun calculatePointerEventType(): PointerEventType {
-        val event = mouseEvent ?: return PointerEventType.Unknown
-        return when (event.getID()) {
-            MouseEvent.MOUSE_PRESSED -> PointerEventType.Press
-            MouseEvent.MOUSE_RELEASED -> PointerEventType.Release
-            MouseEvent.MOUSE_MOVED,
-            MouseEvent.MOUSE_DRAGGED -> PointerEventType.Move
-            MouseEvent.MOUSE_ENTERED -> PointerEventType.Enter
-            MouseEvent.MOUSE_EXITED -> PointerEventType.Exit
-            else -> PointerEventType.Unknown
-        }
     }
 }
 

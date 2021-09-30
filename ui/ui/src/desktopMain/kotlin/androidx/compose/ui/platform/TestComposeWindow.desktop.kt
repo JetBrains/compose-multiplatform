@@ -19,9 +19,11 @@ package androidx.compose.ui.platform
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.InternalComposeUiApi
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.mouse.MouseScrollEvent
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -31,7 +33,6 @@ import kotlinx.coroutines.cancel
 import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.FrameDispatcher
 import java.awt.Component
-import java.awt.event.MouseEvent
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -42,6 +43,7 @@ import kotlin.coroutines.CoroutineContext
  * It doesn't dispatch frames by default. If frame dispatching is needed, pass appropriate
  * dispatcher as coroutineContext (for example, Dispatchers.Swing)
  */
+@OptIn(ExperimentalComposeUiApi::class)
 class TestComposeWindow(
     val width: Int,
     val height: Int,
@@ -98,6 +100,7 @@ class TestComposeWindow(
      * Compose [content] immediately and draw it on a [surface]
      */
     fun setContent(content: @Composable () -> Unit) {
+        owners.constraints = Constraints(maxWidth = width, maxHeight = height)
         owners.setContent(content = content)
         owners.render(canvas, nanoTime = nanoTime())
     }
@@ -107,17 +110,20 @@ class TestComposeWindow(
      */
     @OptIn(ExperimentalComposeUiApi::class)
     fun onMouseScroll(x: Int, y: Int, event: MouseScrollEvent) {
-        owners.onMouseScroll(x, y, event)
+        owners.sendPointerScrollEvent(
+            position = Offset(x.toFloat(), y.toFloat()),
+            delta = event.delta,
+            orientation = event.orientation
+        )
     }
 
     /**
      * Process mouse move event
      */
     fun onMouseMoved(x: Int, y: Int) {
-        owners.onMouseMoved(
-            x,
-            y,
-            MouseEvent(EventComponent, MouseEvent.MOUSE_MOVED, 0, 0, x, y, 1, false)
+        owners.sendPointerEvent(
+            eventType = PointerEventType.Move,
+            position = Offset(x.toFloat(), y.toFloat())
         )
     }
 
@@ -125,10 +131,9 @@ class TestComposeWindow(
      * Process mouse enter event
      */
     fun onMouseEntered(x: Int, y: Int) {
-        owners.onMouseEntered(
-            x,
-            y,
-            MouseEvent(EventComponent, MouseEvent.MOUSE_MOVED, 0, 0, x, y, 1, false)
+        owners.sendPointerEvent(
+            eventType = PointerEventType.Enter,
+            position = Offset(x.toFloat(), y.toFloat())
         )
     }
 
@@ -136,10 +141,9 @@ class TestComposeWindow(
      * Process mouse exit event
      */
     fun onMouseExited() {
-        owners.onMouseExited(
-            -1,
-            -1,
-            MouseEvent(EventComponent, MouseEvent.MOUSE_MOVED, 0, 0, -1, -1, 1, false)
+        owners.sendPointerEvent(
+            eventType = PointerEventType.Exit,
+            position = Offset(-1f, -1f)
         )
     }
 
