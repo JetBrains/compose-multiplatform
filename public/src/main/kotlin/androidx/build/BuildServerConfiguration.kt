@@ -53,8 +53,9 @@ fun isPresubmitBuild(): Boolean {
  * the contents of DIST_DIR to somewhere and make it available.
  */
 fun Project.getDistributionDirectory(): File {
-    return if (System.getenv("DIST_DIR") != null) {
-        File(System.getenv("DIST_DIR"))
+    val envVar = project.providers.environmentVariable("DIST_DIR").forUseAtConfigurationTime().getOrElse("")
+    return if (envVar != "") {
+        File(envVar)
     } else {
         File(getRootOutDirectory(), "dist")
     }.also { distDir ->
