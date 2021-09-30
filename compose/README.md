@@ -43,10 +43,8 @@ Publish artifacts to the local directory `out/androidx/build/support_repo/org/je
 ```
 ./scripts/publish
 ```
-Publish artifacts without Android Layout Inspector (use it on Windows):
-```
-./scripts/publishWithoutInspector
-```
+(on Windows it doesn't build at the moment, the issue is in the line `packageInspector(project, project(":compose:ui:ui-inspection")` in `compose/frameworks/support/compose/ui/ui/build.gradle`)
+
 Publish extended icons:
 ```
 ./scripts/publishExtendedIcons

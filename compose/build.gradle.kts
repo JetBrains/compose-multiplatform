@@ -1,8 +1,7 @@
 val composeBuild = gradle.includedBuild("support")
 fun Task.dependsOnComposeTask(name: String) = dependsOn(composeBuild.task(name))
 
-gradle.startParameter.excludedTaskNames.add(":support:compose:ui:ui-inspection:assembleInspectorJarRelease")
-gradle.startParameter.excludedTaskNames.add(":support:compose:ui:ui-inspection:dexInspectorRelease")
+val isWebExists = composeBuild.projectDir.resolve(".jbWebBranchMergedMarker").exists()
 
 // To show all projects which use `xxx` task, run:
 // ./gradlew -p frameworks/support help --task xxx
@@ -47,10 +46,12 @@ tasks.register("publishComposeJb") {
         dependsOnComposeTask("$it:publishAndroidReleasePublicationToMavenRepository")
     }
 
-    listOf(
-        ":compose:runtime:runtime",
-    ).forEach {
-        dependsOnComposeTask("$it:publishJsPublicationToMavenRepository")
+    if (isWebExists) {
+        listOf(
+            ":compose:runtime:runtime",
+        ).forEach {
+            dependsOnComposeTask("$it:publishJsPublicationToMavenRepository")
+        }
     }
 }
 
@@ -82,9 +83,11 @@ tasks.register("testComposeJbDesktop") {
     dependsOnComposeTask(":compose:runtime:runtime-saveable:desktopTest")
 }
 
-tasks.register("testComposeJbWeb") {
-    dependsOnComposeTask(":compose:runtime:runtime:jsTest")
-    dependsOnComposeTask(":compose:runtime:runtime:test")
+if (isWebExists) {
+    tasks.register("testComposeJbWeb") {
+        dependsOnComposeTask(":compose:runtime:runtime:jsTest")
+        dependsOnComposeTask(":compose:runtime:runtime:test")
+    }
 }
 
 tasks.register("buildNativeDemo") {
