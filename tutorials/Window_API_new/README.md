@@ -467,7 +467,6 @@ fun main() = application {
 }
 ```
 
-
 ## Swing interoperability
 Because Compose for Desktop uses Swing under the hood, it is possible to create a window using Swing directly:
 ```kotlin
