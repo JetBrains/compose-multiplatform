@@ -21,13 +21,13 @@ import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.toAwtImage
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.WindowSize
 import androidx.compose.ui.window.density
 import androidx.compose.ui.window.layoutDirection
 import java.awt.Dialog
@@ -41,7 +41,7 @@ import kotlin.math.roundToInt
  * Ignore size updating if window is maximized or in fullscreen.
  * Otherwise we will reset maximized / fullscreen state.
  */
-internal fun ComposeWindow.setSizeSafely(size: WindowSize) {
+internal fun ComposeWindow.setSizeSafely(size: DpSize) {
     if (placement == WindowPlacement.Floating) {
         (this as Window).setSizeSafely(size)
     }
@@ -62,7 +62,7 @@ internal fun ComposeWindow.setPositionSafely(
 /**
  * Limit the width and the height to a minimum of 0
  */
-internal fun Window.setSizeSafely(size: WindowSize) {
+internal fun Window.setSizeSafely(size: DpSize) {
     val screenBounds by lazy { graphicsConfiguration.bounds }
 
     val width = if (size.width.isSpecified) {

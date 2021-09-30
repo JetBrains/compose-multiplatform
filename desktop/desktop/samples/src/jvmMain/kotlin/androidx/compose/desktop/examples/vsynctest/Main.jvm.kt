@@ -29,10 +29,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowSize
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 
@@ -83,7 +83,7 @@ private fun ApplicationScope.AppWindow() {
 
     Window(
         onCloseRequest = ::exitApplication,
-        state = rememberWindowState(size = WindowSize(800.dp, 200.dp))
+        state = rememberWindowState(size = DpSize(800.dp, 200.dp))
     ) {
         val width = (LocalDensity.current.density * window.width).toInt()
         val singleFrameMillis = remember {

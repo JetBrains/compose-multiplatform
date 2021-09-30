@@ -19,17 +19,17 @@ package androidx.compose.desktop.examples.popupexample
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.key
 import androidx.compose.ui.graphics.toPainter
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Tray
 import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowSize
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberTrayState
 import androidx.compose.ui.window.rememberWindowState
 
 fun main() = application {
     val windowState = rememberWindowState(
-        size = WindowSize(800.dp, 600.dp)
+        size = DpSize(800.dp, 600.dp)
     )
 
     val trayState = rememberTrayState()

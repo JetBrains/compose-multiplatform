@@ -18,6 +18,7 @@ package androidx.compose.ui.awt
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.mouse.MouseScrollOrientation
 import androidx.compose.ui.input.mouse.MouseScrollUnit
@@ -200,6 +201,7 @@ internal class ComposeLayer {
         })
         _component.addMouseWheelListener { event ->
             events.post {
+                @OptIn(ExperimentalComposeUiApi::class)
                 owners.onMouseScroll(
                     (event.x * density).toInt(),
                     (event.y * density).toInt(),
@@ -229,6 +231,7 @@ internal class ComposeLayer {
         })
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     private fun MouseWheelEvent.toComposeEvent() = MouseScrollEvent(
         delta = if (scrollType == MouseWheelEvent.WHEEL_BLOCK_SCROLL) {
             MouseScrollUnit.Page((scrollAmount * preciseWheelRotation).toFloat())

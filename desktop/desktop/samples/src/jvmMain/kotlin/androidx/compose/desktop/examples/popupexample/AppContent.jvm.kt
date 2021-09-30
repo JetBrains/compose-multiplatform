@@ -56,6 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -67,7 +68,6 @@ import androidx.compose.ui.window.TrayState
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowScope
-import androidx.compose.ui.window.WindowSize
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberWindowState
 import java.awt.event.ActionEvent
@@ -544,7 +544,7 @@ fun SwingActionButton(text: String, action: (() -> Unit)? = null) {
 @Composable
 fun ApplicationScope.SecondaryWindow(onCloseRequest: () -> Unit) = Window(
     onCloseRequest = onCloseRequest,
-    state = rememberWindowState(size = WindowSize(400.dp, 200.dp)),
+    state = rememberWindowState(size = DpSize(400.dp, 200.dp)),
     undecorated = AppState.undecorated.value,
 ) {
     WindowContent(

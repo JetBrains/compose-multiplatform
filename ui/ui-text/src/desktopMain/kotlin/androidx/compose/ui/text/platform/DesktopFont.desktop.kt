@@ -295,7 +295,7 @@ internal fun FontListFontFamily.makeAlias(): String {
 private fun ByteArray.toHexString() = joinToString("") { "%02x".format(it) }
 
 class FontLoader : Font.ResourceLoader {
-    val fonts = FontCollection()
+    internal val fonts = FontCollection()
     private val fontProvider = TypefaceFontProvider()
 
     init {
