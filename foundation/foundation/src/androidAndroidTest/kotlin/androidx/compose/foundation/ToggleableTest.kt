@@ -31,6 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.testutils.first
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.InspectableValue
@@ -411,7 +412,7 @@ class ToggleableTest {
                 onValueChange = {},
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
-            ).toList().first() as InspectableValue
+            ).first() as InspectableValue
             assertThat(modifier.nameFallback).isEqualTo("toggleable")
             assertThat(modifier.valueOverride).isNull()
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
@@ -449,7 +450,7 @@ class ToggleableTest {
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClick = {}
-            ).toList().first() as InspectableValue
+            ).first() as InspectableValue
             assertThat(modifier.nameFallback).isEqualTo("triStateToggleable")
             assertThat(modifier.valueOverride).isNull()
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
@@ -522,7 +523,4 @@ class ToggleableTest {
                 click(position = Offset(-1f, -1f))
             }.assertIsOn()
     }
-
-    private fun Modifier.toList(): List<Modifier.Element> =
-        foldIn(mutableListOf()) { acc, e -> acc.apply { acc.add(e) } }
 }

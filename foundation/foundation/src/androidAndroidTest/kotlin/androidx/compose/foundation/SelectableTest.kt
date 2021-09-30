@@ -27,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.testutils.first
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
@@ -314,7 +315,7 @@ class SelectableTest {
                 false,
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
-            ) {}.toList().first() as InspectableValue
+            ) {}.first() as InspectableValue
             assertThat(modifier.nameFallback).isEqualTo("selectable")
             assertThat(modifier.valueOverride).isNull()
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
@@ -327,7 +328,4 @@ class SelectableTest {
             )
         }
     }
-
-    private fun Modifier.toList(): List<Modifier.Element> =
-        foldIn(mutableListOf()) { acc, e -> acc.apply { acc.add(e) } }
 }
