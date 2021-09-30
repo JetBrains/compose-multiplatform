@@ -73,7 +73,7 @@ internal class AndroidInputDispatcher(
 
     private val batchLock = Any()
     private var batchedEvents = mutableListOf<MotionEvent>()
-    private var acceptEvents = true
+    private var disposed = false
     private var currentClockTime = currentTime
 
     override fun PartialGesture.enqueueDown(pointerId: Int) {
@@ -197,15 +197,14 @@ internal class AndroidInputDispatcher(
         }
 
         synchronized(batchLock) {
-            check(acceptEvents) {
+            ensureNotDisposed {
                 "Can't enqueue touch event (" +
                     "downTime=$downTime, " +
                     "action=$action, " +
                     "actionIndex=$actionIndex, " +
                     "pointerIds=$pointerIds, " +
                     "eventTimes=$eventTimes, " +
-                    "coordinates=$coordinates" +
-                    "), events have already been (or are being) dispatched or disposed"
+                    "coordinates=$coordinates)"
             }
             val positionInScreen = root?.let {
                 val array = intArrayOf(0, 0)
@@ -282,7 +281,7 @@ internal class AndroidInputDispatcher(
         axisDelta: Float = 0f
     ) {
         synchronized(batchLock) {
-            check(acceptEvents) {
+            ensureNotDisposed {
                 "Can't enqueue mouse event (" +
                     "downTime=$downTime, " +
                     "eventTime=$eventTime, " +
@@ -290,8 +289,7 @@ internal class AndroidInputDispatcher(
                     "coordinate=$coordinate, " +
                     "buttonState=$buttonState, " +
                     "axis=$axis, " +
-                    "axisDelta=$axisDelta" +
-                    "), events have already been (or are being) dispatched or disposed"
+                    "axisDelta=$axisDelta)"
             }
             val positionInScreen = root?.let {
                 val array = intArrayOf(0, 0)
@@ -334,13 +332,19 @@ internal class AndroidInputDispatcher(
         }
     }
 
-    override fun sendAllSynchronous() {
+    override fun flush() {
         // Must inject on the main thread, because it might modify View properties
         @OptIn(InternalTestApi::class)
         testContext.testOwner.runOnUiThread {
-            checkAndStopAcceptingEvents()
+            val events = synchronized(batchLock) {
+                ensureNotDisposed { "Can't flush events" }
+                mutableListOf<MotionEvent>().apply {
+                    addAll(batchedEvents)
+                    batchedEvents.clear()
+                }
+            }
 
-            batchedEvents.forEach { event ->
+            events.forEach { event ->
                 // Before injecting the next event, pump the clock
                 // by the difference between this and the last event
                 advanceClockTime(event.eventTime - currentClockTime)
@@ -348,8 +352,6 @@ internal class AndroidInputDispatcher(
                 sendAndRecycleEvent(event)
             }
         }
-        // Each invocation of perform.*Input (Actions.kt) uses a new instance of an input
-        // dispatcher, so we don't have to reset firstEventTime after use
     }
 
     @OptIn(InternalTestApi::class)
@@ -360,20 +362,18 @@ internal class AndroidInputDispatcher(
         }
     }
 
-    override fun onDispose() {
-        stopAcceptingEvents()
-    }
-
-    private fun checkAndStopAcceptingEvents() {
-        synchronized(batchLock) {
-            check(acceptEvents) { "Events have already been (or are being) dispatched or disposed" }
-            acceptEvents = false
+    private fun ensureNotDisposed(lazyMessage: () -> String) {
+        check(!disposed) {
+            "${lazyMessage()}, AndroidInputDispatcher has already been disposed"
         }
     }
 
-    private fun stopAcceptingEvents(): Boolean {
+    override fun onDispose() {
         synchronized(batchLock) {
-            return acceptEvents.also { acceptEvents = false }
+            if (!disposed) {
+                disposed = true
+                batchedEvents.forEach { it.recycle() }
+            }
         }
     }
 

@@ -68,7 +68,7 @@ class AdvanceEventTimeTest(private val config: TestConfig) : InputDispatcherTest
         subject.enqueueTouchMove()
         subject.advanceEventTime(config.secondDelayMillis)
         subject.enqueueTouchUp(0)
-        subject.sendAllSynchronous()
+        subject.flush()
 
         // Check if the time between the events was exactly the delay
         val expectedFirstDelay = config.firstDelayMillis

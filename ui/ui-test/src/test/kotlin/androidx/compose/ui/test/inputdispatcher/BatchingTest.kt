@@ -31,132 +31,290 @@ class BatchingTest : InputDispatcherTest() {
 
     companion object {
         private const val cannotEnqueueError = "Can't enqueue touch event \\(.*\\), " +
-            "events have already been \\(or are being\\) dispatched or disposed"
-        private const val cannotSendError = "Events have already " +
-            "been \\(or are being\\) dispatched or disposed"
+            "AndroidInputDispatcher has already been disposed"
+        private const val cannotFlushError =
+            "Can't flush events, AndroidInputDispatcher has already been disposed"
     }
 
     /**
-     * Tests that enqueue doesn't send, send sends and dispose doesn't send anything else
-     *
-     * Happy path
+     * Tests that:
+     * 1. enqueue doesn't send
+     * 2. flush sends
+     * 3. dispose doesn't send more
      */
     @Test
-    fun enqueueSendDispose() {
+    fun enqueueFlushDispose() {
+        // 1. enqueue doesn't send
         subject.enqueueTouchDown(0, Offset.Zero)
         subject.enqueueTouchMove()
         subject.enqueueTouchMove()
         assertThat(recorder.events).isEmpty()
 
-        subject.sendAllSynchronous()
+        // 2. flush sends
+        subject.flush()
         assertThat(recorder.events).hasSize(3)
 
+        // 3. dispose doesn't send more
         subject.dispose()
         assertThat(recorder.events).hasSize(3)
     }
 
     /**
-     * Tests that enqueue doesn't send, send sends and subsequent enqueue fails
+     * Tests that:
+     * 1. enqueue doesn't send
+     * 2. flush sends
+     * 3. flush again doesn't send more
+     * 4. dispose doesn't send more
      */
     @Test
-    fun enqueueSendEnqueue() {
+    fun enqueueFlushFlushDispose() {
+        // 1. enqueue doesn't send
         subject.enqueueTouchDown(0, Offset.Zero)
         subject.enqueueTouchMove()
         subject.enqueueTouchMove()
         assertThat(recorder.events).isEmpty()
 
-        subject.sendAllSynchronous()
+        // 2. flush sends
+        subject.flush()
         assertThat(recorder.events).hasSize(3)
 
+        // 3. flush again doesn't send more
+        subject.flush()
+        assertThat(recorder.events).hasSize(3)
+
+        // 4. dispose doesn't send more
+        subject.dispose()
+        assertThat(recorder.events).hasSize(3)
+    }
+
+    /**
+     * Tests that:
+     * 1. enqueue doesn't send
+     * 2. flush sends
+     * 3. enqueue can be called again
+     * 4. dispose doesn't send more
+     */
+    @Test
+    fun enqueueFlushEnqueueDispose() {
+        // 1. enqueue doesn't send
+        subject.enqueueTouchDown(0, Offset.Zero)
+        subject.enqueueTouchMove()
+        subject.enqueueTouchMove()
+        assertThat(recorder.events).isEmpty()
+
+        // 2. flush sends
+        subject.flush()
+        assertThat(recorder.events).hasSize(3)
+
+        // 3. enqueue can be called again
+        subject.enqueueTouchMove()
+        assertThat(recorder.events).hasSize(3)
+
+        // 4. dispose doesn't send more
+        subject.dispose()
+        assertThat(recorder.events).hasSize(3)
+    }
+
+    /**
+     * Tests that:
+     * 1. enqueue doesn't send
+     * 2. flush sends
+     * 3. enqueue can be called again
+     * 4. flush again does send more
+     * 5. dispose doesn't send more
+     */
+    @Test
+    fun enqueueFlushEnqueueFlushDispose() {
+        // 1. enqueue doesn't send
+        subject.enqueueTouchDown(0, Offset.Zero)
+        subject.enqueueTouchMove()
+        subject.enqueueTouchMove()
+        assertThat(recorder.events).isEmpty()
+
+        // 2. flush sends
+        subject.flush()
+        assertThat(recorder.events).hasSize(3)
+
+        // 3. enqueue can be called again
+        subject.enqueueTouchMove()
+        assertThat(recorder.events).hasSize(3)
+
+        // 4. flush again does send more
+        subject.flush()
+        assertThat(recorder.events).hasSize(4)
+
+        // 5. dispose doesn't send more
+        subject.dispose()
+        assertThat(recorder.events).hasSize(4)
+    }
+
+    /**
+     * Tests that:
+     * 1. enqueue doesn't send
+     * 2. dispose doesn't send more
+     * 3. subsequent enqueue fails
+     * 4. subsequent dispose succeeds and doesn't send more
+     */
+    @Test
+    fun enqueueDisposeEnqueueDispose() {
+        // 1. enqueue doesn't send
+        subject.enqueueTouchDown(0, Offset.Zero)
+        subject.enqueueTouchMove()
+        subject.enqueueTouchMove()
+        assertThat(recorder.events).isEmpty()
+
+        // 2. dispose doesn't send more
+        subject.dispose()
+        assertThat(recorder.events).isEmpty()
+
+        // 3. subsequent enqueue fails
         expectError<IllegalStateException>(expectedMessage = cannotEnqueueError) {
             subject.enqueueTouchMove()
         }
-        assertThat(recorder.events).hasSize(3)
+        assertThat(recorder.events).isEmpty()
 
-        // Do final check to see if the failed enqueue really didn't enqueue an event
-        expectError<IllegalStateException>(expectedMessage = cannotSendError) {
-            subject.sendAllSynchronous()
-        }
-        assertThat(recorder.events).hasSize(3)
+        // 4. subsequent dispose succeeds and doesn't send more
+        subject.dispose()
+        assertThat(recorder.events).isEmpty()
     }
 
     /**
-     * Tests that enqueue doesn't send, send sends and subsequent send fails
+     * Tests that:
+     * 1. enqueue doesn't send
+     * 2. dispose doesn't send more
+     * 3. subsequent flush fails
+     * 4. subsequent dispose succeeds and doesn't send more
      */
     @Test
-    fun enqueueSendSend() {
+    fun enqueueDisposeFlushDispose() {
+        // 1. enqueue doesn't send
         subject.enqueueTouchDown(0, Offset.Zero)
         subject.enqueueTouchMove()
         subject.enqueueTouchMove()
         assertThat(recorder.events).isEmpty()
 
-        subject.sendAllSynchronous()
-        assertThat(recorder.events).hasSize(3)
-
-        expectError<IllegalStateException>(expectedMessage = cannotSendError) {
-            subject.sendAllSynchronous()
-        }
-        assertThat(recorder.events).hasSize(3)
-    }
-
-    /**
-     * Tests that enqueue doesn't send, dispose doesn't send anything and subsequent enqueue fails
-     */
-    @Test
-    fun enqueueDisposeEnqueue() {
-        subject.enqueueTouchDown(0, Offset.Zero)
-        subject.enqueueTouchMove()
-        subject.enqueueTouchMove()
-        assertThat(recorder.events).isEmpty()
-
+        // 2. dispose doesn't send more
         subject.dispose()
         assertThat(recorder.events).isEmpty()
 
-        expectError<IllegalStateException>(expectedMessage = cannotEnqueueError) {
-            subject.enqueueTouchMove()
+        // 3. subsequent flush fails
+        expectError<IllegalStateException>(expectedMessage = cannotFlushError) {
+            subject.flush()
         }
         assertThat(recorder.events).isEmpty()
 
-        // Do final check to see if the failed enqueue really didn't enqueue an event
-        expectError<IllegalStateException>(expectedMessage = cannotSendError) {
-            subject.sendAllSynchronous()
-        }
-        assertThat(recorder.events).isEmpty()
-    }
-
-    /**
-     * Tests that enqueue doesn't send, dispose doesn't send anything and subsequent send fails
-     */
-    @Test
-    fun enqueueDisposeSend() {
-        subject.enqueueTouchDown(0, Offset.Zero)
-        subject.enqueueTouchMove()
-        subject.enqueueTouchMove()
-        assertThat(recorder.events).isEmpty()
-
+        // 4. subsequent dispose succeeds and doesn't send more
         subject.dispose()
         assertThat(recorder.events).isEmpty()
-
-        expectError<IllegalStateException>(expectedMessage = cannotSendError) {
-            subject.sendAllSynchronous()
-        }
-        assertThat(recorder.events).isEmpty()
     }
 
     /**
-     * Tests that enqueue doesn't send, dispose doesn't send anything and subsequent dispose
-     * doesn't do anything either
+     * Tests that:
+     * 1. enqueue doesn't send
+     * 2. dispose doesn't send more
+     * 3. subsequent dispose succeeds and doesn't send more
      */
     @Test
     fun enqueueDisposeDispose() {
+        // 1. enqueue doesn't send
         subject.enqueueTouchDown(0, Offset.Zero)
         subject.enqueueTouchMove()
         subject.enqueueTouchMove()
         assertThat(recorder.events).isEmpty()
 
+        // 2. dispose doesn't send more
         subject.dispose()
         assertThat(recorder.events).isEmpty()
 
+        // 3. subsequent dispose succeeds and doesn't send more
+        subject.dispose()
+        assertThat(recorder.events).isEmpty()
+    }
+
+    /**
+     * Tests that:
+     * 1. flush doesn't send
+     * 2. enqueue doesn't send
+     * 3. subsequent flush sends
+     * 4. dispose doesn't send more
+     */
+    @Test
+    fun flushEnqueueFlushDispose() {
+        // 1. flush doesn't send
+        subject.flush()
+        assertThat(recorder.events).isEmpty()
+
+        // 2. enqueue doesn't send
+        subject.enqueueTouchDown(0, Offset.Zero)
+        subject.enqueueTouchMove()
+        subject.enqueueTouchMove()
+        assertThat(recorder.events).isEmpty()
+
+        // 3. subsequent flush sends
+        subject.flush()
+        assertThat(recorder.events).hasSize(3)
+
+        // 4. dispose doesn't send more
+        subject.dispose()
+        assertThat(recorder.events).hasSize(3)
+    }
+
+    /**
+     * Tests that:
+     * 1. flush doesn't send
+     * 2. enqueue doesn't send
+     * 3. dispose doesn't send
+     */
+    @Test
+    fun flushEnqueueDispose() {
+        // 1. flush doesn't send
+        subject.flush()
+        assertThat(recorder.events).isEmpty()
+
+        // 2. enqueue doesn't send
+        subject.enqueueTouchDown(0, Offset.Zero)
+        subject.enqueueTouchMove()
+        subject.enqueueTouchMove()
+        assertThat(recorder.events).isEmpty()
+
+        // 3. dispose doesn't send
+        subject.dispose()
+        assertThat(recorder.events).isEmpty()
+    }
+
+    /**
+     * Tests that:
+     * 1. flush doesn't send
+     * 2. subsequent flush succeeds and doesn't send
+     * 3. dispose doesn't send
+     */
+    @Test
+    fun flushFlushDispose() {
+        // 1. flush doesn't send
+        subject.flush()
+        assertThat(recorder.events).isEmpty()
+
+        // 2. subsequent flush succeeds and doesn't send
+        subject.flush()
+        assertThat(recorder.events).isEmpty()
+
+        // 3. dispose doesn't send
+        subject.dispose()
+        assertThat(recorder.events).isEmpty()
+    }
+
+    /**
+     * Tests that:
+     * 1. flush doesn't send
+     * 2. dispose doesn't send
+     */
+    @Test
+    fun flushDispose() {
+        // 1. flush doesn't send
+        subject.flush()
+        assertThat(recorder.events).isEmpty()
+
+        // 2. dispose doesn't send
         subject.dispose()
         assertThat(recorder.events).isEmpty()
     }

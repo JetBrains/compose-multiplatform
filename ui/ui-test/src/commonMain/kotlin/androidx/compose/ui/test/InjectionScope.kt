@@ -33,6 +33,10 @@ import androidx.compose.ui.unit.IntSize
  * you can convert between px and dp as you wish. The density used is taken from the
  * [SemanticsNode][androidx.compose.ui.semantics.SemanticsNode] from the
  * [SemanticsNodeInteraction] on which the input injection method is called.
+ *
+ * When the scope is [flushed][flush], all events that have been enqueued up till then will
+ * be dispatched. When the scope is [disposed][dispose], all events that haven't been dispatched
+ * yet are dropped, and subsequent events can't be enqueued anymore.
  */
 interface InjectionScope : Density {
     /**
@@ -194,4 +198,16 @@ interface InjectionScope : Density {
     ): Offset {
         return Offset(x * width, y * height)
     }
+
+    /**
+     * Flushes the stream of input injection commands by sending the input to the Compose
+     * hierarchy. Throws an [IllegalStateException] when the injection scope has already been
+     * [disposed][dispose].
+     */
+    fun flush()
+
+    /**
+     * [Flushes][flush] and disposes the injection scope. No more input can be sent.
+     */
+    fun dispose()
 }
