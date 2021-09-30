@@ -55,7 +55,15 @@ fun BasicText(
     softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
 ) {
+    // NOTE(text-perf-review): consider precomputing layout here by pushing text to a channel...
+    // something like:
+    // remember(text) { precomputeTextLayout(text) }
+
     BasicText(
+        // NOTE(text-perf-review): we create an AnnotatedString here no matter what, which causes
+        // us to lose a lot of information (ie, a bunch of optimization potential by the fact
+        // that it is _just_ a string). We should consider heavily optimizing for the very common
+        // case of String, even if it means we have two separate code paths for a lot of things.
         AnnotatedString(text),
         modifier,
         style,
@@ -99,8 +107,12 @@ fun BasicText(
     maxLines: Int = Int.MAX_VALUE,
     inlineContent: Map<String, InlineTextContent> = mapOf(),
 ) {
+    // NOTE(text-perf-review): why do we have a separate CoreText and BasicText? It seems to be
+    // creating nesting with little to no value. This nesting isn't the end of the world, but it
+    // might be worthwhile to remove it!
     CoreText(
         text,
+        // NOTE(text-perf-review): why is the semantics here and not in the TextDelegate below?
         modifier.semantics { this.text = text },
         style,
         softWrap,

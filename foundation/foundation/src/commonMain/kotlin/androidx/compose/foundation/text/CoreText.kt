@@ -129,11 +129,17 @@ internal fun CoreText(
     // as a brand new CoreText.
     // When SelectionRegistrar is updated, CoreText have to request a new ID to avoid ID collision.
 
+    // NOTE(text-perf-review): potential bug. selectableId is regenerated here whenever text
+    // changes, but it is only saved in the initial creation of TextState.
     val selectableId =
         rememberSaveable(text, selectionRegistrar, saver = selectionIdSaver(selectionRegistrar)) {
             selectionRegistrar?.nextSelectableId() ?: SelectionRegistrar.InvalidSelectableId
         }
 
+    // NOTE(text-perf-review): We might want to consider consolidating a lot of what is going on
+    // here. We might end up saving a bit of cost here. There are 3 things that we remember and
+    // store separately but could instead just be a single object:
+    // selectableId, TextState, TextController.
     val state = remember {
         TextState(
             TextDelegate(
@@ -166,6 +172,13 @@ internal fun CoreText(
     val controller = remember { TextController(state) }
     controller.update(selectionRegistrar)
 
+    // NOTE(text-perf-review): if we split this function into separate String/AnnotatedString
+    // versions, we wouldn't have any inline composables, and text would always be child-less. We
+    // might then want to consider using `ReusableComposeNode` directly instead of `Layout`,
+    // which should be a bit faster (layout isn't buying us anything here). Additionally, we
+    // might want to see if the "non skippable updateable" version of ComposeNode is advantageous
+    // to us here, since this is already a restartable composable and it is a "leaf" node, we don't
+    // need the modifiers to materialize inside of a tight scope.
     Layout(
         content = if (inlineComposables.isEmpty()) {
             {}
@@ -174,6 +187,9 @@ internal fun CoreText(
         },
         modifier = modifier
             .then(controller.modifiers)
+            // NOTE(text-perf-review): consider moving this to controller.modifiers. It only uses
+            // the controller already, and by having the modifier be instance-equal across
+            // recompositions you would gain a lot.
             .then(
                 if (selectionRegistrar != null) {
                     if (isInTouchMode) {
@@ -196,6 +212,8 @@ internal fun CoreText(
         measurePolicy = controller.measurePolicy
     )
 
+    // NOTE(text-perf-review): consider making TextController or TextState a remember observer
+    // and just implementing onDispose on it, which might save us a little bit here.
     DisposableEffect(selectionRegistrar, effect = controller.commit)
 }
 
@@ -216,6 +234,7 @@ internal fun InlineChildren(
     }
 }
 
+// NOTE(text-perf-review): consider merging this with TextDelegate?
 @OptIn(InternalFoundationTextApi::class)
 /*@VisibleForTesting*/
 internal class TextController(val state: TextState) {
@@ -252,6 +271,9 @@ internal class TextController(val state: TextState) {
             measurables: List<Measurable>,
             constraints: Constraints
         ): MeasureResult {
+            // NOTE(text-perf-review): current implementation of layout means that layoutResult
+            // will _never_ be the same instance. We should try and fast path case where
+            // everything is the same and return same instance in that case.
             val layoutResult = state.textDelegate.layout(
                 constraints,
                 layoutDirection,
@@ -299,6 +321,8 @@ internal class TextController(val state: TextState) {
                 // round just because the Android framework is doing float-to-int conversion with
                 // round.
                 // https://cs.android.com/android/platform/superproject/+/master:frameworks/base/core/jni/android/graphics/Paint.cpp;l=635?q=Paint.cpp
+                // NOTE(text-perf-review): layoutResult should ideally just cache this map. It is
+                // being recreated every layout right now,
                 mapOf(
                     FirstBaseline to layoutResult.firstBaseline.roundToInt(),
                     LastBaseline to layoutResult.lastBaseline.roundToInt()
@@ -572,6 +596,7 @@ internal class TextController(val state: TextState) {
         }
 }
 
+// NOTE(text-perf-review): consider merging with TextDelegate?
 @OptIn(InternalFoundationTextApi::class)
 /*@VisibleForTesting*/
 internal class TextState(
@@ -613,6 +638,8 @@ internal fun updateTextDelegate(
     maxLines: Int = Int.MAX_VALUE,
     placeholders: List<AnnotatedString.Range<Placeholder>>
 ): TextDelegate {
+    // NOTE(text-perf-review): whenever we have remember intrinsic implemented, this might be a
+    // lot slower than the equivalent `remember(a, b, c, ...) { ... }` call.
     return if (current.text != text ||
         current.style != style ||
         current.softWrap != softWrap ||
