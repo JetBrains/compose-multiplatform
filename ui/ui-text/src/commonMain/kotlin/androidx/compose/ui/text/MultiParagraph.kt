@@ -259,6 +259,9 @@ class MultiParagraph(
         val paragraphIndex = findParagraphByIndex(paragraphInfoList, start)
         val path = Path()
 
+        // NOTE(text-perf-review): this is making 4 of intermediate list allocations for something
+        // that (i think) is in a relatively hot path. Consider implementing as a fastForEach or
+        // for loop with conditionals
         paragraphInfoList.fastDrop(paragraphIndex)
             .fastTakeWhile { it.startIndex < end }
             .fastFilterNot { it.startIndex == it.endIndex }
@@ -613,6 +616,8 @@ class MultiParagraph(
  * @return The index of the target [ParagraphInfo] in [paragraphInfoList].
  */
 internal fun findParagraphByIndex(paragraphInfoList: List<ParagraphInfo>, index: Int): Int {
+    // NOTE(text-perf-review): consider implementing a binarySearch helper that is inline to
+    // avoid allocating every time this method is called
     return paragraphInfoList.binarySearch { paragraphInfo ->
         when {
             paragraphInfo.startIndex > index -> 1
@@ -633,6 +638,8 @@ internal fun findParagraphByIndex(paragraphInfoList: List<ParagraphInfo>, index:
  * @return The index of the target [ParagraphInfo] in [paragraphInfoList].
  */
 internal fun findParagraphByY(paragraphInfoList: List<ParagraphInfo>, y: Float): Int {
+    // NOTE(text-perf-review): consider implementing a binarySearch helper that is inline to
+    // avoid allocating every time this method is called
     return paragraphInfoList.binarySearch { paragraphInfo ->
         when {
             paragraphInfo.top > y -> 1
@@ -653,6 +660,8 @@ internal fun findParagraphByY(paragraphInfoList: List<ParagraphInfo>, y: Float):
  * @return The index of the target [ParagraphInfo] in [paragraphInfoList].
  */
 internal fun findParagraphByLineIndex(paragraphInfoList: List<ParagraphInfo>, lineIndex: Int): Int {
+    // NOTE(text-perf-review): consider implementing a binarySearch helper that is inline to
+    // avoid allocating every time this method is called
     return paragraphInfoList.binarySearch { paragraphInfo ->
         when {
             paragraphInfo.startLineIndex > lineIndex -> 1
