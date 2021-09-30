@@ -724,6 +724,29 @@ class SnapshotTests {
         assertEquals(0, state.value)
     }
 
+    // Regression test for b/199921314
+    // This test lifted directly from the bug reported by chrnie@foxmail.com, modified and formatted
+    // to avoid lint warnings.
+    @Test(expected = IllegalStateException::class)
+    fun testTakeSnapshotNested() {
+        Snapshot.withMutableSnapshot {
+            val expectReadonlySnapshot = Snapshot.takeSnapshot()
+            try {
+                expectReadonlySnapshot.enter {
+                    var state by mutableStateOf(0)
+
+                    // expect throw IllegalStateException:Cannot modify a state object in a
+                    // read-only snapshot
+                    state = 1
+
+                    assertEquals(1, state)
+                }
+            } finally {
+                expectReadonlySnapshot.dispose()
+            }
+        }
+    }
+
     private var count = 0
 
     @BeforeTest
