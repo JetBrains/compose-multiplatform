@@ -33,6 +33,7 @@ import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.toSize
+import kotlin.jvm.JvmName
 import kotlin.math.abs
 import kotlin.math.sign
 
@@ -474,6 +475,19 @@ fun SemanticsNodeInteraction.performMultiModalInput(
     return this
 }
 
+@Deprecated(
+    message = "Replaced with same function, but with SemanticsNodeInteraction as return type",
+    level = DeprecationLevel.HIDDEN
+)
+@Suppress("unused")
+@JvmName("performSemanticsAction")
+fun <T : Function<Boolean>> SemanticsNodeInteraction.performSemanticsActionUnit(
+    key: SemanticsPropertyKey<AccessibilityAction<T>>,
+    invocation: (T) -> Unit
+) {
+    performSemanticsAction(key, invocation)
+}
+
 /**
  * Provides support to call custom semantics actions on this node.
  *
@@ -486,13 +500,14 @@ fun SemanticsNodeInteraction.performMultiModalInput(
  * @param key Key of the action to be performed.
  * @param invocation Place where you call your action. In the argument is provided the underlying
  * action from the given Semantics action.
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
  *
  * @throws AssertionError If the semantics action is not defined on this node.
  */
 fun <T : Function<Boolean>> SemanticsNodeInteraction.performSemanticsAction(
     key: SemanticsPropertyKey<AccessibilityAction<T>>,
     invocation: (T) -> Unit
-) {
+): SemanticsNodeInteraction {
     val node = fetchSemanticsNode("Failed to perform ${key.name} action.")
     requireSemantics(node, key) {
         "Failed to perform action ${key.name}"
@@ -502,6 +517,20 @@ fun <T : Function<Boolean>> SemanticsNodeInteraction.performSemanticsAction(
     testContext.testOwner.runOnUiThread {
         node.config[key].action?.let(invocation)
     }
+
+    return this
+}
+
+@Deprecated(
+    message = "Replaced with same function, but with SemanticsNodeInteraction as return type",
+    level = DeprecationLevel.HIDDEN
+)
+@Suppress("unused")
+@JvmName("performSemanticsAction")
+fun SemanticsNodeInteraction.performSemanticsActionUnit(
+    key: SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>
+) {
+    performSemanticsAction(key)
 }
 
 /**
@@ -514,13 +543,14 @@ fun <T : Function<Boolean>> SemanticsNodeInteraction.performSemanticsAction(
  * is blocking until the action is performed
  *
  * @param key Key of the action to be performed.
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
  *
  * @throws AssertionError If the semantics action is not defined on this node.
  */
 fun SemanticsNodeInteraction.performSemanticsAction(
     key: SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>
-) {
-    performSemanticsAction(key) { it.invoke() }
+): SemanticsNodeInteraction {
+    return performSemanticsAction(key) { it.invoke() }
 }
 
 // TODO(200928505): get a more accurate indication if it is a lazy list

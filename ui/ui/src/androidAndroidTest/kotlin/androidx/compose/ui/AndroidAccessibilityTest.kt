@@ -1240,7 +1240,6 @@ class AndroidAccessibilityTest {
         waitForSubtreeEventToSend()
         rule.onNodeWithTag(tag)
             .performSemanticsAction(SemanticsActions.SetText) { it(AnnotatedString(text)) }
-        rule.onNodeWithTag(tag)
             .assert(
                 SemanticsMatcher.expectValue(
                     SemanticsProperties.EditableText,

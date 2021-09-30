@@ -56,8 +56,6 @@ class SemanticsNodeInteraction constructor(
     internal val useUnmergedTree: Boolean,
     internal val selector: SemanticsSelector
 ) {
-    private var nodeIds: List<Int>? = null
-
     constructor(
         testContext: TestContext,
         useUnmergedTree: Boolean,
@@ -76,19 +74,11 @@ class SemanticsNodeInteraction constructor(
         atLeastOneRootRequired: Boolean,
         errorMessageOnFail: String? = null
     ): SelectionResult {
-        if (nodeIds == null) {
-            return selector
-                .map(
-                    testContext.getAllSemanticsNodes(atLeastOneRootRequired, useUnmergedTree),
-                    errorMessageOnFail.orEmpty()
-                )
-                .apply { nodeIds = selectedNodes.map { it.id }.toList() }
-        }
-
-        return SelectionResult(
-            testContext.getAllSemanticsNodes(atLeastOneRootRequired, useUnmergedTree)
-                .filter { it.id in nodeIds!! }
-        )
+        return selector
+            .map(
+                testContext.getAllSemanticsNodes(atLeastOneRootRequired, useUnmergedTree),
+                errorMessageOnFail.orEmpty()
+            )
     }
 
     /**
