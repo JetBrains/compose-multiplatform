@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.input.key
 
+import androidx.compose.testutils.first
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement
@@ -57,10 +58,4 @@ class KeyInputModifierTest {
             ValueElement("onPreviewKeyEvent", onPreviewKeyEvent)
         )
     }
-
-    private fun Modifier.toList(): List<Modifier.Element> =
-        foldIn(mutableListOf()) { acc, e -> acc.apply { acc.add(e) } }
-
-    private fun Modifier.first(): Modifier.Element =
-        toList().first()
 }
