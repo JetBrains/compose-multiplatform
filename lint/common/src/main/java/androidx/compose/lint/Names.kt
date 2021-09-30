@@ -37,6 +37,7 @@ object Names {
         val MutableStateOf = Name(PackageName, "mutableStateOf")
         val MutableStateListOf = Name(PackageName, "mutableStateListOf")
         val MutableStateMapOf = Name(PackageName, "mutableStateMapOf")
+        val ProduceState = Name(PackageName, "produceState")
         val Remember = Name(PackageName, "remember")
     }
     object Ui {
