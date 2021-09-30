@@ -40,11 +40,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposePanel
 import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowSize
 import androidx.compose.ui.window.launchApplication
 import androidx.compose.ui.window.rememberWindowState
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -158,7 +158,7 @@ fun ComposeContent(background: Color = Color.White) {
                         GlobalScope.launchApplication {
                             Window(
                                 onCloseRequest = ::exitApplication,
-                                state = rememberWindowState(size = WindowSize(400.dp, 250.dp))
+                                state = rememberWindowState(size = DpSize(400.dp, 250.dp))
                             ) {
                                 SecondWindowContent()
                             }

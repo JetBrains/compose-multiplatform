@@ -28,6 +28,11 @@ import androidx.compose.ui.util.unpackFloat2
 /**
  * Constructs an [WindowSize] from [width] and [height] [Dp] values.
  */
+@Suppress("DEPRECATION")
+@Deprecated(
+    "Use DpSize",
+    replaceWith = ReplaceWith("DpSize(width, height)", "androidx.compose.ui.unit.DpSize")
+)
 fun WindowSize(
     /**
      * The width of the window in [Dp]. If it is [Dp.Unspecified] then the width of the window
@@ -47,6 +52,7 @@ fun WindowSize(
  */
 @Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
+@Deprecated("Use DpSize", replaceWith = ReplaceWith("DpSize", "androidx.compose.ui.unit.DpSize"))
 inline class WindowSize internal constructor(@PublishedApi internal val packedValue: Long) {
     /**
      * `true` if the window size has specified values
@@ -81,6 +87,7 @@ inline class WindowSize internal constructor(@PublishedApi internal val packedVa
      * Returns a copy of this [WindowSize] instance optionally overriding the
      * [width] or [height] parameter.
      */
+    @Suppress("DEPRECATION")
     fun copy(
         width: Dp = this.width,
         height: Dp = this.height

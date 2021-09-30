@@ -21,9 +21,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.awt.ComposeDialog
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.ComponentUpdater
 import androidx.compose.ui.util.setIcon
@@ -132,7 +134,7 @@ fun Dialog(
                 })
                 addComponentListener(object : ComponentAdapter() {
                     override fun componentResized(e: ComponentEvent) {
-                        currentState.size = WindowSize(width.dp, height.dp)
+                        currentState.size = DpSize(width.dp, height.dp)
                     }
 
                     override fun componentMoved(e: ComponentEvent) {
@@ -200,6 +202,7 @@ fun Dialog(
  * @param update The callback to be invoked after the layout is inflated.
  * @param content Composable content of the creating dialog.
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Suppress("unused")
 @Composable
 fun Dialog(

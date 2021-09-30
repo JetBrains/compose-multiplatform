@@ -17,6 +17,7 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -104,6 +105,7 @@ class TestComposeWindow(
     /**
      * Process mouse scroll event
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     fun onMouseScroll(x: Int, y: Int, event: MouseScrollEvent) {
         owners.onMouseScroll(x, y, event)
     }

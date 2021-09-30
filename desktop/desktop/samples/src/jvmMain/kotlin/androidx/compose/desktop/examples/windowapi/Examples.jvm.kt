@@ -43,6 +43,7 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.res.loadSvgPainter
 import androidx.compose.ui.res.useResource
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.AwtWindow
@@ -54,7 +55,6 @@ import androidx.compose.ui.window.TrayState
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.WindowSize
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.awaitApplication
 import androidx.compose.ui.window.launchApplication
@@ -192,7 +192,7 @@ fun closeToTray() = GlobalScope.launchApplication {
     if (!isVisible) {
         Tray(
             icon,
-            hint = "Counter",
+            tooltip = "Counter",
             onAction = { isVisible = true },
             menu = {
                 Item("Exit", onClick = ::exitApplication)
@@ -446,7 +446,7 @@ fun initiallyCenteredWindow() = GlobalScope.launchApplication {
 @OptIn(DelicateCoroutinesApi::class)
 fun setSize() = GlobalScope.launchApplication {
     var isOpen by remember { mutableStateOf(true) }
-    val state = rememberWindowState(size = WindowSize(400.dp, 100.dp))
+    val state = rememberWindowState(size = DpSize(400.dp, 100.dp))
 
     if (isOpen) {
         Window(onCloseRequest = ::exitApplication, state = state) {}
@@ -665,13 +665,13 @@ private fun ApplicationScope.Trays(state: AppState) {
         }
     }
 
-    Tray(icon, hint = "Tray1")
+    Tray(icon, tooltip = "Tray1")
 
     if (state.isTray2Visible) {
         Tray(
             icon = icon,
             state = state.tray,
-            hint = "Tray2",
+            tooltip = "Tray2",
             menu = {
                 Menu("Submenu") {
                     Item(
