@@ -15,9 +15,6 @@
  */
 package androidx.compose.ui.text.platform
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.text.AnnotatedString.Range
 import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.Placeholder
@@ -25,10 +22,8 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.style.ResolvedTextDirection
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.Density
-import org.jetbrains.skia.paragraph.Paragraph
 import kotlin.math.ceil
 
 internal actual fun ActualParagraphIntrinsics(
@@ -50,67 +45,36 @@ internal actual fun ActualParagraphIntrinsics(
 
 internal class DesktopParagraphIntrinsics(
     val text: String,
-    style: TextStyle,
-    spanStyles: List<Range<SpanStyle>>,
-    placeholders: List<Range<Placeholder>>,
-    density: Density,
-    resourceLoader: Font.ResourceLoader
+    private val style: TextStyle,
+    private val spanStyles: List<Range<SpanStyle>>,
+    private val placeholders: List<Range<Placeholder>>,
+    private val density: Density,
+    private val resourceLoader: Font.ResourceLoader
 ) : ParagraphIntrinsics {
-
-    private val fontLoader = resourceLoader as FontLoader
     val textDirection = resolveTextDirection(style.textDirection)
-    val defaultHeight get() = builder.defaultHeight
-    private val builder = ParagraphBuilder(
-        fontLoader = fontLoader,
-        text = text,
-        textStyle = style,
-        spanStyles = spanStyles,
-        placeholders = placeholders,
-        density = density,
-        textDirection = textDirection
+
+    private var layouter: ParagraphLayouter? = newLayouter()
+
+    fun layouter(): ParagraphLayouter {
+        val layouter = this.layouter ?: newLayouter()
+        this.layouter = null
+        return layouter
+    }
+
+    private fun newLayouter() = ParagraphLayouter(
+        text, textDirection, style, spanStyles, placeholders, density, resourceLoader
     )
-    private var para = builder.build()
-    private var width = Float.POSITIVE_INFINITY
+
+    override var minIntrinsicWidth = 0f
+        private set
+    override var maxIntrinsicWidth = 0f
+        private set
 
     init {
-        para.layout(width)
+        val para = layouter!!.layoutParagraph(Float.POSITIVE_INFINITY)
+        minIntrinsicWidth = ceil(para.minIntrinsicWidth)
+        maxIntrinsicWidth = ceil(para.maxIntrinsicWidth)
     }
-
-    fun layoutParagraph(
-        width: Float = this.width,
-        maxLines: Int = builder.maxLines,
-        ellipsis: String = builder.ellipsis,
-        color: Color = builder.textStyle.color,
-        shadow: Shadow? = builder.textStyle.shadow,
-        textDecoration: TextDecoration? = builder.textStyle.textDecoration,
-    ): Paragraph {
-        val actualColor = color.takeOrElse { builder.textStyle.color }
-        if (
-            builder.maxLines != maxLines ||
-            builder.ellipsis != ellipsis ||
-            builder.textStyle.color != actualColor ||
-            builder.textStyle.shadow != shadow ||
-            builder.textStyle.textDecoration != textDecoration
-        ) {
-            this.width = width
-            builder.maxLines = maxLines
-            builder.ellipsis = ellipsis
-            builder.textStyle = builder.textStyle.copy(
-                color = actualColor,
-                shadow = shadow,
-                textDecoration = textDecoration
-            )
-            para = builder.build()
-            para.layout(width)
-        } else if (this.width != width) {
-            this.width = width
-            para.layout(width)
-        }
-        return para
-    }
-
-    override val minIntrinsicWidth = ceil(para.minIntrinsicWidth)
-    override val maxIntrinsicWidth = ceil(para.maxIntrinsicWidth)
 
     private fun resolveTextDirection(direction: TextDirection?): ResolvedTextDirection {
         return when (direction) {
