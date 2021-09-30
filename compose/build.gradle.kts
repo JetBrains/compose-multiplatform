@@ -1,7 +1,7 @@
 val composeBuild = gradle.includedBuild("support")
 fun Task.dependsOnComposeTask(name: String) = dependsOn(composeBuild.task(name))
 
-val isWebExists = composeBuild.projectDir.resolve(".jbWebBranchMergedMarker").exists()
+val isWebExist = composeBuild.projectDir.resolve(".jbWebExistsMarker").exists()
 
 // To show all projects which use `xxx` task, run:
 // ./gradlew -p frameworks/support help --task xxx
@@ -46,7 +46,7 @@ tasks.register("publishComposeJb") {
         dependsOnComposeTask("$it:publishAndroidReleasePublicationToMavenRepository")
     }
 
-    if (isWebExists) {
+    if (isWebExist) {
         listOf(
             ":compose:runtime:runtime",
         ).forEach {
@@ -83,7 +83,7 @@ tasks.register("testComposeJbDesktop") {
     dependsOnComposeTask(":compose:runtime:runtime-saveable:desktopTest")
 }
 
-if (isWebExists) {
+if (isWebExist) {
     tasks.register("testComposeJbWeb") {
         dependsOnComposeTask(":compose:runtime:runtime:jsTest")
         dependsOnComposeTask(":compose:runtime:runtime:test")
