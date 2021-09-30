@@ -1,0 +1,88 @@
+#!/bin/bash
+set -euo pipefail
+
+if [ -z "${AOSP_COMPOSE_SOURCE+x}" ]; then
+echo "Specify AOSP_COMPOSE_SOURCE. For example: export AOSP_COMPOSE_SOURCE=~/work/androidx-main"
+exit 1
+fi
+
+if [ -z "$@" ]; then
+echo "Specify Skiko version. For example: ./updateSkikoInAosp 0.4.15"
+exit 1
+fi
+SKIKO_VERSION=$@
+
+cd "$(dirname "$0")"
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+JB_GRADLE=$SCRIPT_DIR/../gradlew
+
+# --------------------------------- Create branch
+
+pushd $AOSP_COMPOSE_SOURCE/prebuilts/androidx/external
+git fetch
+git checkout aosp/androidx-main
+git checkout -B skiko$SKIKO_VERSION
+popd
+
+pushd $AOSP_COMPOSE_SOURCE/frameworks/support
+git fetch
+git checkout aosp/androidx-main
+git checkout -B skiko$SKIKO_VERSION
+popd
+
+# --------------------------------- Change frameworks/support
+sed -i 's/skiko = ".*"/skiko = "'"$SKIKO_VERSION"'"/' $AOSP_COMPOSE_SOURCE/frameworks/support/gradle/libs.versions.toml
+
+
+# --------------------------------- Change frameworks/prebuilts/androidx/external
+
+# we have error on the second call of Gradle:
+# Cannot invoke "Build_gradle.getAllFilesWithDependencies()" because "this.this$0.this$0" is null
+fixWindows() {
+    rm -rf .gradle
+}
+
+downloadSkiko() {
+    if [[ "$OSTYPE" == "msys" ]]; then
+        fixWindows
+    elif [[ "$OSTYPE" == "win32" ]]; then
+        fixWindows
+    fi
+
+    $JB_GRADLE -PallowJetbrainsDev=true -PartifactName=$1:$SKIKO_VERSION
+}
+
+if [[ "$OSTYPE" == "msys" ]]; then
+    $JB_GRADLE --stop
+elif [[ "$OSTYPE" == "win32" ]]; then
+    $JB_GRADLE --stop
+fi
+
+rm -rf $AOSP_COMPOSE_SOURCE/prebuilts/androidx/external/org/jetbrains/skiko
+
+pushd $AOSP_COMPOSE_SOURCE/frameworks/support/development/importMaven
+downloadSkiko org.jetbrains.skiko:skiko
+downloadSkiko org.jetbrains.skiko:skiko-jvm
+downloadSkiko org.jetbrains.skiko:skiko-jvm-runtime-linux-x64
+downloadSkiko org.jetbrains.skiko:skiko-jvm-runtime-linux-arm64
+downloadSkiko org.jetbrains.skiko:skiko-jvm-runtime-macos-x64
+downloadSkiko org.jetbrains.skiko:skiko-jvm-runtime-macos-arm64
+downloadSkiko org.jetbrains.skiko:skiko-jvm-runtime-windows-x64
+popd
+
+
+# --------------------------------- Commit
+set +euo pipefail
+
+pushd $AOSP_COMPOSE_SOURCE/frameworks/support
+git restore --staged *
+git add gradle/libs.versions.toml
+git commit -m "Update Skiko to $SKIKO_VERSION" -m "" -m  "Test: ./gradlew jvmTest desktopTest -Pandroidx.compose.multiplatformEnabled=true"
+popd
+
+pushd $AOSP_COMPOSE_SOURCE/prebuilts/androidx/external
+git restore --staged *
+git add org/jetbrains/skiko
+git commit -m "Update Skiko to $SKIKO_VERSION"
+popd
