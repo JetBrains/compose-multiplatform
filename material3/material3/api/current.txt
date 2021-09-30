@@ -74,6 +74,8 @@ package androidx.compose.material3 {
   }
 
   public final class DynamicTonalPaletteKt {
+    method @RequiresApi(android.os.Build.VERSION_CODES.S) public static androidx.compose.material3.ColorScheme dynamicDarkColorScheme(android.content.Context context);
+    method @RequiresApi(android.os.Build.VERSION_CODES.S) public static androidx.compose.material3.ColorScheme dynamicLightColorScheme(android.content.Context context);
   }
 
   public final class IconButtonKt {
