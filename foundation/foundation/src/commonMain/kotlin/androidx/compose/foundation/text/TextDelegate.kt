@@ -91,6 +91,9 @@ class TextDelegate(
     val placeholders: List<AnnotatedString.Range<Placeholder>> = emptyList()
 ) {
     /*@VisibleForTesting*/
+    // NOTE(text-perf-review): it seems like TextDelegate essentially guarantees that we use
+    // MultiParagraph. Can we have a fast-path that uses just Paragraph in simpler cases (ie,
+    // String)?
     internal var paragraphIntrinsics: MultiParagraphIntrinsics? = null
     internal var intrinsicsLayoutDirection: LayoutDirection? = null
 
@@ -206,6 +209,8 @@ class TextDelegate(
                 resourceLoader, constraints
             )
         ) {
+            // NOTE(text-perf-review): seems like there's a nontrivial chance for us to be able
+            // to just return prevResult here directly?
             return with(prevResult) {
                 copy(
                     layoutInput = layoutInput.copy(
@@ -234,6 +239,10 @@ class TextDelegate(
             )
         )
 
+        // NOTE(text-perf-review): it feels odd to create the input + result at the same time. if
+        // the allocation of these objects is 1:1 then it might make sense to just merge them?
+        // Alternatively, we might be able to save some effort here by having a common object for
+        // the types that go into the result here that are less likely to change
         return TextLayoutResult(
             TextLayoutInput(
                 text,
