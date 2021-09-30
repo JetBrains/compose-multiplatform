@@ -57,8 +57,10 @@ val AnimationDemos = DemoCategory(
             listOf(
                 ComposableDemo("Animated scrolling") { FancyScrollingDemo() },
                 ComposableDemo("animateColorAsState") { SingleValueAnimationDemo() },
+                ComposableDemo("Double Tap To Like") { SuspendDoubleTapToLikeDemo() },
                 ComposableDemo("Follow the tap") { SuspendAnimationDemo() },
                 ComposableDemo("Infinitely Animating") { InfiniteAnimationDemo() },
+                ComposableDemo("Loading Animation Demo") { LoadingAnimationDemo() },
                 ComposableDemo("Spring back scrolling") { SpringBackScrollingDemo() },
                 ComposableDemo("Swipe to dismiss") { SwipeToDismissDemo() },
             )
