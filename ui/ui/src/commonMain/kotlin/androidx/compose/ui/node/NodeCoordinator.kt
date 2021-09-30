@@ -62,7 +62,7 @@ internal abstract class NodeCoordinator(
     Measurable,
     LayoutCoordinates,
     OwnerScope,
-    (Canvas) -> Unit {
+    InvokeOnCanvas {
 
     abstract val tail: Modifier.Node
 

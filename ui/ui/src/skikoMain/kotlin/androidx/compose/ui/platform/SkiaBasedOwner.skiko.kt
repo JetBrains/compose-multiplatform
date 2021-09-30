@@ -62,6 +62,7 @@ import androidx.compose.ui.input.pointer.TestPointerInputEventData
 import androidx.compose.ui.layout.RootMeasurePolicy
 import androidx.compose.ui.modifier.ModifierLocalManager
 import androidx.compose.ui.node.InternalCoreApi
+import androidx.compose.ui.node.InvokeOnCanvas
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNodeDrawScope
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
@@ -316,7 +317,7 @@ internal class SkiaBasedOwner(
     }
 
     override fun createLayer(
-        drawBlock: (Canvas) -> Unit,
+        drawBlock: InvokeOnCanvas,
         invalidateParentLayer: () -> Unit
     ) = SkiaLayer(
         density,

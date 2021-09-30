@@ -26,6 +26,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.toSize
+import kotlin.js.JsName
 
 /**
  * Can be used to send [bringIntoView] requests. Pass it as a parameter to
@@ -77,6 +78,7 @@ sealed interface BringIntoViewRequester {
  * @sample androidx.compose.foundation.samples.BringPartOfComposableIntoViewSample
  */
 @ExperimentalFoundationApi
+@JsName("funBringIntoViewRequester")
 fun BringIntoViewRequester(): BringIntoViewRequester {
     return BringIntoViewRequesterImpl()
 }

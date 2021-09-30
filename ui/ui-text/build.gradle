@@ -86,6 +86,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         android()
         desktop()
         darwin()
+        js()
     }
 
     kotlin {
@@ -123,6 +124,8 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 dependsOn(skikoMain)
                 dependsOn(jvmMain)
             }
+
+            jsMain.dependsOn(skikoMain)
 
             nativeMain.dependsOn(skikoMain)
 

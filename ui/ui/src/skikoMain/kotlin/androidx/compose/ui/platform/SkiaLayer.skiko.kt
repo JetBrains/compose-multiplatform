@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toSkiaRRect
 import androidx.compose.ui.graphics.toSkiaRect
 import androidx.compose.ui.node.OwnedLayer
+import androidx.compose.ui.node.InvokeOnCanvas
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -55,7 +56,7 @@ import org.jetbrains.skia.ShadowUtils
 internal class SkiaLayer(
     private var density: Density,
     private val invalidateParentLayer: () -> Unit,
-    private val drawBlock: (Canvas) -> Unit,
+    private val drawBlock: InvokeOnCanvas,
     private val onDestroy: () -> Unit = {}
 ) : OwnedLayer {
     private var size = IntSize.Zero

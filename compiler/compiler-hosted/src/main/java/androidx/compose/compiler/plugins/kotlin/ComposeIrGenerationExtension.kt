@@ -34,6 +34,7 @@ import androidx.compose.compiler.plugins.kotlin.lower.decoys.CreateDecoysTransfo
 import androidx.compose.compiler.plugins.kotlin.lower.decoys.FixComposableLambdaCalls
 import androidx.compose.compiler.plugins.kotlin.lower.decoys.RecordDecoySignaturesTransformer
 import androidx.compose.compiler.plugins.kotlin.lower.decoys.SubstituteDecoyCallsTransformer
+import androidx.compose.compiler.plugins.kotlin.lower.decoys.WrapNotInlineableComposableLambdasForJs
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.serialization.DeclarationTable
@@ -80,6 +81,12 @@ class ComposeIrGenerationExtension(
                 moduleFragment.name.asString(),
                 pluginContext
             )
+        }
+
+        if(pluginContext.platform.isJs()) {
+            WrapNotInlineableComposableLambdasForJs(
+                pluginContext, symbolRemapper, metrics
+            ).lower(moduleFragment)
         }
 
         ClassStabilityTransformer(

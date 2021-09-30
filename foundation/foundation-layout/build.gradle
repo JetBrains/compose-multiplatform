@@ -73,6 +73,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         android()
         desktop()
         darwin()
+        js()
     }
 
     kotlin {
@@ -123,6 +124,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             }
             nativeMain.dependsOn(commonMain)
             macosX64Main.dependsOn(commonMain)
+            jsMain.dependsOn(commonMain)
         }
     }
     dependencies {
