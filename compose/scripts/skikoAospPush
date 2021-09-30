@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [ -z "${AOSP_COMPOSE_SOURCE+x}" ]; then
+echo "Specify AOSP_COMPOSE_SOURCE. For example: export AOSP_COMPOSE_SOURCE=~/work/androidx-main"
+exit 1
+fi
+
+SKIKO_VERSION=$(sed -n -e 's/skiko = "\(.*\)"/\1/p' $AOSP_COMPOSE_SOURCE/frameworks/support/gradle/libs.versions.toml)
+
+pushd $AOSP_COMPOSE_SOURCE/frameworks/support
+git push aosp HEAD:refs/for/androidx-main%topic=skiko$SKIKO_VERSION
+popd
+
+pushd $AOSP_COMPOSE_SOURCE/prebuilts/androidx/external
+git push aosp HEAD:refs/for/androidx-main%topic=skiko$SKIKO_VERSION
+popd
