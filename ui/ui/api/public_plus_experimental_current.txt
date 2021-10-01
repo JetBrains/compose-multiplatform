@@ -800,6 +800,27 @@ package androidx.compose.ui.hapticfeedback {
 
 }
 
+package androidx.compose.ui.input {
+
+  public final inline class InputMode {
+    ctor public InputMode();
+  }
+
+  public static final class InputMode.Companion {
+    method public int getKeyboard();
+    method public int getTouch();
+    property public final int Keyboard;
+    property public final int Touch;
+  }
+
+  public interface InputModeManager {
+    method public int getInputMode();
+    method @androidx.compose.ui.ExperimentalComposeUiApi public boolean requestInputMode(int inputMode);
+    property public abstract int inputMode;
+  }
+
+}
+
 package androidx.compose.ui.input.key {
 
   public final inline class Key {
@@ -2224,6 +2245,7 @@ package androidx.compose.ui.platform {
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.unit.Density> getLocalDensity();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.focus.FocusManager> getLocalFocusManager();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.hapticfeedback.HapticFeedback> getLocalHapticFeedback();
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.input.InputModeManager> getLocalInputModeManager();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.unit.LayoutDirection> getLocalLayoutDirection();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.text.input.TextInputService> getLocalTextInputService();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.TextToolbar> getLocalTextToolbar();

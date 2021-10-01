@@ -23,6 +23,7 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.platform.AccessibilityManager
 import androidx.compose.ui.platform.ClipboardManager
@@ -57,6 +58,12 @@ internal interface Owner {
      * Provide haptic feedback to the user. Use the Android version of haptic feedback.
      */
     val hapticFeedBack: HapticFeedback
+
+    /**
+     * Provide information about the current input mode, and a way to programmatically change the
+     * input mode.
+     */
+    val inputModeManager: InputModeManager
 
     /**
      * Provide clipboard manager to the user. Use the Android version of clipboard manager.
