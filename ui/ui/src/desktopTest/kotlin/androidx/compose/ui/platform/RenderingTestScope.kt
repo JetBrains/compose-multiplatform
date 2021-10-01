@@ -17,13 +17,14 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ComposeScene
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.yield
@@ -46,6 +47,7 @@ internal fun renderingTest(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 internal class RenderingTestScope(
     val width: Int,
     val height: Int,
@@ -59,7 +61,7 @@ internal class RenderingTestScope(
 
     val surface: Surface = Surface.makeRasterN32Premul(width, height)
     val canvas: Canvas = surface.canvas
-    val owners = DesktopOwners(
+    val scene = ComposeScene(
         coroutineContext = coroutineContext,
         invalidate = frameDispatcher::scheduleFrame
     ).apply {
@@ -67,27 +69,27 @@ internal class RenderingTestScope(
     }
 
     var density: Float
-        get() = owners.density.density
+        get() = scene.density.density
         set(value) {
-            owners.density = Density(value, owners.density.fontScale)
+            scene.density = Density(value, scene.density.fontScale)
         }
 
     fun dispose() {
-        owners.dispose()
+        scene.dispose()
         frameDispatcher.cancel()
     }
 
     private var onRender = CompletableDeferred<Unit>()
 
     fun setContent(content: @Composable () -> Unit) {
-        owners.setContent {
+        scene.setContent {
             content()
         }
     }
 
     private fun onRender(timeNanos: Long) {
         canvas.clear(Color.Transparent.toArgb())
-        owners.render(canvas, timeNanos)
+        scene.render(canvas, timeNanos)
         onRender.complete(Unit)
     }
 

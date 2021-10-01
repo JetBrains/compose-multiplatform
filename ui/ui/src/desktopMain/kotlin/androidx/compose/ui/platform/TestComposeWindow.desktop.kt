@@ -17,6 +17,7 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ComposeScene
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.geometry.Offset
@@ -66,10 +67,10 @@ class TestComposeWindow(
 
     private fun onFrame() {
         canvas.clear(Color.Transparent.toArgb())
-        owners.render(canvas, nanoTime())
+        scene.render(canvas, nanoTime())
     }
 
-    private val owners = DesktopOwners(
+    private val scene = ComposeScene(
         coroutineScope.coroutineContext,
         density,
         invalidate = frameDispatcher::scheduleFrame
@@ -81,28 +82,28 @@ class TestComposeWindow(
      * All currently registered [RootForTest]s
      */
     @OptIn(InternalComposeUiApi::class)
-    val roots: Set<RootForTest> get() = owners.roots
+    val roots: Set<RootForTest> get() = scene.roots
 
     /**
      * Clear-up all acquired resources and stop all pending work
      */
     fun dispose() {
-        owners.dispose()
+        scene.dispose()
         coroutineScope.cancel()
     }
 
     /**
      * Returns true if there are pending work scheduled by this window
      */
-    fun hasInvalidations(): Boolean = owners.hasInvalidations()
+    fun hasInvalidations(): Boolean = scene.hasInvalidations()
 
     /**
      * Compose [content] immediately and draw it on a [surface]
      */
     fun setContent(content: @Composable () -> Unit) {
-        owners.constraints = Constraints(maxWidth = width, maxHeight = height)
-        owners.setContent(content = content)
-        owners.render(canvas, nanoTime = nanoTime())
+        scene.constraints = Constraints(maxWidth = width, maxHeight = height)
+        scene.setContent(content = content)
+        scene.render(canvas, nanoTime = nanoTime())
     }
 
     /**
@@ -110,7 +111,7 @@ class TestComposeWindow(
      */
     @OptIn(ExperimentalComposeUiApi::class)
     fun onMouseScroll(x: Int, y: Int, event: MouseScrollEvent) {
-        owners.sendPointerScrollEvent(
+        scene.sendPointerScrollEvent(
             position = Offset(x.toFloat(), y.toFloat()),
             delta = event.delta,
             orientation = event.orientation
@@ -121,7 +122,7 @@ class TestComposeWindow(
      * Process mouse move event
      */
     fun onMouseMoved(x: Int, y: Int) {
-        owners.sendPointerEvent(
+        scene.sendPointerEvent(
             eventType = PointerEventType.Move,
             position = Offset(x.toFloat(), y.toFloat())
         )
@@ -131,7 +132,7 @@ class TestComposeWindow(
      * Process mouse enter event
      */
     fun onMouseEntered(x: Int, y: Int) {
-        owners.sendPointerEvent(
+        scene.sendPointerEvent(
             eventType = PointerEventType.Enter,
             position = Offset(x.toFloat(), y.toFloat())
         )
@@ -141,7 +142,7 @@ class TestComposeWindow(
      * Process mouse exit event
      */
     fun onMouseExited() {
-        owners.sendPointerEvent(
+        scene.sendPointerEvent(
             eventType = PointerEventType.Exit,
             position = Offset(-1f, -1f)
         )

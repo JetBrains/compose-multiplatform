@@ -15,6 +15,7 @@
  */
 package androidx.compose.ui.test.junit4
 
+import org.jetbrains.skia.Image
 import androidx.compose.ui.test.InternalTestApi
 import org.jetbrains.skia.Surface
 import org.junit.rules.TestRule
@@ -23,6 +24,8 @@ import org.junit.runners.model.Statement
 import java.io.File
 import java.security.MessageDigest
 import java.util.LinkedList
+
+// TODO(https://github.com/JetBrains/compose-jb/issues/1041): refactor API
 
 // TODO: replace with androidx.test.screenshot.proto.ScreenshotResultProto after MPP
 @InternalTestApi
@@ -58,6 +61,10 @@ class SkiaTestAlbum(val config: GoldenConfig) {
     private val screenshots: MutableMap<String, ScreenshotResultProto> = mutableMapOf()
     private val report = Report(screenshots)
     fun snap(surface: Surface, id: String) {
+        write(surface.makeImageSnapshot(), id)
+    }
+
+    fun write(image: Image, id: String) {
         if (!id.matches("^[A-Za-z0-9_-]+$".toRegex())) {
             throw IllegalArgumentException(
                 "The given golden identifier '$id' does not satisfy the naming " +
@@ -65,7 +72,7 @@ class SkiaTestAlbum(val config: GoldenConfig) {
             )
         }
 
-        val actual = surface.makeImageSnapshot().encodeToData()!!.bytes
+        val actual = image.encodeToData()!!.bytes
 
         val expected = readExpectedImage(id)
         if (expected == null) {
@@ -195,8 +202,12 @@ class ScreenshotTestRule internal constructor(val config: GoldenConfig) : TestRu
     }
 
     fun snap(surface: Surface, idSuffix: String? = null) {
+        write(surface.makeImageSnapshot(), idSuffix)
+    }
+
+    fun write(image: Image, idSuffix: String? = null) {
         val id = testIdentifier + if (idSuffix != null) "_$idSuffix" else ""
-        album.snap(surface, id)
+        album.write(image, id)
     }
 
     private fun handleReport(report: SkiaTestAlbum.Report) {

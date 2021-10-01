@@ -25,7 +25,7 @@ import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.platform.DesktopComponent
-import androidx.compose.ui.platform.DesktopOwners
+import androidx.compose.ui.ComposeScene
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.window.density
@@ -60,7 +60,7 @@ internal class ComposeLayer {
     private val _component = ComponentImpl()
     val component: SkiaLayer get() = _component
 
-    private val owners = DesktopOwners(
+    private val scene = ComposeScene(
         Dispatchers.Swing,
         _component,
         Density(1f),
@@ -97,7 +97,7 @@ internal class ComposeLayer {
         }
 
         override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
-            owners.constraints = Constraints(
+            this@ComposeLayer.scene.constraints = Constraints(
                 maxWidth = (width * density.density).toInt().coerceAtLeast(0),
                 maxHeight = (height * density.density).toInt().coerceAtLeast(0)
             )
@@ -107,8 +107,8 @@ internal class ComposeLayer {
         override fun doLayout() {
             super.doLayout()
             preferredSize = Dimension(
-                (owners.contentSize.width / density.density).toInt(),
-                (owners.contentSize.height / density.density).toInt()
+                (this@ComposeLayer.scene.contentSize.width / density.density).toInt(),
+                (this@ComposeLayer.scene.contentSize.height / density.density).toInt()
             )
         }
 
@@ -120,7 +120,7 @@ internal class ComposeLayer {
 
         private fun resetDensity() {
             density = (this as SkiaLayer).density
-            owners.density = density
+            this@ComposeLayer.scene.density = density
         }
     }
 
@@ -128,7 +128,7 @@ internal class ComposeLayer {
         _component.renderer = object : SkiaRenderer {
             override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                 try {
-                    owners.render(canvas, nanoTime)
+                    scene.render(canvas, nanoTime)
                 } catch (e: Throwable) {
                     if (System.getProperty("compose.desktop.render.ignore.errors") == null) {
                         throw e
@@ -140,12 +140,12 @@ internal class ComposeLayer {
         _component.addInputMethodListener(object : InputMethodListener {
             override fun caretPositionChanged(event: InputMethodEvent?) {
                 if (event != null) {
-                    owners.onInputMethodEvent(event)
+                    scene.onInputMethodEvent(event)
                 }
             }
 
             override fun inputMethodTextChanged(event: InputMethodEvent) = events.post {
-                owners.onInputMethodEvent(event)
+                scene.onInputMethodEvent(event)
             }
         })
 
@@ -153,54 +153,54 @@ internal class ComposeLayer {
             override fun mouseClicked(event: MouseEvent) = Unit
 
             override fun mousePressed(event: MouseEvent) = events.post {
-                owners.onMouseEvent(density, event)
+                scene.onMouseEvent(density, event)
             }
 
             override fun mouseReleased(event: MouseEvent) = events.post {
-                owners.onMouseEvent(density, event)
+                scene.onMouseEvent(density, event)
             }
 
             override fun mouseEntered(event: MouseEvent) = events.post {
-                owners.onMouseEvent(density, event)
+                scene.onMouseEvent(density, event)
             }
 
             override fun mouseExited(event: MouseEvent) = events.post {
-                owners.onMouseEvent(density, event)
+                scene.onMouseEvent(density, event)
             }
         })
         _component.addMouseMotionListener(object : MouseMotionAdapter() {
             override fun mouseDragged(event: MouseEvent) = events.post {
-                owners.onMouseEvent(density, event)
+                scene.onMouseEvent(density, event)
             }
 
             override fun mouseMoved(event: MouseEvent) = events.post {
-                owners.onMouseEvent(density, event)
+                scene.onMouseEvent(density, event)
             }
         })
         _component.addMouseWheelListener { event ->
             events.post {
-                owners.onMouseWheelEvent(density, event)
+                scene.onMouseWheelEvent(density, event)
             }
         }
         _component.focusTraversalKeysEnabled = false
         _component.addKeyListener(object : KeyAdapter() {
             override fun keyPressed(event: KeyEvent) {
-                owners.sendKeyEvent(event)
+                scene.sendKeyEvent(event)
             }
 
             override fun keyReleased(event: KeyEvent) {
-                owners.sendKeyEvent(event)
+                scene.sendKeyEvent(event)
             }
 
             override fun keyTyped(event: KeyEvent) {
-                owners.sendKeyEvent(event)
+                scene.sendKeyEvent(event)
             }
         })
     }
 
     fun dispose() {
         check(!isDisposed)
-        owners.dispose()
+        scene.dispose()
         events.cancel()
         _component.dispose()
         _initContent = null
@@ -217,7 +217,7 @@ internal class ComposeLayer {
         // but the first composition will be useless, as we set density=1
         // (we don't know the real density if we have unattached component)
         _initContent = {
-            owners.setContent(
+            scene.setContent(
                 parentComposition,
                 onPreviewKeyEvent = onPreviewKeyEvent,
                 onKeyEvent = onKeyEvent,
@@ -239,7 +239,7 @@ internal class ComposeLayer {
 
 @Suppress("ControlFlowWithEmptyBody")
 @OptIn(ExperimentalComposeUiApi::class)
-private fun DesktopOwners.onMouseEvent(
+private fun ComposeScene.onMouseEvent(
     density: Float,
     event: MouseEvent
 ) {
@@ -263,7 +263,7 @@ private fun DesktopOwners.onMouseEvent(
 
 @Suppress("ControlFlowWithEmptyBody")
 @OptIn(ExperimentalComposeUiApi::class)
-private fun DesktopOwners.onMouseWheelEvent(
+private fun ComposeScene.onMouseWheelEvent(
     density: Float,
     event: MouseWheelEvent
 ) = with(event) {
@@ -287,6 +287,6 @@ private fun DesktopOwners.onMouseWheelEvent(
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
-private fun DesktopOwners.sendKeyEvent(event: KeyEvent) {
+private fun ComposeScene.sendKeyEvent(event: KeyEvent) {
     sendKeyEvent(ComposeKeyEvent(event))
 }
