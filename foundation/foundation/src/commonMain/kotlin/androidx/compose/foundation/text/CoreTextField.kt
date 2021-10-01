@@ -711,7 +711,7 @@ internal class TextFieldState(
             softWrap = softWrap,
             density = density,
             resourceLoader = resourceLoader,
-            placeholders = emptyList()
+            placeholders = emptyList(),
         )
     }
 }

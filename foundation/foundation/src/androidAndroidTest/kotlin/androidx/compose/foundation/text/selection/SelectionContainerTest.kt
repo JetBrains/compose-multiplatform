@@ -20,7 +20,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.text.CoreText
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TEST_FONT_FAMILY
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -275,7 +275,7 @@ class SelectionContainerTest {
                             selection.value = it
                         }
                     ) {
-                        CoreText(
+                        BasicText(
                             AnnotatedString(textContent),
                             Modifier.fillMaxSize(),
                             style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),

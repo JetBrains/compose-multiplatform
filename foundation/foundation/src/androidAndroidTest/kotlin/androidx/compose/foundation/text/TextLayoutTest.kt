@@ -267,7 +267,7 @@ private fun TestingText(
     val textStyle = remember {
         TextStyle(fontFamily = TEST_FONT_FAMILY)
     }
-    CoreText(
+    BasicText(
         AnnotatedString(text),
         style = textStyle,
         modifier = modifier,
