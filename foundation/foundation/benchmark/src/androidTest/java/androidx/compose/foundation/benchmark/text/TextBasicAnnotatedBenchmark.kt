@@ -27,6 +27,7 @@ import androidx.compose.testutils.benchmark.toggleStateBenchmarkDraw
 import androidx.compose.testutils.benchmark.toggleStateBenchmarkLayout
 import androidx.compose.testutils.benchmark.toggleStateBenchmarkMeasure
 import androidx.compose.testutils.benchmark.toggleStateBenchmarkRecompose
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.benchmark.TextBenchmarkTestRule
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,11 +38,11 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 /**
- * The benchmark for [Text] composable with the input being a plain string.
+ * The benchmark for [Text] composable with the input being a plain annotated string.
  */
 @LargeTest
 @RunWith(Parameterized::class)
-class TextBasicBenchmark(
+class TextBasicAnnotatedBenchmark(
     private val textLength: Int
 ) {
     companion object {
@@ -68,9 +69,9 @@ class TextBasicBenchmark(
              * is created.
              */
             val texts = List(textBenchmarkRule.repeatTimes) {
-                textGenerator.nextParagraph(textLength)
+                AnnotatedString(textGenerator.nextParagraph(textLength))
             }
-            TextInColumnTestCase(
+            AnnotatedTextInColumnTestCase(
                 texts = texts,
                 width = width,
                 fontSize = fontSize
