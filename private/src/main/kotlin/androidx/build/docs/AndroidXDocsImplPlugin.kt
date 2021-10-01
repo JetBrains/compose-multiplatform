@@ -69,7 +69,6 @@ import javax.inject.Inject
  * Plugin that allows to build documentation for a given set of prebuilt and tip of tree projects.
  */
 abstract class AndroidXDocsImplPlugin : Plugin<Project> {
-    lateinit var project: Project
     lateinit var docsType: String
     lateinit var docsSourcesConfiguration: Configuration
     lateinit var samplesSourcesConfiguration: Configuration
@@ -79,7 +78,6 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
     abstract val archiveOperations: ArchiveOperations
 
     override fun apply(project: Project) {
-        this.project = project
         docsType = project.name.removePrefix("docs-")
         project.plugins.all { plugin ->
             when (plugin) {
@@ -98,8 +96,8 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
                 }
             }
         }
-        disableUnneededTasks()
-        createConfigurations()
+        disableUnneededTasks(project)
+        createConfigurations(project)
         val buildOnServer = project.tasks.register<DocsBuildOnServer>("buildOnServer") {
             buildId = getBuildId()
             docsType = this@AndroidXDocsImplPlugin.docsType
@@ -108,12 +106,14 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
 
         val unzippedSamplesSources = File(project.buildDir, "unzippedSampleSources")
         val unzipSamplesTask = configureUnzipTask(
+            project,
             "unzipSampleSources",
             unzippedSamplesSources,
             samplesSourcesConfiguration
         )
         val unzippedDocsSources = File(project.buildDir, "unzippedDocsSources")
         val unzipDocsTask = configureUnzipTask(
+            project,
             "unzipDocsSources",
             unzippedDocsSources,
             docsSourcesConfiguration
@@ -121,11 +121,13 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
 
         val unzippedSourcesForDackka = File(project.buildDir, "unzippedSourcesForDackka")
         val unzipSourcesForDackkaTask = configureDackkaUnzipTask(
+            project,
             unzippedSourcesForDackka,
             docsSourcesConfiguration
         )
 
         configureDackka(
+            project,
             unzippedSourcesForDackka,
             unzipSourcesForDackkaTask,
             unzippedSamplesSources,
@@ -134,6 +136,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             buildOnServer
         )
         configureDokka(
+            project,
             unzippedDocsSources,
             unzipDocsTask,
             unzippedSamplesSources,
@@ -142,6 +145,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             buildOnServer
         )
         configureDoclava(
+            project,
             unzippedDocsSources,
             unzipDocsTask,
             dependencyClasspath,
@@ -154,6 +158,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
      * [docsConfiguration] configuration, resolve them and put them to [destinationDirectory].
      */
     private fun configureUnzipTask(
+        project: Project,
         taskName: String,
         destinationDirectory: File,
         docsConfiguration: Configuration
@@ -196,6 +201,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
      * This is a modified version of [configureUnzipTask], customized for Dackka usage.
      */
     private fun configureDackkaUnzipTask(
+        project: Project,
         destinationDirectory: File,
         docsConfiguration: Configuration
     ): TaskProvider<Sync> {
@@ -223,7 +229,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
      *   samples sources
      * - stubs(project(":foo:foo-stubs")) - stubs needed for a documented library
      */
-    private fun createConfigurations() {
+    private fun createConfigurations(project: Project) {
         project.dependencies.components.all<SourcesVariantRule>()
         val docsConfiguration = project.configurations.create("docs") {
             it.isCanBeResolved = false
@@ -301,6 +307,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
     }
 
     private fun configureDackka(
+        project: Project,
         unzippedDocsSources: File,
         unzipDocsTask: TaskProvider<Sync>,
         unzippedSamplesSources: File,
@@ -360,6 +367,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
     }
 
     private fun configureDokka(
+        project: Project,
         unzippedDocsSources: File,
         unzipDocsTask: TaskProvider<Sync>,
         unzippedSamplesSources: File,
@@ -381,6 +389,9 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             task.dependsOn(unzipSamplesTask)
 
             val androidJar = androidJarFile(project)
+            val dokkaClasspath = project.provider({
+                project.files(androidJar).plus(dependencyClasspath)
+            })
             // DokkaTask tries to resolve DokkaTask#classpath right away for jars that might not
             // be there yet. Delay the setting of this property to before we run the task.
             task.inputs.files(androidJar, dependencyClasspath)
@@ -400,10 +411,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
                     opts.suppress = true
                     dokkaTask.perPackageOptions.add(opts)
                 }
-
-                dokkaTask.classpath = project.files(dokkaTask.classpath)
-                    .plus(project.files(androidJar))
-                    .plus(dependencyClasspath)
+                dokkaTask.classpath = dokkaClasspath.get()
             }
         }
         val zipTask = project.tasks.register("zipDokkaDocs", Zip::class.java) {
@@ -429,6 +437,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
     }
 
     private fun configureDoclava(
+        project: Project,
         unzippedDocsSources: File,
         unzipDocsTask: TaskProvider<Sync>,
         dependencyClasspath: FileCollection,
@@ -535,7 +544,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
      * Replace all tests etc with empty task, so we don't run anything
      * it is more effective then task.enabled = false, because we avoid executing deps as well
      */
-    private fun disableUnneededTasks() {
+    private fun disableUnneededTasks(project: Project) {
         var reentrance = false
         project.tasks.whenTaskAdded { task ->
             if (task is Test || task.name.startsWith("assemble") ||
