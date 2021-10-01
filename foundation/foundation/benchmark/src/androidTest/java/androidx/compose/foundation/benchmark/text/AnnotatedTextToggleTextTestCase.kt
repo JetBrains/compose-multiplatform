@@ -24,47 +24,43 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.testutils.LayeredComposeTestCase
+import androidx.compose.testutils.ComposeTestCase
 import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.benchmark.RandomTextGenerator
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 
-/**
- * The benchmark test case for [Text], where the input is a plain string.
- */
-class TextInColumnTestCase(
-    private val texts: List<String>,
+class AnnotatedTextToggleTextTestCase(
+    private val textGenerator: RandomTextGenerator,
+    private val textLength: Int,
+    private val textNumber: Int,
     private val width: Dp,
     private val fontSize: TextUnit
-) : LayeredComposeTestCase(), ToggleableTestCase {
+) : ComposeTestCase, ToggleableTestCase {
 
-    private val color = mutableStateOf(Color.Black)
-
-    @Composable
-    override fun MeasuredContent() {
-        for (text in texts) {
-            Text(text = text, color = color.value, fontSize = fontSize)
-        }
+    private val texts = List(textNumber) {
+        mutableStateOf(AnnotatedString(textGenerator.nextParagraph(length = textLength)))
     }
 
     @Composable
-    override fun ContentWrappers(content: @Composable () -> Unit) {
+    override fun Content() {
         Column(
             modifier = Modifier.wrapContentSize(Alignment.Center).width(width)
                 .verticalScroll(rememberScrollState())
         ) {
-            content()
+            for (text in texts) {
+                Text(text = text.value, color = Color.Black, fontSize = fontSize)
+            }
         }
     }
 
     override fun toggleState() {
-        if (color.value == Color.Black) {
-            color.value = Color.Red
-        } else {
-            color.value = Color.Black
+        texts.forEach {
+            it.value = AnnotatedString(textGenerator.nextParagraph(length = textLength))
         }
     }
 }
