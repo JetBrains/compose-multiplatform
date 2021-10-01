@@ -19,14 +19,12 @@ package androidx.compose.material3.tokens
 
 internal object ColorLight {
     val Background = Palette.Neutral99
-    val Disabled = Palette.Neutral95
     val Error = Palette.Error40
     val ErrorContainer = Palette.Error90
     val InverseOnSurface = Palette.Neutral95
     val InversePrimary = Palette.Primary80
     val InverseSurface = Palette.Neutral20
     val OnBackground = Palette.Neutral10
-    val OnDisabled = Palette.NeutralVariant50
     val OnError = Palette.Error100
     val OnErrorContainer = Palette.Error10
     val OnPrimary = Palette.Primary100
@@ -42,7 +40,6 @@ internal object ColorLight {
     val PrimaryContainer = Palette.Primary90
     val Secondary = Palette.Secondary40
     val SecondaryContainer = Palette.Secondary90
-    val Shadow = Palette.Neutral0
     val Surface = Palette.Neutral99
     val SurfaceVariant = Palette.NeutralVariant90
     val Tertiary = Palette.Tertiary40

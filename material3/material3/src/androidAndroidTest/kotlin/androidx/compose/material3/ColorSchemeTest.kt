@@ -114,8 +114,6 @@ private fun ColorScheme.contentEquals(other: ColorScheme): Boolean {
     if (onSurfaceVariant != other.onSurfaceVariant) return false
     if (inverseSurface != other.inverseSurface) return false
     if (inverseOnSurface != other.inverseOnSurface) return false
-    if (disabled != other.disabled) return false
-    if (onDisabled != other.onDisabled) return false
     if (error != other.error) return false
     if (onError != other.onError) return false
     if (errorContainer != other.errorContainer) return false
