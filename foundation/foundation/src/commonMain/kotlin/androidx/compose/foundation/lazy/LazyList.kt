@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.assertNotNestingScrollableContainers
 import androidx.compose.foundation.clipScrollableContainer
 import androidx.compose.foundation.gestures.FlingBehavior
@@ -35,10 +34,8 @@ import androidx.compose.foundation.lazy.layout.rememberLazyLayoutPrefetchPolicy
 import androidx.compose.foundation.lazy.layout.rememberLazyLayoutState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
@@ -78,7 +75,7 @@ internal fun LazyList(
 
     val itemScope: Ref<LazyItemScopeImpl> = remember { Ref() }
 
-    val stateOfItemsProvider = rememberStateOfItemsProvider(content, itemScope)
+    val stateOfItemsProvider = rememberStateOfItemsProvider(state, content, itemScope)
 
     val measurePolicy = rememberLazyListMeasurePolicy(
         stateOfItemsProvider,
@@ -137,78 +134,6 @@ internal fun LazyList(
         itemsProvider = { stateOfItemsProvider.value }
     )
 }
-
-@Composable
-private fun rememberStateOfItemsProvider(
-    content: LazyListScope.() -> Unit,
-    itemScope: Ref<LazyItemScopeImpl>
-): State<LazyListItemsProvider> {
-    val latestContent = rememberUpdatedState(content)
-    return remember {
-        derivedStateOf { LazyListScopeImpl(itemScope).apply(latestContent.value) }
-    }
-}
-
-internal class LazyListScopeImpl(
-    private val itemScope: Ref<LazyItemScopeImpl>
-) : LazyListScope, LazyListItemsProvider {
-    private val intervals = IntervalList<IntervalContent>()
-    override val itemsCount get() = intervals.totalSize
-    private var _headerIndexes: MutableList<Int>? = null
-    override val headerIndexes: List<Int> get() = _headerIndexes ?: emptyList()
-
-    override fun getKey(index: Int): Any {
-        val interval = intervals.intervalForIndex(index)
-        val localIntervalIndex = index - interval.startIndex
-        val key = interval.content.key?.invoke(localIntervalIndex)
-        return key ?: getDefaultLazyKeyFor(index)
-    }
-
-    override fun getContent(index: Int): @Composable () -> Unit {
-        val interval = intervals.intervalForIndex(index)
-        val localIntervalIndex = index - interval.startIndex
-        return interval.content.content.invoke(itemScope.value!!, localIntervalIndex)
-    }
-
-    override fun items(
-        count: Int,
-        key: ((index: Int) -> Any)?,
-        itemContent: @Composable LazyItemScope.(index: Int) -> Unit
-    ) {
-        intervals.add(
-            count,
-            IntervalContent(
-                key = key,
-                content = { index -> @Composable { itemContent(index) } }
-            )
-        )
-    }
-
-    override fun item(key: Any?, content: @Composable LazyItemScope.() -> Unit) {
-        intervals.add(
-            1,
-            IntervalContent(
-                key = if (key != null) { _: Int -> key } else null,
-                content = { @Composable { content() } }
-            )
-        )
-    }
-
-    @ExperimentalFoundationApi
-    override fun stickyHeader(key: Any?, content: @Composable LazyItemScope.() -> Unit) {
-        val headersIndexes = _headerIndexes ?: mutableListOf<Int>().also {
-            _headerIndexes = it
-        }
-        headersIndexes.add(itemsCount)
-
-        item(key, content)
-    }
-}
-
-internal class IntervalContent(
-    val key: ((index: Int) -> Any)?,
-    val content: LazyItemScope.(index: Int) -> @Composable () -> Unit
-)
 
 @Composable
 private fun rememberLazyListMeasurePolicy(

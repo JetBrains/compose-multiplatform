@@ -45,6 +45,12 @@ internal class LazyMeasuredItemProvider(
         val placeables = placeablesProvider.getAndMeasure(index.value, childConstraints)
         return measuredItemFactory.createItem(index, key, placeables)
     }
+
+    /**
+     * Contains the mapping between the key and the index. It could contain not all the items of
+     * the list as an optimization.
+     **/
+    val keyToIndexMap: Map<Any, Int> get() = itemsProvider.keyToIndexMap
 }
 
 // This interface allows to avoid autoboxing on index param

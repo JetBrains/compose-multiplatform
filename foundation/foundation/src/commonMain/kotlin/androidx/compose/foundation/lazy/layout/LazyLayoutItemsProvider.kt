@@ -27,4 +27,10 @@ internal interface LazyLayoutItemsProvider {
 
     /** Returns the key for the item on this index */
     fun getKey(index: Int): Any
+
+    /**
+     * Contains the mapping between the key and the index. It could contain not all the items of
+     * the list as an optimization.
+     **/
+    val keyToIndexMap: Map<Any, Int>
 }
