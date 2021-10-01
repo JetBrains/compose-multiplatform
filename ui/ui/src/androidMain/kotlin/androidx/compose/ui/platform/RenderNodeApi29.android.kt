@@ -213,6 +213,10 @@ internal class RenderNodeApi29(val ownerView: AndroidComposeView) : DeviceRender
             alpha = renderNode.alpha,
             renderEffect = internalRenderEffect
         )
+
+    override fun discardDisplayList() {
+        renderNode.discardDisplayList()
+    }
 }
 
 @RequiresApi(Build.VERSION_CODES.S)

@@ -92,6 +92,10 @@ internal class SkiaLayer(
         onDestroy()
     }
 
+    override fun reuseLayer(drawBlock: (Canvas) -> Unit, invalidateParentLayer: () -> Unit) {
+        // TODO: in destroy, call recycle, and reconfigure this layer to be ready to use here.
+    }
+
     override fun resize(size: IntSize) {
         if (size != this.size) {
             this.size = size

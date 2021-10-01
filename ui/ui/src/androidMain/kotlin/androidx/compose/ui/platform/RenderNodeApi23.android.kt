@@ -65,6 +65,7 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
             renderNode.setLeftTopRightBottom(0, 0, 0, 0)
             renderNode.offsetLeftAndRight(0)
             renderNode.offsetTopAndBottom(0)
+            renderNode.discardDisplayList()
             needToValidateAccess = false // only need to do this once
         }
         if (testFailCreateRenderNode) {
@@ -264,6 +265,10 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
             alpha = renderNode.alpha,
             renderEffect = renderEffect
         )
+
+    override fun discardDisplayList() {
+        renderNode.discardDisplayList()
+    }
 
     companion object {
         // Used by tests to force failing creating a RenderNode to simulate a device that
