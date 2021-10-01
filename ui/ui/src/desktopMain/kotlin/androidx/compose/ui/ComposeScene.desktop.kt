@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package androidx.compose.ui.platform
+package androidx.compose.ui
 
 import androidx.compose.runtime.BroadcastFrameClock
 import androidx.compose.runtime.Composable
@@ -26,7 +26,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.runtime.withFrameNanos
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.mouse.MouseScrollEvent
@@ -38,6 +37,15 @@ import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventData
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.platform.DesktopComponent
+import androidx.compose.ui.platform.DesktopOwner
+import androidx.compose.ui.platform.DesktopPlatformInput
+import androidx.compose.ui.platform.DesktopRootForTest
+import androidx.compose.ui.platform.DummyDesktopComponent
+import androidx.compose.ui.platform.EmptyDispatcher
+import androidx.compose.ui.platform.FlushCoroutineDispatcher
+import androidx.compose.ui.platform.GlobalSnapshotManager
+import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -54,8 +62,8 @@ import java.awt.event.MouseEvent
 import kotlin.coroutines.CoroutineContext
 import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
 
-internal val LocalDesktopOwners = staticCompositionLocalOf<DesktopOwners> {
-    error("CompositionLocal LocalDesktopOwners not provided")
+internal val LocalComposeScene = staticCompositionLocalOf<ComposeScene> {
+    error("CompositionLocal LocalComposeScene not provided")
 }
 
 /**
@@ -66,17 +74,17 @@ internal val LocalDesktopOwners = staticCompositionLocalOf<DesktopOwners> {
  *
  * To specify available size for the content, you should use [constraints].
  *
- * After [DesktopOwners] will no longer needed, you should call [dispose] method, so all resources
+ * After [ComposeScene] will no longer needed, you should call [dispose] method, so all resources
  * and subscriptions will be properly closed. Otherwise there can be a memory leak.
  */
-internal class DesktopOwners internal constructor(
+class ComposeScene internal constructor(
     coroutineContext: CoroutineContext,
     component: DesktopComponent,
     density: Density,
     private val invalidate: () -> Unit
 ) {
     /**
-     * Constructs [DesktopOwners]
+     * Constructs [ComposeScene]
      *
      * @param coroutineContext Context which will be used to launch effects ([LaunchedEffect],
      * [rememberCoroutineScope]) and run recompositions.
@@ -152,7 +160,7 @@ internal class DesktopOwners internal constructor(
      */
     var density: Density = density
         set(value) {
-            check(!isDisposed) { "DesktopOwners is disposed" }
+            check(!isDisposed) { "ComposeScene is disposed" }
             field = value
             mainOwner?.density = value
         }
@@ -167,13 +175,13 @@ internal class DesktopOwners internal constructor(
     }
 
     /**
-     * Close all resources and subscriptions. Not calling this method when [DesktopOwners] is no
+     * Close all resources and subscriptions. Not calling this method when [ComposeScene] is no
      * longer needed will cause a memory leak.
      *
      * All effects launched via [LaunchedEffect] or [rememberCoroutineScope] will be cancelled
      * (but not immediately).
      *
-     * After calling this method, you cannot call any other method of this [DesktopOwners].
+     * After calling this method, you cannot call any other method of this [ComposeScene].
      */
     fun dispose() {
         composition?.dispose()
@@ -198,7 +206,7 @@ internal class DesktopOwners internal constructor(
         dispatcher.hasTasks()
 
     internal fun attach(desktopOwner: DesktopOwner) {
-        check(!isDisposed) { "DesktopOwners is disposed" }
+        check(!isDisposed) { "ComposeScene is disposed" }
         list.add(desktopOwner)
         desktopOwner.onNeedsRender = ::invalidateIfNeeded
         desktopOwner.onDispatchCommand = ::dispatchCommand
@@ -210,7 +218,7 @@ internal class DesktopOwners internal constructor(
     }
 
     internal fun detach(desktopOwner: DesktopOwner) {
-        check(!isDisposed) { "DesktopOwners is disposed" }
+        check(!isDisposed) { "ComposeScene is disposed" }
         list.remove(desktopOwner)
         desktopOwner.onDispatchCommand = null
         desktopOwner.onNeedsRender = null
@@ -227,7 +235,7 @@ internal class DesktopOwners internal constructor(
      *
      * Will throw an [IllegalStateException] if the composition has been disposed.
      *
-     * @param content Content of the [DesktopOwners]
+     * @param content Content of the [ComposeScene]
      */
     fun setContent(
         content: @Composable () -> Unit
@@ -238,13 +246,13 @@ internal class DesktopOwners internal constructor(
 
     // TODO(demin): We should configure routing of key events if there
     //  are any popups/root present:
-    //   - DesktopOwners.sendKeyEvent
-    //   - DesktopOwners.onPreviewKeyEvent (or Window.onPreviewKeyEvent)
+    //   - ComposeScene.sendKeyEvent
+    //   - ComposeScene.onPreviewKeyEvent (or Window.onPreviewKeyEvent)
     //   - Popup.onPreviewKeyEvent
     //   - NestedPopup.onPreviewKeyEvent
     //   - NestedPopup.onKeyEvent
     //   - Popup.onKeyEvent
-    //   - DesktopOwners.onKeyEvent
+    //   - ComposeScene.onKeyEvent
     //  Currently we have this routing:
     //   - [active Popup or the main content].onPreviewKeyEvent
     //   - [active Popup or the main content].onKeyEvent
@@ -255,7 +263,7 @@ internal class DesktopOwners internal constructor(
         onKeyEvent: (ComposeKeyEvent) -> Boolean = { false },
         content: @Composable () -> Unit
     ) {
-        check(!isDisposed) { "DesktopOwners is disposed" }
+        check(!isDisposed) { "ComposeScene is disposed" }
         composition?.dispose()
         mainOwner?.dispose()
         val mainOwner = DesktopOwner(
@@ -267,7 +275,7 @@ internal class DesktopOwners internal constructor(
         attach(mainOwner)
         composition = mainOwner.setContent(parentComposition ?: recomposer) {
             CompositionLocalProvider(
-                LocalDesktopOwners provides this,
+                LocalComposeScene provides this,
                 content = content
             )
         }
@@ -293,7 +301,7 @@ internal class DesktopOwners internal constructor(
      */
     val contentSize: IntSize
         get() {
-            check(!isDisposed) { "DesktopOwners is disposed" }
+            check(!isDisposed) { "ComposeScene is disposed" }
             val mainOwner = mainOwner ?: return IntSize.Zero
             mainOwner.measureAndLayout()
             return IntSize(mainOwner.root.width, mainOwner.root.height)
@@ -304,12 +312,21 @@ internal class DesktopOwners internal constructor(
      * animations in the content (or any other code, which uses [withFrameNanos]
      */
     fun render(canvas: Canvas, nanoTime: Long) {
-        check(!isDisposed) { "DesktopOwners is disposed" }
+        check(!isDisposed) { "ComposeScene is disposed" }
         postponeInvalidation {
-            // We must see the actual state before we will render the frame
-            Snapshot.sendApplyNotifications()
-            dispatcher.flush()
-            frameClock.sendFrame(nanoTime)
+            // TODO(https://github.com/JetBrains/compose-jb/issues/1135):
+            //  Temporarily workaround for flaky tests in WithComposeUiTest.
+            //  It fails when we remove synchronized and run:
+            //  ./gradlew desktopTest -Pandroidx.compose.multiplatformEnabled=true
+            //  We should make a minimal reproducer, and fix race condition somewhere
+            //  else, not here.
+            //  See also GlobalSnapshotManager.
+            synchronized(Snapshot.current) {
+                // We must see the actual state before we will render the frame
+                Snapshot.sendApplyNotifications()
+                dispatcher.flush()
+                frameClock.sendFrame(nanoTime)
+            }
 
             forEachOwner {
                 it.render(canvas)
@@ -389,6 +406,7 @@ internal class DesktopOwners internal constructor(
      */
     @OptIn(ExperimentalComposeUiApi::class)
     @Suppress("UNUSED_PARAMETER")
+    @ExperimentalComposeUiApi // it is more experimental than ComposeScene itself
     fun sendPointerScrollEvent(
         position: Offset,
         delta: MouseScrollUnit,

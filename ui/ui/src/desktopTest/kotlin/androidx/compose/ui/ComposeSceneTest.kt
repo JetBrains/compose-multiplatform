@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.platform
+package androidx.compose.ui
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.TweenSpec
@@ -41,8 +41,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusState
@@ -58,6 +56,7 @@ import androidx.compose.ui.input.key.keyEvent
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.test.InternalTestApi
+import androidx.compose.ui.platform.renderingTest
 import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
@@ -73,9 +72,9 @@ import org.junit.Test
 import java.awt.event.KeyEvent
 
 @OptIn(InternalTestApi::class, ExperimentalComposeUiApi::class)
-class DesktopOwnerTest {
+class ComposeSceneTest {
     @get:Rule
-    val screenshotRule = DesktopScreenshotTestRule("compose/ui/ui-desktop/ui")
+    val screenshotRule = DesktopScreenshotTestRule("compose/ui/ui-desktop")
 
     @get:Rule
     val composeRule = createComposeRule()
@@ -278,20 +277,20 @@ class DesktopOwnerTest {
         screenshotRule.snap(surface, "frame1_initial")
         assertFalse(hasRenders())
 
-        owners.sendPointerEvent(PointerEventType.Press, Offset(2f, 2f))
+        scene.sendPointerEvent(PointerEventType.Press, Offset(2f, 2f))
         awaitNextRender()
         screenshotRule.snap(surface, "frame2_onMousePressed")
         assertFalse(hasRenders())
 
-        owners.sendPointerEvent(PointerEventType.Move, Offset(1f, 1f))
+        scene.sendPointerEvent(PointerEventType.Move, Offset(1f, 1f))
         assertFalse(hasRenders())
 
-        owners.sendPointerEvent(PointerEventType.Release, Offset(1f, 1f))
+        scene.sendPointerEvent(PointerEventType.Release, Offset(1f, 1f))
         awaitNextRender()
         screenshotRule.snap(surface, "frame3_onMouseReleased")
 
-        owners.sendPointerEvent(PointerEventType.Move, Offset(1f, 1f))
-        owners.sendPointerEvent(PointerEventType.Press, Offset(3f, 3f))
+        scene.sendPointerEvent(PointerEventType.Move, Offset(1f, 1f))
+        scene.sendPointerEvent(PointerEventType.Press, Offset(3f, 3f))
         awaitNextRender()
         screenshotRule.snap(surface, "frame4_onMouseMoved_onMousePressed")
         assertFalse(hasRenders())
