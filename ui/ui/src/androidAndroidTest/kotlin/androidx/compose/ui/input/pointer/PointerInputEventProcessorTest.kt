@@ -28,6 +28,7 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
@@ -3197,6 +3198,8 @@ private class TestOwner : Owner {
     override val rootForTest: RootForTest
         get() = TODO("Not yet implemented")
     override val hapticFeedBack: HapticFeedback
+        get() = TODO("Not yet implemented")
+    override val inputModeManager: InputModeManager
         get() = TODO("Not yet implemented")
     override val clipboardManager: ClipboardManager
         get() = TODO("Not yet implemented")

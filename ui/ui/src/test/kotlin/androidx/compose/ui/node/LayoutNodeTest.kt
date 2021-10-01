@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -2254,6 +2255,8 @@ private class MockOwner(
     override val rootForTest: RootForTest
         get() = TODO("Not yet implemented")
     override val hapticFeedBack: HapticFeedback
+        get() = TODO("Not yet implemented")
+    override val inputModeManager: InputModeManager
         get() = TODO("Not yet implemented")
     override val clipboardManager: ClipboardManager
         get() = TODO("Not yet implemented")

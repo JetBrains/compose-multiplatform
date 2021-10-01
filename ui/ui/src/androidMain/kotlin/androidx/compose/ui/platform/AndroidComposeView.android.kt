@@ -71,6 +71,10 @@ import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.setFrom
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.PlatformHapticFeedback
+import androidx.compose.ui.input.InputModeManager
+import androidx.compose.ui.input.InputModeManagerImpl
+import androidx.compose.ui.input.InputMode.Companion.Keyboard
+import androidx.compose.ui.input.InputMode.Companion.Touch
 import androidx.compose.ui.input.key.Key.Companion.Back
 import androidx.compose.ui.input.key.Key.Companion.DirectionCenter
 import androidx.compose.ui.input.key.Key.Companion.DirectionDown
@@ -328,6 +332,11 @@ internal class AndroidComposeView(context: Context) :
         updatePositionCacheAndDispatch()
     }
 
+    // executed whenever the touch mode changes.
+    private val touchModeChangeListener = ViewTreeObserver.OnTouchModeChangeListener { touchMode ->
+        _inputModeManager.inputMode = if (touchMode) Touch else Keyboard
+    }
+
     private val textInputServiceAndroid = TextInputServiceAndroid(this)
 
     @OptIn(InternalComposeUiApi::class)
@@ -346,6 +355,27 @@ internal class AndroidComposeView(context: Context) :
      */
     override val hapticFeedBack: HapticFeedback =
         PlatformHapticFeedback(this)
+
+    /**
+     * Provide an instance of [InputModeManager] which is available as a CompositionLocal.
+     */
+    private val _inputModeManager = InputModeManagerImpl(
+        initialInputMode = if (isInTouchMode) Touch else Keyboard,
+        onRequestInputModeChange = {
+            when (it) {
+                // Android doesn't support programmatically switching to touch mode, so we
+                // don't do anything, but just return true if we are already in touch mode.
+                Touch -> isInTouchMode
+
+                // If we are already in keyboard mode, we return true, otherwise, we call
+                // requestFocusFromTouch, which puts the system in non-touch mode.
+                Keyboard -> if (isInTouchMode) requestFocusFromTouch() else true
+
+                else -> false
+            }
+        }
+    )
+    override val inputModeManager: InputModeManager get() = _inputModeManager
 
     /**
      * Provide textToolbar to the user, for text-related operation. Use the Android version of
@@ -836,6 +866,7 @@ internal class AndroidComposeView(context: Context) :
         viewTreeOwners!!.lifecycleOwner.lifecycle.addObserver(this)
         viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
         viewTreeObserver.addOnScrollChangedListener(scrollChangedListener)
+        viewTreeObserver.addOnTouchModeChangeListener(touchModeChangeListener)
     }
 
     override fun onDetachedFromWindow() {
@@ -849,6 +880,7 @@ internal class AndroidComposeView(context: Context) :
         }
         viewTreeObserver.removeOnGlobalLayoutListener(globalLayoutListener)
         viewTreeObserver.removeOnScrollChangedListener(scrollChangedListener)
+        viewTreeObserver.removeOnTouchModeChangeListener(touchModeChangeListener)
     }
 
     override fun onProvideAutofillVirtualStructure(structure: ViewStructure?, flags: Int) {
