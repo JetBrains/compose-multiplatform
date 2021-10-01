@@ -15,6 +15,7 @@
  */
 
 @file:OptIn(ExperimentalTypeInference::class)
+
 package androidx.compose.runtime
 
 import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentList
@@ -204,9 +205,11 @@ internal open class SnapshotMutableStateImpl<T>(
      * The componentN() operators allow state objects to be used with the property destructuring
      * syntax
      *
+     * ```
      * var (foo, setFoo) = remember { mutableStateOf(0) }
      * setFoo(123) // set
      * foo == 123 // get
+     * ```
      */
     override operator fun component1(): T = value
 
@@ -330,12 +333,13 @@ fun <T> mutableStateListOf(vararg elements: T) =
     SnapshotStateList<T>().also { it.addAll(elements.toList()) }
 
 /**
- * Create an instance of MutableList<T> from a collection that is observable and can be snapshot.
+ * Create an instance of [MutableList]<T> from a collection that is observable and can be
+ * snapshot.
  */
 fun <T> Collection<T>.toMutableStateList() = SnapshotStateList<T>().also { it.addAll(this) }
 
 /**
- * Create a instance of MutableMap<K, V> that is observable and can be snapshot.
+ * Create a instance of [MutableMap]<K, V> that is observable and can be snapshot.
  *
  * @sample androidx.compose.runtime.samples.stateMapSample
  *
@@ -347,7 +351,7 @@ fun <T> Collection<T>.toMutableStateList() = SnapshotStateList<T>().also { it.ad
 fun <K, V> mutableStateMapOf() = SnapshotStateMap<K, V>()
 
 /**
- * Create a instance of MutableMap<K, V> that is observable and can be snapshot.
+ * Create a instance of [MutableMap]<K, V> that is observable and can be snapshot.
  *
  * @see mutableStateOf
  * @see mutableMapOf
@@ -358,7 +362,7 @@ fun <K, V> mutableStateMapOf(vararg pairs: Pair<K, V>) =
     SnapshotStateMap<K, V>().apply { putAll(pairs.toMap()) }
 
 /**
- * Create an instance of MutableMap<K, V> from a collection of pairs that is observable and can be
+ * Create an instance of [MutableMap]<K, V> from a collection of pairs that is observable and can be
  * snapshot.
  */
 @Suppress("unused")
@@ -386,11 +390,14 @@ internal interface DerivedState<T> : State<T> {
 }
 
 private typealias DerivedStateObservers = Pair<(DerivedState<*>) -> Unit, (DerivedState<*>) -> Unit>
+
 private val derivedStateObservers = SnapshotThreadLocal<PersistentList<DerivedStateObservers>>()
+
 private class DerivedSnapshotState<T>(
     private val calculation: () -> T
 ) : StateObject, DerivedState<T> {
     private var first: ResultRecord<T> = ResultRecord()
+
     private class ResultRecord<T> : StateRecord() {
         var dependencies: HashSet<StateObject>? = null
         var result: T? = null
@@ -467,15 +474,16 @@ private class DerivedSnapshotState<T>(
         first = value as ResultRecord<T>
     }
 
-    override val value: T get() {
-        // Unlike most state objects, the record list of a derived state can change during a read
-        // because reading updates the cache. To account for this, instead of calling readable,
-        // which sends the read notification, the read observer is notified directly and current
-        // value is used instead which doesn't notify. This allow the read observer to read the
-        // value and only update the cache once.
-        Snapshot.current.readObserver?.invoke(this)
-        return currentValue
-    }
+    override val value: T
+        get() {
+            // Unlike most state objects, the record list of a derived state can change during a read
+            // because reading updates the cache. To account for this, instead of calling readable,
+            // which sends the read notification, the read observer is notified directly and current
+            // value is used instead which doesn't notify. This allow the read observer to read the
+            // value and only update the cache once.
+            Snapshot.current.readObserver?.invoke(this)
+            return currentValue
+        }
 
     override val currentValue: T
         get() = first.withCurrent {

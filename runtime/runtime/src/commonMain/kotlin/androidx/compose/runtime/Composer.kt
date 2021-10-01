@@ -2571,7 +2571,7 @@ internal class ComposerImpl(
             isComposing = true
             try {
                 startRoot()
-                // Ignore reads of derivedStatOf recalculations
+                // Ignore reads of derivedStateOf recalculations
                 observeDerivedStateRecalculations(
                     start = {
                         childrenComposing++
