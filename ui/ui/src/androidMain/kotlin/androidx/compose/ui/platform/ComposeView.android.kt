@@ -24,12 +24,14 @@ import android.view.ViewGroup
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionContext
+import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.Owner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewTreeLifecycleOwner
+import java.lang.ref.WeakReference
 
 /**
  * Base class for custom [android.view.View]s implemented using Jetpack Compose UI.
@@ -61,8 +63,10 @@ abstract class AbstractComposeView @JvmOverloads constructor(
      * If this View moves to the [android.view.ViewOverlay] we won't be able
      * to find view tree dependencies; this happens when using transition APIs
      * to animate views out in particular.
+     *
+     * We only ever set this when we're attached to a window.
      */
-    private var cachedViewTreeCompositionContext: CompositionContext? = null
+    private var cachedViewTreeCompositionContext: WeakReference<CompositionContext>? = null
 
     /**
      * The [getWindowToken] of the window this view was last attached to.
@@ -203,6 +207,24 @@ abstract class AbstractComposeView @JvmOverloads constructor(
     }
 
     /**
+     * `true` if the [CompositionContext] can be considered to be "alive" for the purposes
+     * of locally caching it in case the view is placed into a ViewOverlay.
+     * [Recomposer]s that are in the [Recomposer.State.ShuttingDown] state or lower should
+     * not be cached or reusedif currently cached, as they will never recompose content.
+     */
+    private val CompositionContext.isAlive: Boolean
+        get() = this !is Recomposer || currentState.value > Recomposer.State.ShuttingDown
+
+    /**
+     * Cache this [CompositionContext] in [cachedViewTreeCompositionContext] if it [isAlive]
+     * and return the [CompositionContext] itself either way.
+     */
+    private fun CompositionContext.cacheIfAlive(): CompositionContext = also { context ->
+        context.takeIf { it.isAlive }
+            ?.let { cachedViewTreeCompositionContext = WeakReference(it) }
+    }
+
+    /**
      * Determine the correct [CompositionContext] to use as the parent of this view's
      * composition. This can result in caching a looked-up [CompositionContext] for use
      * later. See [cachedViewTreeCompositionContext] for more details.
@@ -217,9 +239,9 @@ abstract class AbstractComposeView @JvmOverloads constructor(
      * to do it, as well as still locate any view tree dependencies.
      */
     private fun resolveParentCompositionContext() = parentContext
-        ?: findViewTreeCompositionContext()?.also { cachedViewTreeCompositionContext = it }
-        ?: cachedViewTreeCompositionContext
-        ?: windowRecomposer.also { cachedViewTreeCompositionContext = it }
+        ?: findViewTreeCompositionContext()?.cacheIfAlive()
+        ?: cachedViewTreeCompositionContext?.get()?.takeIf { it.isAlive }
+        ?: windowRecomposer.cacheIfAlive()
 
     @Suppress("DEPRECATION") // Still using ViewGroup.setContent for now
     private fun ensureCompositionCreated() {

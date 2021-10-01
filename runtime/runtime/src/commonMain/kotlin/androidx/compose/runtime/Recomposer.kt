@@ -78,6 +78,8 @@ interface RecomposerInfo {
     /**
      * The current [State] of the [Recomposer]. See each [State] value for its meaning.
      */
+    // TODO: Mirror the currentState/StateFlow API change here once we can safely add
+    // default interface methods. https://youtrack.jetbrains.com/issue/KT-47000
     val state: Flow<Recomposer.State>
 
     /**
@@ -288,14 +290,21 @@ class Recomposer(
     /**
      * The current [State] of this [Recomposer]. See each [State] value for its meaning.
      */
+    @Deprecated("Replaced by currentState as a StateFlow", ReplaceWith("currentState"))
     public val state: Flow<State>
+        get() = currentState
+
+    /**
+     * The current [State] of this [Recomposer], available synchronously.
+     */
+    public val currentState: StateFlow<State>
         get() = _state
 
     // A separate private object to avoid the temptation of casting a RecomposerInfo
     // to a Recomposer if Recomposer itself were to implement RecomposerInfo.
     private inner class RecomposerInfoImpl : RecomposerInfo {
         override val state: Flow<State>
-            get() = this@Recomposer.state
+            get() = this@Recomposer.currentState
         override val hasPendingWork: Boolean
             get() = this@Recomposer.hasPendingWork
         override val changeCount: Long
@@ -686,14 +695,26 @@ class Recomposer(
     }
 
     /**
-     * Permanently shut down this [Recomposer] for future use. All ongoing recompositions will stop,
-     * new composer invalidations with this [Recomposer] at the root will no longer occur,
-     * and any [LaunchedEffect]s currently running in compositions managed by this [Recomposer]
-     * will be cancelled. Any [rememberCoroutineScope] scopes from compositions managed by this
-     * [Recomposer] will also be cancelled. See [join] to await the completion of all of these
-     * outstanding tasks.
+     * Permanently shut down this [Recomposer] for future use. [currentState] will immediately
+     * reflect [State.ShuttingDown] (or a lower state) before this call returns.
+     * All ongoing recompositions will stop, new composer invalidations with this [Recomposer] at
+     * the root will no longer occur, and any [LaunchedEffect]s currently running in compositions
+     * managed by this [Recomposer] will be cancelled. Any [rememberCoroutineScope] scopes from
+     * compositions managed by this [Recomposer] will also be cancelled. See [join] to await the
+     * completion of all of these outstanding tasks.
      */
     fun cancel() {
+        // Move to State.ShuttingDown immediately rather than waiting for effectJob to join
+        // if we're cancelling to shut down the Recomposer. This permits other client code
+        // to use `state.first { it < State.Idle }` or similar to reliably and immediately detect
+        // that the recomposer can no longer be used.
+        // It looks like a CAS loop would be more appropriate here, but other occurrences
+        // of taking stateLock assume that the state cannot change without holding it.
+        synchronized(stateLock) {
+            if (_state.value >= State.Idle) {
+                _state.value = State.ShuttingDown
+            }
+        }
         effectJob.cancel()
     }
 
@@ -715,7 +736,7 @@ class Recomposer(
      * Await the completion of a [cancel] operation.
      */
     suspend fun join() {
-        state.first { it == State.ShutDown }
+        currentState.first { it == State.ShutDown }
     }
 
     internal override fun composeInitial(
@@ -834,7 +855,7 @@ class Recomposer(
      * and this method will not suspend.
      */
     suspend fun awaitIdle() {
-        state.takeWhile { it > State.Idle }.collect()
+        currentState.takeWhile { it > State.Idle }.collect()
     }
 
     // Recomposer always starts with a constant compound hash

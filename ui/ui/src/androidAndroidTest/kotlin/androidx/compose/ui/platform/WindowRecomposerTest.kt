@@ -25,6 +25,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Recomposer
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
@@ -36,12 +41,17 @@ import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNotSame
 import org.junit.Assert.assertNull
+import org.junit.Assert.fail
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.lang.ref.WeakReference
@@ -128,6 +138,48 @@ class WindowRecomposerTest {
             assertNotNull("first recomposer", firstRecomposer)
             assertNotNull("second recomposer", secondRecomposer)
             assertNotSame(firstRecomposer, secondRecomposer)
+        }
+    }
+
+    @Test
+    fun setContentViewCalledMultipleTimes(): Unit = runBlocking {
+        var output by mutableStateOf("initial")
+        val input = MutableStateFlow(0)
+        lateinit var view: View
+        ActivityScenario.launch(ComponentActivity::class.java).use { scenario ->
+            scenario.onActivity { activity ->
+                view = ComposeView(activity).apply {
+                    setContent {
+                        val value by input.collectAsState()
+                        output = "one $value"
+                    }
+                }
+                activity.setContentView(view)
+            }
+
+            delay(3_000)
+
+            suspend fun assertOutput(expected: String) {
+                withTimeoutOrNull(1_000) {
+                    snapshotFlow { output }
+                        .first { it == expected }
+                } ?: fail("unexpected output; $output expected $expected")
+            }
+
+            assertOutput("one 0")
+
+            input.value = 1
+
+            assertOutput("one 1")
+
+            scenario.onActivity { activity ->
+                activity.setContentView(view)
+            }
+
+            assertOutput("one 1")
+
+            input.value = 2
+            assertOutput("one 2")
         }
     }
 }
