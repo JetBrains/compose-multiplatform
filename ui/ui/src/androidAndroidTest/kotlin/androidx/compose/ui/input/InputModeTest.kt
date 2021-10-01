@@ -44,8 +44,8 @@ class InputModeTest(private val param: Param) {
     @get:Rule
     val rule = createComposeRule()
 
-    lateinit var inputModeManager: InputModeManager
-    lateinit var view: View
+    private lateinit var inputModeManager: InputModeManager
+    private lateinit var view: View
 
     init {
         InstrumentationRegistry.getInstrumentation().setInTouchMode(param.inputMode == Touch)

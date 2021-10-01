@@ -37,7 +37,8 @@ internal class ModifiedFocusEventNode(
         // For instance, if the observer is moved to the end of the list, and there is no focus
         // modifier following this observer, it's focus state will be invalid. To solve this, we
         // always reset the focus state when a focus observer is re-used.
-        val focusNode = wrapped.findNextFocusWrapper() ?: layoutNode.searchChildrenForFocusNode()
+        val focusNode = wrapped.findNextFocusWrapper(excludeDeactivated = false)
+            ?: layoutNode.searchChildrenForFocusNode(excludeDeactivated = false)
         modifier.onFocusEvent(focusNode?.modifier?.focusState ?: Inactive)
     }
 }

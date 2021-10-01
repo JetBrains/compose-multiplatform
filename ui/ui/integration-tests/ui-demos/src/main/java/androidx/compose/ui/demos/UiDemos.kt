@@ -53,6 +53,7 @@ import androidx.compose.ui.demos.gestures.ScaleGestureFilterDemo
 import androidx.compose.ui.demos.gestures.ScrollGestureFilterDemo
 import androidx.compose.ui.demos.gestures.VerticalScrollerInDrawerDemo
 import androidx.compose.ui.demos.input.TouchModeDemo
+import androidx.compose.ui.demos.focus.ConditionalFocusabilityDemo
 import androidx.compose.ui.demos.scroll.BringIntoViewDemo
 import androidx.compose.ui.demos.keyinput.KeyInputDemo
 import androidx.compose.ui.demos.keyinput.InterceptEnterToSendMessageDemo
@@ -132,7 +133,8 @@ private val FocusDemos = DemoCategory(
         ComposableDemo("Custom Focus Order") { CustomFocusOrderDemo() },
         ComposableDemo("FocusManager.moveFocus()") { FocusManagerMoveFocusDemo() },
         ComposableDemo("Capture/Free Focus") { CaptureFocusDemo() },
-        ComposableDemo("Focus In Scrollable Row") { ScrollableRowFocusDemo() }
+        ComposableDemo("Focus In Scrollable Row") { ScrollableRowFocusDemo() },
+        ComposableDemo("Conditional Focusability") { ConditionalFocusabilityDemo() }
     )
 )
 

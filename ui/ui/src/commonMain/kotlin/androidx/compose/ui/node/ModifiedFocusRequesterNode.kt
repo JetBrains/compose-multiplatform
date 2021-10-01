@@ -35,7 +35,8 @@ internal class ModifiedFocusRequesterNode(
 
     // Searches for the focus node associated with this focus requester node.
     internal fun findFocusNode(): ModifiedFocusNode? {
-        return findNextFocusWrapper() ?: layoutNode.searchChildrenForFocusNode()
+        return findNextFocusWrapper(excludeDeactivated = false)
+            ?: layoutNode.searchChildrenForFocusNode(excludeDeactivated = false)
     }
 
     override fun onModifierChanged() {

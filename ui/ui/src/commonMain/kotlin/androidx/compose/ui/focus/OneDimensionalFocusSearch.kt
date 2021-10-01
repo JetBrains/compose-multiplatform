@@ -21,70 +21,138 @@ import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
 import androidx.compose.ui.focus.FocusStateImpl.Captured
 import androidx.compose.ui.focus.FocusDirection.Companion.Next
 import androidx.compose.ui.focus.FocusDirection.Companion.Previous
-import androidx.compose.ui.focus.FocusStateImpl.Disabled
+import androidx.compose.ui.focus.FocusStateImpl.Deactivated
+import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.node.ModifiedFocusNode
 import androidx.compose.ui.util.fastForEach
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 private const val InvalidFocusDirection = "This function should only be used for 1-D focus search"
 private const val NoActiveChild = "ActiveParent must have a focusedChild"
-private const val NotYetAvailable = "Implement this after adding API to disable a node"
 
 internal fun ModifiedFocusNode.oneDimensionalFocusSearch(
     direction: FocusDirection
-): ModifiedFocusNode = when (direction) {
-    Next -> forwardFocusSearch() ?: this
+): ModifiedFocusNode? = when (direction) {
+    Next -> forwardFocusSearch()
     Previous -> backwardFocusSearch()
     else -> error(InvalidFocusDirection)
 }
 
-private fun ModifiedFocusNode.forwardFocusSearch(): ModifiedFocusNode? = when (focusState) {
-    ActiveParent -> {
-        val focusedChild = focusedChild ?: error(NoActiveChild)
-        focusedChild.forwardFocusSearch()?.let { return it }
+private fun ModifiedFocusNode.forwardFocusSearch(): ModifiedFocusNode? {
+    when (focusState) {
+        ActiveParent, DeactivatedParent -> {
+            val focusedChild = focusedChild ?: error(NoActiveChild)
+            focusedChild.forwardFocusSearch()?.let { return it }
 
-        var currentItemIsAfterFocusedItem = false
-        // TODO(b/192681045): Instead of fetching the children and then iterating on them, add a
-        //  forEachFocusableChild function that does not allocate a list.
-        focusableChildren().fastForEach {
-            if (currentItemIsAfterFocusedItem) {
-                return it
+            // TODO(b/192681045): Instead of fetching the children and then iterating on them, add a
+            //  forEachFocusableChild() function that does not allocate a list.
+            focusableChildren(excludeDeactivated = false).forEachItemAfter(focusedChild) { child ->
+                child.forwardFocusSearch()?.let { return it }
             }
-            if (it == focusedChild) {
-                currentItemIsAfterFocusedItem = true
-            }
+            return null
         }
-        null // Couldn't find a focusable child after the current focused child.
+        Active, Captured, Deactivated -> {
+            focusableChildren(excludeDeactivated = false).fastForEach { focusableChild ->
+                focusableChild.forwardFocusSearch()?.let { return it }
+            }
+            return null
+        }
+        Inactive -> return this
     }
-    Active, Captured -> focusableChildren().firstOrNull()
-    Inactive -> this
-    Disabled -> TODO(NotYetAvailable)
 }
 
-private fun ModifiedFocusNode.backwardFocusSearch(): ModifiedFocusNode = when (focusState) {
-    ActiveParent -> {
-        val focusedChild = focusedChild ?: error(NoActiveChild)
-        when (focusedChild.focusState) {
-            ActiveParent -> focusedChild.backwardFocusSearch()
-            Active, Captured -> {
-                var previousFocusedItem: ModifiedFocusNode? = null
-                // TODO(b/192681045): Instead of fetching the children and then iterating on them, add a
-                //  forEachFocusableChild() function that does not allocate a list.
-                focusableChildren().fastForEach {
-                    if (it == focusedChild) {
-                        return previousFocusedItem?.backwardFocusSearch() ?: this
+private fun ModifiedFocusNode.backwardFocusSearch(): ModifiedFocusNode? {
+    when (focusState) {
+        ActiveParent -> {
+            val focusedChild = focusedChild ?: error(NoActiveChild)
+            when (focusedChild.focusState) {
+                ActiveParent -> return focusedChild.backwardFocusSearch() ?: focusedChild
+                DeactivatedParent -> {
+                    focusedChild.backwardFocusSearch()?.let { return it }
+                    focusableChildren(excludeDeactivated = false).forEachItemBefore(focusedChild) {
+                        it.backwardFocusSearch()?.let { return it }
                     }
-                    previousFocusedItem = it
+                    // backward search returns the parent unless it is the root
+                    // (We don't want to move focus to the root).
+                    return if (isRoot()) null else this
                 }
-                error(NoActiveChild)
+                Active, Captured -> {
+                    focusableChildren(excludeDeactivated = false).forEachItemBefore(focusedChild) {
+                        it.backwardFocusSearch()?.let { return it }
+                    }
+                    // backward search returns the parent unless it is the root
+                    // (We don't want to move focus to the root).
+                    return if (isRoot()) null else this
+                }
+                Deactivated, Inactive -> error(NoActiveChild)
             }
-            else -> error(NoActiveChild)
+        }
+        DeactivatedParent -> {
+            val focusedChild = focusedChild ?: error(NoActiveChild)
+            when (focusedChild.focusState) {
+                ActiveParent -> return focusedChild.backwardFocusSearch() ?: focusedChild
+                DeactivatedParent -> {
+                    focusedChild.backwardFocusSearch()?.let { return it }
+                    focusableChildren(excludeDeactivated = false).forEachItemBefore(focusedChild) {
+                        it.backwardFocusSearch()?.let { return it }
+                    }
+                    return null
+                }
+                Active, Captured -> {
+                    focusableChildren(excludeDeactivated = false).forEachItemBefore(focusedChild) {
+                        it.backwardFocusSearch()?.let { return it }
+                    }
+                    return null
+                }
+                Deactivated, Inactive -> error(NoActiveChild)
+            }
+        }
+        // BackwardFocusSearch Searches among siblings of the ActiveParent for a child that is
+        // focused. So this function should never be called when this node is focused. If we
+        // reached here, it indicates that this is an initial focus state, so we run the same logic
+        // as if this node was Inactive. If we can't find an item for initial focus, we return this
+        // root node as the result.
+        Active, Captured, Inactive ->
+            return focusableChildren(excludeDeactivated = true)
+                .lastOrNull()?.backwardFocusSearch() ?: this
+        // BackwardFocusSearch Searches among siblings of the ActiveParent for a child that is
+        // focused. The search excludes deactivated items, so this function should never be called
+        // on a node with a Deactivated state. If we reached here, it indicates that this is an
+        // initial focus state, so we run the same logic as if this node was Inactive. If we can't
+        // find an item for initial focus, we return null.
+        Deactivated ->
+            return focusableChildren(excludeDeactivated = true).lastOrNull()?.backwardFocusSearch()
+    }
+}
+
+private fun ModifiedFocusNode.isRoot() = findParentFocusNode() == null
+
+@OptIn(ExperimentalContracts::class)
+private inline fun <T> List<T>.forEachItemAfter(item: T, action: (T) -> Unit) {
+    contract { callsInPlace(action) }
+    var itemFound = false
+    for (index in indices) {
+        if (itemFound) {
+            action(get(index))
+        }
+        if (get(index) == item) {
+            itemFound = true
         }
     }
-    // The BackwardFocusSearch Searches among siblings of the ActiveParent for a child that is
-    // focused. So this function should never be called when this node is focused. If we reached
-    // here, it indicates an initial focus state, so we run the same logic as if this node was
-    // Inactive.
-    Active, Captured, Inactive -> focusableChildren().lastOrNull()?.backwardFocusSearch() ?: this
-    Disabled -> TODO(NotYetAvailable)
+}
+
+@OptIn(ExperimentalContracts::class)
+private inline fun <T> List<T>.forEachItemBefore(item: T, action: (T) -> Unit) {
+    contract { callsInPlace(action) }
+    var itemFound = false
+    for (index in indices.reversed()) {
+        if (itemFound) {
+            action(get(index))
+        }
+        if (get(index) == item) {
+            itemFound = true
+        }
+    }
 }

@@ -342,6 +342,7 @@ internal class AndroidComposeView(context: Context) :
     // executed whenever the touch mode changes.
     private val touchModeChangeListener = ViewTreeObserver.OnTouchModeChangeListener { touchMode ->
         _inputModeManager.inputMode = if (touchMode) Touch else Keyboard
+        _focusManager.fetchUpdatedFocusProperties()
     }
 
     private val textInputServiceAndroid = TextInputServiceAndroid(this)

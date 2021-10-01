@@ -17,9 +17,9 @@
 package androidx.compose.ui.focus
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -40,16 +40,15 @@ class FocusTargetAttachDetachTest {
         // Arrange.
         lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
-        lateinit var observingFocusTarget1: MutableState<Boolean>
+        var observingFocusTarget1 by mutableStateOf(true)
         rule.setFocusableContent {
             val focusRequesterModifier = Modifier.focusRequester(focusRequester)
             val onFocusChanged = Modifier.onFocusChanged { focusState = it }
             val focusTarget1 = Modifier.focusTarget()
             val focusTarget2 = Modifier.focusTarget()
             Box {
-                observingFocusTarget1 = remember { mutableStateOf(true) }
                 Box(
-                    modifier = if (observingFocusTarget1.value) {
+                    modifier = if (observingFocusTarget1) {
                         onFocusChanged
                             .then(focusRequesterModifier)
                             .then(focusTarget1)
@@ -69,7 +68,7 @@ class FocusTargetAttachDetachTest {
         }
 
         // Act.
-        rule.runOnIdle { observingFocusTarget1.value = false }
+        rule.runOnIdle { observingFocusTarget1 = false }
 
         // Assert.
         rule.runOnIdle { assertThat(focusState.isFocused).isFalse() }
@@ -80,15 +79,14 @@ class FocusTargetAttachDetachTest {
         // Arrange.
         lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
-        lateinit var onFocusChangedHasFocusTarget: MutableState<Boolean>
+        var onFocusChangedHasFocusTarget by mutableStateOf(true)
         rule.setFocusableContent {
             val focusRequesterModifier = Modifier.focusRequester(focusRequester)
             val onFocusChanged = Modifier.onFocusChanged { focusState = it }
             val focusTarget = Modifier.focusTarget()
             Box {
-                onFocusChangedHasFocusTarget = remember { mutableStateOf(true) }
                 Box(
-                    modifier = if (onFocusChangedHasFocusTarget.value) {
+                    modifier = if (onFocusChangedHasFocusTarget) {
                         onFocusChanged
                             .then(focusRequesterModifier)
                             .then(focusTarget)
@@ -106,7 +104,7 @@ class FocusTargetAttachDetachTest {
         }
 
         // Act.
-        rule.runOnIdle { onFocusChangedHasFocusTarget.value = false }
+        rule.runOnIdle { onFocusChangedHasFocusTarget = false }
 
         // Assert.
         rule.runOnIdle { assertThat(focusState.isFocused).isFalse() }
@@ -117,13 +115,12 @@ class FocusTargetAttachDetachTest {
         // Arrange.
         lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
-        lateinit var optionalFocusTarget: MutableState<Boolean>
+        var optionalFocusTarget by mutableStateOf(true)
         rule.setFocusableContent {
-            optionalFocusTarget = remember { mutableStateOf(true) }
             Box(
                 modifier = Modifier.onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(if (optionalFocusTarget.value) Modifier.focusTarget() else Modifier)
+                    .then(if (optionalFocusTarget) Modifier.focusTarget() else Modifier)
             )
         }
         rule.runOnIdle {
@@ -132,7 +129,7 @@ class FocusTargetAttachDetachTest {
         }
 
         // Act.
-        rule.runOnIdle { optionalFocusTarget.value = false }
+        rule.runOnIdle { optionalFocusTarget = false }
 
         // Assert.
         rule.runOnIdle { assertThat(focusState.isFocused).isFalse() }
@@ -143,13 +140,12 @@ class FocusTargetAttachDetachTest {
         // Arrange.
         lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
-        lateinit var optionalFocusTarget: MutableState<Boolean>
+        var optionalFocusTarget by mutableStateOf(true)
         rule.setFocusableContent {
-            optionalFocusTarget = remember { mutableStateOf(true) }
             Box(
                 modifier = Modifier.onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(if (optionalFocusTarget.value) Modifier.focusTarget() else Modifier)
+                    .then(if (optionalFocusTarget) Modifier.focusTarget() else Modifier)
             ) {
                 Box(modifier = Modifier.focusTarget())
             }
@@ -160,7 +156,7 @@ class FocusTargetAttachDetachTest {
         }
 
         // Act.
-        rule.runOnIdle { optionalFocusTarget.value = false }
+        rule.runOnIdle { optionalFocusTarget = false }
 
         // Assert.
         rule.runOnIdle { assertThat(focusState.isFocused).isFalse() }
@@ -171,13 +167,12 @@ class FocusTargetAttachDetachTest {
         // Arrange.
         lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
-        lateinit var optionalFocusTarget: MutableState<Boolean>
+        var optionalFocusTarget by mutableStateOf(true)
         rule.setFocusableContent {
-            optionalFocusTarget = remember { mutableStateOf(true) }
             Box(
                 modifier = Modifier.onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(if (optionalFocusTarget.value) Modifier.focusTarget() else Modifier)
+                    .then(if (optionalFocusTarget) Modifier.focusTarget() else Modifier)
             ) {
                 Box(modifier = Modifier.focusTarget())
             }
@@ -189,7 +184,7 @@ class FocusTargetAttachDetachTest {
         }
 
         // Act.
-        rule.runOnIdle { optionalFocusTarget.value = false }
+        rule.runOnIdle { optionalFocusTarget = false }
 
         // Assert.
         rule.runOnIdle { assertThat(focusState.isFocused).isFalse() }
@@ -200,15 +195,17 @@ class FocusTargetAttachDetachTest {
         // Arrange.
         lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
-        lateinit var optionalFocusTarget: MutableState<Boolean>
+        var optionalFocusTarget by mutableStateOf(true)
         rule.setFocusableContent {
-            optionalFocusTarget = remember { mutableStateOf(true) }
             Box(
-                modifier = Modifier.onFocusChanged { focusState = it }
-                    .then(if (optionalFocusTarget.value) Modifier.focusTarget() else Modifier)
-                    .focusRequester(focusRequester)
+                modifier = Modifier
+                    .onFocusChanged { focusState = it }
+                    .then(if (optionalFocusTarget) Modifier.focusTarget() else Modifier)
             ) {
-                Box(modifier = Modifier.focusTarget())
+                Box(modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .focusTarget()
+                )
             }
         }
         rule.runOnIdle {
@@ -217,7 +214,7 @@ class FocusTargetAttachDetachTest {
         }
 
         // Act.
-        rule.runOnIdle { optionalFocusTarget.value = false }
+        rule.runOnIdle { optionalFocusTarget = false }
 
         // Assert.
         rule.runOnIdle { assertThat(focusState.isFocused).isTrue() }
@@ -228,13 +225,12 @@ class FocusTargetAttachDetachTest {
         // Arrange.
         lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
-        lateinit var optionalFocusTarget: MutableState<Boolean>
+        var optionalFocusTarget by mutableStateOf(true)
         rule.setFocusableContent {
-            optionalFocusTarget = remember { mutableStateOf(true) }
             Box(
                 modifier = Modifier.onFocusChanged { focusState = it }
                     .then(
-                        if (optionalFocusTarget.value) {
+                        if (optionalFocusTarget) {
                             Modifier
                                 .focusTarget()
                                 .focusRequester(focusRequester)
@@ -251,7 +247,7 @@ class FocusTargetAttachDetachTest {
         }
 
         // Act.
-        rule.runOnIdle { optionalFocusTarget.value = false }
+        rule.runOnIdle { optionalFocusTarget = false }
 
         // Assert.
         rule.runOnIdle { assertThat(focusState.isFocused).isFalse() }
@@ -263,9 +259,8 @@ class FocusTargetAttachDetachTest {
         lateinit var focusState: FocusState
         lateinit var parentFocusState: FocusState
         val focusRequester = FocusRequester()
-        lateinit var optionalFocusTargets: MutableState<Boolean>
+        var optionalFocusTargets by mutableStateOf(true)
         rule.setFocusableContent {
-            optionalFocusTargets = remember { mutableStateOf(true) }
             Box(
                 modifier = Modifier
                     .onFocusChanged { parentFocusState = it }
@@ -273,7 +268,7 @@ class FocusTargetAttachDetachTest {
             ) {
                 Box(
                     modifier = Modifier.onFocusChanged { focusState = it }.then(
-                        if (optionalFocusTargets.value) {
+                        if (optionalFocusTargets) {
                             Modifier.focusTarget()
                                 .focusRequester(focusRequester)
                                 .focusTarget()
@@ -291,7 +286,7 @@ class FocusTargetAttachDetachTest {
         }
 
         // Act.
-        rule.runOnIdle { optionalFocusTargets.value = false }
+        rule.runOnIdle { optionalFocusTargets = false }
 
         // Assert.
         rule.runOnIdle {
@@ -301,23 +296,269 @@ class FocusTargetAttachDetachTest {
     }
 
     @Test
+    fun removedDeactivatedParentFocusTarget_pointsToNextFocusTarget() {
+        // Arrange.
+        lateinit var focusState: FocusState
+        val focusRequester = FocusRequester()
+        var optionalFocusTarget by mutableStateOf(true)
+        rule.setFocusableContent {
+            Box(
+                modifier = Modifier
+                    .onFocusChanged { focusState = it }
+                    .then(
+                        if (optionalFocusTarget)
+                            Modifier
+                                .focusProperties { canFocus = false }
+                                .focusTarget()
+                        else
+                            Modifier
+                    )
+            ) {
+                Box(modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .focusTarget()
+                )
+            }
+        }
+        rule.runOnIdle {
+            focusRequester.requestFocus()
+            assertThat(focusState.hasFocus).isTrue()
+            assertThat(focusState.isDeactivated).isTrue()
+        }
+
+        // Act.
+        rule.runOnIdle { optionalFocusTarget = false }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(focusState.isFocused).isTrue()
+            assertThat(focusState.isDeactivated).isFalse()
+        }
+    }
+
+    @Test
+    fun removedDeactivatedParentFocusTarget_pointsToNextDeactivatedParentFocusTarget() {
+        // Arrange.
+        lateinit var focusState: FocusState
+        val focusRequester = FocusRequester()
+        var optionalFocusTarget by mutableStateOf(true)
+        rule.setFocusableContent {
+            Box(
+                modifier = Modifier
+                    .onFocusChanged { focusState = it }
+                    .then(
+                        if (optionalFocusTarget)
+                            Modifier
+                                .focusProperties { canFocus = false }
+                                .focusTarget()
+                        else
+                            Modifier
+                    )
+            ) {
+                Box(
+                    modifier = Modifier
+                        .onFocusChanged { focusState = it }
+                        .focusProperties { canFocus = false }
+                        .focusTarget()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .focusRequester(focusRequester)
+                            .focusTarget()
+                    )
+                }
+            }
+        }
+        rule.runOnIdle {
+            focusRequester.requestFocus()
+            assertThat(focusState.hasFocus).isTrue()
+            assertThat(focusState.isDeactivated).isTrue()
+        }
+
+        // Act.
+        rule.runOnIdle { optionalFocusTarget = false }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(focusState.isFocused).isFalse()
+            assertThat(focusState.hasFocus).isTrue()
+            assertThat(focusState.isDeactivated).isTrue()
+        }
+    }
+
+    @Test
+    fun removedDeactivatedParent_parentsFocusTarget_isUnchanged() {
+        // Arrange.
+        lateinit var focusState: FocusState
+        val focusRequester = FocusRequester()
+        var optionalFocusTarget by mutableStateOf(true)
+        rule.setFocusableContent {
+            Box(
+                modifier = Modifier
+                    .onFocusChanged { focusState = it }
+                    .focusProperties { canFocus = false }
+                    .focusTarget()
+            ) {
+                Box(
+                    modifier = Modifier.then(
+                            if (optionalFocusTarget)
+                                Modifier
+                                    .focusProperties { canFocus = false }
+                                    .focusTarget()
+                            else
+                                Modifier
+                        )
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .focusRequester(focusRequester)
+                            .focusTarget()
+                    )
+                }
+            }
+        }
+        rule.runOnIdle {
+            focusRequester.requestFocus()
+            assertThat(focusState.isFocused).isFalse()
+            assertThat(focusState.hasFocus).isTrue()
+            assertThat(focusState.isDeactivated).isTrue()
+        }
+
+        // Act.
+        rule.runOnIdle { optionalFocusTarget = false }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(focusState.isFocused).isFalse()
+            assertThat(focusState.hasFocus).isTrue()
+            assertThat(focusState.isDeactivated).isTrue()
+        }
+    }
+
+    @Test
+    fun removedDeactivatedParentAndActiveChild_grandparent_retainsDeactivatedState() {
+        // Arrange.
+        lateinit var focusState: FocusState
+        val focusRequester = FocusRequester()
+        var optionalFocusTarget by mutableStateOf(true)
+        rule.setFocusableContent {
+            Box(
+                modifier = Modifier
+                    .onFocusChanged { focusState = it }
+                    .focusProperties { canFocus = false }
+                    .focusTarget()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .onFocusChanged { focusState = it }
+                        .then(
+                            if (optionalFocusTarget)
+                                Modifier
+                                    .focusProperties { canFocus = false }
+                                    .focusTarget()
+                            else
+                                Modifier
+                        )
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .focusRequester(focusRequester)
+                            .then(
+                                if (optionalFocusTarget)
+                                    Modifier.focusTarget()
+                                else
+                                    Modifier
+                            )
+                    )
+                }
+            }
+        }
+        rule.runOnIdle {
+            focusRequester.requestFocus()
+            assertThat(focusState.hasFocus).isTrue()
+            assertThat(focusState.isDeactivated).isTrue()
+        }
+
+        // Act.
+        rule.runOnIdle { optionalFocusTarget = false }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(focusState.isFocused).isFalse()
+            assertThat(focusState.hasFocus).isFalse()
+            assertThat(focusState.isDeactivated).isTrue()
+        }
+    }
+
+    @Test
+    fun removedNonDeactivatedParentAndActiveChild_grandParent_retainsNonDeactivatedState() {
+        // Arrange.
+        lateinit var focusState: FocusState
+        val focusRequester = FocusRequester()
+        var optionalFocusTarget by mutableStateOf(true)
+        rule.setFocusableContent {
+            Box(
+                modifier = Modifier
+                    .onFocusChanged { focusState = it }
+                    .focusTarget()
+            ) {
+                Box(
+                    modifier = Modifier.then(
+                            if (optionalFocusTarget)
+                                Modifier
+                                    .focusProperties { canFocus = false }
+                                    .focusTarget()
+                            else
+                                Modifier
+                        )
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .focusRequester(focusRequester)
+                            .then(
+                                if (optionalFocusTarget)
+                                    Modifier.focusTarget()
+                                else
+                                    Modifier
+                            )
+                    )
+                }
+            }
+        }
+        rule.runOnIdle {
+            focusRequester.requestFocus()
+            assertThat(focusState.hasFocus).isTrue()
+            assertThat(focusState.isDeactivated).isFalse()
+        }
+
+        // Act.
+        rule.runOnIdle { optionalFocusTarget = false }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(focusState.isFocused).isFalse()
+            assertThat(focusState.hasFocus).isFalse()
+            assertThat(focusState.isDeactivated).isFalse()
+        }
+    }
+
+    @Test
     fun removedInactiveFocusTarget_pointsToNextFocusTarget() {
         // Arrange.
         lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
-        lateinit var optionalFocusTarget: MutableState<Boolean>
+        var optionalFocusTarget by mutableStateOf(true)
         rule.setFocusableContent {
-            optionalFocusTarget = remember { mutableStateOf(true) }
             Box(
                 modifier = Modifier.onFocusChanged { focusState = it }
-                    .then(if (optionalFocusTarget.value) Modifier.focusTarget() else Modifier)
+                    .then(if (optionalFocusTarget) Modifier.focusTarget() else Modifier)
                     .focusRequester(focusRequester)
                     .focusTarget()
             )
         }
 
         // Act.
-        rule.runOnIdle { optionalFocusTarget.value = false }
+        rule.runOnIdle { optionalFocusTarget = false }
 
         // Assert.
         rule.runOnIdle { assertThat(focusState.isFocused).isFalse() }
@@ -328,13 +569,12 @@ class FocusTargetAttachDetachTest {
         // Arrange.
         lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
-        lateinit var addFocusTarget: MutableState<Boolean>
+        var addFocusTarget by mutableStateOf(false)
         rule.setFocusableContent {
-            addFocusTarget = remember { mutableStateOf(false) }
             Box(
                 modifier = Modifier.onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(if (addFocusTarget.value) Modifier.focusTarget() else Modifier)
+                    .then(if (addFocusTarget) Modifier.focusTarget() else Modifier)
             ) {
                 Box(modifier = Modifier.focusTarget())
             }
@@ -345,7 +585,7 @@ class FocusTargetAttachDetachTest {
         }
 
         // Act.
-        rule.runOnIdle { addFocusTarget.value = true }
+        rule.runOnIdle { addFocusTarget = true }
 
         // Assert.
         rule.runOnIdle { assertThat(focusState.isFocused).isFalse() }
@@ -356,13 +596,12 @@ class FocusTargetAttachDetachTest {
         // Arrange.
         lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
-        lateinit var addFocusTarget: MutableState<Boolean>
+        var addFocusTarget by mutableStateOf(false)
         rule.setFocusableContent {
-            addFocusTarget = remember { mutableStateOf(false) }
             Box(
                 modifier = Modifier.onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(if (addFocusTarget.value) Modifier.focusTarget() else Modifier)
+                    .then(if (addFocusTarget) Modifier.focusTarget() else Modifier)
             )
         }
         rule.runOnIdle {
@@ -371,9 +610,109 @@ class FocusTargetAttachDetachTest {
         }
 
         // Act.
-        rule.runOnIdle { addFocusTarget.value = true }
+        rule.runOnIdle { addFocusTarget = true }
 
         // Assert.
         rule.runOnIdle { assertThat(focusState.isFocused).isFalse() }
     }
+
+    @Test
+    fun removingDeactivatedItem_withNoNextFocusTarget() {
+        // Arrange.
+        lateinit var focusState: FocusState
+        var removeDeactivatedItem by mutableStateOf(false)
+        rule.setFocusableContent {
+            Box(
+                modifier = Modifier
+                    .onFocusChanged { focusState = it }
+                    .then(
+                        if (removeDeactivatedItem)
+                            Modifier
+                        else
+                            Modifier
+                                .focusProperties { canFocus = false }
+                                .focusTarget()
+                    )
+            )
+        }
+
+        // Act.
+        rule.runOnIdle { removeDeactivatedItem = true }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(focusState.isFocused).isFalse()
+            assertThat(focusState.isDeactivated).isFalse()
+        }
+    }
+
+    @Test
+    fun removingDeactivatedItem_withInactiveNextFocusTarget() {
+        // Arrange.
+        lateinit var focusState: FocusState
+        var removeDeactivatedItem by mutableStateOf(false)
+        rule.setFocusableContent {
+            Box(
+                modifier = Modifier
+                    .onFocusChanged { focusState = it }
+                    .then(
+                        if (removeDeactivatedItem)
+                            Modifier
+                        else
+                            Modifier
+                                .focusProperties { canFocus = false }
+                                .focusTarget()
+                    )
+            ) {
+                Box(modifier = Modifier.focusTarget())
+            }
+        }
+
+        // Act.
+        rule.runOnIdle { removeDeactivatedItem = true }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(focusState.isFocused).isFalse()
+            assertThat(focusState.isDeactivated).isFalse()
+        }
+    }
+
+    @Test
+    fun removingDeactivatedItem_withDeactivatedNextFocusTarget() {
+        // Arrange.
+        lateinit var focusState: FocusState
+        var removeDeactivatedItem by mutableStateOf(false)
+        rule.setFocusableContent {
+            Box(
+                modifier = Modifier
+                    .onFocusChanged { focusState = it }
+                    .then(
+                        if (removeDeactivatedItem)
+                            Modifier
+                        else
+                            Modifier
+                                .focusProperties { canFocus = false }
+                                .focusTarget()
+                    )
+            ) {
+                Box(modifier = Modifier
+                    .focusProperties { canFocus = false }
+                    .focusTarget()
+                )
+            }
+        }
+
+        // Act.
+        rule.runOnIdle { removeDeactivatedItem = true }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(focusState.isFocused).isFalse()
+            assertThat(focusState.isDeactivated).isTrue()
+        }
+    }
 }
+
+private val FocusState.isDeactivated: Boolean
+    get() = (this as FocusStateImpl).isDeactivated
