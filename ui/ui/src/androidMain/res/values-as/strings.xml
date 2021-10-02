@@ -26,8 +26,7 @@
     <string name="in_progress" msgid="6827826412747255547">"প্ৰক্ৰিয়াকৰণ কৰি থকা হৈছে"</string>
     <string name="tab" msgid="1672349317127674378">"টেব"</string>
     <string name="navigation_menu" msgid="542007171693138492">"নেভিগেশ্বন মেনু"</string>
-    <!-- no translation found for dropdown_menu (1890207353314751437) -->
-    <skip />
+    <string name="dropdown_menu" msgid="1890207353314751437">"ড্ৰপডাউনৰ মেনু"</string>
     <string name="close_drawer" msgid="406453423630273620">"নেভিগেশ্বন মেনু বন্ধ কৰক"</string>
     <string name="close_sheet" msgid="7573152094250666567">"শ্বীট বন্ধ কৰক"</string>
     <string name="default_error_message" msgid="8038256446254964252">"অমান্য ইনপুট"</string>
