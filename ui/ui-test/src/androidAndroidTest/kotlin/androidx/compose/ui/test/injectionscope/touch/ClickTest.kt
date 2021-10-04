@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.test.TouchInjectionScope
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.ComposeTestRule
@@ -101,8 +102,8 @@ class ClickTest(private val config: TestConfig) {
         val id = events[0].id
 
         events[0].verify(t0 + 0, id, true, position)
-        events[1].verify(t0 + 10, id, true, position)
-        events[2].verify(t0 + 10, id, false, position)
+        events[1].verify(t0 + eventPeriodMillis, id, true, position)
+        events[2].verify(t0 + eventPeriodMillis, id, false, position)
     }
 
     private fun ComposeTestRule.click(tag: String) {
