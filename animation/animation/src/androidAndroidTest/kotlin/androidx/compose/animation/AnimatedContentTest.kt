@@ -29,7 +29,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -47,6 +50,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import kotlinx.coroutines.delay
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -383,6 +387,52 @@ class AnimatedContentTest {
                     }
                 }
             }
+        }
+    }
+
+    @OptIn(ExperimentalAnimationApi::class)
+    @Test
+    fun AnimatedContentWithKeysTest() {
+        var targetState by mutableStateOf(1)
+        val list = mutableListOf<Int>()
+        rule.setContent {
+            val transition = updateTransition(targetState)
+            val holder = rememberSaveableStateHolder()
+            transition.AnimatedContent(contentKey = { it > 2 }) {
+                if (it <= 2) {
+                    holder.SaveableStateProvider(11) {
+                        var count by rememberSaveable { mutableStateOf(0) }
+                        LaunchedEffect(Unit) {
+                            list.add(++count)
+                        }
+                    }
+                }
+                Box(Modifier.requiredSize(200.dp))
+            }
+            LaunchedEffect(Unit) {
+                assertFalse(transition.isRunning)
+                targetState = 2
+                withFrameMillis { }
+                assertFalse(transition.isRunning)
+                assertEquals(transition.currentState, transition.targetState)
+                // This state change should now cause an animation
+                targetState = 3
+                withFrameMillis { }
+                assertTrue(transition.isRunning)
+            }
+        }
+        rule.waitForIdle()
+        rule.runOnIdle {
+            assertEquals(1, list.size)
+            assertEquals(1, list[0])
+            targetState = 1
+        }
+
+        rule.runOnIdle {
+            // Check that save worked
+            assertEquals(2, list.size)
+            assertEquals(1, list[0])
+            assertEquals(2, list[1])
         }
     }
 }
