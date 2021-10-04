@@ -60,12 +60,11 @@ internal abstract class InputDispatcher(
 ) {
     companion object {
         /**
-         * The default time between two successively injected events, 10 milliseconds.
-         * Ideally, the value should reflect a realistic pointer input sample rate, but that
-         * depends on too many factors. Instead, the value is chosen comfortably below the
-         * targeted frame rate (60 fps, equating to a 16ms period).
+         * The default time between two successively injected events, 16 milliseconds. Events are
+         * normally sent on every frame and thus follow the frame rate. On a 60Hz screen this is
+         * ~16ms per frame.
          */
-        var eventPeriodMillis = 10L
+        var eventPeriodMillis = 16L
             internal set
     }
 

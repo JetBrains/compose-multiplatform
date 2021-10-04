@@ -22,7 +22,6 @@ import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.MainTestClock
 import androidx.compose.ui.test.TestOwner
 import androidx.compose.ui.test.createTestContext
-import androidx.compose.ui.test.util.InputDispatcherTestRule
 import androidx.compose.ui.test.util.MotionEventRecorder
 import androidx.compose.ui.test.util.assertNoTouchGestureInProgress
 import com.google.common.truth.Truth.assertThat
@@ -30,16 +29,9 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import org.junit.After
-import org.junit.Rule
-import org.junit.rules.TestRule
 
 @OptIn(InternalTestApi::class)
-open class InputDispatcherTest(eventPeriodOverride: Long? = null) {
-
-    @get:Rule
-    val inputDispatcherRule: TestRule = InputDispatcherTestRule(
-        eventPeriodOverride = eventPeriodOverride
-    )
+open class InputDispatcherTest {
 
     internal val recorder = MotionEventRecorder()
 

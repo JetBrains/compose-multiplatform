@@ -566,7 +566,7 @@ private val GestureScope.bottomFuzzed: Float get() = height.endFuzzed
  * move event just before the down or up event if [movePointerTo] or [movePointerBy] has been
  * called and no move event has been sent yet. This does not happen for cancel events, but the
  * cancel event will contain the up to date position of all pointers. Move and cancel events will
- * advance the event time by 10 milliseconds.
+ * advance the event time by 16 milliseconds.
  *
  * Because gestures don't have to be defined all in the same [performGesture] block,
  * keep in mind that while the gesture is not complete, all code you execute in between

@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.test.TouchInjectionScope
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.longClick
@@ -39,12 +40,13 @@ import androidx.compose.ui.test.util.isAlmostEqualTo
 import androidx.compose.ui.test.util.verify
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
-import com.google.common.truth.Truth.assertWithMessage
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import kotlin.math.max
+import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 /**
  * Tests [TouchInjectionScope.longClick] with arguments. Verifies that the click is in the middle
@@ -84,14 +86,6 @@ class LongClickTest(private val config: TestConfig) {
 
     private fun recordLongPress(position: Offset) {
         recordedLongClicks.add(position)
-    }
-
-    @Before
-    fun checkDuration() {
-        assertWithMessage(
-            "Test must either use a duration that is a multiple of 10, or the assertion needs to " +
-                "be rewritten to support arbitrary durations"
-        ).that(expectedDuration % 10).isEqualTo(0)
     }
 
     @Test
@@ -136,12 +130,15 @@ class LongClickTest(private val config: TestConfig) {
     }
 
     private fun SinglePointerInputRecorder.assertIsLongClick(position: Offset) {
-        assertThat(events.size).isAtLeast(2)
+        val steps = max(1, (expectedDuration / eventPeriodMillis.toDouble()).roundToInt())
         val t0 = events[0].timestamp
         val id = events[0].id
 
+        assertThat(events).hasSize(steps + 2)
         events.dropLast(1).forEachIndexed { i, event ->
-            event.verify(t0 + i * 10, id, true, position)
+            // Don't check the timestamp
+            val t = t0 + (expectedDuration * i / steps.toDouble()).roundToLong()
+            event.verify(t, id, true, position)
         }
         events.last().verify(t0 + expectedDuration, id, false, position)
     }
