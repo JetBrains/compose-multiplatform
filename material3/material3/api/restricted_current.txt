@@ -101,6 +101,9 @@ package androidx.compose.material3 {
     method @androidx.compose.runtime.Composable public static void MaterialTheme(optional androidx.compose.material3.ColorScheme colorScheme, optional androidx.compose.material3.Typography typography, optional androidx.compose.material3.Shapes shapes, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
+  public final class ScaffoldKt {
+  }
+
   @androidx.compose.runtime.Immutable public final class Shapes {
     ctor public Shapes(optional androidx.compose.foundation.shape.CornerBasedShape small, optional androidx.compose.foundation.shape.CornerBasedShape medium, optional androidx.compose.foundation.shape.CornerBasedShape large);
     method public androidx.compose.material3.Shapes copy(optional androidx.compose.foundation.shape.CornerBasedShape small, optional androidx.compose.foundation.shape.CornerBasedShape medium, optional androidx.compose.foundation.shape.CornerBasedShape large);
