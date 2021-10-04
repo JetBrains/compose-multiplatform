@@ -77,8 +77,6 @@ import kotlin.math.ln
  * sit on top of other surfaces with [surface] color.
  * @property inverseOnSurface A color that contrasts well with [inverseSurface]. Useful for content
  * that sits on top of containers that are [inverseSurface].
- * @property disabled A disabled color.
- * @property onDisabled Color used for text and icons displayed on top of the disabled color.
  * @property error The error color is used to indicate errors in components, such as invalid text in
  * a text field.
  * @property onError Color used for text and icons displayed on top of the error color.
@@ -111,8 +109,6 @@ class ColorScheme(
     onSurfaceVariant: Color,
     inverseSurface: Color,
     inverseOnSurface: Color,
-    disabled: Color,
-    onDisabled: Color,
     error: Color,
     onError: Color,
     errorContainer: Color,
@@ -161,10 +157,6 @@ class ColorScheme(
         internal set
     var inverseOnSurface by mutableStateOf(inverseOnSurface, structuralEqualityPolicy())
         internal set
-    var disabled by mutableStateOf(disabled, structuralEqualityPolicy())
-        internal set
-    var onDisabled by mutableStateOf(onDisabled, structuralEqualityPolicy())
-        internal set
     var error by mutableStateOf(error, structuralEqualityPolicy())
         internal set
     var onError by mutableStateOf(onError, structuralEqualityPolicy())
@@ -199,8 +191,6 @@ class ColorScheme(
         onSurfaceVariant: Color = this.onSurfaceVariant,
         inverseSurface: Color = this.inverseSurface,
         inverseOnSurface: Color = this.inverseOnSurface,
-        disabled: Color = this.disabled,
-        onDisabled: Color = this.onDisabled,
         error: Color = this.error,
         onError: Color = this.onError,
         errorContainer: Color = this.errorContainer,
@@ -229,8 +219,6 @@ class ColorScheme(
             onSurfaceVariant = onSurfaceVariant,
             inverseSurface = inverseSurface,
             inverseOnSurface = inverseOnSurface,
-            disabled = disabled,
-            onDisabled = onDisabled,
             error = error,
             onError = onError,
             errorContainer = errorContainer,
@@ -261,8 +249,6 @@ class ColorScheme(
             "onSurfaceVariant=$onSurfaceVariant" +
             "inverseSurface=$inverseSurface" +
             "inverseOnSurface=$inverseOnSurface" +
-            "disabled=$disabled" +
-            "onDisabled=$onDisabled" +
             "error=$error" +
             "onError=$onError" +
             "errorContainer=$errorContainer" +
@@ -297,8 +283,6 @@ fun lightColorScheme(
     onSurfaceVariant: Color = ColorLight.OnSurfaceVariant,
     inverseSurface: Color = ColorLight.InverseSurface,
     inverseOnSurface: Color = ColorLight.InverseOnSurface,
-    disabled: Color = ColorLight.Disabled,
-    onDisabled: Color = ColorLight.OnDisabled,
     error: Color = ColorLight.Error,
     onError: Color = ColorLight.OnError,
     errorContainer: Color = ColorLight.ErrorContainer,
@@ -327,8 +311,6 @@ fun lightColorScheme(
         onSurfaceVariant = onSurfaceVariant,
         inverseSurface = inverseSurface,
         inverseOnSurface = inverseOnSurface,
-        disabled = disabled,
-        onDisabled = onDisabled,
         error = error,
         onError = onError,
         errorContainer = errorContainer,
@@ -361,8 +343,6 @@ fun darkColorScheme(
     onSurfaceVariant: Color = ColorDark.OnSurfaceVariant,
     inverseSurface: Color = ColorDark.InverseSurface,
     inverseOnSurface: Color = ColorDark.InverseOnSurface,
-    disabled: Color = ColorDark.Disabled,
-    onDisabled: Color = ColorDark.OnDisabled,
     error: Color = ColorDark.Error,
     onError: Color = ColorDark.OnError,
     errorContainer: Color = ColorDark.ErrorContainer,
@@ -391,8 +371,6 @@ fun darkColorScheme(
         onSurfaceVariant = onSurfaceVariant,
         inverseSurface = inverseSurface,
         inverseOnSurface = inverseOnSurface,
-        disabled = disabled,
-        onDisabled = onDisabled,
         error = error,
         onError = onError,
         errorContainer = errorContainer,
@@ -523,8 +501,6 @@ internal fun ColorScheme.updateColorSchemeFrom(other: ColorScheme) {
     onSurfaceVariant = other.onSurfaceVariant
     inverseSurface = other.inverseSurface
     inverseOnSurface = other.inverseOnSurface
-    disabled = other.disabled
-    onDisabled = other.onDisabled
     error = other.error
     onError = other.onError
     errorContainer = other.errorContainer
@@ -540,14 +516,12 @@ internal fun ColorScheme.updateColorSchemeFrom(other: ColorScheme) {
 internal fun ColorScheme.fromToken(value: ColorSchemeKey): Color {
     return when (value) {
         ColorSchemeKey.Background -> background
-        ColorSchemeKey.Disabled -> disabled
         ColorSchemeKey.Error -> error
         ColorSchemeKey.ErrorContainer -> errorContainer
         ColorSchemeKey.InverseOnSurface -> inverseOnSurface
         ColorSchemeKey.InversePrimary -> inversePrimary
         ColorSchemeKey.InverseSurface -> inverseSurface
         ColorSchemeKey.OnBackground -> onBackground
-        ColorSchemeKey.OnDisabled -> onDisabled
         ColorSchemeKey.OnError -> onError
         ColorSchemeKey.OnErrorContainer -> onErrorContainer
         ColorSchemeKey.OnPrimary -> onPrimary
