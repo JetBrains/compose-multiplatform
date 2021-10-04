@@ -63,6 +63,7 @@ rm -rf $AOSP_COMPOSE_SOURCE/prebuilts/androidx/external/org/jetbrains/skiko
 
 pushd $AOSP_COMPOSE_SOURCE/frameworks/support/development/importMaven
 downloadSkiko org.jetbrains.skiko:skiko:$SKIKO_VERSION
+downloadSkiko org.jetbrains.skiko:skiko:$SKIKO_VERSION:all
 downloadSkiko org.jetbrains.skiko:skiko:$SKIKO_VERSION:kotlin-tooling-metadata
 downloadSkiko org.jetbrains.skiko:skiko-jvm:$SKIKO_VERSION
 downloadSkiko org.jetbrains.skiko:skiko-jvm-runtime-linux-x64:$SKIKO_VERSION
