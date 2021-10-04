@@ -50,7 +50,7 @@ downloadSkiko() {
         fixWindows
     fi
 
-    $JB_GRADLE -PallowJetbrainsDev=true -PartifactName=$1:$SKIKO_VERSION
+    $JB_GRADLE -PallowJetbrainsDev=true -PartifactName=$1
 }
 
 if [[ "$OSTYPE" == "msys" ]]; then
@@ -62,13 +62,14 @@ fi
 rm -rf $AOSP_COMPOSE_SOURCE/prebuilts/androidx/external/org/jetbrains/skiko
 
 pushd $AOSP_COMPOSE_SOURCE/frameworks/support/development/importMaven
-downloadSkiko org.jetbrains.skiko:skiko
-downloadSkiko org.jetbrains.skiko:skiko-jvm
-downloadSkiko org.jetbrains.skiko:skiko-jvm-runtime-linux-x64
-downloadSkiko org.jetbrains.skiko:skiko-jvm-runtime-linux-arm64
-downloadSkiko org.jetbrains.skiko:skiko-jvm-runtime-macos-x64
-downloadSkiko org.jetbrains.skiko:skiko-jvm-runtime-macos-arm64
-downloadSkiko org.jetbrains.skiko:skiko-jvm-runtime-windows-x64
+downloadSkiko org.jetbrains.skiko:skiko:$SKIKO_VERSION
+downloadSkiko org.jetbrains.skiko:skiko:$SKIKO_VERSION:kotlin-tooling-metadata
+downloadSkiko org.jetbrains.skiko:skiko-jvm:$SKIKO_VERSION
+downloadSkiko org.jetbrains.skiko:skiko-jvm-runtime-linux-x64:$SKIKO_VERSION
+downloadSkiko org.jetbrains.skiko:skiko-jvm-runtime-linux-arm64:$SKIKO_VERSION
+downloadSkiko org.jetbrains.skiko:skiko-jvm-runtime-macos-x64:$SKIKO_VERSION
+downloadSkiko org.jetbrains.skiko:skiko-jvm-runtime-macos-arm64:$SKIKO_VERSION
+downloadSkiko org.jetbrains.skiko:skiko-jvm-runtime-windows-x64:$SKIKO_VERSION
 popd
 
 
