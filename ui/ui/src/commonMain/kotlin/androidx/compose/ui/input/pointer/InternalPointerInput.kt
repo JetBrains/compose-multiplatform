@@ -35,7 +35,8 @@ internal expect class PointerInputEvent {
 /**
  * Data that describes a particular pointer
  *
- * [positionOnScreen] is relative to the device screen. [position] is relative to the owner.
+ * @param positionOnScreen The position of the event relative to the device screen.
+ * @param position The position of the event relative to the owner.
  */
 @OptIn(ExperimentalComposeUiApi::class)
 internal data class PointerInputEventData(

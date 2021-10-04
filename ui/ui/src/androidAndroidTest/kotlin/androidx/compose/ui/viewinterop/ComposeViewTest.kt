@@ -22,10 +22,20 @@ import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
@@ -33,13 +43,20 @@ import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.R
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
+import androidx.core.view.setPadding
 import androidx.lifecycle.Lifecycle
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -335,6 +352,245 @@ class ComposeViewTest {
         }
         assertNotNull("test did not run", result?.getOrThrow())
     }
+
+    @Test
+    fun canScrollVerticallyDown_returnsTrue_onlyAfterDownEventInScrollable() {
+        lateinit var composeView: View
+        rule.setContent {
+            composeView = LocalView.current
+            ScrollableAndNonScrollable(vertical = true)
+        }
+
+        rule.onNodeWithTag(SCROLLABLE_FIRST_TAG)
+            .performScrollTo()
+
+        // No down event yet, should not be scrollable in any direction
+        rule.runOnIdle {
+            composeView.assertCanScroll()
+        }
+
+        // Send a down event.
+        rule.onNodeWithTag(SCROLLABLE_TAG)
+            .performTouchInput { down(center) }
+
+        rule.runOnIdle {
+            composeView.assertCanScroll(down = true)
+        }
+    }
+
+    @Test
+    fun canScrollVerticallyUp_returnsTrue_onlyAfterDownEventInScrollable() {
+        lateinit var composeView: View
+        rule.setContent {
+            composeView = LocalView.current
+            ScrollableAndNonScrollable(vertical = true)
+        }
+
+        rule.onNodeWithTag(SCROLLABLE_LAST_TAG)
+            .performScrollTo()
+
+        // No down event yet, should not be scrollable in any direction
+        rule.runOnIdle {
+            composeView.assertCanScroll()
+        }
+
+        // Send a down event.
+        rule.onNodeWithTag(SCROLLABLE_TAG)
+            .performTouchInput {
+                down(center)
+            }
+
+        rule.runOnIdle {
+            composeView.assertCanScroll(up = true)
+        }
+    }
+
+    @Test
+    fun canScrollVertically_returnsFalse_afterDownEventOutsideScrollable() {
+        lateinit var composeView: View
+        rule.setContent {
+            composeView = LocalView.current
+            ScrollableAndNonScrollable(vertical = true)
+        }
+
+        // No down event yet, should not be scrollable in any direction
+        rule.runOnIdle {
+            composeView.assertCanScroll()
+        }
+
+        // Send a down event.
+        rule.onNodeWithTag(NON_SCROLLABLE_TAG)
+            .performTouchInput { down(center) }
+
+        // No down event yet, should not be scrollable in any direction
+        rule.runOnIdle {
+            composeView.assertCanScroll()
+        }
+    }
+
+    @Test
+    fun canScrollHorizontallyRight_returnsTrue_onlyAfterDownEventInScrollable() {
+        lateinit var composeView: View
+        rule.setContent {
+            composeView = LocalView.current
+            ScrollableAndNonScrollable(vertical = false)
+        }
+
+        rule.onNodeWithTag(SCROLLABLE_FIRST_TAG)
+            .performScrollTo()
+
+        // No down event yet, should not be scrollable in any direction
+        rule.runOnIdle {
+            composeView.assertCanScroll()
+        }
+
+        // Send a down event.
+        rule.onNodeWithTag(SCROLLABLE_TAG)
+            .performTouchInput { down(center) }
+
+        rule.runOnIdle {
+            composeView.assertCanScroll(right = true)
+        }
+    }
+
+    @Test
+    fun canScrollHorizontallyLeft_returnsTrue_onlyAfterDownEventInScrollable() {
+        lateinit var composeView: View
+        rule.setContent {
+            composeView = LocalView.current
+            ScrollableAndNonScrollable(vertical = false)
+        }
+
+        rule.onNodeWithTag(SCROLLABLE_LAST_TAG)
+            .performScrollTo()
+
+        // No down event yet, should not be scrollable in any direction
+        rule.runOnIdle {
+            composeView.assertCanScroll()
+        }
+
+        // Send a down event.
+        rule.onNodeWithTag(SCROLLABLE_TAG)
+            .performTouchInput { down(center) }
+
+        rule.runOnIdle {
+            composeView.assertCanScroll(left = true)
+        }
+    }
+
+    @Test
+    fun canScrollHorizontally_returnsFalse_afterDownEventOutsideScrollable() {
+        lateinit var composeView: View
+        rule.setContent {
+            composeView = LocalView.current
+            ScrollableAndNonScrollable(vertical = false)
+        }
+
+        // No down event yet, should not be scrollable in any direction
+        rule.runOnIdle {
+            composeView.assertCanScroll()
+        }
+
+        // Send a down event.
+        rule.onNodeWithTag(NON_SCROLLABLE_TAG)
+            .performTouchInput { down(center) }
+
+        // No down event yet, should not be scrollable in any direction
+        rule.runOnIdle {
+            composeView.assertCanScroll()
+        }
+    }
+
+    /**
+     * Puts a scrollable area of size 1 px square inside a series of nested paddings, both compose-
+     * and view-based, to ensure that the pointer calculations account for all the offsets those
+     * paddings introduce.
+     *
+     * ```
+     *  ┌───────────────61────────────────┐
+     *  │AndroidComposeView (root)        │
+     *  │                                 │
+     *  │  ┌─────────────41─────────────┐ │
+     *  │  │AndroidView/FrameLayout     │ │
+     *  │  │                            │ │
+     *  │  │  ┌──────────21───────────┐ │ │
+     *  6  │  │ComposeView            │ │ │
+     *  1  4  │                       │ │ │
+     *  │  1  2  ┌─────────1────────┐ │ │ │
+     *  │  │  1  │Box (scrollable)  │ │ │ │
+     *  │  │  │  1                  │ │ │ │
+     *  │  │  │  └──────────────────┘ │ │ │
+     *  │  │  └───────────────────────┘ │ │
+     *  │  └────────────────────────────┘ │
+     *  └─────────────────────────────────┘
+     * ```
+     */
+    @Test
+    fun canScroll_accountsForViewAndNodeOffsets() {
+        lateinit var composeView: View
+        rule.setContent {
+            with(LocalDensity.current) {
+                AndroidView(
+                    modifier = Modifier
+                        .requiredSize(61.toDp())
+                        .padding(10.toDp()),
+                    factory = { context ->
+                        FrameLayout(context).apply {
+                            setPadding(10)
+                            addView(ComposeView(context).apply {
+                                setContent {
+                                    // Query the inner android view, not the outer one.
+                                    composeView = LocalView.current
+                                    Box(
+                                        Modifier
+                                            .padding(10.toDp())
+                                            .testTag(SCROLLABLE_TAG)
+                                            .horizontalScroll(rememberScrollState())
+                                            // Give it something to scroll.
+                                            .requiredSize(100.dp)
+                                    )
+                                }
+                            })
+                        }
+                    }
+                )
+            }
+        }
+
+        val scrollable = rule.onNodeWithTag(SCROLLABLE_TAG)
+            .fetchSemanticsNode()
+        assertEquals(IntSize(1, 1), scrollable.size)
+
+        rule.runOnIdle {
+            composeView.assertCanScroll()
+        }
+
+        rule.onNodeWithTag(SCROLLABLE_TAG)
+            .performTouchInput {
+                down(center)
+            }
+
+        rule.runOnIdle {
+            composeView.assertCanScroll(right = true)
+        }
+    }
+}
+
+private const val SCROLLABLE_TAG = "scrollable"
+private const val NON_SCROLLABLE_TAG = "non-scrollable"
+private const val SCROLLABLE_FIRST_TAG = "first-scrollable-child"
+private const val SCROLLABLE_LAST_TAG = "last-scrollable-child"
+
+private fun View.assertCanScroll(
+    left: Boolean = false,
+    up: Boolean = false,
+    right: Boolean = false,
+    down: Boolean = false
+) {
+    assertEquals(left, canScrollHorizontally(-1))
+    assertEquals(right, canScrollHorizontally(1))
+    assertEquals(up, canScrollVertically(-1))
+    assertEquals(down, canScrollVertically(1))
 }
 
 private inline fun ViewGroup.assertUnsupported(
@@ -351,6 +607,45 @@ private inline fun ViewGroup.assertUnsupported(
         "$testName throws UnsupportedOperationException",
         exception is UnsupportedOperationException
     )
+}
+
+@Composable
+private fun ScrollableAndNonScrollable(vertical: Boolean) {
+    @Composable
+    fun layout(size: Dp, content: @Composable (Modifier) -> Unit) {
+        if (vertical) {
+            Column(Modifier.requiredSize(size)) {
+                content(Modifier.weight(1f).fillMaxWidth())
+            }
+        } else {
+            Row(Modifier.requiredSize(100.dp)) {
+                content(Modifier.weight(1f).fillMaxHeight())
+            }
+        }
+    }
+
+    val scrollState = rememberScrollState(0)
+    val scrollModifier = if (vertical) {
+        Modifier.verticalScroll(scrollState)
+    } else {
+        Modifier.horizontalScroll(scrollState)
+    }
+
+    layout(100.dp) { modifier ->
+        Box(
+            modifier
+                .testTag(SCROLLABLE_TAG)
+                .then(scrollModifier)
+        ) {
+            layout(10000.dp) {
+                Box(Modifier.testTag(SCROLLABLE_FIRST_TAG))
+                // Give the scrollable some content that actually requires scrolling.
+                Box(it)
+                Box(Modifier.testTag(SCROLLABLE_LAST_TAG))
+            }
+        }
+        Box(modifier.testTag(NON_SCROLLABLE_TAG))
+    }
 }
 
 private class TestComposeView(

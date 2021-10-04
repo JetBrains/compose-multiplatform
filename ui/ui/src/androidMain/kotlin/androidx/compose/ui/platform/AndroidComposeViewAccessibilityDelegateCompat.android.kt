@@ -38,6 +38,7 @@ import androidx.annotation.DoNotInline
 import androidx.annotation.IntRange
 import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting.PRIVATE
 import androidx.collection.ArraySet
 import androidx.collection.SparseArrayCompat
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -47,6 +48,7 @@ import androidx.compose.ui.focus.requestFocus
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.toAndroidRect
+import androidx.compose.ui.graphics.toComposeRect
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.HitTestResult
@@ -209,11 +211,14 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         val toIndex: Int,
         val traverseTime: Long
     )
+
     private var pendingTextTraversedEvent: PendingTextTraversedEvent? = null
 
-    // Up to date semantics nodes in pruned semantics tree. It always reflects the current
-    // semantics tree. They key is the virtual view id(the root node has a key of
-    // AccessibilityNodeProviderCompat.HOST_VIEW_ID and other node has a key of its id).
+    /**
+     * Up to date semantics nodes in pruned semantics tree. It always reflects the current
+     * semantics tree. They key is the virtual view id(the root node has a key of
+     * AccessibilityNodeProviderCompat.HOST_VIEW_ID and other node has a key of its id).
+     */
     private var currentSemanticsNodes: Map<Int, SemanticsNodeWithAdjustedBounds> = mapOf()
         get() {
             if (currentSemanticsNodesInvalidated) {
@@ -265,6 +270,63 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 handler.removeCallbacks(semanticsChangeChecker)
             }
         })
+    }
+
+    /**
+     * Returns true if there is any semantics node in the tree that can scroll in the given
+     * [orientation][vertical] and [direction] at the given [position] in the view associated with
+     * this delegate.
+     *
+     * @param direction The direction to check for scrolling: <0 means scrolling left or up, >0
+     * means scrolling right or down.
+     * @param position The position in the view to check in view-local coordinates.
+     */
+    internal fun canScroll(
+        vertical: Boolean,
+        direction: Int,
+        position: Offset
+    ): Boolean = canScroll(currentSemanticsNodes.values, vertical, direction, position)
+
+    @VisibleForTesting(otherwise = PRIVATE)
+    internal fun canScroll(
+        currentSemanticsNodes: Collection<SemanticsNodeWithAdjustedBounds>,
+        vertical: Boolean,
+        direction: Int,
+        position: Offset
+    ): Boolean {
+        // No down event has occurred yet which gives us a location to hit test.
+        if (position == Offset.Unspecified || !position.isValid()) return false
+
+        val scrollRangeProperty = when (vertical) {
+            true -> SemanticsProperties.VerticalScrollAxisRange
+            false -> SemanticsProperties.HorizontalScrollAxisRange
+        }
+
+        return currentSemanticsNodes.any { node ->
+            // Only consider nodes that are under the touch event. Checks the adjusted bounds to
+            // avoid overlapping siblings. Because position is a float (touch event can happen in-
+            // between pixels), convert the int-based Android Rect to a float-based Compose Rect
+            // before doing the comparison.
+            if (!node.adjustedBounds.toComposeRect().contains(position)) {
+                return@any false
+            }
+
+            val scrollRange = node.semanticsNode.config.getOrNull(scrollRangeProperty)
+                ?: return@any false
+
+            // A node simply having scrollable semantics doesn't mean it's necessarily scrollable
+            // in the given direction – it must also not be scrolled to its limit in that direction.
+            var actualDirection = if (scrollRange.reverseScrolling) -direction else direction
+            if (direction == 0 && scrollRange.reverseScrolling) {
+                // The View implementation of canScroll* treat zero as a positive direction, so
+                // this code should do the same. That means if scrolling is reversed, zero should be
+                // a negative direction. The actual number doesn't matter, just its sign.
+                actualDirection = -1
+            }
+
+            if (actualDirection < 0) scrollRange.value() > 0
+            else scrollRange.value() < scrollRange.maxValue()
+        }
     }
 
     private fun createNodeInfo(virtualViewId: Int): AccessibilityNodeInfo? {
@@ -2499,9 +2561,11 @@ internal object AccessibilityNodeInfoVerificationHelperMethods {
     }
 }
 
-// These objects are used as snapshot observation scopes for the purpose of sending accessibility
-// scroll events whenever the scroll offset changes.  There is one per scroller and their lifecycle
-// is the same as the scroller's lifecycle in the semantics tree.
+/**
+ * These objects are used as snapshot observation scopes for the purpose of sending accessibility
+ * scroll events whenever the scroll offset changes.  There is one per scroller and their lifecycle
+ * is the same as the scroller's lifecycle in the semantics tree.
+ */
 internal class ScrollObservationScope(
     val semanticsNodeId: Int,
     val allScopes: List<ScrollObservationScope>,
