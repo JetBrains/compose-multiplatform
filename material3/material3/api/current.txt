@@ -1,6 +1,10 @@
 // Signature format: 4.0
 package androidx.compose.material3 {
 
+  public final class AppBarKt {
+    method @androidx.compose.runtime.Composable public static void SmallTopAppBar(kotlin.jvm.functions.Function0<kotlin.Unit> title, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit> navigationIcon, optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> actions, optional androidx.compose.material3.TopAppBarColors colors, optional androidx.compose.material3.TopAppBarScrollBehavior? scrollBehavior);
+  }
+
   @androidx.compose.runtime.Stable public final class ColorScheme {
     ctor public ColorScheme(long primary, long onPrimary, long primaryContainer, long onPrimaryContainer, long inversePrimary, long secondary, long onSecondary, long secondaryContainer, long onSecondaryContainer, long tertiary, long onTertiary, long tertiaryContainer, long onTertiaryContainer, long background, long onBackground, long surface, long onSurface, long surfaceVariant, long onSurfaceVariant, long inverseSurface, long inverseOnSurface, long error, long onError, long errorContainer, long onErrorContainer, long outline);
     method public androidx.compose.material3.ColorScheme copy(optional long primary, optional long onPrimary, optional long primaryContainer, optional long onPrimaryContainer, optional long inversePrimary, optional long secondary, optional long onSecondary, optional long secondaryContainer, optional long onSecondaryContainer, optional long tertiary, optional long onTertiary, optional long tertiaryContainer, optional long onTertiaryContainer, optional long background, optional long onBackground, optional long surface, optional long onSurface, optional long surfaceVariant, optional long onSurfaceVariant, optional long inverseSurface, optional long inverseOnSurface, optional long error, optional long onError, optional long errorContainer, optional long onErrorContainer, optional long outline);
@@ -114,6 +118,35 @@ package androidx.compose.material3 {
   }
 
   public final class TonalPaletteKt {
+  }
+
+  @androidx.compose.runtime.Stable public interface TopAppBarColors {
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> actionIconColor(float scrollFraction);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> containerColor(float scrollFraction);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> navigationIconColor(float scrollFraction);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> titleColor(float scrollFraction);
+  }
+
+  public final class TopAppBarDefaults {
+    method public androidx.compose.material3.TopAppBarScrollBehavior pinnedScrollBehavior(optional kotlin.jvm.functions.Function0<java.lang.Boolean> canScroll);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.TopAppBarColors smallTopAppBarColors(optional long containerColor, optional long scrolledContainerColor, optional long navigationIconColor, optional long titleColor, optional long actionIconsColor);
+    field public static final androidx.compose.material3.TopAppBarDefaults INSTANCE;
+  }
+
+  @androidx.compose.runtime.Stable public interface TopAppBarScrollBehavior {
+    method public float getContentOffset();
+    method public androidx.compose.ui.input.nestedscroll.NestedScrollConnection getNestedScrollConnection();
+    method public float getOffset();
+    method public float getOffsetLimit();
+    method public float getScrollFraction();
+    method public void setContentOffset(float contentOffset);
+    method public void setOffset(float offset);
+    method public void setOffsetLimit(float offsetLimit);
+    property public abstract float contentOffset;
+    property public abstract androidx.compose.ui.input.nestedscroll.NestedScrollConnection nestedScrollConnection;
+    property public abstract float offset;
+    property public abstract float offsetLimit;
+    property public abstract float scrollFraction;
   }
 
   public final class TouchTargetKt {

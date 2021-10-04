@@ -20,6 +20,8 @@ package androidx.compose.material3.catalog.library.model
 
 import androidx.compose.material3.catalog.library.util.SampleSourceUrl
 import androidx.compose.material3.samples.ColorSchemeSample
+import androidx.compose.material3.samples.PinnedSmallTopAppBar
+import androidx.compose.material3.samples.SimpleSmallTopAppBar
 import androidx.compose.runtime.Composable
 
 data class Example(
@@ -38,4 +40,20 @@ val ColorExamples =
             description = ColorExampleDescription,
             sourceUrl = ColorExampleSourceUrl,
         ) { ColorSchemeSample() },
+    )
+
+private const val TopAppBarExampleDescription = "Top app bar examples"
+private const val TopAppBarExampleSourceUrl = "$SampleSourceUrl/AppBarSamples.kt"
+val TopAppBarExamples =
+    listOf(
+        Example(
+            name = ::SimpleSmallTopAppBar.name,
+            description = TopAppBarExampleDescription,
+            sourceUrl = TopAppBarExampleSourceUrl,
+        ) { SimpleSmallTopAppBar() },
+        Example(
+            name = ::PinnedSmallTopAppBar.name,
+            description = TopAppBarExampleDescription,
+            sourceUrl = TopAppBarExampleSourceUrl,
+        ) { PinnedSmallTopAppBar() },
     )
