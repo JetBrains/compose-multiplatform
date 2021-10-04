@@ -12,7 +12,7 @@ clone() {
     popd
 }
 
-# Commit hashes and sdk versions from default.xml (git clone --branch androidx-main https://android.googlesource.com/platform/manifest)
+# Commit hashes and sdk versions from https://android.googlesource.com/platform/manifest/+/refs/heads/androidx-main/default.xml
 
 downloadLinuxSDK() {
     clone ../prebuilts/fullsdk-linux/platforms/android-31 https://android.googlesource.com/platform/prebuilts/fullsdk/platforms/android-31 master
