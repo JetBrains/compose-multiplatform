@@ -16,20 +16,20 @@
 
 package androidx.compose.ui.graphics
 
-import org.jetbrains.skia.PaintMode as SkiaPaintMode
-import org.jetbrains.skia.PaintStrokeCap as SkiaPaintStrokeCap
-import org.jetbrains.skia.PaintStrokeJoin as SkiaPaintStrokeJoin
+import org.jetbrains.skia.PaintMode as SkPaintMode
+import org.jetbrains.skia.PaintStrokeCap as SkPaintStrokeCap
+import org.jetbrains.skia.PaintStrokeJoin as SkPaintStrokeJoin
 
 actual typealias NativePaint = org.jetbrains.skia.Paint
 
-actual fun Paint(): Paint = DesktopPaint()
+actual fun Paint(): Paint = SkiaBackedPaint()
 
 /**
  * Convert the [org.jetbrains.skia.Paint] instance into a Compose-compatible Paint
  */
-fun org.jetbrains.skia.Paint.asComposePaint(): Paint = DesktopPaint(this)
+fun org.jetbrains.skia.Paint.asComposePaint(): Paint = SkiaBackedPaint(this)
 
-internal class DesktopPaint(
+internal class SkiaBackedPaint(
     val skia: org.jetbrains.skia.Paint = org.jetbrains.skia.Paint()
 ) : Paint {
     override fun asFrameworkPaint(): NativePaint = skia
@@ -104,28 +104,28 @@ internal class DesktopPaint(
 
     override var pathEffect: PathEffect? = null
         set(value) {
-            skia.pathEffect = (value as DesktopPathEffect?)?.asSkiaPathEffect()
+            skia.pathEffect = (value as SkiaBackedPathEffect?)?.asSkiaPathEffect()
             field = value
         }
 
     private fun PaintingStyle.toSkia() = when (this) {
-        PaintingStyle.Fill -> SkiaPaintMode.FILL
-        PaintingStyle.Stroke -> SkiaPaintMode.STROKE
-        else -> SkiaPaintMode.FILL
+        PaintingStyle.Fill -> SkPaintMode.FILL
+        PaintingStyle.Stroke -> SkPaintMode.STROKE
+        else -> SkPaintMode.FILL
     }
 
     private fun StrokeCap.toSkia() = when (this) {
-        StrokeCap.Butt -> SkiaPaintStrokeCap.BUTT
-        StrokeCap.Round -> SkiaPaintStrokeCap.ROUND
-        StrokeCap.Square -> SkiaPaintStrokeCap.SQUARE
-        else -> SkiaPaintStrokeCap.BUTT
+        StrokeCap.Butt -> SkPaintStrokeCap.BUTT
+        StrokeCap.Round -> SkPaintStrokeCap.ROUND
+        StrokeCap.Square -> SkPaintStrokeCap.SQUARE
+        else -> SkPaintStrokeCap.BUTT
     }
 
     private fun StrokeJoin.toSkia() = when (this) {
-        StrokeJoin.Miter -> SkiaPaintStrokeJoin.MITER
-        StrokeJoin.Round -> SkiaPaintStrokeJoin.ROUND
-        StrokeJoin.Bevel -> SkiaPaintStrokeJoin.BEVEL
-        else -> SkiaPaintStrokeJoin.MITER
+        StrokeJoin.Miter -> SkPaintStrokeJoin.MITER
+        StrokeJoin.Round -> SkPaintStrokeJoin.ROUND
+        StrokeJoin.Bevel -> SkPaintStrokeJoin.BEVEL
+        else -> SkPaintStrokeJoin.MITER
     }
 }
 

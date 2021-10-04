@@ -84,10 +84,18 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 api("androidx.annotation:annotation:1.2.0")
             }
 
-            desktopMain.dependencies {
-                implementation(libs.kotlinStdlib)
-                implementation(libs.kotlinStdlibJdk8)
-                api(libs.skiko)
+            skikoMain {
+                dependencies {
+                    api(libs.skikoCommon)
+                }
+            }
+
+            desktopMain {
+                dependsOn skikoMain
+                dependencies {
+                    implementation(libs.kotlinStdlib)
+                    implementation(libs.kotlinStdlibJdk8)
+                }
             }
 
             androidTest.dependencies {
