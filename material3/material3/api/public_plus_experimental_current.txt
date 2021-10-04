@@ -2,17 +2,15 @@
 package androidx.compose.material3 {
 
   @androidx.compose.runtime.Stable public final class ColorScheme {
-    ctor public ColorScheme(long primary, long onPrimary, long primaryContainer, long onPrimaryContainer, long inversePrimary, long secondary, long onSecondary, long secondaryContainer, long onSecondaryContainer, long tertiary, long onTertiary, long tertiaryContainer, long onTertiaryContainer, long background, long onBackground, long surface, long onSurface, long surfaceVariant, long onSurfaceVariant, long inverseSurface, long inverseOnSurface, long disabled, long onDisabled, long error, long onError, long errorContainer, long onErrorContainer, long outline);
-    method public androidx.compose.material3.ColorScheme copy(optional long primary, optional long onPrimary, optional long primaryContainer, optional long onPrimaryContainer, optional long inversePrimary, optional long secondary, optional long onSecondary, optional long secondaryContainer, optional long onSecondaryContainer, optional long tertiary, optional long onTertiary, optional long tertiaryContainer, optional long onTertiaryContainer, optional long background, optional long onBackground, optional long surface, optional long onSurface, optional long surfaceVariant, optional long onSurfaceVariant, optional long inverseSurface, optional long inverseOnSurface, optional long disabled, optional long onDisabled, optional long error, optional long onError, optional long errorContainer, optional long onErrorContainer, optional long outline);
+    ctor public ColorScheme(long primary, long onPrimary, long primaryContainer, long onPrimaryContainer, long inversePrimary, long secondary, long onSecondary, long secondaryContainer, long onSecondaryContainer, long tertiary, long onTertiary, long tertiaryContainer, long onTertiaryContainer, long background, long onBackground, long surface, long onSurface, long surfaceVariant, long onSurfaceVariant, long inverseSurface, long inverseOnSurface, long error, long onError, long errorContainer, long onErrorContainer, long outline);
+    method public androidx.compose.material3.ColorScheme copy(optional long primary, optional long onPrimary, optional long primaryContainer, optional long onPrimaryContainer, optional long inversePrimary, optional long secondary, optional long onSecondary, optional long secondaryContainer, optional long onSecondaryContainer, optional long tertiary, optional long onTertiary, optional long tertiaryContainer, optional long onTertiaryContainer, optional long background, optional long onBackground, optional long surface, optional long onSurface, optional long surfaceVariant, optional long onSurfaceVariant, optional long inverseSurface, optional long inverseOnSurface, optional long error, optional long onError, optional long errorContainer, optional long onErrorContainer, optional long outline);
     method public long getBackground();
-    method public long getDisabled();
     method public long getError();
     method public long getErrorContainer();
     method public long getInverseOnSurface();
     method public long getInversePrimary();
     method public long getInverseSurface();
     method public long getOnBackground();
-    method public long getOnDisabled();
     method public long getOnError();
     method public long getOnErrorContainer();
     method public long getOnPrimary();
@@ -33,14 +31,12 @@ package androidx.compose.material3 {
     method public long getTertiary();
     method public long getTertiaryContainer();
     property public final long background;
-    property public final long disabled;
     property public final long error;
     property public final long errorContainer;
     property public final long inverseOnSurface;
     property public final long inversePrimary;
     property public final long inverseSurface;
     property public final long onBackground;
-    property public final long onDisabled;
     property public final long onError;
     property public final long onErrorContainer;
     property public final long onPrimary;
@@ -65,8 +61,8 @@ package androidx.compose.material3 {
   public final class ColorSchemeKt {
     method public static long contentColorFor(androidx.compose.material3.ColorScheme, long backgroundColor);
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static long contentColorFor(long backgroundColor);
-    method public static androidx.compose.material3.ColorScheme darkColorScheme(optional long primary, optional long onPrimary, optional long primaryContainer, optional long onPrimaryContainer, optional long inversePrimary, optional long secondary, optional long onSecondary, optional long secondaryContainer, optional long onSecondaryContainer, optional long tertiary, optional long onTertiary, optional long tertiaryContainer, optional long onTertiaryContainer, optional long background, optional long onBackground, optional long surface, optional long onSurface, optional long surfaceVariant, optional long onSurfaceVariant, optional long inverseSurface, optional long inverseOnSurface, optional long disabled, optional long onDisabled, optional long error, optional long onError, optional long errorContainer, optional long onErrorContainer, optional long outline);
-    method public static androidx.compose.material3.ColorScheme lightColorScheme(optional long primary, optional long onPrimary, optional long primaryContainer, optional long onPrimaryContainer, optional long inversePrimary, optional long secondary, optional long onSecondary, optional long secondaryContainer, optional long onSecondaryContainer, optional long tertiary, optional long onTertiary, optional long tertiaryContainer, optional long onTertiaryContainer, optional long background, optional long onBackground, optional long surface, optional long onSurface, optional long surfaceVariant, optional long onSurfaceVariant, optional long inverseSurface, optional long inverseOnSurface, optional long disabled, optional long onDisabled, optional long error, optional long onError, optional long errorContainer, optional long onErrorContainer, optional long outline);
+    method public static androidx.compose.material3.ColorScheme darkColorScheme(optional long primary, optional long onPrimary, optional long primaryContainer, optional long onPrimaryContainer, optional long inversePrimary, optional long secondary, optional long onSecondary, optional long secondaryContainer, optional long onSecondaryContainer, optional long tertiary, optional long onTertiary, optional long tertiaryContainer, optional long onTertiaryContainer, optional long background, optional long onBackground, optional long surface, optional long onSurface, optional long surfaceVariant, optional long onSurfaceVariant, optional long inverseSurface, optional long inverseOnSurface, optional long error, optional long onError, optional long errorContainer, optional long onErrorContainer, optional long outline);
+    method public static androidx.compose.material3.ColorScheme lightColorScheme(optional long primary, optional long onPrimary, optional long primaryContainer, optional long onPrimaryContainer, optional long inversePrimary, optional long secondary, optional long onSecondary, optional long secondaryContainer, optional long onSecondaryContainer, optional long tertiary, optional long onTertiary, optional long tertiaryContainer, optional long onTertiaryContainer, optional long background, optional long onBackground, optional long surface, optional long onSurface, optional long surfaceVariant, optional long onSurfaceVariant, optional long inverseSurface, optional long inverseOnSurface, optional long error, optional long onError, optional long errorContainer, optional long onErrorContainer, optional long outline);
   }
 
   public final class ContentColorKt {
