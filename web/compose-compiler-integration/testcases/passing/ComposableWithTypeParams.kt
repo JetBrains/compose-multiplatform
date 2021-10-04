@@ -9,6 +9,7 @@ fun main() {
         FooTakesTypedComposableLambda { "text" }
         FooTakesTypedComposableLambda2(10) { it + 100 }
         FooTakesTypedExtesionComposableLambda<String, Any, Unit>("text", Any()) { }
+        MySelect<String>(emptyList(), {})
     }
 }
 
@@ -33,4 +34,11 @@ fun <T> FooTakesTypedComposableLambda2(t: T, composable: @Composable (T) -> T) {
 @Composable
 fun <T, K, R> FooTakesTypedExtesionComposableLambda(t: T, k: K, composable: @Composable T.(K) -> R) {
     t.composable(k)
+}
+
+@Composable
+fun <T> MySelect(
+    options: List<T>,
+    onChange: (T) -> Unit
+) {
 }
