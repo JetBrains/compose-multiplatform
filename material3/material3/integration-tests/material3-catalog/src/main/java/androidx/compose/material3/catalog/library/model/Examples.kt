@@ -20,7 +20,9 @@ package androidx.compose.material3.catalog.library.model
 
 import androidx.compose.material3.catalog.library.util.SampleSourceUrl
 import androidx.compose.material3.samples.ColorSchemeSample
+import androidx.compose.material3.samples.EnterAlwaysSmallTopAppBar
 import androidx.compose.material3.samples.PinnedSmallTopAppBar
+import androidx.compose.material3.samples.SimpleCenteredTopAppBar
 import androidx.compose.material3.samples.SimpleSmallTopAppBar
 import androidx.compose.runtime.Composable
 
@@ -52,8 +54,18 @@ val TopAppBarExamples =
             sourceUrl = TopAppBarExampleSourceUrl,
         ) { SimpleSmallTopAppBar() },
         Example(
+            name = ::SimpleCenteredTopAppBar.name,
+            description = TopAppBarExampleDescription,
+            sourceUrl = TopAppBarExampleSourceUrl,
+        ) { SimpleCenteredTopAppBar() },
+        Example(
             name = ::PinnedSmallTopAppBar.name,
             description = TopAppBarExampleDescription,
             sourceUrl = TopAppBarExampleSourceUrl,
         ) { PinnedSmallTopAppBar() },
+        Example(
+            name = ::EnterAlwaysSmallTopAppBar.name,
+            description = TopAppBarExampleDescription,
+            sourceUrl = TopAppBarExampleSourceUrl,
+        ) { EnterAlwaysSmallTopAppBar() },
     )

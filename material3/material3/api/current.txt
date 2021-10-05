@@ -2,6 +2,7 @@
 package androidx.compose.material3 {
 
   public final class AppBarKt {
+    method @androidx.compose.runtime.Composable public static void SmallCenteredTopAppBar(kotlin.jvm.functions.Function0<kotlin.Unit> title, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit> navigationIcon, optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> actions, optional androidx.compose.material3.TopAppBarColors colors, optional androidx.compose.material3.TopAppBarScrollBehavior? scrollBehavior);
     method @androidx.compose.runtime.Composable public static void SmallTopAppBar(kotlin.jvm.functions.Function0<kotlin.Unit> title, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit> navigationIcon, optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> actions, optional androidx.compose.material3.TopAppBarColors colors, optional androidx.compose.material3.TopAppBarScrollBehavior? scrollBehavior);
   }
 
@@ -128,7 +129,9 @@ package androidx.compose.material3 {
   }
 
   public final class TopAppBarDefaults {
+    method public androidx.compose.material3.TopAppBarScrollBehavior enterAlwaysScrollBehavior(optional kotlin.jvm.functions.Function0<java.lang.Boolean> canScroll);
     method public androidx.compose.material3.TopAppBarScrollBehavior pinnedScrollBehavior(optional kotlin.jvm.functions.Function0<java.lang.Boolean> canScroll);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.TopAppBarColors smallCenteredTopAppBarColors(optional long containerColor, optional long scrolledContainerColor, optional long navigationIconColor, optional long titleColor, optional long actionIconsColor);
     method @androidx.compose.runtime.Composable public androidx.compose.material3.TopAppBarColors smallTopAppBarColors(optional long containerColor, optional long scrolledContainerColor, optional long navigationIconColor, optional long titleColor, optional long actionIconsColor);
     field public static final androidx.compose.material3.TopAppBarDefaults INSTANCE;
   }

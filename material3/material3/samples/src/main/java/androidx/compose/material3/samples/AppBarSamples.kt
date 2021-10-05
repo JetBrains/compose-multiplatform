@@ -29,6 +29,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallCenteredTopAppBar
 import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -57,7 +58,49 @@ fun SimpleSmallTopAppBar() {
                     }
                 },
                 actions = {
-                    // RowScope here, so these icons will be placed horizontally
+                    IconButton(onClick = { /* doSomething() */ }) {
+                        Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+                    }
+                }
+            )
+        },
+        content = { innerPadding ->
+            LazyColumn(
+                contentPadding = innerPadding,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                val list = (0..75).map { it.toString() }
+                items(count = list.size) {
+                    Text(
+                        text = list[it],
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                    )
+                }
+            }
+        }
+    )
+}
+
+/**
+ * A sample for a simple use of [SmallCenteredTopAppBar].
+ *
+ * The top app bar here does not react to any scroll events in the content under it.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Sampled
+@Composable
+fun SimpleCenteredTopAppBar() {
+    Scaffold(
+        topBar = {
+            SmallCenteredTopAppBar(
+                title = { Text("Centered TopAppBar") },
+                navigationIcon = {
+                    IconButton(onClick = { /* doSomething() */ }) {
+                        Icon(Icons.Filled.Menu, contentDescription = "Localized description")
+                    }
+                },
+                actions = {
                     IconButton(onClick = { /* doSomething() */ }) {
                         Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
                     }
@@ -108,6 +151,51 @@ fun PinnedSmallTopAppBar() {
                     IconButton(onClick = { /* doSomething() */ }) {
                         Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
                     }
+                    IconButton(onClick = { /* doSomething() */ }) {
+                        Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+                    }
+                },
+                scrollBehavior = scrollBehavior
+            )
+        },
+        content = { innerPadding ->
+            LazyColumn(
+                contentPadding = innerPadding,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                val list = (0..75).map { it.toString() }
+                items(count = list.size) {
+                    Text(
+                        text = list[it],
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                    )
+                }
+            }
+        }
+    )
+}
+
+/**
+ * A sample for a [SmallTopAppBar] that collapses when the content is scrolled up, and
+ * appears when the content scrolled down.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Sampled
+@Composable
+fun EnterAlwaysSmallTopAppBar() {
+    val scrollBehavior = remember { TopAppBarDefaults.enterAlwaysScrollBehavior() }
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            SmallTopAppBar(
+                title = { Text("Small TopAppBar") },
+                navigationIcon = {
+                    IconButton(onClick = { /* doSomething() */ }) {
+                        Icon(Icons.Filled.Menu, contentDescription = "Localized description")
+                    }
+                },
+                actions = {
                     IconButton(onClick = { /* doSomething() */ }) {
                         Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
                     }

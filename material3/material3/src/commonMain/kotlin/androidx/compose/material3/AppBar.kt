@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.tokens.TopAppBarSmall
+import androidx.compose.material3.tokens.TopAppBarSmallCentered
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
@@ -62,6 +63,7 @@ import kotlin.math.roundToInt
  * A top app bar that uses a [scrollBehavior] to customize its nested scrolling behavior when
  * working in conjunction with a scrolling content looks like:
  * @sample androidx.compose.material3.samples.PinnedSmallTopAppBar
+ * @sample androidx.compose.material3.samples.EnterAlwaysSmallTopAppBar
  *
  * @param title the title to be displayed in the top app bar
  * @param modifier the [Modifier] to be applied to this top app bar
@@ -90,6 +92,52 @@ fun SmallTopAppBar(
         title = title,
         titleTextStyle = MaterialTheme.typography.fromToken(TopAppBarSmall.SmallHeadlineFont),
         centeredTitle = false,
+        navigationIcon = navigationIcon,
+        actions = actions,
+        colors = colors,
+        scrollBehavior = scrollBehavior
+    )
+}
+
+/**
+ * Material Design small top app bar with a header title that is horizontally aligned to the center.
+ *
+ * The top app bar displays information and actions relating to the current screen.
+ *
+ * This SmallCenteredTopAppBar has slots for a title, navigation icon, and actions.
+ *
+ * A small centered top app bar that uses a [scrollBehavior] to customize its nested scrolling
+ * behavior when working in conjunction with a scrolling content looks like:
+ * @sample androidx.compose.material3.samples.SimpleCenteredTopAppBar
+ *
+ * @param title the title to be displayed in the top app bar
+ * @param modifier the [Modifier] to be applied to this top app bar
+ * @param navigationIcon The navigation icon displayed at the start of the top app bar. This should
+ * typically be an [IconButton] or [IconToggleButton].
+ * @param actions the actions displayed at the end of the top app bar. This should typically be
+ * [IconButton]s. The default layout here is a [Row], so icons inside will be placed horizontally.
+ * @param colors a [TopAppBarColors] that will be used to resolve the colors used for this top app
+ * bar in different states. See [TopAppBarDefaults.smallCenteredTopAppBarColors].
+ * @param scrollBehavior a [TopAppBarScrollBehavior] which holds various offset values that will be
+ * applied by this top app bar to set up its height and colors. A scroll behavior is designed to
+ * work in conjunction with a scrolled content to change the top app bar appearance as the content
+ * scrolls. See [TopAppBarScrollBehavior.nestedScrollConnection].
+ */
+@Composable
+fun SmallCenteredTopAppBar(
+    title: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    navigationIcon: @Composable () -> Unit = {},
+    actions: @Composable RowScope.() -> Unit = {},
+    colors: TopAppBarColors = TopAppBarDefaults.smallCenteredTopAppBarColors(),
+    scrollBehavior: TopAppBarScrollBehavior? = null
+) {
+    SingleRowTopAppBar(
+        modifier = modifier,
+        title = title,
+        titleTextStyle =
+        MaterialTheme.typography.fromToken(TopAppBarSmall.SmallHeadlineFont),
+        centeredTitle = true,
         navigationIcon = navigationIcon,
         actions = actions,
         colors = colors,
@@ -247,14 +295,79 @@ object TopAppBarDefaults {
     }
 
     /**
+     * Creates a [TopAppBarColors] for small-centered top app bars. The default implementation
+     * animates between the provided colors according to the Material specification.
+     *
+     * @param containerColor the container color
+     * @param scrolledContainerColor the container color when content is scrolled behind it
+     * @param navigationIconColor the content used color for the navigation icon
+     * @param titleColor the content color used for the title
+     * @param actionIconsColor the content color used for actions
+     * @return the resulting [TopAppBarColors] used for the top app bar
+     */
+    @Composable
+    fun smallCenteredTopAppBarColors(
+        containerColor: Color =
+            MaterialTheme.colorScheme.fromToken(TopAppBarSmallCentered.SmallCenteredContainerColor),
+        scrolledContainerColor: Color = MaterialTheme.colorScheme.applyTonalElevation(
+            backgroundColor = containerColor,
+            elevation = TopAppBarSmall.SmallOnScrollContainerElevation
+        ),
+        navigationIconColor: Color =
+            MaterialTheme.colorScheme.fromToken(
+                TopAppBarSmallCentered.SmallCenteredLeadingIconColor
+            ),
+        titleColor: Color =
+            MaterialTheme.colorScheme.fromToken(
+                TopAppBarSmallCentered.SmallCenteredHeadlineColor
+            ),
+        actionIconsColor: Color =
+            MaterialTheme.colorScheme.fromToken(
+                TopAppBarSmallCentered.SmallCenteredTrailingIconColor
+            )
+    ): TopAppBarColors {
+        return remember(
+            containerColor,
+            scrolledContainerColor,
+            navigationIconColor,
+            titleColor,
+            actionIconsColor
+        ) {
+            AnimatingTopAppBarColors(
+                containerColor,
+                scrolledContainerColor,
+                navigationIconColor,
+                titleColor,
+                actionIconsColor
+            )
+        }
+    }
+
+    /**
      * Returns a pinned [TopAppBarScrollBehavior] that tracks nested-scroll callbacks and
      * updates its [TopAppBarScrollBehavior.contentOffset] accordingly.
      *
-     * @param canScroll a callback used to determine whether scroll events are to be
-     * handled by this pinned [TopAppBarScrollBehavior]
+     * @param canScroll a callback used to determine whether scroll events are to be handled by this
+     * pinned [TopAppBarScrollBehavior]
      */
     fun pinnedScrollBehavior(canScroll: () -> Boolean = { true }): TopAppBarScrollBehavior =
         PinnedScrollBehavior(canScroll)
+
+    /**
+     * Returns a [TopAppBarScrollBehavior] that tracks nested-scroll callbacks and
+     * updates its [TopAppBarScrollBehavior.offset] and [TopAppBarScrollBehavior.contentOffset]
+     * accordingly.
+     *
+     * This scroll-connection updates the `offset` value immediately whenever the content is pulled
+     * up or down. A top-bar that is set up with this [TopAppBarScrollBehavior] managed by this
+     * [EnterAlwaysScrollBehavior] will immediately collapse when the scaffold's content is pulled
+     * up, and will immediately appear when the content is pulled down.
+     *
+     * @param canScroll a callback used to determine whether scroll events are to be handled by this
+     * [EnterAlwaysScrollBehavior]
+     */
+    fun enterAlwaysScrollBehavior(canScroll: () -> Boolean = { true }): TopAppBarScrollBehavior =
+        EnterAlwaysScrollBehavior(canScroll)
 }
 
 /**
@@ -319,15 +432,6 @@ private fun SingleRowTopAppBar(
             actions = actionsRow,
         )
     }
-}
-
-@Composable
-private fun ActionsInRow(content: @Composable (RowScope.() -> Unit)) {
-    Row(
-        horizontalArrangement = Arrangement.End,
-        verticalAlignment = Alignment.CenterVertically,
-        content = content
-    )
 }
 
 /**
@@ -539,6 +643,68 @@ private class PinnedScrollBehavior(val canScroll: () -> Boolean = { true }) :
                 } else {
                     contentOffset += consumed.y
                 }
+                return Offset.Zero
+            }
+        }
+}
+
+/**
+ * A [TopAppBarScrollBehavior] that adjusts its properties to affect the height of the top app bar.
+ *
+ * A top-bar that is set up with this [TopAppBarScrollBehavior] will immediately collapse when the
+ * scaffold's content is pulled up, and will immediately appear when the content is pulled down.
+ *
+ * @param canScroll a callback that can be used to determine whether scroll events are to be
+ * handled by this [EnterAlwaysScrollBehavior]
+ */
+private class EnterAlwaysScrollBehavior(val canScroll: () -> Boolean = { true }) :
+    TopAppBarScrollBehavior {
+    override val scrollFraction: Float
+        get() = if (offsetLimit != 0f) {
+            1 - ((offsetLimit - contentOffset).coerceIn(
+                minimumValue = offsetLimit,
+                maximumValue = 0f
+            ) / offsetLimit)
+        } else {
+            0f
+        }
+    override var offsetLimit by mutableStateOf(-Float.MAX_VALUE)
+    override var offset by mutableStateOf(0f)
+    override var contentOffset by mutableStateOf(0f)
+    override var nestedScrollConnection =
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                if (!canScroll()) return Offset.Zero
+                val newOffset = (offset + available.y)
+                val coerced = newOffset.coerceIn(minimumValue = offsetLimit, maximumValue = 0f)
+                return if (newOffset == coerced) {
+                    // Nothing coerced, meaning we're in the middle of top-bar collapse or
+                    // expand.
+                    offset = coerced
+                    available
+                } else {
+                    Offset.Zero
+                }
+            }
+
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset {
+                if (!canScroll()) return Offset.Zero
+                contentOffset += consumed.y
+                if (offset == 0f || offset == offsetLimit) {
+                    if (consumed.y == 0f && available.y > 0f) {
+                        // Reset the total offset to zero when scrolling all the way down.
+                        // This will eliminate some float precision inaccuracies.
+                        contentOffset = 0f
+                    }
+                }
+                offset = (offset + consumed.y).coerceIn(
+                    minimumValue = offsetLimit,
+                    maximumValue = 0f
+                )
                 return Offset.Zero
             }
         }
