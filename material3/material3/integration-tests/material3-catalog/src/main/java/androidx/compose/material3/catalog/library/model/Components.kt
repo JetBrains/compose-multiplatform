@@ -45,6 +45,19 @@ private val Color = Component(
     examples = ColorExamples
 )
 
+private val TopAppBar = Component(
+    id = 2,
+    name = "Top app bar",
+    description = "Material You top app bar",
+    // No color icon
+    tintIcon = true,
+    guidelinesUrl = "", // No  guidelines yet
+    docsUrl = "", // No docs yet
+    sourceUrl = "$Material3SourceUrl/AppBar.kt",
+    examples = TopAppBarExamples
+)
+
 val Components = listOf(
-    Color
+    Color,
+    TopAppBar
 )
