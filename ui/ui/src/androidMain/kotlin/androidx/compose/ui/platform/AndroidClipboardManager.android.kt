@@ -194,7 +194,6 @@ internal class EncodeHelper {
         }
     }
 
-    @OptIn(ExperimentalUnsignedTypes::class)
     fun encode(color: Color) {
         encode(color.value)
     }
@@ -369,7 +368,6 @@ internal class DecodeHelper(string: String) {
         return mutableSpanStyle.toSpanStyle()
     }
 
-    @OptIn(ExperimentalUnsignedTypes::class)
     fun decodeColor(): Color {
         return Color(decodeULong())
     }

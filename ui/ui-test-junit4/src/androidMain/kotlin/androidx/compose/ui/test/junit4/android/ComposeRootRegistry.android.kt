@@ -33,7 +33,6 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
-import kotlin.time.ExperimentalTime
 
 /**
  * Registry where all views implementing [ViewRootForTest] should be registered while they
@@ -290,7 +289,6 @@ internal fun ComposeRootRegistry.waitForComposeRoots(atLeastOneRootExpected: Boo
     }
 }
 
-@OptIn(ExperimentalTime::class)
 internal suspend fun ComposeRootRegistry.awaitComposeRoots() {
     ensureComposeRootRegistryIsSetUp()
 
