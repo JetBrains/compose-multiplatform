@@ -19,7 +19,6 @@ package androidx.compose.ui.inspection.inspector
 import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
-import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.R
@@ -109,7 +108,6 @@ class LayoutInspectorTree {
     /**
      * Converts the [CompositionData] set held by [view] into a list of root nodes.
      */
-    @OptIn(InternalComposeApi::class)
     fun convert(view: View): List<InspectorNode> {
         parameterFactory.density = Density(view.context)
         @Suppress("UNCHECKED_CAST")
@@ -222,7 +220,6 @@ class LayoutInspectorTree {
         subCompositions.clear()
     }
 
-    @OptIn(InternalComposeApi::class)
     private fun convert(tables: Set<CompositionData>, view: View): List<InspectorNode> {
         val trees = tables.mapNotNull { convert(it, view) }
         return when (trees.size) {
@@ -331,7 +328,7 @@ class LayoutInspectorTree {
         return out
     }
 
-    @OptIn(InternalComposeApi::class, UiToolingDataApi::class)
+    @OptIn(UiToolingDataApi::class)
     private fun convert(table: CompositionData, view: View): MutableInspectorNode? {
         val fakeParent = newNode()
         addToParent(fakeParent, listOf(convert(table.asTree())), buildFakeChildNodes = true)

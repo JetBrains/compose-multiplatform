@@ -88,6 +88,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public default boolean changed(float value);
     method @androidx.compose.runtime.ComposeCompilerApi public default boolean changed(long value);
     method @androidx.compose.runtime.ComposeCompilerApi public default boolean changed(double value);
+    method public void collectParameterInformation();
     method @androidx.compose.runtime.ComposeCompilerApi public <T> void createNode(kotlin.jvm.functions.Function0<? extends T> factory);
     method @androidx.compose.runtime.ComposeCompilerApi public void disableReusing();
     method @androidx.compose.runtime.ComposeCompilerApi public void enableReusing();
