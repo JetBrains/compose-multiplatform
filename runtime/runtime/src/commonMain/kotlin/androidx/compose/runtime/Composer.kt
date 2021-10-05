@@ -885,16 +885,15 @@ interface Composer {
     fun endProviders()
 
     /**
-     * A Compose internal function. DO NOT call directly.
+     * A tooling API function. DO NOT call directly.
      *
      * The data stored for the composition. This is used by Compose tools, such as the preview and
      * the inspector, to display or interpret the result of composition.
      */
-    @InternalComposeApi
     val compositionData: CompositionData
 
     /**
-     * A Compose internal function. DO NOT call directly.
+     * A tooling API function. DO NOT call directly.
      *
      * Called by the inspector to inform the composer that it should collect additional
      * information about call parameters. By default, only collect parameter information for
@@ -904,7 +903,6 @@ interface Composer {
      * WARNING: calling this will result in a significant number of additional allocations that are
      * typically avoided.
      */
-    @InternalComposeApi
     fun collectParameterInformation()
 
     /**
@@ -1289,7 +1287,6 @@ internal class ComposerImpl(
      * Start collecting parameter information. This enables the tools API to always be able to
      * determine the parameter values of composable calls.
      */
-    @InternalComposeApi
     override fun collectParameterInformation() {
         collectParameterInformation = true
     }
@@ -1627,7 +1624,6 @@ internal class ComposerImpl(
         updateValue(value)
     }
 
-    @InternalComposeApi
     override val compositionData: CompositionData get() = slotTable
 
     /**
