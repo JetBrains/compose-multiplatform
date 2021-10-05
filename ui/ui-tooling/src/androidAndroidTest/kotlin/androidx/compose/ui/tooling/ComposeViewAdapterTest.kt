@@ -312,6 +312,14 @@ class ComposeViewAdapterTest {
         )
     }
 
+    @Test
+    fun viewModelPreviewRendersCorrectly() {
+        assertRendersCorrectly(
+            "androidx.compose.ui.tooling.SimpleComposablePreviewKt",
+            "ViewModelPreview"
+        )
+    }
+
     /**
      * Check that no re-composition happens without forcing it.
      */
