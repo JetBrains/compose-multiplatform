@@ -109,6 +109,9 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             }
         }
     }
+    dependencies {
+        samples(project(":compose:animation:animation-graphics:animation-graphics-samples"))
+    }
 }
 
 androidx {
