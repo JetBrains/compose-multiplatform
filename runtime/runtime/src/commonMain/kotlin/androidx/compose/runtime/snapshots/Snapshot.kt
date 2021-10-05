@@ -338,9 +338,8 @@ sealed class Snapshot(
         ): R = takeMutableSnapshot().run {
             try {
                 enter(block).also { apply().check() }
-            } catch (t: Throwable) {
+            } finally {
                 dispose()
-                throw t
             }
         }
 
@@ -536,11 +535,11 @@ open class MutableSnapshot internal constructor(
             sync {
                 val newId = nextSnapshotId++
                 openSnapshots = openSnapshots.set(newId)
-                val invalid = invalid
-                this.invalid = invalid.set(newId)
+                val currentInvalid = invalid
+                this.invalid = currentInvalid.set(newId)
                 NestedMutableSnapshot(
                     newId,
-                    invalid,
+                    currentInvalid.addRange(id + 1, newId),
                     mergedReadObserver(readObserver, this.readObserver),
                     mergedWriteObserver(writeObserver, this.writeObserver),
                     this
@@ -652,13 +651,9 @@ open class MutableSnapshot internal constructor(
             sync {
                 val readonlyId = nextSnapshotId++
                 openSnapshots = openSnapshots.set(readonlyId)
-                var currentInvalid = invalid
-                for (invalidId in previousId + 1 until readonlyId) {
-                    currentInvalid = currentInvalid.set(invalidId)
-                }
                 NestedReadonlySnapshot(
                     readonlyId,
-                    currentInvalid,
+                    invalid.addRange(previousId + 1, readonlyId),
                     readObserver,
                     this
                 )
@@ -818,11 +813,7 @@ open class MutableSnapshot internal constructor(
                 id = nextSnapshotId++
                 openSnapshots = openSnapshots.set(id)
             }
-            var currentInvalid = invalid
-            for (invalidId in previousId + 1 until id) {
-                currentInvalid = currentInvalid.set(invalidId)
-            }
-            invalid = currentInvalid
+            invalid = invalid.addRange(previousId + 1, id)
         }
     }
 
@@ -1191,6 +1182,7 @@ internal class NestedMutableSnapshot(
     writeObserver: ((Any) -> Unit)?,
     val parent: MutableSnapshot
 ) : MutableSnapshot(id, invalid, readObserver, writeObserver) {
+    private var deactivated = false
 
     init { parent.nestedActivated(this) }
 
@@ -1199,7 +1191,7 @@ internal class NestedMutableSnapshot(
     override fun dispose() {
         if (!disposed) {
             super.dispose()
-            parent.nestedDeactivated(this)
+            deactivate()
         }
     }
 
@@ -1248,7 +1240,15 @@ internal class NestedMutableSnapshot(
         }
 
         applied = true
+        deactivate()
         return SnapshotApplyResult.Success
+    }
+
+    private fun deactivate() {
+        if (!deactivated) {
+            deactivated = true
+            parent.nestedDeactivated(this)
+        }
     }
 }
 
@@ -1776,3 +1776,13 @@ internal fun <T : StateRecord> current(r: T, snapshot: Snapshot) =
  */
 inline fun <T : StateRecord, R> T.withCurrent(block: (r: T) -> R): R =
     block(current(this, Snapshot.current))
+
+/**
+ * Helper routine to add a range of values ot a snapshot set
+ */
+internal fun SnapshotIdSet.addRange(from: Int, until: Int): SnapshotIdSet {
+    var result = this
+    for (invalidId in from until until)
+        result = result.set(invalidId)
+    return result
+}

@@ -747,6 +747,57 @@ class SnapshotTests {
         }
     }
 
+    @Test // Regression test for b/200575924
+    // Test copied from b/200575924 bu chrnie@foxmail.com
+    fun nestedMutableSnapshotCanNotSeeOtherSnapshotChange() {
+        var state by mutableStateOf(0)
+
+        val snapshot1 = Snapshot.takeMutableSnapshot()
+        val snapshot2 = Snapshot.takeMutableSnapshot()
+        try {
+            snapshot2.enter {
+                state = 1
+            }
+
+            snapshot1.enter {
+                Snapshot.withMutableSnapshot {
+                    assertEquals(0, state)
+                }
+            }
+        } finally {
+            snapshot1.dispose()
+            snapshot2.dispose()
+        }
+    }
+
+    @Test // Regression test for b/200575924
+    // Test copied from b/200575924 by chrnie@foxmail.com
+    fun nestedSnapshotCanNotSeeOtherSnapshotChange() {
+        var state by mutableStateOf(0)
+
+        val snapshot1 = Snapshot.takeMutableSnapshot()
+        val snapshot2 = Snapshot.takeMutableSnapshot()
+        try {
+            snapshot2.enter {
+                state = 1
+            }
+
+            snapshot1.enter {
+                val nestedSnapshot = Snapshot.takeSnapshot()
+                try {
+                    nestedSnapshot.enter {
+                        assertEquals(0, state)
+                    }
+                } finally {
+                    nestedSnapshot.dispose()
+                }
+            }
+        } finally {
+            snapshot1.dispose()
+            snapshot2.dispose()
+        }
+    }
+
     private var count = 0
 
     @BeforeTest
