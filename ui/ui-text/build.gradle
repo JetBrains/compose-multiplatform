@@ -149,6 +149,9 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             }
         }
     }
+    dependencies {
+        samples(projectOrArtifact(":compose:ui:ui-text:ui-text-samples"))
+    }
 }
 
 androidx {

@@ -146,6 +146,9 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             }
         }
     }
+    dependencies {
+        samples(project(":compose:foundation:foundation:foundation-samples"))
+    }
 }
 
 // Screenshot tests related setup

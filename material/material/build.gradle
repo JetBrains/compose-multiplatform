@@ -125,6 +125,9 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             }
         }
     }
+    dependencies {
+        samples(project(":compose:material:material:material-samples"))
+    }
 }
 
 androidx {

@@ -94,6 +94,9 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             }
         }
     }
+    dependencies {
+        samples(projectOrArtifact(":compose:ui:ui-unit:ui-unit-samples"))
+    }
 }
 
 androidx {
