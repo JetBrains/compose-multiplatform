@@ -102,6 +102,9 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             }
         }
     }
+    dependencies {
+        samples(projectOrArtifact(":compose:runtime:runtime:runtime-samples"))
+    }
 }
 
 android {

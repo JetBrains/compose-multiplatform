@@ -64,6 +64,9 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             }
         }
     }
+    dependencies {
+        samples(project(":compose:material:material-icons-core:material-icons-core-samples"))
+    }
 }
 
 IconGenerationTask.registerCoreIconProject(

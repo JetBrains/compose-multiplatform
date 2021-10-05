@@ -118,6 +118,9 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             }
         }
     }
+    dependencies {
+        samples(projectOrArtifact(":compose:ui:ui-graphics:ui-graphics-samples"))
+    }
 }
 
 androidx {

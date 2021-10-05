@@ -126,6 +126,9 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             }
         }
     }
+    dependencies {
+        samples(project(":compose:animation:animation-core:animation-core-samples"))
+    }
 }
 
 androidx {
