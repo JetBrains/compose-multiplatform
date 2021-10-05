@@ -4,6 +4,8 @@ import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 import java.io.File
 import java.net.URL
 
+private val CHROME_DRIVER_VERSION = "94.0.4606.61"
+private val GECKO_DRIVER_VERSION = "0.29.1"
 
 private fun download(url: String, file: File) {
     println("downloading ${url} to ${file}")
@@ -39,8 +41,8 @@ private fun resolvePath(id: String): String {
     val os = DefaultNativePlatform.getCurrentOperatingSystem()
     val arch = DefaultNativePlatform.getCurrentArchitecture()
 
-    val geckoRepo = "https://github.com/mozilla/geckodriver/releases/download/v0.29.1/"
-    val chromeRepo = "https://chromedriver.storage.googleapis.com/91.0.4472.101/"
+    val geckoRepo = "https://github.com/mozilla/geckodriver/releases/download/v$GECKO_DRIVER_VERSION/"
+    val chromeRepo = "https://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/"
 
     return when (id) {
         "chrome" -> chromeRepo + when {
@@ -53,13 +55,13 @@ private fun resolvePath(id: String): String {
             else -> "chromedriver_linux64.zip"
         }
         "gecko" -> geckoRepo + when {
-            os.isWindows -> "geckodriver-v0.29.1-win64.zip"
+            os.isWindows -> "geckodriver-v$GECKO_DRIVER_VERSION-win64.zip"
             os.isMacOsX -> if (arch.isArm) {
-                "geckodriver-v0.29.1-macos-aarch64.tar.gz"
+                "geckodriver-v$GECKO_DRIVER_VERSION-macos-aarch64.tar.gz"
             } else {
-                "geckodriver-v0.29.1-macos.tar.gz"
+                "geckodriver-v$GECKO_DRIVER_VERSION-macos.tar.gz"
             }
-            else -> "geckodriver-v0.29.1-linux64.tar.gz"
+            else -> "geckodriver-v$GECKO_DRIVER_VERSION-linux64.tar.gz"
         }
         else -> throw Exception("unknown id: ${id}")
     }
