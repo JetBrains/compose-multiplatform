@@ -24,6 +24,7 @@ git config --global submodule.recurse true
 - Android Studio 2021.1.1 Canary 8 (https://developer.android.com/studio/archive)
 - Custom Gradle 7.2 specified in `Settings -> Build, Execution, Deployment -> Build Tools -> Gradle` (because Android Studio will pick the wrong Gradle in the subproject instead of the Gradle in the root project)
 - Specified Gradle JDK 11 in `... -> Build Tools -> Gradle`
+- [macOs/Linux] Android SDK points to a folder, downloaded via `./scripts/downloadAndroidSdk`
 - Environment variables:
 ```
 export ALLOW_PUBLIC_REPOS=1
