@@ -26,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.tooling.CompositionData
-import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Recomposer
@@ -82,7 +81,6 @@ internal fun ViewGroup.setContent(
     return doSetContent(composeView, parent, content)
 }
 
-@OptIn(InternalComposeApi::class)
 private fun doSetContent(
     owner: AndroidComposeView,
     parent: CompositionContext,
@@ -108,7 +106,6 @@ private fun doSetContent(
 private fun enableDebugInspectorInfo() {
     // Set isDebugInspectorInfoEnabled to true via reflection such that R8 cannot see the
     // assignment. This allows the InspectorInfo lambdas to be stripped from release builds.
-    @OptIn(InternalComposeApi::class)
     if (!isDebugInspectorInfoEnabled) {
         try {
             val packageClass = Class.forName("androidx.compose.ui.platform.InspectableValueKt")
@@ -130,7 +127,6 @@ private class WrappedComposition(
     private var addedToLifecycle: Lifecycle? = null
     private var lastContent: @Composable () -> Unit = {}
 
-    @OptIn(InternalComposeApi::class)
     override fun setContent(content: @Composable () -> Unit) {
         owner.setOnViewTreeOwnersAvailable {
             if (!disposed) {
@@ -150,7 +146,6 @@ private class WrappedComposition(
                                 ?: (owner.parent as? View)?.getTag(R.id.inspection_slot_table_set)
                                     as? MutableSet<CompositionData>
                         if (inspectionTable != null) {
-                            @OptIn(InternalComposeApi::class)
                             inspectionTable.add(currentComposer.compositionData)
                             currentComposer.collectParameterInformation()
                         }

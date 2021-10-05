@@ -1,0 +1,3 @@
+// Baseline format: 1.0
+AddedAbstractMethod: androidx.compose.runtime.Composer#collectParameterInformation():
+    Added method androidx.compose.runtime.Composer.collectParameterInformation()

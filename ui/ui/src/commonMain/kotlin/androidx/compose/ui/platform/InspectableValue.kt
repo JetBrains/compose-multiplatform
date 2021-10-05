@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.ui.Modifier
 
 /**
@@ -126,7 +125,6 @@ abstract class InspectorValueInfo(private val info: InspectorInfo.() -> Unit) : 
 inline fun debugInspectorInfo(
     crossinline definitions: InspectorInfo.() -> Unit
 ): InspectorInfo.() -> Unit =
-    @OptIn(InternalComposeApi::class)
     if (isDebugInspectorInfoEnabled) ({ definitions() }) else NoInspectorInfo
 
 /**
