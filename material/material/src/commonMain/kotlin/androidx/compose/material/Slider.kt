@@ -31,6 +31,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.gestures.horizontalDrag
+import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.Interaction
@@ -625,6 +626,7 @@ private fun SliderThumb(
                     interactionSource = interactionSource,
                     indication = rememberRipple(bounded = false, radius = ThumbRippleRadius)
                 )
+                .hoverable(interactionSource = interactionSource)
                 .shadow(if (enabled) elevation else 0.dp, CircleShape, clip = false)
                 .background(colors.thumbColor(enabled).value, CircleShape)
         )

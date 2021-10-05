@@ -58,6 +58,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Slider
+import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
@@ -403,14 +404,25 @@ private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row {
-                Row(modifier = Modifier.padding(4.dp)) {
-                    Checkbox(
+                Column {
+                    Switch(
                         animation.value,
                         onCheckedChange = {
                             animation.value = it
                         }
                     )
-                    Text("Animation")
+                    Row(
+                        modifier = Modifier.padding(4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            animation.value,
+                            onCheckedChange = {
+                                animation.value = it
+                            }
+                        )
+                        Text("Animation")
+                    }
                 }
 
                 Button(

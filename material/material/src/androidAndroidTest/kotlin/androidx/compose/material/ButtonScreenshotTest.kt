@@ -27,6 +27,7 @@ import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performMouseInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -101,5 +102,23 @@ class ButtonScreenshotTest {
         rule.onRoot()
             .captureToImage()
             .assertAgainstGolden(screenshotRule, "button_ripple")
+    }
+
+    @Test
+    fun hover() {
+        rule.setMaterialContent {
+            Box(Modifier.requiredSize(200.dp, 100.dp).wrapContentSize()) {
+                Button(onClick = { }) { }
+            }
+        }
+
+        rule.onNode(hasClickAction())
+            .performMouseInput { enter(center) }
+
+        rule.waitForIdle()
+
+        rule.onRoot()
+            .captureToImage()
+            .assertAgainstGolden(screenshotRule, "button_hover")
     }
 }

@@ -105,7 +105,7 @@ public interface RippleTheme {
  *
  * @property draggedAlpha the alpha used when the ripple is dragged
  * @property focusedAlpha not currently supported
- * @property hoveredAlpha not currently supported
+ * @property hoveredAlpha the alpha used when the ripple is hovered
  * @property pressedAlpha the alpha used when the ripple is pressed
  */
 @Immutable

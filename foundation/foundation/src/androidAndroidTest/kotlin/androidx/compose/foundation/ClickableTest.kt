@@ -20,6 +20,7 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -42,6 +43,7 @@ import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
@@ -58,6 +60,7 @@ import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performMouseInput
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
@@ -816,6 +819,111 @@ class ClickableTest {
             assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
             assertThat(interactions[1]).isInstanceOf(PressInteraction.Cancel::class.java)
             assertThat((interactions[1] as PressInteraction.Cancel).press)
+                .isEqualTo(interactions[0])
+        }
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun clickableTest_interactionSource_hover() {
+        val interactionSource = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box {
+                BasicText(
+                    "ClickableText",
+                    modifier = Modifier
+                        .testTag("myClickable")
+                        .combinedClickable(
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {}
+                )
+            }
+        }
+
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performMouseInput { enter(center) }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(HoverInteraction.Enter::class.java)
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performMouseInput { exit(Offset(-1f, -1f)) }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(HoverInteraction.Enter::class.java)
+            assertThat(interactions[1])
+                .isInstanceOf(HoverInteraction.Exit::class.java)
+            assertThat((interactions[1] as HoverInteraction.Exit).enter)
+                .isEqualTo(interactions[0])
+        }
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun clickableTest_interactionSource_hover_and_press() {
+        val interactionSource = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box {
+                BasicText(
+                    "ClickableText",
+                    modifier = Modifier
+                        .testTag("myClickable")
+                        .combinedClickable(
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {}
+                )
+            }
+        }
+
+        val interactions = mutableListOf<Interaction>()
+
+        scope!!.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performMouseInput {
+                enter(center)
+                click()
+                exit(Offset(-1f, -1f))
+            }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(4)
+            assertThat(interactions[0]).isInstanceOf(HoverInteraction.Enter::class.java)
+            assertThat(interactions[1]).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(interactions[2]).isInstanceOf(PressInteraction.Release::class.java)
+            assertThat(interactions[3]).isInstanceOf(HoverInteraction.Exit::class.java)
+            assertThat((interactions[2] as PressInteraction.Release).press)
+                .isEqualTo(interactions[1])
+            assertThat((interactions[3] as HoverInteraction.Exit).enter)
                 .isEqualTo(interactions[0])
         }
     }
