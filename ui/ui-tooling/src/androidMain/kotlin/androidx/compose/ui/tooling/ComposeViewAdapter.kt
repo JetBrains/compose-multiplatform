@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.IntRect
 import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
@@ -628,6 +629,7 @@ internal class ComposeViewAdapter : FrameLayout {
         if (::clock.isInitialized) {
             clock.dispose()
         }
+        FakeViewModelStoreOwner.viewModelStore.clear()
     }
 
     /**
@@ -713,8 +715,10 @@ internal class ComposeViewAdapter : FrameLayout {
         override fun getLifecycle(): Lifecycle = lifecycle
     }
 
-    private val FakeViewModelStoreOwner = ViewModelStoreOwner {
-        throw IllegalStateException("ViewModels creation is not supported in Preview")
+    private val FakeViewModelStoreOwner = object : ViewModelStoreOwner {
+        private val viewModelStore = ViewModelStore()
+
+        override fun getViewModelStore() = viewModelStore
     }
 
     private val FakeOnBackPressedDispatcherOwner = object : OnBackPressedDispatcherOwner {

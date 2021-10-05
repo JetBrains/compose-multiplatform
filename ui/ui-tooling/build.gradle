@@ -57,6 +57,8 @@ dependencies {
         androidTestImplementation(libs.truth)
         androidTestImplementation(libs.kotlinReflect)
         androidTestImplementation(project(":compose:animation:animation-tooling-internal"))
+        androidTestImplementation(project(":lifecycle:lifecycle-viewmodel-compose"))
+        androidTestImplementation(project(":compose:runtime:runtime-livedata"))
     }
 }
 
@@ -110,6 +112,8 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.truth)
                 implementation(libs.kotlinReflect)
                 implementation(project(":compose:animation:animation-tooling-internal"))
+                implementation(project(":lifecycle:lifecycle-viewmodel-compose"))
+                implementation(project(":compose:runtime:runtime-livedata"))
             }
         }
     }
