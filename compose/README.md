@@ -21,7 +21,7 @@ git config --global submodule.recurse true
   - CMake 3.10.2.4988404 (in folder $androidSdk/cmake, not in $androidSdk/cmake/$version)
 
 ## Requirements to develop in IDE
-- Android Studio 2021.1.1 Canary 8 (https://developer.android.com/studio/archive)
+- Android Studio 2021.1.1 Canary 8 (https://developer.android.com/studio/archive) (it is mandatory to use exactly Canary 8!)
 - Custom Gradle 7.2 specified in `Settings -> Build, Execution, Deployment -> Build Tools -> Gradle` (because Android Studio will pick the wrong Gradle in the subproject instead of the Gradle in the root project)
 - Specified Gradle JDK 11 in `... -> Build Tools -> Gradle`
 - [macOs/Linux] Android SDK points to a folder, downloaded via `./scripts/downloadAndroidSdk`
@@ -30,6 +30,7 @@ git config --global submodule.recurse true
 export ALLOW_PUBLIC_REPOS=1
 export JAVA_TOOLS_JAR=$PWD/external/tools.jar
 export ANDROIDX_PROJECTS=COMPOSE
+export JAVA_HOME=<JDK_home> //it should contain /include/jvmti.h
 ```
 - Gradle properties in ~/.gradle/gradle.properties:
 ```
