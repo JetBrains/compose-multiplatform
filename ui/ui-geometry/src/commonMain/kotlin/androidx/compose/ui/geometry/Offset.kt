@@ -207,7 +207,13 @@ inline class Offset internal constructor(internal val packedValue: Long) {
     @Stable
     operator fun rem(operand: Float) = Offset(x % operand, y % operand)
 
-    override fun toString() = "Offset(${x.toStringAsFixed(1)}, ${y.toStringAsFixed(1)})"
+    override fun toString() = if (isSpecified) {
+        "Offset(${x.toStringAsFixed(1)}, ${y.toStringAsFixed(1)})"
+    } else {
+        // In this case reading the x or y properties will throw, and they don't contain meaningful
+        // values as strings anyway.
+        "Offset.Unspecified"
+    }
 }
 
 /**

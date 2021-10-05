@@ -164,7 +164,7 @@ class SizeTest {
 
     @Test
     fun testUnspecifiedSizeToString() {
-        Assert.assertEquals("Size(UNSPECIFIED)", Size.Unspecified.toString())
+        Assert.assertEquals("Size.Unspecified", Size.Unspecified.toString())
     }
 
     @Test
