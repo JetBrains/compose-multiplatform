@@ -20,6 +20,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.isSpecified
 import kotlin.math.roundToInt
 
 /**
@@ -141,11 +142,19 @@ interface Density {
      * Convert a [DpSize] to a [Size].
      */
     @Stable
-    fun DpSize.toSize(): Size = Size(width.toPx(), height.toPx())
+    fun DpSize.toSize(): Size = if (isSpecified) {
+        Size(width.toPx(), height.toPx())
+    } else {
+        Size.Unspecified
+    }
 
     /**
      * Convert a [Size] to a [DpSize].
      */
     @Stable
-    fun Size.toDpSize(): DpSize = DpSize(width.toDp(), height.toDp())
+    fun Size.toDpSize(): DpSize = if (isSpecified) {
+        DpSize(width.toDp(), height.toDp())
+    } else {
+        DpSize.Unspecified
+    }
 }

@@ -252,7 +252,7 @@ val Offset.isSpecified: Boolean get() = packedValue != Offset.Unspecified.packed
 val Offset.isUnspecified: Boolean get() = packedValue == Offset.Unspecified.packedValue
 
 /**
- * If this [Offset] [isSpecified] then this is returned, otherwise [block] is executed
+ * If this [Offset]&nbsp;[isSpecified] then this is returned, otherwise [block] is executed
  * and its result is returned.
  */
 inline fun Offset.takeOrElse(block: () -> Offset): Offset =
