@@ -20,7 +20,6 @@ import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.tooling.CompositionData
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.R
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.GraphicLayerInfo
@@ -76,7 +75,6 @@ private val unwantedCalls = setOf(
     "ProvideCommonCompositionLocals",
 )
 
-@OptIn(ExperimentalStdlibApi::class)
 @VisibleForTesting
 fun packageNameHash(packageName: String) =
     packageName.fold(0) { hash, char -> hash * 31 + char.code }.absoluteValue
@@ -527,7 +525,6 @@ class LayoutInspectorTree {
             .map { it.layerId }
             .firstOrNull() ?: 0
 
-    @OptIn(ExperimentalComposeUiApi::class)
     private fun belongsToView(layoutNodes: List<LayoutInfo>, view: View): Boolean =
         layoutNodes.asSequence().flatMap { node ->
             node.getModifierInfo().asSequence()
@@ -670,7 +667,6 @@ class LayoutInspectorTree {
          * When "remember" is found in the slot tree and we are currently capturing,
          * the data of the [group] may contain the owner of the sub-composition.
          */
-        @OptIn(ExperimentalComposeUiApi::class)
         fun remember(group: Group) {
             if (!capturing) {
                 return

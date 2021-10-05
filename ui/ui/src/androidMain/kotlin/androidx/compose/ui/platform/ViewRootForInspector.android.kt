@@ -17,14 +17,12 @@
 package androidx.compose.ui.platform
 
 import android.view.View
-import androidx.compose.ui.ExperimentalComposeUiApi
 
 /**
  * The marker interface to be implemented by [View]s that are initialized from Compose.
  * Examples are: DialogWrapper, PopupLayout, ViewFactoryHolder.
  * To be used by the inspector.
  */
-@ExperimentalComposeUiApi
 interface ViewRootForInspector {
 
     /**

@@ -19,7 +19,6 @@ package androidx.compose.ui.platform
 import android.os.Build
 import android.view.View
 import androidx.annotation.RequiresApi
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -79,7 +78,6 @@ internal class RenderNodeLayer(
     override val layerId: Long
         get() = renderNode.uniqueId
 
-    @ExperimentalComposeUiApi
     override val ownerViewId: Long
         get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             UniqueDrawingIdApi29.getUniqueDrawingId(ownerView)

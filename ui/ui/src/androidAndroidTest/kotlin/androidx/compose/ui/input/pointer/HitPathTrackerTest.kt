@@ -3659,8 +3659,6 @@ private class MockOwner(
             override val layerId: Long
                 get() = 0
 
-            @OptIn(ExperimentalComposeUiApi::class)
-            @get:OptIn(ExperimentalComposeUiApi::class)
             override val ownerViewId: Long
                 get() = 0
 
