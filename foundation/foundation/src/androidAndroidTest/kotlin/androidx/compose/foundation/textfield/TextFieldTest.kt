@@ -600,7 +600,6 @@ class TextFieldTest {
         rule.onNodeWithTag(Tag)
             .assertEditableTextEquals("")
             .performSemanticsAction(SemanticsActions.SetText) { it(hello) }
-        rule.onNodeWithTag(Tag)
             .assertEditableTextEquals(hello.text)
             .assert(
                 SemanticsMatcher.expectValue(
@@ -611,7 +610,6 @@ class TextFieldTest {
 
         rule.onNodeWithTag(Tag)
             .performSemanticsAction(SemanticsActions.SetSelection) { it(1, 3, true) }
-        rule.onNodeWithTag(Tag)
             .assert(
                 SemanticsMatcher.expectValue(
                     SemanticsProperties.TextSelectionRange,
