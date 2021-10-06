@@ -29,8 +29,8 @@ interface DesktopRootForTest : RootForTest {
     /**
      * Process pointer event
      *
-     * [nanoTime] time when the pointer event occurred
+     * [timeMillis] time when the pointer event occurred
      * [pointers] state of all pointers
      */
-    fun processPointerInput(nanoTime: Long, pointers: List<TestPointerInputEventData>)
+    fun processPointerInput(timeMillis: Long, pointers: List<TestPointerInputEventData>)
 }
