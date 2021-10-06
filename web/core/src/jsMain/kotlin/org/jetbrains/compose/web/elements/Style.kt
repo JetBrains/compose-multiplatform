@@ -87,30 +87,30 @@ fun CSSRuleDeclaration.stringPresentation(
     delimiter: String = "\n"
 ): String {
     val cssRuleDeclaration = this
-    val stringBuilder = StringBuilder()
-    stringBuilder.append("$baseIndent${cssRuleDeclaration.header} {")
+    val strings = mutableListOf<String>()
+    strings.add("$baseIndent${cssRuleDeclaration.header} {")
     when (cssRuleDeclaration) {
         is CSSStyledRuleDeclaration -> {
             cssRuleDeclaration.style.properties.forEach { (name, value) ->
-                stringBuilder.append("$delimiter$baseIndent$indent$name: $value;")
+                strings.add("$delimiter$baseIndent$indent$name: $value;")
             }
             cssRuleDeclaration.style.variables.forEach { (name, value) ->
-                stringBuilder.append("$delimiter$baseIndent$indent--$name: $value;")
+                strings.add("$delimiter$baseIndent$indent--$name: $value;")
             }
         }
         is CSSGroupingRuleDeclaration -> {
             cssRuleDeclaration.rules.forEach { childRuleDeclaration ->
-                stringBuilder.append("$delimiter${childRuleDeclaration.stringPresentation(baseIndent + indent, indent, delimiter)}")
+                strings.add("$delimiter${childRuleDeclaration.stringPresentation(baseIndent + indent, indent, delimiter)}")
             }
         }
         is CSSKeyframesRuleDeclaration -> {
             cssRuleDeclaration.keys.forEach { childRuleDeclaration ->
-                stringBuilder.append("$delimiter${childRuleDeclaration.stringPresentation(baseIndent + indent, indent, delimiter)}")
+                strings.add("$delimiter${childRuleDeclaration.stringPresentation(baseIndent + indent, indent, delimiter)}")
             }
         }
     }
-    stringBuilder.append("$delimiter$baseIndent}")
-    return stringBuilder.toString()
+    strings.add("$delimiter$baseIndent}")
+    return strings.joinToString("")
 }
 
 internal fun setProperty(
