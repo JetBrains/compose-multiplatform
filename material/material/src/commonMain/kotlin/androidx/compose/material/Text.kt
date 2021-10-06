@@ -106,31 +106,35 @@ fun Text(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     style: TextStyle = LocalTextStyle.current
 ) {
-    // NOTE(text-perf-review): Ideally, this  Text composable will call directly the
-    // BasicText(String, ...) API, with the assumption that BasicText(String, ...) will be more
-    // optimized than BasicText(AnnotatedString, ...)
-    Text(
-        // NOTE(text-perf-review): we create an AnnotatedString here no matter what, which causes
-        // us to lose a lot of information (ie, a bunch of optimization potential by the fact
-        // that it is _just_ a string). We should consider heavily optimizing for the very common
-        // case of String, even if it means we have two separate code paths for a lot of things.
-        AnnotatedString(text),
+
+    val textColor = color.takeOrElse {
+        style.color.takeOrElse {
+            LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+        }
+    }
+    // NOTE(text-perf-review): It might be worthwhile writing a bespoke merge implementation that
+    // will avoid reallocating if all of the options here are the defaults
+    val mergedStyle = style.merge(
+        TextStyle(
+            color = textColor,
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            textAlign = textAlign,
+            lineHeight = lineHeight,
+            fontFamily = fontFamily,
+            textDecoration = textDecoration,
+            fontStyle = fontStyle,
+            letterSpacing = letterSpacing
+        )
+    )
+    BasicText(
+        text,
         modifier,
-        color,
-        fontSize,
-        fontStyle,
-        fontWeight,
-        fontFamily,
-        letterSpacing,
-        textDecoration,
-        textAlign,
-        lineHeight,
+        mergedStyle,
+        onTextLayout,
         overflow,
         softWrap,
         maxLines,
-        emptyMap(),
-        onTextLayout,
-        style
     )
 }
 

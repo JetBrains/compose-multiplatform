@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.CoreText
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TEST_FONT_FAMILY
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
@@ -160,7 +160,7 @@ class SelectionContainerFocusTest {
                         }
                     ) {
                         Column {
-                            CoreText(
+                            BasicText(
                                 AnnotatedString(textContent),
                                 Modifier.fillMaxWidth(),
                                 style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
@@ -183,7 +183,7 @@ class SelectionContainerFocusTest {
                             selection2.value = it
                         }
                     ) {
-                        CoreText(
+                        BasicText(
                             AnnotatedString(textContent),
                             Modifier.fillMaxWidth(),
                             style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
