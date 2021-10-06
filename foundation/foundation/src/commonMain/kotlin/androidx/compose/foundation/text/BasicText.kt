@@ -16,10 +16,19 @@
 
 package androidx.compose.foundation.text
 
+import androidx.compose.foundation.text.selection.LocalSelectionRegistrar
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.SelectionRegistrar
+import androidx.compose.foundation.text.selection.hasSelection
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.currentComposer
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.text
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFontLoader
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -45,6 +54,7 @@ import androidx.compose.ui.text.style.TextOverflow
  * necessary. If the text exceeds the given number of lines, it will be truncated according to
  * [overflow] and [softWrap]. If it is not null, then it must be greater than zero.
  */
+@OptIn(InternalFoundationTextApi::class)
 @Composable
 fun BasicText(
     text: String,
@@ -58,20 +68,64 @@ fun BasicText(
     // NOTE(text-perf-review): consider precomputing layout here by pushing text to a channel...
     // something like:
     // remember(text) { precomputeTextLayout(text) }
+    require(maxLines > 0) { "maxLines should be greater than 0" }
 
-    BasicText(
-        // NOTE(text-perf-review): we create an AnnotatedString here no matter what, which causes
-        // us to lose a lot of information (ie, a bunch of optimization potential by the fact
-        // that it is _just_ a string). We should consider heavily optimizing for the very common
-        // case of String, even if it means we have two separate code paths for a lot of things.
-        AnnotatedString(text),
-        modifier,
-        style,
-        onTextLayout,
-        overflow,
-        softWrap,
-        maxLines
-    )
+    // selection registrar, if no SelectionContainer is added ambient value will be null
+    val selectionRegistrar = LocalSelectionRegistrar.current
+    val density = LocalDensity.current
+    val resourceLoader = LocalFontLoader.current
+
+    // The ID used to identify this CoreText. If this CoreText is removed from the composition
+    // tree and then added back, this ID should stay the same.
+    // Notice that we need to update selectable ID when the input text or selectionRegistrar has
+    // been updated.
+    // When text is updated, the selection on this CoreText becomes invalid. It can be treated
+    // as a brand new CoreText.
+    // When SelectionRegistrar is updated, CoreText have to request a new ID to avoid ID collision.
+
+    // NOTE(text-perf-review): potential bug. selectableId is regenerated here whenever text
+    // changes, but it is only saved in the initial creation of TextState.
+    val selectableId =
+        rememberSaveable(text, selectionRegistrar, saver = selectionIdSaver(selectionRegistrar)) {
+            selectionRegistrar?.nextSelectableId() ?: SelectionRegistrar.InvalidSelectableId
+        }
+
+    val controller = remember {
+        TextController(
+            TextState(
+                TextDelegate(
+                    text = AnnotatedString(text),
+                    style = style,
+                    density = density,
+                    softWrap = softWrap,
+                    resourceLoader = resourceLoader,
+                    overflow = overflow,
+                    maxLines = maxLines,
+                ),
+                selectableId
+            )
+        )
+    }
+    val state = controller.state
+    if (!currentComposer.inserting) {
+        state.textDelegate = updateTextDelegate(
+            current = state.textDelegate,
+            text = text,
+            style = style,
+            density = density,
+            softWrap = softWrap,
+            resourceLoader = resourceLoader,
+            overflow = overflow,
+            maxLines = maxLines,
+        )
+    }
+    state.onTextLayout = onTextLayout
+    controller.update(selectionRegistrar)
+    if (selectionRegistrar != null) {
+        state.selectionBackgroundColor = LocalTextSelectionColors.current.backgroundColor
+    }
+
+    Layout(modifier.then(controller.modifiers), controller.measurePolicy)
 }
 
 /**
@@ -96,6 +150,7 @@ fun BasicText(
  * @param inlineContent A map store composables that replaces certain ranges of the text. It's
  * used to insert composables into text layout. Check [InlineTextContent] for more information.
  */
+@OptIn(InternalFoundationTextApi::class)
 @Composable
 fun BasicText(
     text: AnnotatedString,
@@ -107,18 +162,82 @@ fun BasicText(
     maxLines: Int = Int.MAX_VALUE,
     inlineContent: Map<String, InlineTextContent> = mapOf(),
 ) {
-    // NOTE(text-perf-review): why do we have a separate CoreText and BasicText? It seems to be
-    // creating nesting with little to no value. This nesting isn't the end of the world, but it
-    // might be worthwhile to remove it!
-    CoreText(
-        text,
-        // NOTE(text-perf-review): why is the semantics here and not in the TextDelegate below?
-        modifier.semantics { this.text = text },
-        style,
-        softWrap,
-        overflow,
-        maxLines,
-        inlineContent,
-        onTextLayout
+    require(maxLines > 0) { "maxLines should be greater than 0" }
+
+    // selection registrar, if no SelectionContainer is added ambient value will be null
+    val selectionRegistrar = LocalSelectionRegistrar.current
+    val density = LocalDensity.current
+    val resourceLoader = LocalFontLoader.current
+    val selectionBackgroundColor = LocalTextSelectionColors.current.backgroundColor
+
+    val (placeholders, inlineComposables) = resolveInlineContent(text, inlineContent)
+
+    // The ID used to identify this CoreText. If this CoreText is removed from the composition
+    // tree and then added back, this ID should stay the same.
+    // Notice that we need to update selectable ID when the input text or selectionRegistrar has
+    // been updated.
+    // When text is updated, the selection on this CoreText becomes invalid. It can be treated
+    // as a brand new CoreText.
+    // When SelectionRegistrar is updated, CoreText have to request a new ID to avoid ID collision.
+
+    // NOTE(text-perf-review): potential bug. selectableId is regenerated here whenever text
+    // changes, but it is only saved in the initial creation of TextState.
+    val selectableId =
+        rememberSaveable(text, selectionRegistrar, saver = selectionIdSaver(selectionRegistrar)) {
+            selectionRegistrar?.nextSelectableId() ?: SelectionRegistrar.InvalidSelectableId
+        }
+
+    val controller = remember {
+        TextController(
+            TextState(
+                TextDelegate(
+                    text = text,
+                    style = style,
+                    density = density,
+                    softWrap = softWrap,
+                    resourceLoader = resourceLoader,
+                    overflow = overflow,
+                    maxLines = maxLines,
+                    placeholders = placeholders
+                ),
+                selectableId
+            )
+        )
+    }
+    val state = controller.state
+    if (!currentComposer.inserting) {
+        state.textDelegate = updateTextDelegate(
+            current = state.textDelegate,
+            text = text,
+            style = style,
+            density = density,
+            softWrap = softWrap,
+            resourceLoader = resourceLoader,
+            overflow = overflow,
+            maxLines = maxLines,
+            placeholders = placeholders,
+        )
+    }
+    state.onTextLayout = onTextLayout
+    state.selectionBackgroundColor = selectionBackgroundColor
+
+    controller.update(selectionRegistrar)
+
+    Layout(
+        content = if (inlineComposables.isEmpty()) {
+            {}
+        } else {
+            { InlineChildren(text, inlineComposables) }
+        },
+        modifier = modifier.then(controller.modifiers),
+        measurePolicy = controller.measurePolicy
     )
 }
+
+/**
+ * A custom saver that won't save if no selection is active.
+ */
+private fun selectionIdSaver(selectionRegistrar: SelectionRegistrar?) = Saver<Long, Long>(
+    save = { if (selectionRegistrar.hasSelection(it)) it else null },
+    restore = { it }
+)
