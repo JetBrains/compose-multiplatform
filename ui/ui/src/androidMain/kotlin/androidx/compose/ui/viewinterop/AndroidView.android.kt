@@ -29,7 +29,6 @@ import androidx.compose.runtime.currentCompositeKeyHash
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.saveable.LocalSaveableStateRegistry
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.materialize
 import androidx.compose.ui.node.LayoutNode
@@ -127,7 +126,6 @@ fun <T : View> AndroidView(
  */
 val NoOpUpdate: View.() -> Unit = {}
 
-@OptIn(ExperimentalComposeUiApi::class)
 internal class ViewFactoryHolder<T : View>(
     context: Context,
     parentContext: CompositionContext? = null

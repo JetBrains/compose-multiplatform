@@ -386,7 +386,6 @@ private inline fun SimpleStack(modifier: Modifier, noinline content: @Composable
  * @param composeView The parent view of the popup which is the AndroidComposeView.
  */
 @SuppressLint("ViewConstructor")
-@OptIn(ExperimentalComposeUiApi::class)
 private class PopupLayout(
     private var onDismissRequest: (() -> Unit)?,
     private var properties: PopupProperties,

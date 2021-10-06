@@ -1784,9 +1784,9 @@ package androidx.compose.ui.layout {
 
   public interface GraphicLayerInfo {
     method public long getLayerId();
-    method @androidx.compose.ui.ExperimentalComposeUiApi public default long getOwnerViewId();
+    method public default long getOwnerViewId();
     property public abstract long layerId;
-    property @androidx.compose.ui.ExperimentalComposeUiApi public default long ownerViewId;
+    property public default long ownerViewId;
   }
 
   public final class HorizontalAlignmentLine extends androidx.compose.ui.layout.AlignmentLine {
@@ -2424,7 +2424,7 @@ package androidx.compose.ui.platform {
     property public abstract float touchSlop;
   }
 
-  @androidx.compose.ui.ExperimentalComposeUiApi public interface ViewRootForInspector {
+  public interface ViewRootForInspector {
     method public default androidx.compose.ui.platform.AbstractComposeView? getSubCompositionView();
     method public default android.view.View? getViewRoot();
     property public default androidx.compose.ui.platform.AbstractComposeView? subCompositionView;

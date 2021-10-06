@@ -1601,7 +1601,9 @@ package androidx.compose.ui.layout {
 
   public interface GraphicLayerInfo {
     method public long getLayerId();
+    method public default long getOwnerViewId();
     property public abstract long layerId;
+    property public default long ownerViewId;
   }
 
   public final class HorizontalAlignmentLine extends androidx.compose.ui.layout.AlignmentLine {
@@ -2240,6 +2242,13 @@ package androidx.compose.ui.platform {
     property public abstract long longPressTimeoutMillis;
     property public default long minimumTouchTargetSize;
     property public abstract float touchSlop;
+  }
+
+  public interface ViewRootForInspector {
+    method public default androidx.compose.ui.platform.AbstractComposeView? getSubCompositionView();
+    method public default android.view.View? getViewRoot();
+    property public default androidx.compose.ui.platform.AbstractComposeView? subCompositionView;
+    property public default android.view.View? viewRoot;
   }
 
   @VisibleForTesting public interface ViewRootForTest extends androidx.compose.ui.node.RootForTest {
