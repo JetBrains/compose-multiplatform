@@ -92,25 +92,25 @@ fun CSSRuleDeclaration.stringPresentation(
     when (cssRuleDeclaration) {
         is CSSStyledRuleDeclaration -> {
             cssRuleDeclaration.style.properties.forEach { (name, value) ->
-                strings.add("$delimiter$baseIndent$indent$name: $value;")
+                strings.add("$baseIndent$indent$name: $value;")
             }
             cssRuleDeclaration.style.variables.forEach { (name, value) ->
-                strings.add("$delimiter$baseIndent$indent--$name: $value;")
+                strings.add("$baseIndent$indent--$name: $value;")
             }
         }
         is CSSGroupingRuleDeclaration -> {
             cssRuleDeclaration.rules.forEach { childRuleDeclaration ->
-                strings.add("$delimiter${childRuleDeclaration.stringPresentation(baseIndent + indent, indent, delimiter)}")
+                strings.add(childRuleDeclaration.stringPresentation(baseIndent + indent, indent, delimiter))
             }
         }
         is CSSKeyframesRuleDeclaration -> {
             cssRuleDeclaration.keys.forEach { childRuleDeclaration ->
-                strings.add("$delimiter${childRuleDeclaration.stringPresentation(baseIndent + indent, indent, delimiter)}")
+                strings.add(childRuleDeclaration.stringPresentation(baseIndent + indent, indent, delimiter))
             }
         }
     }
-    strings.add("$delimiter$baseIndent}")
-    return strings.joinToString("")
+    strings.add("$baseIndent}")
+    return strings.joinToString(delimiter)
 }
 
 internal fun setProperty(
