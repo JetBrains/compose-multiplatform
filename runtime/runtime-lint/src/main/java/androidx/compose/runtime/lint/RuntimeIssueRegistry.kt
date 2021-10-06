@@ -37,6 +37,7 @@ class RuntimeIssueRegistry : IssueRegistry() {
         ComposableNamingDetector.ComposableNaming,
         ComposableStateFlowValueDetector.StateFlowValueCalledInComposition,
         CompositionLocalNamingDetector.CompositionLocalNaming,
+        ProduceStateDetector.ProduceStateDoesNotAssignValue,
         RememberDetector.RememberReturnType,
         UnrememberedMutableStateDetector.UnrememberedMutableState
     )
