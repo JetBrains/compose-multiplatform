@@ -23,6 +23,8 @@ import androidx.compose.material3.samples.AlertDialogSample
 import androidx.compose.material3.samples.AlertDialogWithIconSample
 import androidx.compose.material3.samples.ColorSchemeSample
 import androidx.compose.material3.samples.EnterAlwaysSmallTopAppBar
+import androidx.compose.material3.samples.ExitUntilCollapsedLargeTopAppBar
+import androidx.compose.material3.samples.ExitUntilCollapsedMediumTopAppBar
 import androidx.compose.material3.samples.PinnedSmallTopAppBar
 import androidx.compose.material3.samples.SimpleCenteredTopAppBar
 import androidx.compose.material3.samples.SimpleSmallTopAppBar
@@ -86,4 +88,14 @@ val TopAppBarExamples =
             description = TopAppBarExampleDescription,
             sourceUrl = TopAppBarExampleSourceUrl,
         ) { EnterAlwaysSmallTopAppBar() },
+        Example(
+            name = ::ExitUntilCollapsedMediumTopAppBar.name,
+            description = TopAppBarExampleDescription,
+            sourceUrl = TopAppBarExampleSourceUrl,
+        ) { ExitUntilCollapsedMediumTopAppBar() },
+        Example(
+            name = ::ExitUntilCollapsedLargeTopAppBar.name,
+            description = TopAppBarExampleDescription,
+            sourceUrl = TopAppBarExampleSourceUrl,
+        ) { ExitUntilCollapsedLargeTopAppBar() },
     )

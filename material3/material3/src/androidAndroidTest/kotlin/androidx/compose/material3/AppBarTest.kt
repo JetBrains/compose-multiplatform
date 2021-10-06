@@ -156,7 +156,7 @@ class AppBarTest {
                     navigationIconColor = LocalContentColor.current
                     expectedNavigationIconColor =
                         TopAppBarDefaults.smallTopAppBarColors()
-                            .navigationIconColor(scrollFraction = 0f).value
+                            .navigationIconContentColor(scrollFraction = 0f).value
                     // scrollFraction = 0f to indicate no scroll.
                     expectedContainerColor = TopAppBarDefaults
                         .smallTopAppBarColors()
@@ -168,7 +168,7 @@ class AppBarTest {
                     titleColor = LocalContentColor.current
                     expectedTitleColor = TopAppBarDefaults
                         .smallTopAppBarColors()
-                        .titleColor(scrollFraction = 0f)
+                        .titleContentColor(scrollFraction = 0f)
                         .value
                 },
                 actions = {
@@ -176,7 +176,7 @@ class AppBarTest {
                     actionsColor = LocalContentColor.current
                     expectedActionsColor = TopAppBarDefaults
                         .smallTopAppBarColors()
-                        .actionIconColor(scrollFraction = 0f)
+                        .actionIconContentColor(scrollFraction = 0f)
                         .value
                 }
             )
@@ -192,6 +192,7 @@ class AppBarTest {
             .assertContainsColor(expectedContainerColor)
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun smallTopAppBar_scrolledContentColor() {
@@ -221,6 +222,7 @@ class AppBarTest {
             .assertContainsColor(expectedScrolledContainerColor)
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun smallTopAppBar_scrolledPositioning() {
         val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -344,7 +346,7 @@ class AppBarTest {
                     navigationIconColor = LocalContentColor.current
                     expectedNavigationIconColor =
                         TopAppBarDefaults.smallCenteredTopAppBarColors()
-                            .navigationIconColor(scrollFraction = 0f).value
+                            .navigationIconContentColor(scrollFraction = 0f).value
                     // scrollFraction = 0f to indicate no scroll.
                     expectedContainerColor =
                         TopAppBarDefaults.smallCenteredTopAppBarColors()
@@ -355,14 +357,14 @@ class AppBarTest {
                     titleColor = LocalContentColor.current
                     expectedTitleColor =
                         TopAppBarDefaults.smallCenteredTopAppBarColors()
-                            .titleColor(scrollFraction = 0f).value
+                            .titleContentColor(scrollFraction = 0f).value
                 },
                 actions = {
                     FakeIcon(Modifier.testTag(ActionsTestTag))
                     actionsColor = LocalContentColor.current
                     expectedActionsColor =
                         TopAppBarDefaults.smallCenteredTopAppBarColors()
-                            .actionIconColor(scrollFraction = 0f).value
+                            .actionIconContentColor(scrollFraction = 0f).value
                 }
             )
         }
@@ -377,6 +379,7 @@ class AppBarTest {
             .assertContainsColor(expectedContainerColor)
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun smallCenteredTopAppBar_scrolledContentColor() {
