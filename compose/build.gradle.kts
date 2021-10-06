@@ -97,3 +97,7 @@ tasks.register("buildNativeDemo") {
 tasks.register("testRuntimeNative") {
     dependsOnComposeTask(":compose:runtime:runtime:macosX64Test")
 }
+
+tasks.register("testComposeModules") {
+    dependsOnComposeTask(":compose:ui:ui-graphics:test")
+}
