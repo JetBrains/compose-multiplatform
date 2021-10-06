@@ -272,7 +272,7 @@ fun runDoclavaWithArgs(classpath: List<File>, args: List<String>, workerExecutor
     }
 }
 
-abstract class DoclavaWorkAction @Inject constructor (
+abstract class DoclavaWorkAction @Inject constructor(
     private val execOperations: ExecOperations
 ) : WorkAction<DoclavaParams> {
     override fun execute() {

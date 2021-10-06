@@ -62,7 +62,7 @@ interface MetalavaParams : WorkParameters {
     val metalavaClasspath: SetProperty<File>
 }
 
-abstract class MetalavaWorkAction @Inject constructor (
+abstract class MetalavaWorkAction @Inject constructor(
     private val execOperations: ExecOperations
 ) : WorkAction<MetalavaParams> {
     override fun execute() {
