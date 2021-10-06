@@ -16,7 +16,13 @@
 
 package androidx.compose.ui.test.inputdispatcher
 
+import android.view.View
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.platform.ViewRootForTest
+import androidx.compose.ui.semantics.SemanticsNode
+import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.test.AndroidInputDispatcher
 import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.MainTestClock
@@ -45,7 +51,30 @@ open class InputDispatcherTest {
 
     private val testContext = createTestContext(testOwner)
 
-    internal val subject = AndroidInputDispatcher(testContext, null, recorder::recordEvent)
+    private val viewRootForTest: ViewRootForTest = mock {
+        val mockView: View = mock {
+            on { getLocationOnScreen(any()) }.then {
+                it.getArgument<IntArray>(0).fill(0)
+                null
+            }
+        }
+        on { view } doReturn mockView
+
+        val mockSemanticsOwner: SemanticsOwner = mock {
+            val mockSemanticsNode: SemanticsNode = mock {
+                val rootBounds = Rect(Offset.Zero, Size(1000f, 1000f))
+                on { boundsInRoot } doReturn rootBounds
+            }
+            on { rootSemanticsNode } doReturn mockSemanticsNode
+        }
+        on { semanticsOwner } doReturn mockSemanticsOwner
+    }
+
+    internal val subject = AndroidInputDispatcher(
+        testContext,
+        viewRootForTest,
+        recorder::recordEvent
+    )
 
     @After
     fun tearDown() {
