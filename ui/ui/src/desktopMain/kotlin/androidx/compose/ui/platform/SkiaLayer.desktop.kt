@@ -277,7 +277,6 @@ internal class SkiaLayer(
 
     override fun updateDisplayList() = Unit
 
-    @OptIn(ExperimentalUnsignedTypes::class)
     fun drawShadow(canvas: Canvas) = with(density) {
         val path = when (val outline = outlineCache.outline) {
             is Outline.Rectangle -> Path().apply { addRect(outline.rect) }
