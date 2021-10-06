@@ -16,6 +16,7 @@
 
 package androidx.compose.lint
 
+import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiType
@@ -39,4 +40,10 @@ val PsiMethod.returnsUnit
  * @return whether [this] inherits from [name]. Returns `true` if [this] _is_ directly [name].
  */
 fun PsiType.inheritsFrom(name: Name) =
+    InheritanceUtil.isInheritor(this, name.javaFqn)
+
+/**
+ * @return whether [this] inherits from [name]. Returns `true` if [this] _is_ directly [name].
+ */
+fun PsiClass.inheritsFrom(name: Name) =
     InheritanceUtil.isInheritor(this, name.javaFqn)
