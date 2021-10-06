@@ -332,7 +332,6 @@ private val ShadowSaver = Saver<Shadow, Any>(
 internal val Color.Companion.Saver: Saver<Color, Any>
     get() = ColorSaver
 
-@OptIn(ExperimentalUnsignedTypes::class)
 private val ColorSaver = Saver<Color, Any>(
     save = { it.value },
     restore = { Color(it as ULong) }

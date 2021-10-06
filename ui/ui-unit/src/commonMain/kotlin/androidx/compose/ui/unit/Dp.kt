@@ -257,7 +257,6 @@ fun DpOffset(x: Dp, y: Dp): DpOffset = DpOffset(packFloats(x.value, y.value))
 /**
  * A two-dimensional offset using [Dp] for units
  */
-@OptIn(ExperimentalUnsignedTypes::class)
 @Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
 inline class DpOffset internal constructor(@PublishedApi internal val packedValue: Long) {
@@ -331,7 +330,6 @@ fun DpSize(width: Dp, height: Dp): DpSize = DpSize(packFloats(width.value, heigh
 /**
  * A two-dimensional Size using [Dp] for units
  */
-@OptIn(ExperimentalUnsignedTypes::class)
 @Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
 inline class DpSize internal constructor(@PublishedApi internal val packedValue: Long) {
