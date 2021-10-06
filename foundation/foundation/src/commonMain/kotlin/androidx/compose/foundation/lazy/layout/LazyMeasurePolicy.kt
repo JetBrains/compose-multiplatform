@@ -18,7 +18,6 @@ package androidx.compose.foundation.lazy.layout
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.SubcomposeMeasureScope
 import androidx.compose.ui.unit.Constraints
 
@@ -44,12 +43,12 @@ internal class LazyLayoutPlaceablesProvider internal constructor(
      * A cache of the previously composed items. It allows us to support [get]
      * re-executions with the same index during the same measure pass.
      */
-    private val placeablesCache = hashMapOf<Int, Array<Placeable>>()
+    private val placeablesCache = hashMapOf<Int, Array<LazyLayoutPlaceable>>()
 
     /**
      * Used to subcompose and measure the items of lazy layout.
      */
-    fun getAndMeasure(index: Int, constraints: Constraints): Array<Placeable> {
+    fun getAndMeasure(index: Int, constraints: Constraints): Array<LazyLayoutPlaceable> {
         val cachedPlaceable = placeablesCache[index]
         return if (cachedPlaceable != null) {
             cachedPlaceable
@@ -57,8 +56,9 @@ internal class LazyLayoutPlaceablesProvider internal constructor(
             val key = itemsProvider.getKey(index)
             val itemContent = itemContentFactory.getContent(index, key)
             val measurables = subcomposeMeasureScope.subcompose(key, itemContent)
-            Array(measurables.size) {
-                measurables[it].measure(constraints)
+            Array(measurables.size) { i ->
+                val measurable = measurables[i]
+                LazyLayoutPlaceable(measurable.measure(constraints), measurable.parentData)
             }.also {
                 placeablesCache[index] = it
             }

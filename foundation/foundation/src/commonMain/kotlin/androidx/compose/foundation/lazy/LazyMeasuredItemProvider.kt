@@ -16,8 +16,8 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.foundation.lazy.layout.LazyLayoutPlaceable
 import androidx.compose.foundation.lazy.layout.LazyLayoutPlaceablesProvider
-import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 
 /**
@@ -55,5 +55,9 @@ internal class LazyMeasuredItemProvider(
 
 // This interface allows to avoid autoboxing on index param
 internal fun interface MeasuredItemFactory {
-    fun createItem(index: DataIndex, key: Any, placeables: Array<Placeable>): LazyMeasuredItem
+    fun createItem(
+        index: DataIndex,
+        key: Any,
+        placeables: Array<LazyLayoutPlaceable>
+    ): LazyMeasuredItem
 }
