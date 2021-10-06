@@ -18,7 +18,6 @@ package androidx.compose.ui.tooling.animation
 
 import android.util.Log
 import androidx.annotation.VisibleForTesting
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.TweenSpec
@@ -47,7 +46,7 @@ import java.util.concurrent.TimeUnit
  *
  * @suppress
  */
-@OptIn(ExperimentalAnimationApi::class, InternalAnimationApi::class)
+@OptIn(InternalAnimationApi::class)
 internal open class PreviewAnimationClock(private val setAnimationsTimeCallback: () -> Unit = {}) {
 
     private val TAG = "PreviewAnimationClock"
