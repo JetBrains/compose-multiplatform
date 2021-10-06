@@ -81,6 +81,38 @@ private fun fillRule(
     }
 }
 
+fun CSSRuleDeclaration.stringPresentation(
+    baseIndent: String = "",
+    indent: String = "    ",
+    delimiter: String = "\n"
+): String {
+    val cssRuleDeclaration = this
+    val stringBuilder = StringBuilder()
+    stringBuilder.append("$baseIndent${cssRuleDeclaration.header} {")
+    when (cssRuleDeclaration) {
+        is CSSStyledRuleDeclaration -> {
+            cssRuleDeclaration.style.properties.forEach { (name, value) ->
+                stringBuilder.append("$delimiter$baseIndent$indent$name: $value;")
+            }
+            cssRuleDeclaration.style.variables.forEach { (name, value) ->
+                stringBuilder.append("$delimiter$baseIndent$indent--$name: $value;")
+            }
+        }
+        is CSSGroupingRuleDeclaration -> {
+            cssRuleDeclaration.rules.forEach { childRuleDeclaration ->
+                stringBuilder.append("$delimiter${childRuleDeclaration.stringPresentation(baseIndent + indent, indent, delimiter)}")
+            }
+        }
+        is CSSKeyframesRuleDeclaration -> {
+            cssRuleDeclaration.keys.forEach { childRuleDeclaration ->
+                stringBuilder.append("$delimiter${childRuleDeclaration.stringPresentation(baseIndent + indent, indent, delimiter)}")
+            }
+        }
+    }
+    stringBuilder.append("$delimiter$baseIndent}")
+    return stringBuilder.toString()
+}
+
 internal fun setProperty(
     style: CSSStyleDeclaration,
     name: String,
