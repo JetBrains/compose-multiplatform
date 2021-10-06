@@ -20,18 +20,15 @@
 
 package androidx.compose.integration.docs.layout
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -67,77 +64,67 @@ private fun BarChart(
     modifier: Modifier = Modifier
 ) {
     val maxValue: Float = remember(dataPoints) { dataPoints.maxOrNull()!! * 1.2f }
-    val maxDataPoint: Int = remember(dataPoints) { dataPoints.maxOrNull()!! }
-    val minDataPoint: Int = remember(dataPoints) { dataPoints.minOrNull()!! }
 
-    var maxYBaseline by remember { mutableStateOf(Float.MAX_VALUE) }
-    var minYBaseline by remember { mutableStateOf(Float.MIN_VALUE) }
+    BoxWithConstraints(modifier = modifier) {
+        // TODO: Omit the content block for the code snippets in DAC
+        val density = LocalDensity.current
+        with(density) {
+            val yPositionRatio = remember(density, maxHeight, maxValue) {
+                maxHeight.toPx() / maxValue
+            }
+            val xPositionRatio = remember(density, maxWidth, dataPoints) {
+                maxWidth.toPx() / (dataPoints.size + 1)
+            }
+            val xOffset = remember(density) { // center points in the graph
+                xPositionRatio / dataPoints.size
+            }
 
-    Layout(
-        modifier = modifier,
-        content = {
-            // TODO: Omit the content block for the code snippets in DAC
-            BoxWithConstraints(propagateMinConstraints = true) {
-                val density = LocalDensity.current
-                with(density) {
-                    val yPositionRatio = remember(density, maxHeight, maxValue) {
-                        maxHeight.toPx() / maxValue
-                    }
-                    val xPositionRatio = remember(density, maxWidth, dataPoints) {
-                        maxWidth.toPx() / (dataPoints.size + 1)
-                    }
-                    val xOffset = remember(density) { // center points in the graph
-                        xPositionRatio / dataPoints.size
-                    }
-
-                    Canvas(Modifier) {
-                        dataPoints.forEachIndexed { index, dataPoint ->
-                            val rectSize = Size(60f, dataPoint * yPositionRatio)
-                            val topLeftOffset = Offset(
-                                x = xPositionRatio * (index + 1) - xOffset,
-                                y = (maxValue - dataPoint) * yPositionRatio
-                            )
-                            drawRect(Color(0xFF3DDC84), topLeftOffset, rectSize)
-
-                            if (maxYBaseline == Float.MAX_VALUE && dataPoint == maxDataPoint) {
-                                maxYBaseline = topLeftOffset.y
-                            }
-                            if (minYBaseline == Float.MIN_VALUE && dataPoint == minDataPoint) {
-                                minYBaseline = topLeftOffset.y
-                            }
-                        }
-                        drawLine(
-                            Color(0xFF073042),
-                            start = Offset(0f, 0f),
-                            end = Offset(0f, maxHeight.toPx()),
-                            strokeWidth = 6f
+            // Calculate baselines
+            val maxYBaseline = remember(dataPoints) {
+                dataPoints.maxOrNull()?.let {
+                    (maxValue - it) * yPositionRatio
+                } ?: 0f
+            }
+            val minYBaseline = remember(dataPoints) {
+                dataPoints.minOrNull()?.let {
+                    (maxValue - it) * yPositionRatio
+                } ?: 0f
+            }
+            Layout(content = {}, modifier = Modifier.drawBehind {
+                dataPoints.forEachIndexed { index, dataPoint ->
+                    val rectSize = Size(60f, dataPoint * yPositionRatio)
+                    val topLeftOffset = Offset(
+                        x = xPositionRatio * (index + 1) - xOffset,
+                        y = (maxValue - dataPoint) * yPositionRatio
+                    )
+                    drawRect(Color(0xFF3DDC84), topLeftOffset, rectSize)
+                }
+                drawLine(
+                    Color(0xFF073042),
+                    start = Offset(0f, 0f),
+                    end = Offset(0f, maxHeight.toPx()),
+                    strokeWidth = 6f
+                )
+                drawLine(
+                    Color(0xFF073042),
+                    start = Offset(0f, maxHeight.toPx()),
+                    end = Offset(maxWidth.toPx(), maxHeight.toPx()),
+                    strokeWidth = 6f
+                )
+            }) { _, constraints ->
+                with(constraints) {
+                    layout(
+                        width = if (hasBoundedWidth) maxWidth else minWidth,
+                        height = if (hasBoundedHeight) maxHeight else minHeight,
+                        // Custom AlignmentLines are set here. These are propagated
+                        // to direct and indirect parent composables.
+                        alignmentLines = mapOf(
+                            MinChartValue to minYBaseline.roundToInt(),
+                            MaxChartValue to maxYBaseline.roundToInt()
                         )
-                        drawLine(
-                            Color(0xFF073042),
-                            start = Offset(0f, maxHeight.toPx()),
-                            end = Offset(maxWidth.toPx(), maxHeight.toPx()),
-                            strokeWidth = 6f
-                        )
-                    }
+                    ) {}
                 }
             }
-        }
-    ) { measurables, constraints ->
-        // Don't constrain child views further, measure them with given constraints
-        // List of measured children
-        check(measurables.size == 1)
-        val placeable = measurables[0].measure(constraints)
-
-        // Set the size of the layout as big as it can
-        layout(
-            width = constraints.maxWidth,
-            height = constraints.maxHeight,
-            alignmentLines = mapOf(
-                MinChartValue to minYBaseline.roundToInt(),
-                MaxChartValue to maxYBaseline.roundToInt()
-            )
-        ) {
-            placeable.placeRelative(0, 0)
         }
     }
 }
