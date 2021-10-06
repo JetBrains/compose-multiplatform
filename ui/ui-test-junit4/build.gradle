@@ -80,19 +80,18 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
         sourceSets {
             commonMain.dependencies {
-                implementation(project(":compose:ui:ui-text"))
+                api(project(":compose:ui:ui-test"))
                 implementation(libs.kotlinStdlib)
+                implementation(libs.kotlinCoroutinesCore)
+                implementation(libs.kotlinCoroutinesTest)
             }
 
             jvmMain.dependencies {
-                api(project(":compose:ui:ui-test"))
                 api(libs.junit)
                 api(libs.kotlinStdlib)
                 api(libs.kotlinStdlibCommon)
 
                 implementation("androidx.annotation:annotation:1.1.0")
-                implementation(libs.kotlinCoroutinesCore)
-                implementation(libs.kotlinCoroutinesTest)
             }
 
             androidMain.dependencies {
