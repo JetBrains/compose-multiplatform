@@ -110,6 +110,7 @@ val LazyListDemos = listOf(
     ComposableDemo("LazyGrid with Spacing") { LazyGridWithSpacingDemo() },
     ComposableDemo("Custom keys") { ReorderWithCustomKeys() },
     ComposableDemo("Fling Config") { LazyWithFlingConfig() },
+    ComposableDemo("Item reordering") { PopularBooksDemo() },
     PagingDemos
 )
 
@@ -798,6 +799,7 @@ private fun LazyGridWithSpacingForMode(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ReorderWithCustomKeys() {
     var names by remember { mutableStateOf(listOf("John", "Sara", "Dan")) }
@@ -817,7 +819,7 @@ private fun ReorderWithCustomKeys() {
                 key = { it }
             ) {
                 var counter by rememberSaveable { mutableStateOf(0) }
-                Button(onClick = { counter++ }) {
+                Button(onClick = { counter++ }, modifier = Modifier.animateItemPlacement()) {
                     Text("$it has $counter")
                 }
             }
