@@ -53,8 +53,6 @@ class CallSemanticsActionTest {
         rule.onNodeWithContentDescription("Nothing")
             .assertExists()
             .performSemanticsAction(MyActions.SetString) { it("Hello") }
-
-        rule.onNodeWithContentDescription("Nothing")
             .assertDoesNotExist()
 
         rule.onNodeWithContentDescription("Hello")
