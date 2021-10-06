@@ -74,7 +74,7 @@ class AnimationTests {
 
         val el = root.children[0] as HTMLStyleElement
         val cssRules = (el.sheet as? CSSStyleSheet)?.cssRules
-        val rules = (0..((cssRules?.length ?: 0) - 1)).map {
+        val rules = (0 until (cssRules?.length ?: 0)).map {
             cssRules?.item(it)?.cssText ?: ""
         }
 
