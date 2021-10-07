@@ -37,6 +37,8 @@ import androidx.compose.ui.node.UiApplier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.platform.ViewRootForInspector
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.LayoutDirection
@@ -83,6 +85,14 @@ fun <T : View> AndroidView(
     val stateRegistry = LocalSaveableStateRegistry.current
     val stateKey = currentCompositeKeyHash.toString()
     val viewFactoryHolderRef = remember { Ref<ViewFactoryHolder<T>>() }
+
+    // These locals are initialized from the view tree at the AndroidComposeView hosting this
+    // composition, but they need to be passed to this Android View so that the ViewTree*Owner
+    // functions return the correct owners if different local values were provided by the
+    // composition, e.g. by a navigation library.
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val savedStateRegistryOwner = LocalSavedStateRegistryOwner.current
+
     ComposeNode<LayoutNode, UiApplier>(
         factory = {
             val viewFactoryHolder = ViewFactoryHolder<T>(context, parentReference)
@@ -96,6 +106,10 @@ fun <T : View> AndroidView(
         update = {
             set(materialized) { viewFactoryHolderRef.value!!.modifier = it }
             set(density) { viewFactoryHolderRef.value!!.density = it }
+            set(lifecycleOwner) { viewFactoryHolderRef.value!!.lifecycleOwner = it }
+            set(savedStateRegistryOwner) {
+                viewFactoryHolderRef.value!!.savedStateRegistryOwner = it
+            }
             set(update) { viewFactoryHolderRef.value!!.updateBlock = it }
             set(layoutDirection) {
                 viewFactoryHolderRef.value!!.layoutDirection = when (it) {
