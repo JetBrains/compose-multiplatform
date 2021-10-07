@@ -75,7 +75,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
             desktopMain.dependsOn(jvmMain)
 
-            test.dependencies {
+            androidTest.dependencies {
                 implementation(libs.testRules)
                 implementation(libs.testRunner)
                 implementation(libs.junit)
