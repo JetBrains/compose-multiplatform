@@ -16,16 +16,76 @@
 
 package androidx.compose.material3.catalog.library.ui.theme
 
+import android.os.Build
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.catalog.library.model.ColorMode
+import androidx.compose.material3.catalog.library.model.TextDirection
 import androidx.compose.material3.catalog.library.model.Theme
+import androidx.compose.material3.catalog.library.model.ThemeMode
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 
-// TODO: Use components/values from Material3 when available
 @Composable
 @Suppress("UNUSED_PARAMETER")
 fun CatalogTheme(
     theme: Theme,
     content: @Composable () -> Unit
 ) {
-    MaterialTheme(content = content)
+    // TODO(b/201804011): Add sampleDynamicColorScheme
+    val colorScheme =
+        if (theme.colorMode == ColorMode.TrueDynamic &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val context = LocalContext.current
+            when (theme.themeMode) {
+                ThemeMode.Light -> dynamicLightColorScheme(context)
+                ThemeMode.Dark -> dynamicDarkColorScheme(context)
+                ThemeMode.System ->
+                    if (!isSystemInDarkTheme()) {
+                        dynamicLightColorScheme(context)
+                    } else {
+                        dynamicDarkColorScheme(context)
+                    }
+            }
+        } else {
+            when (theme.themeMode) {
+                ThemeMode.Light -> lightColorScheme()
+                ThemeMode.Dark -> darkColorScheme()
+                ThemeMode.System ->
+                    if (!isSystemInDarkTheme()) {
+                        lightColorScheme()
+                    } else {
+                        darkColorScheme()
+                    }
+            }
+        }
+
+    val layoutDirection = when (theme.textDirection) {
+        TextDirection.Ltr -> LayoutDirection.Ltr
+        TextDirection.Rtl -> LayoutDirection.Rtl
+        TextDirection.System -> LocalLayoutDirection.current
+    }
+
+    CompositionLocalProvider(
+        LocalLayoutDirection provides layoutDirection,
+        LocalDensity provides
+            Density(
+                density = LocalDensity.current.density,
+                fontScale = theme.fontScale,
+            ),
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            content = content,
+        )
+    }
 }
