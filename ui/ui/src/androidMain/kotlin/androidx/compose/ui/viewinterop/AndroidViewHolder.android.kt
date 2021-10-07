@@ -44,6 +44,10 @@ import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.compositionContext
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.savedstate.SavedStateRegistryOwner
+import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import kotlin.math.roundToInt
 
 /**
@@ -118,6 +122,24 @@ internal abstract class AndroidViewHolder(
         }
 
     internal var onDensityChanged: ((Density) -> Unit)? = null
+
+    /** Sets the [ViewTreeLifecycleOwner] for this view. */
+    var lifecycleOwner: LifecycleOwner? = null
+        set(value) {
+            if (value !== field) {
+                field = value
+                ViewTreeLifecycleOwner.set(this, value)
+            }
+        }
+
+    /** Sets the [ViewTreeSavedStateRegistryOwner] for this view. */
+    var savedStateRegistryOwner: SavedStateRegistryOwner? = null
+        set(value) {
+            if (value !== field) {
+                field = value
+                ViewTreeSavedStateRegistryOwner.set(this, value)
+            }
+        }
 
     private val snapshotObserver = SnapshotStateObserver { command ->
         if (handler.looper === Looper.myLooper()) {
