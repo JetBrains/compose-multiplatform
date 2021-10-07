@@ -160,7 +160,7 @@ fun main() = application {
     if (!isVisible) {
         Tray(
             TrayIcon,
-            hint = "Counter",
+            tooltip = "Counter",
             onAction = { isVisible = true },
             menu = {
                 Item("Exit", onClick = ::exitApplication)
@@ -386,9 +386,9 @@ Reading the state in composition is useful when you need to update UI, but there
 ```kotlin
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.WindowSize
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import kotlinx.coroutines.flow.filterNot
@@ -414,7 +414,7 @@ fun main() = application {
     }
 }
 
-private fun onWindowResize(size: WindowSize) {
+private fun onWindowResize(size: DpSize) {
     println("onWindowResize $size")
 }
 
