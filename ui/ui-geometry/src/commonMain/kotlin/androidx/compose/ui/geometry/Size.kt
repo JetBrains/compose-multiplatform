@@ -138,7 +138,9 @@ inline class Size internal constructor(@PublishedApi internal val packedValue: L
         if (isSpecified) {
             "Size(${width.toStringAsFixed(1)}, ${height.toStringAsFixed(1)})"
         } else {
-            "Size(UNSPECIFIED)"
+            // In this case reading the width or height properties will throw, and they don't
+            // contain meaningful values as strings anyway.
+            "Size.Unspecified"
         }
 }
 
