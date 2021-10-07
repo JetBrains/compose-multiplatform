@@ -23,9 +23,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.ContentAlpha
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.catalog.library.model.Component
 import androidx.compose.material3.catalog.library.ui.common.compositeBorderColor
 import androidx.compose.material3.catalog.library.ui.common.gridItemBorder
@@ -72,7 +72,7 @@ fun ComponentItem(
         Text(
             text = component.name,
             modifier = Modifier.align(Alignment.BottomStart),
-            style = MaterialTheme.typography.caption
+            style = MaterialTheme.typography.labelSmall
         )
     }
 }

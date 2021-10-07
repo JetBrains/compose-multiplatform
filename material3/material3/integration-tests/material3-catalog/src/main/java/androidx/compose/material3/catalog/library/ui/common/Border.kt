@@ -16,8 +16,8 @@
 
 package androidx.compose.material3.catalog.library.ui.common
 
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -65,7 +65,7 @@ fun Modifier.gridItemBorder(
  */
 @Composable
 fun compositeBorderColor(): Color = LocalContentColor.current.copy(alpha = BorderAlpha)
-    .compositeOver(MaterialTheme.colors.background)
+    .compositeOver(MaterialTheme.colorScheme.background)
 
 val BorderWidth = 1.dp
 private const val BorderAlpha = 0.12f
