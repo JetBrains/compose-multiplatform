@@ -4,5 +4,6 @@ cd "$(dirname "$0")"
 . ./prepare
 
 pushd ..
-./gradlew testComposeModules $COMPOSE_DEFAULT_GRADLE_ARGS "$@" --rerun-tasks|| exit 1
+# used in https://github.com/JetBrains/androidx/tree/jb-main/.github/workflows
+./gradlew testComposeModules testComposeJbDesktop $COMPOSE_DEFAULT_GRADLE_ARGS "$@" || exit 1
 popd

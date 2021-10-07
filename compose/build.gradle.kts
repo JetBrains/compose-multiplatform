@@ -98,7 +98,7 @@ tasks.register("testRuntimeNative") {
     dependsOnComposeTask(":compose:runtime:runtime:macosX64Test")
 }
 
-tasks.register("testComposeModules") {
+tasks.register("testComposeModules") { // used in https://github.com/JetBrains/androidx/tree/jb-main/.github/workflows
     // TODO: donwload robolectrict to run ui:ui:test
     // dependsOnComposeTask(":compose:ui:ui:test")
 
