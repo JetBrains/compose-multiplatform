@@ -64,9 +64,6 @@ import org.jetbrains.skia.paragraph.RectHeightMode
 import org.jetbrains.skia.paragraph.RectWidthMode
 import org.jetbrains.skia.paragraph.StrutStyle
 import org.jetbrains.skia.paragraph.TextBox
-import java.lang.IllegalStateException
-import java.lang.UnsupportedOperationException
-import java.util.WeakHashMap
 import kotlin.math.floor
 import org.jetbrains.skia.Rect as SkRect
 import org.jetbrains.skia.paragraph.Paragraph as SkParagraph
@@ -89,8 +86,8 @@ internal actual fun ActualParagraph(
     width: Float,
     density: Density,
     resourceLoader: Font.ResourceLoader
-): Paragraph = DesktopParagraph(
-    DesktopParagraphIntrinsics(
+): Paragraph = SkiaParagraph(
+    SkiaParagraphIntrinsics(
         text,
         style,
         spanStyles,
@@ -109,14 +106,14 @@ internal actual fun ActualParagraph(
     maxLines: Int,
     ellipsis: Boolean,
     width: Float
-): Paragraph = DesktopParagraph(
-    paragraphIntrinsics as DesktopParagraphIntrinsics,
+): Paragraph = SkiaParagraph(
+    paragraphIntrinsics as SkiaParagraphIntrinsics,
     maxLines,
     ellipsis,
     width
 )
 
-internal class DesktopParagraph(
+internal class SkiaParagraph(
     intrinsics: ParagraphIntrinsics,
     val maxLines: Int,
     val ellipsis: Boolean,
@@ -125,7 +122,7 @@ internal class DesktopParagraph(
 
     private val ellipsisChar = if (ellipsis) "\u2026" else ""
 
-    private val paragraphIntrinsics = intrinsics as DesktopParagraphIntrinsics
+    private val paragraphIntrinsics = intrinsics as SkiaParagraphIntrinsics
 
     private val layouter = paragraphIntrinsics.layouter()
 
@@ -395,14 +392,14 @@ private fun fontSizeInHierarchy(density: Density, base: Float, other: TextUnit):
         other.isUnspecified -> base
         other.isEm -> base * other.value
         other.isSp -> with(density) { other.toPx() }
-        else -> throw UnsupportedOperationException()
+        else -> error("Unexpected size in fontSizeInHierarchy")
     }
 }
 
 // Computed ComputedStyles always have font/letter size in pixels for particular `density`.
 // It's important because density could be changed in runtime and it should force
 // SkTextStyle to be recalculated. Or we can have different densities in different windows.
-private data class ComputedStyle(
+internal data class ComputedStyle(
     var color: Color,
     var fontSize: Float,
     var fontWeight: FontWeight?,
@@ -509,6 +506,8 @@ private data class ComputedStyle(
         other.shadow?.let { shadow = it }
     }
 }
+
+internal expect class WeakHashMap<K, V> : MutableMap<K, V>
 
 // Building of SkTextStyle is a relatively expensive operation. We enable simple caching by
 // mapping SpanStyle to SkTextStyle. To increase the efficiency of this mapping we are making
@@ -748,7 +747,7 @@ internal class ParagraphBuilder(
                     style.lineHeight.toPx()
                 }
                 style.lineHeight.isEm -> fontSize * style.lineHeight.value
-                else -> throw IllegalStateException()
+                else -> error("Unexpected size in textStyleToParagraphStyle")
             }
             strutStyle.height = lineHeight / fontSize
             pStyle.strutStyle = strutStyle
