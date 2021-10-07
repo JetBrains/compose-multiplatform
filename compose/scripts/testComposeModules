@@ -4,5 +4,5 @@ cd "$(dirname "$0")"
 . ./prepare
 
 pushd ..
-./gradlew testComposeModules $COMPOSE_DEFAULT_GRADLE_ARGS "$@" || exit 1
+./gradlew testComposeModules $COMPOSE_DEFAULT_GRADLE_ARGS "$@" --rerun-tasks|| exit 1
 popd

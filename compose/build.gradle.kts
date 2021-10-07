@@ -99,5 +99,24 @@ tasks.register("testRuntimeNative") {
 }
 
 tasks.register("testComposeModules") {
+    // TODO: donwload robolectrict to run ui:ui:test
+    // dependsOnComposeTask(":compose:ui:ui:test")
+
     dependsOnComposeTask(":compose:ui:ui-graphics:test")
+    dependsOnComposeTask(":compose:ui:ui-geometry:test")
+    dependsOnComposeTask(":compose:ui:ui-unit:test")
+    dependsOnComposeTask(":compose:ui:ui-util:test")
+    dependsOnComposeTask(":compose:runtime:runtime:test")
+    dependsOnComposeTask(":compose:runtime:runtime-saveable:test")
+    dependsOnComposeTask(":compose:material:material:test")
+    dependsOnComposeTask(":compose:material:material-ripple:test")
+    dependsOnComposeTask(":compose:foundation:foundation:test")
+    dependsOnComposeTask(":compose:animation:animation:test")
+    dependsOnComposeTask(":compose:animation:animation-core:test")
+    dependsOnComposeTask(":compose:animation:animation-core:test")
+
+    // TODO: enable ui:ui-text:test
+    // dependsOnComposeTask(":compose:ui:ui-text:test")
+    // compose/out/androidx/compose/ui/ui-text/build/intermediates/tmp/manifest/test/debug/tempFile1ProcessTestManifest10207049054096217572.xml Error:
+    // android:exported needs to be explicitly specified for <activity>. Apps targeting Android 12 and higher are required to specify an explicit value for `android:exported` when the corresponding component has an intent filter defined.
 }
