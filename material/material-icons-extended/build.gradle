@@ -68,7 +68,7 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
          * corresponding block above
          */
         sourceSets {
-            androidTest.dependencies {
+            androidAndroidTest.dependencies {
                 implementation(project(":compose:foundation:foundation"))
                 implementation(project(":compose:foundation:foundation-layout"))
                 implementation(project(":compose:ui:ui"))

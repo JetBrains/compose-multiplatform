@@ -85,7 +85,7 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.testRules)
             }
 
-            test.dependencies {
+            androidTest.dependencies {
                 implementation(libs.truth)
             }
 

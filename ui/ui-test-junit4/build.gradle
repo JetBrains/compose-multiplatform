@@ -108,7 +108,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.espressoIdlingResource)
             }
 
-            test.dependencies {
+            androidTest.dependencies {
                 implementation(project(":compose:animation:animation-core"))
                 implementation(project(":compose:material:material"))
                 implementation(project(":compose:test-utils"))
