@@ -29,6 +29,7 @@ AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
 
+    implementation project(path: ':compose:animation:animation-core')
     kotlinPlugin(project(":compose:compiler:compiler"))
 
     if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
