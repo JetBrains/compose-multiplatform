@@ -1677,6 +1677,7 @@ package androidx.compose.ui.input.pointer {
   }
 
   public final class PointerInteropFilter_androidKt {
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.ui.Modifier motionEventSpy(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super android.view.MotionEvent,kotlin.Unit> watcher);
     method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.ui.Modifier pointerInteropFilter(androidx.compose.ui.Modifier, optional androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent? requestDisallowInterceptTouchEvent, kotlin.jvm.functions.Function1<? super android.view.MotionEvent,java.lang.Boolean> onTouchEvent);
   }
 
