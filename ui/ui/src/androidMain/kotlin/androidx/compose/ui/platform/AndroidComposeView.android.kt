@@ -397,6 +397,12 @@ internal class AndroidComposeView(context: Context) :
      */
     private var previousPosition = Offset.Infinite
 
+    /**
+     * A cache for OwnedLayers. Recreating ViewLayers is expensive, so we avoid it as much
+     * as possible. This also helps a little with RenderNodeLayers as well.
+     */
+    private val layerCache = WeakCache<OwnedLayer>()
+
     init {
         setWillNotDraw(false)
         isFocusable = true
@@ -660,6 +666,13 @@ internal class AndroidComposeView(context: Context) :
         drawBlock: (Canvas) -> Unit,
         invalidateParentLayer: () -> Unit
     ): OwnedLayer {
+        // First try the layer cache
+        val layer = layerCache.pop()
+        if (layer !== null) {
+            layer.reuseLayer(drawBlock, invalidateParentLayer)
+            return layer
+        }
+
         // RenderNode is supported on Q+ for certain, but may also be supported on M-O.
         // We can't be confident that RenderNode is supported, so we try and fail over to
         // the ViewLayer implementation. We'll try even on on P devices, but it will fail
@@ -692,6 +705,24 @@ internal class AndroidComposeView(context: Context) :
             addView(viewLayersContainer)
         }
         return ViewLayer(this, viewLayersContainer!!, drawBlock, invalidateParentLayer)
+    }
+
+    /**
+     * Return [layer] to the layer cache. It can be reused in [createLayer] after this.
+     * Returns `true` if it was recycled or `false` if it will be discarded.
+     */
+    internal fun recycle(layer: OwnedLayer): Boolean {
+        // L throws during RenderThread when reusing the Views. The stack trace
+        // wasn't easy to decode, so this work-around keeps up to 10 Views active
+        // only for L. On other versions, it uses the WeakHashMap to retain as many
+        // as are convenient.
+        val cacheValue = viewLayersContainer == null || ViewLayer.shouldUseDispatchDraw ||
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ||
+            layerCache.size < MaximumLayerCacheSize
+        if (cacheValue) {
+            layerCache.push(layer)
+        }
+        return cacheValue
     }
 
     override fun onSemanticsChange() {
@@ -1209,6 +1240,7 @@ internal class AndroidComposeView(context: Context) :
     }
 
     companion object {
+        private const val MaximumLayerCacheSize = 10
         private var systemPropertiesClass: Class<*>? = null
         private var getBooleanMethod: Method? = null
 

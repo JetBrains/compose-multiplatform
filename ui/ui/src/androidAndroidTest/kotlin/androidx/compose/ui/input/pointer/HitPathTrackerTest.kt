@@ -3706,6 +3706,12 @@ private class MockOwner(
             override fun mapBounds(rect: MutableRect, inverse: Boolean) {
             }
 
+            override fun reuseLayer(
+                drawBlock: (Canvas) -> Unit,
+                invalidateParentLayer: () -> Unit
+            ) {
+            }
+
             override fun mapOffset(point: Offset, inverse: Boolean) = point
         }
     }

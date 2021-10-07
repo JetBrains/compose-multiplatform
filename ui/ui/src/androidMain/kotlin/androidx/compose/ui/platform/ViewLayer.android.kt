@@ -45,9 +45,12 @@ import java.lang.reflect.Method
 internal class ViewLayer(
     val ownerView: AndroidComposeView,
     val container: DrawChildContainer,
-    val drawBlock: (Canvas) -> Unit,
-    val invalidateParentLayer: () -> Unit
+    drawBlock: (Canvas) -> Unit,
+    invalidateParentLayer: () -> Unit
 ) : View(ownerView.context), OwnedLayer {
+    private var drawBlock: ((Canvas) -> Unit)? = drawBlock
+    private var invalidateParentLayer: (() -> Unit)? = invalidateParentLayer
+
     private val outlineResolver = OutlineResolver(ownerView.density)
     // Value of the layerModifier's clipToBounds property
     private var clipToBounds = false
@@ -163,7 +166,7 @@ internal class ViewLayer(
             invalidate() // have to redraw the content
         }
         if (!drawnWithZ && elevation > 0) {
-            invalidateParentLayer()
+            invalidateParentLayer?.invoke()
         }
         matrixCache.invalidate()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -253,7 +256,7 @@ internal class ViewLayer(
                 save()
                 clipPath(clipPath)
             }
-            drawBlock(this)
+            drawBlock?.invoke(this)
             if (clipPath != null) {
                 restore()
             }
@@ -272,11 +275,23 @@ internal class ViewLayer(
     }
 
     override fun destroy() {
-        container.postOnAnimation {
-            container.removeView(this)
-        }
         isInvalidated = false
         ownerView.requestClearInvalidObservations()
+        drawBlock = null
+        invalidateParentLayer = null
+
+        // L throws during RenderThread when reusing the Views. The stack trace
+        // wasn't easy to decode, so this work-around keeps up to 10 Views active
+        // only for L. On other versions, it uses the WeakHashMap to retain as many
+        // as are convenient.
+
+        val recycle = ownerView.recycle(this@ViewLayer)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M || shouldUseDispatchDraw || !recycle) {
+            container.removeViewInLayout(this)
+        } else {
+            visibility = GONE
+        }
     }
 
     override fun updateDisplayList() {
@@ -310,6 +325,19 @@ internal class ViewLayer(
         } else {
             matrixCache.calculateMatrix(this).map(rect)
         }
+    }
+
+    override fun reuseLayer(drawBlock: (Canvas) -> Unit, invalidateParentLayer: () -> Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M || shouldUseDispatchDraw) {
+            container.addView(this)
+        } else {
+            visibility = VISIBLE
+        }
+        clipToBounds = false
+        drawnWithZ = false
+        mTransformOrigin = TransformOrigin.Center
+        this.drawBlock = drawBlock
+        this.invalidateParentLayer = invalidateParentLayer
     }
 
     companion object {
