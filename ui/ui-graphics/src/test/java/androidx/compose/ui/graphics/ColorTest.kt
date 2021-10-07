@@ -384,7 +384,6 @@ class ColorTest {
     }
 
     companion object {
-        @OptIn(kotlin.ExperimentalUnsignedTypes::class)
         fun Int.toHexString() = "0x${toUInt().toString(16).padStart(8, '0')}"
     }
 }
