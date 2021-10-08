@@ -29,9 +29,9 @@ import org.jetbrains.skia.Image
 import org.jetbrains.skia.Matrix44
 import org.jetbrains.skia.MipmapMode
 import org.jetbrains.skia.SamplingMode
-import org.jetbrains.skia.ClipMode as SkiaClipMode
-import org.jetbrains.skia.RRect as SkiaRRect
-import org.jetbrains.skia.Rect as SkiaRect
+import org.jetbrains.skia.ClipMode as SkClipMode
+import org.jetbrains.skia.RRect as SkRRect
+import org.jetbrains.skia.Rect as SkRect
 
 actual typealias NativeCanvas = org.jetbrains.skia.Canvas
 
@@ -40,18 +40,18 @@ internal actual fun ActualCanvas(image: ImageBitmap): Canvas {
     require(!skiaBitmap.isImmutable) {
         "Cannot draw on immutable ImageBitmap"
     }
-    return DesktopCanvas(org.jetbrains.skia.Canvas(skiaBitmap))
+    return SkiaBackedCanvas(org.jetbrains.skia.Canvas(skiaBitmap))
 }
 
 /**
  * Convert the [org.jetbrains.skia.Canvas] instance into a Compose-compatible Canvas
  */
-fun org.jetbrains.skia.Canvas.asComposeCanvas(): Canvas = DesktopCanvas(this)
+fun org.jetbrains.skia.Canvas.asComposeCanvas(): Canvas = SkiaBackedCanvas(this)
 
-actual val Canvas.nativeCanvas: NativeCanvas get() = (this as DesktopCanvas).skia
+actual val Canvas.nativeCanvas: NativeCanvas get() = (this as SkiaBackedCanvas).skia
 
-internal class DesktopCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
-    private val Paint.skia get() = (this as DesktopPaint).skia
+internal class SkiaBackedCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
+    private val Paint.skia get() = (this as SkiaBackedPaint).skia
 
     override fun save() {
         skia.save()
@@ -95,7 +95,7 @@ internal class DesktopCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
 
     override fun clipRect(left: Float, top: Float, right: Float, bottom: Float, clipOp: ClipOp) {
         val antiAlias = true
-        skia.clipRect(SkiaRect.makeLTRB(left, top, right, bottom), clipOp.toSkia(), antiAlias)
+        skia.clipRect(SkRect.makeLTRB(left, top, right, bottom), clipOp.toSkia(), antiAlias)
     }
 
     override fun clipPath(path: Path, clipOp: ClipOp) {
@@ -108,7 +108,7 @@ internal class DesktopCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
     }
 
     override fun drawRect(left: Float, top: Float, right: Float, bottom: Float, paint: Paint) {
-        skia.drawRect(SkiaRect.makeLTRB(left, top, right, bottom), paint.skia)
+        skia.drawRect(SkRect.makeLTRB(left, top, right, bottom), paint.skia)
     }
 
     override fun drawRoundRect(
@@ -121,7 +121,7 @@ internal class DesktopCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
         paint: Paint
     ) {
         skia.drawRRect(
-            SkiaRRect.makeLTRB(
+            SkRRect.makeLTRB(
                 left,
                 top,
                 right,
@@ -134,7 +134,7 @@ internal class DesktopCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
     }
 
     override fun drawOval(left: Float, top: Float, right: Float, bottom: Float, paint: Paint) {
-        skia.drawOval(SkiaRect.makeLTRB(left, top, right, bottom), paint.skia)
+        skia.drawOval(SkRect.makeLTRB(left, top, right, bottom), paint.skia)
     }
 
     override fun drawCircle(center: Offset, radius: Float, paint: Paint) {
@@ -203,13 +203,13 @@ internal class DesktopCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
         Image.makeFromBitmap(bitmap).use { skiaImage ->
             skia.drawImageRect(
                 skiaImage,
-                SkiaRect.makeXYWH(
+                SkRect.makeXYWH(
                     srcOffset.x,
                     srcOffset.y,
                     srcSize.width,
                     srcSize.height
                 ),
-                SkiaRect.makeXYWH(
+                SkRect.makeXYWH(
                     dstOffset.x,
                     dstOffset.y,
                     dstSize.width,
@@ -348,9 +348,9 @@ internal class DesktopCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
     }
 
     private fun ClipOp.toSkia() = when (this) {
-        ClipOp.Difference -> SkiaClipMode.DIFFERENCE
-        ClipOp.Intersect -> SkiaClipMode.INTERSECT
-        else -> SkiaClipMode.INTERSECT
+        ClipOp.Difference -> SkClipMode.DIFFERENCE
+        ClipOp.Intersect -> SkClipMode.INTERSECT
+        else -> SkClipMode.INTERSECT
     }
 
     private fun Matrix.toSkia() = Matrix44(
