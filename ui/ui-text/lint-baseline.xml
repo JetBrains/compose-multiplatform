@@ -1,16 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.1.0-alpha02" type="baseline" client="cli" name="Lint" variant="all" version="7.1.0-alpha02">
-
-    <issue
-        id="NewApi"
-        message="Call requires API level 26 (current min is 21): `Font`"
-        errorLine1="            val font = Font(ParcelFileDescriptor.dup(inputStream.fd)) as AndroidFont"
-        errorLine2="                       ~~~~">
-        <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/text/font/AndroidFontTest.kt"
-            line="85"
-            column="24"/>
-    </issue>
+<issues format="6" by="lint 7.2.0-dev" type="baseline" client="gradle" dependencies="false" name="AGP (7.2.0-dev)" variant="all" version="7.2.0-dev">
 
     <issue
         id="NewApi"
@@ -21,6 +10,72 @@
             file="src/androidAndroidTest/kotlin/androidx/compose/ui/text/platform/TypefaceAdapterFileTest.kt"
             line="107"
             column="30"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 26 here from outer annotations"
+        errorLine1="    @RequiresApi(26)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/font/AndroidFont.kt"
+            line="133"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 26 here from outer annotations"
+        errorLine1="    @RequiresApi(26)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/AndroidFontListTypeface.android.kt"
+            line="160"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 24 here from outer annotations"
+        errorLine1="    @RequiresApi(24)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/extensions/LocaleExtensions.android.kt"
+            line="36"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 24 here from outer annotations"
+        errorLine1="    @RequiresApi(24)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/extensions/LocaleExtensions.android.kt"
+            line="43"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 21 from the `minSdkVersion`"
+        errorLine1="@RequiresApi(api = 18)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/TextLayout.kt"
+            line="296"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 28 here from outer annotations"
+        errorLine1="    @RequiresApi(28)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/TypefaceAdapter.android.kt"
+            line="271"
+            column="5"/>
     </issue>
 
 </issues>

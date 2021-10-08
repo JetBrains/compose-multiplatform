@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 7.2.0-dev" type="baseline" client="gradle" dependencies="true" name="AGP (7.2.0-dev)" variant="all" version="7.2.0-dev">
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 26 here from outer annotations"
+        errorLine1="    @RequiresApi(26)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
+            line="140"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 26 here from outer annotations"
+        errorLine1="    @RequiresApi(26)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
+            line="145"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 26 here from outer annotations"
+        errorLine1="    @RequiresApi(26)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
+            line="149"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 26 here from outer annotations"
+        errorLine1="    @RequiresApi(26)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
+            line="153"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 26 here from outer annotations"
+        errorLine1="    @RequiresApi(26)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
+            line="158"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 26 here from outer annotations"
+        errorLine1="    @RequiresApi(26)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
+            line="162"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 26 here from outer annotations"
+        errorLine1="    @RequiresApi(26)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
+            line="166"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 26 here from outer annotations"
+        errorLine1="    @RequiresApi(26)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
+            line="170"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 26 here from outer annotations"
+        errorLine1="    @RequiresApi(26)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
+            line="174"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 23 here from outer annotations"
+        errorLine1="    @RequiresApi(23)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
+            line="186"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 23 here from outer annotations"
+        errorLine1="    @RequiresApi(23)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
+            line="191"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 23 here from outer annotations"
+        errorLine1="    @RequiresApi(23)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
+            line="196"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 23 here from outer annotations"
+        errorLine1="    @RequiresApi(23)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
+            line="206"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 21 from the `minSdkVersion`"
+        errorLine1="@RequiresApi(Build.VERSION_CODES.LOLLIPOP)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.android.kt"
+            line="136"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 26 here from outer annotations"
+        errorLine1="    @RequiresApi(Build.VERSION_CODES.O)"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.android.kt"
+            line="1311"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 26 here from outer annotations"
+        errorLine1="    @RequiresApi(Build.VERSION_CODES.O)"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeViewAccessibilityDelegateCompat.android.kt"
+            line="2557"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 26 here from outer annotations"
+        errorLine1="    @RequiresApi(26)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/font/AndroidFont.kt"
+            line="133"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 26 here from outer annotations"
+        errorLine1="    @RequiresApi(26)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/AndroidFontListTypeface.android.kt"
+            line="160"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 26 here from outer annotations"
+        errorLine1="    @RequiresApi(26)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidFontResourceLoader.android.kt"
+            line="52"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 23 here from outer annotations"
+        errorLine1="    @RequiresApi(23)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidTextToolbar.android.kt"
+            line="82"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 23 here from outer annotations"
+        errorLine1="    @RequiresApi(23)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidTextToolbar.android.kt"
+            line="95"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 24 here from outer annotations"
+        errorLine1="    @RequiresApi(24)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/extensions/LocaleExtensions.android.kt"
+            line="36"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 24 here from outer annotations"
+        errorLine1="    @RequiresApi(24)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/extensions/LocaleExtensions.android.kt"
+            line="43"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 29 here from outer annotations"
+        errorLine1="        @RequiresApi(29)"
+        errorLine2="        ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.android.kt"
+            line="93"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 21 from the `minSdkVersion`"
+        errorLine1="@RequiresApi(api = 18)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="../../../text/text/src/main/java/androidx/compose/ui/text/android/TextLayout.kt"
+            line="296"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 28 here from outer annotations"
+        errorLine1="    @RequiresApi(28)"
+        errorLine2="    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/text/platform/TypefaceAdapter.android.kt"
+            line="271"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 29 here from outer annotations"
+        errorLine1="        @RequiresApi(29)"
+        errorLine2="        ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/ViewLayer.android.kt"
+            line="97"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="SupportAnnotationUsage"
+        message="The API level is already known to be at least 29 here from outer annotations"
+        errorLine1="    @RequiresApi(Build.VERSION_CODES.Q)"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/Wrapper.android.kt"
+            line="214"
+            column="5"/>
+    </issue>
+
+</issues>
