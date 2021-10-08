@@ -751,7 +751,6 @@ class Recomposer(
         if (!composerWasComposing) {
             Snapshot.notifyObjectsInitialized()
         }
-        composition.applyChanges()
 
         synchronized(stateLock) {
             if (_state.value > State.ShuttingDown) {
@@ -760,6 +759,8 @@ class Recomposer(
                 }
             }
         }
+
+        composition.applyChanges()
 
         if (!composerWasComposing) {
             // Ensure that any state objects created during applyChanges are seen as changed
