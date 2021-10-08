@@ -19,15 +19,15 @@ package androidx.compose.ui.graphics
 /**
  * Convert the [org.jetbrains.skia.PathMeasure] instance into a Compose-compatible PathMeasure
  */
-fun org.jetbrains.skia.PathMeasure.asComposePathEffect(): PathMeasure = DesktopPathMeasure(this)
+fun org.jetbrains.skia.PathMeasure.asComposePathEffect(): PathMeasure = SkiaBackedPathMeasure(this)
 
 /**
- * Obtain a reference to the desktop PathMeasure type
+ * Obtain a reference to skia PathMeasure type
  */
 fun PathMeasure.asSkiaPathMeasure(): org.jetbrains.skia.PathMeasure =
-    (this as DesktopPathMeasure).skia
+    (this as SkiaBackedPathMeasure).skia
 
-internal class DesktopPathMeasure(
+internal class SkiaBackedPathMeasure(
     internal val skia: org.jetbrains.skia.PathMeasure = org.jetbrains.skia.PathMeasure()
 ) : PathMeasure {
 
@@ -52,4 +52,4 @@ internal class DesktopPathMeasure(
 }
 
 actual fun PathMeasure(): PathMeasure =
-    DesktopPathMeasure()
+    SkiaBackedPathMeasure()
