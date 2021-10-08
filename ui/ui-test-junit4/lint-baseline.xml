@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.1.0-dev" type="baseline" client="gradle" dependencies="false" name="AGP (7.1.0-dev)" variant="all" version="7.1.0-dev">
+<issues format="6" by="lint 7.2.0-dev" type="baseline" client="gradle" dependencies="false" name="AGP (7.2.0-dev)" variant="all" version="7.2.0-dev">
 
     <issue
         id="VisibleForTests"
@@ -41,7 +41,7 @@
         errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/android/ComposeRootRegistry.android.kt"
-            line="54"
+            line="53"
             column="33"/>
     </issue>
 
@@ -52,7 +52,7 @@
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/android/ComposeRootRegistry.android.kt"
-            line="60"
+            line="59"
             column="25"/>
     </issue>
 
@@ -63,7 +63,7 @@
         errorLine2="                     ~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/android/ComposeRootRegistry.android.kt"
-            line="88"
+            line="87"
             column="22"/>
     </issue>
 
@@ -71,11 +71,11 @@
         id="VisibleForTests"
         message="This method should only be accessed from tests or within private scope"
         errorLine1="            if (composeRoot == this.composeRoot &amp;&amp; !registered) {"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine2="                            ~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/android/ComposeRootRegistry.android.kt"
-            line="223"
-            column="17"/>
+            line="222"
+            column="29"/>
     </issue>
 
     <issue

@@ -59,12 +59,12 @@
     <issue
         id="VisibleForTests"
         message="This method should only be accessed from tests or within private scope"
-        errorLine1="                it.view.getLocationOnScreen(array)"
-        errorLine2="                   ~~~~">
+        errorLine1="                root.view.getLocationOnScreen(array)"
+        errorLine2="                     ~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/test/AndroidInputDispatcher.android.kt"
-            line="183"
-            column="20"/>
+            line="221"
+            column="22"/>
     </issue>
 
     <issue
@@ -74,7 +74,7 @@
         errorLine2="                     ~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/test/AndroidInputDispatcher.android.kt"
-            line="254"
+            line="306"
             column="22"/>
     </issue>
 
