@@ -55,6 +55,7 @@ import androidx.compose.ui.demos.gestures.VerticalScrollerInDrawerDemo
 import androidx.compose.ui.demos.input.TouchModeDemo
 import androidx.compose.ui.demos.scroll.BringIntoViewDemo
 import androidx.compose.ui.demos.keyinput.KeyInputDemo
+import androidx.compose.ui.demos.keyinput.InterceptEnterToSendMessageDemo
 import androidx.compose.ui.demos.modifier.CommunicatingModifierDemo
 import androidx.compose.ui.demos.scroll.BringRectangleIntoViewDemo
 import androidx.compose.ui.demos.scroll.RequestRectangleOnScreenDemo
@@ -135,6 +136,14 @@ private val FocusDemos = DemoCategory(
     )
 )
 
+private val KeyInputDemos = DemoCategory(
+    "KeyInput",
+    listOf(
+        ComposableDemo("onKeyEvent") { KeyInputDemo() },
+        ComposableDemo("onPreviewKeyEvent") { InterceptEnterToSendMessageDemo() },
+    )
+)
+
 private val GraphicsDemos = DemoCategory(
     "Graphics",
     listOf(
@@ -177,7 +186,7 @@ val CoreDemos = DemoCategory(
         ModifierDemos,
         ComposableDemo("Explicit autofill types") { ExplicitAutofillTypesDemo() },
         FocusDemos,
-        ComposableDemo("KeyInput") { KeyInputDemo() },
+        KeyInputDemos,
         ComposableDemo("TouchMode") { TouchModeDemo() },
         ComposableDemo("Multiple collects measure") { MultipleCollectTest() },
         ComposableDemo("Dialog") { DialogDemo() },
