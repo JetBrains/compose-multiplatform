@@ -1126,7 +1126,7 @@ internal class ComposerImpl(
      */
     @ComposeCompilerApi
     @Suppress("unused")
-    override fun startDefaults() = start(0, null, false, null)
+    override fun startDefaults() = start(defaultsKey, null, false, null)
 
     /**
      *
@@ -3409,6 +3409,9 @@ private const val nodeKey = 125
 
 // An arbitrary key value for a node used to force the node to be replaced.
 private const val nodeKeyReplace = 126
+
+// An arbitrary key value for a node used to force the node to be replaced.
+private const val defaultsKey = -127
 
 @PublishedApi
 internal const val invocationKey = 200
