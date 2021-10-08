@@ -499,6 +499,13 @@ internal fun CoreTextField(
             state.layoutResult?.decorationBoxCoordinates = it
         }
 
+    val showHandleAndMagnifier = enabled && state.hasFocus && isInTouchMode
+    val magnifierModifier = if (showHandleAndMagnifier) {
+        Modifier.textFieldMagnifier(manager)
+    } else {
+        Modifier
+    }
+
     Box(modifier = decorationBoxModifier, propagateMinConstraints = true) {
         decorationBox {
             // Modifiers applied directly to the internal input field implementation. In general,
@@ -515,6 +522,7 @@ internal fun CoreTextField(
                 .then(drawModifier)
                 .textFieldMinSize(textStyle)
                 .then(onPositionedModifier)
+                .then(magnifierModifier)
 
             SimpleLayout(coreTextFieldModifier) {
                 Layout(
@@ -554,18 +562,17 @@ internal fun CoreTextField(
                     }
                 )
 
-                val showHandle = enabled && state.hasFocus && isInTouchMode
                 SelectionToolbarAndHandles(
                     manager = manager,
                     show = state.handleState == HandleState.Selection &&
                         state.layoutCoordinates != null &&
                         state.layoutCoordinates!!.isAttached &&
-                        showHandle
+                        showHandleAndMagnifier
                 )
                 if (
                     state.handleState == HandleState.Cursor &&
                     !readOnly &&
-                    showHandle
+                    showHandleAndMagnifier
                 ) {
                     TextFieldCursorHandle(manager = manager)
                 }
@@ -604,6 +611,16 @@ internal enum class HandleState {
      * Also notice that TextField won't enter this state if the current input text is empty.
      */
     Cursor
+}
+
+/**
+ * Indicates which handle is being dragged when the user is dragging on a text field handle.
+ * @see TextFieldState.draggingHandle
+ */
+internal enum class Handle {
+    Cursor,
+    SelectionStart,
+    SelectionEnd
 }
 
 /**
@@ -671,12 +688,13 @@ internal class TextFieldState(
     var handleState by mutableStateOf(HandleState.None)
 
     /**
-     * A flag to check if the selection start or end handle is being dragged.
-     * If this value is true, then onPress will not select any text.
-     * This value will be set to true when either handle is being dragged, and be reset to false
+     * A flag to check if a selection or cursor handle is being dragged, and which handle is being
+     * dragged.
+     * If this value is non-null, then onPress will not select any text.
+     * This value will be set to non-null when either handle is being dragged, and be reset to null
      * when the dragging is stopped.
      */
-    var draggingHandle = false
+    var draggingHandle: Handle? by mutableStateOf(null)
 
     /**
      * A flag to check if the floating toolbar should show.
