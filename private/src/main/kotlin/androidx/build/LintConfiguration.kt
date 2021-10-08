@@ -212,6 +212,7 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
                 fatal("KotlinPropertyAccess")
                 fatal("LambdaLast")
                 fatal("UnknownNullness")
+                fatal("SupportAnnotationUsage")
 
                 // Only override if not set explicitly.
                 // Some Kotlin projects may wish to disable this.
