@@ -14,37 +14,37 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.demos.scroll
+package androidx.compose.foundation.demos.relocation
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Red
-import androidx.compose.ui.layout.RelocationRequester
-import androidx.compose.ui.layout.relocationRequester
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BringRectangleIntoViewDemo() {
     with(LocalDensity.current) {
-        val relocationRequester = remember { RelocationRequester() }
+        val bringIntoViewRequester = remember { BringIntoViewRequester() }
         val coroutineScope = rememberCoroutineScope()
         Column {
             Text(
@@ -60,7 +60,7 @@ fun BringRectangleIntoViewDemo() {
                 Canvas(
                     Modifier
                         .size(1500f.toDp(), 500f.toDp())
-                        .relocationRequester(relocationRequester)
+                        .bringIntoViewRequester(bringIntoViewRequester)
                 ) {
                     drawCircle(color = Red, radius = 250f, center = Offset(750f, 250f))
                 }
@@ -69,7 +69,7 @@ fun BringRectangleIntoViewDemo() {
                 onClick = {
                     val circleCoordinates = Rect(500f, 0f, 1000f, 500f)
                     coroutineScope.launch {
-                        relocationRequester.bringIntoView(circleCoordinates)
+                        bringIntoViewRequester.bringIntoView(circleCoordinates)
                     }
                 }
             ) {

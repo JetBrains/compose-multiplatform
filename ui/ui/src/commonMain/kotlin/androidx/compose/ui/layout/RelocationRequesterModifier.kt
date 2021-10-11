@@ -16,51 +16,24 @@
 
 package androidx.compose.ui.layout
 
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.node.ModifiedRelocationRequesterNode
-import androidx.compose.ui.platform.debugInspectorInfo
-
-// This modifier keeps track of the coordinates when the item is positioned, and when
-// bringIntoParentBounds() is called, it asks parents to scroll to bring this item into view.
-internal class RelocationRequesterModifier : Modifier.Element {
-
-    lateinit var relocationRequesterNode: ModifiedRelocationRequesterNode
-
-    // TODO(b/191393349): Consider adding public API to RelocationRequester to let users specify
-    //  the rectangle that they want to bring inView.
-    suspend fun bringRectIntoView(rect: Rect) {
-        // Ask parents to scroll (or perform some other operation) so that the item is visible.
-        relocationRequesterNode.propagateRelocationRequest(rect)
-    }
-}
 
 /**
  * This is a modifier that can be used to send relocation requests.
- *
- * Here is an example where the a [relocationRequester] can be used to bring an item into parent
- * bounds. It demonstrates how a composable can ask its parents to scroll so that the component
- * using this modifier is brought into the bounds of all its parents.
- * @sample androidx.compose.ui.samples.BringIntoViewSample
  *
  * @param relocationRequester an instance of [RelocationRequester]. This hoisted object can be
  * used to send relocation requests to parents of the current composable.
  */
 @ExperimentalComposeUiApi
-fun Modifier.relocationRequester(relocationRequester: RelocationRequester): Modifier = composed(
-    inspectorInfo = debugInspectorInfo {
-        name = "relocationRequester"
-        properties["relocationRequester"] = relocationRequester
-    }
-) {
-    val modifier = remember { RelocationRequesterModifier() }
-    DisposableEffect(relocationRequester) {
-        relocationRequester.modifiers += modifier
-        onDispose { relocationRequester.modifiers -= modifier }
-    }
-    modifier
-}
+@Suppress("UNUSED_PARAMETER")
+@Deprecated(
+    message = "Please use bringIntoViewRequester instead.",
+    replaceWith = ReplaceWith(
+        "bringIntoViewRequester",
+        "androidx.compose.foundation.relocation.bringIntoViewRequester"
+
+    ),
+    level = DeprecationLevel.ERROR
+)
+fun Modifier.relocationRequester(relocationRequester: Any): Modifier = this
