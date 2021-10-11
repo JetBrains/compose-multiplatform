@@ -134,7 +134,7 @@ object LibraryVersions {
     val VIEWPAGER = Version("1.1.0-alpha02")
     val VIEWPAGER2 = Version("1.1.0-beta02")
     val WEAR = Version("1.3.0-alpha02")
-    val WEAR_COMPOSE = Version("1.0.0-alpha08")
+    val WEAR_COMPOSE = Version("1.0.0-alpha09")
     val WEAR_INPUT = Version("1.2.0-alpha03")
     val WEAR_INPUT_TESTING = WEAR_INPUT
     val WEAR_ONGOING = Version("1.1.0-alpha01")
