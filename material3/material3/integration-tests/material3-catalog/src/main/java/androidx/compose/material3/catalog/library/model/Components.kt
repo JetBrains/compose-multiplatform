@@ -80,9 +80,21 @@ private val FloatingActionButtons = Component(
     examples = FloatingActionButtonsExamples,
 )
 
+private val NavigationBar = Component(
+    id = 5,
+    name = "Navigation bar",
+    description = "Material You navigation bar",
+    tintIcon = true,
+    guidelinesUrl = "", // No  guidelines yet
+    docsUrl = "", // No docs yet
+    sourceUrl = "$Material3SourceUrl/NavigationBar.kt",
+    examples = NavigationBarExamples
+)
+
 val Components = listOf(
     Color,
     Dialog,
+    NavigationBar,
     TopAppBar,
     FloatingActionButtons,
 )
