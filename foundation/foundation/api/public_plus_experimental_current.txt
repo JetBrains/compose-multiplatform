@@ -534,6 +534,35 @@ package androidx.compose.foundation.lazy.layout {
 
 }
 
+package androidx.compose.foundation.relocation {
+
+  @androidx.compose.foundation.ExperimentalFoundationApi public sealed interface BringIntoViewRequester {
+    method public suspend Object? bringIntoView(optional androidx.compose.ui.geometry.Rect? rect, optional kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+  }
+
+  public final class BringIntoViewRequesterKt {
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.foundation.relocation.BringIntoViewRequester BringIntoViewRequester();
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.ui.Modifier bringIntoViewRequester(androidx.compose.ui.Modifier, androidx.compose.foundation.relocation.BringIntoViewRequester bringIntoViewRequester);
+  }
+
+  @androidx.compose.foundation.ExperimentalFoundationApi public interface BringIntoViewResponder {
+    method public suspend Object? bringIntoView(androidx.compose.ui.geometry.Rect rect, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public androidx.compose.ui.geometry.Rect toLocalRect(androidx.compose.ui.geometry.Rect rect, androidx.compose.ui.layout.LayoutCoordinates layoutCoordinates);
+    field public static final androidx.compose.foundation.relocation.BringIntoViewResponder.Companion Companion;
+  }
+
+  @androidx.compose.foundation.ExperimentalFoundationApi public static final class BringIntoViewResponder.Companion {
+    method public androidx.compose.ui.modifier.ProvidableModifierLocal<androidx.compose.foundation.relocation.BringIntoViewResponder> getModifierLocalBringIntoViewResponder();
+    method public androidx.compose.foundation.relocation.BringIntoViewResponder getRootBringIntoViewResponder();
+    property public final androidx.compose.ui.modifier.ProvidableModifierLocal<androidx.compose.foundation.relocation.BringIntoViewResponder> ModifierLocalBringIntoViewResponder;
+    property public final androidx.compose.foundation.relocation.BringIntoViewResponder RootBringIntoViewResponder;
+  }
+
+  public final class BringRectangleOnScreen_androidKt {
+  }
+
+}
+
 package androidx.compose.foundation.selection {
 
   public final class SelectableGroupKt {

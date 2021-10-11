@@ -17,7 +17,6 @@ package androidx.compose.ui.node
 
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.focus.FocusEventModifier
@@ -46,8 +45,6 @@ import androidx.compose.ui.layout.OnGloballyPositionedModifier
 import androidx.compose.ui.layout.OnRemeasuredModifier
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.layout.RelocationModifier
-import androidx.compose.ui.layout.RelocationRequesterModifier
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.modifier.ModifierLocalConsumer
@@ -708,14 +705,6 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
                     }
                     if (mod is NestedScrollModifier) {
                         wrapper = NestedScrollDelegatingWrapper(wrapper, mod).assignChained(toWrap)
-                    }
-                    @OptIn(ExperimentalComposeUiApi::class)
-                    if (mod is RelocationModifier) {
-                        wrapper = ModifiedRelocationNode(wrapper, mod).assignChained(toWrap)
-                    }
-                    if (mod is RelocationRequesterModifier) {
-                        wrapper = ModifiedRelocationRequesterNode(wrapper, mod)
-                            .assignChained(toWrap)
                     }
                     if (mod is LayoutModifier) {
                         wrapper = ModifiedLayoutNode(wrapper, mod).assignChained(toWrap)
