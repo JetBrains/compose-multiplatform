@@ -39,7 +39,7 @@ dependencies {
         api(project(":compose:ui:ui"))
         api(project(":compose:ui:ui-tooling-preview"))
         api(project(":compose:ui:ui-tooling-data"))
-        implementation(project(":compose:material:material"))
+        implementation("androidx.compose.material:material:1.0.0")
         implementation("androidx.activity:activity-compose:1.3.0")
 
         // kotlin-reflect and animation-tooling-internal are provided by Studio at runtime
