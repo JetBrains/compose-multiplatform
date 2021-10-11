@@ -295,3 +295,29 @@ internal class PointerInteropFilter : PointerInputModifier {
             }
         }
 }
+
+/**
+ * Calls [watcher] with each [MotionEvent] that the layout area or any child [pointerInput]
+ * receives. The [MotionEvent] may or may not have been transformed to the local coordinate system.
+ * The Compose View will be considered as handling the [MotionEvent] in the area that the
+ * [motionEventSpy] is active.
+ *
+ * This method can only be used to observe [MotionEvent]s and can not be used to capture an event
+ * stream. Use [pointerInteropFilter] to handle [MotionEvent]s and consume the events.
+ *
+ * [watcher] is called during the [PointerEventPass.Initial] pass.
+ *
+ * Developers should prefer to use [pointerInput] to handle pointer input processing within
+ * Compose. [motionEventSpy] is only useful as part of Android View interoperability.
+ */
+@ExperimentalComposeUiApi
+fun Modifier.motionEventSpy(watcher: (motionEvent: MotionEvent) -> Unit): Modifier =
+    this.pointerInput(watcher) {
+        interceptOutOfBoundsChildEvents = true
+        awaitPointerEventScope {
+            while (true) {
+                val event = awaitPointerEvent(PointerEventPass.Initial)
+                event.motionEvent?.let(watcher)
+            }
+        }
+    }
