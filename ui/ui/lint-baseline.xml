@@ -628,7 +628,7 @@
             column="36"/>
     </issue>
 
- <issue
+    <issue
         id="SupportAnnotationUsage"
         message="The API level is already known to be at least 26 here from outer annotations"
         errorLine1="    @RequiresApi(26)"

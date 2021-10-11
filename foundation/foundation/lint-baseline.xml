@@ -56,4 +56,37 @@
             column="9"/>
     </issue>
 
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="    val layoutInfo: LazyLayoutInfo get() = layoutInfoState.value"
+        errorLine2="        ~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/foundation/lazy/layout/LazyLayoutState.kt"
+            line="44"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="    fun remeasure() = remeasurement?.forceRemeasure()"
+        errorLine2="        ~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/foundation/lazy/layout/LazyLayoutState.kt"
+            line="54"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="    val layoutInfo: LazyListLayoutInfo get() = layoutInfoState.value"
+        errorLine2="        ~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/foundation/lazy/LazyListState.kt"
+            line="97"
+            column="9"/>
+    </issue>
+
 </issues>

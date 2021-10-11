@@ -12,4 +12,15 @@
             column="39"/>
     </issue>
 
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="    override fun Density.modifyParentData(parentData: Any?) ="
+        errorLine2="                         ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/foundation/layout/RowColumnImpl.kt"
+            line="769"
+            column="26"/>
+    </issue>
+
 </issues>
