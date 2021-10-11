@@ -12,4 +12,37 @@
             column="14"/>
     </issue>
 
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="    val colors: Colors"
+        errorLine2="        ~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/material/MaterialTheme.kt"
+            line="100"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="    val typography: Typography"
+        errorLine2="        ~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/material/MaterialTheme.kt"
+            line="110"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="    val shapes: Shapes"
+        errorLine2="        ~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/material/MaterialTheme.kt"
+            line="118"
+            column="9"/>
+    </issue>
+
 </issues>
