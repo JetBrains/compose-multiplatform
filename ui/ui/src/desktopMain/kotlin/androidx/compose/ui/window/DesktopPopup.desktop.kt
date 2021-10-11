@@ -42,6 +42,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
+import java.awt.MouseInfo
+import javax.swing.SwingUtilities.convertPointFromScreen
 
 /**
  * Opens a popup with the given content.
@@ -237,10 +239,11 @@ fun rememberCursorPositionProvider(
 ): PopupPositionProvider = with(LocalDensity.current) {
     val component = LocalLayerContainer.current
     val cursorPoint = remember {
-        val awtMousePosition = component.mousePosition
+        val awtMousePosition = MouseInfo.getPointerInfo().location
+        convertPointFromScreen(awtMousePosition, component)
         IntOffset(
-            (awtMousePosition.x * density).toInt(),
-            (awtMousePosition.y * density).toInt()
+            (awtMousePosition.x * component.density.density).toInt(),
+            (awtMousePosition.y * component.density.density).toInt()
         )
     }
     val offsetPx = IntOffset(offset.x.roundToPx(), offset.y.roundToPx())
