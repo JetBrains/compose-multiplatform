@@ -34,7 +34,7 @@ internal actual fun ActualParagraphIntrinsics(
     density: Density,
     resourceLoader: Font.ResourceLoader
 ): ParagraphIntrinsics =
-    DesktopParagraphIntrinsics(
+    SkiaParagraphIntrinsics(
         text,
         style,
         spanStyles,
@@ -43,7 +43,7 @@ internal actual fun ActualParagraphIntrinsics(
         resourceLoader
     )
 
-internal class DesktopParagraphIntrinsics(
+internal class SkiaParagraphIntrinsics(
     val text: String,
     private val style: TextStyle,
     private val spanStyles: List<Range<SpanStyle>>,

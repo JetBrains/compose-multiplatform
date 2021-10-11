@@ -31,7 +31,7 @@ import org.jetbrains.skia.paragraph.Paragraph
 
 /**
  * The purpose of this class is to store already built paragraph and pass it between
- * different internal entities (from DesktopParagraphIntrinsics to DesktopParagraph).
+ * different internal entities (from SkiaParagraphIntrinsics to SkiaParagraph).
  *
  * An alternative to passing and reusing existed paragraph is to build it again, but it is 2.5x
  * slower.
