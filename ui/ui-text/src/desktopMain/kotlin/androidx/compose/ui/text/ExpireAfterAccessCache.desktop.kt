@@ -19,12 +19,6 @@ package androidx.compose.ui.text
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-// Extremely simple Cache interface which is enough for ui.text needs
-internal interface Cache<K, V> {
-    // get a value for [key] or load it by [loader] if doesn't exist
-    fun get(key: K, loader: (K) -> V): V
-}
-
 // expire cache entries after `expireAfter` after last access
 internal class ExpireAfterAccessCache<K, V>(
     val expireAfterNanos: Long,
