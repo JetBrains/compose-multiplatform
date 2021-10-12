@@ -121,30 +121,17 @@ internal class LazyListScrollPosition(
                 // there were no real item during the previous measure
                 return lastKnownIndex
             }
-            val totalCount = itemsProvider.itemsCount
-            if (lastKnownIndex.value < totalCount &&
+            if (lastKnownIndex.value < itemsProvider.itemsCount &&
                 key == itemsProvider.getKey(lastKnownIndex.value)
             ) {
                 // this item is still at the same index
                 return lastKnownIndex
             }
-            // lets try to find where this item was moved
-            var before = minOf(totalCount - 1, lastKnownIndex.value - 1)
-            var after = lastKnownIndex.value + 1
-            while (before >= 0 || after < totalCount) {
-                if (before >= 0) {
-                    if (key == itemsProvider.getKey(before)) {
-                        return DataIndex(before)
-                    }
-                    before--
-                }
-                if (after < totalCount) {
-                    if (key == itemsProvider.getKey(after)) {
-                        return DataIndex(after)
-                    }
-                    after++
-                }
+            val newIndex = itemsProvider.keyToIndexMap[key]
+            if (newIndex != null) {
+                return DataIndex(newIndex)
             }
+            // fallback to the previous index if we don't know the new index of the item
             return lastKnownIndex
         }
     }

@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.foundation.lazy.layout.LazyLayoutPlaceable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.LayoutDirection
@@ -26,7 +27,7 @@ import androidx.compose.ui.unit.LayoutDirection
  */
 internal class LazyMeasuredItem(
     override val index: Int,
-    private val placeables: Array<Placeable>,
+    private val placeables: Array<LazyLayoutPlaceable>,
     private val isVertical: Boolean,
     private val horizontalAlignment: Alignment.Horizontal?,
     private val verticalAlignment: Alignment.Vertical?,
@@ -62,8 +63,10 @@ internal class LazyMeasuredItem(
         var mainAxisSize = 0
         var maxCrossAxis = 0
         placeables.forEach {
-            mainAxisSize += if (isVertical) it.height else it.width
-            maxCrossAxis = maxOf(maxCrossAxis, if (!isVertical) it.height else it.width)
+            val placeable = it.placeable
+            mainAxisSize += if (isVertical) placeable.height else placeable.width
+            maxCrossAxis =
+                maxOf(maxCrossAxis, if (!isVertical) placeable.height else placeable.width)
         }
         size = mainAxisSize
         sizeWithSpacings = size + spacing
@@ -90,7 +93,7 @@ internal class LazyMeasuredItem(
         }
         var index = if (reverseLayout) placeables.lastIndex else 0
         while (if (reverseLayout) index >= 0 else index < placeables.size) {
-            val it = placeables[index]
+            val it = placeables[index].placeable
             if (reverseLayout) index-- else index++
             if (isVertical) {
                 val x = requireNotNull(horizontalAlignment)

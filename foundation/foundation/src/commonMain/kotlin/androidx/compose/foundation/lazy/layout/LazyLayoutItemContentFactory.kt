@@ -25,17 +25,14 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.util.fastForEach
 
 @Composable
 internal fun rememberItemContentFactory(state: LazyLayoutState): LazyLayoutItemContentFactory {
     val saveableStateHolder = rememberSaveableStateHolder()
     val itemsProvider = state.itemsProvider
-    val factory = remember(itemsProvider) {
+    return remember(itemsProvider) {
         LazyLayoutItemContentFactory(saveableStateHolder, itemsProvider)
     }
-    factory.updateKeyIndexMappingForVisibleItems(state)
-    return factory
 }
 
 /**
@@ -61,24 +58,6 @@ internal class LazyLayoutItemContentFactory(
     private var constraintsOfCachedLambdas = Constraints()
 
     /**
-     * We iterate through the currently composed keys and update the associated indexes so we can
-     * smartly handle reorderings. If we will not do it and just wait for the next remeasure the
-     * item could be recomposed before it and switch to start displaying the wrong item.
-     */
-    fun updateKeyIndexMappingForVisibleItems(state: LazyLayoutState) {
-        val itemsProvider = itemsProvider()
-        val itemsCount = itemsProvider.itemsCount
-        if (itemsCount > 0) {
-            state.layoutInfoNonObservable.visibleItemsInfo.fastForEach {
-                if (it.index < itemsCount) {
-                    val key = itemsProvider.getKey(it.index)
-                    lambdasCache[key]?.index = it.index
-                }
-            }
-        }
-    }
-
-    /**
      * Invalidate the cached lambas if the density or constraints have changed.
      * TODO(popam): probably LazyLayoutState should provide an invalidate() method instead.
      */
@@ -95,7 +74,7 @@ internal class LazyLayoutItemContentFactory(
      */
     fun getContent(index: Int, key: Any): @Composable () -> Unit {
         val cachedContent = lambdasCache[key]
-        return if (cachedContent != null && cachedContent.index == index) {
+        return if (cachedContent != null && cachedContent.lastKnownIndex == index) {
             cachedContent.content
         } else {
             val newContent = CachedItemContent(index, key)
@@ -108,10 +87,14 @@ internal class LazyLayoutItemContentFactory(
         initialIndex: Int,
         val key: Any
     ) {
-        var index by mutableStateOf(initialIndex)
+        var lastKnownIndex by mutableStateOf(initialIndex)
+            private set
 
         val content: @Composable () -> Unit = @Composable {
             val itemsProvider = itemsProvider()
+            val index = itemsProvider.keyToIndexMap[key]?.also {
+                lastKnownIndex = it
+            } ?: lastKnownIndex
             if (index < itemsProvider.itemsCount) {
                 val key = itemsProvider.getKey(index)
                 if (key == this.key) {
