@@ -702,7 +702,7 @@ internal abstract class LayoutNodeWrapper(
      * Note: This method only goes to the modifiers that follow the one wrapped by
      * this [LayoutNodeWrapper], it doesn't to the children [LayoutNode]s.
      */
-    abstract fun findNextFocusWrapper(): ModifiedFocusNode?
+    abstract fun findNextFocusWrapper(excludeDeactivated: Boolean): ModifiedFocusNode?
 
     /**
      * Returns the last [focus node][ModifiedFocusNode] found following this [LayoutNodeWrapper].
@@ -878,10 +878,10 @@ internal abstract class LayoutNodeWrapper(
 
     // TODO(b/152051577): Measure the performance of focusableChildren.
     //  Consider caching the children.
-    fun focusableChildren(): List<ModifiedFocusNode> {
+    fun focusableChildren(excludeDeactivated: Boolean): List<ModifiedFocusNode> {
         // Check the modifier chain that this focus node is part of. If it has a focus modifier,
         // that means you have found the only focusable child for this node.
-        val focusableChild = wrapped?.findNextFocusWrapper()
+        val focusableChild = wrapped?.findNextFocusWrapper(excludeDeactivated)
         // findChildFocusNodeInWrapperChain()
         if (focusableChild != null) {
             return listOf(focusableChild)
@@ -889,7 +889,9 @@ internal abstract class LayoutNodeWrapper(
 
         // Go through all your children and find the first focusable node from each child.
         val focusableChildren = mutableListOf<ModifiedFocusNode>()
-        layoutNode.children.fastForEach { it.findFocusableChildren(focusableChildren) }
+        layoutNode.children.fastForEach {
+            it.findFocusableChildren(focusableChildren, excludeDeactivated)
+        }
         return focusableChildren
     }
 

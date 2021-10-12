@@ -20,7 +20,8 @@ import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.FocusStateImpl.Active
 import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
 import androidx.compose.ui.focus.FocusStateImpl.Captured
-import androidx.compose.ui.focus.FocusStateImpl.Disabled
+import androidx.compose.ui.focus.FocusStateImpl.Deactivated
+import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
@@ -58,7 +59,7 @@ internal class InnerPlaceable(
 
     override fun findPreviousFocusWrapper() = wrappedBy?.findPreviousFocusWrapper()
 
-    override fun findNextFocusWrapper(): ModifiedFocusNode? = null
+    override fun findNextFocusWrapper(excludeDeactivated: Boolean): ModifiedFocusNode? = null
 
     override fun findLastFocusWrapper(): ModifiedFocusNode? = findPreviousFocusWrapper()
 
@@ -70,16 +71,19 @@ internal class InnerPlaceable(
         var allChildrenDisabled: Boolean? = null
         // TODO(b/192681045): Create a utility like fun LayoutNodeWrapper.forEachFocusableChild{...}
         //  that does not allocate, but just iterates over all the focusable children.
-        focusableChildren().fastForEach {
+        focusableChildren(excludeDeactivated = false).fastForEach {
             when (it.focusState) {
-                Active, ActiveParent, Captured -> { focusedChild = it; allChildrenDisabled = false }
-                Disabled -> if (allChildrenDisabled == null) { allChildrenDisabled = true }
+                Active, ActiveParent, Captured, DeactivatedParent -> {
+                    focusedChild = it
+                    allChildrenDisabled = false
+                }
+                Deactivated -> if (allChildrenDisabled == null) { allChildrenDisabled = true }
                 Inactive -> allChildrenDisabled = false
             }
         }
 
         super.propagateFocusEvent(
-            focusedChild?.focusState ?: if (allChildrenDisabled == true) Disabled else Inactive
+            focusedChild?.focusState ?: if (allChildrenDisabled == true) Deactivated else Inactive
         )
     }
 

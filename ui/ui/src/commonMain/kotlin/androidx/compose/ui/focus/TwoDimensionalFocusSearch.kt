@@ -23,7 +23,8 @@ import androidx.compose.ui.focus.FocusDirection.Companion.Up
 import androidx.compose.ui.focus.FocusStateImpl.Active
 import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
 import androidx.compose.ui.focus.FocusStateImpl.Captured
-import androidx.compose.ui.focus.FocusStateImpl.Disabled
+import androidx.compose.ui.focus.FocusStateImpl.Deactivated
+import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.node.ModifiedFocusNode
@@ -46,8 +47,8 @@ internal fun ModifiedFocusNode.twoDimensionalFocusSearch(
 ): ModifiedFocusNode? {
     return when (focusState) {
         Inactive -> this
-        Disabled -> null
-        ActiveParent -> {
+        Deactivated -> null
+        ActiveParent, DeactivatedParent -> {
             // If the focusedChild is an intermediate parent, we continue searching among it's
             // children, and return a focus node if we find one.
             val focusedChild = focusedChild ?: error(NoActiveChild)
@@ -58,13 +59,13 @@ internal fun ModifiedFocusNode.twoDimensionalFocusSearch(
             // Use the focus rect of the active node as the starting point and pick one of our
             // children as the next focused item.
             val activeRect = findActiveFocusNode()?.focusRect() ?: error(NoActiveChild)
-            focusableChildren().findBestCandidate(activeRect, direction)
+            focusableChildren(excludeDeactivated = true).findBestCandidate(activeRect, direction)
         }
         Active, Captured -> {
             // The 2-D focus search starts form the root. If we reached here, it means that there
             // was no intermediate node that was ActiveParent. This is an initial focus scenario.
             // We need to search among this node's children to find the best focus candidate.
-            val focusableChildren = focusableChildren()
+            val focusableChildren = focusableChildren(excludeDeactivated = true)
 
             // If there are aren't multiple children to choose from, return the first child.
             if (focusableChildren.size <= 1) {

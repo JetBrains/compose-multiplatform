@@ -28,7 +28,8 @@ import androidx.compose.ui.focus.FocusDirection.Companion.Up
 import androidx.compose.ui.focus.FocusStateImpl.Active
 import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
 import androidx.compose.ui.focus.FocusStateImpl.Captured
-import androidx.compose.ui.focus.FocusStateImpl.Disabled
+import androidx.compose.ui.focus.FocusStateImpl.Deactivated
+import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.node.ModifiedFocusNode
 import androidx.compose.ui.unit.LayoutDirection
@@ -148,7 +149,11 @@ internal fun ModifiedFocusNode.focusSearch(
             findActiveFocusNode()?.twoDimensionalFocusSearch(direction)
         }
         @OptIn(ExperimentalComposeUiApi::class)
-        Out -> findActiveFocusNode()?.findParentFocusNode()
+        Out -> {
+            findActiveFocusNode()?.findActiveParent().let {
+                if (it == this) null else it
+            }
+        }
         else -> error(invalidFocusDirection)
     }
 }
@@ -156,7 +161,14 @@ internal fun ModifiedFocusNode.focusSearch(
 internal fun ModifiedFocusNode.findActiveFocusNode(): ModifiedFocusNode? {
     return when (focusState) {
         Active, Captured -> this
-        ActiveParent -> focusedChild?.findActiveFocusNode()
-        Inactive, Disabled -> null
+        ActiveParent, DeactivatedParent -> focusedChild?.findActiveFocusNode()
+        Inactive, Deactivated -> null
     }
 }
+
+internal fun ModifiedFocusNode.findActiveParent(): ModifiedFocusNode? = findParentFocusNode()?.let {
+        when (focusState) {
+            Active, Captured, Deactivated, DeactivatedParent, Inactive -> it.findActiveParent()
+            ActiveParent -> this
+        }
+    }

@@ -17,10 +17,12 @@
 package androidx.compose.ui.focus
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusStateImpl.Active
 import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
 import androidx.compose.ui.focus.FocusStateImpl.Captured
-import androidx.compose.ui.focus.FocusStateImpl.Disabled
+import androidx.compose.ui.focus.FocusStateImpl.Deactivated
+import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.filters.SmallTest
@@ -82,11 +84,11 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
     }
 
     @Test
-    fun disabled_isUnchanged() {
+    fun deactivated_isUnchanged() {
         // Arrange.
-        val focusModifier = FocusModifier(Disabled)
+        val focusModifier = FocusModifier(Inactive)
         rule.setFocusableContent {
-            Box(modifier = focusModifier)
+            Box(modifier = Modifier.focusProperties { canFocus = false }.then(focusModifier))
         }
 
         // Act.
@@ -96,7 +98,7 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
 
         // Assert.
         rule.runOnIdle {
-            assertThat(focusModifier.focusState).isEqualTo(Disabled)
+            assertThat(focusModifier.focusState).isEqualTo(Deactivated)
         }
     }
 
@@ -145,6 +147,87 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
                     assertThat(focusModifier.focusState).isEqualTo(Active)
                     assertThat(focusModifier.focusedChild).isNull()
                     assertThat(childFocusModifier.focusState).isEqualTo(Inactive)
+                }
+            }
+        }
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun deactivatedParent_withNoFocusedChild_throwsException() {
+        // Arrange.
+        val focusModifier = FocusModifier(DeactivatedParent)
+        rule.setFocusableContent {
+            Box(modifier = focusModifier)
+        }
+
+        // Act.
+        rule.runOnIdle {
+            focusModifier.focusNode.requestFocus(propagateFocus)
+        }
+    }
+
+    @Test
+    fun deactivatedParent_propagateFocus() {
+        // Arrange.
+        val focusModifier = FocusModifier(ActiveParent)
+        val childFocusModifier = FocusModifier(Active)
+        rule.setFocusableContent {
+            Box(modifier = Modifier.focusProperties { canFocus = false }.then(focusModifier)) {
+                Box(modifier = childFocusModifier)
+            }
+        }
+        rule.runOnIdle {
+            focusModifier.focusedChild = childFocusModifier.focusNode
+        }
+
+        // Act.
+        rule.runOnIdle {
+            focusModifier.focusNode.requestFocus(propagateFocus)
+        }
+
+        // Assert.
+        rule.runOnIdle {
+           // Unchanged.
+           assertThat(focusModifier.focusState).isEqualTo(DeactivatedParent)
+           assertThat(childFocusModifier.focusState).isEqualTo(Active)
+        }
+    }
+
+    @Test
+    fun deactivatedParent_activeChild_propagateFocus() {
+        // Arrange.
+        val focusModifier = FocusModifier(ActiveParent)
+        val childFocusModifier = FocusModifier(Active)
+        val grandchildFocusModifier = FocusModifier(Inactive)
+        rule.setFocusableContent {
+            Box(modifier = Modifier.focusProperties { canFocus = false }.then(focusModifier)) {
+                Box(modifier = childFocusModifier) {
+                    Box(modifier = grandchildFocusModifier)
+                }
+            }
+        }
+        rule.runOnIdle {
+            focusModifier.focusedChild = childFocusModifier.focusNode
+        }
+
+        // Act.
+        rule.runOnIdle {
+            focusModifier.focusNode.requestFocus(propagateFocus)
+        }
+
+        // Assert.
+        rule.runOnIdle {
+            when (propagateFocus) {
+                true -> {
+                    assertThat(focusModifier.focusState).isEqualTo(DeactivatedParent)
+                    assertThat(childFocusModifier.focusState).isEqualTo(Active)
+                    assertThat(grandchildFocusModifier.focusState).isEqualTo(Inactive)
+                }
+                false -> {
+                    assertThat(focusModifier.focusState).isEqualTo(DeactivatedParent)
+                    assertThat(childFocusModifier.focusState).isEqualTo(Active)
+                    assertThat(childFocusModifier.focusedChild).isNull()
+                    assertThat(grandchildFocusModifier.focusState).isEqualTo(Inactive)
                 }
             }
         }

@@ -18,6 +18,7 @@ package androidx.compose.ui.draw
 
 import android.graphics.Bitmap
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -101,7 +102,7 @@ import kotlin.math.roundToInt
 class PainterModifierTest {
 
     val containerWidth = 100.0f
-    val containerHeight = 100.0f
+    private val containerHeight = 100.0f
 
     @get:Rule
     val rule = createComposeRule()
@@ -751,6 +752,7 @@ class PainterModifierTest {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 private fun ComposeTestRule.obtainScreenshotBitmap(width: Int, height: Int = width): Bitmap {
     val bitmap = onRoot().captureToImage()
     assertEquals(width, bitmap.width)

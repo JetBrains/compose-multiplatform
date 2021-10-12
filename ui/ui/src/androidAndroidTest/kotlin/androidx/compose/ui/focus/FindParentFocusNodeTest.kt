@@ -18,21 +18,28 @@ package androidx.compose.ui.focus
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
 @MediumTest
-@RunWith(AndroidJUnit4::class)
-class FindParentFocusNodeTest {
+@RunWith(Parameterized::class)
+class FindParentFocusNodeTest(private val deactivated: Boolean) {
     @get:Rule
     val rule = createComposeRule()
+
+    companion object {
+        @JvmStatic
+        @Parameterized.Parameters(name = "isDeactivated = {0}")
+        fun initParameters() = listOf(true, false)
+    }
 
     @Test
     fun noParentReturnsNull() {
@@ -63,7 +70,13 @@ class FindParentFocusNodeTest {
         val modifier4 = FocusModifier(Inactive)
         val modifier5 = FocusModifier(Inactive)
         rule.setFocusableContent {
-            Box(modifier1.then(modifier2).then(modifier3).then(modifier4).then(modifier5)) {}
+            Box(modifier = modifier1
+                .focusProperties { canFocus = !deactivated }
+                .then(modifier2)
+                .then(modifier3)
+                .then(modifier4)
+                .then(modifier5)
+            )
         }
 
         // Act.
@@ -87,6 +100,7 @@ class FindParentFocusNodeTest {
         rule.setFocusableContent {
             Box(
                 modifier = modifier1
+                    .focusProperties { canFocus = !deactivated }
                     .then(modifier2)
                     .background(color = Red)
                     .then(modifier3)
@@ -114,7 +128,10 @@ class FindParentFocusNodeTest {
         val parentFocusModifier2 = FocusModifier(Inactive)
         val focusModifier = FocusModifier(Inactive)
         rule.setFocusableContent {
-            Box(modifier = parentFocusModifier1.then(parentFocusModifier2)) {
+            Box(modifier = parentFocusModifier1
+                .focusProperties { canFocus = !deactivated }
+                .then(parentFocusModifier2)
+            ) {
                 Box(modifier = focusModifier)
             }
         }
@@ -133,18 +150,26 @@ class FindParentFocusNodeTest {
     @Test
     fun returnsImmediateParent() {
         // Arrange.
+        // greatGrandparentLayoutNode--greatGrandparentFocusNode
+        //       |
         // grandparentLayoutNode--grandparentFocusNode
         //       |
         // parentLayoutNode--parentFocusNode
         //       |
         // layoutNode--focusNode
+        val greatGrandparentFocusModifier = FocusModifier(Inactive)
         val grandparentFocusModifier = FocusModifier(Inactive)
         val parentFocusModifier = FocusModifier(Inactive)
         val focusModifier = FocusModifier(Inactive)
         rule.setFocusableContent {
-            Box(modifier = grandparentFocusModifier) {
-                Box(modifier = parentFocusModifier) {
-                    Box(modifier = focusModifier)
+            Box(modifier = greatGrandparentFocusModifier) {
+                Box(modifier = grandparentFocusModifier) {
+                    Box(modifier = Modifier
+                        .focusProperties { canFocus = !deactivated }
+                        .then(parentFocusModifier)
+                    ) {
+                        Box(modifier = focusModifier)
+                    }
                 }
             }
         }
@@ -161,19 +186,25 @@ class FindParentFocusNodeTest {
     }
 
     @Test
-    fun ignoresIntermediateLayoutNodesThatDontHaveFocusNodes() {
+    fun ignoresIntermediateLayoutNodesThatDoNotHaveFocusNodes() {
         // Arrange.
         // grandparentLayoutNode--grandparentFocusNode
         //       |
         // parentLayoutNode
         //       |
         // layoutNode--focusNode
+        val greatGrandparentFocusModifier = FocusModifier(Inactive)
         val grandparentFocusModifier = FocusModifier(Inactive)
         val focusModifier = FocusModifier(Inactive)
         rule.setFocusableContent {
-            Box(modifier = grandparentFocusModifier) {
-                Box {
-                    Box(modifier = focusModifier)
+            Box(modifier = greatGrandparentFocusModifier) {
+                Box(modifier = Modifier
+                    .focusProperties { canFocus = !deactivated }
+                    .then(grandparentFocusModifier)
+                ) {
+                    Box {
+                        Box(modifier = focusModifier)
+                    }
                 }
             }
         }
