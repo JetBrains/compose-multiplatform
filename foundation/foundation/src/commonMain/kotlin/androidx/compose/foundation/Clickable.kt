@@ -426,5 +426,6 @@ internal fun Modifier.genericClickableWithoutGesture(
     return this
         .then(semanticModifier)
         .indication(interactionSource, indication)
+        .hoverable(interactionSource = interactionSource)
         .then(gestureModifiers)
 }

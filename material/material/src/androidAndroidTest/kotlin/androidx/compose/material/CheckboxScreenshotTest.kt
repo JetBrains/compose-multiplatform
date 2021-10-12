@@ -29,6 +29,7 @@ import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performMouseInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -203,6 +204,26 @@ class CheckboxScreenshotTest {
         rule.mainClock.advanceTimeBy(milliseconds = 80)
 
         assertToggeableAgainstGolden("checkbox_animateToUnchecked")
+    }
+
+    @Test
+    fun checkBoxTest_hover() {
+        rule.setMaterialContent {
+            Box(wrap.testTag(wrapperTestTag)) {
+                Checkbox(
+                    modifier = wrap,
+                    checked = true,
+                    onCheckedChange = { }
+                )
+            }
+        }
+
+        rule.onNode(isToggleable())
+            .performMouseInput { enter(center) }
+
+        rule.waitForIdle()
+
+        assertToggeableAgainstGolden("checkbox_hover")
     }
 
     private fun assertToggeableAgainstGolden(goldenName: String) {

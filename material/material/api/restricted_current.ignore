@@ -1,0 +1,5 @@
+// Baseline format: 1.0
+RemovedMethod: androidx.compose.material.ButtonDefaults#elevation(float, float, float):
+    Removed method androidx.compose.material.ButtonDefaults.elevation(float,float,float)
+RemovedMethod: androidx.compose.material.FloatingActionButtonDefaults#elevation(float, float):
+    Removed method androidx.compose.material.FloatingActionButtonDefaults.elevation(float,float)

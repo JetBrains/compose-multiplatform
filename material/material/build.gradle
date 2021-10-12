@@ -122,6 +122,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.dexmakerMockito)
                 implementation(libs.mockitoCore)
                 implementation(libs.mockitoKotlin)
+                implementation(libs.testUiautomator)
             }
         }
     }

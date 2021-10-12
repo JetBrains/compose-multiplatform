@@ -34,7 +34,7 @@ dependencies {
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block below
          */
-        api("androidx.compose.foundation:foundation:1.0.0")
+        api(project(":compose:foundation:foundation"))
         api(project(":compose:runtime:runtime"))
 
         implementation(libs.kotlinStdlibCommon)

@@ -21,6 +21,7 @@ import androidx.compose.foundation.PressedInteractionSourceDisposableEffect
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.gestures.detectTapAndPress
 import androidx.compose.foundation.handlePressInteraction
+import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -268,5 +269,6 @@ private fun Modifier.toggleableImpl(
     this
         .then(semantics)
         .indication(interactionSource, indication)
+        .hoverable(interactionSource = interactionSource)
         .then(gestures)
 }

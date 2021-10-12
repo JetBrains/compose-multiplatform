@@ -162,7 +162,7 @@ package androidx.compose.material {
 
   public final class ButtonDefaults {
     method @androidx.compose.runtime.Composable public androidx.compose.material.ButtonColors buttonColors(optional long backgroundColor, optional long contentColor, optional long disabledBackgroundColor, optional long disabledContentColor);
-    method @androidx.compose.runtime.Composable public androidx.compose.material.ButtonElevation elevation(optional float defaultElevation, optional float pressedElevation, optional float disabledElevation);
+    method @androidx.compose.runtime.Composable public androidx.compose.material.ButtonElevation elevation(optional float defaultElevation, optional float pressedElevation, optional float disabledElevation, optional float hoveredElevation, optional float focusedElevation);
     method public androidx.compose.foundation.layout.PaddingValues getContentPadding();
     method public float getIconSize();
     method public float getIconSpacing();
@@ -402,7 +402,7 @@ package androidx.compose.material {
   }
 
   public final class FloatingActionButtonDefaults {
-    method @androidx.compose.runtime.Composable public androidx.compose.material.FloatingActionButtonElevation elevation(optional float defaultElevation, optional float pressedElevation);
+    method @androidx.compose.runtime.Composable public androidx.compose.material.FloatingActionButtonElevation elevation(optional float defaultElevation, optional float pressedElevation, optional float hoveredElevation, optional float focusedElevation);
     field public static final androidx.compose.material.FloatingActionButtonDefaults INSTANCE;
   }
 
