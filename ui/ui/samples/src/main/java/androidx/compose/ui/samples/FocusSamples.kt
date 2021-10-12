@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusOrder
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.focus.onFocusChanged
@@ -47,7 +48,9 @@ import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.compose.ui.input.InputMode.Companion.Touch
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.unit.dp
 
 @Sampled
@@ -203,5 +206,23 @@ fun CustomFocusOrderSample() {
                 }
             )
         }
+    }
+}
+
+@Sampled
+@Composable
+fun FocusPropertiesSample() {
+    Column {
+        // Always focusable.
+        Box(modifier = Modifier
+            .focusProperties { canFocus = true }
+            .focusTarget()
+        )
+        // Only focusable in non-touch mode.
+        val inputModeManager = LocalInputModeManager.current
+        Box(modifier = Modifier
+            .focusProperties { canFocus = inputModeManager.inputMode != Touch }
+            .focusTarget()
+        )
     }
 }

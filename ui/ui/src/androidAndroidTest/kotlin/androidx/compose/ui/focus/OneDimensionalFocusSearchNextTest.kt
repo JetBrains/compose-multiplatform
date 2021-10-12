@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.focus
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.focus.FocusDirection.Companion.Next
@@ -45,7 +46,22 @@ class OneDimensionalFocusSearchNextTest {
         rule.setContentWithInitialRootFocus {}
 
         // Act.
-        val movedFocusSuccessfully = focusManager.moveFocus(Next)
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Next) }
+
+        // Assert.
+        rule.runOnIdle { assertThat(movedFocusSuccessfully).isFalse() }
+    }
+
+    @Test
+    fun moveFocus_oneDisabledFocusableItem() {
+        // Arrange.
+        val isItemFocused = mutableStateOf(false)
+        rule.setContentWithInitialRootFocus {
+            FocusableBox(isItemFocused, 0, 0, 10, 10, deactivated = true)
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Next) }
 
         // Assert.
         rule.runOnIdle { assertThat(movedFocusSuccessfully).isFalse() }
@@ -60,12 +76,34 @@ class OneDimensionalFocusSearchNextTest {
         }
 
         // Act.
-        val movedFocusSuccessfully = focusManager.moveFocus(Next)
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Next) }
 
         // Assert.
         rule.runOnIdle {
             assertThat(movedFocusSuccessfully).isTrue()
             assertThat(isItemFocused.value).isTrue()
+        }
+    }
+
+    @Test
+    fun initialFocus_skipsDeactivatedItem() {
+        // Arrange.
+        val (firstItem, secondItem) = List(2) { mutableStateOf(false) }
+        rule.setContentWithInitialRootFocus {
+            Column {
+                FocusableBox(firstItem, 0, 0, 10, 10, deactivated = true)
+                FocusableBox(secondItem, 0, 0, 10, 10)
+            }
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Next) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
+            assertThat(firstItem.value).isFalse()
+            assertThat(secondItem.value).isTrue()
         }
     }
 
@@ -79,7 +117,7 @@ class OneDimensionalFocusSearchNextTest {
         }
 
         // Act.
-        val movedFocusSuccessfully = focusManager.moveFocus(Next)
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Next) }
 
         // Assert.
         rule.runOnIdle {
@@ -102,7 +140,7 @@ class OneDimensionalFocusSearchNextTest {
         }
 
         // Act.
-        val movedFocusSuccessfully = focusManager.moveFocus(Next)
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Next) }
 
         // Assert.
         rule.runOnIdle {
@@ -123,7 +161,7 @@ class OneDimensionalFocusSearchNextTest {
         }
 
         // Act.
-        val movedFocusSuccessfully = focusManager.moveFocus(Next)
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Next) }
 
         // Assert.
         rule.runOnIdle {
@@ -144,7 +182,7 @@ class OneDimensionalFocusSearchNextTest {
         }
 
         // Act.
-        val movedFocusSuccessfully = focusManager.moveFocus(Next)
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Next) }
 
         // Assert.
         rule.runOnIdle {
@@ -164,12 +202,33 @@ class OneDimensionalFocusSearchNextTest {
         }
 
         // Act.
-        val movedFocusSuccessfully = focusManager.moveFocus(Next)
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Next) }
 
         // Assert.
         rule.runOnIdle {
             assertThat(movedFocusSuccessfully).isTrue()
             assertThat(item2.value).isTrue()
+        }
+    }
+
+    @Test
+    fun focusMovesToThirdItem_skipsDeactivatedItem() {
+        // Arrange.
+        val (item1, item2, item3, item4) = List(4) { mutableStateOf(false) }
+        rule.setContentForTest {
+            FocusableBox(item1, 0, 0, 10, 10, initialFocus)
+            FocusableBox(item2, 10, 0, 10, 10, deactivated = true)
+            FocusableBox(item3, 10, 0, 10, 10)
+            FocusableBox(item4, 20, 0, 10, 10)
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Next) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
+            assertThat(item3.value).isTrue()
         }
     }
 
@@ -184,12 +243,33 @@ class OneDimensionalFocusSearchNextTest {
         }
 
         // Act.
-        val movedFocusSuccessfully = focusManager.moveFocus(Next)
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Next) }
 
         // Assert.
         rule.runOnIdle {
             assertThat(movedFocusSuccessfully).isTrue()
             assertThat(item3.value).isTrue()
+        }
+    }
+
+    @Test
+    fun focusMovesToFourthItem() {
+        // Arrange.
+        val (item1, item2, item3, item4) = List(4) { mutableStateOf(false) }
+        rule.setContentForTest {
+            FocusableBox(item1, 0, 0, 10, 10)
+            FocusableBox(item2, 0, 0, 10, 10, deactivated = true)
+            FocusableBox(item3, 10, 0, 10, 10, initialFocus)
+            FocusableBox(item4, 20, 0, 10, 10)
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Next) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
+            assertThat(item4.value).isTrue()
         }
     }
 
@@ -204,7 +284,7 @@ class OneDimensionalFocusSearchNextTest {
         }
 
         // Act.
-        val movedFocusSuccessfully = focusManager.moveFocus(Next)
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Next) }
 
         // Assert.
         rule.runOnIdle {
@@ -214,11 +294,55 @@ class OneDimensionalFocusSearchNextTest {
     }
 
     @Test
+    fun focusWrapsAroundToFirstItem_skippingLastDeactivatedItem() {
+        // Arrange.
+        val (item1, item2, item3, item4) = List(4) { mutableStateOf(false) }
+        rule.setContentForTest {
+            FocusableBox(item1, 0, 0, 10, 10)
+            FocusableBox(item2, 10, 0, 10, 10)
+            FocusableBox(item3, 20, 0, 10, 10, initialFocus)
+            FocusableBox(item4, 10, 0, 10, 10, deactivated = true)
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Next) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
+            assertThat(item1.value).isTrue()
+        }
+    }
+
+    @Test
+    fun focusWrapsAroundToFirstItem_skippingFirstDeactivatedItem() {
+        // Arrange.
+        val (item1, item2, item3, item4) = List(4) { mutableStateOf(false) }
+        rule.setContentForTest {
+            FocusableBox(item1, 10, 0, 10, 10, deactivated = true)
+            FocusableBox(item2, 0, 0, 10, 10)
+            FocusableBox(item3, 10, 0, 10, 10)
+            FocusableBox(item4, 20, 0, 10, 10, initialFocus)
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Next) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
+            assertThat(item2.value).isTrue()
+        }
+    }
+
+    @Test
     fun focusNextOrdering() {
         // Arrange.
         val (parent1, child1, child2, child3) = List(4) { mutableStateOf(false) }
         val (parent2, child4, child5) = List(3) { mutableStateOf(false) }
         val (parent3, child6) = List(2) { mutableStateOf(false) }
+        val (parent4, child7, child8, child9, child10) = List(5) { mutableStateOf(false) }
+        val (parent5, child11) = List(2) { mutableStateOf(false) }
         rule.setContentWithInitialRootFocus {
             FocusableBox(parent1, 0, 0, 10, 10) {
                 FocusableBox(child1, 0, 0, 10, 10)
@@ -232,37 +356,55 @@ class OneDimensionalFocusSearchNextTest {
                 }
                 FocusableBox(child5, 20, 0, 10, 10)
             }
+            FocusableBox(parent4, 0, 10, 10, 10, deactivated = true) {
+                FocusableBox(child7, 0, 10, 10, 10, deactivated = true)
+                FocusableBox(child8, 0, 10, 10, 10)
+                FocusableBox(parent5, 10, 10, 10, 10, deactivated = true) {
+                    FocusableBox(child11, 0, 0, 10, 10)
+                }
+                FocusableBox(child9, 20, 0, 10, 10)
+                FocusableBox(child10, 20, 0, 10, 10, deactivated = true)
+            }
         }
 
         // Act & Assert.
-        focusManager.moveFocus(Next)
+        rule.runOnIdle { focusManager.moveFocus(Next) }
         rule.runOnIdle { assertThat(parent1.value).isTrue() }
 
-        focusManager.moveFocus(Next)
+        rule.runOnIdle { focusManager.moveFocus(Next) }
         rule.runOnIdle { assertThat(child1.value).isTrue() }
 
-        focusManager.moveFocus(Next)
+        rule.runOnIdle { focusManager.moveFocus(Next) }
         rule.runOnIdle { assertThat(child2.value).isTrue() }
 
-        focusManager.moveFocus(Next)
+        rule.runOnIdle { focusManager.moveFocus(Next) }
         rule.runOnIdle { assertThat(child3.value).isTrue() }
 
-        focusManager.moveFocus(Next)
+        rule.runOnIdle { focusManager.moveFocus(Next) }
         rule.runOnIdle { assertThat(parent2.value).isTrue() }
 
-        focusManager.moveFocus(Next)
+        rule.runOnIdle { focusManager.moveFocus(Next) }
         rule.runOnIdle { assertThat(child4.value).isTrue() }
 
-        focusManager.moveFocus(Next)
+        rule.runOnIdle { focusManager.moveFocus(Next) }
         rule.runOnIdle { assertThat(parent3.value).isTrue() }
 
-        focusManager.moveFocus(Next)
+        rule.runOnIdle { focusManager.moveFocus(Next) }
         rule.runOnIdle { assertThat(child6.value).isTrue() }
 
-        focusManager.moveFocus(Next)
+        rule.runOnIdle { focusManager.moveFocus(Next) }
         rule.runOnIdle { assertThat(child5.value).isTrue() }
 
-        focusManager.moveFocus(Next)
+        rule.runOnIdle { focusManager.moveFocus(Next) }
+        rule.runOnIdle { assertThat(child8.value).isTrue() }
+
+        rule.runOnIdle { focusManager.moveFocus(Next) }
+        rule.runOnIdle { assertThat(child11.value).isTrue() }
+
+        rule.runOnIdle { focusManager.moveFocus(Next) }
+        rule.runOnIdle { assertThat(child9.value).isTrue() }
+
+        rule.runOnIdle { focusManager.moveFocus(Next) }
         rule.runOnIdle { assertThat(parent1.value).isTrue() }
     }
 

@@ -358,6 +358,9 @@ package androidx.compose.ui.focus {
     method public boolean moveFocus(int focusDirection);
   }
 
+  public final class FocusManagerKt {
+  }
+
   public final class FocusModifierKt {
     method @Deprecated public static androidx.compose.ui.Modifier focusModifier(androidx.compose.ui.Modifier);
     method public static androidx.compose.ui.Modifier focusTarget(androidx.compose.ui.Modifier);
@@ -402,6 +405,16 @@ package androidx.compose.ui.focus {
     method public static androidx.compose.ui.Modifier focusOrder(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusOrder,kotlin.Unit> focusOrderReceiver);
     method public static androidx.compose.ui.Modifier focusOrder(androidx.compose.ui.Modifier, androidx.compose.ui.focus.FocusRequester focusRequester);
     method public static androidx.compose.ui.Modifier focusOrder(androidx.compose.ui.Modifier, androidx.compose.ui.focus.FocusRequester focusRequester, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusOrder,kotlin.Unit> focusOrderReceiver);
+  }
+
+  public interface FocusProperties {
+    method public boolean getCanFocus();
+    method public void setCanFocus(boolean canFocus);
+    property public abstract boolean canFocus;
+  }
+
+  public final class FocusPropertiesKt {
+    method public static androidx.compose.ui.Modifier focusProperties(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusProperties,kotlin.Unit> scope);
   }
 
   public final class FocusRequester {

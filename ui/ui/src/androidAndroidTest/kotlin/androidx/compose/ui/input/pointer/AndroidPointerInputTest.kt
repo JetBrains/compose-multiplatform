@@ -94,7 +94,6 @@ class AndroidPointerInputTest {
         AndroidPointerInputTestActivity::class.java
     )
 
-    private lateinit var androidComposeView: AndroidComposeView
     private lateinit var container: OpenComposeView
 
     @Before
@@ -238,7 +237,7 @@ class AndroidPointerInputTest {
     @Test
     fun dispatchTouchEvent_notMeasuredLayoutsAreMeasuredFirst() {
         val size = mutableStateOf(10)
-        var latch = CountDownLatch(1)
+        val latch = CountDownLatch(1)
         var consumedDownPosition: Offset? = null
         rule.runOnUiThread {
             container.setContent {
@@ -475,7 +474,7 @@ class AndroidPointerInputTest {
         var didLongPress = false
         var didTap = false
         var inputLatch = CountDownLatch(1)
-        var positionedLatch = CountDownLatch(1)
+        val positionedLatch = CountDownLatch(1)
 
         rule.runOnUiThread {
             container.setContent {

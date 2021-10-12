@@ -26,11 +26,15 @@ internal const val FocusTag = "Compose Focus"
 
 // TODO(b/152051577): Measure the performance of findFocusableChildren().
 //  Consider caching the children.
-internal fun LayoutNode.findFocusableChildren(focusableChildren: MutableList<ModifiedFocusNode>) {
+internal fun LayoutNode.findFocusableChildren(
+    focusableChildren: MutableList<ModifiedFocusNode>,
+    excludeDeactivated: Boolean
+) {
     // TODO(b/152529395): Write a test for LayoutNode.focusableChildren(). We were calling the wrong
     //  function on [LayoutNodeWrapper] but no test caught this.
-    outerLayoutNodeWrapper.findNextFocusWrapper()?.let { focusableChildren.add(it) }
-        ?: children.fastForEach { it.findFocusableChildren(focusableChildren) }
+    outerLayoutNodeWrapper.findNextFocusWrapper(excludeDeactivated)
+        ?.let { focusableChildren.add(it) }
+        ?: children.fastForEach { it.findFocusableChildren(focusableChildren, excludeDeactivated) }
 }
 
 // TODO(b/144126759): For now we always return the first focusable child. We might want to
@@ -42,11 +46,12 @@ internal fun LayoutNode.findFocusableChildren(focusableChildren: MutableList<Mod
  * @param queue a mutable list used as a queue for breadth-first search.
  */
 internal fun LayoutNode.searchChildrenForFocusNode(
-    queue: MutableVector<LayoutNode> = mutableVectorOf()
+    queue: MutableVector<LayoutNode> = mutableVectorOf(),
+    excludeDeactivated: Boolean
 ): ModifiedFocusNode? {
     // Check if any child has a focus Wrapper.
     _children.forEach { layoutNode ->
-        val focusNode = layoutNode.outerLayoutNodeWrapper.findNextFocusWrapper()
+        val focusNode = layoutNode.outerLayoutNodeWrapper.findNextFocusWrapper(excludeDeactivated)
         if (focusNode != null) {
             return focusNode
         } else {
@@ -56,7 +61,7 @@ internal fun LayoutNode.searchChildrenForFocusNode(
 
     // Perform a breadth-first search through the children.
     while (queue.isNotEmpty()) {
-        val focusNode = queue.removeAt(0).searchChildrenForFocusNode(queue)
+        val focusNode = queue.removeAt(0).searchChildrenForFocusNode(queue, excludeDeactivated)
         if (focusNode != null) {
             return focusNode
         }

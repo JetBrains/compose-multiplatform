@@ -51,6 +51,7 @@ internal fun FocusableBox(
     width: Int,
     height: Int,
     focusRequester: FocusRequester? = null,
+    deactivated: Boolean = false,
     content: @Composable () -> Unit = {}
 ) {
     Layout(
@@ -59,6 +60,7 @@ internal fun FocusableBox(
             .offset { IntOffset(x, y) }
             .focusRequester(focusRequester ?: remember { FocusRequester() })
             .onFocusChanged { isFocused.value = it.isFocused }
+            .focusProperties { canFocus = !deactivated }
             .focusTarget(),
         measurePolicy = remember(width, height) {
             MeasurePolicy { measurables, constraint ->
