@@ -32,6 +32,7 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
@@ -89,6 +90,10 @@ import androidx.compose.ui.unit.dp
  * @param tonalElevation When [color] is [ColorScheme.surface], a higher the elevation (surface
  * blended with more primary) will result in a darker surface color in light theme and lighter color
  * in dark theme.
+ * @param shadowElevation The size of the shadow below the surface. To prevent shadow creep, only
+ * apply shadow elevation when absolutely necessary, such as when the surface requires visual
+ * separation from a patterned background. Note that It will not affect z index of the Surface.
+ * If you want to change the drawing order you can use `Modifier.zIndex`.
  * @param border Optional border to draw on top of the surface
  */
 @Composable
@@ -98,6 +103,7 @@ fun Surface(
     color: Color = MaterialTheme.colorScheme.surface,
     contentColor: Color = contentColorFor(color),
     tonalElevation: Dp = 0.dp,
+    shadowElevation: Dp = 0.dp,
     border: BorderStroke? = null,
     content: @Composable () -> Unit
 ) {
@@ -107,6 +113,7 @@ fun Surface(
         color = color,
         contentColor = contentColor,
         tonalElevation = tonalElevation,
+        shadowElevation = shadowElevation,
         border = border,
         content = content,
         clickAndSemanticsModifier =
@@ -168,6 +175,8 @@ fun Surface(
  * @param tonalElevation When [color] is [ColorScheme.surface], a higher the elevation (surface
  * blended with more primary) will result in a darker surface color in light theme and lighter color
  * in dark theme.
+ * @param shadowElevation The size of the shadow below the surface. Note that It will not affect z index
+ * of the Surface. If you want to change the drawing order you can use `Modifier.zIndex`.
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
  * for this Surface. You can create and pass in your own remembered [MutableInteractionSource] if
  * you want to observe [Interaction]s and customize the appearance / behavior of this Surface in
@@ -190,6 +199,7 @@ fun Surface(
     color: Color = MaterialTheme.colorScheme.surface,
     contentColor: Color = contentColorFor(color),
     tonalElevation: Dp = 0.dp,
+    shadowElevation: Dp = 0.dp,
     border: BorderStroke? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     indication: Indication? = LocalIndication.current,
@@ -204,6 +214,7 @@ fun Surface(
         color = color,
         contentColor = contentColor,
         tonalElevation = tonalElevation,
+        shadowElevation = shadowElevation,
         border = border,
         content = content,
         clickAndSemanticsModifier =
@@ -220,12 +231,13 @@ fun Surface(
 
 @Composable
 private fun Surface(
-    modifier: Modifier = Modifier,
-    shape: Shape = RectangleShape,
-    border: BorderStroke? = null,
-    color: Color = MaterialTheme.colorScheme.primary,
-    contentColor: Color = contentColorFor(color),
-    tonalElevation: Dp = 0.dp, // This will be used to compute surface tonal colors
+    modifier: Modifier,
+    shape: Shape,
+    color: Color,
+    contentColor: Color,
+    border: BorderStroke?,
+    tonalElevation: Dp, // This will be used to compute surface tonal colors
+    shadowElevation: Dp,
     clickAndSemanticsModifier: Modifier,
     content: @Composable () -> Unit
 ) {
@@ -242,6 +254,7 @@ private fun Surface(
     ) {
         Box(
             modifier
+                .shadow(shadowElevation, shape, clip = false)
                 .then(if (border != null) Modifier.border(border, shape) else Modifier)
                 .background(color = backgroundColor, shape = shape)
                 .clip(shape)
