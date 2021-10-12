@@ -104,7 +104,8 @@ fun Card(
  * be clickable
  * @param onClickLabel semantic / accessibility label for the [onClick] action
  * @param role the type of user interface element. Accessibility services might use this
- * to describe the element or do customizations
+ * to describe the element or do customizations. For example, if the Card acts as a button, you
+ * should pass the [Role.Button]
  */
 @ExperimentalMaterialApi
 @Composable

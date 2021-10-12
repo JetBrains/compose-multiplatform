@@ -178,8 +178,9 @@ fun Surface(
  * @param enabled Controls the enabled state of the surface. When `false`, this surface will not be
  * clickable
  * @param onClickLabel semantic / accessibility label for the [onClick] action
- * @param role the type of user interface element. Accessibility services might use this to describe
- * the element or do customizations
+ * @param role the type of user interface element. Accessibility services might use this to
+ * describe the element or do customizations. For example, if the Surface acts as a button, you
+ * should pass the [Role.Button]
  */
 @Composable
 fun Surface(
