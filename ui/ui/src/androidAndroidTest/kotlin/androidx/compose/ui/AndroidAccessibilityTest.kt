@@ -120,8 +120,12 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.intl.LocaleList
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -1216,6 +1220,7 @@ class AndroidAccessibilityTest {
 
     @Test
     fun sendTextEvents_whenSetText() {
+        val locale = LocaleList("en_US")
         val tag = "TextField"
         val initialText = "h"
         val text = "hello"
@@ -1224,7 +1229,13 @@ class AndroidAccessibilityTest {
             BasicTextField(
                 modifier = Modifier.testTag(tag),
                 value = value,
-                onValueChange = { value = it }
+                onValueChange = { value = it },
+                visualTransformation = {
+                    TransformedText(
+                        it.toUpperCase(locale),
+                        OffsetMapping.Identity
+                    )
+                }
             )
         }
 
@@ -1233,7 +1244,7 @@ class AndroidAccessibilityTest {
             .assert(
                 SemanticsMatcher.expectValue(
                     SemanticsProperties.EditableText,
-                    AnnotatedString(initialText)
+                    AnnotatedString("H")
                 )
             )
 
@@ -1243,7 +1254,7 @@ class AndroidAccessibilityTest {
             .assert(
                 SemanticsMatcher.expectValue(
                     SemanticsProperties.EditableText,
-                    AnnotatedString(text)
+                    AnnotatedString("HELLO")
                 )
             )
 
@@ -1257,8 +1268,8 @@ class AndroidAccessibilityTest {
         textEvent.fromIndex = initialText.length
         textEvent.removedCount = 0
         textEvent.addedCount = text.length - initialText.length
-        textEvent.beforeText = initialText
-        textEvent.text.add(text)
+        textEvent.beforeText = initialText.toUpperCase(locale)
+        textEvent.text.add(text.toUpperCase(locale))
 
         val selectionEvent = delegate.createEvent(
             textFieldNode.id,
@@ -1267,15 +1278,22 @@ class AndroidAccessibilityTest {
         selectionEvent.fromIndex = text.length
         selectionEvent.toIndex = text.length
         selectionEvent.itemCount = text.length
-        selectionEvent.text.add(text)
+        selectionEvent.text.add(text.toUpperCase(locale))
 
         rule.runOnIdle {
             verify(container, atLeastOnce()).requestSendAccessibilityEvent(
                 eq(androidComposeView), argument.capture()
             )
-            val values = argument.allValues
-            assertTrue(containsEvent(values, textEvent))
-            assertTrue(containsEvent(values, selectionEvent))
+
+            val actualTextEvent = argument.allValues.first {
+                it.eventType == AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED
+            }
+            assertEquals(textEvent.toString(), actualTextEvent.toString())
+
+            val actualSelectionEvent = argument.allValues.first {
+                it.eventType == AccessibilityEvent.TYPE_VIEW_TEXT_SELECTION_CHANGED
+            }
+            assertEquals(selectionEvent.toString(), actualSelectionEvent.toString())
         }
     }
 

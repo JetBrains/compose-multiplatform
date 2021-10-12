@@ -108,11 +108,13 @@ import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.input.CommitTextCommand
 import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextFieldValue.Companion.Saver
 import androidx.compose.ui.text.input.TextInputService
+import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.BaselineShift
@@ -121,6 +123,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.TextIndent
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.text.withAnnotation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Density
@@ -718,6 +721,26 @@ class TextFieldTest {
         rule.onNodeWithTag(Tag)
             .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.CopyText))
             .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.CutText))
+    }
+
+    @Test
+    fun semantics_transformedText() {
+        rule.setContent {
+            BasicTextField(
+                modifier = Modifier.testTag(Tag),
+                value = TextFieldValue("Hello"),
+                onValueChange = {},
+                visualTransformation = { text ->
+                    TransformedText(
+                        text.toUpperCase(LocaleList("en_US")),
+                        OffsetMapping.Identity
+                    )
+                }
+            )
+        }
+
+        rule.onNodeWithTag(Tag)
+            .assertTextEquals("HELLO")
     }
 
     @LargeTest

@@ -176,7 +176,6 @@ object SemanticsProperties {
         }
     )
 
-    // TODO(b/178121203) might need to be transformed text
     /**
      * @see SemanticsPropertyReceiver.editableText
      */
@@ -784,7 +783,8 @@ var SemanticsPropertyReceiver.text: AnnotatedString
     set(value) { set(SemanticsProperties.Text, listOf(value)) }
 
 /**
- * Input text of the text field. It must be real text entered by the user instead of
+ * Input text of the text field with visual transformation applied to it. It must be a real text
+ * entered by the user with visual transformation applied on top of the input text instead of a
  * developer-set content description.
  */
 var SemanticsPropertyReceiver.editableText by SemanticsProperties.EditableText

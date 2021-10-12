@@ -366,7 +366,7 @@ internal fun CoreTextField(
     val semanticsModifier = Modifier.semantics(true) {
         // focused semantics are handled by Modifier.focusable()
         this.imeAction = imeOptions.imeAction
-        this.editableText = value.annotatedString
+        this.editableText = transformedText.text
         this.textSelectionRange = value.selection
         if (!enabled) this.disabled()
         if (isPassword) this.password()
@@ -382,7 +382,21 @@ internal fun CoreTextField(
             onValueChangeWrapper(TextFieldValue(it.text, TextRange(it.text.length)))
             true
         }
-        setSelection { start, end, traversalMode ->
+        setSelection { selectionStart, selectionEnd, traversalMode ->
+            // in traversal mode we get selection from the `textSelectionRange` semantics which is
+            // selection in original text. In non-traversal mode selection comes from the Talkback
+            // and indices are relative to the transformed text
+            val start = if (traversalMode) {
+                selectionStart
+            } else {
+                offsetMapping.transformedToOriginal(selectionStart)
+            }
+            val end = if (traversalMode) {
+                selectionEnd
+            } else {
+                offsetMapping.transformedToOriginal(selectionEnd)
+            }
+
             if (!enabled) {
                 false
             } else if (start == value.selection.start && end == value.selection.end) {
