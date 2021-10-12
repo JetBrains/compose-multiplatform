@@ -42,7 +42,9 @@ dependencies {
         testImplementation(libs.kotlinTestJunit)
         testImplementation(libs.junit)
         testImplementation(libs.robolectric)
-        testImplementation(libs.kotlinCoroutinesTest)
+        // kotlinCoroutinesTest is copy-pasted in source code to support multiplarform tests
+        // testImplementation(libs.kotlinCoroutinesTest)
+        testImplementation("org.jetbrains.kotlinx:atomicfu:0.14.4")
 
         androidTestImplementation(libs.kotlinTestJunit)
         androidTestImplementation(libs.testExtJunit)
@@ -111,6 +113,8 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                     implementation(libs.testRules)
                     implementation(libs.testRunner)
                     implementation(libs.truth)
+                    // kotlinCoroutinesTest is copy-pasted in source code to support multiplarform tests
+                    // implementation(libs.kotlinCoroutinesTest)
                 }
             }
 
@@ -121,8 +125,8 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             }
             jvmTest.dependencies {
                 implementation kotlin("test-junit")
-                implementation(libs.kotlinCoroutinesTest)
-                implementation(libs.kotlinCoroutinesTest)
+                // kotlinCoroutinesTest is copy-pasted in source code to support multiplarform tests
+                // implementation(libs.kotlinCoroutinesTest)
             }
             desktopTest {
                 dependsOn jvmTest
@@ -130,8 +134,10 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             androidTest {
                 dependsOn jvmTest
             }
-            jsTest.dependencies {
-                implementation kotlin("test-js")
+            jsTest {
+                dependencies {
+                    implementation kotlin("test-js")
+                }
             }
         }
     }

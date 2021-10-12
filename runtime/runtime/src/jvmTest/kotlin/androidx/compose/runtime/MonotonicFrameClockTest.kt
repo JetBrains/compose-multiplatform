@@ -16,6 +16,10 @@
 
 package androidx.compose.runtime
 
+import androidx.compose.runtime.ExperimentalComposeApi
+import androidx.compose.runtime.MonotonicFrameClock
+import androidx.compose.runtime.monotonicFrameClock
+import androidx.compose.runtime.withFrameNanos
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals

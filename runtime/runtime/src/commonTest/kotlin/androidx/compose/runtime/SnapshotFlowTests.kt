@@ -31,7 +31,7 @@ import kotlin.test.assertEquals
 @Suppress("RemoveExplicitTypeArguments")
 class SnapshotFlowTests {
     @Test
-    fun observeBasicChanges() = runTest {
+    fun observeBasicChanges() = _runBlocking {
         var state by mutableStateOf(1)
         var result = 0
 
@@ -53,7 +53,7 @@ class SnapshotFlowTests {
     }
 
     @Test
-    fun coalesceChanges() = runTest {
+    fun coalesceChanges() = _runBlocking {
         var state by mutableStateOf(1)
         var runCount = 0
 
@@ -82,7 +82,7 @@ class SnapshotFlowTests {
     }
 
     @Test
-    fun ignoreUnrelatedChanges() = runTest {
+    fun ignoreUnrelatedChanges() = _runBlocking {
         val state by mutableStateOf(1)
         var unrelatedState by mutableStateOf(1)
         var runCount = 0

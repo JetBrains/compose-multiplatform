@@ -18,12 +18,14 @@ package androidx.compose.runtime
 
 import androidx.compose.runtime.mock.compositionTest
 import androidx.compose.runtime.mock.expectNoChanges
+import kotlinx.test.IgnoreJsTarget
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
 class CompoundHashKeyTests {
     @Test // b/157905524
+    @IgnoreJsTarget
     fun testWithSubCompose() = compositionTest {
         val outerKeys = mutableListOf<Int>()
         val innerKeys = mutableListOf<Int>()
