@@ -32,7 +32,14 @@ git checkout -B skiko$SKIKO_VERSION
 popd
 
 # --------------------------------- Change frameworks/support
-sed -i 's/skiko = ".*"/skiko = "'"$SKIKO_VERSION"'"/' $AOSP_COMPOSE_SOURCE/frameworks/support/gradle/libs.versions.toml
+
+if [[ $OSTYPE == 'darwin'* ]]; then
+    SED=gsed
+else
+    SED=sed
+fi
+
+$SED -i 's/skiko = ".*"/skiko = "'"$SKIKO_VERSION"'"/' $AOSP_COMPOSE_SOURCE/frameworks/support/gradle/libs.versions.toml
 
 
 # --------------------------------- Change frameworks/prebuilts/androidx/external
