@@ -227,7 +227,7 @@ private fun FixedLazyGrid(
 
 @ExperimentalFoundationApi
 internal class LazyGridScopeImpl : LazyGridScope {
-    private val intervals = IntervalList<LazyItemScope.(Int) -> (@Composable () -> Unit)>()
+    private val intervals = MutableIntervalList<LazyItemScope.(Int) -> (@Composable () -> Unit)>()
 
     val totalSize get() = intervals.totalSize
 

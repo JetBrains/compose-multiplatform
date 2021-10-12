@@ -101,4 +101,7 @@ private object NoItemsProvider : LazyLayoutItemsProvider {
     override val itemsCount = 0
 
     override fun getKey(index: Int): Any = error("No items")
+
+    override val keyToIndexMap: Map<Any, Int>
+        get() = error("No items")
 }

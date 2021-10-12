@@ -16,8 +16,8 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.foundation.lazy.layout.LazyLayoutPlaceable
 import androidx.compose.foundation.lazy.layout.LazyLayoutPlaceablesProvider
-import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 
 /**
@@ -45,9 +45,19 @@ internal class LazyMeasuredItemProvider(
         val placeables = placeablesProvider.getAndMeasure(index.value, childConstraints)
         return measuredItemFactory.createItem(index, key, placeables)
     }
+
+    /**
+     * Contains the mapping between the key and the index. It could contain not all the items of
+     * the list as an optimization.
+     **/
+    val keyToIndexMap: Map<Any, Int> get() = itemsProvider.keyToIndexMap
 }
 
 // This interface allows to avoid autoboxing on index param
 internal fun interface MeasuredItemFactory {
-    fun createItem(index: DataIndex, key: Any, placeables: Array<Placeable>): LazyMeasuredItem
+    fun createItem(
+        index: DataIndex,
+        key: Any,
+        placeables: Array<LazyLayoutPlaceable>
+    ): LazyMeasuredItem
 }

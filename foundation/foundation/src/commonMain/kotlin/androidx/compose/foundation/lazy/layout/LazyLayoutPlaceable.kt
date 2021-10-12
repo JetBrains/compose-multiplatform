@@ -16,21 +16,9 @@
 
 package androidx.compose.foundation.lazy.layout
 
-import androidx.compose.runtime.Composable
+import androidx.compose.ui.layout.Placeable
 
-internal interface LazyLayoutItemsProvider {
-    /** Returns the content lambda for the given index and scope object */
-    fun getContent(index: Int): @Composable () -> Unit
-
-    /** The total number of items in the lazy layout (visible or not). */
-    val itemsCount: Int
-
-    /** Returns the key for the item on this index */
-    fun getKey(index: Int): Any
-
-    /**
-     * Contains the mapping between the key and the index. It could contain not all the items of
-     * the list as an optimization.
-     **/
-    val keyToIndexMap: Map<Any, Int>
-}
+internal class LazyLayoutPlaceable(
+    val placeable: Placeable,
+    val parentData: Any?
+)

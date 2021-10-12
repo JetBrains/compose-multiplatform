@@ -22,9 +22,9 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
-class IntervalListTest {
+class MutableIntervalListTest {
 
-    private val intervalList = IntervalList<Int>()
+    private val intervalList = MutableIntervalList<Int>()
 
     @Test
     fun addOneItem_searchInterval() {
