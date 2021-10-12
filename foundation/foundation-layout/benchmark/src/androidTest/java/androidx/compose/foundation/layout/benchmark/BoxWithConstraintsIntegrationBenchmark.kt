@@ -28,7 +28,6 @@ import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.NavigationRail
 import androidx.compose.material.NavigationRailItem
@@ -187,7 +186,6 @@ private fun PhoneScreen(gridColumns: Int) {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun TabletScreen(gridColumns: Int) {
     Row {

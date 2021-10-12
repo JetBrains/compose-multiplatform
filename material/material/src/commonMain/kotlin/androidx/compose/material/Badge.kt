@@ -55,7 +55,6 @@ import androidx.compose.ui.unit.sp
  * @param content the anchor to which this badge will be positioned
  *
  */
-@ExperimentalMaterialApi
 @Composable
 fun BadgedBox(
     badge: @Composable BoxScope.() -> Unit,
@@ -127,7 +126,6 @@ fun BadgedBox(
  * @param content optional content to be rendered inside the badge
  *
  */
-@ExperimentalMaterialApi
 @Composable
 fun Badge(
     modifier: Modifier = Modifier,
