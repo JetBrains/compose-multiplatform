@@ -18,27 +18,21 @@ package androidx.compose.ui.window
 import android.view.View
 import android.view.View.MEASURED_STATE_TOO_SMALL
 import android.view.ViewGroup
-import android.view.WindowManager
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.requiredWidth
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.node.Owner
@@ -368,63 +362,6 @@ class PopupTest {
 
     @OptIn(ExperimentalComposeUiApi::class)
     @Test
-    fun isNotDismissedOnAnchorClick_withCustomDismissOnOutsideClick() {
-        var anchorPosition = Rect.Zero
-        rule.setContent {
-            var showPopup by remember { mutableStateOf(true) }
-            Box(Modifier.wrapContentSize()) {
-                if (showPopup) {
-                    Box(
-                        modifier = Modifier.size(100.dp).onGloballyPositioned { layoutCoordinates ->
-                            anchorPosition = layoutCoordinates.boundsInRoot()
-                        }
-                    )
-                    Popup(
-                        properties = PopupProperties(
-                            focusable = true,
-                            dismissOnOutsideClick = { offset, anchorBounds ->
-                                if (offset == null) false
-                                else {
-                                    offset.x < anchorBounds.left ||
-                                        offset.x > anchorBounds.right ||
-                                        offset.y < anchorBounds.top ||
-                                        offset.y > anchorBounds.bottom
-                                }
-                            }
-                        ),
-                        alignment = Alignment.Center,
-                        onDismissRequest = { showPopup = false }
-                    ) {
-                        Box(Modifier.size(50.dp).testTag(testTag))
-                    }
-                }
-            }
-        }
-
-        // Popup should be visible
-        rule.onNodeWithTag(testTag).assertIsDisplayed()
-
-        // Click on the anchor
-        UiDevice.getInstance(getInstrumentation()).click(
-            anchorPosition.center.x.toInt(),
-            anchorPosition.center.y.toInt()
-        )
-
-        // Popup should still be visible
-        rule.onNodeWithTag(testTag).assertIsDisplayed()
-
-        // Click outside the anchor
-        UiDevice.getInstance(getInstrumentation()).click(
-            anchorPosition.right.toInt() + 1,
-            anchorPosition.bottom.toInt() + 1
-        )
-
-        // Popup should not exist
-        rule.onNodeWithTag(testTag).assertDoesNotExist()
-    }
-
-    @OptIn(ExperimentalComposeUiApi::class)
-    @Test
     fun canFillScreenWidth_dependingOnProperty() {
         var box1Width = 0
         var box2Width = 0
@@ -504,55 +441,6 @@ class PopupTest {
         rule.popupMatches(testTag, matchesSize(20, 20))
         rule.runOnIdle { size = size2 }
         rule.popupMatches(testTag, matchesSize(30, 30))
-    }
-
-    @OptIn(ExperimentalComposeUiApi::class)
-    @Test
-    fun propagatesClicksIfNonTouchModalIsSet() {
-        var wasBoxClicked = false
-        rule.setContent {
-            Box(
-                Modifier.fillMaxSize().clickable {
-                    wasBoxClicked = true
-                }
-            ) {
-                Popup(
-                    alignment = Alignment.TopStart,
-                    onDismissRequest = { },
-                    properties = PopupProperties(
-                        focusable = true,
-                        updateAndroidWindowManagerFlags = { flags ->
-                            flags or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-                        }
-                    )
-                ) {
-                    Box(Modifier.size(10.dp).testTag(testTag))
-                }
-            }
-        }
-
-        // Popup should be visible
-        rule.onNodeWithTag(testTag).assertIsDisplayed()
-
-        // Click inside the popup
-        val insideX = with(rule.density) { 5.dp.toPx() }
-        val insideY = with(rule.density) { 5.dp.toPx() }
-        UiDevice.getInstance(getInstrumentation()).click(insideX.toInt(), insideY.toInt())
-
-        // Box should not have been clicked
-        rule.runOnIdle {
-            assertThat(wasBoxClicked).isFalse()
-        }
-
-        // Click outside the popup
-        val outsideX = with(rule.density) { 100.dp.toPx() }
-        val outsideY = with(rule.density) { 100.dp.toPx() }
-        UiDevice.getInstance(getInstrumentation()).click(outsideX.toInt(), outsideY.toInt())
-
-        // Box should've been clicked
-        rule.runOnIdle {
-            assertThat(wasBoxClicked).isTrue()
-        }
     }
 
     private fun matchesSize(width: Int, height: Int): BoundedMatcher<View, View> {
