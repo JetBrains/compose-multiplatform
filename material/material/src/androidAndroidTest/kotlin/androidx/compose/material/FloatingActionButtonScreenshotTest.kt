@@ -23,6 +23,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasClickAction
@@ -141,5 +144,35 @@ class FloatingActionButtonScreenshotTest {
         rule.onRoot()
             .captureToImage()
             .assertAgainstGolden(screenshotRule, "fab_hover")
+    }
+
+    @Test
+    fun focus() {
+        val focusRequester = FocusRequester()
+
+        rule.setMaterialContent {
+            Box(Modifier.requiredSize(100.dp, 100.dp).wrapContentSize()) {
+                FloatingActionButton(
+                    onClick = { },
+                    modifier = Modifier
+                        // Normally this is only focusable in non-touch mode, so let's force it to
+                        // always be focusable so we can test how it appears
+                        .focusProperties { canFocus = true }
+                        .focusRequester(focusRequester)
+                ) {
+                    Icon(Icons.Filled.Favorite, contentDescription = null)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            focusRequester.requestFocus()
+        }
+
+        rule.waitForIdle()
+
+        rule.onRoot()
+            .captureToImage()
+            .assertAgainstGolden(screenshotRule, "fab_focus")
     }
 }

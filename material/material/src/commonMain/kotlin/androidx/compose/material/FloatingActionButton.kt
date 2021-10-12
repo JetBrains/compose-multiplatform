@@ -18,6 +18,7 @@ package androidx.compose.material
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
+import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.InteractionSource
@@ -206,7 +207,6 @@ interface FloatingActionButtonElevation {
  * Contains the default values used by [FloatingActionButton]
  */
 object FloatingActionButtonDefaults {
-    // TODO: b/152525426 add support for focused states
     /**
      * Creates a [FloatingActionButtonElevation] that will animate between the provided values
      * according to the Material specification.
@@ -238,7 +238,8 @@ object FloatingActionButtonDefaults {
      * pressed.
      * @param hoveredElevation the elevation to use when the [FloatingActionButton] is
      * hovered.
-     * @param focusedElevation not currently supported.
+     * @param focusedElevation the elevation to use when the [FloatingActionButton] is
+     * focused.
      */
     @Suppress("UNUSED_PARAMETER")
     @Composable
@@ -248,11 +249,12 @@ object FloatingActionButtonDefaults {
         hoveredElevation: Dp = 8.dp,
         focusedElevation: Dp = 8.dp,
     ): FloatingActionButtonElevation {
-        return remember(defaultElevation, pressedElevation, hoveredElevation) {
+        return remember(defaultElevation, pressedElevation, hoveredElevation, focusedElevation) {
             DefaultFloatingActionButtonElevation(
                 defaultElevation = defaultElevation,
                 pressedElevation = pressedElevation,
                 hoveredElevation = hoveredElevation,
+                focusedElevation = focusedElevation
             )
         }
     }
@@ -265,7 +267,8 @@ object FloatingActionButtonDefaults {
 private class DefaultFloatingActionButtonElevation(
     private val defaultElevation: Dp,
     private val pressedElevation: Dp,
-    private val hoveredElevation: Dp
+    private val hoveredElevation: Dp,
+    private val focusedElevation: Dp
 ) : FloatingActionButtonElevation {
     @Composable
     override fun elevation(interactionSource: InteractionSource): State<Dp> {
@@ -278,6 +281,12 @@ private class DefaultFloatingActionButtonElevation(
                     }
                     is HoverInteraction.Exit -> {
                         interactions.remove(interaction.enter)
+                    }
+                    is FocusInteraction.Focus -> {
+                        interactions.add(interaction)
+                    }
+                    is FocusInteraction.Unfocus -> {
+                        interactions.remove(interaction.focus)
                     }
                     is PressInteraction.Press -> {
                         interactions.add(interaction)
@@ -297,6 +306,7 @@ private class DefaultFloatingActionButtonElevation(
         val target = when (interaction) {
             is PressInteraction.Press -> pressedElevation
             is HoverInteraction.Enter -> hoveredElevation
+            is FocusInteraction.Focus -> focusedElevation
             else -> defaultElevation
         }
 
@@ -306,6 +316,7 @@ private class DefaultFloatingActionButtonElevation(
             val lastInteraction = when (animatable.targetValue) {
                 pressedElevation -> PressInteraction.Press(Offset.Zero)
                 hoveredElevation -> HoverInteraction.Enter()
+                focusedElevation -> FocusInteraction.Focus()
                 else -> null
             }
             animatable.animateElevation(

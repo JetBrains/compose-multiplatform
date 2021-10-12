@@ -104,7 +104,7 @@ public interface RippleTheme {
  * RippleAlpha defines the alpha of the ripple / state layer for different [Interaction]s.
  *
  * @property draggedAlpha the alpha used when the ripple is dragged
- * @property focusedAlpha not currently supported
+ * @property focusedAlpha the alpha used when the ripple is focused
  * @property hoveredAlpha the alpha used when the ripple is hovered
  * @property pressedAlpha the alpha used when the ripple is pressed
  */

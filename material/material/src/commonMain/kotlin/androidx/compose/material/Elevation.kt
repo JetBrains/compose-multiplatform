@@ -22,6 +22,7 @@ import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.PressInteraction
@@ -81,6 +82,7 @@ private object ElevationDefaults {
             is PressInteraction.Press -> DefaultIncomingSpec
             is DragInteraction.Start -> DefaultIncomingSpec
             is HoverInteraction.Enter -> DefaultIncomingSpec
+            is FocusInteraction.Focus -> DefaultIncomingSpec
             else -> null
         }
     }
@@ -96,6 +98,7 @@ private object ElevationDefaults {
             is PressInteraction.Press -> DefaultOutgoingSpec
             is DragInteraction.Start -> DefaultOutgoingSpec
             is HoverInteraction.Enter -> HoveredOutgoingSpec
+            is FocusInteraction.Focus -> DefaultOutgoingSpec
             else -> null
         }
     }

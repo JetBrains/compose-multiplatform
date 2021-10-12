@@ -394,8 +394,6 @@ internal suspend fun PressGestureScope.handlePressInteraction(
  */
 internal expect val TapIndicationDelay: Long
 
-@Composable
-@Suppress("ComposableModifierFactory")
 internal fun Modifier.genericClickableWithoutGesture(
     gestureModifiers: Modifier,
     interactionSource: MutableInteractionSource,
@@ -426,6 +424,7 @@ internal fun Modifier.genericClickableWithoutGesture(
     return this
         .then(semanticModifier)
         .indication(interactionSource, indication)
-        .hoverable(interactionSource = interactionSource)
+        .hoverable(enabled = enabled, interactionSource = interactionSource)
+        .focusableInNonTouchMode(enabled = enabled, interactionSource = interactionSource)
         .then(gestureModifiers)
 }
