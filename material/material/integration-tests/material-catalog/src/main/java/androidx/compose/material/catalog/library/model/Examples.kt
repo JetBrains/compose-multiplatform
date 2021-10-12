@@ -18,6 +18,9 @@
 
 package androidx.compose.material.catalog.library.model
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.catalog.library.util.SampleSourceUrl
 import androidx.compose.material.samples.AlertDialogSample
 import androidx.compose.material.samples.BackdropScaffoldSample
@@ -34,6 +37,7 @@ import androidx.compose.material.samples.CircularProgressIndicatorSample
 import androidx.compose.material.samples.ClickableListItems
 import androidx.compose.material.samples.CompactNavigationRailSample
 import androidx.compose.material.samples.CustomAlertDialogSample
+import androidx.compose.material.samples.ExposedDropdownMenuSample
 import androidx.compose.material.samples.FancyIndicatorContainerTabs
 import androidx.compose.material.samples.FancyIndicatorTabs
 import androidx.compose.material.samples.FancyTabs
@@ -72,6 +76,7 @@ import androidx.compose.material.samples.StepRangeSliderSample
 import androidx.compose.material.samples.StepsSliderSample
 import androidx.compose.material.samples.SwitchSample
 import androidx.compose.material.samples.TextAndIconTabs
+import androidx.compose.material.samples.TextArea
 import androidx.compose.material.samples.TextButtonSample
 import androidx.compose.material.samples.TextFieldSample
 import androidx.compose.material.samples.TextFieldWithErrorState
@@ -86,6 +91,8 @@ import androidx.compose.material.samples.TriStateCheckboxSample
 import androidx.compose.material.samples.TwoLineListItems
 import androidx.compose.material.samples.TwoLineRtlLtrListItems
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 data class Example(
     val name: String,
@@ -344,6 +351,13 @@ val MenusExamples = listOf(
         sourceUrl = MenusExampleSourceUrl
     ) {
         MenuSample()
+    },
+    Example(
+        name = ::ExposedDropdownMenuSample.name,
+        description = MenusExampleDescription,
+        sourceUrl = MenusExampleSourceUrl
+    ) {
+        ExposedDropdownMenuSample()
     }
 )
 
@@ -638,8 +652,22 @@ val TextFieldsExamples = listOf(
         sourceUrl = TextFieldsExampleSourceUrl
     ) {
         TextFieldWithHideKeyboardOnImeAction()
+    },
+    Example(
+        name = ::TextArea.name,
+        description = TextFieldsExampleDescription,
+        sourceUrl = TextFieldsExampleSourceUrl
+    ) {
+       TextArea()
     }
-)
+).map {
+    // By default text field samples are minimal and don't have a `width` modifier to restrict the
+    // width. As a result, they grow horizontally if enough text is typed. To prevent this behavior
+    // in Catalog app the code below restricts the width of every text field sample
+    it.copy(content = {
+        Box(Modifier.wrapContentWidth().width(280.dp)) { it.content() }
+    })
+}
 
 private const val NavigationRailExampleDescription = "Navigation Rail examples"
 private const val NavigationRailExampleSourceUrl = "$SampleSourceUrl/NavigationRailSamples.kt"
