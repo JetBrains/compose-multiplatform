@@ -28,7 +28,6 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LeadingIconTab
@@ -54,7 +53,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BadgeDemo() {
     Column(Modifier.verticalScroll(rememberScrollState())) {
@@ -274,7 +272,6 @@ fun TextTabsWithBadge(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LeadingIconTabsWithBadge(
     onTab1BadgeClick: () -> Unit,
@@ -340,7 +337,6 @@ fun LeadingIconTabsWithBadge(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun DemoBadgedBox(
     badgeText: String?,

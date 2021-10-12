@@ -148,7 +148,6 @@ fun Tab(
  *
  * @see Tab
  */
-@ExperimentalMaterialApi
 @Composable
 fun LeadingIconTab(
     selected: Boolean,

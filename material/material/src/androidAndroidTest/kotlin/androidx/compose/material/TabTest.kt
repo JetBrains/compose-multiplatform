@@ -135,7 +135,6 @@ class TabTest {
             .assertHasClickAction()
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     @Test
     fun leadingIconTab_defaultSemantics() {
         rule.setMaterialContent {
@@ -161,7 +160,6 @@ class TabTest {
             .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.SelectableGroup))
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     @Test
     fun leadingIconTab_disabledSemantics() {
         rule.setMaterialContent {
@@ -218,7 +216,6 @@ class TabTest {
             .assertHeightIsEqualTo(ExpectedLargeTabHeight)
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     @Test
     fun leadingIconTab_height() {
         rule
@@ -429,7 +426,6 @@ class TabTest {
         textBounds.top.assertIsEqualTo(expectedPositionY, "text bounds top y-position")
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     @Test
     fun LeadingIconTab_textAndIconPosition() {
         rule.setMaterialContent {
@@ -818,7 +814,6 @@ class TabTest {
         }
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     @Test
     fun leadingIconTab_disabled_noClicks() {
         var clicks = 0

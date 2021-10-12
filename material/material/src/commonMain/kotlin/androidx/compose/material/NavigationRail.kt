@@ -59,10 +59,10 @@ import kotlin.math.roundToInt
 /**
  * <a href="https://material.io/components/navigation-rail" class="external" target="_blank">Material Design navigation rail</a>.
  *
- * The Navigation Rail is a side navigation component that allows movement between primary
- * destinations in an app. The navigation rail should be used to display three to seven app
- * destinations and, optionally, a  Floating Action Button or a logo header. Each destination is
- * typically represented by an icon and an optional text label.
+ * A Navigation Rail is a side navigation component that allows movement between primary
+ * destinations in an app. A navigation rail should be used to display three to seven app
+ * destinations and, optionally, a [FloatingActionButton] or a logo inside [header]. Each
+ * destination is typically represented by an icon and an optional text label.
  *
  * ![Navigation rail image](https://developer.android.com/images/reference/androidx/compose/material/navigation-rail.png)
  *
@@ -85,11 +85,10 @@ import kotlin.math.roundToInt
  * [backgroundColor] is not a color from the theme, this will keep the same value set above this
  * NavigationRail.
  * @param elevation elevation for this NavigationRail
- * @param header an optional header that may hold a Floating Action Button or a logo
+ * @param header an optional header that may hold a [FloatingActionButton] or a logo
  * @param content destinations inside this NavigationRail, this should contain multiple
  * [NavigationRailItem]s
  */
-@ExperimentalMaterialApi
 @Composable
 fun NavigationRail(
     modifier: Modifier = Modifier,
@@ -144,7 +143,6 @@ fun NavigationRail(
  * and the color of the ripple.
  * @param unselectedContentColor the color of the text label and icon when this item is not selected
  */
-@ExperimentalMaterialApi
 @Composable
 fun NavigationRailItem(
     selected: Boolean,
@@ -206,7 +204,6 @@ fun NavigationRailItem(
 /**
  * Contains default values used for [NavigationRail].
  */
-@ExperimentalMaterialApi
 object NavigationRailDefaults {
     /**
      * Default elevation used for [NavigationRail].
