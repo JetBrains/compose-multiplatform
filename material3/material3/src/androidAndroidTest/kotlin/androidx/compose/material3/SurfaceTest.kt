@@ -22,17 +22,21 @@ import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.testutils.assertPixels
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
@@ -189,6 +193,59 @@ class SurfaceTest {
         rule.runOnIdle {
             Truth.assertThat(outerElevation).isEqualTo(2.dp)
             Truth.assertThat(innerElevation).isEqualTo(6.dp)
+        }
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun absoluteElevationIsNotUsedForShadows() {
+        rule.setMaterialContent {
+            Column {
+                Box(
+                    Modifier
+                        .padding(10.dp)
+                        .size(10.dp, 10.dp)
+                        .semantics(mergeDescendants = true) {}
+                        .testTag("top level")
+                ) {
+                    Surface(
+                        Modifier.fillMaxSize().padding(0.dp),
+                        tonalElevation = 2.dp,
+                        shadowElevation = 2.dp,
+                        color = Color.Blue,
+                        content = {}
+                    )
+                }
+
+                // Set LocalAbsoluteTonalElevation to increase the absolute elevation
+                CompositionLocalProvider(
+                    LocalAbsoluteTonalElevation provides 2.dp
+                ) {
+                    Box(
+                        Modifier
+                            .padding(10.dp)
+                            .size(10.dp, 10.dp)
+                            .semantics(mergeDescendants = true) {}
+                            .testTag("nested")
+                    ) {
+                        Surface(
+                            Modifier.fillMaxSize().padding(0.dp),
+                            tonalElevation = 0.dp,
+                            shadowElevation = 2.dp,
+                            color = Color.Blue,
+                            content = {}
+                        )
+                    }
+                }
+            }
+        }
+
+        val topLevelSurfaceBitmap = rule.onNodeWithTag("top level").captureToImage()
+        val nestedSurfaceBitmap = rule.onNodeWithTag("nested").captureToImage()
+            .asAndroidBitmap()
+
+        topLevelSurfaceBitmap.assertPixels {
+            Color(nestedSurfaceBitmap.getPixel(it.x, it.y))
         }
     }
 
