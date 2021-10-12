@@ -80,13 +80,19 @@ package androidx.compose.ui.unit {
     method public static inline float getWidth(androidx.compose.ui.unit.DpRect);
     method public static inline boolean isFinite(float);
     method public static inline boolean isSpecified(float);
+    method public static inline boolean isSpecified(long);
+    method public static inline boolean isSpecified(long);
     method public static inline boolean isUnspecified(float);
+    method public static inline boolean isUnspecified(long);
+    method public static inline boolean isUnspecified(long);
     method @androidx.compose.runtime.Stable public static float lerp(float start, float stop, float fraction);
     method @androidx.compose.runtime.Stable public static long lerp(long start, long stop, float fraction);
     method @androidx.compose.runtime.Stable public static long lerp(long start, long stop, float fraction);
     method @androidx.compose.runtime.Stable public static inline float max(float a, float b);
     method @androidx.compose.runtime.Stable public static inline float min(float a, float b);
     method public static inline float takeOrElse(float, kotlin.jvm.functions.Function0<androidx.compose.ui.unit.Dp> block);
+    method public static inline long takeOrElse(long, kotlin.jvm.functions.Function0<androidx.compose.ui.unit.DpOffset> block);
+    method public static inline long takeOrElse(long, kotlin.jvm.functions.Function0<androidx.compose.ui.unit.DpSize> block);
     method @androidx.compose.runtime.Stable public static inline operator float times(float, float other);
     method @androidx.compose.runtime.Stable public static inline operator float times(double, float other);
     method @androidx.compose.runtime.Stable public static inline operator float times(int, float other);
@@ -99,7 +105,9 @@ package androidx.compose.ui.unit {
   }
 
   public static final class DpOffset.Companion {
+    method public long getUnspecified();
     method public long getZero();
+    property public final long Unspecified;
     property public final long Zero;
   }
 
@@ -130,7 +138,9 @@ package androidx.compose.ui.unit {
   }
 
   public static final class DpSize.Companion {
+    method public long getUnspecified();
     method public long getZero();
+    property public final long Unspecified;
     property public final long Zero;
   }
 

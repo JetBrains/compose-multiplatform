@@ -17,6 +17,8 @@
 package androidx.compose.ui.unit
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class DpSizeTest {
@@ -73,5 +75,37 @@ class DpSizeTest {
     @Test
     fun dpRectSize() {
         assertEquals(DpSize(10.dp, 5.dp), DpRect(2.dp, 3.dp, 12.dp, 8.dp).size)
+    }
+
+    @Test
+    fun testIsSpecified() {
+        assertFalse(DpSize.Unspecified.isSpecified)
+        assertTrue(DpSize(1.dp, 1.dp).isSpecified)
+    }
+
+    @Test
+    fun testIsUnspecified() {
+        assertTrue(DpSize.Unspecified.isUnspecified)
+        assertFalse(DpSize(1.dp, 1.dp).isUnspecified)
+    }
+
+    @Test
+    fun testTakeOrElseTrue() {
+        assertTrue(DpSize(1.dp, 1.dp).takeOrElse { DpSize.Unspecified }.isSpecified)
+    }
+
+    @Test
+    fun testTakeOrElseFalse() {
+        assertTrue(DpSize.Unspecified.takeOrElse { DpSize(1.dp, 1.dp) }.isSpecified)
+    }
+
+    @Test
+    fun testToString() {
+        assertEquals("1.0.dp x 1.0.dp", DpSize(1.dp, 1.dp).toString())
+    }
+
+    @Test
+    fun testUnspecifiedToString() {
+        assertEquals("DpSize.Unspecified", DpSize.Unspecified.toString())
     }
 }

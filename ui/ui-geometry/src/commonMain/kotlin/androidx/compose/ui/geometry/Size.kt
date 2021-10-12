@@ -86,7 +86,7 @@ inline class Size internal constructor(@PublishedApi internal val packedValue: L
         /**
          * A size whose [width] and [height] are unspecified. This is a sentinel
          * value used to initialize a non-null parameter.
-         * Access to width or height on an unspecified size is not allowed
+         * Access to width or height on an unspecified size is not allowed.
          */
         @Stable
         val Unspecified = Size(Float.NaN, Float.NaN)
@@ -159,7 +159,7 @@ inline val Size.isUnspecified: Boolean
     get() = packedValue == Size.Unspecified.packedValue
 
 /**
- * If this [Size] [isSpecified] then this is returned, otherwise [block] is executed
+ * If this [Size]&nbsp;[isSpecified] then this is returned, otherwise [block] is executed
  * and its result is returned.
  */
 inline fun Size.takeOrElse(block: () -> Size): Size =

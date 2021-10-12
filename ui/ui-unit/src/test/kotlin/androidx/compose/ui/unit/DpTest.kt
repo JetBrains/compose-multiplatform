@@ -162,31 +162,6 @@ class DpTest {
     }
 
     @Test
-    fun lerpPosition() {
-        val a = DpOffset(3.dp, 10.dp)
-        val b = DpOffset(5.dp, 8.dp)
-        assertEquals(DpOffset(4.dp, 9.dp), lerp(a, b, 0.5f))
-        assertEquals(DpOffset(3.dp, 10.dp), lerp(a, b, 0f))
-        assertEquals(DpOffset(5.dp, 8.dp), lerp(a, b, 1f))
-    }
-
-    @Test
-    fun positionMinus() {
-        val a = DpOffset(3.dp, 10.dp)
-        val b = DpOffset(5.dp, 8.dp)
-        assertEquals(DpOffset(-2.dp, 2.dp), a - b)
-        assertEquals(DpOffset(2.dp, -2.dp), b - a)
-    }
-
-    @Test
-    fun positionPlus() {
-        val a = DpOffset(3.dp, 10.dp)
-        val b = DpOffset(5.dp, 8.dp)
-        assertEquals(DpOffset(8.dp, 18.dp), a + b)
-        assertEquals(DpOffset(8.dp, 18.dp), b + a)
-    }
-
-    @Test
     fun dpRectConstructor() {
         assertEquals(
             DpRect(10.dp, 5.dp, 25.dp, 15.dp),
@@ -204,28 +179,6 @@ class DpTest {
     fun dpRectHeight() {
         val dpRect = DpRect(10.dp, 5.dp, 25.dp, 15.dp)
         assertEquals(10.dp, dpRect.height)
-    }
-
-    @Test
-    fun testPositionCopy() {
-        val position = DpOffset(12.dp, 27.dp)
-        assertEquals(position, position.copy())
-    }
-
-    @Test
-    fun testPositionCopyOverwriteX() {
-        val position = DpOffset(15.dp, 32.dp)
-        val copy = position.copy(x = 59.dp)
-        assertEquals(59.dp, copy.x)
-        assertEquals(32.dp, copy.y)
-    }
-
-    @Test
-    fun testPositionCopyOverwriteY() {
-        val position = DpOffset(19.dp, 42.dp)
-        val copy = position.copy(y = 67.dp)
-        assertEquals(19.dp, copy.x)
-        assertEquals(67.dp, copy.y)
     }
 
     @Test
