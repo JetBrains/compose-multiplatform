@@ -18,8 +18,8 @@ package androidx.compose.material
 import android.graphics.Rect
 import android.view.View
 import android.view.ViewTreeObserver
-import android.view.WindowManager
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.interaction.InteractionSource
@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.internal.ExposedDropdownMenuPopup
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
@@ -40,13 +41,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.changedToUp
@@ -61,9 +61,8 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.IntRect
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.util.fastAll
-import androidx.compose.ui.window.PopupProperties
 import kotlinx.coroutines.coroutineScope
 import kotlin.math.max
 
@@ -196,41 +195,49 @@ interface ExposedDropdownMenuBoxScope {
         onDismissRequest: () -> Unit,
         modifier: Modifier = Modifier,
         content: @Composable ColumnScope.() -> Unit
-    ) = DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = onDismissRequest,
-        modifier = modifier.exposedDropdownSize(),
-        properties = ExposedDropdownMenuDefaults.PopupProperties,
-        content = content
-    )
+    ) {
+        // TODO(b/202810604): use DropdownMenu when PopupProperties constructor is stable
+        // return DropdownMenu(
+        //     expanded = expanded,
+        //     onDismissRequest = onDismissRequest,
+        //     modifier = modifier.exposedDropdownSize(),
+        //     properties = ExposedDropdownMenuDefaults.PopupProperties,
+        //     content = content
+        // )
+
+        val expandedStates = remember { MutableTransitionState(false) }
+        expandedStates.targetState = expanded
+
+        if (expandedStates.currentState || expandedStates.targetState) {
+            val transformOriginState = remember { mutableStateOf(TransformOrigin.Center) }
+            val density = LocalDensity.current
+            val popupPositionProvider = DropdownMenuPositionProvider(
+                DpOffset.Zero,
+                density
+            ) { parentBounds, menuBounds ->
+                transformOriginState.value = calculateTransformOrigin(parentBounds, menuBounds)
+            }
+
+            ExposedDropdownMenuPopup(
+                onDismissRequest = onDismissRequest,
+                popupPositionProvider = popupPositionProvider
+            ) {
+                DropdownMenuContent(
+                    expandedStates = expandedStates,
+                    transformOriginState = transformOriginState,
+                    modifier = modifier.exposedDropdownSize(),
+                    content = content
+                )
+            }
+        }
+    }
 }
 
 /**
  * Contains default values used by Exposed Dropdown Menu.
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @ExperimentalMaterialApi
 object ExposedDropdownMenuDefaults {
-    /**
-     * The default Popup Properties for ExposedDropdownMenu inside ExposedDropdownMenuBox.
-     * ExposedDropdownMenu will be focusable, will propagate clicks, work with input method,
-     * won't be dismissed when Text Field was clicked.
-     */
-    val PopupProperties = PopupProperties(
-        focusable = true,
-        dismissOnOutsideClick = { offset: Offset?, bounds: IntRect ->
-            if (offset == null) false
-            else {
-                offset.x < bounds.left || offset.x > bounds.right ||
-                    offset.y < bounds.top || offset.y > bounds.bottom
-            }
-        },
-        updateAndroidWindowManagerFlags = { flags ->
-            flags or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager
-                .LayoutParams.FLAG_ALT_FOCUSABLE_IM
-        }
-    )
-
     /**
      * Default trailing icon for Exposed Dropdown Menu.
      *
