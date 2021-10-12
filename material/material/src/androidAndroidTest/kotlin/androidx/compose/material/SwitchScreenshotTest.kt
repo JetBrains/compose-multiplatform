@@ -34,6 +34,7 @@ import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performMouseInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -233,6 +234,25 @@ class SwitchScreenshotTest {
         Thread.sleep(300)
 
         assertToggeableAgainstGolden("switch_animateToUnchecked")
+    }
+
+    @Test
+    fun switchTest_hover() {
+        rule.setMaterialContent {
+            Box(wrapperModifier) {
+                Switch(
+                    checked = true,
+                    onCheckedChange = { }
+                )
+            }
+        }
+
+        rule.onNode(isToggleable())
+            .performMouseInput { enter(center) }
+
+        rule.waitForIdle()
+
+        assertToggeableAgainstGolden("switch_hover")
     }
 
     private fun assertToggeableAgainstGolden(goldenName: String) {

@@ -18,6 +18,7 @@ package androidx.compose.material
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
+import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -205,7 +206,7 @@ interface FloatingActionButtonElevation {
  * Contains the default values used by [FloatingActionButton]
  */
 object FloatingActionButtonDefaults {
-    // TODO: b/152525426 add support for focused and hovered states
+    // TODO: b/152525426 add support for focused states
     /**
      * Creates a [FloatingActionButtonElevation] that will animate between the provided values
      * according to the Material specification.
@@ -215,17 +216,43 @@ object FloatingActionButtonDefaults {
      * @param pressedElevation the elevation to use when the [FloatingActionButton] is
      * pressed.
      */
+    @Deprecated("Use another overload of elevation", level = DeprecationLevel.HIDDEN)
     @Composable
     fun elevation(
         defaultElevation: Dp = 6.dp,
-        pressedElevation: Dp = 12.dp
-        // focused: Dp = 8.dp,
-        // hovered: Dp = 8.dp,
+        pressedElevation: Dp = 12.dp,
+    ): FloatingActionButtonElevation = elevation(
+        defaultElevation,
+        pressedElevation,
+        hoveredElevation = 8.dp,
+        focusedElevation = 8.dp,
+    )
+
+    /**
+     * Creates a [FloatingActionButtonElevation] that will animate between the provided values
+     * according to the Material specification.
+     *
+     * @param defaultElevation the elevation to use when the [FloatingActionButton] has no
+     * [Interaction]s
+     * @param pressedElevation the elevation to use when the [FloatingActionButton] is
+     * pressed.
+     * @param hoveredElevation the elevation to use when the [FloatingActionButton] is
+     * hovered.
+     * @param focusedElevation not currently supported.
+     */
+    @Suppress("UNUSED_PARAMETER")
+    @Composable
+    fun elevation(
+        defaultElevation: Dp = 6.dp,
+        pressedElevation: Dp = 12.dp,
+        hoveredElevation: Dp = 8.dp,
+        focusedElevation: Dp = 8.dp,
     ): FloatingActionButtonElevation {
-        return remember(defaultElevation, pressedElevation) {
+        return remember(defaultElevation, pressedElevation, hoveredElevation) {
             DefaultFloatingActionButtonElevation(
                 defaultElevation = defaultElevation,
-                pressedElevation = pressedElevation
+                pressedElevation = pressedElevation,
+                hoveredElevation = hoveredElevation,
             )
         }
     }
@@ -238,6 +265,7 @@ object FloatingActionButtonDefaults {
 private class DefaultFloatingActionButtonElevation(
     private val defaultElevation: Dp,
     private val pressedElevation: Dp,
+    private val hoveredElevation: Dp
 ) : FloatingActionButtonElevation {
     @Composable
     override fun elevation(interactionSource: InteractionSource): State<Dp> {
@@ -245,6 +273,12 @@ private class DefaultFloatingActionButtonElevation(
         LaunchedEffect(interactionSource) {
             interactionSource.interactions.collect { interaction ->
                 when (interaction) {
+                    is HoverInteraction.Enter -> {
+                        interactions.add(interaction)
+                    }
+                    is HoverInteraction.Exit -> {
+                        interactions.remove(interaction.enter)
+                    }
                     is PressInteraction.Press -> {
                         interactions.add(interaction)
                     }
@@ -262,6 +296,7 @@ private class DefaultFloatingActionButtonElevation(
 
         val target = when (interaction) {
             is PressInteraction.Press -> pressedElevation
+            is HoverInteraction.Enter -> hoveredElevation
             else -> defaultElevation
         }
 
@@ -270,6 +305,7 @@ private class DefaultFloatingActionButtonElevation(
         LaunchedEffect(target) {
             val lastInteraction = when (animatable.targetValue) {
                 pressedElevation -> PressInteraction.Press(Offset.Zero)
+                hoveredElevation -> HoverInteraction.Enter()
                 else -> null
             }
             animatable.animateElevation(

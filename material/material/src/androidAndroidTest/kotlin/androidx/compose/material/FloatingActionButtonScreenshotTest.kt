@@ -28,6 +28,7 @@ import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performMouseInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -120,5 +121,25 @@ class FloatingActionButtonScreenshotTest {
         rule.onRoot()
             .captureToImage()
             .assertAgainstGolden(screenshotRule, "fab_ripple")
+    }
+
+    @Test
+    fun hover() {
+        rule.setMaterialContent {
+            Box(Modifier.requiredSize(100.dp, 100.dp).wrapContentSize()) {
+                FloatingActionButton(onClick = { }) {
+                    Icon(Icons.Filled.Favorite, contentDescription = null)
+                }
+            }
+        }
+
+        rule.onNode(hasClickAction())
+            .performMouseInput { enter(center) }
+
+        rule.waitForIdle()
+
+        rule.onRoot()
+            .captureToImage()
+            .assertAgainstGolden(screenshotRule, "fab_hover")
     }
 }

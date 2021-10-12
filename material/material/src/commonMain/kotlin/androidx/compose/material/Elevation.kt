@@ -22,6 +22,7 @@ import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.ui.unit.Dp
@@ -79,6 +80,7 @@ private object ElevationDefaults {
         return when (interaction) {
             is PressInteraction.Press -> DefaultIncomingSpec
             is DragInteraction.Start -> DefaultIncomingSpec
+            is HoverInteraction.Enter -> DefaultIncomingSpec
             else -> null
         }
     }
@@ -93,7 +95,7 @@ private object ElevationDefaults {
         return when (interaction) {
             is PressInteraction.Press -> DefaultOutgoingSpec
             is DragInteraction.Start -> DefaultOutgoingSpec
-            // TODO: use [HoveredOutgoingSpec] when hovered
+            is HoverInteraction.Enter -> HoveredOutgoingSpec
             else -> null
         }
     }
@@ -109,7 +111,6 @@ private val DefaultOutgoingSpec = TweenSpec<Dp>(
     easing = CubicBezierEasing(0.40f, 0.00f, 0.60f, 1.00f)
 )
 
-@Suppress("unused")
 private val HoveredOutgoingSpec = TweenSpec<Dp>(
     durationMillis = 120,
     easing = CubicBezierEasing(0.40f, 0.00f, 0.60f, 1.00f)
