@@ -118,6 +118,17 @@ private val TopAppBar = Component(
     examples = TopAppBarExamples
 )
 
+private val NavigationDrawer = Component(
+    id = nextId(),
+    name = "Navigation drawer",
+    description = "Navigation drawers provide access to destinations in your app.",
+    // No navigation drawer icon
+    guidelinesUrl = "", // No guidelines yet
+    docsUrl = "", // No docs yet
+    sourceUrl = "$Material3SourceUrl/Drawer.kt",
+    examples = NavigationDrawerExamples
+)
+
 /** Components for the catalog, ordered alphabetically by name. */
 val Components = listOf(
     Button,
@@ -126,5 +137,6 @@ val Components = listOf(
     FloatingActionButtons,
     NavigationBar,
     NavigationRail,
-    TopAppBar,
+    NavigationDrawer,
+    TopAppBar
 )
