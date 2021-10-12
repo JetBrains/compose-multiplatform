@@ -43,7 +43,7 @@ import org.junit.runner.RunWith
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterialApi::class, ExperimentalTestApi::class)
+@OptIn(ExperimentalTestApi::class)
 class BadgeScreenshotTest {
 
     @get:Rule

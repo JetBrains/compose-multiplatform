@@ -50,7 +50,7 @@ import org.junit.runner.RunWith
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterialApi::class, ExperimentalTestApi::class)
+@OptIn(ExperimentalTestApi::class)
 class NavigationRailScreenshotTest {
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -229,7 +229,6 @@ class NavigationRailScreenshotTest {
  * control its visual state.
  * @param withHeaderFab when true, shows a [FloatingActionButton] as the [NavigationRail] header.
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun DefaultNavigationRail(
     interactionSource: MutableInteractionSource,

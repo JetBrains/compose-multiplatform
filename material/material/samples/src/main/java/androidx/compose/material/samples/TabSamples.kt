@@ -36,7 +36,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ScrollableTabRow
@@ -130,7 +129,6 @@ fun TextAndIconTabs() {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LeadingIconTabs() {
     var state by remember { mutableStateOf(0) }
