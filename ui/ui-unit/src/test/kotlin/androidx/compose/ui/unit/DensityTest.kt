@@ -115,4 +115,14 @@ class DensityTest {
     fun testSizeToDpSize() = with(density) {
         assertEquals(DpSize(1.dp, 3.dp), Size(2f, 6f).toDpSize())
     }
+
+    @Test
+    fun testDpSizeUnspecifiedToSize() = with(density) {
+        assertEquals(Size.Unspecified, DpSize.Unspecified.toSize())
+    }
+
+    @Test
+    fun testSizeUnspecifiedToDpSize() = with(density) {
+        assertEquals(DpSize.Unspecified, Size.Unspecified.toDpSize())
+    }
 }
