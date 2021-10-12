@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 /**
  * An implementation of [AndroidTypeface] for [DefaultFontFamily]
  */
+@Deprecated("This path for preloading fonts is not supported")
 internal class AndroidDefaultTypeface : AndroidTypeface {
 
     override val fontFamily: FontFamily = FontFamily.Default

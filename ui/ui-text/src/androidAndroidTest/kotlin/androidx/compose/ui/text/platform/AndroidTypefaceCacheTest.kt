@@ -26,6 +26,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
+@Suppress("DEPRECATION")
 class AndroidTypefaceCacheTest {
 
     val context = InstrumentationRegistry.getInstrumentation().targetContext!!

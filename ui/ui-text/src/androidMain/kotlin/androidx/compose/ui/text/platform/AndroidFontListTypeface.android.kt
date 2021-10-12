@@ -45,6 +45,8 @@ import androidx.core.content.res.ResourcesCompat
  * An implementation of [AndroidTypeface] for [FontListFontFamily]
  */
 // internal constructor for injecting FontMatcher for testing purpose
+@Suppress("DEPRECATION")
+@Deprecated("This is not supported after downloadable fonts.")
 internal class AndroidFontListTypeface(
     fontFamily: FontListFontFamily,
     context: Context,
@@ -96,6 +98,7 @@ internal class AndroidFontListTypeface(
 /**
  * Global Android NativeTypeface cache.
  */
+@Deprecated("Duplicate cache")
 internal object AndroidTypefaceCache {
 
     // TODO multiple TypefaceCache's, would be good to unify
@@ -116,6 +119,7 @@ internal object AndroidTypefaceCache {
         val typeface = when (font) {
             is ResourceFont ->
                 if (Build.VERSION.SDK_INT >= 26) {
+                    @Suppress("DEPRECATION")
                     AndroidResourceFontLoaderHelper.create(context, font.resId)
                 } else {
                     ResourcesCompat.getFont(context, font.resId)!!
@@ -156,6 +160,7 @@ internal object AndroidTypefaceCache {
  * which use this method will pass.
  */
 @RequiresApi(26)
+@Deprecated("Only used by deprecated APIs in this file, remove with them.")
 private object AndroidResourceFontLoaderHelper {
     @RequiresApi(26)
     @DoNotInline

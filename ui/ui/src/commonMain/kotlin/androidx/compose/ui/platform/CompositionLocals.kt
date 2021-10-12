@@ -90,7 +90,9 @@ val LocalFocusManager = staticCompositionLocalOf<FocusManager> {
 /**
  * The CompositionLocal to provide platform font loading methods.
  *
- * Use [androidx.compose.ui.res.fontResource] instead.
+ * Usages outside of compose may use [Font.Companion.AndroidResourceLoader] to construct a font
+ * loader that uses the application context.
+ *
  * @suppress
  */
 val LocalFontLoader = staticCompositionLocalOf<Font.ResourceLoader> {

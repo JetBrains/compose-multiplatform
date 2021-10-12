@@ -57,6 +57,7 @@ class AndroidTypefaceSubsetTest {
         FontTestData.FONT_900_ITALIC
     )
 
+    @Suppress("DEPRECATION")
     private fun androidTypefaceFromFontFamily(
         context: Context,
         fontFamily: FontFamily,

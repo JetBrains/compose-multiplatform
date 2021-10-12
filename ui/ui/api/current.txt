@@ -2426,7 +2426,7 @@ package androidx.compose.ui.res {
   }
 
   public final class FontResources_androidKt {
-    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static androidx.compose.ui.text.font.Typeface fontResource(androidx.compose.ui.text.font.FontFamily fontFamily);
+    method @Deprecated @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static androidx.compose.ui.text.font.Typeface fontResource(androidx.compose.ui.text.font.FontFamily fontFamily);
   }
 
   public final class ImageResources_androidKt {

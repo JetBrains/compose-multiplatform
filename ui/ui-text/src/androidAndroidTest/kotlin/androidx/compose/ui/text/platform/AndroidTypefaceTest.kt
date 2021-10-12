@@ -51,6 +51,7 @@ class AndroidTypefaceTest {
 
     val context = InstrumentationRegistry.getInstrumentation().targetContext!!
 
+    @Suppress("DEPRECATION")
     private fun androidTypefaceFromFontFamily(
         context: Context,
         fontFamily: FontFamily
@@ -316,6 +317,7 @@ class AndroidTypefaceTest {
 
     @Test
     @MediumTest
+    @Suppress("DEPRECATION")
     fun fontMatcherCalledForCustomFont() {
         // customSinglefontFamilyExactMatch tests all the possible outcomes that FontMatcher
         // might return. Therefore for the best effort matching we just make sure that FontMatcher

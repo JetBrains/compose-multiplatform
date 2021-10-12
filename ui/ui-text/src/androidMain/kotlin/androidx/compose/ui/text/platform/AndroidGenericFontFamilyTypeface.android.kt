@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.GenericFontFamily
 /**
  * An implementation of [AndroidTypeface] for [GenericFontFamily]
  */
+@Deprecated("This path for preloading loading fonts is not supported.")
 internal class AndroidGenericFontFamilyTypeface(
     fontFamily: GenericFontFamily
 ) : AndroidTypeface {

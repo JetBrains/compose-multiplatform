@@ -517,7 +517,7 @@ package androidx.compose.ui.text.font {
 
   public final class AndroidTypeface_androidKt {
     method public static androidx.compose.ui.text.font.FontFamily FontFamily(android.graphics.Typeface typeface);
-    method public static androidx.compose.ui.text.font.Typeface Typeface(android.content.Context context, androidx.compose.ui.text.font.FontFamily fontFamily, optional java.util.List<kotlin.Pair<androidx.compose.ui.text.font.FontWeight,androidx.compose.ui.text.font.FontStyle>>? styles);
+    method @Deprecated public static androidx.compose.ui.text.font.Typeface Typeface(android.content.Context context, androidx.compose.ui.text.font.FontFamily fontFamily, optional java.util.List<kotlin.Pair<androidx.compose.ui.text.font.FontWeight,androidx.compose.ui.text.font.FontStyle>>? styles);
     method public static androidx.compose.ui.text.font.Typeface Typeface(android.graphics.Typeface typeface);
   }
 
