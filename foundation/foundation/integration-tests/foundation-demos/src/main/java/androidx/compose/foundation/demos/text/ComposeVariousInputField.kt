@@ -111,7 +111,7 @@ private class CapitalizeTransformation(
  *
  * @see phoneNumberFilter
  */
-private val phoneNumberOffsetTranslator = object : OffsetMapping {
+private fun phoneNumberOffsetTranslator(text: String) = object : OffsetMapping {
     override fun originalToTransformed(offset: Int): Int {
         return when (offset) {
             0 -> 1
@@ -145,7 +145,7 @@ private val phoneNumberOffsetTranslator = object : OffsetMapping {
             12 -> 8
             13 -> 9
             else -> 10
-        }
+        }.coerceAtMost(text.length)
     }
 }
 
@@ -160,14 +160,31 @@ private val phoneNumberFilter = VisualTransformation { text ->
     val filled = trimmed + "_".repeat(10 - trimmed.length)
     val res = "(" + filled.substring(0..2) + ") " + filled.substring(3..5) + "-" +
         filled.substring(6..9)
-    TransformedText(AnnotatedString(text = res), phoneNumberOffsetTranslator)
+    TransformedText(AnnotatedString(text = res), phoneNumberOffsetTranslator(text.text))
 }
 
 private val emailFilter = VisualTransformation { text ->
     if (text.text.indexOf("@") == -1) {
-        TransformedText(AnnotatedString(text = text.text + "@gmail.com"), identityTranslator)
+        TransformedText(
+            AnnotatedString(text = text.text + "@gmail.com"),
+            emailOffsetTranslator(text.text)
+        )
     } else {
         TransformedText(text, identityTranslator)
+    }
+}
+
+private fun emailOffsetTranslator(text: String) = object : OffsetMapping {
+    override fun originalToTransformed(offset: Int): Int {
+        return (offset).coerceAtMost(text.length + 10)
+    }
+
+    override fun transformedToOriginal(offset: Int): Int {
+        return if (offset <= text.length) {
+            offset
+        } else {
+            (offset - 10).coerceAtMost(text.length).coerceAtLeast(0)
+        }
     }
 }
 
