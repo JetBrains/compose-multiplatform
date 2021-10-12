@@ -116,6 +116,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         const val InvalidId = Integer.MIN_VALUE
         const val ClassName = "android.view.View"
         const val LogTag = "AccessibilityDelegate"
+        const val ExtraDataTestTagKey = "androidx.compose.ui.semantics.testTag"
+
         /**
          * Intent size limitations prevent sending over a megabyte of data. Limit
          * text length to 100K characters - 200KB.
@@ -649,13 +651,23 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_PAGE
             }
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !info.text.isNullOrEmpty() &&
-            semanticsNode.unmergedConfig.contains(SemanticsActions.GetTextLayoutResult)
-        ) {
-            AccessibilityNodeInfoVerificationHelperMethods.setAvailableExtraData(
-                info.unwrap(),
-                listOf(EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY)
-            )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val extraDataKeys: MutableList<String> = mutableListOf()
+            if (!info.text.isNullOrEmpty() &&
+                semanticsNode.unmergedConfig.contains(SemanticsActions.GetTextLayoutResult)
+            ) {
+                extraDataKeys.add(EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY)
+            }
+            if (semanticsNode.unmergedConfig.contains(SemanticsProperties.TestTag)) {
+                extraDataKeys.add(ExtraDataTestTagKey)
+            }
+
+            if (!extraDataKeys.isEmpty()) {
+                AccessibilityNodeInfoVerificationHelperMethods.setAvailableExtraData(
+                    info.unwrap(),
+                    extraDataKeys
+                )
+            }
         }
 
         val rangeInfo =
@@ -1378,6 +1390,13 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 boundingRects.add(boundsOnScreen)
             }
             info.extras.putParcelableArray(extraDataKey, boundingRects.toTypedArray())
+        } else if (node.unmergedConfig.contains(SemanticsProperties.TestTag) &&
+            arguments != null && extraDataKey == ExtraDataTestTagKey
+        ) {
+            val testTag = node.unmergedConfig.getOrNull(SemanticsProperties.TestTag)
+            if (testTag != null) {
+                info.extras.putCharSequence(extraDataKey, testTag)
+            }
         }
     }
 
