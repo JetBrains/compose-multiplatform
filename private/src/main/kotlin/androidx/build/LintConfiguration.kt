@@ -144,7 +144,8 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
     val isTestingLintItself = (project.path == ":lint-checks:integration-tests")
 
     // If -PupdateLintBaseline was set we should update the baseline if it exists
-    val updateLintBaseline = hasProperty(UPDATE_LINT_BASELINE) && !isTestingLintItself
+    val updateLintBaseline = project.providers.gradleProperty(UPDATE_LINT_BASELINE)
+        .forUseAtConfigurationTime().isPresent() && !isTestingLintItself
 
     lintOptions.apply {
         // Skip lintVital tasks on assemble. We explicitly run lintRelease for libraries.
