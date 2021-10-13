@@ -640,3 +640,10 @@ package androidx.compose.material {
 
 }
 
+package androidx.compose.material.internal {
+
+  public final class ExposedDropdownMenuPopupKt {
+  }
+
+}
+
