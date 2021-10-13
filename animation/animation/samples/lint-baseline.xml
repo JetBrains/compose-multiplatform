@@ -1,268 +1,125 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.2.0-dev" type="baseline" client="gradle" dependencies="true" name="AGP (7.2.0-dev)" variant="all" version="7.2.0-dev">
+<issues format="6" by="lint 7.1.0-alpha08" type="baseline" client="gradle" dependencies="true" name="AGP (7.1.0-alpha08)" variant="all" version="7.1.0-alpha08">
 
     <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="    infix fun ContentTransform.using(sizeTransform: SizeTransform?) = this.apply {"
-        errorLine2="                               ~~~~~">
+        id="MissingTestSizeAnnotation"
+        message="Missing test size annotation"
+        errorLine1="    fun testNoopBlur() {"
+        errorLine2="        ~~~~~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/animation/AnimatedContent.kt"
-            line="293"
-            column="32"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"
+            line="58"
+            column="9"/>
     </issue>
 
     <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="    internal val currentRecomposeScope: RecomposeScopeImpl?"
-        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~">
+        id="MissingTestSizeAnnotation"
+        message="Missing test size annotation"
+        errorLine1="    fun testRectBoundedBlur() {"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/Composer.kt"
-            line="1788"
-            column="18"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"
+            line="138"
+            column="9"/>
     </issue>
 
     <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="    internal override val recomposeCoroutineContext: CoroutineContext"
-        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        id="MissingTestSizeAnnotation"
+        message="Missing test size annotation"
+        errorLine1="    fun testUnboundedBlur() {"
+        errorLine2="        ~~~~~~~~~~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/Recomposer.kt"
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"
+            line="151"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="MissingTestSizeAnnotation"
+        message="Missing test size annotation"
+        errorLine1="    fun testCircleBoundedBlur() {"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"
+            line="164"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="MissingTestSizeAnnotation"
+        message="Missing test size annotation"
+        errorLine1="    fun testRectangleBlurredEdgeTreatmentHasShape() {"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"
+            line="174"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="MissingTestSizeAnnotation"
+        message="Missing test size annotation"
+        errorLine1="    fun testUnboundedBlurredEdgeTreatmentDoesNotHaveShape() {"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"
             line="179"
-            column="27"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="    fun get(index: Int) = (currentSlot + index).let { slotIndex ->"
-        errorLine2="        ~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SlotTable.kt"
-            line="694"
             column="9"/>
     </issue>
 
     <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;T> mutableStateListOf(vararg elements: T) ="
-        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        id="MissingTestSizeAnnotation"
+        message="Missing test size annotation"
+        errorLine1="    fun pointerPositionAtMeasuredSize(): Unit = with(rule.density) {"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="233"
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/input/pointer/RestrictedSizeTest.kt"
+            line="47"
             column="9"/>
     </issue>
 
     <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;T> mutableStateListOf(vararg elements: T) ="
-        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        id="MissingTestSizeAnnotation"
+        message="Missing test size annotation"
+        errorLine1="    fun pointerOutOfLayoutBounds(): Unit = with(rule.density) {"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="233"
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/input/pointer/RestrictedSizeTest.kt"
+            line="75"
             column="9"/>
     </issue>
 
     <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;T> mutableStateListOf(vararg elements: T) ="
-        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        id="MissingTestSizeAnnotation"
+        message="Missing test size annotation"
+        errorLine1="    fun semanticsSizeTooSmall(): Unit = with(rule.density) {"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="233"
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/input/pointer/RestrictedSizeTest.kt"
+            line="107"
             column="9"/>
     </issue>
 
     <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;T> mutableStateListOf(vararg elements: T) ="
-        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        id="MissingTestSizeAnnotation"
+        message="Missing test size annotation"
+        errorLine1="    fun clippedTouchInMinimumTouchTarget(): Unit = with(rule.density) {"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="233"
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/input/pointer/RestrictedSizeTest.kt"
+            line="124"
             column="9"/>
     </issue>
 
     <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;T> mutableStateListOf(vararg elements: T) ="
-        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        id="MissingTestSizeAnnotation"
+        message="Missing test size annotation"
+        errorLine1="    fun setContentViewCalledMultipleTimes(): Unit = runBlocking {"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="233"
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/platform/WindowRecomposerTest.kt"
+            line="145"
             column="9"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;T> Collection&lt;T>.toMutableStateList() = SnapshotStateList&lt;T>().also { it.addAll(this) }"
-        errorLine2="                      ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="240"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;T> Collection&lt;T>.toMutableStateList() = SnapshotStateList&lt;T>().also { it.addAll(this) }"
-        errorLine2="                      ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="240"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;T> Collection&lt;T>.toMutableStateList() = SnapshotStateList&lt;T>().also { it.addAll(this) }"
-        errorLine2="                      ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="240"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;T> Collection&lt;T>.toMutableStateList() = SnapshotStateList&lt;T>().also { it.addAll(this) }"
-        errorLine2="                      ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="240"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;T> Collection&lt;T>.toMutableStateList() = SnapshotStateList&lt;T>().also { it.addAll(this) }"
-        errorLine2="                      ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="240"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;K, V> mutableStateMapOf(vararg pairs: Pair&lt;K, V>) ="
-        errorLine2="           ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="262"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;K, V> mutableStateMapOf(vararg pairs: Pair&lt;K, V>) ="
-        errorLine2="           ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="262"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;K, V> mutableStateMapOf(vararg pairs: Pair&lt;K, V>) ="
-        errorLine2="           ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="262"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;K, V> mutableStateMapOf(vararg pairs: Pair&lt;K, V>) ="
-        errorLine2="           ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="262"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;K, V> mutableStateMapOf(vararg pairs: Pair&lt;K, V>) ="
-        errorLine2="           ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="262"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;K, V> Iterable&lt;Pair&lt;K, V>>.toMutableStateMap() ="
-        errorLine2="                                ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="270"
-            column="33"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;K, V> Iterable&lt;Pair&lt;K, V>>.toMutableStateMap() ="
-        errorLine2="                                ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="270"
-            column="33"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;K, V> Iterable&lt;Pair&lt;K, V>>.toMutableStateMap() ="
-        errorLine2="                                ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="270"
-            column="33"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;K, V> Iterable&lt;Pair&lt;K, V>>.toMutableStateMap() ="
-        errorLine2="                                ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="270"
-            column="33"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="fun &lt;K, V> Iterable&lt;Pair&lt;K, V>>.toMutableStateMap() ="
-        errorLine2="                                ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="270"
-            column="33"/>
     </issue>
 
 </issues>
