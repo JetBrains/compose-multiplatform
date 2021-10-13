@@ -18,6 +18,7 @@ package androidx.compose.ui.window
 import android.view.View
 import android.view.View.MEASURED_STATE_TOO_SMALL
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,6 +37,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.node.Owner
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.TestActivity
@@ -50,6 +52,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Root
@@ -441,6 +444,32 @@ class PopupTest {
         rule.popupMatches(testTag, matchesSize(20, 20))
         rule.runOnIdle { size = size2 }
         rule.popupMatches(testTag, matchesSize(30, 30))
+    }
+
+    @Test
+    fun doesNotCrashWhenAnchorDetachedFirst() {
+        var parent: FrameLayout? = null
+        rule.setContent {
+            AndroidView(
+                factory = {
+                    FrameLayout(it).apply {
+                        addView(ComposeView(it).apply {
+                            setContent {
+                                Box {
+                                    Popup { Box(Modifier.size(20.dp)) }
+                                }
+                            }
+                        })
+                    }.also { parent = it }
+                }
+            )
+        }
+
+        rule.runOnIdle {
+            parent!!.removeAllViews()
+        }
+
+        // Should not have crashed.
     }
 
     private fun matchesSize(width: Int, height: Int): BoundedMatcher<View, View> {
