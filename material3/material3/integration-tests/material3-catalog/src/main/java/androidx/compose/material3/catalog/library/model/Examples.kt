@@ -19,6 +19,8 @@
 package androidx.compose.material3.catalog.library.model
 
 import androidx.compose.material3.catalog.library.util.SampleSourceUrl
+import androidx.compose.material3.samples.AlertDialogSample
+import androidx.compose.material3.samples.AlertDialogWithIconSample
 import androidx.compose.material3.samples.ColorSchemeSample
 import androidx.compose.material3.samples.EnterAlwaysSmallTopAppBar
 import androidx.compose.material3.samples.PinnedSmallTopAppBar
@@ -42,6 +44,22 @@ val ColorExamples =
             description = ColorExampleDescription,
             sourceUrl = ColorExampleSourceUrl,
         ) { ColorSchemeSample() },
+    )
+
+private const val DialogExampleDescription = "Basic Dialog examples"
+private const val DialogExampleSourceUrl = "$SampleSourceUrl/AlertDialogSamples.kt"
+val DialogExamples =
+    listOf(
+        Example(
+            name = ::AlertDialogSample.name,
+            description = DialogExampleDescription,
+            sourceUrl = DialogExampleSourceUrl,
+        ) { AlertDialogSample() },
+        Example(
+            name = ::AlertDialogWithIconSample.name,
+            description = DialogExampleDescription,
+            sourceUrl = DialogExampleSourceUrl,
+        ) { AlertDialogWithIconSample() },
     )
 
 private const val TopAppBarExampleDescription = "Top app bar examples"

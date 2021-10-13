@@ -57,7 +57,20 @@ private val TopAppBar = Component(
     examples = TopAppBarExamples
 )
 
+private val Dialog = Component(
+    id = 3,
+    name = "Dialog",
+    description = "Material 3 basic dialogs",
+    // No dialog icon
+    tintIcon = true,
+    guidelinesUrl = "", // No  guidelines yet
+    docsUrl = "", // No docs yet
+    sourceUrl = "$Material3SourceUrl/AlertDialog.kt",
+    examples = DialogExamples
+)
+
 val Components = listOf(
     Color,
+    Dialog,
     TopAppBar
 )
