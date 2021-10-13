@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.input.pointer
+package androidx.compose.ui.platform
 
-import java.awt.event.MouseEvent
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Density
 
-internal actual class PointerInputEvent(
-    val eventType: PointerEventType,
-    actual val uptime: Long,
-    actual val pointers: List<PointerInputEventData>,
-    val mouseEvent: MouseEvent? = null
-)
+class DefaultViewConfiguration(private val density: Density) : ViewConfiguration {
+    override val longPressTimeoutMillis: Long
+        get() = 500
+
+    override val doubleTapTimeoutMillis: Long
+        get() = 300
+
+    override val doubleTapMinTimeMillis: Long
+        get() = 40
+
+    override val touchSlop: Float
+        get() = with(density) { 18.dp.toPx() }
+}

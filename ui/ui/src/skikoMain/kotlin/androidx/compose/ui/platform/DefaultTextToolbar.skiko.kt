@@ -19,7 +19,7 @@ package androidx.compose.ui.platform
 import androidx.compose.ui.geometry.Rect
 
 // TODO(demin): implement TextToolbar
-internal class DesktopTextToolbar : TextToolbar {
+internal class DefaultTextToolbar : TextToolbar {
     override val status: TextToolbarStatus
         get() = TextToolbarStatus.Hidden
 

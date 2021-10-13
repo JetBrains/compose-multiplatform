@@ -200,6 +200,11 @@ internal class SkiaBackedCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
         paint: Paint
     ) {
         val bitmap = image.asSkiaBitmap()
+        // TODO(gorshenev): need to use skiko's .use() rather than jvm one here.
+        // But can't do that as skiko is jvmTarget=11 for now, so can't inline
+        // into jvmTarget=8 compose.
+        // After this issue is resolved use:
+        //     import org.jetbrains.skia.impl.use
         Image.makeFromBitmap(bitmap).use { skiaImage ->
             skia.drawImageRect(
                 skiaImage,

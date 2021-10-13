@@ -22,7 +22,7 @@ import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.awt.datatransfer.UnsupportedFlavorException
 
-internal class DesktopClipboardManager : ClipboardManager {
+internal actual class PlatformClipboardManager : ClipboardManager {
     internal val systemClipboard = try {
         Toolkit.getDefaultToolkit().getSystemClipboard()
     } catch (e: java.awt.HeadlessException) { null }

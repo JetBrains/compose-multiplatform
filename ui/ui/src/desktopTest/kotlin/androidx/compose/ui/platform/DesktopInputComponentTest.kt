@@ -41,7 +41,7 @@ class DesktopInputComponentTest {
     fun replaceInputMethodText_basic() {
         val processor = EditProcessor()
 
-        val input = DesktopPlatformInput(DummyDesktopComponent)
+        val input = PlatformInput(DummyPlatformComponent)
         val inputService = TextInputService(input)
 
         val session = inputService.startInput(
@@ -77,8 +77,8 @@ class DesktopInputComponentTest {
         assumeTrue(isMacOs)
         val processor = EditProcessor()
 
-        val component = DummyDesktopComponent
-        val input = DesktopPlatformInput(component)
+        val component = DummyPlatformComponent
+        val input = PlatformInput(component)
         val inputService = TextInputService(input)
 
         val session = inputService.startInput(
