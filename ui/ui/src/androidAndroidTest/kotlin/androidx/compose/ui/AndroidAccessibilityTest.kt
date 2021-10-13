@@ -481,7 +481,10 @@ class AndroidAccessibilityTest {
         )
         if (Build.VERSION.SDK_INT >= 26) {
             assertEquals(
-                listOf(AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY),
+                listOf(
+                    AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY,
+                    "androidx.compose.ui.semantics.testTag"
+                ),
                 accessibilityNodeInfo.availableExtraData
             )
         }
@@ -941,6 +944,16 @@ class AndroidAccessibilityTest {
         assertEquals(expectedTopLeftInScreenCoords.y, rectF.top)
         assertEquals(expectedRectInLocalCoords.width, rectF.width())
         assertEquals(expectedRectInLocalCoords.height, rectF.height())
+
+        val testTagKey = "androidx.compose.ui.semantics.testTag"
+        provider.addExtraDataToAccessibilityNodeInfo(
+            textFieldNode.id,
+            info,
+            testTagKey,
+            argument
+        )
+        val testTagData = info.extras.getCharSequence(testTagKey)
+        assertEquals(tag, testTagData.toString())
     }
 
     @Test
