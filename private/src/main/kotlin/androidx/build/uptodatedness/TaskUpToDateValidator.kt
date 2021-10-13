@@ -185,6 +185,7 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
     "lintVitalDebug",
     "lintWithExpandProjectionDebug",
     "lintWithoutExpandProjectionDebug",
+    "lintWithNullAwareTypeConverterDebug",
     "lintWithKaptDebug",
     "lintWithKspDebug",
 
