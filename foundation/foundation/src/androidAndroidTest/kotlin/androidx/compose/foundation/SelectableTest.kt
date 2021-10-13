@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation
 
+import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -23,15 +24,24 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.first
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -180,7 +190,7 @@ class SelectableTest {
     fun selectableTest_interactionSource() {
         val interactionSource = MutableInteractionSource()
 
-        var scope: CoroutineScope? = null
+        lateinit var scope: CoroutineScope
 
         rule.mainClock.autoAdvance = false
 
@@ -202,7 +212,7 @@ class SelectableTest {
 
         val interactions = mutableListOf<Interaction>()
 
-        scope!!.launch {
+        scope.launch {
             interactionSource.interactions.collect { interactions.add(it) }
         }
 
@@ -238,7 +248,7 @@ class SelectableTest {
         val interactionSource = MutableInteractionSource()
         var emitSelectableText by mutableStateOf(true)
 
-        var scope: CoroutineScope? = null
+        lateinit var scope: CoroutineScope
 
         rule.mainClock.autoAdvance = false
 
@@ -262,7 +272,7 @@ class SelectableTest {
 
         val interactions = mutableListOf<Interaction>()
 
-        scope!!.launch {
+        scope.launch {
             interactionSource.interactions.collect { interactions.add(it) }
         }
 
@@ -302,7 +312,7 @@ class SelectableTest {
     fun selectableTest_interactionSource_hover() {
         val interactionSource = MutableInteractionSource()
 
-        var scope: CoroutineScope? = null
+        lateinit var scope: CoroutineScope
 
         rule.setContent {
             scope = rememberCoroutineScope()
@@ -322,7 +332,7 @@ class SelectableTest {
 
         val interactions = mutableListOf<Interaction>()
 
-        scope!!.launch {
+        scope.launch {
             interactionSource.interactions.collect { interactions.add(it) }
         }
 
@@ -350,6 +360,127 @@ class SelectableTest {
                 .isEqualTo(interactions[0])
         }
     }
+
+    @Test
+    fun selectableTest_interactionSource_focus_inTouchMode() {
+        val interactionSource = MutableInteractionSource()
+
+        lateinit var scope: CoroutineScope
+
+        val focusRequester = FocusRequester()
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box {
+                Box(
+                    Modifier
+                        .focusRequester(focusRequester)
+                        .selectable(
+                            selected = true,
+                            interactionSource = interactionSource,
+                            indication = null,
+                            onClick = {}
+                        )
+                ) {
+                    BasicText("SelectableText")
+                }
+            }
+        }
+
+        val interactions = mutableListOf<Interaction>()
+
+        scope.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+
+        rule.runOnIdle {
+            focusRequester.requestFocus()
+        }
+
+        // Touch mode by default, so we shouldn't be focused
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+    }
+
+    @Test
+    fun selectableTest_interactionSource_focus_inKeyboardMode() {
+        val interactionSource = MutableInteractionSource()
+
+        lateinit var scope: CoroutineScope
+
+        val focusRequester = FocusRequester()
+
+        lateinit var focusManager: FocusManager
+
+        val keyboardInputModeManager = object : InputModeManager {
+            override val inputMode = InputMode.Keyboard
+
+            @OptIn(ExperimentalComposeUiApi::class)
+            override fun requestInputMode(inputMode: InputMode) = true
+        }
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            focusManager = LocalFocusManager.current
+            CompositionLocalProvider(LocalInputModeManager provides keyboardInputModeManager) {
+                Box {
+                    Box(
+                        Modifier
+                            .focusRequester(focusRequester)
+                            .selectable(
+                                selected = true,
+                                interactionSource = interactionSource,
+                                indication = null,
+                                onClick = {}
+                            )
+                    ) {
+                        BasicText("SelectableText")
+                    }
+                }
+            }
+        }
+
+        val interactions = mutableListOf<Interaction>()
+
+        scope.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+
+        rule.runOnIdle {
+            focusRequester.requestFocus()
+        }
+
+        // Keyboard mode, so we should now be focused and see an interaction
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(FocusInteraction.Focus::class.java)
+        }
+
+        rule.runOnIdle {
+            focusManager.clearFocus()
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(FocusInteraction.Focus::class.java)
+            assertThat(interactions[1])
+                .isInstanceOf(FocusInteraction.Unfocus::class.java)
+            assertThat((interactions[1] as FocusInteraction.Unfocus).focus)
+                .isEqualTo(interactions[0])
+        }
+    }
+
+    // TODO: b/202871171 - add test for changing between keyboard mode and touch mode, making sure
+    // it resets existing focus
 
     @Test
     fun selectableTest_testInspectorValue_noIndication() {
