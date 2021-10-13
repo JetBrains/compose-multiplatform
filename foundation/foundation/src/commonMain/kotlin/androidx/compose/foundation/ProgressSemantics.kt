@@ -44,7 +44,10 @@ fun Modifier.progressSemantics(
     /*@IntRange(from = 0)*/
     steps: Int = 0
 ): Modifier {
-    return semantics {
+    // Older versions of Talkback will ignore nodes with range info which aren't focusable or
+    // screen reader focusable. Setting this semantics as merging descendants will mark it as
+    // screen reader focusable.
+    return semantics(mergeDescendants = true) {
         progressBarRangeInfo =
             ProgressBarRangeInfo(value.coerceIn(valueRange), valueRange, steps)
     }
@@ -62,7 +65,10 @@ fun Modifier.progressSemantics(
  */
 @Stable
 fun Modifier.progressSemantics(): Modifier {
-    return semantics {
+    // Older versions of Talkback will ignore nodes with range info which aren't focusable or
+    // screen reader focusable. Setting this semantics as merging descendants will mark it as
+    // screen reader focusable.
+    return semantics(mergeDescendants = true) {
         progressBarRangeInfo = ProgressBarRangeInfo.Indeterminate
     }
 }
