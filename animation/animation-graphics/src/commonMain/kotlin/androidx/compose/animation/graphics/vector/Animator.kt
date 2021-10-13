@@ -26,7 +26,6 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.keyframes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.PathNode
@@ -40,7 +39,6 @@ import androidx.compose.ui.util.lerp
 internal sealed class Animator {
     abstract val totalDuration: Int
 
-    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     fun createVectorConfig(
         transition: Transition<Boolean>,
@@ -451,7 +449,6 @@ internal enum class Ordering {
     Sequentially
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 internal class StateVectorConfig : VectorConfig {
 
     var rotationState: State<Float>? = null
