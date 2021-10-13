@@ -22,12 +22,19 @@ import android.content.res.Configuration
 import android.graphics.Rect
 import android.os.Build
 import android.os.Looper
+import android.os.SystemClock
 import android.util.Log
 import android.util.SparseArray
 import android.view.InputDevice
 import android.view.MotionEvent
+import android.view.MotionEvent.ACTION_CANCEL
+import android.view.MotionEvent.ACTION_HOVER_ENTER
 import android.view.MotionEvent.ACTION_HOVER_EXIT
 import android.view.MotionEvent.ACTION_HOVER_MOVE
+import android.view.MotionEvent.ACTION_MOVE
+import android.view.MotionEvent.ACTION_POINTER_UP
+import android.view.MotionEvent.ACTION_UP
+import android.view.MotionEvent.TOOL_TYPE_MOUSE
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewStructure
@@ -392,17 +399,69 @@ internal class AndroidComposeView(context: Context) :
     override val textToolbar: TextToolbar = AndroidTextToolbar(this)
 
     /**
-     * The previous raw position of the first pointer. This is useful for avoiding sending
-     * excess Move events when ACTION_HOVER_MOVE immediately follows a different, more meaningful
-     * event, like ACTION_SCROLL.
+     * When the first event for a mouse is ACTION_DOWN, an ACTION_HOVER_ENTER is never sent.
+     * This means that we won't receive an `Enter` event for the first mouse. In order to prevent
+     * this problem, we track whether or not the previous event was with the mouse inside and
+     * if not, we can create a simulated mouse enter event to force an enter.
      */
-    private var previousPosition = Offset.Infinite
+    private var previousMotionEvent: MotionEvent? = null
+
+    /**
+     * The time of the last layout. This is used to send a synthetic MotionEvent.
+     */
+    private var relayoutTime = 0L
 
     /**
      * A cache for OwnedLayers. Recreating ViewLayers is expensive, so we avoid it as much
      * as possible. This also helps a little with RenderNodeLayers as well.
      */
     private val layerCache = WeakCache<OwnedLayer>()
+
+    /**
+     * Runnable used to update the pointer position 150ms after layout. If
+     * another pointer event comes in before this runs, this Runnable will be removed and
+     * not executed.
+     */
+    private val resendMotionEventRunnable = object : Runnable {
+        override fun run() {
+            removeCallbacks(this)
+            val lastMotionEvent = previousMotionEvent
+            if (lastMotionEvent != null) {
+                val wasMouseEvent = lastMotionEvent.getToolType(0) == TOOL_TYPE_MOUSE
+                val action = lastMotionEvent.actionMasked
+                val resend = if (wasMouseEvent) {
+                    action != ACTION_HOVER_EXIT && action != ACTION_UP
+                } else {
+                    action != ACTION_UP
+                }
+                if (resend) {
+                    val newAction =
+                        if (action == ACTION_HOVER_MOVE || action == ACTION_HOVER_ENTER) {
+                            ACTION_HOVER_MOVE
+                        } else {
+                            ACTION_MOVE
+                        }
+                    sendSimulatedEvent(lastMotionEvent, newAction, relayoutTime, forceHover = false)
+                }
+            }
+        }
+    }
+
+    /**
+     * Callback for [measureAndLayout] to update the pointer position 150ms after layout.
+     */
+    private val resendMotionEventOnLayout: () -> Unit = {
+        val lastEvent = previousMotionEvent
+        if (lastEvent != null) {
+            when (lastEvent.actionMasked) {
+                // We currently only care about hover events being updated when layout changes
+                ACTION_HOVER_ENTER, ACTION_HOVER_MOVE -> {
+                    relayoutTime = SystemClock.uptimeMillis()
+                    post(resendMotionEventRunnable)
+                }
+            }
+        }
+    }
 
     init {
         setWillNotDraw(false)
@@ -571,8 +630,9 @@ internal class AndroidComposeView(context: Context) :
         }
     }
 
-    override fun measureAndLayout() {
-        val rootNodeResized = measureAndLayoutDelegate.measureAndLayout()
+    override fun measureAndLayout(sendPointerUpdate: Boolean) {
+        val resend = if (sendPointerUpdate) resendMotionEventOnLayout else null
+        val rootNodeResized = measureAndLayoutDelegate.measureAndLayout(resend)
         if (rootNodeResized) {
             requestLayout()
         }
@@ -609,7 +669,7 @@ internal class AndroidComposeView(context: Context) :
                 wasMeasuredWithMultipleConstraints = true
             }
             measureAndLayoutDelegate.updateRootConstraints(constraints)
-            measureAndLayoutDelegate.measureAndLayout()
+            measureAndLayoutDelegate.measureAndLayout(resendMotionEventOnLayout)
             setMeasuredDimension(root.width, root.height)
             if (_androidViewsHandler != null) {
                 androidViewsHandler.measure(
@@ -947,12 +1007,38 @@ internal class AndroidComposeView(context: Context) :
     }
 
     private fun handleMotionEvent(motionEvent: MotionEvent): ProcessResult {
+        removeCallbacks(resendMotionEventRunnable)
         try {
             recalculateWindowPosition(motionEvent)
             forceUseMatrixCache = true
-            measureAndLayout()
+            measureAndLayout(sendPointerUpdate = false)
             desiredPointerIcon = null
             val result = trace("AndroidOwner:onTouch") {
+                val isInBounds = isInBounds(motionEvent)
+                val action = motionEvent.actionMasked
+                val isMouseEvent = motionEvent.getToolType(0) == TOOL_TYPE_MOUSE
+                val lastEvent = previousMotionEvent
+                val wasMouseEvent = lastEvent?.getToolType(0) == TOOL_TYPE_MOUSE
+                if (!wasMouseEvent &&
+                    isInBounds &&
+                    isMouseEvent &&
+                    action != ACTION_CANCEL &&
+                    action != ACTION_HOVER_ENTER
+                ) {
+                    // We didn't previously have an enter event and we're getting our first
+                    // mouse event. Send a simulated enter event so that we have a consistent
+                    // enter/exit.
+                    sendSimulatedEvent(motionEvent, ACTION_HOVER_ENTER, motionEvent.eventTime)
+                } else if (!isMouseEvent && lastEvent != null && wasMouseEvent &&
+                    lastEvent.actionMasked != ACTION_HOVER_EXIT
+                ) {
+                    // The mouse cursor disappeared without sending an ACTION_HOVER_EXIT, so
+                    // we have to send that event.
+                    sendSimulatedEvent(lastEvent, ACTION_HOVER_EXIT, lastEvent.eventTime)
+                }
+                lastEvent?.recycle()
+                previousMotionEvent = MotionEvent.obtainNoHistory(motionEvent)
+
                 val pointerInputEvent =
                     motionEventAdapter.convertToPointerInputEvent(motionEvent, this)
                 if (pointerInputEvent != null) {
@@ -968,7 +1054,7 @@ internal class AndroidComposeView(context: Context) :
                     pointerInputEventProcessor.process(
                         pointerInputEvent,
                         this,
-                        isInBounds(motionEvent)
+                        isInBounds
                     )
                 } else {
                     pointerInputEventProcessor.processCancel()
@@ -978,7 +1064,6 @@ internal class AndroidComposeView(context: Context) :
                     )
                 }
             }
-            previousPosition = Offset(motionEvent.rawX, motionEvent.rawY)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 AndroidComposeViewVerificationHelperMethodsN.setPointerIcon(
                     this,
@@ -989,6 +1074,64 @@ internal class AndroidComposeView(context: Context) :
         } finally {
             forceUseMatrixCache = false
         }
+    }
+
+    private fun sendSimulatedEvent(
+        motionEvent: MotionEvent,
+        action: Int,
+        eventTime: Long,
+        forceHover: Boolean = true
+    ) {
+        val oldAction = motionEvent.actionMasked
+        // don't send any events for pointers that are "up"
+        val upIndex = when (oldAction) {
+            ACTION_UP -> 0
+            ACTION_POINTER_UP -> motionEvent.actionIndex
+            else -> -1
+        }
+        val pointerCount = motionEvent.pointerCount - if (upIndex >= 0) 1 else 0
+        if (pointerCount == 0) {
+            return
+        }
+        val pointerProperties = Array(pointerCount) { MotionEvent.PointerProperties() }
+        val pointerCoords = Array(pointerCount) { MotionEvent.PointerCoords() }
+        for (i in 0 until pointerCount) {
+            val sourceIndex = i + if (upIndex < 0 || i < upIndex) 0 else 1
+            motionEvent.getPointerProperties(sourceIndex, pointerProperties[i])
+            motionEvent.getPointerCoords(sourceIndex, pointerCoords[i])
+        }
+        val buttonState = if (forceHover) 0 else motionEvent.buttonState
+
+        val downTime = if (motionEvent.downTime == motionEvent.eventTime) {
+            eventTime
+        } else {
+            motionEvent.downTime
+        }
+        val event = MotionEvent.obtain(
+            /* downTime */ downTime,
+            /* eventTime */ eventTime,
+            /* action */ action,
+            /* pointerCount */ pointerCount,
+            /* pointerProperties */ pointerProperties,
+            /* pointerCoords */ pointerCoords,
+            /* metaState */ motionEvent.metaState,
+            /* buttonState */ buttonState,
+            /* xPrecision */ motionEvent.xPrecision,
+            /* yPrecision */ motionEvent.yPrecision,
+            /* deviceId */ motionEvent.deviceId,
+            /* edgeFlags */ motionEvent.edgeFlags,
+            /* source */ motionEvent.source,
+            /* flags */ motionEvent.flags
+        )
+        val pointerInputEvent =
+            motionEventAdapter.convertToPointerInputEvent(event, this)!!
+
+        pointerInputEventProcessor.process(
+            pointerInputEvent,
+            this,
+            true
+        )
+        event.recycle()
     }
 
     /**
@@ -1148,7 +1291,8 @@ internal class AndroidComposeView(context: Context) :
         if (event.pointerCount != 1) {
             return true
         }
-        return event.rawX != previousPosition.x || event.rawY != previousPosition.y
+        val lastEvent = previousMotionEvent
+        return lastEvent == null || event.rawX != lastEvent.rawX || event.rawY != lastEvent.rawY
     }
 
     private fun findViewByAccessibilityIdRootedAtCurrentView(

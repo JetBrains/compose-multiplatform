@@ -40,11 +40,11 @@ import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
-import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -63,7 +63,7 @@ class LayerTouchTransformTest {
     @Test
     fun testTransformTouchEventConsumed() {
         val testTag = "transformedComposable"
-        var latch: CountDownLatch? = null
+        var latch = CountDownLatch(1)
         rule.setContent {
             val pressed = remember { mutableStateOf(false) }
             val onStart: (Offset) -> Unit = {
@@ -84,57 +84,62 @@ class LayerTouchTransformTest {
                 drawRect(Color.Gray)
             }
 
-            val latchDrawModifier = Modifier.drawBehind { latch?.countDown() }
+            val latchDrawModifier = Modifier.drawBehind { latch.countDown() }
 
-            val containerDp = (200.0f / LocalDensity.current.density).dp
-            val boxDp = (50.0f / LocalDensity.current.density).dp
+            with(LocalDensity.current) {
+                val containerDp = 200f.toDp()
+                val boxDp = 50f.toDp()
 
-            val offsetX = (270.0f / LocalDensity.current.density).dp
-            val offsetY = (120.0f / LocalDensity.current.density).dp
-            Box(Modifier.testTag(testTag)) {
-                SimpleLayout(
-                    modifier = Modifier.fillMaxSize().offset(offsetX, offsetY)
-                ) {
-                    SimpleLayout(modifier = background.then(Modifier.size(containerDp))) {
-                        SimpleLayout(
-                            modifier = Modifier
-                                .graphicsLayer(
-                                    scaleX = 2.0f,
-                                    scaleY = 0.5f,
-                                    translationX = 50.0f,
-                                    translationY = 30.0f,
-                                    rotationZ = 45.0f,
-                                    transformOrigin = TransformOrigin(1.0f, 1.0f)
-                                ).drawBehind {
-                                    drawRect(color)
-                                }
-                                .then(latchDrawModifier)
-                                .size(boxDp)
-                                .pointerInput(Unit) {
-                                    detectTapGestures(
-                                        onPress = {
-                                            onStart.invoke(it)
-                                            val success = tryAwaitRelease()
-                                            if (success) onStop.invoke() else onStop.invoke()
-                                        }
-                                    )
-                                }
-                        )
+                val offsetX = 270f.toDp()
+                val offsetY = 120f.toDp()
+                Box(Modifier.testTag(testTag)) {
+                    SimpleLayout(
+                        modifier = Modifier.fillMaxSize().offset(offsetX, offsetY)
+                    ) {
+                        SimpleLayout(modifier = background.then(Modifier.size(containerDp))) {
+                            SimpleLayout(
+                                modifier = Modifier
+                                    .graphicsLayer(
+                                        scaleX = 2.0f,
+                                        scaleY = 0.5f,
+                                        translationX = 50.0f,
+                                        translationY = 30.0f,
+                                        rotationZ = 45.0f,
+                                        transformOrigin = TransformOrigin(1.0f, 1.0f)
+                                    ).drawBehind {
+                                        drawRect(color)
+                                    }
+                                    .then(latchDrawModifier)
+                                    .size(boxDp)
+                                    .pointerInput(Unit) {
+                                        detectTapGestures(
+                                            onPress = {
+                                                onStart.invoke(it)
+                                                val success = tryAwaitRelease()
+                                                if (success) onStop.invoke() else onStop.invoke()
+                                            }
+                                        )
+                                    }
+                            )
+                        }
                     }
                 }
             }
         }
 
+        rule.waitForIdle()
+        assertTrue(latch.await(5, TimeUnit.SECONDS))
+
         // Touch position outside the bounds of the target composable
         // however, after transformations, this point will be within
         // its bounds
 
+        latch = CountDownLatch(1)
         val mappedPosition = Offset(342.0f, 168.0f)
         val node = rule.onNodeWithTag(testTag).performTouchInput { down(mappedPosition) }
 
-        latch = CountDownLatch(1).apply {
-            await(5, TimeUnit.SECONDS)
-        }
+        rule.waitForIdle()
+        assertTrue(latch.await(5, TimeUnit.SECONDS))
 
         node.captureToImage().asAndroidBitmap().apply {
             Assert.assertEquals(

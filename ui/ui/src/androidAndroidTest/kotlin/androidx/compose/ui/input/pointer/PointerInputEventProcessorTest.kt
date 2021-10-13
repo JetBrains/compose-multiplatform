@@ -3249,7 +3249,7 @@ private class TestOwner : Owner {
     override fun calculateLocalPosition(positionInWindow: Offset): Offset =
         positionInWindow - position.toOffset()
 
-    override fun measureAndLayout() {
+    override fun measureAndLayout(sendPointerUpdate: Boolean) {
         delegate.measureAndLayout()
     }
 
