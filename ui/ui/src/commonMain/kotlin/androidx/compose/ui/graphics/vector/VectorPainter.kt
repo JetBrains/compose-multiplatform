@@ -26,7 +26,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
@@ -102,7 +101,6 @@ fun rememberVectorPainter(
  *
  * @param [image] ImageVector used to create a vector graphic sub-composition
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun rememberVectorPainter(image: ImageVector) =
     rememberVectorPainter(
@@ -220,7 +218,6 @@ class VectorPainter internal constructor() : Painter() {
  * Represents one of the properties for PathComponent or GroupComponent that can be overwritten
  * when it is composed and drawn with [RenderVectorGroup].
  */
-@ExperimentalComposeUiApi
 sealed class VectorProperty<T> {
     object Rotation : VectorProperty<Float>()
     object PivotX : VectorProperty<Float>()
@@ -246,7 +243,6 @@ sealed class VectorProperty<T> {
  * This can be passed to [RenderVectorGroup] to alter some property values when the [VectorGroup]
  * is rendered.
  */
-@ExperimentalComposeUiApi
 interface VectorConfig {
     fun <T> getOrDefault(property: VectorProperty<T>, defaultValue: T): T {
         return defaultValue
@@ -260,7 +256,6 @@ interface VectorConfig {
  * @param configs An optional map of [VectorConfig] to provide animation values. The keys are the
  * node names. The values are [VectorConfig] for that node.
  */
-@ExperimentalComposeUiApi
 @Composable
 fun RenderVectorGroup(
     group: VectorGroup,
