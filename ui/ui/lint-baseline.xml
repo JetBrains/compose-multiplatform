@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.2.0-dev" type="baseline" client="gradle" dependencies="false" name="AGP (7.2.0-dev)" variant="all" version="7.2.0-dev">
+<issues format="6" by="lint 7.1.0-alpha08" type="baseline" client="gradle" dependencies="false" name="AGP (7.1.0-alpha08)" variant="all" version="7.1.0-alpha08">
 
     <issue
         id="NewApi"
@@ -21,17 +21,6 @@
             file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
             line="224"
             column="9"/>
-    </issue>
-
-    <issue
-        id="NewApi"
-        message="Field requires API level 29 (current min is 21): `setCameraDistance`"
-        errorLine1="            this.cameraDistance = cameraDistance"
-        errorLine2="                 ~~~~~~~~~~~~~~">
-        <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
-            line="225"
-            column="18"/>
     </issue>
 
     <issue
@@ -58,17 +47,6 @@
 
     <issue
         id="NewApi"
-        message="Field requires API level 23 (current min is 21): `setCameraDistance`"
-        errorLine1="            this.cameraDistance = cameraDistance"
-        errorLine2="                 ~~~~~~~~~~~~~~">
-        <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
-            line="232"
-            column="18"/>
-    </issue>
-
-    <issue
-        id="NewApi"
         message="Call requires API level 23 (current min is 21): `dumpRenderNodeData`"
         errorLine1="        }.dumpRenderNodeData().cameraDistance == -cameraDistance // Camera distance is negative"
         errorLine2="          ~~~~~~~~~~~~~~~~~~">
@@ -85,7 +63,7 @@
         errorLine2="                 ~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidAndroidTest/kotlin/androidx/compose/ui/AndroidLayoutDrawTest.kt"
-            line="3758"
+            line="3778"
             column="18"/>
     </issue>
 
@@ -245,17 +223,6 @@
 
     <issue
         id="NewApi"
-        message="Call requires API level 26 (current min is 21): `setAutofillType`"
-        errorLine1="                        setAutofillType(View.AUTOFILL_TYPE_TEXT)"
-        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
-            line="87"
-            column="41"/>
-    </issue>
-
-    <issue
-        id="NewApi"
         message="Call requires API level 26 (current min is 21): `setAutofillHints`"
         errorLine1="                        setAutofillHints(arrayOf(AUTOFILL_HINT_PERSON_NAME))"
         errorLine2="                        ~~~~~~~~~~~~~~~~">
@@ -263,17 +230,6 @@
             file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
             line="88"
             column="25"/>
-    </issue>
-
-    <issue
-        id="NewApi"
-        message="Call requires API level 26 (current min is 21): `setAutofillHints`"
-        errorLine1="                        setAutofillHints(arrayOf(AUTOFILL_HINT_PERSON_NAME))"
-        errorLine2="                                         ~~~~~~~">
-        <location
-            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
-            line="88"
-            column="42"/>
     </issue>
 
     <issue
@@ -344,17 +300,6 @@
 
     <issue
         id="NewApi"
-        message="Call requires API level 26 (current min is 21): `setAutofillType`"
-        errorLine1="                        setAutofillType(View.AUTOFILL_TYPE_TEXT)"
-        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
-            line="124"
-            column="41"/>
-    </issue>
-
-    <issue
-        id="NewApi"
         message="Call requires API level 26 (current min is 21): `setAutofillHints`"
         errorLine1="                        setAutofillHints(arrayOf(AUTOFILL_HINT_PERSON_NAME))"
         errorLine2="                        ~~~~~~~~~~~~~~~~">
@@ -362,17 +307,6 @@
             file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
             line="125"
             column="25"/>
-    </issue>
-
-    <issue
-        id="NewApi"
-        message="Call requires API level 26 (current min is 21): `setAutofillHints`"
-        errorLine1="                        setAutofillHints(arrayOf(AUTOFILL_HINT_PERSON_NAME))"
-        errorLine2="                                         ~~~~~~~">
-        <location
-            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
-            line="125"
-            column="42"/>
     </issue>
 
     <issue
@@ -410,17 +344,6 @@
 
     <issue
         id="NewApi"
-        message="Call requires API level 26 (current min is 21): `setAutofillType`"
-        errorLine1="                        setAutofillType(View.AUTOFILL_TYPE_TEXT)"
-        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
-            line="133"
-            column="41"/>
-    </issue>
-
-    <issue
-        id="NewApi"
         message="Call requires API level 26 (current min is 21): `setAutofillHints`"
         errorLine1="                        setAutofillHints(arrayOf(View.AUTOFILL_HINT_EMAIL_ADDRESS))"
         errorLine2="                        ~~~~~~~~~~~~~~~~">
@@ -428,17 +351,6 @@
             file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
             line="134"
             column="25"/>
-    </issue>
-
-    <issue
-        id="NewApi"
-        message="Call requires API level 26 (current min is 21): `setAutofillHints`"
-        errorLine1="                        setAutofillHints(arrayOf(View.AUTOFILL_HINT_EMAIL_ADDRESS))"
-        errorLine2="                                         ~~~~~~~">
-        <location
-            file="src/test/kotlin/androidx/compose/ui/autofill/AndroidPopulateViewStructureTest.kt"
-            line="134"
-            column="42"/>
     </issue>
 
     <issue
@@ -597,23 +509,12 @@
 
     <issue
         id="NewApi"
-        message="Call requires API level 26 (current min is 21): `captureToImage`"
-        errorLine1="    val bitmap = onRoot().captureToImage()"
-        errorLine2="                          ~~~~~~~~~~~~~~">
-        <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/PainterModifierTest.kt"
-            line="755"
-            column="27"/>
-    </issue>
-
-    <issue
-        id="NewApi"
         message="Call requires API level 26 (current min is 21): `waitAndScreenShot`"
         errorLine1="        val bitmap = rule.waitAndScreenShot()"
         errorLine2="                          ~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/ShadowTest.kt"
-            line="342"
+            line="343"
             column="27"/>
     </issue>
 
@@ -629,245 +530,124 @@
     </issue>
 
     <issue
-        id="SupportAnnotationUsage"
-        message="The API level is already known to be at least 26 here from outer annotations"
-        errorLine1="    @RequiresApi(26)"
-        errorLine2="    ~~~~~~~~~~~~~~~~">
+        id="MissingTestSizeAnnotation"
+        message="Missing test size annotation"
+        errorLine1="    fun testNoopBlur() {"
+        errorLine2="        ~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="140"
-            column="5"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"
+            line="58"
+            column="9"/>
     </issue>
 
     <issue
-        id="SupportAnnotationUsage"
-        message="The API level is already known to be at least 26 here from outer annotations"
-        errorLine1="    @RequiresApi(26)"
-        errorLine2="    ~~~~~~~~~~~~~~~~">
+        id="MissingTestSizeAnnotation"
+        message="Missing test size annotation"
+        errorLine1="    fun testRectBoundedBlur() {"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="145"
-            column="5"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"
+            line="138"
+            column="9"/>
     </issue>
 
     <issue
-        id="SupportAnnotationUsage"
-        message="The API level is already known to be at least 26 here from outer annotations"
-        errorLine1="    @RequiresApi(26)"
-        errorLine2="    ~~~~~~~~~~~~~~~~">
+        id="MissingTestSizeAnnotation"
+        message="Missing test size annotation"
+        errorLine1="    fun testUnboundedBlur() {"
+        errorLine2="        ~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="149"
-            column="5"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"
+            line="151"
+            column="9"/>
     </issue>
 
     <issue
-        id="SupportAnnotationUsage"
-        message="The API level is already known to be at least 26 here from outer annotations"
-        errorLine1="    @RequiresApi(26)"
-        errorLine2="    ~~~~~~~~~~~~~~~~">
+        id="MissingTestSizeAnnotation"
+        message="Missing test size annotation"
+        errorLine1="    fun testCircleBoundedBlur() {"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="153"
-            column="5"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"
+            line="164"
+            column="9"/>
     </issue>
 
     <issue
-        id="SupportAnnotationUsage"
-        message="The API level is already known to be at least 26 here from outer annotations"
-        errorLine1="    @RequiresApi(26)"
-        errorLine2="    ~~~~~~~~~~~~~~~~">
+        id="MissingTestSizeAnnotation"
+        message="Missing test size annotation"
+        errorLine1="    fun testRectangleBlurredEdgeTreatmentHasShape() {"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="158"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="SupportAnnotationUsage"
-        message="The API level is already known to be at least 26 here from outer annotations"
-        errorLine1="    @RequiresApi(26)"
-        errorLine2="    ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="162"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="SupportAnnotationUsage"
-        message="The API level is already known to be at least 26 here from outer annotations"
-        errorLine1="    @RequiresApi(26)"
-        errorLine2="    ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="166"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="SupportAnnotationUsage"
-        message="The API level is already known to be at least 26 here from outer annotations"
-        errorLine1="    @RequiresApi(26)"
-        errorLine2="    ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="170"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="SupportAnnotationUsage"
-        message="The API level is already known to be at least 26 here from outer annotations"
-        errorLine1="    @RequiresApi(26)"
-        errorLine2="    ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"
             line="174"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="SupportAnnotationUsage"
-        message="The API level is already known to be at least 23 here from outer annotations"
-        errorLine1="    @RequiresApi(23)"
-        errorLine2="    ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="186"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="SupportAnnotationUsage"
-        message="The API level is already known to be at least 23 here from outer annotations"
-        errorLine1="    @RequiresApi(23)"
-        errorLine2="    ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="191"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="SupportAnnotationUsage"
-        message="The API level is already known to be at least 23 here from outer annotations"
-        errorLine1="    @RequiresApi(23)"
-        errorLine2="    ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="196"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="SupportAnnotationUsage"
-        message="The API level is already known to be at least 23 here from outer annotations"
-        errorLine1="    @RequiresApi(23)"
-        errorLine2="    ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.android.kt"
-            line="206"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="SupportAnnotationUsage"
-        message="The API level is already known to be at least 21 from the `minSdkVersion`"
-        errorLine1="@RequiresApi(Build.VERSION_CODES.LOLLIPOP)"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.android.kt"
-            line="136"
-            column="1"/>
-    </issue>
-
-    <issue
-        id="SupportAnnotationUsage"
-        message="The API level is already known to be at least 26 here from outer annotations"
-        errorLine1="    @RequiresApi(Build.VERSION_CODES.O)"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.android.kt"
-            line="1311"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="SupportAnnotationUsage"
-        message="The API level is already known to be at least 26 here from outer annotations"
-        errorLine1="    @RequiresApi(Build.VERSION_CODES.O)"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeViewAccessibilityDelegateCompat.android.kt"
-            line="2557"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="SupportAnnotationUsage"
-        message="The API level is already known to be at least 26 here from outer annotations"
-        errorLine1="    @RequiresApi(26)"
-        errorLine2="    ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidFontResourceLoader.android.kt"
-            line="52"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="SupportAnnotationUsage"
-        message="The API level is already known to be at least 23 here from outer annotations"
-        errorLine1="    @RequiresApi(23)"
-        errorLine2="    ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidTextToolbar.android.kt"
-            line="82"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="SupportAnnotationUsage"
-        message="The API level is already known to be at least 23 here from outer annotations"
-        errorLine1="    @RequiresApi(23)"
-        errorLine2="    ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidTextToolbar.android.kt"
-            line="95"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="SupportAnnotationUsage"
-        message="The API level is already known to be at least 29 here from outer annotations"
-        errorLine1="        @RequiresApi(29)"
-        errorLine2="        ~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.android.kt"
-            line="93"
             column="9"/>
     </issue>
 
     <issue
-        id="SupportAnnotationUsage"
-        message="The API level is already known to be at least 29 here from outer annotations"
-        errorLine1="        @RequiresApi(29)"
-        errorLine2="        ~~~~~~~~~~~~~~~~">
+        id="MissingTestSizeAnnotation"
+        message="Missing test size annotation"
+        errorLine1="    fun testUnboundedBlurredEdgeTreatmentDoesNotHaveShape() {"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/ViewLayer.android.kt"
-            line="97"
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/draw/BlurTest.kt"
+            line="179"
             column="9"/>
     </issue>
 
     <issue
-        id="SupportAnnotationUsage"
-        message="The API level is already known to be at least 29 here from outer annotations"
-        errorLine1="    @RequiresApi(Build.VERSION_CODES.Q)"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        id="MissingTestSizeAnnotation"
+        message="Missing test size annotation"
+        errorLine1="    fun pointerPositionAtMeasuredSize(): Unit = with(rule.density) {"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/platform/Wrapper.android.kt"
-            line="214"
-            column="5"/>
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/input/pointer/RestrictedSizeTest.kt"
+            line="47"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="MissingTestSizeAnnotation"
+        message="Missing test size annotation"
+        errorLine1="    fun pointerOutOfLayoutBounds(): Unit = with(rule.density) {"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/input/pointer/RestrictedSizeTest.kt"
+            line="75"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="MissingTestSizeAnnotation"
+        message="Missing test size annotation"
+        errorLine1="    fun semanticsSizeTooSmall(): Unit = with(rule.density) {"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/input/pointer/RestrictedSizeTest.kt"
+            line="107"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="MissingTestSizeAnnotation"
+        message="Missing test size annotation"
+        errorLine1="    fun clippedTouchInMinimumTouchTarget(): Unit = with(rule.density) {"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/input/pointer/RestrictedSizeTest.kt"
+            line="124"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="MissingTestSizeAnnotation"
+        message="Missing test size annotation"
+        errorLine1="    fun setContentViewCalledMultipleTimes(): Unit = runBlocking {"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidAndroidTest/kotlin/androidx/compose/ui/platform/WindowRecomposerTest.kt"
+            line="145"
+            column="9"/>
     </issue>
 
 </issues>

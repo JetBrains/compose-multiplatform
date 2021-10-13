@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.2.0-dev" type="baseline" client="gradle" dependencies="false" name="AGP (7.2.0-dev)" variant="all" version="7.2.0-dev">
+<issues format="6" by="lint 7.1.0-alpha08" type="baseline" client="gradle" dependencies="false" name="AGP (7.1.0-alpha08)" variant="all" version="7.1.0-alpha08">
 
     <issue
         id="NewApi"
@@ -36,56 +36,12 @@
 
     <issue
         id="NewApi"
-        message="Call requires API level 30 (current min is 21): `android.view.View#setWindowInsetsAnimationCallback`"
-        errorLine1="    rootView.setWindowInsetsAnimationCallback("
-        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/androidAndroidTest/kotlin/androidx/compose/foundation/text/CoreTextFieldSoftKeyboardTest.kt"
-            line="193"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="NewApi"
         message="Call requires API level 30 (current min is 21): `InsetAnimationCallback`"
         errorLine1="        InsetAnimationCallback {"
         errorLine2="        ^">
         <location
             file="src/androidAndroidTest/kotlin/androidx/compose/foundation/text/CoreTextFieldSoftKeyboardTest.kt"
             line="194"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="    val layoutInfo: LazyLayoutInfo get() = layoutInfoState.value"
-        errorLine2="        ~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/lazy/layout/LazyLayoutState.kt"
-            line="44"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="    fun remeasure() = remeasurement?.forceRemeasure()"
-        errorLine2="        ~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/lazy/layout/LazyLayoutState.kt"
-            line="54"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="    val layoutInfo: LazyListLayoutInfo get() = layoutInfoState.value"
-        errorLine2="        ~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/foundation/lazy/LazyListState.kt"
-            line="97"
             column="9"/>
     </issue>
 
