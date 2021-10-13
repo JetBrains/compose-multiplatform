@@ -20,7 +20,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MonotonicFrameClock
+import androidx.compose.runtime.monotonicFrameClock
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -121,5 +124,31 @@ class ApplicationTest {
         awaitIdle()
         assertThat(window1?.isShowing).isFalse()
         assertThat(window2?.isShowing).isFalse()
+    }
+
+    @OptIn(ExperimentalComposeApi::class)
+    @Test
+    fun `window shouldn't use MonotonicFrameClock from application context`() = runApplicationTest {
+        lateinit var appClock: MonotonicFrameClock
+        lateinit var windowClock: MonotonicFrameClock
+
+        launchApplication {
+            LaunchedEffect(Unit) {
+                appClock = coroutineContext.monotonicFrameClock
+            }
+
+            Window(
+                onCloseRequest = {}
+            ) {
+                LaunchedEffect(Unit) {
+                    windowClock = coroutineContext.monotonicFrameClock
+                }
+            }
+        }
+
+        awaitIdle()
+        assertThat(windowClock).isNotEqualTo(appClock)
+
+        exitApplication()
     }
 }

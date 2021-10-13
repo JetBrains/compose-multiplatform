@@ -17,9 +17,10 @@
 package androidx.compose.ui.window
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.currentCompositionLocalContext
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.awt.ComposeDialog
@@ -214,12 +215,16 @@ fun Dialog(
     update: (ComposeDialog) -> Unit = {},
     content: @Composable DialogWindowScope.() -> Unit
 ) {
-    val composition = rememberCompositionContext()
+    val currentLocals by rememberUpdatedState(currentCompositionLocalContext)
     AwtWindow(
         visible = visible,
         create = {
             create().apply {
-                setContent(composition, onPreviewKeyEvent, onKeyEvent, content)
+                setContent(onPreviewKeyEvent, onKeyEvent) {
+                    CompositionLocalProvider(currentLocals) {
+                        content()
+                    }
+                }
             }
         },
         dispose = dispose,

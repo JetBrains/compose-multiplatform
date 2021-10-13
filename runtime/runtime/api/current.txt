@@ -62,6 +62,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.Composable public static inline void ReusableContent(Object? key, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static androidx.compose.runtime.Composer getCurrentComposer();
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ExplicitGroupsComposable public static int getCurrentCompositeKeyHash();
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.CompositionLocalContext getCurrentCompositionLocalContext();
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static androidx.compose.runtime.RecomposeScope getCurrentRecomposeScope();
     method @androidx.compose.runtime.Composable public static inline <T> T! key(Object![]? keys, kotlin.jvm.functions.Function0<? extends T> block);
     method @androidx.compose.runtime.Composable public static inline <T> T! remember(kotlin.jvm.functions.Function0<? extends T> calculation);
@@ -170,8 +171,12 @@ package androidx.compose.runtime {
     property @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public final inline T! current;
   }
 
+  @androidx.compose.runtime.Stable public final class CompositionLocalContext {
+  }
+
   public final class CompositionLocalKt {
     method @androidx.compose.runtime.Composable public static void CompositionLocalProvider(androidx.compose.runtime.ProvidedValue<?>![] values, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void CompositionLocalProvider(androidx.compose.runtime.CompositionLocalContext context, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method public static <T> androidx.compose.runtime.ProvidableCompositionLocal<T> compositionLocalOf(optional androidx.compose.runtime.SnapshotMutationPolicy<T> policy, kotlin.jvm.functions.Function0<? extends T> defaultFactory);
     method public static <T> androidx.compose.runtime.ProvidableCompositionLocal<T> staticCompositionLocalOf(kotlin.jvm.functions.Function0<? extends T> defaultFactory);
   }
