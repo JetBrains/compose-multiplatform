@@ -56,7 +56,10 @@ class AppBarScreenshotTest {
                     SmallTopAppBar(
                         navigationIcon = {
                             IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(Icons.Filled.ArrowBack, null)
+                                Icon(
+                                    imageVector = Icons.Filled.ArrowBack,
+                                    contentDescription = "Back"
+                                )
                             }
                         },
                         title = {
@@ -64,7 +67,10 @@ class AppBarScreenshotTest {
                         },
                         actions = {
                             IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(Icons.Filled.Favorite, null)
+                                Icon(
+                                    imageVector = Icons.Filled.Favorite,
+                                    contentDescription = "Like"
+                                )
                             }
                         }
                     )
@@ -83,7 +89,10 @@ class AppBarScreenshotTest {
                     SmallTopAppBar(
                         navigationIcon = {
                             IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(Icons.Filled.ArrowBack, null)
+                                Icon(
+                                    imageVector = Icons.Filled.ArrowBack,
+                                    contentDescription = "Back"
+                                )
                             }
                         },
                         title = {
@@ -91,7 +100,10 @@ class AppBarScreenshotTest {
                         },
                         actions = {
                             IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(Icons.Filled.Favorite, null)
+                                Icon(
+                                    imageVector = Icons.Filled.Favorite,
+                                    contentDescription = "Like"
+                                )
                             }
                         }
                     )
@@ -103,14 +115,17 @@ class AppBarScreenshotTest {
     }
 
     @Test
-    fun smallCenteredAppBar_lightTheme() {
+    fun centerAlignedAppBar_lightTheme() {
         composeTestRule.setContent {
             MaterialTheme {
                 Box(Modifier.testTag(TestTag)) {
-                    SmallCenteredTopAppBar(
+                    CenterAlignedTopAppBar(
                         navigationIcon = {
                             IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(Icons.Filled.ArrowBack, null)
+                                Icon(
+                                    imageVector = Icons.Filled.ArrowBack,
+                                    contentDescription = "Back"
+                                )
                             }
                         },
                         title = {
@@ -118,7 +133,10 @@ class AppBarScreenshotTest {
                         },
                         actions = {
                             IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(Icons.Filled.Favorite, null)
+                                Icon(
+                                    imageVector = Icons.Filled.Favorite,
+                                    contentDescription = "Like"
+                                )
                             }
                         }
                     )
@@ -126,18 +144,21 @@ class AppBarScreenshotTest {
             }
         }
 
-        assertAppBarAgainstGolden(goldenIdentifier = "smallCenteredAppBar_lightTheme")
+        assertAppBarAgainstGolden(goldenIdentifier = "centerAlignedAppBar_lightTheme")
     }
 
     @Test
-    fun smallCenteredAppBar_darkTheme() {
+    fun centerAlignedAppBar_darkTheme() {
         composeTestRule.setContent {
             MaterialTheme(colorScheme = darkColorScheme()) {
                 Box(Modifier.testTag(TestTag)) {
-                    SmallCenteredTopAppBar(
+                    CenterAlignedTopAppBar(
                         navigationIcon = {
                             IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(Icons.Filled.ArrowBack, null)
+                                Icon(
+                                    imageVector = Icons.Filled.ArrowBack,
+                                    contentDescription = "Back"
+                                )
                             }
                         },
                         title = {
@@ -145,7 +166,10 @@ class AppBarScreenshotTest {
                         },
                         actions = {
                             IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(Icons.Filled.Favorite, null)
+                                Icon(
+                                    imageVector = Icons.Filled.Favorite,
+                                    contentDescription = "Like"
+                                )
                             }
                         }
                     )
@@ -153,7 +177,7 @@ class AppBarScreenshotTest {
             }
         }
 
-        assertAppBarAgainstGolden(goldenIdentifier = "smallCenteredAppBar_darkTheme")
+        assertAppBarAgainstGolden(goldenIdentifier = "centerAlignedAppBar_darkTheme")
     }
 
     @Test
@@ -164,7 +188,10 @@ class AppBarScreenshotTest {
                     MediumTopAppBar(
                         navigationIcon = {
                             IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(Icons.Filled.ArrowBack, null)
+                                Icon(
+                                    imageVector = Icons.Filled.ArrowBack,
+                                    contentDescription = "Back"
+                                )
                             }
                         },
                         title = {
@@ -172,7 +199,10 @@ class AppBarScreenshotTest {
                         },
                         actions = {
                             IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(Icons.Filled.Favorite, null)
+                                Icon(
+                                    imageVector = Icons.Filled.Favorite,
+                                    contentDescription = "Like"
+                                )
                             }
                         }
                     )
@@ -191,7 +221,10 @@ class AppBarScreenshotTest {
                     MediumTopAppBar(
                         navigationIcon = {
                             IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(Icons.Filled.ArrowBack, null)
+                                Icon(
+                                    imageVector = Icons.Filled.ArrowBack,
+                                    contentDescription = "Back"
+                                )
                             }
                         },
                         title = {
@@ -199,7 +232,10 @@ class AppBarScreenshotTest {
                         },
                         actions = {
                             IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(Icons.Filled.Favorite, null)
+                                Icon(
+                                    imageVector = Icons.Filled.Favorite,
+                                    contentDescription = "Like"
+                                )
                             }
                         }
                     )
@@ -218,7 +254,10 @@ class AppBarScreenshotTest {
                     LargeTopAppBar(
                         navigationIcon = {
                             IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(Icons.Filled.ArrowBack, null)
+                                Icon(
+                                    imageVector = Icons.Filled.ArrowBack,
+                                    contentDescription = "Back"
+                                )
                             }
                         },
                         title = {
@@ -226,7 +265,10 @@ class AppBarScreenshotTest {
                         },
                         actions = {
                             IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(Icons.Filled.Favorite, null)
+                                Icon(
+                                    imageVector = Icons.Filled.Favorite,
+                                    contentDescription = "Like"
+                                )
                             }
                         }
                     )
@@ -245,7 +287,10 @@ class AppBarScreenshotTest {
                     LargeTopAppBar(
                         navigationIcon = {
                             IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(Icons.Filled.ArrowBack, null)
+                                Icon(
+                                    imageVector = Icons.Filled.ArrowBack,
+                                    contentDescription = "Back"
+                                )
                             }
                         },
                         title = {
@@ -253,7 +298,10 @@ class AppBarScreenshotTest {
                         },
                         actions = {
                             IconButton(onClick = { /* doSomething() */ }) {
-                                Icon(Icons.Filled.Favorite, null)
+                                Icon(
+                                    imageVector = Icons.Filled.Favorite,
+                                    contentDescription = "Like"
+                                )
                             }
                         }
                     )
