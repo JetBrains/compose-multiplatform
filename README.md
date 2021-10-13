@@ -25,6 +25,7 @@ Preview functionality (check your application UI without building/running it) fo
        * [compose-bird](examples/web-compose-bird) - A flappy bird clone using Compose for Web
        * [notepad](examples/notepad) - Notepad, using the new experimental Composable Window API
        * [todoapp](examples/todoapp) - TODO items tracker with persistence and multiple screens
+       * [todoapp-lite](examples/todoapp-lite) - A simplified version of [todoapp](examples/todoapp), fully based on Jetpack Compose
        * [widgets gallery](examples/widgets-gallery) - Gallery of standard widgets
        * [IDEA plugin](examples/intellij-plugin) - Plugin for IDEA using Compose for Desktop
    * [gradle-plugins](gradle-plugins) - a plugin, simplifying usage of Compose Multiplatform with Gradle
