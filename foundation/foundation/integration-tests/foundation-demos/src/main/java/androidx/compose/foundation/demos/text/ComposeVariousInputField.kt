@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.samples.CreditCardSample
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Text
@@ -44,45 +45,6 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.toUpperCase
-
-/**
- * The offset translator used for credit card input field.
- *
- * @see creditCardFilter
- */
-private val creditCardOffsetTranslator = object : OffsetMapping {
-    override fun originalToTransformed(offset: Int): Int {
-        if (offset <= 3) return offset
-        if (offset <= 7) return offset + 1
-        if (offset <= 11) return offset + 2
-        if (offset <= 16) return offset + 3
-        return 19
-    }
-
-    override fun transformedToOriginal(offset: Int): Int {
-        if (offset <= 4) return offset
-        if (offset <= 9) return offset - 1
-        if (offset <= 14) return offset - 2
-        if (offset <= 19) return offset - 3
-        return 16
-    }
-}
-
-/**
- * The visual filter for credit card input field.
- *
- * This filter converts up to 16 digits to hyphen connected 4 digits string.
- * For example, "1234567890123456" will be shown as "1234-5678-9012-3456".
- */
-private val creditCardFilter = VisualTransformation { text ->
-    val trimmed = if (text.text.length >= 16) text.text.substring(0..15) else text.text
-    var out = ""
-    for (i in 0 until trimmed.length) {
-        out += trimmed[i]
-        if (i % 4 == 3 && i != 15) out += "-"
-    }
-    TransformedText(AnnotatedString(out), creditCardOffsetTranslator)
-}
 
 /**
  * The offset translator which works for all offset keep remains the same.
@@ -233,13 +195,7 @@ fun VariousInputFieldDemo() {
         }
         item {
             TagLine(tag = "Credit Card")
-            VariousEditLine(
-                keyboardType = KeyboardType.Number,
-                onValueChange = { old, new ->
-                    if (new.length > 16 || new.any { !it.isDigit() }) old else new
-                },
-                visualTransformation = creditCardFilter
-            )
+            CreditCardSample()
         }
         item {
             TagLine(tag = "Email Suggestion")
