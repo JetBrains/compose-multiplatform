@@ -16,7 +16,6 @@
 package androidx.compose.ui.awt
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionContext
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.window.FrameWindowScope
@@ -54,7 +53,6 @@ class ComposeWindow : JFrame() {
     fun setContent(
         content: @Composable FrameWindowScope.() -> Unit
     ) = setContent(
-        parentComposition = null,
         onPreviewKeyEvent = { false },
         onKeyEvent = { false },
         content = content
@@ -63,13 +61,6 @@ class ComposeWindow : JFrame() {
     /**
      * Composes the given composable into the ComposeWindow.
      *
-     * The new composition can be logically "linked" to an existing one, by providing a
-     * [parentComposition]. This will ensure that invalidations and CompositionLocals will flow
-     * through the two compositions as if they were not separate.
-     *
-     * @param parentComposition The parent composition reference to coordinate
-     * scheduling of composition updates.
-     * If null then default root composition will be used.
      * @param onPreviewKeyEvent This callback is invoked when the user interacts with the hardware
      * keyboard. It gives ancestors of a focused component the chance to intercept a [KeyEvent].
      * Return true to stop propagation of this event. If you return false, the key event will be
@@ -82,7 +73,6 @@ class ComposeWindow : JFrame() {
      */
     @ExperimentalComposeUiApi
     fun setContent(
-        parentComposition: CompositionContext? = null,
         onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
         onKeyEvent: (KeyEvent) -> Boolean = { false },
         content: @Composable FrameWindowScope.() -> Unit
@@ -91,7 +81,6 @@ class ComposeWindow : JFrame() {
             override val window: ComposeWindow get() = this@ComposeWindow
         }
         delegate.setContent(
-            parentComposition,
             onPreviewKeyEvent,
             onKeyEvent
         ) {

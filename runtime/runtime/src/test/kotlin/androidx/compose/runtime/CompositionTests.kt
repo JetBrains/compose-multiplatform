@@ -20,6 +20,7 @@ package androidx.compose.runtime
 import androidx.compose.runtime.mock.Contact
 import androidx.compose.runtime.mock.ContactModel
 import androidx.compose.runtime.mock.Edit
+import androidx.compose.runtime.mock.EmptyApplier
 import androidx.compose.runtime.mock.Linear
 import androidx.compose.runtime.mock.MockViewValidator
 import androidx.compose.runtime.mock.Point
@@ -3285,23 +3286,4 @@ private interface Ordered {
 
 private interface Named {
     val name: String
-}
-
-private class EmptyApplier : Applier<Unit> {
-    override val current: Unit = Unit
-    override fun down(node: Unit) {}
-    override fun up() {}
-    override fun insertTopDown(index: Int, instance: Unit) {
-        error("Unexpected")
-    }
-    override fun insertBottomUp(index: Int, instance: Unit) {
-        error("Unexpected")
-    }
-    override fun remove(index: Int, count: Int) {
-        error("Unexpected")
-    }
-    override fun move(from: Int, to: Int, count: Int) {
-        error("Unexpected")
-    }
-    override fun clear() {}
 }

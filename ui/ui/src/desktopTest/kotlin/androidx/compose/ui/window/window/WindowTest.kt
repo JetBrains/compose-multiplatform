@@ -305,21 +305,24 @@ class WindowTest {
     fun `pass composition local to windows`() = runApplicationTest {
         var actualValue1: Int? = null
         var actualValue2: Int? = null
+        var actualValue3: Int? = null
 
         var isOpen by mutableStateOf(true)
-        var testValue by mutableStateOf(0)
-        val localTestValue = compositionLocalOf { testValue }
+        val local1TestValue = compositionLocalOf { 0 }
+        val local2TestValue = compositionLocalOf { 0 }
+        var locals by mutableStateOf(arrayOf(local1TestValue provides 1))
 
         launchApplication {
             if (isOpen) {
-                CompositionLocalProvider(localTestValue provides testValue) {
+                CompositionLocalProvider(*locals) {
                     Window(
                         onCloseRequest = {},
                         state = rememberWindowState(
                             size = DpSize(600.dp, 600.dp),
                         )
                     ) {
-                        actualValue1 = localTestValue.current
+                        actualValue1 = local1TestValue.current
+                        actualValue2 = local2TestValue.current
                         Box(Modifier.size(32.dp).background(Color.Red))
 
                         Window(
@@ -328,7 +331,7 @@ class WindowTest {
                                 size = DpSize(300.dp, 300.dp),
                             )
                         ) {
-                            actualValue2 = localTestValue.current
+                            actualValue3 = local1TestValue.current
                             Box(Modifier.size(32.dp).background(Color.Blue))
                         }
                     }
@@ -337,13 +340,33 @@ class WindowTest {
         }
 
         awaitIdle()
-        assertThat(actualValue1).isEqualTo(0)
+        assertThat(actualValue1).isEqualTo(1)
         assertThat(actualValue2).isEqualTo(0)
+        assertThat(actualValue3).isEqualTo(1)
 
-        testValue = 42
+        locals = arrayOf(local1TestValue provides 42)
         awaitIdle()
         assertThat(actualValue1).isEqualTo(42)
-        assertThat(actualValue2).isEqualTo(42)
+        assertThat(actualValue2).isEqualTo(0)
+        assertThat(actualValue3).isEqualTo(42)
+
+        locals = arrayOf(local1TestValue provides 43)
+        awaitIdle()
+        assertThat(actualValue1).isEqualTo(43)
+        assertThat(actualValue2).isEqualTo(0)
+        assertThat(actualValue3).isEqualTo(43)
+
+        locals = arrayOf(local1TestValue provides 43, local2TestValue provides 12)
+        awaitIdle()
+        assertThat(actualValue1).isEqualTo(43)
+        assertThat(actualValue2).isEqualTo(12)
+        assertThat(actualValue3).isEqualTo(43)
+
+        locals = emptyArray()
+        awaitIdle()
+        assertThat(actualValue1).isEqualTo(0)
+        assertThat(actualValue2).isEqualTo(0)
+        assertThat(actualValue3).isEqualTo(0)
 
         isOpen = false
     }

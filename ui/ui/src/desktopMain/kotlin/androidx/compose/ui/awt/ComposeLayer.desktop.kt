@@ -17,7 +17,6 @@
 package androidx.compose.ui.awt
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionContext
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.mouse.MouseScrollOrientation
@@ -208,7 +207,6 @@ internal class ComposeLayer {
     }
 
     fun setContent(
-        parentComposition: CompositionContext? = null,
         onPreviewKeyEvent: (ComposeKeyEvent) -> Boolean = { false },
         onKeyEvent: (ComposeKeyEvent) -> Boolean = { false },
         content: @Composable () -> Unit
@@ -218,7 +216,6 @@ internal class ComposeLayer {
         // (we don't know the real density if we have unattached component)
         _initContent = {
             scene.setContent(
-                parentComposition,
                 onPreviewKeyEvent = onPreviewKeyEvent,
                 onKeyEvent = onKeyEvent,
                 content = content

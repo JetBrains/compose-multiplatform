@@ -17,7 +17,6 @@
 package androidx.compose.ui.awt
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.window.LocalWindow
@@ -78,13 +77,11 @@ internal class ComposeWindowDelegate(private val window: Window) {
     }
 
     fun setContent(
-        parentComposition: CompositionContext? = null,
         onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
         onKeyEvent: (KeyEvent) -> Boolean = { false },
         content: @Composable () -> Unit
     ) {
         layer.setContent(
-            parentComposition = parentComposition,
             onPreviewKeyEvent = onPreviewKeyEvent,
             onKeyEvent = onKeyEvent,
         ) {
