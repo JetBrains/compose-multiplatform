@@ -1,13 +1,13 @@
 package example.todoapp.lite.common
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 
 internal class RootStore {
 
-    private val _state: MutableState<RootState> = mutableStateOf(initialState())
-    val state: State<RootState> = _state
+    var state: RootState by mutableStateOf(initialState())
+        private set
 
     fun onItemClicked(id: Long) {
         setState { copy(editingItemId = id) }
@@ -69,7 +69,7 @@ internal class RootStore {
         )
 
     private inline fun setState(update: RootState.() -> RootState) {
-        _state.value = _state.value.update()
+        state = state.update()
     }
 
     data class RootState(

@@ -8,7 +8,7 @@ import example.todoapp.lite.common.RootStore.RootState
 @Composable
 fun RootContent(modifier: Modifier = Modifier) {
     val model = remember { RootStore() }
-    val state = model.state.value
+    val state = model.state
 
     MainContent(
         modifier = modifier,
