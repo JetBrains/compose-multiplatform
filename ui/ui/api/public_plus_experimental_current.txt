@@ -616,7 +616,7 @@ package androidx.compose.ui.graphics.vector {
     method @androidx.compose.runtime.Composable public static void Path(java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode> pathData, optional int pathFillType, optional String name, optional androidx.compose.ui.graphics.Brush? fill, optional float fillAlpha, optional androidx.compose.ui.graphics.Brush? stroke, optional float strokeAlpha, optional float strokeLineWidth, optional int strokeLineCap, optional int strokeLineJoin, optional float strokeLineMiter, optional float trimPathStart, optional float trimPathEnd, optional float trimPathOffset);
   }
 
-  @androidx.compose.ui.ExperimentalComposeUiApi public interface VectorConfig {
+  public interface VectorConfig {
     method public default <T> T! getOrDefault(androidx.compose.ui.graphics.vector.VectorProperty<T> property, T? defaultValue);
   }
 
@@ -680,7 +680,7 @@ package androidx.compose.ui.graphics.vector {
   }
 
   public final class VectorPainterKt {
-    method @androidx.compose.runtime.Composable @androidx.compose.ui.ExperimentalComposeUiApi public static void RenderVectorGroup(androidx.compose.ui.graphics.vector.VectorGroup group, optional java.util.Map<java.lang.String,? extends androidx.compose.ui.graphics.vector.VectorConfig> configs);
+    method @androidx.compose.runtime.Composable public static void RenderVectorGroup(androidx.compose.ui.graphics.vector.VectorGroup group, optional java.util.Map<java.lang.String,? extends androidx.compose.ui.graphics.vector.VectorConfig> configs);
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter(float defaultWidth, float defaultHeight, optional float viewportWidth, optional float viewportHeight, optional String name, optional long tintColor, optional int tintBlendMode, kotlin.jvm.functions.Function2<? super java.lang.Float,? super java.lang.Float,kotlin.Unit> content);
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.vector.VectorPainter rememberVectorPainter(androidx.compose.ui.graphics.vector.ImageVector image);
     field public static final String RootGroupName = "VectorRootGroup";
@@ -717,7 +717,7 @@ package androidx.compose.ui.graphics.vector {
     property public final float trimPathStart;
   }
 
-  @androidx.compose.ui.ExperimentalComposeUiApi public abstract sealed class VectorProperty<T> {
+  public abstract sealed class VectorProperty<T> {
   }
 
   public static final class VectorProperty.Fill extends androidx.compose.ui.graphics.vector.VectorProperty<androidx.compose.ui.graphics.Brush> {

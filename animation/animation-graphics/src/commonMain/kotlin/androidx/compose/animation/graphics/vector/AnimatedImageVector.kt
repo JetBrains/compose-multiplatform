@@ -20,7 +20,6 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.RenderVectorGroup
@@ -63,7 +62,6 @@ class AnimatedImageVector internal constructor(
      *
      * @sample androidx.compose.animation.graphics.samples.AnimatedVectorSample
      */
-    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     fun painterFor(atEnd: Boolean): Painter {
         return painterFor(atEnd) { group, overrides ->
@@ -71,7 +69,6 @@ class AnimatedImageVector internal constructor(
         }
     }
 
-    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     internal fun painterFor(
         atEnd: Boolean,
