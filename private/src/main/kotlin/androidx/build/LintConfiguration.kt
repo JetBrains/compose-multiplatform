@@ -202,6 +202,9 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
             // Broken in 7.0.0-alpha15 due to b/187508590
             disable("InvalidPackage")
 
+            // Reenable after upgradingto 7.1.0-beta01
+            disable("SupportAnnotationUsage")
+
             // Provide stricter enforcement for project types intended to run on a device.
             if (extension.type.compilationTarget == CompilationTarget.DEVICE) {
                 fatal("Assert")
@@ -212,7 +215,6 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
                 fatal("KotlinPropertyAccess")
                 fatal("LambdaLast")
                 fatal("UnknownNullness")
-                fatal("SupportAnnotationUsage")
 
                 // Only override if not set explicitly.
                 // Some Kotlin projects may wish to disable this.
