@@ -51,7 +51,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.R
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
@@ -86,12 +85,8 @@ import kotlin.math.roundToInt
  * If true, pressing the back button will call onDismissRequest. Note that [focusable] must be
  * set to true in order to receive key events such as the back button - if the popup is not
  * focusable then this property does nothing.
- * @property dismissOnOutsideClick Whether the popup should be dismissed when a click outside
- * the popup happens. This lambda will be called for every click which is about to request popup
- * dismissal, and returns whether the dismiss request should happen or not. The lambda receives
- * the anchor bounds as well the click offset, relative to the application window.
- * Note the offset might be unknown (`null`) when the click happens on a different window
- * (not the main application window) and the touch position is obscured.
+ * @property dismissOnClickOutside Whether the popup can be dismissed by clicking outside the
+ * popup's bounds. If true, clicking outside the popup will call onDismissRequest.
  * @property securePolicy Policy for setting [WindowManager.LayoutParams.FLAG_SECURE] on the popup's
  * window.
  * @property excludeFromSystemGesture A flag to check whether to set the systemGestureExclusionRects.
@@ -102,37 +97,19 @@ import kotlin.math.roundToInt
  * The default value is true.
  * @property usePlatformDefaultWidth Whether the width of the popup's content should be limited to
  * the platform default, which is smaller than the screen width.
- * @property updateAndroidWindowManagerFlags Offers low-level control over the flags passed
- * by the [Popup] to the Android WindowManager. The parameter of the lambda is the flags
- * calculated from the [PopupProperties] values that result in WindowManager flags: e.g. focusable.
- * The return value will be the final flags, which will be passed to the Android WindowManager.
- * By default, it will leave the flags calculated from parameters unchanged.
- * This API should be used with caution, only in cases where the popup has very specific behaviour
- * requirements.
  */
 @Immutable
 class PopupProperties @ExperimentalComposeUiApi constructor(
     val focusable: Boolean = false,
     val dismissOnBackPress: Boolean = true,
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
-    @get:ExperimentalComposeUiApi
-    val dismissOnOutsideClick: (Offset?, IntRect) -> Boolean = alwaysDismissOnOutsideClick,
+    val dismissOnClickOutside: Boolean = true,
     val securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit,
     val excludeFromSystemGesture: Boolean = true,
     val clippingEnabled: Boolean = true,
     @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
     @get:ExperimentalComposeUiApi
-    val usePlatformDefaultWidth: Boolean = false,
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
-    @get:ExperimentalComposeUiApi
-    val updateAndroidWindowManagerFlags: (Int) -> Int = PreserveFlags
+    val usePlatformDefaultWidth: Boolean = false
 ) {
-    @Deprecated(
-        "Superseded by dismissOnOutsideClick",
-        level = DeprecationLevel.WARNING
-    )
-    val dismissOnClickOutside = dismissOnOutsideClick == alwaysDismissOnOutsideClick
-
     @OptIn(ExperimentalComposeUiApi::class)
     constructor(
         focusable: Boolean = false,
@@ -141,16 +118,14 @@ class PopupProperties @ExperimentalComposeUiApi constructor(
         securePolicy: SecureFlagPolicy = SecureFlagPolicy.Inherit,
         excludeFromSystemGesture: Boolean = true,
         clippingEnabled: Boolean = true,
-    ) : this(
+    ) : this (
         focusable = focusable,
         dismissOnBackPress = dismissOnBackPress,
-        dismissOnOutsideClick =
-            if (dismissOnClickOutside) alwaysDismissOnOutsideClick else { _, _ -> false },
+        dismissOnClickOutside = dismissOnClickOutside,
         securePolicy = securePolicy,
         excludeFromSystemGesture = excludeFromSystemGesture,
         clippingEnabled = clippingEnabled,
-        usePlatformDefaultWidth = false,
-        updateAndroidWindowManagerFlags = PreserveFlags
+        usePlatformDefaultWidth = false
     )
 
     @OptIn(ExperimentalComposeUiApi::class)
@@ -160,12 +135,11 @@ class PopupProperties @ExperimentalComposeUiApi constructor(
 
         if (focusable != other.focusable) return false
         if (dismissOnBackPress != other.dismissOnBackPress) return false
-        if (dismissOnOutsideClick != other.dismissOnOutsideClick) return false
+        if (dismissOnClickOutside != other.dismissOnClickOutside) return false
         if (securePolicy != other.securePolicy) return false
         if (excludeFromSystemGesture != other.excludeFromSystemGesture) return false
         if (clippingEnabled != other.clippingEnabled) return false
         if (usePlatformDefaultWidth != other.usePlatformDefaultWidth) return false
-        if (updateAndroidWindowManagerFlags != other.updateAndroidWindowManagerFlags) return false
 
         return true
     }
@@ -175,21 +149,14 @@ class PopupProperties @ExperimentalComposeUiApi constructor(
         var result = dismissOnBackPress.hashCode()
         result = 31 * result + focusable.hashCode()
         result = 31 * result + dismissOnBackPress.hashCode()
-        result = 31 * result + dismissOnOutsideClick.hashCode()
+        result = 31 * result + dismissOnClickOutside.hashCode()
         result = 31 * result + securePolicy.hashCode()
         result = 31 * result + excludeFromSystemGesture.hashCode()
         result = 31 * result + clippingEnabled.hashCode()
         result = 31 * result + usePlatformDefaultWidth.hashCode()
-        result = 31 * result + updateAndroidWindowManagerFlags.hashCode()
         return result
     }
 }
-
-private val alwaysDismissOnOutsideClick = { _: Offset?, _: IntRect ->
-    true
-}
-
-private val PreserveFlags: (Int) -> Int = { flags -> flags }
 
 /**
  * Opens a popup with the given content.
@@ -576,7 +543,6 @@ private class PopupLayout(
         setIsFocusable(properties.focusable)
         setSecurePolicy(properties.securePolicy)
         setClippingEnabled(properties.clippingEnabled)
-        applyNewFlags(properties.updateAndroidWindowManagerFlags(params.flags))
         superSetLayoutDirection(layoutDirection)
     }
 
@@ -631,39 +597,23 @@ private class PopupLayout(
      * users clicks outside the popup.
      */
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        event ?: return super.onTouchEvent(event)
-
+        if (!properties.dismissOnClickOutside) {
+            return super.onTouchEvent(event)
+        }
         // Note that this implementation is taken from PopupWindow. It actually does not seem to
         // matter whether we return true or false as some upper layer decides on whether the
         // event is propagated to other windows or not. So for focusable the event is consumed but
         // for not focusable it is propagated to other windows.
-        if (
-            (
-                (event.action == MotionEvent.ACTION_DOWN) &&
-                    (
-                        (event.x < 0) ||
-                            (event.x >= width) ||
-                            (event.y < 0) ||
-                            (event.y >= height)
-                        )
-                ) ||
-            event.action == MotionEvent.ACTION_OUTSIDE
+        if ((event?.action == MotionEvent.ACTION_DOWN) &&
+            ((event.x < 0) || (event.x >= width) || (event.y < 0) || (event.y >= height))
         ) {
-            val parentBounds = parentBounds
-            val shouldDismiss = parentBounds == null || properties.dismissOnOutsideClick(
-                if (event.x != 0f || event.y != 0f) {
-                    Offset(
-                        params.x + event.x,
-                        params.y + event.y
-                    )
-                } else null,
-                parentBounds
-            )
-            if (shouldDismiss) {
-                onDismissRequest?.invoke()
-                return true
-            }
+            onDismissRequest?.invoke()
+            return true
+        } else if (event?.action == MotionEvent.ACTION_OUTSIDE) {
+            onDismissRequest?.invoke()
+            return true
         }
+
         return super.onTouchEvent(event)
     }
 
@@ -694,17 +644,12 @@ private class PopupLayout(
                 WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES or
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
-                    WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
-                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
                     WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM or
-                    WindowManager.LayoutParams.FLAG_SPLIT_TOUCH or
-                    WindowManager.LayoutParams.SOFT_INPUT_STATE_UNSPECIFIED
+                    WindowManager.LayoutParams.FLAG_SPLIT_TOUCH
                 ).inv()
 
             // Enables us to intercept outside clicks even when popup is not focusable
             flags = flags or WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
-
-            softInputMode = WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED
 
             type = WindowManager.LayoutParams.TYPE_APPLICATION_PANEL
 

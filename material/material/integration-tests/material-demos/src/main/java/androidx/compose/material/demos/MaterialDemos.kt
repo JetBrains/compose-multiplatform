@@ -75,7 +75,6 @@ val MaterialDemos = DemoCategory(
             "Menus",
             listOf(
                 ComposableDemo("Dropdown Menu positioning") { MenuDemo() },
-                ComposableDemo("Menu variations") { DropdownMenuVariationsDemo() },
                 ComposableDemo("ExposedDropdownMenu") { ExposedDropdownMenuDemo() }
             )
         ),
