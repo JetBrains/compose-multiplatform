@@ -21,6 +21,9 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasClickAction
@@ -120,5 +123,33 @@ class ButtonScreenshotTest {
         rule.onRoot()
             .captureToImage()
             .assertAgainstGolden(screenshotRule, "button_hover")
+    }
+
+    @Test
+    fun focus() {
+        val focusRequester = FocusRequester()
+
+        rule.setMaterialContent {
+            Box(Modifier.requiredSize(200.dp, 100.dp).wrapContentSize()) {
+                Button(
+                    onClick = { },
+                    modifier = Modifier
+                        // Normally this is only focusable in non-touch mode, so let's force it to
+                        // always be focusable so we can test how it appears
+                        .focusProperties { canFocus = true }
+                        .focusRequester(focusRequester)
+                ) { }
+            }
+        }
+
+        rule.runOnIdle {
+            focusRequester.requestFocus()
+        }
+
+        rule.waitForIdle()
+
+        rule.onRoot()
+            .captureToImage()
+            .assertAgainstGolden(screenshotRule, "button_focus")
     }
 }

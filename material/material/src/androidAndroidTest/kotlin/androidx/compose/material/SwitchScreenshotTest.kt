@@ -26,6 +26,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
@@ -253,6 +256,33 @@ class SwitchScreenshotTest {
         rule.waitForIdle()
 
         assertToggeableAgainstGolden("switch_hover")
+    }
+
+    @Test
+    fun switchTest_focus() {
+        val focusRequester = FocusRequester()
+
+        rule.setMaterialContent {
+            Box(wrapperModifier) {
+                Switch(
+                    checked = true,
+                    onCheckedChange = { },
+                    modifier = Modifier
+                        // Normally this is only focusable in non-touch mode, so let's force it to
+                        // always be focusable so we can test how it appears
+                        .focusProperties { canFocus = true }
+                        .focusRequester(focusRequester)
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            focusRequester.requestFocus()
+        }
+
+        rule.waitForIdle()
+
+        assertToggeableAgainstGolden("switch_focus")
     }
 
     private fun assertToggeableAgainstGolden(goldenName: String) {

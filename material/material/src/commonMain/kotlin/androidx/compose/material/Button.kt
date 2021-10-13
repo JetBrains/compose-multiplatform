@@ -19,6 +19,7 @@ package androidx.compose.material
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.InteractionSource
@@ -328,7 +329,6 @@ object ButtonDefaults {
      */
     val IconSpacing = 8.dp
 
-    // TODO: b/152525426 add support for focused states
     /**
      * Creates a [ButtonElevation] that will animate between the provided values according to the
      * Material specification for a [Button].
@@ -363,7 +363,7 @@ object ButtonDefaults {
      * is pressed.
      * @param disabledElevation the elevation to use when the [Button] is not enabled.
      * @param hoveredElevation the elevation to use when the [Button] is enabled and is hovered.
-     * @param focusedElevation not currently supported.
+     * @param focusedElevation the elevation to use when the [Button] is enabled and is focused.
      */
     @Suppress("UNUSED_PARAMETER")
     @Composable
@@ -374,12 +374,19 @@ object ButtonDefaults {
         hoveredElevation: Dp = 4.dp,
         focusedElevation: Dp = 4.dp,
     ): ButtonElevation {
-        return remember(defaultElevation, pressedElevation, disabledElevation, hoveredElevation) {
+        return remember(
+            defaultElevation,
+            pressedElevation,
+            disabledElevation,
+            hoveredElevation,
+            focusedElevation
+        ) {
             DefaultButtonElevation(
                 defaultElevation = defaultElevation,
                 pressedElevation = pressedElevation,
                 disabledElevation = disabledElevation,
                 hoveredElevation = hoveredElevation,
+                focusedElevation = focusedElevation
             )
         }
     }
@@ -491,6 +498,7 @@ private class DefaultButtonElevation(
     private val pressedElevation: Dp,
     private val disabledElevation: Dp,
     private val hoveredElevation: Dp,
+    private val focusedElevation: Dp,
 ) : ButtonElevation {
     @Composable
     override fun elevation(enabled: Boolean, interactionSource: InteractionSource): State<Dp> {
@@ -503,6 +511,12 @@ private class DefaultButtonElevation(
                     }
                     is HoverInteraction.Exit -> {
                         interactions.remove(interaction.enter)
+                    }
+                    is FocusInteraction.Focus -> {
+                        interactions.add(interaction)
+                    }
+                    is FocusInteraction.Unfocus -> {
+                        interactions.remove(interaction.focus)
                     }
                     is PressInteraction.Press -> {
                         interactions.add(interaction)
@@ -525,6 +539,7 @@ private class DefaultButtonElevation(
             when (interaction) {
                 is PressInteraction.Press -> pressedElevation
                 is HoverInteraction.Enter -> hoveredElevation
+                is FocusInteraction.Focus -> focusedElevation
                 else -> defaultElevation
             }
         }
@@ -541,6 +556,7 @@ private class DefaultButtonElevation(
                 val lastInteraction = when (animatable.targetValue) {
                     pressedElevation -> PressInteraction.Press(Offset.Zero)
                     hoveredElevation -> HoverInteraction.Enter()
+                    focusedElevation -> FocusInteraction.Focus()
                     else -> null
                 }
                 animatable.animateElevation(

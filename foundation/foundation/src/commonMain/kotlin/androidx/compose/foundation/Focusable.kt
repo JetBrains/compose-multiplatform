@@ -27,10 +27,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.input.InputMode
 import androidx.compose.ui.layout.RelocationRequester
 import androidx.compose.ui.layout.relocationRequester
+import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.semantics
@@ -121,4 +124,26 @@ fun Modifier.focusable(
     } else {
         Modifier
     }
+}
+
+// TODO: b/202856230 - consider either making this / a similar API public, or add a parameter to
+//  focusable to configure this behavior.
+/**
+ * [focusable] but only when not in touch mode - when [LocalInputModeManager] is
+ * not [InputMode.Touch]
+ */
+internal fun Modifier.focusableInNonTouchMode(
+    enabled: Boolean,
+    interactionSource: MutableInteractionSource?
+) = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "focusableInNonTouchMode"
+        properties["enabled"] = enabled
+        properties["interactionSource"] = interactionSource
+    }
+) {
+    val inputModeManager = LocalInputModeManager.current
+    Modifier
+        .focusProperties { canFocus = inputModeManager.inputMode != InputMode.Touch }
+        .focusable(enabled, interactionSource)
 }

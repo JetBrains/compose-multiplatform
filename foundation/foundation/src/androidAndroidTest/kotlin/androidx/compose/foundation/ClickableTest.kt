@@ -20,6 +20,7 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -29,16 +30,25 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.InspectableValue
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
@@ -434,7 +444,7 @@ class ClickableTest {
     fun clickableTest_interactionSource() {
         val interactionSource = MutableInteractionSource()
 
-        var scope: CoroutineScope? = null
+        lateinit var scope: CoroutineScope
 
         rule.mainClock.autoAdvance = false
 
@@ -455,7 +465,7 @@ class ClickableTest {
 
         val interactions = mutableListOf<Interaction>()
 
-        scope!!.launch {
+        scope.launch {
             interactionSource.interactions.collect { interactions.add(it) }
         }
 
@@ -499,7 +509,7 @@ class ClickableTest {
     fun clickableTest_interactionSource_immediateRelease() {
         val interactionSource = MutableInteractionSource()
 
-        var scope: CoroutineScope? = null
+        lateinit var scope: CoroutineScope
 
         rule.mainClock.autoAdvance = false
 
@@ -520,7 +530,7 @@ class ClickableTest {
 
         val interactions = mutableListOf<Interaction>()
 
-        scope!!.launch {
+        scope.launch {
             interactionSource.interactions.collect { interactions.add(it) }
         }
 
@@ -549,7 +559,7 @@ class ClickableTest {
     fun clickableTest_interactionSource_immediateCancel() {
         val interactionSource = MutableInteractionSource()
 
-        var scope: CoroutineScope? = null
+        lateinit var scope: CoroutineScope
 
         rule.mainClock.autoAdvance = false
 
@@ -570,7 +580,7 @@ class ClickableTest {
 
         val interactions = mutableListOf<Interaction>()
 
-        scope!!.launch {
+        scope.launch {
             interactionSource.interactions.collect { interactions.add(it) }
         }
 
@@ -595,7 +605,7 @@ class ClickableTest {
     fun clickableTest_interactionSource_immediateDrag() {
         val interactionSource = MutableInteractionSource()
 
-        var scope: CoroutineScope? = null
+        lateinit var scope: CoroutineScope
 
         rule.mainClock.autoAdvance = false
 
@@ -620,7 +630,7 @@ class ClickableTest {
 
         val interactions = mutableListOf<Interaction>()
 
-        scope!!.launch {
+        scope.launch {
             interactionSource.interactions.collect { interactions.add(it) }
         }
 
@@ -646,7 +656,7 @@ class ClickableTest {
     fun clickableTest_interactionSource_dragAfterTimeout() {
         val interactionSource = MutableInteractionSource()
 
-        var scope: CoroutineScope? = null
+        lateinit var scope: CoroutineScope
 
         rule.mainClock.autoAdvance = false
 
@@ -671,7 +681,7 @@ class ClickableTest {
 
         val interactions = mutableListOf<Interaction>()
 
-        scope!!.launch {
+        scope.launch {
             interactionSource.interactions.collect { interactions.add(it) }
         }
 
@@ -710,7 +720,7 @@ class ClickableTest {
     fun clickableTest_interactionSource_cancelledGesture() {
         val interactionSource = MutableInteractionSource()
 
-        var scope: CoroutineScope? = null
+        lateinit var scope: CoroutineScope
 
         rule.mainClock.autoAdvance = false
 
@@ -731,7 +741,7 @@ class ClickableTest {
 
         val interactions = mutableListOf<Interaction>()
 
-        scope!!.launch {
+        scope.launch {
             interactionSource.interactions.collect { interactions.add(it) }
         }
 
@@ -766,7 +776,7 @@ class ClickableTest {
         val interactionSource = MutableInteractionSource()
         var emitClickableText by mutableStateOf(true)
 
-        var scope: CoroutineScope? = null
+        lateinit var scope: CoroutineScope
 
         rule.mainClock.autoAdvance = false
 
@@ -789,7 +799,7 @@ class ClickableTest {
 
         val interactions = mutableListOf<Interaction>()
 
-        scope!!.launch {
+        scope.launch {
             interactionSource.interactions.collect { interactions.add(it) }
         }
 
@@ -828,7 +838,7 @@ class ClickableTest {
     fun clickableTest_interactionSource_hover() {
         val interactionSource = MutableInteractionSource()
 
-        var scope: CoroutineScope? = null
+        lateinit var scope: CoroutineScope
 
         rule.setContent {
             scope = rememberCoroutineScope()
@@ -847,7 +857,7 @@ class ClickableTest {
 
         val interactions = mutableListOf<Interaction>()
 
-        scope!!.launch {
+        scope.launch {
             interactionSource.interactions.collect { interactions.add(it) }
         }
 
@@ -881,7 +891,7 @@ class ClickableTest {
     fun clickableTest_interactionSource_hover_and_press() {
         val interactionSource = MutableInteractionSource()
 
-        var scope: CoroutineScope? = null
+        lateinit var scope: CoroutineScope
 
         rule.setContent {
             scope = rememberCoroutineScope()
@@ -900,7 +910,7 @@ class ClickableTest {
 
         val interactions = mutableListOf<Interaction>()
 
-        scope!!.launch {
+        scope.launch {
             interactionSource.interactions.collect { interactions.add(it) }
         }
 
@@ -928,6 +938,123 @@ class ClickableTest {
         }
     }
 
+    @Test
+    fun clickableTest_interactionSource_focus_inTouchMode() {
+        val interactionSource = MutableInteractionSource()
+
+        lateinit var scope: CoroutineScope
+
+        val focusRequester = FocusRequester()
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box {
+                BasicText(
+                    "ClickableText",
+                    modifier = Modifier
+                        .testTag("myClickable")
+                        .focusRequester(focusRequester)
+                        .combinedClickable(
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {}
+                )
+            }
+        }
+
+        val interactions = mutableListOf<Interaction>()
+
+        scope.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+
+        rule.runOnIdle {
+            focusRequester.requestFocus()
+        }
+
+        // Touch mode by default, so we shouldn't be focused
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+    }
+
+    @Test
+    fun clickableTest_interactionSource_focus_inKeyboardMode() {
+        val interactionSource = MutableInteractionSource()
+
+        lateinit var scope: CoroutineScope
+
+        val focusRequester = FocusRequester()
+
+        lateinit var focusManager: FocusManager
+
+        val keyboardInputModeManager = object : InputModeManager {
+            override val inputMode = InputMode.Keyboard
+
+            @OptIn(ExperimentalComposeUiApi::class)
+            override fun requestInputMode(inputMode: InputMode) = true
+        }
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            focusManager = LocalFocusManager.current
+            CompositionLocalProvider(LocalInputModeManager provides keyboardInputModeManager) {
+                Box {
+                    BasicText(
+                        "ClickableText",
+                        modifier = Modifier
+                            .testTag("myClickable")
+                            .focusRequester(focusRequester)
+                            .combinedClickable(
+                                interactionSource = interactionSource,
+                                indication = null
+                            ) {}
+                    )
+                }
+            }
+        }
+
+        val interactions = mutableListOf<Interaction>()
+
+        scope.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+
+        rule.runOnIdle {
+            focusRequester.requestFocus()
+        }
+
+        // Keyboard mode, so we should now be focused and see an interaction
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(FocusInteraction.Focus::class.java)
+        }
+
+        rule.runOnIdle {
+            focusManager.clearFocus()
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(FocusInteraction.Focus::class.java)
+            assertThat(interactions[1])
+                .isInstanceOf(FocusInteraction.Unfocus::class.java)
+            assertThat((interactions[1] as FocusInteraction.Unfocus).focus)
+                .isEqualTo(interactions[0])
+        }
+    }
+
+    // TODO: b/202871171 - add test for changing between keyboard mode and touch mode, making sure
+    // it resets existing focus
+
     /**
      * Regression test for b/186223077
      *
@@ -945,7 +1072,7 @@ class ClickableTest {
         // Simulate the long click causing a recomposition, and changing the lambda instance
         onLongClick = initialLongClick
 
-        var scope: CoroutineScope? = null
+        lateinit var scope: CoroutineScope
 
         rule.mainClock.autoAdvance = false
 
@@ -967,7 +1094,7 @@ class ClickableTest {
 
         val interactions = mutableListOf<Interaction>()
 
-        scope!!.launch {
+        scope.launch {
             interactionSource.interactions.collect { interactions.add(it) }
         }
 
@@ -1021,7 +1148,7 @@ class ClickableTest {
         // Simulate the long click causing a recomposition, and changing the lambda to be null
         onLongClick = initialLongClick
 
-        var scope: CoroutineScope? = null
+        lateinit var scope: CoroutineScope
 
         rule.mainClock.autoAdvance = false
 
@@ -1043,7 +1170,7 @@ class ClickableTest {
 
         val interactions = mutableListOf<Interaction>()
 
-        scope!!.launch {
+        scope.launch {
             interactionSource.interactions.collect { interactions.add(it) }
         }
 
