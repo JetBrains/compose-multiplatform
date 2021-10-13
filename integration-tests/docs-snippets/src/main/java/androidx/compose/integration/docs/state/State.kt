@@ -19,29 +19,33 @@
 
 package androidx.compose.integration.docs.state
 
+import android.content.res.Resources
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.launch
 
 /**
  * This file lets DevRel track changes to snippets present in
@@ -132,46 +136,6 @@ private object StateSnippet4 {
 }
 
 private object StateSnippet5 {
-    class HelloViewModel : ViewModel() {
-
-        // LiveData holds state which is observed by the UI
-        // (state flows down from ViewModel)
-        private val _name = MutableLiveData("")
-        val name: LiveData<String> = _name
-
-        // onNameChanged is an event we're defining that the UI can invoke
-        // (events flow up from UI)
-        fun onNameChanged(newName: String) {
-            _name.value = newName
-        }
-    }
-
-    @Composable
-    fun HelloScreen(helloViewModel: HelloViewModel = viewModel()) {
-        // by default, viewModel() follows the Lifecycle as the Activity or Fragment
-        // that calls HelloScreen(). This lifecycle can be modified by callers of HelloScreen.
-
-        // name is the _current_ value of [helloViewModel.name]
-        // with an initial value of ""
-        val name: String by helloViewModel.name.observeAsState("")
-
-        Column {
-            Text(text = name)
-            TextField(
-                value = name,
-                onValueChange = { helloViewModel.onNameChanged(it) },
-                label = { Text("Name") }
-            )
-        }
-    }
-}
-
-@Composable
-private fun StateSnippet6() {
-    val nameState: State<String> = helloViewModel.name.observeAsState("")
-}
-
-private object StateSnippet7 {
     @Parcelize
     data class City(val name: String, val country: String) : Parcelable
 
@@ -183,7 +147,7 @@ private object StateSnippet7 {
     }
 }
 
-private object StateSnippet8 {
+private object StateSnippet6 {
     data class City(val name: String, val country: String)
 
     val CitySaver = run {
@@ -204,7 +168,7 @@ private object StateSnippet8 {
 }
 
 @Composable
-private fun StateSnippets9() {
+private fun StateSnippets7() {
     data class City(val name: String, val country: String)
 
     val CitySaver = listSaver<City, Any>(
@@ -216,6 +180,90 @@ private fun StateSnippets9() {
     fun CityScreen() {
         var selectedCity = rememberSaveable(stateSaver = CitySaver) {
             mutableStateOf(City("Madrid", "Spain"))
+        }
+    }
+}
+
+@Composable
+private fun StateSnippets8() {
+    @Composable
+    fun MyApp() {
+        MyTheme {
+            val scaffoldState = rememberScaffoldState()
+            val coroutineScope = rememberCoroutineScope()
+
+            Scaffold(scaffoldState = scaffoldState) {
+                MyContent(
+                    showSnackbar = { message ->
+                        coroutineScope.launch {
+                            scaffoldState.snackbarHostState.showSnackbar(message)
+                        }
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun StateSnippets9() {
+
+    // Plain class that manages App's UI logic and UI elements' state
+    class MyAppState(
+        val scaffoldState: ScaffoldState,
+        val navController: NavHostController,
+        private val resources: Resources,
+        /* ... */
+    ) {
+        val bottomBarTabs = /* State */
+            // DO NOT COPY IN DAC
+            Unit
+
+        // Logic to decide when to show the bottom bar
+        val shouldShowBottomBar: Boolean
+            @Composable get() = /* ... */
+                // DO NOT COPY IN DAC
+                false
+
+        // Navigation logic, which is a type of UI logic
+        fun navigateToBottomBarRoute(route: String) { /* ... */ }
+
+        // Show snackbar using Resources
+        fun showSnackbar(message: String) { /* ... */ }
+    }
+
+    @Composable
+    fun rememberMyAppState(
+        scaffoldState: ScaffoldState = rememberScaffoldState(),
+        navController: NavHostController = rememberNavController(),
+        resources: Resources = LocalContext.current.resources,
+        /* ... */
+    ) = remember(scaffoldState, navController, resources, /* ... */) {
+        MyAppState(scaffoldState, navController, resources, /* ... */)
+    }
+}
+
+@Composable
+private fun StateSnippets10() {
+    @Composable
+    fun MyApp() {
+        MyTheme {
+            val myAppState = rememberMyAppState()
+            Scaffold(
+                scaffoldState = myAppState.scaffoldState,
+                bottomBar = {
+                    if (myAppState.shouldShowBottomBar) {
+                        BottomBar(
+                            tabs = myAppState.bottomBarTabs,
+                            navigateToRoute = {
+                                myAppState.navigateToBottomBarRoute(it)
+                            }
+                        )
+                    }
+                }
+            ) {
+                NavHost(navController = myAppState.navController, "initial") { /* ... */ }
+            }
         }
     }
 }
@@ -234,25 +282,37 @@ private object binding {
     }
 }
 
-private lateinit var helloViewModel: StateSnippet5.HelloViewModel
+@Composable
+private fun MyTheme(content: @Composable () -> Unit) {}
 
-private class HelloViewModel : ViewModel() {
+@Composable
+private fun MyContent(showSnackbar: (String) -> Unit) {}
 
-    // LiveData holds state which is observed by the UI
-    // (state flows down from ViewModel)
-    private val _name = MutableLiveData("")
-    val name: LiveData<String> = _name
+@Composable
+private fun BottomBar(tabs: Unit, navigateToRoute: (String) -> Unit) {}
 
-    // onNameChanged is an event we're defining that the UI can invoke
-    // (events flow up from UI)
-    fun onNameChanged(newName: String) {
-        _name.value = newName
-    }
+@Composable
+private fun rememberMyAppState(
+    scaffoldState: ScaffoldState = rememberScaffoldState(),
+    navController: NavHostController = rememberNavController(),
+    resources: Resources = LocalContext.current.resources
+) = remember(scaffoldState, navController, resources) {
+    MyAppState(scaffoldState, navController, resources)
+}
+
+private class MyAppState(
+    val scaffoldState: ScaffoldState,
+    val navController: NavHostController,
+    private val resources: Resources,
+) {
+    val shouldShowBottomBar: Boolean = false
+    val bottomBarTabs = Unit
+    fun navigateToBottomBarRoute(route: String) {}
 }
 
 /**
  * Add fake Parcelize and Parcelable to avoid adding AndroidX wide dependency on
  * kotlin-parcelize just for snippets
  */
-annotation class Parcelize
-interface Parcelable
+private annotation class Parcelize
+private interface Parcelable
