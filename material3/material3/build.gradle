@@ -121,8 +121,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Material3 Components"
     type = LibraryType.PUBLISHED_LIBRARY
-    // Remove this `publish = Publish.` line when ready start publishing module
-    publish = Publish.SNAPSHOT_ONLY
     mavenGroup = LibraryGroups.Compose.MATERIAL3
     inceptionYear = "2021"
     description = "Compose Material You Design Components library"
