@@ -55,6 +55,18 @@ private val Buttons = Component(
     examples = ButtonsExamples,
 )
 
+private val Card = Component(
+    id = nextId(),
+    name = "Card",
+    description = "Cards contain content and actions that relate information about a subject.",
+    // No card icon
+    tintIcon = true,
+    guidelinesUrl = "$StyleGuidelinesUrl/cards",
+    docsUrl = "$PackageSummaryUrl#card",
+    sourceUrl = "$Material3SourceUrl/Card.kt",
+    examples = CardExamples
+)
+
 private val Color = Component(
     id = nextId(),
     name = "Color",
@@ -210,6 +222,7 @@ private val TopAppBar = Component(
 /** Components for the catalog, ordered alphabetically by name. */
 val Components = listOf(
     Buttons,
+    Card,
     Checkboxes,
     Color,
     Dialogs,

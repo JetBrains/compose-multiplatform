@@ -23,10 +23,15 @@ import androidx.compose.material3.samples.AlertDialogSample
 import androidx.compose.material3.samples.AlertDialogWithIconSample
 import androidx.compose.material3.samples.ButtonSample
 import androidx.compose.material3.samples.ButtonWithIconSample
+import androidx.compose.material3.samples.CardSample
 import androidx.compose.material3.samples.CheckboxSample
 import androidx.compose.material3.samples.CircularProgressIndicatorSample
+import androidx.compose.material3.samples.ClickableCardSample
+import androidx.compose.material3.samples.ClickableElevatedCardSample
+import androidx.compose.material3.samples.ClickableOutlinedCardSample
 import androidx.compose.material3.samples.ColorSchemeSample
 import androidx.compose.material3.samples.ElevatedButtonSample
+import androidx.compose.material3.samples.ElevatedCardSample
 import androidx.compose.material3.samples.EnterAlwaysSmallTopAppBar
 import androidx.compose.material3.samples.ExitUntilCollapsedLargeTopAppBar
 import androidx.compose.material3.samples.ExitUntilCollapsedMediumTopAppBar
@@ -42,6 +47,7 @@ import androidx.compose.material3.samples.NavigationRailBottomAlignSample
 import androidx.compose.material3.samples.NavigationRailSample
 import androidx.compose.material3.samples.NavigationRailWithOnlySelectedLabelsSample
 import androidx.compose.material3.samples.OutlinedButtonSample
+import androidx.compose.material3.samples.OutlinedCardSample
 import androidx.compose.material3.samples.PinnedSmallTopAppBar
 import androidx.compose.material3.samples.RadioButtonSample
 import androidx.compose.material3.samples.RadioGroupSample
@@ -98,6 +104,53 @@ val ButtonsExamples =
             sourceUrl = ButtonsExampleSourceUrl,
         ) { ButtonWithIconSample() }
     )
+
+private const val CardsExampleDescription = "Cards examples"
+private const val CardsExampleSourceUrl = "$SampleSourceUrl/CardSamples.kt"
+val CardExamples = listOf(
+    Example(
+        name = ::CardSample.name,
+        description = CardsExampleDescription,
+        sourceUrl = CardsExampleSourceUrl
+    ) {
+        CardSample()
+    },
+    Example(
+        name = ::ClickableCardSample.name,
+        description = CardsExampleDescription,
+        sourceUrl = CardsExampleSourceUrl
+    ) {
+        ClickableCardSample()
+    },
+    Example(
+        name = ::ElevatedCardSample.name,
+        description = CardsExampleDescription,
+        sourceUrl = CardsExampleSourceUrl
+    ) {
+        ElevatedCardSample()
+    },
+    Example(
+        name = ::ClickableElevatedCardSample.name,
+        description = CardsExampleDescription,
+        sourceUrl = CardsExampleSourceUrl
+    ) {
+        ClickableElevatedCardSample()
+    },
+    Example(
+        name = ::OutlinedCardSample.name,
+        description = CardsExampleDescription,
+        sourceUrl = CardsExampleSourceUrl
+    ) {
+        OutlinedCardSample()
+    },
+    Example(
+        name = ::ClickableOutlinedCardSample.name,
+        description = CardsExampleDescription,
+        sourceUrl = CardsExampleSourceUrl
+    ) {
+        ClickableOutlinedCardSample()
+    }
+)
 
 private const val ColorExampleDescription = "Color examples"
 private const val ColorExampleSourceUrl = "$SampleSourceUrl/ColorSamples.kt"
