@@ -92,11 +92,13 @@ private fun Project.configureComponent(
                         removePreviouslyUploadedArchives(projectArchiveDir)
                     }
                 } else {
-                    it.create<MavenPublication>("maven") {
-                        from(component)
-                    }
-                    tasks.getByName("publishMavenPublicationToMavenRepository").doFirst {
-                        removePreviouslyUploadedArchives(projectArchiveDir)
+                    if (!project.isMultiplatformPublicationEnabled()) {
+                        it.create<MavenPublication>("maven") {
+                            from(component)
+                        }
+                        tasks.getByName("publishMavenPublicationToMavenRepository").doFirst {
+                            removePreviouslyUploadedArchives(projectArchiveDir)
+                        }
                     }
                 }
             }
@@ -125,18 +127,20 @@ private fun Project.configureComponent(
             }
         }
 
-        if (project.isMultiplatformEnabled()) {
+        if (project.isMultiplatformPublicationEnabled()) {
             configureMultiplatformPublication()
         }
     }
 }
 
-private fun Project.configureMultiplatformPublication() {
-    val multiplatformExtension = extensions.findByType<KotlinMultiplatformExtension>() ?: return
+private fun Project.isMultiplatformPublicationEnabled(): Boolean {
+    if (!project.isMultiplatformEnabled())
+        return false
+    return extensions.findByType<KotlinMultiplatformExtension>() != null
+}
 
-    // publishMavenPublicationToMavenRepository will produce conflicting artifacts with the same
-    // name as the artifacts producing by publishKotlinMultiplatformPublicationToMavenRepository
-    project.tasks.findByName("publishMavenPublicationToMavenRepository")?.enabled = false
+private fun Project.configureMultiplatformPublication() {
+    val multiplatformExtension = extensions.findByType<KotlinMultiplatformExtension>()!!
 
     multiplatformExtension.targets.all { target ->
         if (target is KotlinAndroidTarget) {
@@ -219,6 +223,7 @@ private fun tweakDependenciesMetadata(
         // https://android-review.googlesource.com/c/platform/frameworks/support/+/1144664/8/buildSrc/src/main/kotlin/androidx/build/MavenUploadHelper.kt#177
         assignSingleVersionDependenciesInGroupForPom(xml, mavenGroup)
         assignAarTypes(xml, androidLibrariesSetProvider)
+        ensureConsistentJvmSuffix(xml)
     }
 }
 
@@ -310,6 +315,35 @@ private fun Project.collectDependenciesForConfiguration(
     config?.dependencies?.forEach { dep ->
         if (dep.group?.startsWith("androidx.") == true) {
             androidxDependencies.add(dep)
+        }
+    }
+}
+
+/**
+ * Ensures that artifactIds are consistent when using configuration caching.
+ * A workaround for https://github.com/gradle/gradle/issues/18369
+ */
+private fun ensureConsistentJvmSuffix(
+    xml: XmlProvider
+) {
+    val dependencies = xml.asNode().children().find {
+        it is Node && it.name().toString().endsWith("dependencies")
+    } as Node?
+    dependencies?.children()?.forEach { dep ->
+        if (dep !is Node) {
+            return@forEach
+        }
+        val artifactIdNode = dep.children().first {
+            it is Node && it.name().toString().endsWith("artifactId")
+        } as Node
+        val artifactId = artifactIdNode.children()[0].toString()
+        // kotlinx-coroutines-core is only a .pom and only depends on kotlinx-coroutines-core-jvm,
+        // so the two artifacts should be approximately equivalent. However,
+        // when loading from configuration cache, Gradle often returns a different resolution.
+        // We replace it here to ensure consistency and predictability, and
+        // to avoid having to rerun any zip tasks that include it
+        if (artifactId == "kotlinx-coroutines-core-jvm") {
+            artifactIdNode.setValue("kotlinx-coroutines-core")
         }
     }
 }

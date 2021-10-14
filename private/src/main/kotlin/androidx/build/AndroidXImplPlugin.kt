@@ -86,7 +86,8 @@ import java.util.concurrent.ConcurrentHashMap
  */
 class AndroidXImplPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        if (project.isRoot) throw Exception("Root project should use AndroidXRootImplPlugin instead")
+        if (project.isRoot)
+            throw Exception("Root project should use AndroidXRootImplPlugin instead")
         val extension = project.extensions.create<AndroidXExtension>(EXTENSION_NAME, project)
         // Perform different actions based on which plugins have been applied to the project.
         // Many of the actions overlap, ex. API tracking.
@@ -114,6 +115,8 @@ class AndroidXImplPlugin : Plugin<Project> {
         project.configureExternalDependencyLicenseCheck()
         project.configureProjectStructureValidation(extension)
         project.configureProjectVersionValidation(extension)
+
+        project.configurations.create("samples")
     }
 
     /**
@@ -639,7 +642,9 @@ class AndroidXImplPlugin : Plugin<Project> {
             val taskProvider = tasks.register(
                 "verifyDependencyVersions",
                 VerifyDependencyVersionsTask::class.java
-            )
+            ) { task ->
+                task.version.set(project.version.toString())
+            }
             addToBuildOnServer(taskProvider)
             return taskProvider
         }
@@ -893,7 +898,7 @@ fun Project.validateProjectStructure(groupId: String) {
     // TODO(b/197253160): Re-enable this check for playground. For unknown reasons in playground
     //  builds, automatically generated parent projects such as :activity are incorrectly
     //  inheriting their children's build file which causes the AndroidXPlugin to get applied.
-    if (studioType() == StudioType.PLAYGROUND) {
+    if (studioType() == StudioType.PLAYGROUND || !project.isValidateProjectStructureEnabled()) {
         return
     }
 

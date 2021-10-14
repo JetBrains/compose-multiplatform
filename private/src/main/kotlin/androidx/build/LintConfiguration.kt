@@ -144,7 +144,8 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
     val isTestingLintItself = (project.path == ":lint-checks:integration-tests")
 
     // If -PupdateLintBaseline was set we should update the baseline if it exists
-    val updateLintBaseline = hasProperty(UPDATE_LINT_BASELINE) && !isTestingLintItself
+    val updateLintBaseline = project.providers.gradleProperty(UPDATE_LINT_BASELINE)
+        .forUseAtConfigurationTime().isPresent() && !isTestingLintItself
 
     lintOptions.apply {
         // Skip lintVital tasks on assemble. We explicitly run lintRelease for libraries.
@@ -199,11 +200,11 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
             // Broken in 7.0.0-alpha15 due to b/180408990
             disable("RestrictedApi")
 
-            // Broken in 7.0.0-alpha15 due to b/187418637
-            disable("EnforceSampledAnnotation")
-
             // Broken in 7.0.0-alpha15 due to b/187508590
             disable("InvalidPackage")
+
+            // Reenable after upgradingto 7.1.0-beta01
+            disable("SupportAnnotationUsage")
 
             // Provide stricter enforcement for project types intended to run on a device.
             if (extension.type.compilationTarget == CompilationTarget.DEVICE) {
@@ -237,6 +238,20 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
 
             // Broken in 7.0.0-alpha15 due to b/187343720
             disable("UnusedResources")
+
+            if (extension.type == LibraryType.SAMPLES) {
+                // TODO: b/190833328 remove if / when AGP will analyze dependencies by default
+                //  This is needed because SampledAnnotationDetector uses partial analysis, and
+                //  hence requires dependencies to be analyzed.
+                isCheckDependencies = true
+                // TODO: baselines from dependencies aren't used when we run lint with
+                //  isCheckDependencies = true. NewApi was recently enabled for tests, and so
+                //  there are a large amount of baselined issues that would be reported here
+                //  again, and we don't want to add them to the baseline for the sample modules.
+                //  Instead just temporarily disable this lint check until the underlying issues
+                //  are fixed.
+                disable("NewApi")
+            }
 
             // Only run certain checks where API tracking is important.
             if (extension.type.checkApi is RunApiTasks.No) {

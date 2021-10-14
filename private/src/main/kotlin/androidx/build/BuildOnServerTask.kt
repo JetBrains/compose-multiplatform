@@ -17,11 +17,10 @@
 package androidx.build
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.Project
-import org.gradle.api.Task
+import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
-import org.gradle.api.tasks.TaskProvider
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -35,24 +34,33 @@ import java.util.zip.ZipInputStream
  * produce artifacts that we want to build on server builds
  * When BuildOnServer executes, it double-checks that all expected artifacts were built
  */
-open class BuildOnServer : DefaultTask() {
+open class BuildOnServerTask : DefaultTask() {
 
     init {
         group = "Build"
         description = "Builds all of the Androidx libraries and documentation"
     }
 
+    @Internal
+    lateinit var distributionDirectory: File
+
+    @Internal
+    lateinit var buildId: String
+
+    @Internal
+    var jetifierProjectPresent: Boolean = false
+
+    @InputDirectory
+    lateinit var repositoryDirectory: File
+
     @InputFiles
     fun getRequiredFiles(): List<File> {
-        val distributionDirectory = project.getDistributionDirectory()
-        val buildId = getBuildId()
-
         val filesNames = mutableListOf(
             "androidx_aggregate_build_info.txt",
             "top-of-tree-m2repository-all-$buildId.zip"
         )
 
-        if (project.findProject(":jetifier:jetifier-standalone") != null) {
+        if (jetifierProjectPresent) {
             filesNames.add("jetifier-standalone.zip")
             filesNames.add("top-of-tree-m2repository-partially-dejetified-$buildId.zip")
         }
@@ -62,7 +70,6 @@ open class BuildOnServer : DefaultTask() {
 
     @TaskAction
     fun checkAllBuildOutputs() {
-
         val missingFiles = mutableListOf<String>()
         getRequiredFiles().forEach { file ->
             if (!file.exists()) {
@@ -79,7 +86,7 @@ open class BuildOnServer : DefaultTask() {
     }
 
     private fun verifyVersionFilesPresent() {
-        project.getRepositoryDirectory().walk().forEach { file ->
+        repositoryDirectory.walk().forEach { file ->
             if (file.extension == "aar") {
                 val inputStream = FileInputStream(file)
                 val aarFileInputStream = ZipInputStream(inputStream)

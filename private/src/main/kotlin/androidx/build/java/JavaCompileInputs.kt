@@ -80,7 +80,7 @@ data class JavaCompileInputs(
                 sourceSets
                     .filter { it.name.contains("main", ignoreCase = true) }
                     // TODO(igotti): come up with better filtering for non-Android sources.
-                    .filterNot { it.name == "desktopMain" }
+                    .filterNot { it.name == "desktopMain" || it.name == "skikoMain" }
                     .flatMap { it.kotlin.sourceDirectories }
                     .also { require(it.isNotEmpty()) }
             } ?: project.provider {

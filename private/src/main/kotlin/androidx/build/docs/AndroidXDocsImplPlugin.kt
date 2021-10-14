@@ -43,6 +43,7 @@ import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.DocsType
 import org.gradle.api.attributes.Usage
+import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.FileCollection
 import org.gradle.api.model.ObjectFactory
@@ -67,15 +68,16 @@ import javax.inject.Inject
 /**
  * Plugin that allows to build documentation for a given set of prebuilt and tip of tree projects.
  */
-class AndroidXDocsImplPlugin : Plugin<Project> {
-    lateinit var project: Project
+abstract class AndroidXDocsImplPlugin : Plugin<Project> {
     lateinit var docsType: String
     lateinit var docsSourcesConfiguration: Configuration
     lateinit var samplesSourcesConfiguration: Configuration
     lateinit var dependencyClasspath: FileCollection
 
+    @get:javax.inject.Inject
+    abstract val archiveOperations: ArchiveOperations
+
     override fun apply(project: Project) {
-        this.project = project
         docsType = project.name.removePrefix("docs-")
         project.plugins.all { plugin ->
             when (plugin) {
@@ -94,8 +96,8 @@ class AndroidXDocsImplPlugin : Plugin<Project> {
                 }
             }
         }
-        disableUnneededTasks()
-        createConfigurations()
+        disableUnneededTasks(project)
+        createConfigurations(project)
         val buildOnServer = project.tasks.register<DocsBuildOnServer>("buildOnServer") {
             buildId = getBuildId()
             docsType = this@AndroidXDocsImplPlugin.docsType
@@ -104,12 +106,14 @@ class AndroidXDocsImplPlugin : Plugin<Project> {
 
         val unzippedSamplesSources = File(project.buildDir, "unzippedSampleSources")
         val unzipSamplesTask = configureUnzipTask(
+            project,
             "unzipSampleSources",
             unzippedSamplesSources,
             samplesSourcesConfiguration
         )
         val unzippedDocsSources = File(project.buildDir, "unzippedDocsSources")
         val unzipDocsTask = configureUnzipTask(
+            project,
             "unzipDocsSources",
             unzippedDocsSources,
             docsSourcesConfiguration
@@ -117,11 +121,13 @@ class AndroidXDocsImplPlugin : Plugin<Project> {
 
         val unzippedSourcesForDackka = File(project.buildDir, "unzippedSourcesForDackka")
         val unzipSourcesForDackkaTask = configureDackkaUnzipTask(
+            project,
             unzippedSourcesForDackka,
             docsSourcesConfiguration
         )
 
         configureDackka(
+            project,
             unzippedSourcesForDackka,
             unzipSourcesForDackkaTask,
             unzippedSamplesSources,
@@ -130,6 +136,7 @@ class AndroidXDocsImplPlugin : Plugin<Project> {
             buildOnServer
         )
         configureDokka(
+            project,
             unzippedDocsSources,
             unzipDocsTask,
             unzippedSamplesSources,
@@ -138,6 +145,7 @@ class AndroidXDocsImplPlugin : Plugin<Project> {
             buildOnServer
         )
         configureDoclava(
+            project,
             unzippedDocsSources,
             unzipDocsTask,
             dependencyClasspath,
@@ -150,6 +158,7 @@ class AndroidXDocsImplPlugin : Plugin<Project> {
      * [docsConfiguration] configuration, resolve them and put them to [destinationDirectory].
      */
     private fun configureUnzipTask(
+        project: Project,
         taskName: String,
         destinationDirectory: File,
         docsConfiguration: Configuration
@@ -163,7 +172,7 @@ class AndroidXDocsImplPlugin : Plugin<Project> {
             task.from(
                 sources.elements.map { jars ->
                     jars.map {
-                        project.zipTree(it).matching {
+                        archiveOperations.zipTree(it).matching {
                             // Filter out files that documentation tools cannot process.
                             it.exclude("**/*.MF")
                             it.exclude("**/*.aidl")
@@ -192,6 +201,7 @@ class AndroidXDocsImplPlugin : Plugin<Project> {
      * This is a modified version of [configureUnzipTask], customized for Dackka usage.
      */
     private fun configureDackkaUnzipTask(
+        project: Project,
         destinationDirectory: File,
         docsConfiguration: Configuration
     ): TaskProvider<Sync> {
@@ -202,7 +212,7 @@ class AndroidXDocsImplPlugin : Plugin<Project> {
             task.from(
                 sources.elements.map { jars ->
                     jars.map {
-                        project.zipTree(it)
+                        archiveOperations.zipTree(it)
                     }
                 }
             )
@@ -219,7 +229,7 @@ class AndroidXDocsImplPlugin : Plugin<Project> {
      *   samples sources
      * - stubs(project(":foo:foo-stubs")) - stubs needed for a documented library
      */
-    private fun createConfigurations() {
+    private fun createConfigurations(project: Project) {
         project.dependencies.components.all<SourcesVariantRule>()
         val docsConfiguration = project.configurations.create("docs") {
             it.isCanBeResolved = false
@@ -297,6 +307,7 @@ class AndroidXDocsImplPlugin : Plugin<Project> {
     }
 
     private fun configureDackka(
+        project: Project,
         unzippedDocsSources: File,
         unzipDocsTask: TaskProvider<Sync>,
         unzippedSamplesSources: File,
@@ -356,6 +367,7 @@ class AndroidXDocsImplPlugin : Plugin<Project> {
     }
 
     private fun configureDokka(
+        project: Project,
         unzippedDocsSources: File,
         unzipDocsTask: TaskProvider<Sync>,
         unzippedSamplesSources: File,
@@ -377,6 +389,9 @@ class AndroidXDocsImplPlugin : Plugin<Project> {
             task.dependsOn(unzipSamplesTask)
 
             val androidJar = androidJarFile(project)
+            val dokkaClasspath = project.provider({
+                project.files(androidJar).plus(dependencyClasspath)
+            })
             // DokkaTask tries to resolve DokkaTask#classpath right away for jars that might not
             // be there yet. Delay the setting of this property to before we run the task.
             task.inputs.files(androidJar, dependencyClasspath)
@@ -396,10 +411,7 @@ class AndroidXDocsImplPlugin : Plugin<Project> {
                     opts.suppress = true
                     dokkaTask.perPackageOptions.add(opts)
                 }
-
-                dokkaTask.classpath = project.files(dokkaTask.classpath)
-                    .plus(project.files(androidJar))
-                    .plus(dependencyClasspath)
+                dokkaTask.classpath = dokkaClasspath.get()
             }
         }
         val zipTask = project.tasks.register("zipDokkaDocs", Zip::class.java) {
@@ -425,6 +437,7 @@ class AndroidXDocsImplPlugin : Plugin<Project> {
     }
 
     private fun configureDoclava(
+        project: Project,
         unzippedDocsSources: File,
         unzipDocsTask: TaskProvider<Sync>,
         dependencyClasspath: FileCollection,
@@ -531,7 +544,7 @@ class AndroidXDocsImplPlugin : Plugin<Project> {
      * Replace all tests etc with empty task, so we don't run anything
      * it is more effective then task.enabled = false, because we avoid executing deps as well
      */
-    private fun disableUnneededTasks() {
+    private fun disableUnneededTasks(project: Project) {
         var reentrance = false
         project.tasks.whenTaskAdded { task ->
             if (task is Test || task.name.startsWith("assemble") ||
@@ -609,7 +622,7 @@ abstract class SourcesVariantRule : ComponentMetadataRule {
     }
 }
 
-private const val DACKKA_DEPENDENCY = "com.google.devsite:dackka:0.0.9"
+private const val DACKKA_DEPENDENCY = "com.google.devsite:dackka:0.0.11"
 private const val DOCLAVA_DEPENDENCY = "com.android:doclava:1.0.6"
 
 // List of packages to exclude from both Java and Kotlin refdoc generation

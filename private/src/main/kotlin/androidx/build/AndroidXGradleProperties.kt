@@ -16,7 +16,6 @@
 
 package androidx.build
 
-import androidx.build.COMPOSE_MPP_ENABLED
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -50,9 +49,19 @@ const val ALTERNATIVE_PROJECT_URL = "androidx.alternativeProjectUrl"
 const val VERSION_EXTRA_CHECK_ENABLED = "androidx.versionExtraCheckEnabled"
 
 /**
+ * Validate the project structure against Jetpack guidelines
+ */
+const val VALIDATE_PROJECT_STRUCTURE = "androidx.validateProjectStructure"
+
+/**
  * Setting this property enables multiplatform builds of Compose
  */
 const val ENABLE_COMPOSE_COMPILER_METRICS = "androidx.enableComposeCompilerMetrics"
+
+/**
+ * Setting this property enables multiplatform builds of Compose
+ */
+const val ENABLE_COMPOSE_COMPILER_REPORTS = "androidx.enableComposeCompilerReports"
 
 /**
  * Returns whether the project should generate documentation.
@@ -119,12 +128,19 @@ const val VERIFY_UP_TO_DATE = "androidx.verifyUpToDate"
  */
 const val KMP_GITHUB_BUILD = "androidx.github.build"
 
+/**
+ * If true, include mac targets when building KMP
+ */
+const val KMP_ENABLE_MAC = "androidx.kmp.mac.enabled"
+
 val ALL_ANDROIDX_PROPERTIES = setOf(
     ALL_WARNINGS_AS_ERRORS,
     ALTERNATIVE_PROJECT_URL,
     VERSION_EXTRA_CHECK_ENABLED,
+    VALIDATE_PROJECT_STRUCTURE,
     COMPOSE_MPP_ENABLED,
     ENABLE_COMPOSE_COMPILER_METRICS,
+    ENABLE_COMPOSE_COMPILER_REPORTS,
     DISPLAY_TEST_OUTPUT,
     ENABLE_DOCUMENTATION,
     PROJECT_SUBSET,
@@ -140,7 +156,8 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     PLAYGROUND_SNAPSHOT_BUILD_ID,
     PLAYGROUND_METALAVA_BUILD_ID,
     PLAYGROUND_DOKKA_BUILD_ID,
-    KMP_GITHUB_BUILD
+    KMP_GITHUB_BUILD,
+    KMP_ENABLE_MAC
 )
 
 /**
@@ -158,6 +175,12 @@ fun Project.getAlternativeProjectUrl(): String? =
  */
 fun Project.isVersionExtraCheckEnabled(): Boolean =
     (project.findProperty(VERSION_EXTRA_CHECK_ENABLED) as? String)?.toBoolean() ?: true
+
+/**
+ * Validate the project structure against Jetpack guidelines
+ */
+fun Project.isValidateProjectStructureEnabled(): Boolean =
+    (project.findProperty(VALIDATE_PROJECT_STRUCTURE) as? String)?.toBoolean() ?: true
 
 /**
  * Validates that all properties passed by the user of the form "-Pandroidx.*" are not misspelled

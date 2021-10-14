@@ -128,7 +128,8 @@ fun Project.addAppApkToTestConfigGeneration(overrideProject: Project = this) {
     extensions.getByType<ApplicationAndroidComponentsExtension>().apply {
         onVariants(selector().withBuildType("debug")) { appVariant ->
             overrideProject.tasks.named(
-                "${AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK}${appVariant.name}AndroidTest"
+                AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK +
+                    "${appVariant.name}AndroidTest"
             ) { configTask ->
                 configTask as GenerateTestConfigurationTask
                 configTask.appFolder.set(appVariant.artifacts.get(SingleArtifact.APK))
@@ -369,15 +370,26 @@ fun Project.isMacrobenchmarkTarget(): Boolean {
 fun Project.configureTestConfigGeneration(baseExtension: BaseExtension) {
     extensions.getByType(AndroidComponentsExtension::class.java).apply {
         onVariants { variant ->
-            val androidTest = when (variant) {
-                is HasAndroidTest -> variant.androidTest
-                else -> return@onVariants
-            } ?: return@onVariants
+            var name: String? = null
+            var artifacts: Artifacts? = null
+            when {
+                variant is HasAndroidTest -> {
+                    name = variant.androidTest?.name
+                    artifacts = variant.androidTest?.artifacts
+                }
+                project.plugins.hasPlugin("com.android.test") -> {
+                    name = variant.name
+                    artifacts = variant.artifacts
+                }
+            }
+            if (name == null || artifacts == null) {
+                return@onVariants
+            }
             when {
                 path.contains("media2:media2-session:version-compat-tests:") -> {
                     createOrUpdateMediaTestConfigurationGenerationTask(
-                        androidTest.name,
-                        androidTest.artifacts,
+                        name,
+                        artifacts,
                         baseExtension.defaultConfig.minSdk!!,
                         baseExtension.defaultConfig.testInstrumentationRunner!!,
                         isMedia2 = true
@@ -385,8 +397,8 @@ fun Project.configureTestConfigGeneration(baseExtension: BaseExtension) {
                 }
                 path.contains("media:version-compat-tests:") -> {
                     createOrUpdateMediaTestConfigurationGenerationTask(
-                        androidTest.name,
-                        androidTest.artifacts,
+                        name,
+                        artifacts,
                         baseExtension.defaultConfig.minSdk!!,
                         baseExtension.defaultConfig.testInstrumentationRunner!!,
                         isMedia2 = false
@@ -395,16 +407,16 @@ fun Project.configureTestConfigGeneration(baseExtension: BaseExtension) {
                 path.endsWith("macrobenchmark") ||
                     isMacrobenchmarkTarget() -> {
                     configureMacrobenchmarkConfigTask(
-                        androidTest.name,
-                        androidTest.artifacts,
+                        name,
+                        artifacts,
                         baseExtension.defaultConfig.minSdk!!,
                         baseExtension.defaultConfig.testInstrumentationRunner!!
                     )
                 }
                 else -> {
                     createTestConfigurationGenerationTask(
-                        androidTest.name,
-                        androidTest.artifacts,
+                        name,
+                        artifacts,
                         baseExtension.defaultConfig.minSdk!!,
                         baseExtension.defaultConfig.testInstrumentationRunner!!
                     )

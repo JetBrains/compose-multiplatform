@@ -182,11 +182,12 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
     "lint",
     "lintAnalyzeDebug",
     "lintDebug",
-    "lintVitalRelease",
+    "lintVitalDebug",
     "lintWithExpandProjectionDebug",
     "lintWithoutExpandProjectionDebug",
+    "lintWithNullAwareTypeConverterDebug",
     "lintWithKaptDebug",
-    "lintWithKspDebug",
+    "lintWithKspDebug"
 )
 
 abstract class TaskUpToDateValidator :

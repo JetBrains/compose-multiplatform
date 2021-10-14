@@ -38,6 +38,7 @@ import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.kotlin.dsl.KotlinClosure1
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.extra
 import java.io.File
 import java.util.Locale
@@ -75,8 +76,13 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
 
         val buildOnServerTask = tasks.create(
             BUILD_ON_SERVER_TASK,
-            BuildOnServer::class.java
+            BuildOnServerTask::class.java
         )
+        buildOnServerTask.distributionDirectory = getDistributionDirectory()
+        buildOnServerTask.repositoryDirectory = getRepositoryDirectory()
+        buildOnServerTask.buildId = getBuildId()
+        buildOnServerTask.jetifierProjectPresent =
+            project.findProject(":jetifier:jetifier-standalone") != null
         buildOnServerTask.dependsOn(
             tasks.register(
                 AndroidXImplPlugin.CREATE_AGGREGATE_BUILD_INFO_FILES_TASK,
@@ -94,7 +100,7 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
         val createArchiveTask = Release.getGlobalFullZipTask(this)
         buildOnServerTask.dependsOn(createArchiveTask)
         val partiallyDejetifyArchiveTask = partiallyDejetifyArchiveTask(
-            createArchiveTask.flatMap { it.archiveFile }
+            getGlobalZipFile()
         )
         if (partiallyDejetifyArchiveTask != null)
             buildOnServerTask.dependsOn(partiallyDejetifyArchiveTask)
@@ -178,6 +184,8 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
 
         tasks.register(AndroidXImplPlugin.BUILD_TEST_APKS_TASK)
 
+        // NOTE: this task is used by the Github CI as well. If you make any changes here,
+        // please update the .github/workflows files as well, if necessary.
         project.tasks.register(
             ZIP_TEST_CONFIGS_WITH_APKS_TASK, Zip::class.java
         ) {

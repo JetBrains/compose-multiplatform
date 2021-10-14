@@ -16,7 +16,6 @@
 
 package androidx.build
 
-import androidx.build.COMPOSE_MPP_ENABLED
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.extra
 

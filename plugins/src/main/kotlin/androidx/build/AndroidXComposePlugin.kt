@@ -26,7 +26,12 @@ import org.gradle.api.Project
  */
 class AndroidXComposePlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        project.apply(mapOf<String, String>("from" to "${project.getSupportRootFolder()}/buildSrc/apply/applyAndroidXComposeImplPlugin.gradle"))
+        val supportRoot = project.getSupportRootFolder()
+        project.apply(
+            mapOf<String, String>(
+                "from" to "$supportRoot/buildSrc/apply/applyAndroidXComposeImplPlugin.gradle"
+            )
+        )
     }
 
     companion object {
@@ -42,7 +47,8 @@ class AndroidXComposePlugin : Plugin<Project> {
             isMultiplatformEnabled: Boolean = project.isMultiplatformEnabled()
         ) {
             @Suppress("UNCHECKED_CAST")
-            val companion: KFunction<Unit> = project.extensions.getByName("applyAndConfigureKotlinPlugin") as KFunction<Unit>
+            val companion: KFunction<Unit> =
+                project.extensions.getByName("applyAndConfigureKotlinPlugin") as KFunction<Unit>
             companion.call(project, isMultiplatformEnabled)
         }
     }
