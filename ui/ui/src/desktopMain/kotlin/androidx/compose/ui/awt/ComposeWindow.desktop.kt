@@ -23,6 +23,9 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.UndecoratedWindowResizer
 import androidx.compose.ui.window.WindowPlacement
 import org.jetbrains.skiko.GraphicsApi
+import org.jetbrains.skiko.hostOs
+import org.jetbrains.skiko.OS
+import java.awt.Color
 import java.awt.Component
 import java.awt.event.MouseListener
 import java.awt.event.MouseMotionListener
@@ -115,6 +118,30 @@ class ComposeWindow : JFrame() {
         super.setResizable(value)
         undecoratedWindowResizer.enabled = isUndecorated && isResizable
     }
+
+    /**
+     * `true` if background of the window is transparent, `false` otherwise
+     * Transparency should be set only if window is not showing and `isUndecorated` is set to
+     * `true`, otherwise AWT will throw an exception.
+     */
+    var isTransparent: Boolean
+        get() = layer.component.transparency
+        set(value) {
+            if (value != layer.component.transparency) {
+                check(isUndecorated) { "Window should be undecorated!" }
+                check(!isDisplayable) {
+                    "Cannot change transparency if window is already displayable."
+                }
+                layer.component.transparency = value
+                if (value) {
+                    if (hostOs != OS.Windows) {
+                        background = Color(0, 0, 0, 0)
+                    }
+                } else {
+                    background = null
+                }
+            }
+        }
 
     var placement: WindowPlacement
         get() = when {
