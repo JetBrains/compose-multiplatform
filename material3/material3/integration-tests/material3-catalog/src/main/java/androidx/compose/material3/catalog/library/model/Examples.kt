@@ -25,9 +25,13 @@ import androidx.compose.material3.samples.ColorSchemeSample
 import androidx.compose.material3.samples.EnterAlwaysSmallTopAppBar
 import androidx.compose.material3.samples.ExitUntilCollapsedLargeTopAppBar
 import androidx.compose.material3.samples.ExitUntilCollapsedMediumTopAppBar
+import androidx.compose.material3.samples.ExtendedFloatingActionButtonSample
+import androidx.compose.material3.samples.FloatingActionButtonSample
+import androidx.compose.material3.samples.LargeFloatingActionButtonSample
 import androidx.compose.material3.samples.PinnedSmallTopAppBar
 import androidx.compose.material3.samples.SimpleCenteredTopAppBar
 import androidx.compose.material3.samples.SimpleSmallTopAppBar
+import androidx.compose.material3.samples.SmallFloatingActionButtonSample
 import androidx.compose.runtime.Composable
 
 data class Example(
@@ -98,4 +102,32 @@ val TopAppBarExamples =
             description = TopAppBarExampleDescription,
             sourceUrl = TopAppBarExampleSourceUrl,
         ) { ExitUntilCollapsedLargeTopAppBar() },
+    )
+
+private const val ButtonsFloatingActionButtonExampleDescription =
+    "Buttons: floating action button examples"
+private const val ButtonsFloatingActionButtonExampleSourceUrl =
+    "$SampleSourceUrl/FloatingActionButtonSamples.kt"
+val FloatingActionButtonsExamples =
+    listOf(
+        Example(
+            name = ::FloatingActionButtonSample.name,
+            description = ButtonsFloatingActionButtonExampleDescription,
+            sourceUrl = ButtonsFloatingActionButtonExampleSourceUrl,
+        ) { FloatingActionButtonSample() },
+        Example(
+            name = ::LargeFloatingActionButtonSample.name,
+            description = ButtonsFloatingActionButtonExampleDescription,
+            sourceUrl = ButtonsFloatingActionButtonExampleSourceUrl,
+        ) { LargeFloatingActionButtonSample() },
+        Example(
+            name = ::SmallFloatingActionButtonSample.name,
+            description = ButtonsFloatingActionButtonExampleDescription,
+            sourceUrl = ButtonsFloatingActionButtonExampleSourceUrl,
+        ) { SmallFloatingActionButtonSample() },
+        Example(
+            name = ::ExtendedFloatingActionButtonSample.name,
+            description = ButtonsFloatingActionButtonExampleDescription,
+            sourceUrl = ButtonsFloatingActionButtonExampleSourceUrl,
+        ) { ExtendedFloatingActionButtonSample() },
     )

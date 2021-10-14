@@ -69,8 +69,20 @@ private val Dialog = Component(
     examples = DialogExamples
 )
 
+private val FloatingActionButtons = Component(
+    id = 4,
+    name = "Floating action button",
+    description = "A floating action button (FAB) represents the primary action of a screen.",
+    tintIcon = true,
+    guidelinesUrl = "", // No guidelines yet
+    docsUrl = "", // No docs yet
+    sourceUrl = "$Material3SourceUrl/FloatingActionButton.kt",
+    examples = FloatingActionButtonsExamples,
+)
+
 val Components = listOf(
     Color,
     Dialog,
-    TopAppBar
+    TopAppBar,
+    FloatingActionButtons,
 )
