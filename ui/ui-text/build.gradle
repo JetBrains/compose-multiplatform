@@ -44,7 +44,7 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         implementation(project(":compose:ui:ui-util"))
         implementation(libs.kotlinStdlib)
         implementation("androidx.collection:collection:1.1.0")
-        implementation("androidx.core:core:1.5.0-rc02")
+        implementation("androidx.core:core:1.5.0")
 
         testImplementation(project(":compose:ui:ui-test-font"))
         testImplementation(libs.testRules)
@@ -66,6 +66,8 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         androidTestImplementation(libs.mockitoCore)
         androidTestImplementation(libs.truth)
         androidTestImplementation(libs.mockitoKotlin)
+
+        samples(projectOrArtifact(":compose:ui:ui-text:ui-text-samples"))
     }
 
     android {
@@ -102,13 +104,22 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.kotlinStdlib)
             }
 
-            desktopMain.dependsOn(jvmMain)
+            skikoMain {
+                dependencies {
+                    api(libs.skikoCommon)
+                }
+            }
+
+            desktopMain {
+                dependsOn(skikoMain)
+                dependsOn(jvmMain)
+            }
             androidMain.dependsOn(jvmMain)
 
             androidMain.dependencies {
                 api("androidx.annotation:annotation:1.1.0")
                 implementation("androidx.collection:collection:1.1.0")
-                implementation("androidx.core:core:1.5.0-rc02")
+                implementation("androidx.core:core:1.5.0")
             }
 
             androidMain.kotlin.srcDirs("../../../text/text/src/main/java")
@@ -146,6 +157,9 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(project(":compose:ui:ui-test-font"))
             }
         }
+    }
+    dependencies {
+        samples(projectOrArtifact(":compose:ui:ui-text:ui-text-samples"))
     }
 }
 

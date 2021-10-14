@@ -37,14 +37,10 @@ import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.test.center
-import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.moveBy
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.pinch
-import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -92,7 +88,7 @@ class TransformableTest {
             )
         }
 
-        rule.onNodeWithTag(TEST_TAG).performGesture {
+        rule.onNodeWithTag(TEST_TAG).performTouchInput {
             val leftStartX = center.x - 10
             val leftEndX = visibleSize.toSize().width * EDGE_FUZZ_FACTOR
             val rightStartX = center.x + 10
@@ -129,7 +125,7 @@ class TransformableTest {
 
         val expected = Offset(50f + touchSlop, 0f)
 
-        rule.onNodeWithTag(TEST_TAG).performGesture {
+        rule.onNodeWithTag(TEST_TAG).performTouchInput {
             down(1, center)
             down(2, center + Offset(10f, 10f))
             moveBy(1, expected)
@@ -157,7 +153,7 @@ class TransformableTest {
             )
         }
 
-        rule.onNodeWithTag(TEST_TAG).performGesture {
+        rule.onNodeWithTag(TEST_TAG).performTouchInput {
             down(1, center)
             down(2, center + Offset(0f, 50f))
             moveBy(2, Offset(50f, -50f))
@@ -190,7 +186,7 @@ class TransformableTest {
 
         val panShift = Offset(touchSlop, 0f)
 
-        rule.onNodeWithTag(TEST_TAG).performGesture {
+        rule.onNodeWithTag(TEST_TAG).performTouchInput {
             down(1, center)
             down(2, center + Offset(0f, 50f))
             // first pan a bit
@@ -214,7 +210,7 @@ class TransformableTest {
         rotationLock.value = !rotationLock.value
         rule.waitForIdle()
 
-        rule.onNodeWithTag(TEST_TAG).performGesture {
+        rule.onNodeWithTag(TEST_TAG).performTouchInput {
             down(1, center)
             down(2, center + Offset(0f, 50f))
             // first pan a bit
@@ -248,7 +244,7 @@ class TransformableTest {
             )
         }
 
-        rule.onNodeWithTag(TEST_TAG).performGesture {
+        rule.onNodeWithTag(TEST_TAG).performTouchInput {
             val leftStartX = visibleSize.toSize().width * EDGE_FUZZ_FACTOR
             val leftEndX = center.x - 10
             val rightStartX = visibleSize.toSize().width * (1 - EDGE_FUZZ_FACTOR)
@@ -286,7 +282,7 @@ class TransformableTest {
             assertThat(state.isTransformInProgress).isEqualTo(false)
         }
 
-        rule.onNodeWithTag(TEST_TAG).performGesture {
+        rule.onNodeWithTag(TEST_TAG).performTouchInput {
             down(pointerId = 1, center)
             down(pointerId = 2, center + Offset(10f, 10f))
             moveBy(2, Offset(20f, 20f))
@@ -294,7 +290,7 @@ class TransformableTest {
 
         assertThat(state.isTransformInProgress).isEqualTo(true)
 
-        rule.onNodeWithTag(TEST_TAG).performGesture {
+        rule.onNodeWithTag(TEST_TAG).performTouchInput {
             up(pointerId = 1)
             up(pointerId = 2)
         }
@@ -318,7 +314,7 @@ class TransformableTest {
             )
         }
 
-        rule.onNodeWithTag(TEST_TAG).performGesture {
+        rule.onNodeWithTag(TEST_TAG).performTouchInput {
             val leftStartX = center.x - 10
             val leftEndX = visibleSize.toSize().width * EDGE_FUZZ_FACTOR
             val rightStartX = center.x + 10
@@ -341,7 +337,7 @@ class TransformableTest {
         enabled.value = false
         rule.waitForIdle()
 
-        rule.onNodeWithTag(TEST_TAG).performGesture {
+        rule.onNodeWithTag(TEST_TAG).performTouchInput {
             val leftStartX = visibleSize.toSize().width * EDGE_FUZZ_FACTOR
             val leftEndX = center.x - 10
             val rightStartX = visibleSize.toSize().width * (1 - EDGE_FUZZ_FACTOR)

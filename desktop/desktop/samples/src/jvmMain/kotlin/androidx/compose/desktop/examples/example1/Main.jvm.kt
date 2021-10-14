@@ -18,8 +18,6 @@ package androidx.compose.desktop.examples.example1
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.desktop.DesktopMaterialTheme
-import androidx.compose.foundation.ExperimentalDesktopApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
@@ -60,6 +58,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Slider
+import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
@@ -91,7 +90,8 @@ import androidx.compose.ui.input.key.isMetaPressed
 import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.input.pointer.pointerMoveFilter
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.Placeholder
@@ -106,12 +106,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDecoration.Companion.Underline
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.FrameWindowScope
-import androidx.compose.ui.window.WindowSize
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.launchApplication
 import androidx.compose.ui.window.rememberWindowState
@@ -143,7 +143,7 @@ fun main() = singleWindowApplication(
 @Composable
 private fun FrameWindowScope.App() {
     val uriHandler = LocalUriHandler.current
-    DesktopMaterialTheme {
+    MaterialTheme {
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -197,10 +197,7 @@ private fun FrameWindowScope.LeftColumn(modifier: Modifier) = Box(modifier.fillM
     )
 }
 
-@OptIn(
-    ExperimentalComposeUiApi::class,
-    ExperimentalDesktopApi::class
-)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
     val amount = remember { mutableStateOf(0f) }
@@ -346,20 +343,25 @@ private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
                     "   }\n" +
                     "}",
                 fontFamily = italicFont,
-                modifier = Modifier.padding(10.dp).pointerMoveFilter(
-                    onMove = {
-                        overText = "Move position: $it"
-                        false
-                    },
-                    onEnter = {
-                        overText = "Over enter"
-                        false
-                    },
-                    onExit = {
-                        overText = "Over exit"
-                        false
+                modifier = Modifier.padding(10.dp).pointerInput(Unit) {
+                    awaitPointerEventScope {
+                        while (true) {
+                            val event = awaitPointerEvent()
+                            val position = event.changes.first().position
+                            when (event.type) {
+                                PointerEventType.Move -> {
+                                    overText = "Move position: $position"
+                                }
+                                PointerEventType.Enter -> {
+                                    overText = "Over enter"
+                                }
+                                PointerEventType.Exit -> {
+                                    overText = "Over exit"
+                                }
+                            }
+                        }
                     }
-                )
+                }
             )
         }
 
@@ -374,7 +376,7 @@ private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
             }
 
             var clickableText by remember { mutableStateOf("Click me!") }
-
+            @OptIn(ExperimentalFoundationApi::class)
             Text(
                 modifier = Modifier.mouseClickable(
                     onClick = {
@@ -402,14 +404,25 @@ private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row {
-                Row(modifier = Modifier.padding(4.dp)) {
-                    Checkbox(
+                Column {
+                    Switch(
                         animation.value,
                         onCheckedChange = {
                             animation.value = it
                         }
                     )
-                    Text("Animation")
+                    Row(
+                        modifier = Modifier.padding(4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            animation.value,
+                            onCheckedChange = {
+                                animation.value = it
+                            }
+                        )
+                        Text("Animation")
+                    }
                 }
 
                 Button(
@@ -419,7 +432,7 @@ private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
                         GlobalScope.launchApplication {
                             Window(
                                 onCloseRequest = ::exitApplication,
-                                state = rememberWindowState(size = WindowSize(400.dp, 200.dp)),
+                                state = rememberWindowState(size = DpSize(400.dp, 200.dp)),
                                 onPreviewKeyEvent = {
                                     if (it.key == Key.Escape) {
                                         exitApplication()

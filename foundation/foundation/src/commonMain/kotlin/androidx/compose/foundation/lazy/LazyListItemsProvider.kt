@@ -16,18 +16,9 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.lazy.layout.LazyLayoutItemsProvider
 
-internal interface LazyListItemsProvider {
-    /** The total size of the list */
-    val itemsCount: Int
-
+internal interface LazyListItemsProvider : LazyLayoutItemsProvider {
     /** The list of indexes of the sticky header items */
     val headerIndexes: List<Int>
-
-    /** Returns the key for the item on this index */
-    fun getKey(index: Int): Any
-
-    /** Returns the content lambda for the given index and scope object */
-    fun getContent(index: Int, scope: LazyItemScope): @Composable() () -> Unit
 }

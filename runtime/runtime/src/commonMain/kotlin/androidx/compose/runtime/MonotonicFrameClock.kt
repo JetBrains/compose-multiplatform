@@ -35,7 +35,7 @@ interface MonotonicFrameClock : CoroutineContext.Element {
      * "now" value.
      *
      * The time base of the value provided by [withFrameNanos] is implementation defined.
-     * Time values provided are monotonically increasing; after a call to [withFrameNanos]
+     * Time values provided are strictly monotonically increasing; after a call to [withFrameNanos]
      * completes it must not provide the same value again for a subsequent call.
      */
     suspend fun <R> withFrameNanos(onFrame: (frameTimeNanos: Long) -> R): R
@@ -47,17 +47,16 @@ interface MonotonicFrameClock : CoroutineContext.Element {
 
 /**
  * Suspends until a new frame is requested, immediately invokes [onFrame] with the frame time
- * in nanoseconds in the calling context of frame dispatch, then resumes with the result from
+ * in milliseconds in the calling context of frame dispatch, then resumes with the result from
  * [onFrame].
  *
- * `frameTimeNanos` should be used when calculating animation time deltas from frame to frame
+ * `frameTimeMillis` should be used when calculating animation time deltas from frame to frame
  * as it may be normalized to the target time for the frame, not necessarily a direct,
  * "now" value.
  *
  * The time base of the value provided by [MonotonicFrameClock.withFrameMillis] is
  * implementation defined. Time values provided are monotonically increasing; after a call to
- * [MonotonicFrameClock.withFrameMillis] completes it must not provide the same value again for
- * a subsequent call.
+ * [withFrameMillis] completes it must not provide a smaller value for a subsequent call.
  */
 @Suppress("UnnecessaryLambdaCreation")
 suspend inline fun <R> MonotonicFrameClock.withFrameMillis(
@@ -74,7 +73,7 @@ suspend inline fun <R> MonotonicFrameClock.withFrameMillis(
  * "now" value.
  *
  * The time base of the value provided by [withFrameNanos] is implementation defined.
- * Time values provided are monotonically increasing; after a call to [withFrameNanos]
+ * Time values provided are strictly monotonically increasing; after a call to [withFrameNanos]
  * completes it must not provide the same value again for a subsequent call.
  *
  * This function will invoke [MonotonicFrameClock.withFrameNanos] using the calling
@@ -82,22 +81,21 @@ suspend inline fun <R> MonotonicFrameClock.withFrameMillis(
  * not present in the [CoroutineContext].
  */
 @OptIn(ExperimentalComposeApi::class)
-suspend fun <R> withFrameNanos(onFrame: (frameTimeMillis: Long) -> R): R =
+suspend fun <R> withFrameNanos(onFrame: (frameTimeNanos: Long) -> R): R =
     coroutineContext.monotonicFrameClock.withFrameNanos(onFrame)
 
 /**
  * Suspends until a new frame is requested, immediately invokes [onFrame] with the frame time
- * in nanoseconds in the calling context of frame dispatch, then resumes with the result from
+ * in milliseconds in the calling context of frame dispatch, then resumes with the result from
  * [onFrame].
  *
- * `frameTimeNanos` should be used when calculating animation time deltas from frame to frame
+ * `frameTimeMillis` should be used when calculating animation time deltas from frame to frame
  * as it may be normalized to the target time for the frame, not necessarily a direct,
  * "now" value.
  *
  * The time base of the value provided by [MonotonicFrameClock.withFrameMillis] is
  * implementation defined. Time values provided are monotonically increasing; after a call to
- * [MonotonicFrameClock.withFrameMillis] completes it must not provide the same value again for
- * a subsequent call.
+ * [withFrameMillis] completes it must not provide a smaller value for a subsequent call.
  *
  * This function will invoke [MonotonicFrameClock.withFrameNanos] using the calling
  * [CoroutineContext]'s [MonotonicFrameClock] and will throw an [IllegalStateException] if one is

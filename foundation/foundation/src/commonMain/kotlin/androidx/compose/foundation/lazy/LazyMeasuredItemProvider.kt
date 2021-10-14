@@ -16,8 +16,8 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.layout.SubcomposeMeasureScope
+import androidx.compose.foundation.lazy.layout.LazyLayoutPlaceable
+import androidx.compose.foundation.lazy.layout.LazyLayoutPlaceablesProvider
 import androidx.compose.ui.unit.Constraints
 
 /**
@@ -26,9 +26,8 @@ import androidx.compose.ui.unit.Constraints
 internal class LazyMeasuredItemProvider(
     constraints: Constraints,
     isVertical: Boolean,
-    private val scope: SubcomposeMeasureScope,
     private val itemsProvider: LazyListItemsProvider,
-    private val itemContentFactory: LazyListItemContentFactory,
+    private val placeablesProvider: LazyLayoutPlaceablesProvider,
     private val measuredItemFactory: MeasuredItemFactory
 ) {
     // the constraints we will measure child with. the main axis is not restricted
@@ -40,20 +39,25 @@ internal class LazyMeasuredItemProvider(
     /**
      * Used to subcompose items of lazy lists. Composed placeables will be measured with the
      * correct constraints and wrapped into [LazyMeasuredItem].
-     * This method can be called only once with each [index] per the measure pass.
      */
     fun getAndMeasure(index: DataIndex): LazyMeasuredItem {
         val key = itemsProvider.getKey(index.value)
-        val content = itemContentFactory.getContent(index.value, key)
-        val measurables = scope.subcompose(key, content)
-        val placeables = Array(measurables.size) {
-            measurables[it].measure(childConstraints)
-        }
+        val placeables = placeablesProvider.getAndMeasure(index.value, childConstraints)
         return measuredItemFactory.createItem(index, key, placeables)
     }
+
+    /**
+     * Contains the mapping between the key and the index. It could contain not all the items of
+     * the list as an optimization.
+     **/
+    val keyToIndexMap: Map<Any, Int> get() = itemsProvider.keyToIndexMap
 }
 
 // This interface allows to avoid autoboxing on index param
 internal fun interface MeasuredItemFactory {
-    fun createItem(index: DataIndex, key: Any, placeables: Array<Placeable>): LazyMeasuredItem
+    fun createItem(
+        index: DataIndex,
+        key: Any,
+        placeables: Array<LazyLayoutPlaceable>
+    ): LazyMeasuredItem
 }

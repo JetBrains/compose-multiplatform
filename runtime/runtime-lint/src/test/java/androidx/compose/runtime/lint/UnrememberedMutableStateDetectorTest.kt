@@ -109,7 +109,7 @@ class UnrememberedMutableStateDetectorTest : LintDetectorTest() {
             """
             ),
             Stubs.Composable,
-            Stubs.MutableState,
+            Stubs.SnapshotState,
             Stubs.Remember
         )
             .skipTestModes(TestMode.TYPE_ALIAS)
@@ -275,7 +275,7 @@ src/androidx/compose/runtime/foo/{.kt:61: Error: Creating a state object during 
             """
             ),
             Stubs.Composable,
-            Stubs.MutableState,
+            Stubs.SnapshotState,
             Stubs.Remember
         )
             .run()
@@ -363,7 +363,7 @@ src/androidx/compose/runtime/foo/{.kt:61: Error: Creating a state object during 
             """
             ),
             Stubs.Composable,
-            Stubs.MutableState,
+            Stubs.SnapshotState,
             Stubs.Remember
         )
             .run()

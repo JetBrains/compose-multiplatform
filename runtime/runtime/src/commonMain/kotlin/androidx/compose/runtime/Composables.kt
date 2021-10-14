@@ -168,11 +168,24 @@ val currentRecomposeScope: RecomposeScope
     }
 
 /**
+ * Returns the current [CompositionLocalContext] which contains all
+ * [CompositionLocal]'s in the current composition and their values
+ * provided by [CompositionLocalProvider]'s.
+ * This context can be used to pass locals to another composition via [CompositionLocalProvider].
+ * That is usually needed if another composition is not a subcomposition of the current one.
+ */
+@OptIn(InternalComposeApi::class)
+val currentCompositionLocalContext: CompositionLocalContext
+    @Composable get() = CompositionLocalContext(
+        currentComposer.buildContext().getCompositionLocalScope()
+    )
+
+/**
  * This a hash value used to coordinate map externally stored state to the composition. For
  * example, this is used by saved instance state to preserve state across activity lifetime
  * boundaries.
  *
- * This value is not likely to be unique but is not guaranteed unique. There are known cases,
+ * This value is likely to be unique but is not guaranteed unique. There are known cases,
  * such as for loops without a [key], where the runtime does not have enough information to
  * make the compound key hash unique.
  */

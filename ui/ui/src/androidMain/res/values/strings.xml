@@ -34,6 +34,8 @@
     <string name="tab">Tab</string>
     <!-- Spoken title when a navigation drawer opens. -->
     <string name="navigation_menu">"Navigation menu"</string>
+    <!-- Spoken title of a dropdown menu. -->
+    <string name="dropdown_menu">"Dropdown menu"</string>
     <!--
       Spoken content description of an element which will close the navigation menu when clicked.
     -->

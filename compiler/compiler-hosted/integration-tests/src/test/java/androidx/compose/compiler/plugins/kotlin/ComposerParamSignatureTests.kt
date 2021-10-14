@@ -125,6 +125,49 @@ class ComposerParamSignatureTests : AbstractCodegenSignatureTest() {
     )
 
     @Test
+    fun testArrayListSizeOverride(): Unit = validateBytecode(
+        """
+        class CustomList : ArrayList<Any>() {
+            override val size: Int
+                get() = super.size
+        }
+        """, dumpClasses = true
+    ) {
+        assertTrue(it.contains("INVOKESPECIAL java/util/ArrayList.size ()I"))
+        assertFalse(it.contains("INVOKESPECIAL java/util/ArrayList.getSize ()I"))
+    }
+
+    @Test
+    fun testForLoopIssue1(): Unit = codegen(
+        """
+            @Composable
+            fun Test(text: String, callback: @Composable () -> Unit) {
+                for (char in text) {
+                    if (char == '}') {
+                        callback()
+                        continue
+                    }
+                }
+            }
+        """
+    )
+
+    @Test
+    fun testForLoopIssue2(): Unit = codegen(
+        """
+            @Composable
+            fun Test(text: List<String>, callback: @Composable () -> Unit) {
+                for ((i, value) in text.withIndex()) {
+                    if (value == "" || i == 0) {
+                        callback()
+                        continue
+                    }
+                }
+            }
+        """
+    )
+
+    @Test
     fun test32Params(): Unit = codegen(
         """
         @Composable

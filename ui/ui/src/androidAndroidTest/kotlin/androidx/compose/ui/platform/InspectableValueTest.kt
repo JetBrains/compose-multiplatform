@@ -17,6 +17,7 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.foundation.border
+import androidx.compose.testutils.first
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.padding
@@ -56,7 +57,7 @@ class InspectableValueTest {
 
     @Test
     fun simpleLayoutTest() {
-        val modifier = Modifier.simple(10, 3.dp) as InspectableValue
+        val modifier = Modifier.simple(10, 3.dp).first() as InspectableValue
         assertThat(modifier.nameFallback).isEqualTo("simple")
         assertThat(modifier.inspectableElements.asIterable()).containsExactly(
             ValueElement("padding", 10),

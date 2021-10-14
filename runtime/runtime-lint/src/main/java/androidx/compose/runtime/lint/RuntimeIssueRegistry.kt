@@ -35,7 +35,9 @@ class RuntimeIssueRegistry : IssueRegistry() {
         ComposableLambdaParameterDetector.ComposableLambdaParameterNaming,
         ComposableLambdaParameterDetector.ComposableLambdaParameterPosition,
         ComposableNamingDetector.ComposableNaming,
+        ComposableStateFlowValueDetector.StateFlowValueCalledInComposition,
         CompositionLocalNamingDetector.CompositionLocalNaming,
+        ProduceStateDetector.ProduceStateDoesNotAssignValue,
         RememberDetector.RememberReturnType,
         UnrememberedMutableStateDetector.UnrememberedMutableState
     )

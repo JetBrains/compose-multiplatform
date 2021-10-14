@@ -16,15 +16,22 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
@@ -33,6 +40,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -274,6 +283,152 @@ class LazyArrangementsTest {
             .assertLeftPositionInRootIsEqualTo(itemSize * 2.5f)
     }
 
+    @Test
+    fun column_scrollingByExactlyTheItemSizePlusSpacer_switchesTheFirstVisibleItem() {
+        val itemSizePx = 30
+        val spacingSizePx = 4
+        val itemSize = with(rule.density) { itemSizePx.toDp() }
+        val spacingSize = with(rule.density) { spacingSizePx.toDp() }
+        lateinit var state: LazyListState
+        rule.setContentWithTestViewConfiguration {
+            LazyColumn(
+                Modifier.size(itemSize * 3),
+                state = rememberLazyListState().also { state = it },
+                verticalArrangement = Arrangement.spacedBy(spacingSize)
+            ) {
+                items(5) {
+                    Spacer(
+                        Modifier.size(itemSize).testTag("$it")
+                    )
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy((itemSizePx + spacingSizePx).toFloat())
+            }
+        }
+
+        rule.onNodeWithTag("0")
+            .assertIsNotDisplayed()
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(1)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun column_scrollingByExactlyTheItemSizePlusHalfTheSpacer_staysOnTheSameItem() {
+        val itemSizePx = 30
+        val spacingSizePx = 4
+        val itemSize = with(rule.density) { itemSizePx.toDp() }
+        val spacingSize = with(rule.density) { spacingSizePx.toDp() }
+        lateinit var state: LazyListState
+        rule.setContentWithTestViewConfiguration {
+            LazyColumn(
+                Modifier.size(itemSize * 3),
+                state = rememberLazyListState().also { state = it },
+                verticalArrangement = Arrangement.spacedBy(spacingSize)
+            ) {
+                items(5) {
+                    Spacer(
+                        Modifier.size(itemSize).testTag("$it")
+                    )
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy((itemSizePx + spacingSizePx / 2).toFloat())
+            }
+        }
+
+        rule.onNodeWithTag("0")
+            .assertIsNotDisplayed()
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+            assertThat(state.firstVisibleItemScrollOffset)
+                .isEqualTo(itemSizePx + spacingSizePx / 2)
+        }
+    }
+
+    @Test
+    fun row_scrollingByExactlyTheItemSizePlusSpacer_switchesTheFirstVisibleItem() {
+        val itemSizePx = 30
+        val spacingSizePx = 4
+        val itemSize = with(rule.density) { itemSizePx.toDp() }
+        val spacingSize = with(rule.density) { spacingSizePx.toDp() }
+        lateinit var state: LazyListState
+        rule.setContentWithTestViewConfiguration {
+            LazyRow(
+                Modifier.size(itemSize * 3),
+                state = rememberLazyListState().also { state = it },
+                horizontalArrangement = Arrangement.spacedBy(spacingSize)
+            ) {
+                items(5) {
+                    Spacer(
+                        Modifier.size(itemSize).testTag("$it")
+                    )
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy((itemSizePx + spacingSizePx).toFloat())
+            }
+        }
+
+        rule.onNodeWithTag("0")
+            .assertIsNotDisplayed()
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(1)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun row_scrollingByExactlyTheItemSizePlusHalfTheSpacer_staysOnTheSameItem() {
+        val itemSizePx = 30
+        val spacingSizePx = 4
+        val itemSize = with(rule.density) { itemSizePx.toDp() }
+        val spacingSize = with(rule.density) { spacingSizePx.toDp() }
+        lateinit var state: LazyListState
+        rule.setContentWithTestViewConfiguration {
+            LazyRow(
+                Modifier.size(itemSize * 3),
+                state = rememberLazyListState().also { state = it },
+                horizontalArrangement = Arrangement.spacedBy(spacingSize)
+            ) {
+                items(5) {
+                    Spacer(
+                        Modifier.size(itemSize).testTag("$it")
+                    )
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy((itemSizePx + spacingSizePx / 2).toFloat())
+            }
+        }
+
+        rule.onNodeWithTag("0")
+            .assertIsNotDisplayed()
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+            assertThat(state.firstVisibleItemScrollOffset)
+                .isEqualTo(itemSizePx + spacingSizePx / 2)
+        }
+    }
+
     // with reverseLayout == true
 
     @Test
@@ -308,6 +463,52 @@ class LazyArrangementsTest {
         assertArrangementForTwoItems(
             Arrangement.End, LayoutDirection.Ltr, reverseLayout = true
         )
+    }
+
+    @Test
+    fun column_whenArrangementChanges() {
+        var arrangement by mutableStateOf(Arrangement.Top)
+        rule.setContent {
+            LazyColumn(
+                modifier = Modifier.requiredSize(containerSize),
+                verticalArrangement = arrangement
+            ) {
+                items(2) {
+                    Item(it)
+                }
+            }
+        }
+
+        assertArrangementForTwoItems(Arrangement.Top)
+
+        rule.runOnIdle {
+            arrangement = Arrangement.Bottom
+        }
+
+        assertArrangementForTwoItems(Arrangement.Bottom)
+    }
+
+    @Test
+    fun row_whenArrangementChanges() {
+        var arrangement by mutableStateOf(Arrangement.Start)
+        rule.setContent {
+            LazyRow(
+                modifier = Modifier.requiredSize(containerSize),
+                horizontalArrangement = arrangement
+            ) {
+                items(2) {
+                    Item(it)
+                }
+            }
+        }
+
+        assertArrangementForTwoItems(Arrangement.Start, LayoutDirection.Ltr)
+
+        rule.runOnIdle {
+            arrangement = Arrangement.End
+        }
+
+        assertArrangementForTwoItems(Arrangement.End, LayoutDirection.Ltr)
     }
 
     fun composeColumnWith(arrangement: Arrangement.Vertical) {

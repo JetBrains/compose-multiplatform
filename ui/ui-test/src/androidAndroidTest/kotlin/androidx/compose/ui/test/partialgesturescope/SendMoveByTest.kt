@@ -19,6 +19,7 @@ package androidx.compose.ui.test.partialgesturescope
 import android.os.SystemClock.sleep
 import androidx.compose.testutils.expectError
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.test.cancel
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -62,6 +63,7 @@ class SendMoveByTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun onePointer() {
         // When we inject a down event followed by a move event
@@ -78,13 +80,14 @@ class SendMoveByTest {
                 var t = events[0].getPointer(0).timestamp
                 val pointerId = events[0].getPointer(0).id
 
-                t += 10
+                t += eventPeriodMillis
                 assertThat(events[1].pointerCount).isEqualTo(1)
                 events[1].getPointer(0).verify(t, pointerId, true, downPosition1 + delta1)
             }
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun twoPointers() {
         // When we inject two down events followed by two move events
@@ -103,12 +106,12 @@ class SendMoveByTest {
                 val pointerId1 = events[0].getPointer(0).id
                 val pointerId2 = events[1].getPointer(1).id
 
-                t += 10
+                t += eventPeriodMillis
                 assertThat(events[2].pointerCount).isEqualTo(2)
                 events[2].getPointer(0).verify(t, pointerId1, true, downPosition1 + delta1)
                 events[2].getPointer(1).verify(t, pointerId2, true, downPosition2)
 
-                t += 10
+                t += eventPeriodMillis
                 assertThat(events[3].pointerCount).isEqualTo(2)
                 events[3].getPointer(0).verify(t, pointerId1, true, downPosition1 + delta1)
                 events[3].getPointer(1).verify(t, pointerId2, true, downPosition2 + delta2)
@@ -116,6 +119,7 @@ class SendMoveByTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun twoPointers_oneMoveEvent() {
         // When we inject two down events followed by one move events
@@ -136,7 +140,7 @@ class SendMoveByTest {
                 val pointerId1 = events[0].getPointer(0).id
                 val pointerId2 = events[1].getPointer(1).id
 
-                t += 10
+                t += eventPeriodMillis
                 assertThat(events[2].pointerCount).isEqualTo(2)
                 events[2].getPointer(0).verify(t, pointerId1, true, downPosition1 + delta1)
                 events[2].getPointer(1).verify(t, pointerId2, true, downPosition2 + delta2)
@@ -144,6 +148,7 @@ class SendMoveByTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun moveByWithoutDown() {
         expectError<IllegalStateException> {
@@ -151,6 +156,7 @@ class SendMoveByTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun moveByWrongPointerId() {
         rule.partialGesture { down(1, downPosition1) }
@@ -159,6 +165,7 @@ class SendMoveByTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun moveByAfterUp() {
         rule.partialGesture { down(downPosition1) }
@@ -168,6 +175,7 @@ class SendMoveByTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun moveByAfterCancel() {
         rule.partialGesture { down(downPosition1) }
@@ -177,6 +185,7 @@ class SendMoveByTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun movePointerByWithoutDown() {
         expectError<IllegalStateException> {
@@ -184,6 +193,7 @@ class SendMoveByTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun movePointerByWrongPointerId() {
         rule.partialGesture { down(1, downPosition1) }
@@ -192,6 +202,7 @@ class SendMoveByTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun movePointerByAfterUp() {
         rule.partialGesture { down(1, downPosition1) }
@@ -201,6 +212,7 @@ class SendMoveByTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun movePointerByAfterCancel() {
         rule.partialGesture { down(1, downPosition1) }

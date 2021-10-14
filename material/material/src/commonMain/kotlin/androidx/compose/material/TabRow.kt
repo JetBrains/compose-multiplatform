@@ -169,7 +169,7 @@ fun TabRow(
                 }
 
                 subcompose(TabSlots.Divider, divider).fastForEach {
-                    val placeable = it.measure(constraints)
+                    val placeable = it.measure(constraints.copy(minHeight = 0))
                     placeable.placeRelative(0, tabRowHeight - placeable.height)
                 }
 
@@ -284,7 +284,11 @@ fun ScrollableTabRow(
                 // of the tab row, and then placed on top of the tabs.
                 subcompose(TabSlots.Divider, divider).fastForEach {
                     val placeable = it.measure(
-                        constraints.copy(minWidth = layoutWidth, maxWidth = layoutWidth)
+                        constraints.copy(
+                            minHeight = 0,
+                            minWidth = layoutWidth,
+                            maxWidth = layoutWidth
+                        )
                     )
                     placeable.placeRelative(0, layoutHeight - placeable.height)
                 }

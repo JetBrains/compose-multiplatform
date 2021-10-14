@@ -60,7 +60,18 @@ fun CheckBoxScaffoldPreview() {
 @Composable
 fun AnimatedVisibilityPreview() {
     val editable by remember { mutableStateOf(true) }
-    AnimatedVisibility(visible = editable) {
+    AnimatedVisibility(label = "My Animated Visibility", visible = editable) {
+        Text(text = "Edit")
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Preview(name = "transition.AnimatedVisibility")
+@Composable
+fun TransitionAnimatedVisibilityPreview() {
+    val editable by remember { mutableStateOf(CheckBoxState.Unselected) }
+    val transition = updateTransition(targetState = editable, label = "transition.AV")
+    transition.AnimatedVisibility(visible = { it == CheckBoxState.Selected }) {
         Text(text = "Edit")
     }
 }

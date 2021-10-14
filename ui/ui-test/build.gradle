@@ -27,6 +27,13 @@ plugins {
 AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 android {
+    if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
+        sourceSets {
+            test.java.srcDirs += "src/androidCommonTest/kotlin"
+            androidTest.java.srcDirs += "src/androidCommonTest/kotlin"
+        }
+    }
+
     lintOptions {
         disable("InvalidPackage")
     }
@@ -50,7 +57,13 @@ dependencies {
         implementation("androidx.annotation:annotation:1.1.0")
         implementation(libs.espressoCore)
 
-        androidTestImplementation(project(":activity:activity-compose"))
+        testImplementation(project(":compose:test-utils"))
+        testImplementation(libs.truth)
+        testImplementation(libs.robolectric)
+        testImplementation(libs.mockitoCore)
+        testImplementation(libs.mockitoKotlin)
+
+        androidTestImplementation("androidx.activity:activity-compose:1.3.1")
         androidTestImplementation(project(":compose:material:material"))
         androidTestImplementation(project(":compose:test-utils"))
         androidTestImplementation(project(":compose:ui:ui-test-junit4"))
@@ -91,15 +104,22 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.espressoCore)
             }
 
-            androidAndroidTest.dependencies {
-                implementation(project(":compose:material:material"))
+            androidCommonTest.dependencies {
                 implementation(project(":compose:test-utils"))
-                implementation(project(":compose:ui:ui-test-junit4"))
-                implementation(project(":activity:activity-compose"))
                 implementation(libs.truth)
                 implementation(libs.mockitoCore)
-                implementation(libs.dexmakerMockito)
                 implementation(libs.mockitoKotlin)
+            }
+
+            androidTest.dependencies {
+                implementation(libs.robolectric)
+            }
+
+            androidAndroidTest.dependencies {
+                implementation(project(":compose:material:material"))
+                implementation(project(":compose:ui:ui-test-junit4"))
+                implementation("androidx.activity:activity-compose:1.3.1")
+                implementation(libs.dexmakerMockito)
             }
 
             desktopMain.dependencies {
@@ -111,6 +131,10 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             androidMain.dependsOn(jvmMain)
             desktopMain.dependsOn(jvmMain)
             jvmMain.dependsOn(commonMain)
+
+            androidCommonTest.dependsOn(commonTest)
+            androidTest.dependsOn(androidCommonTest)
+            androidAndroidTest.dependsOn(androidCommonTest)
         }
     }
 }

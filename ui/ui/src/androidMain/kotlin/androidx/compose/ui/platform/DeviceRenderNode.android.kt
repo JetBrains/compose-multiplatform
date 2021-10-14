@@ -71,6 +71,8 @@ internal interface DeviceRenderNode {
      * RenderNode directly and potentially crashing on certain multiplatform configurations
      */
     fun dumpRenderNodeData(): DeviceRenderNodeData
+
+    fun discardDisplayList()
 }
 
 /**

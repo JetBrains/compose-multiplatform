@@ -192,7 +192,7 @@ private fun Modifier.touchScrollable(
         enabled = enabled,
         interactionSource = interactionSource,
         reverseDirection = false,
-        startDragImmediately = { controller.isScrollInProgress },
+        startDragImmediately = { scrollLogic.value.shouldScrollImmediately() },
         onDragStopped = { velocity ->
             nestedScrollDispatcher.value.coroutineScope.launch {
                 scrollLogic.value.onDragStopped(velocity)
@@ -225,6 +225,9 @@ private class ScrollingLogic(
     fun Velocity.toFloat(): Float =
         if (orientation == Horizontal) this.x else this.y
 
+    fun Velocity.update(newValue: Float): Velocity =
+        if (orientation == Horizontal) copy(x = newValue) else copy(y = newValue)
+
     fun Float.reverseIfNeeded(): Float = if (reverseDirection) this * -1 else this
 
     fun ScrollScope.dispatchScroll(
@@ -232,19 +235,26 @@ private class ScrollingLogic(
         pointerPosition: Offset?,
         source: NestedScrollSource
     ): Float {
+        val overScrollPreConsumed =
+            overScrollController
+                ?.consumePreScroll(scrollDelta.toOffset(), pointerPosition, source)
+                ?.toFloat()
+                ?: 0f
+        val afterPreOverscroll = scrollDelta - overScrollPreConsumed
         val nestedScrollDispatcher = nestedScrollDispatcher.value
         val preConsumedByParent = nestedScrollDispatcher
-            .dispatchPreScroll(scrollDelta.toOffset(), source)
+            .dispatchPreScroll(afterPreOverscroll.toOffset(), source)
 
-        val scrollAvailable = scrollDelta - preConsumedByParent.toFloat()
+        val scrollAvailable = afterPreOverscroll - preConsumedByParent.toFloat()
         val consumed = scrollBy(scrollAvailable.reverseIfNeeded()).reverseIfNeeded()
         val leftForParent = scrollAvailable - consumed
         val parentConsumed = nestedScrollDispatcher
             .dispatchPostScroll(consumed.toOffset(), leftForParent.toOffset(), source)
-        overScrollController?.processDragDelta(
-            scrollAvailable.reverseIfNeeded().toOffset(),
-            (leftForParent - parentConsumed.toFloat()).reverseIfNeeded().toOffset(),
-            pointerPosition
+        overScrollController?.consumePostScroll(
+            scrollAvailable.toOffset(),
+            (leftForParent - parentConsumed.toFloat()).toOffset(),
+            pointerPosition,
+            source
         )
         return leftForParent
     }
@@ -259,15 +269,18 @@ private class ScrollingLogic(
     }
 
     suspend fun onDragStopped(axisVelocity: Float) {
-        val velocity = axisVelocity.toVelocity()
+        val preOverscrollConsumed = overScrollController
+            ?.consumePreFling(axisVelocity.toVelocity())?.toFloat()
+            ?: 0f
+        val velocity = (axisVelocity - preOverscrollConsumed).toVelocity()
         val preConsumedByParent = nestedScrollDispatcher.value.dispatchPreFling(velocity)
         val available = velocity - preConsumedByParent
         val velocityLeft = doFlingAnimation(available)
         val consumedPost =
             nestedScrollDispatcher.value.dispatchPostFling(available - velocityLeft, velocityLeft)
         val totalLeft = velocityLeft - consumedPost
+        overScrollController?.consumePostFling(totalLeft.toFloat().toVelocity())
         overScrollController?.release()
-        overScrollController?.processVelocity(totalLeft.toFloat().reverseIfNeeded().toVelocity())
     }
 
     suspend fun doFlingAnimation(available: Velocity): Velocity {
@@ -284,12 +297,18 @@ private class ScrollingLogic(
             }
             with(scope) {
                 with(flingBehavior) {
-                    result = performFling(available.toFloat().reverseIfNeeded())
-                        .reverseIfNeeded().toVelocity()
+                    result = result.update(
+                        performFling(available.toFloat().reverseIfNeeded()).reverseIfNeeded()
+                    )
                 }
             }
         }
         return result
+    }
+
+    fun shouldScrollImmediately(): Boolean {
+        return scrollableState.isScrollInProgress ||
+            overScrollController?.stopOverscrollAnimation() ?: false
     }
 }
 

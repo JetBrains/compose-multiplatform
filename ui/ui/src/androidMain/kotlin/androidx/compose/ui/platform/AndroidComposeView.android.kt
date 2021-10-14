@@ -24,7 +24,10 @@ import android.os.Build
 import android.os.Looper
 import android.util.Log
 import android.util.SparseArray
+import android.view.InputDevice
 import android.view.MotionEvent
+import android.view.MotionEvent.ACTION_HOVER_EXIT
+import android.view.MotionEvent.ACTION_HOVER_MOVE
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewStructure
@@ -49,7 +52,6 @@ import androidx.compose.ui.autofill.AutofillCallback
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.autofill.performAutofill
 import androidx.compose.ui.autofill.populateViewStructure
-import androidx.compose.ui.focus.FocusTag
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusDirection.Companion.Down
 import androidx.compose.ui.focus.FocusDirection.Companion.In
@@ -61,6 +63,7 @@ import androidx.compose.ui.focus.FocusDirection.Companion.Right
 import androidx.compose.ui.focus.FocusDirection.Companion.Up
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusManagerImpl
+import androidx.compose.ui.focus.FocusTag
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
@@ -68,6 +71,10 @@ import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.setFrom
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.PlatformHapticFeedback
+import androidx.compose.ui.input.InputModeManager
+import androidx.compose.ui.input.InputModeManagerImpl
+import androidx.compose.ui.input.InputMode.Companion.Keyboard
+import androidx.compose.ui.input.InputMode.Companion.Touch
 import androidx.compose.ui.input.key.Key.Companion.Back
 import androidx.compose.ui.input.key.Key.Companion.DirectionCenter
 import androidx.compose.ui.input.key.Key.Companion.DirectionDown
@@ -129,6 +136,13 @@ import androidx.compose.ui.geometry.Rect as ComposeRect
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 internal class AndroidComposeView(context: Context) :
     ViewGroup(context), Owner, ViewRootForTest, PositionCalculator, DefaultLifecycleObserver {
+
+    /**
+     * Remembers the position of the last pointer input event that was down. This position will be
+     * used to calculate whether this view is considered scrollable via [canScrollHorizontally]/
+     * [canScrollVertically].
+     */
+    private var lastDownPointerPosition: Offset = Offset.Unspecified
 
     /**
      * Signal that AndroidComposeView's superclass constructors have finished running.
@@ -325,6 +339,12 @@ internal class AndroidComposeView(context: Context) :
         updatePositionCacheAndDispatch()
     }
 
+    // executed whenever the touch mode changes.
+    private val touchModeChangeListener = ViewTreeObserver.OnTouchModeChangeListener { touchMode ->
+        _inputModeManager.inputMode = if (touchMode) Touch else Keyboard
+        _focusManager.fetchUpdatedFocusProperties()
+    }
+
     private val textInputServiceAndroid = TextInputServiceAndroid(this)
 
     @OptIn(InternalComposeUiApi::class)
@@ -345,10 +365,44 @@ internal class AndroidComposeView(context: Context) :
         PlatformHapticFeedback(this)
 
     /**
+     * Provide an instance of [InputModeManager] which is available as a CompositionLocal.
+     */
+    private val _inputModeManager = InputModeManagerImpl(
+        initialInputMode = if (isInTouchMode) Touch else Keyboard,
+        onRequestInputModeChange = {
+            when (it) {
+                // Android doesn't support programmatically switching to touch mode, so we
+                // don't do anything, but just return true if we are already in touch mode.
+                Touch -> isInTouchMode
+
+                // If we are already in keyboard mode, we return true, otherwise, we call
+                // requestFocusFromTouch, which puts the system in non-touch mode.
+                Keyboard -> if (isInTouchMode) requestFocusFromTouch() else true
+
+                else -> false
+            }
+        }
+    )
+    override val inputModeManager: InputModeManager get() = _inputModeManager
+
+    /**
      * Provide textToolbar to the user, for text-related operation. Use the Android version of
      * floating toolbar(post-M) and primary toolbar(pre-M).
      */
     override val textToolbar: TextToolbar = AndroidTextToolbar(this)
+
+    /**
+     * The previous raw position of the first pointer. This is useful for avoiding sending
+     * excess Move events when ACTION_HOVER_MOVE immediately follows a different, more meaningful
+     * event, like ACTION_SCROLL.
+     */
+    private var previousPosition = Offset.Infinite
+
+    /**
+     * A cache for OwnedLayers. Recreating ViewLayers is expensive, so we avoid it as much
+     * as possible. This also helps a little with RenderNodeLayers as well.
+     */
+    private val layerCache = WeakCache<OwnedLayer>()
 
     init {
         setWillNotDraw(false)
@@ -475,9 +529,8 @@ internal class AndroidComposeView(context: Context) :
      */
     fun removeAndroidView(view: AndroidViewHolder) {
         androidViewsHandler.removeView(view)
-        androidViewsHandler.holderToLayoutNode.remove(view)
         androidViewsHandler.layoutNodeToHolder.remove(
-            androidViewsHandler.holderToLayoutNode[view]
+            androidViewsHandler.holderToLayoutNode.remove(view)
         )
         ViewCompat.setImportantForAccessibility(
             view,
@@ -614,6 +667,13 @@ internal class AndroidComposeView(context: Context) :
         drawBlock: (Canvas) -> Unit,
         invalidateParentLayer: () -> Unit
     ): OwnedLayer {
+        // First try the layer cache
+        val layer = layerCache.pop()
+        if (layer !== null) {
+            layer.reuseLayer(drawBlock, invalidateParentLayer)
+            return layer
+        }
+
         // RenderNode is supported on Q+ for certain, but may also be supported on M-O.
         // We can't be confident that RenderNode is supported, so we try and fail over to
         // the ViewLayer implementation. We'll try even on on P devices, but it will fail
@@ -646,6 +706,24 @@ internal class AndroidComposeView(context: Context) :
             addView(viewLayersContainer)
         }
         return ViewLayer(this, viewLayersContainer!!, drawBlock, invalidateParentLayer)
+    }
+
+    /**
+     * Return [layer] to the layer cache. It can be reused in [createLayer] after this.
+     * Returns `true` if it was recycled or `false` if it will be discarded.
+     */
+    internal fun recycle(layer: OwnedLayer): Boolean {
+        // L throws during RenderThread when reusing the Views. The stack trace
+        // wasn't easy to decode, so this work-around keeps up to 10 Views active
+        // only for L. On other versions, it uses the WeakHashMap to retain as many
+        // as are convenient.
+        val cacheValue = viewLayersContainer == null || ViewLayer.shouldUseDispatchDraw ||
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ||
+            layerCache.size < MaximumLayerCacheSize
+        if (cacheValue) {
+            layerCache.push(layer)
+        }
+        return cacheValue
     }
 
     override fun onSemanticsChange() {
@@ -827,6 +905,7 @@ internal class AndroidComposeView(context: Context) :
         viewTreeOwners!!.lifecycleOwner.lifecycle.addObserver(this)
         viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
         viewTreeObserver.addOnScrollChangedListener(scrollChangedListener)
+        viewTreeObserver.addOnTouchModeChangeListener(touchModeChangeListener)
     }
 
     override fun onDetachedFromWindow() {
@@ -840,6 +919,7 @@ internal class AndroidComposeView(context: Context) :
         }
         viewTreeObserver.removeOnGlobalLayoutListener(globalLayoutListener)
         viewTreeObserver.removeOnScrollChangedListener(scrollChangedListener)
+        viewTreeObserver.removeOnTouchModeChangeListener(touchModeChangeListener)
     }
 
     override fun onProvideAutofillVirtualStructure(structure: ViewStructure?, flags: Int) {
@@ -852,22 +932,42 @@ internal class AndroidComposeView(context: Context) :
 
     // TODO(shepshapard): Test this method.
     override fun dispatchTouchEvent(motionEvent: MotionEvent): Boolean {
-        if (motionEvent.x.isNaN() ||
-            motionEvent.y.isNaN() ||
-            motionEvent.rawX.isNaN() ||
-            motionEvent.rawY.isNaN()
-        ) {
+        if (isBadMotionEvent(motionEvent)) {
             return false // Bad MotionEvent. Don't handle it.
         }
+
+        val processResult = handleMotionEvent(motionEvent)
+
+        if (processResult.anyMovementConsumed) {
+            parent.requestDisallowInterceptTouchEvent(true)
+        }
+
+        return processResult.dispatchedToAPointerInputModifier
+    }
+
+    private fun handleMotionEvent(motionEvent: MotionEvent): ProcessResult {
         try {
             recalculateWindowPosition(motionEvent)
             forceUseMatrixCache = true
             measureAndLayout()
-            val processResult = trace("AndroidOwner:onTouch") {
+            val result = trace("AndroidOwner:onTouch") {
                 val pointerInputEvent =
                     motionEventAdapter.convertToPointerInputEvent(motionEvent, this)
                 if (pointerInputEvent != null) {
-                    pointerInputEventProcessor.process(pointerInputEvent, this)
+                    // Cache the last position of the last pointer to go down so we can check if
+                    // it's in a scrollable region in canScroll{Vertically|Horizontally}. Those
+                    // methods use semantics data, and because semantics coordinates are local to
+                    // this view, the pointer _position_, not _positionOnScreen_, is the offset that
+                    // needs to be cached.
+                    pointerInputEvent.pointers.lastOrNull { it.down }?.position?.let {
+                        lastDownPointerPosition = it
+                    }
+
+                    pointerInputEventProcessor.process(
+                        pointerInputEvent,
+                        this,
+                        isInBounds(motionEvent)
+                    )
                 } else {
                     pointerInputEventProcessor.processCancel()
                     ProcessResult(
@@ -876,15 +976,33 @@ internal class AndroidComposeView(context: Context) :
                     )
                 }
             }
-
-            if (processResult.anyMovementConsumed) {
-                parent.requestDisallowInterceptTouchEvent(true)
-            }
-
-            return processResult.dispatchedToAPointerInputModifier
+            previousPosition = Offset(motionEvent.rawX, motionEvent.rawY)
+            return result
         } finally {
             forceUseMatrixCache = false
         }
+    }
+
+    /**
+     * This method is required to correctly support swipe-to-dismiss layouts on WearOS, which search
+     * their children for scrollable views to determine whether or not to intercept touch events –
+     * a sort of simplified nested scrolling mechanism.
+     *
+     * Because a composition may contain many scrollable and non-scrollable areas, and this method
+     * doesn't know which part of the view the caller cares about, it uses the
+     * [lastDownPointerPosition] as the location to check.
+     */
+    override fun canScrollHorizontally(direction: Int): Boolean =
+        accessibilityDelegate.canScroll(vertical = false, direction, lastDownPointerPosition)
+
+    /** See [canScrollHorizontally]. */
+    override fun canScrollVertically(direction: Int): Boolean =
+        accessibilityDelegate.canScroll(vertical = true, direction, lastDownPointerPosition)
+
+    private fun isInBounds(motionEvent: MotionEvent): Boolean {
+        val x = motionEvent.x
+        val y = motionEvent.y
+        return (x in 0f..width.toFloat() && y in 0f..height.toFloat())
     }
 
     override fun localToScreen(localPosition: Offset): Offset {
@@ -986,7 +1104,43 @@ internal class AndroidComposeView(context: Context) :
     private fun autofillSupported() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
 
     public override fun dispatchHoverEvent(event: MotionEvent): Boolean {
-        return accessibilityDelegate.dispatchHoverEvent(event)
+        if (isBadMotionEvent(event)) {
+            return false // Bad MotionEvent. Don't handle it.
+        }
+        if (event.isFromSource(InputDevice.SOURCE_TOUCHSCREEN) &&
+            event.getToolType(0) == MotionEvent.TOOL_TYPE_FINGER
+        ) {
+            // Accessibility touch exploration
+            return accessibilityDelegate.dispatchHoverEvent(event)
+        }
+        when (event.actionMasked) {
+            ACTION_HOVER_EXIT ->
+                // Check if we're receiving ACTION_HOVER_EXIT because of a button press
+                if (event.buttonState != 0) {
+                    return false
+                }
+            ACTION_HOVER_MOVE ->
+                // Check if we're receiving this when we've already handled it elsewhere
+                if (!isPositionChanged(event)) {
+                    return false
+                }
+        }
+        val result = handleMotionEvent(event)
+        return result.dispatchedToAPointerInputModifier
+    }
+
+    private fun isBadMotionEvent(event: MotionEvent): Boolean {
+        return event.x.isNaN() ||
+            event.y.isNaN() ||
+            event.rawX.isNaN() ||
+            event.rawY.isNaN()
+    }
+
+    private fun isPositionChanged(event: MotionEvent): Boolean {
+        if (event.pointerCount != 1) {
+            return true
+        }
+        return event.rawX != previousPosition.x || event.rawY != previousPosition.y
     }
 
     private fun findViewByAccessibilityIdRootedAtCurrentView(
@@ -1087,6 +1241,7 @@ internal class AndroidComposeView(context: Context) :
     }
 
     companion object {
+        private const val MaximumLayerCacheSize = 10
         private var systemPropertiesClass: Class<*>? = null
         private var getBooleanMethod: Method? = null
 

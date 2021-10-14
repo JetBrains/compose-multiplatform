@@ -50,6 +50,8 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         androidTestImplementation(libs.espressoCore)
         androidTestImplementation(libs.truth)
         androidTestImplementation(libs.kotlinTest)
+
+        samples(projectOrArtifact(":compose:ui:ui-unit:ui-unit-samples"))
     }
 }
 
@@ -91,6 +93,9 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.espressoCore)
             }
         }
+    }
+    dependencies {
+        samples(projectOrArtifact(":compose:ui:ui-unit:ui-unit-samples"))
     }
 }
 

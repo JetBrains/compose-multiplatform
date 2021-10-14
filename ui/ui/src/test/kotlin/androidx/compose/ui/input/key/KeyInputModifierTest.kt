@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.input.key
 
+import androidx.compose.testutils.first
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.ValueElement
@@ -39,7 +40,7 @@ class KeyInputModifierTest {
     @Test
     fun testInspectorValueForKeyEvent() {
         val onKeyEvent: (KeyEvent) -> Boolean = { true }
-        val modifier = Modifier.onKeyEvent(onKeyEvent) as InspectableValue
+        val modifier = Modifier.onKeyEvent(onKeyEvent).first() as InspectableValue
         assertThat(modifier.nameFallback).isEqualTo("onKeyEvent")
         assertThat(modifier.valueOverride).isNull()
         assertThat(modifier.inspectableElements.asIterable()).containsExactly(
@@ -50,7 +51,7 @@ class KeyInputModifierTest {
     @Test
     fun testInspectorValueForPreviewKeyEvent() {
         val onPreviewKeyEvent: (KeyEvent) -> Boolean = { true }
-        val modifier = Modifier.onPreviewKeyEvent(onPreviewKeyEvent) as InspectableValue
+        val modifier = Modifier.onPreviewKeyEvent(onPreviewKeyEvent).first() as InspectableValue
         assertThat(modifier.nameFallback).isEqualTo("onPreviewKeyEvent")
         assertThat(modifier.valueOverride).isNull()
         assertThat(modifier.inspectableElements.asIterable()).containsExactly(

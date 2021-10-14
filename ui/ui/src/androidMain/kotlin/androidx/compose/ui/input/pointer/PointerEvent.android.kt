@@ -18,6 +18,7 @@ package androidx.compose.ui.input.pointer
 
 import android.view.KeyEvent
 import android.view.MotionEvent
+import androidx.compose.ui.util.fastForEach
 
 internal actual typealias NativePointerButtons = Int
 internal actual typealias NativePointerKeyboardModifiers = Int
@@ -45,6 +46,36 @@ actual data class PointerEvent internal constructor(
     actual val buttons = PointerButtons(motionEvent?.buttonState ?: 0)
 
     actual val keyboardModifiers = PointerKeyboardModifiers(motionEvent?.metaState ?: 0)
+
+    actual var type: PointerEventType = calculatePointerEventType()
+        internal set
+
+    private fun calculatePointerEventType(): PointerEventType {
+        if (motionEvent != null) {
+            return when (motionEvent.actionMasked) {
+                MotionEvent.ACTION_DOWN,
+                MotionEvent.ACTION_POINTER_DOWN -> PointerEventType.Press
+                MotionEvent.ACTION_UP,
+                MotionEvent.ACTION_POINTER_UP -> PointerEventType.Release
+                MotionEvent.ACTION_HOVER_MOVE,
+                MotionEvent.ACTION_MOVE -> PointerEventType.Move
+                MotionEvent.ACTION_HOVER_ENTER -> PointerEventType.Enter
+                MotionEvent.ACTION_HOVER_EXIT -> PointerEventType.Exit
+
+                else -> PointerEventType.Unknown
+            }
+        }
+        // Used for testing.
+        changes.fastForEach {
+            if (it.changedToUpIgnoreConsumed()) {
+                return PointerEventType.Release
+            }
+            if (it.changedToDownIgnoreConsumed()) {
+                return PointerEventType.Press
+            }
+        }
+        return PointerEventType.Move
+    }
 }
 
 actual val PointerButtons.isPrimaryPressed: Boolean

@@ -56,6 +56,10 @@ import java.util.Locale as JavaLocale
 /**
  * Android specific implementation for [Paragraph]
  */
+// NOTE(text-perf-review): I see most of the APIs in this class just delegate to TextLayout or to
+// AndroidParagraphIntrinsics. Should we consider just having one TextLayout class which
+// implements Paragraph and ParagraphIntrinsics? it seems like all of these types are immutable
+// and have similar sets of responsibilities.
 @OptIn(InternalPlatformTextApi::class)
 internal class AndroidParagraph constructor(
     val paragraphIntrinsics: AndroidParagraphIntrinsics,

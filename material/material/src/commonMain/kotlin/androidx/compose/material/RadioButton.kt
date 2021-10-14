@@ -104,6 +104,7 @@ fun RadioButton(
         }
     Canvas(
         modifier
+            .then(if (onClick != null) { Modifier.minimumTouchTargetSize() } else { Modifier })
             .then(selectableModifier)
             .wrapContentSize(Alignment.Center)
             .padding(RadioButtonPadding)

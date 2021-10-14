@@ -14,21 +14,14 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION", "DeprecatedCallableAddReplaceWith")
+
 package androidx.compose.ui.test
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.lerp
 import androidx.compose.ui.semantics.SemanticsNode
-import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.util.lerp
-import kotlin.math.atan2
-import kotlin.math.ceil
-import kotlin.math.cos
 import kotlin.math.roundToInt
-import kotlin.math.sign
-import kotlin.math.sin
 
 /**
  * The distance of a swipe's start position from the node's edge, in terms of the node's length.
@@ -44,18 +37,10 @@ private const val edgeFuzzFactor = 0.083f
 private const val doubleClickDelayMillis = 145L
 
 /** The time before a long press gesture attempts to win. */
-// remove after b/179281066
 private const val LongPressTimeoutMillis: Long = 500L
 
 /**
- * The maximum time from the start of the first tap to the start of the second
- * tap in a double-tap gesture.
- */
-// remove after b/179281066
-private const val DoubleTapTimeoutMillis: Long = 300L
-
-/**
- * The receiver scope for injecting gestures on the [semanticsNode] identified by the
+ * The receiver scope for injecting gestures on the SemanticsNode identified by the
  * corresponding [SemanticsNodeInteraction]. Gestures can be injected by calling methods defined
  * on [GestureScope], such as [click] or [swipe]. The [SemanticsNodeInteraction] can be found by
  * one of the finder methods such as
@@ -102,85 +87,78 @@ private const val DoubleTapTimeoutMillis: Long = 300L
  *    }
  * ```
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope"
+)
 class GestureScope(node: SemanticsNode, testContext: TestContext) {
-    // TODO(b/133217292): Better error: explain which gesture couldn't be performed
-    private var _semanticsNode: SemanticsNode? = node
-    internal val semanticsNode
-        get() = checkNotNull(_semanticsNode) {
-            "Can't query SemanticsNode, GestureScope has already been disposed"
-        }
-
-    // TODO(b/133217292): Better error: explain which gesture couldn't be performed
-    private var _inputDispatcher: InputDispatcher? =
-        createInputDispatcher(testContext, checkNotNull(semanticsNode.root))
-    internal val inputDispatcher
-        get() = checkNotNull(_inputDispatcher) {
-            "Can't send gesture, GestureScope has already been disposed"
-        }
-
-    /**
-     * Returns and stores the visible bounds of the [semanticsNode] we're interacting with. This
-     * applies clipping, which is almost always the correct thing to do when injecting gestures,
-     * as gestures operate on visible UI.
-     */
-    internal val boundsInRoot: Rect by lazy { semanticsNode.boundsInRoot }
+    @PublishedApi
+    internal val delegateScope: MultiModalInjectionScope =
+        MultiModalInjectionScopeImpl(node, testContext)
 
     /**
      * Returns the size of the visible part of the node we're interacting with. This is contrary
      * to [SemanticsNode.size], which returns the unclipped size of the node.
      */
-    val visibleSize: IntSize by lazy {
-        IntSize(boundsInRoot.width.roundToInt(), boundsInRoot.height.roundToInt())
-    }
-
-    internal fun dispose() {
-        inputDispatcher.dispose()
-        _semanticsNode = null
-        _inputDispatcher = null
-    }
+    val visibleSize: IntSize = delegateScope.visibleSize
 }
 
 /**
  * Shorthand for `size.width`
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 inline val GestureScope.width: Int
-    get() = visibleSize.width
+    get() = delegateScope.width
 
 /**
  * Shorthand for `size.height`
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 inline val GestureScope.height: Int
-    get() = visibleSize.height
+    get() = delegateScope.height
 
 /**
  * Returns the x-coordinate for the left edge of the node we're interacting with, in the
  * node's local coordinate system, where (0, 0) is the top left corner of the node.
  */
-@Suppress("unused")
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 inline val GestureScope.left: Float
-    get() = 0f
+    get() = delegateScope.left
 
 /**
  * Returns the y-coordinate for the bottom of the node we're interacting with, in the
  * node's local coordinate system, where (0, 0) is the top left corner of the node.
  */
-@Suppress("unused")
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 inline val GestureScope.top: Float
-    get() = 0f
+    get() = delegateScope.top
 
 /**
  * Returns the x-coordinate for the center of the node we're interacting with, in the
  * node's local coordinate system, where (0, 0) is the top left corner of the node.
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 inline val GestureScope.centerX: Float
-    get() = width / 2f
+    get() = delegateScope.centerX
 
 /**
  * Returns the y-coordinate for the center of the node we're interacting with, in the
  * node's local coordinate system, where (0, 0) is the top left corner of the node.
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 inline val GestureScope.centerY: Float
-    get() = height / 2f
+    get() = delegateScope.centerY
 
 /**
  * Returns the x-coordinate for the right edge of the node we're interacting with, in the
@@ -188,8 +166,11 @@ inline val GestureScope.centerY: Float
  * Note that, unless `width == 0`, `right != width`. In particular, `right == width - 1f`, because
  * pixels are 0-based. If `width == 0`, `right == 0` too.
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 inline val GestureScope.right: Float
-    get() = width.let { if (it == 0) 0f else it - 1f }
+    get() = delegateScope.right
 
 /**
  * Returns the y-coordinate for the bottom of the node we're interacting with, in the
@@ -197,77 +178,106 @@ inline val GestureScope.right: Float
  * Note that, unless `height == 0`, `bottom != height`. In particular, `bottom == height - 1f`,
  * because pixels are 0-based. If `height == 0`, `bottom == 0` too.
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 inline val GestureScope.bottom: Float
-    get() = height.let { if (it == 0) 0f else it - 1f }
+    get() = delegateScope.bottom
 
 /**
  * Returns the top left corner of the node we're interacting with, in the node's
  * local coordinate system, where (0, 0) is the top left corner of the node.
  */
-@Suppress("unused")
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 val GestureScope.topLeft: Offset
-    get() = Offset(left, top)
+    get() = delegateScope.topLeft
 
 /**
  * Returns the center of the top edge of the node we're interacting with, in the node's
  * local coordinate system, where (0, 0) is the top left corner of the node.
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 val GestureScope.topCenter: Offset
-    get() = Offset(centerX, top)
+    get() = delegateScope.topCenter
 
 /**
  * Returns the top right corner of the node we're interacting with, in the node's
  * local coordinate system, where (0, 0) is the top left corner of the node. Note that
  * `topRight.x != width`, see [right].
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 val GestureScope.topRight: Offset
-    get() = Offset(right, top)
+    get() = delegateScope.topRight
 
 /**
  * Returns the center of the left edge of the node we're interacting with, in the
  * node's local coordinate system, where (0, 0) is the top left corner of the node.
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 val GestureScope.centerLeft: Offset
-    get() = Offset(left, centerY)
+    get() = delegateScope.centerLeft
 
 /**
  * Returns the center of the node we're interacting with, in the node's
  * local coordinate system, where (0, 0) is the top left corner of the node.
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 val GestureScope.center: Offset
-    get() = Offset(centerX, centerY)
+    get() = delegateScope.center
 
 /**
  * Returns the center of the right edge of the node we're interacting with, in the
  * node's local coordinate system, where (0, 0) is the top left corner of the node.
  * Note that `centerRight.x != width`, see [right].
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 val GestureScope.centerRight: Offset
-    get() = Offset(right, centerY)
+    get() = delegateScope.centerRight
 
 /**
  * Returns the bottom left corner of the node we're interacting with, in the node's
  * local coordinate system, where (0, 0) is the top left corner of the node. Note that
  * `bottomLeft.y != height`, see [bottom].
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 val GestureScope.bottomLeft: Offset
-    get() = Offset(left, bottom)
+    get() = delegateScope.bottomLeft
 
 /**
  * Returns the center of the bottom edge of the node we're interacting with, in the node's
  * local coordinate system, where (0, 0) is the top left corner of the node. Note that
  * `bottomCenter.y != height`, see [bottom].
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 val GestureScope.bottomCenter: Offset
-    get() = Offset(centerX, bottom)
+    get() = delegateScope.bottomCenter
 
 /**
  * Returns the bottom right corner of the node we're interacting with, in the node's
  * local coordinate system, where (0, 0) is the top left corner of the node. Note that
  * `bottomRight.x != width` and `bottomRight.y != height`, see [right] and [bottom].
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 val GestureScope.bottomRight: Offset
-    get() = Offset(right, bottom)
+    get() = delegateScope.bottomRight
 
 /**
  * Creates an [Offset] relative to the size of the node we're interacting with. [x] and [y]
@@ -279,24 +289,15 @@ val GestureScope.bottomRight: Offset
  * `bottomRight - percentOffset(.2f, .1f)` is a point 20% to the left and 10% to the top of the
  * bottom right corner.
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 fun GestureScope.percentOffset(
     /*@FloatRange(from = -1.0, to = 1.0)*/
     x: Float = 0f,
     /*@FloatRange(from = -1.0, to = 1.0)*/
     y: Float = 0f
-): Offset {
-    return Offset(x * width, y * height)
-}
-
-/**
- * Transforms the [position] to root coordinates.
- *
- * @param position A position in local coordinates
- * @return [position] transformed to coordinates relative to the containing root.
- */
-private fun GestureScope.localToRoot(position: Offset): Offset {
-    return position + boundsInRoot.topLeft
-}
+): Offset = delegateScope.percentOffset(x, y)
 
 /**
  * Performs a click gesture at the given [position] on the associated node, or in the center
@@ -307,9 +308,10 @@ private fun GestureScope.localToRoot(position: Offset): Offset {
  * @param position The position where to click, in the node's local coordinate system. If
  * omitted, the center position will be used.
  */
-fun GestureScope.click(position: Offset = center) {
-    inputDispatcher.enqueueClick(localToRoot(position))
-}
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
+fun GestureScope.click(position: Offset = center) = delegateScope.Touch.click(position)
 
 /**
  * Performs a long click gesture at the given [position] on the associated node, or in the
@@ -321,15 +323,13 @@ fun GestureScope.click(position: Offset = center) {
  * omitted, the center position will be used.
  * @param durationMillis The time between the down and the up event
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 fun GestureScope.longClick(
     position: Offset = center,
     durationMillis: Long = LongPressTimeoutMillis + 100
-) {
-    require(durationMillis >= LongPressTimeoutMillis) {
-        "Long click must have a duration of at least ${LongPressTimeoutMillis}ms"
-    }
-    swipe(position, position, durationMillis)
-}
+) = delegateScope.Touch.longClick(position, durationMillis)
 
 /**
  * Performs a double click gesture at the given [position] on the associated node, or in the
@@ -342,18 +342,13 @@ fun GestureScope.longClick(
  * @param delayMillis The time between the up event of the first click and the down event of the
  * second click
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 fun GestureScope.doubleClick(
     position: Offset = center,
     delayMillis: Long = doubleClickDelayMillis
-) {
-    require(delayMillis <= DoubleTapTimeoutMillis - 10) {
-        "Time between clicks in double click can be at most ${DoubleTapTimeoutMillis - 10}ms"
-    }
-    val globalPosition = localToRoot(position)
-    inputDispatcher.enqueueClick(globalPosition)
-    inputDispatcher.advanceEventTime(delayMillis)
-    inputDispatcher.enqueueClick(globalPosition)
-}
+) = delegateScope.Touch.doubleClick(position, delayMillis)
 
 /**
  * Performs the swipe gesture on the associated node. The motion events are linearly
@@ -365,15 +360,14 @@ fun GestureScope.doubleClick(
  * @param end The end position of the gesture, in the node's local coordinate system
  * @param durationMillis The duration of the gesture
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 fun GestureScope.swipe(
     start: Offset,
     end: Offset,
     durationMillis: Long = 200
-) {
-    val globalStart = localToRoot(start)
-    val globalEnd = localToRoot(end)
-    inputDispatcher.enqueueSwipe(globalStart, globalEnd, durationMillis)
-}
+) = delegateScope.Touch.swipe(start, end, durationMillis)
 
 /**
  * Performs a pinch gesture on the associated node.
@@ -388,27 +382,16 @@ fun GestureScope.swipe(
  * @param end1 The end position of the second gesture in the node's local coordinate system
  * @param durationMillis the duration of the gesture
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 fun GestureScope.pinch(
     start0: Offset,
     end0: Offset,
     start1: Offset,
     end1: Offset,
     durationMillis: Long = 400
-) {
-    val globalStart0 = localToRoot(start0)
-    val globalEnd0 = localToRoot(end0)
-    val globalStart1 = localToRoot(start1)
-    val globalEnd1 = localToRoot(end1)
-    val durationFloat = durationMillis.toFloat()
-
-    inputDispatcher.enqueueSwipes(
-        listOf<(Long) -> Offset>(
-            { lerp(globalStart0, globalEnd0, it / durationFloat) },
-            { lerp(globalStart1, globalEnd1, it / durationFloat) }
-        ),
-        durationMillis
-    )
-}
+) = delegateScope.Touch.pinch(start0, end0, start1, end1, durationMillis)
 
 /**
  * Performs the swipe gesture on the associated node, such that the velocity when the
@@ -426,59 +409,25 @@ fun GestureScope.pinch(
  * @param durationMillis The duration of the gesture in milliseconds. Must be long enough that at
  * least 3 input events are generated, which happens with a duration of 25ms or more.
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 fun GestureScope.swipeWithVelocity(
     start: Offset,
     end: Offset,
     /*@FloatRange(from = 0.0)*/
     endVelocity: Float,
     durationMillis: Long = 200
-) {
-    require(endVelocity >= 0f) {
-        "Velocity cannot be $endVelocity, it must be positive"
-    }
-    require(eventPeriodMillis < 40) {
-        "InputDispatcher.eventPeriod must be smaller than 40ms in order to generate velocities"
-    }
-    val minimumDuration = ceil(2.5f * eventPeriodMillis).roundToInt()
-    require(durationMillis >= minimumDuration) {
-        "Duration must be at least ${minimumDuration}ms because " +
-            "velocity requires at least 3 input events"
-    }
-    val globalStart = localToRoot(start)
-    val globalEnd = localToRoot(end)
-
-    // Decompose v into it's x and y components
-    val delta = end - start
-    val theta = atan2(delta.y, delta.x)
-    // VelocityTracker internally calculates px/s, not px/ms
-    val vx = cos(theta) * endVelocity / 1000
-    val vy = sin(theta) * endVelocity / 1000
-
-    // Note: it would be more precise to do `theta = atan2(-y, x)`, because atan2 expects a
-    // coordinate system where positive y goes up and in our coordinate system positive y goes
-    // down. However, in that case we would also have to inverse `vy` to convert the velocity
-    // back to our own coordinate system. But then it's just a double negation, so we can skip
-    // both conversions entirely.
-
-    // To get the desired velocity, generate fx and fy such that VelocityTracker calculates
-    // the right velocity. VelocityTracker makes a polynomial fit through the points
-    // (-age, x) and (-age, y) for vx and vy respectively, which is accounted for in
-    // f(Long, Long, Float, Float, Float).
-    val fx = createFunctionForVelocity(durationMillis, globalStart.x, globalEnd.x, vx)
-    val fy = createFunctionForVelocity(durationMillis, globalStart.y, globalEnd.y, vy)
-
-    inputDispatcher.enqueueSwipe({ t -> Offset(fx(t), fy(t)) }, durationMillis)
-}
+) = delegateScope.Touch.swipeWithVelocity(start, end, endVelocity, durationMillis)
 
 /**
  * Performs a swipe up gesture along the [centerX] of the associated node. The gesture starts
  * slightly above the [bottom] of the node and ends at the [top].
  */
-fun GestureScope.swipeUp() {
-    val start = Offset(centerX, bottomFuzzed)
-    val end = Offset(centerX, top)
-    swipe(start, end, 200)
-}
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
+fun GestureScope.swipeUp() = delegateScope.Touch.swipeUp()
 
 /**
  * Performs a swipe up gesture along the [centerX] of the associated node, from [startY] till
@@ -490,29 +439,24 @@ fun GestureScope.swipeUp() {
  * [startY]. By default the [top] of the node.
  * @param durationMillis The duration of the swipe. By default 200 milliseconds.
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 @ExperimentalTestApi
 fun GestureScope.swipeUp(
     startY: Float = bottomFuzzed,
     endY: Float = top,
     durationMillis: Long = 200
-) {
-    require(startY >= endY) {
-        "startY=$startY needs to be greater than or equal to endY=$endY"
-    }
-    val start = Offset(centerX, startY)
-    val end = Offset(centerX, endY)
-    swipe(start, end, durationMillis)
-}
+) = delegateScope.Touch.swipeUp(startY, endY, durationMillis)
 
 /**
  * Performs a swipe down gesture along the [centerX] of the associated node. The gesture starts
  * slightly below the [top] of the node and ends at the [bottom].
  */
-fun GestureScope.swipeDown() {
-    val start = Offset(centerX, topFuzzed)
-    val end = Offset(centerX, bottom)
-    swipe(start, end, 200)
-}
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
+fun GestureScope.swipeDown() = delegateScope.Touch.swipeDown()
 
 /**
  * Performs a swipe down gesture along the [centerX] of the associated node, from [startY] till
@@ -524,29 +468,24 @@ fun GestureScope.swipeDown() {
  * [startY]. By default the [bottom] of the node.
  * @param durationMillis The duration of the swipe. By default 200 milliseconds.
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 @ExperimentalTestApi
 fun GestureScope.swipeDown(
     startY: Float = topFuzzed,
     endY: Float = bottom,
     durationMillis: Long = 200
-) {
-    require(startY <= endY) {
-        "startY=$startY needs to be less than or equal to endY=$endY"
-    }
-    val start = Offset(centerX, startY)
-    val end = Offset(centerX, endY)
-    swipe(start, end, durationMillis)
-}
+) = delegateScope.Touch.swipeDown(startY, endY, durationMillis)
 
 /**
  * Performs a swipe left gesture along the [centerY] of the associated node. The gesture starts
  * slightly left of the [right] side of the node and ends at the [left] side.
  */
-fun GestureScope.swipeLeft() {
-    val start = Offset(rightFuzzed, centerY)
-    val end = Offset(left, centerY)
-    swipe(start, end, 200)
-}
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
+fun GestureScope.swipeLeft() = delegateScope.Touch.swipeLeft()
 
 /**
  * Performs a swipe left gesture along the [centerY] of the associated node, from [startX] till
@@ -558,29 +497,24 @@ fun GestureScope.swipeLeft() {
  * [startX]. By default the [left] of the node.
  * @param durationMillis The duration of the swipe. By default 200 milliseconds.
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 @ExperimentalTestApi
 fun GestureScope.swipeLeft(
     startX: Float = rightFuzzed,
     endX: Float = left,
     durationMillis: Long = 200
-) {
-    require(startX >= endX) {
-        "startX=$startX needs to be greater than or equal to endX=$endX"
-    }
-    val start = Offset(startX, centerY)
-    val end = Offset(endX, centerY)
-    swipe(start, end, durationMillis)
-}
+) = delegateScope.Touch.swipeLeft(startX, endX, durationMillis)
 
 /**
  * Performs a swipe right gesture along the [centerY] of the associated node. The gesture starts
  * slightly right of the [left] side of the node and ends at the [right] side.
  */
-fun GestureScope.swipeRight() {
-    val start = Offset(leftFuzzed, centerY)
-    val end = Offset(right, centerY)
-    swipe(start, end, 200)
-}
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
+fun GestureScope.swipeRight() = delegateScope.Touch.swipeRight()
 
 /**
  * Performs a swipe right gesture along the [centerY] of the associated node, from [startX] till
@@ -592,19 +526,15 @@ fun GestureScope.swipeRight() {
  * [startX]. By default the [right] of the node.
  * @param durationMillis The duration of the swipe. By default 200 milliseconds.
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 @ExperimentalTestApi
 fun GestureScope.swipeRight(
     startX: Float = leftFuzzed,
     endX: Float = right,
     durationMillis: Long = 200
-) {
-    require(startX <= endX) {
-        "startX=$startX needs to be less than or equal to endX=$endX"
-    }
-    val start = Offset(startX, centerY)
-    val end = Offset(endX, centerY)
-    swipe(start, end, durationMillis)
-}
+) = delegateScope.Touch.swipeRight(startX, endX, durationMillis)
 
 private val Int.startFuzzed: Float get() = (this * edgeFuzzFactor).roundToInt().toFloat()
 private val Int.endFuzzed: Float get() = (this * (1 - edgeFuzzFactor)).roundToInt().toFloat()
@@ -613,68 +543,6 @@ private val GestureScope.leftFuzzed: Float get() = width.startFuzzed
 private val GestureScope.topFuzzed: Float get() = height.startFuzzed
 private val GestureScope.rightFuzzed: Float get() = width.endFuzzed
 private val GestureScope.bottomFuzzed: Float get() = height.endFuzzed
-
-/**
- * Generate a function of the form `f(t) = a*(t-T)^2 + b*(t-T) + c` that satisfies
- * `f(0) = [start]`, `f([duration]) = [end]`, `T = [duration]` and `b = [velocity]`.
- *
- * Filling in `f([duration]) = [end]`, `T = [duration]` and `b = [velocity]` gives:
- * * `a * (duration - duration)^2 + velocity * (duration - duration) + c = end`
- * * `c = end`
- *
- * Filling in `f(0) = [start]`, `T = [duration]` and `b = [velocity]` gives:
- * * `a * (0 - duration)^2 + velocity * (0 - duration) + c = start`
- * * `a * duration^2 - velocity * duration + end = start`
- * * `a * duration^2 = start - end + velocity * duration`
- * * `a = (start - end + velocity * duration) / duration^2`
- *
- * @param duration The duration of the fling
- * @param start The start x or y position
- * @param end The end x or y position
- * @param velocity The desired velocity in the x or y direction at the [end] position
- */
-private fun createFunctionForVelocity(
-    duration: Long,
-    start: Float,
-    end: Float,
-    velocity: Float
-): (Long) -> Float {
-    val a = (start - end + velocity * duration) / (duration * duration)
-    val function = { t: Long ->
-        val tMinusDuration = t - duration
-        // `f(t) = a*(t-T)^2 + b*(t-T) + c`
-        a * tMinusDuration * tMinusDuration + velocity * tMinusDuration + end
-    }
-
-    // High velocities often result in curves that start off in the wrong direction, like a bow
-    // being strung to reach a high velocity at the end coordinate. For a gesture, that is not
-    // desirable, and can be mitigated by using the fact that VelocityTracker only uses the last
-    // 100 ms of the gesture. Anything before that doesn't need to follow the curve.
-
-    // Does the function go in the correct direction at the start?
-    if (sign(function(1) - start) == sign(end - start)) {
-        return function
-    } else {
-        // If not, lerp between 0 and `duration - 100` in an attempt to prevent the function from
-        // going in the wrong direction. This does not affect the velocity at f(duration), as
-        // VelocityTracker only uses the last 100ms. This only works if f(duration - 100) is
-        // between from and to, log a warning if this is not the case.
-        val cutOffTime = duration - 100
-        val cutOffValue = function(cutOffTime)
-        require(sign(cutOffValue - start) == sign(end - start)) {
-            "Creating a gesture between $start and $end with a duration of $duration and a " +
-                "resulting velocity of $velocity results in a movement that goes outside " +
-                "of the range [$start..$end]"
-        }
-        return { t ->
-            if (t < cutOffTime) {
-                lerp(start, cutOffValue, t / cutOffTime.toFloat())
-            } else {
-                function(t)
-            }
-        }
-    }
-}
 
 /**
  * Sends a down event for the pointer with the given [pointerId] at [position] on the associated
@@ -698,7 +566,7 @@ private fun createFunctionForVelocity(
  * move event just before the down or up event if [movePointerTo] or [movePointerBy] has been
  * called and no move event has been sent yet. This does not happen for cancel events, but the
  * cancel event will contain the up to date position of all pointers. Move and cancel events will
- * advance the event time by 10 milliseconds.
+ * advance the event time by 16 milliseconds.
  *
  * Because gestures don't have to be defined all in the same [performGesture] block,
  * keep in mind that while the gesture is not complete, all code you execute in between
@@ -711,10 +579,11 @@ private fun createFunctionForVelocity(
  * @param pointerId The id of the pointer, can be any number not yet in use by another pointer
  * @param position The position of the down event, in the node's local coordinate system
  */
-fun GestureScope.down(pointerId: Int, position: Offset) {
-    val globalPosition = localToRoot(position)
-    inputDispatcher.enqueueTouchDown(pointerId, globalPosition)
-}
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
+fun GestureScope.down(pointerId: Int, position: Offset) =
+    delegateScope.Touch.down(pointerId, position)
 
 /**
  * Sends a down event for the default pointer at [position] on the associated node. The
@@ -727,9 +596,10 @@ fun GestureScope.down(pointerId: Int, position: Offset) {
  *
  * @param position The position of the down event, in the node's local coordinate system
  */
-fun GestureScope.down(position: Offset) {
-    down(0, position)
-}
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
+fun GestureScope.down(position: Offset) = delegateScope.Touch.down(position)
 
 /**
  * Sends a move event on the associated node, with the position of the pointer with the
@@ -741,10 +611,11 @@ fun GestureScope.down(position: Offset) {
  * @param pointerId The id of the pointer to move, as supplied in [down]
  * @param position The new position of the pointer, in the node's local coordinate system
  */
-fun GestureScope.moveTo(pointerId: Int, position: Offset) {
-    movePointerTo(pointerId, position)
-    move()
-}
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
+fun GestureScope.moveTo(pointerId: Int, position: Offset) =
+    delegateScope.Touch.moveTo(pointerId, position)
 
 /**
  * Sends a move event on the associated node, with the position of the default pointer
@@ -755,9 +626,10 @@ fun GestureScope.moveTo(pointerId: Int, position: Offset) {
  *
  * @param position The new position of the pointer, in the node's local coordinate system
  */
-fun GestureScope.moveTo(position: Offset) {
-    moveTo(0, position)
-}
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
+fun GestureScope.moveTo(position: Offset) = delegateScope.Touch.moveTo(position)
 
 /**
  * Updates the position of the pointer with the given [pointerId] to the given [position], but
@@ -770,10 +642,13 @@ fun GestureScope.moveTo(position: Offset) {
  * @param pointerId The id of the pointer to move, as supplied in [down]
  * @param position The new position of the pointer, in the node's local coordinate system
  */
-fun GestureScope.movePointerTo(pointerId: Int, position: Offset) {
-    val globalPosition = localToRoot(position)
-    inputDispatcher.updateTouchPointer(pointerId, globalPosition)
-}
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of " +
+        "`performGesture`",
+    replaceWith = ReplaceWith("updatePointerTo(pointerId, position)")
+)
+fun GestureScope.movePointerTo(pointerId: Int, position: Offset) =
+    delegateScope.Touch.updatePointerTo(pointerId, position)
 
 /**
  * Sends a move event on the associated node, with the position of the pointer with the
@@ -786,10 +661,11 @@ fun GestureScope.movePointerTo(pointerId: Int, position: Offset) {
  * pointer. For example, `delta = Offset(10.px, -10.px) will add 10.px to the pointer's last
  * x-position, and subtract 10.px from the pointer's last y-position.
  */
-fun GestureScope.moveBy(pointerId: Int, delta: Offset) {
-    movePointerBy(pointerId, delta)
-    move()
-}
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
+fun GestureScope.moveBy(pointerId: Int, delta: Offset) =
+    delegateScope.Touch.moveBy(pointerId, delta)
 
 /**
  * Sends a move event on the associated node, with the position of the default pointer
@@ -801,9 +677,10 @@ fun GestureScope.moveBy(pointerId: Int, delta: Offset) {
  * pointer. For example, `delta = Offset(10.px, -10.px) will add 10.px to the pointer's last
  * x-position, and subtract 10.px from the pointer's last y-position.
  */
-fun GestureScope.moveBy(delta: Offset) {
-    moveBy(0, delta)
-}
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
+fun GestureScope.moveBy(delta: Offset) = delegateScope.Touch.moveBy(delta)
 
 /**
  * Moves the position of the pointer with the given [pointerId] by the given [delta], but does
@@ -816,21 +693,23 @@ fun GestureScope.moveBy(delta: Offset) {
  * pointer. For example, `delta = Offset(10.px, -10.px) will add 10.px to the pointer's last
  * x-position, and subtract 10.px from the pointer's last y-position.
  */
-fun GestureScope.movePointerBy(pointerId: Int, delta: Offset) {
-    // Ignore currentPosition of null here, let movePointer generate the error
-    val globalPosition =
-        (inputDispatcher.getCurrentTouchPosition(pointerId) ?: Offset.Zero) + delta
-    inputDispatcher.updateTouchPointer(pointerId, globalPosition)
-}
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of " +
+        "`performGesture`",
+    replaceWith = ReplaceWith("updatePointerBy(pointerId, delta)")
+)
+fun GestureScope.movePointerBy(pointerId: Int, delta: Offset) =
+    delegateScope.Touch.updatePointerBy(pointerId, delta)
 
 /**
  * Sends a move event without updating any of the pointer positions. This can be useful when
  * batching movement of multiple pointers together, which can be done with [movePointerTo] and
  * [movePointerBy].
  */
-fun GestureScope.move() {
-    inputDispatcher.enqueueTouchMove()
-}
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
+fun GestureScope.move() = delegateScope.Touch.move()
 
 /**
  * Sends an up event for the pointer with the given [pointerId], or the default pointer if
@@ -840,23 +719,27 @@ fun GestureScope.move() {
  *
  * @param pointerId The id of the pointer to lift up, as supplied in [down]
  */
-fun GestureScope.up(pointerId: Int = 0) {
-    inputDispatcher.enqueueTouchUp(pointerId)
-}
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
+fun GestureScope.up(pointerId: Int = 0) = delegateScope.Touch.up(pointerId)
 
 /**
  * Sends a cancel event to cancel the current gesture. The cancel event contains the
  * current position of all active pointers.
  */
-fun GestureScope.cancel() {
-    inputDispatcher.enqueueTouchCancel()
-}
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
+fun GestureScope.cancel() = delegateScope.Touch.cancel()
 
 /**
  * Adds the given [durationMillis] to the current event time, delaying the next event by that
  * time. Only valid when a gesture has already been started, or when a finished gesture is resumed.
  */
+@Deprecated(
+    message = "Replaced by TouchInjectionScope. Use `performTouchInput` instead of `performGesture`"
+)
 @ExperimentalTestApi
-fun GestureScope.advanceEventTime(durationMillis: Long) {
-    inputDispatcher.advanceEventTime(durationMillis)
-}
+fun GestureScope.advanceEventTime(durationMillis: Long) =
+    delegateScope.Touch.advanceEventTime(durationMillis)

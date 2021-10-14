@@ -18,8 +18,10 @@ package androidx.compose.ui.input.mouse
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerMoveFilter
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.TestComposeWindow
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
@@ -28,6 +30,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
+@OptIn(ExperimentalComposeUiApi::class)
 @RunWith(JUnit4::class)
 class MouseHoverFilterTest {
     private val window = TestComposeWindow(width = 100, height = 100, density = Density(2f))
@@ -41,24 +44,24 @@ class MouseHoverFilterTest {
         window.setContent {
             Box(
                 modifier = Modifier
-                    .pointerMoveFilter(
+                    .pointerMove(
                         onMove = {
                             moveCount++
-                            false
                         },
                         onEnter = {
                             enterCount++
-                            false
                         },
                         onExit = {
                             exitCount++
-                            false
                         }
                     )
                     .size(10.dp, 20.dp)
             )
         }
-
+        window.onMouseEntered(
+            x = 0,
+            y = 0
+        )
         window.onMouseMoved(
             x = 10,
             y = 20
@@ -93,18 +96,15 @@ class MouseHoverFilterTest {
         window.setContent {
             Box(
                 modifier = Modifier
-                    .pointerMoveFilter(
+                    .pointerMove(
                         onMove = {
                             moveCount++
-                            false
                         },
                         onEnter = {
                             enterCount++
-                            false
                         },
                         onExit = {
                             exitCount++
-                            false
                         }
                     )
                     .size(10.dp, 20.dp)
@@ -123,5 +123,22 @@ class MouseHoverFilterTest {
         assertThat(enterCount).isEqualTo(1)
         assertThat(exitCount).isEqualTo(1)
         assertThat(moveCount).isEqualTo(0)
+    }
+}
+
+private fun Modifier.pointerMove(
+    onMove: () -> Unit,
+    onExit: () -> Unit,
+    onEnter: () -> Unit,
+): Modifier = pointerInput(onMove, onExit, onEnter) {
+    awaitPointerEventScope {
+        while (true) {
+            val event = awaitPointerEvent()
+            when (event.type) {
+                PointerEventType.Move -> onMove()
+                PointerEventType.Enter -> onEnter()
+                PointerEventType.Exit -> onExit()
+            }
+        }
     }
 }

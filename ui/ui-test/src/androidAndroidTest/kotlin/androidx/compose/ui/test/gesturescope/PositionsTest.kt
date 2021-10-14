@@ -64,6 +64,7 @@ class PositionsTest {
     fun testCornersEdgesAndCenter() {
         rule.setContent { ClickableTestBox(width = 3f, height = 100f) }
 
+        @Suppress("DEPRECATION")
         rule.onNodeWithTag(defaultTag).performGesture {
             assertThat(width).isEqualTo(3)
             assertThat(height).isEqualTo(100)
@@ -92,6 +93,7 @@ class PositionsTest {
     fun testRelativeOffset() {
         rule.setContent { ClickableTestBox() }
 
+        @Suppress("DEPRECATION")
         rule.onNodeWithTag(defaultTag).performGesture {
             assertThat(percentOffset(.1f, .1f)).isEqualTo(Offset(10f, 10f))
             assertThat(percentOffset(-.2f, 0f)).isEqualTo(Offset(-20f, 0f))
@@ -152,6 +154,7 @@ class PositionsTest {
             }
         }
 
+        @Suppress("DEPRECATION")
         rule.onNodeWithTag("viewport").performGesture {
             assertThat(width).isEqualTo(100)
             assertThat(height).isEqualTo(100)

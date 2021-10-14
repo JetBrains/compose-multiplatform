@@ -38,20 +38,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.centerX
-import androidx.compose.ui.test.centerY
-import androidx.compose.ui.test.down
-import androidx.compose.ui.test.height
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.moveBy
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performGesture
-import androidx.compose.ui.test.width
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
+import androidx.testutils.AnimationDurationScaleRule
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -68,17 +63,22 @@ class OverScrollScreenshotTest {
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_UI)
 
+    @get:Rule
+    val animationScaleRule: AnimationDurationScaleRule =
+        AnimationDurationScaleRule.createForAllTests(1f)
+
     val overScrollTag = "overScrollTag"
 
     @Test
-    @Ignore
+    @Ignore("b/197325932 no animations in screenshot tests")
     fun overscroll_dragTop() {
+        animationScaleRule.setAnimationDurationScale(1f)
         rule.setContent {
             VerticalScrollable()
         }
 
         rule.onNodeWithTag(overScrollTag)
-            .performGesture {
+            .performTouchInput {
                 down(Offset(centerX + width / 2 - 10, centerY))
                 moveBy(Offset(0f, 500f))
                 repeat(5) {
@@ -92,14 +92,15 @@ class OverScrollScreenshotTest {
     }
 
     @Test
-    @Ignore
+    @Ignore("b/197325932 no animations in screenshot tests")
     fun overscroll_dragBottom() {
+        animationScaleRule.setAnimationDurationScale(1f)
         rule.setContent {
             VerticalScrollable()
         }
 
         rule.onNodeWithTag(overScrollTag)
-            .performGesture {
+            .performTouchInput {
                 down(Offset(centerX + width / 2 - 10, centerY))
                 moveBy(Offset(0f, -500f))
                 repeat(5) {
@@ -113,14 +114,15 @@ class OverScrollScreenshotTest {
     }
 
     @Test
-    @Ignore
+    @Ignore("b/197325932 no animations in screenshot tests")
     fun overscroll_dragLeft() {
+        animationScaleRule.setAnimationDurationScale(1f)
         rule.setContent {
             HorizontalScrollable()
         }
 
         rule.onNodeWithTag(overScrollTag)
-            .performGesture {
+            .performTouchInput {
                 down(Offset(centerX, centerY + height / 2 - 10))
                 moveBy(Offset(500f, 0f))
                 repeat(5) {
@@ -134,14 +136,15 @@ class OverScrollScreenshotTest {
     }
 
     @Test
-    @Ignore
+    @Ignore("b/197325932 no animations in screenshot tests")
     fun overscroll_dragRight() {
+        animationScaleRule.setAnimationDurationScale(1f)
         rule.setContent {
             HorizontalScrollable()
         }
 
         rule.onNodeWithTag(overScrollTag)
-            .performGesture {
+            .performTouchInput {
                 down(Offset(centerX, centerY + height / 2 - 10))
                 moveBy(Offset(-500f, 0f))
                 repeat(5) {

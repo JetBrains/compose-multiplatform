@@ -28,6 +28,7 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
@@ -111,6 +112,7 @@ class PointerInputEventProcessorTest {
     }
 
     @Test
+    @OptIn(ExperimentalComposeUiApi::class)
     fun pointerTypePassed() {
         val pointerTypes = listOf(
             PointerType.Unknown,
@@ -3161,7 +3163,7 @@ class PointerInputEventProcessorTest {
 private class PointerInputModifierImpl2(override val pointerInputFilter: PointerInputFilter) :
     PointerInputModifier
 
-private fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Modifier) =
+internal fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Modifier) =
     LayoutNode().apply {
         this.modifier = Modifier.layout { measurable, constraints ->
             val placeable = measurable.measure(constraints)
@@ -3196,6 +3198,8 @@ private class TestOwner : Owner {
     override val rootForTest: RootForTest
         get() = TODO("Not yet implemented")
     override val hapticFeedBack: HapticFeedback
+        get() = TODO("Not yet implemented")
+    override val inputModeManager: InputModeManager
         get() = TODO("Not yet implemented")
     override val clipboardManager: ClipboardManager
         get() = TODO("Not yet implemented")

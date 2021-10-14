@@ -26,7 +26,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
 import androidx.compose.ui.unit.LayoutDirection
@@ -175,7 +175,7 @@ class SwipeToDismissTest {
             )
         }
 
-        rule.onNodeWithTag(swipeToDismissTag).performGesture { swipeRight() }
+        rule.onNodeWithTag(swipeToDismissTag).performTouchInput { swipeRight() }
 
         advanceClock()
 
@@ -198,7 +198,7 @@ class SwipeToDismissTest {
             )
         }
 
-        rule.onNodeWithTag(swipeToDismissTag).performGesture { swipeLeft() }
+        rule.onNodeWithTag(swipeToDismissTag).performTouchInput { swipeLeft() }
 
         advanceClock()
 
@@ -223,7 +223,7 @@ class SwipeToDismissTest {
             }
         }
 
-        rule.onNodeWithTag(swipeToDismissTag).performGesture { swipeLeft() }
+        rule.onNodeWithTag(swipeToDismissTag).performTouchInput { swipeLeft() }
 
         advanceClock()
 
@@ -248,7 +248,7 @@ class SwipeToDismissTest {
             }
         }
 
-        rule.onNodeWithTag(swipeToDismissTag).performGesture { swipeRight() }
+        rule.onNodeWithTag(swipeToDismissTag).performTouchInput { swipeRight() }
 
         advanceClock()
 
@@ -271,7 +271,7 @@ class SwipeToDismissTest {
             )
         }
 
-        rule.onNodeWithTag(swipeToDismissTag).performGesture { swipeRight() }
+        rule.onNodeWithTag(swipeToDismissTag).performTouchInput { swipeRight() }
 
         advanceClock()
 
@@ -279,7 +279,7 @@ class SwipeToDismissTest {
             assertThat(dismissState.currentValue).isEqualTo(DismissValue.Default)
         }
 
-        rule.onNodeWithTag(swipeToDismissTag).performGesture { swipeLeft() }
+        rule.onNodeWithTag(swipeToDismissTag).performTouchInput { swipeLeft() }
 
         advanceClock()
 

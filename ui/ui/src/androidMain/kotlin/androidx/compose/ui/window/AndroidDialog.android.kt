@@ -254,7 +254,6 @@ private class DialogLayout(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 private class DialogWrapper(
     private var onDismissRequest: () -> Unit,
     private var properties: DialogProperties,

@@ -184,6 +184,55 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
     )
 
     @Test
+    fun testInlineReturnLabel(): Unit = controlFlow(
+        """
+            @Composable
+            @NonRestartableComposable
+            fun CustomTextBroken(condition: Boolean) {
+                FakeBox {
+                    if (condition) {
+                        return@FakeBox
+                    }
+                    A()
+                }
+            }
+            @Composable
+            inline fun FakeBox(content: @Composable () -> Unit) {
+                content()
+            }
+        """,
+        """
+            @Composable
+            @NonRestartableComposable
+            fun CustomTextBroken(condition: Boolean, %composer: Composer?, %changed: Int) {
+              %composer.startReplaceableGroup(<>)
+              sourceInformation(%composer, "C(CustomTextBroken)<FakeBo...>:Test.kt")
+              FakeBox({ %composer: Composer?, %changed: Int ->
+                %composer.startReplaceableGroup(<>)
+                sourceInformation(%composer, "C<A()>:Test.kt")
+                if (%changed and 0b1011 xor 0b0010 !== 0 || !%composer.skipping) {
+                  if (condition) {
+                    %composer.endReplaceableGroup()
+                  }
+                  A(%composer, 0)
+                } else {
+                  %composer.skipToGroupEnd()
+                }
+                %composer.endReplaceableGroup()
+              }, %composer, 0)
+              %composer.endReplaceableGroup()
+            }
+            @Composable
+            fun FakeBox(content: Function2<Composer, Int, Unit>, %composer: Composer?, %changed: Int) {
+              %composer.startReplaceableGroup(<>)
+              sourceInformation(%composer, "C(FakeBox)<conten...>:Test.kt")
+              content(%composer, 0b1110 and %changed)
+              %composer.endReplaceableGroup()
+            }
+        """
+    )
+
+    @Test
     fun testIfElseWithCallsInConditions(): Unit = controlFlow(
         """
             @NonRestartableComposable @Composable
@@ -2413,7 +2462,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               %composer = %composer.startRestartGroup(<>)
               sourceInformation(%composer, "C(Test)<W>:Test.kt")
               if (%changed !== 0 || !%composer.skipping) {
-                W(ComposableSingletons%TestKt.lambda-1, %composer, 0)
+                W(ComposableSingletons%TestKt.lambda-1, %composer, 0b0110)
               } else {
                 %composer.skipToGroupEnd()
               }
@@ -2491,7 +2540,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               %composer = %composer.startRestartGroup(<>)
               sourceInformation(%composer, "C(Test)<Wrap>:Test.kt")
               if (%changed !== 0 || !%composer.skipping) {
-                Wrap(ComposableSingletons%TestKt.lambda-1, %composer, 0)
+                Wrap(ComposableSingletons%TestKt.lambda-1, %composer, 0b0110)
               } else {
                 %composer.skipToGroupEnd()
               }
@@ -2508,12 +2557,12 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
                   repeat(number) { it: Int ->
                     effects[it] = effect({
                       0
-                    }, %composer, 0)
+                    }, %composer, 0b0110)
                   }
                   %composer.endReplaceableGroup()
                   outside = effect({
                     "0"
-                  }, %composer, 0)
+                  }, %composer, 0b0110)
                 } else {
                   %composer.skipToGroupEnd()
                 }
@@ -2549,7 +2598,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               sourceInformation(%composer, "C(Test)P(0:InlineClass)<A()>:Test.kt")
               val %dirty = %changed
               if (%changed and 0b1110 === 0) {
-                %dirty = %dirty or if (%composer.changed(value.value)) 0b0100 else 0b0010
+                %dirty = %dirty or if (%composer.changed(<unsafe-coerce>(value))) 0b0100 else 0b0010
               }
               if (%dirty and 0b1011 xor 0b0010 !== 0 || !%composer.skipping) {
                 used(value)
@@ -3437,7 +3486,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               sourceInformation(%composer, "C(Test)P(0:c#runtime.tests.LocalInlineClass):Test.kt#992ot2")
               val %dirty = %changed
               if (%changed and 0b1110 === 0) {
-                %dirty = %dirty or if (%composer.changed(value.value)) 0b0100 else 0b0010
+                %dirty = %dirty or if (%composer.changed(<unsafe-coerce>(value))) 0b0100 else 0b0010
               }
               if (%dirty and 0b1011 xor 0b0010 !== 0 || !%composer.skipping) {
                 used(value)
@@ -3583,7 +3632,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               %composer = %composer.startRestartGroup(<>)
               sourceInformation(%composer, "C(Test)<W>:Test.kt")
               if (%changed !== 0 || !%composer.skipping) {
-                W(ComposableSingletons%TestKt.lambda-1, %composer, 0)
+                W(ComposableSingletons%TestKt.lambda-1, %composer, 0b0110)
               } else {
                 %composer.skipToGroupEnd()
               }

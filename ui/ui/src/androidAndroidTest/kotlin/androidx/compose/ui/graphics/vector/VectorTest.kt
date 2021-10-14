@@ -16,8 +16,14 @@
 
 package androidx.compose.ui.graphics.vector
 
+import android.app.Application
+import android.content.ComponentCallbacks2
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.os.Build
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -38,30 +44,41 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalImageVectorCache
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.ImageVectorCache
+
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.R
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import org.junit.Assert
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class VectorTest {
 
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createAndroidComposeRule<ComponentActivity>()
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
@@ -340,6 +357,98 @@ class VectorTest {
             assertEquals(getPixel(10, 10), Color.Yellow.toArgb())
             assertEquals(getPixel(100, 100), Color.Red.toArgb())
             assertEquals(getPixel(300, 300), Color.Red.toArgb())
+        }
+    }
+
+    @Test
+    fun testImageVectorCacheHit() {
+        var vectorInCache = false
+        rule.setContent {
+            val theme = LocalContext.current.theme
+            val imageVectorCache = LocalImageVectorCache.current
+            imageVectorCache.clear()
+            Image(
+                painterResource(R.drawable.ic_triangle),
+                contentDescription = null
+            )
+
+            vectorInCache =
+                imageVectorCache[ImageVectorCache.Key(theme, R.drawable.ic_triangle)] != null
+        }
+
+        assertTrue(vectorInCache)
+    }
+
+    @Test
+    fun testImageVectorCacheCleared() {
+        var vectorInCache = false
+        var application: Application? = null
+        var theme: Resources.Theme? = null
+        var vectorCache: ImageVectorCache? = null
+        rule.setContent {
+            application = LocalContext.current.applicationContext as Application
+            theme = LocalContext.current.theme
+            val imageVectorCache = LocalImageVectorCache.current
+            imageVectorCache.clear()
+            Image(
+                painterResource(R.drawable.ic_triangle),
+                contentDescription = null
+            )
+
+            vectorInCache =
+                imageVectorCache[ImageVectorCache.Key(theme!!, R.drawable.ic_triangle)] != null
+
+            vectorCache = imageVectorCache
+        }
+
+        application?.onTrimMemory(0)
+
+        val cacheCleared = vectorCache?.let {
+            it[ImageVectorCache.Key(theme!!, R.drawable.ic_triangle)] == null
+        } ?: false
+
+        assertTrue("Vector was not inserted in cache after initial creation", vectorInCache)
+        assertTrue("Cache was not cleared after trim memory call", cacheCleared)
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun testImageVectorConfigChange() {
+        val tag = "testTag"
+        rule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+
+        val latch = CountDownLatch(1)
+
+        rule.activity.application.registerComponentCallbacks(object : ComponentCallbacks2 {
+            override fun onConfigurationChanged(p0: Configuration) {
+                latch.countDown()
+            }
+
+            override fun onLowMemory() {
+                // NO-OP
+            }
+
+            override fun onTrimMemory(p0: Int) {
+                // NO-OP
+            }
+        })
+
+        try {
+            latch.await(1500, TimeUnit.MILLISECONDS)
+            rule.setContent {
+                Image(
+                    painterResource(R.drawable.ic_triangle_config),
+                    contentDescription = null,
+                    modifier = Modifier.testTag(tag)
+                )
+            }
+            rule.onNodeWithTag(tag).captureToImage().apply {
+                assertEquals(Color.Blue, toPixelMap()[width - 5, 5])
+            }
+        } catch (e: InterruptedException) {
+            fail("Unable to verify vector asset in landscape orientation")
+        } finally {
+            rule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         }
     }
 

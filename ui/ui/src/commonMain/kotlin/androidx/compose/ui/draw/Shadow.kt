@@ -18,11 +18,11 @@ package androidx.compose.ui.draw
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.platform.inspectable
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -47,15 +47,13 @@ import androidx.compose.ui.unit.dp
  * @param shape Defines a shape of the physical object
  * @param clip When active, the content drawing clips to the shape.
  */
-// TODO: b/191017532 remove Modifier.composed
-@Suppress("UnnecessaryComposedModifier")
 @Stable
 fun Modifier.shadow(
     elevation: Dp,
     shape: Shape = RectangleShape,
     clip: Boolean = elevation > 0.dp
 ) = if (elevation > 0.dp || clip) {
-    composed(
+    inspectable(
         inspectorInfo = debugInspectorInfo {
             name = "shadow"
             properties["elevation"] = elevation

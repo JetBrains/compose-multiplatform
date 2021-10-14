@@ -31,6 +31,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.gestures.horizontalDrag
+import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.Interaction
@@ -118,7 +119,7 @@ import kotlin.math.abs
  * coerced to this range.
  * @param onValueChange lambda in which value should be updated
  * @param modifier modifiers for the Slider layout
- * @param enabled whether or not component is enabled and can we interacted with or not
+ * @param enabled whether or not component is enabled and can be interacted with or not
  * @param valueRange range of values that Slider value can take. Passed [value] will be coerced to
  * this range
  * @param steps if greater than 0, specifies the amounts of discrete values, evenly distributed
@@ -154,6 +155,7 @@ fun Slider(
     }
     BoxWithConstraints(
         modifier
+            .minimumTouchTargetSize()
             .requiredSizeIn(minWidth = ThumbRadius * 2, minHeight = ThumbRadius * 2)
             .sliderSemantics(value, tickFractions, enabled, onValueChange, valueRange, steps)
             .focusable(enabled, interactionSource)
@@ -624,6 +626,7 @@ private fun SliderThumb(
                     interactionSource = interactionSource,
                     indication = rememberRipple(bounded = false, radius = ThumbRippleRadius)
                 )
+                .hoverable(interactionSource = interactionSource)
                 .shadow(if (enabled) elevation else 0.dp, CircleShape, clip = false)
                 .background(colors.thumbColor(enabled).value, CircleShape)
         )

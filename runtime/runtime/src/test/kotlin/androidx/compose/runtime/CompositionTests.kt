@@ -20,6 +20,7 @@ package androidx.compose.runtime
 import androidx.compose.runtime.mock.Contact
 import androidx.compose.runtime.mock.ContactModel
 import androidx.compose.runtime.mock.Edit
+import androidx.compose.runtime.mock.EmptyApplier
 import androidx.compose.runtime.mock.Linear
 import androidx.compose.runtime.mock.MockViewValidator
 import androidx.compose.runtime.mock.Point
@@ -44,10 +45,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
@@ -1943,6 +1946,109 @@ class CompositionTests {
     }
 
     @Test
+    fun testRememberObserver_Abandon_Simple() = compositionTest {
+        val abandonedObjects = mutableListOf<RememberObserver>()
+        val observed = object : RememberObserver {
+            override fun onAbandoned() {
+                abandonedObjects.add(this)
+            }
+
+            override fun onForgotten() {
+                error("Unexpected call to onForgotten")
+            }
+
+            override fun onRemembered() {
+                error("Unexpected call to onRemembered")
+            }
+        }
+
+        assertFailsWith(IllegalStateException::class, message = "Throw") {
+            compose {
+                @Suppress("UNUSED_EXPRESSION")
+                remember { observed }
+                error("Throw")
+            }
+        }
+
+        assertArrayEquals(listOf(observed), abandonedObjects)
+    }
+
+    @Test
+    fun testRememberObserver_Abandon_Recompose() {
+        val abandonedObjects = mutableListOf<RememberObserver>()
+        val observed = object : RememberObserver {
+            override fun onAbandoned() {
+                abandonedObjects.add(this)
+            }
+
+            override fun onForgotten() {
+                error("Unexpected call to onForgotten")
+            }
+
+            override fun onRemembered() {
+                error("Unexpected call to onRemembered")
+            }
+        }
+        assertFailsWith(IllegalStateException::class, message = "Throw") {
+            compositionTest {
+                val rememberObject = mutableStateOf(false)
+
+                compose {
+                    if (rememberObject.value) {
+                        @Suppress("UNUSED_EXPRESSION")
+                        remember { observed }
+                        error("Throw")
+                    }
+                }
+
+                assertTrue(abandonedObjects.isEmpty())
+
+                rememberObject.value = true
+
+                advance(ignorePendingWork = true)
+            }
+        }
+
+        assertArrayEquals(listOf(observed), abandonedObjects)
+    }
+
+    @Test
+    fun testRememberedObserver_Controlled_Dispose() = runBlocking {
+        val recomposer = Recomposer(coroutineContext)
+        val root = View()
+        val controlled = ControlledComposition(ViewApplier(root), recomposer)
+
+        val abandonedObjects = mutableListOf<RememberObserver>()
+        val observed = object : RememberObserver {
+            override fun onAbandoned() {
+                abandonedObjects.add(this)
+            }
+
+            override fun onForgotten() {
+                error("Unexpected call to onForgotten")
+            }
+
+            override fun onRemembered() {
+                error("Unexpected call to onRemembered")
+            }
+        }
+
+        controlled.composeContent {
+            @Suppress("UNUSED_EXPRESSION")
+            remember<RememberObserver> {
+                observed
+            }
+        }
+
+        assertTrue(abandonedObjects.isEmpty())
+
+        controlled.dispose()
+
+        assertArrayEquals(listOf(observed), abandonedObjects)
+        recomposer.close()
+    }
+
+    @Test
     fun testCompoundKeyHashStaysTheSameAfterRecompositions() = compositionTest {
         val outerKeys = mutableListOf<Int>()
         val innerKeys = mutableListOf<Int>()
@@ -3180,23 +3286,4 @@ private interface Ordered {
 
 private interface Named {
     val name: String
-}
-
-private class EmptyApplier : Applier<Unit> {
-    override val current: Unit = Unit
-    override fun down(node: Unit) {}
-    override fun up() {}
-    override fun insertTopDown(index: Int, instance: Unit) {
-        error("Unexpected")
-    }
-    override fun insertBottomUp(index: Int, instance: Unit) {
-        error("Unexpected")
-    }
-    override fun remove(index: Int, count: Int) {
-        error("Unexpected")
-    }
-    override fun move(from: Int, to: Int, count: Int) {
-        error("Unexpected")
-    }
-    override fun clear() {}
 }

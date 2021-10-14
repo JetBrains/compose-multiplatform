@@ -16,10 +16,10 @@
 
 package androidx.compose.desktop.examples.popupexample
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.BoxWithTooltip
+import androidx.compose.foundation.TooltipArea
 import androidx.compose.foundation.TooltipPlacement
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -56,6 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -67,14 +68,12 @@ import androidx.compose.ui.window.TrayState
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowScope
-import androidx.compose.ui.window.WindowSize
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberWindowState
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import javax.swing.JButton
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun WindowScope.Content(
     windowState: WindowState,
@@ -251,6 +250,7 @@ fun WindowScope.Content(
             dialogState.value = false
             println("Dialog window is dismissed.")
         }
+        @OptIn(ExperimentalMaterialApi::class)
         if (AppState.alertDialog.value) {
             AlertDialog(
                 onDismissRequest = dismiss,
@@ -352,7 +352,8 @@ fun Button(
     color: Color = Color(10, 162, 232),
     size: IntSize = IntSize(200, 35)
 ) {
-    BoxWithTooltip(
+    @OptIn(ExperimentalFoundationApi::class)
+    TooltipArea(
         tooltip = {
             Surface(
                 color = Color(210, 210, 210),
@@ -388,14 +389,16 @@ fun TextBox(text: String = "", modifier: Modifier = Modifier.height(30.dp)) {
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
+@OptIn(
+    ExperimentalFoundationApi::class
+)
 fun ContextMenu() {
     val items = listOf("Item A", "Item B", "Item C", "Item D", "Item E", "Item F")
     val showMenu = remember { mutableStateOf(false) }
     val selectedIndex = remember { mutableStateOf(0) }
-    BoxWithTooltip(
-        delay = 100,
+    TooltipArea(
+        delayMillis = 100,
         tooltipPlacement = TooltipPlacement.ComponentRect(
             anchor = Alignment.TopStart,
             alignment = Alignment.TopEnd
@@ -541,7 +544,7 @@ fun SwingActionButton(text: String, action: (() -> Unit)? = null) {
 @Composable
 fun ApplicationScope.SecondaryWindow(onCloseRequest: () -> Unit) = Window(
     onCloseRequest = onCloseRequest,
-    state = rememberWindowState(size = WindowSize(400.dp, 200.dp)),
+    state = rememberWindowState(size = DpSize(400.dp, 200.dp)),
     undecorated = AppState.undecorated.value,
 ) {
     WindowContent(

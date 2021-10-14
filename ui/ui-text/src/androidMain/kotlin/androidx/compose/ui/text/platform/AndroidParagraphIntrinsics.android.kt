@@ -73,6 +73,8 @@ internal class AndroidParagraphIntrinsics(
             text = text,
             contextFontSize = textPaint.textSize,
             contextTextStyle = style,
+            // NOTE(text-perf-review): this is sabotaging the optimization that
+            // createCharSequence makes where it just uses `text` if there are no spanStyles!
             spanStyles = listOf(
                 AnnotatedString.Range(
                     item = notAppliedStyle,

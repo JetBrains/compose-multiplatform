@@ -15,59 +15,26 @@
  */
 
 
-import androidx.build.BuildOnServerKt
-import androidx.build.BuildServerConfigurationKt
 import androidx.build.Publish
 
 plugins {
     id("AndroidXPlugin")
-    id("com.android.application")
+    id("com.android.library")
     id("AndroidXComposePlugin")
     id("org.jetbrains.kotlin.android")
-}
-
-android {
-    defaultConfig {
-        applicationId "androidx.compose.material.catalog"
-        versionCode 1001
-        versionName "1.0.1"
-    }
-    buildTypes {
-        release {
-            minifyEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
-        }
-    }
 }
 
 dependencies {
     kotlinPlugin project(":compose:compiler:compiler")
     implementation(libs.kotlinStdlib)
+    implementation project(":core:core")
+    implementation project(":compose:runtime:runtime")
     implementation project(":compose:ui:ui")
     implementation project(":compose:material:material")
     implementation project(":compose:material:material:material-samples")
-    implementation project(":activity:activity-compose")
     implementation project(":navigation:navigation-compose")
+    implementation "com.google.accompanist:accompanist-insets:0.18.0"
 }
-
-// We want to publish a release APK of this project for the Compose Material Catalog
-def copyReleaseApk = tasks.register("copyReleaseApk", Copy) { task ->
-    android.applicationVariants.all { variant ->
-        if (variant.buildType.name == "release") {
-            task.from(variant.packageApplicationProvider.get().outputDirectory)
-        }
-    }
-    task.include("*.apk")
-    task.rename { fileName ->
-        "${project.path.substring(1).replace(':', '-')}_$fileName"
-    }
-    task.destinationDir =
-            new File(BuildServerConfigurationKt.getDistributionDirectory(project), "apks")
-    task.dependsOn(project.path + ":assembleRelease")
-}
-
-BuildOnServerKt.addToBuildOnServer(project, copyReleaseApk)
 
 androidx {
     name = "Compose Material Catalog"

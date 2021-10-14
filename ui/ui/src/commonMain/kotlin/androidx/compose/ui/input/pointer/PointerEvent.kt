@@ -19,6 +19,7 @@
 package androidx.compose.ui.input.pointer
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -79,6 +80,16 @@ abstract class PointerInputFilter {
         get() = layoutCoordinates?.size ?: IntSize.Zero
     internal val isAttached: Boolean
         get() = layoutCoordinates?.isAttached == true
+
+    /**
+     * Intercept pointer input that children receive even if the pointer is out of bounds.
+     *
+     * If `true`, and a child has been moved out of this layout and receives an event, this
+     * will receive that event. If `false`, a child receiving pointer input outside of the
+     * bounds of this layout will not trigger any events in this.
+     */
+    open val interceptOutOfBoundsChildEvents: Boolean
+        get() = false
 }
 
 /**
@@ -107,6 +118,12 @@ expect class PointerEvent @OptIn(InternalCoreApi::class) internal constructor(
      * The state of modifier keys during this event.
      */
     val keyboardModifiers: PointerKeyboardModifiers
+
+    /**
+     * The primary reason the [PointerEvent] was sent.
+     */
+    var type: PointerEventType
+        internal set
 }
 
 // TODO mark internal once https://youtrack.jetbrains.com/issue/KT-36695 is fixed
@@ -272,6 +289,61 @@ inline class PointerType internal constructor(private val value: Int) {
 }
 
 /**
+ * Indicates the primary reason that the [PointerEvent] was sent.
+ */
+inline class PointerEventType(internal val value: Int) {
+    companion object {
+        /**
+         * An unknown reason for the event.
+         */
+        val Unknown = PointerEventType(0)
+
+        /**
+         * A button on the device was pressed or a new pointer was detected.
+         */
+        val Press = PointerEventType(1)
+
+        /**
+         * A button on the device was released or a pointer was raised.
+         */
+        val Release = PointerEventType(2)
+
+        /**
+         * The cursor or one or more touch pointers was moved.
+         */
+        val Move = PointerEventType(3)
+
+        /**
+         * The cursor has entered the input region. This will only be sent after the cursor is
+         * hovering when in the input region.
+         *
+         * For example, the user's cursor is outside the input region and presses the button
+         * prior to entering the input region. The [Enter] event will be sent when the button
+         * is released inside the input region.
+         */
+        val Enter = PointerEventType(4)
+
+        /**
+         * A cursor device or elevated stylus exited the input region. This will only follow
+         * an [Enter] event, so if a cursor with the button pressed enters and exits region,
+         * neither [Enter] nor [Exit] will be sent for the input region. However, if a cursor
+         * enters the input region, then a button is pressed, then the cursor exits and reenters,
+         * [Enter], [Exit], and [Enter] will be received.
+         */
+        val Exit = PointerEventType(5)
+    }
+
+    override fun toString(): String = when (this) {
+        Press -> "Press"
+        Release -> "Release"
+        Move -> "Move"
+        Enter -> "Enter"
+        Exit -> "Exit"
+        else -> "Unknown"
+    }
+}
+
+/**
  * Describes a change that has occurred for a particular pointer, as well as how much of the change
  * has been consumed (meaning, used by a node in the UI).
  *
@@ -308,6 +380,7 @@ inline class PointerType internal constructor(private val value: Int) {
  * or [touch][PointerType.Touch].git
  */
 @Immutable
+@OptIn(ExperimentalComposeUiApi::class)
 class PointerInputChange(
     val id: PointerId,
     val uptimeMillis: Long,
@@ -319,6 +392,46 @@ class PointerInputChange(
     val consumed: ConsumedData,
     val type: PointerType = PointerType.Touch
 ) {
+    /**
+     * Optional high-frequency pointer moves in between the last two dispatched events.
+     * Can be used for extra accuracy when touchscreen rate exceeds framerate.
+     */
+    // With these experimental annotations, the API can be either cleanly removed or
+    // stabilized. It doesn't appear in current.txt; and in experimental_current.txt,
+    // it has the same effect as a primary constructor val.
+    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @ExperimentalComposeUiApi
+    @get:ExperimentalComposeUiApi
+    val historical: List<HistoricalChange>
+        get() = _historical ?: listOf()
+    private var _historical: List<HistoricalChange>? = null
+
+    @ExperimentalComposeUiApi
+    constructor(
+        id: PointerId,
+        uptimeMillis: Long,
+        position: Offset,
+        pressed: Boolean,
+        previousUptimeMillis: Long,
+        previousPosition: Offset,
+        previousPressed: Boolean,
+        consumed: ConsumedData,
+        type: PointerType,
+        historical: List<HistoricalChange>
+    ) : this(
+        id,
+        uptimeMillis,
+        position,
+        pressed,
+        previousUptimeMillis,
+        previousPosition,
+        previousPressed,
+        consumed,
+        type
+    ) {
+        _historical = historical
+    }
+
     fun copy(
         id: PointerId = this.id,
         currentTime: Long = this.uptimeMillis,
@@ -338,7 +451,33 @@ class PointerInputChange(
         previousPosition,
         previousPressed,
         consumed,
-        type
+        type,
+        this.historical
+    )
+
+    @ExperimentalComposeUiApi
+    fun copy(
+        id: PointerId = this.id,
+        currentTime: Long = this.uptimeMillis,
+        currentPosition: Offset = this.position,
+        currentPressed: Boolean = this.pressed,
+        previousTime: Long = this.previousUptimeMillis,
+        previousPosition: Offset = this.previousPosition,
+        previousPressed: Boolean = this.previousPressed,
+        consumed: ConsumedData = this.consumed,
+        type: PointerType = this.type,
+        historical: List<HistoricalChange>
+    ): PointerInputChange = PointerInputChange(
+        id,
+        currentTime,
+        currentPosition,
+        currentPressed,
+        previousTime,
+        previousPosition,
+        previousPressed,
+        consumed,
+        type,
+        historical
     )
 
     override fun toString(): String {
@@ -350,7 +489,31 @@ class PointerInputChange(
             "previousPosition=$previousPosition, " +
             "previousPressed=$previousPressed, " +
             "consumed=$consumed, " +
-            "type=$type)"
+            "type=$type, " +
+            "historical=$historical)"
+    }
+}
+
+/**
+ * Data structure for "historical" pointer moves.
+ *
+ * Optional high-frequency pointer moves in between the last two dispatched events:
+ * can be used for extra accuracy when touchscreen rate exceeds framerate.
+ *
+ * @param uptimeMillis The time of the historical pointer event, in milliseconds. In between
+ * the current and previous pointer event times.
+ * @param position The [Offset] of the historical pointer event, relative to the containing
+ * element.
+ */
+@Immutable
+@ExperimentalComposeUiApi
+class HistoricalChange(
+    val uptimeMillis: Long,
+    val position: Offset
+) {
+    override fun toString(): String {
+        return "HistoricalChange(uptimeMillis=$uptimeMillis, " +
+            "position=$position)"
     }
 }
 
@@ -368,7 +531,12 @@ inline class PointerId(val value: Long)
  * @param downChange True if a change to down or up has been consumed.
  */
 class ConsumedData(
+    @Suppress("GetterSetterNames")
+    @get:Suppress("GetterSetterNames")
     var positionChange: Boolean = false,
+
+    @Suppress("GetterSetterNames")
+    @get:Suppress("GetterSetterNames")
     var downChange: Boolean = false
 )
 

@@ -24,15 +24,17 @@ import androidx.compose.ui.isLinux
 import androidx.compose.ui.isWindows
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.TestComposeWindow
+import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
 import androidx.compose.ui.unit.dp
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
 
+@OptIn(InternalTestApi::class)
 class DesktopSvgResourcesTest {
     @get:Rule
-    val screenshotRule = DesktopScreenshotTestRule("ui/ui-desktop/res")
+    val screenshotRule = DesktopScreenshotTestRule("compose/ui/ui-desktop/res")
 
     @Test
     fun `load SVG with specified size`() {

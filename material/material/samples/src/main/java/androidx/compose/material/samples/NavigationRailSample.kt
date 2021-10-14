@@ -18,7 +18,6 @@ package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.NavigationRail
 import androidx.compose.material.NavigationRailItem
@@ -34,7 +33,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 
-@OptIn(ExperimentalMaterialApi::class)
 @Sampled
 @Composable
 fun NavigationRailSample() {
@@ -53,7 +51,6 @@ fun NavigationRailSample() {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NavigationRailWithOnlySelectedLabelsSample() {
     var selectedItem by remember { mutableStateOf(0) }
@@ -72,7 +69,6 @@ fun NavigationRailWithOnlySelectedLabelsSample() {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CompactNavigationRailSample() {
     var selectedItem by remember { mutableStateOf(0) }
@@ -89,7 +85,6 @@ fun CompactNavigationRailSample() {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NavigationRailBottomAlignSample() {
     var selectedItem by remember { mutableStateOf(0) }

@@ -748,7 +748,13 @@ private fun intrinsicCrossAxisSize(
         if (weight > 0f) {
             crossAxisMax = max(
                 crossAxisMax,
-                child.crossAxisSize((weightUnitSpace * weight).roundToInt())
+                child.crossAxisSize(
+                    if (weightUnitSpace != Constraints.Infinity) {
+                        (weightUnitSpace * weight).roundToInt()
+                    } else {
+                        Constraints.Infinity
+                    }
+                )
             )
         }
     }

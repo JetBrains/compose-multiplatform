@@ -210,7 +210,7 @@ fun CenterMenu(
             BottomCenter -> expandVertically(expandFrom = Bottom)
             CenterStart -> expandHorizontally(expandFrom = Start)
             CenterEnd -> expandHorizontally(expandFrom = End)
-            else -> expandIn(animationAlignment)
+            else -> expandIn(expandFrom = animationAlignment)
         }
 
         val shrink = when (animationAlignment) {
@@ -218,30 +218,30 @@ fun CenterMenu(
             BottomCenter -> shrinkVertically(shrinkTowards = Bottom)
             CenterStart -> shrinkHorizontally(shrinkTowards = Start)
             CenterEnd -> shrinkHorizontally(shrinkTowards = End)
-            else -> shrinkOut(animationAlignment)
+            else -> shrinkOut(shrinkTowards = animationAlignment)
         }
 
         val slideIn = when (alignment) {
-            TopCenter -> slideInVertically({ -it })
-            BottomCenter -> slideInVertically({ it })
-            CenterStart -> slideInHorizontally({ -it })
-            CenterEnd -> slideInHorizontally({ it })
-            TopStart -> slideIn({ IntOffset(-it.width, -it.height) })
-            BottomStart -> slideIn({ IntOffset(-it.width, it.height) })
-            TopEnd -> slideIn({ IntOffset(it.width, -it.height) })
-            BottomEnd -> slideIn({ IntOffset(it.width, it.height) })
-            else -> slideIn({ alignment.align(it, IntSize.Zero, LayoutDirection.Ltr) })
+            TopCenter -> slideInVertically { -it }
+            BottomCenter -> slideInVertically { it }
+            CenterStart -> slideInHorizontally { -it }
+            CenterEnd -> slideInHorizontally { it }
+            TopStart -> slideIn { IntOffset(-it.width, -it.height) }
+            BottomStart -> slideIn { IntOffset(-it.width, it.height) }
+            TopEnd -> slideIn { IntOffset(it.width, -it.height) }
+            BottomEnd -> slideIn { IntOffset(it.width, it.height) }
+            else -> slideIn { alignment.align(it, IntSize.Zero, LayoutDirection.Ltr) }
         }
         val slideOut = when (alignment) {
-            TopCenter -> slideOutVertically({ -it })
-            BottomCenter -> slideOutVertically({ it })
-            CenterStart -> slideOutHorizontally({ -it })
-            CenterEnd -> slideOutHorizontally({ it })
-            TopStart -> slideOut({ IntOffset(-it.width, -it.height) })
-            BottomStart -> slideOut({ IntOffset(-it.width, it.height) })
-            TopEnd -> slideOut({ IntOffset(it.width, -it.height) })
-            BottomEnd -> slideOut({ IntOffset(it.width, it.height) })
-            else -> slideOut({ alignment.align(IntSize.Zero, it, LayoutDirection.Ltr) })
+            TopCenter -> slideOutVertically { -it }
+            BottomCenter -> slideOutVertically { it }
+            CenterStart -> slideOutHorizontally { -it }
+            CenterEnd -> slideOutHorizontally { it }
+            TopStart -> slideOut { IntOffset(-it.width, -it.height) }
+            BottomStart -> slideOut { IntOffset(-it.width, it.height) }
+            TopEnd -> slideOut { IntOffset(it.width, -it.height) }
+            BottomEnd -> slideOut { IntOffset(it.width, it.height) }
+            else -> slideOut { alignment.align(IntSize.Zero, it, LayoutDirection.Ltr) }
         }
 
         var enter: EnterTransition? = null

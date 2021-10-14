@@ -23,9 +23,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -37,7 +40,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 
 @Sampled
@@ -109,5 +117,60 @@ fun TextFieldWithIconSample() {
                 innerTextField()
             }
         }
+    )
+}
+
+@Sampled
+@Composable
+fun CreditCardSample() {
+    /** The offset translator used for credit card input field */
+    val creditCardOffsetTranslator = object : OffsetMapping {
+        override fun originalToTransformed(offset: Int): Int {
+            return when {
+                offset < 4 -> offset
+                offset < 8 -> offset + 1
+                offset < 12 -> offset + 2
+                offset <= 16 -> offset + 3
+                else -> 19
+            }
+        }
+
+        override fun transformedToOriginal(offset: Int): Int {
+            return when {
+                offset <= 4 -> offset
+                offset <= 9 -> offset - 1
+                offset <= 14 -> offset - 2
+                offset <= 19 -> offset - 3
+                else -> 16
+            }
+        }
+    }
+
+    /**
+     * Converts up to 16 digits to hyphen connected 4 digits string. For example,
+     * "1234567890123456" will be shown as "1234-5678-9012-3456"
+     */
+    val creditCardTransformation = VisualTransformation { text ->
+        val trimmedText = if (text.text.length > 16) text.text.substring(0..15) else text.text
+        var transformedText = ""
+        trimmedText.forEachIndexed { index, char ->
+            transformedText += char
+            if ((index + 1) % 4 == 0 && index != 15) transformedText += "-"
+        }
+        TransformedText(AnnotatedString(transformedText), creditCardOffsetTranslator)
+    }
+
+    var text by rememberSaveable { mutableStateOf("") }
+    BasicTextField(
+        value = text,
+        onValueChange = { input ->
+            if (input.length <= 16 && input.none { !it.isDigit() }) {
+                text = input
+            }
+        },
+        modifier = Modifier.size(170.dp, 30.dp).background(Color.LightGray).wrapContentSize(),
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        visualTransformation = creditCardTransformation
     )
 }

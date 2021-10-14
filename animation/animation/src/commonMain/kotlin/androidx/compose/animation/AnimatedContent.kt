@@ -48,9 +48,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.ParentDataModifier
@@ -130,7 +132,7 @@ fun <S> AnimatedContent(
         modifier,
         transitionSpec,
         contentAlignment,
-        content
+        content = content
     )
 }
 
@@ -351,34 +353,22 @@ class AnimatedContentScope<S> internal constructor(
         initialOffset: (offsetForFullSlide: Int) -> Int = { it }
     ): EnterTransition =
         when {
-            towards.isLeft -> slideInHorizontally(
-                {
-                    initialOffset.invoke(
-                        currentSize.width - calculateOffset(IntSize(it, it), currentSize).x
-                    )
-                },
-                animationSpec
-            )
-            towards.isRight -> slideInHorizontally(
-                {
-                    initialOffset.invoke(-calculateOffset(IntSize(it, it), currentSize).x - it)
-                },
-                animationSpec
-            )
-            towards == Up -> slideInVertically(
-                {
-                    initialOffset.invoke(
-                        currentSize.height - calculateOffset(IntSize(it, it), currentSize).y
-                    )
-                },
-                animationSpec
-            )
-            towards == Down -> slideInVertically(
-                {
-                    initialOffset.invoke(-calculateOffset(IntSize(it, it), currentSize).y - it)
-                },
-                animationSpec
-            )
+            towards.isLeft -> slideInHorizontally(animationSpec) {
+                initialOffset.invoke(
+                    currentSize.width - calculateOffset(IntSize(it, it), currentSize).x
+                )
+            }
+            towards.isRight -> slideInHorizontally(animationSpec) {
+                initialOffset.invoke(-calculateOffset(IntSize(it, it), currentSize).x - it)
+            }
+            towards == Up -> slideInVertically(animationSpec) {
+                initialOffset.invoke(
+                    currentSize.height - calculateOffset(IntSize(it, it), currentSize).y
+                )
+            }
+            towards == Down -> slideInVertically(animationSpec) {
+                initialOffset.invoke(-calculateOffset(IntSize(it, it), currentSize).y - it)
+            }
             else -> EnterTransition.None
         }
 
@@ -428,38 +418,28 @@ class AnimatedContentScope<S> internal constructor(
     ): ExitTransition {
         return when {
             // Note: targetSize could be 0 for empty composables
-            towards.isLeft -> slideOutHorizontally(
-                {
-                    val targetSize = targetSizeMap[transition.targetState]?.value ?: IntSize.Zero
-                    targetOffset.invoke(-calculateOffset(IntSize(it, it), targetSize).x - it)
-                },
-                animationSpec
-            )
-            towards.isRight -> slideOutHorizontally(
-                {
-                    val targetSize = targetSizeMap[transition.targetState]?.value ?: IntSize.Zero
-                    targetOffset.invoke(
-                        -calculateOffset(IntSize(it, it), targetSize).x + targetSize.width
-                    )
-                },
-                animationSpec
-            )
-            towards == Up -> slideOutVertically(
-                {
-                    val targetSize = targetSizeMap[transition.targetState]?.value ?: IntSize.Zero
-                    targetOffset.invoke(-calculateOffset(IntSize(it, it), targetSize).y - it)
-                },
-                animationSpec
-            )
-            towards == Down -> slideOutVertically(
-                {
-                    val targetSize = targetSizeMap[transition.targetState]?.value ?: IntSize.Zero
-                    targetOffset.invoke(
-                        -calculateOffset(IntSize(it, it), targetSize).y + targetSize.height
-                    )
-                },
-                animationSpec
-            )
+            towards.isLeft -> slideOutHorizontally(animationSpec) {
+                val targetSize = targetSizeMap[transition.targetState]?.value ?: IntSize.Zero
+                targetOffset.invoke(-calculateOffset(IntSize(it, it), targetSize).x - it)
+            }
+            towards.isRight -> slideOutHorizontally(animationSpec) {
+
+                val targetSize = targetSizeMap[transition.targetState]?.value ?: IntSize.Zero
+                targetOffset.invoke(
+                    -calculateOffset(IntSize(it, it), targetSize).x + targetSize.width
+                )
+            }
+            towards == Up -> slideOutVertically(animationSpec) {
+
+                val targetSize = targetSizeMap[transition.targetState]?.value ?: IntSize.Zero
+                targetOffset.invoke(-calculateOffset(IntSize(it, it), targetSize).y - it)
+            }
+            towards == Down -> slideOutVertically(animationSpec) {
+                val targetSize = targetSizeMap[transition.targetState]?.value ?: IntSize.Zero
+                targetOffset.invoke(
+                    -calculateOffset(IntSize(it, it), targetSize).y + targetSize.height
+                )
+            }
             else -> ExitTransition.None
         }
     }
@@ -513,7 +493,7 @@ class AnimatedContentScope<S> internal constructor(
     private inner class SizeModifier(
         val sizeAnimation: Transition<S>.DeferredAnimation<IntSize, AnimationVector2D>,
         val sizeTransform: State<SizeTransform?>,
-    ) : LayoutModifier {
+    ) : LayoutModifierWithPassThroughIntrinsics() {
 
         override fun MeasureScope.measure(
             measurable: Measurable,
@@ -579,6 +559,12 @@ class AnimatedContentScope<S> internal constructor(
  * via [AnimatedVisibilityScope.animateEnterExit] and [AnimatedVisibilityScope.transition]. These
  * custom enter/exit animations will be triggered as the content enters/leaves the container.
  *
+ * [contentKey] can be used to specify a key for each targetState. There will be no animation
+ * when switching between target states that share the same same key. By default,
+ * the key will be the same as the targetState object. [contentKey] can be particularly useful if
+ * target state object gets recreated across save & restore while a more persistent key is needed
+ * to properly restore the internal states of the content.
+ *
  * @sample androidx.compose.animation.samples.TransitionExtensionAnimatedContentSample
  *
  * @see ContentTransform
@@ -594,6 +580,7 @@ fun <S> Transition<S>.AnimatedContent(
             fadeOut(animationSpec = tween(90))
     },
     contentAlignment: Alignment = Alignment.TopStart,
+    contentKey: (targetState: S) -> Any? = { it },
     content: @Composable() AnimatedVisibilityScope.(targetState: S) -> Unit
 ) {
     val layoutDirection = LocalLayoutDirection.current
@@ -623,10 +610,17 @@ fun <S> Transition<S>.AnimatedContent(
     // the targetState get placed last, so the target composable will be displayed on top of
     // content associated with other states, unless zIndex is specified.
     if (currentState != targetState && !currentlyVisible.contains(targetState)) {
-        currentlyVisible.add(targetState)
+        // Replace the target with the same key if any
+        val id = currentlyVisible.indexOfFirst { contentKey(it) == contentKey(targetState) }
+        if (id == -1) {
+            currentlyVisible.add(targetState)
+        } else {
+            currentlyVisible[id] = targetState
+        }
     }
 
     if (!contentMap.containsKey(targetState)) {
+        contentMap.clear()
         currentlyVisible.fastForEach { stateForContent ->
             contentMap[stateForContent] = {
                 val specOnEnter = remember { transitionSpec(rootScope) }
@@ -673,12 +667,21 @@ fun <S> Transition<S>.AnimatedContent(
         modifier = modifier.then(sizeModifier),
         content = {
             currentlyVisible.forEach {
-                key(it) {
+                key(contentKey(it)) {
                     contentMap[it]?.invoke()
                 }
             }
-        }
-    ) { measurables, constraints ->
+        },
+        measurePolicy = remember { AnimatedContentMeasurePolicy(rootScope) }
+    )
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+private class AnimatedContentMeasurePolicy(val rootScope: AnimatedContentScope<*>) : MeasurePolicy {
+    override fun MeasureScope.measure(
+        measurables: List<Measurable>,
+        constraints: Constraints
+    ): MeasureResult {
         val placeables = arrayOfNulls<Placeable>(measurables.size)
         // Measure the target composable first (but place it on top unless zIndex is specified)
         measurables.fastForEachIndexed { index, measurable ->
@@ -698,7 +701,7 @@ fun <S> Transition<S>.AnimatedContent(
         val maxHeight = placeables.maxByOrNull { it?.height ?: 0 }?.height ?: 0
         rootScope.measuredSize = IntSize(maxWidth, maxHeight)
         // Position the children.
-        layout(maxWidth, maxHeight) {
+        return layout(maxWidth, maxHeight) {
             placeables.forEach { placeable ->
                 placeable?.let {
                     val offset = rootScope.contentAlignment.align(
@@ -711,4 +714,24 @@ fun <S> Transition<S>.AnimatedContent(
             }
         }
     }
+
+    override fun IntrinsicMeasureScope.minIntrinsicWidth(
+        measurables: List<IntrinsicMeasurable>,
+        height: Int
+    ) = measurables.asSequence().map { it.minIntrinsicWidth(height) }.maxOrNull() ?: 0
+
+    override fun IntrinsicMeasureScope.minIntrinsicHeight(
+        measurables: List<IntrinsicMeasurable>,
+        width: Int
+    ) = measurables.asSequence().map { it.minIntrinsicHeight(width) }.maxOrNull() ?: 0
+
+    override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+        measurables: List<IntrinsicMeasurable>,
+        height: Int
+    ) = measurables.asSequence().map { it.maxIntrinsicWidth(height) }.maxOrNull() ?: 0
+
+    override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+        measurables: List<IntrinsicMeasurable>,
+        width: Int
+    ) = measurables.asSequence().map { it.maxIntrinsicHeight(width) }.maxOrNull() ?: 0
 }

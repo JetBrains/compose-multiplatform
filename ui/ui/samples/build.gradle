@@ -31,9 +31,9 @@ dependencies {
 
     compileOnly(project(":annotation:annotation-sampled"))
 
-    implementation(project(":compose:animation:animation-core"))
-    implementation(project(":compose:foundation:foundation-layout"))
-    implementation(project(":compose:material:material"))
+    implementation("androidx.compose.animation:animation-core:1.0.0")
+    implementation("androidx.compose.foundation:foundation-layout:1.0.0")
+    implementation("androidx.compose.material:material:1.0.0")
     implementation(project(":compose:runtime:runtime"))
     implementation(project(":compose:ui:ui"))
 }

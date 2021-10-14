@@ -61,7 +61,6 @@ import org.junit.runner.RunWith
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalMaterialApi::class)
 class BadgeTest {
 
     private val icon = Icons.Filled.Favorite

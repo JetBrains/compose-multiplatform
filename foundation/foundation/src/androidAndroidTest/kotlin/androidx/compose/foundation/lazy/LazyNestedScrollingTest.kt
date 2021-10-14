@@ -25,12 +25,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.moveBy
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performGesture
-import androidx.compose.ui.test.up
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -75,7 +72,7 @@ class LazyNestedScrollingTest {
         }
 
         rule.onNodeWithTag(LazyTag)
-            .performGesture {
+            .performTouchInput {
                 down(Offset(x = 10f, y = 10f))
                 moveBy(Offset(x = 0f, y = 100f + TestTouchSlop))
                 up()
@@ -119,7 +116,7 @@ class LazyNestedScrollingTest {
             .scrollBy(y = -(21.dp), density = rule.density)
 
         rule.onNodeWithTag(LazyTag)
-            .performGesture {
+            .performTouchInput {
                 draggedOffset = 0f
                 down(Offset(x = 10f, y = 10f))
                 moveBy(Offset(x = 0f, y = dragOffsetWithTouchSlop))
@@ -155,7 +152,7 @@ class LazyNestedScrollingTest {
         }
 
         rule.onNodeWithTag(LazyTag)
-            .performGesture {
+            .performTouchInput {
                 down(Offset(x = 10f, y = 10f))
                 moveBy(Offset(x = 0f, y = -dragOffsetWithTouchSlop))
                 up()
@@ -194,7 +191,7 @@ class LazyNestedScrollingTest {
             .scrollBy(y = 55.dp, density = rule.density)
 
         rule.onNodeWithTag(LazyTag)
-            .performGesture {
+            .performTouchInput {
                 draggedOffset = 0f
                 down(Offset(x = 10f, y = 10f))
                 moveBy(Offset(x = 0f, y = -dragOffsetWithTouchSlop))
@@ -232,7 +229,7 @@ class LazyNestedScrollingTest {
         }
 
         rule.onNodeWithTag(LazyTag)
-            .performGesture {
+            .performTouchInput {
                 down(Offset(x = 10f, y = 10f))
                 moveBy(Offset(x = dragOffsetWithTouchSlop, y = 0f))
                 up()
@@ -278,7 +275,7 @@ class LazyNestedScrollingTest {
             .scrollBy(x = -(21.dp), density = rule.density)
 
         rule.onNodeWithTag(LazyTag)
-            .performGesture {
+            .performTouchInput {
                 draggedOffset = 0f
                 down(Offset(x = 10f, y = 10f))
                 moveBy(Offset(x = dragOffsetWithTouchSlop, y = 0f))
@@ -316,7 +313,7 @@ class LazyNestedScrollingTest {
         }
 
         rule.onNodeWithTag(LazyTag)
-            .performGesture {
+            .performTouchInput {
                 down(Offset(x = 10f, y = 10f))
                 moveBy(Offset(x = -dragOffsetWithTouchSlop, y = 0f))
                 up()
@@ -357,7 +354,7 @@ class LazyNestedScrollingTest {
             .scrollBy(x = 55.dp, density = rule.density)
 
         rule.onNodeWithTag(LazyTag)
-            .performGesture {
+            .performTouchInput {
                 draggedOffset = 0f
                 down(Offset(x = 10f, y = 10f))
                 moveBy(Offset(x = -dragOffsetWithTouchSlop, y = 0f))

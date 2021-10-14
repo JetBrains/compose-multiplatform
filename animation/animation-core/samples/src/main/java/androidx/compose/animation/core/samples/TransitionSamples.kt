@@ -405,6 +405,7 @@ enum class DialerState {
     NumberPad
 }
 
+@Sampled
 @OptIn(ExperimentalTransitionApi::class)
 @Composable
 fun TransitionStateIsIdleSample() {

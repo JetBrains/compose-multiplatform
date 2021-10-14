@@ -47,7 +47,7 @@ import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onParent
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeUp
@@ -254,7 +254,7 @@ class BottomSheetScaffoldTest {
         }
 
         rule.onNodeWithTag(sheetContent)
-            .performGesture { swipeUp() }
+            .performTouchInput { swipeUp() }
 
         advanceClock()
 
@@ -263,7 +263,7 @@ class BottomSheetScaffoldTest {
         }
 
         rule.onNodeWithTag(sheetContent)
-            .performGesture { swipeDown() }
+            .performTouchInput { swipeDown() }
 
         advanceClock()
 
@@ -299,7 +299,7 @@ class BottomSheetScaffoldTest {
         }
 
         rule.onNodeWithTag(sheetContent)
-            .performGesture { swipeUp() }
+            .performTouchInput { swipeUp() }
 
         advanceClock()
 
@@ -342,7 +342,7 @@ class BottomSheetScaffoldTest {
         }
 
         rule.onNodeWithTag(sheetContent)
-            .performGesture { swipeUp() }
+            .performTouchInput { swipeUp() }
 
         advanceClock()
 

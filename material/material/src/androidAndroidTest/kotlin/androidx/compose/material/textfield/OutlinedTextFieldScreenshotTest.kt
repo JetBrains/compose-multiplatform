@@ -41,14 +41,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.center
-import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.move
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
-import androidx.compose.ui.test.up
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
@@ -56,7 +52,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
@@ -428,7 +423,7 @@ class OutlinedTextFieldScreenshotTest {
 
         rule.mainClock.autoAdvance = false
 
-        rule.onNodeWithTag(TextFieldTag).performGesture { swipeLeft() }
+        rule.onNodeWithTag(TextFieldTag).performTouchInput { swipeLeft() }
 
         // wait for swipe to finish
         rule.waitForIdle()
@@ -469,7 +464,6 @@ class OutlinedTextFieldScreenshotTest {
         assertAgainstGolden("outlinedTextField_readOnly_focused")
     }
 
-    @FlakyTest(bugId = 178510985)
     @Test
     fun outlinedTextField_readOnly_scrolled() {
         rule.setMaterialContent {
@@ -485,7 +479,7 @@ class OutlinedTextFieldScreenshotTest {
 
         rule.mainClock.autoAdvance = false
 
-        rule.onNodeWithTag(TextFieldTag).performGesture { swipeLeft() }
+        rule.onNodeWithTag(TextFieldTag).performTouchInput { swipeLeft() }
 
         // wait for swipe to finish
         rule.waitForIdle()
@@ -528,7 +522,7 @@ class OutlinedTextFieldScreenshotTest {
 
     private fun SemanticsNodeInteraction.focus() {
         // split click into (down) and (move, up) to enforce a composition in between
-        this.performGesture { down(center) }.performGesture { move(); up() }
+        this.performTouchInput { down(center) }.performTouchInput { move(); up() }
     }
 
     @Test

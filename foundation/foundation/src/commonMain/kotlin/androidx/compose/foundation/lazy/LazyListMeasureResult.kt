@@ -16,7 +16,10 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.ui.layout.Placeable
+import androidx.compose.foundation.lazy.layout.LazyLayoutItemInfo
+import androidx.compose.foundation.lazy.layout.LazyLayoutMeasureResult
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.util.fastMap
 
 /**
  * The result of the measure pass for lazy list layout.
@@ -31,16 +34,9 @@ internal class LazyListMeasureResult(
     val canScrollForward: Boolean,
     /** The amount of scroll consumed during the measure pass.*/
     val consumedScroll: Float,
-    /** List of items which were composed, but are not a part of [visibleItemsInfo].*/
-    val composedButNotVisibleItems: List<LazyMeasuredItem>?,
-    // properties to be used by the Layout's measure result
-    /** The calculated layout width */
-    val layoutWidth: Int,
-    /** The calculated layout height */
-    val layoutHeight: Int,
-    /** The placement block */
-    val placementBlock: Placeable.PlacementScope.() -> Unit,
-    // properties representing the info needed for LazyListLayoutInfo
+    /** MeasureResult defining the layout.*/
+    val measureResult: MeasureResult,
+    // properties representing the info needed for LazyListLayoutInfo:
     /** see [LazyListLayoutInfo.visibleItemsInfo] */
     override val visibleItemsInfo: List<LazyListItemInfo>,
     /** see [LazyListLayoutInfo.viewportStartOffset] */
@@ -49,4 +45,15 @@ internal class LazyListMeasureResult(
     override val viewportEndOffset: Int,
     /** see [LazyListLayoutInfo.totalItemsCount] */
     override val totalItemsCount: Int,
-) : LazyListLayoutInfo
+) : LazyListLayoutInfo, MeasureResult by measureResult {
+    val lazyLayoutMeasureResult: LazyLayoutMeasureResult get() =
+        object : LazyLayoutMeasureResult, MeasureResult by measureResult {
+            override val visibleItemsInfo: List<LazyLayoutItemInfo>
+                get() = this@LazyListMeasureResult.visibleItemsInfo.fastMap {
+                    object : LazyLayoutItemInfo {
+                        override val index: Int get() = it.index
+                        override val key: Any get() = it.key
+                    }
+                }
+        }
+}

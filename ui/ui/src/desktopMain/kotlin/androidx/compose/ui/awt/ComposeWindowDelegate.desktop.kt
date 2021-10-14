@@ -17,7 +17,6 @@
 package androidx.compose.ui.awt
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.window.LocalWindow
@@ -37,29 +36,29 @@ internal class ComposeWindowDelegate(private val window: Window) {
     val layer = ComposeLayer()
     val pane = object : JLayeredPane() {
         override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
-            layer.wrapped.setSize(width, height)
+            layer.component.setSize(width, height)
             super.setBounds(x, y, width, height)
         }
 
         override fun add(component: Component): Component {
             val clipComponent = ClipComponent(component)
             clipMap[component] = clipComponent
-            layer.wrapped.clipComponents.add(clipComponent)
+            layer.component.clipComponents.add(clipComponent)
             return add(component, Integer.valueOf(0))
         }
 
         override fun remove(component: Component) {
-            layer.wrapped.clipComponents.remove(clipMap[component]!!)
+            layer.component.clipComponents.remove(clipMap[component]!!)
             clipMap.remove(component)
             super.remove(component)
         }
 
         override fun addNotify() {
             super.addNotify()
-            layer.wrapped.requestFocus()
+            layer.component.requestFocus()
         }
 
-        override fun getPreferredSize() = layer.wrapped.preferredSize
+        override fun getPreferredSize() = layer.component.preferredSize
     }
 
     private val clipMap = mutableMapOf<Component, ClipComponent>()
@@ -78,13 +77,11 @@ internal class ComposeWindowDelegate(private val window: Window) {
     }
 
     fun setContent(
-        parentComposition: CompositionContext? = null,
         onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
         onKeyEvent: (KeyEvent) -> Boolean = { false },
         content: @Composable () -> Unit
     ) {
         layer.setContent(
-            parentComposition = parentComposition,
             onPreviewKeyEvent = onPreviewKeyEvent,
             onKeyEvent = onKeyEvent,
         ) {

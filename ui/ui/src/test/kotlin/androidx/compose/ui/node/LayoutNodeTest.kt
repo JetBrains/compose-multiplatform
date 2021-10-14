@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -838,6 +839,42 @@ class LayoutNodeTest {
     }
 
     @Test
+    fun hitTest_pointerInMinimumTouchTarget_pointerInputFilterHit_horizontal() {
+        val pointerInputFilter: PointerInputFilter = mockPointerInputFilter()
+        val layoutNode =
+            LayoutNode(
+                0, 0, 1000, 1,
+                PointerInputModifierImpl(pointerInputFilter),
+                DpSize(48.dp, 48.dp)
+            ).apply {
+                attach(MockOwner())
+            }
+        val hit = mutableListOf<PointerInputFilter>()
+
+        layoutNode.hitTest(Offset(0f, 3f), hit, true)
+
+        assertThat(hit).isEqualTo(listOf(pointerInputFilter))
+    }
+
+    @Test
+    fun hitTest_pointerInMinimumTouchTarget_pointerInputFilterHit_vertical() {
+        val pointerInputFilter: PointerInputFilter = mockPointerInputFilter()
+        val layoutNode =
+            LayoutNode(
+                0, 0, 1, 1000,
+                PointerInputModifierImpl(pointerInputFilter),
+                DpSize(48.dp, 48.dp)
+            ).apply {
+                attach(MockOwner())
+            }
+        val hit = mutableListOf<PointerInputFilter>()
+
+        layoutNode.hitTest(Offset(3f, 0f), hit, true)
+
+        assertThat(hit).isEqualTo(listOf(pointerInputFilter))
+    }
+
+    @Test
     fun hitTest_pointerInMinimumTouchTarget_pointerInputFilterHit_nestedNodes() {
         val pointerInputFilter: PointerInputFilter = mockPointerInputFilter()
         val outerNode = LayoutNode(0, 0, 1, 1).apply { attach(MockOwner()) }
@@ -853,6 +890,50 @@ class LayoutNodeTest {
         outerNode.hitTest(Offset(-3f, 3f), hit, true)
 
         assertThat(hit).isEqualTo(listOf(pointerInputFilter))
+    }
+
+    @Test
+    fun hitTest_pointerInputFilterHit_outsideParent() {
+        val outerPointerInputFilter: PointerInputFilter = mockPointerInputFilter()
+        val outerNode = LayoutNode(
+            0, 0, 10, 10,
+            PointerInputModifierImpl(outerPointerInputFilter)
+        ).apply { attach(MockOwner()) }
+        val pointerInputFilter: PointerInputFilter = mockPointerInputFilter()
+        val layoutNode = LayoutNode(
+            20, 20, 30, 30,
+            PointerInputModifierImpl(pointerInputFilter)
+        )
+        outerNode.add(layoutNode)
+        layoutNode.onNodePlaced()
+        val hit = mutableListOf<PointerInputFilter>()
+
+        outerNode.hitTest(Offset(25f, 25f), hit)
+
+        assertThat(hit).isEqualTo(listOf(pointerInputFilter))
+    }
+
+    @Test
+    fun hitTest_pointerInputFilterHit_outsideParent_interceptOutOfBoundsChildEvents() {
+        val outerPointerInputFilter: PointerInputFilter = mockPointerInputFilter(
+            interceptChildEvents = true
+        )
+        val outerNode = LayoutNode(
+            0, 0, 10, 10,
+            PointerInputModifierImpl(outerPointerInputFilter)
+        ).apply { attach(MockOwner()) }
+        val pointerInputFilter: PointerInputFilter = mockPointerInputFilter()
+        val layoutNode = LayoutNode(
+            20, 20, 30, 30,
+            PointerInputModifierImpl(pointerInputFilter)
+        )
+        outerNode.add(layoutNode)
+        layoutNode.onNodePlaced()
+        val hit = mutableListOf<PointerInputFilter>()
+
+        outerNode.hitTest(Offset(25f, 25f), hit)
+
+        assertThat(hit).isEqualTo(listOf(outerPointerInputFilter, pointerInputFilter))
     }
 
     @Test
@@ -957,7 +1038,8 @@ class LayoutNodeTest {
             DpSize(48.dp, 48.dp)
         )
 
-        val pointerInputFilter2: PointerInputFilter = mockPointerInputFilter()
+        val pointerInputFilter2: PointerInputFilter =
+            mockPointerInputFilter(interceptChildEvents = true)
         val layoutNode2 = LayoutNode(
             0, 0, 10, 10,
             PointerInputModifierImpl(pointerInputFilter2),
@@ -2106,6 +2188,33 @@ class LayoutNodeTest {
         assertEquals(3, node.getModifierInfo().size)
     }
 
+    @Test
+    fun layoutNodeWrapper_alpha() {
+        val root = LayoutNode().apply { this.modifier = Modifier.drawBehind {} }
+        val layoutNode1 = LayoutNode().apply {
+            this.modifier = Modifier.graphicsLayer { }.graphicsLayer { }.drawBehind {}
+        }
+        val layoutNode2 = LayoutNode().apply { this.modifier = Modifier.drawBehind {} }
+        val owner = MockOwner()
+
+        root.insertAt(0, layoutNode1)
+        layoutNode1.insertAt(0, layoutNode2)
+        root.attach(owner)
+
+        // provide alpha to the graphics layer
+        layoutNode1.outerLayoutNodeWrapper.wrapped!!.onLayerBlockUpdated {
+            alpha = 0f
+        }
+        layoutNode1.outerLayoutNodeWrapper.wrapped!!.wrapped!!.onLayerBlockUpdated {
+            alpha = 0.5f
+        }
+
+        assertFalse(layoutNode1.outerLayoutNodeWrapper.isTransparent())
+        assertTrue(layoutNode1.innerLayoutNodeWrapper.isTransparent())
+        assertTrue(layoutNode2.outerLayoutNodeWrapper.isTransparent())
+        assertTrue(layoutNode2.innerLayoutNodeWrapper.isTransparent())
+    }
+
     private fun createSimpleLayout(): Triple<LayoutNode, LayoutNode, LayoutNode> {
         val layoutNode = ZeroSizedLayoutNode()
         val child1 = ZeroSizedLayoutNode()
@@ -2146,6 +2255,8 @@ private class MockOwner(
     override val rootForTest: RootForTest
         get() = TODO("Not yet implemented")
     override val hapticFeedBack: HapticFeedback
+        get() = TODO("Not yet implemented")
+    override val inputModeManager: InputModeManager
         get() = TODO("Not yet implemented")
     override val clipboardManager: ClipboardManager
         get() = TODO("Not yet implemented")
@@ -2210,7 +2321,6 @@ private class MockOwner(
             override val layerId: Long
                 get() = 0
 
-            @ExperimentalComposeUiApi
             override val ownerViewId: Long
                 get() = 0
 
@@ -2256,6 +2366,12 @@ private class MockOwner(
             }
 
             override fun mapBounds(rect: MutableRect, inverse: Boolean) {
+            }
+
+            override fun reuseLayer(
+                drawBlock: (Canvas) -> Unit,
+                invalidateParentLayer: () -> Unit
+            ) {
             }
 
             override fun mapOffset(point: Offset, inverse: Boolean) = point
@@ -2321,7 +2437,9 @@ private fun LayoutNode(
     detach()
 }
 
-private fun mockPointerInputFilter(): PointerInputFilter = object : PointerInputFilter() {
+private fun mockPointerInputFilter(
+    interceptChildEvents: Boolean = false
+): PointerInputFilter = object : PointerInputFilter() {
     override fun onPointerEvent(
         pointerEvent: PointerEvent,
         pass: PointerEventPass,
@@ -2331,4 +2449,7 @@ private fun mockPointerInputFilter(): PointerInputFilter = object : PointerInput
 
     override fun onCancel() {
     }
+
+    override val interceptOutOfBoundsChildEvents: Boolean
+        get() = interceptChildEvents
 }

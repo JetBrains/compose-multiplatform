@@ -22,7 +22,7 @@ package androidx.compose.animation.tooling
  * with it.
  */
 public enum class ComposeAnimationType {
-    TRANSITION_ANIMATION, ANIMATED_VALUE
+    TRANSITION_ANIMATION, ANIMATED_VALUE, ANIMATED_VISIBILITY
 }
 
 /**

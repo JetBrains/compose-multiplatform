@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.samples.IconButtonSample
 import androidx.compose.material.samples.IconToggleButtonSample
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -35,6 +36,8 @@ import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
+import androidx.compose.ui.test.assertTouchHeightIsEqualTo
+import androidx.compose.ui.test.assertTouchWidthIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.hasClickAction
@@ -42,7 +45,7 @@ import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -67,6 +70,21 @@ class IconButtonTest {
         rule
             .setMaterialContentForSizeAssertions {
                 IconButtonSample()
+            }
+            .assertWidthIsEqualTo(width)
+            .assertHeightIsEqualTo(height)
+    }
+
+    @OptIn(ExperimentalMaterialApi::class)
+    @Test
+    fun iconButton_size_withoutMinimumTouchTarget() {
+        val width = 24.dp
+        val height = 24.dp
+        rule
+            .setMaterialContentForSizeAssertions {
+                CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
+                    IconButtonSample()
+                }
             }
             .assertWidthIsEqualTo(width)
             .assertHeightIsEqualTo(height)
@@ -161,6 +179,21 @@ class IconButtonTest {
         rule
             .setMaterialContentForSizeAssertions {
                 IconToggleButtonSample()
+            }
+            .assertWidthIsEqualTo(width)
+            .assertHeightIsEqualTo(height)
+    }
+
+    @OptIn(ExperimentalMaterialApi::class)
+    @Test
+    fun iconToggleButton_size_withoutMinimumTouchTarget() {
+        val width = 24.dp
+        val height = 24.dp
+        rule
+            .setMaterialContentForSizeAssertions {
+                CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
+                    IconToggleButtonSample()
+                }
             }
             .assertWidthIsEqualTo(width)
             .assertHeightIsEqualTo(height)
@@ -268,13 +301,14 @@ class IconButtonTest {
                 }
             }
         }
-        val pokePosition = 48.dp.roundToPx().toFloat() - 1f
         rule.onNodeWithTag(tag)
             .assertIsOff()
-            .assertWidthIsEqualTo(48.dp)
-            .assertHeightIsEqualTo(48.dp)
-            .performGesture {
-                click(position = Offset(pokePosition, pokePosition))
+            .assertWidthIsEqualTo(2.dp)
+            .assertHeightIsEqualTo(2.dp)
+            .assertTouchWidthIsEqualTo(48.dp)
+            .assertTouchHeightIsEqualTo(48.dp)
+            .performTouchInput {
+                click(position = Offset(-1f, -1f))
             }.assertIsOn()
     }
 }

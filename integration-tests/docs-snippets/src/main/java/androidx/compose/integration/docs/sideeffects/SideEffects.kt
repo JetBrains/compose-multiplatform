@@ -21,8 +21,6 @@
 
 package androidx.compose.integration.docs.sideeffects
 
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.OnBackPressedDispatcher
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -49,12 +47,23 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlin.Boolean
+import kotlin.Exception
+import kotlin.Long
+import kotlin.Nothing
+import kotlin.String
+import kotlin.Suppress
+import kotlin.Unit
 import kotlin.random.Random
 
 /**
@@ -142,61 +151,56 @@ private object SideEffectsSnippet3 {
 
 private object SideEffectsSnippet4 {
     @Composable
-    fun BackHandler(backDispatcher: OnBackPressedDispatcher, onBack: () -> Unit) {
+    fun HomeScreen(
+        lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
+        onStart: () -> Unit, // Send the 'started' analytics event
+        onStop: () -> Unit // Send the 'stopped' analytics event
+    ) {
+        // Safely update the current lambdas when a new one is provided
+        val currentOnStart by rememberUpdatedState(onStart)
+        val currentOnStop by rememberUpdatedState(onStop)
 
-        // Safely update the current `onBack` lambda when a new one is provided
-        val currentOnBack by rememberUpdatedState(onBack)
-
-        // Remember in Composition a back callback that calls the `onBack` lambda
-        val backCallback = remember {
-            // Always intercept back events. See the SideEffect for a more complete version
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    currentOnBack()
+        // If `lifecycleOwner` changes, dispose and reset the effect
+        DisposableEffect(lifecycleOwner) {
+            // Create an observer that triggers our remembered callbacks
+            // for sending analytics events
+            val observer = LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_START) {
+                    currentOnStart()
+                } else if (event == Lifecycle.Event.ON_STOP) {
+                    currentOnStop()
                 }
             }
-        }
 
-        // If `backDispatcher` changes, dispose and reset the effect
-        DisposableEffect(backDispatcher) {
-            // Add callback to the backDispatcher
-            backDispatcher.addCallback(backCallback)
+            // Add the observer to the lifecycle
+            lifecycleOwner.lifecycle.addObserver(observer)
 
-            // When the effect leaves the Composition, remove the callback
+            // When the effect leaves the Composition, remove the observer
             onDispose {
-                backCallback.remove()
+                lifecycleOwner.lifecycle.removeObserver(observer)
             }
         }
+
+        /* Home screen content */
     }
 }
 
 private object SideEffectsSnippet5 {
     @Composable
-    fun BackHandler(
-        backDispatcher: OnBackPressedDispatcher,
-        enabled: Boolean = true, // Whether back events should be intercepted or not
-        onBack: () -> Unit
-    ) {
-        // START - DO NOT COPY IN CODE SNIPPET
-        val currentOnBack by rememberUpdatedState(onBack)
-
-        val backCallback = remember {
-            // Always intercept back events. See the SideEffect for a more complete version
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    currentOnBack()
-                }
-            }
+    fun rememberAnalytics(user: User): FirebaseAnalytics {
+        val analytics: FirebaseAnalytics = remember {
+            // START - DO NOT COPY IN CODE SNIPPET
+            FirebaseAnalytics()
+            // END - DO NOT COPY IN CODE SNIPPET, just use /* ... */
         }
-        // END - DO NOT COPY IN CODE SNIPPET, just use /* ... */
 
-        // On every successful composition, update the callback with the `enabled` value
-        // to tell `backCallback` whether back events should be intercepted or not
+        // On every successful composition, update FirebaseAnalytics with
+        // the userType from the current User, ensuring that future analytics
+        // events have this metadata attached
         SideEffect {
-            backCallback.isEnabled = enabled
+            analytics.setUserProperty("userType", user.userType)
         }
-
-        /* Rest of the code */
+        return analytics
     }
 }
 
@@ -269,24 +273,29 @@ private fun SideEffectsSnippet8(messages: List<Message>) {
 
 private object SideEffectsSnippet9 {
     @Composable
-    fun BackHandler(backDispatcher: OnBackPressedDispatcher, onBack: () -> Unit) {
-        // START - DO NOT COPY IN CODE SNIPPET
-        val currentOnBack by rememberUpdatedState(onBack)
+    fun HomeScreen(
+        lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
+        onStart: () -> Unit, // Send the 'started' analytics event
+        onStop: () -> Unit // Send the 'stopped' analytics event
+    ) {
+        // These values never change in Composition
+        val currentOnStart by rememberUpdatedState(onStart)
+        val currentOnStop by rememberUpdatedState(onStop)
 
-        val backCallback = remember {
-            // Always intercept back events. See the SideEffect for a more complete version
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    currentOnBack()
+        DisposableEffect(lifecycleOwner) {
+            val observer = LifecycleEventObserver { _, event ->
+                // START - DO NOT COPY IN CODE SNIPPET
+                if (event == Lifecycle.Event.ON_START) {
+                    currentOnStart()
+                } else if (event == Lifecycle.Event.ON_STOP) {
+                    currentOnStop()
                 }
+                // END - DO NOT COPY IN CODE SNIPPET, just use /* ... */
             }
-        }
-        // END - DO NOT COPY IN CODE SNIPPET, just use /* ... */
 
-        DisposableEffect(backDispatcher) {
-            backDispatcher.addCallback(backCallback)
+            lifecycleOwner.lifecycle.addObserver(observer)
             onDispose {
-                backCallback.remove()
+                lifecycleOwner.lifecycle.removeObserver(observer)
             }
         }
     }
@@ -315,13 +324,17 @@ private class ImageRepository {
     fun load(url: String): Image? = if (Random.nextInt() == 0) Image() else null // Avoid warnings
 }
 
+private class FirebaseAnalytics {
+    fun setUserProperty(name: String, value: String) {}
+}
+
 private sealed class Result<out R> {
     data class Success<out T>(val data: T) : Result<T>()
     object Loading : Result<Nothing>()
     object Error : Result<Nothing>()
 }
 
-private class User
+private class User(val userType: String = "user")
 private class Weather
 private class Greeting(val name: String)
 private fun prepareGreeting(user: User, weather: Weather) = Greeting("haha")

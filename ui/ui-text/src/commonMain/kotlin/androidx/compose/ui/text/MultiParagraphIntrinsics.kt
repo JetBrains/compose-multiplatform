@@ -47,6 +47,8 @@ class MultiParagraphIntrinsics(
     resourceLoader: Font.ResourceLoader
 ) : ParagraphIntrinsics {
 
+    // NOTE(text-perf-review): why are we using lazy here? Are there cases where these
+    // calculations aren't executed?
     override val minIntrinsicWidth: Float by lazy(LazyThreadSafetyMode.NONE) {
         infoList.fastMaxBy {
             it.intrinsics.minIntrinsicWidth

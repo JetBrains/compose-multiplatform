@@ -67,8 +67,10 @@ class SendMultipleGesturesTest {
         expectedDifference: Long,
         betweenGesturesBlock: () -> Unit
     ) {
+        @Suppress("DEPRECATION")
         rule.partialGesture { click() }
         betweenGesturesBlock.invoke()
+        @Suppress("DEPRECATION")
         rule.partialGesture { click() }
 
         rule.runOnIdle {

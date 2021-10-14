@@ -16,9 +16,13 @@
 
 package androidx.compose.ui.graphics.vector.compat
 
+import android.content.res.ColorStateList
 import android.content.res.Resources
+import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.util.TypedValue
+import androidx.annotation.ColorInt
+import androidx.annotation.StyleableRes
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -83,16 +87,16 @@ internal fun XmlPullParser.isAtEnd(): Boolean =
  * @return The number of nested VectorGroups that are not `<group>` in XML, but represented as
  * VectorGroup in the [builder]. These are also popped when this function sees `</group>`.
  */
-internal fun XmlPullParser.parseCurrentVectorNode(
+internal fun AndroidVectorParser.parseCurrentVectorNode(
     res: Resources,
     attrs: AttributeSet,
     theme: Resources.Theme? = null,
     builder: ImageVector.Builder,
     nestedGroups: Int
 ): Int {
-    when (eventType) {
+    when (xmlParser.eventType) {
         XmlPullParser.START_TAG -> {
-            when (name) {
+            when (xmlParser.name) {
                 SHAPE_PATH -> {
                     parsePath(res, theme, attrs, builder)
                 }
@@ -106,7 +110,7 @@ internal fun XmlPullParser.parseCurrentVectorNode(
             }
         }
         XmlPullParser.END_TAG -> {
-            if (SHAPE_GROUP == name) {
+            if (SHAPE_GROUP == xmlParser.name) {
                 repeat(nestedGroups + 1) {
                     builder.clearGroup()
                 }
@@ -134,12 +138,12 @@ internal fun XmlPullParser.seekToStartTag(): XmlPullParser {
 }
 
 @SuppressWarnings("RestrictedApi")
-internal fun XmlPullParser.createVectorImageBuilder(
+internal fun AndroidVectorParser.createVectorImageBuilder(
     res: Resources,
     theme: Resources.Theme?,
     attrs: AttributeSet
 ): ImageVector.Builder {
-    val vectorAttrs = TypedArrayUtils.obtainAttributes(
+    val vectorAttrs = obtainAttributes(
         res,
         theme,
         attrs,
@@ -150,17 +154,15 @@ internal fun XmlPullParser.createVectorImageBuilder(
 //        state.mAutoMirrored = TypedArrayUtils.getNamedBoolean(a, parser, "autoMirrored",
 //                AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_AUTO_MIRRORED, state.mAutoMirrored)
 
-    val viewportWidth = TypedArrayUtils.getNamedFloat(
+    val viewportWidth = getNamedFloat(
         vectorAttrs,
-        this,
         "viewportWidth",
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_VIEWPORT_WIDTH,
         0.0f
     )
 
-    val viewportHeight = TypedArrayUtils.getNamedFloat(
+    val viewportHeight = getNamedFloat(
         vectorAttrs,
-        this,
         "viewportHeight",
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_VIEWPORT_HEIGHT,
         0.0f
@@ -176,10 +178,12 @@ internal fun XmlPullParser.createVectorImageBuilder(
         )
     }
 
-    val defaultWidth = vectorAttrs.getDimension(
+    val defaultWidth = getDimension(
+        vectorAttrs,
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_WIDTH, 0.0f
     )
-    val defaultHeight = vectorAttrs.getDimension(
+    val defaultHeight = getDimension(
+        vectorAttrs,
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_HEIGHT, 0.0f
     )
 
@@ -195,8 +199,8 @@ internal fun XmlPullParser.createVectorImageBuilder(
         if (value.type == TypedValue.TYPE_ATTRIBUTE) {
             Color.Unspecified
         } else {
-            val tintColorStateList = TypedArrayUtils.getNamedColorStateList(
-                vectorAttrs, this, theme, "tint",
+            val tintColorStateList = getNamedColorStateList(
+                vectorAttrs, theme, "tint",
                 AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_TINT
             )
             if (tintColorStateList != null) {
@@ -209,7 +213,8 @@ internal fun XmlPullParser.createVectorImageBuilder(
         Color.Unspecified
     }
 
-    val blendModeValue = vectorAttrs.getInt(
+    val blendModeValue = getInt(
+        vectorAttrs,
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_TINT_MODE, -1
     )
     val tintBlendMode = if (blendModeValue != -1) {
@@ -245,104 +250,102 @@ internal fun XmlPullParser.createVectorImageBuilder(
 
 @Throws(IllegalArgumentException::class)
 @SuppressWarnings("RestrictedApi")
-internal fun XmlPullParser.parsePath(
+internal fun AndroidVectorParser.parsePath(
     res: Resources,
     theme: Resources.Theme?,
     attrs: AttributeSet,
     builder: ImageVector.Builder
 ) {
-    val a = TypedArrayUtils.obtainAttributes(
+    val a = obtainAttributes(
         res,
         theme,
         attrs,
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_PATH
     )
 
-    val hasPathData = TypedArrayUtils.hasAttribute(this, "pathData")
+    val hasPathData = TypedArrayUtils.hasAttribute(xmlParser, "pathData")
     if (!hasPathData) {
         // If there is no pathData in the VPath tag, then this is an empty VPath,
         // nothing need to be drawn.
         throw IllegalArgumentException("No path data available")
     }
 
-    val name: String = a.getString(AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_PATH_NAME) ?: ""
+    val name: String = getString(
+        a, AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_PATH_NAME
+    ) ?: ""
 
-    val pathStr = a.getString(AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_PATH_PATH_DATA)
+    val pathStr = getString(a, AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_PATH_PATH_DATA)
 
     val pathData: List<PathNode> = addPathNodes(pathStr)
 
-    val fillColor = TypedArrayUtils.getNamedComplexColor(
+    val fillColor = getNamedComplexColor(
         a,
-        this,
         theme,
         "fillColor",
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_PATH_FILL_COLOR, 0
     )
-    val fillAlpha = TypedArrayUtils.getNamedFloat(
+    val fillAlpha = getNamedFloat(
         a,
-        this,
         "fillAlpha",
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_PATH_FILL_ALPHA, 1.0f
     )
-    val lineCap = TypedArrayUtils.getNamedInt(
+    val lineCap = getNamedInt(
         a,
-        this,
         "strokeLineCap",
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_PATH_STROKE_LINE_CAP, -1
     )
     val strokeLineCap = getStrokeLineCap(lineCap, StrokeCap.Butt)
-    val lineJoin = TypedArrayUtils.getNamedInt(
+    val lineJoin = getNamedInt(
         a,
-        this,
         "strokeLineJoin",
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_PATH_STROKE_LINE_JOIN, -1
     )
     val strokeLineJoin =
         getStrokeLineJoin(lineJoin, StrokeJoin.Bevel)
-    val strokeMiterLimit = TypedArrayUtils.getNamedFloat(
+    val strokeMiterLimit = getNamedFloat(
         a,
-        this,
         "strokeMiterLimit",
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_PATH_STROKE_MITER_LIMIT,
         1.0f
     )
-    val strokeColor = TypedArrayUtils.getNamedComplexColor(
+    val strokeColor = getNamedComplexColor(
         a,
-        this,
         theme,
         "strokeColor",
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_PATH_STROKE_COLOR, 0
     )
-    val strokeAlpha = TypedArrayUtils.getNamedFloat(
+    val strokeAlpha = getNamedFloat(
         a,
-        this,
         "strokeAlpha",
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_PATH_STROKE_ALPHA, 1.0f
     )
-    val strokeLineWidth = TypedArrayUtils.getNamedFloat(
+    val strokeLineWidth = getNamedFloat(
         a,
-        this,
         "strokeWidth",
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_PATH_STROKE_WIDTH, 1.0f
     )
 
-    val trimPathEnd = TypedArrayUtils.getNamedFloat(
-        a, this, "trimPathEnd",
+    val trimPathEnd = getNamedFloat(
+        a,
+        "trimPathEnd",
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_PATH_TRIM_PATH_END, 1.0f
     )
-    val trimPathOffset = TypedArrayUtils.getNamedFloat(
-        a, this, "trimPathOffset",
+    val trimPathOffset = getNamedFloat(
+        a,
+        "trimPathOffset",
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_PATH_TRIM_PATH_OFFSET,
         0.0f
     )
-    val trimPathStart = TypedArrayUtils.getNamedFloat(
-        a, this, "trimPathStart",
+    val trimPathStart = getNamedFloat(
+        a,
+        "trimPathStart",
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_PATH_TRIM_PATH_START,
         0.0f
     )
 
-    val fillRule = TypedArrayUtils.getNamedInt(
-        a, this, "fillType",
+    val fillRule = getNamedInt(
+        a,
+        "fillType",
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_PATH_TRIM_PATH_FILLTYPE,
         FILL_TYPE_WINDING
     )
@@ -384,24 +387,26 @@ private fun obtainBrushFromComplexColor(complexColor: ComplexColorCompat): Brush
         null
     }
 
-internal fun XmlPullParser.parseClipPath(
+internal fun AndroidVectorParser.parseClipPath(
     res: Resources,
     theme: Resources.Theme?,
     attrs: AttributeSet,
     builder: ImageVector.Builder
 ) {
-    val a = theme?.obtainStyledAttributes(
+    val a = obtainAttributes(
+        res,
+        theme,
         attrs,
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_CLIP_PATH,
-        0,
-        0
-    ) ?: res.obtainAttributes(attrs, AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_CLIP_PATH)
+    )
 
-    val name: String = a.getString(
+    val name: String = getString(
+        a,
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_CLIP_PATH_NAME
     ) ?: ""
     val pathData = addPathNodes(
-        a.getString(
+        getString(
+            a,
             AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_CLIP_PATH_PATH_DATA
         )
     )
@@ -417,13 +422,13 @@ internal fun XmlPullParser.parseClipPath(
 }
 
 @SuppressWarnings("RestrictedApi")
-internal fun XmlPullParser.parseGroup(
+internal fun AndroidVectorParser.parseGroup(
     res: Resources,
     theme: Resources.Theme?,
     attrs: AttributeSet,
     builder: ImageVector.Builder
 ) {
-    val a = TypedArrayUtils.obtainAttributes(
+    val a = obtainAttributes(
         res,
         theme,
         attrs,
@@ -437,58 +442,57 @@ internal fun XmlPullParser.parseGroup(
     // mThemeAttrs = null // TODO TINT THEME Not supported yet a.extractThemeAttrs();
 
     // This is added in API 11
-    val rotate = TypedArrayUtils.getNamedFloat(
+    val rotate = getNamedFloat(
         a,
-        this,
         "rotation",
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_GROUP_ROTATION,
         DefaultRotation
     )
 
-    val pivotX = a.getFloat(
+    val pivotX = getFloat(
+        a,
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_GROUP_PIVOT_X,
         DefaultPivotX
     )
-    val pivotY = a.getFloat(
+    val pivotY = getFloat(
+        a,
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_GROUP_PIVOT_Y,
         DefaultPivotY
     )
 
     // This is added in API 11
-    val scaleX = TypedArrayUtils.getNamedFloat(
+    val scaleX = getNamedFloat(
         a,
-        this,
         "scaleX",
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_GROUP_SCALE_X,
         DefaultScaleX
     )
 
     // This is added in API 11
-    val scaleY = TypedArrayUtils.getNamedFloat(
+    val scaleY = getNamedFloat(
         a,
-        this,
         "scaleY",
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_GROUP_SCALE_Y,
         DefaultScaleY
     )
 
-    val translateX = TypedArrayUtils.getNamedFloat(
+    val translateX = getNamedFloat(
         a,
-        this,
         "translateX",
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_GROUP_TRANSLATE_X,
         DefaultTranslationX
     )
-    val translateY = TypedArrayUtils.getNamedFloat(
+    val translateY = getNamedFloat(
         a,
-        this,
         "translateY",
         AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_GROUP_TRANSLATE_Y,
         DefaultTranslationY
     )
 
-    val name: String =
-        a.getString(AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_GROUP_NAME) ?: ""
+    val name: String = getString(
+        a,
+        AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_GROUP_NAME
+    ) ?: ""
 
     a.recycle()
 
@@ -503,4 +507,192 @@ internal fun XmlPullParser.parseGroup(
         translateY,
         EmptyPath
     )
+}
+
+/**
+ * Class responsible for parsing vector graphics attributes and keeping track of
+ * which attributes depend on a configuration parameter.
+ * This is used to determine which cached vector graphics objects can be pruned
+ * during a configuration change as the vector graphic would need to be reloaded
+ * if a corresponding configuration parameter changed.
+ *
+ * For example, if the fill color for a path was dependent on the orientation of the device
+ * the config flag would include the value [android.content.pm.ActivityInfo.CONFIG_ORIENTATION]
+ */
+internal data class AndroidVectorParser(
+    val xmlParser: XmlPullParser,
+    var config: Int = 0
+) {
+
+    private fun updateConfig(resConfig: Int) {
+        config = config or resConfig
+    }
+
+    /**
+     * Helper method to parse the attributre set update the configuration flags this
+     * that these attributes may depend on
+     */
+    fun obtainAttributes(
+        res: Resources,
+        theme: Resources.Theme?,
+        set: AttributeSet,
+        attrs: IntArray
+    ): TypedArray {
+        val typedArray = TypedArrayUtils.obtainAttributes(
+            res,
+            theme,
+            set,
+            attrs
+        )
+        updateConfig(typedArray.changingConfigurations)
+        return typedArray
+    }
+
+    /**
+     * Helper method to parse an int with the given resource identifier and
+     * attribute name as well as update the configuration flags this
+     * int may depend on.
+     */
+    fun getNamedInt(
+        typedArray: TypedArray,
+        attrName: String,
+        @StyleableRes resId: Int,
+        defaultValue: Int
+    ): Int {
+        with(typedArray) {
+            val result = TypedArrayUtils.getNamedInt(
+                this,
+                xmlParser,
+                attrName,
+                resId,
+                defaultValue
+            )
+            updateConfig(changingConfigurations)
+            return result
+        }
+    }
+
+    /**
+     * Helper method to parse a float with the given resource identifier and
+     * attribute name as well as update the configuration flags this
+     * float may depend on.
+     */
+    fun getNamedFloat(
+        typedArray: TypedArray,
+        attrName: String,
+        @StyleableRes resId: Int,
+        defaultValue: Float
+    ): Float {
+        with(typedArray) {
+            val result = TypedArrayUtils.getNamedFloat(
+                this,
+                xmlParser,
+                attrName,
+                resId,
+                defaultValue
+            )
+            updateConfig(changingConfigurations)
+            return result
+        }
+    }
+
+    /**
+     * Helper method to parse a float with the given resource identifier
+     * and update the configuration flags this float may depend on.
+     */
+    fun getFloat(typedArray: TypedArray, index: Int, defaultValue: Float): Float {
+        with(typedArray) {
+            val result = getFloat(
+                index,
+                defaultValue
+            )
+            updateConfig(changingConfigurations)
+            return result
+        }
+    }
+
+    /**
+     * Helper method to parse an int with the given resource identifier
+     * and update the configuration flags this int may depend on.
+     */
+    fun getInt(typedArray: TypedArray, index: Int, defaultValue: Int): Int {
+        with(typedArray) {
+            val result = getInt(index, defaultValue)
+            updateConfig(changingConfigurations)
+            return result
+        }
+    }
+
+    /**
+     * Helper method to parse a String with the given resource identifier
+     * and update the configuration flags this String may depend on.
+     */
+    fun getString(typedArray: TypedArray, index: Int): String? {
+        with(typedArray) {
+            val result = getString(index)
+            updateConfig(changingConfigurations)
+            return result
+        }
+    }
+
+    /**
+     * Helper method to parse a dimension with the given resource identifier
+     * and update the configuration flags this dimension may depend on.
+     */
+    fun getDimension(typedArray: TypedArray, index: Int, defValue: Float): Float {
+        with(typedArray) {
+            val result = getDimension(index, defValue)
+            updateConfig(changingConfigurations)
+            return result
+        }
+    }
+
+    /**
+     * Helper method to parse a ComplexColor with the given resource identifier
+     * and name as well as update the configuration flags this
+     * ComplexColor may depend on.
+     */
+    fun getNamedComplexColor(
+        typedArray: TypedArray,
+        theme: Resources.Theme?,
+        attrName: String,
+        @StyleableRes resId: Int,
+        @ColorInt defaultValue: Int
+    ): ComplexColorCompat {
+        with(typedArray) {
+            val result = TypedArrayUtils.getNamedComplexColor(
+                this,
+                xmlParser,
+                theme,
+                attrName,
+                resId, defaultValue
+            )
+            updateConfig(changingConfigurations)
+            return result
+        }
+    }
+
+    /**
+     * Helper method to parse a ColorStateList with the given resource identifier
+     * and name as well as update the configuration flags this
+     * ColorStateList may depend on.
+     */
+    fun getNamedColorStateList(
+        typedArray: TypedArray,
+        theme: Resources.Theme?,
+        attrName: String,
+        @StyleableRes resId: Int
+    ): ColorStateList? {
+        with(typedArray) {
+            val result = TypedArrayUtils.getNamedColorStateList(
+                typedArray,
+                xmlParser,
+                theme,
+                attrName,
+                resId
+            )
+            updateConfig(changingConfigurations)
+            return result
+        }
+    }
 }

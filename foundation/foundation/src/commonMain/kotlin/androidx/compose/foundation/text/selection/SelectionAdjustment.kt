@@ -35,16 +35,19 @@ internal interface SelectionAdjustment {
      * @param textLayoutResult the [TextLayoutResult] of the involved [Selectable].
      * @param newRawSelectionRange the new selection range computed from the selection handle
      * position on screen.
-     * @param previousRawSelectionRange the previous raw selection range.
-     * @param previousAdjustedSelection the previous adjusted selection range, or the selection
-     * range to be updated.
+     * @param previousHandleOffset the previous offset of the moving handle. When isStartHandle is
+     * true, it's the previous offset of the start handle before the movement, and vice versa.
+     * When there isn't a valid previousHandleOffset, previousHandleOffset should be -1.
+     * @param isStartHandle whether the moving handle is the start handle.
+     * @param previousSelectionRange the previous selection range, or the selection range to be
+     * updated.
      */
     fun adjust(
         textLayoutResult: TextLayoutResult,
         newRawSelectionRange: TextRange,
-        previousRawSelectionRange: TextRange?,
-        previousAdjustedSelection: TextRange?,
-        isStartHandle: Boolean
+        previousHandleOffset: Int,
+        isStartHandle: Boolean,
+        previousSelectionRange: TextRange?
     ): TextRange
 
     companion object {
@@ -56,9 +59,9 @@ internal interface SelectionAdjustment {
             override fun adjust(
                 textLayoutResult: TextLayoutResult,
                 newRawSelectionRange: TextRange,
-                previousRawSelectionRange: TextRange?,
-                previousAdjustedSelection: TextRange?,
-                isStartHandle: Boolean
+                previousHandleOffset: Int,
+                isStartHandle: Boolean,
+                previousSelectionRange: TextRange?
             ): TextRange = newRawSelectionRange
         }
 
@@ -76,13 +79,13 @@ internal interface SelectionAdjustment {
             override fun adjust(
                 textLayoutResult: TextLayoutResult,
                 newRawSelectionRange: TextRange,
-                previousRawSelectionRange: TextRange?,
-                previousAdjustedSelection: TextRange?,
-                isStartHandle: Boolean
+                previousHandleOffset: Int,
+                isStartHandle: Boolean,
+                previousSelectionRange: TextRange?
             ): TextRange {
                 return if (newRawSelectionRange.collapsed) {
                     // If there isn't any selection before, we assume handles are not crossed.
-                    val previousHandlesCrossed = previousAdjustedSelection?.reversed ?: false
+                    val previousHandlesCrossed = previousSelectionRange?.reversed ?: false
                     ensureAtLeastOneChar(
                         offset = newRawSelectionRange.start,
                         lastOffset = textLayoutResult.layoutInput.text.lastIndex,
@@ -105,9 +108,9 @@ internal interface SelectionAdjustment {
             override fun adjust(
                 textLayoutResult: TextLayoutResult,
                 newRawSelectionRange: TextRange,
-                previousRawSelectionRange: TextRange?,
-                previousAdjustedSelection: TextRange?,
-                isStartHandle: Boolean
+                previousHandleOffset: Int,
+                isStartHandle: Boolean,
+                previousSelectionRange: TextRange?
             ): TextRange {
                 return adjustByBoundary(
                     textLayoutResult = textLayoutResult,
@@ -127,9 +130,9 @@ internal interface SelectionAdjustment {
             override fun adjust(
                 textLayoutResult: TextLayoutResult,
                 newRawSelectionRange: TextRange,
-                previousRawSelectionRange: TextRange?,
-                previousAdjustedSelection: TextRange?,
-                isStartHandle: Boolean
+                previousHandleOffset: Int,
+                isStartHandle: Boolean,
+                previousSelectionRange: TextRange?
             ): TextRange {
                 val boundaryFun = textLayoutResult.layoutInput.text::getParagraphBoundary
                 return adjustByBoundary(
@@ -184,21 +187,18 @@ internal interface SelectionAdjustment {
             override fun adjust(
                 textLayoutResult: TextLayoutResult,
                 newRawSelectionRange: TextRange,
-                previousRawSelectionRange: TextRange?,
-                previousAdjustedSelection: TextRange?,
-                isStartHandle: Boolean
+                previousHandleOffset: Int,
+                isStartHandle: Boolean,
+                previousSelectionRange: TextRange?
             ): TextRange {
                 // Previous selection is null. We start a word based selection.
-                if (
-                    previousRawSelectionRange == null ||
-                    previousAdjustedSelection == null
-                ) {
+                if (previousSelectionRange == null) {
                     return Word.adjust(
                         textLayoutResult = textLayoutResult,
                         newRawSelectionRange = newRawSelectionRange,
-                        previousRawSelectionRange = previousRawSelectionRange,
-                        previousAdjustedSelection = previousAdjustedSelection,
-                        isStartHandle = isStartHandle
+                        previousHandleOffset = previousHandleOffset,
+                        isStartHandle = isStartHandle,
+                        previousSelectionRange = previousSelectionRange
                     )
                 }
 
@@ -208,40 +208,47 @@ internal interface SelectionAdjustment {
                         offset = newRawSelectionRange.start,
                         lastOffset = textLayoutResult.layoutInput.text.lastIndex,
                         isStartHandle = isStartHandle,
-                        previousHandlesCrossed = previousAdjustedSelection.reversed
+                        previousHandlesCrossed = previousSelectionRange.reversed
                     )
                 }
 
-                // Notice that we assume only one selection boundary is really updated. So we can
-                // directly pass previousAdjustedSelection.end as otherBoundOffset.
-                val start = updateSelectionBoundary(
-                    textLayoutResult,
-                    newRawSelectionRange.start,
-                    previousRawSelectionRange.start,
-                    previousAdjustedSelection.start,
-                    previousAdjustedSelection.end,
-                    true,
-                    previousRawSelectionRange.reversed
-                )
-                val end = updateSelectionBoundary(
-                    textLayoutResult,
-                    newRawSelectionRange.end,
-                    previousRawSelectionRange.end,
-                    previousAdjustedSelection.end,
-                    previousAdjustedSelection.start,
-                    false,
-                    previousRawSelectionRange.reversed
-                )
+                val start: Int
+                val end: Int
+                if (isStartHandle) {
+                    start = updateSelectionBoundary(
+                        textLayoutResult = textLayoutResult,
+                        newRawOffset = newRawSelectionRange.start,
+                        previousRawOffset = previousHandleOffset,
+                        previousAdjustedOffset = previousSelectionRange.start,
+                        otherBoundaryOffset = newRawSelectionRange.end,
+                        isStart = true,
+                        isReversed = newRawSelectionRange.reversed
+                    )
+                    end = newRawSelectionRange.end
+                } else {
+                    start = newRawSelectionRange.start
+                    end = updateSelectionBoundary(
+                        textLayoutResult = textLayoutResult,
+                        newRawOffset = newRawSelectionRange.end,
+                        previousRawOffset = previousHandleOffset,
+                        previousAdjustedOffset = previousSelectionRange.end,
+                        otherBoundaryOffset = newRawSelectionRange.start,
+                        isStart = false,
+                        isReversed = newRawSelectionRange.reversed
+                    )
+                }
                 return TextRange(start, end)
             }
 
             /**
-             * Helper function that updates start or end offset of the selection. It implements the
-             * "expand by word and shrink by character behavior".
+             * Helper function that updates start or end boundary of the selection. It implements
+             * the "expand by word and shrink by character behavior".
              *
              * @param textLayoutResult the text layout result
-             * @param newRawOffset the new raw offset of the selection boundary.
-             * @param previousRawOffset the previous raw offset of the selection boundary.
+             * @param newRawOffset the new raw offset of the selection boundary after the movement.
+             * @param previousRawOffset the raw offset of the updated selection boundary before the
+             * movement. In the case where previousRawOffset invalid(when selection update is
+             * triggered by long-press or click) pass -1 for this parameter.
              * @param previousAdjustedOffset the previous final/adjusted offset. It's the current
              * @param otherBoundaryOffset the offset of the other selection boundary. It is used
              * to avoid empty selection in word based selection mode.
@@ -377,6 +384,10 @@ internal interface SelectionAdjustment {
                 isStart: Boolean,
                 previousReversed: Boolean
             ): Boolean {
+                // -1 is considered as no previous offset, so the selection is expanding.
+                if (previousRawOffset == -1) {
+                    return true
+                }
                 if (newRawOffset == previousRawOffset) {
                     return false
                 }

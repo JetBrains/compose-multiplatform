@@ -115,6 +115,9 @@ fun Switch(
 
     Box(
         modifier
+            .then(
+                if (onCheckedChange != null) Modifier.minimumTouchTargetSize() else Modifier
+            )
             .then(toggleableModifier)
             .swipeable(
                 state = swipeableState,

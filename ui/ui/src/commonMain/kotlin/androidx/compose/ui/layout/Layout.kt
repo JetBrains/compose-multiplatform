@@ -86,6 +86,50 @@ import androidx.compose.ui.util.fastMap
     )
 }
 
+/**
+ * [Layout] is the main core component for layout for "leaf" nodes. It can be used to measure and
+ * position zero children.
+ *
+ * The measurement, layout and intrinsic measurement behaviours of this layout will be defined
+ * by the [measurePolicy] instance. See [MeasurePolicy] for more details.
+ *
+ * For a composable able to define its content according to the incoming constraints,
+ * see [androidx.compose.foundation.layout.BoxWithConstraints].
+ *
+ * Example usage:
+ * @sample androidx.compose.ui.samples.LayoutUsage
+ *
+ * Example usage with custom intrinsic measurements:
+ * @sample androidx.compose.ui.samples.LayoutWithProvidedIntrinsicsUsage
+ *
+ * @param modifier Modifiers to be applied to the layout.
+ * @param measurePolicy The policy defining the measurement and positioning of the layout.
+ *
+ * @see Layout
+ * @see MeasurePolicy
+ * @see androidx.compose.foundation.layout.BoxWithConstraints
+ */
+@Suppress("NOTHING_TO_INLINE")
+@Composable inline fun Layout(
+    modifier: Modifier = Modifier,
+    measurePolicy: MeasurePolicy
+) {
+    val density = LocalDensity.current
+    val layoutDirection = LocalLayoutDirection.current
+    val viewConfiguration = LocalViewConfiguration.current
+    val materialized = currentComposer.materialize(modifier)
+    ReusableComposeNode<ComposeUiNode, Applier<Any>>(
+        factory = ComposeUiNode.Constructor,
+        update = {
+            set(measurePolicy, ComposeUiNode.SetMeasurePolicy)
+            set(density, ComposeUiNode.SetDensity)
+            set(layoutDirection, ComposeUiNode.SetLayoutDirection)
+            set(viewConfiguration, ComposeUiNode.SetViewConfiguration)
+            set(materialized, ComposeUiNode.SetModifier)
+        },
+    )
+}
+
 @Suppress("ComposableLambdaParameterPosition")
 @Composable
 @Deprecated(

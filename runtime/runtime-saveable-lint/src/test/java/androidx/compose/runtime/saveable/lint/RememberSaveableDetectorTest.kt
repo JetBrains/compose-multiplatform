@@ -162,7 +162,7 @@ class RememberSaveableDetectorTest : LintDetectorTest() {
             ),
             rememberSaveableStub,
             Stubs.Composable,
-            Stubs.MutableState
+            Stubs.SnapshotState
         )
             .run()
             .expect(
@@ -276,7 +276,7 @@ Fix for src/test/Foo.kt line 22: Change to `stateSaver = fooSaver4`:
             ),
             rememberSaveableStub,
             Stubs.Composable,
-            Stubs.MutableState
+            Stubs.SnapshotState
         )
             .run()
             .expectClean()

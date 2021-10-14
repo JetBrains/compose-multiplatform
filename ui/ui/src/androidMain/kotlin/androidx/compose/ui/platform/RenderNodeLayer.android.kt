@@ -19,7 +19,6 @@ package androidx.compose.ui.platform
 import android.os.Build
 import android.view.View
 import androidx.annotation.RequiresApi
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -42,9 +41,12 @@ import androidx.compose.ui.unit.LayoutDirection
 @RequiresApi(Build.VERSION_CODES.M)
 internal class RenderNodeLayer(
     val ownerView: AndroidComposeView,
-    val drawBlock: (Canvas) -> Unit,
-    val invalidateParentLayer: () -> Unit
+    drawBlock: (Canvas) -> Unit,
+    invalidateParentLayer: () -> Unit
 ) : OwnedLayer {
+    private var drawBlock: ((Canvas) -> Unit)? = drawBlock
+    private var invalidateParentLayer: (() -> Unit)? = invalidateParentLayer
+
     /**
      * True when the RenderNodeLayer has been invalidated and not yet drawn.
      */
@@ -79,7 +81,6 @@ internal class RenderNodeLayer(
     override val layerId: Long
         get() = renderNode.uniqueId
 
-    @ExperimentalComposeUiApi
     override val ownerViewId: Long
         get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             UniqueDrawingIdApi29.getUniqueDrawingId(ownerView)
@@ -147,7 +148,7 @@ internal class RenderNodeLayer(
             triggerRepaint()
         }
         if (!drawnWithZ && renderNode.elevation > 0f) {
-            invalidateParentLayer()
+            invalidateParentLayer?.invoke()
         }
         matrixCache.invalidate()
     }
@@ -232,7 +233,7 @@ internal class RenderNodeLayer(
                 canvas.disableZ()
             }
         } else {
-            drawBlock(canvas)
+            drawBlock?.invoke(canvas)
             isDirty = false
         }
     }
@@ -241,14 +242,20 @@ internal class RenderNodeLayer(
         if (isDirty || !renderNode.hasDisplayList) {
             isDirty = false
             val clipPath = if (renderNode.clipToOutline) outlineResolver.clipPath else null
-            renderNode.record(canvasHolder, clipPath, drawBlock)
+            renderNode.record(canvasHolder, clipPath, drawBlock!!)
         }
     }
 
     override fun destroy() {
+        if (renderNode.hasDisplayList) {
+            renderNode.discardDisplayList()
+        }
+        drawBlock = null
+        invalidateParentLayer = null
         isDestroyed = true
         isDirty = false
         ownerView.requestClearInvalidObservations()
+        ownerView.recycle(this)
     }
 
     override fun mapOffset(point: Offset, inverse: Boolean): Offset {
@@ -270,6 +277,15 @@ internal class RenderNodeLayer(
         } else {
             matrixCache.calculateMatrix(renderNode).map(rect)
         }
+    }
+
+    override fun reuseLayer(drawBlock: (Canvas) -> Unit, invalidateParentLayer: () -> Unit) {
+        isDirty = false
+        isDestroyed = false
+        drawnWithZ = false
+        transformOrigin = TransformOrigin.Center
+        this.drawBlock = drawBlock
+        this.invalidateParentLayer = invalidateParentLayer
     }
 
     companion object {

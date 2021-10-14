@@ -97,9 +97,9 @@ fun ScaleEnterExitDemo() {
         }
         AnimatedVisibility(
             visible = showBlue,
-            enter = scaleIn(1.2f) +
+            enter = scaleIn(initialScale = 1.2f) +
                 slideInHorizontally(initialOffsetX = { (-it * 1.2f).toInt() }),
-            exit = scaleOut(2f) +
+            exit = scaleOut(targetScale = 2f) +
                 slideOutHorizontally(targetOffsetX = { -2 * it })
         ) {
             Box(Modifier.size(100.dp).background(Color.Blue, shape = RoundedCornerShape(20.dp)))

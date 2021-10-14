@@ -16,14 +16,18 @@
 
 package androidx.compose.ui.window
 
+import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.Snapshot
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withTimeout
@@ -103,6 +107,7 @@ internal class WindowTestScope(
     private val useDelay: Boolean
 ) : CoroutineScope by CoroutineScope(scope.coroutineContext + Job()) {
     var isOpen by mutableStateOf(true)
+    private val initialRecomposers = Recomposer.runningRecomposers.value
 
     fun exitApplication() {
         isOpen = false
@@ -121,6 +126,11 @@ internal class WindowTestScope(
         // after fourth yield()
         repeat(100) {
             yield()
+        }
+
+        Snapshot.sendApplyNotifications()
+        for (recomposerInfo in Recomposer.runningRecomposers.value - initialRecomposers) {
+            recomposerInfo.state.takeWhile { it > Recomposer.State.Idle }.collect()
         }
     }
 }

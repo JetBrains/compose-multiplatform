@@ -16,37 +16,19 @@
 
 package androidx.compose.ui.semantics
 
-import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.layout.boundsInRoot
-import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.findRoot
-import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.DelegatingLayoutNodeWrapper
 import androidx.compose.ui.node.HitTestResult
 import androidx.compose.ui.node.LayoutNodeWrapper
-import androidx.compose.ui.node.requireOwner
-import androidx.compose.ui.unit.toSize
 
 internal class SemanticsWrapper(
     wrapped: LayoutNodeWrapper,
     semanticsModifier: SemanticsModifier
 ) : DelegatingLayoutNodeWrapper<SemanticsModifier>(wrapped, semanticsModifier) {
-    val semanticsSize: Size
-        get() {
-            val measuredSize = measuredSize
-            if (!useMinimumTouchTarget) {
-                return measuredSize.toSize()
-            }
-            val minTouchTargetSize = minimumTouchTargetSize
-            val width = maxOf(measuredSize.width.toFloat(), minTouchTargetSize.width)
-            val height = maxOf(measuredSize.height.toFloat(), minTouchTargetSize.height)
-            return Size(width, height)
-        }
-
     private val useMinimumTouchTarget: Boolean
         get() = modifier.semanticsConfiguration.getOrNull(SemanticsActions.OnClick) != null
 
@@ -82,7 +64,9 @@ internal class SemanticsWrapper(
         hitTestInMinimumTouchTarget(
             pointerPosition,
             hitSemanticsWrappers,
-            this
+            forceParentIntercept = false,
+            useTouchSize = true,
+            content = this
         ) {
             // Also, keep looking to see if we also might hit any children.
             // This avoids checking layer bounds twice as when we call super.hitTest()
@@ -91,53 +75,14 @@ internal class SemanticsWrapper(
         }
     }
 
-    fun semanticsPositionInRoot(): Offset {
-        if (!useMinimumTouchTarget) {
-            return positionInRoot()
+    fun touchBoundsInRoot(): Rect {
+        if (!isAttached) {
+            return Rect.Zero
         }
-        check(isAttached) { ExpectAttachedLayoutCoordinates }
-        val root = findRoot()
-
-        val padding = calculateMinimumTouchTargetPadding(minimumTouchTargetSize)
-        val left = -padding.width
-        val top = -padding.height
-
-        return root.localPositionOf(this, Offset(left, top))
-    }
-
-    fun semanticsPositionInWindow(): Offset {
-        val positionInRoot = semanticsPositionInRoot()
-        return layoutNode.requireOwner().calculatePositionInWindow(positionInRoot)
-    }
-
-    fun semanticsBoundsInRoot(): Rect {
         if (!useMinimumTouchTarget) {
             return boundsInRoot()
         }
-        return calculateBoundsInRoot().toRect()
-    }
 
-    fun semanticsBoundsInWindow(): Rect {
-        if (!useMinimumTouchTarget) {
-            return boundsInWindow()
-        }
-        val bounds = calculateBoundsInRoot()
-
-        val root = findRoot()
-        val topLeft = root.localToWindow(Offset(bounds.left, bounds.top))
-        val topRight = root.localToWindow(Offset(bounds.right, bounds.top))
-        val bottomRight = root.localToWindow(Offset(bounds.right, bounds.bottom))
-        val bottomLeft = root.localToWindow(Offset(bounds.left, bounds.bottom))
-        val left = minOf(topLeft.x, topRight.x, bottomLeft.x, bottomRight.x)
-        val top = minOf(topLeft.y, topRight.y, bottomLeft.y, bottomRight.y)
-        val right = maxOf(topLeft.x, topRight.x, bottomLeft.x, bottomRight.x)
-        val bottom = maxOf(topLeft.y, topRight.y, bottomLeft.y, bottomRight.y)
-
-        return Rect(left, top, right, bottom)
-    }
-
-    private fun calculateBoundsInRoot(): MutableRect {
-        check(isAttached) { ExpectAttachedLayoutCoordinates }
         val root = findRoot()
 
         val bounds = rectCache
@@ -149,14 +94,13 @@ internal class SemanticsWrapper(
 
         var wrapper: LayoutNodeWrapper = this
         while (wrapper !== root) {
-            wrapper.rectInParent(bounds, true)
+            wrapper.rectInParent(bounds, clipBounds = false, clipToMinimumTouchTargetSize = true)
             if (bounds.isEmpty) {
-                bounds.set(0f, 0f, 0f, 0f)
-                return bounds
+                return Rect.Zero
             }
 
             wrapper = wrapper.wrappedBy!!
         }
-        return bounds
+        return bounds.toRect()
     }
 }

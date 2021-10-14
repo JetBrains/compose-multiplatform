@@ -331,7 +331,7 @@ class SnackbarTest {
         )
 
         snackbar
-            .assertHeightIsEqualTo(8.dp + buttonBounds.top + buttonBounds.height)
+            .assertHeightIsEqualTo(2.dp + buttonBounds.top + buttonBounds.height)
             .assertWidthIsEqualTo(8.dp + buttonBounds.left + buttonBounds.width)
     }
 

@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.Density
 /**
  * A [Modifier] that provides data to the parent [Layout]. This can be read from within the
  * the [Layout] during measurement and positioning, via [IntrinsicMeasurable.parentData].
- * Th parent data is commonly used to inform the parent how the child [Layout] should be measured
+ * The parent data is commonly used to inform the parent how the child [Layout] should be measured
  * and positioned.
  */
 interface ParentDataModifier : Modifier.Element {

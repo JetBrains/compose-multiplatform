@@ -42,9 +42,9 @@ dependencies {
 }
 
 androidx {
-    name = "AndroidX Compose UI Material Design Components Samples"
+    name = "AndroidX Compose Material Components Samples"
     type = LibraryType.SAMPLES
     mavenGroup = LibraryGroups.Compose.MATERIAL
     inceptionYear = "2019"
-    description = "Contains the sample code for the Androidx Compose UI Material Design Components"
+    description = "Contains the sample code for the AndroidX Compose Material components."
 }

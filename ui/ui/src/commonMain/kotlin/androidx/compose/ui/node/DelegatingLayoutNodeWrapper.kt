@@ -74,7 +74,7 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
         hitTestResult: HitTestResult<PointerInputFilter>,
         isTouchEvent: Boolean
     ) {
-        if (withinLayerBounds(pointerPosition)) {
+        if (withinLayerBounds(pointerPosition, isTouchEvent)) {
             val positionInWrapped = wrapped.fromParentPosition(pointerPosition)
             wrapped.hitTest(positionInWrapped, hitTestResult, isTouchEvent)
         }
@@ -84,7 +84,7 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
         pointerPosition: Offset,
         hitSemanticsWrappers: HitTestResult<SemanticsWrapper>
     ) {
-        if (withinLayerBounds(pointerPosition)) {
+        if (withinLayerBounds(pointerPosition, true)) {
             val positionInWrapped = wrapped.fromParentPosition(pointerPosition)
             wrapped.hitTestSemantics(positionInWrapped, hitSemanticsWrappers)
         }
@@ -131,16 +131,18 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
 
     override fun findPreviousFocusWrapper() = wrappedBy?.findPreviousFocusWrapper()
 
-    override fun findNextFocusWrapper() = wrapped.findNextFocusWrapper()
+    override fun findNextFocusWrapper(excludeDeactivated: Boolean): ModifiedFocusNode? {
+        return wrapped.findNextFocusWrapper(excludeDeactivated)
+    }
 
     override fun findLastFocusWrapper(): ModifiedFocusNode? {
         var lastFocusWrapper: ModifiedFocusNode? = null
 
         // Find last focus wrapper for the current layout node.
-        var next: ModifiedFocusNode? = findNextFocusWrapper()
+        var next: ModifiedFocusNode? = findNextFocusWrapper(excludeDeactivated = false)
         while (next != null) {
             lastFocusWrapper = next
-            next = next.wrapped.findNextFocusWrapper()
+            next = next.wrapped.findNextFocusWrapper(excludeDeactivated = false)
         }
         return lastFocusWrapper
     }
@@ -168,15 +170,6 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
 
     override val parentData: Any? get() = wrapped.parentData
 
-    private fun offsetFromEdge(pointerPosition: Offset): Offset {
-        val x = pointerPosition.x
-        val horizontal = maxOf(0f, if (x < 0) -x else x - measuredWidth)
-        val y = pointerPosition.y
-        val vertical = maxOf(0f, if (y < 0) -y else y - measuredHeight)
-
-        return Offset(horizontal, vertical)
-    }
-
     /**
      * Returns the additional amount on the horizontal and vertical dimensions that
      * this extends beyond [width] and [height] on all sides. This takes into account
@@ -191,16 +184,18 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
     /**
      * Does a hit test, adding [content] as a [HitTestResult.hit] or
      * [HitTestResult.hitInMinimumTouchTarget] depending on whether or not it hit
-     * or hit in the [minimumTouchTargetSize] area. The newly-created [HitTestResult] is returned
+     * or hit in the minimum touch target size area. The newly-created [HitTestResult] is returned
      * if there was a hit or `null` is returned if it missed.
      */
     protected fun <T> hitTestInMinimumTouchTarget(
         pointerPosition: Offset,
         hitTestResult: HitTestResult<T>,
+        forceParentIntercept: Boolean,
+        useTouchSize: Boolean,
         content: T,
         block: () -> Unit
     ) {
-        if (!withinLayerBounds(pointerPosition)) {
+        if (!withinLayerBounds(pointerPosition, useTouchSize)) {
             return
         }
         if (isPointerInBounds(pointerPosition)) {
@@ -208,26 +203,20 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
         } else {
             val offsetFromEdge = offsetFromEdge(pointerPosition)
             val distanceFromEdge = maxOf(offsetFromEdge.x, offsetFromEdge.y)
-            val minimumTouchTargetSize = minimumTouchTargetSize
 
-            if (offsetFromEdge.x >= minimumTouchTargetSize.width / 2f ||
-                offsetFromEdge.y >= minimumTouchTargetSize.height / 2f ||
-                !hitTestResult.isHitInMinimumTouchTargetBetter(distanceFromEdge)
+            if (useTouchSize && isHitInMinimumTouchTarget(offsetFromEdge, minimumTouchTargetSize) &&
+                hitTestResult.isHitInMinimumTouchTargetBetter(distanceFromEdge)
             ) {
-                return // complete miss or the other hit was better
-            }
-
-            if (isHitInMinimumTouchTarget(offsetFromEdge, minimumTouchTargetSize)) {
-                // This was definitely closer than any other target and hit this
+                // Hit closer than existing handlers, so just record it
                 hitTestResult.hitInMinimumTouchTarget(content, distanceFromEdge, block)
-            } else {
-                // We have to consider anything that may be within the minimum touch target
-                // in case a child is within the minimum touch target. For example, a
-                // switch may have a thumb to one side. The switch's width may preclude
-                // it from receiving minimum touch target special treatment, but the thumb
-                // may be small enough to receive a minimum touch target outside the bounds
-                // of the switch.
+            }
+            if (forceParentIntercept) {
+                // We only want to replace the existing touch target if there are better
+                // hits in the children
                 hitTestResult.speculativeHit(content, distanceFromEdge, block)
+            } else {
+                // The parent wasn't hit, but the child may be.
+                block()
             }
         }
     }
@@ -236,7 +225,8 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
         offsetFromEdge: Offset,
         minimumTouchTargetSize: Size
     ): Boolean {
-        val touchPadding = calculateMinimumTouchTargetPadding(minimumTouchTargetSize)
-        return offsetFromEdge.x < touchPadding.width && offsetFromEdge.y < touchPadding.height
+        val (width, height) = calculateMinimumTouchTargetPadding(minimumTouchTargetSize)
+        return (width > 0f || height > 0f) &&
+            offsetFromEdge.x <= width && offsetFromEdge.y <= height
     }
 }

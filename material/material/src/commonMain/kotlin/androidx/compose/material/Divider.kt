@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -35,7 +36,8 @@ import androidx.compose.ui.unit.dp
  * ![Dividers image](https://developer.android.com/images/reference/androidx/compose/material/dividers.png)
  *
  * @param color color of the divider line
- * @param thickness thickness of the divider line, 1 dp is used by default
+ * @param thickness thickness of the divider line, 1 dp is used by default. Using [Dp.Hairline]
+ * will produce a single pixel divider regardless of screen density.
  * @param startIndent start offset of this line, no offset by default
  */
 @Composable
@@ -50,10 +52,15 @@ fun Divider(
     } else {
         Modifier
     }
+    val targetThickness = if (thickness == Dp.Hairline) {
+        (1f / LocalDensity.current.density).dp
+    } else {
+        thickness
+    }
     Box(
         modifier.then(indentMod)
             .fillMaxWidth()
-            .height(thickness)
+            .height(targetThickness)
             .background(color = color)
     )
 }

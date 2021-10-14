@@ -23,8 +23,11 @@ import java.awt.im.InputMethodRequests
 internal interface DesktopComponent : DesktopInputComponent
 
 internal object DummyDesktopComponent : DesktopComponent {
-    override fun enableInput(inputMethodRequests: InputMethodRequests) {}
-    override fun disableInput() {}
+    var enabledInput: InputMethodRequests? = null
+    override fun enableInput(inputMethodRequests: InputMethodRequests) {
+        enabledInput = inputMethodRequests
+    }
+    override fun disableInput() { enabledInput = null }
     override val locationOnScreen = Point(0, 0)
     override val density: Density
         get() = Density(1f, 1f)

@@ -51,6 +51,10 @@ package androidx.compose.foundation {
     method public static androidx.compose.ui.Modifier focusable(androidx.compose.ui.Modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource? interactionSource);
   }
 
+  public final class HoverableKt {
+    method public static androidx.compose.ui.Modifier hoverable(androidx.compose.ui.Modifier, androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional boolean enabled);
+  }
+
   public final class ImageKt {
     method @androidx.compose.runtime.Composable public static void Image(androidx.compose.ui.graphics.ImageBitmap bitmap, String? contentDescription, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.Alignment alignment, optional androidx.compose.ui.layout.ContentScale contentScale, optional float alpha, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional int filterQuality);
     method @androidx.compose.runtime.Composable public static void Image(androidx.compose.ui.graphics.vector.ImageVector imageVector, String? contentDescription, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.Alignment alignment, optional androidx.compose.ui.layout.ContentScale contentScale, optional float alpha, optional androidx.compose.ui.graphics.ColorFilter? colorFilter);
@@ -300,6 +304,23 @@ package androidx.compose.foundation.interaction {
     method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<java.lang.Boolean> collectIsFocusedAsState(androidx.compose.foundation.interaction.InteractionSource);
   }
 
+  public interface HoverInteraction extends androidx.compose.foundation.interaction.Interaction {
+  }
+
+  public static final class HoverInteraction.Enter implements androidx.compose.foundation.interaction.HoverInteraction {
+    ctor public HoverInteraction.Enter();
+  }
+
+  public static final class HoverInteraction.Exit implements androidx.compose.foundation.interaction.HoverInteraction {
+    ctor public HoverInteraction.Exit(androidx.compose.foundation.interaction.HoverInteraction.Enter enter);
+    method public androidx.compose.foundation.interaction.HoverInteraction.Enter getEnter();
+    property public final androidx.compose.foundation.interaction.HoverInteraction.Enter enter;
+  }
+
+  public final class HoverInteractionKt {
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<java.lang.Boolean> collectIsHoveredAsState(androidx.compose.foundation.interaction.InteractionSource);
+  }
+
   public interface Interaction {
   }
 
@@ -346,6 +367,9 @@ package androidx.compose.foundation.interaction {
 
 package androidx.compose.foundation.lazy {
 
+  public final class IntervalListKt {
+  }
+
   public final class LazyDslKt {
     method @androidx.compose.runtime.Composable public static void LazyColumn(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional boolean reverseLayout, optional androidx.compose.foundation.layout.Arrangement.Vertical verticalArrangement, optional androidx.compose.ui.Alignment.Horizontal horizontalAlignment, optional androidx.compose.foundation.gestures.FlingBehavior flingBehavior, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyListScope,kotlin.Unit> content);
     method @androidx.compose.runtime.Composable public static void LazyRow(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional boolean reverseLayout, optional androidx.compose.foundation.layout.Arrangement.Horizontal horizontalArrangement, optional androidx.compose.ui.Alignment.Vertical verticalAlignment, optional androidx.compose.foundation.gestures.FlingBehavior flingBehavior, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyListScope,kotlin.Unit> content);
@@ -367,9 +391,6 @@ package androidx.compose.foundation.lazy {
   public final class LazyListHeadersKt {
   }
 
-  public final class LazyListItemContentFactoryKt {
-  }
-
   public interface LazyListItemInfo {
     method public int getIndex();
     method public Object getKey();
@@ -379,6 +400,9 @@ package androidx.compose.foundation.lazy {
     property public abstract Object key;
     property public abstract int offset;
     property public abstract int size;
+  }
+
+  public final class LazyListItemsProviderImplKt {
   }
 
   public final class LazyListKt {
@@ -396,9 +420,6 @@ package androidx.compose.foundation.lazy {
   }
 
   public final class LazyListMeasureKt {
-  }
-
-  public final class LazyListPrefetcher_androidKt {
   }
 
   @androidx.compose.foundation.lazy.LazyScopeMarker public interface LazyListScope {
@@ -444,6 +465,25 @@ package androidx.compose.foundation.lazy {
   }
 
   public final class Lazy_androidKt {
+  }
+
+}
+
+package androidx.compose.foundation.lazy.layout {
+
+  public final class LazyLayoutItemContentFactoryKt {
+  }
+
+  public final class LazyLayoutKt {
+  }
+
+  public final class LazyLayoutPrefetchPolicyKt {
+  }
+
+  public final class LazyLayoutPrefetcher_androidKt {
+  }
+
+  public final class LazyLayoutStateKt {
   }
 
 }

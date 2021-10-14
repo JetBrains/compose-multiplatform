@@ -117,9 +117,6 @@ class MutableTransitionState<S>(initialState: S) {
      *
      * @sample androidx.compose.animation.core.samples.TransitionStateIsIdleSample
      */
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
-    @get:ExperimentalTransitionApi
-    @ExperimentalTransitionApi
     val isIdle: Boolean
         get() = (currentState == targetState) && !isRunning
 
@@ -439,14 +436,21 @@ class Transition<S> @PublishedApi internal constructor(
 
         // Changed during composition, may rollback
         private var targetValue: T by mutableStateOf(initialValue)
-        private var animationSpec: FiniteAnimationSpec<T> by mutableStateOf(spring())
 
-        private var animation: TargetBasedAnimation<T, V> by mutableStateOf(
+        @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+        @get:InternalAnimationApi
+        var animationSpec: FiniteAnimationSpec<T> by mutableStateOf(spring())
+            private set
+
+        @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+        @get:InternalAnimationApi
+        var animation: TargetBasedAnimation<T, V> by mutableStateOf(
             TargetBasedAnimation(
                 animationSpec, typeConverter, initialValue, targetValue,
                 initialVelocityVector
             )
         )
+            private set
         internal var isFinished: Boolean by mutableStateOf(true)
         private var offsetTimeNanos by mutableStateOf(0L)
         private var needsReset by mutableStateOf(false)

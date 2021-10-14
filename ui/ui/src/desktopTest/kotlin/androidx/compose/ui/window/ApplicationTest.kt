@@ -20,7 +20,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MonotonicFrameClock
+import androidx.compose.runtime.monotonicFrameClock
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -28,6 +31,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CompletableDeferred
@@ -84,7 +88,7 @@ class ApplicationTest {
                 Window(
                     onCloseRequest = {},
                     state = rememberWindowState(
-                        size = WindowSize(600.dp, 600.dp),
+                        size = DpSize(600.dp, 600.dp),
                     )
                 ) {
                     window1 = this.window
@@ -98,7 +102,7 @@ class ApplicationTest {
                 Window(
                     onCloseRequest = {},
                     state = rememberWindowState(
-                        size = WindowSize(300.dp, 300.dp),
+                        size = DpSize(300.dp, 300.dp),
                     )
                 ) {
                     window2 = this.window
@@ -120,5 +124,31 @@ class ApplicationTest {
         awaitIdle()
         assertThat(window1?.isShowing).isFalse()
         assertThat(window2?.isShowing).isFalse()
+    }
+
+    @OptIn(ExperimentalComposeApi::class)
+    @Test
+    fun `window shouldn't use MonotonicFrameClock from application context`() = runApplicationTest {
+        lateinit var appClock: MonotonicFrameClock
+        lateinit var windowClock: MonotonicFrameClock
+
+        launchApplication {
+            LaunchedEffect(Unit) {
+                appClock = coroutineContext.monotonicFrameClock
+            }
+
+            Window(
+                onCloseRequest = {}
+            ) {
+                LaunchedEffect(Unit) {
+                    windowClock = coroutineContext.monotonicFrameClock
+                }
+            }
+        }
+
+        awaitIdle()
+        assertThat(windowClock).isNotEqualTo(appClock)
+
+        exitApplication()
     }
 }

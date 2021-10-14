@@ -885,16 +885,15 @@ interface Composer {
     fun endProviders()
 
     /**
-     * A Compose internal function. DO NOT call directly.
+     * A tooling API function. DO NOT call directly.
      *
      * The data stored for the composition. This is used by Compose tools, such as the preview and
      * the inspector, to display or interpret the result of composition.
      */
-    @InternalComposeApi
     val compositionData: CompositionData
 
     /**
-     * A Compose internal function. DO NOT call directly.
+     * A tooling API function. DO NOT call directly.
      *
      * Called by the inspector to inform the composer that it should collect additional
      * information about call parameters. By default, only collect parameter information for
@@ -904,7 +903,6 @@ interface Composer {
      * WARNING: calling this will result in a significant number of additional allocations that are
      * typically avoided.
      */
-    @InternalComposeApi
     fun collectParameterInformation()
 
     /**
@@ -1128,7 +1126,7 @@ internal class ComposerImpl(
      */
     @ComposeCompilerApi
     @Suppress("unused")
-    override fun startDefaults() = start(0, null, false, null)
+    override fun startDefaults() = start(defaultsKey, null, false, null)
 
     /**
      *
@@ -1289,7 +1287,6 @@ internal class ComposerImpl(
      * Start collecting parameter information. This enables the tools API to always be able to
      * determine the parameter values of composable calls.
      */
-    @InternalComposeApi
     override fun collectParameterInformation() {
         collectParameterInformation = true
     }
@@ -1590,12 +1587,15 @@ internal class ComposerImpl(
             writer.update(value)
             if (value is RememberObserver) {
                 record { _, _, rememberManager -> rememberManager.remembering(value) }
+                abandonSet.add(value)
             }
         } else {
             val groupSlotIndex = reader.groupSlotIndex - 1
+            if (value is RememberObserver) {
+                abandonSet.add(value)
+            }
             recordSlotTableOperation(forParent = true) { _, slots, rememberManager ->
                 if (value is RememberObserver) {
-                    abandonSet.add(value)
                     rememberManager.remembering(value)
                 }
                 when (val previous = slots.set(groupSlotIndex, value)) {
@@ -1621,13 +1621,9 @@ internal class ComposerImpl(
     @PublishedApi
     @OptIn(InternalComposeApi::class)
     internal fun updateCachedValue(value: Any?) {
-        if (inserting && value is RememberObserver) {
-            abandonSet.add(value)
-        }
         updateValue(value)
     }
 
-    @InternalComposeApi
     override val compositionData: CompositionData get() = slotTable
 
     /**
@@ -2571,7 +2567,7 @@ internal class ComposerImpl(
             isComposing = true
             try {
                 startRoot()
-                // Ignore reads of derivedStatOf recalculations
+                // Ignore reads of derivedStateOf recalculations
                 observeDerivedStateRecalculations(
                     start = {
                         childrenComposing++
@@ -3413,6 +3409,9 @@ private const val nodeKey = 125
 
 // An arbitrary key value for a node used to force the node to be replaced.
 private const val nodeKeyReplace = 126
+
+// An arbitrary key value for a node used to force the node to be replaced.
+private const val defaultsKey = -127
 
 @PublishedApi
 internal const val invocationKey = 200

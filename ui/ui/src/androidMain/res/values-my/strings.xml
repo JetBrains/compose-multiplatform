@@ -26,6 +26,7 @@
     <string name="in_progress" msgid="6827826412747255547">"ဆောင်ရွက်နေဆဲ"</string>
     <string name="tab" msgid="1672349317127674378">"တဘ်"</string>
     <string name="navigation_menu" msgid="542007171693138492">"လမ်းညွှန် မီနူး"</string>
+    <string name="dropdown_menu" msgid="1890207353314751437">"ဆွဲချမီနူး"</string>
     <string name="close_drawer" msgid="406453423630273620">"လမ်းညွှန် မီနူး ပိတ်ရန်"</string>
     <string name="close_sheet" msgid="7573152094250666567">"စာမျက်နှာ ပိတ်ရန်"</string>
     <string name="default_error_message" msgid="8038256446254964252">"ထည့်သွင်းမှု မမှန်ကန်ပါ"</string>

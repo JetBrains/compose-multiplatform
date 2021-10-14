@@ -21,13 +21,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredHeightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.requiredWidthIn
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -37,7 +37,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
@@ -47,22 +46,28 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertHeightIsAtLeast
+import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsEqualTo
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertTouchHeightIsEqualTo
+import androidx.compose.ui.test.assertTouchWidthIsEqualTo
+import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
@@ -210,7 +215,7 @@ class ButtonTest {
             return
         }
         rule.setMaterialContent {
-            Button(modifier = Modifier.clipToBounds(), onClick = {}) {
+            Button(onClick = {}) {
                 Text("Test button")
             }
         }
@@ -358,28 +363,23 @@ class ButtonTest {
     fun containedButtonDisabledBackgroundIsCorrect() {
         var surface = Color.Transparent
         var onSurface = Color.Transparent
-        val padding = 8.dp
         rule.setMaterialContent {
             surface = MaterialTheme.colors.surface
             onSurface = MaterialTheme.colors.onSurface
-            Box(Modifier.testTag("myButton")) {
-                // stack allows to verify there is no shadow
-                Box(Modifier.padding(padding)) {
-                    Button(
-                        onClick = {},
-                        enabled = false,
-                        shape = RectangleShape
-                    ) {}
-                }
-            }
+            Button(
+                modifier = Modifier.testTag("myButton"),
+                onClick = {},
+                enabled = false,
+                shape = RectangleShape
+            ) {}
         }
 
         rule.onNodeWithTag("myButton")
             .captureToImage()
             .assertShape(
                 density = rule.density,
-                horizontalPadding = padding,
-                verticalPadding = padding,
+                horizontalPadding = 0.dp,
+                verticalPadding = 0.dp,
                 backgroundColor = surface,
                 shapeColor = onSurface.copy(alpha = 0.12f).compositeOver(surface)
             )
@@ -391,31 +391,26 @@ class ButtonTest {
     fun containedButtonWithCustomColorDisabledBackgroundIsCorrect() {
         var surface = Color.Transparent
         var onSurface = Color.Transparent
-        val padding = 8.dp
         rule.setMaterialContent {
             surface = MaterialTheme.colors.surface
             onSurface = MaterialTheme.colors.onSurface
-            Box(Modifier.testTag("myButton")) {
-                // stack allows to verify there is no shadow
-                Box(Modifier.padding(padding)) {
-                    Button(
-                        onClick = {},
-                        enabled = false,
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color.Red
-                        ),
-                        shape = RectangleShape
-                    ) {}
-                }
-            }
+            Button(
+                modifier = Modifier.testTag("myButton"),
+                onClick = {},
+                enabled = false,
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.Red
+                ),
+                shape = RectangleShape
+            ) {}
         }
 
         rule.onNodeWithTag("myButton")
             .captureToImage()
             .assertShape(
                 density = rule.density,
-                horizontalPadding = padding,
-                verticalPadding = padding,
+                horizontalPadding = 0.dp,
+                verticalPadding = 0.dp,
                 backgroundColor = surface,
                 shapeColor = onSurface.copy(alpha = 0.12f).compositeOver(surface)
             )
@@ -426,25 +421,23 @@ class ButtonTest {
     @LargeTest
     fun outlinedButtonDisabledBackgroundIsCorrect() {
         var surface = Color.Transparent
-        val padding = 8.dp
         rule.setMaterialContent {
             surface = MaterialTheme.colors.surface
-            // stack allows to verify there is no shadow
-            Box(Modifier.padding(padding)) {
-                OutlinedButton(
-                    modifier = Modifier.testTag("myButton"),
-                    onClick = {},
-                    enabled = false,
-                    shape = RectangleShape,
-                    border = null
-                ) {}
-            }
+            OutlinedButton(
+                modifier = Modifier.testTag("myButton"),
+                onClick = {},
+                enabled = false,
+                shape = RectangleShape,
+                border = null
+            ) {}
         }
 
         rule.onNodeWithTag("myButton")
             .captureToImage()
             .assertShape(
                 density = rule.density,
+                horizontalPadding = 0.dp,
+                verticalPadding = 0.dp,
                 shape = RectangleShape,
                 shapeColor = surface,
                 backgroundColor = surface
@@ -458,21 +451,20 @@ class ButtonTest {
         var surface = Color.Transparent
         rule.setMaterialContent {
             surface = MaterialTheme.colors.surface
-            // stack allows to verify there is no shadow
-            Box(Modifier.padding(8.dp)) {
-                TextButton(
-                    modifier = Modifier.testTag("myButton"),
-                    onClick = {},
-                    enabled = false,
-                    shape = RectangleShape
-                ) {}
-            }
+            TextButton(
+                modifier = Modifier.testTag("myButton"),
+                onClick = {},
+                enabled = false,
+                shape = RectangleShape
+            ) {}
         }
 
         rule.onNodeWithTag("myButton")
             .captureToImage()
             .assertShape(
                 density = rule.density,
+                horizontalPadding = 0.dp,
+                verticalPadding = 0.dp,
                 shape = RectangleShape,
                 shapeColor = surface,
                 backgroundColor = surface
@@ -634,6 +626,33 @@ class ButtonTest {
         assertThat(item2Bounds.center.y).isWithin(1f).of(buttonBounds.center.y)
         assertThat(item1Bounds.right).isWithin(1f).of(buttonBounds.center.x)
         assertThat(item2Bounds.left).isWithin(1f).of(buttonBounds.center.x)
+    }
+
+    @Test
+    fun buttonClickableInMinimumTouchTarget() {
+        var clicked = false
+        val tag = "button"
+        rule.setMaterialContent {
+            Box(Modifier.fillMaxSize()) {
+                Button(
+                    modifier = Modifier.testTag(tag).requiredSize(10.dp),
+                    onClick = { clicked = !clicked }
+                ) {
+                    Box(Modifier.size(10.dp))
+                }
+            }
+        }
+
+        rule.onNodeWithTag(tag)
+            .assertWidthIsEqualTo(10.dp)
+            .assertHeightIsEqualTo(10.dp)
+            .assertTouchWidthIsEqualTo(48.dp)
+            .assertTouchHeightIsEqualTo(48.dp)
+            .performTouchInput {
+                click(Offset(-1f, -1f))
+            }
+
+        assertThat(clicked).isTrue()
     }
 
     private fun assertLeftPaddingIs(

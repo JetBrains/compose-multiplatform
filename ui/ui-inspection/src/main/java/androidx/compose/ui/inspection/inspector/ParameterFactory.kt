@@ -858,11 +858,7 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
 
         private fun unwrap(value: Modifier): List<Modifier.Element> {
             val collector = ModifierCollector()
-            value.foldIn(collector) { acc, m ->
-                acc.apply {
-                    add(m)
-                }
-            }
+            value.foldIn(collector) { acc, m -> acc.apply { add(m) } }
             return collector.modifiers
         }
 
@@ -942,16 +938,14 @@ internal class ParameterFactory(private val inlineClassConverter: InlineClassCon
 
     private class ModifierCollector {
         val modifiers = mutableListOf<Modifier.Element>()
-        private var ignoreCount = 0
+        var start: InspectableModifier? = null
 
-        fun add(element: Modifier.Element) {
-            if (ignoreCount > 0) {
-                ignoreCount--
-            } else {
+        fun add(element: Modifier.Element) = when {
+            element == start?.end -> start = null
+            start != null -> {}
+            else -> {
                 modifiers.add(element)
-                if (element is InspectableModifier) {
-                    ignoreCount = element.wrapped.foldIn(0) { count, _ -> count + 1 }
-                }
+                start = element as? InspectableModifier
             }
         }
     }

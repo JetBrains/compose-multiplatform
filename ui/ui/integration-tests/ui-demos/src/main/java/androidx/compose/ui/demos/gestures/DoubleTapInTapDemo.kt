@@ -64,14 +64,12 @@ fun DoubleTapInTapDemo() {
         )
         Box(
             Modifier
-
                 .fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .size(192.dp)
                 .pointerInput(Unit) { detectTapGestures(onTap = onTap) }
                 .border(2.dp, BorderColor)
                 .background(color = outerColor.value)
-
                 .fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .size(96.dp)

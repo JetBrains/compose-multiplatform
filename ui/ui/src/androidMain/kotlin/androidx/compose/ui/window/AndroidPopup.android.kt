@@ -28,6 +28,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.View.MeasureSpec.makeMeasureSpec
 import android.view.ViewOutlineProvider
+import android.view.ViewTreeObserver
 import android.view.WindowManager
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
@@ -352,7 +353,6 @@ private inline fun SimpleStack(modifier: Modifier, noinline content: @Composable
  * @param composeView The parent view of the popup which is the AndroidComposeView.
  */
 @SuppressLint("ViewConstructor")
-@OptIn(ExperimentalComposeUiApi::class)
 private class PopupLayout(
     private var onDismissRequest: (() -> Unit)?,
     private var properties: PopupProperties,
@@ -361,7 +361,10 @@ private class PopupLayout(
     density: Density,
     initialPositionProvider: PopupPositionProvider,
     popupId: UUID
-) : AbstractComposeView(composeView.context), ViewRootForInspector {
+) : AbstractComposeView(composeView.context),
+    ViewRootForInspector,
+    ViewTreeObserver.OnGlobalLayoutListener,
+    View.OnAttachStateChangeListener {
     private val windowManager =
         composeView.context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private val params = createLayoutParams()
@@ -385,6 +388,12 @@ private class PopupLayout(
         PopupLayoutHelperImpl()
     }
 
+    // The window visible frame used for the last popup position calculation.
+    private val previousWindowVisibleFrame = Rect()
+    private val tmpWindowVisibleFrame = Rect()
+    // Whether the PopupLayout is currently listening to global layout changes.
+    private var isListeningToGlobalLayout = false
+
     override val subCompositionView: AbstractComposeView get() = this
 
     init {
@@ -392,6 +401,12 @@ private class PopupLayout(
         ViewTreeLifecycleOwner.set(this, ViewTreeLifecycleOwner.get(composeView))
         ViewTreeViewModelStoreOwner.set(this, ViewTreeViewModelStoreOwner.get(composeView))
         ViewTreeSavedStateRegistryOwner.set(this, ViewTreeSavedStateRegistryOwner.get(composeView))
+        // We are listening to composeView detach changes, in order to remove properly the
+        // global layout listener we add to its viewTreeObserver. We cannot just remove the
+        // listener in during popup's dismiss as this can happen only after the composeView was
+        // detached and no longer references the original viewTreeObserver.
+        composeView.addOnAttachStateChangeListener(this)
+        registerOnGlobalLayoutListener()
         // Set unique id for AbstractComposeView. This allows state restoration for the state
         // defined inside the Popup via rememberSaveable()
         setTag(R.id.compose_view_saveable_id_tag, "Popup:$popupId")
@@ -551,7 +566,7 @@ private class PopupLayout(
         val parentBounds = parentBounds ?: return
         val popupContentSize = popupContentSize ?: return
 
-        val windowSize = Rect().let {
+        val windowSize = previousWindowVisibleFrame.let {
             composeView.getWindowVisibleDisplayFrame(it)
             val bounds = it.toIntBounds()
             IntSize(width = bounds.width, height = bounds.height)
@@ -581,6 +596,8 @@ private class PopupLayout(
      */
     fun dismiss() {
         ViewTreeLifecycleOwner.set(this, null)
+        unregisterOnGlobalLayoutListener()
+        composeView.removeOnAttachStateChangeListener(this)
         windowManager.removeViewImmediate(this)
     }
 
@@ -666,6 +683,30 @@ private class PopupLayout(
         right = right,
         bottom = bottom
     )
+
+    override fun onViewAttachedToWindow(composeView: View) = registerOnGlobalLayoutListener()
+
+    override fun onViewDetachedFromWindow(composeView: View) = unregisterOnGlobalLayoutListener()
+
+    private fun registerOnGlobalLayoutListener() {
+        if (isListeningToGlobalLayout || !composeView.isAttachedToWindow) return
+        composeView.viewTreeObserver.addOnGlobalLayoutListener(this)
+        isListeningToGlobalLayout = true
+    }
+
+    private fun unregisterOnGlobalLayoutListener() {
+        if (!isListeningToGlobalLayout) return
+        composeView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+        isListeningToGlobalLayout = false
+    }
+
+    override fun onGlobalLayout() {
+        // Update the position of the popup, in case getWindowVisibleDisplayFrame has changed.
+        composeView.getWindowVisibleDisplayFrame(tmpWindowVisibleFrame)
+        if (tmpWindowVisibleFrame != previousWindowVisibleFrame) {
+            updatePosition()
+        }
+    }
 }
 
 private interface PopupLayoutHelper {

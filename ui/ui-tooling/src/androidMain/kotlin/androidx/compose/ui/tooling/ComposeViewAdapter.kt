@@ -48,17 +48,18 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalFontLoader
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.tooling.CommonPreviewUtils.invokeComposableViaReflection
+import androidx.compose.ui.tooling.animation.PreviewAnimationClock
 import androidx.compose.ui.tooling.data.Group
 import androidx.compose.ui.tooling.data.SourceLocation
 import androidx.compose.ui.tooling.data.UiToolingDataApi
 import androidx.compose.ui.tooling.data.asTree
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import androidx.compose.ui.tooling.animation.PreviewAnimationClock
 import androidx.compose.ui.unit.IntRect
 import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
@@ -325,6 +326,7 @@ internal class ComposeViewAdapter : FrameLayout {
 
         val slotTrees = slotTableRecord.store.map { it.asTree() }
         val transitions = mutableSetOf<Transition<Any>>()
+        val animatedVisibilityParentTransitions = mutableSetOf<Transition<Any>>()
         // Check all the slot tables, since some animations might not be present in the same
         // table as the one containing the `@Composable` being previewed, e.g. when they're
         // defined using sub-composition.
@@ -337,7 +339,7 @@ internal class ComposeViewAdapter : FrameLayout {
             )
             // Find `AnimatedVisibility` calls in the user code, i.e. when source location is
             // known. Then, find the underlying `updateTransition` it uses.
-            val animatedVisibilityParentTransitions =
+            animatedVisibilityParentTransitions.addAll(
                 tree.findAll {
                     it.name == "AnimatedVisibility" && it.location != null
                 }.mapNotNull {
@@ -345,15 +347,21 @@ internal class ComposeViewAdapter : FrameLayout {
                         updateTransitionCall.name == UPDATE_TRANSITION_FUNCTION_NAME
                     }
                 }.findTransitionObjects()
+            )
+
             // Remove all AnimatedVisibility parent transitions from the transitions list,
-            // otherwise we'd list them in the Animation Preview in Android Studio, but we don't
-            // support inspecting child transitions yet.
+            // otherwise we'd duplicate them in the Android Studio Animation Preview because we
+            // will track them separately.
             transitions.removeAll(animatedVisibilityParentTransitions)
         }
-        hasAnimations = transitions.isNotEmpty()
+
+        hasAnimations = transitions.isNotEmpty() || animatedVisibilityParentTransitions.isNotEmpty()
         // Make the `PreviewAnimationClock` track all the transitions found.
         if (::clock.isInitialized) {
             transitions.forEach { clock.trackTransition(it) }
+            animatedVisibilityParentTransitions.forEach {
+                clock.trackAnimatedVisibility(it)
+            }
         }
     }
 
@@ -621,6 +629,7 @@ internal class ComposeViewAdapter : FrameLayout {
         if (::clock.isInitialized) {
             clock.dispose()
         }
+        FakeViewModelStoreOwner.viewModelStore.clear()
     }
 
     /**
@@ -706,8 +715,10 @@ internal class ComposeViewAdapter : FrameLayout {
         override fun getLifecycle(): Lifecycle = lifecycle
     }
 
-    private val FakeViewModelStoreOwner = ViewModelStoreOwner {
-        throw IllegalStateException("ViewModels creation is not supported in Preview")
+    private val FakeViewModelStoreOwner = object : ViewModelStoreOwner {
+        private val viewModelStore = ViewModelStore()
+
+        override fun getViewModelStore() = viewModelStore
     }
 
     private val FakeOnBackPressedDispatcherOwner = object : OnBackPressedDispatcherOwner {

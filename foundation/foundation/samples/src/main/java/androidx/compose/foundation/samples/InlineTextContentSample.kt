@@ -43,7 +43,7 @@ fun InlineTextContentSample() {
 
     val inlineContent = mapOf(
         Pair(
-            // This tells the [CoreText] to replace the placeholder string "[myBox]" by
+            // This tells the [BasicText] to replace the placeholder string "[myBox]" by
             // the composable given in the [InlineTextContent] object.
             myId,
             InlineTextContent(

@@ -17,7 +17,6 @@
 package androidx.compose.ui.res
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.ColorFilter
@@ -26,38 +25,17 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.DrawCache
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
-import org.jetbrains.skija.Data
-import org.jetbrains.skija.Rect
-import org.jetbrains.skija.svg.SVGDOM
-import org.jetbrains.skija.svg.SVGLength
-import org.jetbrains.skija.svg.SVGLengthUnit
-import org.jetbrains.skija.svg.SVGPreserveAspectRatio
-import org.jetbrains.skija.svg.SVGPreserveAspectRatioAlign
+import org.jetbrains.skia.Data
+import org.jetbrains.skia.Rect
+import org.jetbrains.skia.svg.SVGDOM
+import org.jetbrains.skia.svg.SVGLength
+import org.jetbrains.skia.svg.SVGLengthUnit
+import org.jetbrains.skia.svg.SVGPreserveAspectRatio
+import org.jetbrains.skia.svg.SVGPreserveAspectRatioAlign
 import java.io.InputStream
 import kotlin.math.ceil
-
-/**
- * Synchronously load an SVG image stored in resources for the application.
- *
- * @param resourcePath path to the file in the resources folder
- * @return the decoded vector image associated with the resource
- */
-@Composable
-@Deprecated(
-    "Use painterResource(resourcePath)",
-    replaceWith = ReplaceWith("painterResource(resourcePath)")
-)
-fun svgResource(resourcePath: String): Painter {
-    val density = LocalDensity.current
-    return remember(resourcePath, density) {
-        useResource(resourcePath) {
-            loadSvgPainter(it, density)
-        }
-    }
-}
 
 /**
  * Synchronously load an SVG image from some [inputStream].
@@ -78,19 +56,6 @@ fun loadSvgPainter(
     return SVGPainter(SVGDOM(data), density)
 }
 
-/**
- * Synchronously load an SVG image from some [inputStream].
- *
- * In contrast to [svgResource] this function isn't [Composable]
- *
- * @param inputStream input stream to load an SVG image. All bytes will be read from this stream,
- *        but stream will not be closed after this method.
- * @return the decoded SVG image associated with the image
- */
-@Deprecated("Use loadSvg", replaceWith = ReplaceWith("loadSvgPainter(inputStream, density)"))
-fun loadSvgResource(inputStream: InputStream, density: Density): Painter =
-    loadSvgPainter(inputStream, density)
-
 private class SVGPainter(
     private val dom: SVGDOM,
     private val density: Density
@@ -109,7 +74,7 @@ private class SVGPainter(
 
     init {
         if (root?.viewBox == null && defaultSizePx.isSpecified) {
-            root?.setViewBox(Rect.makeXYWH(0f, 0f, defaultSizePx.width, defaultSizePx.height))
+            root?.viewBox = Rect.makeXYWH(0f, 0f, defaultSizePx.width, defaultSizePx.height)
         }
     }
 

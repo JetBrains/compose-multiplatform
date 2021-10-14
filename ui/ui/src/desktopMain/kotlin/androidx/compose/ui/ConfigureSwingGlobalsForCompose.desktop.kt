@@ -15,7 +15,7 @@
  */
 package androidx.compose.ui
 
-import org.jetbrains.skija.impl.Library
+import org.jetbrains.skia.impl.Library
 
 /**
  * Override global configuration for Swing that is needed for stand-alone Compose application.
@@ -34,9 +34,17 @@ import org.jetbrains.skija.impl.Library
  * Should be called before using any class from `java.swing.*`
  * (even before SwingUtilities.invokeLater or Dispatchers.Swing)
  */
-fun configureSwingGlobalsForCompose() {
-    System.setProperty("skiko.rendering.laf.global", "true")
-    System.setProperty("skiko.rendering.useScreenMenuBar", "true")
-    System.setProperty("skiko.linux.autodpi", "true")
+@ExperimentalComposeUiApi
+fun configureSwingGlobalsForCompose(
+    overrideLookAndFeel: Boolean =
+        System.getProperty("skiko.rendering.laf.global", "true") == "true",
+    useScreenMenuBarOnMacOs: Boolean =
+        System.getProperty("skiko.rendering.useScreenMenuBar", "true") == "true",
+    useAutoDpiOnLinux: Boolean =
+        System.getProperty("skiko.linux.autodpi", "true") == "true",
+) {
+    System.setProperty("skiko.rendering.laf.global", overrideLookAndFeel.toString())
+    System.setProperty("skiko.rendering.useScreenMenuBar", useScreenMenuBarOnMacOs.toString())
+    System.setProperty("skiko.linux.autodpi", useAutoDpiOnLinux.toString())
     Library.staticLoad()
 }

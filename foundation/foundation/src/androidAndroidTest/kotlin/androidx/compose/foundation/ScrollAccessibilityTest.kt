@@ -88,19 +88,23 @@ class ScrollAccessibilityTest(private val config: TestConfig) {
     private val scrollerTag = "ScrollerTest"
     private var composeView: View? = null
     private val accessibilityNodeProvider: AccessibilityNodeProvider
-        get() = ViewCompat
-            .getAccessibilityDelegate(composeView!!)!!
-            .getAccessibilityNodeProvider(composeView)
-            .provider as AccessibilityNodeProvider
+        get() = checkNotNull(composeView) {
+            "composeView not initialized. Did `composeView = LocalView.current` not work?"
+        }.let { composeView ->
+            ViewCompat
+                .getAccessibilityDelegate(composeView)!!
+                .getAccessibilityNodeProvider(composeView)
+                .provider as AccessibilityNodeProvider
+        }
 
     @Test
     fun scrollForward() {
-        testRelativeDirection(55, AccessibilityNodeInfoCompat.ACTION_SCROLL_FORWARD)
+        testScrollAction(55, AccessibilityNodeInfoCompat.ACTION_SCROLL_FORWARD)
     }
 
     @Test
     fun scrollBackward() {
-        testRelativeDirection(45, AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD)
+        testScrollAction(45, AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD)
     }
 
     @Test
@@ -121,20 +125,6 @@ class ScrollAccessibilityTest(private val config: TestConfig) {
     @Test
     fun scrollUp() {
         testAbsoluteDirection(45, android.R.id.accessibilityActionScrollUp, config.vertical)
-    }
-
-    /**
-     * Setup the test, run the given [accessibilityAction], and check if the [canonicalTarget]
-     * has been reached. The canonical target is the item that we expect to see when moving
-     * forward in a non-reversed scrollable (e.g. down in vertical orientation or right in
-     * horizontal orientation in LTR). The actual target is either the canonical target or the
-     * target that is as far from the middle of the scrollable as the canonical target, but on
-     * the other side of the middle. For testing relative directions, this mirroring is done if
-     * the scroll is [reversed][TestConfig.reversed].
-     */
-    private fun testRelativeDirection(canonicalTarget: Int, accessibilityAction: Int) {
-        val target = if (!config.reversed) canonicalTarget else 100 - canonicalTarget - 1
-        testScrollAction(target, accessibilityAction)
     }
 
     /**
@@ -169,7 +159,6 @@ class ScrollAccessibilityTest(private val config: TestConfig) {
         createScrollableContent_StartInMiddle()
         rule.onNodeWithText("$target").assertIsNotDisplayed()
 
-        waitForSubtreeEventToSend()
         val returnValue = rule.onNodeWithTag(scrollerTag).withSemanticsNode {
             accessibilityNodeProvider.performAction(id, accessibilityAction, null)
         }
@@ -231,12 +220,5 @@ class ScrollAccessibilityTest(private val config: TestConfig) {
 
     private fun <T> SemanticsNodeInteraction.withSemanticsNode(block: SemanticsNode.() -> T): T {
         return block.invoke(fetchSemanticsNode())
-    }
-
-    private fun waitForSubtreeEventToSend() {
-        // When the subtree events are sent, we will also update our previousSemanticsNodes,
-        // which will affect our next accessibility events from semantics tree comparison.
-        rule.mainClock.advanceTimeBy(1000)
-        rule.waitForIdle()
     }
 }

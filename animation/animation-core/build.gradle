@@ -61,6 +61,8 @@ dependencies {
         androidTestImplementation(project(":compose:test-utils"))
 
         lintPublish project(":compose:animation:animation-core-lint")
+
+        samples(project(":compose:animation:animation-core:animation-core-samples"))
     }
 }
 
@@ -123,6 +125,9 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(project(":compose:test-utils"))
             }
         }
+    }
+    dependencies {
+        samples(project(":compose:animation:animation-core:animation-core-samples"))
     }
 }
 

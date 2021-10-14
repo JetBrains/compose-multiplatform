@@ -16,8 +16,11 @@
 
 package androidx.compose.ui.input.pointer
 
+import android.view.InputDevice
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_DOWN
+import android.view.MotionEvent.ACTION_HOVER_MOVE
+import android.view.MotionEvent.ACTION_UP
 import android.view.View
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -85,6 +88,44 @@ internal fun catchThrowable(lambda: () -> Unit): Throwable? {
  * are actually needed.
  */
 internal val MotionEventDouble = MotionEvent.obtain(0L, 0L, ACTION_DOWN, 0f, 0f, 0)
+
+/**
+ * To be used to construct types that require a MotionEvent but where only the ACTION_UP
+ * type is needed.
+ */
+internal val MotionEventUp = MotionEvent.obtain(0L, 0L, ACTION_UP, 0f, 0f, 0)
+
+/**
+ * To be used to construct types that require a MotionEvent but where we only care if the event
+ * is a hover event.
+ */
+internal val MotionEventHover = createHoverMotionEvent(ACTION_HOVER_MOVE, 0f, 0f)
+
+fun createHoverMotionEvent(action: Int, x: Float, y: Float): MotionEvent {
+    val pointerProperties = MotionEvent.PointerProperties().apply {
+        toolType = MotionEvent.TOOL_TYPE_MOUSE
+    }
+    val pointerCoords = MotionEvent.PointerCoords().also {
+        it.x = x
+        it.y = y
+    }
+    return MotionEvent.obtain(
+        0L /* downTime */,
+        0L /* eventTime */,
+        action,
+        1 /* pointerCount */,
+        arrayOf(pointerProperties),
+        arrayOf(pointerCoords),
+        0 /* metaState */,
+        0 /* buttonState */,
+        0f /* xPrecision */,
+        0f /* yPrecision */,
+        0 /* deviceId */,
+        0 /* edgeFlags */,
+        InputDevice.SOURCE_MOUSE,
+        0 /* flags */
+    )
+}
 
 internal fun Modifier.spyGestureFilter(
     callback: (PointerEventPass) -> Unit
@@ -195,7 +236,7 @@ internal fun PointerEvent.deepCopy() =
             it.deepCopy()
         },
         motionEvent = motionEvent
-    )
+    ).also { it.type = type }
 
 internal fun pointerEventOf(
     vararg changes: PointerInputChange,
@@ -251,8 +292,38 @@ internal class OnCancelEntry(
     val pointerInputFilter: PointerInputFilter
 ) : LogEntry()
 
-internal fun internalPointerEventOf(vararg changes: PointerInputChange) =
-    InternalPointerEvent(changes.toList().associateBy { it.id }.toMutableMap(), MotionEventDouble)
+internal fun internalPointerEventOf(vararg changes: PointerInputChange): InternalPointerEvent {
+    val event = if (changes.any { it.changedToUpIgnoreConsumed() }) {
+        MotionEventUp
+    } else {
+        MotionEventDouble
+    }
+
+    return InternalPointerEvent(changes.toList().associateBy { it.id }.toMutableMap(), event)
+}
+
+internal fun hoverInternalPointerEvent(
+    action: Int = ACTION_HOVER_MOVE,
+    x: Float = 0f,
+    y: Float = 0f
+): InternalPointerEvent {
+    val change = PointerInputChange(
+        PointerId(0),
+        0L,
+        Offset(0f, 0f),
+        false,
+        0L,
+        Offset(0f, 0f),
+        false,
+        ConsumedData(),
+        PointerType.Mouse
+    )
+
+    return InternalPointerEvent(
+        mutableMapOf(change.id to change),
+        createHoverMotionEvent(action, x, y)
+    )
+}
 
 internal class PointerEventSubject(
     metaData: FailureMetadata,

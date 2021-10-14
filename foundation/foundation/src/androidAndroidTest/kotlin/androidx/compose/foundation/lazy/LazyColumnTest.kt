@@ -17,6 +17,7 @@
 package androidx.compose.foundation.lazy
 
 import android.os.Build
+import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
@@ -46,14 +47,12 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertPositionInRootIsEqualTo
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.center
-import androidx.compose.ui.test.down
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -204,6 +203,33 @@ class LazyColumnTest {
     }
 
     @Test
+    fun changeItemsCountAndScrollImmediately() {
+        lateinit var state: LazyListState
+        var count by mutableStateOf(100)
+        val composedIndexes = mutableListOf<Int>()
+        rule.setContent {
+            state = rememberLazyListState()
+            LazyColumn(Modifier.fillMaxWidth().height(10.dp), state) {
+                items(count) { index ->
+                    composedIndexes.add(index)
+                    Box(Modifier.size(20.dp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            composedIndexes.clear()
+            count = 10
+            runBlocking(AutoTestFrameClock()) {
+                state.scrollToItem(50)
+            }
+            composedIndexes.forEach {
+                assertThat(it).isLessThan(count)
+            }
+            assertThat(state.firstVisibleItemIndex).isEqualTo(9)
+        }
+    }
+    @Test
     fun changingDataTest() {
         val dataLists = listOf(
             (1..3).toList(),
@@ -326,7 +352,7 @@ class LazyColumnTest {
 
         rule.mainClock.autoAdvance = false
         rule.onNodeWithTag(LazyListTag)
-            .performGesture { swipeUp() }
+            .performTouchInput { swipeUp() }
         rule.mainClock.advanceTimeBy(100)
 
         val itemIndexWhenInterrupting = state.firstVisibleItemIndex
@@ -336,7 +362,7 @@ class LazyColumnTest {
         assertThat(itemOffsetWhenInterrupting).isNotEqualTo(0)
 
         rule.onNodeWithTag(LazyListTag)
-            .performGesture { down(center) }
+            .performTouchInput { down(center) }
         rule.mainClock.advanceTimeBy(100)
 
         assertThat(state.firstVisibleItemIndex).isEqualTo(itemIndexWhenInterrupting)

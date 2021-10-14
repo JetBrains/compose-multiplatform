@@ -1,6 +1,10 @@
 // Baseline format: 1.0
 RemovedClass: androidx.compose.foundation.gestures.RelativeVelocityTrackerKt:
     Removed class androidx.compose.foundation.gestures.RelativeVelocityTrackerKt
+RemovedClass: androidx.compose.foundation.lazy.LazyListItemContentFactoryKt:
+    Removed class androidx.compose.foundation.lazy.LazyListItemContentFactoryKt
+RemovedClass: androidx.compose.foundation.lazy.LazyListPrefetcher_androidKt:
+    Removed class androidx.compose.foundation.lazy.LazyListPrefetcher_androidKt
 
 
 RemovedMethod: androidx.compose.foundation.ImageKt#Image(androidx.compose.ui.graphics.ImageBitmap, String, androidx.compose.ui.Modifier, androidx.compose.ui.Alignment, androidx.compose.ui.layout.ContentScale, float, androidx.compose.ui.graphics.ColorFilter):

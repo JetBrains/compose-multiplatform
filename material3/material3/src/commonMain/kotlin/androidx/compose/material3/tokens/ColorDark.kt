@@ -19,14 +19,12 @@ package androidx.compose.material3.tokens
 
 internal object ColorDark {
     val Background = Palette.Neutral10
-    val Disabled = Palette.Neutral20
     val Error = Palette.Error80
     val ErrorContainer = Palette.Error30
     val InverseOnSurface = Palette.Neutral20
     val InversePrimary = Palette.Primary40
     val InverseSurface = Palette.Neutral90
     val OnBackground = Palette.Neutral90
-    val OnDisabled = Palette.NeutralVariant60
     val OnError = Palette.Error20
     val OnErrorContainer = Palette.Error80
     val OnPrimary = Palette.Primary20
@@ -42,7 +40,6 @@ internal object ColorDark {
     val PrimaryContainer = Palette.Primary30
     val Secondary = Palette.Secondary80
     val SecondaryContainer = Palette.Secondary30
-    val Shadow = Palette.Neutral0
     val Surface = Palette.Neutral10
     val SurfaceVariant = Palette.NeutralVariant30
     val Tertiary = Palette.Tertiary80

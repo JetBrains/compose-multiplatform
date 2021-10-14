@@ -24,6 +24,7 @@ import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.LocalComposeScene
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.LocalLayerContainer
 import androidx.compose.ui.geometry.Offset
@@ -32,7 +33,6 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.DesktopOwner
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalDesktopOwners
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
@@ -42,6 +42,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
+import java.awt.MouseInfo
+import javax.swing.SwingUtilities.convertPointFromScreen
 
 /**
  * Opens a popup with the given content.
@@ -133,6 +135,7 @@ fun Popup(
     )
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun PopupLayout(
     popupPositionProvider: PopupPositionProvider,
@@ -142,7 +145,7 @@ private fun PopupLayout(
     onKeyEvent: ((KeyEvent) -> Boolean) = { false },
     content: @Composable () -> Unit
 ) {
-    val owners = LocalDesktopOwners.current
+    val scene = LocalComposeScene.current
     val density = LocalDensity.current
 
     var parentBounds by remember { mutableStateOf(IntRect.Zero) }
@@ -166,7 +169,7 @@ private fun PopupLayout(
     val parentComposition = rememberCompositionContext()
     val (owner, composition) = remember {
         val owner = DesktopOwner(
-            container = owners,
+            platformInputService = scene.platformInputService,
             density = density,
             isPopup = true,
             isFocusable = focusable,
@@ -174,6 +177,7 @@ private fun PopupLayout(
             onPreviewKeyEvent = onPreviewKeyEvent,
             onKeyEvent = onKeyEvent
         )
+        scene.attach(owner)
         val composition = owner.setContent(parent = parentComposition) {
             Layout(
                 content = content,
@@ -212,14 +216,11 @@ private fun PopupLayout(
     owner.density = density
     DisposableEffect(Unit) {
         onDispose {
+            scene.detach(owner)
             composition.dispose()
             owner.dispose()
         }
     }
-}
-
-private fun isOutsideRectTap(rect: IntRect, point: Offset): Boolean {
-    return !rect.contains(IntOffset(point.x.toInt(), point.y.toInt()))
 }
 
 /**
@@ -238,10 +239,11 @@ fun rememberCursorPositionProvider(
 ): PopupPositionProvider = with(LocalDensity.current) {
     val component = LocalLayerContainer.current
     val cursorPoint = remember {
-        val awtMousePosition = component.mousePosition
+        val awtMousePosition = MouseInfo.getPointerInfo().location
+        convertPointFromScreen(awtMousePosition, component)
         IntOffset(
-            (awtMousePosition.x * density).toInt(),
-            (awtMousePosition.y * density).toInt()
+            (awtMousePosition.x * component.density.density).toInt(),
+            (awtMousePosition.y * component.density.density).toInt()
         )
     }
     val offsetPx = IntOffset(offset.x.roundToPx(), offset.y.roundToPx())

@@ -69,7 +69,7 @@ class CoreTextInlineContentTest {
             CompositionLocalProvider(
                 LocalDensity provides Density(density = 1f, fontScale = 1f)
             ) {
-                CoreText(
+                BasicText(
                     text = buildAnnotatedString {
                         append("Hello")
                         appendInlineContent("box")

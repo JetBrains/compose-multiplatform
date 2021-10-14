@@ -112,4 +112,11 @@ internal interface OwnedLayer : GraphicLayerInfo {
      * converting bounds in a parent layer to be in this layer's coordinates.
      */
     fun mapBounds(rect: MutableRect, inverse: Boolean)
+
+    /**
+     * Reuse this layer after it was [destroy]ed, setting the new
+     * [drawBlock] and [invalidateParentLayer] values. The layer will be reinitialized
+     * as new after this call.
+     */
+    fun reuseLayer(drawBlock: (Canvas) -> Unit, invalidateParentLayer: () -> Unit)
 }

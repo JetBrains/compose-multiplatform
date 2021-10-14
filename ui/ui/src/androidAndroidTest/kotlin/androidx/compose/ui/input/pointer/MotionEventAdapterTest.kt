@@ -16,13 +16,18 @@
 
 package androidx.compose.ui.input.pointer
 
+import android.util.SparseLongArray
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_CANCEL
 import android.view.MotionEvent.ACTION_DOWN
+import android.view.MotionEvent.ACTION_HOVER_ENTER
+import android.view.MotionEvent.ACTION_HOVER_EXIT
 import android.view.MotionEvent.ACTION_MOVE
 import android.view.MotionEvent.ACTION_POINTER_DOWN
 import android.view.MotionEvent.ACTION_POINTER_UP
 import android.view.MotionEvent.ACTION_UP
+import android.view.MotionEvent.TOOL_TYPE_FINGER
+import android.view.MotionEvent.TOOL_TYPE_MOUSE
 import androidx.compose.ui.geometry.Offset
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
@@ -80,6 +85,111 @@ class MotionEventAdapterTest {
                 pointerType
             )
         }
+    }
+
+    @Test
+    fun hoverEventsStay() {
+        // When a hover event happens, the pointer ID should stick around until it is removed.
+        val hoverEnter = MotionEvent(
+            0,
+            ACTION_HOVER_ENTER,
+            1,
+            0,
+            arrayOf(PointerProperties(1, TOOL_TYPE_MOUSE)),
+            arrayOf(PointerCoords(10f, 10f))
+        )
+        val hoverEnterEvent = motionEventAdapter.convertToPointerInputEvent(hoverEnter)!!
+        assertThat(hoverEnterEvent.pointers).hasSize(1)
+        val hoverEnterId = hoverEnterEvent.pointers[0].id
+
+        val hoverExit = MotionEvent(
+            1,
+            ACTION_HOVER_EXIT,
+            1,
+            0,
+            arrayOf(PointerProperties(1, TOOL_TYPE_MOUSE)),
+            arrayOf(PointerCoords(10f, 10f))
+        )
+
+        val hoverExitEvent = motionEventAdapter.convertToPointerInputEvent(hoverExit)!!
+        assertThat(hoverExitEvent.pointers).hasSize(1)
+        assertThat(hoverExitEvent.pointers[0].id).isEqualTo(hoverEnterId)
+
+        val down = MotionEvent(
+            1,
+            ACTION_DOWN,
+            1,
+            0,
+            arrayOf(PointerProperties(1, TOOL_TYPE_MOUSE)),
+            arrayOf(PointerCoords(10f, 10f))
+        )
+
+        val downEvent = motionEventAdapter.convertToPointerInputEvent(down)!!
+        assertThat(downEvent.pointers).hasSize(1)
+        assertThat(downEvent.pointers[0].id).isEqualTo(hoverEnterId)
+
+        val up = MotionEvent(
+            2,
+            ACTION_UP,
+            1,
+            0,
+            arrayOf(PointerProperties(1, TOOL_TYPE_MOUSE)),
+            arrayOf(PointerCoords(10f, 10f))
+        )
+
+        val upEvent = motionEventAdapter.convertToPointerInputEvent(up)!!
+        assertThat(upEvent.pointers).hasSize(1)
+        assertThat(upEvent.pointers[0].id).isEqualTo(hoverEnterId)
+
+        val hoverEnterEvent2 = motionEventAdapter.convertToPointerInputEvent(hoverEnter)!!
+        assertThat(hoverEnterEvent2.pointers).hasSize(1)
+        assertThat(hoverEnterEvent2.pointers[0].id).isEqualTo(hoverEnterId)
+        motionEventAdapter.convertToPointerInputEvent(hoverExit)!!
+
+        val touchDown = MotionEvent(
+            3,
+            ACTION_DOWN,
+            1,
+            0,
+            arrayOf(PointerProperties(1, TOOL_TYPE_FINGER)),
+            arrayOf(PointerCoords(10f, 10f))
+        )
+        val touchDownEvent = motionEventAdapter.convertToPointerInputEvent(touchDown)!!
+        assertThat(touchDownEvent.pointers).hasSize(1)
+        assertThat(touchDownEvent.pointers[0].id).isNotEqualTo(hoverEnterId)
+        val touchDownId = touchDownEvent.pointers[0].id
+
+        val touchUp = MotionEvent(
+            4,
+            ACTION_UP,
+            1,
+            0,
+            arrayOf(PointerProperties(1, TOOL_TYPE_FINGER)),
+            arrayOf(PointerCoords(10f, 10f))
+        )
+        val touchUpEvent = motionEventAdapter.convertToPointerInputEvent(touchUp)!!
+        assertThat(touchUpEvent.pointers).hasSize(1)
+        assertThat(touchUpEvent.pointers[0].id).isEqualTo(touchDownEvent.pointers[0].id)
+
+        val hoverEnterEvent3 = motionEventAdapter.convertToPointerInputEvent(hoverEnter)!!
+        assertThat(hoverEnterEvent3.pointers).hasSize(1)
+        assertThat(hoverEnterEvent3.pointers[0].id).isNotEqualTo(touchDownId)
+        assertThat(hoverEnterEvent3.pointers[0].id).isNotEqualTo(hoverEnterId)
+    }
+
+    @Test
+    fun robustIdConversion() {
+        // When an ID shows up unexpectedly, it shouldn't crash
+        val hoverExit = MotionEvent(
+            3,
+            ACTION_HOVER_EXIT,
+            1,
+            0,
+            arrayOf(PointerProperties(1, TOOL_TYPE_MOUSE)),
+            arrayOf(PointerCoords(10f, 10f))
+        )
+        val event = motionEventAdapter.convertToPointerInputEvent(hoverExit)!!
+        assertThat(event.pointers).hasSize(1)
     }
 
     @Test
@@ -1214,7 +1324,7 @@ class MotionEventAdapterTest {
         motionEventAdapter.convertToPointerInputEvent(motionEvent1)
         motionEventAdapter.convertToPointerInputEvent(motionEvent2)
 
-        assertThat(motionEventAdapter.motionEventToComposePointerIdMap).isEmpty()
+        assertThat(motionEventAdapter.motionEventToComposePointerIdMap.size()).isEqualTo(0)
     }
 
     @Test
@@ -1245,12 +1355,13 @@ class MotionEventAdapterTest {
         motionEventAdapter.convertToPointerInputEvent(motionEvent1)
         motionEventAdapter.convertToPointerInputEvent(motionEvent2)
 
-        assertThat(motionEventAdapter.motionEventToComposePointerIdMap).containsExactlyEntriesIn(
-            mapOf(
-                2 to PointerId(0),
-                5 to PointerId(1)
+        assertThat(motionEventAdapter.motionEventToComposePointerIdMap.toMap())
+            .containsExactlyEntriesIn(
+                mapOf(
+                    2 to PointerId(0),
+                    5 to PointerId(1)
+                )
             )
-        )
     }
 
     @Test
@@ -1296,9 +1407,10 @@ class MotionEventAdapterTest {
         motionEventAdapter.convertToPointerInputEvent(motionEvent2)
         motionEventAdapter.convertToPointerInputEvent(motionEvent3)
 
-        assertThat(motionEventAdapter.motionEventToComposePointerIdMap).containsExactlyEntriesIn(
-            mapOf(2 to PointerId(0))
-        )
+        assertThat(motionEventAdapter.motionEventToComposePointerIdMap.toMap())
+            .containsExactlyEntriesIn(
+                mapOf(2 to PointerId(0))
+            )
     }
 
     @Test
@@ -1344,9 +1456,10 @@ class MotionEventAdapterTest {
         motionEventAdapter.convertToPointerInputEvent(motionEvent2)
         motionEventAdapter.convertToPointerInputEvent(motionEvent3)
 
-        assertThat(motionEventAdapter.motionEventToComposePointerIdMap).containsExactlyEntriesIn(
-            mapOf(5 to PointerId(1))
-        )
+        assertThat(motionEventAdapter.motionEventToComposePointerIdMap.toMap())
+            .containsExactlyEntriesIn(
+                mapOf(5 to PointerId(1))
+            )
     }
 
     @Test
@@ -1401,7 +1514,7 @@ class MotionEventAdapterTest {
         motionEventAdapter.convertToPointerInputEvent(motionEvent3)
         motionEventAdapter.convertToPointerInputEvent(motionEvent4)
 
-        assertThat(motionEventAdapter.motionEventToComposePointerIdMap).isEmpty()
+        assertThat(motionEventAdapter.motionEventToComposePointerIdMap.toMap()).isEmpty()
     }
 
     @Test
@@ -1446,7 +1559,7 @@ class MotionEventAdapterTest {
         motionEventAdapter.convertToPointerInputEvent(motionEvent2)
         motionEventAdapter.convertToPointerInputEvent(motionEvent3)
 
-        assertThat(motionEventAdapter.motionEventToComposePointerIdMap).isEmpty()
+        assertThat(motionEventAdapter.motionEventToComposePointerIdMap.toMap()).isEmpty()
     }
 
     @Test
@@ -1540,6 +1653,16 @@ class MotionEventAdapterTest {
 
     private fun MotionEventAdapter.convertToPointerInputEvent(motionEvent: MotionEvent) =
         convertToPointerInputEvent(motionEvent, positionCalculator)
+
+    private fun SparseLongArray.toMap(): Map<Int, PointerId> {
+        val map = mutableMapOf<Int, PointerId>()
+        for (i in 0 until size()) {
+            val key = keyAt(i)
+            val value = valueAt(i)
+            map[key] = PointerId(value)
+        }
+        return map
+    }
 }
 
 // Private helper functions

@@ -47,7 +47,6 @@ import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
-import org.jetbrains.kotlin.ir.backend.js.utils.OperatorNames
 import org.jetbrains.kotlin.ir.builders.declarations.addValueParameter
 import org.jetbrains.kotlin.ir.builders.irBlockBody
 import org.jetbrains.kotlin.ir.builders.irCall
@@ -155,6 +154,7 @@ import org.jetbrains.kotlin.platform.jvm.isJvm
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.types.typeUtil.isUnit
+import org.jetbrains.kotlin.util.OperatorNameConventions
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.ceil
@@ -983,6 +983,9 @@ class ComposableFunctionBodyTransformer(
                     returnVar?.let { irReturn(declaration.symbol, irGet(it)) }
                 )
             )
+            if (collectSourceInformation && scope.isInlinedLambda) {
+                scope.realizeEndCalls { irEndReplaceableGroup() }
+            }
         } else {
             declaration.body = IrBlockBodyImpl(
                 body.startOffset,
@@ -1404,17 +1407,17 @@ class ComposableFunctionBodyTransformer(
                 // over time. In the future, we may want to make an optimization where whether or
                 // not the call site had a spread or not and only create groups if it did.
 
-                // composer.startReplaceableGroup(values.size)
+                // composer.startMovableGroup(<>, values.size)
                 val irGetParamSize = irMethodCall(
                     irGet(param),
                     param.type.classOrNull!!.getPropertyGetter("size")!!.owner
                 )
                 // TODO(lmr): verify this works with default vararg expressions!
                 skipPreamble.statements.add(
-                    irStartReplaceableGroup(
+                    irStartMovableGroup(
                         param,
+                        irGetParamSize,
                         defaultScope,
-                        irGetParamSize
                     )
                 )
 
@@ -1442,8 +1445,8 @@ class ComposableFunctionBodyTransformer(
                     }
                 )
 
-                // composer.endReplaceableGroup()
-                skipPreamble.statements.add(irEndReplaceableGroup())
+                // composer.endMovableGroup()
+                skipPreamble.statements.add(irEndMovableGroup())
 
                 // if (dirty and 0b0110 === 0) {
                 //   dirty = dirty or 0b0010
@@ -1476,6 +1479,7 @@ class ComposableFunctionBodyTransformer(
             // otherwise, we wrap the whole thing in an if expression with a skip
             scope.hasDefaultsGroup = true
             scope.metrics.recordGroup()
+            bodyPreamble.statements.add(irStartDefaults(sourceElement))
             bodyPreamble.statements.add(
                 irIfThenElse(
                     // this prevents us from re-executing the defaults if this function is getting
@@ -1486,22 +1490,17 @@ class ComposableFunctionBodyTransformer(
                         irDefaultsInvalid()
                     ),
                     // set all of the default temp vars
-                    thenPart = irBlock(
-                        statements = listOf(
-                            irStartDefaults(sourceElement),
-                            *setDefaults.statements.toTypedArray(),
-                            irEndDefaults()
-                        )
-                    ),
+                    thenPart = setDefaults,
                     // composer.skipCurrentGroup()
                     elsePart = irBlock(
                         statements = listOf(
-                            irSkipCurrentGroup(),
+                            irSkipToGroupEnd(UNDEFINED_OFFSET, UNDEFINED_OFFSET),
                             *skipDefaults.statements.toTypedArray()
                         )
                     )
                 )
             )
+            bodyPreamble.statements.add(irEndDefaults())
         }
 
         return mightSkip
@@ -2105,6 +2104,39 @@ class ComposableFunctionBodyTransformer(
         )
     }
 
+    private fun IrBlock.withReplaceableGroupStatements(scope: Scope.BlockScope): IrExpression {
+        currentFunctionScope.metrics.recordGroup()
+        scope.realizeGroup(::irEndReplaceableGroup)
+        return when {
+            // if the scope ends with a return call, then it will get properly ended if we
+            // just push the end call on the scope because of the way returns get transformed in
+            // this class. As a result, here we can safely just "prepend" the start call
+            endsWithReturnOrJump() -> IrBlockImpl(
+                startOffset,
+                endOffset,
+                type,
+                origin,
+                listOf(irStartReplaceableGroup(this, scope)) + statements
+            )
+            // otherwise, we want to push an end call for any early returns/jumps, but also add
+            // an end call to the end of the group
+            else -> IrBlockImpl(
+                startOffset,
+                endOffset,
+                type,
+                origin,
+                listOf(
+                    irStartReplaceableGroup(
+                        this,
+                        scope,
+                        startOffset = startOffset,
+                        endOffset = endOffset
+                    )
+                ) + statements + listOf(irEndReplaceableGroup(startOffset, endOffset))
+            )
+        }
+    }
+
     private fun IrExpression.asReplaceableGroup(scope: Scope.BlockScope): IrExpression {
         currentFunctionScope.metrics.recordGroup()
         // if the scope has no composable calls, then the only important thing is that a
@@ -2521,6 +2553,10 @@ class ComposableFunctionBodyTransformer(
                 } else {
                     error("Expected transformed loop to be an IrBlock")
                 }
+            }
+            IrStatementOrigin.FOR_LOOP_INNER_WHILE -> {
+                val result = super.visitBlock(expression)
+                result
             }
             else -> super.visitBlock(expression)
         }
@@ -3031,7 +3067,7 @@ class ComposableFunctionBodyTransformer(
 
                             irCall(
                                 int.binaryOperator(
-                                    OperatorNames.SHL,
+                                    OperatorNameConventions.SHL,
                                     int
                                 ),
                                 null,
@@ -3194,7 +3230,12 @@ class ComposableFunctionBodyTransformer(
 
             loop.body = loop.body?.transform(this, null)
             if (loopScope.needsGroupPerIteration && loopScope.hasComposableCalls) {
-                loop.body = loop.body?.asReplaceableGroup(loopScope)
+                val current = loop.body
+                if (current is IrBlock) {
+                    loop.body = current.withReplaceableGroupStatements(loopScope)
+                } else {
+                    loop.body = current?.asReplaceableGroup(loopScope)
+                }
             }
         }
         return if (!loopScope.needsGroupPerIteration && loopScope.hasComposableCalls) {
@@ -4054,11 +4095,11 @@ class ComposableFunctionBodyTransformer(
             if (bitsToShiftLeft == 0) return value
             val int = context.irBuiltIns.intType
             val shiftLeft = int.binaryOperator(
-                OperatorNames.SHL,
+                OperatorNameConventions.SHL,
                 int
             )
             val shiftRight = int.binaryOperator(
-                OperatorNames.SHR,
+                OperatorNameConventions.SHR,
                 int
             )
 

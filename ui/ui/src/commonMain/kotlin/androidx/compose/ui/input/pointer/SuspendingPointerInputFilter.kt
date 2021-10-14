@@ -147,6 +147,19 @@ interface PointerInputScope : Density {
     val viewConfiguration: ViewConfiguration
 
     /**
+     * Intercept pointer input that children receive even if the pointer is out of bounds.
+     *
+     * If `true`, and a child has been moved out of this layout and receives an event, this
+     * will receive that event. If `false`, a child receiving pointer input outside of the
+     * bounds of this layout will not trigger any events in this.
+     */
+    @Suppress("GetterSetterNames")
+    @get:Suppress("GetterSetterNames")
+    var interceptOutOfBoundsChildEvents: Boolean
+        get() = false
+        set(_) {}
+
+    /**
      * Suspend and install a pointer input [block] that can await input events and respond to
      * them immediately. A call to [awaitPointerEventScope] will resume with [block]'s result after
      * it completes.
@@ -351,6 +364,8 @@ internal class SuspendingPointerInputFilter(
             return Size(horizontal, vertical)
         }
 
+    override var interceptOutOfBoundsChildEvents: Boolean = false
+
     /**
      * Snapshot the current [pointerHandlers] and run [block] on each one.
      * May not be called reentrant or concurrent with itself.
@@ -543,7 +558,13 @@ internal class SuspendingPointerInputFilter(
                 )
             }
             val job = coroutineScope.launch {
-                delay(timeMillis)
+                // Delay twice because the timeout continuation needs to be lower-priority than
+                // input events, not treated fairly in FIFO order. The second
+                // micro-delay reposts it to the back of the queue, after any input events
+                // that were posted but not processed during the first delay.
+                delay(timeMillis - 1)
+                delay(1)
+
                 pointerAwaiter?.resumeWithException(
                     PointerEventTimeoutCancellationException(timeMillis)
                 )
