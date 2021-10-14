@@ -28,7 +28,6 @@ import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.material.ProgressIndicatorDefaults.IndicatorBackgroundOpacity
@@ -80,7 +79,6 @@ fun LinearProgressIndicator(
         modifier
             .progressSemantics(progress)
             .size(LinearIndicatorWidth, LinearIndicatorHeight)
-            .focusable()
     ) {
         val strokeWidth = size.height
         drawLinearIndicatorBackground(backgroundColor, strokeWidth)
@@ -157,7 +155,6 @@ fun LinearProgressIndicator(
         modifier
             .progressSemantics()
             .size(LinearIndicatorWidth, LinearIndicatorHeight)
-            .focusable()
     ) {
         val strokeWidth = size.height
         drawLinearIndicatorBackground(backgroundColor, strokeWidth)
@@ -237,7 +234,6 @@ fun CircularProgressIndicator(
         modifier
             .progressSemantics(progress)
             .size(CircularIndicatorDiameter)
-            .focusable()
     ) {
         // Start at 12 O'clock
         val startAngle = 270f
@@ -318,7 +314,6 @@ fun CircularProgressIndicator(
         modifier
             .progressSemantics()
             .size(CircularIndicatorDiameter)
-            .focusable()
     ) {
 
         val currentRotationAngleOffset = (currentRotation * RotationAngleOffset) % 360f
