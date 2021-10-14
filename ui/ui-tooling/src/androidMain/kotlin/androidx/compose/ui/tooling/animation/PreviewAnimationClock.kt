@@ -18,7 +18,6 @@ package androidx.compose.ui.tooling.animation
 
 import android.util.Log
 import androidx.annotation.VisibleForTesting
-import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.SnapSpec
@@ -46,7 +45,6 @@ import java.util.concurrent.TimeUnit
  *
  * @suppress
  */
-@OptIn(InternalAnimationApi::class)
 internal open class PreviewAnimationClock(private val setAnimationsTimeCallback: () -> Unit = {}) {
 
     private val TAG = "PreviewAnimationClock"
@@ -55,15 +53,17 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
 
     /**
      * Set of tracked [TransitionComposeAnimation]s, each one having a [Transition] object that
-     * is used in [setClockTime], where we call [Transition.seek], and in [getAnimatedProperties],
-     * where we get the animation values.
+     * is used in [setClockTime], where we call
+     * [Transition.setPlaytimeAfterInitialAndTargetStateEstablished],
+     * and in [getAnimatedProperties], where we get the animation values.
      */
     @VisibleForTesting
     internal val trackedTransitions = hashSetOf<TransitionComposeAnimation>()
 
     /**
      * Set of tracked [AnimatedVisibilityComposeAnimation]s, each one having a [Transition] object
-     * representing the parent and used in [setClockTime], where we call [Transition.seek]. Each
+     * representing the parent and used in [setClockTime], where we call
+     * [Transition.setPlaytimeAfterInitialAndTargetStateEstablished]. Each
      * [AnimatedVisibilityComposeAnimation] also has another [Transition] object representing the
      * child transition used in [getAnimatedProperties], where we get the animation values.
      */
@@ -131,7 +131,11 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
         val composeAnimation = parent.parseAnimatedVisibility()
         // Call seek on the first frame to get the correct duration
         val (current, target) = animatedVisibilityStates[parent]!!.toCurrentTargetPair()
-        parent.seek(initialState = current, targetState = target, 0)
+        parent.setPlaytimeAfterInitialAndTargetStateEstablished(
+            initialState = current,
+            targetState = target,
+            0
+        )
         trackedAnimatedVisibility.add(composeAnimation)
         notifySubscribe(composeAnimation)
     }
@@ -283,14 +287,18 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
         trackedTransitions.forEach { composeAnimation ->
             composeAnimation.animationObject.let {
                 val states = transitionStates[it] ?: return@let
-                it.seek(states.current, states.target, timeNs)
+                it.setPlaytimeAfterInitialAndTargetStateEstablished(
+                    states.current,
+                    states.target,
+                    timeNs
+                )
             }
         }
         trackedAnimatedVisibility.forEach { composeAnimation ->
             composeAnimation.animationObject.let {
                 val (current, target) =
                     animatedVisibilityStates[it]?.toCurrentTargetPair() ?: return@let
-                it.seek(current, target, timeNs)
+                it.setPlaytimeAfterInitialAndTargetStateEstablished(current, target, timeNs)
             }
         }
         setAnimationsTimeCallback.invoke()
