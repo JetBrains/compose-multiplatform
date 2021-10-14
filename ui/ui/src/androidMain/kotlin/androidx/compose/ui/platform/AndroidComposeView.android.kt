@@ -81,6 +81,9 @@ import androidx.compose.ui.input.key.Key.Companion.DirectionDown
 import androidx.compose.ui.input.key.Key.Companion.DirectionLeft
 import androidx.compose.ui.input.key.Key.Companion.DirectionRight
 import androidx.compose.ui.input.key.Key.Companion.DirectionUp
+import androidx.compose.ui.input.key.Key.Companion.Enter
+import androidx.compose.ui.input.key.Key.Companion.Escape
+import androidx.compose.ui.input.key.Key.Companion.NumPadEnter
 import androidx.compose.ui.input.key.Key.Companion.Tab
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType.Companion.KeyDown
@@ -741,8 +744,8 @@ internal class AndroidComposeView(context: Context) :
             DirectionLeft -> Left
             DirectionUp -> Up
             DirectionDown -> Down
-            DirectionCenter -> In
-            Back -> Out
+            DirectionCenter, Enter, NumPadEnter -> In
+            Back, Escape -> Out
             else -> null
         }
     }

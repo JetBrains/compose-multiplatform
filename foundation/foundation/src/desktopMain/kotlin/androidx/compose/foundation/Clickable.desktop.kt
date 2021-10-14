@@ -23,6 +23,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType.Companion.KeyUp
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.nativeKeyCode
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.AwaitPointerEventScope
 import androidx.compose.ui.input.pointer.PointerButtons
 import androidx.compose.ui.input.pointer.PointerEvent
@@ -36,10 +41,21 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.util.fastAll
+import java.awt.event.KeyEvent.VK_ENTER
 import kotlinx.coroutines.coroutineScope
 
 // TODO: b/168524931 - should this depend on the input device?
 internal actual val TapIndicationDelay: Long = 0L
+
+/**
+ * Whether the specified [KeyEvent] represents a user intent to perform a click.
+ * (eg. When you press Enter on a focused button, it should perform a click).
+ */
+internal actual val KeyEvent.isClick: Boolean
+    get() = type == KeyUp && when (key.nativeKeyCode) {
+        VK_ENTER -> true
+        else -> false
+    }
 
 @Immutable @ExperimentalFoundationApi
 class MouseClickScope constructor(
