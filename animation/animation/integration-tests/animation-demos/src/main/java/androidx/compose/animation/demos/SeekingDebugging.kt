@@ -99,9 +99,13 @@ fun SeekingDemo() {
         }.collect {
             val totalDuration = transition.totalDurationNanos
             if (entering) {
-                transition.seek(false, true, (abs(it) * totalDuration).toLong())
+                transition.setPlaytimeAfterInitialAndTargetStateEstablished(
+                    false, true, (abs(it) * totalDuration).toLong()
+                )
             } else {
-                transition.seek(true, false, (abs(it) * totalDuration).toLong())
+                transition.setPlaytimeAfterInitialAndTargetStateEstablished(
+                    true, false, (abs(it) * totalDuration).toLong()
+                )
             }
         }
     }

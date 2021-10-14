@@ -464,16 +464,22 @@ package androidx.compose.animation.core {
   }
 
   @androidx.compose.runtime.Stable public final class Transition<S> {
+    method public java.util.List<androidx.compose.animation.core.Transition<S>.TransitionAnimationState<?,?>> getAnimations();
     method public S! getCurrentState();
     method public String? getLabel();
     method public androidx.compose.animation.core.Transition.Segment<S> getSegment();
     method public S! getTargetState();
+    method public long getTotalDurationNanos();
+    method public java.util.List<androidx.compose.animation.core.Transition<?>> getTransitions();
     method public boolean isRunning();
+    property public final java.util.List<androidx.compose.animation.core.Transition<S>.TransitionAnimationState<?,?>> animations;
     property public final S! currentState;
     property public final boolean isRunning;
     property public final String? label;
     property public final androidx.compose.animation.core.Transition.Segment<S> segment;
     property public final S! targetState;
+    property public final long totalDurationNanos;
+    property public final java.util.List<androidx.compose.animation.core.Transition<?>> transitions;
   }
 
   public static interface Transition.Segment<S> {
@@ -482,6 +488,19 @@ package androidx.compose.animation.core {
     method public default infix boolean isTransitioningTo(S?, S? targetState);
     property public abstract S! initialState;
     property public abstract S! targetState;
+  }
+
+  @androidx.compose.runtime.Stable public final class Transition.TransitionAnimationState<T, V extends androidx.compose.animation.core.AnimationVector> implements androidx.compose.runtime.State<T> {
+    method public androidx.compose.animation.core.TargetBasedAnimation<T,V> getAnimation();
+    method public androidx.compose.animation.core.FiniteAnimationSpec<T> getAnimationSpec();
+    method public String getLabel();
+    method public androidx.compose.animation.core.TwoWayConverter<T,V> getTypeConverter();
+    method public T! getValue();
+    property public final androidx.compose.animation.core.TargetBasedAnimation<T,V> animation;
+    property public final androidx.compose.animation.core.FiniteAnimationSpec<T> animationSpec;
+    property public final String label;
+    property public final androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter;
+    property public T! value;
   }
 
   public final class TransitionKt {
