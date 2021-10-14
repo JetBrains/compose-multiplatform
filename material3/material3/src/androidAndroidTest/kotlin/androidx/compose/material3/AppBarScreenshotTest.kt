@@ -156,11 +156,119 @@ class AppBarScreenshotTest {
         assertAppBarAgainstGolden(goldenIdentifier = "smallCenteredAppBar_darkTheme")
     }
 
+    @Test
+    fun mediumAppBar_lightTheme() {
+        composeTestRule.setContent {
+            MaterialTheme {
+                Box(Modifier.testTag(TestTag)) {
+                    MediumTopAppBar(
+                        navigationIcon = {
+                            IconButton(onClick = { /* doSomething() */ }) {
+                                Icon(Icons.Filled.ArrowBack, null)
+                            }
+                        },
+                        title = {
+                            Text("Title")
+                        },
+                        actions = {
+                            IconButton(onClick = { /* doSomething() */ }) {
+                                Icon(Icons.Filled.Favorite, null)
+                            }
+                        }
+                    )
+                }
+            }
+        }
+
+        assertAppBarAgainstGolden(goldenIdentifier = "mediumAppBar_lightTheme")
+    }
+
+    @Test
+    fun mediumAppBar_darkTheme() {
+        composeTestRule.setContent {
+            MaterialTheme(colorScheme = darkColorScheme()) {
+                Box(Modifier.testTag(TestTag)) {
+                    MediumTopAppBar(
+                        navigationIcon = {
+                            IconButton(onClick = { /* doSomething() */ }) {
+                                Icon(Icons.Filled.ArrowBack, null)
+                            }
+                        },
+                        title = {
+                            Text("Title")
+                        },
+                        actions = {
+                            IconButton(onClick = { /* doSomething() */ }) {
+                                Icon(Icons.Filled.Favorite, null)
+                            }
+                        }
+                    )
+                }
+            }
+        }
+
+        assertAppBarAgainstGolden(goldenIdentifier = "mediumAppBar_darkTheme")
+    }
+
+    @Test
+    fun largeAppBar_lightTheme() {
+        composeTestRule.setContent {
+            MaterialTheme {
+                Box(Modifier.testTag(TestTag)) {
+                    LargeTopAppBar(
+                        navigationIcon = {
+                            IconButton(onClick = { /* doSomething() */ }) {
+                                Icon(Icons.Filled.ArrowBack, null)
+                            }
+                        },
+                        title = {
+                            Text("Title")
+                        },
+                        actions = {
+                            IconButton(onClick = { /* doSomething() */ }) {
+                                Icon(Icons.Filled.Favorite, null)
+                            }
+                        }
+                    )
+                }
+            }
+        }
+
+        assertAppBarAgainstGolden(goldenIdentifier = "largeAppBar_lightTheme")
+    }
+
+    @Test
+    fun largeAppBar_darkTheme() {
+        composeTestRule.setContent {
+            MaterialTheme(colorScheme = darkColorScheme()) {
+                Box(Modifier.testTag(TestTag)) {
+                    LargeTopAppBar(
+                        navigationIcon = {
+                            IconButton(onClick = { /* doSomething() */ }) {
+                                Icon(Icons.Filled.ArrowBack, null)
+                            }
+                        },
+                        title = {
+                            Text("Title")
+                        },
+                        actions = {
+                            IconButton(onClick = { /* doSomething() */ }) {
+                                Icon(Icons.Filled.Favorite, null)
+                            }
+                        }
+                    )
+                }
+            }
+        }
+
+        assertAppBarAgainstGolden(goldenIdentifier = "largeAppBar_darkTheme")
+    }
+
     private fun assertAppBarAgainstGolden(goldenIdentifier: String) {
         composeTestRule.onNodeWithTag(TestTag)
             .captureToImage()
             .assertAgainstGolden(screenshotRule, goldenIdentifier)
     }
-}
 
-private const val TestTag = "topAppBar"
+    private val TestTag = "topAppBar"
+}
