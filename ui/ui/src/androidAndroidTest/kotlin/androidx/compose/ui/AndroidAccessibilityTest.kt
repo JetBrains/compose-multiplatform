@@ -2875,6 +2875,30 @@ class AndroidAccessibilityTest {
         }
     }
 
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.P)
+    fun progressSemantics_mergesSemantics_forTalkback() {
+        container.setContent {
+            Box(Modifier.progressSemantics(0.5f).testTag("box"))
+        }
+
+        val node = rule.onNodeWithTag("box").fetchSemanticsNode()
+        val info = provider.createAccessibilityNodeInfo(node.id)
+        assertEquals(info.isScreenReaderFocusable, true)
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.P)
+    fun indeterminateProgressSemantics_mergesSemantics_forTalkback() {
+        container.setContent {
+            Box(Modifier.progressSemantics().testTag("box"))
+        }
+
+        val node = rule.onNodeWithTag("box").fetchSemanticsNode()
+        val info = provider.createAccessibilityNodeInfo(node.id)
+        assertEquals(info.isScreenReaderFocusable, true)
+    }
+
     private fun eventIndex(list: List<AccessibilityEvent>, event: AccessibilityEvent): Int {
         for (i in list.indices) {
             if (ReflectionEquals(list[i], null).matches(event)) {

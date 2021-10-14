@@ -758,7 +758,7 @@ private fun Modifier.sliderSemantics(
     steps: Int = 0
 ): Modifier {
     val coerced = value.coerceIn(valueRange.start, valueRange.endInclusive)
-    return semantics(mergeDescendants = true) {
+    return semantics {
         if (!enabled) disabled()
         setProgress(
             action = { targetValue ->
