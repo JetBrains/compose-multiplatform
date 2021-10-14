@@ -16,6 +16,12 @@
 
 package androidx.compose.foundation
 
+import android.view.KeyEvent.ACTION_DOWN
+import android.view.KeyEvent.ACTION_UP
+import android.view.KeyEvent.KEYCODE_DPAD_CENTER
+import android.view.KeyEvent.KEYCODE_ENTER
+import android.view.KeyEvent.KEYCODE_NUMPAD_ENTER
+import android.view.KeyEvent as AndroidKeyEvent
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
@@ -45,6 +51,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.InputMode
 import androidx.compose.ui.input.InputModeManager
+import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalFocusManager
@@ -70,6 +77,7 @@ import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performKeyPress
 import androidx.compose.ui.test.performMouseInput
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTouchInput
@@ -200,6 +208,87 @@ class ClickableTest {
         rule.runOnIdle {
             assertThat(counter).isEqualTo(2)
         }
+    }
+
+    @Test
+    fun clickableTest_clickWithEnterKey() {
+        var counter = 0
+        val focusRequester = FocusRequester()
+        rule.setContent {
+            BasicText(
+                    "ClickableText",
+                    modifier = Modifier
+                        .testTag("myClickable")
+                        .focusRequester(focusRequester)
+                        .clickable { counter++ }
+            )
+        }
+
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        rule.onNodeWithTag("myClickable")
+            .performKeyPress(KeyEvent(AndroidKeyEvent(ACTION_DOWN, KEYCODE_ENTER)))
+
+        rule.runOnIdle { assertThat(counter).isEqualTo(0) }
+
+        rule.onNodeWithTag("myClickable")
+            .performKeyPress(KeyEvent(AndroidKeyEvent(ACTION_UP, KEYCODE_ENTER)))
+
+        rule.runOnIdle { assertThat(counter).isEqualTo(1) }
+    }
+
+    @Test
+    fun clickableTest_clickWithNumPadEnterKey() {
+        var counter = 0
+        val focusRequester = FocusRequester()
+        rule.setContent {
+            BasicText(
+                "ClickableText",
+                modifier = Modifier
+                    .testTag("myClickable")
+                    .focusRequester(focusRequester)
+                    .clickable { counter++ }
+            )
+        }
+
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        rule.onNodeWithTag("myClickable")
+            .performKeyPress(KeyEvent(AndroidKeyEvent(ACTION_DOWN, KEYCODE_NUMPAD_ENTER)))
+
+        rule.runOnIdle { assertThat(counter).isEqualTo(0) }
+
+        rule.onNodeWithTag("myClickable")
+            .performKeyPress(KeyEvent(AndroidKeyEvent(ACTION_UP, KEYCODE_NUMPAD_ENTER)))
+
+        rule.runOnIdle { assertThat(counter).isEqualTo(1) }
+    }
+
+    @Test
+    fun clickableTest_clickWithDPadCenter() {
+        var counter = 0
+        val focusRequester = FocusRequester()
+        rule.setContent {
+            BasicText(
+                "ClickableText",
+                modifier = Modifier
+                    .testTag("myClickable")
+                    .focusRequester(focusRequester)
+                    .clickable { counter++ }
+            )
+        }
+
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        rule.onNodeWithTag("myClickable")
+            .performKeyPress(KeyEvent(AndroidKeyEvent(ACTION_DOWN, KEYCODE_DPAD_CENTER)))
+
+        rule.runOnIdle { assertThat(counter).isEqualTo(0) }
+
+        rule.onNodeWithTag("myClickable")
+            .performKeyPress(KeyEvent(AndroidKeyEvent(ACTION_UP, KEYCODE_DPAD_CENTER)))
+
+        rule.runOnIdle { assertThat(counter).isEqualTo(1) }
     }
 
     @Test
