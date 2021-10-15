@@ -16,7 +16,7 @@
 
 package androidx.build.studio
 
-import org.gradle.api.Project
+import org.gradle.process.ExecOperations
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -26,7 +26,7 @@ import java.nio.file.Paths
  * extracting later.
  */
 typealias StudioArchiveCreator = (
-    project: Project,
+    execOperations: ExecOperations,
     studioVersion: String,
     filename: String,
     destinationPath: String
@@ -36,7 +36,7 @@ typealias StudioArchiveCreator = (
  * Downloads a Studio archive from the official download URL, and places it at destinationPath.
  */
 val UrlArchiveCreator: StudioArchiveCreator = fun (
-    project: Project,
+    execOperations: ExecOperations,
     studioVersion: String,
     filename: String,
     destinationPath: String
@@ -46,7 +46,7 @@ val UrlArchiveCreator: StudioArchiveCreator = fun (
     val tmpDownloadPath = File("$destinationPath.tmp").absolutePath
 
     println("Downloading $url to $tmpDownloadPath")
-    project.exec { execSpec ->
+    execOperations.exec { execSpec ->
         with(execSpec) {
             executable("curl")
             args(url, "--output", tmpDownloadPath)

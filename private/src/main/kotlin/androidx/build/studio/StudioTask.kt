@@ -29,7 +29,9 @@ import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.gradle.internal.service.ServiceRegistry
+import org.gradle.process.ExecOperations
 import java.io.File
+import javax.inject.Inject
 
 /**
  * Base task with common logic for updating and launching studio in both the frameworks/support
@@ -48,6 +50,9 @@ abstract class StudioTask : DefaultTask() {
     private val platformUtilities by lazy {
         StudioPlatformUtilities.get(projectRoot, studioInstallationDir)
     }
+
+    @get:Inject
+    abstract val execOperations: ExecOperations
 
     /**
      * If `true`, checks for `ANDROIDX_PROJECTS` environment variable to decide which
@@ -138,9 +143,6 @@ abstract class StudioTask : DefaultTask() {
         File("$studioInstallationDir/STUDIOW_LICENSE_ACCEPTED")
     }
 
-    @get:Internal
-    protected open val studioPatcher = NoopStudioPatcher
-
     /**
      * Install Studio and removes any old installation files if they exist.
      */
@@ -151,18 +153,17 @@ abstract class StudioTask : DefaultTask() {
             studioInstallationDir.parentFile.deleteRecursively()
             // Create installation directory and any needed parent directories
             studioInstallationDir.mkdirs()
-            studioArchiveCreator(project, studioVersion, studioArchiveName, studioArchivePath)
+            studioArchiveCreator(
+                execOperations,
+                studioVersion,
+                studioArchiveName,
+                studioArchivePath
+            )
             println("Extracting archive...")
             extractStudioArchive()
             with(platformUtilities) { updateJvmHeapSize() }
             // Finish install process
             successfulInstallFile.createNewFile()
-        }
-        val successfulStudioPatch = File("$studioInstallationDir/PLUGIN_PATCH_SUCCESSFUL")
-        if (!successfulStudioPatch.exists()) {
-            studioPatcher(this, project, studioInstallationDir)
-            // Finish patch process
-            successfulStudioPatch.createNewFile()
         }
     }
 
@@ -234,7 +235,9 @@ abstract class StudioTask : DefaultTask() {
         val fromPath = studioArchivePath
         val toPath = studioInstallationDir.absolutePath
         println("Extracting to $toPath...")
-        project.exec { execSpec -> platformUtilities.extractArchive(fromPath, toPath, execSpec) }
+        execOperations.exec {
+                execSpec -> platformUtilities.extractArchive(fromPath, toPath, execSpec)
+        }
         // Remove studio archive once done
         File(studioArchivePath).delete()
     }
@@ -255,16 +258,15 @@ abstract class StudioTask : DefaultTask() {
 /**
  * Task for launching studio in the frameworks/support project
  */
-open class RootStudioTask : StudioTask() {
+abstract class RootStudioTask : StudioTask() {
     override val studioArchiveCreator = UrlArchiveCreator
-    override val studioPatcher: StudioPatcher = PerformancePluginStudioPatcher
     override val ideaProperties get() = projectRoot.resolve("development/studio/idea.properties")
 }
 
 /**
  * Task for launching studio in a playground project
  */
-open class PlaygroundStudioTask : RootStudioTask() {
+abstract class PlaygroundStudioTask : RootStudioTask() {
     @get:Internal
     val supportRootFolder = (project.rootProject.property("ext") as ExtraPropertiesExtension)
         .let { it.get("supportRootFolder") as File }
