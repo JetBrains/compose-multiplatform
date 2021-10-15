@@ -25,6 +25,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,7 +33,6 @@ import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallCenteredTopAppBar
 import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -57,12 +57,18 @@ fun SimpleSmallTopAppBar() {
                 title = { Text("Simple TopAppBar") },
                 navigationIcon = {
                     IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Menu, contentDescription = "Localized description")
+                        Icon(
+                            imageVector = Icons.Filled.Menu,
+                            contentDescription = "Localized description"
+                        )
                     }
                 },
                 actions = {
                     IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+                        Icon(
+                            imageVector = Icons.Filled.Favorite,
+                            contentDescription = "Localized description"
+                        )
                     }
                 }
             )
@@ -86,26 +92,32 @@ fun SimpleSmallTopAppBar() {
 }
 
 /**
- * A sample for a simple use of [SmallCenteredTopAppBar].
+ * A sample for a simple use of [CenterAlignedTopAppBar].
  *
  * The top app bar here does not react to any scroll events in the content under it.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Sampled
 @Composable
-fun SimpleCenteredTopAppBar() {
+fun SimpleCenterAlignedTopAppBar() {
     Scaffold(
         topBar = {
-            SmallCenteredTopAppBar(
+            CenterAlignedTopAppBar(
                 title = { Text("Centered TopAppBar") },
                 navigationIcon = {
                     IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Menu, contentDescription = "Localized description")
+                        Icon(
+                            imageVector = Icons.Filled.Menu,
+                            contentDescription = "Localized description"
+                        )
                     }
                 },
                 actions = {
                     IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+                        Icon(
+                            imageVector = Icons.Filled.Favorite,
+                            contentDescription = "Localized description"
+                        )
                     }
                 }
             )
@@ -146,16 +158,25 @@ fun PinnedSmallTopAppBar() {
                 title = { Text("Small TopAppBar") },
                 navigationIcon = {
                     IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Menu, contentDescription = "Localized description")
+                        Icon(
+                            imageVector = Icons.Filled.Menu,
+                            contentDescription = "Localized description"
+                        )
                     }
                 },
                 actions = {
                     // RowScope here, so these icons will be placed horizontally
                     IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+                        Icon(
+                            imageVector = Icons.Filled.Favorite,
+                            contentDescription = "Localized description"
+                        )
                     }
                     IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+                        Icon(
+                            imageVector = Icons.Filled.Favorite,
+                            contentDescription = "Localized description"
+                        )
                     }
                 },
                 scrollBehavior = scrollBehavior
@@ -195,12 +216,18 @@ fun EnterAlwaysSmallTopAppBar() {
                 title = { Text("Small TopAppBar") },
                 navigationIcon = {
                     IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Menu, contentDescription = "Localized description")
+                        Icon(
+                            imageVector = Icons.Filled.Menu,
+                            contentDescription = "Localized description"
+                        )
                     }
                 },
                 actions = {
                     IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+                        Icon(
+                            imageVector = Icons.Filled.Favorite,
+                            contentDescription = "Localized description"
+                        )
                     }
                 },
                 scrollBehavior = scrollBehavior
@@ -243,12 +270,18 @@ fun ExitUntilCollapsedMediumTopAppBar() {
                 title = { Text("Medium TopAppBar") },
                 navigationIcon = {
                     IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Menu, contentDescription = "Localized description")
+                        Icon(
+                            imageVector = Icons.Filled.Menu,
+                            contentDescription = "Localized description"
+                        )
                     }
                 },
                 actions = {
                     IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+                        Icon(
+                            imageVector = Icons.Filled.Favorite,
+                            contentDescription = "Localized description"
+                        )
                     }
                 },
                 scrollBehavior = scrollBehavior
@@ -291,12 +324,18 @@ fun ExitUntilCollapsedLargeTopAppBar() {
                 title = { Text("Large TopAppBar") },
                 navigationIcon = {
                     IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Menu, contentDescription = "Localized description")
+                        Icon(
+                            imageVector = Icons.Filled.Menu,
+                            contentDescription = "Localized description"
+                        )
                     }
                 },
                 actions = {
                     IconButton(onClick = { /* doSomething() */ }) {
-                        Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+                        Icon(
+                            imageVector = Icons.Filled.Favorite,
+                            contentDescription = "Localized description"
+                        )
                     }
                 },
                 scrollBehavior = scrollBehavior

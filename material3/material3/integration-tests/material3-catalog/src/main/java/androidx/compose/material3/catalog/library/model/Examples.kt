@@ -31,7 +31,7 @@ import androidx.compose.material3.samples.LargeFloatingActionButtonSample
 import androidx.compose.material3.samples.NavigationBarSample
 import androidx.compose.material3.samples.NavigationBarWithOnlySelectedLabelsSample
 import androidx.compose.material3.samples.PinnedSmallTopAppBar
-import androidx.compose.material3.samples.SimpleCenteredTopAppBar
+import androidx.compose.material3.samples.SimpleCenterAlignedTopAppBar
 import androidx.compose.material3.samples.SimpleSmallTopAppBar
 import androidx.compose.material3.samples.SmallFloatingActionButtonSample
 import androidx.compose.runtime.Composable
@@ -80,10 +80,10 @@ val TopAppBarExamples =
             sourceUrl = TopAppBarExampleSourceUrl,
         ) { SimpleSmallTopAppBar() },
         Example(
-            name = ::SimpleCenteredTopAppBar.name,
+            name = ::SimpleCenterAlignedTopAppBar.name,
             description = TopAppBarExampleDescription,
             sourceUrl = TopAppBarExampleSourceUrl,
-        ) { SimpleCenteredTopAppBar() },
+        ) { SimpleCenterAlignedTopAppBar() },
         Example(
             name = ::PinnedSmallTopAppBar.name,
             description = TopAppBarExampleDescription,
