@@ -17,6 +17,7 @@
 package androidx.build
 
 import androidx.build.dependencyTracker.AffectedModuleDetector
+import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.gradle.internal.dsl.LintOptions
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -303,10 +304,8 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
         }
     }
 
-    // TODO(aurimas): migrate away from this when upgrading to AGP 7.1.0-alpha03 or newer
-    @Suppress("UnstableApiUsage", "DEPRECATION")
     val androidComponents = extensions.findByType(
-        com.android.build.api.extension.AndroidComponentsExtension::class.java
+        AndroidComponentsExtension::class.java
     )
     if (null != androidComponents) {
         @Suppress("UnstableApiUsage")
