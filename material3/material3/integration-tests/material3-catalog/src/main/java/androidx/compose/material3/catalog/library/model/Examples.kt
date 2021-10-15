@@ -21,19 +21,25 @@ package androidx.compose.material3.catalog.library.model
 import androidx.compose.material3.catalog.library.util.SampleSourceUrl
 import androidx.compose.material3.samples.AlertDialogSample
 import androidx.compose.material3.samples.AlertDialogWithIconSample
+import androidx.compose.material3.samples.ButtonSample
+import androidx.compose.material3.samples.ButtonWithIconSample
 import androidx.compose.material3.samples.ColorSchemeSample
 import androidx.compose.material3.samples.EnterAlwaysSmallTopAppBar
+import androidx.compose.material3.samples.ElevatedButtonSample
 import androidx.compose.material3.samples.ExitUntilCollapsedLargeTopAppBar
 import androidx.compose.material3.samples.ExitUntilCollapsedMediumTopAppBar
 import androidx.compose.material3.samples.ExtendedFloatingActionButtonSample
+import androidx.compose.material3.samples.FilledTonalButtonSample
 import androidx.compose.material3.samples.FloatingActionButtonSample
 import androidx.compose.material3.samples.LargeFloatingActionButtonSample
 import androidx.compose.material3.samples.NavigationBarSample
 import androidx.compose.material3.samples.NavigationBarWithOnlySelectedLabelsSample
+import androidx.compose.material3.samples.OutlinedButtonSample
 import androidx.compose.material3.samples.PinnedSmallTopAppBar
 import androidx.compose.material3.samples.SimpleCenterAlignedTopAppBar
 import androidx.compose.material3.samples.SimpleSmallTopAppBar
 import androidx.compose.material3.samples.SmallFloatingActionButtonSample
+import androidx.compose.material3.samples.TextButtonSample
 import androidx.compose.runtime.Composable
 
 data class Example(
@@ -42,6 +48,42 @@ data class Example(
     val sourceUrl: String,
     val content: @Composable () -> Unit
 )
+
+private const val ButtonsExampleDescription = "Buttons examples"
+private const val ButtonsExampleSourceUrl = "$SampleSourceUrl/ButtonSamples.kt"
+val ButtonsExamples =
+    listOf(
+        Example(
+            name = ::ButtonSample.name,
+            description = ButtonsExampleDescription,
+            sourceUrl = ButtonsExampleSourceUrl,
+        ) { ButtonSample() },
+        Example(
+            name = ::ElevatedButtonSample.name,
+            description = ButtonsExampleDescription,
+            sourceUrl = ButtonsExampleSourceUrl,
+        ) { ElevatedButtonSample() },
+        Example(
+            name = ::FilledTonalButtonSample.name,
+            description = ButtonsExampleDescription,
+            sourceUrl = ButtonsExampleSourceUrl,
+        ) { FilledTonalButtonSample() },
+        Example(
+            name = ::OutlinedButtonSample.name,
+            description = ButtonsExampleDescription,
+            sourceUrl = ButtonsExampleSourceUrl,
+        ) { OutlinedButtonSample() },
+        Example(
+            name = ::TextButtonSample.name,
+            description = ButtonsExampleDescription,
+            sourceUrl = ButtonsExampleSourceUrl,
+        ) { TextButtonSample() },
+        Example(
+            name = ::ButtonWithIconSample.name,
+            description = ButtonsExampleDescription,
+            sourceUrl = ButtonsExampleSourceUrl,
+        ) { ButtonWithIconSample() }
+    )
 
 private const val ColorExampleDescription = "Color examples"
 private const val ColorExampleSourceUrl = "$SampleSourceUrl/ColorSamples.kt"
