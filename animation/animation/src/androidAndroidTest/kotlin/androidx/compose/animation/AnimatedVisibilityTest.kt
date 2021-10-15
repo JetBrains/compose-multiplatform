@@ -611,7 +611,9 @@ class AnimatedVisibilityTest {
         var playTimeMs = 0
         while (true) {
             // Seeking the enter transition, and check alpha & slide
-            transition.seek(false, true, playTimeMs * 1_000_000L)
+            transition.setPlaytimeAfterInitialAndTargetStateEstablished(
+                false, true, playTimeMs * 1_000_000L
+            )
             rule.waitForIdle()
             assertEquals(200_000_000L, transition.totalDurationNanos)
 
@@ -637,7 +639,9 @@ class AnimatedVisibilityTest {
 
         while (true) {
             // Seeking the exit transition, and check scale & shrink
-            transition.seek(true, false, playTimeMs * 1_000_000L)
+            transition.setPlaytimeAfterInitialAndTargetStateEstablished(
+                true, false, playTimeMs * 1_000_000L
+            )
             rule.waitForIdle()
             assertEquals(200_000_000L, transition.totalDurationNanos)
 
