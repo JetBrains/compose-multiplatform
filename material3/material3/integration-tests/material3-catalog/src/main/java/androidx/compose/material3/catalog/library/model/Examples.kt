@@ -34,6 +34,9 @@ import androidx.compose.material3.samples.FloatingActionButtonSample
 import androidx.compose.material3.samples.LargeFloatingActionButtonSample
 import androidx.compose.material3.samples.NavigationBarSample
 import androidx.compose.material3.samples.NavigationBarWithOnlySelectedLabelsSample
+import androidx.compose.material3.samples.NavigationRailBottomAlignSample
+import androidx.compose.material3.samples.NavigationRailSample
+import androidx.compose.material3.samples.NavigationRailWithOnlySelectedLabelsSample
 import androidx.compose.material3.samples.OutlinedButtonSample
 import androidx.compose.material3.samples.PinnedSmallTopAppBar
 import androidx.compose.material3.samples.SimpleCenterAlignedTopAppBar
@@ -190,4 +193,25 @@ val NavigationBarExamples =
             description = NavigationBarExampleDescription,
             sourceUrl = NavigationBarExampleSourceUrl,
         ) { NavigationBarWithOnlySelectedLabelsSample() },
+    )
+
+private const val NavigationRailExampleDescription = "Navigation rail examples"
+private const val NavigationRailExampleSourceUrl = "$SampleSourceUrl/NavigationRailSamples.kt"
+val NavigationRailExamples =
+    listOf(
+        Example(
+            name = ::NavigationRailSample.name,
+            description = NavigationRailExampleDescription,
+            sourceUrl = NavigationRailExampleSourceUrl,
+        ) { NavigationRailSample() },
+        Example(
+            name = ::NavigationRailWithOnlySelectedLabelsSample.name,
+            description = NavigationRailExampleDescription,
+            sourceUrl = NavigationRailExampleSourceUrl,
+        ) { NavigationRailWithOnlySelectedLabelsSample() },
+        Example(
+            name = ::NavigationRailBottomAlignSample.name,
+            description = NavigationRailExampleDescription,
+            sourceUrl = NavigationRailExampleSourceUrl,
+        ) { NavigationRailBottomAlignSample() },
     )
