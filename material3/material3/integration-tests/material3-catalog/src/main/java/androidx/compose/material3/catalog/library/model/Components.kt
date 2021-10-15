@@ -33,28 +33,29 @@ data class Component(
     val examples: List<Example>
 )
 
-private val Color = Component(
+// Components are ordered alphabetically by name.
+
+private val Button = Component(
     id = 1,
+    name = "Button",
+    description = "Buttons allow users to take actions, and make choices, with a single tap.",
+    tintIcon = true,
+    guidelinesUrl = "", // No guidelines yet
+    docsUrl = "", // No docs yet
+    sourceUrl = "$Material3SourceUrl/Button.kt",
+    examples = ButtonsExamples,
+)
+
+private val Color = Component(
+    id = 2,
     name = "Color",
     description = "Material You colors",
     // No color icon
     tintIcon = true,
-    guidelinesUrl = "", // No  guidelines yet
+    guidelinesUrl = "", // No guidelines yet
     docsUrl = "", // No docs yet
     sourceUrl = "$Material3SourceUrl/ColorScheme.kt",
     examples = ColorExamples
-)
-
-private val TopAppBar = Component(
-    id = 2,
-    name = "Top app bar",
-    description = "Material You top app bar",
-    // No color icon
-    tintIcon = true,
-    guidelinesUrl = "", // No  guidelines yet
-    docsUrl = "", // No docs yet
-    sourceUrl = "$Material3SourceUrl/AppBar.kt",
-    examples = TopAppBarExamples
 )
 
 private val Dialog = Component(
@@ -63,7 +64,7 @@ private val Dialog = Component(
     description = "Material 3 basic dialogs",
     // No dialog icon
     tintIcon = true,
-    guidelinesUrl = "", // No  guidelines yet
+    guidelinesUrl = "", // No guidelines yet
     docsUrl = "", // No docs yet
     sourceUrl = "$Material3SourceUrl/AlertDialog.kt",
     examples = DialogExamples
@@ -91,10 +92,26 @@ private val NavigationBar = Component(
     examples = NavigationBarExamples
 )
 
+private val TopAppBar = Component(
+    id = 6,
+    name = "Top app bar",
+    description = "Material You top app bar",
+    // No color icon
+    tintIcon = true,
+    guidelinesUrl = "", // No guidelines yet
+    docsUrl = "", // No docs yet
+    sourceUrl = "$Material3SourceUrl/AppBar.kt",
+    examples = TopAppBarExamples
+)
+
+// Next component ID = 7
+
+/** Components for the catalog, ordered alphabetically by name. */
 val Components = listOf(
+    Button,
+    FloatingActionButtons,
     Color,
     Dialog,
     NavigationBar,
     TopAppBar,
-    FloatingActionButtons,
 )
