@@ -296,6 +296,10 @@ interface FloatingActionButtonElevation {
      * Represents the tonal elevation used in a floating action button, depending on
      * [interactionSource]. This should typically be the same value as the [shadowElevation].
      *
+     * Tonal elevation is used to apply a color shift to the surface to give the it higher emphasis.
+     *
+     * See [shadowElevation] which controls the elevation of the shadow drawn around the FAB.
+     *
      * @param interactionSource the [InteractionSource] for this floating action button
      */
     @Composable
@@ -304,6 +308,10 @@ interface FloatingActionButtonElevation {
     /**
      * Represents the shadow elevation used in a floating action button, depending on
      * [interactionSource]. This should typically be the same value as the [tonalElevation].
+     *
+     * Shadow elevation is used to apply a shadow around the surface to give it higher emphasis.
+     *
+     * See [tonalElevation] which controls the elevation with a color shift to the surface.
      *
      * @param interactionSource the [InteractionSource] for this floating action button
      */
