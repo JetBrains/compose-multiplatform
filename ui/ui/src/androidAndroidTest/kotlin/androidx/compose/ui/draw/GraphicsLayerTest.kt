@@ -17,6 +17,7 @@
 package androidx.compose.ui.draw
 
 import android.os.Build
+import android.view.View
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.testutils.assertPixelColor
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.FixedSize
@@ -46,6 +48,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.inset
 import androidx.compose.ui.graphics.graphicsLayer
@@ -55,11 +58,13 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.padding
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.captureToImage
@@ -83,6 +88,7 @@ import org.junit.Assert.fail
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.math.roundToInt
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -562,6 +568,64 @@ class GraphicsLayerTest {
                         assertEquals("Index $x, $y should be black", Color.Black, pixelMap[x, y])
                     }
                 }
+            }
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun testSoftwareLayerOffset() {
+        val testTag = "box"
+        var offset = 0
+        val scale = 0.5f
+        val boxAlpha = 0.5f
+        val sizePx = 100
+        val squarePx = sizePx / 2
+        rule.setContent {
+            LocalView.current.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+            val density = LocalDensity.current.density
+            val size = (sizePx / density)
+            val squareSize = (squarePx / density)
+            offset = (20f / density).roundToInt()
+            Box(Modifier.size(size.dp).background(Color.LightGray).testTag(testTag)) {
+                Box(
+                    Modifier
+                        .layout { measurable, constraints ->
+                            val placeable = measurable.measure(constraints)
+                            layout(placeable.width, placeable.height) {
+                                placeable.placeWithLayer(offset, offset) {
+                                    alpha = boxAlpha
+                                    scaleX = scale
+                                    scaleY = scale
+                                    transformOrigin = TransformOrigin(0f, 0f)
+                                }
+                            }
+                        }
+                        .size(squareSize.dp)
+                        .background(Color.Red)
+                )
+            }
+        }
+
+        rule.onNodeWithTag(testTag).captureToImage().apply {
+            with(toPixelMap()) {
+                assertEquals(Color.LightGray, this[0, 0])
+                assertEquals(Color.LightGray, this[width - 1, 0])
+                assertEquals(Color.LightGray, this[0, height - 1])
+                assertEquals(Color.LightGray, this[width - 1, height - 1])
+
+                val blended = Color.Red.copy(alpha = boxAlpha).compositeOver(Color.LightGray)
+
+                val scaledSquare = squarePx * scale
+                val scaledLeft = offset
+                val scaledTop = offset
+                val scaledRight = (offset + scaledSquare).toInt()
+                val scaledBottom = (offset + scaledSquare).toInt()
+
+                assertPixelColor(blended, scaledLeft + 3, scaledTop + 3)
+                assertPixelColor(blended, scaledRight - 3, scaledTop + 3)
+                assertPixelColor(blended, scaledLeft + 3, scaledBottom - 3)
+                assertPixelColor(blended, scaledRight - 3, scaledBottom - 3)
             }
         }
     }
