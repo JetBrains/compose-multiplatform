@@ -211,7 +211,10 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
     "lintWithoutExpandProjectionDebug",
     "lintWithNullAwareTypeConverterDebug",
     "lintWithKaptDebug",
-    "lintWithKspDebug"
+    "lintWithKspDebug",
+    "lintTargetSdk29Debug",
+    "lintTargetSdk30Debug",
+    "lintTargetSdkLatestDebug"
 )
 
 @Suppress("UnstableApiUsage") // usage of BuildService that's incubating
