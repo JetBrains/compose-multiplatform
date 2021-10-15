@@ -23,6 +23,7 @@ import androidx.build.SupportConfigKt
 
 plugins {
     id("AndroidXPlugin")
+    id("java") // https://github.com/gradle/gradle/issues/18622
     id("AndroidXComposePlugin")
     id("kotlin-multiplatform")
 }
