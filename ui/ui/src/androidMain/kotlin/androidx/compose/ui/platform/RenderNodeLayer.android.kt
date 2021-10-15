@@ -123,7 +123,7 @@ internal class RenderNodeLayer(
         density: Density
     ) {
         this.transformOrigin = transformOrigin
-        val wasClippingManually = renderNode.clipToOutline && outlineResolver.clipPath != null
+        val wasClippingManually = renderNode.clipToOutline && !outlineResolver.outlineClipSupported
         renderNode.scaleX = scaleX
         renderNode.scaleY = scaleY
         renderNode.alpha = alpha
@@ -148,7 +148,7 @@ internal class RenderNodeLayer(
             density
         )
         renderNode.setOutline(outlineResolver.outline)
-        val isClippingManually = renderNode.clipToOutline && outlineResolver.clipPath != null
+        val isClippingManually = renderNode.clipToOutline && !outlineResolver.outlineClipSupported
         if (wasClippingManually != isClippingManually || (isClippingManually && shapeChanged)) {
             invalidate()
         } else {
@@ -263,16 +263,31 @@ internal class RenderNodeLayer(
             // in the move call which operates directly on the RenderNode
             canvas.translate(left, top)
             canvas.concat(matrixCache.calculateMatrix(renderNode))
+            clipRenderNode(canvas)
             drawBlock?.invoke(canvas)
             canvas.restore()
             isDirty = false
         }
     }
 
+    /**
+     * Manually clips the content of the RenderNodeLayer in the provided canvas.
+     * This is used only in software rendered use cases
+     */
+    private fun clipRenderNode(canvas: Canvas) {
+        if (renderNode.clipToOutline || renderNode.clipToBounds) {
+            outlineResolver.clipToOutline(canvas)
+        }
+    }
+
     override fun updateDisplayList() {
         if (isDirty || !renderNode.hasDisplayList) {
             isDirty = false
-            val clipPath = if (renderNode.clipToOutline) outlineResolver.clipPath else null
+            val clipPath = if (renderNode.clipToOutline && !outlineResolver.outlineClipSupported) {
+                outlineResolver.clipPath
+            } else {
+                null
+            }
             renderNode.record(canvasHolder, clipPath, drawBlock!!)
         }
     }
