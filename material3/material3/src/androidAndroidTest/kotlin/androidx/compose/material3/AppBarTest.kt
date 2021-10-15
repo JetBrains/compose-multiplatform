@@ -254,30 +254,30 @@ class AppBarTest {
     }
 
     @Test
-    fun smallCenteredTopAppBar_expandsToScreen() {
+    fun centerAlignedTopAppBar_expandsToScreen() {
         rule.setMaterialContentForSizeAssertions {
-            SmallCenteredTopAppBar(title = { Text("Title") })
+            CenterAlignedTopAppBar(title = { Text("Title") })
         }
             .assertHeightIsEqualTo(TopAppBarSmallCentered.SmallCenteredContainerHeight)
             .assertWidthIsEqualTo(rule.rootWidth())
     }
 
     @Test
-    fun smallCenteredTopAppBar_withTitle() {
+    fun centerAlignedTopAppBar_withTitle() {
         val title = "Title"
         rule.setMaterialContent {
             Box(Modifier.testTag(TopAppBarTestTag)) {
-                SmallCenteredTopAppBar(title = { Text(title) })
+                CenterAlignedTopAppBar(title = { Text(title) })
             }
         }
         rule.onNodeWithText(title).assertIsDisplayed()
     }
 
     @Test
-    fun smallCenteredTopAppBar_default_positioning() {
+    fun centerAlignedTopAppBar_default_positioning() {
         rule.setMaterialContent {
             Box(Modifier.testTag(TopAppBarTestTag)) {
-                SmallTopAppBar(
+                CenterAlignedTopAppBar(
                     navigationIcon = {
                         FakeIcon(Modifier.testTag(NavigationIconTestTag))
                     },
@@ -290,14 +290,14 @@ class AppBarTest {
                 )
             }
         }
-        assertSmallDefaultPositioning()
+        assertSmallDefaultPositioning(isCenteredTitle = true)
     }
 
     @Test
-    fun smallCenteredTopAppBar_noNavigationIcon_positioning() {
+    fun centerAlignedTopAppBar_noNavigationIcon_positioning() {
         rule.setMaterialContent {
             Box(Modifier.testTag(TopAppBarTestTag)) {
-                SmallTopAppBar(
+                CenterAlignedTopAppBar(
                     title = {
                         Text("Title", Modifier.testTag(TitleTestTag))
                     },
@@ -307,15 +307,15 @@ class AppBarTest {
                 )
             }
         }
-        assertSmallPositioningWithoutNavigation()
+        assertSmallPositioningWithoutNavigation(isCenteredTitle = true)
     }
 
     @Test
-    fun smallCenteredTopAppBar_titleDefaultStyle() {
+    fun centerAlignedTopAppBar_titleDefaultStyle() {
         var textStyle: TextStyle? = null
         var expectedTextStyle: TextStyle? = null
         rule.setMaterialContent {
-            SmallCenteredTopAppBar(
+            CenterAlignedTopAppBar(
                 title = {
                     Text("Title")
                     textStyle = LocalTextStyle.current
@@ -332,7 +332,7 @@ class AppBarTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
-    fun smallCenteredTopAppBar_contentColor() {
+    fun centerAlignedTopAppBar_contentColor() {
         var titleColor: Color = Color.Unspecified
         var navigationIconColor: Color = Color.Unspecified
         var actionsColor: Color = Color.Unspecified
@@ -342,31 +342,31 @@ class AppBarTest {
         var expectedContainerColor: Color = Color.Unspecified
 
         rule.setMaterialContent {
-            SmallCenteredTopAppBar(
+            CenterAlignedTopAppBar(
                 modifier = Modifier.testTag(TopAppBarTestTag),
                 navigationIcon = {
                     FakeIcon(Modifier.testTag(NavigationIconTestTag))
                     navigationIconColor = LocalContentColor.current
                     expectedNavigationIconColor =
-                        TopAppBarDefaults.smallCenteredTopAppBarColors()
+                        TopAppBarDefaults.centerAlignedTopAppBarColors()
                             .navigationIconContentColor(scrollFraction = 0f).value
                     // scrollFraction = 0f to indicate no scroll.
                     expectedContainerColor =
-                        TopAppBarDefaults.smallCenteredTopAppBarColors()
+                        TopAppBarDefaults.centerAlignedTopAppBarColors()
                             .containerColor(scrollFraction = 0f).value
                 },
                 title = {
                     Text("Title", Modifier.testTag(TitleTestTag))
                     titleColor = LocalContentColor.current
                     expectedTitleColor =
-                        TopAppBarDefaults.smallCenteredTopAppBarColors()
+                        TopAppBarDefaults.centerAlignedTopAppBarColors()
                             .titleContentColor(scrollFraction = 0f).value
                 },
                 actions = {
                     FakeIcon(Modifier.testTag(ActionsTestTag))
                     actionsColor = LocalContentColor.current
                     expectedActionsColor =
-                        TopAppBarDefaults.smallCenteredTopAppBarColors()
+                        TopAppBarDefaults.centerAlignedTopAppBarColors()
                             .actionIconContentColor(scrollFraction = 0f).value
                 }
             )
@@ -385,18 +385,18 @@ class AppBarTest {
     @OptIn(ExperimentalMaterial3Api::class)
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
-    fun smallCenteredTopAppBar_scrolledContentColor() {
+    fun centerAlignedTopAppBar_scrolledContentColor() {
         var expectedScrolledContainerColor: Color = Color.Unspecified
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
         rule.setMaterialContent {
-            SmallCenteredTopAppBar(
+            CenterAlignedTopAppBar(
                 modifier = Modifier.testTag(TopAppBarTestTag),
                 title = {
                     Text("Title", Modifier.testTag(TitleTestTag))
                     // scrollFraction = 1f to indicate a scroll.
                     expectedScrolledContainerColor =
-                        TopAppBarDefaults.smallCenteredTopAppBarColors()
+                        TopAppBarDefaults.centerAlignedTopAppBarColors()
                             .containerColor(scrollFraction = 1f).value
                 },
                 scrollBehavior = scrollBehavior
@@ -571,16 +571,26 @@ class AppBarTest {
 
     /**
      * Checks the app bar's components positioning when it's a [SmallTopAppBar], a
-     * [SmallCenteredTopAppBar], or a larger app bar that is scrolled up and collapsed into a small
+     * [CenterAlignedTopAppBar], or a larger app bar that is scrolled up and collapsed into a small
      * configuration and there is no navigation icon.
      */
-    private fun assertSmallPositioningWithoutNavigation() {
+    private fun assertSmallPositioningWithoutNavigation(isCenteredTitle: Boolean = false) {
         val appBarBounds = rule.onNodeWithTag(TopAppBarTestTag).getUnclippedBoundsInRoot()
+        val titleBounds = rule.onNodeWithTag(TitleTestTag).getUnclippedBoundsInRoot()
 
-        rule.onNodeWithTag(TitleTestTag)
+        val titleNode = rule.onNodeWithTag(TitleTestTag)
+        // Title should be vertically centered
+        titleNode.assertTopPositionInRootIsEqualTo((appBarBounds.height - titleBounds.height) / 2)
+        if (isCenteredTitle) {
+            // Title should be horizontally centered
+            titleNode.assertLeftPositionInRootIsEqualTo(
+                (appBarBounds.width - titleBounds.width) / 2
+            )
+        } else {
             // Title should now be placed 16.dp from the start, as there is no navigation icon
             // 4.dp padding for the whole app bar + 12.dp inset
-            .assertLeftPositionInRootIsEqualTo(4.dp + 12.dp)
+            titleNode.assertLeftPositionInRootIsEqualTo(4.dp + 12.dp)
+        }
 
         rule.onNodeWithTag(ActionsTestTag)
             // Action should still be placed at the end
@@ -589,9 +599,9 @@ class AppBarTest {
 
     /**
      * Checks the app bar's components positioning when it's a [SmallTopAppBar] or a
-     * [SmallCenteredTopAppBar].
+     * [CenterAlignedTopAppBar].
      */
-    private fun assertSmallDefaultPositioning() {
+    private fun assertSmallDefaultPositioning(isCenteredTitle: Boolean = false) {
         val appBarBounds = rule.onNodeWithTag(TopAppBarTestTag).getUnclippedBoundsInRoot()
         val titleBounds = rule.onNodeWithTag(TitleTestTag).getUnclippedBoundsInRoot()
         val appBarBottomEdgeY = appBarBounds.top + appBarBounds.height
@@ -604,12 +614,19 @@ class AppBarTest {
                 appBarBottomEdgeY - AppBarTopAndBottomPadding - FakeIconSize
             )
 
-        rule.onNodeWithTag(TitleTestTag)
+        val titleNode = rule.onNodeWithTag(TitleTestTag)
+        // Title should be vertically centered
+        titleNode.assertTopPositionInRootIsEqualTo((appBarBounds.height - titleBounds.height) / 2)
+        if (isCenteredTitle) {
+            // Title should be horizontally centered
+            titleNode.assertLeftPositionInRootIsEqualTo(
+                (appBarBounds.width - titleBounds.width) / 2
+            )
+        } else {
             // Title should be 56.dp from the start
             // 4.dp padding for the whole app bar + 48.dp icon size + 4.dp title padding.
-            .assertLeftPositionInRootIsEqualTo(4.dp + FakeIconSize + 4.dp)
-            // Title should be vertically centered
-            .assertTopPositionInRootIsEqualTo((appBarBounds.height - titleBounds.height) / 2)
+            titleNode.assertLeftPositionInRootIsEqualTo(4.dp + FakeIconSize + 4.dp)
+        }
 
         rule.onNodeWithTag(ActionsTestTag)
             // Action should be placed at the end

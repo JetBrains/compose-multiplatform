@@ -118,11 +118,11 @@ fun SmallTopAppBar(
  *
  * The top app bar displays information and actions relating to the current screen.
  *
- * This SmallCenteredTopAppBar has slots for a title, navigation icon, and actions.
+ * This CenterAlignedTopAppBar has slots for a title, navigation icon, and actions.
  *
- * A small centered top app bar that uses a [scrollBehavior] to customize its nested scrolling
+ * A center aligned top app bar that uses a [scrollBehavior] to customize its nested scrolling
  * behavior when working in conjunction with a scrolling content looks like:
- * @sample androidx.compose.material3.samples.SimpleCenteredTopAppBar
+ * @sample androidx.compose.material3.samples.SimpleCenterAlignedTopAppBar
  *
  * @param title the title to be displayed in the top app bar
  * @param modifier the [Modifier] to be applied to this top app bar
@@ -131,19 +131,19 @@ fun SmallTopAppBar(
  * @param actions the actions displayed at the end of the top app bar. This should typically be
  * [IconButton]s. The default layout here is a [Row], so icons inside will be placed horizontally.
  * @param colors a [TopAppBarColors] that will be used to resolve the colors used for this top app
- * bar in different states. See [TopAppBarDefaults.smallCenteredTopAppBarColors].
+ * bar in different states. See [TopAppBarDefaults.centerAlignedTopAppBarColors].
  * @param scrollBehavior a [TopAppBarScrollBehavior] which holds various offset values that will be
  * applied by this top app bar to set up its height and colors. A scroll behavior is designed to
  * work in conjunction with a scrolled content to change the top app bar appearance as the content
  * scrolls. See [TopAppBarScrollBehavior.nestedScrollConnection].
  */
 @Composable
-fun SmallCenteredTopAppBar(
+fun CenterAlignedTopAppBar(
     title: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
-    colors: TopAppBarColors = TopAppBarDefaults.smallCenteredTopAppBarColors(),
+    colors: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors(),
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     SingleRowTopAppBar(
@@ -416,7 +416,7 @@ object TopAppBarDefaults {
     }
 
     /**
-     * Creates a [TopAppBarColors] for small-centered top app bars. The default implementation
+     * Creates a [TopAppBarColors] for center aligned top app bars. The default implementation
      * animates between the provided colors according to the Material Design specification.
      *
      * @param containerColor the container color
@@ -427,7 +427,7 @@ object TopAppBarDefaults {
      * @return the resulting [TopAppBarColors] used for the top app bar
      */
     @Composable
-    fun smallCenteredTopAppBarColors(
+    fun centerAlignedTopAppBarColors(
         containerColor: Color =
             MaterialTheme.colorScheme.fromToken(TopAppBarSmallCentered.SmallCenteredContainerColor),
         scrolledContainerColor: Color = MaterialTheme.colorScheme.applyTonalElevation(
@@ -599,7 +599,7 @@ object TopAppBarDefaults {
 }
 
 /**
- * A single-row top app bar that is designed to be called by the Small and Small-Centered top app
+ * A single-row top app bar that is designed to be called by the small and center aligned top app
  * bar composables.
  *
  * This SingleRowTopAppBar has slots for a title, navigation icon, and actions. When the
