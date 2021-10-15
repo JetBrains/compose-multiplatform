@@ -19,9 +19,12 @@ package androidx.build
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.gradle.internal.dsl.LintOptions
+import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.services.BuildService
+import org.gradle.api.services.BuildServiceParameters
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.TaskAction
@@ -35,10 +38,34 @@ import java.util.Locale
 private const val UPDATE_LINT_BASELINE = "updateLintBaseline"
 
 /**
+ * Name of the service we use to limit the number of concurrent executions of lint
+ */
+public const val LINT_SERVICE_NAME = "androidxLintService"
+
+/**
  * Property used by Lint to continue creating baselines without failing lint, normally set by:
  * -Dlint.baselines.continue=true from command line.
  */
 private const val LINT_BASELINE_CONTINUE = "lint.baselines.continue"
+
+// service for limiting the number of concurrent lint tasks
+interface AndroidXLintService : BuildService<BuildServiceParameters.None> {
+}
+
+fun Project.configureRootProjectForLint() {
+    // determine many lint tasks to run in parallel
+    val memoryPerTask = 512 * 1024 * 1024
+    val maxLintMemory = Runtime.getRuntime().maxMemory() * 0.75 // save memory for other things too
+    val maxNumParallelUsages = Math.max(1, (maxLintMemory / memoryPerTask).toInt())
+
+    project.gradle.sharedServices.registerIfAbsent(
+        LINT_SERVICE_NAME,
+        AndroidXLintService::class.java,
+        { spec ->
+            spec.maxParallelUsages.set(maxNumParallelUsages)
+        }
+    )
+}
 
 fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
     apply(mapOf("plugin" to "com.android.lint"))
@@ -151,6 +178,12 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
     lintOptions.apply {
         // Skip lintVital tasks on assemble. We explicitly run lintRelease for libraries.
         isCheckReleaseBuilds = false
+    }
+
+    tasks.withType(AndroidLintAnalysisTask::class.java).configureEach { task ->
+        task.usesService(
+            task.project.gradle.sharedServices.registrations.getByName(LINT_SERVICE_NAME).service
+        )
     }
 
     // Lint is configured entirely in finalizeDsl so that individual projects cannot easily

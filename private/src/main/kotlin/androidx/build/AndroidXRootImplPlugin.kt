@@ -170,6 +170,7 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
                 it.dependsOn(validateProperties)
             }
         }
+        project.configureRootProjectForLint()
 
         if (partiallyDejetifyArchiveTask != null) {
             project(":jetifier:jetifier-standalone").afterEvaluate { standAloneProject ->
