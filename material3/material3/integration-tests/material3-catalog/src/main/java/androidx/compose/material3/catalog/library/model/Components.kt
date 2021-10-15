@@ -33,10 +33,13 @@ data class Component(
     val examples: List<Example>
 )
 
+private var nextId: Int = 1
+private fun nextId(): Int = nextId.also { nextId += 1 }
+
 // Components are ordered alphabetically by name.
 
 private val Button = Component(
-    id = 1,
+    id = nextId(),
     name = "Button",
     description = "Buttons allow users to take actions, and make choices, with a single tap.",
     tintIcon = true,
@@ -47,7 +50,7 @@ private val Button = Component(
 )
 
 private val Color = Component(
-    id = 2,
+    id = nextId(),
     name = "Color",
     description = "Material You colors",
     // No color icon
@@ -59,7 +62,7 @@ private val Color = Component(
 )
 
 private val Dialog = Component(
-    id = 3,
+    id = nextId(),
     name = "Dialog",
     description = "Material 3 basic dialogs",
     // No dialog icon
@@ -71,7 +74,7 @@ private val Dialog = Component(
 )
 
 private val FloatingActionButtons = Component(
-    id = 4,
+    id = nextId(),
     name = "Floating action button",
     description = "A floating action button (FAB) represents the primary action of a screen.",
     tintIcon = true,
@@ -82,18 +85,29 @@ private val FloatingActionButtons = Component(
 )
 
 private val NavigationBar = Component(
-    id = 5,
+    id = nextId(),
     name = "Navigation bar",
     description = "Material You navigation bar",
     tintIcon = true,
-    guidelinesUrl = "", // No  guidelines yet
+    guidelinesUrl = "", // No guidelines yet
     docsUrl = "", // No docs yet
     sourceUrl = "$Material3SourceUrl/NavigationBar.kt",
     examples = NavigationBarExamples
 )
 
+private val NavigationRail = Component(
+    id = nextId(),
+    name = "Navigation rail",
+    description = "Material You navigation rail",
+    tintIcon = true,
+    guidelinesUrl = "", // No guidelines yet
+    docsUrl = "", // No docs yet
+    sourceUrl = "$Material3SourceUrl/NavigationRail.kt",
+    examples = NavigationRailExamples
+)
+
 private val TopAppBar = Component(
-    id = 6,
+    id = nextId(),
     name = "Top app bar",
     description = "Material You top app bar",
     // No color icon
@@ -104,14 +118,13 @@ private val TopAppBar = Component(
     examples = TopAppBarExamples
 )
 
-// Next component ID = 7
-
 /** Components for the catalog, ordered alphabetically by name. */
 val Components = listOf(
     Button,
-    FloatingActionButtons,
     Color,
     Dialog,
+    FloatingActionButtons,
     NavigationBar,
+    NavigationRail,
     TopAppBar,
 )
