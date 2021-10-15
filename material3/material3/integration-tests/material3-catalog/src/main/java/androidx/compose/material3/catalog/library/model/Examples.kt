@@ -28,6 +28,8 @@ import androidx.compose.material3.samples.ExitUntilCollapsedMediumTopAppBar
 import androidx.compose.material3.samples.ExtendedFloatingActionButtonSample
 import androidx.compose.material3.samples.FloatingActionButtonSample
 import androidx.compose.material3.samples.LargeFloatingActionButtonSample
+import androidx.compose.material3.samples.NavigationBarSample
+import androidx.compose.material3.samples.NavigationBarWithOnlySelectedLabelsSample
 import androidx.compose.material3.samples.PinnedSmallTopAppBar
 import androidx.compose.material3.samples.SimpleCenteredTopAppBar
 import androidx.compose.material3.samples.SimpleSmallTopAppBar
@@ -130,4 +132,20 @@ val FloatingActionButtonsExamples =
             description = ButtonsFloatingActionButtonExampleDescription,
             sourceUrl = ButtonsFloatingActionButtonExampleSourceUrl,
         ) { ExtendedFloatingActionButtonSample() },
+    )
+
+private const val NavigationBarExampleDescription = "Navigation bar examples"
+private const val NavigationBarExampleSourceUrl = "$SampleSourceUrl/NavigationBarSamples.kt"
+val NavigationBarExamples =
+    listOf(
+        Example(
+            name = ::NavigationBarSample.name,
+            description = NavigationBarExampleDescription,
+            sourceUrl = NavigationBarExampleSourceUrl,
+        ) { NavigationBarSample() },
+        Example(
+            name = ::NavigationBarWithOnlySelectedLabelsSample.name,
+            description = NavigationBarExampleDescription,
+            sourceUrl = NavigationBarExampleSourceUrl,
+        ) { NavigationBarWithOnlySelectedLabelsSample() },
     )
