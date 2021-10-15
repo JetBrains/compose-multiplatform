@@ -392,6 +392,8 @@ package androidx.compose.ui.text {
 
   @androidx.compose.runtime.Immutable public final inline class TextRange {
     ctor public TextRange();
+    method public operator boolean contains(long other);
+    method public operator boolean contains(int offset);
   }
 
   public static final class TextRange.Companion {
