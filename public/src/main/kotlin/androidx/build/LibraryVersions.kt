@@ -29,7 +29,7 @@ object LibraryVersions {
     val ARCH_CORE = Version("2.2.0-alpha01")
     val ASYNCLAYOUTINFLATER = Version("1.1.0-alpha01")
     val AUTOFILL = Version("1.2.0-beta02")
-    val BENCHMARK = Version("1.1.0-beta01")
+    val BENCHMARK = Version("1.1.0-alpha10")
     val BIOMETRIC = Version("1.2.0-alpha04")
     val BROWSER = Version("1.5.0-alpha01")
     val BUILDSRC_TESTS = Version("1.0.0-alpha01")
