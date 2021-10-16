@@ -87,6 +87,8 @@ internal actual fun <T> invokeComposableForResult(
     return realFn(composer, 1)
 }
 
+actual annotation class CompositionContextLocal {}
+
 internal actual class AtomicInt actual constructor(value: Int) {
     val delegate = java.util.concurrent.atomic.AtomicInteger(value)
     actual fun get(): Int = delegate.get()

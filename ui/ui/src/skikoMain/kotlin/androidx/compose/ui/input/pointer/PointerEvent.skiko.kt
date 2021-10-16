@@ -16,8 +16,17 @@
 
 package androidx.compose.ui.input.pointer
 
+import org.jetbrains.skiko.SkikoPointerEventKind
+
 internal actual typealias NativePointerButtons = Int
 internal actual typealias NativePointerKeyboardModifiers = Int
+
+fun SkikoPointerEventKind.toCompose() = when(this) {
+    SkikoPointerEventKind.UP -> PointerEventType.Release
+    SkikoPointerEventKind.DOWN -> PointerEventType.Press
+    SkikoPointerEventKind.MOVE -> PointerEventType.Move
+    else -> PointerEventType.Unknown
+}
 
 /**
  * Creates [PointerButtons] with the specified state of the pressed buttons.

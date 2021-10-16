@@ -65,6 +65,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         android()
         desktop()
         js()
+        darwin()
     }
 
     kotlin {
@@ -139,6 +140,12 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                     implementation kotlin("test-js")
                 }
             }
+            nativeTest {
+                dependsOn(commonTest)
+                kotlin.srcDir("src/nativeTest/kotlin")
+            }
+            macosX64Test.dependsOn(nativeTest)
+            uikitX64Test.dependsOn(nativeTest)
         }
     }
     dependencies {

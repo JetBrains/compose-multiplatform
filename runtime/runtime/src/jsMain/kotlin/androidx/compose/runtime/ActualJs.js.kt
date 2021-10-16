@@ -34,6 +34,8 @@ internal actual open class ThreadLocal<T> actual constructor(
     actual fun set(value: T) {
         this.value = value
     }
+
+    actual fun remove() {}
 }
 
 internal actual class SnapshotThreadLocal<T> actual constructor() {
@@ -43,6 +45,18 @@ internal actual class SnapshotThreadLocal<T> actual constructor() {
 
     actual fun set(value: T?) {
         this.value = value
+    }
+}
+
+internal actual class AtomicInt actual constructor(private var value: Int) {
+    actual fun get(): Int = value
+
+    actual fun set(value: Int) {
+        this.value = value
+    }
+    actual fun add(amount: Int): Int {
+        this.value += amount
+        return this.value
     }
 }
 
@@ -85,6 +99,10 @@ internal actual fun identityHashCode(instance: Any?): Int {
         )
     }
 }
+
+internal actual fun ensureMutable(it: Any) { /* NOTHING */ }
+
+actual annotation class CompositionContextLocal {}
 
 private var nextHash = 1
 private const val IDENTITY_HASHCODE_FIELD = "kotlinIdentityHashcodeValue$"

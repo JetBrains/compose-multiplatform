@@ -120,6 +120,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     androidXComposeMultiplatform {
         android()
         desktop()
+        darwin()
     }
 
     kotlin {
@@ -169,6 +170,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 dependsOn(commonMain)
                 dependencies {
                     api(project(":compose:ui:ui-graphics"))
+                    api(project(":compose:ui:ui-text"))
                     api(libs.skikoCommon)
                 }
             }
@@ -177,6 +179,10 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 dependencies {
                     implementation(libs.kotlinStdlibJdk8)
                 }
+            }
+
+            nativeMain {
+                dependsOn(skikoMain)
             }
 
             // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you

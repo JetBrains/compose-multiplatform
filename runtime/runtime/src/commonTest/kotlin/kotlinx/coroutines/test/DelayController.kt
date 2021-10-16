@@ -92,7 +92,7 @@ public interface DelayController {
      * coroutines.
      */
     @ExperimentalCoroutinesApi // Since 1.2.1, tentatively till 1.3.0
-    @Throws(UncompletedCoroutinesError::class)
+    // @Throws(UncompletedCoroutinesError::class)
     public fun cleanupTestCoroutines()
 
     /**

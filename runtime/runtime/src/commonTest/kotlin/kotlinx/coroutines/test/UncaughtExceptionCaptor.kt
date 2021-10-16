@@ -16,6 +16,7 @@
 
 package kotlinx.coroutines.test
 
+import androidx.compose.runtime.synchronized
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlin.coroutines.AbstractCoroutineContextElement

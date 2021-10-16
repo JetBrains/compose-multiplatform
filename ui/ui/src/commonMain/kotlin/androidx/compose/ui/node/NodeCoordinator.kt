@@ -1193,6 +1193,7 @@ internal abstract class NodeCoordinator(
         )
     }
 
+    @kotlin.native.concurrent.ThreadLocal
     internal companion object {
         const val ExpectAttachedLayoutCoordinates = "LayoutCoordinate operations are only valid " +
             "when isAttached is true"

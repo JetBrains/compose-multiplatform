@@ -335,6 +335,7 @@ abstract class Placeable : Measured {
             placeAt(position + apparentToRealOffset, zIndex, layerBlock)
         }
 
+        @kotlin.native.concurrent.ThreadLocal
         internal companion object : PlacementScope() {
             override var parentLayoutDirection = LayoutDirection.Ltr
                 private set
