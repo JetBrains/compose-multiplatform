@@ -1,0 +1,47 @@
+// Signature format: 4.0
+package androidx.compose.animation.graphics {
+
+  @kotlin.RequiresOptIn(message="This is an experimental animation graphics API.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ExperimentalAnimationGraphicsApi {
+  }
+
+}
+
+package androidx.compose.animation.graphics.res {
+
+  public final class AnimatedVectorResources_androidKt {
+    method @androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi @androidx.compose.runtime.Composable public static androidx.compose.animation.graphics.vector.AnimatedImageVector animatedVectorResource(@DrawableRes int id);
+  }
+
+  public final class AnimatorResources_androidKt {
+  }
+
+}
+
+package androidx.compose.animation.graphics.vector {
+
+  @androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi @androidx.compose.runtime.Immutable public final class AnimatedImageVector {
+    method public androidx.compose.ui.graphics.vector.ImageVector getImageVector();
+    method public int getTotalDuration();
+    method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.painter.Painter painterFor(boolean atEnd);
+    property public final androidx.compose.ui.graphics.vector.ImageVector imageVector;
+    property public final int totalDuration;
+  }
+
+  public final class AnimatorKt {
+  }
+
+}
+
+package androidx.compose.animation.graphics.vector.compat {
+
+  public final class XmlAnimatedVectorParser_androidKt {
+  }
+
+  public final class XmlAnimatorParser_androidKt {
+  }
+
+  public final class XmlPullParserUtils_androidKt {
+  }
+
+}
+
