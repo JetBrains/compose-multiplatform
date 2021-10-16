@@ -52,6 +52,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
 import org.jetbrains.kotlin.gradle.targets.js.KotlinJsCompilerAttribute
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jetbrains.kotlin.tooling.core.withClosure
 
 const val composeSourceOption =
@@ -128,9 +129,11 @@ class AndroidXComposeImplPlugin : Plugin<Project> {
                 project.configureForKotlinMultiplatformSourceStructure()
             }
 
-            project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
-                // Needed to enable `expect` and `actual` keywords
-                compile.kotlinOptions.freeCompilerArgs += "-Xmulti-platform"
+            project.afterEvaluate { projectAfterEvaluate ->
+                projectAfterEvaluate.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
+                    // Needed to enable `expect` and `actual` keywords
+                    compile.kotlinOptions.freeCompilerArgs += "-Xmulti-platform"
+                }
             }
 
             project.tasks.withType(KotlinJsCompile::class.java).configureEach { compile ->
@@ -387,7 +390,9 @@ private fun configureComposeCompilerPlugin(
             // Gradle hack ahead, we use of absolute paths, but is OK here because we do it in
             // doFirst which happens after Gradle task input snapshotting. AGP does the same.
             compile.doFirst {
-                compile.kotlinOptions.freeCompilerArgs += "-Xplugin=${kotlinPlugin.first()}"
+                if (compile !is KotlinNativeCompile) {
+                    compile.kotlinOptions.freeCompilerArgs += "-Xplugin=${kotlinPlugin.first()}"
+                }
 
                 if (enableMetricsProvider.orNull == "true") {
                     val metricsDest = File(libraryMetricsDirectory, "compose")
