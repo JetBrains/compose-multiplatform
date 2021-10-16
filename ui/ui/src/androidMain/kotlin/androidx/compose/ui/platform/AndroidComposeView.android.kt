@@ -416,6 +416,7 @@ internal class AndroidComposeView(context: Context) :
         }
         isFocusableInTouchMode = true
         clipChildren = false
+        isTransitionGroup = true
         ViewCompat.setAccessibilityDelegate(this, accessibilityDelegate)
         ViewRootForTest.onViewCreatedCallback?.invoke(this)
         root.attach(this)
