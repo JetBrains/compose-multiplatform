@@ -16,14 +16,13 @@
 
 package androidx.compose.material3.samples
 
-// TODO(b/198216553): Update to use Material 3 TextButton.
 import androidx.annotation.Sampled
-import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
