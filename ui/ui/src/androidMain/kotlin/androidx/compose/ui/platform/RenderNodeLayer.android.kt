@@ -24,6 +24,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.Shape
@@ -60,6 +61,12 @@ internal class RenderNodeLayer(
     private val outlineResolver = OutlineResolver(ownerView.density)
     private var isDestroyed = false
     private var drawnWithZ = false
+
+    /**
+     * Optional paint used when the RenderNode is rendered on a software backed
+     * canvas and is somewhat transparent (i.e. alpha less than 1.0f)
+     */
+    private var softwareLayerPaint: Paint? = null
 
     private val matrixCache = LayerMatrixCache(getMatrix)
 
@@ -233,7 +240,31 @@ internal class RenderNodeLayer(
                 canvas.disableZ()
             }
         } else {
+            val left = renderNode.left.toFloat()
+            val top = renderNode.top.toFloat()
+            val right = renderNode.right.toFloat()
+            val bottom = renderNode.bottom.toFloat()
+            // If there is alpha applied, we must render into an offscreen buffer to
+            // properly blend the contents of this layer against the background content
+            if (renderNode.alpha < 1.0f) {
+                val paint = (softwareLayerPaint ?: Paint().also { softwareLayerPaint = it })
+                    .apply { alpha = renderNode.alpha }
+                androidCanvas.saveLayer(
+                    left,
+                    top,
+                    right,
+                    bottom,
+                    paint.asFrameworkPaint()
+                )
+            } else {
+                canvas.save()
+            }
+            // If we are software rendered we must translate the canvas based on the offset provided
+            // in the move call which operates directly on the RenderNode
+            canvas.translate(left, top)
+            canvas.concat(matrixCache.calculateMatrix(renderNode))
             drawBlock?.invoke(canvas)
+            canvas.restore()
             isDirty = false
         }
     }
