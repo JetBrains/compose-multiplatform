@@ -187,7 +187,7 @@ class SelectableTest {
     }
 
     @Test
-    fun selectableTest_interactionSource() {
+    fun selectableTest_interactionSource_noScrollableContainer() {
         val interactionSource = MutableInteractionSource()
 
         lateinit var scope: CoroutineScope
@@ -197,6 +197,121 @@ class SelectableTest {
         rule.setContent {
             scope = rememberCoroutineScope()
             Box {
+                Box(
+                    Modifier.selectable(
+                        selected = true,
+                        interactionSource = interactionSource,
+                        indication = null,
+                        onClick = {}
+                    )
+                ) {
+                    BasicText("SelectableText")
+                }
+            }
+        }
+
+        val interactions = mutableListOf<Interaction>()
+
+        scope.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+
+        rule.onNodeWithText("SelectableText")
+            .performTouchInput { down(center) }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+        }
+
+        rule.onNodeWithText("SelectableText")
+            .performTouchInput { up() }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(interactions[1]).isInstanceOf(PressInteraction.Release::class.java)
+            assertThat((interactions[1] as PressInteraction.Release).press)
+                .isEqualTo(interactions[0])
+        }
+    }
+
+    @Test
+    fun selectableTest_interactionSource_resetWhenDisposed_noScrollableContainer() {
+        val interactionSource = MutableInteractionSource()
+        var emitSelectableText by mutableStateOf(true)
+
+        lateinit var scope: CoroutineScope
+
+        rule.mainClock.autoAdvance = false
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box {
+                if (emitSelectableText) {
+                    Box(
+                        Modifier.selectable(
+                            selected = true,
+                            interactionSource = interactionSource,
+                            indication = null,
+                            onClick = {}
+                        )
+                    ) {
+                        BasicText("SelectableText")
+                    }
+                }
+            }
+        }
+
+        val interactions = mutableListOf<Interaction>()
+
+        scope.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+
+        rule.onNodeWithText("SelectableText")
+            .performTouchInput { down(center) }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+        }
+
+        // Dispose selectable
+        rule.runOnIdle {
+            emitSelectableText = false
+        }
+
+        rule.mainClock.advanceTimeByFrame()
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(interactions[1]).isInstanceOf(PressInteraction.Cancel::class.java)
+            assertThat((interactions[1] as PressInteraction.Cancel).press)
+                .isEqualTo(interactions[0])
+        }
+    }
+
+    @Test
+    fun selectableTest_interactionSource_scrollableContainer() {
+        val interactionSource = MutableInteractionSource()
+
+        lateinit var scope: CoroutineScope
+
+        rule.mainClock.autoAdvance = false
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box(Modifier.verticalScroll(rememberScrollState())) {
                 Box(
                     Modifier.selectable(
                         selected = true,
@@ -244,7 +359,7 @@ class SelectableTest {
     }
 
     @Test
-    fun selectableTest_interactionSource_resetWhenDisposed() {
+    fun selectableTest_interactionSource_resetWhenDisposed_scrollableContainer() {
         val interactionSource = MutableInteractionSource()
         var emitSelectableText by mutableStateOf(true)
 
@@ -254,7 +369,7 @@ class SelectableTest {
 
         rule.setContent {
             scope = rememberCoroutineScope()
-            Box {
+            Box(Modifier.verticalScroll(rememberScrollState())) {
                 if (emitSelectableText) {
                     Box(
                         Modifier.selectable(

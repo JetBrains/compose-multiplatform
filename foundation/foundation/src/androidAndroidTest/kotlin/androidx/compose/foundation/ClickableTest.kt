@@ -530,7 +530,7 @@ class ClickableTest {
     }
 
     @Test
-    fun clickableTest_interactionSource() {
+    fun clickableTest_interactionSource_noScrollableContainer() {
         val interactionSource = MutableInteractionSource()
 
         lateinit var scope: CoroutineScope
@@ -540,6 +540,213 @@ class ClickableTest {
         rule.setContent {
             scope = rememberCoroutineScope()
             Box {
+                BasicText(
+                    "ClickableText",
+                    modifier = Modifier
+                        .testTag("myClickable")
+                        .combinedClickable(
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {}
+                )
+            }
+        }
+
+        val interactions = mutableListOf<Interaction>()
+
+        scope.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performTouchInput { down(center) }
+
+        // No scrollable container, so there should be no delay and we should instantly appear
+        // pressed
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performTouchInput { up() }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(interactions[1]).isInstanceOf(PressInteraction.Release::class.java)
+            assertThat((interactions[1] as PressInteraction.Release).press)
+                .isEqualTo(interactions[0])
+        }
+    }
+
+    @Test
+    fun clickableTest_interactionSource_immediateRelease_noScrollableContainer() {
+        val interactionSource = MutableInteractionSource()
+
+        lateinit var scope: CoroutineScope
+
+        rule.mainClock.autoAdvance = false
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box {
+                BasicText(
+                    "ClickableText",
+                    modifier = Modifier
+                        .testTag("myClickable")
+                        .combinedClickable(
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {}
+                )
+            }
+        }
+
+        val interactions = mutableListOf<Interaction>()
+
+        scope.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performTouchInput {
+                down(center)
+                up()
+            }
+
+        // We haven't reached the tap delay, but we have finished a press so we should have
+        // emitted both press and release
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(interactions[1]).isInstanceOf(PressInteraction.Release::class.java)
+            assertThat((interactions[1] as PressInteraction.Release).press)
+                .isEqualTo(interactions[0])
+        }
+    }
+
+    @Test
+    fun clickableTest_interactionSource_immediateCancel_noScrollableContainer() {
+        val interactionSource = MutableInteractionSource()
+
+        lateinit var scope: CoroutineScope
+
+        rule.mainClock.autoAdvance = false
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box {
+                BasicText(
+                    "ClickableText",
+                    modifier = Modifier
+                        .testTag("myClickable")
+                        .combinedClickable(
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {}
+                )
+            }
+        }
+
+        val interactions = mutableListOf<Interaction>()
+
+        scope.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performTouchInput {
+                down(center)
+                cancel()
+            }
+
+        // We are not in a scrollable container, so we should see a press and immediate cancel
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(interactions[1]).isInstanceOf(PressInteraction.Cancel::class.java)
+            assertThat((interactions[1] as PressInteraction.Cancel).press)
+                .isEqualTo(interactions[0])
+        }
+    }
+
+    @Test
+    fun clickableTest_interactionSource_immediateDrag_noScrollableContainer() {
+        val interactionSource = MutableInteractionSource()
+
+        lateinit var scope: CoroutineScope
+
+        rule.mainClock.autoAdvance = false
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box {
+                BasicText(
+                    "ClickableText",
+                    modifier = Modifier
+                        .testTag("myClickable")
+                        .draggable(
+                            state = rememberDraggableState {},
+                            orientation = Orientation.Horizontal
+                        )
+                        .combinedClickable(
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {}
+                )
+            }
+        }
+
+        val interactions = mutableListOf<Interaction>()
+
+        scope.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performTouchInput {
+                down(centerLeft)
+                moveTo(centerRight)
+            }
+
+        // The press should fire, and then the drag should instantly cancel it
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(interactions[1]).isInstanceOf(PressInteraction.Cancel::class.java)
+            assertThat((interactions[1] as PressInteraction.Cancel).press)
+                .isEqualTo(interactions[0])
+        }
+    }
+
+    @Test
+    fun clickableTest_interactionSource_scrollableContainer() {
+        val interactionSource = MutableInteractionSource()
+
+        lateinit var scope: CoroutineScope
+
+        rule.mainClock.autoAdvance = false
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box(Modifier.verticalScroll(rememberScrollState())) {
                 BasicText(
                     "ClickableText",
                     modifier = Modifier
@@ -595,7 +802,7 @@ class ClickableTest {
     }
 
     @Test
-    fun clickableTest_interactionSource_immediateRelease() {
+    fun clickableTest_interactionSource_immediateRelease_scrollableContainer() {
         val interactionSource = MutableInteractionSource()
 
         lateinit var scope: CoroutineScope
@@ -604,7 +811,7 @@ class ClickableTest {
 
         rule.setContent {
             scope = rememberCoroutineScope()
-            Box {
+            Box(Modifier.verticalScroll(rememberScrollState())) {
                 BasicText(
                     "ClickableText",
                     modifier = Modifier
@@ -645,7 +852,7 @@ class ClickableTest {
     }
 
     @Test
-    fun clickableTest_interactionSource_immediateCancel() {
+    fun clickableTest_interactionSource_immediateCancel_scrollableContainer() {
         val interactionSource = MutableInteractionSource()
 
         lateinit var scope: CoroutineScope
@@ -654,7 +861,7 @@ class ClickableTest {
 
         rule.setContent {
             scope = rememberCoroutineScope()
-            Box {
+            Box(Modifier.verticalScroll(rememberScrollState())) {
                 BasicText(
                     "ClickableText",
                     modifier = Modifier
@@ -691,7 +898,7 @@ class ClickableTest {
     }
 
     @Test
-    fun clickableTest_interactionSource_immediateDrag() {
+    fun clickableTest_interactionSource_immediateDrag_scrollableContainer() {
         val interactionSource = MutableInteractionSource()
 
         lateinit var scope: CoroutineScope
@@ -700,7 +907,7 @@ class ClickableTest {
 
         rule.setContent {
             scope = rememberCoroutineScope()
-            Box {
+            Box(Modifier.verticalScroll(rememberScrollState())) {
                 BasicText(
                     "ClickableText",
                     modifier = Modifier
@@ -742,7 +949,7 @@ class ClickableTest {
     }
 
     @Test
-    fun clickableTest_interactionSource_dragAfterTimeout() {
+    fun clickableTest_interactionSource_dragAfterTimeout_scrollableContainer() {
         val interactionSource = MutableInteractionSource()
 
         lateinit var scope: CoroutineScope
@@ -751,7 +958,7 @@ class ClickableTest {
 
         rule.setContent {
             scope = rememberCoroutineScope()
-            Box {
+            Box(Modifier.verticalScroll(rememberScrollState())) {
                 BasicText(
                     "ClickableText",
                     modifier = Modifier
@@ -806,7 +1013,7 @@ class ClickableTest {
     }
 
     @Test
-    fun clickableTest_interactionSource_cancelledGesture() {
+    fun clickableTest_interactionSource_cancelledGesture_scrollableContainer() {
         val interactionSource = MutableInteractionSource()
 
         lateinit var scope: CoroutineScope
@@ -815,7 +1022,7 @@ class ClickableTest {
 
         rule.setContent {
             scope = rememberCoroutineScope()
-            Box {
+            Box(Modifier.verticalScroll(rememberScrollState())) {
                 BasicText(
                     "ClickableText",
                     modifier = Modifier
