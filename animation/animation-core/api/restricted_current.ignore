@@ -1,10 +1,4 @@
 // Baseline format: 1.0
-InvalidNullConversion: androidx.compose.animation.core.AnimationSpecKt#infiniteRepeatable(androidx.compose.animation.core.DurationBasedAnimationSpec<T>, androidx.compose.animation.core.RepeatMode):
-    Attempted to remove @NonNull annotation from method androidx.compose.animation.core.AnimationSpecKt.infiniteRepeatable(androidx.compose.animation.core.DurationBasedAnimationSpec<T>,androidx.compose.animation.core.RepeatMode)
-InvalidNullConversion: androidx.compose.animation.core.AnimationSpecKt#repeatable(int, androidx.compose.animation.core.DurationBasedAnimationSpec<T>, androidx.compose.animation.core.RepeatMode):
-    Attempted to remove @NonNull annotation from method androidx.compose.animation.core.AnimationSpecKt.repeatable(int,androidx.compose.animation.core.DurationBasedAnimationSpec<T>,androidx.compose.animation.core.RepeatMode)
-
-
 ParameterNameChange: androidx.compose.animation.core.TransitionKt#createChildTransitionInternal(androidx.compose.animation.core.Transition<S>, T, T, String) parameter #3:
     Attempted to change parameter name from label to childLabel in method androidx.compose.animation.core.TransitionKt.createChildTransitionInternal
 
@@ -17,6 +11,10 @@ RemovedInterface: androidx.compose.animation.core.InfiniteAnimationPolicy:
     Removed class androidx.compose.animation.core.InfiniteAnimationPolicy
 
 
+RemovedMethod: androidx.compose.animation.core.AnimationSpecKt#infiniteRepeatable(androidx.compose.animation.core.DurationBasedAnimationSpec<T>, androidx.compose.animation.core.RepeatMode):
+    Removed method androidx.compose.animation.core.AnimationSpecKt.infiniteRepeatable(androidx.compose.animation.core.DurationBasedAnimationSpec<T>,androidx.compose.animation.core.RepeatMode)
+RemovedMethod: androidx.compose.animation.core.AnimationSpecKt#repeatable(int, androidx.compose.animation.core.DurationBasedAnimationSpec<T>, androidx.compose.animation.core.RepeatMode):
+    Removed method androidx.compose.animation.core.AnimationSpecKt.repeatable(int,androidx.compose.animation.core.DurationBasedAnimationSpec<T>,androidx.compose.animation.core.RepeatMode)
 RemovedMethod: androidx.compose.animation.core.InfiniteRepeatableSpec#InfiniteRepeatableSpec(androidx.compose.animation.core.DurationBasedAnimationSpec<T>, androidx.compose.animation.core.RepeatMode):
     Removed constructor androidx.compose.animation.core.InfiniteRepeatableSpec(androidx.compose.animation.core.DurationBasedAnimationSpec<T>,androidx.compose.animation.core.RepeatMode)
 RemovedMethod: androidx.compose.animation.core.RepeatableSpec#RepeatableSpec(int, androidx.compose.animation.core.DurationBasedAnimationSpec<T>, androidx.compose.animation.core.RepeatMode):

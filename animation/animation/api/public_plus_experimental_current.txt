@@ -161,7 +161,6 @@ package androidx.compose.animation {
 
   public final class SplineBasedFloatDecayAnimationSpec_androidKt {
     method @androidx.compose.runtime.Composable public static <T> androidx.compose.animation.core.DecayAnimationSpec<T> rememberSplineBasedDecay();
-    method @Deprecated public static <T> androidx.compose.animation.core.DecayAnimationSpec<T>! splineBasedDecayDeprecated(androidx.compose.ui.unit.Density density);
   }
 
   public final class TransitionKt {
