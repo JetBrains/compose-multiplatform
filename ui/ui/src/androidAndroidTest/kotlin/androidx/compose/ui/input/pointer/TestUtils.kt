@@ -244,6 +244,24 @@ internal fun pointerEventOf(
 ) = PointerEvent(changes.toList(),
     InternalPointerEvent(changes.map { it.id to it }.toMap(), motionEvent))
 
+internal fun InternalPointerEvent(
+    changes: Map<PointerId, PointerInputChange>,
+    motionEvent: MotionEvent
+): InternalPointerEvent {
+    val pointers = changes.values.map {
+        PointerInputEventData(
+            id = it.id,
+            uptime = it.uptimeMillis,
+            positionOnScreen = it.position,
+            position = it.position,
+            down = it.pressed,
+            type = it.type
+        )
+    }
+    val pointer = PointerInputEvent(pointers[0].uptime, pointers, motionEvent)
+    return InternalPointerEvent(changes, pointer)
+}
+
 internal class PointerInputFilterMock(
     val log: MutableList<LogEntry> = mutableListOf(),
     val pointerEventHandler: PointerEventHandler? = null,
@@ -293,6 +311,7 @@ internal class OnCancelEntry(
     val pointerInputFilter: PointerInputFilter
 ) : LogEntry()
 
+@Suppress("EXPERIMENTAL_API_USAGE_FUTURE_ERROR")
 internal fun internalPointerEventOf(vararg changes: PointerInputChange): InternalPointerEvent {
     val event = if (changes.any { it.changedToUpIgnoreConsumed() }) {
         MotionEventUp
@@ -300,7 +319,20 @@ internal fun internalPointerEventOf(vararg changes: PointerInputChange): Interna
         MotionEventDouble
     }
 
-    return InternalPointerEvent(changes.toList().associateBy { it.id }.toMutableMap(), event)
+    val pointers = changes.map {
+        PointerInputEventData(
+            id = it.id,
+            uptime = it.uptimeMillis,
+            positionOnScreen = it.position,
+            position = it.position,
+            down = it.pressed,
+            type = it.type,
+            issuesEnterExit = false,
+            historical = emptyList()
+        )
+    }
+    val pointerEvent = PointerInputEvent(0L, pointers, event)
+    return InternalPointerEvent(changes.toList().associateBy { it.id }.toMutableMap(), pointerEvent)
 }
 
 internal fun hoverInternalPointerEvent(
@@ -311,7 +343,7 @@ internal fun hoverInternalPointerEvent(
     val change = PointerInputChange(
         PointerId(0),
         0L,
-        Offset(0f, 0f),
+        Offset(x, y),
         false,
         0L,
         Offset(0f, 0f),
@@ -320,9 +352,22 @@ internal fun hoverInternalPointerEvent(
         PointerType.Mouse
     )
 
+    @Suppress("EXPERIMENTAL_API_USAGE_FUTURE_ERROR")
+    val pointer = PointerInputEventData(
+        id = change.id,
+        uptime = change.uptimeMillis,
+        positionOnScreen = change.position,
+        position = change.position,
+        down = change.pressed,
+        type = change.type,
+        issuesEnterExit = true,
+        historical = emptyList()
+    )
+    val pointerEvent = PointerInputEvent(0L, listOf(pointer), createHoverMotionEvent(action, x, y))
+
     return InternalPointerEvent(
         mutableMapOf(change.id to change),
-        createHoverMotionEvent(action, x, y)
+        pointerEvent
     )
 }
 

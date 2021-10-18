@@ -19,6 +19,7 @@ package androidx.compose.ui.input.pointer
 import android.view.KeyEvent
 import android.view.MotionEvent
 import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastMap
 
 internal actual typealias NativePointerButtons = Int
 internal actual typealias NativePointerKeyboardModifiers = Int
@@ -91,7 +92,20 @@ actual class PointerEvent internal actual constructor(
             changes.fastForEach { change ->
                 map[change.id] = change
             }
-            val event = InternalPointerEvent(map, motionEvent)
+            val pointerEventData = changes.fastMap {
+                PointerInputEventData(
+                    it.id,
+                    it.uptimeMillis,
+                    it.position,
+                    it.position,
+                    it.pressed,
+                    it.type,
+                    this.internalPointerEvent?.issuesEnterExitEvent(it.id) == true
+                )
+            }
+            val pointerInputEvent =
+                PointerInputEvent(motionEvent.eventTime, pointerEventData, motionEvent)
+            val event = InternalPointerEvent(map, pointerInputEvent)
             PointerEvent(changes, event)
         }
     }
