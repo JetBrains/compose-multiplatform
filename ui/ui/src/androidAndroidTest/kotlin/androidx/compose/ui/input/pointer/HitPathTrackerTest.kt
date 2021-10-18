@@ -3214,12 +3214,8 @@ class HitPathTrackerTest {
 
         assertThat(areEqual(hitPathTracker.root, expectedRoot)).isTrue()
 
-        assertHoverEvent(
-            log,
-            pif1 to PointerEventType.Move,
-            pif2 to PointerEventType.Move,
-            pif3 to PointerEventType.Move,
-        )
+        // When the same position is sent, it should ignore the change.
+        assertThat(log).hasSize(0)
     }
 
     private fun assertHoverEvent(
