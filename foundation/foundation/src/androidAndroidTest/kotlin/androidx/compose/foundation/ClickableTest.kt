@@ -623,8 +623,7 @@ class ClickableTest {
                 up()
             }
 
-        // We haven't reached the tap delay, but we have finished a press so we should have
-        // emitted both press and release
+        // Press finished so we should see both press and release
         rule.runOnIdle {
             assertThat(interactions).hasSize(2)
             assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)

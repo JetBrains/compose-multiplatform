@@ -27,6 +27,7 @@ import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.isComposeRootInScrollableContainer
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -260,7 +261,11 @@ private fun Modifier.toggleableImpl(
     if (enabled) {
         PressedInteractionSourceDisposableEffect(interactionSource, pressedInteraction)
     }
-    val isInScrollableContainer = remember { mutableStateOf(true) }
+    val isRootInScrollableContainer = isComposeRootInScrollableContainer()
+    val isToggleableInScrollableContainer = remember { mutableStateOf(true) }
+    val delayPressInteraction = rememberUpdatedState {
+        isToggleableInScrollableContainer.value || isRootInScrollableContainer()
+    }
     val gestures = Modifier.pointerInput(interactionSource, enabled) {
         detectTapAndPress(
             onPress = { offset ->
@@ -269,7 +274,7 @@ private fun Modifier.toggleableImpl(
                         offset,
                         interactionSource,
                         pressedInteraction,
-                        isInScrollableContainer
+                        delayPressInteraction
                     )
                 }
             },
@@ -282,7 +287,8 @@ private fun Modifier.toggleableImpl(
                 object : ModifierLocalConsumer {
                     override fun onModifierLocalsUpdated(scope: ModifierLocalReadScope) {
                         with(scope) {
-                            isInScrollableContainer.value = ModifierLocalScrollableContainer.current
+                            isToggleableInScrollableContainer.value =
+                                ModifierLocalScrollableContainer.current
                         }
                     }
                 }
