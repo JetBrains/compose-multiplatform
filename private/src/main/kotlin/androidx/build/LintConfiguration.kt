@@ -49,8 +49,7 @@ public const val LINT_SERVICE_NAME = "androidxLintService"
 private const val LINT_BASELINE_CONTINUE = "lint.baselines.continue"
 
 // service for limiting the number of concurrent lint tasks
-interface AndroidXLintService : BuildService<BuildServiceParameters.None> {
-}
+interface AndroidXLintService : BuildService<BuildServiceParameters.None>
 
 fun Project.configureRootProjectForLint() {
     // determine many lint tasks to run in parallel
