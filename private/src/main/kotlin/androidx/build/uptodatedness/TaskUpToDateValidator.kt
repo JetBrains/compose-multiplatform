@@ -190,6 +190,7 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
     "lintWithKspDebug"
 )
 
+@Suppress("UnstableApiUsage") // usage of BuildService that's incubating
 abstract class TaskUpToDateValidator :
     BuildService<TaskUpToDateValidator.Parameters>, OperationCompletionListener {
     interface Parameters : BuildServiceParameters {
@@ -200,7 +201,7 @@ abstract class TaskUpToDateValidator :
     }
 
     override fun onFinish(event: FinishEvent) {
-        if (!getParameters().validate.get()) {
+        if (!parameters.validate.get()) {
             return
         }
         val result = event.result
@@ -228,7 +229,7 @@ abstract class TaskUpToDateValidator :
         // Tells whether to create a TaskUpToDateValidator listener
         private fun shouldEnable(project: Project): Boolean {
             return project.providers.gradleProperty(ENABLE_FLAG_NAME)
-                .forUseAtConfigurationTime().isPresent()
+                .forUseAtConfigurationTime().isPresent
         }
 
         private fun isAllowedToRerunTask(taskPath: String): Boolean {
@@ -257,14 +258,13 @@ abstract class TaskUpToDateValidator :
                 return
             }
             val validate = rootProject.providers.gradleProperty(DISALLOW_TASK_EXECUTION_FLAG_NAME)
-                .map({ _ -> true }).orElse(false)
+                .map { true }.orElse(false)
             // create listener for validating that any task that reran was expected to rerun
-            val validatorProvider = rootProject.getGradle().getSharedServices()
+            val validatorProvider = rootProject.gradle.sharedServices
                 .registerIfAbsent(
                     "TaskUpToDateValidator",
-                    TaskUpToDateValidator::class.java,
-                    { spec -> spec.getParameters().validate = validate }
-                )
+                    TaskUpToDateValidator::class.java
+                ) { spec -> spec.parameters.validate = validate }
             registry.onTaskCompletion(validatorProvider)
 
             // skip rerunning tasks that are known to be unnecessary to rerun
