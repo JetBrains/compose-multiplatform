@@ -788,7 +788,7 @@ fun <T> produceState(
  * parameter or event callback changes, but they should have the current value available when
  * needed. For example:
  *
- * @sample androidx.compose.runtime.samples.rememberUpdatedStateSampleWithLaunchedTask
+ * @sample androidx.compose.runtime.samples.rememberUpdatedStateSampleWithLaunchedEffect
  *
  * By using [rememberUpdatedState] a composable function can update these operations in progress.
  */
