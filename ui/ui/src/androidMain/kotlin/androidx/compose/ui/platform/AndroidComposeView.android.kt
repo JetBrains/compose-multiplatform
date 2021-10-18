@@ -419,7 +419,7 @@ internal class AndroidComposeView(context: Context) :
     private val layerCache = WeakCache<OwnedLayer>()
 
     /**
-     * Runnable used to update the pointer position 150ms after layout. If
+     * Runnable used to update the pointer position after layout. If
      * another pointer event comes in before this runs, this Runnable will be removed and
      * not executed.
      */
@@ -1130,7 +1130,12 @@ internal class AndroidComposeView(context: Context) :
         for (i in 0 until pointerCount) {
             val sourceIndex = i + if (upIndex < 0 || i < upIndex) 0 else 1
             motionEvent.getPointerProperties(sourceIndex, pointerProperties[i])
-            motionEvent.getPointerCoords(sourceIndex, pointerCoords[i])
+            val coords = pointerCoords[i]
+            motionEvent.getPointerCoords(sourceIndex, coords)
+            val localPosition = Offset(coords.x, coords.y)
+            val screenPosition = localToScreen(localPosition)
+            coords.x = screenPosition.x
+            coords.y = screenPosition.y
         }
         val buttonState = if (forceHover) 0 else motionEvent.buttonState
 
