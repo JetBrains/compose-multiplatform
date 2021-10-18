@@ -18,7 +18,6 @@ package androidx.compose.runtime {
 
   public final class ActualAndroid_androidKt {
     method @Deprecated public static androidx.compose.runtime.MonotonicFrameClock getDefaultMonotonicFrameClock();
-    property @Deprecated public static final androidx.compose.runtime.MonotonicFrameClock DefaultMonotonicFrameClock;
   }
 
   public final class ActualJvm_jvmKt {
@@ -72,10 +71,6 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.Composable public static inline <T> T! remember(Object? key1, Object? key2, Object? key3, kotlin.jvm.functions.Function0<? extends T> calculation);
     method @androidx.compose.runtime.Composable public static inline <T> T! remember(Object![]? keys, kotlin.jvm.functions.Function0<? extends T> calculation);
     method @androidx.compose.runtime.Composable public static androidx.compose.runtime.CompositionContext rememberCompositionContext();
-    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static final androidx.compose.runtime.Composer currentComposer;
-    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ExplicitGroupsComposable public static final int currentCompositeKeyHash;
-    property @androidx.compose.runtime.Composable public static final androidx.compose.runtime.CompositionLocalContext currentCompositionLocalContext;
-    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static final androidx.compose.runtime.RecomposeScope currentRecomposeScope;
   }
 
   @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ComposeCompilerApi {
@@ -363,7 +358,6 @@ package androidx.compose.runtime {
 
   public final inline class SkippableUpdater<T> {
     ctor public SkippableUpdater();
-    method public inline void update(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> block);
   }
 
   public final class SlotTableKt {
@@ -415,8 +409,6 @@ package androidx.compose.runtime {
 
   public final inline class Updater<T> {
     ctor public Updater();
-    method public inline void set(int value, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,? extends kotlin.Unit> block);
-    method public inline void update(int value, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,? extends kotlin.Unit> block);
   }
 
 }
@@ -576,7 +568,6 @@ package androidx.compose.runtime.internal {
 
   public final class LiveLiteralKt {
     method public static boolean isLiveLiteralsEnabled();
-    property public static final boolean isLiveLiteralsEnabled;
   }
 
   @androidx.compose.runtime.ComposeCompilerApi @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget) public @interface StabilityInferred {
@@ -793,7 +784,6 @@ package androidx.compose.runtime.tooling {
 
   public final class InspectionTablesKt {
     method public static androidx.compose.runtime.ProvidableCompositionLocal<java.util.Set<androidx.compose.runtime.tooling.CompositionData>> getLocalInspectionTables();
-    property public static final androidx.compose.runtime.ProvidableCompositionLocal<java.util.Set<androidx.compose.runtime.tooling.CompositionData>> LocalInspectionTables;
   }
 
 }

@@ -52,15 +52,7 @@ package androidx.compose.ui.unit {
   @androidx.compose.runtime.Immutable public final inline class Dp implements java.lang.Comparable<androidx.compose.ui.unit.Dp> {
     ctor public Dp();
     method @androidx.compose.runtime.Stable public operator int compareTo(float other);
-    method @androidx.compose.runtime.Stable public inline operator float div(float other);
-    method @androidx.compose.runtime.Stable public inline operator float div(int other);
-    method @androidx.compose.runtime.Stable public inline operator float div(float other);
     method public float getValue();
-    method @androidx.compose.runtime.Stable public inline operator float minus(float other);
-    method @androidx.compose.runtime.Stable public inline operator float plus(float other);
-    method @androidx.compose.runtime.Stable public inline operator float times(float other);
-    method @androidx.compose.runtime.Stable public inline operator float times(int other);
-    method @androidx.compose.runtime.Stable public inline operator float unaryMinus();
     property public final float value;
   }
 
@@ -110,8 +102,6 @@ package androidx.compose.ui.unit {
 
   @androidx.compose.runtime.Immutable public final inline class DpOffset {
     ctor public DpOffset();
-    method @androidx.compose.runtime.Stable public inline operator long minus(long other);
-    method @androidx.compose.runtime.Stable public inline operator long plus(long other);
   }
 
   public static final class DpOffset.Companion {
@@ -145,14 +135,6 @@ package androidx.compose.ui.unit {
 
   @androidx.compose.runtime.Immutable public final inline class DpSize {
     ctor public DpSize();
-    method @androidx.compose.runtime.Stable public inline operator float component1();
-    method @androidx.compose.runtime.Stable public inline operator float component2();
-    method @androidx.compose.runtime.Stable public operator long div(int other);
-    method @androidx.compose.runtime.Stable public operator long div(float other);
-    method @androidx.compose.runtime.Stable public inline operator long minus(long other);
-    method @androidx.compose.runtime.Stable public inline operator long plus(long other);
-    method @androidx.compose.runtime.Stable public operator long times(int other);
-    method @androidx.compose.runtime.Stable public operator long times(float other);
   }
 
   public static final class DpSize.Companion {
@@ -164,14 +146,6 @@ package androidx.compose.ui.unit {
 
   @androidx.compose.runtime.Immutable public final inline class IntOffset {
     ctor public IntOffset();
-    method @androidx.compose.runtime.Stable public operator int component1();
-    method @androidx.compose.runtime.Stable public operator int component2();
-    method @androidx.compose.runtime.Stable public operator long div(float operand);
-    method @androidx.compose.runtime.Stable public inline operator long minus(long other);
-    method @androidx.compose.runtime.Stable public inline operator long plus(long other);
-    method @androidx.compose.runtime.Stable public operator long rem(int operand);
-    method @androidx.compose.runtime.Stable public operator long times(float operand);
-    method @androidx.compose.runtime.Stable public inline operator long unaryMinus();
   }
 
   public static final class IntOffset.Companion {
@@ -259,10 +233,6 @@ package androidx.compose.ui.unit {
 
   @androidx.compose.runtime.Immutable public final inline class IntSize {
     ctor public IntSize();
-    method @androidx.compose.runtime.Stable public inline operator int component1();
-    method @androidx.compose.runtime.Stable public inline operator int component2();
-    method @androidx.compose.runtime.Stable public operator long div(int other);
-    method @androidx.compose.runtime.Stable public operator long times(int other);
   }
 
   public static final class IntSize.Companion {
@@ -285,14 +255,6 @@ package androidx.compose.ui.unit {
 
   @androidx.compose.runtime.Immutable public final inline class TextUnit {
     ctor public TextUnit();
-    method public inline operator int compareTo(long other);
-    method public inline operator long div(float other);
-    method public inline operator long div(double other);
-    method public inline operator long div(int other);
-    method public inline operator long times(float other);
-    method public inline operator long times(double other);
-    method public inline operator long times(int other);
-    method public inline operator long unaryMinus();
   }
 
   public static final class TextUnit.Companion {
@@ -331,14 +293,6 @@ package androidx.compose.ui.unit {
 
   @androidx.compose.runtime.Immutable public final inline class Velocity {
     ctor public Velocity();
-    method @androidx.compose.runtime.Stable public operator float component1();
-    method @androidx.compose.runtime.Stable public operator float component2();
-    method @androidx.compose.runtime.Stable public operator long div(float operand);
-    method @androidx.compose.runtime.Stable public operator long minus(long other);
-    method @androidx.compose.runtime.Stable public operator long plus(long other);
-    method @androidx.compose.runtime.Stable public operator long rem(float operand);
-    method @androidx.compose.runtime.Stable public operator long times(float operand);
-    method @androidx.compose.runtime.Stable public operator long unaryMinus();
   }
 
   public static final class Velocity.Companion {

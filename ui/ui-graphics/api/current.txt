@@ -299,12 +299,6 @@ package androidx.compose.ui.graphics {
 
   @androidx.compose.runtime.Immutable public final inline class Color {
     ctor public Color();
-    method @androidx.compose.runtime.Stable public operator float component1();
-    method @androidx.compose.runtime.Stable public operator float component2();
-    method @androidx.compose.runtime.Stable public operator float component3();
-    method @androidx.compose.runtime.Stable public operator float component4();
-    method @androidx.compose.runtime.Stable public operator androidx.compose.ui.graphics.colorspace.ColorSpace! component5();
-    method @androidx.compose.runtime.Stable public long copy(optional float alpha, optional float red, optional float green, optional float blue);
     method public long getValue();
     property public final long value;
   }
@@ -364,10 +358,7 @@ package androidx.compose.ui.graphics {
 
   public final inline class ColorMatrix {
     ctor public ColorMatrix();
-    method public inline operator float get(int row, int column);
     method public float[] getValues();
-    method public inline operator void set(int row, int column, float v);
-    method public operator void timesAssign(float[] colorMatrix);
     property public final float[] values;
   }
 
@@ -444,10 +435,7 @@ package androidx.compose.ui.graphics {
 
   public final inline class Matrix {
     ctor public Matrix();
-    method public inline operator float get(int row, int column);
     method public float[] getValues();
-    method public inline operator void set(int row, int column, float v);
-    method public operator void timesAssign(float[] m);
     property public final float[] values;
   }
 
@@ -543,7 +531,6 @@ package androidx.compose.ui.graphics {
   }
 
   public final class PaintKt {
-    method public static androidx.compose.ui.graphics.Paint! Paint();
     field public static final float DefaultAlpha = 1.0f;
   }
 
@@ -689,7 +676,6 @@ package androidx.compose.ui.graphics {
 
   public final class RectangleShapeKt {
     method public static androidx.compose.ui.graphics.Shape getRectangleShape();
-    property public static final androidx.compose.ui.graphics.Shape RectangleShape;
   }
 
   @androidx.compose.runtime.Immutable public abstract sealed class RenderEffect {
@@ -1107,7 +1093,7 @@ package androidx.compose.ui.graphics.drawscope {
     method public void drawCircle(long color, optional float radius, optional long center, optional float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional int blendMode);
     method public void drawImage(androidx.compose.ui.graphics.ImageBitmap image, optional long topLeft, optional float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional int blendMode);
     method public default void drawImage(androidx.compose.ui.graphics.ImageBitmap image, optional long srcOffset, optional long srcSize, optional long dstOffset, optional long dstSize, optional float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional int blendMode, optional int filterQuality);
-    method @Deprecated public void drawImage(androidx.compose.ui.graphics.ImageBitmap image, optional long srcOffset, optional long srcSize, optional long dstOffset, optional long dstSize, optional float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional int blendMode);
+    method public void drawImage(androidx.compose.ui.graphics.ImageBitmap image, optional long srcOffset, optional long srcSize, optional long dstOffset, optional long dstSize, optional float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional int blendMode);
     method public void drawLine(androidx.compose.ui.graphics.Brush brush, long start, long end, optional float strokeWidth, optional int cap, optional androidx.compose.ui.graphics.PathEffect? pathEffect, optional float alpha, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional int blendMode);
     method public void drawLine(long color, long start, long end, optional float strokeWidth, optional int cap, optional androidx.compose.ui.graphics.PathEffect? pathEffect, optional float alpha, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional int blendMode);
     method public void drawOval(androidx.compose.ui.graphics.Brush brush, optional long topLeft, optional long size, optional float alpha, optional androidx.compose.ui.graphics.drawscope.DrawStyle style, optional androidx.compose.ui.graphics.ColorFilter? colorFilter, optional int blendMode);
@@ -1124,6 +1110,7 @@ package androidx.compose.ui.graphics.drawscope {
     method public androidx.compose.ui.graphics.drawscope.DrawContext getDrawContext();
     method public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
     method public default long getSize();
+    method public long offsetSize(long, long offset);
     property public default long center;
     property public abstract androidx.compose.ui.graphics.drawscope.DrawContext drawContext;
     property public abstract androidx.compose.ui.unit.LayoutDirection layoutDirection;
