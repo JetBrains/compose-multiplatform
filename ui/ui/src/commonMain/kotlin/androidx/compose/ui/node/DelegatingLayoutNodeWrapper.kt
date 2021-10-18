@@ -213,8 +213,7 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
             ) {
                 // Hit closer than existing handlers, so just record it
                 hitTestResult.hitInMinimumTouchTarget(content, distanceFromEdge, block)
-            }
-            if (forceParentIntercept) {
+            } else if (forceParentIntercept) {
                 // We only want to replace the existing touch target if there are better
                 // hits in the children
                 hitTestResult.speculativeHit(content, distanceFromEdge, block)
