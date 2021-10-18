@@ -488,6 +488,16 @@ package androidx.compose.foundation.lazy.layout {
 
 }
 
+package androidx.compose.foundation.relocation {
+
+  public final class BringIntoViewRequesterKt {
+  }
+
+  public final class BringRectangleOnScreen_androidKt {
+  }
+
+}
+
 package androidx.compose.foundation.selection {
 
   public final class SelectableGroupKt {

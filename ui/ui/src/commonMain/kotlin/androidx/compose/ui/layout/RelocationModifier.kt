@@ -19,8 +19,6 @@ package androidx.compose.ui.layout
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.platform.InspectorValueInfo
-import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
  * A [modifier][Modifier.Element] that can be used to respond to relocation requests to relocate
@@ -33,11 +31,13 @@ import androidx.compose.ui.platform.debugInspectorInfo
  * compute their destinations, the framework calls [performRelocation](source, destination)
  * which performs the actual relocation (scrolling).
  *
- * @sample androidx.compose.ui.samples.BringIntoViewSample
- *
  * @see RelocationRequester
  */
 @ExperimentalComposeUiApi
+@Deprecated(
+    message = "Please use BringIntoViewParent instead.",
+    level = DeprecationLevel.ERROR
+)
 interface RelocationModifier : Modifier.Element {
     /**
      * Compute the destination given the source rectangle and current bounds.
@@ -55,14 +55,15 @@ interface RelocationModifier : Modifier.Element {
     suspend fun performRelocation(source: Rect, destination: Rect)
 }
 
-private val debugInspectorInfo = debugInspectorInfo { name = "onRelocationRequest" }
-
 /**
  * Add this modifier to respond to requests to bring an item into view.
- *
- * @sample androidx.compose.ui.samples.BringIntoViewSample
  */
+@Suppress("UNUSED_PARAMETER", "unused")
 @ExperimentalComposeUiApi
+@Deprecated(
+    message = "Please use BringIntoViewParent instead.",
+    level = DeprecationLevel.ERROR
+)
 fun Modifier.onRelocationRequest(
     /**
      * Provide the destination given the source rectangle and current bounds.
@@ -78,19 +79,4 @@ fun Modifier.onRelocationRequest(
      * source rect to the destination location. (This is usually achieved by scrolling).
      */
     onPerformRelocation: suspend (sourceRect: Rect, destinationRect: Rect) -> Unit
-): Modifier {
-    return then(
-        object : RelocationModifier, InspectorValueInfo(debugInspectorInfo) {
-            override fun computeDestination(
-                source: Rect,
-                layoutCoordinates: LayoutCoordinates
-            ): Rect {
-                return onProvideDestination(source, layoutCoordinates)
-            }
-
-            override suspend fun performRelocation(source: Rect, destination: Rect) {
-                onPerformRelocation(source, destination)
-            }
-        }
-    )
-}
+): Modifier = this

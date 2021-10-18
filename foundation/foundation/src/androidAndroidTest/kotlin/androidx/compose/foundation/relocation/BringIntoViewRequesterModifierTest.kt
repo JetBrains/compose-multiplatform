@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.layout
+package androidx.compose.foundation.relocation
 
 import android.os.Build.VERSION_CODES.O
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.Orientation.Horizontal
@@ -33,10 +34,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.testutils.assertAgainstGolden
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.GOLDEN_UI
+import androidx.compose.foundation.GOLDEN_UI
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.background
+import androidx.compose.foundation.background
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -64,11 +64,11 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalFoundationApi::class)
 @MediumTest
 @RunWith(Parameterized::class)
 @SdkSuppress(minSdkVersion = O)
-class RelocationRequesterModifierTest(private val orientation: Orientation) {
+class BringIntoViewRequesterModifierTest(private val orientation: Orientation) {
     @get:Rule
     val rule = createComposeRule()
 
@@ -86,7 +86,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
     @Test
     fun noScrollableParent_noChange() {
         // Arrange.
-        val relocationRequester = RelocationRequester()
+        val bringIntoViewRequester = BringIntoViewRequester()
         rule.setContent {
             Box(
                 Modifier
@@ -103,13 +103,13 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                     Modifier
                         .size(50.dp)
                         .background(Blue)
-                        .relocationRequester(relocationRequester)
+                        .bringIntoViewRequester(bringIntoViewRequester)
                 )
             }
         }
 
         // Act.
-        runBlockingAndAwaitIdle { relocationRequester.bringIntoView() }
+        runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
         assertScreenshot(if (horizontal) "blueBoxLeft" else "blueBoxTop")
@@ -118,7 +118,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
     @Test
     fun noScrollableParent_itemNotVisible_noChange() {
         // Arrange.
-        val relocationRequester = RelocationRequester()
+        val bringIntoViewRequester = BringIntoViewRequester()
         rule.setContent {
             Box(
                 Modifier
@@ -141,13 +141,13 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                         )
                         .size(50.dp)
                         .background(Blue)
-                        .relocationRequester(relocationRequester)
+                        .bringIntoViewRequester(bringIntoViewRequester)
                 )
             }
         }
 
         // Act.
-        runBlockingAndAwaitIdle { relocationRequester.bringIntoView() }
+        runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
         assertScreenshot(if (horizontal) "grayRectangleHorizontal" else "grayRectangleVertical")
@@ -156,7 +156,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
     @Test
     fun itemAtLeadingEdge_alreadyVisible_noChange() {
         // Arrange.
-        val relocationRequester = RelocationRequester()
+        val bringIntoViewRequester = BringIntoViewRequester()
         rule.setContent {
             Box(
                 Modifier
@@ -179,13 +179,13 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                     Modifier
                         .size(50.dp)
                         .background(Blue)
-                        .relocationRequester(relocationRequester)
+                        .bringIntoViewRequester(bringIntoViewRequester)
                 )
             }
         }
 
         // Act.
-        runBlockingAndAwaitIdle { relocationRequester.bringIntoView() }
+        runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
         assertScreenshot(if (horizontal) "blueBoxLeft" else "blueBoxTop")
@@ -194,7 +194,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
     @Test
     fun itemAtTrailingEdge_alreadyVisible_noChange() {
         // Arrange.
-        val relocationRequester = RelocationRequester()
+        val bringIntoViewRequester = BringIntoViewRequester()
         rule.setContent {
             Box(
                 Modifier
@@ -223,13 +223,13 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                         )
                         .size(50.dp)
                         .background(Blue)
-                        .relocationRequester(relocationRequester)
+                        .bringIntoViewRequester(bringIntoViewRequester)
                 )
             }
         }
 
         // Act.
-        runBlockingAndAwaitIdle { relocationRequester.bringIntoView() }
+        runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
         assertScreenshot(if (horizontal) "blueBoxRight" else "blueBoxBottom")
@@ -238,7 +238,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
     @Test
     fun itemAtCenter_alreadyVisible_noChange() {
         // Arrange.
-        val relocationRequester = RelocationRequester()
+        val bringIntoViewRequester = BringIntoViewRequester()
         rule.setContent {
             Box(
                 Modifier
@@ -267,13 +267,13 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                         )
                         .size(50.dp)
                         .background(Blue)
-                        .relocationRequester(relocationRequester)
+                        .bringIntoViewRequester(bringIntoViewRequester)
                 )
             }
         }
 
         // Act.
-        runBlockingAndAwaitIdle { relocationRequester.bringIntoView() }
+        runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
         assertScreenshot(if (horizontal) "blueBoxCenterHorizontal" else "blueBoxCenterVertical")
@@ -282,7 +282,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
     @Test
     fun itemBiggerThanParentAtLeadingEdge_alreadyVisible_noChange() {
         // Arrange.
-        val relocationRequester = RelocationRequester()
+        val bringIntoViewRequester = BringIntoViewRequester()
         rule.setContent {
             Box(
                 Modifier
@@ -298,7 +298,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
             ) {
                 // Using a multi-colored item to make sure we can assert that the right part of
                 // the item is visible.
-                RowOrColumn(Modifier.relocationRequester(relocationRequester)) {
+                RowOrColumn(Modifier.bringIntoViewRequester(bringIntoViewRequester)) {
                     Box(Modifier.size(50.dp).background(Blue))
                     Box(Modifier.size(50.dp).background(Green))
                     Box(Modifier.size(50.dp).background(Red))
@@ -307,7 +307,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         }
 
         // Act.
-        runBlockingAndAwaitIdle { relocationRequester.bringIntoView() }
+        runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
         assertScreenshot("blueBox")
@@ -316,7 +316,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
     @Test
     fun itemBiggerThanParentAtTrailingEdge_alreadyVisible_noChange() {
         // Arrange.
-        val relocationRequester = RelocationRequester()
+        val bringIntoViewRequester = BringIntoViewRequester()
         lateinit var scrollState: ScrollState
         rule.setContent {
             scrollState = rememberScrollState()
@@ -334,7 +334,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
             ) {
                 // Using a multi-colored item to make sure we can assert that the right part of
                 // the item is visible.
-                RowOrColumn(Modifier.relocationRequester(relocationRequester)) {
+                RowOrColumn(Modifier.bringIntoViewRequester(bringIntoViewRequester)) {
                     Box(Modifier.size(50.dp).background(Red))
                     Box(Modifier.size(50.dp).background(Green))
                     Box(Modifier.size(50.dp).background(Blue))
@@ -344,7 +344,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         runBlockingAndAwaitIdle { scrollState.scrollTo(scrollState.maxValue) }
 
         // Act.
-        runBlockingAndAwaitIdle { relocationRequester.bringIntoView() }
+        runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
         assertScreenshot("blueBox")
@@ -353,7 +353,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
     @Test
     fun itemBiggerThanParentAtCenter_alreadyVisible_noChange() {
         // Arrange.
-        val relocationRequester = RelocationRequester()
+        val bringIntoViewRequester = BringIntoViewRequester()
         lateinit var scrollState: ScrollState
         rule.setContent {
             scrollState = rememberScrollState()
@@ -371,7 +371,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
             ) {
                 // Using a multi-colored item to make sure we can assert that the right part of
                 // the item is visible.
-                RowOrColumn(Modifier.relocationRequester(relocationRequester)) {
+                RowOrColumn(Modifier.bringIntoViewRequester(bringIntoViewRequester)) {
                     Box(Modifier.size(50.dp).background(Green))
                     Box(Modifier.size(50.dp).background(Blue))
                     Box(Modifier.size(50.dp).background(Red))
@@ -381,7 +381,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         runBlockingAndAwaitIdle { scrollState.scrollTo(scrollState.maxValue / 2) }
 
         // Act.
-        runBlockingAndAwaitIdle { relocationRequester.bringIntoView() }
+        runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
         assertScreenshot("blueBox")
@@ -390,7 +390,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
     @Test
     fun childBeforeVisibleBounds_parentIsScrolledSoThatLeadingEdgeOfChildIsVisible() {
         // Arrange.
-        val relocationRequester = RelocationRequester()
+        val bringIntoViewRequester = BringIntoViewRequester()
         lateinit var scrollState: ScrollState
         rule.setContent {
             scrollState = rememberScrollState()
@@ -427,7 +427,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                             )
                             .size(50.dp)
                             .background(Blue)
-                            .relocationRequester(relocationRequester)
+                            .bringIntoViewRequester(bringIntoViewRequester)
                     )
                 }
             }
@@ -435,7 +435,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         runBlockingAndAwaitIdle { scrollState.scrollTo(scrollState.maxValue) }
 
         // Act.
-        runBlockingAndAwaitIdle { relocationRequester.bringIntoView() }
+        runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
         assertScreenshot(if (horizontal) "blueBoxLeft" else "blueBoxTop")
@@ -444,7 +444,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
     @Test
     fun childAfterVisibleBounds_parentIsScrolledSoThatTrailingEdgeOfChildIsVisible() {
         // Arrange.
-        val relocationRequester = RelocationRequester()
+        val bringIntoViewRequester = BringIntoViewRequester()
         lateinit var scrollState: ScrollState
         rule.setContent {
             scrollState = rememberScrollState()
@@ -481,7 +481,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                             )
                             .size(50.dp)
                             .background(Blue)
-                            .relocationRequester(relocationRequester)
+                            .bringIntoViewRequester(bringIntoViewRequester)
                     )
                 }
             }
@@ -489,7 +489,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         runBlockingAndAwaitIdle { scrollState.scrollTo(scrollState.maxValue) }
 
         // Act.
-        runBlockingAndAwaitIdle { relocationRequester.bringIntoView() }
+        runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
         assertScreenshot(if (horizontal) "blueBoxRight" else "blueBoxBottom")
@@ -498,7 +498,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
     @Test
     fun childPartiallyVisible_parentIsScrolledSoThatLeadingEdgeOfChildIsVisible() {
         // Arrange.
-        val relocationRequester = RelocationRequester()
+        val bringIntoViewRequester = BringIntoViewRequester()
         lateinit var scrollState: ScrollState
         rule.setContent {
             scrollState = rememberScrollState()
@@ -530,7 +530,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                             )
                             .size(50.dp)
                             .background(Blue)
-                            .relocationRequester(relocationRequester)
+                            .bringIntoViewRequester(bringIntoViewRequester)
                     )
                 }
             }
@@ -538,7 +538,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         runBlockingAndAwaitIdle { scrollState.scrollTo(scrollState.maxValue / 2) }
 
         // Act.
-        runBlockingAndAwaitIdle { relocationRequester.bringIntoView() }
+        runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
         assertScreenshot(if (horizontal) "blueBoxLeft" else "blueBoxTop")
@@ -547,7 +547,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
     @Test
     fun childPartiallyVisible_parentIsScrolledSoThatTrailingEdgeOfChildIsVisible() {
         // Arrange.
-        val relocationRequester = RelocationRequester()
+        val bringIntoViewRequester = BringIntoViewRequester()
         lateinit var scrollState: ScrollState
         rule.setContent {
             scrollState = rememberScrollState()
@@ -584,7 +584,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                             )
                             .size(50.dp)
                             .background(Blue)
-                            .relocationRequester(relocationRequester)
+                            .bringIntoViewRequester(bringIntoViewRequester)
                     )
                 }
             }
@@ -592,7 +592,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         runBlockingAndAwaitIdle { scrollState.scrollTo(scrollState.maxValue) }
 
         // Act.
-        runBlockingAndAwaitIdle { relocationRequester.bringIntoView() }
+        runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
         assertScreenshot(if (horizontal) "blueBoxRight" else "blueBoxBottom")
@@ -601,7 +601,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
     @Test
     fun multipleParentsAreScrolledSoThatChildIsVisible() {
         // Arrange.
-        val relocationRequester = RelocationRequester()
+        val bringIntoViewRequester = BringIntoViewRequester()
         lateinit var parentScrollState: ScrollState
         lateinit var grandParentScrollState: ScrollState
         rule.setContent {
@@ -656,7 +656,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                                 )
                                 .size(50.dp)
                                 .background(Blue)
-                                .relocationRequester(relocationRequester)
+                                .bringIntoViewRequester(bringIntoViewRequester)
                         )
                     }
                 }
@@ -666,7 +666,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         runBlockingAndAwaitIdle { grandParentScrollState.scrollTo(grandParentScrollState.maxValue) }
 
         // Act.
-        runBlockingAndAwaitIdle { relocationRequester.bringIntoView() }
+        runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
         assertScreenshot(if (horizontal) "blueBoxLeft" else "blueBoxTop")
@@ -675,7 +675,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
     @Test
     fun multipleParentsAreScrolledInDifferentDirectionsSoThatChildIsVisible() {
         // Arrange.
-        val relocationRequester = RelocationRequester()
+        val bringIntoViewRequester = BringIntoViewRequester()
         lateinit var parentScrollState: ScrollState
         lateinit var grandParentScrollState: ScrollState
         rule.setContent {
@@ -715,7 +715,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                                 .offset(x = 25.dp, y = 25.dp)
                                 .size(50.dp)
                                 .background(Blue)
-                                .relocationRequester(relocationRequester)
+                                .bringIntoViewRequester(bringIntoViewRequester)
                         )
                     }
                 }
@@ -725,7 +725,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
         runBlockingAndAwaitIdle { grandParentScrollState.scrollTo(grandParentScrollState.maxValue) }
 
         // Act.
-        runBlockingAndAwaitIdle { relocationRequester.bringIntoView() }
+        runBlockingAndAwaitIdle { bringIntoViewRequester.bringIntoView() }
 
         // Assert.
         assertScreenshot(if (horizontal) "blueBoxLeft" else "blueBoxTop")
@@ -734,7 +734,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
     @Test
     fun specifiedPartOfComponentBroughtOnScreen() {
         // Arrange.
-        val relocationRequester = RelocationRequester()
+        val bringIntoViewRequester = BringIntoViewRequester()
         lateinit var density: Density
         rule.setContent {
             density = LocalDensity.current
@@ -754,7 +754,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                     when (orientation) {
                         Horizontal -> Modifier.size(150.dp, 50.dp)
                         Vertical -> Modifier.size(50.dp, 150.dp)
-                    }.relocationRequester(relocationRequester)
+                    }.bringIntoViewRequester(bringIntoViewRequester)
                 ) {
                     with(density) {
                         drawRect(
@@ -778,7 +778,7 @@ class RelocationRequesterModifierTest(private val orientation: Orientation) {
                     Vertical -> Rect(0.dp.toPx(), 50.dp.toPx(), 50.dp.toPx(), 100.dp.toPx())
                 }
             }
-            relocationRequester.bringIntoView(rect)
+            bringIntoViewRequester.bringIntoView(rect)
         }
 
         // Assert.

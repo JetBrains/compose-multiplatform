@@ -14,35 +14,35 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.demos.scroll
+package androidx.compose.foundation.demos.relocation
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.RelocationRequester
-import androidx.compose.ui.layout.relocationRequester
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RequestRectangleOnScreenDemo() {
-    val relocationRequester = remember { RelocationRequester() }
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
     val coroutineScope = rememberCoroutineScope()
     Column {
         TextField(value = "Click here to bring up the soft keyboard", onValueChange = {})
-        Button(onClick = { coroutineScope.launch { relocationRequester.bringIntoView() } }) {
+        Button(onClick = { coroutineScope.launch { bringIntoViewRequester.bringIntoView() } }) {
             Text("Bring blue rectangle into view")
         }
         Spacer(Modifier.weight(weight = 1f, fill = true))
@@ -50,7 +50,7 @@ fun RequestRectangleOnScreenDemo() {
             Modifier
                 .size(50.dp)
                 .background(Color.Blue)
-                .relocationRequester(relocationRequester)
+                .bringIntoViewRequester(bringIntoViewRequester)
         )
     }
 }
