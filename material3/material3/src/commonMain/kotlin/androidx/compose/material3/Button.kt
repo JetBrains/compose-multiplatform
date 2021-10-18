@@ -20,6 +20,8 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.FocusInteraction
+import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -825,9 +827,7 @@ interface ButtonColors {
 private class DefaultButtonElevation(
     private val defaultElevation: Dp,
     private val pressedElevation: Dp,
-    @Suppress("unused") // TODO(b/201342102): Add support for focused states.
     private val focusedElevation: Dp,
-    @Suppress("unused") // TODO(b/201342102): Add support for hovered states.
     private val hoveredElevation: Dp,
     private val disabledElevation: Dp,
 ) : ButtonElevation {
@@ -853,6 +853,18 @@ private class DefaultButtonElevation(
         LaunchedEffect(interactionSource) {
             interactionSource.interactions.collect { interaction ->
                 when (interaction) {
+                    is HoverInteraction.Enter -> {
+                        interactions.add(interaction)
+                    }
+                    is HoverInteraction.Exit -> {
+                        interactions.remove(interaction.enter)
+                    }
+                    is FocusInteraction.Focus -> {
+                        interactions.add(interaction)
+                    }
+                    is FocusInteraction.Unfocus -> {
+                        interactions.remove(interaction.focus)
+                    }
                     is PressInteraction.Press -> {
                         interactions.add(interaction)
                     }
@@ -874,6 +886,8 @@ private class DefaultButtonElevation(
             } else {
                 when (interaction) {
                     is PressInteraction.Press -> pressedElevation
+                    is HoverInteraction.Enter -> hoveredElevation
+                    is FocusInteraction.Focus -> focusedElevation
                     else -> defaultElevation
                 }
             }
@@ -885,7 +899,8 @@ private class DefaultButtonElevation(
             LaunchedEffect(target) { animatable.snapTo(target) }
         } else {
             LaunchedEffect(target) {
-                // TODO(b/196061625): Add back animateElevation code.
+                // TODO(b/203232064): Use lastInteraction and animateElevation from Elevation.kt.
+                animatable.snapTo(target)
             }
         }
 
