@@ -16,32 +16,25 @@
 
 package androidx.compose.ui.layout
 
-import androidx.compose.runtime.collection.MutableVector
-import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.toRect
-import androidx.compose.ui.platform.ifDebug
-import androidx.compose.ui.unit.toSize
 
 /**
  * This class can be used to send relocation requests. Pass it as a parameter to
  * [Modifier.relocationRequester()][relocationRequester].
- *
- * For instance, you can call [RelocationRequester.bringIntoView][bringIntoView] to
- * make all the scrollable parents scroll so that the specified item is brought into parent
- * bounds. This sample demonstrates this use case:
- *
- * Here is a sample where a composable is brought into view:
- * @sample androidx.compose.ui.samples.BringIntoViewSample
- *
- * Here is a sample where a part of a composable is brought into view:
- * @sample androidx.compose.ui.samples.BringPartOfComposableIntoViewSample
  */
 @ExperimentalComposeUiApi
-class RelocationRequester {
-    internal val modifiers: MutableVector<RelocationRequesterModifier> = mutableVectorOf()
+@Suppress("UNUSED_PARAMETER", "RedundantSuspendModifier")
+@Deprecated(
+    message = "Please use BringIntoViewRequester instead.",
+    replaceWith = ReplaceWith(
+        "BringIntoViewRequester",
+        "androidx.compose.foundation.relocation.BringIntoViewRequester"
 
+    ),
+    level = DeprecationLevel.ERROR
+)
+class RelocationRequester {
     /**
      * Bring this item into bounds by making all the scrollable parents scroll appropriately.
      *
@@ -49,21 +42,15 @@ class RelocationRequester {
      * don't specify the coordinates, the coordinates of the
      * [Modifier.relocationRequester()][relocationRequester] associated with this
      * [RelocationRequester] will be used.
-     *
-     * Here is a sample where a composable is brought into view:
-     * @sample androidx.compose.ui.samples.BringIntoViewSample
-     *
-     * Here is a sample where a part of a composable is brought into view:
-     * @sample androidx.compose.ui.samples.BringPartOfComposableIntoViewSample
      */
-    suspend fun bringIntoView(rect: Rect? = null) {
-        modifiers.forEach {
-            val node = it.relocationRequesterNode
-            when {
-                rect != null -> it.bringRectIntoView(rect)
-                node.isAttached -> it.bringRectIntoView(node.size.toSize().toRect())
-                else -> ifDebug { println("Cannot calculate rectangle to be brought into view") }
-            }
-        }
-    }
+    @Deprecated(
+        message = "Please use BringIntoViewRequester instead.",
+        replaceWith = ReplaceWith(
+            "bringIntoView",
+            "androidx.compose.foundation.relocation.BringIntoViewRequester"
+
+        ),
+        level = DeprecationLevel.ERROR
+    )
+    suspend fun bringIntoView(rect: Rect? = null) {}
 }

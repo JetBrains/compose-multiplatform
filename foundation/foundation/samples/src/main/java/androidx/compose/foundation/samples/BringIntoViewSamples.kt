@@ -14,54 +14,54 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.samples
+package androidx.compose.foundation.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.RelocationRequester
-import androidx.compose.ui.layout.relocationRequester
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
-@ExperimentalComposeUiApi
+@OptIn(ExperimentalFoundationApi::class)
 @Sampled
 @Composable
 fun BringIntoViewSample() {
     Row(Modifier.horizontalScroll(rememberScrollState())) {
         repeat(100) {
-            val relocationRequester = remember { RelocationRequester() }
+            val bringIntoViewRequester = remember { BringIntoViewRequester() }
             val coroutineScope = rememberCoroutineScope()
             Box(
                 Modifier
                     // This associates the RelocationRequester with a Composable that wants to be
                     // brought into view.
-                    .relocationRequester(relocationRequester)
+                    .bringIntoViewRequester(bringIntoViewRequester)
                     .onFocusChanged {
                         if (it.isFocused) {
                             coroutineScope.launch {
                                 // This sends a request to all parents that asks them to scroll so
                                 // that this item is brought into view.
-                                relocationRequester.bringIntoView()
+                                bringIntoViewRequester.bringIntoView()
                             }
                         }
                     }
@@ -71,12 +71,12 @@ fun BringIntoViewSample() {
     }
 }
 
-@ExperimentalComposeUiApi
+@OptIn(ExperimentalFoundationApi::class)
 @Sampled
 @Composable
 fun BringPartOfComposableIntoViewSample() {
     with(LocalDensity.current) {
-        val relocationRequester = remember { RelocationRequester() }
+        val bringIntoViewRequester = remember { BringIntoViewRequester() }
         val coroutineScope = rememberCoroutineScope()
         Column {
             Box(
@@ -90,7 +90,7 @@ fun BringPartOfComposableIntoViewSample() {
                         .size(1500f.toDp(), 500f.toDp())
                         // This associates the RelocationRequester with a Composable that wants
                         // to be brought into view.
-                        .relocationRequester(relocationRequester)
+                        .bringIntoViewRequester(bringIntoViewRequester)
                 ) {
                     drawCircle(color = Color.Red, radius = 250f, center = Offset(750f, 250f))
                 }
@@ -101,7 +101,7 @@ fun BringPartOfComposableIntoViewSample() {
                     coroutineScope.launch {
                         // This sends a request to all parents that asks them to scroll so that
                         // the circle is brought into view.
-                        relocationRequester.bringIntoView(circleCoordinates)
+                        bringIntoViewRequester.bringIntoView(circleCoordinates)
                     }
                 }
             ) {
