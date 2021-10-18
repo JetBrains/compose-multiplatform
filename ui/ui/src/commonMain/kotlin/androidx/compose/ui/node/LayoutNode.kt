@@ -677,10 +677,15 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
                     // it's draw bounds reflect the dimensions defined by the LayoutModifier.
                     // Please ensure that ModifierLocalProvider is the first item here so that
                     // other layoutNodeWrappers don't accidentally use values that they provided.
-                    // Also ensure that ModifierLocalConsumer is the last item here, so that the
-                    // other modifiers can access ModifierLocals read by the ModifierLocalConsumer.
+                    // Also ensure that ModifierLocalConsumer is the next item here, so that it is
+                    // created after all the other LayoutNodeWrappers are created, (So that the
+                    // other layoutNodeWrappers are initialized by the time
+                    // onModifierLocalsUpdated() is called.
                     if (mod is ModifierLocalProvider<*>) {
                         wrapper = ModifierLocalProviderNode(wrapper, mod).assignChained(toWrap)
+                    }
+                    if (mod is ModifierLocalConsumer) {
+                        wrapper = ModifierLocalConsumerNode(wrapper, mod).assignChained(toWrap)
                     }
                     if (mod is DrawModifier) {
                         wrapper = ModifiedDrawNode(wrapper, mod)
@@ -722,9 +727,6 @@ internal class LayoutNode : Measurable, Remeasurement, OwnerScope, LayoutInfo, C
                         wrapper =
                             OnGloballyPositionedModifierWrapper(wrapper, mod).assignChained(toWrap)
                         getOrCreateOnPositionedCallbacks() += wrapper
-                    }
-                    if (mod is ModifierLocalConsumer) {
-                        wrapper = ModifierLocalConsumerNode(wrapper, mod).assignChained(toWrap)
                     }
                 }
                 wrapper
