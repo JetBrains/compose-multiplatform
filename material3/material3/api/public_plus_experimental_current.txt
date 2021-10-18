@@ -137,6 +137,9 @@ package androidx.compose.material3 {
     method @RequiresApi(android.os.Build.VERSION_CODES.S) public static androidx.compose.material3.ColorScheme dynamicLightColorScheme(android.content.Context context);
   }
 
+  public final class ElevationKt {
+  }
+
   @kotlin.RequiresOptIn(message="This material API is experimental and is likely to change or to be removed in" + " the future.") public @interface ExperimentalMaterial3Api {
   }
 

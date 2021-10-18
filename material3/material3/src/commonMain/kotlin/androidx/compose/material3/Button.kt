@@ -50,6 +50,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
@@ -899,8 +900,17 @@ private class DefaultButtonElevation(
             LaunchedEffect(target) { animatable.snapTo(target) }
         } else {
             LaunchedEffect(target) {
-                // TODO(b/203232064): Use lastInteraction and animateElevation from Elevation.kt.
-                animatable.snapTo(target)
+                val lastInteraction = when (animatable.targetValue) {
+                    pressedElevation -> PressInteraction.Press(Offset.Zero)
+                    hoveredElevation -> HoverInteraction.Enter()
+                    focusedElevation -> FocusInteraction.Focus()
+                    else -> null
+                }
+                animatable.animateElevation(
+                    from = lastInteraction,
+                    to = interaction,
+                    target = target
+                )
             }
         }
 
