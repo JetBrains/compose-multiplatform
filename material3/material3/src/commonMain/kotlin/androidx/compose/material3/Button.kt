@@ -59,9 +59,9 @@ import androidx.compose.ui.unit.dp
 
 import kotlinx.coroutines.flow.collect
 
-// TODO(b/197880751): Link to specific Button pages directly and add image.
-
 /**
+ * ![Filled button image](https://developer.android.com/images/reference/androidx/compose/material3/filled-button.png)
+ *
  * A default Material button, which is also known as a Filled button. Buttons contain actions for
  * your app.
  *
@@ -157,6 +157,8 @@ fun Button(
 }
 
 /**
+ * ![Elevated button image](https://developer.android.com/images/reference/androidx/compose/material3/elevated-button.png)
+ *
  * A Material Elevated button. Buttons contain actions for your app.
  *
  * Elevated buttons are high-emphasis buttons that are essentially [FilledTonalButton]s with a
@@ -222,6 +224,8 @@ fun ElevatedButton(
     )
 
 /**
+ * ![Filled tonal button image](https://developer.android.com/images/reference/androidx/compose/material3/filled-tonal-button.png)
+ *
  * A Material Filled tonal button. Buttons contain actions for your app.
  *
  * Filled tonal buttons are medium-emphasis buttons that is an alternative middle ground between
@@ -287,6 +291,8 @@ fun FilledTonalButton(
     )
 
 /**
+ * ![Outlined button image](https://developer.android.com/images/reference/androidx/compose/material3/outlined-button.png)
+ *
  * A Material Outlined button. Buttons contain actions for your app.
  *
  * Outlined buttons are medium-emphasis buttons. They contain actions that are important, but are
@@ -351,6 +357,8 @@ fun OutlinedButton(
     )
 
 /**
+ * ![Text button image](https://developer.android.com/images/reference/androidx/compose/material3/text-button.png)
+ *
  * A Material Text button. Buttons contain actions for your app.
  *
  * Text buttons are typically used for less-pronounced actions, including those located in dialogs

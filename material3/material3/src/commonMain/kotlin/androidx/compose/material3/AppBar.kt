@@ -66,6 +66,8 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 
 /**
+ * ![Small top app bar image](https://developer.android.com/images/reference/androidx/compose/material3/small-top-app-bar.png)
+ *
  * Material Design small top app bar.
  *
  * The top app bar displays information and actions relating to the current screen.
@@ -114,6 +116,8 @@ fun SmallTopAppBar(
 }
 
 /**
+ * ![Center-aligned top app bar image](https://developer.android.com/images/reference/androidx/compose/material3/center-aligned-top-app-bar.png)
+ *
  * Material Design small top app bar with a header title that is horizontally aligned to the center.
  *
  * The top app bar displays information and actions relating to the current screen.
@@ -160,6 +164,8 @@ fun CenterAlignedTopAppBar(
 }
 
 /**
+ * ![Medium top app bar image](https://developer.android.com/images/reference/androidx/compose/material3/medium-top-app-bar.png)
+ *
  * Material Design medium top app bar.
  *
  * The top app bar displays information and actions relating to the current screen.
@@ -212,6 +218,8 @@ fun MediumTopAppBar(
 }
 
 /**
+ * ![Large top app bar image](https://developer.android.com/images/reference/androidx/compose/material3/large-top-app-bar.png)
+ *
  * Material Design large top app bar.
  *
  * The top app bar displays information and actions relating to the current screen.
