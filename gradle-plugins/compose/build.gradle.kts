@@ -12,6 +12,7 @@ plugins {
 gradlePluginConfig {
     pluginId = "org.jetbrains.compose"
     implementationClass = "org.jetbrains.compose.ComposePlugin"
+    pluginPortalTags = listOf("ui-framework")
 }
 
 mavenPublicationConfig {

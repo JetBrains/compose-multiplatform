@@ -9,6 +9,7 @@ import org.gradle.api.Project
 open class GradlePluginConfigExtension {
     lateinit var pluginId: String
     lateinit var implementationClass: String
+    var pluginPortalTags: Collection<String> = emptyList()
 }
 
 val Project.gradlePluginConfig: GradlePluginConfigExtension?
