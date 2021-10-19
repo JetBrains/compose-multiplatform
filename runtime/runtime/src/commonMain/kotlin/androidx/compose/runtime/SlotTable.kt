@@ -21,9 +21,9 @@ import androidx.compose.runtime.snapshots.fastFilterIndexed
 import androidx.compose.runtime.snapshots.fastForEach
 import androidx.compose.runtime.snapshots.fastMap
 import androidx.compose.runtime.tooling.CompositionData
+import androidx.compose.runtime.tooling.CompositionGroup
 import kotlin.math.max
 import kotlin.math.min
-import androidx.compose.runtime.tooling.CompositionGroup
 
 // Nomenclature -
 // Address      - an absolute offset into the array ignoring its gap. See Index below.
@@ -2579,6 +2579,12 @@ private class GroupIterator(
                     null
 
             override val data: Iterable<Any?> get() = DataIterator(table, group)
+
+            override val identity: Any
+                get() {
+                    validateRead()
+                    return table.read { it.anchor(group) }
+                }
 
             override val compositionGroups: Iterable<CompositionGroup> get() = this
 

@@ -74,4 +74,10 @@ interface CompositionGroup : CompositionData {
      * [remember] and the last value returned by [remember], etc.
      */
     val data: Iterable<Any?>
+
+    /**
+     * A value that identifies a Group independently of movement caused by recompositions.
+     */
+    val identity: Any?
+      get() = null
 }

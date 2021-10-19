@@ -899,10 +899,12 @@ package androidx.compose.runtime.tooling {
 
   public interface CompositionGroup extends androidx.compose.runtime.tooling.CompositionData {
     method public Iterable<java.lang.Object> getData();
+    method public default Object? getIdentity();
     method public Object getKey();
     method public Object? getNode();
     method public String? getSourceInfo();
     property public abstract Iterable<java.lang.Object> data;
+    property public default Object? identity;
     property public abstract Object key;
     property public abstract Object? node;
     property public abstract String? sourceInfo;
