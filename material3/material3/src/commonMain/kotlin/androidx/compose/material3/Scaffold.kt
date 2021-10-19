@@ -16,14 +16,21 @@
 
 package androidx.compose.material3
 
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.tokens.NavigationDrawer
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
@@ -37,12 +44,25 @@ import androidx.compose.ui.unit.dp
  * components will work together correctly.
  *
  * @param modifier optional Modifier for the root of the [Scaffold]
+ * @param scaffoldState state of this scaffold widget. It contains the state of the screen, e.g.
+ * variables to provide manual control over the drawer behavior, sizes of components, etc
  * @param topBar top app bar of the screen. Consider using [SmallTopAppBar].
  * @param bottomBar bottom bar of the screen. Consider using [NavigationBar].
  * @param floatingActionButton Main action button of your screen. Consider using
  * [FloatingActionButton] for this slot.
  * @param floatingActionButtonPosition position of the FAB on the screen. See [FabPosition] for
  * possible options available.
+ * @param drawerContent content of the Drawer sheet that can be pulled from the left side (right
+ * for RTL).
+ * @param drawerGesturesEnabled whether or not drawer (if set) can be interacted with via gestures
+ * @param drawerShape shape of the drawer sheet (if set)
+ * @param drawerTonalElevation Affects the alpha of the color overlay applied on the container color
+ * of the drawer sheet.
+ * @param drawerContainerColor container color to be used for the drawer sheet
+ * @param drawerContentColor color of the content to use inside the drawer sheet. Defaults to
+ * either the matching content color for [drawerContainerColor], or, if it is not a color from
+ * the theme, this will keep the same value set above this Surface.
+ * @param drawerScrimColor color of the scrim that obscures content when the drawer is open
  * @param containerColor background of the scaffold body
  * @param contentColor color of the content in scaffold body. Defaults to either the matching
  * content color for [containerColor], or, if it is not a color from the theme, this will keep
@@ -58,10 +78,19 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun Scaffold(
     modifier: Modifier = Modifier,
+    scaffoldState: ScaffoldState = rememberScaffoldState(),
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     floatingActionButton: @Composable () -> Unit = {},
     floatingActionButtonPosition: FabPosition = FabPosition.End,
+    drawerContent: @Composable (ColumnScope.() -> Unit)? = null,
+    drawerGesturesEnabled: Boolean = true,
+    drawerShape: Shape = RoundedCornerShape(16.dp),
+    drawerTonalElevation: Dp = DrawerDefaults.Elevation,
+    drawerContainerColor: Color =
+        MaterialTheme.colorScheme.fromToken(NavigationDrawer.ContainerColor),
+    drawerContentColor: Color = contentColorFor(drawerContainerColor),
+    drawerScrimColor: Color = DrawerDefaults.scrimColor,
     containerColor: Color = MaterialTheme.colorScheme.background,
     contentColor: Color = contentColorFor(containerColor),
     content: @Composable (PaddingValues) -> Unit
@@ -78,8 +107,22 @@ fun Scaffold(
         }
     }
 
-    // TODO(b/196872589): Add drawer support.
-    child(modifier)
+    if (drawerContent != null) {
+        ModalDrawer(
+            modifier = modifier,
+            drawerState = scaffoldState.drawerState,
+            gesturesEnabled = drawerGesturesEnabled,
+            drawerContent = drawerContent,
+            drawerShape = drawerShape,
+            drawerTonalElevation = drawerTonalElevation,
+            drawerContainerColor = drawerContainerColor,
+            drawerContentColor = drawerContentColor,
+            scrimColor = drawerScrimColor,
+            content = { child(Modifier) }
+        )
+    } else {
+        child(modifier)
+    }
 }
 
 /**
@@ -188,6 +231,33 @@ private fun ScaffoldLayout(
             }
         }
     }
+}
+
+/**
+ * State for [Scaffold] composable component.
+ *
+ * Contains basic screen state, e.g. Drawer configuration, as well as sizes of components after
+ * layout has happened
+ *
+ * @param drawerState the drawer state
+ */
+@Stable
+@ExperimentalMaterial3Api
+class ScaffoldState(
+    val drawerState: DrawerState,
+)
+
+/**
+ * Creates a [ScaffoldState] with the default animation clock and memoizes it.
+ *
+ * @param drawerState the drawer state
+ */
+@ExperimentalMaterial3Api
+@Composable
+fun rememberScaffoldState(
+    drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
+): ScaffoldState = remember {
+    ScaffoldState(drawerState)
 }
 
 /**
