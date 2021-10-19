@@ -38,7 +38,7 @@ import androidx.compose.material3.samples.NavigationRailBottomAlignSample
 import androidx.compose.material3.samples.NavigationRailSample
 import androidx.compose.material3.samples.NavigationRailWithOnlySelectedLabelsSample
 import androidx.compose.material3.samples.OutlinedButtonSample
-import androidx.compose.material3.samples.ModalDrawerSample
+import androidx.compose.material3.samples.NavigationDrawerSample
 import androidx.compose.material3.samples.PinnedSmallTopAppBar
 import androidx.compose.material3.samples.SimpleCenterAlignedTopAppBar
 import androidx.compose.material3.samples.SimpleSmallTopAppBar
@@ -221,10 +221,10 @@ private const val NavigationDrawerExampleDescription = "Navigation drawer exampl
 private const val NavigationDrawerExampleSourceUrl = "$SampleSourceUrl/DrawerSamples.kt"
 val NavigationDrawerExamples = listOf(
     Example(
-        name = ::ModalDrawerSample.name,
+        name = ::NavigationDrawerSample.name,
         description = NavigationDrawerExampleDescription,
         sourceUrl = NavigationDrawerExampleSourceUrl
     ) {
-        ModalDrawerSample()
+        NavigationDrawerSample()
     }
 )

@@ -74,7 +74,7 @@ enum class DrawerValue {
 }
 
 /**
- * State of the [ModalDrawer] composable.
+ * State of the [NavigationDrawer] composable.
  *
  * @param initialValue The initial value of the state.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
@@ -223,7 +223,9 @@ fun rememberDrawerState(
  * Modal navigation drawers block interaction with the rest of an app’s content with a scrim.
  * They are elevated above most of the app’s UI and don’t affect the screen’s layout grid.
  *
- * @sample androidx.compose.material3.samples.ModalDrawerSample
+ * ![Modal drawer image](https://developer.android.com/images/reference/androidx/compose/material/modal-drawer.png)
+ *
+ * @sample androidx.compose.material3.samples.NavigationDrawerSample
  *
  * @param drawerContent composable that represents content inside the drawer
  * @param modifier optional modifier for the drawer
@@ -243,7 +245,7 @@ fun rememberDrawerState(
  */
 @Composable
 @ExperimentalMaterial3Api
-fun ModalDrawer(
+fun NavigationDrawer(
     drawerContent: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
     drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
@@ -258,13 +260,13 @@ fun ModalDrawer(
 ) {
     val scope = rememberCoroutineScope()
     BoxWithConstraints(modifier.fillMaxSize()) {
-        val modalDrawerConstraints = constraints
+        val navigationDrawerConstraints = constraints
         // TODO : think about Infinite max bounds case
-        if (!modalDrawerConstraints.hasBoundedWidth) {
+        if (!navigationDrawerConstraints.hasBoundedWidth) {
             throw IllegalStateException("Drawer shouldn't have infinite width")
         }
 
-        val minValue = -modalDrawerConstraints.maxWidth.toFloat()
+        val minValue = -navigationDrawerConstraints.maxWidth.toFloat()
         val maxValue = 0f
 
         val anchors = mapOf(minValue to DrawerValue.Closed, maxValue to DrawerValue.Open)
@@ -304,10 +306,10 @@ fun ModalDrawer(
                 modifier = with(LocalDensity.current) {
                     Modifier
                         .sizeIn(
-                            minWidth = modalDrawerConstraints.minWidth.toDp(),
-                            minHeight = modalDrawerConstraints.minHeight.toDp(),
+                            minWidth = navigationDrawerConstraints.minWidth.toDp(),
+                            minHeight = navigationDrawerConstraints.minHeight.toDp(),
                             maxWidth = NavigationDrawer.ContainerWidth,
-                            maxHeight = modalDrawerConstraints.maxHeight.toDp()
+                            maxHeight = navigationDrawerConstraints.maxHeight.toDp()
                         )
                 }
                     .offset { IntOffset(drawerState.offset.value.roundToInt(), 0) }
@@ -336,7 +338,7 @@ fun ModalDrawer(
 }
 
 /**
- * Object to hold default values for [ModalDrawer]
+ * Object to hold default values for [NavigationDrawer]
  */
 @ExperimentalMaterial3Api
 object DrawerDefaults {

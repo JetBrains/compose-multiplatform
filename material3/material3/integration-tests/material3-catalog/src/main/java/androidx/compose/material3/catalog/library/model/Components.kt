@@ -125,7 +125,7 @@ private val NavigationDrawer = Component(
     // No navigation drawer icon
     guidelinesUrl = "", // No guidelines yet
     docsUrl = "", // No docs yet
-    sourceUrl = "$Material3SourceUrl/Drawer.kt",
+    sourceUrl = "$Material3SourceUrl/NavigationDrawer.kt",
     examples = NavigationDrawerExamples
 )
 
