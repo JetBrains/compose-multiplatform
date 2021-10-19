@@ -15,6 +15,7 @@ import org.w3c.dom.HTMLTextAreaElement
 
 
 private val controlledInputsValuesWeakMap: JsWeakMap = js("new WeakMap();").unsafeCast<JsWeakMap>()
+internal val stopSelectPropagation: JsWeakMap = js("new WeakMap();").unsafeCast<JsWeakMap>()
 
 internal fun restoreControlledInputState(type: InputType<*>, inputElement: HTMLInputElement) {
     if (controlledInputsValuesWeakMap.has(inputElement)) {

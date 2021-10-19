@@ -2,6 +2,7 @@ package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.web.attributes.SelectAttrsBuilder
 import kotlinx.browser.document
@@ -677,23 +678,43 @@ fun TextArea(
 ) {
     // if firstProvidedValueWasNotNull then TextArea behaves as controlled input
     val firstProvidedValueWasNotNull = remember { value != null }
+    val savedCursorPosition = remember { mutableStateOf(Int.MAX_VALUE) }
 
     TagElement(
         elementBuilder = TextArea,
         applyAttrs = {
-            val  taab = TextAreaAttrsBuilder()
+            val  textAreaAttrsBuilder = TextAreaAttrsBuilder()
+            textAreaAttrsBuilder.onSelect {
+                if (stopSelectPropagation.has(it.target)) {
+                    stopSelectPropagation.delete(it.target)
+                    it.stopImmediatePropagation()
+                }
+            }
             if (attrs != null) {
-                taab.attrs()
+                textAreaAttrsBuilder.attrs()
             }
             if (firstProvidedValueWasNotNull) {
-                taab.value(value ?: "")
+                textAreaAttrsBuilder.value(value ?: "")
             }
 
-            taab.onInput {
+            textAreaAttrsBuilder.onInput {
+                val cursorStartAfterInput = it.target.selectionStart ?: 0
                 restoreControlledTextAreaState(it.target)
+
+                val lastIx = it.target.value.length
+                it.target.setSelectionRange(lastIx, lastIx)
+                savedCursorPosition.value = cursorStartAfterInput
             }
 
-            this.copyFrom(taab)
+            textAreaAttrsBuilder.prop<HTMLInputElement, Int>({ e, cursorPos ->
+                if (document.activeElement == e) {
+                    stopSelectPropagation.set(e, 1)
+                    e.setSelectionRange(cursorPos, cursorPos)
+
+                }
+            }, savedCursorPosition.value)
+
+            this.copyFrom(textAreaAttrsBuilder)
         },
         content = null
     )
@@ -988,15 +1009,46 @@ fun <K> Input(
     type: InputType<K>,
     attrs: InputAttrsBuilder<K>.() -> Unit
 ) {
+    val savedCursorPosition = remember { mutableStateOf(Int.MAX_VALUE) }
+
     TagElement(
         elementBuilder = Input,
         applyAttrs = {
             val inputAttrsBuilder = InputAttrsBuilder(type)
             inputAttrsBuilder.type(type)
+
+            inputAttrsBuilder.onSelect {
+                if (stopSelectPropagation.has(it.target)) {
+                    stopSelectPropagation.delete(it.target)
+                    it.stopImmediatePropagation()
+                }
+            }
+
             inputAttrsBuilder.attrs()
 
             inputAttrsBuilder.onInput {
+                val cursorStartAfterInput = if (type.supportsSelectionRange()) {
+                    it.target.selectionStart ?: 0
+                } else {
+                    0
+                }
                 restoreControlledInputState(type = type, inputElement = it.target)
+
+                if (type.supportsSelectionRange()) {
+                    val lastIx = it.target.value.length
+                    it.target.setSelectionRange(lastIx, lastIx)
+                    savedCursorPosition.value = cursorStartAfterInput
+                }
+            }
+
+            if (type.supportsSelectionRange()) {
+                inputAttrsBuilder.prop<HTMLInputElement, Int>({ e, cursorPos ->
+                    if (document.activeElement == e) {
+                        stopSelectPropagation.set(e, 1)
+                        e.setSelectionRange(cursorPos, cursorPos)
+
+                    }
+                }, savedCursorPosition.value)
             }
 
             this.copyFrom(inputAttrsBuilder)

@@ -50,6 +50,17 @@ sealed class InputType<T>(val typeStr: String) {
     protected fun valueAsString(event: Event): String {
         return event.target?.asDynamic()?.value?.unsafeCast<String>() ?: ""
     }
+
+    internal fun supportsSelectionRange(): Boolean {
+        return when (this) {
+            is Password,
+            is Search,
+            is Tel,
+            is Text,
+            is Url -> true
+            else -> false
+        }
+    }
 }
 
 sealed class DirType(val dirStr: String) {
