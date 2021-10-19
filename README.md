@@ -15,7 +15,6 @@ Preview functionality (check your application UI without building/running it) fo
    * [benchmarks](benchmarks) - collection of benchmarks
    * [compose](compose) - composite build of [Compose-jb sources](https://github.com/JetBrains/androidx)
    * [ci](ci) - Continuous Integration helpers
-   * [cef](cef) - CEF integration in Jetpack Compose (somewhat outdated)
    * [examples](examples) - examples of multiplatform Compose applications for Desktop, Android and Web
        * [codeviewer](examples/codeviewer) - File Browser and Code Viewer application for Android and Desktop
        * [imageviewer](examples/imageviewer) - Image Viewer application for Android and Desktop
@@ -45,9 +44,10 @@ Preview functionality (check your application UI without building/running it) fo
        * [Swing interoperability](tutorials/Swing_Integration)
        * [Navigation](tutorials/Navigation)
    * [components](components) - custom components of Compose Multiplatform
-       * [Video Player](components/VideoPlayer)
        * [Split Pane](components/SplitPane)
    * [experimental](experimental) - experimental components and examples
+       * [cef](experimental/cef) - CEF integration in Jetpack Compose (somewhat outdated)
+       * [Video Player](experimental/components/VideoPlayer)
        * [LWJGL integration](experimental/lwjgl-integration) - An example showing how to integrate Compose with [LWJGL](https://www.lwjgl.org)
        
 ## Getting latest version of Compose Multiplatform ##
