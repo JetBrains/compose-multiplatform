@@ -198,7 +198,6 @@ private fun getOrCreateMediaTestConfigTask(project: Project, isMedia2: Boolean):
             project.rootProject.tasks.findByName(ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
                 .dependsOn(task)
             project.rootProject.tasks.findByName(ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK)!!
-
                 .dependsOn(task)
             return task
         } else {
