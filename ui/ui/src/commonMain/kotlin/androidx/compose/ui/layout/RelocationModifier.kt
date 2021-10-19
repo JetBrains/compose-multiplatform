@@ -33,9 +33,10 @@ import androidx.compose.ui.geometry.Rect
  *
  * @see RelocationRequester
  */
+@Suppress("unused", "DeprecatedCallableAddReplaceWith")
 @ExperimentalComposeUiApi
 @Deprecated(
-    message = "Please use BringIntoViewParent instead.",
+    message = "Please use BringIntoViewResponder instead.",
     level = DeprecationLevel.ERROR
 )
 interface RelocationModifier : Modifier.Element {
@@ -58,10 +59,10 @@ interface RelocationModifier : Modifier.Element {
 /**
  * Add this modifier to respond to requests to bring an item into view.
  */
-@Suppress("UNUSED_PARAMETER", "unused")
+@Suppress("UNUSED_PARAMETER", "unused", "DeprecatedCallableAddReplaceWith")
 @ExperimentalComposeUiApi
 @Deprecated(
-    message = "Please use BringIntoViewParent instead.",
+    message = "Please use BringIntoViewResponder instead.",
     level = DeprecationLevel.ERROR
 )
 fun Modifier.onRelocationRequest(
