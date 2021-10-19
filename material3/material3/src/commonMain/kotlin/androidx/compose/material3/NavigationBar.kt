@@ -57,6 +57,8 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
 /**
+ * ![Navigation bar image](https://developer.android.com/images/reference/androidx/compose/material3/navigation-bar.png)
+ *
  * Material Design bottom navigation bar.
  *
  * A bottom navigation bar allows switching between primary destinations in an app.
