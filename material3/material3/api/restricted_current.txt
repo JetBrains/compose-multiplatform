@@ -140,6 +140,9 @@ package androidx.compose.material3 {
     method @RequiresApi(android.os.Build.VERSION_CODES.S) public static androidx.compose.material3.ColorScheme dynamicLightColorScheme(android.content.Context context);
   }
 
+  public final class ElevationKt {
+  }
+
   public final class FloatingActionButtonDefaults {
     method @androidx.compose.runtime.Composable public androidx.compose.material3.FloatingActionButtonElevation elevation(optional float defaultElevation, optional float hoveredElevation);
     method public float getLargeIconSize();
