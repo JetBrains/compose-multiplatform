@@ -3,7 +3,7 @@ import com.gradle.publish.PluginBundleExtension
 plugins {
     // __KOTLIN_COMPOSE_VERSION__
     kotlin("jvm") version "1.5.10" apply false
-    id("com.gradle.plugin-publish") version "0.15.0" apply false
+    id("com.gradle.plugin-publish") version "0.16.0" apply false
 }
 
 subprojects {
@@ -99,6 +99,7 @@ fun Project.configureGradlePlugin(
         vcsUrl = BuildProperties.vcs
         website = BuildProperties.website
         description = publicationConfig.description
+        tags = gradlePluginConfig.pluginPortalTags
     }
 
     // gradle plugin definition (relates to gradlePlugin extension block from java-gradle-plugin)
