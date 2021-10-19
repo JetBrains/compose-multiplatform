@@ -29,7 +29,6 @@ AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
 
-    implementation project(path: ':compose:animation:animation-core')
     kotlinPlugin(project(":compose:compiler:compiler"))
 
     if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
@@ -38,15 +37,16 @@ dependencies {
          * corresponding block below
          */
         implementation(libs.kotlinStdlibCommon)
-        implementation(project(":compose:foundation:foundation-layout"))
+        implementation("androidx.compose.animation:animation-core:1.1.0-beta01")
+        implementation("androidx.compose.foundation:foundation-layout:1.1.0-beta01")
         implementation("androidx.compose.ui:ui-util:1.0.0")
 
-        api(project(":compose:foundation:foundation"))
+        api("androidx.compose.foundation:foundation:1.1.0-beta01")
         api("androidx.compose.material:material-icons-core:1.0.2")
         api("androidx.compose.material:material-ripple:1.0.0")
         api("androidx.compose.runtime:runtime:1.0.1")
         api("androidx.compose.ui:ui-graphics:1.0.1")
-        api(project(":compose:ui:ui"))
+        api("androidx.compose.ui:ui:1.1.0-beta01")
         api("androidx.compose.ui:ui-text:1.0.1")
 
         testImplementation(libs.testRules)
@@ -79,6 +79,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         sourceSets {
             commonMain.dependencies {
                 implementation(libs.kotlinStdlibCommon)
+                implementation(project(":compose:animation:animation-core"))
 
                 api(project(":compose:foundation:foundation"))
                 api(project(":compose:material:material-icons-core"))
