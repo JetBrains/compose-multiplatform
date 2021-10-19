@@ -399,6 +399,7 @@ package androidx.compose.ui.graphics {
   public final class GraphicsLayerModifierKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier graphicsLayer(androidx.compose.ui.Modifier, optional float scaleX, optional float scaleY, optional float alpha, optional float translationX, optional float translationY, optional float shadowElevation, optional float rotationX, optional float rotationY, optional float rotationZ, optional float cameraDistance, optional long transformOrigin, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip, optional androidx.compose.ui.graphics.RenderEffect? renderEffect);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier graphicsLayer(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.GraphicsLayerScope,kotlin.Unit> block);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier! graphicsLayer(androidx.compose.ui.Modifier, optional float scaleX, optional float scaleY, optional float alpha, optional float translationX, optional float translationY, optional float shadowElevation, optional float rotationX, optional float rotationY, optional float rotationZ, optional float cameraDistance, optional long transformOrigin, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier toolingGraphicsLayer(androidx.compose.ui.Modifier);
   }
 
@@ -454,6 +455,8 @@ package androidx.compose.ui.graphics {
 
   @androidx.compose.runtime.Immutable public final inline class TransformOrigin {
     ctor public TransformOrigin();
+    method @androidx.compose.runtime.Stable public inline operator float component1();
+    method @androidx.compose.runtime.Stable public inline operator float component2();
   }
 
   public static final class TransformOrigin.Companion {
@@ -562,6 +565,12 @@ package androidx.compose.ui.graphics.vector {
     method public static int getDefaultTintBlendMode();
     method public static long getDefaultTintColor();
     method public static java.util.List<androidx.compose.ui.graphics.vector.PathNode> getEmptyPath();
+    property public static final int DefaultFillType;
+    property public static final int DefaultStrokeLineCap;
+    property public static final int DefaultStrokeLineJoin;
+    property public static final int DefaultTintBlendMode;
+    property public static final long DefaultTintColor;
+    property public static final java.util.List<androidx.compose.ui.graphics.vector.PathNode> EmptyPath;
     field public static final String DefaultGroupName = "";
     field public static final String DefaultPathName = "";
     field public static final float DefaultPivotX = 0.0f;
@@ -1461,8 +1470,11 @@ package androidx.compose.ui.input.pointer {
     method public static void consumeAllChanges(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static void consumeDownChange(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static void consumePositionChange(androidx.compose.ui.input.pointer.PointerInputChange);
+    method public static int indexOfFirstPressed(int);
+    method public static int indexOfLastPressed(int);
     method @Deprecated public static boolean isOutOfBounds(androidx.compose.ui.input.pointer.PointerInputChange, long size);
     method public static boolean isOutOfBounds(androidx.compose.ui.input.pointer.PointerInputChange, long size, long extendedTouchPadding);
+    method public static boolean isPressed(int, int buttonIndex);
     method public static long positionChange(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static boolean positionChangeConsumed(androidx.compose.ui.input.pointer.PointerInputChange);
     method public static long positionChangeIgnoreConsumed(androidx.compose.ui.input.pointer.PointerInputChange);
@@ -1648,6 +1660,8 @@ package androidx.compose.ui.layout {
   public final class AlignmentLineKt {
     method public static androidx.compose.ui.layout.HorizontalAlignmentLine getFirstBaseline();
     method public static androidx.compose.ui.layout.HorizontalAlignmentLine getLastBaseline();
+    property public static final androidx.compose.ui.layout.HorizontalAlignmentLine FirstBaseline;
+    property public static final androidx.compose.ui.layout.HorizontalAlignmentLine LastBaseline;
   }
 
   @androidx.compose.runtime.Stable public interface ContentScale {
@@ -1913,6 +1927,10 @@ package androidx.compose.ui.layout {
 
   @androidx.compose.runtime.Immutable public final inline class ScaleFactor {
     ctor public ScaleFactor();
+    method @androidx.compose.runtime.Stable public inline operator float component1();
+    method @androidx.compose.runtime.Stable public inline operator float component2();
+    method @androidx.compose.runtime.Stable public operator long div(float operand);
+    method @androidx.compose.runtime.Stable public operator long times(float operand);
   }
 
   public static final class ScaleFactor.Companion {
@@ -1987,7 +2005,6 @@ package androidx.compose.ui.modifier {
 
   public interface ModifierLocalReadScope {
     method public <T> T! getCurrent(androidx.compose.ui.modifier.ModifierLocal<T>);
-    property public abstract T! current;
   }
 
   @androidx.compose.runtime.Stable public final class ProvidableModifierLocal<T> extends androidx.compose.ui.modifier.ModifierLocal<T> {
@@ -2064,6 +2081,11 @@ package androidx.compose.ui.platform {
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.lifecycle.LifecycleOwner> getLocalLifecycleOwner();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.savedstate.SavedStateRegistryOwner> getLocalSavedStateRegistryOwner();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<android.view.View> getLocalView();
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<android.content.res.Configuration> LocalConfiguration;
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<android.content.Context> LocalContext;
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.lifecycle.LifecycleOwner> LocalLifecycleOwner;
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.savedstate.SavedStateRegistryOwner> LocalSavedStateRegistryOwner;
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<android.view.View> LocalView;
   }
 
   public final class AndroidUiDispatcher extends kotlinx.coroutines.CoroutineDispatcher {
@@ -2136,6 +2158,18 @@ package androidx.compose.ui.platform {
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.UriHandler> getLocalUriHandler();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.ViewConfiguration> getLocalViewConfiguration();
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.WindowInfo> getLocalWindowInfo();
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.AccessibilityManager> LocalAccessibilityManager;
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.ClipboardManager> LocalClipboardManager;
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.unit.Density> LocalDensity;
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.focus.FocusManager> LocalFocusManager;
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.hapticfeedback.HapticFeedback> LocalHapticFeedback;
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.input.InputModeManager> LocalInputModeManager;
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.unit.LayoutDirection> LocalLayoutDirection;
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.text.input.TextInputService> LocalTextInputService;
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.TextToolbar> LocalTextToolbar;
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.UriHandler> LocalUriHandler;
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.ViewConfiguration> LocalViewConfiguration;
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.WindowInfo> LocalWindowInfo;
   }
 
   public final class DebugUtilsKt {
@@ -2179,10 +2213,13 @@ package androidx.compose.ui.platform {
     method public static inline androidx.compose.ui.Modifier inspectable(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> inspectorInfo, kotlin.jvm.functions.Function1<? super androidx.compose.ui.Modifier,? extends androidx.compose.ui.Modifier> factory);
     method public static boolean isDebugInspectorInfoEnabled();
     method public static void setDebugInspectorInfoEnabled(boolean isDebugInspectorInfoEnabled);
+    property public static final kotlin.jvm.functions.Function1<androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> NoInspectorInfo;
+    property public static final boolean isDebugInspectorInfoEnabled;
   }
 
   public final class InspectionModeKt {
     method public static androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean> getLocalInspectionMode();
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean> LocalInspectionMode;
   }
 
   public final class InspectorInfo {
@@ -2770,6 +2807,7 @@ package androidx.compose.ui.viewinterop {
   public final class AndroidView_androidKt {
     method @androidx.compose.runtime.Composable public static <T extends android.view.View> void AndroidView(kotlin.jvm.functions.Function1<? super android.content.Context,? extends T> factory, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function1<? super T,kotlin.Unit> update);
     method public static kotlin.jvm.functions.Function1<android.view.View,kotlin.Unit> getNoOpUpdate();
+    property public static final kotlin.jvm.functions.Function1<android.view.View,kotlin.Unit> NoOpUpdate;
   }
 
 }

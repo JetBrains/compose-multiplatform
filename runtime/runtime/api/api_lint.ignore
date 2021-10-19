@@ -9,6 +9,8 @@ DocumentExceptions: androidx.compose.runtime.snapshots.SnapshotApplyResult.Failu
     Method Failure.check appears to be throwing androidx.compose.runtime.snapshots.SnapshotApplyConflictException; this should be recorded with a @Throws annotation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
 
 
+KotlinOperator: androidx.compose.runtime.Updater#set(int, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,? extends kotlin.Unit>):
+    Note that adding the `operator` keyword would allow calling this method using operator syntax
 KotlinOperator: androidx.compose.runtime.snapshots.SnapshotStateList#contains(T):
     Note that adding the `operator` keyword would allow calling this method using operator syntax
 
