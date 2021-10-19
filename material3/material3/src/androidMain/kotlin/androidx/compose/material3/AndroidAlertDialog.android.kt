@@ -25,9 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 
-// TODO(b/197880751): Update the docs with the 3P location of the AlertDialogSamples, specs, and
-//  images.
 /**
+ * ![Basic dialog image](https://developer.android.com/images/reference/androidx/compose/material3/basic-dialog.png)
+ *
  * Material Design basic dialog.
  *
  * Dialogs interrupt users with urgent information, details, or actions.

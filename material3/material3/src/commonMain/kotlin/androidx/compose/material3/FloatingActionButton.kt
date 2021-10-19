@@ -50,6 +50,8 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.draw.shadow
 
 /**
+ * ![FAB image](https://developer.android.com/images/reference/androidx/compose/material3/fab.png)
+ *
  * A floating action button (FAB) represents the primary action of a screen.
  *
  * @sample androidx.compose.material3.samples.FloatingActionButtonSample
@@ -119,6 +121,8 @@ fun FloatingActionButton(
 }
 
 /**
+ * ![Small FAB image](https://developer.android.com/images/reference/androidx/compose/material3/small-fab.png)
+ *
  * A small floating action button.
  *
  * @sample androidx.compose.material3.samples.SmallFloatingActionButtonSample
@@ -165,6 +169,8 @@ fun SmallFloatingActionButton(
 }
 
 /**
+ * ![Large FAB image](https://developer.android.com/images/reference/androidx/compose/material3/large-fab.png)
+ *
  *  A large circular floating action button.
  *
  * @sample androidx.compose.material3.samples.LargeFloatingActionButtonSample
@@ -213,6 +219,8 @@ fun LargeFloatingActionButton(
 }
 
 /**
+ * ![Extended FAB image](https://developer.android.com/images/reference/androidx/compose/material3/extended-fab.png)
+ *
  * The extended FAB is wider than a regular FAB, and it includes a text label.
  *
  * @sample androidx.compose.material3.samples.ExtendedFloatingActionButtonSample

@@ -58,6 +58,8 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
 /**
+ * ![Navigation rail image](https://developer.android.com/images/reference/androidx/compose/material3/navigation-rail.png)
+ *
  * Material Design navigation rail.
  *
  * [NavigationRail] is a side navigation component that allows movement between primary destinations
