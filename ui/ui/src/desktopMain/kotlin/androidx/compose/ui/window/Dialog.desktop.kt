@@ -78,6 +78,9 @@ import javax.swing.JDialog
  * will leave the composition.
  * @param title Title in the titlebar of the dialog
  * @param icon Icon in the titlebar of the dialog (for platforms which support this)
+ * @param undecorated Disables or enables decorations for this window.
+ * @param transparent Disables or enables window transparency. Transparency should be set
+ * only if window is undecorated, otherwise an exception will be thrown.
  * @param resizable Can dialog be resized by the user (application still can resize the dialog
  * changing [state])
  * @param enabled Can dialog react to input events
@@ -100,6 +103,7 @@ fun Dialog(
     title: String = "Untitled",
     icon: Painter? = null,
     undecorated: Boolean = false,
+    transparent: Boolean = false,
     resizable: Boolean = true,
     enabled: Boolean = true,
     focusable: Boolean = true,
@@ -113,6 +117,7 @@ fun Dialog(
     val currentTitle by rememberUpdatedState(title)
     val currentIcon by rememberUpdatedState(icon)
     val currentUndecorated by rememberUpdatedState(undecorated)
+    val currentTransparent by rememberUpdatedState(transparent)
     val currentResizable by rememberUpdatedState(resizable)
     val currentEnabled by rememberUpdatedState(enabled)
     val currentFocusable by rememberUpdatedState(focusable)
@@ -150,6 +155,7 @@ fun Dialog(
                 set(currentTitle, dialog::setTitle)
                 set(currentIcon, dialog::setIcon)
                 set(currentUndecorated, dialog::setUndecoratedSafely)
+                set(currentTransparent, dialog::isTransparent::set)
                 set(currentResizable, dialog::setResizable)
                 set(currentEnabled, dialog::setEnabled)
                 set(currentFocusable, dialog::setFocusable)
