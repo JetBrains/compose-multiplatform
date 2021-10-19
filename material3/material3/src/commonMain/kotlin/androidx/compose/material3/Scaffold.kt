@@ -108,7 +108,7 @@ fun Scaffold(
     }
 
     if (drawerContent != null) {
-        ModalDrawer(
+        NavigationDrawer(
             modifier = modifier,
             drawerState = scaffoldState.drawerState,
             gesturesEnabled = drawerGesturesEnabled,

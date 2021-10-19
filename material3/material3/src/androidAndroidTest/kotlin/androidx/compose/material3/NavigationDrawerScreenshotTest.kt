@@ -42,7 +42,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalMaterial3Api::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-class DrawerScreenshotTest {
+class NavigationDrawerScreenshotTest {
 
     @Suppress("DEPRECATION")
     @get:Rule
@@ -51,10 +51,10 @@ class DrawerScreenshotTest {
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL3)
 
-    private fun ComposeContentTestRule.setModalDrawer(drawerValue: DrawerValue) {
+    private fun ComposeContentTestRule.setnavigationDrawer(drawerValue: DrawerValue) {
         setMaterialContent {
             Box(Modifier.requiredSize(400.dp, 32.dp).testTag(ContainerTestTag)) {
-                ModalDrawer(
+                NavigationDrawer(
                     drawerState = rememberDrawerState(drawerValue),
                     drawerContent = {},
                     content = {
@@ -79,10 +79,10 @@ class DrawerScreenshotTest {
         }
     }
 
-    private fun ComposeContentTestRule.setDarkModalDrawer(drawerValue: DrawerValue) {
+    private fun ComposeContentTestRule.setDarknavigationDrawer(drawerValue: DrawerValue) {
         setMaterialContentWithDarkTheme {
             Box(Modifier.requiredSize(400.dp, 32.dp).testTag(ContainerTestTag)) {
-                ModalDrawer(
+                NavigationDrawer(
                     drawerState = rememberDrawerState(drawerValue),
                     drawerContent = {},
                     content = {
@@ -96,21 +96,21 @@ class DrawerScreenshotTest {
     }
 
     @Test
-    fun lightTheme_modalDrawer_closed() {
-        rule.setModalDrawer(DrawerValue.Closed)
-        assertScreenshotAgainstGolden("modalDrawer_closed")
+    fun lightTheme_navigationDrawer_closed() {
+        rule.setnavigationDrawer(DrawerValue.Closed)
+        assertScreenshotAgainstGolden("navigationDrawer_closed")
     }
 
     @Test
-    fun lightTheme_modalDrawer_open() {
-        rule.setModalDrawer(DrawerValue.Open)
-        assertScreenshotAgainstGolden("modalDrawer_light_opened")
+    fun lightTheme_navigationDrawer_open() {
+        rule.setnavigationDrawer(DrawerValue.Open)
+        assertScreenshotAgainstGolden("navigationDrawer_light_opened")
     }
 
     @Test
-    fun darkTheme_modalDrawer_open() {
-        rule.setDarkModalDrawer(DrawerValue.Open)
-        assertScreenshotAgainstGolden("modalDrawer_dark_opened")
+    fun darkTheme_navigationDrawer_open() {
+        rule.setDarknavigationDrawer(DrawerValue.Open)
+        assertScreenshotAgainstGolden("navigationDrawer_dark_opened")
     }
 
     private fun assertScreenshotAgainstGolden(goldenName: String) {

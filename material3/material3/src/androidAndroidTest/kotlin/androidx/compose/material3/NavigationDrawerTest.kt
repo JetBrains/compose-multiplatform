@@ -60,7 +60,7 @@ import org.junit.runner.RunWith
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalMaterial3Api::class)
-class DrawerTest {
+class NavigationDrawerTest {
 
     @get:Rule
     val rule = createComposeRule()
@@ -70,10 +70,10 @@ class DrawerTest {
     }
 
     @Test
-    fun modalDrawer_testOffset_whenOpen() {
+    fun navigationDrawer_testOffset_whenOpen() {
         rule.setMaterialContent {
             val drawerState = rememberDrawerState(DrawerValue.Open)
-            ModalDrawer(
+            NavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("content"))
@@ -87,10 +87,10 @@ class DrawerTest {
     }
 
     @Test
-    fun modalDrawer_testOffset_whenClosed() {
+    fun navigationDrawer_testOffset_whenClosed() {
         rule.setMaterialContent {
             val drawerState = rememberDrawerState(DrawerValue.Closed)
-            ModalDrawer(
+            NavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("content"))
@@ -105,10 +105,10 @@ class DrawerTest {
     }
 
     @Test
-    fun modalDrawer_testWidth_whenOpen() {
+    fun navigationDrawer_testWidth_whenOpen() {
         rule.setMaterialContent {
             val drawerState = rememberDrawerState(DrawerValue.Open)
-            ModalDrawer(
+            NavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag("content"))
@@ -123,31 +123,31 @@ class DrawerTest {
 
     @Test
     @SmallTest
-    fun modalDrawer_hasPaneTitle() {
+    fun navigationDrawer_hasPaneTitle() {
         lateinit var navigationMenu: String
         rule.setMaterialContent {
-            ModalDrawer(
+            NavigationDrawer(
                 drawerState = rememberDrawerState(DrawerValue.Open),
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag("modalDrawerTag"))
+                    Box(Modifier.fillMaxSize().testTag("navigationDrawerTag"))
                 },
                 content = {}
             )
             navigationMenu = getString(Strings.NavigationMenu)
         }
 
-        rule.onNodeWithTag("modalDrawerTag", useUnmergedTree = true)
+        rule.onNodeWithTag("navigationDrawerTag", useUnmergedTree = true)
             .onParent()
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.PaneTitle, navigationMenu))
     }
 
     @Test
     @LargeTest
-    fun modalDrawer_openAndClose(): Unit = runBlocking(AutoTestFrameClock()) {
+    fun navigationDrawer_openAndClose(): Unit = runBlocking(AutoTestFrameClock()) {
         lateinit var drawerState: DrawerState
         rule.setMaterialContent {
             drawerState = rememberDrawerState(DrawerValue.Closed)
-            ModalDrawer(
+            NavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
@@ -174,11 +174,11 @@ class DrawerTest {
 
     @Test
     @LargeTest
-    fun modalDrawer_animateTo(): Unit = runBlocking(AutoTestFrameClock()) {
+    fun navigationDrawer_animateTo(): Unit = runBlocking(AutoTestFrameClock()) {
         lateinit var drawerState: DrawerState
         rule.setMaterialContent {
             drawerState = rememberDrawerState(DrawerValue.Closed)
-            ModalDrawer(
+            NavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
@@ -205,11 +205,11 @@ class DrawerTest {
 
     @Test
     @LargeTest
-    fun modalDrawer_snapTo(): Unit = runBlocking(AutoTestFrameClock()) {
+    fun navigationDrawer_snapTo(): Unit = runBlocking(AutoTestFrameClock()) {
         lateinit var drawerState: DrawerState
         rule.setMaterialContent {
             drawerState = rememberDrawerState(DrawerValue.Closed)
-            ModalDrawer(
+            NavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
@@ -236,11 +236,11 @@ class DrawerTest {
 
     @Test
     @LargeTest
-    fun modalDrawer_currentValue(): Unit = runBlocking(AutoTestFrameClock()) {
+    fun navigationDrawer_currentValue(): Unit = runBlocking(AutoTestFrameClock()) {
         lateinit var drawerState: DrawerState
         rule.setMaterialContent {
             drawerState = rememberDrawerState(DrawerValue.Closed)
-            ModalDrawer(
+            NavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
@@ -265,14 +265,14 @@ class DrawerTest {
 
     @Test
     @LargeTest
-    fun modalDrawer_bodyContent_clickable(): Unit = runBlocking(AutoTestFrameClock()) {
+    fun navigationDrawer_bodyContent_clickable(): Unit = runBlocking(AutoTestFrameClock()) {
         var drawerClicks = 0
         var bodyClicks = 0
         lateinit var drawerState: DrawerState
         rule.setMaterialContent {
             drawerState = rememberDrawerState(DrawerValue.Closed)
             // emulate click on the screen
-            ModalDrawer(
+            NavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
                     Box(Modifier.fillMaxSize().clickable { drawerClicks += 1 })
@@ -305,14 +305,14 @@ class DrawerTest {
 
     @Test
     @LargeTest
-    fun modalDrawer_drawerContent_doesntPropagateClicksWhenOpen(): Unit = runBlocking(
+    fun navigationDrawer_drawerContent_doesntPropagateClicksWhenOpen(): Unit = runBlocking(
         AutoTestFrameClock()
     ) {
         var bodyClicks = 0
         lateinit var drawerState: DrawerState
         rule.setMaterialContent {
             drawerState = rememberDrawerState(DrawerValue.Closed)
-            ModalDrawer(
+            NavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
@@ -343,12 +343,12 @@ class DrawerTest {
 
     @Test
     @LargeTest
-    fun modalDrawer_openBySwipe() {
+    fun navigationDrawer_openBySwipe() {
         lateinit var drawerState: DrawerState
         rule.setMaterialContent {
             drawerState = rememberDrawerState(DrawerValue.Closed)
             Box(Modifier.testTag(DrawerTestTag)) {
-                ModalDrawer(
+                NavigationDrawer(
                     drawerState = drawerState,
                     drawerContent = {
                         Box(Modifier.fillMaxSize().background(color = Color.Magenta))
@@ -377,7 +377,7 @@ class DrawerTest {
 
     @Test
     @LargeTest
-    fun modalDrawer_confirmStateChangeRespect() {
+    fun navigationDrawer_confirmStateChangeRespect() {
         lateinit var drawerState: DrawerState
         rule.setMaterialContent {
             drawerState = rememberDrawerState(
@@ -387,7 +387,7 @@ class DrawerTest {
                 }
             )
             Box(Modifier.testTag(DrawerTestTag)) {
-                ModalDrawer(
+                NavigationDrawer(
                     drawerState = drawerState,
                     drawerContent = {
                         Box(
@@ -422,14 +422,14 @@ class DrawerTest {
 
     @Test
     @LargeTest
-    fun modalDrawer_openBySwipe_rtl() {
+    fun navigationDrawer_openBySwipe_rtl() {
         lateinit var drawerState: DrawerState
         rule.setMaterialContent {
             drawerState = rememberDrawerState(DrawerValue.Closed)
             // emulate click on the screen
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Box(Modifier.testTag(DrawerTestTag)) {
-                    ModalDrawer(
+                    NavigationDrawer(
                         drawerState = drawerState,
                         drawerContent = {
                             Box(Modifier.fillMaxSize().background(color = Color.Magenta))
@@ -459,13 +459,13 @@ class DrawerTest {
 
     @Test
     @LargeTest
-    fun modalDrawer_noDismissActionWhenClosed_hasDissmissActionWhenOpen(): Unit = runBlocking(
+    fun navigationDrawer_noDismissActionWhenClosed_hasDissmissActionWhenOpen(): Unit = runBlocking(
         AutoTestFrameClock()
     ) {
         lateinit var drawerState: DrawerState
         rule.setMaterialContent {
             drawerState = rememberDrawerState(DrawerValue.Closed)
-            ModalDrawer(
+            NavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
                     Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
@@ -497,11 +497,11 @@ class DrawerTest {
     }
 
     @Test
-    fun modalDrawer_scrimNode_reportToSemanticsWhenOpen_notReportToSemanticsWhenClosed() {
-        val topTag = "ModalDrawer"
+    fun navigationDrawer_scrimNode_reportToSemanticsWhenOpen_notReportToSemanticsWhenClosed() {
+        val topTag = "navigationDrawer"
         lateinit var closeDrawer: String
         rule.setMaterialContent {
-            ModalDrawer(
+            NavigationDrawer(
                 modifier = Modifier.testTag(topTag),
                 drawerState = rememberDrawerState(DrawerValue.Open),
                 drawerContent = {
