@@ -49,6 +49,7 @@ import com.android.build.gradle.TestExtension
 import com.android.build.gradle.TestPlugin
 import com.android.build.gradle.TestedExtension
 import com.android.build.gradle.internal.tasks.AnalyticsRecordingTask
+import com.android.build.gradle.internal.tasks.ListingFileRedirectTask
 import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.Plugin
@@ -541,6 +542,9 @@ class AndroidXImplPlugin : Plugin<Project> {
                 return
             }
             addToTestZips(project, packageTask)
+        }
+        project.tasks.withType(ListingFileRedirectTask::class.java).forEach {
+            AffectedModuleDetector.configureTaskGuard(it)
         }
     }
 
