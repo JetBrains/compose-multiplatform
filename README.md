@@ -47,6 +47,8 @@ Preview functionality (check your application UI without building/running it) fo
    * [components](components) - custom components of Compose Multiplatform
        * [Video Player](components/VideoPlayer)
        * [Split Pane](components/SplitPane)
+   * [experimental](experimental) - experimental components and examples
+       * [LWJGL integration](experimental/lwjgl-integration) - An example showing how to integrate Compose with [LWJGL](https://www.lwjgl.org)
        
 ## Getting latest version of Compose Multiplatform ##
 
