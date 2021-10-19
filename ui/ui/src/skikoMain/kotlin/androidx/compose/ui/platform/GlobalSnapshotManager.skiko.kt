@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,6 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.ui.platform.GlobalSnapshotManager.ensureStarted
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.swing.Swing
-import java.util.concurrent.atomic.AtomicBoolean
-
 /**
  * Platform-specific mechanism for starting a monitor of global snapshot state writes
  * in order to schedule the periodic dispatch of snapshot apply notifications.
@@ -37,20 +27,6 @@ import java.util.concurrent.atomic.AtomicBoolean
  * For desktop, these notifications are always sent on [Dispatchers.Swing]. Other platforms
  * may establish different policies for these notifications.
  */
-internal actual object GlobalSnapshotManager {
-    private val started = AtomicBoolean(false)
-
-    actual fun ensureStarted() {
-        if (started.compareAndSet(false, true)) {
-            val channel = Channel<Unit>(Channel.CONFLATED)
-            CoroutineScope(Dispatchers.Swing).launch {
-                channel.consumeEach {
-                    Snapshot.sendApplyNotifications()
-                }
-            }
-            Snapshot.registerGlobalWriteObserver {
-                channel.trySend(Unit)
-            }
-        }
-    }
+internal expect object GlobalSnapshotManager {
+    fun ensureStarted()
 }

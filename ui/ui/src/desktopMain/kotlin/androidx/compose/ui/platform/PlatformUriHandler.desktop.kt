@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.input.pointer
+package androidx.compose.ui.platform
 
-import java.awt.event.MouseEvent
+import java.awt.Desktop
+import java.net.URI
 
-internal actual class PointerInputEvent(
-    val eventType: PointerEventType,
-    actual val uptime: Long,
-    actual val pointers: List<PointerInputEventData>,
-    val mouseEvent: MouseEvent? = null
-)
+internal actual class PlatformUriHandler : UriHandler {
+    override fun openUri(uri: String) {
+        Desktop.getDesktop().browse(URI(uri))
+    }
+}

@@ -22,22 +22,22 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.node.LayoutNode
 
 /**
- * Composes the given composable into [DesktopOwner]
+ * Composes the given composable into [SkiaBasedOwner]
  *
  * @param parent The parent composition reference to coordinate scheduling of composition updates
  *        If null then default root composition will be used.
  * @param content A `@Composable` function declaring the UI contents
  */
 @OptIn(ExperimentalComposeUiApi::class)
-internal fun DesktopOwner.setContent(
+internal fun SkiaBasedOwner.setContent(
     parent: CompositionContext,
     content: @Composable () -> Unit
 ): Composition {
-    val composition = Composition(DesktopUiApplier(root), parent)
+    val composition = Composition(DefaultUiApplier(root), parent)
     composition.setContent {
         ProvideCommonCompositionLocals(
             owner = this,
-            uriHandler = DesktopUriHandler(),
+            uriHandler = PlatformUriHandler(),
             content = content
         )
     }
@@ -48,6 +48,6 @@ internal actual fun createSubcomposition(
     container: LayoutNode,
     parent: CompositionContext
 ): Composition = Composition(
-    DesktopUiApplier(container),
+    DefaultUiApplier(container),
     parent
 )
