@@ -16,22 +16,21 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.ui.input.key.KeyInputModifier
-import androidx.compose.ui.input.key.KeyEvent
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.type
+import androidx.compose.ui.InternalComposeUiApi
+import androidx.compose.ui.input.pointer.TestPointerInputEventData
+import androidx.compose.ui.node.RootForTest
 
-internal actual fun sendKeyEvent(
-    platformInputService: PlatformInput,
-    keyInputModifier: KeyInputModifier,
-    keyEvent: KeyEvent
-): Boolean {
-    when {
-        keyEvent.nativeKeyEvent.id == java.awt.event.KeyEvent.KEY_TYPED ->
-            platformInputService.charKeyPressed = true
-        keyEvent.type == KeyEventType.KeyUp ->
-            platformInputService.charKeyPressed = false
-    }
-
-    return keyInputModifier.processKeyInput(keyEvent)
+/**
+ * The marker interface to be implemented by the desktop root backing the composition.
+ * To be used in tests.
+ */
+@InternalComposeUiApi
+interface SkiaRootForTest : RootForTest {
+    /**
+     * Process pointer event
+     *
+     * [timeMillis] time when the pointer event occurred
+     * [pointers] state of all pointers
+     */
+    fun processPointerInput(timeMillis: Long, pointers: List<TestPointerInputEventData>)
 }
