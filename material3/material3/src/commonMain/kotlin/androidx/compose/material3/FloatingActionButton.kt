@@ -16,6 +16,10 @@
 
 package androidx.compose.material3
 
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.InteractionSource
@@ -46,7 +50,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.draw.shadow
 
 /**
@@ -390,18 +393,32 @@ private class DefaultFloatingActionButtonElevation(
 ) : FloatingActionButtonElevation {
     @Composable
     override fun shadowElevation(interactionSource: InteractionSource): State<Dp> {
-        // TODO(b/202957927): Add animation between elevation states.
-        val isHovered by interactionSource.collectIsHoveredAsState()
-        return rememberUpdatedState(if (isHovered) hoveredElevation else defaultElevation)
+        return animateElevation(interactionSource = interactionSource)
     }
 
     @Composable
     override fun tonalElevation(interactionSource: InteractionSource): State<Dp> {
-        // TODO(b/202957927): Add animation between elevation states.
+        return animateElevation(interactionSource = interactionSource)
+    }
+
+    @Composable
+    private fun animateElevation(interactionSource: InteractionSource): State<Dp> {
         val isHovered by interactionSource.collectIsHoveredAsState()
-        return rememberUpdatedState(if (isHovered) hoveredElevation else defaultElevation)
+        val targetElevation = if (isHovered) hoveredElevation else defaultElevation
+        val animationSpec = if (isHovered) IncomingSpec else OutgoingSpec
+        return animateDpAsState(targetElevation, animationSpec)
     }
 }
+
+private val IncomingSpec = TweenSpec<Dp>(
+    durationMillis = 120,
+    easing = FastOutSlowInEasing
+)
+
+private val OutgoingSpec = TweenSpec<Dp>(
+    durationMillis = 120,
+    easing = CubicBezierEasing(0.40f, 0.00f, 0.60f, 1.00f)
+)
 
 private val ExtendedFabIconPadding = 12.dp
 
