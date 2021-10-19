@@ -16,6 +16,26 @@
 
 package androidx.compose.foundation
 
+import android.view.KeyEvent.KEYCODE_DPAD_CENTER
+import android.view.KeyEvent.KEYCODE_ENTER
+import android.view.KeyEvent.KEYCODE_NUMPAD_ENTER
 import android.view.ViewConfiguration
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType.Companion.KeyUp
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.nativeKeyCode
+import androidx.compose.ui.input.key.type
 
 internal actual val TapIndicationDelay: Long = ViewConfiguration.getTapTimeout().toLong()
+
+/**
+ * Whether the specified [KeyEvent] represents a user intent to perform a click.
+ * (eg. When you press Enter on a focused button, it should perform a click).
+ */
+internal actual val KeyEvent.isClick: Boolean
+    get() = type == KeyUp && when (key.nativeKeyCode) {
+            KEYCODE_DPAD_CENTER,
+            KEYCODE_ENTER,
+            KEYCODE_NUMPAD_ENTER -> true
+            else -> false
+    }
