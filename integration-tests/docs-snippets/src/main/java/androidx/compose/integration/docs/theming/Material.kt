@@ -431,7 +431,7 @@ private val LightColors = lightColors()
 @Composable private fun BlueTheme(content: @Composable () -> Unit) {}
 
 @Suppress("ClassName")
-private object R {
+internal object R {
     object drawable {
         const val ic_sun_24dp = 1
         const val ic_moon_24dp = 1
@@ -440,6 +440,8 @@ private object R {
         const val rubik_regular = 1
         const val rubik_medium = 1
         const val rubik_bold = 1
+        const val karla_regular = 1
+        const val karla_bold = 1
     }
 }
 
