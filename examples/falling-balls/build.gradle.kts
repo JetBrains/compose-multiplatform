@@ -6,7 +6,7 @@ plugins {
     // __KOTLIN_COMPOSE_VERSION__
     kotlin("jvm") version "1.5.31"
     // __LATEST_COMPOSE_RELEASE_VERSION__
-    id("org.jetbrains.compose") version "1.0.0-alpha4-build361"
+    id("org.jetbrains.compose") version "0.0.0-master-build413"
 }
 
 group = "me.user"
