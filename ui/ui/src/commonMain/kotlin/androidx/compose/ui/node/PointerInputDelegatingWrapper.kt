@@ -22,19 +22,13 @@ import androidx.compose.ui.input.pointer.PointerInputModifier
 
 internal class PointerInputDelegatingWrapper(
     wrapped: LayoutNodeWrapper,
-    pointerInputModifier: PointerInputModifier
-) : DelegatingLayoutNodeWrapper<PointerInputModifier>(wrapped, pointerInputModifier) {
+    modifier: PointerInputModifier
+) : DelegatingLayoutNodeWrapper<PointerInputModifier>(wrapped, modifier) {
 
-    init {
-        pointerInputModifier.pointerInputFilter.layoutCoordinates = this
+    override fun onInitialize() {
+        super.onInitialize()
+        modifier.pointerInputFilter.layoutCoordinates = this
     }
-
-    override var modifier: PointerInputModifier
-        get() = super.modifier
-        set(value) {
-            super.modifier = value
-            value.pointerInputFilter.layoutCoordinates = this
-        }
 
     override fun hitTest(
         pointerPosition: Offset,
