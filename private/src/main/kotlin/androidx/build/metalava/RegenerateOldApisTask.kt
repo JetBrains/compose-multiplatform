@@ -20,7 +20,7 @@ import androidx.build.Version
 import androidx.build.checkapi.getApiFileVersion
 import androidx.build.checkapi.getVersionedApiLocation
 import androidx.build.checkapi.isValidArtifactVersion
-import androidx.build.doclava.androidJarFile
+import androidx.build.getAndroidJar
 import androidx.build.getCheckoutRoot
 import androidx.build.java.JavaCompileInputs
 import org.gradle.api.DefaultTask
@@ -103,7 +103,7 @@ abstract class RegenerateOldApisTask @Inject constructor(
         val jars = getJars(runnerProject, mavenId)
         val sources = getSources(runnerProject, mavenId + ":sources")
 
-        return JavaCompileInputs(sources, jars, androidJarFile(project))
+        return JavaCompileInputs(sources, jars, project.getAndroidJar())
     }
 
     fun getJars(runnerProject: Project, mavenId: String): FileCollection {

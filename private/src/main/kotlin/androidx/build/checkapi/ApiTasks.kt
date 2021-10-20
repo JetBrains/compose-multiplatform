@@ -20,7 +20,7 @@ import androidx.build.AndroidXExtension
 import androidx.build.Release
 import androidx.build.RunApiTasks
 import androidx.build.Version
-import androidx.build.doclava.androidJarFile
+import androidx.build.getAndroidJar
 import androidx.build.isWriteVersionedApiFilesEnabled
 import androidx.build.java.JavaCompileInputs
 import androidx.build.metalava.MetalavaTasks
@@ -226,6 +226,6 @@ fun Project.jvmCompileInputsFromKmpProject(): JavaCompileInputs {
     return JavaCompileInputs(
         sourcePaths = mainSourcePaths + kotlinSourcePaths,
         dependencyClasspath = dependencyClasspath,
-        androidJarFile(project)
+        project.getAndroidJar()
     )
 }
