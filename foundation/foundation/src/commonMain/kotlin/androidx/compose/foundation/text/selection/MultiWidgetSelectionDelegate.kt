@@ -161,8 +161,8 @@ internal fun getTextSelectionInfo(
     val bounds = Rect(
         0.0f,
         0.0f,
-        textLayoutResult.size.width.toFloat(),
-        textLayoutResult.size.height.toFloat()
+        textLayoutResult.multiParagraph.width.toFloat(),
+        textLayoutResult.multiParagraph.height.toFloat()
     )
 
     val isSelected =

@@ -785,7 +785,12 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
 }
 
 internal fun merge(lhs: Selection?, rhs: Selection?): Selection? {
-    return lhs?.merge(rhs) ?: rhs
+    return when {
+        lhs == null -> rhs
+        rhs == null || rhs.start == rhs.end -> lhs
+        lhs.start == lhs.end -> lhs.copy(handlesCrossed = rhs.handlesCrossed).merge(rhs)
+        else -> lhs.merge(rhs)
+    }
 }
 
 internal expect fun isCopyKeyEvent(keyEvent: KeyEvent): Boolean
