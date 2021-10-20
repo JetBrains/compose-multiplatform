@@ -73,11 +73,11 @@ class StretchOverscrollTest {
 
         rule.onNodeWithTag(OverscrollBox).performTouchInput {
             down(center)
-            moveBy(Offset(200f, 0f))
+            moveBy(Offset(-(200f + (viewConfiguration?.touchSlop ?: 0f)), 0f))
             // pull in the opposite direction. Since we pulled overscroll with positive delta
             // it will consume negative delta before scroll happens
             // assert in the ScrollableState lambda will check it
-            moveBy(Offset(-200f + (viewConfiguration?.touchSlop ?: 0f), 0f))
+            moveBy(Offset(200f, 0f))
             up()
         }
 
