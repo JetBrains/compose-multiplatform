@@ -1,0 +1,3 @@
+// Baseline format: 1.0
+RemovedMethod: androidx.compose.ui.graphics.drawscope.DrawScope#offsetSize(long, long):
+    Removed method androidx.compose.ui.graphics.drawscope.DrawScope.offsetSize(long,long)
