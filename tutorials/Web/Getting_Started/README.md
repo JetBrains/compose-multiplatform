@@ -89,7 +89,7 @@ kotlin {
 </html>
 ```
 
-#### 7. Add the `Main.kt` file:
+#### 7. Add the `Main.kt` file to the `kotlin`:
 ```kotlin
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
