@@ -223,8 +223,6 @@ fun rememberDrawerState(
  * Modal navigation drawers block interaction with the rest of an app’s content with a scrim.
  * They are elevated above most of the app’s UI and don’t affect the screen’s layout grid.
  *
- * ![Modal drawer image](https://developer.android.com/images/reference/androidx/compose/material/modal-drawer.png)
- *
  * @sample androidx.compose.material3.samples.NavigationDrawerSample
  *
  * @param drawerContent composable that represents content inside the drawer
