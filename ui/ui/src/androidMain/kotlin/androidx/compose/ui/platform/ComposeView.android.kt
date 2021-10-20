@@ -376,6 +376,8 @@ abstract class AbstractComposeView @JvmOverloads constructor(
         checkAddView()
         return super.addViewInLayout(child, index, params, preventRequestLayout)
     }
+
+    override fun shouldDelayChildPressedState(): Boolean = false
 }
 
 /**

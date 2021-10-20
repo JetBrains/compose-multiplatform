@@ -18,6 +18,7 @@ package androidx.compose.foundation
 
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -43,6 +44,9 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.util.fastAll
 import java.awt.event.KeyEvent.VK_ENTER
 import kotlinx.coroutines.coroutineScope
+
+@Composable
+internal actual fun isComposeRootInScrollableContainer(): () -> Boolean = { false }
 
 // TODO: b/168524931 - should this depend on the input device?
 internal actual val TapIndicationDelay: Long = 0L

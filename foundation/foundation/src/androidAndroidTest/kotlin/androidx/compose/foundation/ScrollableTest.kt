@@ -18,6 +18,7 @@ package androidx.compose.foundation
 
 import androidx.compose.animation.core.keyframes
 import androidx.compose.foundation.gestures.FlingBehavior
+import androidx.compose.foundation.gestures.ModifierLocalScrollableContainer
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableState
@@ -41,6 +42,8 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.modifier.ModifierLocalConsumer
+import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
@@ -1349,6 +1352,56 @@ class ScrollableTest {
         rule.runOnIdle {
             assertThat(total).isEqualTo(prevTotal + 123)
             assertThat(returned).isEqualTo(123f)
+        }
+    }
+
+    @Test
+    fun scrollable_setsModifierLocalScrollableContainer() {
+        val controller = ScrollableState { it }
+
+        var isOuterInScrollableContainer: Boolean? = null
+        var isInnerInScrollableContainer: Boolean? = null
+        rule.setContent {
+            Box {
+                Box(
+                    modifier = Modifier
+                        .testTag(scrollableBoxTag)
+                        .size(100.dp)
+                        .then(
+                            object : ModifierLocalConsumer {
+                                override fun onModifierLocalsUpdated(
+                                    scope: ModifierLocalReadScope
+                                ) {
+                                    with(scope) {
+                                        isOuterInScrollableContainer =
+                                            ModifierLocalScrollableContainer.current
+                                    }
+                                }
+                            }
+                        )
+                        .scrollable(
+                            state = controller,
+                            orientation = Orientation.Horizontal
+                        )
+                        .then(
+                            object : ModifierLocalConsumer {
+                                override fun onModifierLocalsUpdated(
+                                    scope: ModifierLocalReadScope
+                                ) {
+                                    with(scope) {
+                                        isInnerInScrollableContainer =
+                                            ModifierLocalScrollableContainer.current
+                                    }
+                                }
+                            }
+                        )
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(isOuterInScrollableContainer).isFalse()
+            assertThat(isInnerInScrollableContainer).isTrue()
         }
     }
 

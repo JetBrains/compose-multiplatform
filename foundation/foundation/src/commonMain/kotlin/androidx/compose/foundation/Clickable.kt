@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation
 
+import androidx.compose.foundation.gestures.ModifierLocalScrollableContainer
 import androidx.compose.foundation.gestures.PressGestureScope
 import androidx.compose.foundation.gestures.detectTapAndPress
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -24,6 +25,7 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -33,6 +35,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.modifier.ModifierLocalConsumer
+import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.disabled
@@ -129,17 +133,39 @@ fun Modifier.clickable(
         if (enabled) {
             PressedInteractionSourceDisposableEffect(interactionSource, pressedInteraction)
         }
+        val isRootInScrollableContainer = isComposeRootInScrollableContainer()
+        val isClickableInScrollableContainer = remember { mutableStateOf(true) }
+        val delayPressInteraction = rememberUpdatedState {
+            isClickableInScrollableContainer.value || isRootInScrollableContainer()
+        }
         val gesture = Modifier.pointerInput(interactionSource, enabled) {
             detectTapAndPress(
                 onPress = { offset ->
                     if (enabled) {
-                        handlePressInteraction(offset, interactionSource, pressedInteraction)
+                        handlePressInteraction(
+                            offset,
+                            interactionSource,
+                            pressedInteraction,
+                            delayPressInteraction
+                        )
                     }
                 },
                 onTap = { if (enabled) onClickState.value.invoke() }
             )
         }
         Modifier
+            .then(
+                remember {
+                    object : ModifierLocalConsumer {
+                        override fun onModifierLocalsUpdated(scope: ModifierLocalReadScope) {
+                            with(scope) {
+                                isClickableInScrollableContainer.value =
+                                    ModifierLocalScrollableContainer.current
+                            }
+                        }
+                    }
+                }
+            )
             .genericClickableWithoutGesture(
                 gestureModifiers = gesture,
                 interactionSource = interactionSource,
@@ -282,6 +308,11 @@ fun Modifier.combinedClickable(
             }
             PressedInteractionSourceDisposableEffect(interactionSource, pressedInteraction)
         }
+        val isRootInScrollableContainer = isComposeRootInScrollableContainer()
+        val isClickableInScrollableContainer = remember { mutableStateOf(true) }
+        val delayPressInteraction = rememberUpdatedState {
+            isClickableInScrollableContainer.value || isRootInScrollableContainer()
+        }
         val gesture =
             Modifier.pointerInput(interactionSource, hasLongClick, hasDoubleClick, enabled) {
                 detectTapGestures(
@@ -297,13 +328,30 @@ fun Modifier.combinedClickable(
                     },
                     onPress = { offset ->
                         if (enabled) {
-                            handlePressInteraction(offset, interactionSource, pressedInteraction)
+                            handlePressInteraction(
+                                offset,
+                                interactionSource,
+                                pressedInteraction,
+                                delayPressInteraction
+                            )
                         }
                     },
                     onTap = { if (enabled) onClickState.value.invoke() }
                 )
             }
         Modifier
+            .then(
+                remember {
+                    object : ModifierLocalConsumer {
+                        override fun onModifierLocalsUpdated(scope: ModifierLocalReadScope) {
+                            with(scope) {
+                                isClickableInScrollableContainer.value =
+                                    ModifierLocalScrollableContainer.current
+                            }
+                        }
+                    }
+                }
+            )
             .genericClickableWithoutGesture(
                 gestureModifiers = gesture,
                 interactionSource = interactionSource,
@@ -349,11 +397,14 @@ internal fun PressedInteractionSourceDisposableEffect(
 internal suspend fun PressGestureScope.handlePressInteraction(
     pressPoint: Offset,
     interactionSource: MutableInteractionSource,
-    pressedInteraction: MutableState<PressInteraction.Press?>
+    pressedInteraction: MutableState<PressInteraction.Press?>,
+    delayPressInteraction: State<() -> Boolean>
 ) {
     coroutineScope {
         val delayJob = launch {
-            delay(TapIndicationDelay)
+            if (delayPressInteraction.value()) {
+                delay(TapIndicationDelay)
+            }
             val pressInteraction = PressInteraction.Press(pressPoint)
             interactionSource.emit(pressInteraction)
             pressedInteraction.value = pressInteraction
@@ -387,14 +438,22 @@ internal suspend fun PressGestureScope.handlePressInteraction(
 /**
  * How long to wait before appearing 'pressed' (emitting [PressInteraction.Press]) - if a touch
  * down will quickly become a drag / scroll, this timeout means that we don't show a press effect.
- *
- * TODO: b/168524931 currently this delay is always used since we will require API changes to
- * allow clickable to know whether it 'is in a scrollable container' - ideally this delay should
- * only be used if there is the possibility of a scroll / drag. We should also expose this /
- * [handlePressInteraction] in some similar form, to make it easy for developers to also use this
- * delay when handling presses.
  */
 internal expect val TapIndicationDelay: Long
+
+/**
+ * Returns a lambda that calculates whether the root Compose layout node is hosted in a scrollable
+ * container outside of Compose. On Android this will be whether the root View is in a scrollable
+ * ViewGroup, as even if nothing in the Compose part of the hierarchy is scrollable, if the View
+ * itself is in a scrollable container, we still want to delay presses in case presses in Compose
+ * convert to a scroll outside of Compose.
+ *
+ * Combine this with [ModifierLocalScrollableContainer], which returns whether a [Modifier] is
+ * within a scrollable Compose layout, to calculate whether this modifier is within some form of
+ * scrollable container, and hence should delay presses.
+ */
+@Composable
+internal expect fun isComposeRootInScrollableContainer(): () -> Boolean
 
 /**
  * Whether the specified [KeyEvent] represents a user intent to perform a click.

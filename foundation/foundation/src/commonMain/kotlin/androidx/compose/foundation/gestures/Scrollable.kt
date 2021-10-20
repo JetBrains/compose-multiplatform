@@ -48,6 +48,7 @@ import androidx.compose.ui.layout.OnGloballyPositionedModifier
 import androidx.compose.ui.modifier.ModifierLocalConsumer
 import androidx.compose.ui.modifier.ModifierLocalProvider
 import androidx.compose.ui.modifier.ModifierLocalReadScope
+import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.toSize
@@ -122,6 +123,12 @@ internal fun Modifier.scrollable(
 
         fun Float.reverseIfNeeded(): Float = if (reverseDirection) this * -1 else this
 
+        val scrollableContainerProvider = if (enabled) {
+            ModifierLocalScrollableContainerProvider
+        } else {
+            Modifier
+        }
+
         Modifier
             .then(bringIntoViewModifier)
             .then(overscrollModifier)
@@ -137,6 +144,7 @@ internal fun Modifier.scrollable(
             .mouseScrollable(orientation) {
                 state.dispatchRawDelta(it.reverseIfNeeded())
             }
+            .then(scrollableContainerProvider)
     }
 )
 
@@ -506,4 +514,16 @@ private fun relocationDistance(leadingEdge: Float, trailingEdge: Float, parentSi
     // Find the minimum scroll needed to make one of the edges coincide with the parent's edge.
     abs(leadingEdge) < abs(trailingEdge - parentSize) -> leadingEdge
     else -> trailingEdge - parentSize
+}
+
+// TODO: b/203141462 - make this public and move it to ui
+/**
+ * Whether this modifier is inside a scrollable container, provided by [Modifier.scrollable].
+ * Defaults to false.
+ */
+internal val ModifierLocalScrollableContainer = modifierLocalOf { false }
+
+private object ModifierLocalScrollableContainerProvider : ModifierLocalProvider<Boolean> {
+    override val key = ModifierLocalScrollableContainer
+    override val value = true
 }
