@@ -95,6 +95,15 @@ abstract class BaseIntegrationTests() {
         return (this as JavascriptExecutor).executeAsyncScript(script).toString()
     }
 
+    fun WebDriver.cursorPosition(id: String): Int {
+        val script = """
+             var callback = arguments[arguments.length - 1];
+             callback(document.getElementById("$id").selectionStart);
+        """.trimIndent()
+
+        return (this as JavascriptExecutor).executeAsyncScript(script).toString().toInt()
+    }
+
     fun WebDriver.sendKeysForDateInput(input: WebElement, year: Int, month: Int, day: Int) {
         val keys = when (this) {
             is ChromeDriver -> "${day}${month}${year}"

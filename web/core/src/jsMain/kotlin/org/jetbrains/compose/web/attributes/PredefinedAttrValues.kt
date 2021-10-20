@@ -50,6 +50,34 @@ sealed class InputType<T>(val typeStr: String) {
     protected fun valueAsString(event: Event): String {
         return event.target?.asDynamic()?.value?.unsafeCast<String>() ?: ""
     }
+
+    companion object {
+        internal fun fromString(type: String): InputType<*> {
+            return when (type) {
+                "button" -> Button
+                "checkbox" -> Checkbox
+                "color" -> Color
+                "date" -> Date
+                "datetime-local" -> DateTimeLocal
+                "email" -> Email
+                "file" -> File
+                "hidden" -> Hidden
+                "month" -> Month
+                "number" -> Number
+                "password" -> Password
+                "radio" -> Radio
+                "range" -> Range
+                "search" -> Search
+                "submit" -> Submit
+                "tel" -> Tel
+                "text" -> Text
+                "time" -> Time
+                "url" -> Url
+                "week" -> Week
+                else -> error("fromString got unknown type - $type")
+            }
+        }
+    }
 }
 
 sealed class DirType(val dirStr: String) {
