@@ -225,10 +225,6 @@ class AndroidXImplPlugin : Plugin<Project> {
         project.tasks.withType(KotlinCompile::class.java).configureEach { task ->
             task.kotlinOptions.jvmTarget = "1.8"
             project.configureJavaCompilationWarnings(task)
-
-            // Not directly impacting us, but a bunch of issues like KT-46512, probably prudent
-            // for us to just disable until Kotlin 1.5.10+ to avoid end users hitting users
-            task.kotlinOptions.freeCompilerArgs += listOf("-Xsam-conversions=class")
         }
         project.afterEvaluate {
             val isAndroidProject = project.plugins.hasPlugin(LibraryPlugin::class.java) ||
