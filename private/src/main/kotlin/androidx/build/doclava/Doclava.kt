@@ -17,10 +17,10 @@
 package androidx.build.doclava
 
 import androidx.build.SupportConfig
+import androidx.build.getAndroidJar
 import androidx.build.getSdkPath
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.util.PatternSet
 import java.io.File
@@ -46,7 +46,7 @@ internal fun createGenerateSdkApiTask(
             setDocletpath(doclavaConfig)
             destinationDir = destination
             // Strip the androidx.annotation classes injected by Metalava. They are not accessible.
-            classpath = androidJarFile(project)
+            classpath = project.getAndroidJar()
                 .filter { it.path.contains("androidx/annotation") }
                 .plus(annotationConfig)
             source(
@@ -75,25 +75,6 @@ internal val GENERATE_DOCS_CONFIG = ChecksConfig(
     hidden = GENERATEDOCS_HIDDEN + DEFAULT_DOCLAVA_CONFIG.hidden,
     errors = ((101..122) - GENERATEDOCS_HIDDEN)
 )
-
-/**
- * @return the project's Android SDK stub JAR as a File.
- */
-fun androidJarFile(project: Project): FileCollection =
-    project.files(
-        arrayOf(
-            File(
-                project.getSdkPath(),
-                "platforms/${SupportConfig.COMPILE_SDK_VERSION}/android.jar"
-            ),
-            // Allow using optional android.car APIs
-            File(
-                project.getSdkPath(),
-                "platforms/${SupportConfig.COMPILE_SDK_VERSION}/optional/android.car.jar"
-            )
-
-        )
-    )
 
 /**
  * @return the project's Android SDK stub source JAR as a File.

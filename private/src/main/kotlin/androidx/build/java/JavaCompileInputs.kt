@@ -16,7 +16,7 @@
 
 package androidx.build.java
 
-import androidx.build.doclava.androidJarFile
+import androidx.build.getAndroidJar
 import androidx.build.multiplatformExtension
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
@@ -63,7 +63,7 @@ data class JavaCompileInputs(
                 }
             )
             val dependencyClasspath = sourceSet.compileClasspath
-            return JavaCompileInputs(sourcePaths, dependencyClasspath, androidJarFile(project))
+            return JavaCompileInputs(sourcePaths, dependencyClasspath, project.getAndroidJar())
         }
 
         @Suppress("DEPRECATION") // BaseVariant, SourceKind
