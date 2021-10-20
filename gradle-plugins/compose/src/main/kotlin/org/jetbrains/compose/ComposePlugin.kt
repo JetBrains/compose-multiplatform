@@ -71,7 +71,7 @@ class ComposePlugin : Plugin<Project> {
 
             //redirecting all android artifacts to androidx.compose
             project.dependencies.modules {
-                if (!androidExtension.useAndroidX) {
+                if (!androidExtension.useAndroidX and !ComposeBuildConfig.experimentalOELPublication) {
                     // Replace 'androidx.compose' artifacts by 'org.jetbrains.compose' artifacts.
                     // It is needed, because 'org.jetbrains.compose' artifacts are the same artifacts as 'androidx.compose'
                     // (but with different version).

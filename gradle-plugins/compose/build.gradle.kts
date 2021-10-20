@@ -27,6 +27,10 @@ val buildConfig = tasks.register("buildConfig", GenerateBuildConfig::class.java)
     generatedOutputDir.set(buildConfigDir)
     fieldsToGenerate.put("composeVersion", BuildProperties.composeVersion(project))
     fieldsToGenerate.put("isComposeWithWeb", BuildProperties.isComposeWithWeb(project))
+    fieldsToGenerate.put("experimentalOELPublication", BuildProperties.experimentalOELPublication(project))
+    if (BuildProperties.oelAndroidXVersion(project) != null) {
+        fieldsToGenerate.put("oelAndroidXVersion", BuildProperties.oelAndroidXVersion(project)!!)
+    }
 }
 tasks.named("compileKotlin") {
     dependsOn(buildConfig)
