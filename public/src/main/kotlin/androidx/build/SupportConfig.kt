@@ -16,8 +16,10 @@
 
 package androidx.build
 
+import androidx.build.SupportConfig.COMPILE_SDK_VERSION
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import java.io.File
 
@@ -76,3 +78,21 @@ fun Project.getPrebuiltsRoot(): File {
     val reposProperties = ext.get("repos") as Map<*, *>
     return File(reposProperties["prebuiltsRoot"].toString())
 }
+
+/**
+ * @return the project's Android SDK stub JAR as a File.
+ */
+fun Project.getAndroidJar(): FileCollection =
+    files(
+        arrayOf(
+            File(
+                getSdkPath(),
+                "platforms/$COMPILE_SDK_VERSION/android.jar"
+            ),
+            // Allow using optional android.car APIs
+            File(
+                getSdkPath(),
+                "platforms/$COMPILE_SDK_VERSION/optional/android.car.jar"
+            )
+        )
+    )

@@ -22,9 +22,9 @@ import androidx.build.dependencies.KOTLIN_VERSION
 import androidx.build.doclava.DacOptions
 import androidx.build.doclava.DoclavaTask
 import androidx.build.doclava.GENERATE_DOCS_CONFIG
-import androidx.build.doclava.androidJarFile
 import androidx.build.doclava.createGenerateSdkApiTask
 import androidx.build.dokka.Dokka
+import androidx.build.getAndroidJar
 import androidx.build.getBuildId
 import androidx.build.getCheckoutRoot
 import androidx.build.getDistributionDirectory
@@ -337,7 +337,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
                 samplesDir = unzippedSamplesSources
                 sourcesDir = unzippedDocsSources
                 docsProjectDir = File(project.rootDir, "docs-public")
-                dependenciesClasspath = androidJarFile(project) + dependencyClasspath
+                dependenciesClasspath = project.getAndroidJar() + dependencyClasspath
                 excludedPackages = hiddenPackages.toSet()
                 excludedPackagesForJava = hiddenPackagesJava
                 excludedPackagesForKotlin = emptySet()
@@ -388,7 +388,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             task.dependsOn(unzipDocsTask)
             task.dependsOn(unzipSamplesTask)
 
-            val androidJar = androidJarFile(project)
+            val androidJar = project.getAndroidJar()
             val dokkaClasspath = project.provider({
                 project.files(androidJar).plus(dependencyClasspath)
             })
@@ -481,7 +481,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
                 dependsOn(doclavaConfiguration)
                 setDocletpath(doclavaConfiguration)
                 destinationDir = destDir
-                classpath = androidJarFile(project) + dependencyClasspath
+                classpath = project.getAndroidJar() + dependencyClasspath
                 checksConfig = GENERATE_DOCS_CONFIG
                 extraArgumentsBuilder.apply {
                     addStringOption(
