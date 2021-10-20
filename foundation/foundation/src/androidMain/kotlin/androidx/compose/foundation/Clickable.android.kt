@@ -19,12 +19,36 @@ package androidx.compose.foundation
 import android.view.KeyEvent.KEYCODE_DPAD_CENTER
 import android.view.KeyEvent.KEYCODE_ENTER
 import android.view.KeyEvent.KEYCODE_NUMPAD_ENTER
+import android.view.View
 import android.view.ViewConfiguration
+import android.view.ViewGroup
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType.Companion.KeyUp
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalView
+
+@Composable
+internal actual fun isComposeRootInScrollableContainer(): () -> Boolean {
+    val view = LocalView.current
+    return {
+        view.isInScrollableViewGroup()
+    }
+}
+
+// Copied from View#isInScrollingContainer() which is @hide
+private fun View.isInScrollableViewGroup(): Boolean {
+    var p = parent
+    while (p != null && p is ViewGroup) {
+        if (p.shouldDelayChildPressedState()) {
+            return true
+        }
+        p = p.parent
+    }
+    return false
+}
 
 internal actual val TapIndicationDelay: Long = ViewConfiguration.getTapTimeout().toLong()
 

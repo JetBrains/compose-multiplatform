@@ -1236,6 +1236,8 @@ internal class AndroidComposeView(context: Context) :
         preTransform(tmpCalculationMatrix)
     }
 
+    override fun shouldDelayChildPressedState(): Boolean = false
+
     companion object {
         private const val MaximumLayerCacheSize = 10
         private var systemPropertiesClass: Class<*>? = null

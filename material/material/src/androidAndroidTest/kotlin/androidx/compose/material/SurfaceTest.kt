@@ -281,8 +281,6 @@ class SurfaceTest {
 
         var scope: CoroutineScope? = null
 
-        rule.mainClock.autoAdvance = false
-
         rule.setContent {
             scope = rememberCoroutineScope()
             Surface(
@@ -306,9 +304,6 @@ class SurfaceTest {
 
         rule.onNodeWithTag("surface")
             .performTouchInput { down(center) }
-
-        // Advance past the tap timeout
-        rule.mainClock.advanceTimeBy(100)
 
         rule.runOnIdle {
             Truth.assertThat(interactions).hasSize(1)

@@ -282,7 +282,7 @@ class ToggleableTest {
     }
 
     @Test
-    fun toggleableTest_interactionSource() {
+    fun toggleableTest_interactionSource_noScrollableContainer() {
         val interactionSource = MutableInteractionSource()
 
         lateinit var scope: CoroutineScope
@@ -292,6 +292,121 @@ class ToggleableTest {
         rule.setContent {
             scope = rememberCoroutineScope()
             Box {
+                Box(
+                    Modifier.toggleable(
+                        value = true,
+                        interactionSource = interactionSource,
+                        indication = null,
+                        onValueChange = {}
+                    )
+                ) {
+                    BasicText("ToggleableText")
+                }
+            }
+        }
+
+        val interactions = mutableListOf<Interaction>()
+
+        scope.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+
+        rule.onNodeWithText("ToggleableText")
+            .performTouchInput { down(center) }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+        }
+
+        rule.onNodeWithText("ToggleableText")
+            .performTouchInput { up() }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(interactions[1]).isInstanceOf(PressInteraction.Release::class.java)
+            assertThat((interactions[1] as PressInteraction.Release).press)
+                .isEqualTo(interactions[0])
+        }
+    }
+
+    @Test
+    fun toggleableTest_interactionSource_resetWhenDisposed_noScrollableContainer() {
+        val interactionSource = MutableInteractionSource()
+        var emitToggleableText by mutableStateOf(true)
+
+        lateinit var scope: CoroutineScope
+
+        rule.mainClock.autoAdvance = false
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box {
+                if (emitToggleableText) {
+                    Box(
+                        Modifier.toggleable(
+                            value = true,
+                            interactionSource = interactionSource,
+                            indication = null,
+                            onValueChange = {}
+                        )
+                    ) {
+                        BasicText("ToggleableText")
+                    }
+                }
+            }
+        }
+
+        val interactions = mutableListOf<Interaction>()
+
+        scope.launch {
+            interactionSource.interactions.collect { interactions.add(it) }
+        }
+
+        rule.runOnIdle {
+            assertThat(interactions).isEmpty()
+        }
+
+        rule.onNodeWithText("ToggleableText")
+            .performTouchInput { down(center) }
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(1)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+        }
+
+        // Dispose toggleable
+        rule.runOnIdle {
+            emitToggleableText = false
+        }
+
+        rule.mainClock.advanceTimeByFrame()
+
+        rule.runOnIdle {
+            assertThat(interactions).hasSize(2)
+            assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
+            assertThat(interactions[1]).isInstanceOf(PressInteraction.Cancel::class.java)
+            assertThat((interactions[1] as PressInteraction.Cancel).press)
+                .isEqualTo(interactions[0])
+        }
+    }
+
+    @Test
+    fun toggleableTest_interactionSource_scrollableContainer() {
+        val interactionSource = MutableInteractionSource()
+
+        lateinit var scope: CoroutineScope
+
+        rule.mainClock.autoAdvance = false
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            Box(Modifier.verticalScroll(rememberScrollState())) {
                 Box(
                     Modifier.toggleable(
                         value = true,
@@ -339,7 +454,7 @@ class ToggleableTest {
     }
 
     @Test
-    fun toggleableTest_interactionSource_resetWhenDisposed() {
+    fun toggleableTest_interactionSource_resetWhenDisposed_scrollableContainer() {
         val interactionSource = MutableInteractionSource()
         var emitToggleableText by mutableStateOf(true)
 
@@ -349,7 +464,7 @@ class ToggleableTest {
 
         rule.setContent {
             scope = rememberCoroutineScope()
-            Box {
+            Box(Modifier.verticalScroll(rememberScrollState())) {
                 if (emitToggleableText) {
                     Box(
                         Modifier.toggleable(

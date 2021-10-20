@@ -20,18 +20,22 @@ import androidx.compose.foundation.Indication
 import androidx.compose.foundation.PressedInteractionSourceDisposableEffect
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.focusableInNonTouchMode
+import androidx.compose.foundation.gestures.ModifierLocalScrollableContainer
 import androidx.compose.foundation.gestures.detectTapAndPress
 import androidx.compose.foundation.handlePressInteraction
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.isComposeRootInScrollableContainer
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.modifier.ModifierLocalConsumer
+import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.platform.inspectable
 import androidx.compose.ui.semantics.Role
@@ -257,17 +261,39 @@ private fun Modifier.toggleableImpl(
     if (enabled) {
         PressedInteractionSourceDisposableEffect(interactionSource, pressedInteraction)
     }
+    val isRootInScrollableContainer = isComposeRootInScrollableContainer()
+    val isToggleableInScrollableContainer = remember { mutableStateOf(true) }
+    val delayPressInteraction = rememberUpdatedState {
+        isToggleableInScrollableContainer.value || isRootInScrollableContainer()
+    }
     val gestures = Modifier.pointerInput(interactionSource, enabled) {
         detectTapAndPress(
             onPress = { offset ->
                 if (enabled) {
-                    handlePressInteraction(offset, interactionSource, pressedInteraction)
+                    handlePressInteraction(
+                        offset,
+                        interactionSource,
+                        pressedInteraction,
+                        delayPressInteraction
+                    )
                 }
             },
             onTap = { if (enabled) onClickState.value.invoke() }
         )
     }
     this
+        .then(
+            remember {
+                object : ModifierLocalConsumer {
+                    override fun onModifierLocalsUpdated(scope: ModifierLocalReadScope) {
+                        with(scope) {
+                            isToggleableInScrollableContainer.value =
+                                ModifierLocalScrollableContainer.current
+                        }
+                    }
+                }
+            }
+        )
         .then(semantics)
         .indication(interactionSource, indication)
         .hoverable(enabled = enabled, interactionSource = interactionSource)

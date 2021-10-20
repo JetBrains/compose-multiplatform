@@ -185,8 +185,6 @@ class CardTest {
 
         var scope: CoroutineScope? = null
 
-        rule.mainClock.autoAdvance = false
-
         rule.setContent {
             scope = rememberCoroutineScope()
             Card(
@@ -210,9 +208,6 @@ class CardTest {
 
         rule.onNodeWithTag("card")
             .performTouchInput { down(center) }
-
-        // Advance past the tap timeout
-        rule.mainClock.advanceTimeBy(100)
 
         rule.runOnIdle {
             Truth.assertThat(interactions).hasSize(1)
