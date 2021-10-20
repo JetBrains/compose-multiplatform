@@ -4,10 +4,11 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.pointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import java.awt.Cursor
 
+@OptIn(ExperimentalComposeUiApi::class)
 actual fun Modifier.pointerMoveFilter(
     onEnter: () -> Boolean,
     onExit: () -> Boolean,
@@ -16,4 +17,4 @@ actual fun Modifier.pointerMoveFilter(
 
 @OptIn(ExperimentalComposeUiApi::class)
 actual fun Modifier.cursorForHorizontalResize(): Modifier =
-    pointerIcon(PointerIcon(Cursor(Cursor.E_RESIZE_CURSOR)))
+    Modifier.pointerHoverIcon(PointerIcon.Crosshair)
