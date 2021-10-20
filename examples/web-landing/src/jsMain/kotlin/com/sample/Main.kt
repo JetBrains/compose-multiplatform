@@ -5,8 +5,6 @@ import org.jetbrains.compose.web.renderComposable
 import com.sample.components.*
 import com.sample.content.*
 import com.sample.style.AppStylesheet
-import org.w3c.dom.HTMLElement
-
 
 fun main() {
     renderComposable(rootElementId = "root") {

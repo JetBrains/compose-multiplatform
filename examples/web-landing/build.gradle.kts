@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
 
 plugins {
-    kotlin("multiplatform") version "1.5.21"
-    id("org.jetbrains.compose") version "1.0.0-alpha1"
+    kotlin("multiplatform") version "1.5.31"
+    id("org.jetbrains.compose") version "0.0.0-master-build413"
 }
 
 repositories {
@@ -32,5 +32,6 @@ kotlin {
 afterEvaluate {
     rootProject.extensions.configure<NodeJsRootExtension> {
         versions.webpackDevServer.version = "4.0.0"
+        versions.webpackCli.version = "4.9.0"
     }
 }

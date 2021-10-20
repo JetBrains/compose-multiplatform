@@ -2,7 +2,6 @@ package com.sample.content
 
 import androidx.compose.runtime.Composable
 import org.jetbrains.compose.web.attributes.InputType
-import org.jetbrains.compose.web.attributes.checked
 import org.jetbrains.compose.web.attributes.name
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.selectors.CSSSelector
@@ -13,7 +12,6 @@ import org.jetbrains.compose.web.dom.Input
 import org.jetbrains.compose.web.dom.Label
 import org.jetbrains.compose.web.dom.Text
 import com.sample.style.AppStylesheet
-import org.jetbrains.compose.web.attributes.value
 
 private object SwitcherVariables {
     val labelWidth by variable<CSSpxValue>()
@@ -81,7 +79,7 @@ fun CodeSampleSwitcher(count: Int, current: Int, onSelect: (Int) -> Unit) {
                 name("code-snippet")
                 value("snippet$ix")
                 id("snippet$ix")
-                if (current == ix) checked()
+                if (current == ix) checked(true)
                 onChange { onSelect(ix) }
             })
             Label(forId = "snippet$ix") { Text("${ix + 1}") }
