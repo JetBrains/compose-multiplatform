@@ -23,6 +23,7 @@ import androidx.compose.ui.util.lerp
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 /**
  * The receiver scope of the touch input injection lambda from [performTouchInput].
@@ -555,16 +556,18 @@ fun TouchInjectionScope.pinch(
  * restrictive), an exception will be thrown with suggestions to fix the input.
  *
  * The coordinates are in the node's local coordinate system, where (0, 0) is the top left corner
- * of the node. The default duration is 200 milliseconds.
+ * of the node. The default duration is calculated such that a feasible swipe can be created that
+ * ends in the given velocity.
  *
  * @param start The start position of the gesture, in the node's local coordinate system
  * @param end The end position of the gesture, in the node's local coordinate system
  * @param endVelocity The velocity of the gesture at the moment it ends in px/second. Must be
  * positive.
  * @param durationMillis The duration of the gesture in milliseconds. Must be long enough that at
- * least 3 input events are generated, which happens with a duration of 25ms or more.
+ * least 3 input events are generated, which happens with a duration of 40ms or more. If omitted,
+ * a duration is calculated such that a valid swipe with velocity can be created.
  *
- * @throws IllegalStateException When no swipe can be generated that will result in the desired
+ * @throws IllegalArgumentException When no swipe can be generated that will result in the desired
  * velocity. The error message will suggest changes to the input parameters such that a swipe
  * will become feasible.
  */
@@ -573,7 +576,7 @@ fun TouchInjectionScope.swipeWithVelocity(
     end: Offset,
     /*@FloatRange(from = 0.0)*/
     endVelocity: Float,
-    durationMillis: Long = 200
+    durationMillis: Long = VelocityPathFinder.calculateDefaultDuration(start, end, endVelocity)
 ) {
     require(endVelocity >= 0f) {
         "Velocity cannot be $endVelocity, it must be positive"
@@ -581,7 +584,7 @@ fun TouchInjectionScope.swipeWithVelocity(
     require(eventPeriodMillis < 40) {
         "InputDispatcher.eventPeriod must be smaller than 40ms in order to generate velocities"
     }
-    val minimumDuration = ceil(2.5f * eventPeriodMillis).roundToInt()
+    val minimumDuration = ceil(2.5f * eventPeriodMillis).roundToLong()
     require(durationMillis >= minimumDuration) {
         "Duration must be at least ${minimumDuration}ms because " +
             "velocity requires at least 3 input events"
