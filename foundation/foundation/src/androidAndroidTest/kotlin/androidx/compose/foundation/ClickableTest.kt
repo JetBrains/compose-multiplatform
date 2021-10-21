@@ -83,6 +83,7 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -1233,6 +1234,7 @@ class ClickableTest {
         }
     }
 
+    @FlakyTest(bugId = 203399664)
     @Test
     fun clickableTest_interactionSource_focus_inTouchMode() {
         val interactionSource = MutableInteractionSource()
