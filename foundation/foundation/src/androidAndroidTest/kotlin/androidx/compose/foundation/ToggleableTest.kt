@@ -72,6 +72,7 @@ import androidx.compose.ui.test.performMouseInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
@@ -571,6 +572,7 @@ class ToggleableTest {
         }
     }
 
+    @FlakyTest(bugId = 203399664)
     @Test
     fun toggleableTest_interactionSource_focus_inTouchMode() {
         val interactionSource = MutableInteractionSource()
