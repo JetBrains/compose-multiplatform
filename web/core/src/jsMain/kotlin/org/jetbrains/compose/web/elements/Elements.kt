@@ -675,21 +675,23 @@ fun TextArea(
 ) {
     // if firstProvidedValueWasNotNull then TextArea behaves as controlled input
     val firstProvidedValueWasNotNull = remember { value != null }
+
+    // changes to this key trigger [textAreaRestoreControlledStateEffect]
     val keyForRestoringControlledState: MutableState<Int> = remember { mutableStateOf(0) }
 
     TagElement(
         elementBuilder = TextArea,
         applyAttrs = {
             val  textAreaAttrsBuilder = TextAreaAttrsBuilder()
+            textAreaAttrsBuilder.onInput {
+                // controlled state needs to be restored after every input
+                keyForRestoringControlledState.value = keyForRestoringControlledState.value + 1
+            }
             if (attrs != null) {
                 textAreaAttrsBuilder.attrs()
             }
             if (firstProvidedValueWasNotNull) {
                 textAreaAttrsBuilder.value(value ?: "")
-            }
-
-            textAreaAttrsBuilder.onInput {
-                keyForRestoringControlledState.value = keyForRestoringControlledState.value + 1
             }
 
             this.copyFrom(textAreaAttrsBuilder)
@@ -994,6 +996,7 @@ fun <K> Input(
     type: InputType<K>,
     attrs: InputAttrsBuilder<K>.() -> Unit
 ) {
+    // changes to this key trigger [inputRestoreControlledStateEffect]
     val keyForRestoringControlledState: MutableState<Int> = remember { mutableStateOf(0) }
 
     TagElement(
@@ -1001,11 +1004,12 @@ fun <K> Input(
         applyAttrs = {
             val inputAttrsBuilder = InputAttrsBuilder(type)
             inputAttrsBuilder.type(type)
-            inputAttrsBuilder.attrs()
-
             inputAttrsBuilder.onInput {
+                // controlled state needs to be restored after every input
                 keyForRestoringControlledState.value = keyForRestoringControlledState.value + 1
             }
+
+            inputAttrsBuilder.attrs()
 
             this.copyFrom(inputAttrsBuilder)
         },
