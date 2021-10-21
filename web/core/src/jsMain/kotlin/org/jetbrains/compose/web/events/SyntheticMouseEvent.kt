@@ -23,8 +23,12 @@ open class SyntheticMouseEvent internal constructor(
     val clientY: Int = nativeEvent.clientY
     val ctrlKey: Boolean = nativeEvent.ctrlKey
     val metaKey: Boolean = nativeEvent.metaKey
-    val movementX: Int = nativeEvent.asDynamic().movementX as Int
-    val movementY: Int = nativeEvent.asDynamic().movementY as Int
+
+    // https://github.com/JetBrains/compose-jb/issues/1053
+    // movementX and movementY are undefined in SafariMobile MouseEvent
+    val movementX: Int = (nativeEvent.asDynamic().movementX as? Int) ?: 0
+    val movementY: Int = (nativeEvent.asDynamic().movementY as? Int) ?: 0
+
     val offsetX: Double = nativeEvent.offsetX
     val offsetY: Double = nativeEvent.offsetY
     val pageX: Double = nativeEvent.pageX
