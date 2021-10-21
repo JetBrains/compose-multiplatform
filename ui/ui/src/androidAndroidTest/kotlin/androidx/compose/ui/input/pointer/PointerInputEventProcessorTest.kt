@@ -3215,6 +3215,8 @@ private class TestOwner : Owner {
         get() = Density(1f)
     override val textInputService: TextInputService
         get() = TODO("Not yet implemented")
+    override val pointerIconService: PointerIconService
+        get() = TODO("Not yet implemented")
     override val focusManager: FocusManager
         get() = TODO("Not yet implemented")
     override val windowInfo: WindowInfo
