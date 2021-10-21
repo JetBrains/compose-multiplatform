@@ -16,7 +16,9 @@ import org.w3c.dom.HTMLTextAreaElement
 
 private val controlledInputsValuesWeakMap: JsWeakMap = js("new WeakMap();").unsafeCast<JsWeakMap>()
 
-internal fun restoreControlledInputState(type: InputType<*>, inputElement: HTMLInputElement) {
+internal fun restoreControlledInputState(inputElement: HTMLInputElement) {
+    val type = InputType.fromString(inputElement.type)
+
     if (controlledInputsValuesWeakMap.has(inputElement)) {
         if (type == InputType.Radio) {
             controlledRadioGroups[inputElement.name]?.forEach { radio ->

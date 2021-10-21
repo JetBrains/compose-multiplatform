@@ -299,7 +299,9 @@ fun AttrsBuilder<HTMLImageElement>.alt(value: String): AttrsBuilder<HTMLImageEle
 
 
 internal val setInputValue: (HTMLInputElement, String) -> Unit = { e, v ->
-    e.value = v
+    if (v != e.value) {
+        e.value = v
+    }
     saveControlledInputState(e, v)
 }
 

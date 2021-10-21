@@ -1,8 +1,6 @@
 package org.jetbrains.compose.web.dom
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposeNode
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.web.attributes.SelectAttrsBuilder
 import kotlinx.browser.document
 import org.jetbrains.compose.web.attributes.*
@@ -678,25 +676,34 @@ fun TextArea(
     // if firstProvidedValueWasNotNull then TextArea behaves as controlled input
     val firstProvidedValueWasNotNull = remember { value != null }
 
+    // changes to this key trigger [textAreaRestoreControlledStateEffect]
+    val keyForRestoringControlledState: MutableState<Int> = remember { mutableStateOf(0) }
+
     TagElement(
         elementBuilder = TextArea,
         applyAttrs = {
-            val  taab = TextAreaAttrsBuilder()
+            val  textAreaAttrsBuilder = TextAreaAttrsBuilder()
+            textAreaAttrsBuilder.onInput {
+                // controlled state needs to be restored after every input
+                keyForRestoringControlledState.value = keyForRestoringControlledState.value + 1
+            }
             if (attrs != null) {
-                taab.attrs()
+                textAreaAttrsBuilder.attrs()
             }
             if (firstProvidedValueWasNotNull) {
-                taab.value(value ?: "")
+                textAreaAttrsBuilder.value(value ?: "")
             }
 
-            taab.onInput {
-                restoreControlledTextAreaState(it.target)
-            }
-
-            this.copyFrom(taab)
+            this.copyFrom(textAreaAttrsBuilder)
         },
-        content = null
+        content = {
+            DomSideEffect(keyForRestoringControlledState.value, textAreaRestoreControlledStateEffect)
+        }
     )
+}
+
+private val textAreaRestoreControlledStateEffect: DomEffectScope.(HTMLTextAreaElement) -> Unit = {
+    restoreControlledTextAreaState(element = it)
 }
 
 @Composable
@@ -983,21 +990,26 @@ inline fun Style(
  * }
  * ```
  */
+@OptIn(ComposeWebInternalApi::class)
 @Composable
 fun <K> Input(
     type: InputType<K>,
     attrs: InputAttrsBuilder<K>.() -> Unit
 ) {
+    // changes to this key trigger [inputRestoreControlledStateEffect]
+    val keyForRestoringControlledState: MutableState<Int> = remember { mutableStateOf(0) }
+
     TagElement(
         elementBuilder = Input,
         applyAttrs = {
             val inputAttrsBuilder = InputAttrsBuilder(type)
             inputAttrsBuilder.type(type)
-            inputAttrsBuilder.attrs()
-
             inputAttrsBuilder.onInput {
-                restoreControlledInputState(type = type, inputElement = it.target)
+                // controlled state needs to be restored after every input
+                keyForRestoringControlledState.value = keyForRestoringControlledState.value + 1
             }
+
+            inputAttrsBuilder.attrs()
 
             this.copyFrom(inputAttrsBuilder)
         },
@@ -1005,8 +1017,13 @@ fun <K> Input(
             if (type == InputType.Radio) {
                 DisposeRadioGroupEffect()
             }
+            DomSideEffect(keyForRestoringControlledState.value, inputRestoreControlledStateEffect)
         }
     )
+}
+
+private val inputRestoreControlledStateEffect: DomEffectScope.(HTMLInputElement) -> Unit = {
+    restoreControlledInputState(inputElement = it)
 }
 
 @Composable
