@@ -24,6 +24,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,8 +37,10 @@ import androidx.compose.ui.FixedSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Padding
 import androidx.compose.ui.background
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlurEffect
 import androidx.compose.ui.graphics.Color
@@ -526,15 +530,20 @@ class GraphicsLayerTest {
             BoxBlur(tag, size, blurRadius)
         }
         rule.onNodeWithTag(tag).captureToImage().apply {
-            val pixelMap = toPixelMap()
-            for (x in 0 until width) {
-                for (y in 0 until height) {
-                    if (x >= blurRadius && x < width - blurRadius &&
-                        y >= blurRadius && y < height - blurRadius
-                    ) {
-                        assertEquals("Index $x, $y should be blue", Color.Blue, pixelMap[x, y])
-                    } else {
-                        assertEquals("Index $x, $y should be black", Color.Black, pixelMap[x, y])
+            with(toPixelMap()) {
+                for (x in 0 until width) {
+                    for (y in 0 until height) {
+                        if (x >= blurRadius && x < width - blurRadius &&
+                            y >= blurRadius && y < height - blurRadius
+                        ) {
+                            assertPixelColor(Color.Blue, x, y) {
+                                "Index $x, $y should be blue"
+                            }
+                        } else {
+                            assertPixelColor(Color.Black, x, y) {
+                                "Index $x, $y should be black"
+                            }
+                        }
                     }
                 }
             }
@@ -626,6 +635,394 @@ class GraphicsLayerTest {
                 assertPixelColor(blended, scaledRight - 3, scaledTop + 3)
                 assertPixelColor(blended, scaledLeft + 3, scaledBottom - 3)
                 assertPixelColor(blended, scaledRight - 3, scaledBottom - 3)
+            }
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun testSoftwareLayerRectangularClip() {
+        val testTag = "box"
+        var offset = 0
+        val scale = 0.5f
+        val boxAlpha = 0.5f
+        val sizePx = 100
+        val squarePx = sizePx / 2
+        rule.setContent {
+            LocalView.current.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+            val density = LocalDensity.current.density
+            val size = (sizePx / density)
+            val squareSize = (squarePx / density)
+            offset = (20f / density).roundToInt()
+            Box(Modifier.size(size.dp).background(Color.LightGray).testTag(testTag)) {
+                Box(
+                    Modifier
+                        .layout { measurable, constraints ->
+                            val placeable = measurable.measure(constraints)
+                            layout(placeable.width, placeable.height) {
+                                placeable.placeWithLayer(offset, offset) {
+                                    alpha = boxAlpha
+                                    scaleX = scale
+                                    scaleY = scale
+                                    clip = true
+                                    transformOrigin = TransformOrigin(0f, 0f)
+                                }
+                            }
+                        }
+                        .size(squareSize.dp)
+                        .drawBehind {
+                            // Draw a rectangle twice the size of the original bounds
+                            // to verify rectangular clipping is applied properly and ignores
+                            // the pixels outside of the original size
+                            val width = this.size.width
+                            val height = this.size.height
+                            drawRect(
+                                color = Color.Red,
+                                topLeft = Offset(-width, -height),
+                                size = Size(width * 2, height * 2))
+                        }
+                )
+            }
+        }
+
+        rule.onNodeWithTag(testTag).captureToImage().apply {
+            with(toPixelMap()) {
+                assertEquals(Color.LightGray, this[0, 0])
+                assertEquals(Color.LightGray, this[width - 1, 0])
+                assertEquals(Color.LightGray, this[0, height - 1])
+                assertEquals(Color.LightGray, this[width - 1, height - 1])
+
+                val blended = Color.Red.copy(alpha = boxAlpha).compositeOver(Color.LightGray)
+
+                val scaledSquare = squarePx * scale
+                val scaledLeft = offset
+                val scaledTop = offset
+                val scaledRight = (offset + scaledSquare).toInt()
+                val scaledBottom = (offset + scaledSquare).toInt()
+
+                assertPixelColor(Color.LightGray, scaledLeft - 3, scaledTop - 3)
+                assertPixelColor(Color.LightGray, scaledRight + 3, scaledTop - 3)
+                assertPixelColor(Color.LightGray, scaledLeft - 3, scaledBottom + 3)
+                assertPixelColor(Color.LightGray, scaledRight + 3, scaledBottom + 3)
+
+                assertPixelColor(blended, scaledLeft + 3, scaledTop + 3)
+                assertPixelColor(blended, scaledRight - 3, scaledTop + 3)
+                assertPixelColor(blended, scaledLeft + 3, scaledBottom - 3)
+                assertPixelColor(blended, scaledRight - 3, scaledBottom - 3)
+            }
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun testSoftwareCircularShapeClip() {
+        val testTag = "box"
+        var offset = 0
+        val scale = 0.5f
+        val boxAlpha = 0.5f
+        val sizePx = 200
+        val squarePx = sizePx / 2
+        rule.setContent {
+            LocalView.current.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+            val density = LocalDensity.current.density
+            val size = (sizePx / density)
+            val squareSize = (squarePx / density)
+            offset = (20f / density).roundToInt()
+            Box(Modifier.size(size.dp).background(Color.LightGray).testTag(testTag)) {
+                Box(
+                    Modifier
+                        .layout { measurable, constraints ->
+                            val placeable = measurable.measure(constraints)
+                            layout(placeable.width, placeable.height) {
+                                placeable.placeWithLayer(offset, offset) {
+                                    alpha = boxAlpha
+                                    scaleX = scale
+                                    scaleY = scale
+                                    clip = true
+                                    shape = CircleShape
+                                    transformOrigin = TransformOrigin(0f, 0f)
+                                }
+                            }
+                        }
+                        .size(squareSize.dp)
+                        .drawBehind {
+                            // Draw a rectangle twice the size of the original bounds
+                            // to verify rectangular clipping is applied properly and ignores
+                            // the pixels outside of the original size
+                            val width = this.size.width
+                            val height = this.size.height
+                            drawRect(
+                                color = Color.Red,
+                                topLeft = Offset(-width, -height),
+                                size = Size(width * 2, height * 2))
+                        }
+                )
+            }
+        }
+
+        rule.onNodeWithTag(testTag).captureToImage().apply {
+            with(toPixelMap()) {
+                assertEquals(Color.LightGray, this[0, 0])
+                assertEquals(Color.LightGray, this[width - 1, 0])
+                assertEquals(Color.LightGray, this[0, height - 1])
+                assertEquals(Color.LightGray, this[width - 1, height - 1])
+
+                val blended = Color.Red.copy(alpha = boxAlpha).compositeOver(Color.LightGray)
+
+                val scaledSquare = squarePx * scale
+                val scaledLeft = offset
+                val scaledTop = offset
+                val scaledRight = (offset + scaledSquare).toInt()
+                val scaledBottom = (offset + scaledSquare).toInt()
+
+                assertPixelColor(Color.LightGray, scaledLeft + 1, scaledTop + 1)
+                assertPixelColor(Color.LightGray, scaledRight - 1, scaledTop + 1)
+                assertPixelColor(Color.LightGray, scaledLeft + 1, scaledBottom - 1)
+                assertPixelColor(Color.LightGray, scaledRight - 1, scaledBottom - 1)
+
+                val scaledMidHorizontal = (scaledLeft + scaledRight) / 2
+                val scaledMidVertical = (scaledTop + scaledBottom) / 2
+                assertPixelColor(blended, scaledMidHorizontal, scaledTop + 3)
+                assertPixelColor(blended, scaledRight - 3, scaledMidVertical)
+                assertPixelColor(blended, scaledMidHorizontal, scaledBottom - 3)
+                assertPixelColor(blended, scaledLeft + 3, scaledMidVertical)
+            }
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun testSoftwareLayerManualClip() {
+        val testTag = "box"
+        var offset = 0
+        val scale = 0.5f
+        val boxAlpha = 0.5f
+        val sizePx = 100
+        val squarePx = sizePx / 2
+        rule.setContent {
+            LocalView.current.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+            val density = LocalDensity.current.density
+            val size = (sizePx / density)
+            val squareSize = (squarePx / density)
+            offset = (20f / density).roundToInt()
+            Box(Modifier.size(size.dp).background(Color.LightGray).testTag(testTag)) {
+                Box(
+                    Modifier
+                        .layout { measurable, constraints ->
+                            val placeable = measurable.measure(constraints)
+                            layout(placeable.width, placeable.height) {
+                                placeable.placeWithLayer(offset, offset) {
+                                    alpha = boxAlpha
+                                    scaleX = scale
+                                    scaleY = scale
+                                    clip = true
+                                    shape = GenericShape { size, _ ->
+                                        lineTo(size.width, 0f)
+                                        lineTo(0f, size.height)
+                                        close()
+                                    }
+                                    transformOrigin = TransformOrigin(0f, 0f)
+                                }
+                            }
+                        }
+                        .size(squareSize.dp)
+                        .drawBehind {
+                            // Draw a rectangle twice the size of the original bounds
+                            // to verify rectangular clipping is applied properly and ignores
+                            // the pixels outside of the original size
+                            val width = this.size.width
+                            val height = this.size.height
+                            drawRect(
+                                color = Color.Red,
+                                topLeft = Offset(-width, -height),
+                                size = Size(width * 2, height * 2))
+                        }
+                )
+            }
+        }
+
+        rule.onNodeWithTag(testTag).captureToImage().apply {
+            with(toPixelMap()) {
+                assertEquals(Color.LightGray, this[0, 0])
+                assertEquals(Color.LightGray, this[width - 1, 0])
+                assertEquals(Color.LightGray, this[0, height - 1])
+                assertEquals(Color.LightGray, this[width - 1, height - 1])
+
+                val blended = Color.Red.copy(alpha = boxAlpha).compositeOver(Color.LightGray)
+
+                val scaledSquare = squarePx * scale
+                val scaledLeft = offset
+                val scaledTop = offset
+                val scaledRight = (offset + scaledSquare).toInt()
+                val scaledBottom = (offset + scaledSquare).toInt()
+
+                assertPixelColor(Color.LightGray, scaledLeft - 3, scaledTop - 3)
+                assertPixelColor(Color.LightGray, scaledRight + 3, scaledTop - 3)
+                assertPixelColor(Color.LightGray, scaledLeft - 3, scaledBottom + 3)
+                assertPixelColor(Color.LightGray, scaledRight + 3, scaledBottom + 3)
+
+                assertPixelColor(blended, scaledLeft + 3, scaledTop + 3)
+                assertPixelColor(blended, scaledRight - 5, scaledTop + 1)
+                assertPixelColor(blended, scaledLeft + 1, scaledBottom - 5)
+
+                assertPixelColor(Color.LightGray,
+                    (scaledLeft + scaledRight) / 2 + 3, (scaledTop + scaledBottom) / 2 + 3)
+            }
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun testSoftwareLayerOffsetRectangularClip() {
+        val testTag = "box"
+        var offset = 0
+        val scale = 0.5f
+        val boxAlpha = 0.5f
+        val sizePx = 100
+        val squarePx = sizePx / 2
+        rule.setContent {
+            LocalView.current.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+            val density = LocalDensity.current.density
+            val size = (sizePx / density)
+            val squareSize = (squarePx / density)
+            offset = (20f / density).roundToInt()
+            Box(Modifier.size(size.dp).background(Color.LightGray).testTag(testTag)) {
+                Box(
+                    Modifier
+                        .layout { measurable, constraints ->
+                            val placeable = measurable.measure(constraints)
+                            layout(placeable.width, placeable.height) {
+                                placeable.placeWithLayer(offset, offset) {
+                                    alpha = boxAlpha
+                                    scaleX = scale
+                                    scaleY = scale
+                                    transformOrigin = TransformOrigin(0f, 0f)
+                                    clip = true
+                                    shape = object : Shape {
+                                        override fun createOutline(
+                                            size: Size,
+                                            layoutDirection: LayoutDirection,
+                                            density: Density
+                                        ): Outline {
+                                            return Outline.Rectangle(
+                                                Rect(
+                                                    left = -size.width / 2,
+                                                    top = -size.height / 2,
+                                                    right = size.width / 2,
+                                                    bottom = size.height / 2,
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .size(squareSize.dp)
+                        .background(Color.Red)
+                )
+            }
+        }
+
+        rule.onNodeWithTag(testTag).captureToImage().apply {
+            with(toPixelMap()) {
+                assertEquals(Color.LightGray, this[0, 0])
+                assertEquals(Color.LightGray, this[width / 2 - 1, 0])
+                assertEquals(Color.LightGray, this[0, height / 2 - 1])
+                assertEquals(Color.LightGray, this[width / 2 - 1, height / 2 - 1])
+
+                val blended = Color.Red.copy(alpha = boxAlpha).compositeOver(Color.LightGray)
+
+                val scaledSquare = squarePx * scale
+                val scaledLeft = offset
+                val scaledTop = offset
+                val scaledRight = (offset + scaledSquare / 2).toInt()
+                val scaledBottom = (offset + scaledSquare / 2).toInt()
+
+                assertPixelColor(blended, scaledLeft + 3, scaledTop + 3)
+                assertPixelColor(blended, scaledRight - 3, scaledTop + 3)
+                assertPixelColor(blended, scaledLeft + 3, scaledBottom - 3)
+                assertPixelColor(blended, scaledRight - 3, scaledBottom - 3)
+            }
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun testSoftwareLayerOffsetRoundedRectClip() {
+        val testTag = "box"
+        var offset = 0
+        val scale = 0.5f
+        val boxAlpha = 0.5f
+        val sizePx = 200
+        val squarePx = sizePx / 2
+        rule.setContent {
+            LocalView.current.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+            val density = LocalDensity.current.density
+            val size = (sizePx / density)
+            val squareSize = (squarePx / density)
+            offset = (20f / density).roundToInt()
+            Box(Modifier.size(size.dp).background(Color.LightGray).testTag(testTag)) {
+                Box(
+                    Modifier
+                        .layout { measurable, constraints ->
+                            val placeable = measurable.measure(constraints)
+                            layout(placeable.width, placeable.height) {
+                                placeable.placeWithLayer(offset, offset) {
+                                    alpha = boxAlpha
+                                    scaleX = scale
+                                    scaleY = scale
+                                    clip = true
+                                    shape = object : Shape {
+                                        override fun createOutline(
+                                            size: Size,
+                                            layoutDirection: LayoutDirection,
+                                            density: Density
+                                        ): Outline {
+                                            return Outline.Rounded(
+                                                RoundRect(
+                                                    left = -size.width / 2,
+                                                    top = -size.height / 2,
+                                                    right = size.width / 2,
+                                                    bottom = size.height / 2,
+                                                    cornerRadius = CornerRadius(
+                                                        size.width / 2,
+                                                        size.height / 2
+                                                    )
+                                                )
+                                            )
+                                        }
+                                    }
+                                    transformOrigin = TransformOrigin(0f, 0f)
+                                }
+                            }
+                        }
+                        .size(squareSize.dp)
+                        .background(Color.Red)
+                )
+            }
+        }
+
+        rule.onNodeWithTag(testTag).captureToImage().apply {
+            with(toPixelMap()) {
+                assertEquals(Color.LightGray, this[0, 0])
+                assertEquals(Color.LightGray, this[width / 2 - 1, 0])
+                assertEquals(Color.LightGray, this[0, height / 2 - 1])
+                assertEquals(Color.LightGray, this[width / 2 - 1, height / 2 - 1])
+
+                val blended = Color.Red.copy(alpha = boxAlpha).compositeOver(Color.LightGray)
+
+                val scaledSquare = squarePx * scale
+                val scaledLeft = offset
+                val scaledTop = offset
+                val scaledRight = (offset + scaledSquare / 2).toInt()
+                val scaledBottom = (offset + scaledSquare / 2).toInt()
+
+                assertPixelColor(blended, scaledLeft + 3, scaledTop + 3)
+                assertPixelColor(blended, scaledRight - 3, scaledTop + 3)
+                assertPixelColor(blended, scaledLeft + 3, scaledBottom - 3)
+
+                // The bottom right corner should be clipped out and the background should be revealed
+                assertPixelColor(Color.LightGray, scaledRight, scaledBottom)
             }
         }
     }

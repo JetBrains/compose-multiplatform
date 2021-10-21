@@ -56,7 +56,11 @@ internal class ViewLayer(
     private var clipToBounds = false
     private var clipBoundsCache: android.graphics.Rect? = null
     private val manualClipPath: Path? get() =
-        if (!clipToOutline) null else outlineResolver.clipPath
+        if (!clipToOutline || outlineResolver.outlineClipSupported) {
+            null
+        } else {
+            outlineResolver.clipPath
+        }
     var isInvalidated = false
         private set(value) {
             if (value != field) {
@@ -251,13 +255,15 @@ internal class ViewLayer(
     override fun dispatchDraw(canvas: android.graphics.Canvas) {
         isInvalidated = false
         canvasHolder.drawInto(canvas) {
+            var didClip = false
             val clipPath = manualClipPath
-            if (clipPath != null) {
+            if (clipPath != null || !canvas.isHardwareAccelerated) {
+                didClip = true
                 save()
-                clipPath(clipPath)
+                outlineResolver.clipToOutline(this)
             }
             drawBlock?.invoke(this)
-            if (clipPath != null) {
+            if (didClip) {
                 restore()
             }
         }
