@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package androidx.compose.ui.platform
 
-internal expect interface PlatformComponent : PlatformInputComponent, PlatformComponentWithCursor
+package androidx.compose.foundation.text
 
-internal expect interface PlatformComponentWithCursor
+import androidx.compose.ui.input.pointer.PointerIcon
+import java.awt.Cursor
 
-internal expect object DummyPlatformComponent : PlatformComponent
+internal actual val textPointerIcon: PointerIcon =
+    PointerIcon(Cursor(Cursor.TEXT_CURSOR))

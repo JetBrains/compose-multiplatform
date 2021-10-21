@@ -832,6 +832,9 @@ package androidx.compose.foundation.text {
   public final class TextLayoutResultProxyKt {
   }
 
+  public final class TextPointerIcon_androidKt {
+  }
+
   public final class TouchMode_androidKt {
   }
 

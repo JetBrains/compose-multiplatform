@@ -20,6 +20,9 @@ import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.pointer.AwtCursor
+import androidx.compose.ui.input.pointer.PointerIcon
+import java.awt.Cursor
 
 internal actual fun sendKeyEvent(
     platformInputService: PlatformInput,
@@ -34,4 +37,18 @@ internal actual fun sendKeyEvent(
     }
 
     return keyInputModifier.processKeyInput(keyEvent)
+}
+
+private val defaultCursor = Cursor(Cursor.DEFAULT_CURSOR)
+
+internal actual fun setPointerIcon(
+    containerCursor: PlatformComponentWithCursor?,
+    icon: PointerIcon?
+) {
+    when (icon) {
+        is AwtCursor -> containerCursor?.componentCursor = icon.cursor
+        else -> if (containerCursor?.componentCursor != defaultCursor) {
+            containerCursor?.componentCursor = defaultCursor
+        }
+    }
 }
