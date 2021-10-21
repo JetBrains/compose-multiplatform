@@ -19,4 +19,8 @@ object BuildProperties {
             ?: project.findProperty("deploy.version") as String
     fun isComposeWithWeb(project: Project): Boolean =
         project.findProperty("compose.with.web") == "true"
+    fun experimentalOELPublication(project: Project): Boolean =
+        project.findProperty("oel.publication") == "true"
+    fun oelAndroidXVersion(project: Project): String? =
+        project.findProperty("oel.androidx.version") as String?
 }
