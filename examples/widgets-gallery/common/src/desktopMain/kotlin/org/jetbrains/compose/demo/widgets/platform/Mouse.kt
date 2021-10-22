@@ -17,4 +17,4 @@ actual fun Modifier.pointerMoveFilter(
 
 @OptIn(ExperimentalComposeUiApi::class)
 actual fun Modifier.cursorForHorizontalResize(): Modifier =
-    Modifier.pointerHoverIcon(PointerIcon.Crosshair)
+    this.pointerHoverIcon(PointerIcon(Cursor(Cursor.E_RESIZE_CURSOR)))
