@@ -1,18 +1,14 @@
 package org.jetbrains.codeviewer.platform
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.pointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import java.awt.Cursor
 
+@OptIn(ExperimentalComposeUiApi::class)
 actual fun Modifier.pointerMoveFilter(
     onEnter: () -> Boolean,
     onExit: () -> Boolean,
@@ -20,19 +16,27 @@ actual fun Modifier.pointerMoveFilter(
 ): Modifier = this.pointerMoveFilter(onEnter = onEnter, onExit = onExit, onMove = onMove)
 
 @OptIn(ExperimentalComposeUiApi::class)
-actual fun Modifier.cursorForHorizontalResize(): Modifier = composed {
-    var isHover by remember { mutableStateOf(false) }
+internal class AwtCursor(val cursor: Cursor) : PointerIcon {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-    pointerMoveFilter(
-        onEnter = { isHover = true; true },
-        onExit = { isHover = false; true }
-    ).pointerIcon(
-        PointerIcon(
-            if (isHover) {
-                Cursor(Cursor.E_RESIZE_CURSOR)
-            } else {
-                Cursor.getDefaultCursor()
-            }
-        )
-    )
+        other as AwtCursor
+
+        if (cursor != other.cursor) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return cursor.hashCode()
+    }
+
+    override fun toString(): String {
+        return "AwtCursor(cursor=$cursor)"
+    }
 }
+
+@OptIn(ExperimentalComposeUiApi::class)
+actual fun Modifier.cursorForHorizontalResize(): Modifier =
+    Modifier.pointerHoverIcon(AwtCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR)))
