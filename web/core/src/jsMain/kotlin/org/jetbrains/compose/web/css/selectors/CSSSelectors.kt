@@ -231,8 +231,19 @@ fun attr(
     caseSensitive: Boolean = true
 ) = CSSSelector.Attribute(name, value, operator, caseSensitive)
 fun group(vararg selectors: CSSSelector) = CSSSelector.Group(selectors.toList())
+
+@Deprecated("Replaced with `desc`", ReplaceWith("desc(parent, selected)"))
 fun descendant(parent: CSSSelector, selected: CSSSelector) =
+    desc(parent, selected)
+fun desc(parent: CSSSelector, selected: CSSSelector) =
     CSSSelector.Descendant(parent, selected)
+fun desc(parent: CSSSelector, selected: String) =
+    desc(parent, selector(selected))
+fun desc(parent: String, selected: CSSSelector) =
+    desc(selector(parent), selected)
+fun desc(parent: String, selected: String) =
+    desc(selector(parent), selector(selected))
+
 fun child(parent: CSSSelector, selected: CSSSelector) =
     CSSSelector.Child(parent, selected)
 fun sibling(sibling: CSSSelector, selected: CSSSelector) = CSSSelector.Descendant(sibling, selected)
