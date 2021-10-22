@@ -197,6 +197,10 @@ class ComposePlugin : Plugin<Project> {
             composeDependency("org.jetbrains.compose.web:web-core")
         }
 
+        val svg by lazy {
+            composeDependency("org.jetbrains.compose.web:web-svg")
+        }
+
         val widgets by lazy {
             composeDependency("org.jetbrains.compose.web:web-widgets")
         }
