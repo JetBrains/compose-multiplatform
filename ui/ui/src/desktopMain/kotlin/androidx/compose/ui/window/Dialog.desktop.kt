@@ -130,6 +130,14 @@ fun Dialog(
 
     val updater = remember(::ComponentUpdater)
 
+    // the state applied to the dialog. exist to avoid races between DialogState changes and the state stored inside the native dialog
+    val appliedState = remember {
+        object {
+            var size: DpSize? = null
+            var position: WindowPosition? = null
+        }
+    }
+
     Dialog(
         visible = visible,
         onPreviewKeyEvent = onPreviewKeyEvent,
@@ -146,10 +154,12 @@ fun Dialog(
                 addComponentListener(object : ComponentAdapter() {
                     override fun componentResized(e: ComponentEvent) {
                         currentState.size = DpSize(width.dp, height.dp)
+                        appliedState.size = currentState.size
                     }
 
                     override fun componentMoved(e: ComponentEvent) {
                         currentState.position = WindowPosition(x.dp, y.dp)
+                        appliedState.position = currentState.position
                     }
                 })
             }
@@ -164,8 +174,14 @@ fun Dialog(
                 set(currentResizable, dialog::setResizable)
                 set(currentEnabled, dialog::setEnabled)
                 set(currentFocusable, dialog::setFocusable)
-                set(state.size, dialog::setSizeSafely)
-                set(state.position, dialog::setPositionSafely)
+            }
+            if (state.size != appliedState.size) {
+                dialog.setSizeSafely(state.size)
+                appliedState.size = state.size
+            }
+            if (state.position != appliedState.position) {
+                dialog.setPositionSafely(state.position)
+                appliedState.position = state.position
             }
         },
         content = content

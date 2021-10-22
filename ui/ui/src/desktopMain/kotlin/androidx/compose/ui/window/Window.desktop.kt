@@ -144,6 +144,16 @@ fun Window(
 
     val updater = remember(::ComponentUpdater)
 
+    // the state applied to the window. exist to avoid races between WindowState changes and the state stored inside the native window
+    val appliedState = remember {
+        object {
+            var size: DpSize? = null
+            var position: WindowPosition? = null
+            var placement: WindowPlacement? = null
+            var isMinimized: Boolean? = null
+        }
+    }
+
     Window(
         visible = visible,
         onPreviewKeyEvent = onPreviewKeyEvent,
@@ -160,6 +170,8 @@ fun Window(
                 addWindowStateListener {
                     currentState.placement = placement
                     currentState.isMinimized = isMinimized
+                    appliedState.placement = currentState.placement
+                    appliedState.isMinimized = currentState.isMinimized
                 }
                 addComponentListener(object : ComponentAdapter() {
                     override fun componentResized(e: ComponentEvent) {
@@ -168,10 +180,13 @@ fun Window(
                         // fire windowStateChanged, only componentResized
                         currentState.placement = placement
                         currentState.size = DpSize(width.dp, height.dp)
+                        appliedState.placement = currentState.placement
+                        appliedState.size = currentState.size
                     }
 
                     override fun componentMoved(e: ComponentEvent) {
                         currentState.position = WindowPosition(x.dp, y.dp)
+                        appliedState.position = currentState.position
                     }
                 })
             }
@@ -187,10 +202,22 @@ fun Window(
                 set(currentEnabled, window::setEnabled)
                 set(currentFocusable, window::setFocusable)
                 set(currentAlwaysOnTop, window::setAlwaysOnTop)
-                set(state.size, window::setSizeSafely)
-                set(state.position, window::setPositionSafely)
-                set(state.placement, window::placement::set)
-                set(state.isMinimized, window::isMinimized::set)
+            }
+            if (state.size != appliedState.size) {
+                window.setSizeSafely(state.size)
+                appliedState.size = state.size
+            }
+            if (state.position != appliedState.position) {
+                window.setPositionSafely(state.position)
+                appliedState.position = state.position
+            }
+            if (state.placement != appliedState.placement) {
+                window.placement = state.placement
+                appliedState.placement = state.placement
+            }
+            if (state.isMinimized != appliedState.isMinimized) {
+                window.isMinimized = state.isMinimized
+                appliedState.isMinimized = state.isMinimized
             }
         },
         content = content

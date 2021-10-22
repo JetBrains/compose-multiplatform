@@ -270,7 +270,9 @@ class WindowStateTest {
     }
 
     @Test
-    fun `state position should be specified after attach`() = runApplicationTest {
+    fun `state position should be specified after attach`() = runApplicationTest(
+        useDelay = isLinux
+    ) {
         val state = WindowState(size = DpSize(200.dp, 200.dp))
 
         launchApplication {
