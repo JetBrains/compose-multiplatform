@@ -6,11 +6,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import org.jetbrains.compose.common.ui.unit.IntSize
 import org.jetbrains.compose.common.core.graphics.Color
+import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 import kotlin.random.Random
 
+@OptIn(ExperimentalComposeWebWidgetsApi::class)
 private fun Color.Companion.random() =
     Color((0..255).random(), (0..255).random(), (0..255).random())
 
+@OptIn(ExperimentalComposeWebWidgetsApi::class)
 abstract class Game {
     internal var previousTime: Long = Long.MAX_VALUE
     private var startTime = 0L

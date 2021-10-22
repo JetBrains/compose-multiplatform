@@ -28,7 +28,6 @@ kotlin {
         }
         named("desktopMain") {
             kotlin.srcDirs("src/jvmMain/kotlin")
-            resources.srcDirs("src/commonMain/resources")
             dependencies {
                 api(compose.desktop.common)
             }
