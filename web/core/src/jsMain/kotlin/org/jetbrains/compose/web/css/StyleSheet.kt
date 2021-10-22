@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import org.jetbrains.compose.web.ExperimentalComposeWebStyleApi
 import org.jetbrains.compose.web.css.selectors.CSSSelector
 import org.jetbrains.compose.web.css.selectors.className
 import org.jetbrains.compose.web.dom.Style
@@ -86,6 +87,7 @@ open class StyleSheet(
     }
 
     // TODO: just proof of concept, do not use it
+    @ExperimentalComposeWebStyleApi
     fun css(cssBuild: CSSBuilder.() -> Unit): String {
         val selfSelector = CSSSelfSelector()
         val (style, newCssRules) = buildCSS(selfSelector, selfSelector, cssBuild)
