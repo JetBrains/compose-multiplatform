@@ -120,3 +120,7 @@ tasks.register("testComposeModules") { // used in https://github.com/JetBrains/a
     // compose/out/androidx/compose/ui/ui-text/build/intermediates/tmp/manifest/test/debug/tempFile1ProcessTestManifest10207049054096217572.xml Error:
     // android:exported needs to be explicitly specified for <activity>. Apps targeting Android 12 and higher are required to specify an explicit value for `android:exported` when the corresponding component has an intent filter defined.
 }
+
+tasks.register("run") {
+    dependsOnComposeTask(":compose:desktop:desktop:desktop-samples:run")
+}
