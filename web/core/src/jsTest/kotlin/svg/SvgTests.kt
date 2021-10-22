@@ -6,6 +6,7 @@
 package org.jetbrains.compose.web.core.tests.svg
 
 import androidx.compose.runtime.Composable
+import org.jetbrains.compose.web.ExperimentalComposeWebSvgApi
 import org.jetbrains.compose.web.css.opacity
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
@@ -17,6 +18,7 @@ import org.w3c.dom.svg.SVGElement
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@ExperimentalComposeWebSvgApi
 class SvgTests {
     @Test
     fun nodeNames() = runTest {

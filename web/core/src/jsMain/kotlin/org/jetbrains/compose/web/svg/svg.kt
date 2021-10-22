@@ -7,6 +7,7 @@ package org.jetbrains.compose.web.svg
 
 import androidx.compose.runtime.Composable
 import kotlinx.browser.document
+import org.jetbrains.compose.web.ExperimentalComposeWebSvgApi
 import org.jetbrains.compose.web.css.CSSLengthOrPercentageValue
 import org.jetbrains.compose.web.dom.*
 import org.w3c.css.masking.SVGClipPathElement
@@ -58,6 +59,7 @@ private val Use = ElementBuilderNS<SVGUseElement>("use", SVG_NS)
 private val View = ElementBuilderNS<SVGViewElement>("view", SVG_NS)
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Svg(
     viewBox: String? = null,
     attrs: AttrBuilderContext<SVGElement>? = null,
@@ -74,6 +76,7 @@ fun Svg(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun SvgA(
     href: String,
     attrs: AttrBuilderContext<SVGAElement>? = null,
@@ -90,6 +93,7 @@ fun SvgA(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Circle(
     cx: CSSLengthOrPercentageValue,
     cy: CSSLengthOrPercentageValue,
@@ -111,6 +115,7 @@ fun Circle(
 
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Circle(
     cx: Number,
     cy: Number,
@@ -132,6 +137,7 @@ fun Circle(
 
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun SvgText(
     text: String,
     x: Number = 0,
@@ -152,6 +158,7 @@ fun SvgText(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun View(
     id: String,
     viewBox: String,
@@ -169,6 +176,7 @@ fun View(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Rect(
     x: Number,
     y: Number,
@@ -191,6 +199,7 @@ fun Rect(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Rect(
     x: CSSLengthOrPercentageValue,
     y: CSSLengthOrPercentageValue,
@@ -213,6 +222,7 @@ fun Rect(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Ellipse(
     cx: CSSLengthOrPercentageValue,
     cy: CSSLengthOrPercentageValue,
@@ -235,6 +245,7 @@ fun Ellipse(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Ellipse(
     cx: Number,
     cy: Number,
@@ -258,6 +269,7 @@ fun Ellipse(
 
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Symbol(
     id: String? = null,
     attrs: AttrBuilderContext<SVGSymbolElement>? = null,
@@ -274,6 +286,7 @@ fun Symbol(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Use(
     href: String,
     attrs: AttrBuilderContext<SVGUseElement>? = null,
@@ -290,6 +303,7 @@ fun Use(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Line(
     x1: CSSLengthOrPercentageValue,
     y1: CSSLengthOrPercentageValue,
@@ -312,6 +326,7 @@ fun Line(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Line(
     x1: Number,
     y1: Number,
@@ -335,6 +350,7 @@ fun Line(
 
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun ClipPath(
     id: String,
     attrs: AttrBuilderContext<SVGClipPathElement>? = null,
@@ -351,6 +367,7 @@ fun ClipPath(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Path(
     d: String,
     attrs: AttrBuilderContext<SVGPathElement>? = null,
@@ -367,6 +384,7 @@ fun Path(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun G(
     attrs: AttrBuilderContext<SVGElement>? = null,
     content: ContentBuilder<SVGElement>? = null
@@ -379,6 +397,7 @@ fun G(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Image(
     href: String,
     attrs: AttrBuilderContext<SVGImageElement>? = null,
@@ -395,6 +414,7 @@ fun Image(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Mask(
     id: String? = null,
     attrs: AttrBuilderContext<SVGMaskElement>? = null,
@@ -411,6 +431,7 @@ fun Mask(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Defs(
     attrs: AttrBuilderContext<SVGDefsElement>? = null,
     content: ContentBuilder<SVGDefsElement>? = null
@@ -423,6 +444,7 @@ fun Defs(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Pattern(
     id: String,
     attrs: AttrBuilderContext<SVGPatternElement>? = null,
@@ -439,6 +461,7 @@ fun Pattern(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Polygon(
     vararg points: Number,
     attrs: AttrBuilderContext<SVGPolygonElement>? = null,
@@ -455,6 +478,7 @@ fun Polygon(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Polyline(
     vararg points: Number,
     attrs: AttrBuilderContext<SVGPolylineElement>? = null,
@@ -471,6 +495,7 @@ fun Polyline(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun TextPath(
     href: String,
     text: String,
@@ -489,6 +514,7 @@ fun TextPath(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Animate(
     attrs: AttrBuilderContext<SVGElement>? = null,
     content: ContentBuilder<SVGElement>? = null
@@ -501,6 +527,7 @@ fun Animate(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun AnimateMotion(
     attrs: AttrBuilderContext<SVGElement>? = null,
     content: ContentBuilder<SVGElement>? = null
@@ -513,6 +540,7 @@ fun AnimateMotion(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun AnimateTransform(
     attrs: AttrBuilderContext<SVGElement>? = null,
     content: ContentBuilder<SVGElement>? = null
@@ -525,6 +553,7 @@ fun AnimateTransform(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun LinearGradient(
     id: String? = null,
     attrs: AttrBuilderContext<SVGLinearGradientElement>? = null,
@@ -542,6 +571,7 @@ fun LinearGradient(
 
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun RadialGradient(
     id: String? = null,
     attrs: AttrBuilderContext<SVGRadialGradientElement>? = null,
@@ -558,6 +588,7 @@ fun RadialGradient(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Stop(
     attrs: AttrBuilderContext<SVGStopElement>? = null,
     content: ContentBuilder<SVGStopElement>? = null
@@ -570,6 +601,7 @@ fun Stop(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Switch(
     attrs: AttrBuilderContext<SVGSwitchElement>? = null,
     content: ContentBuilder<SVGSwitchElement>? = null
@@ -582,6 +614,7 @@ fun Switch(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Title(
     text: String,
     attrs: AttrBuilderContext<SVGTitleElement>? = null,
@@ -596,6 +629,7 @@ fun Title(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Tspan(
     attrs: AttrBuilderContext<SVGTSpanElement>? = null,
     content: ContentBuilder<SVGTSpanElement>? = null
@@ -608,6 +642,7 @@ fun Tspan(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Desc(
     content: String,
     attrs: AttrBuilderContext<SVGDescElement>? = null,
@@ -622,6 +657,7 @@ fun Desc(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Marker(
     attrs: AttrBuilderContext<SVGMarkerElement>? = null,
     content: ContentBuilder<SVGMarkerElement>? = null
@@ -634,6 +670,7 @@ fun Marker(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Mpath(
     attrs: AttrBuilderContext<SVGElement>? = null,
     content: ContentBuilder<SVGElement>? = null
@@ -646,6 +683,7 @@ fun Mpath(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Filter(
     attrs: AttrBuilderContext<SVGElement>? = null,
     content: ContentBuilder<SVGElement>? = null
@@ -658,6 +696,7 @@ fun Filter(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun Set(
     attributeName: String,
     to: String,
@@ -676,6 +715,7 @@ fun Set(
 }
 
 @Composable
+@ExperimentalComposeWebSvgApi
 fun <T : SVGElement> SvgElement(
     name: String,
     attrs: AttrBuilderContext<T>? = null,
