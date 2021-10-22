@@ -1,6 +1,7 @@
 package org.jetbrains.compose.web.css
 
 import org.jetbrains.compose.web.css.selectors.CSSSelector
+import org.jetbrains.compose.web.css.selectors.desc
 
 interface CSSBuilder : CSSStyleRuleBuilder, GenericStyleSheetBuilder<CSSBuilder> {
     val root: CSSSelector
@@ -15,7 +16,11 @@ class CSSBuilderImpl(
     override fun style(selector: CSSSelector, cssRule: CSSBuilder.() -> Unit) {
         val (style, rules) = buildCSS(root, selector, cssRule)
         rules.forEach { add(it) }
-        add(selector, style)
+        if (selector.contains(self, true) || selector.contains(root, true)) {
+            add(selector, style)
+        } else {
+            add(desc(self, selector), style)
+        }
     }
 
     override fun buildRules(rulesBuild: GenericStyleSheetBuilder<CSSBuilder>.() -> Unit) =
