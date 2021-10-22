@@ -77,7 +77,7 @@ fun Svg(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun SvgA(
+fun ElementScope<SVGElement>.SvgA(
     href: String,
     attrs: AttrBuilderContext<SVGAElement>? = null,
     content: ContentBuilder<SVGAElement>? = null
@@ -94,7 +94,7 @@ fun SvgA(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Circle(
+fun ElementScope<SVGElement>.Circle(
     cx: CSSLengthOrPercentageValue,
     cy: CSSLengthOrPercentageValue,
     r: CSSLengthOrPercentageValue,
@@ -116,7 +116,7 @@ fun Circle(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Circle(
+fun ElementScope<SVGElement>.Circle(
     cx: Number,
     cy: Number,
     r: Number,
@@ -138,7 +138,7 @@ fun Circle(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun SvgText(
+fun ElementScope<SVGElement>.SvgText(
     text: String,
     x: Number = 0,
     y: Number = 0,
@@ -159,7 +159,7 @@ fun SvgText(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun View(
+fun ElementScope<SVGElement>.View(
     id: String,
     viewBox: String,
     attrs: AttrBuilderContext<SVGViewElement>? = null,
@@ -177,7 +177,7 @@ fun View(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Rect(
+fun ElementScope<SVGElement>.Rect(
     x: Number,
     y: Number,
     width: Number,
@@ -200,7 +200,7 @@ fun Rect(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Rect(
+fun ElementScope<SVGElement>.Rect(
     x: CSSLengthOrPercentageValue,
     y: CSSLengthOrPercentageValue,
     width: CSSLengthOrPercentageValue,
@@ -223,7 +223,7 @@ fun Rect(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Ellipse(
+fun ElementScope<SVGElement>.Ellipse(
     cx: CSSLengthOrPercentageValue,
     cy: CSSLengthOrPercentageValue,
     rx: CSSLengthOrPercentageValue,
@@ -246,7 +246,7 @@ fun Ellipse(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Ellipse(
+fun ElementScope<SVGElement>.Ellipse(
     cx: Number,
     cy: Number,
     rx: Number,
@@ -270,7 +270,7 @@ fun Ellipse(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Symbol(
+fun ElementScope<SVGElement>.Symbol(
     id: String? = null,
     attrs: AttrBuilderContext<SVGSymbolElement>? = null,
     content: ContentBuilder<SVGSymbolElement>? = null
@@ -287,7 +287,7 @@ fun Symbol(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Use(
+fun ElementScope<SVGElement>.Use(
     href: String,
     attrs: AttrBuilderContext<SVGUseElement>? = null,
     content: ContentBuilder<SVGUseElement>? = null
@@ -304,7 +304,7 @@ fun Use(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Line(
+fun ElementScope<SVGElement>.Line(
     x1: CSSLengthOrPercentageValue,
     y1: CSSLengthOrPercentageValue,
     x2: CSSLengthOrPercentageValue,
@@ -327,7 +327,7 @@ fun Line(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Line(
+fun ElementScope<SVGElement>.Line(
     x1: Number,
     y1: Number,
     x2: Number,
@@ -351,7 +351,7 @@ fun Line(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun ClipPath(
+fun ElementScope<SVGElement>.ClipPath(
     id: String,
     attrs: AttrBuilderContext<SVGClipPathElement>? = null,
     content: ContentBuilder<SVGClipPathElement>? = null
@@ -368,7 +368,7 @@ fun ClipPath(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Path(
+fun ElementScope<SVGElement>.Path(
     d: String,
     attrs: AttrBuilderContext<SVGPathElement>? = null,
     content: ContentBuilder<SVGPathElement>? = null
@@ -385,7 +385,7 @@ fun Path(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun G(
+fun ElementScope<SVGElement>.G(
     attrs: AttrBuilderContext<SVGElement>? = null,
     content: ContentBuilder<SVGElement>? = null
 ) {
@@ -398,7 +398,7 @@ fun G(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Image(
+fun ElementScope<SVGElement>.Image(
     href: String,
     attrs: AttrBuilderContext<SVGImageElement>? = null,
     content: ContentBuilder<SVGImageElement>? = null
@@ -415,7 +415,7 @@ fun Image(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Mask(
+fun ElementScope<SVGElement>.Mask(
     id: String? = null,
     attrs: AttrBuilderContext<SVGMaskElement>? = null,
     content: ContentBuilder<SVGMaskElement>? = null
@@ -432,7 +432,7 @@ fun Mask(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Defs(
+fun ElementScope<SVGElement>.Defs(
     attrs: AttrBuilderContext<SVGDefsElement>? = null,
     content: ContentBuilder<SVGDefsElement>? = null
 ) {
@@ -445,7 +445,7 @@ fun Defs(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Pattern(
+fun ElementScope<SVGElement>.Pattern(
     id: String,
     attrs: AttrBuilderContext<SVGPatternElement>? = null,
     content: ContentBuilder<SVGPatternElement>? = null
@@ -462,7 +462,7 @@ fun Pattern(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Polygon(
+fun ElementScope<SVGElement>.Polygon(
     vararg points: Number,
     attrs: AttrBuilderContext<SVGPolygonElement>? = null,
     content: ContentBuilder<SVGPolygonElement>? = null
@@ -479,7 +479,7 @@ fun Polygon(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Polyline(
+fun ElementScope<SVGElement>.Polyline(
     vararg points: Number,
     attrs: AttrBuilderContext<SVGPolylineElement>? = null,
     content: ContentBuilder<SVGPolylineElement>? = null
@@ -496,7 +496,7 @@ fun Polyline(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun TextPath(
+fun ElementScope<SVGElement>.TextPath(
     href: String,
     text: String,
     attrs: AttrBuilderContext<SVGTextPathElement>? = null,
@@ -515,7 +515,7 @@ fun TextPath(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Animate(
+fun ElementScope<SVGElement>.Animate(
     attrs: AttrBuilderContext<SVGElement>? = null,
     content: ContentBuilder<SVGElement>? = null
 ) {
@@ -528,7 +528,7 @@ fun Animate(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun AnimateMotion(
+fun ElementScope<SVGElement>.AnimateMotion(
     attrs: AttrBuilderContext<SVGElement>? = null,
     content: ContentBuilder<SVGElement>? = null
 ) {
@@ -541,7 +541,7 @@ fun AnimateMotion(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun AnimateTransform(
+fun ElementScope<SVGElement>.AnimateTransform(
     attrs: AttrBuilderContext<SVGElement>? = null,
     content: ContentBuilder<SVGElement>? = null
 ) {
@@ -554,7 +554,7 @@ fun AnimateTransform(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun LinearGradient(
+fun ElementScope<SVGElement>.LinearGradient(
     id: String? = null,
     attrs: AttrBuilderContext<SVGLinearGradientElement>? = null,
     content: ContentBuilder<SVGLinearGradientElement>? = null
@@ -572,7 +572,7 @@ fun LinearGradient(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun RadialGradient(
+fun ElementScope<SVGElement>.RadialGradient(
     id: String? = null,
     attrs: AttrBuilderContext<SVGRadialGradientElement>? = null,
     content: ContentBuilder<SVGRadialGradientElement>? = null
@@ -589,7 +589,7 @@ fun RadialGradient(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Stop(
+fun ElementScope<SVGElement>.Stop(
     attrs: AttrBuilderContext<SVGStopElement>? = null,
     content: ContentBuilder<SVGStopElement>? = null
 ) {
@@ -602,7 +602,7 @@ fun Stop(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Switch(
+fun ElementScope<SVGElement>.Switch(
     attrs: AttrBuilderContext<SVGSwitchElement>? = null,
     content: ContentBuilder<SVGSwitchElement>? = null
 ) {
@@ -615,7 +615,7 @@ fun Switch(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Title(
+fun ElementScope<SVGElement>.Title(
     text: String,
     attrs: AttrBuilderContext<SVGTitleElement>? = null,
 ) {
@@ -630,7 +630,7 @@ fun Title(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Tspan(
+fun ElementScope<SVGElement>.Tspan(
     attrs: AttrBuilderContext<SVGTSpanElement>? = null,
     content: ContentBuilder<SVGTSpanElement>? = null
 ) {
@@ -643,7 +643,7 @@ fun Tspan(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Desc(
+fun ElementScope<SVGElement>.Desc(
     content: String,
     attrs: AttrBuilderContext<SVGDescElement>? = null,
 ) {
@@ -658,7 +658,7 @@ fun Desc(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Marker(
+fun ElementScope<SVGElement>.Marker(
     attrs: AttrBuilderContext<SVGMarkerElement>? = null,
     content: ContentBuilder<SVGMarkerElement>? = null
 ) {
@@ -671,7 +671,7 @@ fun Marker(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Mpath(
+fun ElementScope<SVGElement>.Mpath(
     attrs: AttrBuilderContext<SVGElement>? = null,
     content: ContentBuilder<SVGElement>? = null
 ) {
@@ -684,7 +684,7 @@ fun Mpath(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Filter(
+fun ElementScope<SVGElement>.Filter(
     attrs: AttrBuilderContext<SVGElement>? = null,
     content: ContentBuilder<SVGElement>? = null
 ) {
@@ -697,7 +697,7 @@ fun Filter(
 
 @Composable
 @ExperimentalComposeWebSvgApi
-fun Set(
+fun ElementScope<SVGElement>.Set(
     attributeName: String,
     to: String,
     attrs: AttrBuilderContext<SVGElement>? = null,

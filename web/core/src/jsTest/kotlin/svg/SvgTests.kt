@@ -5,16 +5,13 @@
 
 package org.jetbrains.compose.web.core.tests.svg
 
-import androidx.compose.runtime.Composable
 import org.jetbrains.compose.web.ExperimentalComposeWebSvgApi
 import org.jetbrains.compose.web.css.opacity
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.svg.*
 import org.jetbrains.compose.web.testutils.*
-import org.w3c.dom.get
 import org.w3c.dom.svg.SVGCircleElement
-import org.w3c.dom.svg.SVGElement
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -22,28 +19,25 @@ import kotlin.test.assertEquals
 class SvgTests {
     @Test
     fun nodeNames() = runTest {
-        val nodes = listOf<Pair<@Composable () -> Unit, String>>(
-            Pair({ Animate() }, "animate"),
-            Pair({ AnimateMotion() }, "animateMotion"),
-            Pair({ AnimateTransform() }, "animateTransform"),
-            Pair({ Defs() }, "defs"),
-            Pair({ Filter() }, "filter"),
-            Pair({ G() }, "g"),
-            Pair({ Marker() }, "marker"),
-            Pair({ Mpath() }, "mpath"),
-            Pair({ Switch() }, "switch"),
-            Pair({ Tspan() }, "tspan"),
-        )
-
         composition {
-            nodes.forEach {
-                it.first.invoke()
+            Svg {
+                Animate()
+                AnimateMotion()
+                AnimateTransform()
+                Defs()
+                Filter()
+                G()
+                Marker()
+                Mpath()
+                Switch()
+                Tspan()
             }
         }
 
-        nodes.forEachIndexed { index, it ->
-            assertEquals(it.second, root.children[index]?.nodeName)
-        }
+        assertEquals(
+            "<svg><animate></animate><animateMotion></animateMotion><animateTransform></animateTransform><defs></defs><filter></filter><g></g><marker></marker><mpath></mpath><switch></switch><tspan></tspan></svg>",
+            nextChild<SVGCircleElement>().outerHTML
+        )
     }
 
     @Test
