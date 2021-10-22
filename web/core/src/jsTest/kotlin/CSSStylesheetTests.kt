@@ -7,12 +7,15 @@ package org.jetbrains.compose.web.core.tests
 
 import kotlinx.browser.window
 import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.selectors.desc
 import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.dom.stringPresentation
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import org.jetbrains.compose.web.testutils.*
+import kotlin.test.assertContains
 
 object AppCSSVariables {
     val width by variable<CSSUnitValue>()
@@ -67,6 +70,19 @@ object AppStylesheet : StyleSheet() {
             }
         }
 
+    }
+
+    val withNestedWithImplicitSelf by style {
+        color(Color.green)
+        "h1" {
+            color(Color.lime)
+        }
+    }
+    val withNestedWithExplicitSelf by style {
+        color(Color.green)
+        desc(self, "h1") style {
+            color(Color.lime)
+        }
     }
 }
 
@@ -143,5 +159,35 @@ class CSSVariableTests {
             assertEquals("rgb(0, 255, 0)", window.getComputedStyle(el).color)
             assertEquals("rgb(0, 128, 0)", window.getComputedStyle(el).backgroundColor)
         }
+    }
+
+    @Test
+    fun nestedStyleWithImplicitSelf() = runTest {
+        val generatedRules = AppStylesheet.cssRules.map { it.stringPresentation() }
+
+        assertContains(
+            generatedRules,
+            """
+                .AppStylesheet-withNestedWithImplicitSelf h1 {
+                    color: lime;
+                }
+            """.trimIndent(),
+            "Nested selector with implicit self isn't generated correctly"
+        )
+    }
+
+    @Test
+    fun nestedStyleWithExplicitSelf() = runTest {
+        val generatedRules = AppStylesheet.cssRules.map { it.stringPresentation() }
+
+        assertContains(
+            generatedRules,
+            """
+                .AppStylesheet-withNestedWithExplicitSelf h1 {
+                    color: lime;
+                }
+            """.trimIndent(),
+            "Nested selector with implicit self isn't generated correctly"
+        )
     }
 }

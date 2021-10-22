@@ -23,7 +23,11 @@ sealed class Nth {
 
 open class CSSSelector {
     override fun equals(other: Any?): Boolean {
-        return toString() == other.toString()
+        return this === other || toString() == other.toString()
+    }
+
+    internal open fun contains(other: CSSSelector, strict: Boolean = false): Boolean {
+        return if (strict) this === other else this == other
     }
 
     data class Raw(val selector: String) : CSSSelector() {
@@ -69,26 +73,44 @@ open class CSSSelector {
     }
 
     data class Combine(val selectors: MutableList<CSSSelector>) : CSSSelector() {
+        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+            contains(this, other, selectors, strict)
+
         override fun toString(): String = selectors.joinToString("")
     }
 
     data class Group(val selectors: List<CSSSelector>) : CSSSelector() {
+        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+            contains(this, other, selectors, strict)
+
         override fun toString(): String = selectors.joinToString(", ")
     }
 
     data class Descendant(val parent: CSSSelector, val selected: CSSSelector) : CSSSelector() {
+        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+            contains(this, other, listOf(parent, selected), strict)
+
         override fun toString(): String = "$parent $selected"
     }
 
     data class Child(val parent: CSSSelector, val selected: CSSSelector) : CSSSelector() {
+        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+            contains(this, other, listOf(parent, selected), strict)
+
         override fun toString(): String = "$parent > $selected"
     }
 
     data class Sibling(val prev: CSSSelector, val selected: CSSSelector) : CSSSelector() {
+        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+            contains(this, other, listOf(prev, selected), strict)
+
         override fun toString(): String = "$prev ~ $selected"
     }
 
     data class Adjacent(val prev: CSSSelector, val selected: CSSSelector) : CSSSelector() {
+        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+            contains(this, other, listOf(prev, selected), strict)
+
         override fun toString(): String = "$prev + $selected"
     }
 
@@ -177,11 +199,17 @@ open class CSSSelector {
             override fun argsStr() = "$nth"
         }
         class Host(val selector: CSSSelector) : PseudoClass("host") {
+            override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+                contains(this, other, listOf(selector), strict)
+
             override fun argsStr() = "$selector"
         }
 
         // Etc
         class Not(val selector: CSSSelector) : PseudoClass("not") {
+            override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+                contains(this, other, listOf(selector), strict)
+
             override fun argsStr() = "$selector"
         }
     }
@@ -207,6 +235,9 @@ open class CSSSelector {
         }
 
         class Slotted(val selector: CSSSelector) : PseudoElement("slotted") {
+            override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+                contains(this, other, listOf(selector), strict)
+
             override fun argsStr() = selector.toString()
         }
     }
@@ -231,8 +262,19 @@ fun attr(
     caseSensitive: Boolean = true
 ) = CSSSelector.Attribute(name, value, operator, caseSensitive)
 fun group(vararg selectors: CSSSelector) = CSSSelector.Group(selectors.toList())
+
+@Deprecated("Replaced with `desc`", ReplaceWith("desc(parent, selected)"))
 fun descendant(parent: CSSSelector, selected: CSSSelector) =
+    desc(parent, selected)
+fun desc(parent: CSSSelector, selected: CSSSelector) =
     CSSSelector.Descendant(parent, selected)
+fun desc(parent: CSSSelector, selected: String) =
+    desc(parent, selector(selected))
+fun desc(parent: String, selected: CSSSelector) =
+    desc(selector(parent), selected)
+fun desc(parent: String, selected: String) =
+    desc(selector(parent), selector(selected))
+
 fun child(parent: CSSSelector, selected: CSSSelector) =
     CSSSelector.Child(parent, selected)
 fun sibling(sibling: CSSSelector, selected: CSSSelector) = CSSSelector.Descendant(sibling, selected)
@@ -241,3 +283,10 @@ fun adjacent(sibling: CSSSelector, selected: CSSSelector) = CSSSelector.Adjacent
 fun not(selector: CSSSelector) = CSSSelector.PseudoClass.Not(selector)
 fun hover() = CSSSelector.PseudoClass.hover
 fun hover(selector: CSSSelector) = selector + hover()
+
+@Suppress("SuspiciousEqualsCombination")
+private fun contains(that: CSSSelector, other: CSSSelector, children: List<CSSSelector>, strict: Boolean): Boolean {
+    return that === other || // exactly same selector
+            children.any { it.contains(other, strict) } || // contains it in children
+            (!strict && that == other) // equals structurally
+}
