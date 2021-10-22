@@ -814,6 +814,7 @@ private object Testing {
         rule.mainClock.advanceTimeBy(50L)
 
         // Compare the result with the image showing the expected result.
+        // `assertAgainGolden` needs to be implemented in your code.
         rule.onRoot().captureToImage().assertAgainstGolden()
     }
 }
