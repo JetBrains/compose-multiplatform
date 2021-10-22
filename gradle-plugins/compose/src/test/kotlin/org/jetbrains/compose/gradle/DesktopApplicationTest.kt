@@ -119,7 +119,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                 assertEquals("MainKt", mainClass, "Unexpected main class")
 
                 jar.entries().toList().mapTo(HashSet()) { it.name }.apply {
-                    checkContains("MainKt.class", "org/jetbrains/skiko/SkiaWindow.class")
+                    checkContains("MainKt.class", "org/jetbrains/skiko/SkiaLayer.class")
                 }
             }
         }
