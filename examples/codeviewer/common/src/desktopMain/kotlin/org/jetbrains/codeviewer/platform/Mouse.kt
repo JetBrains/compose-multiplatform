@@ -15,28 +15,7 @@ actual fun Modifier.pointerMoveFilter(
     onMove: (Offset) -> Boolean
 ): Modifier = this.pointerMoveFilter(onEnter = onEnter, onExit = onExit, onMove = onMove)
 
-@OptIn(ExperimentalComposeUiApi::class)
-internal class AwtCursor(val cursor: Cursor) : PointerIcon {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as AwtCursor
-
-        if (cursor != other.cursor) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return cursor.hashCode()
-    }
-
-    override fun toString(): String {
-        return "AwtCursor(cursor=$cursor)"
-    }
-}
 
 @OptIn(ExperimentalComposeUiApi::class)
 actual fun Modifier.cursorForHorizontalResize(): Modifier =
-    Modifier.pointerHoverIcon(AwtCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR)))
+    this.pointerHoverIcon(PointerIcon(Cursor(Cursor.E_RESIZE_CURSOR)))
