@@ -40,6 +40,8 @@ androidx.validateProjectStructure=false
 ```
 (note that https://android.googlesource.com/platform/frameworks/support build doesn't work with androidx.compose.jsCompilerTestsEnabled)
 
+After all is configured, open `compose` folder in Android Studio (not `compose/frameworks/support`)
+
 ## Scripts
 Publish artifacts to the local directory `out/androidx/build/support_repo/org/jetbrains/compose`:
 ```
