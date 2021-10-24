@@ -20,27 +20,26 @@ git config --global submodule.recurse true
   - NDK 21.3.6528147 (in folder $androidSdk/ndk, not in $androidSdk/ndk/$version)
   - CMake 3.10.2.4988404 (in folder $androidSdk/cmake, not in $androidSdk/cmake/$version)
 
-## Requirements to develop in IDE
-- Android Studio 2021.1.1 Canary 8 (https://developer.android.com/studio/archive) (it is mandatory to use exactly Canary 8!)
-- Custom Gradle 7.2 specified in `Settings -> Build, Execution, Deployment -> Build Tools -> Gradle` (because Android Studio will pick the wrong Gradle in the subproject instead of the Gradle in the root project)
-- Specified Gradle JDK 11 in `... -> Build Tools -> Gradle`
-- [macOs/Linux] Android SDK points to a folder, downloaded via `./scripts/downloadAndroidSdk`
-- Environment variables:
+## Developing in IDE
+1. Download Android Studio 2021.1.1 Canary 8 (https://developer.android.com/studio/archive) (it is mandatory to use exactly Canary 8!)
+2. Set environment variables:
 ```
 export ALLOW_PUBLIC_REPOS=1
 export JAVA_TOOLS_JAR=$PWD/external/tools.jar
 export ANDROIDX_PROJECTS=COMPOSE
-export JAVA_HOME=<JDK_home> //it should contain /include/jvmti.h
+export JAVA_HOME=<JDK_home> // it should point to Java 11 and contain /include/jvmti.h
 ```
-- Gradle properties in ~/.gradle/gradle.properties:
+3. Set gradle properties in ~/.gradle/gradle.properties:
 ```
 androidx.compose.multiplatformEnabled=true
 androidx.compose.jsCompilerTestsEnabled=true
 androidx.validateProjectStructure=false
 ```
 (note that https://android.googlesource.com/platform/frameworks/support build doesn't work with androidx.compose.jsCompilerTestsEnabled)
-
-Once everything is set up, open `compose` folder in Android Studio (not `compose/frameworks/support`)
+4. Open `compose` folder in Android Studio (not `compose/frameworks/support`)
+5. Download a custom Gradle 7.2 and specify it in `Settings -> Build, Execution, Deployment -> Build Tools -> Gradle` (because Android Studio will pick the wrong Gradle in the subproject instead of the Gradle in the root project)
+6. Specify Gradle JDK 11 in `... -> Build Tools -> Gradle`
+7. [macOs/Linux] Specify Android SDK pointed to a folder, downloaded via `./scripts/downloadAndroidSdk`
 
 ## Scripts
 Publish artifacts to the local directory `out/androidx/build/support_repo/org/jetbrains/compose`:
