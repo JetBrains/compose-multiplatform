@@ -32,10 +32,10 @@ export JAVA_HOME=<JDK_home> // it should point to Java 11 and contain /include/j
 3. Set gradle properties in ~/.gradle/gradle.properties:
 ```
 androidx.compose.multiplatformEnabled=true
+# note that https://android.googlesource.com/platform/frameworks/support build doesn't work with androidx.compose.jsCompilerTestsEnabled)
 androidx.compose.jsCompilerTestsEnabled=true
 androidx.validateProjectStructure=false
 ```
-(note that https://android.googlesource.com/platform/frameworks/support build doesn't work with androidx.compose.jsCompilerTestsEnabled)
 4. Open `compose` folder in Android Studio (not `compose/frameworks/support`)
 5. Download a custom Gradle 7.2 and specify it in `Settings -> Build, Execution, Deployment -> Build Tools -> Gradle` (because Android Studio will pick the wrong Gradle in the subproject instead of the Gradle in the root project)
 6. Specify Gradle JDK 11 in `... -> Build Tools -> Gradle`
