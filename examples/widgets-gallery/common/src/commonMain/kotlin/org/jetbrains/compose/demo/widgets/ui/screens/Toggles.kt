@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
@@ -30,29 +31,14 @@ fun Toggles() {
 
         AlignedColumn {
             var selected by remember { mutableStateOf("Kotlin") }
-
-            Row {
-                RadioButton(selected = selected == "Kotlin", onClick = { selected = "Kotlin" })
-                Text(
-                    text = "Kotlin",
-                    modifier = Modifier.clickable(onClick = { selected = "Kotlin" }).padding(start = 4.dp)
-                )
-            }
-            //Spacer(modifier = Modifier.size(4.dp))
-            Row {
-                RadioButton(selected = selected == "Java", onClick = { selected = "Java" })
-                Text(
-                    text = "Java",
-                    modifier = Modifier.clickable(onClick = { selected = "Java" }).padding(start = 4.dp)
-                )
-            }
-            //Spacer(modifier = Modifier.size(4.dp))
-            Row {
-                RadioButton(selected = selected == "Swift", onClick = { selected = "Swift" })
-                Text(
-                    text = "Swift",
-                    modifier = Modifier.clickable(onClick = { selected = "Swift" }).padding(start = 4.dp)
-                )
+            for (lang in arrayOf("Kotlin", "Java", "Swift")) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(selected = selected == lang, onClick = { selected = lang })
+                    Text(
+                        text = lang,
+                        modifier = Modifier.clickable(onClick = { selected = lang }).padding(start = 4.dp)
+                    )
+                }
             }
         }
 
