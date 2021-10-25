@@ -7,12 +7,15 @@
 
 package org.jetbrains.compose
 
+import groovy.lang.Closure
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ComponentMetadataContext
 import org.gradle.api.artifacts.ComponentMetadataRule
 import org.gradle.api.artifacts.dsl.ComponentModuleMetadataHandler
 import org.gradle.api.artifacts.dsl.DependencyHandler
+import org.gradle.api.artifacts.dsl.RepositoryHandler
+import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.plugins.ExtensionAware
 import org.jetbrains.compose.android.AndroidExtension
 import org.jetbrains.compose.desktop.DesktopExtension
@@ -32,13 +35,7 @@ class ComposePlugin : Plugin<Project> {
         val androidExtension = composeExtension.extensions.create("android", AndroidExtension::class.java)
 
         if (!project.buildFile.endsWith(".gradle.kts")) {
-            // add compose extension for Groovy DSL to work
-            project.dependencies.extensions.add("compose", Dependencies)
-            project.plugins.withId("org.jetbrains.kotlin.multiplatform") {
-                (project.extensions.getByName("kotlin") as? ExtensionAware)?.apply {
-                    extensions.add("compose", Dependencies)
-                }
-            }
+            setUpGroovyDslExtensions(project)
         }
 
         project.initializePreview()
@@ -211,6 +208,9 @@ class ComposePlugin : Plugin<Project> {
     }
 }
 
+fun RepositoryHandler.jetbrainsCompose(): MavenArtifactRepository =
+    maven { repo -> repo.setUrl("https://maven.pkg.jetbrains.space/public/p/compose/dev") }
+
 fun KotlinDependencyHandler.compose(groupWithArtifact: String) = composeDependency(groupWithArtifact)
 val KotlinDependencyHandler.compose get() = ComposePlugin.Dependencies
 
@@ -218,3 +218,19 @@ fun DependencyHandler.compose(groupWithArtifact: String) = composeDependency(gro
 val DependencyHandler.compose get() = ComposePlugin.Dependencies
 
 private fun composeDependency(groupWithArtifact: String) = "$groupWithArtifact:$composeVersion"
+
+private fun setUpGroovyDslExtensions(project: Project) {
+    // add compose extension for Groovy DSL to work
+    project.dependencies.extensions.add("compose", ComposePlugin.Dependencies)
+    project.plugins.withId("org.jetbrains.kotlin.multiplatform") {
+        (project.extensions.getByName("kotlin") as? ExtensionAware)?.apply {
+            extensions.add("compose", ComposePlugin.Dependencies)
+        }
+    }
+    (project.repositories as? ExtensionAware)?.extensions?.apply {
+        add("jetbrainsCompose", object : Closure<MavenArtifactRepository>(project.repositories) {
+            fun doCall(): MavenArtifactRepository =
+                project.repositories.jetbrainsCompose()
+        })
+    }
+}
