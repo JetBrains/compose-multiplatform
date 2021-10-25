@@ -268,8 +268,8 @@ internal class TextController(val state: TextState) : RememberObserver {
                 }
                 Modifier.pointerInput(mouseSelectionObserver) {
                     mouseSelectionDetector(mouseSelectionObserver)
-                }
-            }.pointerHoverIcon(textPointerIcon)
+                }.pointerHoverIcon(textPointerIcon)
+            }
         } else {
             Modifier
         }
