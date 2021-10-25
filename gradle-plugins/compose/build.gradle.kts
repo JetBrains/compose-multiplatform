@@ -38,25 +38,31 @@ sourceSets.main.configure {
     java.srcDir(buildConfigDir)
 }
 
-val embedded by configurations.creating
+val embeddedDependencies by configurations.creating
 
 dependencies {
+    // By default, Gradle resolves plugins only via Gradle Plugin Portal.
+    // To avoid declaring an additional repo, all dependencies must:
+    // 1. Either be provided by Gradle at runtime (e.g. gradleApi());
+    // 2. Or be included and optionally relocated.
+    // Use `embedded` helper to include a dependency.
+    fun embedded(dep: Any) {
+        compileOnly(dep)
+        embeddedDependencies(dep)
+    }
+
     compileOnly(gradleApi())
     compileOnly(localGroovy())
     compileOnly(kotlin("gradle-plugin-api"))
     compileOnly(kotlin("gradle-plugin"))
-    implementation(project(":preview-rpc"))
 
     testImplementation(gradleTestKit())
     testImplementation(platform("org.junit:junit-bom:5.7.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 
-    fun embeddedCompileOnly(dep: String) {
-        compileOnly(dep)
-        embedded(dep)
-    }
     // include relocated download task to avoid potential runtime conflicts
-    embeddedCompileOnly("de.undercouch:gradle-download-task:4.1.1")
+    embedded("de.undercouch:gradle-download-task:4.1.1")
+    embedded(project(":preview-rpc"))
 }
 
 val shadow = tasks.named<ShadowJar>("shadowJar") {
@@ -64,7 +70,7 @@ val shadow = tasks.named<ShadowJar>("shadowJar") {
     val toPackage = "org.jetbrains.compose.$fromPackage"
     relocate(fromPackage, toPackage)
     archiveClassifier.set("shadow")
-    configurations = listOf(embedded)
+    configurations = listOf(embeddedDependencies)
     exclude("META-INF/gradle-plugins/de.undercouch.download.properties")
 }
 
