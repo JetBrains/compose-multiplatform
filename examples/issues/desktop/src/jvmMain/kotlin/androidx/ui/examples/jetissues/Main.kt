@@ -28,5 +28,5 @@ fun main() {
             }
         }
     }
-    exitProcess(0) // force close Apollo Client, using inside IssuesRepositoryImpl
+    exitProcess(0) // force close Apollo Client, that is used inside IssuesRepositoryImpl
 }
