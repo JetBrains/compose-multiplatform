@@ -14,13 +14,14 @@ class CSSBuilderImpl(
     rulesHolder: CSSRulesHolder
 ) : CSSRuleBuilderImpl(), CSSBuilder, CSSRulesHolder by rulesHolder {
     override fun style(selector: CSSSelector, cssRule: CSSBuilder.() -> Unit) {
-        val (style, rules) = buildCSS(root, selector, cssRule)
-        rules.forEach { add(it) }
-        if (selector.contains(self, true) || selector.contains(root, true)) {
-            add(selector, style)
+        val resolvedSelector = if (selector.contains(self, true) || selector.contains(root, true)) {
+            selector
         } else {
-            add(desc(self, selector), style)
+            desc(self, selector)
         }
+        val (style, rules) = buildCSS(root, resolvedSelector, cssRule)
+        rules.forEach { add(it) }
+        add(resolvedSelector, style)
     }
 
     override fun buildRules(rulesBuild: GenericStyleSheetBuilder<CSSBuilder>.() -> Unit) =

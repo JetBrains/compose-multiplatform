@@ -78,6 +78,17 @@ object AppStylesheet : StyleSheet() {
             color(Color.lime)
         }
     }
+
+    val withNestedWithImplicitSelf2Layers by style {
+        color(Color.green)
+        "h1" {
+            color(Color.lime)
+            "span" {
+                color(Color.red)
+            }
+        }
+    }
+
     val withNestedWithExplicitSelf by style {
         color(Color.green)
         desc(self, "h1") style {
@@ -185,6 +196,30 @@ class CSSVariableTests {
             """
                 .AppStylesheet-withNestedWithExplicitSelf h1 {
                     color: lime;
+                }
+            """.trimIndent(),
+            "Nested selector with implicit self isn't generated correctly"
+        )
+    }
+
+    @Test
+    fun nestedStyleWithImplicitSelf2Layers() = runTest {
+        val generatedRules = AppStylesheet.cssRules.map { it.stringPresentation() }
+
+        assertContains(
+            generatedRules,
+            """
+                .AppStylesheet-withNestedWithImplicitSelf2Layers h1 {
+                    color: lime;
+                }
+            """.trimIndent(),
+            "Nested selector with implicit self isn't generated correctly"
+        )
+        assertContains(
+            generatedRules,
+            """
+                .AppStylesheet-withNestedWithImplicitSelf2Layers h1 span {
+                    color: red;
                 }
             """.trimIndent(),
             "Nested selector with implicit self isn't generated correctly"
