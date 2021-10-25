@@ -15,7 +15,5 @@ expect fun VerticalScrollbar(
 @Composable
 expect fun VerticalScrollbar(
     modifier: Modifier,
-    scrollState: LazyListState,
-    itemCount: Int,
-    averageItemSize: Dp
+    scrollState: LazyListState
 )

@@ -15,7 +15,5 @@ actual fun VerticalScrollbar(
 @Composable
 actual fun VerticalScrollbar(
     modifier: Modifier,
-    scrollState: LazyListState,
-    itemCount: Int,
-    averageItemSize: Dp
+    scrollState: LazyListState
 ) = Unit

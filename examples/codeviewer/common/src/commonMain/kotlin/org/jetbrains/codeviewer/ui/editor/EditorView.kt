@@ -74,14 +74,13 @@ private fun Lines(lines: Editor.Lines, settings: Settings) = with(LocalDensity.c
 
     Box(Modifier.fillMaxSize()) {
         val scrollState = rememberLazyListState()
-        val lineHeight = settings.fontSize.toDp() * 1.6f
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             state = scrollState
         ) {
             items(lines.size) { index ->
-                Box(Modifier.height(lineHeight)) {
+                Box(Modifier.height(settings.fontSize.toDp() * 1.6f)) {
                     Line(Modifier.align(Alignment.CenterStart), maxNum, lines[index], settings)
                 }
             }
@@ -89,9 +88,7 @@ private fun Lines(lines: Editor.Lines, settings: Settings) = with(LocalDensity.c
 
         VerticalScrollbar(
             Modifier.align(Alignment.CenterEnd),
-            scrollState,
-            lines.size,
-            lineHeight
+            scrollState
         )
     }
 }

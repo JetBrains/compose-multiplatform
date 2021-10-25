@@ -6,7 +6,6 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import org.jetbrains.codeviewer.platform.HomeFolder
-import org.jetbrains.codeviewer.platform.PlatformTheme
 import org.jetbrains.codeviewer.ui.common.AppTheme
 import org.jetbrains.codeviewer.ui.common.Settings
 import org.jetbrains.codeviewer.ui.editor.Editors
@@ -28,10 +27,8 @@ fun MainView() {
         MaterialTheme(
             colors = AppTheme.colors.material
         ) {
-            PlatformTheme {
-                Surface {
-                    CodeViewerView(codeViewer)
-                }
+            Surface {
+                CodeViewerView(codeViewer)
             }
         }
     }

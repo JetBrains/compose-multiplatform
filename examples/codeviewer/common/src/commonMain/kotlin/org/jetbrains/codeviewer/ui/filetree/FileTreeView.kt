@@ -49,23 +49,19 @@ fun FileTreeView(model: FileTree) = Surface(
     with(LocalDensity.current) {
         Box {
             val scrollState = rememberLazyListState()
-            val fontSize = 14.sp
-            val lineHeight = fontSize.toDp() * 1.5f
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize().withoutWidthConstraints(),
                 state = scrollState
             ) {
                 items(model.items.size) {
-                    FileTreeItemView(fontSize, lineHeight, model.items[it])
+                    FileTreeItemView(14.sp, 14.sp.toDp() * 1.5f, model.items[it])
                 }
             }
 
             VerticalScrollbar(
                 Modifier.align(Alignment.CenterEnd),
-                scrollState,
-                model.items.size,
-                lineHeight
+                scrollState
             )
         }
     }
