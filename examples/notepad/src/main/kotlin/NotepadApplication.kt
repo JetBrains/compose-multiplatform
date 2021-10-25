@@ -1,7 +1,6 @@
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.MenuScope
 import androidx.compose.ui.window.Tray
@@ -22,7 +21,6 @@ fun ApplicationScope.NotepadApplication(state: NotepadApplicationState) {
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ApplicationScope.ApplicationTray(state: NotepadApplicationState) {
     Tray(

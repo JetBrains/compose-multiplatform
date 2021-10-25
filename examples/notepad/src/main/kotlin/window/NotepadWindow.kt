@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 import util.FileDialog
 import util.YesNoCancelDialog
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun NotepadWindow(state: NotepadWindowState) {
     val scope = rememberCoroutineScope()

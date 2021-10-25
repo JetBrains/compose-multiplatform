@@ -8,15 +8,10 @@ import androidx.compose.ui.window.Notification
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowState
 import common.Settings
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import util.AlertDialogResult
 import java.nio.file.Path
 
@@ -129,11 +124,11 @@ class NotepadWindowState(
 
         try {
             saveJob?.join()
-            _notifications.offer(NotepadWindowNotification.SaveSuccess(path))
+            _notifications.trySend(NotepadWindowNotification.SaveSuccess(path))
         } catch (e: Exception) {
             isChanged = true
             e.printStackTrace()
-            _notifications.offer(NotepadWindowNotification.SaveError(path))
+            _notifications.trySend(NotepadWindowNotification.SaveError(path))
         }
     }
 
@@ -171,6 +166,7 @@ class NotepadWindowState(
     }
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 private fun Path.launchSaving(text: String) = GlobalScope.launch {
     writeTextAsync(text)
 }

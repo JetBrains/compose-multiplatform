@@ -18,13 +18,12 @@ val LocalAppResources = staticCompositionLocalOf<AppResources> {
 
 @Composable
 fun rememberAppResources(): AppResources {
-    val icon = rememberVectorPainter(Icons.Default.Description, Color(0xFF2CA4E1))
+    val icon = rememberVectorPainter(Icons.Default.Description, tintColor = Color(0xFF2CA4E1))
     return remember { AppResources(icon) }
 }
 
 class AppResources(val icon: VectorPainter)
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun rememberVectorPainter(image: ImageVector, tintColor: Color) =
     rememberVectorPainter(

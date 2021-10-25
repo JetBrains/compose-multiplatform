@@ -6,6 +6,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.AwtWindow
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.WindowScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -15,7 +16,6 @@ import java.io.File
 import java.nio.file.Path
 import javax.swing.JOptionPane
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun FrameWindowScope.FileDialog(
     title: String,
@@ -41,6 +41,7 @@ fun FrameWindowScope.FileDialog(
     dispose = FileDialog::dispose
 )
 
+@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun WindowScope.YesNoCancelDialog(
     title: String,
