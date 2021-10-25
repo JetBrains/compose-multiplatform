@@ -317,8 +317,8 @@ internal fun CoreTextField(
         Modifier.mouseDragGestureDetector(
             observer = manager.mouseSelectionObserver,
             enabled = enabled
-        )
-    }.pointerHoverIcon(textPointerIcon)
+        ).pointerHoverIcon(textPointerIcon)
+    }
 
     val drawModifier = Modifier.drawBehind {
         state.layoutResult?.let { layoutResult ->
