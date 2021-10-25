@@ -1,4 +1,4 @@
-import org.jetbrains.compose.compose
+import org.jetbrains.compose.*
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
@@ -9,7 +9,7 @@ plugins {
 repositories {
     google()
     mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    jetbrainsCompose()
 }
 
 dependencies {
