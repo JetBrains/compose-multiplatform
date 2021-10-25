@@ -10,6 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity
+            android:exported="true"
             android:name="androidx.ui.examples.jetissues.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
