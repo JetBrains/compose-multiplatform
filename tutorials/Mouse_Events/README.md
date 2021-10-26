@@ -1,4 +1,4 @@
-# Getting Started with Compose for Desktop
+# Mouse events
 
 ## What is covered
 
