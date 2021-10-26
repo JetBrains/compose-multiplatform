@@ -44,6 +44,7 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.3.1")
     implementation(project(":lifecycle:lifecycle-viewmodel-compose"))
     implementation(project(":paging:paging-compose"))
+    implementation(project(":window:window"))
 
     implementation(libs.kotlinStdlib)
     implementation(libs.kotlinReflect)
