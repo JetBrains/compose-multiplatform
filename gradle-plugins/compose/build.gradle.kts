@@ -48,6 +48,7 @@ dependencies {
     // Use `embedded` helper to include a dependency.
     fun embedded(dep: Any) {
         compileOnly(dep)
+        testCompileOnly(dep)
         embeddedDependencies(dep)
     }
 
