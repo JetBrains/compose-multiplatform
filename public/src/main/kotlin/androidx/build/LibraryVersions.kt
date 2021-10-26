@@ -25,7 +25,7 @@ object LibraryVersions {
     val ANNOTATION = Version("1.4.0-alpha01")
     val ANNOTATION_EXPERIMENTAL = Version("1.2.0-alpha01")
     val APPCOMPAT = Version("1.5.0-alpha01")
-    val APPSEARCH = Version("1.0.0-alpha03")
+    val APPSEARCH = Version("1.0.0-alpha04")
     val ARCH_CORE = Version("2.2.0-alpha01")
     val ASYNCLAYOUTINFLATER = Version("1.1.0-alpha01")
     val AUTOFILL = Version("1.2.0-beta02")
