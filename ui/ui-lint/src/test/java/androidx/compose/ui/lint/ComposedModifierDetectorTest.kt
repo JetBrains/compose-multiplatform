@@ -21,7 +21,6 @@ package androidx.compose.ui.lint
 import androidx.compose.lint.test.Stubs
 import androidx.compose.lint.test.compiledStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
-import com.android.tools.lint.checks.infrastructure.TestMode
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
 import org.junit.Test
@@ -138,7 +137,6 @@ class ComposedModifierDetectorTest : LintDetectorTest() {
             Stubs.Composable,
             Stubs.Modifier
         )
-            .skipTestModes(TestMode.WHITESPACE) // b/202187519, remove when upgrading to 7.1.0
             .run()
             .expect(
                 """
@@ -228,7 +226,6 @@ src/test/test.kt:22: Warning: Unnecessary use of Modifier.composed [UnnecessaryC
             Stubs.Modifier,
             Stubs.Remember
         )
-            .skipTestModes(TestMode.WHITESPACE) // b/202187519, remove when upgrading to 7.1.0
             .run()
             .expectClean()
     }
