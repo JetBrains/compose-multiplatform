@@ -271,7 +271,7 @@ internal class SkiaBasedOwner(
         onNeedsRender?.invoke()
     }
 
-    override fun measureAndLayout() {
+    override fun measureAndLayout(sendPointerUpdate: Boolean) {
         measureAndLayoutDelegate.updateRootConstraints(constraints)
         if (measureAndLayoutDelegate.measureAndLayout()) {
             requestDraw()

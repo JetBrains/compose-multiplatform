@@ -187,7 +187,7 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
     /**
      * Iterates through all LayoutNodes that have requested layout and measures and lays them out
      */
-    fun measureAndLayout(): Boolean {
+    fun measureAndLayout(onLayout: (() -> Unit)? = null): Boolean {
         require(root.isAttached)
         require(root.isPlaced)
         require(!duringMeasureLayout)
@@ -233,6 +233,7 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
                 duringMeasureLayout = false
             }
             consistencyChecker?.assertConsistent()
+            onLayout?.invoke()
         }
         return rootNodeResized
     }
