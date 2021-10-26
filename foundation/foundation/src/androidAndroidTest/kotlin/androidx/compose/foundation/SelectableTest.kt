@@ -24,24 +24,19 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.text.BasicText
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.first
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.InputMode
-import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -60,8 +55,8 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performMouseInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
@@ -477,13 +472,11 @@ class SelectableTest {
         }
     }
 
-    @FlakyTest(bugId = 203399664)
     @Test
     fun selectableTest_interactionSource_focus_inTouchMode() {
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(true)
         val interactionSource = MutableInteractionSource()
-
         lateinit var scope: CoroutineScope
-
         val focusRequester = FocusRequester()
 
         rule.setContent {
@@ -526,25 +519,15 @@ class SelectableTest {
 
     @Test
     fun selectableTest_interactionSource_focus_inKeyboardMode() {
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
-
         lateinit var scope: CoroutineScope
-
         val focusRequester = FocusRequester()
-
         lateinit var focusManager: FocusManager
-
-        val keyboardInputModeManager = object : InputModeManager {
-            override val inputMode = InputMode.Keyboard
-
-            @OptIn(ExperimentalComposeUiApi::class)
-            override fun requestInputMode(inputMode: InputMode) = true
-        }
 
         rule.setContent {
             scope = rememberCoroutineScope()
             focusManager = LocalFocusManager.current
-            CompositionLocalProvider(LocalInputModeManager provides keyboardInputModeManager) {
                 Box {
                     Box(
                         Modifier
@@ -559,7 +542,6 @@ class SelectableTest {
                         BasicText("SelectableText")
                     }
                 }
-            }
         }
 
         val interactions = mutableListOf<Interaction>()
