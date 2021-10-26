@@ -453,7 +453,7 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
     }
 
     private fun isCursorEvent(event: PointerEvent): Boolean {
-        return event.changes.size == 1 && event.changes[0].type != PointerType.Touch
+        return event.changes.size == 1 && event.changes[0].type == PointerType.Mouse
     }
 
     override fun cleanUpHits() {
@@ -471,8 +471,10 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
                 }
             }
         } else {
-            // Clear when hover exit
-            if (event.type == PointerEventType.Exit && !event.buttons.areAnyPressed) {
+            // Clear when hover exit or "up" after exiting.
+            if ((event.type == PointerEventType.Exit && !event.buttons.areAnyPressed) ||
+                (!event.buttons.areAnyPressed && !isIn)
+            ) {
                 pointerIds.clear()
             }
         }
