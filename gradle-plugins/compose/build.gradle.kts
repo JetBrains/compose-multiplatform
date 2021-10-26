@@ -96,6 +96,8 @@ val isWindows = getCurrentOperatingSystem().isWindows
 
 val gradleTestsPattern = "org.jetbrains.compose.gradle.*"
 tasks.test {
+    dependsOn(jar)
+    classpath = project.files(jar.map { it.archiveFile }) + classpath
     filter {
         excludeTestsMatching(gradleTestsPattern)
     }
