@@ -13,9 +13,10 @@
 ### API changes
 - DesktopMaterialTheme is deprecated, use MaterialTheme instead
 - WindowSize is deprecated, use DpSize instead
+- Modifier.pointerMoveFilter marked as Experimental, stable alternatives are Modifier.hoverable or Modifier.pointerInput
+- Modifier.mouseScrollFilter marked as Experimental, this API will likely change in the future
 
 ### API breaking changes
-- Mouse pointer API was redesigned 
 - Old Window API (AppWindow, AppManager), was removed
 - Modifier.pointerIcon is replaced with Modifier.pointerHoverIcon
 - Tray can be used only inside ApplicationScope now
