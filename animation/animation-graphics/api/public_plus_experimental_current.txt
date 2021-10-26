@@ -1,7 +1,7 @@
 // Signature format: 4.0
 package androidx.compose.animation.graphics {
 
-  @kotlin.RequiresOptIn(message="This is an experimental animation graphics API.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ExperimentalAnimationGraphicsApi {
+  @kotlin.RequiresOptIn(message="This is an experimental animation graphics API.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.CLASS, kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY}) public @interface ExperimentalAnimationGraphicsApi {
   }
 
 }
