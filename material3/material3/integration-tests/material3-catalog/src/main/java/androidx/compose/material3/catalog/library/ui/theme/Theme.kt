@@ -17,7 +17,9 @@
 package androidx.compose.material3.catalog.library.ui.theme
 
 import android.os.Build
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.catalog.library.model.ColorMode
@@ -30,12 +32,15 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.core.view.ViewCompat
 
 @Composable
 fun CatalogTheme(
@@ -43,7 +48,7 @@ fun CatalogTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme =
-        if (theme.colorMode == ColorMode.TrueDynamic &&
+        if (theme.colorMode == ColorMode.Dynamic &&
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val context = LocalContext.current
             colorSchemeFromThemeMode(
@@ -51,11 +56,11 @@ fun CatalogTheme(
                 lightColorScheme = dynamicLightColorScheme(context),
                 darkColorScheme = dynamicDarkColorScheme(context),
             )
-        } else if (theme.colorMode == ColorMode.SampleDynamic) {
+        } else if (theme.colorMode == ColorMode.Custom) {
             colorSchemeFromThemeMode(
                 themeMode = theme.themeMode,
-                lightColorScheme = DynamicLightColorSchemeSample,
-                darkColorScheme = DynamicDarkColorSchemeSample,
+                lightColorScheme = LightCustomColorScheme,
+                darkColorScheme = DarkCustomColorScheme,
             )
         } else {
             colorSchemeFromThemeMode(
@@ -66,9 +71,15 @@ fun CatalogTheme(
         }
 
     val layoutDirection = when (theme.textDirection) {
-        TextDirection.Ltr -> LayoutDirection.Ltr
-        TextDirection.Rtl -> LayoutDirection.Rtl
+        TextDirection.LTR -> LayoutDirection.Ltr
+        TextDirection.RTL -> LayoutDirection.Rtl
         TextDirection.System -> LocalLayoutDirection.current
+    }
+
+    val view = LocalView.current
+    val darkTheme = isSystemInDarkTheme()
+    SideEffect {
+        ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = !darkTheme
     }
 
     CompositionLocalProvider(
@@ -78,6 +89,8 @@ fun CatalogTheme(
                 density = LocalDensity.current.density,
                 fontScale = theme.fontScale,
             ),
+        // TODO: M3 MaterialTheme doesn't provide LocalIndication, remove when it does
+        LocalIndication provides rememberRipple()
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
@@ -103,7 +116,7 @@ fun colorSchemeFromThemeMode(
     }
 }
 
-val DynamicLightColorSchemeSample = ColorScheme(
+private val LightCustomColorScheme = lightColorScheme(
     primary = Color(0xFF984816),
     onPrimary = Color(0xFFFFFFFF),
     primaryContainer = Color(0xFFFFDBC9),
@@ -132,7 +145,7 @@ val DynamicLightColorSchemeSample = ColorScheme(
     outline = Color(0xFF85736B),
 )
 
-val DynamicDarkColorSchemeSample = ColorScheme(
+private val DarkCustomColorScheme = darkColorScheme(
     primary = Color(0xFFFFB68F),
     onPrimary = Color(0xFF562000),
     primaryContainer = Color(0xFF793100),

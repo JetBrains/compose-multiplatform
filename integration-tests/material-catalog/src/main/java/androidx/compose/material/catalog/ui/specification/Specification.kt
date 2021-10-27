@@ -18,18 +18,22 @@ package androidx.compose.material.catalog.ui.specification
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.catalog.R
 import androidx.compose.material.catalog.model.Specification
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 
-// TODO: Use components/values from Material3 when available
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 fun Specification(
@@ -42,17 +46,31 @@ fun Specification(
         BoxWithConstraints(modifier = Modifier.padding(paddingValues)) {
             LazyColumn(
                 content = {
+                    item {
+                        Text(
+                            text = stringResource(id = R.string.specifications),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Spacer(modifier = Modifier.height(SpecificationPadding))
+                    }
                     items(specifications) { specification ->
                         SpecificationItem(
                             specification = specification,
                             onClick = onSpecificationClick
                         )
+                        Spacer(modifier = Modifier.height(SpecificationItemPadding))
                     }
                 },
                 contentPadding = rememberInsetsPaddingValues(
-                    insets = LocalWindowInsets.current.navigationBars
+                    insets = LocalWindowInsets.current.navigationBars,
+                    additionalTop = SpecificationPadding,
+                    additionalStart = SpecificationPadding,
+                    additionalEnd = SpecificationPadding
                 )
             )
         }
     }
 }
+
+private val SpecificationPadding = 16.dp
+private val SpecificationItemPadding = 8.dp
