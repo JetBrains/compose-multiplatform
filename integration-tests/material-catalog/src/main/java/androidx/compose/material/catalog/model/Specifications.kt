@@ -18,19 +18,24 @@ package androidx.compose.material.catalog.model
 
 data class Specification(
     val id: Int,
-    val name: String
+    val name: String,
+    val artifact: String
 )
 
-private const val MaterialTitle = "Material"
+private const val MaterialTitle = "Material Design 2"
+private const val MaterialArtifact = "androidx.compose.material"
 val MaterialSpecification = Specification(
     id = 1,
-    name = MaterialTitle
+    name = MaterialTitle,
+    artifact = MaterialArtifact
 )
 
-private const val Material3Title = "Material You"
+private const val Material3Title = "Material Design 3"
+private const val Material3Artifact = "androidx.compose.material3"
 val Material3Specification = Specification(
     id = 2,
-    name = Material3Title
+    name = Material3Title,
+    artifact = Material3Artifact
 )
 
 val Specifications = listOf(

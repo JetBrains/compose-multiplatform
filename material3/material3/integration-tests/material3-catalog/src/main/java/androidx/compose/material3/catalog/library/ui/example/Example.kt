@@ -28,7 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.google.accompanist.insets.navigationBarsPadding
 
-// TODO: Use components/values from Material3 when available
 @Composable
 fun Example(
     component: Component,

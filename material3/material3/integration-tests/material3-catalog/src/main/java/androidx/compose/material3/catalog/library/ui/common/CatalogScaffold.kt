@@ -17,6 +17,7 @@
 package androidx.compose.material3.catalog.library.ui.common
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
@@ -25,6 +26,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.catalog.library.model.Theme
 import androidx.compose.material3.catalog.library.ui.theme.ThemePicker
 import androidx.compose.material3.catalog.library.util.GuidelinesUrl
@@ -38,12 +40,15 @@ import androidx.compose.material3.catalog.library.util.openUrl
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
-// TODO: Use components/values from Material3 when available
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CatalogScaffold(
@@ -63,13 +68,15 @@ fun CatalogScaffold(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
-    val containerColor = MaterialTheme.colorScheme.background
+    val containerColor = MaterialTheme.colorScheme.surfaceVariant
     val contentColor = contentColorFor(containerColor)
     CompositionLocalProvider(LocalContentColor provides contentColor) {
+        // TODO: Replace with M3 ModalBottomSheetLayout when available
         ModalBottomSheetLayout(
             sheetState = sheetState,
             sheetBackgroundColor = containerColor,
             sheetContentColor = contentColor,
+            sheetShape = SheetShape,
             sheetContent = {
                 ThemePicker(
                     theme = theme,
@@ -86,11 +93,13 @@ fun CatalogScaffold(
             scrimColor = SheetScrimColor
         ) {
             val context = LocalContext.current
+            val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior() }
             Scaffold(
                 topBar = {
                     CatalogTopAppBar(
                         title = topBarTitle,
                         showBackNavigationIcon = showBackNavigationIcon,
+                        scrollBehavior = scrollBehavior,
                         onBackClick = onBackClick,
                         onThemeClick = { coroutineScope.launch { sheetState.show() } },
                         onGuidelinesClick = { context.openUrl(guidelinesUrl) },
@@ -102,12 +111,17 @@ fun CatalogScaffold(
                         onLicensesClick = { context.openUrl(licensesUrl) }
                     )
                 },
-                containerColor = containerColor,
-                contentColor = contentColor,
+                modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                 content = content
             )
         }
     }
 }
 
-private val SheetScrimColor = Color.Black.copy(alpha = 0.32f)
+private val SheetScrimColor = Color.Black.copy(alpha = 0.4f)
+private val SheetShape = RoundedCornerShape(
+    topStart = 16.dp,
+    topEnd = 16.dp,
+    bottomEnd = 0.dp,
+    bottomStart = 0.dp
+)
