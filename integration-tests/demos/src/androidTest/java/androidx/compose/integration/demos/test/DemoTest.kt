@@ -37,6 +37,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -48,6 +49,7 @@ private val ignoredDemos = listOf<String>(
     // Not ignoring any of them \o/
 )
 
+@FlakyTest(bugId = 204322457)
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalTestApi::class)
