@@ -53,7 +53,7 @@ data class Example(
     val content: @Composable () -> Unit
 )
 
-private const val ButtonsExampleDescription = "Buttons examples"
+private const val ButtonsExampleDescription = "Button examples"
 private const val ButtonsExampleSourceUrl = "$SampleSourceUrl/ButtonSamples.kt"
 val ButtonsExamples =
     listOf(
@@ -100,7 +100,7 @@ val ColorExamples =
         ) { ColorSchemeSample() },
     )
 
-private const val DialogExampleDescription = "Basic Dialog examples"
+private const val DialogExampleDescription = "Dialog examples"
 private const val DialogExampleSourceUrl = "$SampleSourceUrl/AlertDialogSamples.kt"
 val DialogExamples =
     listOf(
@@ -152,32 +152,37 @@ val TopAppBarExamples =
         ) { ExitUntilCollapsedLargeTopAppBar() },
     )
 
-private const val ButtonsFloatingActionButtonExampleDescription =
-    "Buttons: floating action button examples"
-private const val ButtonsFloatingActionButtonExampleSourceUrl =
+private const val ExtendedFABExampleDescription = "Extended FAB examples"
+private const val ExtendedFABExampleSourceUrl = "$SampleSourceUrl/FloatingActionButtonSamples.kt"
+val ExtendedFABExamples =
+    listOf(
+        Example(
+            name = ::ExtendedFloatingActionButtonSample.name,
+            description = ExtendedFABExampleDescription,
+            sourceUrl = ExtendedFABExampleSourceUrl,
+        ) { ExtendedFloatingActionButtonSample() },
+    )
+
+private const val FloatingActionButtonsExampleDescription = "Floating action button examples"
+private const val FloatingActionButtonsExampleSourceUrl =
     "$SampleSourceUrl/FloatingActionButtonSamples.kt"
 val FloatingActionButtonsExamples =
     listOf(
         Example(
             name = ::FloatingActionButtonSample.name,
-            description = ButtonsFloatingActionButtonExampleDescription,
-            sourceUrl = ButtonsFloatingActionButtonExampleSourceUrl,
+            description = FloatingActionButtonsExampleDescription,
+            sourceUrl = FloatingActionButtonsExampleSourceUrl,
         ) { FloatingActionButtonSample() },
         Example(
             name = ::LargeFloatingActionButtonSample.name,
-            description = ButtonsFloatingActionButtonExampleDescription,
-            sourceUrl = ButtonsFloatingActionButtonExampleSourceUrl,
+            description = FloatingActionButtonsExampleDescription,
+            sourceUrl = FloatingActionButtonsExampleSourceUrl,
         ) { LargeFloatingActionButtonSample() },
         Example(
             name = ::SmallFloatingActionButtonSample.name,
-            description = ButtonsFloatingActionButtonExampleDescription,
-            sourceUrl = ButtonsFloatingActionButtonExampleSourceUrl,
-        ) { SmallFloatingActionButtonSample() },
-        Example(
-            name = ::ExtendedFloatingActionButtonSample.name,
-            description = ButtonsFloatingActionButtonExampleDescription,
-            sourceUrl = ButtonsFloatingActionButtonExampleSourceUrl,
-        ) { ExtendedFloatingActionButtonSample() },
+            description = FloatingActionButtonsExampleDescription,
+            sourceUrl = FloatingActionButtonsExampleSourceUrl,
+        ) { SmallFloatingActionButtonSample() }
     )
 
 private const val NavigationBarExampleDescription = "Navigation bar examples"

@@ -16,21 +16,23 @@
 
 package androidx.compose.material3.catalog.library.ui.theme
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Divider
 import androidx.compose.material.RadioButton
 import androidx.compose.material.RadioButtonDefaults
 import androidx.compose.material.Slider
+import androidx.compose.material.SliderDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.catalog.library.R
 import androidx.compose.material3.catalog.library.model.ColorMode
+import androidx.compose.material3.catalog.library.model.MaxFontScale
+import androidx.compose.material3.catalog.library.model.MinFontScale
 import androidx.compose.material3.catalog.library.model.TextDirection
 import androidx.compose.material3.catalog.library.model.Theme
 import androidx.compose.material3.catalog.library.model.ThemeMode
@@ -43,15 +45,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.rememberInsetsPaddingValues
 
-// TODO: Use components/values from Material3 when available
 @Composable
-@Suppress("UNUSED_PARAMETER")
 fun ThemePicker(
     theme: Theme,
     onThemeChange: (theme: Theme) -> Unit
 ) {
-    LazyColumn {
+    LazyColumn(
+        contentPadding = rememberInsetsPaddingValues(
+            insets = LocalWindowInsets.current.navigationBars,
+            additionalTop = ThemePickerPadding,
+            additionalBottom = ThemePickerPadding
+        ),
+        verticalArrangement = Arrangement.spacedBy(ThemePickerPadding)
+    ) {
         item {
             Text(
                 text = stringResource(id = R.string.theme),
@@ -60,15 +69,17 @@ fun ThemePicker(
             )
             // LazyVerticalGrid can't be used within LazyColumn due to nested scrolling
             val themeModes = ThemeMode.values()
-            Column(modifier = Modifier.padding(ThemePickerPadding)) {
-                Row {
+            Column(
+                modifier = Modifier.padding(ThemePickerPadding),
+                verticalArrangement = Arrangement.spacedBy(ThemePickerPadding)
+            ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(ThemePickerPadding)) {
                     ThemeModeItem(
                         modifier = Modifier.weight(1f),
                         themeMode = themeModes[0],
                         selected = themeModes[0] == theme.themeMode,
                         onClick = { onThemeChange(theme.copy(themeMode = it)) }
                     )
-                    Spacer(modifier = Modifier.width(ThemePickerPadding))
                     ThemeModeItem(
                         modifier = Modifier.weight(1f),
                         themeMode = themeModes[1],
@@ -76,7 +87,6 @@ fun ThemePicker(
                         onClick = { onThemeChange(theme.copy(themeMode = it)) }
                     )
                 }
-                Spacer(modifier = Modifier.height(ThemePickerPadding))
                 Row {
                     ThemeModeItem(
                         modifier = Modifier.weight(1f),
@@ -87,7 +97,6 @@ fun ThemePicker(
                 }
             }
             Divider(modifier = Modifier.padding(horizontal = ThemePickerPadding))
-            Spacer(modifier = Modifier.height(ThemePickerPadding))
         }
         item {
             Text(
@@ -97,15 +106,17 @@ fun ThemePicker(
             )
             // LazyVerticalGrid can't be used within LazyColumn due to nested scrolling
             val colorModes = ColorMode.values()
-            Column(modifier = Modifier.padding(ThemePickerPadding)) {
-                Row {
+            Column(
+                modifier = Modifier.padding(ThemePickerPadding),
+                verticalArrangement = Arrangement.spacedBy(ThemePickerPadding)
+            ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(ThemePickerPadding)) {
                     ColorModeItem(
                         modifier = Modifier.weight(1f),
                         colorMode = colorModes[0],
                         selected = colorModes[0] == theme.colorMode,
                         onClick = { onThemeChange(theme.copy(colorMode = it)) }
                     )
-                    Spacer(modifier = Modifier.width(ThemePickerPadding))
                     ColorModeItem(
                         modifier = Modifier.weight(1f),
                         colorMode = colorModes[1],
@@ -113,7 +124,6 @@ fun ThemePicker(
                         onClick = { onThemeChange(theme.copy(colorMode = it)) }
                     )
                 }
-                Spacer(modifier = Modifier.height(ThemePickerPadding))
                 Row {
                     ColorModeItem(
                         modifier = Modifier.weight(1f),
@@ -124,21 +134,6 @@ fun ThemePicker(
                 }
             }
             Divider(modifier = Modifier.padding(horizontal = ThemePickerPadding))
-            Spacer(modifier = Modifier.height(ThemePickerPadding))
-        }
-        item {
-            Text(
-                text = stringResource(id = R.string.text_scale),
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(horizontal = ThemePickerPadding)
-            )
-            var fontScale by remember { mutableStateOf(theme.fontScale) }
-            Slider(
-                value = fontScale,
-                onValueChange = { fontScale = it },
-                onValueChangeFinished = { onThemeChange(theme.copy(fontScale = fontScale)) },
-                valueRange = 0f..4f,
-            )
         }
         item {
             Text(
@@ -148,15 +143,17 @@ fun ThemePicker(
             )
             // LazyVerticalGrid can't be used within LazyColumn due to nested scrolling
             val textDirections = TextDirection.values()
-            Column(modifier = Modifier.padding(ThemePickerPadding)) {
-                Row {
+            Column(
+                modifier = Modifier.padding(ThemePickerPadding),
+                verticalArrangement = Arrangement.spacedBy(ThemePickerPadding)
+            ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(ThemePickerPadding)) {
                     TextDirectionItem(
                         modifier = Modifier.weight(1f),
                         textDirection = textDirections[0],
                         selected = textDirections[0] == theme.textDirection,
                         onClick = { onThemeChange(theme.copy(textDirection = it)) }
                     )
-                    Spacer(modifier = Modifier.width(ThemePickerPadding))
                     TextDirectionItem(
                         modifier = Modifier.weight(1f),
                         textDirection = textDirections[1],
@@ -164,7 +161,6 @@ fun ThemePicker(
                         onClick = { onThemeChange(theme.copy(textDirection = it)) }
                     )
                 }
-                Spacer(modifier = Modifier.height(ThemePickerPadding))
                 Row {
                     TextDirectionItem(
                         modifier = Modifier.weight(1f),
@@ -174,6 +170,23 @@ fun ThemePicker(
                     )
                 }
             }
+            Divider(modifier = Modifier.padding(horizontal = ThemePickerPadding))
+        }
+        item {
+            Text(
+                text = stringResource(id = R.string.font_scale),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(horizontal = ThemePickerPadding)
+            )
+            var fontScale by remember { mutableStateOf(theme.fontScale) }
+            FontScaleItem(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = ThemePickerPadding),
+                fontScale = fontScale,
+                onValueChange = { fontScale = it },
+                onValueChangeFinished = { onThemeChange(theme.copy(fontScale = fontScale)) }
+            )
         }
     }
 }
@@ -187,19 +200,21 @@ private fun ThemeModeItem(
 ) {
     Row(
         modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(ThemePickerPadding)
     ) {
+        // TODO: Replace with M3 RadioButton when available
         RadioButton(
             selected = selected,
             onClick = { onClick(themeMode) },
             colors = RadioButtonDefaults.colors(
-                selectedColor = MaterialTheme.colorScheme.secondary,
-                unselectedColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                selectedColor = MaterialTheme.colorScheme.primary,
+                unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant,
             ),
         )
-        Spacer(modifier = Modifier.width(ThemePickerPadding))
         Text(
             text = themeMode.toString(),
+            style = MaterialTheme.typography.bodyMedium
         )
     }
 }
@@ -213,19 +228,21 @@ private fun ColorModeItem(
 ) {
     Row(
         modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(ThemePickerPadding)
     ) {
+        // TODO: Replace with M3 RadioButton when available
         RadioButton(
             selected = selected,
             onClick = { onClick(colorMode) },
             colors = RadioButtonDefaults.colors(
-                selectedColor = MaterialTheme.colorScheme.secondary,
-                unselectedColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                selectedColor = MaterialTheme.colorScheme.primary,
+                unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant,
             ),
         )
-        Spacer(modifier = Modifier.width(ThemePickerPadding))
         Text(
             text = colorMode.toString(),
+            style = MaterialTheme.typography.bodyMedium
         )
     }
 }
@@ -239,19 +256,49 @@ private fun TextDirectionItem(
 ) {
     Row(
         modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(ThemePickerPadding)
     ) {
+        // TODO: Replace with M3 RadioButton when available
         RadioButton(
             selected = selected,
             onClick = { onClick(textDirection) },
             colors = RadioButtonDefaults.colors(
-                selectedColor = MaterialTheme.colorScheme.secondary,
-                unselectedColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                selectedColor = MaterialTheme.colorScheme.primary,
+                unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant,
             ),
         )
-        Spacer(modifier = Modifier.width(ThemePickerPadding))
         Text(
             text = textDirection.toString(),
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
+
+@Composable
+private fun FontScaleItem(
+    modifier: Modifier = Modifier,
+    fontScale: Float,
+    fontScaleMin: Float = MinFontScale,
+    fontScaleMax: Float = MaxFontScale,
+    onValueChange: (textScale: Float) -> Unit,
+    onValueChangeFinished: () -> Unit
+) {
+    Column(modifier = modifier) {
+        // TODO: Replace with M3 Slider when available
+        Slider(
+            value = fontScale,
+            onValueChange = onValueChange,
+            onValueChangeFinished = onValueChangeFinished,
+            valueRange = fontScaleMin..fontScaleMax,
+            colors = SliderDefaults.colors(
+                thumbColor = MaterialTheme.colorScheme.primary,
+                activeTrackColor = MaterialTheme.colorScheme.primary
+            )
+        )
+        Text(
+            text = stringResource(id = R.string.scale, fontScale),
+            style = MaterialTheme.typography.bodyMedium
         )
     }
 }

@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.ContentAlpha
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -45,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 
-// TODO: Use components/values from Material3 when available
 @Composable
 fun Component(
     component: Component,
@@ -65,11 +63,11 @@ fun Component(
         onBackClick = onBackClick
     ) { paddingValues ->
         LazyColumn(
-            modifier = Modifier
-                .padding(paddingValues)
-                .padding(horizontal = ComponentPadding),
+            modifier = Modifier.padding(paddingValues),
             contentPadding = rememberInsetsPaddingValues(
-                insets = LocalWindowInsets.current.navigationBars
+                insets = LocalWindowInsets.current.navigationBars,
+                additionalStart = ComponentPadding,
+                additionalEnd = ComponentPadding
             )
         ) {
             item {
@@ -85,9 +83,7 @@ fun Component(
                             .size(ComponentIconSize)
                             .align(Alignment.Center),
                         colorFilter = if (component.tintIcon) {
-                            ColorFilter.tint(
-                                LocalContentColor.current.copy(alpha = ContentAlpha.disabled)
-                            )
+                            ColorFilter.tint(LocalContentColor.current)
                         } else {
                             null
                         }
@@ -97,7 +93,7 @@ fun Component(
             item {
                 Text(
                     text = stringResource(id = R.string.description),
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyLarge
                 )
                 Spacer(modifier = Modifier.height(ComponentPadding))
                 Text(
@@ -109,7 +105,7 @@ fun Component(
             item {
                 Text(
                     text = stringResource(id = R.string.examples),
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyLarge
                 )
                 Spacer(modifier = Modifier.height(ComponentPadding))
             }
@@ -119,7 +115,7 @@ fun Component(
                         example = example,
                         onClick = onExampleClick
                     )
-                    Spacer(modifier = Modifier.height(ComponentPadding))
+                    Spacer(modifier = Modifier.height(ExampleItemPadding))
                 }
             } else {
                 item {
@@ -138,3 +134,4 @@ private val ComponentIconSize = 108.dp
 private val ComponentIconVerticalPadding = 42.dp
 private val ComponentPadding = 16.dp
 private val ComponentDescriptionPadding = 32.dp
+private val ExampleItemPadding = 8.dp
