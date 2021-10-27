@@ -235,18 +235,19 @@ internal class SkiaBasedOwner(
 
     override val measureIteration: Long get() = measureAndLayoutDelegate.measureIteration
 
-    private var needsLayout = true
-    private var needsDraw = true
+    private var needLayout = true
+    private var needDraw = true
 
-    val needsRender get() = needsLayout || needsDraw
-    var onNeedsRender: (() -> Unit)? = null
+    val needRender get() = needLayout || needDraw || needSendSyntheticEvents
+    var onNeedRender: (() -> Unit)? = null
     var onDispatchCommand: ((Command) -> Unit)? = null
     var containerCursor: PlatformComponentWithCursor? = null
 
     fun render(canvas: org.jetbrains.skia.Canvas) {
-        needsLayout = false
+        needLayout = false
         measureAndLayout()
-        needsDraw = false
+        sendSyntheticEvents()
+        needDraw = false
         draw(canvas)
         clearInvalidObservations()
     }
@@ -261,19 +262,23 @@ internal class SkiaBasedOwner(
     }
 
     private fun requestLayout() {
-        needsLayout = true
-        needsDraw = true
-        onNeedsRender?.invoke()
+        needLayout = true
+        needDraw = true
+        onNeedRender?.invoke()
     }
 
     private fun requestDraw() {
-        needsDraw = true
-        onNeedsRender?.invoke()
+        needDraw = true
+        onNeedRender?.invoke()
     }
 
     override fun measureAndLayout(sendPointerUpdate: Boolean) {
         measureAndLayoutDelegate.updateRootConstraints(constraints)
-        if (measureAndLayoutDelegate.measureAndLayout()) {
+        if (
+            measureAndLayoutDelegate.measureAndLayout(
+                scheduleSyntheticEvents.takeIf { sendPointerUpdate }
+            )
+        ) {
             requestDraw()
         }
         measureAndLayoutDelegate.dispatchOnPositionedCallbacks()
@@ -331,9 +336,49 @@ internal class SkiaBasedOwner(
 
     private var desiredPointerIcon: PointerIcon? = null
 
+    private var needSendSyntheticEvents = false
+    private var lastPointerEvent: PointerInputEvent? = null
+
+    private val scheduleSyntheticEvents: () -> Unit = {
+        // we can't send event synchronously, as we can have call of `measureAndLayout`
+        // inside the event handler. So we can have a situation when we call event handler inside
+        // event handler. And that can lead to unpredictable behaviour.
+        // Nature of synthetic events doesn't require that they should be fired
+        // synchronously on layout change.
+        needSendSyntheticEvents = true
+        onNeedRender?.invoke()
+    }
+
+    // TODO(demin) should we repeat all events, or only which are make sense?
+    //  For example, touch Move after touch Release doesn't make sense,
+    //  and an application can handle it in a wrong way
+    //  Desktop doesn't support touch at the moment, but when it will, we should resolve this.
+    private fun sendSyntheticEvents() {
+        if (needSendSyntheticEvents) {
+            needSendSyntheticEvents = false
+            val lastPointerEvent = lastPointerEvent
+            if (lastPointerEvent != null) {
+                doProcessPointerInput(
+                    PointerInputEvent(
+                        PointerEventType.Move,
+                        lastPointerEvent.uptime,
+                        lastPointerEvent.pointers,
+                        lastPointerEvent.mouseEvent
+                    )
+                )
+            }
+        }
+    }
+
     internal fun processPointerInput(event: PointerInputEvent): ProcessResult {
         measureAndLayout()
+        sendSyntheticEvents()
         desiredPointerIcon = null
+        lastPointerEvent = event
+        return doProcessPointerInput(event)
+    }
+
+    private fun doProcessPointerInput(event: PointerInputEvent): ProcessResult {
         return pointerInputEventProcessor.process(
             event,
             this,
@@ -358,8 +403,14 @@ internal class SkiaBasedOwner(
 
     // TODO(demin): This is likely temporary. After PointerInputEvent can handle mouse events
     //  (scroll in particular), we can replace it with processPointerInput. see b/166105940
-    internal fun onMouseScroll(position: Offset, event: MouseScrollEvent) {
+    internal fun onMouseScroll(
+        position: Offset,
+        event: MouseScrollEvent,
+        pointerInputEvent: PointerInputEvent
+    ) {
         measureAndLayout()
+        sendSyntheticEvents()
+        lastPointerEvent = pointerInputEvent
 
         val inputFilters = HitTestResult<PointerInputFilter>()
         root.hitTest(position, inputFilters)
