@@ -43,7 +43,7 @@ Material 3 Components are interactive building blocks for creating a user interf
 | **Extended FAB** | [ExtendedFloatingActionButton] | M3 extended FAB |
 | **Dialogs** | [AlertDialog] | M3 basic dialog |
 | **Navigation bar** | [NavigationBar] | M3 navigation bar |
-| **Navigation drawer** | [ModalDrawer] | M3 navigation drawer |
+| **Navigation drawer** | [NavigationDrawer] | M3 navigation drawer |
 | **Navigation rail** | [NavigationRail] | M3 navigation rail |
 | **Top app bar** | [SmallTopAppBar] | M3 small top app bar |
 |  | [CenterAlignedTopAppBar] | M3 center-aligned top app bar |
