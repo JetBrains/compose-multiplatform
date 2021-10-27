@@ -16,7 +16,10 @@
 
 package androidx.build.studio
 
+import androidx.build.OperatingSystem
 import androidx.build.StudioType
+import androidx.build.getOperatingSystem
+import androidx.build.getSdkPath
 import androidx.build.getSupportRootFolder
 import androidx.build.studioType
 import com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
@@ -31,6 +34,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.internal.service.ServiceRegistry
 import org.gradle.process.ExecOperations
 import java.io.File
+import java.nio.file.Files
 import javax.inject.Inject
 
 /**
@@ -168,6 +172,33 @@ abstract class StudioTask : DefaultTask() {
     }
 
     /**
+     * Attempts to symlink the system-images and emulator SDK directories to a canonical SDK.
+     */
+    private fun setupSymlinksIfNeeded() {
+        val paths = listOf("system-images", "emulator")
+
+        val localSdkPath = project.getSdkPath()
+        val canonicalSdkPath = when (getOperatingSystem()) {
+            OperatingSystem.MAC -> File(System.getProperty("user.home"), "Library/Android/sdk")
+            OperatingSystem.LINUX -> File(System.getProperty("user.home"), "Android/Sdk")
+            else -> null
+        } ?: return
+
+        if (!canonicalSdkPath.exists()) {
+            // In the future, we might want to try a little harder to locate a canonical SDK path.
+            return
+        }
+
+        paths.forEach { path ->
+            val link = File(localSdkPath, path)
+            val target = File(canonicalSdkPath, path)
+            if (target.exists() && !link.exists()) {
+                Files.createSymbolicLink(link.toPath(), target.toPath())
+            }
+        }
+    }
+
+    /**
      * Launches Studio if the user accepts / has accepted the license agreement.
      */
     private fun launch() {
@@ -182,6 +213,10 @@ abstract class StudioTask : DefaultTask() {
                     """.trimIndent()
                 )
             }
+
+            // This seems like as good a time as any to set up SDK symlinks...
+            setupSymlinksIfNeeded()
+
             println("Launching studio...")
             launchStudio()
         } else {
