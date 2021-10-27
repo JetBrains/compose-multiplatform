@@ -41,7 +41,51 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="332"
+            line="233"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="fun &lt;T> mutableStateListOf(vararg elements: T) ="
+        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
+            line="233"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="fun &lt;T> mutableStateListOf(vararg elements: T) ="
+        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
+            line="233"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="fun &lt;T> mutableStateListOf(vararg elements: T) ="
+        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
+            line="233"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="fun &lt;T> mutableStateListOf(vararg elements: T) ="
+        errorLine2="        ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
+            line="233"
             column="9"/>
     </issue>
 
@@ -52,7 +96,51 @@
         errorLine2="                      ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="339"
+            line="240"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="fun &lt;T> Collection&lt;T>.toMutableStateList() = SnapshotStateList&lt;T>().also { it.addAll(this) }"
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
+            line="240"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="fun &lt;T> Collection&lt;T>.toMutableStateList() = SnapshotStateList&lt;T>().also { it.addAll(this) }"
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
+            line="240"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="fun &lt;T> Collection&lt;T>.toMutableStateList() = SnapshotStateList&lt;T>().also { it.addAll(this) }"
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
+            line="240"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="fun &lt;T> Collection&lt;T>.toMutableStateList() = SnapshotStateList&lt;T>().also { it.addAll(this) }"
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
+            line="240"
             column="23"/>
     </issue>
 
@@ -63,7 +151,51 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~">
         <location
             file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="361"
+            line="262"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="fun &lt;K, V> mutableStateMapOf(vararg pairs: Pair&lt;K, V>) ="
+        errorLine2="           ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
+            line="262"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="fun &lt;K, V> mutableStateMapOf(vararg pairs: Pair&lt;K, V>) ="
+        errorLine2="           ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
+            line="262"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="fun &lt;K, V> mutableStateMapOf(vararg pairs: Pair&lt;K, V>) ="
+        errorLine2="           ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
+            line="262"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="fun &lt;K, V> mutableStateMapOf(vararg pairs: Pair&lt;K, V>) ="
+        errorLine2="           ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
+            line="262"
             column="12"/>
     </issue>
 
@@ -74,7 +206,51 @@
         errorLine2="                                ~~~~~~~~~~~~~~~~~">
         <location
             file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
-            line="369"
+            line="270"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="fun &lt;K, V> Iterable&lt;Pair&lt;K, V>>.toMutableStateMap() ="
+        errorLine2="                                ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
+            line="270"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="fun &lt;K, V> Iterable&lt;Pair&lt;K, V>>.toMutableStateMap() ="
+        errorLine2="                                ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
+            line="270"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="fun &lt;K, V> Iterable&lt;Pair&lt;K, V>>.toMutableStateMap() ="
+        errorLine2="                                ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
+            line="270"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        message="Should explicitly declare type here since implicit type does not specify nullness"
+        errorLine1="fun &lt;K, V> Iterable&lt;Pair&lt;K, V>>.toMutableStateMap() ="
+        errorLine2="                                ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/runtime/SnapshotState.kt"
+            line="270"
             column="33"/>
     </issue>
 
