@@ -339,7 +339,7 @@ package androidx.compose.animation.core {
     method @androidx.compose.runtime.Composable public static androidx.compose.animation.core.InfiniteTransition rememberInfiniteTransition();
   }
 
-  @kotlin.RequiresOptIn(message="This API is internal to library.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface InternalAnimationApi {
+  @kotlin.RequiresOptIn(message="This API is internal to library.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.CLASS, kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY, kotlin.annotation.AnnotationTarget.FIELD, kotlin.annotation.AnnotationTarget.PROPERTY_GETTER}) public @interface InternalAnimationApi {
   }
 
   @androidx.compose.runtime.Immutable public final class KeyframesSpec<T> implements androidx.compose.animation.core.DurationBasedAnimationSpec<T> {

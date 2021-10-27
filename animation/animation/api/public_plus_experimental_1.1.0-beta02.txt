@@ -128,7 +128,7 @@ package androidx.compose.animation {
     property public final androidx.compose.animation.ExitTransition None;
   }
 
-  @kotlin.RequiresOptIn(message="This is an experimental animation API.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget, kotlin.annotation.AnnotationTarget}) public @interface ExperimentalAnimationApi {
+  @kotlin.RequiresOptIn(message="This is an experimental animation API.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.CLASS, kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY, kotlin.annotation.AnnotationTarget.FIELD, kotlin.annotation.AnnotationTarget.PROPERTY_GETTER}) public @interface ExperimentalAnimationApi {
   }
 
   public final class FlingCalculatorKt {
