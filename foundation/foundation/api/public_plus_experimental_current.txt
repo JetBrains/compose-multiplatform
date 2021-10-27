@@ -423,6 +423,10 @@ package androidx.compose.foundation.lazy {
     property public final int count;
   }
 
+  @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Immutable public final inline class GridItemSpan {
+    ctor public GridItemSpan();
+  }
+
   public final class IntervalListKt {
   }
 
@@ -435,17 +439,30 @@ package androidx.compose.foundation.lazy {
     method public static inline <T> void itemsIndexed(androidx.compose.foundation.lazy.LazyListScope, T![] items, optional kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,?>? key, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? super T,kotlin.Unit> itemContent);
   }
 
+  @androidx.compose.foundation.ExperimentalFoundationApi public interface LazyGridItemSpanScope {
+    method public int getItemColumn();
+    method public int getItemRow();
+    method public int getMaxCurrentLineSpan();
+    property public abstract int itemColumn;
+    property public abstract int itemRow;
+    property public abstract int maxCurrentLineSpan;
+  }
+
   public final class LazyGridKt {
     method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static void LazyVerticalGrid(androidx.compose.foundation.lazy.GridCells cells, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.lazy.LazyListState state, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional androidx.compose.foundation.layout.Arrangement.Vertical verticalArrangement, optional androidx.compose.foundation.layout.Arrangement.Horizontal horizontalArrangement, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyGridScope,kotlin.Unit> content);
-    method @androidx.compose.foundation.ExperimentalFoundationApi public static inline <T> void items(androidx.compose.foundation.lazy.LazyGridScope, java.util.List<? extends T> items, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super T,kotlin.Unit> itemContent);
-    method @androidx.compose.foundation.ExperimentalFoundationApi public static inline <T> void items(androidx.compose.foundation.lazy.LazyGridScope, T![] items, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super T,kotlin.Unit> itemContent);
-    method @androidx.compose.foundation.ExperimentalFoundationApi public static inline <T> void itemsIndexed(androidx.compose.foundation.lazy.LazyGridScope, java.util.List<? extends T> items, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? super T,kotlin.Unit> itemContent);
-    method @androidx.compose.foundation.ExperimentalFoundationApi public static inline <T> void itemsIndexed(androidx.compose.foundation.lazy.LazyGridScope, T![] items, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? super T,kotlin.Unit> itemContent);
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static inline <T> void items(androidx.compose.foundation.lazy.LazyGridScope, java.util.List<? extends T> items, optional kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyGridItemSpanScope,? super T,androidx.compose.foundation.lazy.GridItemSpan>? spans, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super T,kotlin.Unit> itemContent);
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static inline <T> void items(androidx.compose.foundation.lazy.LazyGridScope, T![] items, optional kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyGridItemSpanScope,? super T,androidx.compose.foundation.lazy.GridItemSpan>? spans, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super T,kotlin.Unit> itemContent);
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static inline <T> void itemsIndexed(androidx.compose.foundation.lazy.LazyGridScope, java.util.List<? extends T> items, optional kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyGridItemSpanScope,? super java.lang.Integer,? super T,androidx.compose.foundation.lazy.GridItemSpan>? spans, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? super T,kotlin.Unit> itemContent);
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static inline <T> void itemsIndexed(androidx.compose.foundation.lazy.LazyGridScope, T![] items, optional kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyGridItemSpanScope,? super java.lang.Integer,? super T,androidx.compose.foundation.lazy.GridItemSpan>? spans, kotlin.jvm.functions.Function3<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,? super T,kotlin.Unit> itemContent);
   }
 
   @androidx.compose.foundation.ExperimentalFoundationApi public interface LazyGridScope {
-    method public void item(kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyItemScope,kotlin.Unit> content);
-    method public void items(int count, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,kotlin.Unit> itemContent);
+    method public void item(optional kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyGridItemSpanScope,androidx.compose.foundation.lazy.GridItemSpan>? span, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyItemScope,kotlin.Unit> content);
+    method public void items(int count, optional kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyGridItemSpanScope,? super java.lang.Integer,androidx.compose.foundation.lazy.GridItemSpan>? span, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.lazy.LazyItemScope,? super java.lang.Integer,kotlin.Unit> itemContent);
+  }
+
+  public final class LazyGridSpanKt {
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static long GridItemSpan(int currentLineSpan);
   }
 
   @androidx.compose.foundation.lazy.LazyScopeMarker @androidx.compose.runtime.Stable public interface LazyItemScope {

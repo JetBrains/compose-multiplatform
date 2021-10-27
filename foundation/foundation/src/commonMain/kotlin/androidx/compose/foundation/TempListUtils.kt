@@ -69,3 +69,19 @@ internal inline fun <T, R> List<T>.fastMapIndexedNotNull(
     }
     return target
 }
+
+/**
+ * Returns the largest value among all values produced by selector function applied to each element
+ * in the collection or null if there are no elements.
+ */
+@OptIn(ExperimentalContracts::class)
+internal inline fun <T, R : Comparable<R>> List<T>.fastMaxOfOrNull(selector: (T) -> R): R? {
+    contract { callsInPlace(selector) }
+    if (isEmpty()) return null
+    var maxValue = selector(get(0))
+    for (i in 1..lastIndex) {
+        val v = selector(get(i))
+        if (v > maxValue) maxValue = v
+    }
+    return maxValue
+}
