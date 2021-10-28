@@ -19,6 +19,8 @@ package androidx.compose.material3.catalog.library.ui.theme
 import android.os.Build
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.darkColors
+import androidx.compose.material.lightColors
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
@@ -92,10 +94,15 @@ fun CatalogTheme(
         // TODO: M3 MaterialTheme doesn't provide LocalIndication, remove when it does
         LocalIndication provides rememberRipple()
     ) {
-        MaterialTheme(
-            colorScheme = colorScheme,
-            content = content,
-        )
+        // TODO: Remove M2 MaterialTheme when using only M3 components
+        androidx.compose.material.MaterialTheme(
+            colors = if (darkTheme) darkColors() else lightColors()
+        ) {
+            MaterialTheme(
+                colorScheme = colorScheme,
+                content = content,
+            )
+        }
     }
 }
 
