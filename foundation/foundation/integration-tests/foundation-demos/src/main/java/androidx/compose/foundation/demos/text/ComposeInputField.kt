@@ -39,6 +39,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 
 @Composable
 fun InputFieldDemo() {
@@ -71,6 +72,13 @@ fun InputFieldDemo() {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun DialogInputFieldDemo(onNavigateUp: () -> Unit) {
+    Dialog(onDismissRequest = onNavigateUp) {
+        InputFieldDemo()
     }
 }
 
