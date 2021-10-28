@@ -16,6 +16,7 @@
 
 package androidx.compose.material3.catalog.library.ui.theme
 
+import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -96,7 +97,11 @@ fun ThemePicker(
                     )
                 }
             }
-            Divider(modifier = Modifier.padding(horizontal = ThemePickerPadding))
+            // TODO: Replace with M3 Divider when available
+            Divider(
+                modifier = Modifier.padding(horizontal = ThemePickerPadding),
+                color = MaterialTheme.colorScheme.outline
+            )
         }
         item {
             Text(
@@ -133,7 +138,11 @@ fun ThemePicker(
                     )
                 }
             }
-            Divider(modifier = Modifier.padding(horizontal = ThemePickerPadding))
+            // TODO: Replace with M3 Divider when available
+            Divider(
+                modifier = Modifier.padding(horizontal = ThemePickerPadding),
+                color = MaterialTheme.colorScheme.outline
+            )
         }
         item {
             Text(
@@ -170,7 +179,11 @@ fun ThemePicker(
                     )
                 }
             }
-            Divider(modifier = Modifier.padding(horizontal = ThemePickerPadding))
+            // TODO: Replace with M3 Divider when available
+            Divider(
+                modifier = Modifier.padding(horizontal = ThemePickerPadding),
+                color = MaterialTheme.colorScheme.outline
+            )
         }
         item {
             Text(
@@ -231,9 +244,14 @@ private fun ColorModeItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(ThemePickerPadding)
     ) {
+        val enabled = when {
+            colorMode == ColorMode.Dynamic && Build.VERSION.SDK_INT < Build.VERSION_CODES.S -> false
+            else -> true
+        }
         // TODO: Replace with M3 RadioButton when available
         RadioButton(
             selected = selected,
+            enabled = enabled,
             onClick = { onClick(colorMode) },
             colors = RadioButtonDefaults.colors(
                 selectedColor = MaterialTheme.colorScheme.primary,
@@ -241,7 +259,7 @@ private fun ColorModeItem(
             ),
         )
         Text(
-            text = colorMode.toString(),
+            text = colorMode.label,
             style = MaterialTheme.typography.bodyMedium
         )
     }

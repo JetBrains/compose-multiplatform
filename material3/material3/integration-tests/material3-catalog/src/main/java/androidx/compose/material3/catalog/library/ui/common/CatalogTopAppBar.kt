@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -175,11 +176,11 @@ private fun MoreMenu(
         DropdownMenuItem(onClick = onSourceClick) {
             Text(stringResource(id = R.string.view_source_code))
         }
-        Divider()
+        Divider(color = MaterialTheme.colorScheme.outline)
         DropdownMenuItem(onClick = onIssueClick) {
             Text(stringResource(id = R.string.report_an_issue))
         }
-        Divider()
+        Divider(color = MaterialTheme.colorScheme.outline)
         DropdownMenuItem(onClick = onTermsClick) {
             Text(stringResource(id = R.string.terms_of_service))
         }
