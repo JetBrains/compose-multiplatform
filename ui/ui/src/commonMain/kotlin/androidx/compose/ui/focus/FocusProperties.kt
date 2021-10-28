@@ -16,16 +16,14 @@
 
 package androidx.compose.ui.focus
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.modifier.ModifierLocalConsumer
 import androidx.compose.ui.modifier.ModifierLocalProvider
 import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.node.ModifiedFocusNode
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
 
 /**
@@ -33,9 +31,17 @@ import androidx.compose.ui.platform.debugInspectorInfo
  *
  * @see [focusProperties]
  */
-internal val ModifierLocalFocusProperties = modifierLocalOf { defaultFocusProperties }
+internal val ModifierLocalFocusProperties =
+    modifierLocalOf<FocusProperties> { DefaultFocusProperties }
 
-internal val defaultFocusProperties: FocusProperties = FocusPropertiesImpl(canFocus = true)
+internal object DefaultFocusProperties : FocusProperties {
+    @Suppress("UNUSED_PARAMETER")
+    override var canFocus: Boolean
+        get() = true
+        set(value) {
+            error("Attempting to change DefaultFocusProperties")
+        }
+}
 
 /**
  * Properties that are applied to [focusTarget]s that can read the [ModifierLocalFocusProperties]
@@ -58,19 +64,22 @@ interface FocusProperties {
  *
  * @sample androidx.compose.ui.samples.FocusPropertiesSample
  */
-fun Modifier.focusProperties(scope: FocusProperties.() -> Unit): Modifier = composed(
-    debugInspectorInfo {
-        name = "focusProperties"
-        properties["scope"] = scope
-    }
-) {
-    val rememberedScope by rememberUpdatedState(scope)
-    remember { FocusPropertiesModifier(focusPropertiesScope = rememberedScope) }
-}
+fun Modifier.focusProperties(scope: FocusProperties.() -> Unit): Modifier = this.then(
+    FocusPropertiesModifier(
+        focusPropertiesScope = scope,
+        inspectorInfo = debugInspectorInfo {
+            name = "focusProperties"
+            properties["scope"] = scope
+        }
+    )
+)
 
 internal class FocusPropertiesModifier(
-    val focusPropertiesScope: FocusProperties.() -> Unit
-) : ModifierLocalConsumer, ModifierLocalProvider<FocusProperties> {
+    val focusPropertiesScope: FocusProperties.() -> Unit,
+    inspectorInfo: InspectorInfo.() -> Unit
+) : ModifierLocalConsumer,
+    ModifierLocalProvider<FocusProperties>,
+    InspectorValueInfo(inspectorInfo) {
 
     private var parentFocusProperties: FocusProperties? = null
 
@@ -81,25 +90,33 @@ internal class FocusPropertiesModifier(
     override val key = ModifierLocalFocusProperties
 
     override val value: FocusProperties
-        get() = defaultFocusProperties.copy {
-            // Populate with the specified focus properties.
-            apply(focusPropertiesScope)
-
-            // current value for deactivated can be overridden by a parent's value.
-            parentFocusProperties?.let {
-                if (it != defaultFocusProperties) {
-                    canFocus = it.canFocus
-                }
+        get() {
+            // Start with default focus properties.
+            val properties = object : FocusProperties {
+                override var canFocus: Boolean = DefaultFocusProperties.canFocus
             }
+
+            // Populate with the specified focus properties.
+            properties.apply(focusPropertiesScope)
+
+            // Current focus properties can be overridden by a parent's value, unless the parent's
+            // properties are DefaultFocusProperties (The previous focus modifier sets the modifier
+            // local to the DefaultFocusProperties to prevent the propagation of its focus
+            // properties to its children).
+            val parentProperties = parentFocusProperties
+            if (parentProperties != null && parentProperties != DefaultFocusProperties) {
+                properties.canFocus = parentProperties.canFocus
+            }
+
+            return properties
         }
+
+    override fun equals(other: Any?) =
+        other is FocusPropertiesModifier && focusPropertiesScope == other.focusPropertiesScope
+
+    override fun hashCode() = focusPropertiesScope.hashCode()
 }
 
 internal fun ModifiedFocusNode.setUpdatedProperties(properties: FocusProperties) {
     if (properties.canFocus) activateNode() else deactivateNode()
-}
-
-private class FocusPropertiesImpl(override var canFocus: Boolean) : FocusProperties
-
-private fun FocusProperties.copy(scope: FocusProperties.() -> Unit): FocusProperties {
-    return FocusPropertiesImpl(canFocus = canFocus).apply(scope)
 }
