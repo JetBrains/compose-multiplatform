@@ -1,5 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.getCurrentOperatingSystem
+import java.util.zip.ZipFile
 
 plugins {
     kotlin("jvm")
@@ -38,7 +39,9 @@ sourceSets.main.configure {
     java.srcDir(buildConfigDir)
 }
 
-val embeddedDependencies by configurations.creating
+val embeddedDependencies by configurations.creating {
+    isTransitive = false
+}
 
 dependencies {
     // By default, Gradle resolves plugins only via Gradle Plugin Portal.
@@ -95,6 +98,35 @@ val javaHomeForTests: String? = when {
 val isWindows = getCurrentOperatingSystem().isWindows
 
 val gradleTestsPattern = "org.jetbrains.compose.gradle.*"
+
+// check we don't accidentally including unexpected classes (e.g. from embedded dependencies)
+val checkJar by tasks.registering {
+    dependsOn(jar)
+
+    doLast {
+        val file = jar.get().archiveFile.get().asFile
+        ZipFile(file).use { zip ->
+            val nonJbComposeClasses = zip.entries().asIterator().asSequence().filter {
+                !it.isDirectory
+                        && it.name.endsWith(".class")
+                        && !it.name.startsWith("org/jetbrains/compose")
+            }.toList()
+            if (nonJbComposeClasses.any()) {
+                error(buildString {
+                    appendLine("Some classes from $file are not from 'org.jetbrains.compose' package:")
+                    for (entry in nonJbComposeClasses) {
+                        appendLine("  * ${entry.name}")
+                    }
+                })
+            }
+        }
+    }
+}
+
+tasks.check {
+    dependsOn(checkJar)
+}
+
 tasks.test {
     dependsOn(jar)
     classpath = project.files(jar.map { it.archiveFile }) + classpath
