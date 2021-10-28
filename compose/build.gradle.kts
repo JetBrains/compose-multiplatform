@@ -1,6 +1,7 @@
 val composeBuild = gradle.includedBuild("support")
 fun Task.dependsOnComposeTask(name: String) = dependsOn(composeBuild.task(name))
 
+val isOelPublication = project.findProperty("oel.publication") == "true"
 val isWebExist = composeBuild.projectDir.resolve(".jbWebExistsMarker").exists()
 
 // To show all projects which use `xxx` task, run:
@@ -42,8 +43,11 @@ tasks.register("publishComposeJb") {
     ).forEach {
         dependsOnComposeTask("$it:publishKotlinMultiplatformPublicationToMavenRepository")
         dependsOnComposeTask("$it:publishDesktopPublicationToMavenRepository")
-        dependsOnComposeTask("$it:publishAndroidDebugPublicationToMavenRepository")
-        dependsOnComposeTask("$it:publishAndroidReleasePublicationToMavenRepository")
+
+        if (!isOelPublication) {
+            dependsOnComposeTask("$it:publishAndroidDebugPublicationToMavenRepository")
+            dependsOnComposeTask("$it:publishAndroidReleasePublicationToMavenRepository")
+        }
     }
 
     if (isWebExist) {
@@ -63,8 +67,11 @@ tasks.register("publishComposeJbExtendedIcons") {
     ).forEach {
         dependsOnComposeTask("$it:publishKotlinMultiplatformPublicationToMavenRepository")
         dependsOnComposeTask("$it:publishDesktopPublicationToMavenRepository")
-        dependsOnComposeTask("$it:publishAndroidDebugPublicationToMavenRepository")
-        dependsOnComposeTask("$it:publishAndroidReleasePublicationToMavenRepository")
+
+        if (!isOelPublication) {
+            dependsOnComposeTask("$it:publishAndroidDebugPublicationToMavenRepository")
+            dependsOnComposeTask("$it:publishAndroidReleasePublicationToMavenRepository")
+        }
     }
 }
 
@@ -99,7 +106,7 @@ tasks.register("testRuntimeNative") {
 }
 
 tasks.register("testComposeModules") { // used in https://github.com/JetBrains/androidx/tree/jb-main/.github/workflows
-    // TODO: donwload robolectrict to run ui:ui:test
+    // TODO: download robolectrict to run ui:ui:test
     // dependsOnComposeTask(":compose:ui:ui:test")
 
     dependsOnComposeTask(":compose:ui:ui-graphics:test")
