@@ -19,12 +19,12 @@ dependencies {
     kotlinPlugin(project(":compose:compiler:compiler"))
 
     implementation(libs.kotlinStdlib)
+    implementation(project(":activity:activity-compose"))
     implementation(project(":compose:foundation:foundation-layout"))
     implementation(project(":compose:material:material"))
     implementation(project(":compose:runtime:runtime"))
     implementation(project(":compose:ui:ui"))
     implementation(project(":compose:ui:ui-tooling"))
-    implementation("androidx.activity:activity-compose:1.3.1")
 }
 
 android.defaultConfig.minSdkVersion 21
