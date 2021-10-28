@@ -15,11 +15,6 @@ import java.awt.event.MouseEvent
 @OptIn(ExperimentalComposeUiApi::class)
 fun ComposeScene.subscribeToGLFWEvents(windowHandle: Long) {
     glfwSetMouseButtonCallback(windowHandle) { _, button, action, mods ->
-        when (action) {
-            GLFW_PRESS -> PointerEventType.Press
-            GLFW_RELEASE -> PointerEventType.Release
-            else -> PointerEventType.Unknown
-        }
         sendPointerEvent(
             position = glfwGetCursorPos(windowHandle),
             eventType = when (action) {
