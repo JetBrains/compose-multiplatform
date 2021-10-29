@@ -628,26 +628,6 @@ class AndroidXImplPlugin : Plugin<Project> {
         }
     }
 
-    private fun Project.createVerifyDependencyVersionsTask():
-        TaskProvider<VerifyDependencyVersionsTask>? {
-            /**
-             * Ignore -Pandroidx.useMaxDepVersions when verifying dependency versions because it is a
-             * hypothetical build which is only intended to check for forward compatibility.
-             */
-            if (project.usingMaxDepVersions()) {
-                return null
-            }
-
-            val taskProvider = tasks.register(
-                "verifyDependencyVersions",
-                VerifyDependencyVersionsTask::class.java
-            ) { task ->
-                task.version.set(project.version.toString())
-            }
-            addToBuildOnServer(taskProvider)
-            return taskProvider
-        }
-
     // Task that creates a json file of a project's dependencies
     private fun Project.addCreateLibraryBuildInfoFileTask(extension: AndroidXExtension) {
         afterEvaluate {
