@@ -16,7 +16,9 @@
 
 package androidx.build.jetpad;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Object outlining the format of a library's build info file.
@@ -52,11 +54,27 @@ public class LibraryBuildInfoFile {
     /**
      * @property isTipOfTree boolean that specifies whether the dependency is tip-of-tree
      */
-    public class Dependency {
+    public static class Dependency implements Serializable {
         public String groupId;
         public String artifactId;
         public String version;
         public boolean isTipOfTree;
+        public static final long serialVersionUID = 12345L;
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Dependency that = (Dependency) o;
+            return isTipOfTree == that.isTipOfTree && groupId.equals(that.groupId)
+                    && artifactId.equals(
+                    that.artifactId) && version.equals(that.version);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(groupId, artifactId, version, isTipOfTree);
+        }
     }
 
     public class Check {
