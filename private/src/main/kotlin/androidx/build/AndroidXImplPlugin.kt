@@ -534,10 +534,9 @@ class AndroidXImplPlugin : Plugin<Project> {
         packageApplicationProvider.get().let { packageTask ->
             AffectedModuleDetector.configureTaskGuard(packageTask)
             // Skip copying AndroidTest apks if they have no source code (no tests to run).
-            if (testApk && !project.hasAndroidTestSourceCode()) {
-                return
+            if (!testApk || project.hasAndroidTestSourceCode()) {
+                addToTestZips(project, packageTask)
             }
-            addToTestZips(project, packageTask)
         }
         project.tasks.withType(ListingFileRedirectTask::class.java).forEach {
             AffectedModuleDetector.configureTaskGuard(it)
