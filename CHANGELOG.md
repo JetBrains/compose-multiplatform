@@ -8,7 +8,8 @@
 - Accessability support on MacOS
 - Smart rendering fallback logic (no crashes on bad hardware/drivers anymore)
 - Performance improvement of software rendering (up to 100%)
-- Transparent window support 
+- Transparent window support
+- `clickable` and `toggleable` components have a hoverable indication
 
 ### API changes
 - DesktopMaterialTheme is deprecated, use MaterialTheme instead
@@ -17,7 +18,7 @@
 - Modifier.mouseScrollFilter marked as Experimental, this API will likely change in the future
 
 ### API breaking changes
-- Old Window API (AppWindow, AppManager), was removed
+- Old Window API (AppWindow, AppManager) was removed
 - Modifier.pointerIcon is replaced with Modifier.pointerHoverIcon
 - Tray can be used only inside ApplicationScope now
 - Tray(hint=) replaced with Tray(tooltip=)
