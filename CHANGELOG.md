@@ -1,3 +1,37 @@
+# 1.0.0-beta (Oct 2021)
+## Common
+- no Android artifacts are published anymore. Google-published artifacts are referenced instead. This approach eliminates compatibility issues.
+
+## Desktop
+
+### Features
+- Accessability support on MacOS
+- Smart rendering fallback logic (no crashes on bad hardware/drivers anymore)
+- Performance improvement of software rendering (up to 100%)
+- Transparent window support
+- `clickable` and `toggleable` components have a hoverable indication
+
+### API changes
+- DesktopMaterialTheme is deprecated, use MaterialTheme instead
+- WindowSize is deprecated, use DpSize instead
+- Modifier.pointerMoveFilter marked as Experimental, stable alternatives are Modifier.hoverable or Modifier.pointerInput
+- Modifier.mouseScrollFilter marked as Experimental, this API will likely change in the future
+
+### API breaking changes
+- Old Window API (AppWindow, AppManager) was removed
+- Modifier.pointerIcon is replaced with Modifier.pointerHoverIcon
+- Tray can be used only inside ApplicationScope now
+- Tray(hint=) replaced with Tray(tooltip=)
+
+## Web
+
+### Features
+- SVG support
+
+### API changes
+- Controlled Inputs were added
+- New API for testing - test-utils was added 
+
 # 1.0.0-alpha (Aug 2021)
 ## Common
 - Desktop, Web, and Android artifacts publish at the same time with the same version
@@ -23,7 +57,7 @@
 - classes from `android.compose.desktop.*` moved to `androidx.compose.ui.awt.*` (ComposeWindow, ComposePanel, etc)
 - `svgResource`/`vectorXmlResource`/`imageResource` replaced by painterResource
 
-### API breaking changes:
+### API breaking changes
 - Window level keyboard API for the old Window API removed
 - Window(icon: BufferedImage) replaced by Window(icon: Painter)
 - ContextMenu renamed to CursorDropdownMenu
