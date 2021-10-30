@@ -21,7 +21,7 @@ import androidx.build.AndroidXImplPlugin.Companion.ZIP_TEST_CONFIGS_WITH_APKS_TA
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.gradle.isRoot
 import androidx.build.license.CheckExternalDependencyLicensesTask
-import androidx.build.playground.VerifyPlaygroundGradlePropertiesTask
+import androidx.build.playground.VerifyPlaygroundGradleConfigurationTask
 import androidx.build.studio.StudioTask.Companion.registerStudioTask
 import androidx.build.testConfiguration.registerOwnersServiceTasks
 import androidx.build.uptodatedness.TaskUpToDateValidator
@@ -38,7 +38,6 @@ import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.kotlin.dsl.KotlinClosure1
-import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.extra
 import java.io.File
 import java.util.Locale
@@ -93,7 +92,7 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
             tasks.register(AndroidXImplPlugin.CREATE_LIBRARY_BUILD_INFO_FILES_TASK)
         )
 
-        VerifyPlaygroundGradlePropertiesTask.createIfNecessary(project)?.let {
+        VerifyPlaygroundGradleConfigurationTask.createIfNecessary(project)?.let {
             buildOnServerTask.dependsOn(it)
         }
 
