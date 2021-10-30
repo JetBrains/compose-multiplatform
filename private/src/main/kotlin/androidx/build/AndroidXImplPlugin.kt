@@ -248,15 +248,25 @@ class AndroidXImplPlugin : Plugin<Project> {
 
     @Suppress("UnstableApiUsage") // AGP DSL APIs
     private fun configureWithAppPlugin(project: Project, androidXExtension: AndroidXExtension) {
-        val appExtension = project.extensions.getByType<AppExtension>().apply {
+        project.extensions.getByType<AppExtension>().apply {
             configureAndroidBaseOptions(project, androidXExtension)
             configureAndroidApplicationOptions(project)
         }
 
         project.extensions.getByType<ApplicationAndroidComponentsExtension>().apply {
             onVariants { it.configureLicensePackaging() }
+            finalizeDsl {
+                project.configureAndroidProjectForLint(it.lint, androidXExtension)
+                it.lint {
+                    abortOnError = true
+
+                    val baselineFile = project.lintBaseline
+                    if (baselineFile.exists()) {
+                        baseline = baselineFile
+                    }
+                }
+            }
         }
-        project.configureAndroidProjectForLint(appExtension.lintOptions, androidXExtension)
     }
 
     private fun configureWithTestPlugin(
@@ -305,6 +315,7 @@ class AndroidXImplPlugin : Plugin<Project> {
                 variant.enableUnitTest = false
             }
             onVariants { it.configureLicensePackaging() }
+            finalizeDsl { project.configureAndroidProjectForLint(it.lint, androidXExtension) }
         }
 
         project.configurePublicResourcesStub(libraryExtension)
@@ -333,8 +344,7 @@ class AndroidXImplPlugin : Plugin<Project> {
             }
         }
 
-        // Standard lint, docs, resource API, and Metalava configuration for AndroidX projects.
-        project.configureAndroidProjectForLint(libraryExtension.lintOptions, androidXExtension)
+        // Standard docs, resource API, and Metalava configuration for AndroidX projects.
         project.configureProjectForApiTasks(
             LibraryApiTaskConfig(libraryExtension),
             androidXExtension
@@ -588,16 +598,6 @@ class AndroidXImplPlugin : Plugin<Project> {
         defaultConfig.apply {
             versionCode = 1
             versionName = "1.0"
-        }
-
-        @Suppress("DEPRECATION") // lintOptions methods
-        lintOptions.apply {
-            isAbortOnError = true
-
-            val baseline = project.lintBaseline
-            if (baseline.exists()) {
-                baseline(baseline)
-            }
         }
 
         project.addAppApkToTestConfigGeneration()
