@@ -66,6 +66,7 @@ import androidx.compose.ui.demos.viewinterop.EditTextInteropDemo
 import androidx.compose.ui.demos.viewinterop.FocusTransferDemo
 import androidx.compose.ui.demos.viewinterop.ViewInteropDemo
 import androidx.compose.ui.samples.NestedScrollConnectionSample
+import androidx.compose.ui.demos.recyclerview.RecyclerViewDemos
 
 private val GestureDemos = DemoCategory(
     "Gestures",
@@ -189,5 +190,6 @@ val CoreDemos = DemoCategory(
         GestureDemos,
         ViewInteropDemos,
         ComposableDemo("Software Keyboard Controller") { SoftwareKeyboardControllerDemo() },
+        RecyclerViewDemos
     )
 )
