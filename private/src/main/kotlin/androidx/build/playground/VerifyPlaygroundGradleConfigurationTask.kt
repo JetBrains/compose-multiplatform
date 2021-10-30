@@ -16,6 +16,7 @@
 
 package androidx.build.playground
 
+import com.google.common.annotations.VisibleForTesting
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -28,26 +29,66 @@ import java.io.File
 import java.util.Properties
 
 /**
- * Compares the properties file for playground projects with the main androidx properties file
+ * Compares the playground Gradle configuration with the main androidx Gradle configuration
  * to ensure playgrounds do not define any property in their own build that conflicts with the
  * main build.
  */
-@Suppress("UnstableApiUsage") // for fileProperty
-abstract class VerifyPlaygroundGradlePropertiesTask : DefaultTask() {
+abstract class VerifyPlaygroundGradleConfigurationTask : DefaultTask() {
     @get:InputFile
     abstract val androidxProperties: RegularFileProperty
 
     @get:InputFile
     abstract val playgroundProperties: RegularFileProperty
 
+    @get:InputFile
+    abstract val androidxGradleWrapper: RegularFileProperty
+
+    @get:InputFile
+    abstract val playgroundGradleWrapper: RegularFileProperty
+
     @get:OutputFile
     abstract val outputFile: RegularFileProperty
 
     @TaskAction
-    fun compareProperties() {
+    fun checkPlaygroundGradleConfiguration() {
+        compareProperties()
+        compareGradleWrapperVersion()
+        // put the success into an output so that task can be up to date.
+        outputFile.get().asFile.writeText("valid", Charsets.UTF_8)
+    }
+
+    private fun compareProperties() {
         val rootProperties = loadPropertiesFile(androidxProperties.get().asFile)
         val playgroundProperties = loadPropertiesFile(playgroundProperties.get().asFile)
         validateProperties(rootProperties, playgroundProperties)
+    }
+
+    private fun compareGradleWrapperVersion() {
+        val androidxGradleVersion = readGradleVersionFromWrapperProperties(
+            androidxGradleWrapper.get().asFile
+        )
+        val playgroundGradleVersion = readGradleVersionFromWrapperProperties(
+            playgroundGradleWrapper.get().asFile
+        )
+        if (androidxGradleVersion != playgroundGradleVersion) {
+            throw GradleException("""
+                Playground gradle version ($playgroundGradleVersion) must match the AndroidX main
+                build gradle version ($androidxGradleVersion).
+            """.trimIndent())
+        }
+    }
+
+    private fun readGradleVersionFromWrapperProperties(
+        file: File
+    ): String {
+        val distributionUrl = loadPropertiesFile(file).getProperty("distributionUrl")
+        checkNotNull(distributionUrl) {
+            "cannot read distribution url from gradle wrapper file: ${file.canonicalPath}"
+        }
+        val gradleVersion = extractGradleVersion(distributionUrl)
+        return checkNotNull(gradleVersion) {
+            "Failed to extract gradle version from gradle wrapper file. Input: $distributionUrl"
+        }
     }
 
     private fun validateProperties(
@@ -56,7 +97,7 @@ abstract class VerifyPlaygroundGradlePropertiesTask : DefaultTask() {
     ) {
         // ensure we don't define properties that do not match the root file
         // this includes properties that are not defined in the root androidx build as they might
-        // be properties which can alter the build output. We might consider whitelisting certain
+        // be properties which can alter the build output. We might consider allow listing certain
         // properties in the future if necessary.
         playgroundProperties.forEach {
             val rootValue = rootProperties[it.key]
@@ -71,8 +112,6 @@ abstract class VerifyPlaygroundGradlePropertiesTask : DefaultTask() {
                 )
             }
         }
-        // put the success into an output so that task can be up to date.
-        outputFile.get().asFile.writeText("valid", Charsets.UTF_8)
     }
 
     private fun loadPropertiesFile(file: File) = file.inputStream().use { inputStream ->
@@ -82,7 +121,20 @@ abstract class VerifyPlaygroundGradlePropertiesTask : DefaultTask() {
     }
 
     companion object {
-        private const val TASK_NAME = "verifyPlaygroundGradleProperties"
+        private const val TASK_NAME = "verifyPlaygroundGradleConfiguration"
+
+        /**
+         * Regular expression to extract the gradle version from a distributionUrl property.
+         * Sample input looks like: <some-path>/gradle-7.3-rc-2-all.zip
+         */
+        private val GRADLE_VERSION_REGEX = """/gradle-(.+)-(all|bin)\.zip$""".toRegex()
+
+        @VisibleForTesting // make it accessible for buildSrc-tests
+        fun extractGradleVersion(
+            distributionUrl: String
+        ): String? {
+            return GRADLE_VERSION_REGEX.find(distributionUrl)?.groupValues?.getOrNull(1)
+        }
 
         /**
          * Creates the task to verify playground properties if an only if we have the
@@ -90,11 +142,11 @@ abstract class VerifyPlaygroundGradlePropertiesTask : DefaultTask() {
          */
         fun createIfNecessary(
             project: Project
-        ): TaskProvider<VerifyPlaygroundGradlePropertiesTask>? {
+        ): TaskProvider<VerifyPlaygroundGradleConfigurationTask>? {
             return if (project.projectDir.resolve("playground-common").exists()) {
                 project.tasks.register(
                     TASK_NAME,
-                    VerifyPlaygroundGradlePropertiesTask::class.java
+                    VerifyPlaygroundGradleConfigurationTask::class.java
                 ) {
                     it.androidxProperties.set(
                         project.layout.projectDirectory.file("gradle.properties")
@@ -102,6 +154,16 @@ abstract class VerifyPlaygroundGradlePropertiesTask : DefaultTask() {
                     it.playgroundProperties.set(
                         project.layout.projectDirectory.file(
                             "playground-common/androidx-shared.properties"
+                        )
+                    )
+                    it.androidxGradleWrapper.set(
+                        project.layout.projectDirectory.file(
+                            "gradle/wrapper/gradle-wrapper.properties"
+                        )
+                    )
+                    it.playgroundGradleWrapper.set(
+                        project.layout.projectDirectory.file(
+                            "playground-common/gradle/wrapper/gradle-wrapper.properties"
                         )
                     )
                     it.outputFile.set(
