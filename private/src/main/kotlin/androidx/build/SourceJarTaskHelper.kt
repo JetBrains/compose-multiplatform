@@ -32,46 +32,27 @@ import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.named
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
-import java.util.Locale
 
 /**
  * Sets up a source jar task for an Android library project.
  */
 fun Project.configureSourceJarForAndroid(extension: LibraryExtension) {
-    extension.defaultPublishVariant { variant ->
-        val sourceJar = tasks.register(
-            "sourceJar${variant.name.replaceFirstChar {
-                if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
-            }}",
-            Jar::class.java
-        ) {
-            it.archiveClassifier.set("sources")
-            it.from(extension.sourceSets.getByName("main").java.srcDirs)
-            // Do not allow source files with duplicate names, information would be lost otherwise.
-            it.duplicatesStrategy = DuplicatesStrategy.FAIL
-        }
-        registerSourcesVariant(sourceJar)
+    val sourceJar = tasks.register("sourceJar", Jar::class.java) {
+        it.archiveClassifier.set("sources")
+        it.from(extension.sourceSets.getByName("main").java.srcDirs)
+        // Do not allow source files with duplicate names, information would be lost otherwise.
+        it.duplicatesStrategy = DuplicatesStrategy.FAIL
     }
+    registerSourcesVariant(sourceJar)
     project.afterEvaluate {
         // we can only tell if a project is multiplatform after it is configured
         if (it.multiplatformExtension != null && it.extra.has("publish")) {
-            extension.defaultPublishVariant { variant ->
-                val kotlinExt = project.extensions.getByName("kotlin") as KotlinProjectExtension
-                val sourceJar =
-                    project.tasks.named(
-                        "sourceJar${variant.name.replaceFirstChar {
-                            if (it.isLowerCase()) {
-                                it.titlecase(Locale.getDefault())
-                            } else it.toString()
-                        }}",
-                        Jar::class.java
-                    )
-                // multiplatform projects use different source sets, so we need to modify the task
-                sourceJar.configure { sourceJarTask ->
-                    // use an inclusion list of source sets, because that is the preferred policy
-                    sourceJarTask.from(kotlinExt.sourceSets.getByName("commonMain").kotlin.srcDirs)
-                    sourceJarTask.from(kotlinExt.sourceSets.getByName("androidMain").kotlin.srcDirs)
-                }
+            val kotlinExt = project.extensions.getByName("kotlin") as KotlinProjectExtension
+            // multiplatform projects use different source sets, so we need to modify the task
+            sourceJar.configure { sourceJarTask ->
+                // use an inclusion list of source sets, because that is the preferred policy
+                sourceJarTask.from(kotlinExt.sourceSets.getByName("commonMain").kotlin.srcDirs)
+                sourceJarTask.from(kotlinExt.sourceSets.getByName("androidMain").kotlin.srcDirs)
             }
         }
     }
