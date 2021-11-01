@@ -126,28 +126,27 @@ class AndroidXComposeImplPlugin : Plugin<Project> {
             extensions.findByType(AndroidComponentsExtension::class.java)!!.finalizeDsl {
                 val isPublished = androidxExtension()?.type == LibraryType.PUBLISHED_LIBRARY
 
-                @Suppress("DEPRECATION") // lintOptions methods
-                testedExtension.lintOptions.apply {
+                it.lint {
                     // Too many Kotlin features require synthetic accessors - we want to rely on R8 to
                     // remove these accessors
-                    disable("SyntheticAccessor")
+                    disable.add("SyntheticAccessor")
                     // These lint checks are normally a warning (or lower), but we ignore (in AndroidX)
                     // warnings in Lint, so we make it an error here so it will fail the build.
                     // Note that this causes 'UnknownIssueId' lint warnings in the build log when
                     // Lint tries to apply this rule to modules that do not have this lint check, so
                     // we disable that check too
-                    disable("UnknownIssueId")
-                    error("ComposableNaming")
-                    error("ComposableLambdaParameterNaming")
-                    error("ComposableLambdaParameterPosition")
-                    error("CompositionLocalNaming")
-                    error("ComposableModifierFactory")
-                    error("InvalidColorHexValue")
-                    error("MissingColorAlphaChannel")
-                    error("ModifierFactoryReturnType")
-                    error("ModifierFactoryExtensionFunction")
-                    error("ModifierParameter")
-                    error("UnnecessaryComposedModifier")
+                    disable.add("UnknownIssueId")
+                    error.add("ComposableNaming")
+                    error.add("ComposableLambdaParameterNaming")
+                    error.add("ComposableLambdaParameterPosition")
+                    error.add("CompositionLocalNaming")
+                    error.add("ComposableModifierFactory")
+                    error.add("InvalidColorHexValue")
+                    error.add("MissingColorAlphaChannel")
+                    error.add("ModifierFactoryReturnType")
+                    error.add("ModifierFactoryExtensionFunction")
+                    error.add("ModifierParameter")
+                    error.add("UnnecessaryComposedModifier")
 
                     // Paths we want to enable ListIterator checks for - for higher level
                     // libraries it won't have a noticeable performance impact, and we don't want
@@ -174,7 +173,7 @@ class AndroidXComposeImplPlugin : Plugin<Project> {
                         ignoreListIteratorFilter.any { path.contains(it) } ||
                         !isPublished
                     ) {
-                        disable("ListIterator")
+                        disable.add("ListIterator")
                     }
                 }
             }
