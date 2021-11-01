@@ -46,7 +46,6 @@ object ResourceTasks {
                     if (it.isLowerCase()) it.titlecase(Locale.US) else it.toString()
                 }}Resources"
             )
-        @Suppress("UnstableApiUsage") // flatMap
         val builtApiFile = packageResTask.flatMap { task ->
             (task as com.android.build.gradle.tasks.MergeResources).publicFile
         }
@@ -69,7 +68,6 @@ object ResourceTasks {
         // Policy: If the artifact has previously been released, e.g. has a beta or later API file
         // checked in, then we must verify "release compatibility" against the work-in-progress
         // API file.
-        @Suppress("UnstableApiUsage") // flatMap
         val checkResourceApiRelease = project.getRequiredCompatibilityApiLocation()?.let {
             lastReleasedApiFile ->
             project.tasks.register(
@@ -88,7 +86,6 @@ object ResourceTasks {
         // Policy: All changes to API surfaces for which compatibility is enforced must be
         // explicitly confirmed by running the updateApi task. To enforce this, the implementation
         // checks the "work-in-progress" built API file against the checked in current API file.
-        @Suppress("UnstableApiUsage") // flatMap
         val checkResourceApi = project.tasks.register(
             CHECK_RESOURCE_API_TASK,
             CheckResourceApiTask::class.java
@@ -107,7 +104,6 @@ object ResourceTasks {
             AffectedModuleDetector.configureTaskGuard(task)
         }
 
-        @Suppress("UnstableApiUsage") // flatMap
         val updateResourceApi = project.tasks.register(
             UPDATE_RESOURCE_API_TASK,
             UpdateResourceApiTask::class.java
@@ -119,7 +115,7 @@ object ResourceTasks {
             task.dependsOn(generateResourceApi)
             task.outputApiLocations.set(outputApiLocations)
             task.forceUpdate.set(
-                project.providers.gradleProperty("force").forUseAtConfigurationTime().isPresent()
+                project.providers.gradleProperty("force").forUseAtConfigurationTime().isPresent
             )
             checkResourceApiRelease?.let {
                 // If a developer (accidentally) makes a non-backwards compatible change to an
