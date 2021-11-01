@@ -34,7 +34,7 @@ fun Project.writeSdkPathToLocalPropertiesFile() {
         // Gradle always separates directories with '/' regardless of the OS, so convert here.
         val gradlePath = sdkPath.absolutePath.replace(File.separator, "/")
         var expectedContents = "sdk.dir=$gradlePath"
-        expectedContents += "\ncmake.dir=$gradlePath/cmake"
+        expectedContents += "\ncmake.dir=$gradlePath/native-build-tools"
         if (!props.exists() || props.readText(Charsets.UTF_8).trim() != expectedContents) {
             props.printWriter().use { out ->
                 out.println(expectedContents)
