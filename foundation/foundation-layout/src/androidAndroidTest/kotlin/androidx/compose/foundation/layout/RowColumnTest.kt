@@ -2795,6 +2795,41 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(latch.await(1, TimeUnit.SECONDS))
     }
+
+    @Test
+    fun testRow_withSpacedByArrangement_rtl() = with(density) {
+        val spacePx = 10f
+        val space = spacePx.toDp()
+        val bufferPx = 15f
+        val buffer = bufferPx.toDp()
+        val sizePx = 20f
+        val size = sizePx.toDp()
+        val latch = CountDownLatch(2)
+        show {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                Column {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(space),
+                        modifier = Modifier.requiredWidth(size * 2 + space + buffer)
+                    ) {
+                        Box(
+                            Modifier.requiredSize(size).onGloballyPositioned {
+                                assertEquals(sizePx + spacePx + bufferPx, it.positionInParent().x)
+                                latch.countDown()
+                            }
+                        )
+                        Box(
+                            Modifier.requiredSize(size).onGloballyPositioned {
+                                assertEquals(bufferPx, it.positionInParent().x)
+                                latch.countDown()
+                            }
+                        )
+                    }
+                }
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+    }
     // endregion
 
     // region Main axis alignment tests in Column
@@ -3330,6 +3365,41 @@ class RowColumnTest : LayoutTest() {
         assertTrue(layoutLatch.await(1, TimeUnit.SECONDS))
 
         assertEquals(IntSize(childSize, childSize), containerSize.value)
+    }
+
+    @Test
+    fun testColumn_withSpacedByArrangement_rtl() = with(density) {
+        val spacePx = 10f
+        val space = spacePx.toDp()
+        val sizePx = 20f
+        val size = sizePx.toDp()
+        val latch = CountDownLatch(2)
+        show {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                // Nothing should change compared to the same ltr test. (just the size of the
+                // Column as we are doing fillMaxHeight()).
+                Row {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(space),
+                        modifier = Modifier.fillMaxHeight()
+                    ) {
+                        Box(
+                            Modifier.requiredSize(size).onGloballyPositioned {
+                                assertEquals(0f, it.positionInParent().x)
+                                latch.countDown()
+                            }
+                        )
+                        Box(
+                            Modifier.requiredSize(size).onGloballyPositioned {
+                                assertEquals(sizePx + spacePx, it.positionInParent().y)
+                                latch.countDown()
+                            }
+                        )
+                    }
+                }
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
     }
     // endregion
 
