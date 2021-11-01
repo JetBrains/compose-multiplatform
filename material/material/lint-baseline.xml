@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.2.0-dev" type="baseline" client="gradle" dependencies="false" name="AGP (7.2.0-dev)" variant="all" version="7.2.0-dev">
+<issues format="6" by="lint 7.1.0-alpha08" type="baseline" client="gradle" dependencies="false" name="AGP (7.1.0-alpha08)" variant="all" version="7.1.0-alpha08">
 
     <issue
         id="NewApi"
@@ -8,41 +8,8 @@
         errorLine2="             ~~~~~~~~~~~~~~">
         <location
             file="src/androidAndroidTest/kotlin/androidx/compose/material/BadgeTest.kt"
-            line="125"
+            line="124"
             column="14"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="    val colors: Colors"
-        errorLine2="        ~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/material/MaterialTheme.kt"
-            line="100"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="    val typography: Typography"
-        errorLine2="        ~~~~~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/material/MaterialTheme.kt"
-            line="110"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="    val shapes: Shapes"
-        errorLine2="        ~~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/material/MaterialTheme.kt"
-            line="118"
-            column="9"/>
     </issue>
 
 </issues>
