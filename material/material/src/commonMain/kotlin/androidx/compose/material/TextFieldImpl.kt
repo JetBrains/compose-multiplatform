@@ -39,6 +39,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.takeOrElse
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.LayoutIdParentData
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
@@ -46,6 +48,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.lerp
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -375,11 +378,15 @@ private enum class InputPhase {
     UnfocusedNotEmpty
 }
 
+internal val IntrinsicMeasurable.layoutId: Any?
+    get() = (parentData as? LayoutIdParentData)?.layoutId
+
 internal const val TextFieldId = "TextField"
 internal const val PlaceholderId = "Hint"
 internal const val LabelId = "Label"
 internal const val LeadingId = "Leading"
 internal const val TrailingId = "Trailing"
+internal val ZeroConstraints = Constraints(0, 0, 0, 0)
 
 internal const val AnimationDuration = 150
 private const val PlaceholderAnimationDuration = 83

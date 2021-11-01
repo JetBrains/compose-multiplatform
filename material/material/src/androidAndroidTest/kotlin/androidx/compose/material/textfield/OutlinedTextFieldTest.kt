@@ -73,6 +73,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.click
@@ -80,6 +81,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -937,12 +939,12 @@ class OutlinedTextFieldTest {
     }
 
     @Test
-    fun testOutlinedTextField_doesNotCrash_rowHeightWithMinIntrinsics() {
-        var textFieldSize: IntSize? = null
+    fun testOutlinedTextField_withLabel_doesNotCrash_rowHeightWithMinIntrinsics() {
+        var size: IntSize? = null
         var dividerSize: IntSize? = null
         rule.setMaterialContent {
             val text = remember { mutableStateOf("") }
-            Box {
+            Box(Modifier.onGloballyPositioned { size = it.size }) {
                 Row(Modifier.height(IntrinsicSize.Min)) {
                     Divider(
                         modifier = Modifier
@@ -953,8 +955,7 @@ class OutlinedTextFieldTest {
                     OutlinedTextField(
                         value = text.value,
                         label = { Text(text = "Label") },
-                        onValueChange = { text.value = it },
-                        modifier = Modifier.onGloballyPositioned { textFieldSize = it.size }
+                        onValueChange = { text.value = it }
                     )
                 }
             }
@@ -962,8 +963,8 @@ class OutlinedTextFieldTest {
 
         rule.runOnIdle {
             assertThat(dividerSize).isNotNull()
-            assertThat(textFieldSize).isNotNull()
-            assertThat(dividerSize!!.height).isEqualTo(textFieldSize!!.height)
+            assertThat(size).isNotNull()
+            assertThat(dividerSize!!.height).isEqualTo(size!!.height)
         }
     }
 
@@ -989,7 +990,7 @@ class OutlinedTextFieldTest {
     }
 
     @Test
-    fun testOutlinedTextField_doesNotCrash_columnWidthWithMinIntrinsics() {
+    fun testOutlinedTextField_withLabel_doesNotCrash_columnWidthWithMinIntrinsics() {
         var textFieldSize: IntSize? = null
         var dividerSize: IntSize? = null
         rule.setMaterialContent {
@@ -1214,6 +1215,102 @@ class OutlinedTextFieldTest {
         rule.runOnIdle {
             assertThat(textStyle.color).isEqualTo(captionColor)
             assertThat(contentColor).isEqualTo(focusedLabelColor)
+        }
+    }
+
+    @Test
+    fun testOutlinedTextField_withIntrinsicsMeasurement_getsIdle() {
+        rule.setMaterialContent {
+            val text = remember { mutableStateOf("") }
+            Row(Modifier.height(IntrinsicSize.Min)) {
+                OutlinedTextField(
+                    value = text.value,
+                    onValueChange = { text.value = it },
+                    label = { Text("Label") }
+                )
+                Divider(Modifier.fillMaxHeight())
+            }
+        }
+
+        rule.onNodeWithText("Label")
+            .assertExists()
+            .assertIsDisplayed()
+            .performTextInput("text")
+
+        rule.onNodeWithText("text").assertExists()
+    }
+
+    @Test
+    fun testOutlinedTextField_intrinsicsMeasurement_correctHeight() {
+        var height = 0
+        rule.setMaterialContent {
+            val text = remember { mutableStateOf("") }
+            Box(Modifier.onGloballyPositioned {
+                height = it.size.height
+            }) {
+                Row(Modifier.height(IntrinsicSize.Min)) {
+                    OutlinedTextField(
+                        value = text.value,
+                        onValueChange = { text.value = it },
+                        placeholder = { Text("placeholder") }
+                    )
+                    Divider(Modifier.fillMaxHeight())
+                }
+            }
+        }
+
+        with(rule.density) {
+            assertThat(height).isEqualTo((TextFieldDefaults.MinHeight).roundToPx())
+        }
+    }
+
+    @Test
+    fun testOutlinedTextField_intrinsicsMeasurement_withLeadingIcon_correctHeight() {
+        var height = 0
+        rule.setMaterialContent {
+            val text = remember { mutableStateOf("") }
+            Box(Modifier.onGloballyPositioned {
+                height = it.size.height
+            }) {
+                Row(Modifier.height(IntrinsicSize.Min)) {
+                    OutlinedTextField(
+                        value = text.value,
+                        onValueChange = { text.value = it },
+                        placeholder = { Text("placeholder") },
+                        leadingIcon = { Icon(Icons.Default.Favorite, null) }
+                    )
+                    Divider(Modifier.fillMaxHeight())
+                }
+            }
+        }
+
+        with(rule.density) {
+            assertThat(height).isEqualTo((TextFieldDefaults.MinHeight).roundToPx())
+        }
+    }
+
+    @Test
+    fun testOutlinedTextField_intrinsicsMeasurement_withTrailingIcon_correctHeight() {
+        var height = 0
+        rule.setMaterialContent {
+            val text = remember { mutableStateOf("") }
+            Box(Modifier.onGloballyPositioned {
+                height = it.size.height
+            }) {
+                Row(Modifier.height(IntrinsicSize.Min)) {
+                    OutlinedTextField(
+                        value = text.value,
+                        onValueChange = { text.value = it },
+                        placeholder = { Text("placeholder") },
+                        trailingIcon = { Icon(Icons.Default.Favorite, null) }
+                    )
+                    Divider(Modifier.fillMaxHeight())
+                }
+            }
+        }
+
+        with(rule.density) {
+            assertThat(height).isEqualTo((TextFieldDefaults.MinHeight).roundToPx())
         }
     }
 }

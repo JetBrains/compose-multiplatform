@@ -42,7 +42,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasurePolicy
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.text.TextStyle
@@ -392,6 +398,9 @@ private fun IconsWithTextFieldLayout(
     borderColor: Color,
     labelSize: Size
 ) {
+    val measurePolicy = remember(onLabelMeasured, singleLine, animationProgress) {
+        OutlinedTextFieldMeasurePolicy(onLabelMeasured, singleLine, animationProgress)
+    }
     Layout(
         content = {
             // We use additional box here to place an outlined cutout border as a sibling after the
@@ -446,29 +455,42 @@ private fun IconsWithTextFieldLayout(
             if (label != null) {
                 Box(modifier = Modifier.layoutId(LabelId)) { label() }
             }
-        }
-    ) { measurables, incomingConstraints ->
+        },
+        measurePolicy = measurePolicy
+    )
+}
+
+private class OutlinedTextFieldMeasurePolicy(
+    val onLabelMeasured: (Size) -> Unit,
+    val singleLine: Boolean,
+    val animationProgress: Float
+) : MeasurePolicy {
+    override fun MeasureScope.measure(
+        measurables: List<Measurable>,
+        constraints: Constraints
+    ): MeasureResult {
         // used to calculate the constraints for measuring elements that will be placed in a row
         var occupiedSpaceHorizontally = 0
         val bottomPadding = TextFieldPadding.roundToPx()
 
         // measure leading icon
-        val constraints =
-            incomingConstraints.copy(minWidth = 0, minHeight = 0)
-        val leadingPlaceable = measurables.find { it.layoutId == LeadingId }?.measure(constraints)
+        val relaxedConstraints = constraints.copy(minWidth = 0, minHeight = 0)
+        val leadingPlaceable = measurables.find {
+            it.layoutId == LeadingId
+        }?.measure(relaxedConstraints)
         occupiedSpaceHorizontally += widthOrZero(
             leadingPlaceable
         )
 
         // measure trailing icon
         val trailingPlaceable = measurables.find { it.layoutId == TrailingId }
-            ?.measure(constraints.offset(horizontal = -occupiedSpaceHorizontally))
+            ?.measure(relaxedConstraints.offset(horizontal = -occupiedSpaceHorizontally))
         occupiedSpaceHorizontally += widthOrZero(
             trailingPlaceable
         )
 
         // measure label
-        val labelConstraints = constraints.offset(
+        val labelConstraints = relaxedConstraints.offset(
             horizontal = -occupiedSpaceHorizontally,
             vertical = -bottomPadding
         )
@@ -482,7 +504,7 @@ private fun IconsWithTextFieldLayout(
         // on top we offset either by default padding or by label's half height if its too big
         // minWidth must not be set to 0 due to how foundation TextField treats zero minWidth
         val topPadding = max(heightOrZero(labelPlaceable) / 2, bottomPadding)
-        val textConstraints = incomingConstraints.offset(
+        val textConstraints = constraints.offset(
             horizontal = -occupiedSpaceHorizontally,
             vertical = -bottomPadding - topPadding
         ).copy(minHeight = 0)
@@ -496,21 +518,21 @@ private fun IconsWithTextFieldLayout(
 
         val width =
             calculateWidth(
-                leadingPlaceable,
-                trailingPlaceable,
-                textFieldPlaceable,
-                labelPlaceable,
-                placeholderPlaceable,
-                incomingConstraints
+                widthOrZero(leadingPlaceable),
+                widthOrZero(trailingPlaceable),
+                textFieldPlaceable.width,
+                widthOrZero(labelPlaceable),
+                widthOrZero(placeholderPlaceable),
+                constraints
             )
         val height =
             calculateHeight(
-                leadingPlaceable,
-                trailingPlaceable,
-                textFieldPlaceable,
-                labelPlaceable,
-                placeholderPlaceable,
-                incomingConstraints,
+                heightOrZero(leadingPlaceable),
+                heightOrZero(trailingPlaceable),
+                textFieldPlaceable.height,
+                heightOrZero(labelPlaceable),
+                heightOrZero(placeholderPlaceable),
+                constraints,
                 density
             )
 
@@ -522,7 +544,7 @@ private fun IconsWithTextFieldLayout(
                 maxHeight = height
             )
         )
-        layout(width, height) {
+        return layout(width, height) {
             place(
                 height,
                 width,
@@ -538,6 +560,101 @@ private fun IconsWithTextFieldLayout(
             )
         }
     }
+
+    override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+        measurables: List<IntrinsicMeasurable>,
+        width: Int
+    ): Int {
+        return intrinsicHeight(measurables, width) { intrinsicMeasurable, w ->
+            intrinsicMeasurable.maxIntrinsicHeight(w)
+        }
+    }
+
+    override fun IntrinsicMeasureScope.minIntrinsicHeight(
+        measurables: List<IntrinsicMeasurable>,
+        width: Int
+    ): Int {
+        return intrinsicHeight(measurables, width) { intrinsicMeasurable, w ->
+            intrinsicMeasurable.minIntrinsicHeight(w)
+        }
+    }
+
+    override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+        measurables: List<IntrinsicMeasurable>,
+        height: Int
+    ): Int {
+        return intrinsicWidth(measurables, height) { intrinsicMeasurable, h ->
+            intrinsicMeasurable.maxIntrinsicWidth(h)
+        }
+    }
+
+    override fun IntrinsicMeasureScope.minIntrinsicWidth(
+        measurables: List<IntrinsicMeasurable>,
+        height: Int
+    ): Int {
+        return intrinsicWidth(measurables, height) { intrinsicMeasurable, h ->
+            intrinsicMeasurable.minIntrinsicWidth(h)
+        }
+    }
+
+    private fun intrinsicWidth(
+        measurables: List<IntrinsicMeasurable>,
+        height: Int,
+        intrinsicMeasurer: (IntrinsicMeasurable, Int) -> Int
+    ): Int {
+        val textFieldWidth =
+            intrinsicMeasurer(measurables.first { it.layoutId == TextFieldId }, height)
+        val labelWidth = measurables.find { it.layoutId == LabelId }?.let {
+            intrinsicMeasurer(it, height)
+        } ?: 0
+        val trailingWidth = measurables.find { it.layoutId == TrailingId }?.let {
+            intrinsicMeasurer(it, height)
+        } ?: 0
+        val leadingWidth = measurables.find { it.layoutId == LeadingId }?.let {
+            intrinsicMeasurer(it, height)
+        } ?: 0
+        val placeholderWidth = measurables.find { it.layoutId == PlaceholderId }?.let {
+            intrinsicMeasurer(it, height)
+        } ?: 0
+        return calculateWidth(
+            leadingPlaceableWidth = leadingWidth,
+            trailingPlaceableWidth = trailingWidth,
+            textFieldPlaceableWidth = textFieldWidth,
+            labelPlaceableWidth = labelWidth,
+            placeholderPlaceableWidth = placeholderWidth,
+            constraints = ZeroConstraints
+        )
+    }
+
+    private fun IntrinsicMeasureScope.intrinsicHeight(
+        measurables: List<IntrinsicMeasurable>,
+        width: Int,
+        intrinsicMeasurer: (IntrinsicMeasurable, Int) -> Int
+    ): Int {
+        val textFieldHeight =
+            intrinsicMeasurer(measurables.first { it.layoutId == TextFieldId }, width)
+        val labelHeight = measurables.find { it.layoutId == LabelId }?.let {
+            intrinsicMeasurer(it, width)
+        } ?: 0
+        val trailingHeight = measurables.find { it.layoutId == TrailingId }?.let {
+            intrinsicMeasurer(it, width)
+        } ?: 0
+        val leadingHeight = measurables.find { it.layoutId == LeadingId }?.let {
+            intrinsicMeasurer(it, width)
+        } ?: 0
+        val placeholderHeight = measurables.find { it.layoutId == PlaceholderId }?.let {
+            intrinsicMeasurer(it, width)
+        } ?: 0
+        return calculateHeight(
+            leadingPlaceableHeight = leadingHeight,
+            trailingPlaceableHeight = trailingHeight,
+            textFieldPlaceableHeight = textFieldHeight,
+            labelPlaceableHeight = labelHeight,
+            placeholderPlaceableHeight = placeholderHeight,
+            constraints = ZeroConstraints,
+            density = density
+        )
+    }
 }
 
 /**
@@ -545,22 +662,20 @@ private fun IconsWithTextFieldLayout(
  * placed inside
  */
 private fun calculateWidth(
-    leadingPlaceable: Placeable?,
-    trailingPlaceable: Placeable?,
-    textFieldPlaceable: Placeable,
-    labelPlaceable: Placeable?,
-    placeholderPlaceable: Placeable?,
+    leadingPlaceableWidth: Int,
+    trailingPlaceableWidth: Int,
+    textFieldPlaceableWidth: Int,
+    labelPlaceableWidth: Int,
+    placeholderPlaceableWidth: Int,
     constraints: Constraints
 ): Int {
     val middleSection = maxOf(
-        textFieldPlaceable.width,
-        widthOrZero(labelPlaceable),
-        widthOrZero(placeholderPlaceable)
+        textFieldPlaceableWidth,
+        labelPlaceableWidth,
+        placeholderPlaceableWidth
     )
     val wrappedWidth =
-        widthOrZero(leadingPlaceable) + middleSection + widthOrZero(
-            trailingPlaceable
-        )
+        leadingPlaceableWidth + middleSection + trailingPlaceableWidth
     return max(wrappedWidth, constraints.minWidth)
 }
 
@@ -569,11 +684,11 @@ private fun calculateWidth(
  * placed inside
  */
 private fun calculateHeight(
-    leadingPlaceable: Placeable?,
-    trailingPlaceable: Placeable?,
-    textFieldPlaceable: Placeable,
-    labelPlaceable: Placeable?,
-    placeholderPlaceable: Placeable?,
+    leadingPlaceableHeight: Int,
+    trailingPlaceableHeight: Int,
+    textFieldPlaceableHeight: Int,
+    labelPlaceableHeight: Int,
+    placeholderPlaceableHeight: Int,
     constraints: Constraints,
     density: Float
 ): Int {
@@ -581,19 +696,19 @@ private fun calculateHeight(
     // taller) plus 16.dp or half height of the label if it is taller, given that the label
     // is vertically centered to the top edge of the resulting text field's container
     val inputFieldHeight = max(
-        textFieldPlaceable.height,
-        heightOrZero(placeholderPlaceable)
+        textFieldPlaceableHeight,
+        placeholderPlaceableHeight
     )
     val topBottomPadding = TextFieldPadding.value * density
     val middleSectionHeight = inputFieldHeight + topBottomPadding + max(
         topBottomPadding,
-        heightOrZero(labelPlaceable) / 2f
+        labelPlaceableHeight / 2f
     )
     return max(
         constraints.minHeight,
         maxOf(
-            heightOrZero(leadingPlaceable),
-            heightOrZero(trailingPlaceable),
+            leadingPlaceableHeight,
+            trailingPlaceableHeight,
             middleSectionHeight.roundToInt()
         )
     )
