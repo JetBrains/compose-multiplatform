@@ -16,14 +16,24 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.VisibilityThreshold
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ParentDataModifier
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 
 /**
  * Receiver scope being used by the item content parameter of LazyColumn/Row.
@@ -76,6 +86,25 @@ interface LazyItemScope {
         /*@FloatRange(from = 0.0, to = 1.0)*/
         fraction: Float = 1f
     ): Modifier
+
+    /**
+     * This modifier animates the item placement within the Lazy list.
+     *
+     * When you provide a key via [LazyListScope.item]/[LazyListScope.items] this modifier will
+     * enable item reordering animations. Aside from item reordering all other position changes
+     * caused by events like arrangement or alignment changes will also be animated.
+     *
+     * @sample androidx.compose.foundation.samples.ItemPlacementAnimationSample
+     *
+     * @param animationSpec a finite animation that will be used to animate the item placement.
+     */
+    @ExperimentalFoundationApi
+    fun Modifier.animateItemPlacement(
+        animationSpec: FiniteAnimationSpec<IntOffset> = spring(
+            stiffness = Spring.StiffnessMediumLow,
+            visibilityThreshold = IntOffset.VisibilityThreshold
+        )
+    ): Modifier
 }
 
 internal data class LazyItemScopeImpl(
@@ -95,4 +124,28 @@ internal data class LazyItemScopeImpl(
 
     override fun Modifier.fillParentMaxHeight(fraction: Float) =
         height(maxHeight * fraction)
+
+    @ExperimentalFoundationApi
+    override fun Modifier.animateItemPlacement(animationSpec: FiniteAnimationSpec<IntOffset>) =
+        this.then(AnimateItemPlacementModifier(animationSpec, debugInspectorInfo {
+            name = "animateItemPlacement"
+            value = animationSpec
+        }))
+}
+
+private class AnimateItemPlacementModifier(
+    val animationSpec: FiniteAnimationSpec<IntOffset>,
+    inspectorInfo: InspectorInfo.() -> Unit,
+) : ParentDataModifier, InspectorValueInfo(inspectorInfo) {
+    override fun Density.modifyParentData(parentData: Any?): Any = animationSpec
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is AnimateItemPlacementModifier) return false
+        return animationSpec != other.animationSpec
+    }
+
+    override fun hashCode(): Int {
+        return animationSpec.hashCode()
+    }
 }

@@ -431,6 +431,7 @@ package androidx.compose.foundation.lazy {
   }
 
   @androidx.compose.foundation.lazy.LazyScopeMarker @androidx.compose.runtime.Stable public interface LazyItemScope {
+    method @androidx.compose.foundation.ExperimentalFoundationApi public androidx.compose.ui.Modifier animateItemPlacement(androidx.compose.ui.Modifier, optional androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntOffset> animationSpec);
     method public androidx.compose.ui.Modifier fillParentMaxHeight(androidx.compose.ui.Modifier, optional float fraction);
     method public androidx.compose.ui.Modifier fillParentMaxSize(androidx.compose.ui.Modifier, optional float fraction);
     method public androidx.compose.ui.Modifier fillParentMaxWidth(androidx.compose.ui.Modifier, optional float fraction);
@@ -448,6 +449,9 @@ package androidx.compose.foundation.lazy {
     property public abstract Object key;
     property public abstract int offset;
     property public abstract int size;
+  }
+
+  public final class LazyListItemPlacementAnimatorKt {
   }
 
   public final class LazyListItemsProviderImplKt {

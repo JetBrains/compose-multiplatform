@@ -25,13 +25,13 @@ import androidx.compose.ui.util.fastForEachIndexed
  * header wasn't in this list but is needed the header will be added as the first item in this list.
  * @param itemProvider the provider so we can compose a header if it wasn't composed already
  * @param headerIndexes list of indexes of headers. Must be sorted.
- * @param startContentPadding the padding before the first item in the list
+ * @param beforeContentPadding the padding before the first item in the list
  */
 internal fun findOrComposeLazyListHeader(
     composedVisibleItems: MutableList<LazyListPositionedItem>,
     itemProvider: LazyMeasuredItemProvider,
     headerIndexes: List<Int>,
-    startContentPadding: Int,
+    beforeContentPadding: Int,
     layoutWidth: Int,
     layoutHeight: Int,
 ): LazyListPositionedItem? {
@@ -73,9 +73,9 @@ internal fun findOrComposeLazyListHeader(
     val measuredHeaderItem = itemProvider.getAndMeasure(DataIndex(currentHeaderListPosition))
 
     var headerOffset = if (currentHeaderOffset != Int.MIN_VALUE) {
-        maxOf(-startContentPadding, currentHeaderOffset)
+        maxOf(-beforeContentPadding, currentHeaderOffset)
     } else {
-        -startContentPadding
+        -beforeContentPadding
     }
     // if we have a next header overlapping with the current header, the next one will be
     // pushing the current one away from the viewport.
