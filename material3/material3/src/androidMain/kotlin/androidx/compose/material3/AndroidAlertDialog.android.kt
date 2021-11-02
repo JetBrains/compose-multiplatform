@@ -75,20 +75,20 @@ fun AlertDialog(
     icon: @Composable (() -> Unit)? = null,
     title: @Composable (() -> Unit)? = null,
     text: @Composable (() -> Unit)? = null,
-    shape: Shape = androidx.compose.material3.tokens.Dialog.ContainerShape,
+    shape: Shape = androidx.compose.material3.tokens.DialogTokens.ContainerShape,
     containerColor: Color =
         MaterialTheme.colorScheme.fromToken(
-            androidx.compose.material3.tokens.Dialog.ContainerColor
+            androidx.compose.material3.tokens.DialogTokens.ContainerColor
         ),
-    tonalElevation: Dp = androidx.compose.material3.tokens.Dialog.ContainerElevation,
+    tonalElevation: Dp = androidx.compose.material3.tokens.DialogTokens.ContainerElevation,
     iconContentColor: Color = MaterialTheme.colorScheme.fromToken(
-        androidx.compose.material3.tokens.Dialog.WithIconIconColor
+        androidx.compose.material3.tokens.DialogTokens.IconColor
     ),
     titleContentColor: Color = MaterialTheme.colorScheme.fromToken(
-        androidx.compose.material3.tokens.Dialog.SubheadColor
+        androidx.compose.material3.tokens.DialogTokens.SubheadColor
     ),
     textContentColor: Color = MaterialTheme.colorScheme.fromToken(
-        androidx.compose.material3.tokens.Dialog.SupportingTextColor
+        androidx.compose.material3.tokens.DialogTokens.SupportingTextColor
     ),
     properties: DialogProperties = DialogProperties()
 ) {
@@ -118,7 +118,7 @@ fun AlertDialog(
             // TextButtons will not consume this provided content color value, and will used their
             // own defined or default colors.
             buttonContentColor = MaterialTheme.colorScheme.fromToken(
-                androidx.compose.material3.tokens.Dialog.ActionLabelTextColor
+                androidx.compose.material3.tokens.DialogTokens.ActionLabelTextColor
             ),
             iconContentColor = iconContentColor,
             titleContentColor = titleContentColor,

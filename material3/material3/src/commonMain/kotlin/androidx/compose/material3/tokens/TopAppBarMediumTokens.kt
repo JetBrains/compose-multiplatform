@@ -19,12 +19,14 @@ package androidx.compose.material3.tokens
 
 import androidx.compose.ui.unit.dp
 
-internal object CircularProgressIndicatorTokens {
-    val ActiveIndicatorColor = ColorSchemeKeyTokens.Primary
-    val ActiveIndicatorWidth = 4.0.dp
-    val FourColorActiveIndicatorFourColor = ColorSchemeKeyTokens.TertiaryContainer
-    val FourColorActiveIndicatorOneColor = ColorSchemeKeyTokens.Primary
-    val FourColorActiveIndicatorThreeColor = ColorSchemeKeyTokens.Tertiary
-    val FourColorActiveIndicatorTwoColor = ColorSchemeKeyTokens.PrimaryContainer
-    val Size = 48.0.dp
+internal object TopAppBarMediumTokens {
+    val ContainerColor = ColorSchemeKeyTokens.Surface
+    val ContainerElevation = ElevationTokens.Level0
+    val ContainerHeight = 112.0.dp
+    val HeadlineColor = ColorSchemeKeyTokens.OnSurface
+    val HeadlineFont = TypographyKeyTokens.HeadlineSmall
+    val LeadingIconColor = ColorSchemeKeyTokens.OnSurface
+    val LeadingIconSize = 24.0.dp
+    val TrailingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val TrailingIconSize = 24.0.dp
 }

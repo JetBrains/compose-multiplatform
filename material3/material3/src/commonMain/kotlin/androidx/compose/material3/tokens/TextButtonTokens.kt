@@ -20,24 +20,25 @@ package androidx.compose.material3.tokens
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 
-internal object FilledButton {
-    val ContainerColor = ColorSchemeKey.Primary
-    val ContainerElevation = Elevation.Level0
+internal object TextButtonTokens {
+    val ContainerElevation = ElevationTokens.Level0
     val ContainerHeight = 40.0.dp
     val ContainerShape = RoundedCornerShape(20.0.dp)
-    val DisabledContainerColor = ColorSchemeKey.OnSurface
-    val DisabledContainerElevation = Elevation.Level0
-    const val DisabledContainerOpacity = 0.12f
-    val DisabledLabelTextColor = ColorSchemeKey.OnSurface
+    val DisabledLabelTextColor = ColorSchemeKeyTokens.OnSurface
     const val DisabledLabelTextOpacity = 0.38f
-    val DraggedContainerElevation = Elevation.Level3
-    val FocusContainerElevation = Elevation.Level0
-    val HoverContainerElevation = Elevation.Level1
-    val LabelTextColor = ColorSchemeKey.OnPrimary
-    val LabelTextFont = TypographyKey.LabelLarge
-    val PressedContainerElevation = Elevation.Level0
-    val DisabledIconColor = ColorSchemeKey.OnSurface
+    val FocusLabelTextColor = ColorSchemeKeyTokens.Primary
+    val FocusStateLayerColor = ColorSchemeKeyTokens.Primary
+    val HoverLabelTextColor = ColorSchemeKeyTokens.Primary
+    val HoverStateLayerColor = ColorSchemeKeyTokens.Primary
+    val LabelTextColor = ColorSchemeKeyTokens.Primary
+    val LabelTextFont = TypographyKeyTokens.LabelLarge
+    val PressedLabelTextColor = ColorSchemeKeyTokens.Primary
+    val PressedStateLayerColor = ColorSchemeKeyTokens.Primary
+    val DisabledIconColor = ColorSchemeKeyTokens.OnSurface
     const val DisabledIconOpacity = 0.38f
-    val IconColor = ColorSchemeKey.OnPrimary
+    val FocusIconColor = ColorSchemeKeyTokens.Primary
+    val HoverIconColor = ColorSchemeKeyTokens.Primary
+    val IconColor = ColorSchemeKeyTokens.Primary
     val IconSize = 18.0.dp
+    val PressedIconColor = ColorSchemeKeyTokens.Primary
 }

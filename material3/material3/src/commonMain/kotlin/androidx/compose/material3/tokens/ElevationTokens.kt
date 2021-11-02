@@ -17,31 +17,13 @@
 
 package androidx.compose.material3.tokens
 
-internal enum class ColorSchemeKey {
-    Background,
-    Error,
-    ErrorContainer,
-    InverseOnSurface,
-    InversePrimary,
-    InverseSurface,
-    OnBackground,
-    OnError,
-    OnErrorContainer,
-    OnPrimary,
-    OnPrimaryContainer,
-    OnSecondary,
-    OnSecondaryContainer,
-    OnSurface,
-    OnSurfaceVariant,
-    OnTertiary,
-    OnTertiaryContainer,
-    Outline,
-    Primary,
-    PrimaryContainer,
-    Secondary,
-    SecondaryContainer,
-    Surface,
-    SurfaceVariant,
-    Tertiary,
-    TertiaryContainer,
+import androidx.compose.ui.unit.dp
+
+internal object ElevationTokens {
+    val Level0 = 0.0.dp
+    val Level1 = 1.0.dp
+    val Level2 = 3.0.dp
+    val Level3 = 6.0.dp
+    val Level4 = 8.0.dp
+    val Level5 = 12.0.dp
 }

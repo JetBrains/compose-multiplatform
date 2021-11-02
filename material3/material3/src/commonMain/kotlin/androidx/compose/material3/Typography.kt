@@ -16,11 +16,11 @@
 
 package androidx.compose.material3
 
-import androidx.compose.material3.tokens.TypographyKey
+import androidx.compose.material3.tokens.TypographyKeyTokens
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.material3.tokens.Typography as TypographyStyleTokens
+import androidx.compose.material3.tokens.TypographyTokens
 
 // TODO(b/197880751): Update description after spec draft is available.
 /**
@@ -73,21 +73,21 @@ import androidx.compose.material3.tokens.Typography as TypographyStyleTokens
  */
 @Immutable
 class Typography(
-    val displayLarge: TextStyle = TypographyStyleTokens.DisplayLarge,
-    val displayMedium: TextStyle = TypographyStyleTokens.DisplayMedium,
-    val displaySmall: TextStyle = TypographyStyleTokens.DisplaySmall,
-    val headlineLarge: TextStyle = TypographyStyleTokens.HeadlineLarge,
-    val headlineMedium: TextStyle = TypographyStyleTokens.HeadlineMedium,
-    val headlineSmall: TextStyle = TypographyStyleTokens.HeadlineSmall,
-    val titleLarge: TextStyle = TypographyStyleTokens.TitleLarge,
-    val titleMedium: TextStyle = TypographyStyleTokens.TitleMedium,
-    val titleSmall: TextStyle = TypographyStyleTokens.TitleSmall,
-    val bodyLarge: TextStyle = TypographyStyleTokens.BodyLarge,
-    val bodyMedium: TextStyle = TypographyStyleTokens.BodyMedium,
-    val bodySmall: TextStyle = TypographyStyleTokens.BodySmall,
-    val labelLarge: TextStyle = TypographyStyleTokens.LabelLarge,
-    val labelMedium: TextStyle = TypographyStyleTokens.LabelMedium,
-    val labelSmall: TextStyle = TypographyStyleTokens.LabelSmall,
+    val displayLarge: TextStyle = TypographyTokens.DisplayLarge,
+    val displayMedium: TextStyle = TypographyTokens.DisplayMedium,
+    val displaySmall: TextStyle = TypographyTokens.DisplaySmall,
+    val headlineLarge: TextStyle = TypographyTokens.HeadlineLarge,
+    val headlineMedium: TextStyle = TypographyTokens.HeadlineMedium,
+    val headlineSmall: TextStyle = TypographyTokens.HeadlineSmall,
+    val titleLarge: TextStyle = TypographyTokens.TitleLarge,
+    val titleMedium: TextStyle = TypographyTokens.TitleMedium,
+    val titleSmall: TextStyle = TypographyTokens.TitleSmall,
+    val bodyLarge: TextStyle = TypographyTokens.BodyLarge,
+    val bodyMedium: TextStyle = TypographyTokens.BodyMedium,
+    val bodySmall: TextStyle = TypographyTokens.BodySmall,
+    val labelLarge: TextStyle = TypographyTokens.LabelLarge,
+    val labelMedium: TextStyle = TypographyTokens.LabelMedium,
+    val labelSmall: TextStyle = TypographyTokens.LabelSmall,
 ) {
 
     /** Returns a copy of this Typography, optionally overriding some of the values. */
@@ -181,23 +181,23 @@ class Typography(
 /**
  * Helper function for component typography tokens.
  */
-internal fun Typography.fromToken(value: TypographyKey): TextStyle {
+internal fun Typography.fromToken(value: TypographyKeyTokens): TextStyle {
     return when (value) {
-        TypographyKey.DisplayLarge -> displayLarge
-        TypographyKey.DisplayMedium -> displayMedium
-        TypographyKey.DisplaySmall -> displaySmall
-        TypographyKey.HeadlineLarge -> headlineLarge
-        TypographyKey.HeadlineMedium -> headlineMedium
-        TypographyKey.HeadlineSmall -> headlineSmall
-        TypographyKey.TitleLarge -> titleLarge
-        TypographyKey.TitleMedium -> titleMedium
-        TypographyKey.TitleSmall -> titleSmall
-        TypographyKey.BodyLarge -> bodyLarge
-        TypographyKey.BodyMedium -> bodyMedium
-        TypographyKey.BodySmall -> bodySmall
-        TypographyKey.LabelLarge -> labelLarge
-        TypographyKey.LabelMedium -> labelMedium
-        TypographyKey.LabelSmall -> labelSmall
+        TypographyKeyTokens.DisplayLarge -> displayLarge
+        TypographyKeyTokens.DisplayMedium -> displayMedium
+        TypographyKeyTokens.DisplaySmall -> displaySmall
+        TypographyKeyTokens.HeadlineLarge -> headlineLarge
+        TypographyKeyTokens.HeadlineMedium -> headlineMedium
+        TypographyKeyTokens.HeadlineSmall -> headlineSmall
+        TypographyKeyTokens.TitleLarge -> titleLarge
+        TypographyKeyTokens.TitleMedium -> titleMedium
+        TypographyKeyTokens.TitleSmall -> titleSmall
+        TypographyKeyTokens.BodyLarge -> bodyLarge
+        TypographyKeyTokens.BodyMedium -> bodyMedium
+        TypographyKeyTokens.BodySmall -> bodySmall
+        TypographyKeyTokens.LabelLarge -> labelLarge
+        TypographyKeyTokens.LabelMedium -> labelMedium
+        TypographyKeyTokens.LabelSmall -> labelSmall
     }
 }
 
