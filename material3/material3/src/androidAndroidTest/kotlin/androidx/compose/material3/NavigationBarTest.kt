@@ -19,7 +19,10 @@ package androidx.compose.material3
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material3.samples.NavigationBarSample
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertIsEqualTo
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -126,7 +129,17 @@ class NavigationBarTest {
     fun navigationBar_size() {
         val height = NavigationBarTokens.ContainerHeight
         rule.setMaterialContentForSizeAssertions {
-            NavigationBarSample()
+            val items = listOf("Songs", "Artists", "Playlists")
+            NavigationBar {
+                items.forEachIndexed { index, item ->
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Filled.Favorite, contentDescription = null) },
+                        label = { Text(item) },
+                        selected = index == 0,
+                        onClick = { /* do something */ }
+                    )
+                }
+            }
         }
             .assertWidthIsEqualTo(rule.rootWidth())
             .assertHeightIsEqualTo(height)
@@ -285,7 +298,19 @@ class NavigationBarTest {
     @Test
     fun navigationBar_selectNewItem() {
         rule.setMaterialContent {
-            NavigationBarSample()
+            var selectedItem by remember { mutableStateOf(0) }
+            val items = listOf("Songs", "Artists", "Playlists")
+
+            NavigationBar {
+                items.forEachIndexed { index, item ->
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Filled.Favorite, contentDescription = null) },
+                        label = { Text(item) },
+                        selected = selectedItem == index,
+                        onClick = { selectedItem = index }
+                    )
+                }
+            }
         }
 
         // Find all items and ensure there are 3

@@ -19,7 +19,13 @@ package androidx.compose.material3
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material3.samples.NavigationRailSample
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertIsEqualTo
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -125,7 +131,18 @@ class NavigationRailTest {
     fun navigationRail_width() {
         val defaultWidth = NavigationRailItemWidth
         rule.setMaterialContentForSizeAssertions {
-            NavigationRailSample()
+            val items = listOf("Home", "Search", "Settings")
+            val icons = listOf(Icons.Filled.Home, Icons.Filled.Search, Icons.Filled.Settings)
+            NavigationRail {
+                items.forEachIndexed { index, item ->
+                    NavigationRailItem(
+                        icon = { Icon(icons[index], contentDescription = item) },
+                        label = { Text(item) },
+                        selected = index == 0,
+                        onClick = { /* do something */ }
+                    )
+                }
+            }
         }.assertWidthIsEqualTo(defaultWidth)
     }
 
@@ -289,7 +306,19 @@ class NavigationRailTest {
     @Test
     fun navigationRail_selectNewItem() {
         rule.setMaterialContent {
-            NavigationRailSample()
+            var selectedItem by remember { mutableStateOf(0) }
+            val items = listOf("Home", "Search", "Settings")
+            val icons = listOf(Icons.Filled.Home, Icons.Filled.Search, Icons.Filled.Settings)
+            NavigationRail {
+                items.forEachIndexed { index, item ->
+                    NavigationRailItem(
+                        icon = { Icon(icons[index], contentDescription = item) },
+                        label = { Text(item) },
+                        selected = selectedItem == index,
+                        onClick = { selectedItem = index }
+                    )
+                }
+            }
         }
 
         // Find all items and ensure there are 3
