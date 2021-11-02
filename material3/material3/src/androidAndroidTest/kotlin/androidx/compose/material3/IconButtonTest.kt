@@ -15,19 +15,23 @@
  */
 package androidx.compose.material3
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.samples.IconButtonSample
-import androidx.compose.material3.samples.IconToggleButtonSample
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsEnabled
@@ -68,7 +72,7 @@ class IconButtonTest {
         val height = 48.dp
         rule
             .setMaterialContentForSizeAssertions {
-                IconButtonSample()
+                IconButtonContent()
             }
             .assertWidthIsEqualTo(width)
             .assertHeightIsEqualTo(height)
@@ -82,7 +86,7 @@ class IconButtonTest {
         rule
             .setMaterialContentForSizeAssertions {
                 CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
-                    IconButtonSample()
+                    IconButtonContent()
                 }
             }
             .assertWidthIsEqualTo(width)
@@ -92,7 +96,7 @@ class IconButtonTest {
     @Test
     fun iconButton_defaultSemantics() {
         rule.setMaterialContent {
-            IconButtonSample()
+            IconButtonContent()
         }
         rule.onNode(hasClickAction()).apply {
             assertIsEnabled()
@@ -150,7 +154,7 @@ class IconButtonTest {
         val height = 48.dp
         rule
             .setMaterialContentForSizeAssertions {
-                IconToggleButtonSample()
+                IconToggleButtonContent()
             }
             .assertWidthIsEqualTo(width)
             .assertHeightIsEqualTo(height)
@@ -164,7 +168,7 @@ class IconButtonTest {
         rule
             .setMaterialContentForSizeAssertions {
                 CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
-                    IconToggleButtonSample()
+                    IconToggleButtonContent()
                 }
             }
             .assertWidthIsEqualTo(width)
@@ -174,7 +178,7 @@ class IconButtonTest {
     @Test
     fun iconToggleButton_defaultSemantics() {
         rule.setMaterialContent {
-            IconToggleButtonSample()
+            IconToggleButtonContent()
         }
         rule.onNode(isToggleable()).apply {
             assertIsEnabled()
@@ -255,5 +259,22 @@ class IconButtonTest {
             .performTouchInput {
                 click(position = Offset(-1f, -1f))
             }.assertIsOn()
+    }
+
+    @Composable
+    private fun IconButtonContent() {
+        IconButton(onClick = { /* doSomething() */ }) {
+            Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+        }
+    }
+
+    @Composable
+    private fun IconToggleButtonContent() {
+        var checked by remember { mutableStateOf(false) }
+
+        IconToggleButton(checked = checked, onCheckedChange = { checked = it }) {
+            val tint by animateColorAsState(if (checked) Color(0xFFEC407A) else Color(0xFFB0BEC5))
+            Icon(Icons.Filled.Favorite, contentDescription = "Localized description", tint = tint)
+        }
     }
 }
