@@ -220,7 +220,7 @@ internal class SkiaParagraph(
     private fun lineMetricsForOffset(offset: Int): LineMetrics? {
         val metrics = lineMetrics
         for (line in metrics) {
-            if (offset < line.endIndex) {
+            if (offset < line.endIncludingNewline) {
                 return line
             }
         }

@@ -97,6 +97,20 @@ class DesktopParagraphTest {
     }
 
     @Test
+    fun getLineForOffset() {
+        val text = "ab\na"
+        val paragraph = simpleParagraph(
+            text = text,
+            style = TextStyle(fontSize = 50.sp)
+        )
+
+        Truth.assertThat(paragraph.getLineForOffset(2))
+            .isEqualTo(0)
+        Truth.assertThat(paragraph.getLineForOffset(3))
+            .isEqualTo(1)
+    }
+
+    @Test
     fun getLineEnd() {
         with(defaultDensity) {
             val text = ""
