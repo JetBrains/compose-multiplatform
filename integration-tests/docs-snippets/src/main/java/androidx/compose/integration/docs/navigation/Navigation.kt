@@ -98,7 +98,6 @@ private fun NavigationSnippet5(navController: NavHostController) {
     }
 }
 
-@Composable
 private fun NavGraphBuilder.NavigationSnippet6(navController: NavHostController) {
     composable("profile/{userId}") { backStackEntry ->
         Profile(navController, backStackEntry.arguments?.getString("userId"))
@@ -110,7 +109,6 @@ private fun NavigationSnippet7(navController: NavHostController) {
     navController.navigate("profile/user1234")
 }
 
-@Composable
 private fun NavGraphBuilder.NavigationSnippet8(navController: NavHostController) {
     composable(
         "profile?userId={userId}",
@@ -122,7 +120,6 @@ private fun NavGraphBuilder.NavigationSnippet8(navController: NavHostController)
 
 /* Deep links */
 
-@Composable
 private fun NavGraphBuilder.NavigationSnippet9(navController: NavHostController) {
     val uri = "https://example.com"
 
@@ -189,7 +186,6 @@ private fun NavigationSnippet11(items: List<Screen>) {
     }
 }
 
-@Composable
 private fun NavGraphBuilder.NavigationSnippet12(navController: NavHostController) {
     composable(
         "profile?userId={userId}",
