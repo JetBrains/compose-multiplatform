@@ -26,10 +26,12 @@ import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchPolicy
 import androidx.compose.foundation.lazy.layout.LazyLayoutState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Density
 import kotlin.math.abs
 
@@ -167,6 +169,8 @@ class LazyListState constructor(
      */
     internal var innerState: LazyLayoutState? = null
 
+    internal var placementAnimator by mutableStateOf<LazyListItemPlacementAnimator?>(null)
+
     /**
      * Instantly brings the item at [index] to the top of the viewport, offset by [scrollOffset]
      * pixels.
@@ -192,6 +196,8 @@ class LazyListState constructor(
 
     internal fun snapToItemIndexInternal(index: Int, scrollOffset: Int) {
         scrollPosition.requestPosition(DataIndex(index), scrollOffset)
+        // placement animation is not needed because we snap into a new position.
+        placementAnimator?.reset()
         innerState?.remeasure()
     }
 
