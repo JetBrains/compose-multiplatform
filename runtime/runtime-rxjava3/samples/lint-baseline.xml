@@ -4,17 +4,6 @@
     <issue
         id="UnknownNullness"
         message="Should explicitly declare type here since implicit type does not specify nullness"
-        errorLine1="    infix fun ContentTransform.using(sizeTransform: SizeTransform?) = this.apply {"
-        errorLine2="                               ~~~~~">
-        <location
-            file="src/commonMain/kotlin/androidx/compose/animation/AnimatedContent.kt"
-            line="293"
-            column="32"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Should explicitly declare type here since implicit type does not specify nullness"
         errorLine1="    internal val currentRecomposeScope: RecomposeScopeImpl?"
         errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
