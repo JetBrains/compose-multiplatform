@@ -45,5 +45,6 @@ val FoundationDemos = DemoCategory(
         DemoCategory("Suspending Gesture Detectors", CoroutineGestureDemos),
         ComposableDemo("NestedScroll") { NestedScrollDemo() },
         DemoCategory("Relocation Demos", RelocationDemos),
+        DemoCategory("Magnifier Demos", MagnifierDemos),
     )
 )
