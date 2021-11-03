@@ -184,6 +184,9 @@ internal class PointerInteropFilter : PointerInputModifier {
 
             private var state = DispatchToViewState.Unknown
 
+            override val shareWithSiblings
+                get() = true
+
             override fun onPointerEvent(
                 pointerEvent: PointerEvent,
                 pass: PointerEventPass,

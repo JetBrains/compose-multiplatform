@@ -316,6 +316,36 @@ class HitTestResultTest {
         assertThat(listIterator2.previous()).isEqualTo("this")
     }
 
+    @Test
+    fun siblingHits() {
+        val hitTestResult = HitTestResult<String>()
+
+        hitTestResult.siblingHits {
+            hitTestResult.hit("Hello") {
+                hitTestResult.siblingHits {
+                    hitTestResult.hit("World") {}
+                }
+            }
+            hitTestResult.acceptHits()
+            hitTestResult.hit("this") {
+                hitTestResult.siblingHits {
+                    hitTestResult.hit("is") {}
+                }
+            }
+            hitTestResult.acceptHits()
+            hitTestResult.hit("great") {}
+        }
+        assertThat(hitTestResult.toList()).isEqualTo(
+            listOf(
+                "Hello",
+                "World",
+                "this",
+                "is",
+                "great"
+            )
+        )
+    }
+
     private fun fillHitTestResult(last: String? = null): HitTestResult<String> {
         val hitTestResult = HitTestResult<String>()
         hitTestResult.hit("Hello") {

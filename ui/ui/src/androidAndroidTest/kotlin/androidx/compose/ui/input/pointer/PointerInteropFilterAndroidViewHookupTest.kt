@@ -24,6 +24,8 @@ import android.view.MotionEvent.ACTION_UP
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.PointerProperties
@@ -50,6 +52,7 @@ class PointerInteropFilterAndroidViewHookupTest {
     private lateinit var captureRequestDisallow: CaptureRequestDisallow
     private val motionEventLog = mutableListOf<MotionEvent?>()
     private val eventStringLog = mutableListOf<String>()
+    private val siblingEvents = mutableListOf<PointerEventType>()
     private val motionEventCallback: (MotionEvent?) -> Unit = {
         motionEventLog.add(it)
         eventStringLog.add("motionEvent")
@@ -72,10 +75,22 @@ class PointerInteropFilterAndroidViewHookupTest {
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
                 setContent {
-                    AndroidView(
-                        { child },
-                        Modifier.spyGestureFilter { eventStringLog.add(it.name) }
-                    )
+                    Box(Modifier.fillMaxSize()) {
+                        Box(Modifier.fillMaxSize()
+                            .pointerInput(Unit) {
+                                awaitPointerEventScope {
+                                    while (true) {
+                                        val event = awaitPointerEvent()
+                                        siblingEvents += event.type
+                                    }
+                                }
+                            }
+                        )
+                        AndroidView(
+                            { child },
+                            Modifier.spyGestureFilter { eventStringLog.add(it.name) }
+                        )
+                    }
                 }
             }
 
@@ -84,6 +99,7 @@ class PointerInteropFilterAndroidViewHookupTest {
             activity.setContentView(captureRequestDisallow)
             root = activity.findViewById(android.R.id.content)
         }
+        siblingEvents.clear()
     }
 
     @Test
@@ -475,6 +491,29 @@ class PointerInteropFilterAndroidViewHookupTest {
 
         assertThat(clicked).isFalse()
         assertThat(captureRequestDisallow.disallowIntercept).isTrue()
+    }
+
+    @Test
+    fun overlappingChildAllowsEventsThrough() {
+        rule.runOnIdle {
+            val start = Offset(50f, 50f)
+            val middle = Offset(10f, 10f)
+            val end = Offset(51f, 50f)
+            root.dispatchTouchEvent(down(0, start))
+            root.dispatchTouchEvent(move(10, middle))
+            root.dispatchTouchEvent(move(20, end))
+            root.dispatchTouchEvent(up(30, end))
+        }
+
+        rule.runOnIdle {
+            assertThat(siblingEvents).hasSize(4)
+            assertThat(siblingEvents).containsExactly(
+                PointerEventType.Press,
+                PointerEventType.Move,
+                PointerEventType.Move,
+                PointerEventType.Release
+            )
+        }
     }
 
     fun down(eventTime: Int = 0, offset: Offset = Offset(50f, 50f)) =

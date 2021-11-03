@@ -895,6 +895,8 @@ internal abstract class LayoutNodeWrapper(
         return focusableChildren
     }
 
+    open fun shouldSharePointerInputWithSiblings(): Boolean = false
+
     protected fun offsetFromEdge(pointerPosition: Offset): Offset {
         val x = pointerPosition.x
         val horizontal = maxOf(0f, if (x < 0) -x else x - measuredWidth)
