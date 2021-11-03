@@ -308,12 +308,6 @@ interface Canvas {
      * Reduces the clip region to the intersection of the current clip and the
      * given rectangle.
      *
-     * If the clip is not axis-aligned with the display device, and
-     * [Paint.isAntiAlias] is true, then the clip will be anti-aliased. If
-     * multiple draw commands intersect with the clip boundary, this can result
-     * in incorrect blending at the clip boundary. See [saveLayer] for a
-     * discussion of how to address that.
-     *
      * Use [ClipOp.Difference] to subtract the provided rectangle from the
      * current clip.
      */
@@ -324,12 +318,6 @@ interface Canvas {
     /**
      * Reduces the clip region to the intersection of the current clip and the
      * given bounds.
-     *
-     * If the clip is not axis-aligned with the display device, and
-     * [Paint.isAntiAlias] is true, then the clip will be anti-aliased. If
-     * multiple draw commands intersect with the clip boundary, this can result
-     * in incorrect blending at the clip boundary. See [saveLayer] for a
-     * discussion of how to address that.
      *
      * Use [ClipOp.Difference] to subtract the provided rectangle from the
      * current clip.
@@ -350,11 +338,6 @@ interface Canvas {
     /**
      * Reduces the clip region to the intersection of the current clip and the
      * given [Path].
-     *
-     * If [Paint.isAntiAlias] is true, then the clip will be anti-aliased. If
-     * multiple draw commands intersect with the clip boundary, this can result
-     * in incorrect blending at the clip boundary. See [saveLayer] for a
-     * discussion of how to address that.
      */
     fun clipPath(path: Path, clipOp: ClipOp = ClipOp.Intersect)
 
