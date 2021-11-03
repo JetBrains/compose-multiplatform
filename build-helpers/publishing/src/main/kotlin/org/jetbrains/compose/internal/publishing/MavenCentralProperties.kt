@@ -8,10 +8,8 @@ package org.jetbrains.compose.internal.publishing
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 
+@Suppress("unused") // public api
 class MavenCentralProperties(private val myProject: Project) {
-    private fun environmentVariable(variable: String) =
-        myProject.providers.environmentVariable(variable)
-
     val version: Provider<String> =
         propertyProvider("maven.central.version")
 

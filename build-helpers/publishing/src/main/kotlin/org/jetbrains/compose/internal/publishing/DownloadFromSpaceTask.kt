@@ -9,6 +9,7 @@ import org.gradle.api.tasks.TaskAction
 import org.jsoup.Jsoup
 import java.net.URL
 
+@Suppress("unused") // public api
 abstract class DownloadFromSpaceMavenRepoTask : DefaultTask() {
     @get:Internal
     abstract val modulesToDownload: ListProperty<ModuleToUpload>

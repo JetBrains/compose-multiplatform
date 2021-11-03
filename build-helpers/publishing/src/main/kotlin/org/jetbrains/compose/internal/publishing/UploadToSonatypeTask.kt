@@ -10,6 +10,7 @@ import org.jetbrains.compose.internal.publishing.sonatype.SonatypeApi
 import org.jetbrains.compose.internal.publishing.sonatype.SonatypeRestApiClient
 import org.jetbrains.compose.internal.publishing.sonatype.StagingProfile
 
+@Suppress("unused") // public api
 abstract class UploadToSonatypeTask : DefaultTask() {
     // the task must always re-run anyway, so all inputs can be declared Internal
     @get:Internal
