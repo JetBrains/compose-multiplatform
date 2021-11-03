@@ -5,10 +5,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
-import org.jetbrains.compose.internal.publishing.sonatype.ModuleValidator
-import org.jetbrains.compose.internal.publishing.sonatype.SonatypeApi
-import org.jetbrains.compose.internal.publishing.sonatype.SonatypeRestApiClient
-import org.jetbrains.compose.internal.publishing.sonatype.StagingProfile
+import org.jetbrains.compose.internal.publishing.utils.*
 
 @Suppress("unused") // public api
 abstract class UploadToSonatypeTask : DefaultTask() {

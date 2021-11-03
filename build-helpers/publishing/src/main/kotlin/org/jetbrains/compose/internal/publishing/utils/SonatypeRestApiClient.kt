@@ -1,4 +1,4 @@
-package org.jetbrains.compose.internal.publishing.sonatype
+package org.jetbrains.compose.internal.publishing.utils
 
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.Request

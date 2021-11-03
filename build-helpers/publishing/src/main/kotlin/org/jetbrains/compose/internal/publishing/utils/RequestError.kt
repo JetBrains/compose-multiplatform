@@ -1,4 +1,4 @@
-package org.jetbrains.compose.internal.publishing.sonatype
+package org.jetbrains.compose.internal.publishing.utils
 
 import okhttp3.Request
 import okhttp3.Response

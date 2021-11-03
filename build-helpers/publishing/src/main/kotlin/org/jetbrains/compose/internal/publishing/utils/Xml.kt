@@ -1,4 +1,4 @@
-package org.jetbrains.compose.internal.publishing.sonatype
+package org.jetbrains.compose.internal.publishing.utils
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.MapperFeature
