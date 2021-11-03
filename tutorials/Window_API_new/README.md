@@ -391,7 +391,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -407,7 +407,7 @@ fun main() = application {
                 .launchIn(this)
 
             snapshotFlow { state.position }
-                .filterNot { it.isSpecified }
+                .filter { it.isSpecified }
                 .onEach(::onWindowRelocate)
                 .launchIn(this)
         }
