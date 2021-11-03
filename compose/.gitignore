@@ -1,4 +1,5 @@
-prebuilds
+prebuilts/fullsdk-darwin/
+prebuilts/fullsdk-linux/
 out
 *.iml
 .gradle
