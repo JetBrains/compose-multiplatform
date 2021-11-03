@@ -37,12 +37,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.AwaitPointerEventScope
+import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputChange
+import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
-import androidx.compose.ui.input.pointer.util.addPointerInputChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
+import androidx.compose.ui.input.pointer.util.addPointerInputChange
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Velocity
 import kotlinx.coroutines.CoroutineScope
@@ -303,14 +305,18 @@ private suspend fun AwaitPointerEventScope.awaitDownAndSlop(
     velocityTracker: VelocityTracker,
     orientation: Orientation
 ): Pair<PointerInputChange, Float>? {
-    val down = awaitFirstDown(requireUnconsumed = false)
-    velocityTracker.addPointerInputChange(down)
-    return if (!canDrag.value.invoke(down)) {
+    val initialDown =
+        awaitFirstDownOnPass(requireUnconsumed = false, pass = PointerEventPass.Initial)
+    return if (!canDrag.value.invoke(initialDown)) {
         null
     } else if (startDragImmediately.value.invoke()) {
+        initialDown.consumeAllChanges()
+        velocityTracker.addPointerInputChange(initialDown)
         // since we start immediately we don't wait for slop and the initial delta is 0
-        down to 0f
+        initialDown to 0f
     } else {
+        val down = awaitFirstDown(requireUnconsumed = false)
+        velocityTracker.addPointerInputChange(down)
         var initialDelta = 0f
         val postPointerSlop = { event: PointerInputChange, offset: Float ->
             velocityTracker.addPointerInputChange(event)

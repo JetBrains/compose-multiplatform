@@ -233,10 +233,16 @@ internal suspend fun PointerInputScope.detectTapAndPress(
  */
 suspend fun AwaitPointerEventScope.awaitFirstDown(
     requireUnconsumed: Boolean = true
+): PointerInputChange =
+    awaitFirstDownOnPass(pass = PointerEventPass.Main, requireUnconsumed = requireUnconsumed)
+
+internal suspend fun AwaitPointerEventScope.awaitFirstDownOnPass(
+    pass: PointerEventPass,
+    requireUnconsumed: Boolean
 ): PointerInputChange {
     var event: PointerEvent
     do {
-        event = awaitPointerEvent()
+        event = awaitPointerEvent(pass)
     } while (
         !event.changes.fastAll {
             if (requireUnconsumed) it.changedToDown() else it.changedToDownIgnoreConsumed()
@@ -261,8 +267,8 @@ suspend fun AwaitPointerEventScope.waitForUpOrCancellation(): PointerInputChange
         }
 
         if (event.changes.fastAny {
-            it.consumed.downChange || it.isOutOfBounds(size, extendedTouchPadding)
-        }
+                it.consumed.downChange || it.isOutOfBounds(size, extendedTouchPadding)
+            }
         ) {
             return null // Canceled
         }
