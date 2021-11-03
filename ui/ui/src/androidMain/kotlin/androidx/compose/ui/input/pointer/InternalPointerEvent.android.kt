@@ -26,4 +26,6 @@ internal actual class InternalPointerEvent constructor(
         changes: Map<PointerId, PointerInputChange>,
         pointerInputEvent: PointerInputEvent
     ) : this(changes, pointerInputEvent.motionEvent)
+
+    actual var suppressMovementConsumption: Boolean = false
 }

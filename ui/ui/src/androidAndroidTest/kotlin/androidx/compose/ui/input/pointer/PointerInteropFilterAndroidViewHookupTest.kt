@@ -23,7 +23,9 @@ import android.view.MotionEvent.ACTION_MOVE
 import android.view.MotionEvent.ACTION_UP
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.PointerProperties
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.test.TestActivity
@@ -45,6 +47,7 @@ class PointerInteropFilterAndroidViewHookupTest {
 
     private lateinit var root: View
     private lateinit var child: CustomView2
+    private lateinit var captureRequestDisallow: CaptureRequestDisallow
     private val motionEventLog = mutableListOf<MotionEvent?>()
     private val eventStringLog = mutableListOf<String>()
     private val motionEventCallback: (MotionEvent?) -> Unit = {
@@ -76,7 +79,9 @@ class PointerInteropFilterAndroidViewHookupTest {
                 }
             }
 
-            activity.setContentView(parent)
+            captureRequestDisallow = CaptureRequestDisallow(activity)
+            captureRequestDisallow.addView(parent)
+            activity.setContentView(captureRequestDisallow)
             root = activity.findViewById(android.R.id.content)
         }
     }
@@ -438,6 +443,72 @@ class PointerInteropFilterAndroidViewHookupTest {
         assertThat(eventStringLog[2]).isEqualTo(PointerEventPass.Final.toString())
         assertThat(eventStringLog[3]).isEqualTo("motionEvent")
     }
+
+    @Test
+    fun disallowNotTriggeredWhenMovementInClickChild() {
+        var clicked = false
+        child.setOnClickListener { clicked = true }
+
+        rule.runOnIdle {
+            val outOfView = Offset(-50f, -50f)
+            root.dispatchTouchEvent(down())
+            root.dispatchTouchEvent(move(10, outOfView))
+            root.dispatchTouchEvent(up(20, outOfView))
+        }
+
+        assertThat(clicked).isFalse()
+        assertThat(captureRequestDisallow.disallowIntercept).isFalse()
+    }
+
+    @Test
+    fun disallowTriggeredWhenMovementInClickChildAfterRequestDisallow() {
+        var clicked = false
+        child.setOnClickListener { clicked = true }
+
+        rule.runOnIdle {
+            val outOfView = Offset(-50f, -50f)
+            root.dispatchTouchEvent(down())
+            child.requestDisallowInterceptTouchEvent(true)
+            root.dispatchTouchEvent(move(10, outOfView))
+            root.dispatchTouchEvent(up(20, outOfView))
+        }
+
+        assertThat(clicked).isFalse()
+        assertThat(captureRequestDisallow.disallowIntercept).isTrue()
+    }
+
+    fun down(eventTime: Int = 0, offset: Offset = Offset(50f, 50f)) =
+        MotionEvent(
+            eventTime,
+            ACTION_DOWN,
+            1,
+            0,
+            arrayOf(PointerProperties(0)),
+            arrayOf(PointerCoords(offset.x, offset.y)),
+            root
+        )
+
+    fun move(eventTime: Int, offset: Offset) =
+        MotionEvent(
+            eventTime,
+            ACTION_MOVE,
+            1,
+            0,
+            arrayOf(PointerProperties(0)),
+            arrayOf(PointerCoords(offset.x, offset.y)),
+            root
+        )
+
+    fun up(eventTime: Int, offset: Offset = Offset(50f, 50f)) =
+        MotionEvent(
+            eventTime,
+            ACTION_UP,
+            1,
+            0,
+            arrayOf(PointerProperties(0)),
+            arrayOf(PointerCoords(offset.x, offset.y)),
+            root
+        )
 }
 
 private class CustomView2(context: Context, val callBack: (MotionEvent?) -> Unit) : ViewGroup
@@ -450,4 +521,12 @@ private class CustomView2(context: Context, val callBack: (MotionEvent?) -> Unit
     }
 
     override fun onLayout(p0: Boolean, p1: Int, p2: Int, p3: Int, p4: Int) {}
+}
+
+private class CaptureRequestDisallow(context: Context) : FrameLayout(context) {
+    var disallowIntercept = false
+    override fun requestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
+        this.disallowIntercept = disallowIntercept
+        super.requestDisallowInterceptTouchEvent(disallowIntercept)
+    }
 }

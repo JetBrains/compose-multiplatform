@@ -1044,7 +1044,7 @@ class AndroidPointerInputTest {
         val coords = innerCoordinates!!
         dispatchMouseEvent(ACTION_HOVER_ENTER, coords)
         dispatchMouseEvent(ACTION_DOWN, coords)
-        dispatchMouseEvent(ACTION_MOVE, coords, Offset(0f, coords.size.height / 2f - 1f))
+        dispatchMouseEvent(ACTION_MOVE, coords, Offset(0f, coords.size.height / 2 - 1f))
         dispatchMouseEvent(ACTION_MOVE, coords, Offset(0f, coords.size.height - 1f))
         dispatchMouseEvent(ACTION_UP, coords, Offset(0f, coords.size.height - 1f))
         rule.runOnUiThread {
