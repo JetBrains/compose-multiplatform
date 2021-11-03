@@ -49,10 +49,6 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
     // because they match the modifier instance.
     var toBeReusedForSameModifier = false
 
-    init {
-        wrapped.wrappedBy = this
-    }
-
     /**
      * Sets the modifier instance to the new modifier. [modifier] must be the
      * same type as the current modifier.
@@ -63,6 +59,14 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
             @Suppress("UNCHECKED_CAST")
             this.modifier = modifier as T
         }
+    }
+
+    /**
+     * An initialization function that is called when the [LayoutNodeWrapper] is initially created,
+     * and also called when the [LayoutNodeWrapper] is re-used.
+     */
+    open fun onInitialize() {
+        wrapped.wrappedBy = this
     }
 
     override fun performDraw(canvas: Canvas) {

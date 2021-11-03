@@ -1082,9 +1082,8 @@ internal class AndroidComposeView(context: Context) :
         eventTime: Long,
         forceHover: Boolean = true
     ) {
-        val oldAction = motionEvent.actionMasked
         // don't send any events for pointers that are "up"
-        val upIndex = when (oldAction) {
+        val upIndex = when (motionEvent.actionMasked) {
             ACTION_UP -> 0
             ACTION_POINTER_UP -> motionEvent.actionIndex
             else -> -1

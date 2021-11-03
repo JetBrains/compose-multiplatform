@@ -26,6 +26,12 @@ internal class OnGloballyPositionedModifierWrapper(
     wrapped: LayoutNodeWrapper,
     modifier: OnGloballyPositionedModifier
 ) : DelegatingLayoutNodeWrapper<OnGloballyPositionedModifier>(wrapped, modifier) {
+
+    override fun onInitialize() {
+        super.onInitialize()
+        layoutNode.getOrCreateOnPositionedCallbacks() += this
+    }
+
     override val providedAlignmentLines: Set<AlignmentLine>
         get() {
             val result = mutableSetOf<AlignmentLine>()
