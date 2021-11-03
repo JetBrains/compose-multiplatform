@@ -71,13 +71,11 @@ internal class ModifiedDrawNode(
         }
     }
 
-    override var modifier: DrawModifier
-        get() = super.modifier
-        set(value) {
-            super.modifier = value
-            cacheDrawModifier = updateCacheDrawModifier()
-            invalidateCache = true
-        }
+    override fun onInitialize() {
+        super.onInitialize()
+        cacheDrawModifier = updateCacheDrawModifier()
+        invalidateCache = true
+    }
 
     override fun onMeasureResultChanged(width: Int, height: Int) {
         super.onMeasureResultChanged(width, height)

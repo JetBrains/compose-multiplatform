@@ -21,19 +21,13 @@ import androidx.compose.ui.input.key.KeyInputModifier
 
 internal class ModifiedKeyInputNode(
     wrapped: LayoutNodeWrapper,
-    keyInputModifier: KeyInputModifier
-) : DelegatingLayoutNodeWrapper<KeyInputModifier>(wrapped, keyInputModifier) {
+    modifier: KeyInputModifier
+) : DelegatingLayoutNodeWrapper<KeyInputModifier>(wrapped, modifier) {
 
-    init {
-        keyInputModifier.keyInputNode = this
+    override fun onInitialize() {
+        super.onInitialize()
+        modifier.keyInputNode = this
     }
-
-    override var modifier: KeyInputModifier
-        get() = super.modifier
-        set(value) {
-            super.modifier = value
-            value.keyInputNode = this
-        }
 
     override fun findPreviousKeyInputWrapper() = this
 

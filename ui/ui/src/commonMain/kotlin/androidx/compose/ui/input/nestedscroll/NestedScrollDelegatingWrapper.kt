@@ -87,6 +87,9 @@ internal class NestedScrollDelegatingWrapper(
             localLastModifier.connection !== modifier.connection ||
             localLastModifier.dispatcher !== modifier.dispatcher
         if (modifierChanged && isAttached) {
+            // Note: This optimization assumes that the NestedScrollWrappers are always in the same
+            // order. ie. Modifier.nestedScroll(connection1).nestedScroll(connection2) will never be
+            // Modifier.nestedScroll(connection2).nestedScroll(connection1) after recomposition.
             val parent = super.findPreviousNestedScrollWrapper()
             parentConnection = parent?.childScrollConnection
             coroutineScopeEvaluation = parent?.coroutineScopeEvaluation ?: coroutineScopeEvaluation
