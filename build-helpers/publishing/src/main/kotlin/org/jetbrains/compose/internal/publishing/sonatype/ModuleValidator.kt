@@ -49,12 +49,14 @@ internal class ModuleValidator(
             else -> null
         }
 
-        val packageFile = artifactFile(extension = pom?.packaging ?: "jar")
-        val sourcesJar = artifactFile(extension = "jar", classifier = "sources")
-        val javadocJar = artifactFile(extension = "jar", classifier = "javadoc")
+        val mandatoryFiles = arrayListOf(pomFile)
+        if (pom != null && pom.packaging != "pom") {
+            mandatoryFiles.add(artifactFile(extension = pom.packaging ?: "jar"))
+            mandatoryFiles.add(artifactFile(extension = "jar", classifier = "sources"))
+            mandatoryFiles.add(artifactFile(extension = "jar", classifier = "javadoc"))
+        }
 
-        val nonExistingFiles = listOf(pomFile, packageFile, sourcesJar, javadocJar)
-            .filter { !it.exists() }
+        val nonExistingFiles = mandatoryFiles.filter { !it.exists() }
         if (nonExistingFiles.isNotEmpty()) {
             errors.add("Some necessary files do not exist: [${nonExistingFiles.map { it.name }.joinToString()}]")
         }
