@@ -64,7 +64,7 @@ fun SemanticsNodeInteractionsProvider.onNodeWithContentDescription(
     onNode(hasContentDescription(label, substring, ignoreCase), useUnmergedTree)
 
 /**
- * Finds a semantincs node with the given text.
+ * Finds a semantics node with the given text.
  *
  * For usage patterns and semantics concepts see [SemanticsNodeInteraction]
  *
