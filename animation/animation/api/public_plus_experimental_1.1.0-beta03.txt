@@ -81,6 +81,7 @@ package androidx.compose.animation {
 
   public final class CrossfadeKt {
     method @androidx.compose.runtime.Composable public static <T> void Crossfade(T? targetState, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.core.FiniteAnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static <T> void Crossfade(androidx.compose.animation.core.Transition<T>, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.animation.core.FiniteAnimationSpec<java.lang.Float> animationSpec, optional kotlin.jvm.functions.Function1<? super T,?> contentKey, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> content);
   }
 
   @androidx.compose.animation.ExperimentalAnimationApi public enum EnterExitState {
