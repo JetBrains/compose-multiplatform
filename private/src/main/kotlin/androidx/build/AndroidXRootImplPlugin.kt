@@ -240,7 +240,7 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
                     subproject.configurations.all { configuration ->
                         configuration.resolutionStrategy.dependencySubstitution.apply {
                             all { dep ->
-                                val requested = dep.getRequested()
+                                val requested = dep.requested
                                 if (requested is ModuleComponentSelector) {
                                     val module = requested.group + ":" + requested.module
                                     if (projectModules.containsKey(module)) {

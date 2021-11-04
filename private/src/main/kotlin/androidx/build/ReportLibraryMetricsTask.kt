@@ -84,7 +84,7 @@ abstract class ReportLibraryMetricsTask : DefaultTask() {
     }
 
     private fun getBytecodeSize(jarFiles: List<File>): Long {
-        return jarFiles.map { it.length() }.sum()
+        return jarFiles.sumOf { it.length() }
     }
 
     private fun getMethodCount(jarFiles: List<File>): Int {

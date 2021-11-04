@@ -38,7 +38,7 @@ abstract class ModuleInfoGenerator : DefaultTask() {
     @Input
     fun getSerialized(): String {
         val gson = GsonBuilder().setPrettyPrinting().create()
-        return gson.toJson(testModules.map { it.name to it }.toMap())
+        return gson.toJson(testModules.associateBy { it.name })
     }
 
     @TaskAction
