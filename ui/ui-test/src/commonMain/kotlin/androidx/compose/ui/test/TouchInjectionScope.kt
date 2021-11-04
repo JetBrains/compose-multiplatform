@@ -298,6 +298,63 @@ interface TouchInjectionScope : InjectionScope {
     fun cancel(delayMillis: Long = eventPeriodMillis)
 }
 
+internal class TouchInjectionScopeImpl(
+    private val baseScope: MultiModalInjectionScopeImpl
+) : TouchInjectionScope, InjectionScope by baseScope {
+    private val inputDispatcher get() = baseScope.inputDispatcher
+    private fun localToRoot(position: Offset) = baseScope.localToRoot(position)
+
+    override fun currentPosition(pointerId: Int): Offset? {
+        val positionInRoot = inputDispatcher.getCurrentTouchPosition(pointerId) ?: return null
+        return baseScope.rootToLocal(positionInRoot)
+    }
+
+    override fun down(pointerId: Int, position: Offset) {
+        val positionInRoot = localToRoot(position)
+        inputDispatcher.enqueueTouchDown(pointerId, positionInRoot)
+    }
+
+    override fun updatePointerTo(pointerId: Int, position: Offset) {
+        val positionInRoot = localToRoot(position)
+        inputDispatcher.updateTouchPointer(pointerId, positionInRoot)
+    }
+
+    override fun move(delayMillis: Long) {
+        advanceEventTime(delayMillis)
+        inputDispatcher.enqueueTouchMove()
+    }
+
+    @ExperimentalTestApi
+    override fun moveWithHistoryMultiPointer(
+        relativeHistoricalTimes: List<Long>,
+        historicalCoordinates: List<List<Offset>>,
+        delayMillis: Long
+    ) {
+        repeat(relativeHistoricalTimes.size) {
+            check(relativeHistoricalTimes[it] < 0) {
+                "Relative historical times should be negative, in order to be in the past" +
+                    "(offset $it was: ${relativeHistoricalTimes[it]})"
+            }
+            check(relativeHistoricalTimes[it] >= -delayMillis) {
+                "Relative historical times should not be earlier than the previous event " +
+                    "(offset $it was: ${relativeHistoricalTimes[it]}, ${-delayMillis})"
+            }
+        }
+
+        advanceEventTime(delayMillis)
+        inputDispatcher.enqueueTouchMoves(relativeHistoricalTimes, historicalCoordinates)
+    }
+
+    override fun up(pointerId: Int) {
+        inputDispatcher.enqueueTouchUp(pointerId)
+    }
+
+    override fun cancel(delayMillis: Long) {
+        advanceEventTime(delayMillis)
+        inputDispatcher.enqueueTouchCancel()
+    }
+}
+
 /**
  * Performs a click gesture (aka a tap) on the associated node.
  *

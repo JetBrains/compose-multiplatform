@@ -252,8 +252,7 @@ package androidx.compose.ui.test {
   }
 
   public sealed interface MultiModalInjectionScope extends androidx.compose.ui.test.InjectionScope {
-    method public androidx.compose.ui.test.TouchInjectionScope getTouch();
-    property public abstract androidx.compose.ui.test.TouchInjectionScope Touch;
+    method public void touch(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.TouchInjectionScope,kotlin.Unit> block);
   }
 
   public final class OutputKt {

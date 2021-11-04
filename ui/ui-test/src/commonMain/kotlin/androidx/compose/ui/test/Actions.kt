@@ -370,7 +370,7 @@ fun SemanticsNodeInteraction.performTouchInput(
     val node = fetchSemanticsNode("Failed to inject touch input.")
     with(MultiModalInjectionScopeImpl(node, testContext)) {
         try {
-            block.invoke(Touch)
+            touch(block)
         } finally {
             dispose()
         }
@@ -425,7 +425,7 @@ fun SemanticsNodeInteraction.performMouseInput(
     val node = fetchSemanticsNode("Failed to inject mouse input.")
     with(MultiModalInjectionScopeImpl(node, testContext)) {
         try {
-            block.invoke(Mouse)
+            mouse(block)
         } finally {
             dispose()
         }
@@ -440,8 +440,8 @@ fun SemanticsNodeInteraction.performMouseInput(
  * modality is needed (e.g. touch, mouse, stylus, keyboard, etc), you should use the
  * `perform.*Input` of that modality instead.
  *
- * Each input modality is made available via a property of that modality's scope type, like
- * [Touch][MultiModalInjectionScope.Touch] of type [TouchInjectionScope]. This allows you to
+ * Functions for each modality can be called by invoking that modality's function, like
+ * [touch][MultiModalInjectionScope.touch] to inject touch events. This allows you to
  * inject events for each modality.
  *
  * Be aware that if you split a gesture over multiple invocations of `perform.*Input`, everything
