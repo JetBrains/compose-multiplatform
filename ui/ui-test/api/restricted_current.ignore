@@ -1,5 +1,7 @@
 // Baseline format: 1.0
-ChangedType: androidx.compose.ui.test.ActionsKt#performSemanticsAction(androidx.compose.ui.test.SemanticsNodeInteraction, androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<T>>, kotlin.jvm.functions.Function1<? super T,kotlin.Unit>):
-    Method androidx.compose.ui.test.ActionsKt.performSemanticsAction has changed return type from void to androidx.compose.ui.test.SemanticsNodeInteraction
-ChangedType: androidx.compose.ui.test.ActionsKt#performSemanticsAction(androidx.compose.ui.test.SemanticsNodeInteraction, androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>>):
-    Method androidx.compose.ui.test.ActionsKt.performSemanticsAction has changed return type from void to androidx.compose.ui.test.SemanticsNodeInteraction
+AddedAbstractMethod: androidx.compose.ui.test.MultiModalInjectionScope#touch(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.TouchInjectionScope,kotlin.Unit>):
+    Added method androidx.compose.ui.test.MultiModalInjectionScope.touch(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.TouchInjectionScope,kotlin.Unit>)
+
+
+RemovedMethod: androidx.compose.ui.test.MultiModalInjectionScope#getTouch():
+    Removed method androidx.compose.ui.test.MultiModalInjectionScope.getTouch()
