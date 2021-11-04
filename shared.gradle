@@ -51,40 +51,6 @@ configurations.configureEach { conf ->
   conf.exclude(group:"org.jetbrains.dokka", module:"dokka-core")
 }
 
-apply plugin: "java-gradle-plugin"
-
-sourceSets {
-    main.java.srcDirs += "../public/src/main/kotlin"
-    main.resources.srcDirs += "../public/src/main/resources"
-
-
-    main.java.srcDirs += "${supportRootFolder}/benchmark/gradle-plugin/src/main/kotlin"
-    main.resources.srcDirs += "${supportRootFolder}/benchmark/gradle-plugin/src/main/resources"
-
-    main.java.srcDirs += "${supportRootFolder}/inspection/inspection-gradle-plugin/src/main/kotlin"
-    main.resources.srcDirs += "${supportRootFolder}/inspection/inspection-gradle-plugin/src/main" +
-            "/resources"
-
-    main.java.srcDirs += "${supportRootFolder}/compose/material/material/icons/generator/src/main" +
-            "/kotlin"
-
-    main.java.srcDirs += "${supportRootFolder}/glance/glance-appwidget/glance-layout-generator/" +
-            "src/main/kotlin"
-}
-
-gradlePlugin {
-    plugins {
-        benchmark {
-            id = "androidx.benchmark"
-            implementationClass = "androidx.benchmark.gradle.BenchmarkPlugin"
-        }
-        inspection {
-            id = "androidx.inspection"
-            implementationClass = "androidx.inspection.gradle.InspectionPlugin"
-        }
-    }
-}
-
 // Saves configuration into destFile
 // Each line of destFile will be the absolute filepath of one of the files in configuration
 def saveConfigurationResolution(configuration, destFile) {

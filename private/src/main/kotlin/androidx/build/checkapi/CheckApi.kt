@@ -69,7 +69,7 @@ fun getApiFileVersion(version: Version): Version {
     }
     var extra = ""
     if (version.patch == 0 && version.extra != null) {
-        extra = version.extra
+        extra = version.extra!!
     }
     return Version(version.major, version.minor, 0, extra)
 }
