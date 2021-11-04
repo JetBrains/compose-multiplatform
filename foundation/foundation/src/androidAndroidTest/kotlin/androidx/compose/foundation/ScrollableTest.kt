@@ -383,6 +383,61 @@ class ScrollableTest {
     }
 
     @Test
+    fun scrollable_blocksDownEvents_ifFlingingCaught() {
+        rule.mainClock.autoAdvance = false
+        var total = 0f
+        val controller = ScrollableState(
+            consumeScrollDelta = {
+                total += it
+                it
+            }
+        )
+        rule.setContent {
+            Box {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(300.dp)
+                        .scrollable(
+                            orientation = Orientation.Horizontal,
+                            state = controller
+                        )
+                ) {
+                    Box(
+                        modifier = Modifier.size(300.dp)
+                            .testTag(scrollableBoxTag)
+                            .clickable {
+                                assertWithMessage("Clickable shouldn't click when fling caught")
+                                    .fail()
+                            }
+                    )
+                }
+            }
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
+            swipeWithVelocity(
+                start = this.center,
+                end = Offset(this.center.x + 200f, this.center.y),
+                durationMillis = 100,
+                endVelocity = 4000f
+            )
+        }
+        assertThat(total).isGreaterThan(0f)
+        val prev = total
+        // pump frames twice to start fling animation
+        rule.mainClock.advanceTimeByFrame()
+        rule.mainClock.advanceTimeByFrame()
+        val prevAfterSomeFling = total
+        assertThat(prevAfterSomeFling).isGreaterThan(prev)
+        // don't advance main clock anymore since we're in the middle of the fling. Now interrupt
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
+            down(this.center)
+            up()
+        }
+        // shouldn't assert in clickable lambda
+    }
+
+    @Test
     fun scrollable_snappingScrolling() {
         var total = 0f
         val controller = ScrollableState(
