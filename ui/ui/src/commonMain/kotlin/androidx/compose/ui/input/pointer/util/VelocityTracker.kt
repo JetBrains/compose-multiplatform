@@ -26,6 +26,7 @@ import kotlin.math.sqrt
 
 private const val AssumePointerMoveStoppedMilliseconds: Int = 40
 private const val HistorySize: Int = 20
+// TODO(b/204895043): Keep value in sync with VelocityPathFinder.HorizonMilliSeconds
 private const val HorizonMilliseconds: Int = 100
 private const val MinSampleSize: Int = 3
 

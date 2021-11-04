@@ -121,12 +121,12 @@ class VelocityPathFinderTest(private val config: TestConfig) {
                 endVelocity = config.requestedVelocity,
                 durationMillis = config.durationMillis
             ).generateFunction()
-            fail("Expected an IllegalStateException")
-        } catch (e: IllegalStateException) {
+            fail("Expected an IllegalArgumentException")
+        } catch (e: IllegalArgumentException) {
             assertThat(e.message).startsWith(
                 "Unable to generate a swipe gesture between ${Offset.Zero} and ${config.end} " +
                     "with duration ${config.durationMillis} that ends with velocity of " +
-                    "${config.requestedVelocity}, without going outside of the range " +
+                    "${config.requestedVelocity} px/s, without going outside of the range " +
                     "[start..end]. Suggested fixes: "
             )
 
@@ -136,7 +136,7 @@ class VelocityPathFinderTest(private val config: TestConfig) {
             // Verify that the suggestions change the current config
             assertThat(maxDuration).isLessThan(config.durationMillis.toFloat())
             assertThat(maxVelocity).isLessThan(config.requestedVelocity)
-            assertThat(minDistance).isAtLeast(config.end.getDistance())
+            assertThat(minDistance).isGreaterThan(config.end.getDistance())
 
             if (testSuggestions) {
                 // Try just inside the suggested value range
@@ -156,7 +156,7 @@ class VelocityPathFinderTest(private val config: TestConfig) {
 
     private val suggestedFixesRegex = Regex(
         "1\\. set duration to (.*) or lower; " +
-            "2\\. set velocity to (.*) or lower; or " +
+            "2\\. set velocity to (.*) px/s or lower; or " +
             "3\\. increase the distance between the start and end to (.*) or higher"
     )
 
