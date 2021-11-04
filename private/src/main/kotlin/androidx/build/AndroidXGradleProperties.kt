@@ -138,6 +138,11 @@ const val KMP_ENABLE_MAC = "androidx.kmp.mac.enabled"
  */
 const val KMP_ENABLE_JS = "androidx.kmp.js.enabled"
 
+/**
+ * If true, include linux targets when building KMP
+ */
+const val KMP_ENABLE_LINUX = "androidx.kmp.linux.enabled"
+
 val ALL_ANDROIDX_PROPERTIES = setOf(
     ALL_WARNINGS_AS_ERRORS,
     ALTERNATIVE_PROJECT_URL,
@@ -163,7 +168,8 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     PLAYGROUND_DOKKA_BUILD_ID,
     KMP_GITHUB_BUILD,
     KMP_ENABLE_MAC,
-    KMP_ENABLE_JS
+    KMP_ENABLE_JS,
+    KMP_ENABLE_LINUX
 )
 
 /**
