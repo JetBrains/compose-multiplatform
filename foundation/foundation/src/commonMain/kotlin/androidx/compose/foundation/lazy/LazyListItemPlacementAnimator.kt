@@ -17,6 +17,7 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.VisibilityThreshold
@@ -391,4 +392,7 @@ private class PlaceableInfo(
 /**
  * We switch to this spec when a duration based animation is being interrupted.
  */
-private val InterruptionSpec = spring(visibilityThreshold = IntOffset.VisibilityThreshold)
+private val InterruptionSpec = spring(
+    stiffness = Spring.StiffnessMediumLow,
+    visibilityThreshold = IntOffset.VisibilityThreshold
+)
