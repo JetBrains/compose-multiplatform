@@ -29,8 +29,9 @@ import kotlin.math.roundToInt
  *
  * [MultiModalInjectionScope] brings together the receiver scopes of all individual modalities,
  * allowing you to inject gestures that consist of events from different modalities, like touch
- * and mouse. For each modality, there is a property exposing that modality: currently, we have a
- * [Touch] scope and a [Mouse] scope. See their respective docs for more information.
+ * and mouse. For each modality, there is a function to which you pass a lambda in which you can
+ * inject events for that modality: currently, we have [touch] and a [mouse] functions. See their
+ * respective docs for more information.
  *
  * All events generated for all modalities are enqueued and sent together when any scope is
  * [flushed][flush]. This can be done at any time during the lambda passed to
@@ -58,17 +59,15 @@ import kotlin.math.roundToInt
 // TODO(fresen): add better multi modal example when we have keyboard support
 sealed interface MultiModalInjectionScope : InjectionScope {
     /**
-     * The receiver scope for touch input injection. See [TouchInjectionScope].
+     * Injects all touch events sent by the given [block]
      */
-    val Touch: TouchInjectionScope
+    fun touch(block: TouchInjectionScope.() -> Unit)
 
     /**
-     * The receiver scope for mouse input injection. See [MouseInjectionScope].
+     * Injects all mouse events sent by the given [block]
      */
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
-    @get:ExperimentalTestApi // Required to annotate Java-facing APIs
     @ExperimentalTestApi
-    val Mouse: MouseInjectionScope
+    fun mouse(block: MouseInjectionScope.() -> Unit)
 }
 
 internal class MultiModalInjectionScopeImpl(node: SemanticsNode, testContext: TestContext) :
@@ -109,11 +108,11 @@ internal class MultiModalInjectionScopeImpl(node: SemanticsNode, testContext: Te
      * @param position A position in local coordinates
      * @return [position] transformed to coordinates relative to the containing root.
      */
-    private fun localToRoot(position: Offset): Offset {
+    internal fun localToRoot(position: Offset): Offset {
         return position + boundsInRoot.topLeft
     }
 
-    private fun rootToLocal(position: Offset): Offset {
+    internal fun rootToLocal(position: Offset): Offset {
         return position - boundsInRoot.topLeft
     }
 
@@ -145,103 +144,17 @@ internal class MultiModalInjectionScopeImpl(node: SemanticsNode, testContext: Te
         inputDispatcher.advanceEventTime(durationMillis)
     }
 
-    override val Touch: TouchInjectionScope = object : TouchInjectionScope, InjectionScope by this {
-        override fun currentPosition(pointerId: Int): Offset? {
-            val positionInRoot = inputDispatcher.getCurrentTouchPosition(pointerId) ?: return null
-            return rootToLocal(positionInRoot)
-        }
+    private val touchScope: TouchInjectionScope = TouchInjectionScopeImpl(this)
 
-        override fun down(pointerId: Int, position: Offset) {
-            val positionInRoot = localToRoot(position)
-            inputDispatcher.enqueueTouchDown(pointerId, positionInRoot)
-        }
+    @ExperimentalTestApi
+    private val mouseScope: MouseInjectionScope = MouseInjectionScopeImpl(this)
 
-        override fun updatePointerTo(pointerId: Int, position: Offset) {
-            val positionInRoot = localToRoot(position)
-            inputDispatcher.updateTouchPointer(pointerId, positionInRoot)
-        }
-
-        override fun move(delayMillis: Long) {
-            advanceEventTime(delayMillis)
-            inputDispatcher.enqueueTouchMove()
-        }
-
-        @ExperimentalTestApi
-        override fun moveWithHistoryMultiPointer(
-            relativeHistoricalTimes: List<Long>,
-            historicalCoordinates: List<List<Offset>>,
-            delayMillis: Long
-        ) {
-            repeat(relativeHistoricalTimes.size) {
-                check(relativeHistoricalTimes[it] < 0) {
-                    "Relative historical times should be negative, in order to be in the past" +
-                        "(offset $it was: ${relativeHistoricalTimes[it]})"
-                }
-                check(relativeHistoricalTimes[it] >= -delayMillis) {
-                    "Relative historical times should not be earlier than the previous event " +
-                        "(offset $it was: ${relativeHistoricalTimes[it]}, ${-delayMillis})"
-                }
-            }
-
-            advanceEventTime(delayMillis)
-            inputDispatcher.enqueueTouchMoves(relativeHistoricalTimes, historicalCoordinates)
-        }
-
-        override fun up(pointerId: Int) {
-            inputDispatcher.enqueueTouchUp(pointerId)
-        }
-
-        override fun cancel(delayMillis: Long) {
-            advanceEventTime(delayMillis)
-            inputDispatcher.enqueueTouchCancel()
-        }
+    override fun touch(block: TouchInjectionScope.() -> Unit) {
+        block.invoke(touchScope)
     }
 
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
-    @get:ExperimentalTestApi // Required to annotate Java-facing APIs
     @ExperimentalTestApi
-    override val Mouse: MouseInjectionScope = object : MouseInjectionScope, InjectionScope by this {
-        override val currentPosition: Offset
-            get() = rootToLocal(inputDispatcher.currentMousePosition)
-
-        override fun moveTo(position: Offset, delayMillis: Long) {
-            advanceEventTime(delayMillis)
-            val positionInRoot = localToRoot(position)
-            inputDispatcher.enqueueMouseMove(positionInRoot)
-        }
-
-        override fun updatePointerTo(position: Offset) {
-            val positionInRoot = localToRoot(position)
-            inputDispatcher.updateMousePosition(positionInRoot)
-        }
-
-        override fun press(button: MouseButton) {
-            inputDispatcher.enqueueMousePress(button.buttonId)
-        }
-
-        override fun release(button: MouseButton) {
-            inputDispatcher.enqueueMouseRelease(button.buttonId)
-        }
-
-        override fun enter(position: Offset, delayMillis: Long) {
-            advanceEventTime(delayMillis)
-            val positionInRoot = localToRoot(position)
-            inputDispatcher.enqueueMouseEnter(positionInRoot)
-        }
-
-        override fun exit(position: Offset, delayMillis: Long) {
-            advanceEventTime(delayMillis)
-            val positionInRoot = localToRoot(position)
-            inputDispatcher.enqueueMouseExit(positionInRoot)
-        }
-
-        override fun cancel(delayMillis: Long) {
-            advanceEventTime(delayMillis)
-            inputDispatcher.enqueueMouseCancel()
-        }
-
-        override fun scroll(delta: Float, scrollWheel: ScrollWheel) {
-            inputDispatcher.enqueueMouseScroll(delta, scrollWheel)
-        }
+    override fun mouse(block: MouseInjectionScope.() -> Unit) {
+        block.invoke(mouseScope)
     }
 }

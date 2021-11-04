@@ -243,6 +243,57 @@ interface MouseInjectionScope : InjectionScope {
     fun scroll(delta: Float, scrollWheel: ScrollWheel = ScrollWheel.Vertical)
 }
 
+@ExperimentalTestApi
+internal class MouseInjectionScopeImpl(
+    private val baseScope: MultiModalInjectionScopeImpl
+) : MouseInjectionScope, InjectionScope by baseScope {
+    private val inputDispatcher get() = baseScope.inputDispatcher
+    private fun localToRoot(position: Offset) = baseScope.localToRoot(position)
+
+    override val currentPosition: Offset
+        get() = baseScope.rootToLocal(inputDispatcher.currentMousePosition)
+
+    override fun moveTo(position: Offset, delayMillis: Long) {
+        advanceEventTime(delayMillis)
+        val positionInRoot = localToRoot(position)
+        inputDispatcher.enqueueMouseMove(positionInRoot)
+    }
+
+    override fun updatePointerTo(position: Offset) {
+        val positionInRoot = localToRoot(position)
+        inputDispatcher.updateMousePosition(positionInRoot)
+    }
+
+    override fun press(button: MouseButton) {
+        inputDispatcher.enqueueMousePress(button.buttonId)
+    }
+
+    override fun release(button: MouseButton) {
+        inputDispatcher.enqueueMouseRelease(button.buttonId)
+    }
+
+    override fun enter(position: Offset, delayMillis: Long) {
+        advanceEventTime(delayMillis)
+        val positionInRoot = localToRoot(position)
+        inputDispatcher.enqueueMouseEnter(positionInRoot)
+    }
+
+    override fun exit(position: Offset, delayMillis: Long) {
+        advanceEventTime(delayMillis)
+        val positionInRoot = localToRoot(position)
+        inputDispatcher.enqueueMouseExit(positionInRoot)
+    }
+
+    override fun cancel(delayMillis: Long) {
+        advanceEventTime(delayMillis)
+        inputDispatcher.enqueueMouseCancel()
+    }
+
+    override fun scroll(delta: Float, scrollWheel: ScrollWheel) {
+        inputDispatcher.enqueueMouseScroll(delta, scrollWheel)
+    }
+}
+
 /**
  * Click on [position], or on the current mouse position if [position] is
  * [unspecified][Offset.Unspecified]. The [position] is in the node's local coordinate system,
