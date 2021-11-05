@@ -235,13 +235,14 @@ internal fun PointerEvent.deepCopy() =
         changes.map {
             it.deepCopy()
         },
-        motionEvent = motionEvent
+        internalPointerEvent = internalPointerEvent
     ).also { it.type = type }
 
 internal fun pointerEventOf(
     vararg changes: PointerInputChange,
     motionEvent: MotionEvent = MotionEventDouble
-) = PointerEvent(changes.toList(), motionEvent)
+) = PointerEvent(changes.toList(),
+    InternalPointerEvent(changes.map { it.id to it }.toMap(), motionEvent))
 
 internal class PointerInputFilterMock(
     val log: MutableList<LogEntry> = mutableListOf(),

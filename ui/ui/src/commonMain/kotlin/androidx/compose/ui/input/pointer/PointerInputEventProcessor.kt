@@ -79,14 +79,10 @@ internal class PointerInputEventProcessor(val root: LayoutNode) {
         // Dispatch to PointerInputFilters
         val dispatchedToSomething = hitPathTracker.dispatchChanges(internalPointerEvent, isInBounds)
 
-        var anyMovementConsumed = false
-
-        // Remove hit paths from the tracker due to up events, and calculate if we have consumed
-        // any movement
-        internalPointerEvent.changes.values.forEach { pointerInputChange ->
-            if (pointerInputChange.positionChangeConsumed()) {
-                anyMovementConsumed = true
-            }
+        val anyMovementConsumed = if (internalPointerEvent.suppressMovementConsumption) {
+            false
+        } else {
+            internalPointerEvent.changes.values.any { it.consumed.positionChange }
         }
 
         return ProcessResult(dispatchedToSomething, anyMovementConsumed)
