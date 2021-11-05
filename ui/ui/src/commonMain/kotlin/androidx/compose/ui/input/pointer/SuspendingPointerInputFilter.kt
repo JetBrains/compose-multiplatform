@@ -288,8 +288,6 @@ fun Modifier.pointerInput(
     }
 }
 
-private val DownChangeConsumed = ConsumedData(downChange = true)
-
 private val EmptyPointerEvent = PointerEvent(emptyList())
 
 /**
@@ -427,19 +425,20 @@ internal class SuspendingPointerInputFilter(
     override fun onCancel() {
         // Synthesize a cancel event for whatever state we previously saw, if one is applicable.
         // A cancel event is one where all previously down pointers are now up, the change in
-        // down-ness is consumed, and we omit any pointers that previously went up entirely.
+        // down-ness is consumed. Any pointers that were previously hovering are left unchanged.
         val lastEvent = lastPointerEvent ?: return
 
+        if (lastEvent.changes.fastAll { !it.pressed }) {
+            return // There aren't any pressed pointers, so we don't need to send any events.
+        }
         val newChanges = lastEvent.changes.fastMapNotNull { old ->
-            if (old.pressed) {
-                old.copy(
-                    currentPressed = false,
-                    previousPosition = old.position,
-                    previousTime = old.uptimeMillis,
-                    previousPressed = old.pressed,
-                    consumed = DownChangeConsumed
-                )
-            } else null
+            old.copy(
+                currentPressed = false,
+                previousPosition = old.position,
+                previousTime = old.uptimeMillis,
+                previousPressed = old.pressed,
+                consumed = ConsumedData(downChange = old.pressed)
+            )
         }
 
         val cancelEvent = PointerEvent(newChanges)

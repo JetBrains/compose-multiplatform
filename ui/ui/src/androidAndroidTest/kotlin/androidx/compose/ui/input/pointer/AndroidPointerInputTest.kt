@@ -27,6 +27,7 @@ import android.view.MotionEvent.ACTION_HOVER_MOVE
 import android.view.MotionEvent.ACTION_MOVE
 import android.view.MotionEvent.ACTION_POINTER_INDEX_SHIFT
 import android.view.MotionEvent.ACTION_UP
+import android.view.MotionEvent.TOOL_TYPE_FINGER
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
@@ -1022,7 +1023,7 @@ class AndroidPointerInputTest {
                         Modifier
                             .align(Alignment.BottomCenter)
                             .size(50.dp)
-                            .graphicsLayer { translationY = 25.dp.toPx() }
+                            .graphicsLayer { translationY = 25.dp.roundToPx().toFloat() }
                             .pointerInput(Unit) {
                                 awaitPointerEventScope {
                                     while (true) {
@@ -1068,7 +1069,7 @@ class AndroidPointerInputTest {
                         Box(
                             Modifier
                                 .requiredSize(50.dp)
-                                .graphicsLayer { translationY = 25.dp.toPx() }
+                                .graphicsLayer { translationY = 25.dp.roundToPx().toFloat() }
                                 .pointerInput(Unit) {
                                     awaitPointerEventScope {
                                         while (true) {
@@ -1100,6 +1101,57 @@ class AndroidPointerInputTest {
             assertThat(eventLog[2].type).isEqualTo(PointerEventType.Move)
             assertThat(eventLog[3].type).isEqualTo(PointerEventType.Release)
             assertThat(eventLog[4].type).isEqualTo(PointerEventType.Exit)
+        }
+    }
+
+    @Test
+    fun cancelOnDeviceChange() {
+        // When a pointer has had a surprise removal, a "cancel" event should be sent if it was
+        // pressed.
+        var innerCoordinates: LayoutCoordinates? = null
+        val latch = CountDownLatch(1)
+        val eventLog = mutableListOf<PointerEvent>()
+        rule.runOnUiThread {
+            container.setContent {
+                Box(Modifier.fillMaxSize()
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                val event = awaitPointerEvent()
+                                event.changes[0].consumeAllChanges()
+                                eventLog += event
+                            }
+                        }
+                    }.onGloballyPositioned {
+                        innerCoordinates = it
+                        latch.countDown()
+                    }
+                )
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        val coords = innerCoordinates!!
+        dispatchMouseEvent(ACTION_HOVER_ENTER, coords)
+        dispatchMouseEvent(ACTION_DOWN, coords)
+        dispatchMouseEvent(ACTION_MOVE, coords, Offset(0f, 1f))
+
+        val motionEvent = MotionEvent(
+            5,
+            ACTION_DOWN,
+            1,
+            0,
+            arrayOf(PointerProperties(10).also { it.toolType = TOOL_TYPE_FINGER }),
+            arrayOf(PointerCoords(1f, 1f))
+        )
+
+        container.dispatchTouchEvent(motionEvent)
+        rule.runOnUiThread {
+            assertThat(eventLog).hasSize(5)
+            assertThat(eventLog[0].type).isEqualTo(PointerEventType.Enter)
+            assertThat(eventLog[1].type).isEqualTo(PointerEventType.Press)
+            assertThat(eventLog[2].type).isEqualTo(PointerEventType.Move)
+            assertThat(eventLog[3].type).isEqualTo(PointerEventType.Release)
+            assertThat(eventLog[4].type).isEqualTo(PointerEventType.Press)
         }
     }
 
