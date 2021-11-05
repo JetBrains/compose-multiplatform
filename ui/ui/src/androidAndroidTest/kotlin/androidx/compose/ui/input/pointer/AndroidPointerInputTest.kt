@@ -1104,13 +1104,9 @@ class AndroidPointerInputTest {
         }
     }
 
-    @Test
-    fun cancelOnDeviceChange() {
-        // When a pointer has had a surprise removal, a "cancel" event should be sent if it was
-        // pressed.
+    private fun setSimpleLayout(eventLog: MutableList<PointerEvent>): LayoutCoordinates {
         var innerCoordinates: LayoutCoordinates? = null
         val latch = CountDownLatch(1)
-        val eventLog = mutableListOf<PointerEvent>()
         rule.runOnUiThread {
             container.setContent {
                 Box(Modifier.fillMaxSize()
@@ -1130,7 +1126,16 @@ class AndroidPointerInputTest {
             }
         }
         assertTrue(latch.await(1, TimeUnit.SECONDS))
-        val coords = innerCoordinates!!
+        return innerCoordinates!!
+    }
+
+    @Test
+    fun cancelOnDeviceChange() {
+        // When a pointer has had a surprise removal, a "cancel" event should be sent if it was
+        // pressed.
+        val eventLog = mutableListOf<PointerEvent>()
+        val coords = setSimpleLayout(eventLog)
+
         dispatchMouseEvent(ACTION_HOVER_ENTER, coords)
         dispatchMouseEvent(ACTION_DOWN, coords)
         dispatchMouseEvent(ACTION_MOVE, coords, Offset(0f, 1f))
@@ -1152,6 +1157,18 @@ class AndroidPointerInputTest {
             assertThat(eventLog[2].type).isEqualTo(PointerEventType.Move)
             assertThat(eventLog[3].type).isEqualTo(PointerEventType.Release)
             assertThat(eventLog[4].type).isEqualTo(PointerEventType.Press)
+        }
+    }
+
+    @Test
+    fun testSyntheticEventPosition() {
+        val eventLog = mutableListOf<PointerEvent>()
+        val coords = setSimpleLayout(eventLog)
+        dispatchMouseEvent(ACTION_DOWN, coords)
+
+        rule.runOnUiThread {
+            assertThat(eventLog).hasSize(2)
+            assertThat(eventLog[0].changes[0].position).isEqualTo(eventLog[1].changes[0].position)
         }
     }
 
