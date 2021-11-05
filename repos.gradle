@@ -67,9 +67,7 @@ def addMavenRepositories(RepositoryHandler handler) {
         handler.mavenCentral()
         handler.jcenter()
         handler.google()
-        handler.maven {
-            url("https://plugins.gradle.org/m2/")
-        }
+        handler.gradlePluginPortal()
         handler.maven {
                url("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         }
