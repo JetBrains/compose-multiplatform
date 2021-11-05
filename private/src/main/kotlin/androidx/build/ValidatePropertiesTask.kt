@@ -25,7 +25,7 @@ import org.gradle.api.tasks.TaskAction
  * Gradle itself, but does not output them to stdout.
  * In practice, this should ensure that Android Studio sync is able to succeed
  */
-abstract class ValidatePropertiesTask() : DefaultTask() {
+abstract class ValidatePropertiesTask : DefaultTask() {
     @TaskAction
     fun exec() {
         for (entry in project.properties.toMap()) {

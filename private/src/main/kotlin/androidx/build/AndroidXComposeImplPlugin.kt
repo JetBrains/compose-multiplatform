@@ -59,7 +59,7 @@ const val enableReportsArg = "androidx.enableComposeCompilerReports"
  */
 class AndroidXComposeImplPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        val f: KFunction<Unit> = AndroidXComposeImplPlugin.Companion::applyAndConfigureKotlinPlugin
+        val f: KFunction<Unit> = Companion::applyAndConfigureKotlinPlugin
         project.extensions.add("applyAndConfigureKotlinPlugin", f)
         project.plugins.all { plugin ->
             when (plugin) {
@@ -311,9 +311,9 @@ fun Project.configureComposeImplPluginForAndroidx() {
         }
     }.files
 
-    val isTipOfTreeComposeCompilerProvider = project.provider({
+    val isTipOfTreeComposeCompilerProvider = project.provider {
         (!conf.isEmpty) && (conf.dependencies.first() !is ExternalModuleDependency)
-    })
+    }
     val enableMetricsProvider = project.providers.gradleProperty(enableMetricsArg)
     val enableReportsProvider = project.providers.gradleProperty(enableReportsArg)
 
@@ -330,9 +330,9 @@ fun Project.configureComposeImplPluginForAndroidx() {
                 compile.kotlinOptions.freeCompilerArgs +=
                     "-Xplugin=${kotlinPlugin.first()}"
 
-                val enableMetrics = (enableMetricsProvider.getOrNull() == "true")
+                val enableMetrics = (enableMetricsProvider.orNull == "true")
 
-                val enableReports = (enableReportsProvider.getOrNull() == "true")
+                val enableReports = (enableReportsProvider.orNull == "true")
 
                 // since metrics reports in compose compiler are a new feature, we only want to
                 // pass in this parameter for modules that are using the tip of tree compose

@@ -22,7 +22,6 @@ import groovy.util.Node
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.XmlProvider
-import org.gradle.api.artifacts.Dependency
 import org.gradle.api.component.SoftwareComponent
 import org.gradle.api.provider.Provider
 import org.gradle.api.publish.PublishingExtension
@@ -117,7 +116,7 @@ private fun Project.configureComponent(
         project.tasks.withType(GenerateModuleMetadata::class.java).configureEach { task ->
             task.doLast {
                 val metadata = task.outputFile.asFile.get()
-                var text = metadata.readText()
+                val text = metadata.readText()
                 metadata.writeText(
                     text.replace(
                         "\"buildId\": .*".toRegex(),
@@ -305,18 +304,6 @@ private fun isVersionRange(text: String): Boolean {
         text.contains("(") ||
         text.contains(")") ||
         text.contains(",")
-}
-
-private fun Project.collectDependenciesForConfiguration(
-    androidxDependencies: MutableSet<Dependency>,
-    name: String
-) {
-    val config = configurations.findByName(name)
-    config?.dependencies?.forEach { dep ->
-        if (dep.group?.startsWith("androidx.") == true) {
-            androidxDependencies.add(dep)
-        }
-    }
 }
 
 /**

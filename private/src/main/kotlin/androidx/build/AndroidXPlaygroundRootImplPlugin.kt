@@ -119,7 +119,7 @@ class AndroidXPlaygroundRootImplPlugin : Plugin<Project> {
             if (sections.size >= 3) {
                 val group = sections
                     // Filter empty sections as many declarations start with ':'
-                    .filter { !it.isBlank() }
+                    .filter { it.isNotBlank() }
                     // Last element is the artifact.
                     .dropLast(1)
                     .joinToString(".")
@@ -175,9 +175,9 @@ class AndroidXPlaygroundRootImplPlugin : Plugin<Project> {
 
     private fun RepositoryHandler.addPlaygroundRepositories() {
         repos.all.forEach { repoUrl ->
-            maven {
-                it.url = URI(repoUrl)
-                it.metadataSources {
+            maven { repository ->
+                repository.url = URI(repoUrl)
+                repository.metadataSources {
                     it.mavenPom()
                     it.artifact()
                 }
