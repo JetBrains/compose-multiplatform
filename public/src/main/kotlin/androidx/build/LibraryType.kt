@@ -74,6 +74,11 @@ enum class LibraryType(
     INTERNAL_TEST_LIBRARY(
         checkApi = RunApiTasks.No("Internal Library")
     ),
+    PUBLISHED_NATIVE_LIBRARY(
+        publish = Publish.SNAPSHOT_AND_RELEASE,
+        sourceJars = true,
+        checkApi = RunApiTasks.Yes()
+    ),
     SAMPLES(
         publish = Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = true,
