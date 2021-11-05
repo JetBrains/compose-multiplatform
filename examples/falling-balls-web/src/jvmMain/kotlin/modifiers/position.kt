@@ -9,6 +9,7 @@ import org.jetbrains.compose.common.ui.unit.implementation
 import androidx.compose.foundation.layout.offset
 
 @Composable
+@OptIn(ExperimentalComposeWebWidgetsApi::class)
 actual fun Modifier.position(width: Dp, height: Dp): Modifier = castOrCreate().apply {
     modifier = modifier.offset(width.implementation, height.implementation)
 }
