@@ -18,7 +18,6 @@ package androidx.build.studio
 
 import androidx.build.StudioType
 import androidx.build.getSupportRootFolder
-import androidx.build.studioType
 import com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -72,6 +71,7 @@ abstract class StudioTask : DefaultTask() {
         val libs = project.extensions.getByType(
             VersionCatalogsExtension::class.java
         ).find("libs").get()
+
         fun getVersion(key: String): String {
             val version = libs.findVersion(key)
             return if (version.isPresent) {
@@ -235,8 +235,8 @@ abstract class StudioTask : DefaultTask() {
         val fromPath = studioArchivePath
         val toPath = studioInstallationDir.absolutePath
         println("Extracting to $toPath...")
-        execOperations.exec {
-                execSpec -> platformUtilities.extractArchive(fromPath, toPath, execSpec)
+        execOperations.exec { execSpec ->
+            platformUtilities.extractArchive(fromPath, toPath, execSpec)
         }
         // Remove studio archive once done
         File(studioArchivePath).delete()
@@ -246,7 +246,7 @@ abstract class StudioTask : DefaultTask() {
         private const val STUDIO_TASK = "studio"
 
         fun Project.registerStudioTask() {
-            val studioTask = when (studioType()) {
+            val studioTask = when (StudioType.from(this)) {
                 StudioType.ANDROIDX -> RootStudioTask::class.java
                 StudioType.PLAYGROUND -> PlaygroundStudioTask::class.java
             }
