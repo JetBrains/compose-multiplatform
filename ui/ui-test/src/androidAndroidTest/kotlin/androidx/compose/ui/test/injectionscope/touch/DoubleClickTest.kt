@@ -119,19 +119,17 @@ class DoubleClickTest(private val config: TestConfig) {
     }
 
     private fun SinglePointerInputRecorder.assertIsDoubleClick(position: Offset) {
-        assertThat(events).hasSize(6)
+        assertThat(events).hasSize(4)
         val t0 = events[0].timestamp
         val id0 = events[0].id
 
         events[0].verify(t0 + 0, id0, true, position)
-        events[1].verify(t0 + eventPeriodMillis, id0, true, position)
-        events[2].verify(t0 + eventPeriodMillis, id0, false, position)
+        events[1].verify(t0 + eventPeriodMillis, id0, false, position)
 
-        val t1 = events[2].timestamp + expectedDelay
-        val id1 = events[3].id
+        val t1 = events[1].timestamp + expectedDelay
+        val id1 = events[2].id
 
-        events[3].verify(t1 + 0, id1, true, position)
-        events[4].verify(t1 + eventPeriodMillis, id1, true, position)
-        events[5].verify(t1 + eventPeriodMillis, id1, false, position)
+        events[2].verify(t1 + 0, id1, true, position)
+        events[3].verify(t1 + eventPeriodMillis, id1, false, position)
     }
 }

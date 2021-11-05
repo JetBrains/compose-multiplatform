@@ -20,6 +20,7 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.view.MotionEvent
+import android.view.MotionEvent.ACTION_CANCEL
 import android.view.MotionEvent.ACTION_DOWN
 import android.view.MotionEvent.ACTION_HOVER_ENTER
 import android.view.MotionEvent.ACTION_HOVER_EXIT
@@ -762,6 +763,37 @@ class AndroidPointerInputTest {
         }
     }
 
+    private fun dispatchStylusEvents(
+        layoutCoordinates: LayoutCoordinates,
+        offset: Offset,
+        vararg actions: Int
+    ) {
+        rule.runOnUiThread {
+            val root = layoutCoordinates.findRoot()
+            val pos = root.localPositionOf(layoutCoordinates, offset)
+            val androidComposeView = findAndroidComposeView(container) as AndroidComposeView
+
+            for (action in actions) {
+                val event = MotionEvent(
+                    0,
+                    action,
+                    1,
+                    0,
+                    arrayOf(PointerProperties(0).also {
+                        it.toolType = MotionEvent.TOOL_TYPE_STYLUS
+                    }),
+                    arrayOf(PointerCoords(pos.x, pos.y))
+                )
+
+                when (action) {
+                    ACTION_HOVER_ENTER, ACTION_HOVER_MOVE, ACTION_HOVER_EXIT ->
+                        androidComposeView.dispatchHoverEvent(event)
+                    else -> androidComposeView.dispatchTouchEvent(event)
+                }
+            }
+        }
+    }
+
     @Test
     fun dispatchHoverEnter() {
         var layoutCoordinates: LayoutCoordinates? = null
@@ -1169,6 +1201,135 @@ class AndroidPointerInputTest {
         rule.runOnUiThread {
             assertThat(eventLog).hasSize(2)
             assertThat(eventLog[0].changes[0].position).isEqualTo(eventLog[1].changes[0].position)
+        }
+    }
+
+    @Test
+    fun testStylusHoverExitDueToPress() {
+        val eventLog = mutableListOf<PointerEvent>()
+        val coords = setSimpleLayout(eventLog)
+
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_ENTER)
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_EXIT, ACTION_DOWN)
+
+        rule.runOnUiThread {
+            assertThat(eventLog).hasSize(2)
+            assertThat(eventLog[0].type).isEqualTo(PointerEventType.Enter)
+            assertThat(eventLog[1].type).isEqualTo(PointerEventType.Press)
+        }
+    }
+
+    @Test
+    fun testStylusHoverExitNoFollowingEvent() {
+        val eventLog = mutableListOf<PointerEvent>()
+        val coords = setSimpleLayout(eventLog)
+
+        // Exit followed by nothing should just send the exit
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_ENTER)
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_EXIT)
+
+        rule.runOnUiThread {
+            assertThat(eventLog).hasSize(2)
+            assertThat(eventLog[0].type).isEqualTo(PointerEventType.Enter)
+            assertThat(eventLog[1].type).isEqualTo(PointerEventType.Exit)
+        }
+    }
+
+    @Test
+    fun testStylusHoverExitWithFollowingHoverEvent() {
+        val eventLog = mutableListOf<PointerEvent>()
+        val coords = setSimpleLayout(eventLog)
+
+        // Exit immediately followed by enter with the same device should send both
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_ENTER)
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_EXIT, ACTION_HOVER_ENTER)
+
+        rule.runOnUiThread {
+            assertThat(eventLog).hasSize(3)
+            assertThat(eventLog[0].type).isEqualTo(PointerEventType.Enter)
+            assertThat(eventLog[1].type).isEqualTo(PointerEventType.Exit)
+            assertThat(eventLog[2].type).isEqualTo(PointerEventType.Enter)
+        }
+    }
+
+    @Test
+    fun testStylusHoverExitWithFollowingTouchEvent() {
+        val eventLog = mutableListOf<PointerEvent>()
+        val coords = setSimpleLayout(eventLog)
+
+        // Exit followed by cancel should send both
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_ENTER)
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_EXIT, ACTION_CANCEL)
+
+        rule.runOnUiThread {
+            assertThat(eventLog).hasSize(2)
+            assertThat(eventLog[0].type).isEqualTo(PointerEventType.Enter)
+            assertThat(eventLog[1].type).isEqualTo(PointerEventType.Exit)
+        }
+    }
+
+    @Test
+    fun testStylusHoverExitWithFollowingDownOnDifferentDevice() {
+        val eventLog = mutableListOf<PointerEvent>()
+        val coords = setSimpleLayout(eventLog)
+
+        // Exit followed by a different device should send the exit
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_ENTER)
+        rule.runOnUiThread {
+            val root = coords.findRoot()
+            val pos = root.localPositionOf(coords, Offset.Zero)
+            val androidComposeView = findAndroidComposeView(container) as AndroidComposeView
+            val exit = MotionEvent(
+                0,
+                ACTION_HOVER_EXIT,
+                1,
+                0,
+                arrayOf(PointerProperties(0).also {
+                    it.toolType = MotionEvent.TOOL_TYPE_STYLUS
+                }),
+                arrayOf(PointerCoords(pos.x, pos.y))
+            )
+
+            androidComposeView.dispatchHoverEvent(exit)
+
+            val down = MotionEvent(
+                0,
+                ACTION_DOWN,
+                1,
+                0,
+                arrayOf(PointerProperties(0).also {
+                    it.toolType = MotionEvent.TOOL_TYPE_FINGER
+                }),
+                arrayOf(PointerCoords(pos.x, pos.y))
+            )
+            androidComposeView.dispatchTouchEvent(down)
+        }
+
+        rule.runOnUiThread {
+            assertThat(eventLog).hasSize(3)
+            assertThat(eventLog[0].type).isEqualTo(PointerEventType.Enter)
+            assertThat(eventLog[1].type).isEqualTo(PointerEventType.Exit)
+            assertThat(eventLog[2].type).isEqualTo(PointerEventType.Press)
+        }
+    }
+
+    @Test
+    fun syntheticEventSentAfterUp() {
+        val eventLog = mutableListOf<PointerEvent>()
+        val coords = setSimpleLayout(eventLog)
+
+        dispatchMouseEvent(ACTION_HOVER_ENTER, coords)
+        dispatchMouseEvent(ACTION_DOWN, coords)
+        dispatchMouseEvent(ACTION_UP, coords)
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_ENTER)
+
+        rule.runOnUiThread {
+            assertThat(eventLog).hasSize(5)
+            assertThat(eventLog[0].type).isEqualTo(PointerEventType.Enter)
+            assertThat(eventLog[1].type).isEqualTo(PointerEventType.Press)
+            assertThat(eventLog[2].type).isEqualTo(PointerEventType.Release)
+            assertThat(eventLog[3].type).isEqualTo(PointerEventType.Exit)
+            assertThat(eventLog[4].type).isEqualTo(PointerEventType.Enter)
         }
     }
 
