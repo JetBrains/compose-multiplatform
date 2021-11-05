@@ -47,6 +47,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.yield
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -167,9 +168,8 @@ class SuspendingPointerInputFilterTest {
                 )
             ),
             // Synthetic cancel should look like this;
-            // only one pointer since the previous event's second pointer changed to up,
-            // the old position unchanged, 'down' changed from true to false, and the downChange
-            // marked as consumed.
+            // Both pointers are there, but only the with the pressed = true is changed to false,
+            // and the down change is consumed.
             PointerEvent(
                 listOf(
                     PointerInputChange(
@@ -181,13 +181,25 @@ class SuspendingPointerInputFilterTest {
                         Offset(6f, 6f),
                         true,
                         consumed = ConsumedData(downChange = true)
+                    ),
+                    PointerInputChange(
+                        PointerId(1),
+                        0,
+                        Offset(10f, 10f),
+                        false,
+                        0,
+                        Offset(10f, 10f),
+                        false,
+                        consumed = ConsumedData()
                     )
                 )
             )
         )
 
         expectedEvents.take(expectedEvents.size - 1).forEach {
+            filter.onPointerEvent(it, PointerEventPass.Initial, bounds)
             filter.onPointerEvent(it, PointerEventPass.Main, bounds)
+            filter.onPointerEvent(it, PointerEventPass.Final, bounds)
         }
         filter.onCancel()
 
@@ -202,8 +214,76 @@ class SuspendingPointerInputFilterTest {
             PointerEventSubject.assertThat(actualEvent).isStructurallyEqualTo(expectedEvent)
         }
         assertThat(currentEventAtEnd).isNotNull()
-        assertThat(currentEventAtEnd!!.changes.size).isEqualTo(1)
-        assertThat(currentEventAtEnd!!.changes[0].pressed).isFalse()
+        PointerEventSubject.assertThat(currentEventAtEnd!!)
+            .isStructurallyEqualTo(expectedEvents.last())
+    }
+
+    @Test
+    fun testNoSyntheticCancelEventWhenPressIsFalse(): Unit = runBlockingTest {
+        var currentEventAtEnd: PointerEvent? = null
+        val filter = SuspendingPointerInputFilter(TestViewConfiguration())
+        val results = Channel<PointerEvent>(Channel.UNLIMITED)
+        launch {
+            with(filter) {
+                awaitPointerEventScope {
+                    try {
+                        repeat(3) {
+                            withTimeout(200) {
+                                results.trySend(awaitPointerEvent())
+                            }
+                        }
+                    } finally {
+                        currentEventAtEnd = currentEvent
+                        results.close()
+                    }
+                }
+            }
+        }
+
+        val bounds = IntSize(50, 50)
+        val emitter1 = PointerInputChangeEmitter(0)
+        val emitter2 = PointerInputChangeEmitter(1)
+        val expectedEvents = listOf(
+            PointerEvent(
+                listOf(
+                    emitter1.nextChange(Offset(5f, 5f)),
+                    emitter2.nextChange(Offset(10f, 10f))
+                )
+            ),
+            PointerEvent(
+                listOf(
+                    emitter1.nextChange(Offset(6f, 6f), down = false),
+                    emitter2.nextChange(Offset(10f, 10f), down = false)
+                )
+            )
+            // Unlike when a pointer is down, there is no cancel event sent
+            // when there aren't any pressed pointers. There's no event stream to cancel.
+        )
+
+        expectedEvents.forEach {
+            filter.onPointerEvent(it, PointerEventPass.Initial, bounds)
+            filter.onPointerEvent(it, PointerEventPass.Main, bounds)
+            filter.onPointerEvent(it, PointerEventPass.Final, bounds)
+        }
+        filter.onCancel()
+
+        withTimeout(400) {
+            while (!results.isClosedForSend) {
+                yield()
+            }
+        }
+
+        val received = results.receiveAsFlow().toList()
+
+        assertThat(received).hasSize(expectedEvents.size)
+
+        expectedEvents.forEachIndexed { index, expectedEvent ->
+            val actualEvent = received[index]
+            PointerEventSubject.assertThat(actualEvent).isStructurallyEqualTo(expectedEvent)
+        }
+        assertThat(currentEventAtEnd).isNotNull()
+        PointerEventSubject.assertThat(currentEventAtEnd!!)
+            .isStructurallyEqualTo(expectedEvents.last())
     }
 
     @Test

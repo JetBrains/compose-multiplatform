@@ -28,6 +28,7 @@ import android.util.SparseArray
 import android.view.InputDevice
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_CANCEL
+import android.view.MotionEvent.ACTION_DOWN
 import android.view.MotionEvent.ACTION_HOVER_ENTER
 import android.view.MotionEvent.ACTION_HOVER_EXIT
 import android.view.MotionEvent.ACTION_HOVER_MOVE
@@ -1014,27 +1015,36 @@ internal class AndroidComposeView(context: Context) :
             measureAndLayout(sendPointerUpdate = false)
             desiredPointerIcon = null
             val result = trace("AndroidOwner:onTouch") {
-                val isInBounds = isInBounds(motionEvent)
                 val action = motionEvent.actionMasked
-                val isMouseEvent = motionEvent.getToolType(0) == TOOL_TYPE_MOUSE
                 val lastEvent = previousMotionEvent
-                val wasMouseEvent = lastEvent?.getToolType(0) == TOOL_TYPE_MOUSE
-                if (!wasMouseEvent &&
-                    isInBounds &&
-                    isMouseEvent &&
-                    action != ACTION_CANCEL &&
-                    action != ACTION_HOVER_ENTER
+
+                if (lastEvent != null &&
+                    hasChangedDevices(motionEvent, lastEvent) &&
+                    isDevicePressEvent(lastEvent)
                 ) {
-                    // We didn't previously have an enter event and we're getting our first
-                    // mouse event. Send a simulated enter event so that we have a consistent
-                    // enter/exit.
-                    sendSimulatedEvent(motionEvent, ACTION_HOVER_ENTER, motionEvent.eventTime)
-                } else if (!isMouseEvent && lastEvent != null && wasMouseEvent &&
-                    lastEvent.actionMasked != ACTION_HOVER_EXIT
-                ) {
-                    // The mouse cursor disappeared without sending an ACTION_HOVER_EXIT, so
-                    // we have to send that event.
-                    sendSimulatedEvent(lastEvent, ACTION_HOVER_EXIT, lastEvent.eventTime)
+                    // Send a cancel event
+                    pointerInputEventProcessor.processCancel()
+                } else {
+                    val isMouseEvent = motionEvent.getToolType(0) == TOOL_TYPE_MOUSE
+                    val wasMouseEvent = lastEvent?.getToolType(0) == TOOL_TYPE_MOUSE
+
+                    if (!wasMouseEvent &&
+                        isMouseEvent &&
+                        action != ACTION_CANCEL &&
+                        action != ACTION_HOVER_ENTER &&
+                        isInBounds(motionEvent)
+                    ) {
+                        // We didn't previously have an enter event and we're getting our first
+                        // mouse event. Send a simulated enter event so that we have a consistent
+                        // enter/exit.
+                        sendSimulatedEvent(motionEvent, ACTION_HOVER_ENTER, motionEvent.eventTime)
+                    } else if (!isMouseEvent && lastEvent != null && wasMouseEvent &&
+                        lastEvent.actionMasked != ACTION_HOVER_EXIT
+                    ) {
+                        // The mouse cursor disappeared without sending an ACTION_HOVER_EXIT, so
+                        // we have to send that event.
+                        sendSimulatedEvent(lastEvent, ACTION_HOVER_EXIT, lastEvent.eventTime)
+                    }
                 }
                 lastEvent?.recycle()
                 previousMotionEvent = MotionEvent.obtainNoHistory(motionEvent)
@@ -1054,7 +1064,7 @@ internal class AndroidComposeView(context: Context) :
                     pointerInputEventProcessor.process(
                         pointerInputEvent,
                         this,
-                        isInBounds
+                        isInBounds(motionEvent)
                     )
                 } else {
                     pointerInputEventProcessor.processCancel()
@@ -1073,6 +1083,29 @@ internal class AndroidComposeView(context: Context) :
             return result
         } finally {
             forceUseMatrixCache = false
+        }
+    }
+
+    private fun hasChangedDevices(event: MotionEvent, lastEvent: MotionEvent): Boolean {
+        return lastEvent.source != event.source ||
+            lastEvent.getToolType(0) != event.getToolType(0)
+    }
+
+    private fun isDevicePressEvent(event: MotionEvent): Boolean {
+        if (event.buttonState != 0) {
+            return true
+        }
+        return when (event.actionMasked) {
+            ACTION_POINTER_UP, // means that there is at least one remaining pointer
+            ACTION_DOWN,
+            ACTION_MOVE -> true
+//            ACTION_SCROLL, // We've already checked for buttonState, so it must not be down
+//            ACTION_HOVER_ENTER,
+//            ACTION_HOVER_MOVE,
+//            ACTION_HOVER_EXIT,
+//            ACTION_UP,
+//            ACTION_CANCEL,
+            else -> false
         }
     }
 
