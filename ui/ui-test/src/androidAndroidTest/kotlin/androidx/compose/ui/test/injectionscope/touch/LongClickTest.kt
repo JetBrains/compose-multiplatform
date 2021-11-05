@@ -134,7 +134,7 @@ class LongClickTest(private val config: TestConfig) {
         val t0 = events[0].timestamp
         val id = events[0].id
 
-        assertThat(events).hasSize(steps + 2)
+        assertThat(events).hasSize(2)
         events.dropLast(1).forEachIndexed { i, event ->
             // Don't check the timestamp
             val t = t0 + (expectedDuration * i / steps.toDouble()).roundToLong()

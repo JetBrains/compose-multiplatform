@@ -371,7 +371,7 @@ class PointerInteropFilterComposeHookupTest {
                 1,
                 0,
                 arrayOf(PointerProperties(0)),
-                arrayOf(PointerCoords(100f, 50f)),
+                arrayOf(PointerCoords(100f, 51f)),
                 root
             )
 

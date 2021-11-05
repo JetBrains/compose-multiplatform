@@ -102,8 +102,8 @@ class SwipeWithVelocityTest(private val config: TestConfig) {
 
         rule.runOnIdle {
             recorder.run {
-                val durationMs = config.durationMillis
-                val minimumEventSize = max(2, (durationMs / eventPeriodMillis).toInt())
+                // At least the last 100ms should have velocity
+                val minimumEventSize = max(2, (100 / eventPeriodMillis).toInt())
                 assertThat(events.size).isAtLeast(minimumEventSize)
                 assertOnlyLastEventIsUp()
                 assertUpSameAsLastMove()

@@ -79,10 +79,10 @@ import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.setFrom
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.PlatformHapticFeedback
-import androidx.compose.ui.input.InputModeManager
-import androidx.compose.ui.input.InputModeManagerImpl
 import androidx.compose.ui.input.InputMode.Companion.Keyboard
 import androidx.compose.ui.input.InputMode.Companion.Touch
+import androidx.compose.ui.input.InputModeManager
+import androidx.compose.ui.input.InputModeManagerImpl
 import androidx.compose.ui.input.key.Key.Companion.Back
 import androidx.compose.ui.input.key.Key.Companion.DirectionCenter
 import androidx.compose.ui.input.key.Key.Companion.DirectionDown
@@ -447,6 +447,26 @@ internal class AndroidComposeView(context: Context) :
             }
         }
     }
+
+    /**
+     * If an [ACTION_HOVER_EXIT] event is received, it could be because an [ACTION_DOWN] is coming
+     * from a mouse or stylus. We can't know for certain until the next event is sent. This message
+     * is posted after receiving the [ACTION_HOVER_EXIT] to send the event if nothing else is
+     * received before that.
+     */
+    private val sendHoverExitEvent = Runnable {
+        hoverExitReceived = false
+        val lastEvent = previousMotionEvent!!
+        check(lastEvent.actionMasked == ACTION_HOVER_EXIT) {
+            "The ACTION_HOVER_EXIT event was not cleared."
+        }
+        sendMotionEvent(lastEvent)
+    }
+
+    /**
+     * Set to `true` when [sendHoverExitEvent] has been posted.
+     */
+    private var hoverExitReceived = false
 
     /**
      * Callback for [measureAndLayout] to update the pointer position 150ms after layout.
@@ -994,8 +1014,28 @@ internal class AndroidComposeView(context: Context) :
 
     // TODO(shepshapard): Test this method.
     override fun dispatchTouchEvent(motionEvent: MotionEvent): Boolean {
+        if (hoverExitReceived) {
+            // Go ahead and send ACTION_HOVER_EXIT if this isn't an ACTION_DOWN for the same
+            // pointer
+            removeCallbacks(sendHoverExitEvent)
+            val lastEvent = previousMotionEvent!!
+            if (motionEvent.actionMasked != ACTION_DOWN ||
+                hasChangedDevices(motionEvent, lastEvent)
+            ) {
+                sendHoverExitEvent.run()
+            } else {
+                hoverExitReceived = false
+            }
+        }
         if (isBadMotionEvent(motionEvent)) {
             return false // Bad MotionEvent. Don't handle it.
+        }
+
+        if (motionEvent.actionMasked == ACTION_MOVE && !isPositionChanged(motionEvent)) {
+            // There was no movement from previous MotionEvent, so we don't need to dispatch this.
+            // This could be a scroll event or some other non-touch event that results in an
+            // ACTION_MOVE without any movement.
+            return false
         }
 
         val processResult = handleMotionEvent(motionEvent)
@@ -1018,61 +1058,37 @@ internal class AndroidComposeView(context: Context) :
                 val action = motionEvent.actionMasked
                 val lastEvent = previousMotionEvent
 
+                val wasMouseEvent = lastEvent?.getToolType(0) == TOOL_TYPE_MOUSE
                 if (lastEvent != null &&
-                    hasChangedDevices(motionEvent, lastEvent) &&
-                    isDevicePressEvent(lastEvent)
+                    hasChangedDevices(motionEvent, lastEvent)
                 ) {
-                    // Send a cancel event
-                    pointerInputEventProcessor.processCancel()
-                } else {
-                    val isMouseEvent = motionEvent.getToolType(0) == TOOL_TYPE_MOUSE
-                    val wasMouseEvent = lastEvent?.getToolType(0) == TOOL_TYPE_MOUSE
-
-                    if (!wasMouseEvent &&
-                        isMouseEvent &&
-                        action != ACTION_CANCEL &&
-                        action != ACTION_HOVER_ENTER &&
-                        isInBounds(motionEvent)
-                    ) {
-                        // We didn't previously have an enter event and we're getting our first
-                        // mouse event. Send a simulated enter event so that we have a consistent
-                        // enter/exit.
-                        sendSimulatedEvent(motionEvent, ACTION_HOVER_ENTER, motionEvent.eventTime)
-                    } else if (!isMouseEvent && lastEvent != null && wasMouseEvent &&
-                        lastEvent.actionMasked != ACTION_HOVER_EXIT
-                    ) {
+                    if (isDevicePressEvent(lastEvent)) {
+                        // Send a cancel event
+                        pointerInputEventProcessor.processCancel()
+                    } else if (lastEvent.actionMasked != ACTION_HOVER_EXIT && wasMouseEvent) {
                         // The mouse cursor disappeared without sending an ACTION_HOVER_EXIT, so
                         // we have to send that event.
                         sendSimulatedEvent(lastEvent, ACTION_HOVER_EXIT, lastEvent.eventTime)
                     }
                 }
+
+                val isMouseEvent = motionEvent.getToolType(0) == TOOL_TYPE_MOUSE
+
+                if (!wasMouseEvent &&
+                    isMouseEvent &&
+                    action != ACTION_CANCEL &&
+                    action != ACTION_HOVER_ENTER &&
+                    isInBounds(motionEvent)
+                ) {
+                    // We didn't previously have an enter event and we're getting our first
+                    // mouse event. Send a simulated enter event so that we have a consistent
+                    // enter/exit.
+                    sendSimulatedEvent(motionEvent, ACTION_HOVER_ENTER, motionEvent.eventTime)
+                }
                 lastEvent?.recycle()
                 previousMotionEvent = MotionEvent.obtainNoHistory(motionEvent)
 
-                val pointerInputEvent =
-                    motionEventAdapter.convertToPointerInputEvent(motionEvent, this)
-                if (pointerInputEvent != null) {
-                    // Cache the last position of the last pointer to go down so we can check if
-                    // it's in a scrollable region in canScroll{Vertically|Horizontally}. Those
-                    // methods use semantics data, and because semantics coordinates are local to
-                    // this view, the pointer _position_, not _positionOnScreen_, is the offset that
-                    // needs to be cached.
-                    pointerInputEvent.pointers.lastOrNull { it.down }?.position?.let {
-                        lastDownPointerPosition = it
-                    }
-
-                    pointerInputEventProcessor.process(
-                        pointerInputEvent,
-                        this,
-                        isInBounds(motionEvent)
-                    )
-                } else {
-                    pointerInputEventProcessor.processCancel()
-                    ProcessResult(
-                        dispatchedToAPointerInputModifier = false,
-                        anyMovementConsumed = false
-                    )
-                }
+                sendMotionEvent(motionEvent)
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 AndroidComposeViewVerificationHelperMethodsN.setPointerIcon(
@@ -1109,15 +1125,43 @@ internal class AndroidComposeView(context: Context) :
         }
     }
 
+    private fun sendMotionEvent(motionEvent: MotionEvent): ProcessResult {
+        val pointerInputEvent =
+            motionEventAdapter.convertToPointerInputEvent(motionEvent, this)
+        return if (pointerInputEvent != null) {
+            // Cache the last position of the last pointer to go down so we can check if
+            // it's in a scrollable region in canScroll{Vertically|Horizontally}. Those
+            // methods use semantics data, and because semantics coordinates are local to
+            // this view, the pointer _position_, not _positionOnScreen_, is the offset that
+            // needs to be cached.
+            pointerInputEvent.pointers.lastOrNull { it.down }?.position?.let {
+                lastDownPointerPosition = it
+            }
+
+            pointerInputEventProcessor.process(
+                pointerInputEvent,
+                this,
+                isInBounds(motionEvent)
+            )
+        } else {
+            pointerInputEventProcessor.processCancel()
+            ProcessResult(
+                dispatchedToAPointerInputModifier = false,
+                anyMovementConsumed = false
+            )
+        }
+    }
+
     private fun sendSimulatedEvent(
         motionEvent: MotionEvent,
         action: Int,
         eventTime: Long,
         forceHover: Boolean = true
     ) {
-        // don't send any events for pointers that are "up"
-        val upIndex = when (motionEvent.actionMasked) {
-            ACTION_UP -> 0
+        val oldAction = motionEvent.actionMasked
+        // don't send any events for pointers that are "up" unless they support hover
+        val upIndex = when (oldAction) {
+            ACTION_UP -> if (action == ACTION_HOVER_ENTER || action == ACTION_HOVER_EXIT) -1 else 0
             ACTION_POINTER_UP -> motionEvent.actionIndex
             else -> -1
         }
@@ -1292,6 +1336,11 @@ internal class AndroidComposeView(context: Context) :
     private fun autofillSupported() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
 
     public override fun dispatchHoverEvent(event: MotionEvent): Boolean {
+        if (hoverExitReceived) {
+            // Go ahead and send it now
+            removeCallbacks(sendHoverExitEvent)
+            sendHoverExitEvent.run()
+        }
         if (isBadMotionEvent(event)) {
             return false // Bad MotionEvent. Don't handle it.
         }
@@ -1302,11 +1351,23 @@ internal class AndroidComposeView(context: Context) :
             return accessibilityDelegate.dispatchHoverEvent(event)
         }
         when (event.actionMasked) {
-            ACTION_HOVER_EXIT ->
-                // Check if we're receiving ACTION_HOVER_EXIT because of a button press
-                if (event.buttonState != 0) {
-                    return false
+            ACTION_HOVER_EXIT -> {
+                if (isInBounds(event)) {
+                    if (event.getToolType(0) != TOOL_TYPE_MOUSE) {
+                        // This may be caused by a press (e.g. stylus pressed on the screen), but
+                        // we can't be sure until the ACTION_DOWN is received. Let's delay this
+                        // message and see if the ACTION_DOWN comes.
+                        previousMotionEvent?.recycle()
+                        previousMotionEvent = MotionEvent.obtainNoHistory(event)
+                        hoverExitReceived = true
+                        post(sendHoverExitEvent)
+                        return false
+                    } else if (event.buttonState != 0) {
+                        // We know that this is caused by a button press, so we can ignore it
+                        return false
+                    }
                 }
+            }
             ACTION_HOVER_MOVE ->
                 // Check if we're receiving this when we've already handled it elsewhere
                 if (!isPositionChanged(event)) {

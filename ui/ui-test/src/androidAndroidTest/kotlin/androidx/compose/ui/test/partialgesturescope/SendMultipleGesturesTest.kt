@@ -75,11 +75,11 @@ class SendMultipleGesturesTest {
 
         rule.runOnIdle {
             recorder.run {
-                // Then we have recorded [down, move, up*, down**, move, up] and the difference
+                // Then we have recorded [down, up*, down**, up] and the difference
                 // between *) and **) is zero
-                assertThat(events).hasSize(6)
-                val t1 = events[2].timestamp
-                val t2 = events[3].timestamp
+                assertThat(events).hasSize(4)
+                val t1 = events[1].timestamp
+                val t2 = events[2].timestamp
                 assertThat(t2 - t1).isEqualTo(expectedDifference)
             }
         }
