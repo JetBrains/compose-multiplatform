@@ -18,6 +18,13 @@ package androidx.compose.ui.input.pointer
 
 import android.os.SystemClock
 import android.view.MotionEvent
+import android.view.MotionEvent.ACTION_CANCEL
+import android.view.MotionEvent.ACTION_DOWN
+import android.view.MotionEvent.ACTION_MOVE
+import android.view.MotionEvent.ACTION_OUTSIDE
+import android.view.MotionEvent.ACTION_POINTER_DOWN
+import android.view.MotionEvent.ACTION_POINTER_UP
+import android.view.MotionEvent.ACTION_UP
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewParent
@@ -96,7 +103,21 @@ class RequestDisallowInterceptTouchEvent : (Boolean) -> Unit {
 internal fun Modifier.pointerInteropFilter(view: AndroidViewHolder): Modifier {
     val filter = PointerInteropFilter()
     filter.onTouchEvent = { motionEvent ->
-        view.dispatchTouchEvent(motionEvent)
+        when (motionEvent.actionMasked) {
+            ACTION_DOWN,
+            ACTION_POINTER_DOWN,
+            ACTION_MOVE,
+            ACTION_UP,
+            ACTION_POINTER_UP,
+            ACTION_OUTSIDE,
+            ACTION_CANCEL -> view.dispatchTouchEvent(motionEvent)
+            // ACTION_HOVER_ENTER,
+            // ACTION_HOVER_MOVE,
+            // ACTION_HOVER_EXIT,
+            // ACTION_BUTTON_PRESS,
+            // ACTION_BUTTON_RELEASE,
+            else -> view.dispatchGenericMotionEvent(motionEvent)
+        }
     }
     val requestDisallowInterceptTouchEvent = RequestDisallowInterceptTouchEvent()
     filter.requestDisallowInterceptTouchEvent = requestDisallowInterceptTouchEvent
