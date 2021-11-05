@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.layout.GraphicLayerInfo
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
@@ -44,7 +45,7 @@ internal class RenderNodeLayer(
     val ownerView: AndroidComposeView,
     drawBlock: (Canvas) -> Unit,
     invalidateParentLayer: () -> Unit
-) : OwnedLayer {
+) : OwnedLayer, GraphicLayerInfo {
     private var drawBlock: ((Canvas) -> Unit)? = drawBlock
     private var invalidateParentLayer: (() -> Unit)? = invalidateParentLayer
 
