@@ -26,6 +26,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
@@ -38,6 +39,7 @@ import java.io.File
  * version of public androidx dependencies and release checklist of the library for consumption
  * by the Jetpack Release Service (JetPad).
  */
+@CacheableTask
 abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
     init {
         group = "Help"
