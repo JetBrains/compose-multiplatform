@@ -62,4 +62,10 @@ internal expect class InternalPointerEvent(
     pointerInputEvent: PointerInputEvent
 ) {
     val changes: Map<PointerId, PointerInputChange>
+
+    /**
+     * Embedded Android Views may consume an event and [ProcessResult] should not
+     * return that the position change was consumed because of this.
+     */
+    var suppressMovementConsumption: Boolean
 }

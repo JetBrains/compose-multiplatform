@@ -26,22 +26,20 @@ internal actual typealias NativePointerKeyboardModifiers = Int
 /**
  * Describes a pointer input change event that has occurred at a particular point in time.
  */
-actual data class PointerEvent internal constructor(
+actual class PointerEvent internal actual constructor(
     /**
      * The changes.
      */
     actual val changes: List<PointerInputChange>,
-    internal val motionEvent: MotionEvent?
+    internal val internalPointerEvent: InternalPointerEvent?
 ) {
-    internal actual constructor(
-        changes: List<PointerInputChange>,
-        internalPointerEvent: InternalPointerEvent?
-    ) : this(changes, internalPointerEvent?.motionEvent)
+    internal val motionEvent: MotionEvent?
+        get() = internalPointerEvent?.motionEvent
 
     /**
      * @param changes The changes.
      */
-    actual constructor(changes: List<PointerInputChange>) : this(changes, motionEvent = null)
+    actual constructor(changes: List<PointerInputChange>) : this(changes, null)
 
     actual val buttons = PointerButtons(motionEvent?.buttonState ?: 0)
 
@@ -51,6 +49,7 @@ actual data class PointerEvent internal constructor(
         internal set
 
     private fun calculatePointerEventType(): PointerEventType {
+        val motionEvent = motionEvent
         if (motionEvent != null) {
             return when (motionEvent.actionMasked) {
                 MotionEvent.ACTION_DOWN,
@@ -75,6 +74,26 @@ actual data class PointerEvent internal constructor(
             }
         }
         return PointerEventType.Move
+    }
+
+    // only because PointerEvent was a data class
+    fun component1(): List<PointerInputChange> = changes
+
+    // only because PointerEvent was a data class
+    fun copy(
+        changes: List<PointerInputChange>,
+        motionEvent: MotionEvent?
+    ): PointerEvent = when (motionEvent) {
+        null -> PointerEvent(changes, null)
+        this.motionEvent -> PointerEvent(changes, internalPointerEvent)
+        else -> {
+            val map = mutableMapOf<PointerId, PointerInputChange>()
+            changes.fastForEach { change ->
+                map[change.id] = change
+            }
+            val event = InternalPointerEvent(map, motionEvent)
+            PointerEvent(changes, event)
+        }
     }
 }
 
