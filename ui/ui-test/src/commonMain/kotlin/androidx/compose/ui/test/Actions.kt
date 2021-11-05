@@ -314,7 +314,7 @@ fun SemanticsNodeInteraction.performGesture(
         try {
             block()
         } finally {
-            delegateScope.dispose()
+            dispose()
         }
     }
     return this

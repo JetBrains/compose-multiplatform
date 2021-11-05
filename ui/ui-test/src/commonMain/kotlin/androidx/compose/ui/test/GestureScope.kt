@@ -91,15 +91,19 @@ private const val LongPressTimeoutMillis: Long = 500L
     message = "Replaced by TouchInjectionScope"
 )
 class GestureScope(node: SemanticsNode, testContext: TestContext) {
+    private val delegateScopeImpl = MultiModalInjectionScopeImpl(node, testContext)
     @PublishedApi
-    internal val delegateScope: MultiModalInjectionScope =
-        MultiModalInjectionScopeImpl(node, testContext)
+    internal val delegateScope: MultiModalInjectionScope = delegateScopeImpl
 
     /**
      * Returns the size of the visible part of the node we're interacting with. This is contrary
      * to [SemanticsNode.size], which returns the unclipped size of the node.
      */
     val visibleSize: IntSize = delegateScope.visibleSize
+
+    internal fun dispose() {
+        delegateScopeImpl.dispose()
+    }
 }
 
 /**
