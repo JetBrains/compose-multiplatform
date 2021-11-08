@@ -139,7 +139,8 @@ fun ExposedDropdownMenuBox(
     }
 
     DisposableEffect(view) {
-        val listener = ViewTreeObserver.OnGlobalLayoutListener {
+        val listener = OnGlobalLayoutListener(view) {
+            // We want to recalculate the menu height on relayout - e.g. when keyboard shows up.
             updateHeight(
                 view.rootView,
                 coordinates.value,
@@ -148,10 +149,46 @@ fun ExposedDropdownMenuBox(
                 menuHeight = newHeight
             }
         }
-        view.viewTreeObserver.addOnGlobalLayoutListener(listener)
-        onDispose {
-            view.viewTreeObserver.removeOnGlobalLayoutListener(listener)
-        }
+        onDispose { listener.dispose() }
+    }
+}
+
+/**
+ * Subscribes to onGlobalLayout and correctly removes the callback when the View is detached.
+ * Logic copied from AndroidPopup.android.kt.
+ */
+private class OnGlobalLayoutListener(
+    private val view: View,
+    private val onGlobalLayoutCallback: () -> Unit
+) : View.OnAttachStateChangeListener, ViewTreeObserver.OnGlobalLayoutListener {
+    private var isListeningToGlobalLayout = false
+
+    init {
+        view.addOnAttachStateChangeListener(this)
+        registerOnGlobalLayoutListener()
+    }
+
+    override fun onViewAttachedToWindow(p0: View?) = registerOnGlobalLayoutListener()
+
+    override fun onViewDetachedFromWindow(p0: View?) = unregisterOnGlobalLayoutListener()
+
+    override fun onGlobalLayout() = onGlobalLayoutCallback()
+
+    private fun registerOnGlobalLayoutListener() {
+        if (isListeningToGlobalLayout || !view.isAttachedToWindow) return
+        view.viewTreeObserver.addOnGlobalLayoutListener(this)
+        isListeningToGlobalLayout = true
+    }
+
+    private fun unregisterOnGlobalLayoutListener() {
+        if (!isListeningToGlobalLayout) return
+        view.viewTreeObserver.removeOnGlobalLayoutListener(this)
+        isListeningToGlobalLayout = false
+    }
+
+    fun dispose() {
+        unregisterOnGlobalLayoutListener()
+        view.removeOnAttachStateChangeListener(this)
     }
 }
 

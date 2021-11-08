@@ -451,9 +451,9 @@ class PopupTest {
         var parent: FrameLayout? = null
         rule.setContent {
             AndroidView(
-                factory = {
-                    FrameLayout(it).apply {
-                        addView(ComposeView(it).apply {
+                factory = { context ->
+                    FrameLayout(context).apply {
+                        addView(ComposeView(context).apply {
                             setContent {
                                 Box {
                                     Popup { Box(Modifier.size(20.dp)) }
@@ -468,6 +468,8 @@ class PopupTest {
         rule.runOnIdle {
             parent!!.removeAllViews()
         }
+
+        rule.waitForIdle()
 
         // Should not have crashed.
     }
