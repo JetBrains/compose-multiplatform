@@ -11,13 +11,14 @@ subprojects {
         mavenCentral()
     }
 
-    plugins.withId("java") {
-        configureIfExists<JavaPluginExtension> {
-            sourceCompatibility = JavaVersion.VERSION_1_8
-            targetCompatibility = JavaVersion.VERSION_1_8
-
-            withJavadocJar()
-            withSourcesJar()
+    plugins.withType(JavaBasePlugin::class.java) {
+        afterEvaluate {
+            configureIfExists<JavaPluginExtension> {
+                if (sourceSets.names.contains(SourceSet.MAIN_SOURCE_SET_NAME)) {
+                    withJavadocJar()
+                    withSourcesJar()
+                }
+            }
         }
     }
 
