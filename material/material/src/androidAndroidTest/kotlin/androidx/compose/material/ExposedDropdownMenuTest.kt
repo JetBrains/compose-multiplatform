@@ -16,8 +16,10 @@
 
 package androidx.compose.material
 
+import android.widget.FrameLayout
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsFocused
@@ -35,6 +38,8 @@ import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -175,6 +180,36 @@ class ExposedDropdownMenuTest {
         // Menu should collapse
         rule.onNodeWithTag(MenuItemTag).assertDoesNotExist()
         rule.onNodeWithTag(TFTag).assertTextContains(OptionName)
+    }
+
+    @Test
+    fun doesNotCrashWhenAnchorDetachedFirst() {
+        var parent: FrameLayout? = null
+        rule.setContent {
+            AndroidView(
+                factory = { context ->
+                    FrameLayout(context).apply {
+                        addView(ComposeView(context).apply {
+                            setContent {
+                                Box {
+                                    ExposedDropdownMenuBox(expanded = true, onExpandedChange = {}) {
+                                        Box(Modifier.size(20.dp))
+                                    }
+                                }
+                            }
+                        })
+                    }.also { parent = it }
+                }
+            )
+        }
+
+        rule.runOnIdle {
+            parent!!.removeAllViews()
+        }
+
+        rule.waitForIdle()
+
+        // Should not have crashed.
     }
 
     @Composable
