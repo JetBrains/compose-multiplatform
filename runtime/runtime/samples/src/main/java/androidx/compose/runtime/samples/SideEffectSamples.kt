@@ -118,7 +118,7 @@ private interface Notification {
 private const val NotificationTimeout = 5_000L
 
 @Sampled
-fun rememberUpdatedStateSampleWithLaunchedTask() {
+fun rememberUpdatedStateSampleWithLaunchedEffect() {
     @Composable
     fun NotificationHost(state: NotificationState, onTimeout: (Notification) -> Unit) {
         val currentOnTimeout by rememberUpdatedState(onTimeout)
