@@ -33,7 +33,7 @@ Preview functionality (check your application UI without building/running it) fo
        * [Getting started](tutorials/Getting_Started)
        * [Image and icon manipulations](tutorials/Image_And_Icons_Manipulations)
        * [Mouse events and hover](tutorials/Mouse_Events)
-       * [Scrolling and scrollbars](tutorials/Desktop_Components)
+       * [Scrolling and scrollbars](tutorials/Desktop_Components#scrollbars)
        * [Tooltips](tutorials/Desktop_Components#tooltips)
        * [Top level windows management](tutorials/Window_API_new)
        * [Menu, tray, notifications](tutorials/Tray_Notifications_MenuBar_new)
