@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.test.junit4.android
+package androidx.compose.ui.test.junit4
 
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.test.IdlingResource
-import androidx.compose.ui.test.junit4.MainTestClockImpl
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
 
 /**
  * Provides an idle check to be registered into Espresso.

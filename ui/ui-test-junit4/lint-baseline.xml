@@ -7,8 +7,8 @@
         errorLine1="            hadPendingMeasureLayout = composeRoots.any { it.hasPendingMeasureOrLayout }"
         errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/android/ComposeIdlingResource.android.kt"
-            line="69"
+            file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/ComposeIdlingResource.android.kt"
+            line="67"
             column="61"/>
     </issue>
 
@@ -18,8 +18,8 @@
         errorLine1="        return view.rootView.parent != null &amp;&amp; !view.isAttachedToWindow"
         errorLine2="               ~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/android/ComposeIdlingResource.android.kt"
-            line="113"
+            file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/ComposeIdlingResource.android.kt"
+            line="111"
             column="16"/>
     </issue>
 
@@ -29,8 +29,8 @@
         errorLine1="        return view.rootView.parent != null &amp;&amp; !view.isAttachedToWindow"
         errorLine2="                                                ~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/android/ComposeIdlingResource.android.kt"
-            line="113"
+            file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/ComposeIdlingResource.android.kt"
+            line="111"
             column="49"/>
     </issue>
 
@@ -40,7 +40,7 @@
         errorLine1="        get() = ViewRootForTest.onViewCreatedCallback == ::onViewRootCreated"
         errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/android/ComposeRootRegistry.android.kt"
+            file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/ComposeRootRegistry.android.kt"
             line="53"
             column="33"/>
     </issue>
@@ -51,7 +51,7 @@
         errorLine1="        ViewRootForTest.onViewCreatedCallback = ::onViewRootCreated"
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/android/ComposeRootRegistry.android.kt"
+            file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/ComposeRootRegistry.android.kt"
             line="59"
             column="25"/>
     </issue>
@@ -62,7 +62,7 @@
         errorLine1="                root.view.addOnAttachStateChangeListener(StateChangeHandler(root))"
         errorLine2="                     ~~~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/android/ComposeRootRegistry.android.kt"
+            file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/ComposeRootRegistry.android.kt"
             line="87"
             column="22"/>
     </issue>
@@ -73,7 +73,7 @@
         errorLine1="            if (composeRoot == this.composeRoot &amp;&amp; !registered) {"
         errorLine2="                            ~~">
         <location
-            file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/android/ComposeRootRegistry.android.kt"
+            file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/ComposeRootRegistry.android.kt"
             line="222"
             column="29"/>
     </issue>
@@ -85,7 +85,7 @@
         errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/RobolectricIdlingStrategy.android.kt"
-            line="94"
+            line="91"
             column="41"/>
     </issue>
 
@@ -96,7 +96,7 @@
         errorLine2="                         ~~~~">
         <location
             file="src/androidMain/kotlin/androidx/compose/ui/test/junit4/RobolectricIdlingStrategy.android.kt"
-            line="95"
+            line="92"
             column="26"/>
     </issue>
 
