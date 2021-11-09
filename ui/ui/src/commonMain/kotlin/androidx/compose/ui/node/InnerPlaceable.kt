@@ -144,15 +144,52 @@ internal class InnerPlaceable(
     override fun hitTest(
         pointerPosition: Offset,
         hitTestResult: HitTestResult<PointerInputFilter>,
-        isTouchEvent: Boolean
+        isTouchEvent: Boolean,
+        isInLayer: Boolean
     ) {
-        if (withinLayerBounds(pointerPosition, isTouchEvent)) {
+        hitTest(pointerPosition, hitTestResult, isTouchEvent, isInLayer, LayoutNode::hitTest)
+    }
+
+    override fun hitTestSemantics(
+        pointerPosition: Offset,
+        hitSemanticsWrappers: HitTestResult<SemanticsWrapper>,
+        isInLayer: Boolean
+    ) {
+        hitTest(
+            pointerPosition,
+            hitSemanticsWrappers,
+            true,
+            isInLayer,
+            LayoutNode::hitTestSemantics
+        )
+    }
+
+    private inline fun <T> hitTest(
+        pointerPosition: Offset,
+        hitTestResult: HitTestResult<T>,
+        isTouchEvent: Boolean,
+        isInLayer: Boolean,
+        childHitTest: LayoutNode.(Offset, HitTestResult<T>, Boolean, Boolean) -> Unit
+    ) {
+        var inLayer = isInLayer
+        var hitTestChildren = false
+
+        if (withinLayerBounds(pointerPosition)) {
+            hitTestChildren = true
+        } else if (isTouchEvent &&
+            distanceInMinimumTouchTarget(pointerPosition, minimumTouchTargetSize).isFinite()
+        ) {
+            inLayer = false
+            hitTestChildren = true
+        }
+
+        if (hitTestChildren) {
             hitTestResult.siblingHits {
                 // Any because as soon as true is returned, we know we have found a hit path and we must
                 // not add hit results on different paths so we should not even go looking.
                 layoutNode.zSortedChildren.reversedAny { child ->
                     if (child.isPlaced) {
-                        child.hitTest(pointerPosition, hitTestResult, isTouchEvent)
+                        child.childHitTest(pointerPosition, hitTestResult, isTouchEvent, inLayer)
                         val wasHit = hitTestResult.hasHit()
                         val continueHitTest: Boolean
                         if (!wasHit) {
@@ -169,24 +206,6 @@ internal class InnerPlaceable(
                     } else {
                         false
                     }
-                }
-            }
-        }
-    }
-
-    override fun hitTestSemantics(
-        pointerPosition: Offset,
-        hitSemanticsWrappers: HitTestResult<SemanticsWrapper>
-    ) {
-        if (withinLayerBounds(pointerPosition, true)) {
-            // Any because as soon as true is returned, we know we have found a hit path and we must
-            // not add hit results on different paths so we should not even go looking.
-            layoutNode.zSortedChildren.reversedAny { child ->
-                if (child.isPlaced) {
-                    child.hitTestSemantics(pointerPosition, hitSemanticsWrappers, true)
-                    hitSemanticsWrappers.hasHit()
-                } else {
-                    false
                 }
             }
         }

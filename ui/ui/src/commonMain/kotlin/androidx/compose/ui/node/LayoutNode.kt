@@ -869,13 +869,15 @@ internal class LayoutNode(
     internal fun hitTest(
         pointerPosition: Offset,
         hitTestResult: HitTestResult<PointerInputFilter>,
-        isTouchEvent: Boolean = false
+        isTouchEvent: Boolean = false,
+        isInLayer: Boolean = true
     ) {
         val positionInWrapped = outerLayoutNodeWrapper.fromParentPosition(pointerPosition)
         outerLayoutNodeWrapper.hitTest(
             positionInWrapped,
             hitTestResult,
-            isTouchEvent
+            isTouchEvent,
+            isInLayer
         )
     }
 
@@ -883,12 +885,14 @@ internal class LayoutNode(
     internal fun hitTestSemantics(
         pointerPosition: Offset,
         hitSemanticsWrappers: HitTestResult<SemanticsWrapper>,
-        isTouchEvent: Boolean = true
+        isTouchEvent: Boolean = true,
+        isInLayer: Boolean = true
     ) {
         val positionInWrapped = outerLayoutNodeWrapper.fromParentPosition(pointerPosition)
         outerLayoutNodeWrapper.hitTestSemantics(
             positionInWrapped,
-            hitSemanticsWrappers
+            hitSemanticsWrappers,
+            isInLayer
         )
     }
 

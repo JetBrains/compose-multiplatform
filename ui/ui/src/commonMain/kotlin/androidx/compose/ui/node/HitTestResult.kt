@@ -16,6 +16,10 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.ui.util.unpackFloat1
+import androidx.compose.ui.util.unpackInt2
+import kotlin.math.sign
+
 /**
  * This tracks the hit test results to allow for minimum touch target and single-pass hit testing.
  * If there is a hit at the minimum touch target, searching for a hit within the layout bounds
@@ -29,7 +33,8 @@ package androidx.compose.ui.node
  */
 internal class HitTestResult<T> : List<T> {
     private var values = arrayOfNulls<Any>(16)
-    private var distancesFromEdge = FloatArray(16)
+    // contains DistanceAndInLayer
+    private var distanceFromEdgeAndInLayer = LongArray(16)
     private var hitDepth = -1
 
     override var size: Int = 0
@@ -41,7 +46,7 @@ internal class HitTestResult<T> : List<T> {
      */
     fun hasHit(): Boolean {
         val distance = findBestHitDistance()
-        return distance < 0f
+        return distance.distance < 0f && distance.isInLayer
     }
 
     /**
@@ -63,19 +68,21 @@ internal class HitTestResult<T> : List<T> {
      * Returns `true` if [distanceFromEdge] is less than the previous value passed in
      * [hitInMinimumTouchTarget] or [speculativeHit].
      */
-    fun isHitInMinimumTouchTargetBetter(distanceFromEdge: Float): Boolean {
+    fun isHitInMinimumTouchTargetBetter(distanceFromEdge: Float, isInLayer: Boolean): Boolean {
         if (hitDepth == lastIndex) {
             return true
         }
+        val distanceAndInLayer = DistanceAndInLayer(distanceFromEdge, isInLayer)
         val bestDistance = findBestHitDistance()
-        return bestDistance > distanceFromEdge
+        return bestDistance > distanceAndInLayer
     }
 
-    private fun findBestHitDistance(): Float {
-        var bestDistance = Float.POSITIVE_INFINITY
+    private fun findBestHitDistance(): DistanceAndInLayer {
+        var bestDistance = DistanceAndInLayer(Float.POSITIVE_INFINITY, false)
         for (i in hitDepth + 1..lastIndex) {
-            bestDistance = minOf(distancesFromEdge[i], bestDistance)
-            if (bestDistance < 0f) {
+            val distance = DistanceAndInLayer(distanceFromEdgeAndInLayer[i])
+            bestDistance = if (distance < bestDistance) distance else bestDistance
+            if (bestDistance.distance < 0f && bestDistance.isInLayer) {
                 return bestDistance
             }
         }
@@ -86,20 +93,26 @@ internal class HitTestResult<T> : List<T> {
      * Records [node] as a hit, adding it to the [HitTestResult] or replacing the existing one.
      * Runs [childHitTest] to do further hit testing for children.
      */
-    fun hit(node: T, childHitTest: () -> Unit) {
-        hitInMinimumTouchTarget(node, -1f, childHitTest)
+    fun hit(node: T, isInLayer: Boolean, childHitTest: () -> Unit) {
+        hitInMinimumTouchTarget(node, -1f, isInLayer, childHitTest)
     }
 
     /**
      * Records [node] as a hit with [distanceFromEdge] distance, replacing any existing record.
      * Runs [childHitTest] to do further hit testing for children.
      */
-    fun hitInMinimumTouchTarget(node: T, distanceFromEdge: Float, childHitTest: () -> Unit) {
+    fun hitInMinimumTouchTarget(
+        node: T,
+        distanceFromEdge: Float,
+        isInLayer: Boolean,
+        childHitTest: () -> Unit
+    ) {
         val startDepth = hitDepth
         hitDepth++
         ensureContainerSize()
         values[hitDepth] = node
-        distancesFromEdge[hitDepth] = distanceFromEdge
+        distanceFromEdgeAndInLayer[hitDepth] =
+            DistanceAndInLayer(distanceFromEdge, isInLayer).packedValue
         resizeToHitDepth()
         childHitTest()
         hitDepth = startDepth
@@ -111,10 +124,15 @@ internal class HitTestResult<T> : List<T> {
      * the hit is discarded. If a child had a hit, then [node] replaces an existing
      * hit.
      */
-    fun speculativeHit(node: T, distanceFromEdge: Float, childHitTest: () -> Unit) {
+    fun speculativeHit(
+        node: T,
+        distanceFromEdge: Float,
+        isInLayer: Boolean,
+        childHitTest: () -> Unit
+    ) {
         if (hitDepth == lastIndex) {
             // Speculation is easy. We don't have to do any array shuffling.
-            hitInMinimumTouchTarget(node, distanceFromEdge, childHitTest)
+            hitInMinimumTouchTarget(node, distanceFromEdge, isInLayer, childHitTest)
             if (hitDepth + 1 == lastIndex) {
                 // Discard the hit because there were no child hits.
                 resizeToHitDepth()
@@ -127,7 +145,7 @@ internal class HitTestResult<T> : List<T> {
         val previousHitDepth = hitDepth
         hitDepth = lastIndex
 
-        hitInMinimumTouchTarget(node, distanceFromEdge, childHitTest)
+        hitInMinimumTouchTarget(node, distanceFromEdge, isInLayer, childHitTest)
         if (hitDepth + 1 < lastIndex && previousDistance > findBestHitDistance()) {
             // This was a successful hit, so we should move this to the previous hit depth
             val fromIndex = hitDepth + 1
@@ -138,8 +156,8 @@ internal class HitTestResult<T> : List<T> {
                 startIndex = fromIndex,
                 endIndex = size
             )
-            distancesFromEdge.copyInto(
-                destination = distancesFromEdge,
+            distanceFromEdgeAndInLayer.copyInto(
+                destination = distanceFromEdgeAndInLayer,
                 destinationOffset = toIndex,
                 startIndex = fromIndex,
                 endIndex = size
@@ -167,7 +185,7 @@ internal class HitTestResult<T> : List<T> {
         if (hitDepth >= values.size) {
             val newSize = values.size + 16
             values = values.copyOf(newSize)
-            distancesFromEdge = distancesFromEdge.copyOf(newSize)
+            distanceFromEdgeAndInLayer = distanceFromEdgeAndInLayer.copyOf(newSize)
         }
     }
 
@@ -294,4 +312,29 @@ internal class HitTestResult<T> : List<T> {
         override fun subList(fromIndex: Int, toIndex: Int): List<T> =
             SubList(minIndex + fromIndex, minIndex + toIndex)
     }
+}
+
+@Suppress("INLINE_CLASS_DEPRECATED")
+private inline class DistanceAndInLayer(val packedValue: Long) {
+    val distance: Float
+        get() = unpackFloat1(packedValue)
+
+    val isInLayer: Boolean
+        get() = unpackInt2(packedValue) != 0
+
+    operator fun compareTo(other: DistanceAndInLayer): Int {
+        val thisIsInLayer = isInLayer
+        val otherIsInLayer = other.isInLayer
+        if (thisIsInLayer != otherIsInLayer) {
+            return if (thisIsInLayer) -1 else 1
+        }
+        val distanceDiff = this.distance - other.distance
+        return sign(distanceDiff).toInt()
+    }
+}
+
+private fun DistanceAndInLayer(distance: Float, isInLayer: Boolean): DistanceAndInLayer {
+    val v1 = distance.toBits().toLong()
+    val v2 = if (isInLayer) 1L else 0L
+    return DistanceAndInLayer(v1.shl(32) or (v2 and 0xFFFFFFFF))
 }

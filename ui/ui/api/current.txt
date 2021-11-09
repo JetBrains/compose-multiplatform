@@ -2030,6 +2030,9 @@ package androidx.compose.ui.modifier {
 
 package androidx.compose.ui.node {
 
+  public final class HitTestResultKt {
+  }
+
   public final class LayoutNodeKt {
   }
 
