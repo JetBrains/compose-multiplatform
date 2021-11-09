@@ -205,16 +205,18 @@ class AndroidXImplPlugin : Plugin<Project> {
                 }
             }
         }
-        task.systemProperty("robolectric.offline", "true")
-        val robolectricDependencies =
-            File(
-                project.getPrebuiltsRoot(),
-                "androidx/external/org/robolectric/android-all-instrumented"
+        if (!StudioType.isPlayground(project)) { // For non-playground setup use robolectric offline
+            task.systemProperty("robolectric.offline", "true")
+            val robolectricDependencies =
+                File(
+                    project.getPrebuiltsRoot(),
+                    "androidx/external/org/robolectric/android-all-instrumented"
+                )
+            task.systemProperty(
+                "robolectric.dependency.dir",
+                robolectricDependencies.absolutePath
             )
-        task.systemProperty(
-            "robolectric.dependency.dir",
-            robolectricDependencies.absolutePath
-        )
+        }
     }
 
     private fun configureWithKotlinPlugin(
