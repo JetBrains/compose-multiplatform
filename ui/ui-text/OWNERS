@@ -1,3 +1,5 @@
+include /TEXT_OWNERS
+
 pavlis@google.com
 adamp@google.com
 mount@google.com
@@ -5,9 +7,3 @@ popam@google.com
 andreykulikov@google.com
 ryanmentley@google.com
 njawad@google.com
-haoyuchang@google.com
-nona@google.com
-siyamed@google.com
-qqd@google.com
-klippenstein@google.com
-seanmcq@google.com
