@@ -7,12 +7,7 @@ tianliu@google.com
 soboleva@google.com
 
 # Text
-haoyuchang@google.com
-nona@google.com
-qqd@google.com
-siyamed@google.com
-klippenstein@google.com
-seanmcq@google.com
+include /TEXT_OWNERS
 
 # AdapterList
 ryanmentley@google.com

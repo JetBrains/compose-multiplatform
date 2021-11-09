@@ -4,9 +4,4 @@ njawad@google.com
 popam@google.com
 
 # For text related files
-qqd@google.com
-nona@google.com
-haoyuchang@google.com
-siyamed@google.com
-klippenstein@google.com
-seanmcq@google.com
+include /TEXT_OWNERS
