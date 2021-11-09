@@ -1697,10 +1697,12 @@ package androidx.compose.ui.input.pointer {
   public abstract class PointerInputFilter {
     ctor public PointerInputFilter();
     method public boolean getInterceptOutOfBoundsChildEvents();
+    method @androidx.compose.ui.ExperimentalComposeUiApi public boolean getShareWithSiblings();
     method public final long getSize();
     method public abstract void onCancel();
     method public abstract void onPointerEvent(androidx.compose.ui.input.pointer.PointerEvent pointerEvent, androidx.compose.ui.input.pointer.PointerEventPass pass, long bounds);
     property public boolean interceptOutOfBoundsChildEvents;
+    property @androidx.compose.ui.ExperimentalComposeUiApi public boolean shareWithSiblings;
     property public final long size;
   }
 
