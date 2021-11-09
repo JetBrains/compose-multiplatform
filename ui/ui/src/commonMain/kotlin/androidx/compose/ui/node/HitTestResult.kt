@@ -44,6 +44,14 @@ internal class HitTestResult<T> : List<T> {
         return distance < 0f
     }
 
+    /**
+     * Accepts all hits for a child and moves the hit depth. This should only be called
+     * within [siblingHits] to allow multiple siblings to have hit results.
+     */
+    fun acceptHits() {
+        hitDepth = size - 1
+    }
+
     private fun resizeToHitDepth() {
         for (i in (hitDepth + 1)..lastIndex) {
             values[i] = null
@@ -87,13 +95,14 @@ internal class HitTestResult<T> : List<T> {
      * Runs [childHitTest] to do further hit testing for children.
      */
     fun hitInMinimumTouchTarget(node: T, distanceFromEdge: Float, childHitTest: () -> Unit) {
+        val startDepth = hitDepth
         hitDepth++
         ensureContainerSize()
         values[hitDepth] = node
         distancesFromEdge[hitDepth] = distanceFromEdge
         resizeToHitDepth()
         childHitTest()
-        hitDepth--
+        hitDepth = startDepth
     }
 
     /**
@@ -141,6 +150,17 @@ internal class HitTestResult<T> : List<T> {
         }
         resizeToHitDepth()
         hitDepth = previousHitDepth
+    }
+
+    /**
+     * Allow multiple sibling children to have a target hit within a Layout.
+     * Use [acceptHits] within [block] to mark a child's hits as accepted and
+     * proceed to hit test more children.
+     */
+    inline fun siblingHits(block: () -> Unit) {
+        val depth = hitDepth
+        block()
+        hitDepth = depth
     }
 
     private fun ensureContainerSize() {

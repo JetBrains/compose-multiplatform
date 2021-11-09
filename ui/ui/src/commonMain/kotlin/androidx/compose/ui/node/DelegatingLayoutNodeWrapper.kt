@@ -174,6 +174,9 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
 
     override val parentData: Any? get() = wrapped.parentData
 
+    override fun shouldSharePointerInputWithSiblings(): Boolean =
+        wrapped.shouldSharePointerInputWithSiblings()
+
     /**
      * Returns the additional amount on the horizontal and vertical dimensions that
      * this extends beyond [width] and [height] on all sides. This takes into account

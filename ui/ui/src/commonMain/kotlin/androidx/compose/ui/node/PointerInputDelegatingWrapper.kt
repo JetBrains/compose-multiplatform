@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
@@ -56,4 +57,9 @@ internal class PointerInputDelegatingWrapper(
         val positionInWrapped = wrapped.fromParentPosition(pointerPosition)
         wrapped.hitTest(positionInWrapped, hitTestResult, isTouchEvent)
     }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    override fun shouldSharePointerInputWithSiblings(): Boolean =
+        modifier.pointerInputFilter.shareWithSiblings ||
+            wrapped.shouldSharePointerInputWithSiblings()
 }

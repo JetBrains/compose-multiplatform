@@ -90,6 +90,19 @@ abstract class PointerInputFilter {
      */
     open val interceptOutOfBoundsChildEvents: Boolean
         get() = false
+
+    /**
+     * If `false`, then this [PointerInputFilter] will not allow siblings under it to respond
+     * to events. If `true`, this will have the first chance to respond and the next sibling
+     * under will then get a chance to respond as well. This trigger acts as at the Layout
+     * level, so if any [PointerInputFilter]s on a Layout has [shareWithSiblings] set to `true`
+     * then the Layout will share with siblings.
+     */
+    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @ExperimentalComposeUiApi
+    @get:ExperimentalComposeUiApi
+    open val shareWithSiblings: Boolean
+        get() = false
 }
 
 /**
