@@ -35,5 +35,13 @@ enum class StudioType {
                 else -> error("Invalid project type $value")
             }
         }
+
+        /**
+         * @return `true` if running in a Playground (Github) setup, `false` otherwise.
+         */
+        @JvmStatic
+        fun isPlayground(project: Project): Boolean {
+            return StudioType.from(project) == StudioType.PLAYGROUND
+        }
     }
 }
