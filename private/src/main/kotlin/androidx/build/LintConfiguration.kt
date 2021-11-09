@@ -392,10 +392,8 @@ abstract class UpdateBaselineTask : DefaultTask() {
                 Files.copy(source, dest)
                 println("Updated baseline file ${dest.path}")
             } else {
-                // Temporarily (b/205315927) skipping deleting baselines because lint doesn't
-                // always generate all of the required baselines
-                // dest.delete()
-                // println("Deleted baseline file ${dest.path}")
+                dest.delete()
+                println("Deleted baseline file ${dest.path}")
             }
         }
     }
