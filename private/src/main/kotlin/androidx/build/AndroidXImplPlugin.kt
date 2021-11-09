@@ -259,14 +259,6 @@ class AndroidXImplPlugin : Plugin<Project> {
             onVariants { it.configureLicensePackaging() }
             finalizeDsl {
                 project.configureAndroidProjectForLint(it.lint, androidXExtension)
-                it.lint {
-                    abortOnError = true
-
-                    val baselineFile = project.lintBaseline
-                    if (baselineFile.exists()) {
-                        baseline = baselineFile
-                    }
-                }
             }
         }
     }
