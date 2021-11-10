@@ -252,6 +252,56 @@ class MenuTest {
     }
 
     @Test
+    fun menu_positioning_anchorPartiallyVisible() {
+        val screenWidth = 500
+        val screenHeight = 1000
+        val density = Density(1f)
+        val windowSize = IntSize(screenWidth, screenHeight)
+        val anchorPosition = IntOffset(-25, -10)
+        val anchorPositionRtl = IntOffset(525, -10)
+        val anchorSize = IntSize(50, 20)
+        val popupSize = IntSize(150, 500)
+
+        // The min margin above and below the menu, relative to the screen.
+        val MenuVerticalMargin = 48.dp
+        val verticalMargin = with(density) { MenuVerticalMargin.roundToPx() }
+
+        val position = DropdownMenuPositionProvider(
+            DpOffset(0.dp, 0.dp),
+            density
+        ).calculatePosition(
+            IntRect(anchorPosition, anchorSize),
+            windowSize,
+            LayoutDirection.Ltr,
+            popupSize
+        )
+
+        assertThat(position.x).isEqualTo(
+            0
+        )
+        assertThat(position.y).isEqualTo(
+            verticalMargin
+        )
+
+        val rtlPosition = DropdownMenuPositionProvider(
+            DpOffset(0.dp, 0.dp),
+            density
+        ).calculatePosition(
+            IntRect(anchorPositionRtl, anchorSize),
+            windowSize,
+            LayoutDirection.Rtl,
+            popupSize
+        )
+
+        assertThat(rtlPosition.x).isEqualTo(
+            screenWidth - popupSize.width
+        )
+        assertThat(rtlPosition.y).isEqualTo(
+            verticalMargin
+        )
+    }
+
+    @Test
     fun menu_positioning_callback() {
         val screenWidth = 500
         val screenHeight = 1000
