@@ -72,7 +72,7 @@ object LibraryVersions {
     val HEALTH_SERVICES_CLIENT = Version("1.0.0-alpha04")
     val HEIFWRITER = Version("1.1.0-alpha02")
     val HILT = Version("1.1.0-alpha01")
-    val HILT_NAVIGATION_COMPOSE = Version("1.0.0-alpha04")
+    val HILT_NAVIGATION_COMPOSE = Version("1.0.0-beta01")
     val INSPECTION = Version("1.0.0")
     val INTERPOLATOR = Version("1.1.0-alpha01")
     val JETIFIER = Version("1.0.0-beta11")
