@@ -147,7 +147,7 @@ private fun com.android.build.gradle.api.BaseVariant.registerIconGenerationTask(
 // instead of needing one-off support here.
 private fun Project.addToSourceJar(buildDirectory: File, task: TaskProvider<*>) {
     afterEvaluate {
-        val sourceJar = tasks.named("sourceJar", Jar::class.java)
+        val sourceJar = tasks.named("sourceJarRelease", Jar::class.java)
         sourceJar.configure {
             // Generating source jars requires the generation task to run first. This shouldn't
             // be needed for the MPP build because we use builtBy to set up the dependency
