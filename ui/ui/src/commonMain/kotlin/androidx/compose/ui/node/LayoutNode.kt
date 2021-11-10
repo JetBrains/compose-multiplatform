@@ -17,6 +17,7 @@ package androidx.compose.ui.node
 
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.focus.FocusEventModifier
@@ -42,6 +43,7 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.ModifierInfo
 import androidx.compose.ui.layout.OnGloballyPositionedModifier
+import androidx.compose.ui.layout.OnPlacedModifier
 import androidx.compose.ui.layout.OnRemeasuredModifier
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.Placeable
@@ -629,6 +631,7 @@ internal class LayoutNode(
     /**
      * The [Modifier] currently applied to this node.
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     override var modifier: Modifier = Modifier
         set(value) {
             if (value == field) return
@@ -739,6 +742,11 @@ internal class LayoutNode(
                 }
                 if (mod is OnRemeasuredModifier) {
                     wrapper = RemeasureModifierWrapper(wrapper, mod)
+                        .initialize()
+                        .assignChained(toWrap)
+                }
+                if (mod is OnPlacedModifier) {
+                    wrapper = OnPlacedModifierWrapper(wrapper, mod)
                         .initialize()
                         .assignChained(toWrap)
                 }

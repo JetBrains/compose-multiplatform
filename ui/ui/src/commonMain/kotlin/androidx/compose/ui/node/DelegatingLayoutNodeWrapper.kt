@@ -110,6 +110,8 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
         // our position in order ot know how to offset the value we provided).
         if (wrappedBy?.isShallowPlacing == true) return
 
+        onPlaced()
+
         PlacementScope.executeWithRtlMirroringValues(
             measuredSize.width,
             measureScope.layoutDirection
