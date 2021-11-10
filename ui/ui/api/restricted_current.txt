@@ -2065,6 +2065,9 @@ package androidx.compose.ui.node {
     property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.ComposeUiNode,androidx.compose.ui.platform.ViewConfiguration,kotlin.Unit> SetViewConfiguration;
   }
 
+  public final class HitTestResultKt {
+  }
+
   public final class LayoutNodeKt {
   }
 

@@ -380,12 +380,14 @@ internal abstract class LayoutNodeWrapper(
     abstract fun hitTest(
         pointerPosition: Offset,
         hitTestResult: HitTestResult<PointerInputFilter>,
-        isTouchEvent: Boolean
+        isTouchEvent: Boolean,
+        isInLayer: Boolean
     )
 
     abstract fun hitTestSemantics(
         pointerPosition: Offset,
-        hitSemanticsWrappers: HitTestResult<SemanticsWrapper>
+        hitSemanticsWrappers: HitTestResult<SemanticsWrapper>,
+        isInLayer: Boolean
     )
 
     override fun windowToLocal(relativeToWindow: Offset): Offset {
@@ -622,28 +624,12 @@ internal abstract class LayoutNodeWrapper(
         }
     }
 
-    protected fun withinLayerBounds(pointerPosition: Offset, isTouchEvent: Boolean): Boolean {
+    protected fun withinLayerBounds(pointerPosition: Offset): Boolean {
         if (!pointerPosition.isFinite) {
             return false
         }
         val layer = layer
-        if (layer != null && isClipping) {
-            if (isTouchEvent) {
-                val minimumTouchTargetSize = minimumTouchTargetSize
-                if (!minimumTouchTargetSize.isEmpty()) {
-                    val offsetFromEdge = offsetFromEdge(pointerPosition)
-                    val minTouchTargetSize = with(layerDensity) {
-                        layoutNode.viewConfiguration.minimumTouchTargetSize.toSize()
-                    }
-                    return offsetFromEdge.x <= minTouchTargetSize.width / 2f &&
-                        offsetFromEdge.y <= minTouchTargetSize.height / 2f
-                }
-            }
-            return layer.isInLayer(pointerPosition)
-        }
-
-        // If we are here, we aren't clipping or there is no layer
-        return true
+        return layer == null || !isClipping || layer.isInLayer(pointerPosition)
     }
 
     /**
@@ -899,13 +885,51 @@ internal abstract class LayoutNodeWrapper(
 
     open fun shouldSharePointerInputWithSiblings(): Boolean = false
 
-    protected fun offsetFromEdge(pointerPosition: Offset): Offset {
+    private fun offsetFromEdge(pointerPosition: Offset): Offset {
         val x = pointerPosition.x
         val horizontal = maxOf(0f, if (x < 0) -x else x - measuredWidth)
         val y = pointerPosition.y
         val vertical = maxOf(0f, if (y < 0) -y else y - measuredHeight)
 
         return Offset(horizontal, vertical)
+    }
+
+    /**
+     * Returns the additional amount on the horizontal and vertical dimensions that
+     * this extends beyond [width] and [height] on all sides. This takes into account
+     * [minimumTouchTargetSize] and [measuredSize] vs. [width] and [height].
+     */
+    protected fun calculateMinimumTouchTargetPadding(minimumTouchTargetSize: Size): Size {
+        val widthDiff = minimumTouchTargetSize.width - measuredWidth.toFloat()
+        val heightDiff = minimumTouchTargetSize.height - measuredHeight.toFloat()
+        return Size(maxOf(0f, widthDiff / 2f), maxOf(0f, heightDiff / 2f))
+    }
+
+    /**
+     * The distance within the [minimumTouchTargetSize] of [pointerPosition] to the layout
+     * size. If [pointerPosition] isn't within [minimumTouchTargetSize], then
+     * [Float.POSITIVE_INFINITY] is returned.
+     */
+    protected fun distanceInMinimumTouchTarget(
+        pointerPosition: Offset,
+        minimumTouchTargetSize: Size
+    ): Float {
+        if (measuredWidth >= minimumTouchTargetSize.width &&
+            measuredHeight >= minimumTouchTargetSize.height
+        ) {
+            // this layout is big enough that it doesn't qualify for minimum touch targets
+            return Float.POSITIVE_INFINITY
+        }
+
+        val (width, height) = calculateMinimumTouchTargetPadding(minimumTouchTargetSize)
+        val offsetFromEdge = offsetFromEdge(pointerPosition)
+
+        return if ((width > 0f || height > 0f) &&
+            offsetFromEdge.x <= width && offsetFromEdge.y <= height) {
+            maxOf(offsetFromEdge.x, offsetFromEdge.y)
+        } else {
+            Float.POSITIVE_INFINITY // miss
+        }
     }
 
     internal companion object {

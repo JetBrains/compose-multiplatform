@@ -36,6 +36,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertShape
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -635,7 +636,7 @@ class ButtonTest {
         rule.setMaterialContent {
             Box(Modifier.fillMaxSize()) {
                 Button(
-                    modifier = Modifier.testTag(tag).requiredSize(10.dp),
+                    modifier = Modifier.align(Alignment.Center).testTag(tag).requiredSize(10.dp),
                     onClick = { clicked = !clicked }
                 ) {
                     Box(Modifier.size(10.dp))
