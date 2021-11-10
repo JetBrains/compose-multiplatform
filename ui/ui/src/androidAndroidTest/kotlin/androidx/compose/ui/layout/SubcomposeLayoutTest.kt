@@ -35,6 +35,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
 import androidx.compose.ui.composed
@@ -55,6 +56,7 @@ import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -1074,6 +1076,106 @@ class SubcomposeLayoutTest {
                     subcompose(Unit, subcomposeLambda)
                     layout(100, 100) {}
                 }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(subcomposionValue).isTrue()
+            flag = false
+        }
+
+        rule.runOnIdle {
+            assertThat(subcomposionValue).isFalse()
+        }
+    }
+
+    @Test
+    fun compositionLocalChangeInMainCompositionRecomposesSubcomposition_noRemeasure() {
+        var flag by mutableStateOf(true)
+        val compositionLocal = compositionLocalOf<Boolean> { error("") }
+        var subcomposionValue: Boolean? = null
+        val subcomposeLambda = @Composable {
+            // makes sure the recomposition happens only once after the change
+            assertThat(compositionLocal.current).isNotEqualTo(subcomposionValue)
+            subcomposionValue = compositionLocal.current
+        }
+        val measurePolicy: SubcomposeMeasureScope.(Constraints) -> MeasureResult = {
+            subcompose(Unit, subcomposeLambda)
+            layout(100, 100) {}
+        }
+
+        rule.setContent {
+            CompositionLocalProvider(compositionLocal provides flag) {
+                SubcomposeLayout(measurePolicy = measurePolicy)
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(subcomposionValue).isTrue()
+            flag = false
+        }
+
+        rule.runOnIdle {
+            assertThat(subcomposionValue).isFalse()
+        }
+    }
+
+    @Test
+    fun staticCompositionLocalChangeInMainCompositionRecomposesSubcomposition() {
+        var flag by mutableStateOf(true)
+        val compositionLocal = staticCompositionLocalOf<Boolean> { error("") }
+        var subcomposionValue: Boolean? = null
+        val subcomposeLambda = @Composable {
+            // makes sure the recomposition happens only once after the change
+            assertThat(compositionLocal.current).isNotEqualTo(subcomposionValue)
+            subcomposionValue = compositionLocal.current
+        }
+        val measureBlock: SubcomposeMeasureScope.(Constraints) -> MeasureResult = {
+            subcompose(Unit, subcomposeLambda)
+            layout(100, 100) {}
+        }
+
+        rule.setContent {
+            CompositionLocalProvider(compositionLocal provides flag) {
+                val mainCompositionValue = flag
+                SubcomposeLayout(
+                    Modifier.drawBehind {
+                        // makes sure we never draw inconsistent states
+                        assertThat(subcomposionValue).isEqualTo(mainCompositionValue)
+                    },
+                    measureBlock
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(subcomposionValue).isTrue()
+            flag = false
+        }
+
+        rule.runOnIdle {
+            assertThat(subcomposionValue).isFalse()
+        }
+    }
+
+    @Test
+    fun staticCompositionLocalChangeInMainCompositionRecomposesSubcomposition_noRemeasure() {
+        var flag by mutableStateOf(true)
+        val compositionLocal = staticCompositionLocalOf<Boolean> { error("") }
+        var subcomposionValue: Boolean? = null
+        val subcomposeLambda = @Composable {
+            // makes sure the recomposition happens only once after the change
+            assertThat(compositionLocal.current).isNotEqualTo(subcomposionValue)
+            subcomposionValue = compositionLocal.current
+        }
+        val measurePolicy: SubcomposeMeasureScope.(Constraints) -> MeasureResult = {
+            subcompose(Unit, subcomposeLambda)
+            layout(100, 100) {}
+        }
+
+        rule.setContent {
+            CompositionLocalProvider(compositionLocal provides flag) {
+                SubcomposeLayout(measurePolicy = measurePolicy)
             }
         }
 
