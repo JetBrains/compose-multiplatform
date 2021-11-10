@@ -265,12 +265,16 @@ internal class MotionEventAdapter {
 
         val historical = mutableListOf<HistoricalChange>()
         with(motionEvent) {
-            repeat(getHistorySize()) { pos ->
-                val historicalChange = HistoricalChange(
-                    getHistoricalEventTime(pos),
-                    Offset(getHistoricalX(index, pos), getHistoricalY(index, pos))
-                )
-                historical.add(historicalChange)
+            repeat(historySize) { pos ->
+                val x = getHistoricalX(index, pos)
+                val y = getHistoricalY(index, pos)
+                if (x.isFinite() && y.isFinite()) {
+                    val historicalChange = HistoricalChange(
+                        getHistoricalEventTime(pos),
+                        Offset(x, y)
+                    )
+                    historical.add(historicalChange)
+                }
             }
         }
 
