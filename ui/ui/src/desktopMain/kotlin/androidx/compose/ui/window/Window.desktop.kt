@@ -17,7 +17,6 @@
 package androidx.compose.ui.window
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.currentCompositionLocalContext
@@ -361,7 +360,7 @@ fun Window(
     update: (ComposeWindow) -> Unit = {},
     content: @Composable FrameWindowScope.() -> Unit
 ) {
-    val currentLocals by rememberUpdatedState(currentCompositionLocalContext)
+    val compositionLocalContext by rememberUpdatedState(currentCompositionLocalContext)
     val windowExceptionHandlerFactory by rememberUpdatedState(
         LocalWindowExceptionHandlerFactory.current
     )
@@ -369,16 +368,14 @@ fun Window(
         visible = visible,
         create = {
             create().apply {
+                this.compositionLocalContext = compositionLocalContext
                 this.exceptionHandler = windowExceptionHandlerFactory.exceptionHandler(this)
-                setContent(onPreviewKeyEvent, onKeyEvent) {
-                    CompositionLocalProvider(currentLocals) {
-                        content()
-                    }
-                }
+                setContent(onPreviewKeyEvent, onKeyEvent, content)
             }
         },
         dispose = dispose,
         update = {
+            it.compositionLocalContext = compositionLocalContext
             it.exceptionHandler = windowExceptionHandlerFactory.exceptionHandler(it)
 
             update(it)

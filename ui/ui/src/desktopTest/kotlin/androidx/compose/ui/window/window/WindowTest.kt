@@ -37,6 +37,8 @@ import androidx.compose.ui.LeakDetector
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -55,6 +57,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import org.junit.Assume.assumeFalse
 import org.junit.Test
+import kotlinx.coroutines.cancelAndJoin
 
 @OptIn(ExperimentalComposeUiApi::class)
 class WindowTest {
@@ -460,6 +463,28 @@ class WindowTest {
         awaitIdle()
         assertThat(isVisibleOnFirstComposition).isFalse()
         assertThat(isVisibleOnFirstDraw).isFalse()
+
+        exitApplication()
+    }
+
+    @Test(timeout = 30000)
+    fun `Window should override density provided by application`() = runApplicationTest {
+        val customDensity = Density(3.14f)
+        var actualDensity: Density? = null
+
+        launchApplication {
+            if (isOpen) {
+                CompositionLocalProvider(LocalDensity provides customDensity) {
+                    Window(onCloseRequest = ::exitApplication) {
+                        actualDensity = LocalDensity.current
+                    }
+                }
+            }
+        }
+
+        awaitIdle()
+        assertThat(actualDensity).isNotNull()
+        assertThat(actualDensity).isNotEqualTo(customDensity)
 
         exitApplication()
     }

@@ -29,6 +29,10 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerButtons
 import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
+import androidx.compose.runtime.CompositionLocalContext
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputEvent
@@ -273,6 +277,13 @@ class ComposeScene internal constructor(
     }
 
     /**
+     * Top-level composition locals, which will be provided for the Composable content, which is set by [setContent].
+     *
+     * `null` if no composition locals should be provided.
+     */
+    var compositionLocalContext: CompositionLocalContext? by mutableStateOf(null)
+
+    /**
      * Update the composition with the content described by the [content] composable. After this
      * has been called the changes to produce the initial composition has been calculated and
      * applied to the composition.
@@ -321,7 +332,10 @@ class ComposeScene internal constructor(
             onKeyEvent = onKeyEvent
         )
         attach(mainOwner)
-        composition = mainOwner.setContent(parentComposition ?: recomposer) {
+        composition = mainOwner.setContent(
+            parentComposition ?: recomposer,
+            { compositionLocalContext }
+        ) {
             CompositionLocalProvider(
                 LocalComposeScene provides this,
                 content = content

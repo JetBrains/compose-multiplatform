@@ -17,6 +17,7 @@
 package androidx.compose.ui.awt
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalContext
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.KeyEvent
@@ -109,6 +110,12 @@ internal class ComposeWindowDelegate(
         get() = layer.component.fullscreen
         set(value) {
             layer.component.fullscreen = value
+        }
+
+    var compositionLocalContext: CompositionLocalContext?
+        get() = layer.compositionLocalContext
+        set(value) {
+            layer.compositionLocalContext = value
         }
 
     fun setContent(
