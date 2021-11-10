@@ -1333,6 +1333,62 @@ class AndroidPointerInputTest {
         }
     }
 
+    @Test
+    fun stylusEnterExitPointerArea() {
+        // Stylus hover enter/exit events should be sent to pointer input areas
+        val eventLog = mutableListOf<PointerEvent>()
+        var innerCoordinates: LayoutCoordinates? = null
+        val latch = CountDownLatch(1)
+        rule.runOnUiThread {
+            container.setContent {
+                Box(Modifier.fillMaxSize()
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                awaitPointerEvent()
+                            }
+                        }
+                    }
+                ) {
+                    Box(Modifier.size(50.dp).align(AbsoluteAlignment.BottomRight)
+                        .pointerInput(Unit) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    val event = awaitPointerEvent()
+                                    event.changes.forEach { it.consumeAllChanges() }
+                                    eventLog += event
+                                }
+                            }
+                        }.onGloballyPositioned {
+                            innerCoordinates = it
+                            latch.countDown()
+                        }
+                    )
+                }
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+
+        val coords = innerCoordinates!!
+        val outside = Offset(-100f, -100f)
+        dispatchStylusEvents(coords, outside, ACTION_HOVER_ENTER)
+        rule.runOnUiThread {
+            // The event didn't land inside the box, so it shouldn't get the hover enter
+            assertThat(eventLog).isEmpty()
+        }
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_MOVE)
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_EXIT, ACTION_DOWN)
+        dispatchStylusEvents(coords, outside, ACTION_MOVE)
+        dispatchStylusEvents(coords, outside, ACTION_UP, ACTION_HOVER_ENTER)
+        rule.runOnUiThread {
+            assertThat(eventLog).hasSize(4)
+            assertThat(eventLog[0].type).isEqualTo(PointerEventType.Enter)
+            assertThat(eventLog[1].type).isEqualTo(PointerEventType.Press)
+            assertThat(eventLog[2].type).isEqualTo(PointerEventType.Exit)
+            assertThat(eventLog[3].type).isEqualTo(PointerEventType.Release)
+        }
+    }
+
     private fun createPointerEventAt(eventTime: Int, action: Int, locationInWindow: IntArray) =
         MotionEvent(
             eventTime,
