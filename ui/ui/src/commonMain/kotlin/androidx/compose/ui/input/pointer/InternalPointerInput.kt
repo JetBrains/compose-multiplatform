@@ -46,6 +46,7 @@ internal data class PointerInputEventData(
     val position: Offset,
     val down: Boolean,
     val type: PointerType,
+    val issuesEnterExit: Boolean = false,
     val historical: List<HistoricalChange> = mutableListOf()
 )
 
@@ -68,4 +69,5 @@ internal expect class InternalPointerEvent(
      * return that the position change was consumed because of this.
      */
     var suppressMovementConsumption: Boolean
+    fun issuesEnterExitEvent(pointerId: PointerId): Boolean
 }
