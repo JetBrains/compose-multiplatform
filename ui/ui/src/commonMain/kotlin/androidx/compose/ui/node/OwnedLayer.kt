@@ -23,7 +23,6 @@ import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.layout.GraphicLayerInfo
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -32,7 +31,7 @@ import androidx.compose.ui.unit.LayoutDirection
 /**
  * A layer returned by [Owner.createLayer] to separate drawn content.
  */
-internal interface OwnedLayer : GraphicLayerInfo {
+internal interface OwnedLayer {
 
     /**
      * Applies the new layer properties and causing this layer to be redrawn.

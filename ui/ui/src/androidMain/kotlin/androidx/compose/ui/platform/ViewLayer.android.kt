@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.layout.GraphicLayerInfo
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
@@ -47,7 +48,7 @@ internal class ViewLayer(
     val container: DrawChildContainer,
     drawBlock: (Canvas) -> Unit,
     invalidateParentLayer: () -> Unit
-) : View(ownerView.context), OwnedLayer {
+) : View(ownerView.context), OwnedLayer, GraphicLayerInfo {
     private var drawBlock: ((Canvas) -> Unit)? = drawBlock
     private var invalidateParentLayer: (() -> Unit)? = invalidateParentLayer
 

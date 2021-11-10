@@ -3654,12 +3654,6 @@ private class MockOwner(
         invalidateParentLayer: () -> Unit
     ): OwnedLayer {
         return object : OwnedLayer {
-            override val layerId: Long
-                get() = 0
-
-            override val ownerViewId: Long
-                get() = 0
-
             override fun updateLayerProperties(
                 scaleX: Float,
                 scaleY: Float,
