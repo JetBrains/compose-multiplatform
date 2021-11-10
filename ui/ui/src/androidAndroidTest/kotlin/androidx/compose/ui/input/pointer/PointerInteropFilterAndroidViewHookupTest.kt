@@ -463,8 +463,9 @@ class PointerInteropFilterAndroidViewHookupTest {
     @Test
     fun disallowNotTriggeredWhenMovementInClickChild() {
         var clicked = false
-        child.setOnClickListener { clicked = true }
-
+        rule.runOnUiThread {
+            child.setOnClickListener { clicked = true }
+        }
         rule.runOnIdle {
             val outOfView = Offset(-50f, -50f)
             root.dispatchTouchEvent(down())
@@ -479,7 +480,9 @@ class PointerInteropFilterAndroidViewHookupTest {
     @Test
     fun disallowTriggeredWhenMovementInClickChildAfterRequestDisallow() {
         var clicked = false
-        child.setOnClickListener { clicked = true }
+        rule.runOnUiThread {
+            child.setOnClickListener { clicked = true }
+        }
 
         rule.runOnIdle {
             val outOfView = Offset(-50f, -50f)
