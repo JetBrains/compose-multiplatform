@@ -29,6 +29,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.isLinux
 import androidx.compose.ui.isWindows
+import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.platform.WindowInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -40,10 +42,6 @@ import androidx.compose.ui.window.launchApplication
 import androidx.compose.ui.window.rememberWindowState
 import androidx.compose.ui.window.runApplicationTest
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.consumeEach
-import org.junit.Assume.assumeTrue
-import org.junit.Test
 import java.awt.Dimension
 import java.awt.Point
 import java.awt.Rectangle
@@ -52,6 +50,10 @@ import java.awt.event.WindowEvent
 import javax.swing.JFrame
 import kotlin.math.abs
 import kotlin.math.max
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consumeEach
+import org.junit.Assume.assumeTrue
+import org.junit.Test
 
 // Note that on Linux some tests are flaky. Swing event listener's on Linux has non-deterministic
 // nature. To avoid flaky'ness we use delays
@@ -767,6 +769,42 @@ class WindowStateTest {
         sendChannel.send(2)
         awaitIdle()
         assertThat(receivedNumbers).isEqualTo(listOf(1, 2))
+
+        exitApplication()
+    }
+
+    @Test
+    fun `WindowInfo isFocused`() = runApplicationTest {
+        lateinit var window1: ComposeWindow
+        lateinit var window2: ComposeWindow
+        lateinit var window1Info: WindowInfo
+        lateinit var window2Info: WindowInfo
+
+        launchApplication {
+            Window(onCloseRequest = ::exitApplication) {
+                window1 = window
+                window1Info = LocalWindowInfo.current
+            }
+
+            Window(onCloseRequest = ::exitApplication) {
+                window2 = window
+                window2Info = LocalWindowInfo.current
+            }
+        }
+
+        awaitIdle()
+        assertThat(window1.isFocused).isEqualTo(window1Info.isWindowFocused)
+        assertThat(window2.isFocused).isEqualTo(window2Info.isWindowFocused)
+
+        window1.requestFocus()
+        awaitIdle()
+        assertThat(window1.isFocused).isEqualTo(window1Info.isWindowFocused)
+        assertThat(window2.isFocused).isEqualTo(window2Info.isWindowFocused)
+
+        window2.requestFocus()
+        awaitIdle()
+        assertThat(window1.isFocused).isEqualTo(window1Info.isWindowFocused)
+        assertThat(window2.isFocused).isEqualTo(window2Info.isWindowFocused)
 
         exitApplication()
     }

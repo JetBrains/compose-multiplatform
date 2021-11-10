@@ -325,6 +325,7 @@ class ComposeScene internal constructor(
         val mainOwner = SkiaBasedOwner(
             platformInputService,
             component,
+            component.windowInfo,
             pointerPositionUpdater,
             density,
             IntSize(constraints.maxWidth, constraints.maxHeight).toIntRect(),
@@ -527,10 +528,6 @@ class ComposeScene internal constructor(
      */
     fun sendKeyEvent(event: ComposeKeyEvent): Boolean = postponeInvalidation {
         return focusedOwner?.sendKeyEvent(event) == true
-    }
-
-    internal fun setCurrentKeyboardModifiers(modifiers: PointerKeyboardModifiers) {
-        mainOwner?.setCurrentKeyboardModifiers(modifiers)
     }
 
     internal fun onInputMethodEvent(event: Any) = this.onPlatformInputMethodEvent(event)

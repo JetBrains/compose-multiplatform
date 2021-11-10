@@ -25,6 +25,7 @@ import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
 import androidx.compose.ui.platform.DesktopPlatform
 import androidx.compose.ui.platform.AccessibilityControllerImpl
 import androidx.compose.ui.platform.PlatformComponent
+import androidx.compose.ui.platform.WindowInfoImpl
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.window.WindowExceptionHandler
@@ -41,6 +42,7 @@ import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.Point
 import java.awt.Toolkit
+import java.awt.Window
 import java.awt.event.FocusEvent
 import java.awt.event.InputEvent
 import java.awt.event.InputMethodEvent
@@ -51,9 +53,12 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.event.MouseMotionAdapter
 import java.awt.event.MouseWheelEvent
+import java.awt.event.WindowEvent
+import java.awt.event.WindowFocusListener
 import java.awt.im.InputMethodRequests
 import javax.accessibility.Accessible
 import javax.accessibility.AccessibleContext
+import javax.swing.SwingUtilities
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
@@ -126,11 +131,27 @@ internal class ComposeLayer {
         SkiaLayer(externalAccessibleFactory = ::makeAccessible), Accessible, PlatformComponent {
         var currentInputMethodRequests: InputMethodRequests? = null
 
+        private var window: Window? = null
+        private var windowListener = object : WindowFocusListener {
+            override fun windowGainedFocus(e: WindowEvent) = refreshWindowFocus()
+            override fun windowLostFocus(e: WindowEvent) = refreshWindowFocus()
+        }
+
         override fun addNotify() {
             super.addNotify()
             resetDensity()
             initContent()
             updateSceneSize()
+            window = SwingUtilities.getWindowAncestor(this)
+            window?.addWindowFocusListener(windowListener)
+            refreshWindowFocus()
+        }
+
+        override fun removeNotify() {
+            window?.removeWindowFocusListener(windowListener)
+            window = null
+            refreshWindowFocus()
+            super.removeNotify()
         }
 
         override fun paint(g: Graphics) {
@@ -201,6 +222,19 @@ internal class ComposeLayer {
                 positionSourceEvent.y
             )
         }
+
+        private val _windowInfo = WindowInfoImpl()
+
+        override val windowInfo = _windowInfo
+
+        private fun refreshWindowFocus() {
+            windowInfo.isWindowFocused = window?.isFocused ?: false
+            keyboardModifiersRequireUpdate = true
+        }
+
+        fun setCurrentKeyboardModifiers(modifiers: PointerKeyboardModifiers) {
+            _windowInfo.keyboardModifiers = modifiers
+        }
     }
 
     init {
@@ -257,7 +291,7 @@ internal class ComposeLayer {
         if (isDisposed) return@catchExceptions
         if (keyboardModifiersRequireUpdate) {
             keyboardModifiersRequireUpdate = false
-            scene.setCurrentKeyboardModifiers(event.keyboardModifiers)
+            _component.setCurrentKeyboardModifiers(event.keyboardModifiers)
         }
         scene.onMouseEvent(density, event)
     }
@@ -269,7 +303,7 @@ internal class ComposeLayer {
 
     private fun onKeyEvent(event: KeyEvent) = catchExceptions {
         if (isDisposed) return@catchExceptions
-        scene.setCurrentKeyboardModifiers(event.toPointerKeyboardModifiers())
+        _component.setCurrentKeyboardModifiers(event.toPointerKeyboardModifiers())
         if (scene.sendKeyEvent(ComposeKeyEvent(event))) {
             event.consume()
         }
