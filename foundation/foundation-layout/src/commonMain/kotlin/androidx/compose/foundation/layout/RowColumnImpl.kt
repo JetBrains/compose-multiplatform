@@ -681,7 +681,13 @@ private fun intrinsicSize(
 ) = if (layoutOrientation == intrinsicOrientation) {
     intrinsicMainAxisSize(children, intrinsicMainSize, crossAxisAvailable, mainAxisSpacing)
 } else {
-    intrinsicCrossAxisSize(children, intrinsicCrossSize, intrinsicMainSize, crossAxisAvailable)
+    intrinsicCrossAxisSize(
+        children,
+        intrinsicCrossSize,
+        intrinsicMainSize,
+        crossAxisAvailable,
+        mainAxisSpacing
+    )
 }
 
 private fun intrinsicMainAxisSize(
@@ -711,9 +717,10 @@ private fun intrinsicCrossAxisSize(
     children: List<IntrinsicMeasurable>,
     mainAxisSize: IntrinsicMeasurable.(Int) -> Int,
     crossAxisSize: IntrinsicMeasurable.(Int) -> Int,
-    mainAxisAvailable: Int
+    mainAxisAvailable: Int,
+    mainAxisSpacing: Int
 ): Int {
-    var fixedSpace = 0
+    var fixedSpace = min((children.size - 1) * mainAxisSpacing, mainAxisAvailable)
     var crossAxisMax = 0
     var totalWeight = 0f
     children.fastForEach { child ->
