@@ -106,7 +106,7 @@ val taskNamesKnownToDuplicateOutputs = setOf(
     "jarDebug",
     "kotlinSourcesJar",
     "releaseSourcesJar",
-    "sourceJar",
+    "sourceJarRelease",
     // Can remove "lint" after AGP 7.1.0-alpha05.
     "lint",
     "lintReport",
