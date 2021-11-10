@@ -37,6 +37,7 @@ val AnimationDemos = DemoCategory(
             listOf(
                 ComposableDemo("Animate Content Size") { AnimateContentSizeDemo() },
                 ComposableDemo("Animate Increment/Decrement") { AnimateIncrementDecrementDemo() },
+                ComposableDemo("Animate Placement") { AnimatedPlacementDemo() },
                 ComposableDemo("Animate Visibility Demo") { AnimatedVisibilityDemo() },
                 ComposableDemo("Animate Visibility Lazy Column Demo") {
                     AnimatedVisibilityLazyColumnDemo()
