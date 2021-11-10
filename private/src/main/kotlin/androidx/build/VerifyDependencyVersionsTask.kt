@@ -199,6 +199,9 @@ private fun shouldVerifyConfiguration(configuration: Configuration): Boolean {
 
     // allow tip of tree compose compiler
     if (name.startsWith("kotlinPlugin")) return false
+
+    // Don't check Hilt compile-only configurations
+    if (name.startsWith("hiltCompileOnly")) return false
     return true
 }
 
