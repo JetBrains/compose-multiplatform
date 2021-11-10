@@ -282,18 +282,27 @@ private val SETUP_INCLUDE = """
 """.trimIndent()
 
 /**
- * We can't remove the apk on API < 27 due to a platform crash that occurs
- * when handling a PACKAGE_CHANGED broadcast after the package has been removed. b/37264334
+ * Specify the following options on the APK installer:
+ * - Don't attempt to remove APKs after testing. We can't remove the apk on API < 27 due to a
+ *   platform crash that occurs when handling a PACKAGE_CHANGED broadcast after the package has
+ *   been removed. See b/37264334.
+ * - Pass the -t argument when installing APKs. This allows testonly APKs to be installed, which
+ *   includes all APKs built against a pre-release SDK. See b/205571374.
  */
 private val TARGET_PREPARER_OPEN = """
     <target_preparer class="com.android.tradefed.targetprep.suite.SuiteApkInstaller">
     <option name="cleanup-apks" value="false" />
+    <option name="install-arg" value="-t" />
 
 """.trimIndent()
 
+/**
+ * Differs from [TARGET_PREPARER_OPEN] in that Media target can remove APKs after testing.
+ */
 private val MEDIA_TARGET_PREPARER_OPEN = """
     <target_preparer class="com.android.tradefed.targetprep.suite.SuiteApkInstaller">
     <option name="cleanup-apks" value="true" />
+    <option name="install-arg" value="-t" />
 
 """.trimIndent()
 
