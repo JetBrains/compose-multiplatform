@@ -33,6 +33,7 @@ import org.gradle.process.ExecOperations
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
 import org.gradle.workers.WorkerExecutor
+import org.json.JSONObject
 import java.io.File
 import javax.inject.Inject
 
@@ -82,59 +83,53 @@ abstract class DackkaTask @Inject constructor(
     lateinit var excludedPackagesForKotlin: Set<String>
 
     // Documentation for Dackka command line usage and arguments can be found at
-    // https://kotlin.github.io/dokka/1.4.0/user_guide/cli/usage/
-    private fun computeArguments(): List<String> {
+    // https://kotlin.github.io/dokka/1.6.0/user_guide/cli/usage/
+    private fun computeArguments(): File {
 
-        // path comes with colons but dokka expects a semicolon delimited string
-        val classPath = dependenciesClasspath.asPath.replace(':', ';')
+        // path comes with colons but dokka json expects an ArrayList
+        val classPath = dependenciesClasspath.asPath.split(':').toMutableList<String>()
 
         var linksConfiguration = ""
-        mapOf(
+        val linksMap = mapOf(
             "coroutinesCore"
                 to "https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core",
             "android" to "https://developer.android.com/reference",
             "guava" to "https://guava.dev/releases/18.0/api/docs/",
             "kotlin" to "https://kotlinlang.org/api/latest/jvm/stdlib/"
-        ).map {
-            // Dokka sets this format: url^packageListUrl^^url2...
-            linksConfiguration +=
-                "${it.value}^${docsProjectDir.toPath()}/package-lists/${it.key}/package-list^^"
-        }
-        val includes = sourcesDir.walkTopDown()
-            .filter { it.name.endsWith("documentation.md") }
-            .joinToString(";")
-        val includesString = if (includes.isNotEmpty()) { "-includes $includes" } else { "" }
-
-        return listOf(
-
-            // moduleName arg needs to be present but is not used the generated docs
-            // b/184166302 tracks an update to the CLI to mark this as optional
-            "-moduleName",
-            "",
-
-            // location of the generated docs
-            "-outputDir",
-            "$destinationDir",
-
-            // links to external types
-            "-globalLinks",
-            linksConfiguration,
-
-            // Set logging level to only show warnings and errors
-            "-loggingLevel",
-            "WARN",
-
-            // Configuration of sources. The generated string looks like this:
-            // "-sourceSet -src /path/to/src -samples /path/to/samples ..."
-            "-sourceSet",
-            "-src $sourcesDir" +
-                " -samples $samplesDir" +
-                " -samples $frameworkSamplesDir" +
-                " -classpath $classPath" +
-                " $includesString",
-
-            "-offlineMode"
         )
+        val includes = sourcesDir.walkTopDown()
+            .filter { it.name.endsWith("documentation.md") }.map { it.path }.toHashSet<String>()
+
+        val jsonMap = mapOf(
+            "moduleName" to "",
+            "outputDir" to destinationDir.path,
+            "globalLinks" to linksConfiguration,
+            "sourceSets" to listOf(mutableMapOf(
+                "sourceSetID" to mapOf(
+                    "scopeId" to "androidx",
+                    "sourceSetName" to "main"
+                    ),
+                "sourceRoots" to listOf(sourcesDir.path),
+                "samples" to listOf(samplesDir.path, frameworkSamplesDir.path),
+                "classpath" to classPath,
+                "externalDocumentationLinks" to linksMap.map { (name, url) -> mapOf(
+                    "url" to url,
+                    "packageListUrl" to
+                        "file://${docsProjectDir.toPath()}/package-lists/$name/package-list"
+                    ) },
+                )),
+            "offlinemode" to ""
+            )
+        @Suppress("UNCHECKED_CAST")
+        if (includes.isNotEmpty())
+            ((jsonMap["sourceSets"]as List<*>).single() as MutableMap<String, Any>)
+            .put("includes", includes)
+
+        val json = JSONObject(jsonMap)
+        val outputFile = File.createTempFile("dackkaArgs", ".json")
+        outputFile.deleteOnExit()
+        outputFile.writeText(json.toString(2))
+        return outputFile
     }
 
     @TaskAction
@@ -162,7 +157,7 @@ interface DackkaParams : WorkParameters {
 @Suppress("UnstableApiUsage")
 fun runDackkaWithArgs(
     classpath: FileCollection,
-    args: List<String>,
+    argsFile: File,
     workerExecutor: WorkerExecutor,
     excludedPackages: Set<String>,
     excludedPackagesForJava: Set<String>,
@@ -170,7 +165,7 @@ fun runDackkaWithArgs(
 ) {
     val workQueue = workerExecutor.noIsolation()
     workQueue.submit(DackkaWorkAction::class.java) { parameters ->
-        parameters.args.set(args)
+        parameters.args.set(listOf(argsFile.getPath(), "-loggingLevel", "WARN"))
         parameters.classpath.set(classpath)
         parameters.excludedPackages.set(excludedPackages)
         parameters.excludedPackagesForJava.set(excludedPackagesForJava)
