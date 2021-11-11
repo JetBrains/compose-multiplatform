@@ -43,6 +43,12 @@ package androidx.compose.ui.test.junit4 {
     method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> composable);
   }
 
+  public final class ComposeIdlingResource_androidKt {
+  }
+
+  public final class ComposeRootRegistry_androidKt {
+  }
+
   public interface ComposeTestRule extends org.junit.rules.TestRule androidx.compose.ui.test.SemanticsNodeInteractionsProvider {
     method public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public androidx.compose.ui.unit.Density getDensity();
@@ -57,6 +63,9 @@ package androidx.compose.ui.test.junit4 {
     property public abstract androidx.compose.ui.test.MainTestClock mainClock;
   }
 
+  public final class EspressoLink_androidKt {
+  }
+
   public final class StateRestorationTester {
     ctor public StateRestorationTester(androidx.compose.ui.test.junit4.ComposeContentTestRule composeTestRule);
     method public void emulateSavedInstanceStateRestore();
@@ -67,17 +76,8 @@ package androidx.compose.ui.test.junit4 {
 
 package androidx.compose.ui.test.junit4.android {
 
-  public final class ComposeIdlingResource_androidKt {
-  }
-
   public final class ComposeNotIdleException extends java.lang.Throwable {
     ctor public ComposeNotIdleException(String? message, Throwable? cause);
-  }
-
-  public final class ComposeRootRegistry_androidKt {
-  }
-
-  public final class EspressoLink_androidKt {
   }
 
 }
