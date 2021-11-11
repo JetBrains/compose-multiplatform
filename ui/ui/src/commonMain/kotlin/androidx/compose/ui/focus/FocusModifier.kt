@@ -23,6 +23,8 @@ import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.modifier.ModifierLocalConsumer
 import androidx.compose.ui.modifier.ModifierLocalProvider
 import androidx.compose.ui.modifier.ModifierLocalReadScope
+import androidx.compose.ui.modifier.ProvidableModifierLocal
+import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.node.ModifiedFocusNode
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
@@ -46,11 +48,9 @@ internal class FocusModifier(
     // TODO(b/188684110): Move focusState and focusedChild to ModifiedFocusNode and make this
     //  modifier stateless.
     var focusState: FocusStateImpl = initialFocus
-
     var focusedChild: ModifiedFocusNode? = null
-
+    var hasFocusListeners: Boolean = false
     lateinit var focusNode: ModifiedFocusNode
-
     lateinit var modifierLocalReadScope: ModifierLocalReadScope
 
     // Reading the FocusProperties ModifierLocal.
@@ -59,6 +59,7 @@ internal class FocusModifier(
 
         // Update the focus node with the current focus properties.
         with(scope) {
+            hasFocusListeners = ModifierLocalHasFocusEventListener.current
             focusNode.setUpdatedProperties(ModifierLocalFocusProperties.current)
         }
     }
@@ -84,7 +85,7 @@ internal class FocusModifier(
  * @sample androidx.compose.ui.samples.FocusableSampleUsingLowerLevelFocusTarget
  */
 fun Modifier.focusTarget(): Modifier = composed(debugInspectorInfo { name = "focusTarget" }) {
-    remember { FocusModifier(Inactive) }
+    remember { FocusModifier(Inactive).then(NoFocusListener) }
 }
 
 /**
@@ -95,5 +96,22 @@ fun Modifier.focusTarget(): Modifier = composed(debugInspectorInfo { name = "foc
     ReplaceWith("focusTarget()", "androidx.compose.ui.focus.focusTarget")
 )
 fun Modifier.focusModifier(): Modifier = composed(debugInspectorInfo { name = "focusModifier" }) {
-    remember { FocusModifier(Inactive) }
+    remember { FocusModifier(Inactive).then(NoFocusListener) }
+}
+
+/**
+ * This modifier local is used as a temporary work-around to improve performance.
+ * Instead of sending focus state change events up the hierarchy, we only send it if we have
+ * listeners that need this state.
+ */
+internal val ModifierLocalHasFocusEventListener = modifierLocalOf { false }
+
+/**
+ * A modifier that updates the HasFocusEventListener modifier local value to false.
+ * This is used after every focusModifier because the listeners that appeared before
+ * are not applicable further down the hierarchy.
+ */
+internal object NoFocusListener : ModifierLocalProvider<Boolean> {
+    override val key: ProvidableModifierLocal<Boolean> get() = ModifierLocalHasFocusEventListener
+    override val value: Boolean get() = false
 }
