@@ -40,6 +40,8 @@ import androidx.compose.material3.samples.NavigationRailWithOnlySelectedLabelsSa
 import androidx.compose.material3.samples.OutlinedButtonSample
 import androidx.compose.material3.samples.NavigationDrawerSample
 import androidx.compose.material3.samples.PinnedSmallTopAppBar
+import androidx.compose.material3.samples.RadioButtonSample
+import androidx.compose.material3.samples.RadioGroupSample
 import androidx.compose.material3.samples.SimpleCenterAlignedTopAppBar
 import androidx.compose.material3.samples.SimpleSmallTopAppBar
 import androidx.compose.material3.samples.SmallFloatingActionButtonSample
@@ -232,4 +234,23 @@ val NavigationDrawerExamples = listOf(
     ) {
         NavigationDrawerSample()
     }
+)
+
+private const val RadioButtonsExampleDescription = "Radio buttons examples"
+private const val RadioButtonsExampleSourceUrl = "$SampleSourceUrl/RadioButtonSamples.kt"
+val RadioButtonsExamples = listOf(
+    Example(
+        name = ::RadioButtonSample.name,
+        description = RadioButtonsExampleDescription,
+        sourceUrl = RadioButtonsExampleSourceUrl
+    ) {
+        RadioButtonSample()
+    },
+    Example(
+        name = ::RadioGroupSample.name,
+        description = RadioButtonsExampleDescription,
+        sourceUrl = RadioButtonsExampleSourceUrl
+    ) {
+        RadioGroupSample()
+    },
 )

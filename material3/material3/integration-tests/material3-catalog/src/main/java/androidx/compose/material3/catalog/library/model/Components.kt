@@ -144,6 +144,18 @@ private val NavigationRail = Component(
     examples = NavigationRailExamples
 )
 
+private val RadioButtons = Component(
+    id = nextId(),
+    name = "Radio buttons",
+    description = "Radio buttons allow the user to select one option from a set.",
+    // No radio-button icon
+    tintIcon = true,
+    guidelinesUrl = "$ComponentGuidelinesUrl/radio-buttons",
+    docsUrl = "$DocsUrl#radiobutton",
+    sourceUrl = "$Material3SourceUrl/RadioButton.kt",
+    examples = RadioButtonsExamples
+)
+
 private val TopAppBar = Component(
     id = nextId(),
     name = "Top app bar",
@@ -166,5 +178,6 @@ val Components = listOf(
     NavigationBar,
     NavigationDrawer,
     NavigationRail,
+    RadioButtons,
     TopAppBar
 )
