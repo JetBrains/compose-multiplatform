@@ -3649,6 +3649,9 @@ private class MockOwner(
     override fun measureAndLayout(sendPointerUpdate: Boolean) {
     }
 
+    override fun forceMeasureTheSubtree(layoutNode: LayoutNode) {
+    }
+
     override fun createLayer(
         drawBlock: (Canvas) -> Unit,
         invalidateParentLayer: () -> Unit

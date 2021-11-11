@@ -3253,6 +3253,10 @@ private class TestOwner : Owner {
         delegate.measureAndLayout()
     }
 
+    override fun forceMeasureTheSubtree(layoutNode: LayoutNode) {
+        delegate.forceMeasureTheSubtree(layoutNode)
+    }
+
     override fun createLayer(
         drawBlock: (Canvas) -> Unit,
         invalidateParentLayer: () -> Unit

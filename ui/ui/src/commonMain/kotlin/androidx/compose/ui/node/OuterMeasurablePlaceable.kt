@@ -111,6 +111,12 @@ internal class OuterMeasurablePlaceable(
             // We are using the coerced wrapper size here to avoid double offset in layout coop.
             measuredSize = IntSize(outerWrapper.width, outerWrapper.height)
             return sizeChanged
+        } else {
+            // this node doesn't require being remeasured. however in order to make sure we have
+            // the final size we need to also make sure the whole subtree is remeasured as it can
+            // trigger extra remeasure request on our node. we do it now in order to report the
+            // final measured size to our parent without doing extra pass later.
+            owner.forceMeasureTheSubtree(layoutNode)
         }
         return false
     }
