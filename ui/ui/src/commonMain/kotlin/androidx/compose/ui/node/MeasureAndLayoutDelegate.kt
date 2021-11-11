@@ -105,7 +105,7 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
     /**
      * Requests remeasure for this [layoutNode] and nodes affected by its measure result.
      *
-     * @return returns true if the [measureAndLayout] execution should be scheduled as a result
+     * @return true if the [measureAndLayout] execution should be scheduled as a result
      * of the request.
      */
     fun requestRemeasure(layoutNode: LayoutNode): Boolean = when (layoutNode.layoutState) {
@@ -142,7 +142,7 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
     /**
      * Requests relayout for this [layoutNode] and nodes affected by its position.
      *
-     * @return returns true if the [measureAndLayout] execution should be scheduled as a result
+     * @return true if the [measureAndLayout] execution should be scheduled as a result
      * of the request.
      */
     fun requestRelayout(layoutNode: LayoutNode): Boolean = when (layoutNode.layoutState) {
@@ -164,24 +164,25 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
         }
     }
 
-    private fun doRemeasure(layoutNode: LayoutNode, rootConstraints: Constraints): Boolean {
+    /**
+     * @return true if the [LayoutNode] size has been changed.
+     */
+    private fun doRemeasure(layoutNode: LayoutNode): Boolean {
         val sizeChanged = if (layoutNode === root) {
-            layoutNode.remeasure(rootConstraints)
+            layoutNode.remeasure(rootConstraints!!)
         } else {
             layoutNode.remeasure()
         }
         val parent = layoutNode.parent
-        if (sizeChanged) {
-            if (parent == null) {
-                return true
-            } else if (layoutNode.measuredByParent == InMeasureBlock) {
+        if (sizeChanged && parent != null) {
+            if (layoutNode.measuredByParent == InMeasureBlock) {
                 requestRemeasure(parent)
             } else {
                 require(layoutNode.measuredByParent == InLayoutBlock)
                 requestRelayout(parent)
             }
         }
-        return false
+        return sizeChanged
     }
 
     /**
@@ -192,41 +193,18 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
         require(root.isPlaced)
         require(!duringMeasureLayout)
         // we don't need to measure any children unless we have the correct root constraints
-        val rootConstraints = rootConstraints ?: return false
+        if (rootConstraints == null) {
+            return false
+        }
 
         var rootNodeResized = false
         if (relayoutNodes.isNotEmpty()) {
             duringMeasureLayout = true
             try {
                 relayoutNodes.popEach { layoutNode ->
-                    if (layoutNode.isPlaced ||
-                        layoutNode.canAffectParent ||
-                        layoutNode.alignmentLines.required
-                    ) {
-                        if (layoutNode.layoutState == NeedsRemeasure) {
-                            if (doRemeasure(layoutNode, rootConstraints)) {
-                                rootNodeResized = true
-                            }
-                        }
-                        if (layoutNode.layoutState == NeedsRelayout && layoutNode.isPlaced) {
-                            if (layoutNode === root) {
-                                layoutNode.place(0, 0)
-                            } else {
-                                layoutNode.replace()
-                            }
-                            onPositionedDispatcher.onNodePositioned(layoutNode)
-                            consistencyChecker?.assertConsistent()
-                        }
-                        measureIteration++
-                        // execute postponed `onRequestMeasure`
-                        if (postponedMeasureRequests.isNotEmpty()) {
-                            postponedMeasureRequests.fastForEach {
-                                if (it.isAttached) {
-                                    requestRemeasure(it)
-                                }
-                            }
-                            postponedMeasureRequests.clear()
-                        }
+                    val sizeChanged = remeasureAndRelayoutIfNeeded(layoutNode)
+                    if (layoutNode === root && sizeChanged) {
+                        rootNodeResized = true
                     }
                 }
             } finally {
@@ -236,6 +214,77 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
             onLayout?.invoke()
         }
         return rootNodeResized
+    }
+
+    /**
+     * Does actual remeasure and relayout on the node if it is required.
+     * The [layoutNode] should be already removed from [relayoutNodes] before running it.
+     *
+     * @return true if the [LayoutNode] size has been changed.
+     */
+    private fun remeasureAndRelayoutIfNeeded(layoutNode: LayoutNode): Boolean {
+        var sizeChanged = false
+        if (layoutNode.isPlaced ||
+            layoutNode.canAffectParent ||
+            layoutNode.alignmentLines.required
+        ) {
+            if (layoutNode.layoutState == NeedsRemeasure) {
+                sizeChanged = doRemeasure(layoutNode)
+            }
+            if (layoutNode.layoutState == NeedsRelayout && layoutNode.isPlaced) {
+                if (layoutNode === root) {
+                    layoutNode.place(0, 0)
+                } else {
+                    layoutNode.replace()
+                }
+                onPositionedDispatcher.onNodePositioned(layoutNode)
+                consistencyChecker?.assertConsistent()
+            }
+            measureIteration++
+            // execute postponed `onRequestMeasure`
+            if (postponedMeasureRequests.isNotEmpty()) {
+                postponedMeasureRequests.fastForEach {
+                    if (it.isAttached) {
+                        requestRemeasure(it)
+                    }
+                }
+                postponedMeasureRequests.clear()
+            }
+        }
+        return sizeChanged
+    }
+
+    /**
+     * Makes sure the passed [layoutNode] and its subtree is remeasured and has the final sizes.
+     */
+    fun forceMeasureTheSubtree(layoutNode: LayoutNode) {
+        // if there is nothing in `relayoutNodes` everything is remeasured.
+        if (relayoutNodes.isEmpty()) {
+            return
+        }
+
+        // assert that it is executed during the `measureAndLayout` pass.
+        check(duringMeasureLayout)
+        // if this node is not yet measured this invocation shouldn't be needed.
+        require(layoutNode.layoutState != NeedsRemeasure)
+
+        layoutNode._children.forEach { child ->
+            if (child.layoutState == NeedsRemeasure && relayoutNodes.remove(child)) {
+                remeasureAndRelayoutIfNeeded(child)
+            }
+
+            // run recursively for the subtree.
+            forceMeasureTheSubtree(child)
+        }
+
+        // if the child was resized during the remeasurement it could request a remeasure on
+        // the parent. we need to remeasure now as this function assumes the whole subtree is
+        // fully measured as a result of the invocation.
+        if (layoutNode.layoutState == NeedsRemeasure && relayoutNodes.remove(layoutNode)) {
+            remeasureAndRelayoutIfNeeded(layoutNode)
+        }
+
+        require(layoutNode.layoutState != NeedsRemeasure)
     }
 
     /**
