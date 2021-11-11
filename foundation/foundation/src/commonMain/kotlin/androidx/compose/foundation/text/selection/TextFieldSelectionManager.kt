@@ -16,8 +16,9 @@
 
 package androidx.compose.foundation.text.selection
 
-import androidx.compose.foundation.text.InternalFoundationTextApi
+import androidx.compose.foundation.text.Handle
 import androidx.compose.foundation.text.HandleState
+import androidx.compose.foundation.text.InternalFoundationTextApi
 import androidx.compose.foundation.text.TextDragObserver
 import androidx.compose.foundation.text.TextFieldState
 import androidx.compose.foundation.text.UndoManager
@@ -77,7 +78,7 @@ internal class TextFieldSelectionManager(
     /**
      * The current [TextFieldValue].
      */
-    internal var value: TextFieldValue = TextFieldValue()
+    internal var value: TextFieldValue by mutableStateOf(TextFieldValue())
 
     /**
      * Visual transformation of the text field's text. Used to check if certain toolbar options
@@ -143,7 +144,7 @@ internal class TextFieldSelectionManager(
     internal val touchSelectionObserver = object : TextDragObserver {
         override fun onStart(startPoint: Offset) {
             state?.let {
-                if (it.draggingHandle) return
+                if (it.draggingHandle != null) return
             }
 
             // Long Press at the blank area, the cursor should show up at the end of the line.
@@ -315,7 +316,8 @@ internal class TextFieldSelectionManager(
                 dragBeginPosition = getAdjustedCoordinates(getHandlePosition(isStartHandle))
                 // Zero out the total distance that being dragged.
                 dragTotalDistance = Offset.Zero
-                state?.draggingHandle = true
+                state?.draggingHandle =
+                    if (isStartHandle) Handle.SelectionStart else Handle.SelectionEnd
                 state?.showFloatingToolbar = false
             }
 
@@ -345,7 +347,7 @@ internal class TextFieldSelectionManager(
             }
 
             override fun onStop() {
-                state?.draggingHandle = false
+                state?.draggingHandle = null
                 state?.showFloatingToolbar = true
                 if (textToolbar?.status == TextToolbarStatus.Hidden) showSelectionToolbar()
             }
@@ -365,7 +367,7 @@ internal class TextFieldSelectionManager(
                 dragBeginPosition = getAdjustedCoordinates(getHandlePosition(true))
                 // Zero out the total distance that being dragged.
                 dragTotalDistance = Offset.Zero
-                state?.draggingHandle = true
+                state?.draggingHandle = Handle.Cursor
             }
 
             override fun onDrag(delta: Offset) {
@@ -391,7 +393,7 @@ internal class TextFieldSelectionManager(
             }
 
             override fun onStop() {
-                state?.draggingHandle = false
+                state?.draggingHandle = null
             }
 
             override fun onCancel() {}
