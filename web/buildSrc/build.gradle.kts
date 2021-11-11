@@ -1,8 +1,8 @@
 repositories {
     gradlePluginPortal()
     mavenCentral()
-    maven { 
-        url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev") 
+    maven {
+        url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
     maven {
         url = uri("https://packages.jetbrains.team/maven/p/ui/dev")
@@ -10,5 +10,5 @@ repositories {
 }
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.5.31"
+    id("org.jetbrains.kotlin.jvm") version "1.6.0-RC2"
 }

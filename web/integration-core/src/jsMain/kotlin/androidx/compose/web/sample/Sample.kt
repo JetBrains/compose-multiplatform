@@ -251,12 +251,12 @@ fun main() {
         Div(
             attrs = {
                 classes(
-                    Auto.css {
-                        color(Color.pink)
-                        hover(self) style {
-                            color(Color.blue)
-                        }
-                    }
+//                    Auto.css {
+//                        color(Color.pink)
+//                        hover(self) style {
+//                            color(Color.blue)
+//                        }
+//                    }
                 )
 
                 style {
