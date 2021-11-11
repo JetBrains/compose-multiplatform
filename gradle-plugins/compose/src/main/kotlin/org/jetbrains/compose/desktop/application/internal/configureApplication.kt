@@ -315,6 +315,12 @@ private fun JavaExec.configureRunTask(
     executable(javaExecutable(app.javaHomeOrDefault()))
     jvmArgs = arrayListOf<String>().apply {
         addAll(defaultJvmArgs)
+
+        if (currentOS == OS.MacOS) {
+            val file = app.nativeDistributions.macOS.iconFile.ioFileOrNull
+            if (file != null) add("-Xdock:icon=$file")
+        }
+
         addAll(app.jvmArgs)
         val appResourcesDir = prepareAppResources.get().destinationDir
         add("-D$APP_RESOURCES_DIR=${appResourcesDir.absolutePath}")
