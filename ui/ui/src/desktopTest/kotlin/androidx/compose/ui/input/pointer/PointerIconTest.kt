@@ -19,30 +19,35 @@ package androidx.compose.ui.input.pointer
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.ComposeScene
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.DummyPlatformComponent
 import androidx.compose.ui.platform.LocalPointerIconService
-import androidx.compose.ui.platform.TestComposeWindow
-import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.use
 import com.google.common.truth.Truth.assertThat
+import java.awt.Cursor
+import org.jetbrains.skia.Surface
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import java.awt.Cursor
 
 @RunWith(JUnit4::class)
 @OptIn(ExperimentalComposeUiApi::class)
 class PointerIconTest {
-    private val window = TestComposeWindow(width = 100, height = 100, density = Density(1f))
-
     private val iconService = object : PointerIconService {
         override var current: PointerIcon = PointerIconDefaults.Default
     }
 
     @Test
-    fun basicTest() {
-        window.setContent {
+    fun basicTest() = ImageComposeScene(
+        width = 100, height = 100
+    ).use { scene ->
+        scene.setContent {
             CompositionLocalProvider(
                 LocalPointerIconService provides iconService
             ) {
@@ -59,64 +64,72 @@ class PointerIconTest {
             }
         }
 
-        window.onMouseMoved(
-            x = 5,
-            y = 5
-        )
+        scene.sendPointerEvent(PointerEventType.Move, Offset(5f, 5f))
         assertThat(iconService.current).isEqualTo(PointerIconDefaults.Text)
     }
 
     @Test
     fun commitsToComponent() {
-        window.setContent {
-            Box(
-                modifier = Modifier
-                    .size(30.dp, 30.dp)
-            ) {
+        val component = DummyPlatformComponent
+        val surface = Surface.makeRasterN32Premul(100, 100)
+        val scene = ComposeScene(component = component)
+
+        try {
+            scene.constraints = Constraints(maxWidth = surface.width, maxHeight = surface.height)
+            scene.setContent {
                 Box(
                     modifier = Modifier
-                        .pointerHoverIcon(PointerIconDefaults.Text)
-                        .size(10.dp, 10.dp)
-                )
+                        .size(30.dp, 30.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .pointerHoverIcon(PointerIconDefaults.Text)
+                            .size(10.dp, 10.dp)
+                    )
+                }
             }
-        }
 
-        window.onMouseMoved(
-            x = 5,
-            y = 5
-        )
-        assertThat(window.currentCursor.type).isEqualTo(Cursor.TEXT_CURSOR)
+            scene.sendPointerEvent(PointerEventType.Move, Offset(5f, 5f))
+            assertThat(component.componentCursor.type).isEqualTo(Cursor.TEXT_CURSOR)
+        } finally {
+            scene.close()
+        }
     }
 
     @Test
     fun preservedIfSameEventDispatchedTwice() {
-        window.setContent {
-            Box(
-                modifier = Modifier
-                    .size(30.dp, 30.dp)
-            ) {
+        val component = DummyPlatformComponent
+        val surface = Surface.makeRasterN32Premul(100, 100)
+        val scene = ComposeScene(component = component)
+
+        try {
+            scene.constraints = Constraints(maxWidth = surface.width, maxHeight = surface.height)
+            scene.setContent {
                 Box(
                     modifier = Modifier
-                        .pointerHoverIcon(PointerIconDefaults.Text)
-                        .size(10.dp, 10.dp)
-                )
+                        .size(30.dp, 30.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .pointerHoverIcon(PointerIconDefaults.Text)
+                            .size(10.dp, 10.dp)
+                    )
+                }
             }
-        }
 
-        window.onMouseMoved(
-            x = 5,
-            y = 5
-        )
-        window.onMouseMoved(
-            x = 5,
-            y = 5
-        )
-        assertThat(window.currentCursor.type).isEqualTo(Cursor.TEXT_CURSOR)
+            scene.sendPointerEvent(PointerEventType.Move, Offset(5f, 5f))
+            scene.sendPointerEvent(PointerEventType.Move, Offset(5f, 5f))
+            assertThat(component.componentCursor.type).isEqualTo(Cursor.TEXT_CURSOR)
+        } finally {
+            scene.close()
+        }
     }
 
     @Test
-    fun parentWins() {
-        window.setContent {
+    fun parentWins() = ImageComposeScene(
+        width = 100, height = 100
+    ).use { scene ->
+        scene.setContent {
             CompositionLocalProvider(
                 LocalPointerIconService provides iconService
             ) {
@@ -134,22 +147,18 @@ class PointerIconTest {
             }
         }
 
-        window.onMouseMoved(
-            x = 5,
-            y = 5
-        )
+        scene.sendPointerEvent(PointerEventType.Move, Offset(5f, 5f))
         assertThat(iconService.current).isEqualTo(PointerIconDefaults.Hand)
 
-        window.onMouseMoved(
-            x = 15,
-            y = 15
-        )
+        scene.sendPointerEvent(PointerEventType.Move, Offset(15f, 15f))
         assertThat(iconService.current).isEqualTo(PointerIconDefaults.Hand)
     }
 
     @Test
-    fun childWins() {
-        window.setContent {
+    fun childWins() = ImageComposeScene(
+        width = 100, height = 100
+    ).use { scene ->
+        scene.setContent {
             CompositionLocalProvider(
                 LocalPointerIconService provides iconService
             ) {
@@ -167,16 +176,10 @@ class PointerIconTest {
             }
         }
 
-        window.onMouseMoved(
-            x = 5,
-            y = 5
-        )
+        scene.sendPointerEvent(PointerEventType.Move, Offset(5f, 5f))
         assertThat(iconService.current).isEqualTo(PointerIconDefaults.Text)
 
-        window.onMouseMoved(
-            x = 15,
-            y = 15
-        )
+        scene.sendPointerEvent(PointerEventType.Move, Offset(15f, 15f))
         assertThat(iconService.current).isEqualTo(PointerIconDefaults.Hand)
     }
 }

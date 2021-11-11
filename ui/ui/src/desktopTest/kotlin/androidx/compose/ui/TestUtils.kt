@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
+import java.awt.Component
 import java.awt.Image
 import java.awt.Window
 import java.awt.event.KeyEvent
@@ -120,3 +121,23 @@ fun JFrame.sendMouseWheelEvent(
     component.dispatchEvent(event)
     return event.isConsumed
 }
+
+private val EventComponent = object : Component() {}
+
+internal fun awtWheelEvent(isScrollByPages: Boolean = false) = MouseWheelEvent(
+    EventComponent,
+    MouseWheelEvent.MOUSE_WHEEL,
+    0,
+    0,
+    0,
+    0,
+    0,
+    false,
+    if (isScrollByPages) {
+        MouseWheelEvent.WHEEL_BLOCK_SCROLL
+    } else {
+        MouseWheelEvent.WHEEL_UNIT_SCROLL
+    },
+    1,
+    0
+)

@@ -16,8 +16,8 @@
 
 package androidx.compose.desktop.ui.tooling.preview.runtime
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentComposer
+import androidx.compose.ui.renderComposeScene
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.platform.TestComposeWindow
 import androidx.compose.ui.unit.Density
@@ -51,8 +51,7 @@ internal class NonInteractivePreviewFacade {
             val className = fqName.substringBeforeLast(".")
             val methodName = fqName.substringAfterLast(".")
             val density = scale?.let { Density(it.toFloat()) } ?: Density(1f)
-            val window = TestComposeWindow(width = width, height = height, density = density)
-            window.setContent @Composable {
+            return renderComposeScene(width = width, height = height, density = density) {
                 // We need to delay the reflection instantiation of the class until we are in the
                 // composable to ensure all the right initialization has happened and the Composable
                 // class loads correctly.
@@ -61,8 +60,7 @@ internal class NonInteractivePreviewFacade {
                     methodName,
                     currentComposer
                 )
-            }
-            return window.surface.makeImageSnapshot().encodeToData()!!.bytes
+            }.encodeToData()!!.bytes
         }
     }
 }

@@ -360,11 +360,6 @@ class ComposeScene internal constructor(
         forEachOwner { it.clearInvalidObservations() }
     }
 
-    // for TestComposeWindow backward compatibility
-    internal fun flushEffects() {
-        effectDispatcher.flush()
-    }
-
     private var focusedOwner: SkiaBasedOwner? = null
     private val hoveredOwner: SkiaBasedOwner?
         get() = list.lastOrNull { it.isHovered(pointLocation) } ?: list.lastOrNull()
