@@ -118,7 +118,7 @@ abstract class DackkaTask @Inject constructor(
                         "file://${docsProjectDir.toPath()}/package-lists/$name/package-list"
                     ) },
                 )),
-            "offlinemode" to ""
+            "offlinemode" to "true"
             )
         @Suppress("UNCHECKED_CAST")
         if (includes.isNotEmpty())
