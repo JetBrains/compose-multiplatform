@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.test.junit4.android
+package androidx.compose.ui.test.junit4
 
 import android.os.Handler
 import android.os.Looper

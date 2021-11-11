@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.test.junit4.android
+package androidx.compose.ui.test.junit4
 
-import androidx.compose.ui.test.junit4.IdlingResourceRegistry
-import androidx.compose.ui.test.junit4.IdlingStrategy
-import androidx.compose.ui.test.junit4.isOnUiThread
+import androidx.compose.ui.test.junit4.android.ComposeNotIdleException
 import androidx.test.espresso.AppNotIdleException
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.IdlingRegistry
@@ -58,11 +56,19 @@ internal class EspressoLink(
     override fun getStatementFor(base: Statement): Statement {
         return object : Statement() {
             override fun evaluate() {
+                @Suppress("DEPRECATION") // See comment below
                 try {
-                    IdlingRegistry.getInstance().register(this@EspressoLink)
+                    // TODO(b/205550018): remove usage of deprecated API when b/205550018 is fixed
+                    // When (un)registering via IdlingRegistry, the resource will only be removed
+                    // from IdlingResourceRegistry when the two sources of truth are synced with
+                    // each other, which only happens in interactions with UiController and would
+                    // thus require awaiting quiescence (e.g. Espresso.onIdle())
+                    // However, the deprecated (un)register methods on Espresso also trigger a sync
+                    // between the two sources of truth, which means we don't have to do an onIdle()
+                    Espresso.registerIdlingResources(this@EspressoLink)
                     base.evaluate()
                 } finally {
-                    IdlingRegistry.getInstance().unregister(this@EspressoLink)
+                    Espresso.unregisterIdlingResources(this@EspressoLink)
                 }
             }
         }
@@ -159,8 +165,3 @@ private inline fun <reified T : Throwable> tryToFindCause(e: Throwable): Throwab
     }
     return null
 }
-
-/**
- * Thrown in cases where Compose can't get idle in Espresso's defined time limit.
- */
-class ComposeNotIdleException(message: String?, cause: Throwable?) : Throwable(message, cause)
