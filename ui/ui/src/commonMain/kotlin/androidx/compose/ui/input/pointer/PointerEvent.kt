@@ -439,6 +439,30 @@ class PointerInputChange(
         get() = _scrollDelta
     private var _scrollDelta: Offset = Offset.Zero
 
+    /**
+     * Indicates whether the change was consumed or not. Note that the change must be consumed in
+     * full as there's no partial consumption system provided.
+     */
+    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @ExperimentalComposeUiApi
+    @get:ExperimentalComposeUiApi
+    val isConsumed: Boolean
+        get() = consumed.downChange || consumed.positionChange
+
+    /**
+     * Consume change event, claiming all the corresponding change info to the caller. This is
+     * usually needed when, button, when being clicked, consumed the "up" event so no other parents
+     * of this button could consume this "up" again.
+     *
+     * "Consumption" is just an indication of the claim and each pointer input handler
+     * implementation must manually check this flag to respect it.
+     */
+    @ExperimentalComposeUiApi
+    fun consume() {
+        consumed.downChange = true
+        consumed.positionChange = true
+    }
+
     internal constructor(
         id: PointerId,
         uptimeMillis: Long,
