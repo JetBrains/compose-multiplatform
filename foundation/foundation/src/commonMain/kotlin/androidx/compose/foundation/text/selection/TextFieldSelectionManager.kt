@@ -51,7 +51,9 @@ import androidx.compose.ui.text.input.getTextAfterSelection
 import androidx.compose.ui.text.input.getTextBeforeSelection
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
 
@@ -845,36 +847,57 @@ internal expect val PointerEvent.isShiftPressed: Boolean
  */
 internal expect fun Modifier.textFieldMagnifier(manager: TextFieldSelectionManager): Modifier
 
-internal fun calculateSelectionMagnifierCenterAndroid(manager: TextFieldSelectionManager): Offset {
-    // manager.state is not a snapshot state value, it's just a regular lazily-initialized property
-    // that doesn't change after being initialized, so it doesn't need to be read inside a
-    // restartable function.
-    val state = manager.state ?: return Offset.Unspecified
-
-    return calculateSelectionMagnifierCenterAndroid(
-        draggingHandle = manager.draggingHandle,
-        fieldValue = manager.value,
-        transformTextOffset = { manager.offsetMapping.originalToTransformed(it) },
-        getCursorRect = { state.layoutResult?.value?.getCursorRect(it) },
-    )
-}
-
-/*@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)*/
 internal fun calculateSelectionMagnifierCenterAndroid(
-    draggingHandle: Handle?,
-    fieldValue: TextFieldValue,
-    transformTextOffset: (Int) -> Int,
-    getCursorRect: (offset: Int) -> Rect?,
+    manager: TextFieldSelectionManager,
+    magnifierSize: IntSize
 ): Offset {
-    val rawTextOffset = when (draggingHandle) {
+    val rawTextOffset = when (manager.draggingHandle) {
         null -> return Offset.Unspecified
         Handle.Cursor,
-        Handle.SelectionStart -> fieldValue.selection.start
-        Handle.SelectionEnd -> fieldValue.selection.end
+        Handle.SelectionStart -> manager.value.selection.start
+        Handle.SelectionEnd -> manager.value.selection.end
     }
-    val textOffset = transformTextOffset(rawTextOffset)
-
+    val textOffset = manager.offsetMapping.originalToTransformed(rawTextOffset)
+        .coerceIn(manager.value.text.indices)
+    val layoutResult = manager.state?.layoutResult?.value ?: return Offset.Unspecified
     // Center vertically on the current line.
     // If the text hasn't been laid out yet, don't show the modifier.
-    return getCursorRect(textOffset)?.center ?: Offset.Unspecified
+    val offsetCenter = layoutResult.getBoundingBox(textOffset).center
+
+    val containerCoordinates = manager.state?.layoutCoordinates ?: return Offset.Unspecified
+    val fieldCoordinates =
+        manager.state?.layoutResult?.innerTextFieldCoordinates ?: return Offset.Unspecified
+    val localDragPosition = manager.currentDragPosition?.let {
+        fieldCoordinates.localPositionOf(containerCoordinates, it)
+    } ?: return Offset.Unspecified
+    val dragX = localDragPosition.x
+    val line = layoutResult.getLineForOffset(textOffset)
+    val lineStartOffset = layoutResult.getLineStart(line)
+    val lineEndOffset = layoutResult.getLineEnd(line, visibleEnd = true)
+    val areHandlesCrossed = manager.value.selection.start > manager.value.selection.end
+    val lineStart = layoutResult.getHorizontalPosition(
+        lineStartOffset,
+        isStart = true,
+        areHandlesCrossed = areHandlesCrossed
+    )
+    val lineEnd = layoutResult.getHorizontalPosition(
+        lineEndOffset,
+        isStart = false,
+        areHandlesCrossed = areHandlesCrossed
+    )
+    val lineMin = minOf(lineStart, lineEnd)
+    val lineMax = maxOf(lineStart, lineEnd)
+    val centerX = dragX.coerceIn(lineMin, lineMax)
+
+    // Hide the magnifier when dragged too far (outside the horizontal bounds of how big the
+    // magnifier actually is). See
+    // https://cs.android.com/android/platform/superproject/+/master:frameworks/base/core/java/android/widget/Editor.java;l=5228-5231;drc=2fdb6bd709be078b72f011334362456bb758922c
+    if ((dragX - centerX).absoluteValue > magnifierSize.width / 2) {
+        return Offset.Unspecified
+    }
+
+    return containerCoordinates.localPositionOf(
+        fieldCoordinates,
+        Offset(centerX, offsetCenter.y)
+    )
 }

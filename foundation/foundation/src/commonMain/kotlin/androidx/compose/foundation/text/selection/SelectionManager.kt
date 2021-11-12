@@ -50,6 +50,8 @@ import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.IntSize
+import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
 import kotlinx.coroutines.coroutineScope
@@ -790,25 +792,50 @@ internal expect fun isCopyKeyEvent(keyEvent: KeyEvent): Boolean
 
 internal expect fun Modifier.selectionMagnifier(manager: SelectionManager): Modifier
 
-internal fun calculateSelectionMagnifierCenterAndroid(manager: SelectionManager): Offset {
+internal fun calculateSelectionMagnifierCenterAndroid(
+    manager: SelectionManager,
+    magnifierSize: IntSize
+): Offset {
     fun getMagnifierCenter(anchor: AnchorInfo, isStartHandle: Boolean): Offset {
-        // TODO(b/206833278) Clamp x to the end of the selectable area, hide after a threshold.
-        // TODO(b/206833278) Animate x when jumping lines.
-        // TODO(b/206833278) X should track drag exactly, not clamp to cursor positions.
+        val selectable = manager.getAnchorSelectable(anchor) ?: return Offset.Unspecified
+        val containerCoordinates = manager.containerLayoutCoordinates ?: return Offset.Unspecified
+        val selectableCoordinates = selectable.getLayoutCoordinates() ?: return Offset.Unspecified
+        // The end offset is exclusive.
+        val offset = if (isStartHandle) anchor.offset else anchor.offset - 1
+
+        // The horizontal position doesn't snap to cursor positions but should directly track the
+        // actual drag.
+        val localDragPosition = selectableCoordinates.localPositionOf(
+            containerCoordinates,
+            manager.currentDragPosition!!
+        )
+        val dragX = localDragPosition.x
+        // But it is constrained by the horizontal bounds of the current line.
+        val centerX = selectable.getRangeOfLineContaining(offset).let { line ->
+            val lineMin = selectable.getBoundingBox(line.min)
+            // line.end is exclusive, but we want the bounding box of the actual last character in
+            // the line.
+            val lineMax = selectable.getBoundingBox((line.max - 1).coerceAtLeast(line.min))
+            val minX = minOf(lineMin.left, lineMax.left)
+            val maxX = maxOf(lineMin.right, lineMax.right)
+            dragX.coerceIn(minX, maxX)
+        }
+
+        // Hide the magnifier when dragged too far (outside the horizontal bounds of how big the
+        // magnifier actually is). See
+        // https://cs.android.com/android/platform/superproject/+/master:frameworks/base/core/java/android/widget/Editor.java;l=5228-5231;drc=2fdb6bd709be078b72f011334362456bb758922c
+        if ((dragX - centerX).absoluteValue > magnifierSize.width / 2) {
+            return Offset.Unspecified
+        }
 
         // Let the selectable determine the vertical position of the magnifier, since it should be
         // clamped to the center of text lines.
-        val selectable = manager.getAnchorSelectable(anchor) ?: return Offset.Unspecified
-        // The end offset is exclusive.
-        val selectionOffset = if (isStartHandle) anchor.offset else anchor.offset - 1
-        val bounds = selectable.getBoundingBox(selectionOffset)
-        // Don't need to account for Rtl here because the bounds will already be adjusted for that.
-        // (i.e. in Rtl, left > right)
-        val localCenter = if (isStartHandle) bounds.centerLeft else bounds.centerRight
-        val containerCoordinates = manager.containerLayoutCoordinates ?: return Offset.Unspecified
+        val anchorBounds = selectable.getBoundingBox(offset)
+        val centerY = anchorBounds.center.y
+
         return containerCoordinates.localPositionOf(
-            sourceCoordinates = selectable.getLayoutCoordinates() ?: return Offset.Unspecified,
-            relativeToSource = localCenter
+            sourceCoordinates = selectableCoordinates,
+            relativeToSource = Offset(centerX, centerY)
         )
     }
 
