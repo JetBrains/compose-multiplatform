@@ -90,7 +90,7 @@ class LazyScrollAccessibilityTest(private val config: TestConfig) {
         }.let { composeView ->
             ViewCompat
                 .getAccessibilityDelegate(composeView)!!
-                .getAccessibilityNodeProvider(composeView)
+                .getAccessibilityNodeProvider(composeView)!!
                 .provider as AccessibilityNodeProvider
         }
 
