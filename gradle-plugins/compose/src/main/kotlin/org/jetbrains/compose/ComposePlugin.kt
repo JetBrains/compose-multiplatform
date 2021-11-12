@@ -159,8 +159,11 @@ class ComposePlugin : Plugin<Project> {
         val animation get() = composeDependency("org.jetbrains.compose.animation:animation")
         val foundation get() = composeDependency("org.jetbrains.compose.foundation:foundation")
         val material get() = composeDependency("org.jetbrains.compose.material:material")
+        @ExperimentalComposeLibrary
+        val material3 get() = composeDependency("org.jetbrains.compose.material3:material3")
         val runtime get() = composeDependency("org.jetbrains.compose.runtime:runtime")
         val ui get() = composeDependency("org.jetbrains.compose.ui:ui")
+        @ExperimentalComposeLibrary
         val uiTestJUnit4 get() = composeDependency("org.jetbrains.compose.ui:ui-test-junit4")
         val uiTooling get() = composeDependency("org.jetbrains.compose.ui:ui-tooling")
         val preview get() = composeDependency("org.jetbrains.compose.ui:ui-tooling-preview")
@@ -186,6 +189,7 @@ class ComposePlugin : Plugin<Project> {
     }
 
     object DesktopComponentsDependencies {
+        @ExperimentalComposeLibrary
         val splitPane = composeDependency("org.jetbrains.compose.components:components-splitpane")
     }
 
