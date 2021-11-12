@@ -59,7 +59,7 @@ internal class ModifiedFocusNode(
     fun focusRect(): Rect = findRoot().localBoundingBoxOf(this, clipBounds = false)
 
     fun sendOnFocusEvent(focusState: FocusState) {
-        if (isAttached) {
+        if (isAttached && modifier.hasFocusListeners) {
             wrappedBy?.propagateFocusEvent(focusState)
         }
     }
