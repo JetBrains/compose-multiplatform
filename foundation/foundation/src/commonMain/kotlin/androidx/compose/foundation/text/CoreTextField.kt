@@ -25,6 +25,7 @@ import androidx.compose.foundation.text.selection.SimpleLayout
 import androidx.compose.foundation.text.selection.TextFieldSelectionHandle
 import androidx.compose.foundation.text.selection.TextFieldSelectionManager
 import androidx.compose.foundation.text.selection.isSelectionHandleInVisibleBound
+import androidx.compose.foundation.text.selection.textFieldMagnifier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.currentRecomposeScope

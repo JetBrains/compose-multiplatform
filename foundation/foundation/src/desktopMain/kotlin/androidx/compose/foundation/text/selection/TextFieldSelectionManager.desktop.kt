@@ -16,7 +16,13 @@
 
 package androidx.compose.foundation.text.selection
 
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEvent
 
 internal actual val PointerEvent.isShiftPressed: Boolean
     get() = mouseEvent?.isShiftDown ?: false
+
+/**
+ * Magnification is not supported on desktop.
+ */
+internal actual fun Modifier.textFieldMagnifier(manager: TextFieldSelectionManager): Modifier = this
