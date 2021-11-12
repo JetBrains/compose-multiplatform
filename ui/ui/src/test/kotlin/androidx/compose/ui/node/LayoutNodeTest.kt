@@ -681,8 +681,8 @@ class LayoutNodeTest {
     @Test
     fun coordinatesAttachedWhenLayoutNodeAttached() {
         val layoutNode = LayoutNode()
-        val drawModifier = Modifier.drawBehind { }
-        layoutNode.modifier = drawModifier
+        val layoutModifier = Modifier.graphicsLayer { }
+        layoutNode.modifier = layoutModifier
         assertFalse(layoutNode.coordinates.isAttached)
         assertFalse(layoutNode.coordinates.isAttached)
         layoutNode.attach(MockOwner())
@@ -697,16 +697,16 @@ class LayoutNodeTest {
     @Test
     fun layoutNodeWrapperSameWithReplacementModifier() {
         val layoutNode = LayoutNode()
-        val drawModifier = Modifier.drawBehind { }
+        val layoutModifier = Modifier.graphicsLayer { }
 
-        layoutNode.modifier = drawModifier
+        layoutNode.modifier = layoutModifier
         val oldLayoutNodeWrapper = layoutNode.outerLayoutNodeWrapper
         assertFalse(oldLayoutNodeWrapper.isAttached)
 
         layoutNode.attach(MockOwner())
         assertTrue(oldLayoutNodeWrapper.isAttached)
 
-        layoutNode.modifier = Modifier.drawBehind { }
+        layoutNode.modifier = Modifier.graphicsLayer { }
         val newLayoutNodeWrapper = layoutNode.outerLayoutNodeWrapper
         assertSame(newLayoutNodeWrapper, oldLayoutNodeWrapper)
     }
@@ -741,9 +741,9 @@ class LayoutNodeTest {
     @Test
     fun layoutNodeWrapperAttachedWhenLayoutNodeAttached() {
         val layoutNode = LayoutNode()
-        val drawModifier = Modifier.drawBehind { }
+        val layoutModifier = Modifier.graphicsLayer { }
 
-        layoutNode.modifier = drawModifier
+        layoutNode.modifier = layoutModifier
         val oldLayoutNodeWrapper = layoutNode.outerLayoutNodeWrapper
         assertFalse(oldLayoutNodeWrapper.isAttached)
 
@@ -760,8 +760,8 @@ class LayoutNodeTest {
     fun layoutNodeWrapperParentLayoutCoordinates() {
         val layoutNode = LayoutNode()
         val layoutNode2 = LayoutNode()
-        val drawModifier = Modifier.drawBehind { }
-        layoutNode.modifier = drawModifier
+        val layoutModifier = Modifier.graphicsLayer { }
+        layoutNode.modifier = layoutModifier
         layoutNode2.insertAt(0, layoutNode)
         layoutNode2.attach(MockOwner())
 

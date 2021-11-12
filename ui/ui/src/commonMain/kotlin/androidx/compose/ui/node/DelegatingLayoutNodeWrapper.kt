@@ -60,11 +60,8 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
         }
     }
 
-    /**
-     * An initialization function that is called when the [LayoutNodeWrapper] is initially created,
-     * and also called when the [LayoutNodeWrapper] is re-used.
-     */
-    open fun onInitialize() {
+    override fun onInitialize() {
+        super.onInitialize()
         wrapped.wrappedBy = this
     }
 
