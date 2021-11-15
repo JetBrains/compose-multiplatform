@@ -109,19 +109,19 @@ private fun Project.registerSourcesVariant(sourceJar: TaskProvider<Jar>) {
         gradleVariant.isCanBeResolved = false
         gradleVariant.attributes.attribute(
             Usage.USAGE_ATTRIBUTE,
-            objects.named(Usage.JAVA_RUNTIME)
+            objects.named<Usage>(Usage.JAVA_RUNTIME)
         )
         gradleVariant.attributes.attribute(
             Category.CATEGORY_ATTRIBUTE,
-            objects.named(Category.DOCUMENTATION)
+            objects.named<Category>(Category.DOCUMENTATION)
         )
         gradleVariant.attributes.attribute(
             Bundling.BUNDLING_ATTRIBUTE,
-            objects.named(Bundling.EXTERNAL)
+            objects.named<Bundling>(Bundling.EXTERNAL)
         )
         gradleVariant.attributes.attribute(
             DocsType.DOCS_TYPE_ATTRIBUTE,
-            objects.named(DocsType.SOURCES)
+            objects.named<DocsType>(DocsType.SOURCES)
         )
         gradleVariant.outgoing.artifact(sourceJar)
 
