@@ -31,9 +31,6 @@ abstract class UploadToSonatypeTask : DefaultTask() {
     abstract val autoCommitOnSuccess: Property<Boolean>
 
     @get:Internal
-    abstract val autoDropOnError: Property<Boolean>
-
-    @get:Internal
     abstract val version: Property<String>
 
     @get:Internal
@@ -72,9 +69,6 @@ abstract class UploadToSonatypeTask : DefaultTask() {
                 sonatype.closeStagingRepo(stagingRepo)
             }
         } catch (e: Exception) {
-            if (autoDropOnError.get()) {
-                sonatype.dropStagingRepo(stagingRepo)
-            }
             throw e
         }
     }

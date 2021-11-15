@@ -76,27 +76,13 @@ class SonatypeRestApiClient(
         return StagingRepo(response, profile)
     }
 
-    override fun dropStagingRepo(repo: StagingRepo) {
-        stagingRepoAction("drop", repo)
-    }
-
     override fun closeStagingRepo(repo: StagingRepo) {
-        stagingRepoAction("finish", repo)
-    }
-
-    private fun stagingRepoAction(
-        action: String, repo: StagingRepo
-    ) {
-        val logRepoDescription = "profileId='${repo.profile.id}', repoId='${repo.id}', description='${repo.description}'"
-        logger.info("Starting '$action': $logRepoDescription")
-        buildRequest("service/local/staging/${repo.profile.id}/$action") {
-            val promoteRequest = StagingRepo.PromoteRequest(
-                StagingRepo.PromoteData(stagedRepositoryId = repo.id, description = repo.description)
-            )
-            post(Xml.serialize(promoteRequest).toRequestBody(Xml.mediaType))
+        logger.info("Closing repository '${repo.id}'")
+        buildRequest("service/local/staging/bulk/close") {
+            val request = "{\"data\":{\"stagedRepositoryIds\":[\"${repo.id}\"]}}"
+            post(Xml.serialize(request).toRequestBody(Json.mediaType))
         }.execute { responseBody ->
-            logger.info("Finished '$action': $logRepoDescription")
-            logger.info("Response: '${responseBody.string()}'")
+            logger.info("Finished closing repository '${repo.id}': '${responseBody.string()}'")
         }
     }
 }
