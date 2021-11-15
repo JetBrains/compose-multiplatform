@@ -21,7 +21,7 @@ git config --global submodule.recurse true
   - CMake 3.10.2.4988404 (in folder $androidSdk/cmake, not in $androidSdk/cmake/$version)
 
 ## Developing in IDE
-1. Download Android Studio 2021.1.1 Canary 8 (https://developer.android.com/studio/archive) (it is mandatory to use exactly Canary 8!)
+1. Download Android Studio 2021.1.1 Canary 8 (https://developer.android.com/studio/archive) (it is mandatory to use exactly this version!)
 2. Set environment variables:
 ```
 export ALLOW_PUBLIC_REPOS=1
