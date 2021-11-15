@@ -115,6 +115,8 @@ object ResourceTasks {
             task.dependsOn(generateResourceApi)
             task.outputApiLocations.set(outputApiLocations)
             task.forceUpdate.set(
+                // forUseAtConfigurationTime() is deprecated in Gradle 7.4, but we still use 7.3
+                @Suppress("DEPRECATION")
                 project.providers.gradleProperty("force").forUseAtConfigurationTime().isPresent
             )
             checkResourceApiRelease?.let {

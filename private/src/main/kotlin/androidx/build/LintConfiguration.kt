@@ -171,6 +171,8 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension) {
     val isTestingLintItself = (project.path == ":lint-checks:integration-tests")
 
     // If -PupdateLintBaseline was set we should update the baseline if it exists
+    // forUseAtConfigurationTime() is deprecated in Gradle 7.4, but we still use 7.3
+    @Suppress("DEPRECATION")
     val updateLintBaseline = project.providers.gradleProperty(UPDATE_LINT_BASELINE)
         .forUseAtConfigurationTime().isPresent && !isTestingLintItself
 
