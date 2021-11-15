@@ -32,6 +32,7 @@ tasks.register("publishComposeJb") {
         ":compose:foundation:foundation",
         ":compose:foundation:foundation-layout",
         ":compose:material:material",
+        ":compose:material3:material3",
         ":compose:material:material-icons-core",
         ":compose:material:material-ripple",
         ":compose:runtime:runtime",
