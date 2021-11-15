@@ -448,13 +448,11 @@ class SubcomposeLayoutState(
     internal fun forceRecomposeChildren() {
         val root = _root
         if (root != null) {
-            val remeasureScheduled = root.layoutState == LayoutState.NeedsRemeasure
-            nodeToNodeState.forEach { (layoutNode, nodeState) ->
-                if (remeasureScheduled) {
-                    nodeState.forceRecompose = true
-                } else {
-                    subcompose(layoutNode, nodeState)
-                }
+            nodeToNodeState.forEach { (_, nodeState) ->
+                nodeState.forceRecompose = true
+            }
+            if (root.layoutState != LayoutState.NeedsRemeasure) {
+                root.requestRemeasure()
             }
         }
     }
