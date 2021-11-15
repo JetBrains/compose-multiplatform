@@ -185,7 +185,6 @@ val reuploadArtifactsToMavenCentral by tasks.registering(UploadToSonatypeTask::c
     user.set(mavenCentral.user)
     password.set(mavenCentral.password)
     autoCommitOnSuccess.set(mavenCentral.autoCommitOnSuccess)
-    autoDropOnError.set(mavenCentral.autoDropOnError)
     stagingProfileName.set("org.jetbrains.compose")
 }
 

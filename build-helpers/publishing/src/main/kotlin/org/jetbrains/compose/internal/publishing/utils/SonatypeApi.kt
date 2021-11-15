@@ -13,7 +13,6 @@ interface SonatypeApi {
     fun upload(repo: StagingRepo, module: ModuleToUpload)
     fun stagingProfiles(): StagingProfiles
     fun createStagingRepo(profile: StagingProfile, description: String): StagingRepo
-    fun dropStagingRepo(repo: StagingRepo)
     fun closeStagingRepo(repo: StagingRepo)
 }
 

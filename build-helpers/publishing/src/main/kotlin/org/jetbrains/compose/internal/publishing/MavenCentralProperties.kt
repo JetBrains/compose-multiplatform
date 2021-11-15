@@ -23,10 +23,6 @@ class MavenCentralProperties(private val myProject: Project) {
         propertyProvider("maven.central.staging.close.after.upload", defaultValue = "false")
             .map { it.toBoolean() }
 
-    val autoDropOnError: Provider<Boolean> =
-        propertyProvider("maven.central.staging.from.after.error", defaultValue = "false")
-            .map { it.toBoolean() }
-
     val signArtifacts: Boolean
         get() = myProject.findProperty("maven.central.sign") == "true"
 
