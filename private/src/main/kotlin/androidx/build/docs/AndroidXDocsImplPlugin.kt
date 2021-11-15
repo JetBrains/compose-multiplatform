@@ -248,11 +248,18 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             isTransitive = false
             isCanBeConsumed = false
             attributes {
-                it.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.JAVA_RUNTIME))
                 it.attribute(
-                    Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.DOCUMENTATION)
+                    Usage.USAGE_ATTRIBUTE,
+                    project.objects.named<Usage>(Usage.JAVA_RUNTIME)
                 )
-                it.attribute(DocsType.DOCS_TYPE_ATTRIBUTE, project.objects.named(DocsType.SOURCES))
+                it.attribute(
+                    Category.CATEGORY_ATTRIBUTE,
+                    project.objects.named<Category>(Category.DOCUMENTATION)
+                )
+                it.attribute(
+                    DocsType.DOCS_TYPE_ATTRIBUTE,
+                    project.objects.named<DocsType>(DocsType.SOURCES)
+                )
             }
         }
         docsSourcesConfiguration = project.configurations.create("docs-sources") {
@@ -267,11 +274,18 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
         fun Configuration.setResolveClasspathForUsage(usage: String) {
             isCanBeConsumed = false
             attributes {
-                it.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(usage))
                 it.attribute(
-                    Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.LIBRARY)
+                    Usage.USAGE_ATTRIBUTE,
+                    project.objects.named<Usage>(usage)
                 )
-                it.attribute(BuildTypeAttr.ATTRIBUTE, project.objects.named("release"))
+                it.attribute(
+                    Category.CATEGORY_ATTRIBUTE,
+                    project.objects.named<Category>(Category.LIBRARY)
+                )
+                it.attribute(
+                    BuildTypeAttr.ATTRIBUTE,
+                    project.objects.named<BuildTypeAttr>("release")
+                )
             }
             extendsFrom(docsConfiguration, samplesConfiguration, stubsConfiguration)
         }
