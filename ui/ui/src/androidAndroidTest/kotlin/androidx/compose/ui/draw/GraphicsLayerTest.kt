@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -1116,6 +1117,36 @@ class GraphicsLayerTest {
         rule.runOnIdle {
             assertFalse("First element is clicked", firstClicked)
             assertTrue("Second element is not clicked", secondClicked)
+        }
+    }
+
+    @Test
+    fun usingNestedDerivedStateInGraphicsLayerBlock() {
+        val mutableState = mutableStateOf(1f)
+        val derivedState by derivedStateOf { mutableState.value }
+        val nestedDerivedState by derivedStateOf { derivedState }
+        var valueReadInGraphicsLayer = Float.MIN_VALUE
+
+        rule.setContent {
+            Box(Modifier
+                .layout { measurable, constraints ->
+                    // update the state during the measure pass
+                    mutableState.value = 2f
+
+                    val placeable = measurable.measure(constraints)
+                    layout(placeable.width, placeable.height) {
+                        placeable.place(0, 0)
+                    }
+                }
+                .graphicsLayer {
+                    // read during updateLayerParameters
+                    valueReadInGraphicsLayer = nestedDerivedState
+                }
+            )
+        }
+
+        rule.runOnIdle {
+            assertEquals(2f, valueReadInGraphicsLayer)
         }
     }
 }
