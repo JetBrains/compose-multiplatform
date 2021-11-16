@@ -17,13 +17,11 @@
 
 <resources>
 
-    <string name="compose_material_you">Compose Material You</string>
+    <string name="compose_material_3">Compose Material 3</string>
 
     <string name="description">Description</string>
     <string name="examples">Examples</string>
     <string name="no_examples">No examples</string>
-
-    <string name="theming_options">Theming options</string>
 
     <string name="view_design_guidelines">View design guidelines</string>
     <string name="view_developer_docs">View developer docs</string>
@@ -34,7 +32,10 @@
     <string name="open_source_licenses">Open source licenses</string>
 
     <string name="theme" description="Theme. [CHAR_LIMIT=NONE]">Theme</string>
-    <string name="color_mode" description=" Material 3 Color Mode. [CHAR_LIMIT=NONE]">Color Mode</string>
-    <string name="text_scale" description="Text scale. [CHAR_LIMIT=NONE]">Text Scale</string>
-    <string name="text_direction" description="Text direction. [CHAR_LIMIT=NONE]">Text Direction</string>
+    <string name="color_mode" description=" Material 3 Color Mode. [CHAR_LIMIT=NONE]">Color mode</string>
+    <string name="font_scale" description="Font scale. [CHAR_LIMIT=NONE]">Font scale</string>
+    <string name="text_direction" description="Text direction. [CHAR_LIMIT=NONE]">Text direction</string>
+
+    <string name="scale">%.2f</string>
+
 </resources>

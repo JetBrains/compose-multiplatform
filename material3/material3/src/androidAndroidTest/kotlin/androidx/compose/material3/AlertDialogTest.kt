@@ -20,8 +20,6 @@ import android.os.Build
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -86,14 +84,15 @@ class AlertDialogTest {
                     Text("Text")
                     textContentColor = LocalContentColor.current
                 },
-                // TODO(b/198216553): Wrap with Material 3 TextButton when available.
                 confirmButton = {
-                    Text("Confirm")
-                    buttonContentColor = LocalContentColor.current
-                    expectedButtonContentColor =
-                        MaterialTheme.colorScheme.fromToken(
-                            androidx.compose.material3.tokens.Dialog.ActionLabelTextColor
-                        )
+                    TextButton(onClick = { /* doSomething() */ }) {
+                        Text("Confirm")
+                        buttonContentColor = LocalContentColor.current
+                        expectedButtonContentColor =
+                            MaterialTheme.colorScheme.fromToken(
+                                androidx.compose.material3.tokens.Dialog.ActionLabelTextColor
+                            )
+                    }
                 },
                 containerColor = Color.Yellow,
                 tonalElevation = 0.dp,
@@ -146,9 +145,16 @@ class AlertDialogTest {
                             "which presents the details regarding the Dialog's purpose."
                     )
                 },
-                // TODO(b/198216553): Wrap with Material 3 TextButton when available.
-                confirmButton = { Text("Confirm") },
-                dismissButton = { Text("Dismiss") },
+                confirmButton = {
+                    TextButton(onClick = { /* doSomething() */ }) {
+                        Text("Confirm")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { /* doSomething() */ }) {
+                        Text("Dismiss")
+                    }
+                },
             )
         }
 
@@ -171,8 +177,11 @@ class AlertDialogTest {
                 onDismissRequest = {},
                 title = { Text(text = "Title") },
                 text = { Text("Short") },
-                // TODO(b/198216553): Wrap with Material 3 TextButton when available.
-                confirmButton = { Text("Confirm") }
+                confirmButton = {
+                    TextButton(onClick = { /* doSomething() */ }) {
+                        Text("Confirm")
+                    }
+                }
             )
         }
 
@@ -196,22 +205,20 @@ class AlertDialogTest {
                 },
                 title = { Text(text = "Title", modifier = Modifier.testTag(TitleTestTag)) },
                 text = { Text("Text", modifier = Modifier.testTag(TextTestTag)) },
-                // TODO(b/198216553): Using IconButton to ensure a minimum touch target of 48dp.
-                //  Wrap with Material 3 TextButton when available.
                 confirmButton = {
-                    IconButton(
+                    TextButton(
                         onClick = { /* doSomething() */ },
                         Modifier.testTag(ConfirmButtonTestTag).semantics(mergeDescendants = true) {}
                     ) {
-                        Icon(Icons.Filled.Check, contentDescription = null)
+                        Text("Confirm")
                     }
                 },
                 dismissButton = {
-                    IconButton(
+                    TextButton(
                         onClick = { /* doSomething() */ },
                         Modifier.testTag(DismissButtonTestTag).semantics(mergeDescendants = true) {}
                     ) {
-                        Icon(Icons.Filled.Close, contentDescription = null)
+                        Text("Dismiss")
                     }
                 }
             )
@@ -271,15 +278,13 @@ class AlertDialogTest {
                 onDismissRequest = {},
                 title = { Text(text = "Title", modifier = Modifier.testTag(TitleTestTag)) },
                 text = { Text("Text", modifier = Modifier.testTag(TextTestTag)) },
-                // TODO(b/198216553): Using IconButton to ensure a minimum touch target of 48dp.
-                //  Wrap with Material 3 TextButton when available.
                 confirmButton = {},
                 dismissButton = {
-                    IconButton(
+                    TextButton(
                         onClick = { /* doSomething() */ },
                         Modifier.testTag(DismissButtonTestTag).semantics(mergeDescendants = true) {}
                     ) {
-                        Icon(Icons.Filled.Close, contentDescription = null)
+                        Text("Dismiss")
                     }
                 }
             )

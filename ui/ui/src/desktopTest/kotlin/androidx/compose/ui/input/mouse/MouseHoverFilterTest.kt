@@ -17,7 +17,10 @@
 package androidx.compose.ui.input.mouse
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventType
@@ -123,6 +126,62 @@ class MouseHoverFilterTest {
         assertThat(enterCount).isEqualTo(1)
         assertThat(exitCount).isEqualTo(1)
         assertThat(moveCount).isEqualTo(0)
+    }
+
+    @Test
+    fun `scroll should trigger enter and exit`() {
+        val boxCount = 3
+
+        val enterCounts = Array(boxCount) { 0 }
+        val exitCounts = Array(boxCount) { 0 }
+
+        window.setContent {
+            Column(
+                Modifier
+                    .size(10.dp, 20.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                repeat(boxCount) { index ->
+                    Box(
+                        modifier = Modifier
+                            .pointerMove(
+                                onMove = {},
+                                onEnter = {
+                                    enterCounts[index] = enterCounts[index] + 1
+                                },
+                                onExit = {
+                                    exitCounts[index] = exitCounts[index] + 1
+                                }
+                            )
+                            .size(10.dp, 20.dp)
+                    )
+                }
+            }
+        }
+
+        window.onMouseEntered(0, 0)
+        window.onMouseScroll(
+            0,
+            0,
+            MouseScrollEvent(MouseScrollUnit.Page(1f), MouseScrollOrientation.Vertical)
+        )
+        window.render() // synthetic enter/exit will trigger only on relayout
+        assertThat(enterCounts.toList()).isEqualTo(listOf(1, 1, 0))
+        assertThat(exitCounts.toList()).isEqualTo(listOf(1, 0, 0))
+
+        window.onMouseMoved(1, 1)
+        window.onMouseScroll(
+            2,
+            2,
+            MouseScrollEvent(MouseScrollUnit.Page(1f), MouseScrollOrientation.Vertical)
+        )
+        window.render()
+        assertThat(enterCounts.toList()).isEqualTo(listOf(1, 1, 1))
+        assertThat(exitCounts.toList()).isEqualTo(listOf(1, 1, 0))
+
+        window.onMouseExited()
+        assertThat(enterCounts.toList()).isEqualTo(listOf(1, 1, 1))
+        assertThat(exitCounts.toList()).isEqualTo(listOf(1, 1, 1))
     }
 }
 

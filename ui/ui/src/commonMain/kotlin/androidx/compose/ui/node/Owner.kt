@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.pointer.PointerIconService
 import androidx.compose.ui.platform.AccessibilityManager
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
@@ -104,6 +105,8 @@ internal interface Owner {
 
     val textInputService: TextInputService
 
+    val pointerIconService: PointerIconService
+
     /**
      * Provide a focus manager that controls focus within Compose.
      */
@@ -172,9 +175,11 @@ internal interface Owner {
     fun requestFocus(): Boolean
 
     /**
-     * Iterates through all LayoutNodes that have requested layout and measures and lays them out
+     * Iterates through all LayoutNodes that have requested layout and measures and lays them out.
+     * If [sendPointerUpdate] is `true` then a simulated PointerEvent may be sent to update pointer
+     * input handlers.
      */
-    fun measureAndLayout()
+    fun measureAndLayout(sendPointerUpdate: Boolean = true)
 
     /**
      * Creates an [OwnedLayer] which will be drawing the passed [drawBlock].

@@ -35,7 +35,7 @@ class PointerInteropUtilsTest {
     fun toMotionEventScope_noPlatformEvent_throws() {
         val pointerEvent = PointerEvent(
             listOf(),
-            motionEvent = null
+            internalPointerEvent = null
         )
         pointerEvent.toMotionEventScope(Offset.Zero) {}
     }
@@ -323,7 +323,7 @@ class PointerInteropUtilsTest {
     fun toCancelMotionEventScope_noPlatformEvent_throws() {
         val pointerEvent = PointerEvent(
             listOf(),
-            motionEvent = null
+            internalPointerEvent = null
         )
         pointerEvent.toCancelMotionEventScope(Offset.Zero) {}
     }
@@ -572,3 +572,12 @@ private fun MotionEvent.asOffsetToScreen() =
     MotionEvent.obtain(this).also { motionEvent ->
         motionEvent.offsetLocation(rawX - x, rawY - y)
     }
+
+private fun PointerEvent(
+    changes: List<PointerInputChange>,
+    motionEvent: MotionEvent
+): PointerEvent {
+    val changesMap = changes.map { it.id to it }.toMap()
+    val internalPointerEvent = InternalPointerEvent(changesMap, motionEvent)
+    return PointerEvent(changes, internalPointerEvent)
+}

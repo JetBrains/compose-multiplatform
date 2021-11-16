@@ -59,19 +59,21 @@ internal class SemanticsWrapper(
 
     override fun hitTestSemantics(
         pointerPosition: Offset,
-        hitSemanticsWrappers: HitTestResult<SemanticsWrapper>
+        hitSemanticsWrappers: HitTestResult<SemanticsWrapper>,
+        isInLayer: Boolean
     ) {
         hitTestInMinimumTouchTarget(
             pointerPosition,
             hitSemanticsWrappers,
             forceParentIntercept = false,
             useTouchSize = true,
+            isInLayer,
             content = this
-        ) {
+        ) { inLayer ->
             // Also, keep looking to see if we also might hit any children.
             // This avoids checking layer bounds twice as when we call super.hitTest()
             val positionInWrapped = wrapped.fromParentPosition(pointerPosition)
-            wrapped.hitTestSemantics(positionInWrapped, hitSemanticsWrappers)
+            wrapped.hitTestSemantics(positionInWrapped, hitSemanticsWrappers, inLayer)
         }
     }
 

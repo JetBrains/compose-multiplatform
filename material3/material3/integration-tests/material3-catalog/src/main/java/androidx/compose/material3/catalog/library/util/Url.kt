@@ -25,8 +25,13 @@ fun Context.openUrl(url: String) {
     startActivity(intent)
 }
 
-const val GuidelinesUrl = "https://material.io"
-const val ReleasesUrl = "https://developer.android.com/jetpack/androidx/releases/compose-material"
+const val GuidelinesUrl = "https://m3.material.io"
+const val ComponentGuidelinesUrl = "https://m3.material.io/components"
+const val StyleGuidelinesUrl = "https://m3.material.io/styles"
+const val ReleasesUrl = "https://developer.android.com/jetpack/androidx/releases/compose-material3"
+const val DocsUrl = "https://developer.android.com/reference/kotlin/androidx/compose/material3"
+const val PackageSummaryUrl = "https://developer.android.com/reference/kotlin/androidx/compose/" +
+    "material3/package-summary"
 const val SourceUrl = "https://cs.android.com/androidx/platform/frameworks/support/+/" +
     "androidx-main:compose/material3"
 const val Material3SourceUrl = "https://cs.android.com/androidx/platform/frameworks/support/+/" +
@@ -35,7 +40,6 @@ const val Material3SourceUrl = "https://cs.android.com/androidx/platform/framewo
 const val SampleSourceUrl = "https://cs.android.com/androidx/platform/frameworks/support/+/" +
     "androidx-main:compose/material3/" +
     "material3/samples/src/main/java/androidx/compose/material3/samples"
-// TODO: Update issue URL for Material3 component when available
 const val IssueUrl = "https://issuetracker.google.com/issues/new?component=742043"
 const val TermsUrl = "https://policies.google.com/terms"
 const val PrivacyUrl = "https://policies.google.com/privacy"

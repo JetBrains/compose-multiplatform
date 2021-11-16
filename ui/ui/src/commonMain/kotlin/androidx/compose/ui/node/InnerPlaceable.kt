@@ -122,7 +122,6 @@ internal class InnerPlaceable(
         // get(line), to obtain the position of the alignment line the wrapper currently needs
         // our position in order ot know how to offset the value we provided).
         if (wrappedBy?.isShallowPlacing == true) return
-
         layoutNode.onNodePlaced()
     }
 
@@ -145,33 +144,68 @@ internal class InnerPlaceable(
     override fun hitTest(
         pointerPosition: Offset,
         hitTestResult: HitTestResult<PointerInputFilter>,
-        isTouchEvent: Boolean
+        isTouchEvent: Boolean,
+        isInLayer: Boolean
     ) {
-        hitTestSubtree(pointerPosition, hitTestResult, isTouchEvent, LayoutNode::hitTest)
+        hitTest(pointerPosition, hitTestResult, isTouchEvent, isInLayer, LayoutNode::hitTest)
     }
 
     override fun hitTestSemantics(
         pointerPosition: Offset,
-        hitSemanticsWrappers: HitTestResult<SemanticsWrapper>
+        hitSemanticsWrappers: HitTestResult<SemanticsWrapper>,
+        isInLayer: Boolean
     ) {
-        hitTestSubtree(pointerPosition, hitSemanticsWrappers, true, LayoutNode::hitTestSemantics)
+        hitTest(
+            pointerPosition,
+            hitSemanticsWrappers,
+            true,
+            isInLayer,
+            LayoutNode::hitTestSemantics
+        )
     }
 
-    private inline fun <T> hitTestSubtree(
+    private inline fun <T> hitTest(
         pointerPosition: Offset,
         hitTestResult: HitTestResult<T>,
         isTouchEvent: Boolean,
-        nodeHitTest: LayoutNode.(Offset, HitTestResult<T>, Boolean) -> Unit
+        isInLayer: Boolean,
+        childHitTest: LayoutNode.(Offset, HitTestResult<T>, Boolean, Boolean) -> Unit
     ) {
-        if (withinLayerBounds(pointerPosition, isTouchEvent)) {
-            // Any because as soon as true is returned, we know we have found a hit path and we must
-            // not add hit results on different paths so we should not even go looking.
-            layoutNode.zSortedChildren.reversedAny { child ->
-                if (child.isPlaced) {
-                    child.nodeHitTest(pointerPosition, hitTestResult, isTouchEvent)
-                    hitTestResult.hasHit()
-                } else {
-                    false
+        var inLayer = isInLayer
+        var hitTestChildren = false
+
+        if (withinLayerBounds(pointerPosition)) {
+            hitTestChildren = true
+        } else if (isTouchEvent &&
+            distanceInMinimumTouchTarget(pointerPosition, minimumTouchTargetSize).isFinite()
+        ) {
+            inLayer = false
+            hitTestChildren = true
+        }
+
+        if (hitTestChildren) {
+            hitTestResult.siblingHits {
+                // Any because as soon as true is returned, we know we have found a hit path and we must
+                // not add hit results on different paths so we should not even go looking.
+                layoutNode.zSortedChildren.reversedAny { child ->
+                    if (child.isPlaced) {
+                        child.childHitTest(pointerPosition, hitTestResult, isTouchEvent, inLayer)
+                        val wasHit = hitTestResult.hasHit()
+                        val continueHitTest: Boolean
+                        if (!wasHit) {
+                            continueHitTest = true
+                        } else if (
+                            child.outerLayoutNodeWrapper.shouldSharePointerInputWithSiblings()
+                        ) {
+                            hitTestResult.acceptHits()
+                            continueHitTest = true
+                        } else {
+                            continueHitTest = false
+                        }
+                        !continueHitTest
+                    } else {
+                        false
+                    }
                 }
             }
         }
@@ -180,6 +214,8 @@ internal class InnerPlaceable(
     override fun getWrappedByCoordinates(): LayoutCoordinates {
         return this
     }
+
+    override fun shouldSharePointerInputWithSiblings(): Boolean = false
 
     internal companion object {
         val innerBoundsPaint = Paint().also { paint ->

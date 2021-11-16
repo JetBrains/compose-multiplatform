@@ -13,7 +13,4 @@ soboleva@google.com
 malkov@google.com
 
 # For text related files
-haoyuchang@google.com
-nona@google.com
-qqd@google.com
-siyamed@google.com
+include /TEXT_OWNERS

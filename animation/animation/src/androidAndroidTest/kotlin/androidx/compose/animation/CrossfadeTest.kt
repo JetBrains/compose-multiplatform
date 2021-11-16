@@ -17,19 +17,27 @@ package androidx.compose.animation
 
 import androidx.compose.animation.core.AnimationConstants.DefaultDurationMillis
 import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameMillis
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -202,6 +210,55 @@ class CrossfadeTest {
 
         assertEquals(1, counter1)
         assertEquals(2, counter2)
+    }
+
+    @OptIn(ExperimentalAnimationApi::class)
+    @Test
+    fun crossfadeTest_contentKey() {
+        var targetState by mutableStateOf(1)
+        val list = mutableListOf<Int>()
+        rule.setContent {
+            val transition = updateTransition(targetState)
+            val holder = rememberSaveableStateHolder()
+            transition.Crossfade(contentKey = { it > 0 }) {
+                if (it > 0) {
+                    holder.SaveableStateProvider(true) {
+                        var count by rememberSaveable { mutableStateOf(0) }
+                        LaunchedEffect(Unit) {
+                            list.add(++count)
+                        }
+                    }
+                }
+                Box(Modifier.requiredSize(200.dp))
+            }
+            LaunchedEffect(Unit) {
+                // Expect no animation when targetState changed while the contentKey remains
+                // the same.
+                Assert.assertFalse(transition.isRunning)
+                targetState = 2
+                withFrameMillis { }
+                Assert.assertFalse(transition.isRunning)
+                assertEquals(transition.currentState, transition.targetState)
+                // This state change should now change the contentKey & hence trigger an animation
+                targetState = -1
+                withFrameMillis { }
+                assertTrue(transition.isRunning)
+            }
+        }
+        rule.waitForIdle()
+        rule.runOnIdle {
+            assertEquals(1, list.size)
+            assertEquals(1, list[0])
+            // Switch back to 1, expect a targetState change in Transition.
+            targetState = 1
+        }
+
+        rule.runOnIdle {
+            // Check that save worked
+            assertEquals(2, list.size)
+            assertEquals(1, list[0])
+            assertEquals(2, list[1])
+        }
     }
 
     companion object {

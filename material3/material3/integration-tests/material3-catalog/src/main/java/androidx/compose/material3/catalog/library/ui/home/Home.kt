@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.catalog.library.R
 import androidx.compose.material3.catalog.library.model.Component
 import androidx.compose.material3.catalog.library.model.Theme
@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 
-// TODO: Use components/values from Material3 when available
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 fun Home(
@@ -44,28 +43,28 @@ fun Home(
     onComponentClick: (component: Component) -> Unit
 ) {
     CatalogScaffold(
-        topBarTitle = stringResource(id = R.string.compose_material_you),
+        topBarTitle = stringResource(id = R.string.compose_material_3),
         theme = theme,
         onThemeChange = onThemeChange
     ) { paddingValues ->
         BoxWithConstraints(modifier = Modifier.padding(paddingValues)) {
-            val cellsCount = maxOf((maxWidth / HomeCellMinSize).toInt(), 1)
             LazyVerticalGrid(
-                // LazyGridScope doesn't expose nColumns from LazyVerticalGrid
-                // https://issuetracker.google.com/issues/183187002
-                cells = GridCells.Fixed(count = cellsCount),
+                modifier = Modifier.padding(paddingValues),
+                cells = GridCells.Adaptive(HomeCellMinSize),
                 content = {
-                    itemsIndexed(components) { index, component ->
+                    items(components) { component ->
                         ComponentItem(
                             component = component,
-                            onClick = onComponentClick,
-                            index = index,
-                            cellsCount = cellsCount
+                            onClick = onComponentClick
                         )
                     }
                 },
                 contentPadding = rememberInsetsPaddingValues(
-                    insets = LocalWindowInsets.current.navigationBars
+                    insets = LocalWindowInsets.current.navigationBars,
+                    additionalStart = HomePadding,
+                    additionalTop = HomePadding,
+                    additionalEnd = HomePadding,
+                    additionalBottom = HomePadding
                 )
             )
         }
@@ -73,3 +72,4 @@ fun Home(
 }
 
 private val HomeCellMinSize = 180.dp
+private val HomePadding = 12.dp

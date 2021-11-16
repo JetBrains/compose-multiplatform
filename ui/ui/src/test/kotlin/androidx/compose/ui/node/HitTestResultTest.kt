@@ -27,21 +27,45 @@ class HitTestResultTest {
     @Test
     fun testHit() {
         val hitTestResult = HitTestResult<String>()
-        hitTestResult.hit("Hello") {
-            hitTestResult.hit("World") {
+        hitTestResult.hit("Hello", true) {
+            hitTestResult.hit("World", true) {
                 assertThat(hitTestResult.hasHit()).isFalse()
             }
             assertThat(hitTestResult.hasHit()).isTrue()
         }
         assertThat(hitTestResult.hasHit()).isTrue()
-        assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(0f)).isFalse()
+        assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(0f, true)).isFalse()
+        assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(0f, false)).isFalse()
 
         assertThat(hitTestResult).hasSize(2)
         assertThat(hitTestResult[0]).isEqualTo("Hello")
         assertThat(hitTestResult[1]).isEqualTo("World")
 
-        hitTestResult.hit("Baz") {}
+        hitTestResult.hit("Baz", true) {}
         assertThat(hitTestResult.hasHit()).isTrue()
+        assertThat(hitTestResult).hasSize(1)
+        assertThat(hitTestResult[0]).isEqualTo("Baz")
+    }
+
+    @Test
+    fun testHitClipped() {
+        val hitTestResult = HitTestResult<String>()
+        hitTestResult.hit("Hello", false) {
+            hitTestResult.hit("World", false) {
+                assertThat(hitTestResult.hasHit()).isFalse()
+            }
+            assertThat(hitTestResult.hasHit()).isFalse()
+        }
+        assertThat(hitTestResult.hasHit()).isFalse()
+        assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(0f, true)).isTrue()
+        assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(0f, false)).isFalse()
+
+        assertThat(hitTestResult).hasSize(2)
+        assertThat(hitTestResult[0]).isEqualTo("Hello")
+        assertThat(hitTestResult[1]).isEqualTo("World")
+
+        hitTestResult.hit("Baz", false) {}
+        assertThat(hitTestResult.hasHit()).isFalse()
         assertThat(hitTestResult).hasSize(1)
         assertThat(hitTestResult[0]).isEqualTo("Baz")
     }
@@ -49,21 +73,22 @@ class HitTestResultTest {
     @Test
     fun testHitInMinimumTouchTarget() {
         val hitTestResult = HitTestResult<String>()
-        hitTestResult.hitInMinimumTouchTarget("Hello", 1f) {
-            hitTestResult.hitInMinimumTouchTarget("World", 2f) { }
+        hitTestResult.hitInMinimumTouchTarget("Hello", 1f, true) {
+            hitTestResult.hitInMinimumTouchTarget("World", 2f, false) { }
             assertThat(hitTestResult.hasHit()).isFalse()
-            assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(1.5f)).isTrue()
-            assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(2.5f)).isFalse()
+            assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(1.5f, false)).isTrue()
+            assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(2.5f, false)).isFalse()
+            assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(2.5f, true)).isTrue()
         }
         assertThat(hitTestResult.hasHit()).isFalse()
-        assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(0.5f)).isTrue()
-        assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(1.5f)).isFalse()
+        assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(0.5f, true)).isTrue()
+        assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(1.5f, true)).isFalse()
 
         assertThat(hitTestResult).hasSize(2)
         assertThat(hitTestResult[0]).isEqualTo("Hello")
         assertThat(hitTestResult[1]).isEqualTo("World")
 
-        hitTestResult.hitInMinimumTouchTarget("Baz", 0.5f) { }
+        hitTestResult.hitInMinimumTouchTarget("Baz", 0.5f, false) { }
         assertThat(hitTestResult.hasHit()).isFalse()
         assertThat(hitTestResult).hasSize(1)
         assertThat(hitTestResult[0]).isEqualTo("Baz")
@@ -72,8 +97,8 @@ class HitTestResultTest {
     @Test
     fun testHasHit() {
         val hitTestResult = HitTestResult<String>()
-        hitTestResult.hitInMinimumTouchTarget("Hello", 1f) {
-            hitTestResult.hit("World") {
+        hitTestResult.hitInMinimumTouchTarget("Hello", 1f, true) {
+            hitTestResult.hit("World", true) {
                 assertThat(hitTestResult.hasHit()).isFalse()
             }
             assertThat(hitTestResult.hasHit()).isTrue()
@@ -84,17 +109,17 @@ class HitTestResultTest {
     @Test
     fun testEasySpeculativeHit() {
         val hitTestResult = HitTestResult<String>()
-        hitTestResult.speculativeHit("Hello", 1f) {
+        hitTestResult.speculativeHit("Hello", 1f, true) {
         }
         assertThat(hitTestResult).hasSize(0)
 
-        hitTestResult.speculativeHit("Hello", 1f) {
-            hitTestResult.hitInMinimumTouchTarget("World", 2f) {}
+        hitTestResult.speculativeHit("Hello", 1f, true) {
+            hitTestResult.hitInMinimumTouchTarget("World", 2f, true) {}
         }
 
         assertThat(hitTestResult.hasHit()).isFalse()
-        assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(0.5f)).isTrue()
-        assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(1.5f)).isFalse()
+        assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(0.5f, true)).isTrue()
+        assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(1.5f, true)).isFalse()
 
         assertThat(hitTestResult).hasSize(2)
         assertThat(hitTestResult[0]).isEqualTo("Hello")
@@ -104,21 +129,21 @@ class HitTestResultTest {
     @Test
     fun testSpeculativeHitWithMove() {
         val hitTestResult = HitTestResult<String>()
-        hitTestResult.hitInMinimumTouchTarget("Foo", 1.5f) { }
+        hitTestResult.hitInMinimumTouchTarget("Foo", 1.5f, true) { }
 
-        hitTestResult.speculativeHit("Hello", 1f) {
+        hitTestResult.speculativeHit("Hello", 1f, true) {
         }
 
         assertThat(hitTestResult).hasSize(1)
         assertThat(hitTestResult[0]).isEqualTo("Foo")
 
-        hitTestResult.speculativeHit("Hello", 1f) {
-            hitTestResult.hitInMinimumTouchTarget("World", 2f) {}
+        hitTestResult.speculativeHit("Hello", 1f, true) {
+            hitTestResult.hitInMinimumTouchTarget("World", 2f, true) {}
         }
 
         assertThat(hitTestResult.hasHit()).isFalse()
-        assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(0.5f)).isTrue()
-        assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(1.25f)).isFalse()
+        assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(0.5f, true)).isTrue()
+        assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(1.25f, true)).isFalse()
 
         assertThat(hitTestResult).hasSize(2)
         assertThat(hitTestResult[0]).isEqualTo("Hello")
@@ -128,23 +153,23 @@ class HitTestResultTest {
     @Test
     fun testSpeculateHitWithDeepHit() {
         val hitTestResult = HitTestResult<String>()
-        hitTestResult.hitInMinimumTouchTarget("Foo", 1.5f) { }
+        hitTestResult.hitInMinimumTouchTarget("Foo", 1.5f, true) { }
 
-        hitTestResult.speculativeHit("Hello", 2f) {
-            hitTestResult.hitInMinimumTouchTarget("World", 1f) {}
+        hitTestResult.speculativeHit("Hello", 2f, true) {
+            hitTestResult.hitInMinimumTouchTarget("World", 1f, true) {}
         }
 
         assertThat(hitTestResult.hasHit()).isFalse()
-        assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(0.5f)).isTrue()
-        assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(1.25f)).isFalse()
+        assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(0.5f, true)).isTrue()
+        assertThat(hitTestResult.isHitInMinimumTouchTargetBetter(1.25f, true)).isFalse()
 
         assertThat(hitTestResult).hasSize(2)
         assertThat(hitTestResult[0]).isEqualTo("Hello")
         assertThat(hitTestResult[1]).isEqualTo("World")
 
-        hitTestResult.speculativeHit("Goodbye", 2f) {
-            hitTestResult.hitInMinimumTouchTarget("Cruel", 1f) {
-                hitTestResult.hit("World!") {}
+        hitTestResult.speculativeHit("Goodbye", 2f, true) {
+            hitTestResult.hitInMinimumTouchTarget("Cruel", 1f, true) {
+                hitTestResult.hit("World!", true) {}
             }
         }
 
@@ -316,15 +341,45 @@ class HitTestResultTest {
         assertThat(listIterator2.previous()).isEqualTo("this")
     }
 
+    @Test
+    fun siblingHits() {
+        val hitTestResult = HitTestResult<String>()
+
+        hitTestResult.siblingHits {
+            hitTestResult.hit("Hello", true) {
+                hitTestResult.siblingHits {
+                    hitTestResult.hit("World", true) {}
+                }
+            }
+            hitTestResult.acceptHits()
+            hitTestResult.hit("this", true) {
+                hitTestResult.siblingHits {
+                    hitTestResult.hit("is", true) {}
+                }
+            }
+            hitTestResult.acceptHits()
+            hitTestResult.hit("great", true) {}
+        }
+        assertThat(hitTestResult.toList()).isEqualTo(
+            listOf(
+                "Hello",
+                "World",
+                "this",
+                "is",
+                "great"
+            )
+        )
+    }
+
     private fun fillHitTestResult(last: String? = null): HitTestResult<String> {
         val hitTestResult = HitTestResult<String>()
-        hitTestResult.hit("Hello") {
-            hitTestResult.hit("World") {
-                hitTestResult.hit("this") {
-                    hitTestResult.hit("is") {
-                        hitTestResult.hit("great") {
+        hitTestResult.hit("Hello", true) {
+            hitTestResult.hit("World", true) {
+                hitTestResult.hit("this", true) {
+                    hitTestResult.hit("is", true) {
+                        hitTestResult.hit("great", true) {
                             last?.let {
-                                hitTestResult.hit(it) {}
+                                hitTestResult.hit(it, true) {}
                             }
                         }
                     }

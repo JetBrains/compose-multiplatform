@@ -92,9 +92,6 @@ class RadioButtonScreenshotTest {
             down(center)
         }
 
-        // Advance past the tap timeout
-        rule.mainClock.advanceTimeBy(100)
-
         // Ripples are drawn on the RenderThread, not the main (UI) thread, so we can't wait for
         // synchronization. Instead just wait until after the ripples are finished animating.
         Thread.sleep(300)

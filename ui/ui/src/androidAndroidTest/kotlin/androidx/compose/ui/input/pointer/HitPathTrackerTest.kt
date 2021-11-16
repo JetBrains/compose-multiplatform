@@ -3214,12 +3214,8 @@ class HitPathTrackerTest {
 
         assertThat(areEqual(hitPathTracker.root, expectedRoot)).isTrue()
 
-        assertHoverEvent(
-            log,
-            pif1 to PointerEventType.Move,
-            pif2 to PointerEventType.Move,
-            pif3 to PointerEventType.Move,
-        )
+        // When the same position is sent, it should ignore the change.
+        assertThat(log).hasSize(0)
     }
 
     private fun assertHoverEvent(
@@ -3612,6 +3608,8 @@ private class MockOwner(
         get() = Density(1f)
     override val textInputService: TextInputService
         get() = TODO("Not yet implemented")
+    override val pointerIconService: PointerIconService
+        get() = TODO("Not yet implemented")
     override val focusManager: FocusManager
         get() = TODO("Not yet implemented")
     override val windowInfo: WindowInfo
@@ -3648,7 +3646,7 @@ private class MockOwner(
 
     override fun requestFocus(): Boolean = false
 
-    override fun measureAndLayout() {
+    override fun measureAndLayout(sendPointerUpdate: Boolean) {
     }
 
     override fun createLayer(
@@ -3656,12 +3654,6 @@ private class MockOwner(
         invalidateParentLayer: () -> Unit
     ): OwnedLayer {
         return object : OwnedLayer {
-            override val layerId: Long
-                get() = 0
-
-            override val ownerViewId: Long
-                get() = 0
-
             override fun updateLayerProperties(
                 scaleX: Float,
                 scaleY: Float,

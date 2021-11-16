@@ -31,4 +31,9 @@ internal actual class InternalPointerEvent constructor(
         changes,
         pointerInputEvent.mouseEvent
     )
+
+    actual var suppressMovementConsumption: Boolean = false
+
+    // Assume that all changes are from mouse events for now
+    actual fun issuesEnterExitEvent(pointerId: PointerId): Boolean = true
 }

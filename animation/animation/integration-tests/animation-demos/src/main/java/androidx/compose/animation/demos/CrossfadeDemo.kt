@@ -16,8 +16,8 @@
 
 package androidx.compose.animation.demos
 
-import android.util.Log
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -46,7 +46,6 @@ fun CrossfadeDemo() {
                 Box(
                     Modifier.pointerInput(Unit) {
                         detectTapGestures {
-                            Log.e("Crossfade", "Switch to $tab")
                             current = index
                         }
                     }
@@ -57,7 +56,7 @@ fun CrossfadeDemo() {
             }
         }
         val saveableStateHolder = rememberSaveableStateHolder()
-        Crossfade(targetState = current) { current ->
+        Crossfade(targetState = current, animationSpec = tween(1000)) { current ->
             saveableStateHolder.SaveableStateProvider(current) {
                 val tab = tabs[current]
                 arrayOf<Any?>()
@@ -78,7 +77,6 @@ private data class Tab(val color: Color) {
     var lastInt: Int = 0
         set(value) {
             if (value != field) {
-                Log.e("Crossfade", "State recreated for $color")
                 field = value
             }
         }

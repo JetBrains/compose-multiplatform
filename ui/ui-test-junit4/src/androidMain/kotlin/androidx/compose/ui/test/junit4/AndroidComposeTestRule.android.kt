@@ -175,17 +175,15 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
     private val idlingStrategy: IdlingStrategy by lazy { idlingStrategyFactory.invoke() }
 
     private val recomposer: Recomposer
-    private val testCoroutineDispatcher: TestCoroutineDispatcher
+    private val testCoroutineDispatcher = TestCoroutineDispatcher()
+    private val frameCoroutineScope = CoroutineScope(testCoroutineDispatcher)
     private val recomposerApplyCoroutineScope: CoroutineScope
-    private val frameCoroutineScope: CoroutineScope
     private val coroutineExceptionHandler = UncaughtExceptionHandler()
 
     override val mainClock: MainTestClock
         get() = mainClockImpl
 
     init {
-        testCoroutineDispatcher = TestCoroutineDispatcher()
-        frameCoroutineScope = CoroutineScope(testCoroutineDispatcher)
         val frameClock = TestMonotonicFrameClock(frameCoroutineScope)
         mainClockImpl = MainTestClockImpl(testCoroutineDispatcher, frameClock)
         val infiniteAnimationPolicy = object : InfiniteAnimationPolicy {
@@ -201,11 +199,9 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
                 coroutineExceptionHandler + Job()
         )
         recomposer = Recomposer(recomposerApplyCoroutineScope.coroutineContext)
-            .also { recomposerApplyCoroutineScope.launch { it.runRecomposeAndApplyChanges() } }
         composeIdlingResource = ComposeIdlingResource(
             composeRootRegistry, mainClockImpl, recomposer
         )
-        registerIdlingResource(composeIdlingResource)
     }
 
     private var idlingStrategyFactory: () -> IdlingStrategy = {
@@ -232,6 +228,10 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
             .outerRule { base, _ -> composeRootRegistry.getStatementFor(base) }
             .around { base, _ -> idlingResourceRegistry.getStatementFor(base) }
             .around { base, _ -> idlingStrategy.getStatementFor(base) }
+            .around { base, _ -> CleanupCoroutinesStatement(base) }
+            .around { base, _ -> RecomposerStatement(base) }
+            .around { base, _ -> ComposeIdlingResourceStatement(base) }
+            .around { base, _ -> TextInputServiceStatement(base) }
             .around { base, _ -> AndroidComposeStatement(base) }
             .around(activityRule)
             .apply(base, description)
@@ -336,35 +336,11 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
         idlingResourceRegistry.unregisterIdlingResource(idlingResource)
     }
 
-    inner class AndroidComposeStatement(
-        private val base: Statement
-    ) : Statement() {
-
-        @OptIn(InternalComposeUiApi::class)
+    inner class AndroidComposeStatement(private val base: Statement) : Statement() {
         override fun evaluate() {
-            WindowRecomposerPolicy.withFactory({ recomposer }) {
-                evaluateInner()
-            }
-        }
-
-        @OptIn(InternalComposeUiApi::class)
-        private fun evaluateInner() {
-            val oldTextInputFactory = textInputServiceFactory
             try {
-                textInputServiceFactory = {
-                    TextInputServiceForTests(it)
-                }
                 base.evaluate()
             } finally {
-                textInputServiceFactory = oldTextInputFactory
-                recomposer.cancel()
-                // FYI: Not canceling these scope below would end up cleanupTestCoroutines
-                // throwing errors on active coroutines
-                recomposerApplyCoroutineScope.cancel()
-                frameCoroutineScope.cancel()
-                coroutineExceptionHandler.throwUncaught()
-                @OptIn(ExperimentalCoroutinesApi::class)
-                testCoroutineDispatcher.cleanupTestCoroutines()
                 // Dispose the content
                 if (disposeContentHook != null) {
                     runOnUiThread {
@@ -382,6 +358,70 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity>(
                         disposeContentHook = null
                     }
                 }
+            }
+        }
+    }
+
+    private inner class RecomposerStatement(private val base: Statement) : Statement() {
+        override fun evaluate() {
+            @OptIn(InternalComposeUiApi::class)
+            WindowRecomposerPolicy.withFactory({ recomposer }) {
+                evaluateWithWindowRecomposer()
+            }
+        }
+
+        private fun evaluateWithWindowRecomposer() {
+            try {
+                // Start the recomposer:
+                recomposerApplyCoroutineScope.launch {
+                    recomposer.runRecomposeAndApplyChanges()
+                }
+                base.evaluate()
+            } finally {
+                // Stop the recomposer:
+                recomposer.cancel()
+                // Cancel our scope to ensure there are no active coroutines when
+                // cleanupTestCoroutines is called in the CleanupCoroutinesStatement
+                recomposerApplyCoroutineScope.cancel()
+            }
+        }
+    }
+
+    private inner class CleanupCoroutinesStatement(private val base: Statement) : Statement() {
+        override fun evaluate() {
+            try {
+                base.evaluate()
+            } finally {
+                frameCoroutineScope.cancel()
+                coroutineExceptionHandler.throwUncaught()
+                @OptIn(ExperimentalCoroutinesApi::class)
+                testCoroutineDispatcher.cleanupTestCoroutines()
+            }
+        }
+    }
+
+    private inner class ComposeIdlingResourceStatement(private val base: Statement) : Statement() {
+        override fun evaluate() {
+            try {
+                registerIdlingResource(composeIdlingResource)
+                base.evaluate()
+            } finally {
+                unregisterIdlingResource(composeIdlingResource)
+            }
+        }
+    }
+
+    private class TextInputServiceStatement(private val base: Statement) : Statement() {
+        @OptIn(InternalComposeUiApi::class)
+        override fun evaluate() {
+            val oldTextInputFactory = textInputServiceFactory
+            try {
+                textInputServiceFactory = {
+                    TextInputServiceForTests(it)
+                }
+                base.evaluate()
+            } finally {
+                textInputServiceFactory = oldTextInputFactory
             }
         }
     }

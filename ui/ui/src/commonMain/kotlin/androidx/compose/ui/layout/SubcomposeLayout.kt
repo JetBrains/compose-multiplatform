@@ -22,6 +22,7 @@ import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
@@ -116,6 +117,11 @@ fun SubcomposeLayout(
             set(viewConfiguration, ComposeUiNode.SetViewConfiguration)
         }
     )
+    if (!currentComposer.skipping) {
+        SideEffect {
+            state.forceRecomposeChildren()
+        }
+    }
 }
 
 /**
@@ -224,9 +230,10 @@ class SubcomposeLayoutState(
             NodeState(slotId, {})
         }
         val hasPendingChanges = nodeState.composition?.hasInvalidations ?: true
-        if (nodeState.content !== content || hasPendingChanges) {
+        if (nodeState.content !== content || hasPendingChanges || nodeState.forceRecompose) {
             nodeState.content = content
             subcompose(node, nodeState)
+            nodeState.forceRecompose = false
         }
     }
 
@@ -438,6 +445,20 @@ class SubcomposeLayoutState(
         }
     }
 
+    internal fun forceRecomposeChildren() {
+        val root = _root
+        if (root != null) {
+            val remeasureScheduled = root.layoutState == LayoutState.NeedsRemeasure
+            nodeToNodeState.forEach { (layoutNode, nodeState) ->
+                if (remeasureScheduled) {
+                    nodeState.forceRecompose = true
+                } else {
+                    subcompose(layoutNode, nodeState)
+                }
+            }
+        }
+    }
+
     private fun createNodeAt(index: Int) = LayoutNode(isVirtual = true).also {
         ignoreRemeasureRequests {
             root.insertAt(index, it)
@@ -457,7 +478,9 @@ class SubcomposeLayoutState(
         var slotId: Any?,
         var content: @Composable () -> Unit,
         var composition: Composition? = null
-    )
+    ) {
+        var forceRecompose = false
+    }
 
     private inner class Scope : SubcomposeMeasureScope {
         // MeasureScope delegation

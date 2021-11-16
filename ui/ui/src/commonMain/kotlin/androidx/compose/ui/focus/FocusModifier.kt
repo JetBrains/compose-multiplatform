@@ -67,7 +67,7 @@ internal class FocusModifier(
 
     // Writing the FocusProperties ModifierLocal so that any child focus modifiers don't read
     // properties that were meant for this focus modifier.
-    override val value = defaultFocusProperties
+    override val value = DefaultFocusProperties
 }
 
 /**

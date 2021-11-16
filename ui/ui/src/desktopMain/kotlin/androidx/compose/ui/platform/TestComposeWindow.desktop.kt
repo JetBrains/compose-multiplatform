@@ -106,6 +106,10 @@ class TestComposeWindow(
         scene.render(canvas, nanoTime = nanoTime())
     }
 
+    fun render() {
+        scene.render(canvas, nanoTime = nanoTime())
+    }
+
     /**
      * Process mouse scroll event
      */

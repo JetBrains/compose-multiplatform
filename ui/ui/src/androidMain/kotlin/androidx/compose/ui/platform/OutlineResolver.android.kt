@@ -17,11 +17,13 @@
 package androidx.compose.ui.platform
 
 import android.os.Build
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSimple
+import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
@@ -86,6 +88,22 @@ internal class OutlineResolver(private var density: Density) {
     private var usePathForClip = false
 
     /**
+     * Scratch path used for manually clipping in software backed canvases
+     */
+    private var tmpPath: Path? = null
+
+    /**
+     * Scratch [RoundRect] used for manually clipping round rects in software backed canvases
+     */
+    private var tmpRoundRect: RoundRect? = null
+
+    /**
+     * Radius value used for symmetric rounded shapes. For rectangular or path based outlines
+     * this value is 0f
+     */
+    private var roundedCornerRadius: Float = 0f
+
+    /**
      * Returns the Android Outline to be used in the layer.
      */
     val outline: AndroidOutline?
@@ -95,15 +113,40 @@ internal class OutlineResolver(private var density: Density) {
         }
 
     /**
-     * When a the layer doesn't support clipping of the outline, this returns the Path
-     * that should be used to manually clip. When the layer does support manual clipping
-     * or there is no outline, this returns null.
+     * Determines if the particular outline shape or path supports clipping.
+     * True for rect or symmetrical round rects.
+     * This method is used to determine if the framework can handle clipping to the outline
+     * for a particular shape. If not, then the clipped path must be applied directly to the canvas.
+     */
+    val outlineClipSupported: Boolean
+        get() = !usePathForClip
+
+    /**
+     * Returns the path used to manually clip regardless if the layer supports clipping or not.
+     * In some cases (i.e. software rendering) clipping must be done manually.
+     * Consumers should query whether or not the layer will handle clipping with
+     * [outlineClipSupported] first before applying the clip manually.
+     * Or when rendering in software, the clip path provided here must always be clipped manually.
      */
     val clipPath: Path?
         get() {
             updateCache()
-            return if (usePathForClip) outlinePath else null
+            return outlinePath
         }
+
+    /**
+     * Returns the top left offset for a rectangular, or rounded rect outline (regardless if it
+     * is symmetric or asymmetric)
+     * For path based outlines this returns [Offset.Zero]
+     */
+    private var rectTopLeft: Offset = Offset.Zero
+
+    /**
+     * Returns the size for a rectangular, or rounded rect outline (regardless if it
+     * is symmetric or asymmetric)
+     * For path based outlines this returns [Size.Zero]
+     */
+    private var rectSize: Size = Size.Zero
 
     /**
      * True when we are going to clip or have a non-zero elevation for shadows.
@@ -162,6 +205,57 @@ internal class OutlineResolver(private var density: Density) {
     }
 
     /**
+     * Manually applies the clip to the provided canvas based on the given outline.
+     * This is used in scenarios where clipping must be applied manually either because
+     * the outline cannot be clipped automatically for specific shapes or if the
+     * layer is being rendered in software
+     */
+    fun clipToOutline(canvas: Canvas) {
+        // If we have a clip path that means we are clipping to an arbitrary path or
+        // a rounded rect with non-uniform corner radii
+        val targetPath = clipPath
+        if (targetPath != null) {
+            canvas.clipPath(targetPath)
+        } else {
+            // If we have a non-zero radius, that means we are clipping to a symmetrical
+            // rounded rectangle.
+            // Canvas does not include a clipRoundRect API so create a path with the round rect
+            // and clip to the given path/
+            if (roundedCornerRadius > 0f) {
+                var roundRectClipPath = tmpPath
+                var roundRect = tmpRoundRect
+                if (roundRectClipPath == null ||
+                    !roundRect.isSameBounds(rectTopLeft, rectSize, roundedCornerRadius)) {
+                    roundRect = RoundRect(
+                        left = rectTopLeft.x,
+                        top = rectTopLeft.y,
+                        right = rectTopLeft.x + rectSize.width,
+                        bottom = rectTopLeft.y + rectSize.height,
+                        cornerRadius = CornerRadius(roundedCornerRadius)
+                    )
+                    if (roundRectClipPath == null) {
+                        roundRectClipPath = Path()
+                    } else {
+                        roundRectClipPath.reset()
+                    }
+                    roundRectClipPath.addRoundRect(roundRect)
+                    tmpRoundRect = roundRect
+                    tmpPath = roundRectClipPath
+                }
+                canvas.clipPath(roundRectClipPath)
+            } else {
+                // ... otherwise, just clip to the bounds of the rect
+                canvas.clipRect(
+                    left = rectTopLeft.x,
+                    top = rectTopLeft.y,
+                    right = rectTopLeft.x + rectSize.width,
+                    bottom = rectTopLeft.y + rectSize.height,
+                )
+            }
+        }
+    }
+
+    /**
      * Updates the size.
      */
     fun update(size: Size) {
@@ -173,6 +267,10 @@ internal class OutlineResolver(private var density: Density) {
 
     private fun updateCache() {
         if (cacheIsDirty) {
+            rectTopLeft = Offset.Zero
+            rectSize = size
+            roundedCornerRadius = 0f
+            outlinePath = null
             cacheIsDirty = false
             usePathForClip = false
             if (outlineNeeded && size.width > 0.0f && size.height > 0.0f) {
@@ -194,6 +292,8 @@ internal class OutlineResolver(private var density: Density) {
     }
 
     private fun updateCacheWithRect(rect: Rect) {
+        rectTopLeft = Offset(rect.left, rect.top)
+        rectSize = Size(rect.width, rect.height)
         cachedOutline.setRect(
             rect.left.roundToInt(),
             rect.top.roundToInt(),
@@ -204,6 +304,8 @@ internal class OutlineResolver(private var density: Density) {
 
     private fun updateCacheWithRoundRect(roundRect: RoundRect) {
         val radius = roundRect.topLeftCornerRadius.x
+        rectTopLeft = Offset(roundRect.left, roundRect.top)
+        rectSize = Size(roundRect.width, roundRect.height)
         if (roundRect.isSimple) {
             cachedOutline.setRoundRect(
                 roundRect.left.roundToInt(),
@@ -212,6 +314,7 @@ internal class OutlineResolver(private var density: Density) {
                 roundRect.bottom.roundToInt(),
                 radius
             )
+            roundedCornerRadius = radius
         } else {
             val path = cachedRrectPath ?: Path().also { cachedRrectPath = it }
             path.reset()
@@ -234,9 +337,19 @@ internal class OutlineResolver(private var density: Density) {
         outlinePath = composePath
     }
 
-    companion object {
-        // Because we only use these on the main thread, we can allocate just one
-        private val tmpOpPath = Path()
-        private val tmpTouchPointPath = Path()
+    /**
+     * Helper method to see if the RoundRect has the same bounds as the offset as well as the same
+     * corner radius. If the RoundRect does not have symmetrical corner radii this method always
+     * returns false
+     */
+    private fun RoundRect?.isSameBounds(offset: Offset, size: Size, radius: Float): Boolean {
+        if (this == null || !isSimple) {
+            return false
+        }
+        return left == offset.x &&
+            top == offset.y &&
+            right == (offset.x + size.width) &&
+            bottom == (offset.y + size.height) &&
+            topLeftCornerRadius.x == radius
     }
 }

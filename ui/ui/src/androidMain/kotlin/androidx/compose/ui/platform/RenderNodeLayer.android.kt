@@ -24,11 +24,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.layout.GraphicLayerInfo
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
@@ -43,7 +45,7 @@ internal class RenderNodeLayer(
     val ownerView: AndroidComposeView,
     drawBlock: (Canvas) -> Unit,
     invalidateParentLayer: () -> Unit
-) : OwnedLayer {
+) : OwnedLayer, GraphicLayerInfo {
     private var drawBlock: ((Canvas) -> Unit)? = drawBlock
     private var invalidateParentLayer: (() -> Unit)? = invalidateParentLayer
 
@@ -60,6 +62,12 @@ internal class RenderNodeLayer(
     private val outlineResolver = OutlineResolver(ownerView.density)
     private var isDestroyed = false
     private var drawnWithZ = false
+
+    /**
+     * Optional paint used when the RenderNode is rendered on a software backed
+     * canvas and is somewhat transparent (i.e. alpha less than 1.0f)
+     */
+    private var softwareLayerPaint: Paint? = null
 
     private val matrixCache = LayerMatrixCache(getMatrix)
 
@@ -116,7 +124,7 @@ internal class RenderNodeLayer(
         density: Density
     ) {
         this.transformOrigin = transformOrigin
-        val wasClippingManually = renderNode.clipToOutline && outlineResolver.clipPath != null
+        val wasClippingManually = renderNode.clipToOutline && !outlineResolver.outlineClipSupported
         renderNode.scaleX = scaleX
         renderNode.scaleY = scaleY
         renderNode.alpha = alpha
@@ -141,7 +149,7 @@ internal class RenderNodeLayer(
             density
         )
         renderNode.setOutline(outlineResolver.outline)
-        val isClippingManually = renderNode.clipToOutline && outlineResolver.clipPath != null
+        val isClippingManually = renderNode.clipToOutline && !outlineResolver.outlineClipSupported
         if (wasClippingManually != isClippingManually || (isClippingManually && shapeChanged)) {
             invalidate()
         } else {
@@ -233,15 +241,54 @@ internal class RenderNodeLayer(
                 canvas.disableZ()
             }
         } else {
+            val left = renderNode.left.toFloat()
+            val top = renderNode.top.toFloat()
+            val right = renderNode.right.toFloat()
+            val bottom = renderNode.bottom.toFloat()
+            // If there is alpha applied, we must render into an offscreen buffer to
+            // properly blend the contents of this layer against the background content
+            if (renderNode.alpha < 1.0f) {
+                val paint = (softwareLayerPaint ?: Paint().also { softwareLayerPaint = it })
+                    .apply { alpha = renderNode.alpha }
+                androidCanvas.saveLayer(
+                    left,
+                    top,
+                    right,
+                    bottom,
+                    paint.asFrameworkPaint()
+                )
+            } else {
+                canvas.save()
+            }
+            // If we are software rendered we must translate the canvas based on the offset provided
+            // in the move call which operates directly on the RenderNode
+            canvas.translate(left, top)
+            canvas.concat(matrixCache.calculateMatrix(renderNode))
+            clipRenderNode(canvas)
             drawBlock?.invoke(canvas)
+            canvas.restore()
             isDirty = false
+        }
+    }
+
+    /**
+     * Manually clips the content of the RenderNodeLayer in the provided canvas.
+     * This is used only in software rendered use cases
+     */
+    private fun clipRenderNode(canvas: Canvas) {
+        if (renderNode.clipToOutline || renderNode.clipToBounds) {
+            outlineResolver.clipToOutline(canvas)
         }
     }
 
     override fun updateDisplayList() {
         if (isDirty || !renderNode.hasDisplayList) {
             isDirty = false
-            val clipPath = if (renderNode.clipToOutline) outlineResolver.clipPath else null
+            val clipPath = if (renderNode.clipToOutline && !outlineResolver.outlineClipSupported) {
+                outlineResolver.clipPath
+            } else {
+                null
+            }
             renderNode.record(canvasHolder, clipPath, drawBlock!!)
         }
     }

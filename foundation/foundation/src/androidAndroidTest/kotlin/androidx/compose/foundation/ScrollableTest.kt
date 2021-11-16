@@ -18,6 +18,7 @@ package androidx.compose.foundation
 
 import androidx.compose.animation.core.keyframes
 import androidx.compose.foundation.gestures.FlingBehavior
+import androidx.compose.foundation.gestures.ModifierLocalScrollableContainer
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableState
@@ -41,6 +42,8 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.modifier.ModifierLocalConsumer
+import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
@@ -377,6 +380,61 @@ class ScrollableTest {
         }
         val expected = prevAfterSomeFling + 115
         assertThat(total).isEqualTo(expected)
+    }
+
+    @Test
+    fun scrollable_blocksDownEvents_ifFlingingCaught() {
+        rule.mainClock.autoAdvance = false
+        var total = 0f
+        val controller = ScrollableState(
+            consumeScrollDelta = {
+                total += it
+                it
+            }
+        )
+        rule.setContent {
+            Box {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(300.dp)
+                        .scrollable(
+                            orientation = Orientation.Horizontal,
+                            state = controller
+                        )
+                ) {
+                    Box(
+                        modifier = Modifier.size(300.dp)
+                            .testTag(scrollableBoxTag)
+                            .clickable {
+                                assertWithMessage("Clickable shouldn't click when fling caught")
+                                    .fail()
+                            }
+                    )
+                }
+            }
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
+            swipeWithVelocity(
+                start = this.center,
+                end = Offset(this.center.x + 200f, this.center.y),
+                durationMillis = 100,
+                endVelocity = 4000f
+            )
+        }
+        assertThat(total).isGreaterThan(0f)
+        val prev = total
+        // pump frames twice to start fling animation
+        rule.mainClock.advanceTimeByFrame()
+        rule.mainClock.advanceTimeByFrame()
+        val prevAfterSomeFling = total
+        assertThat(prevAfterSomeFling).isGreaterThan(prev)
+        // don't advance main clock anymore since we're in the middle of the fling. Now interrupt
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
+            down(this.center)
+            up()
+        }
+        // shouldn't assert in clickable lambda
     }
 
     @Test
@@ -1349,6 +1407,56 @@ class ScrollableTest {
         rule.runOnIdle {
             assertThat(total).isEqualTo(prevTotal + 123)
             assertThat(returned).isEqualTo(123f)
+        }
+    }
+
+    @Test
+    fun scrollable_setsModifierLocalScrollableContainer() {
+        val controller = ScrollableState { it }
+
+        var isOuterInScrollableContainer: Boolean? = null
+        var isInnerInScrollableContainer: Boolean? = null
+        rule.setContent {
+            Box {
+                Box(
+                    modifier = Modifier
+                        .testTag(scrollableBoxTag)
+                        .size(100.dp)
+                        .then(
+                            object : ModifierLocalConsumer {
+                                override fun onModifierLocalsUpdated(
+                                    scope: ModifierLocalReadScope
+                                ) {
+                                    with(scope) {
+                                        isOuterInScrollableContainer =
+                                            ModifierLocalScrollableContainer.current
+                                    }
+                                }
+                            }
+                        )
+                        .scrollable(
+                            state = controller,
+                            orientation = Orientation.Horizontal
+                        )
+                        .then(
+                            object : ModifierLocalConsumer {
+                                override fun onModifierLocalsUpdated(
+                                    scope: ModifierLocalReadScope
+                                ) {
+                                    with(scope) {
+                                        isInnerInScrollableContainer =
+                                            ModifierLocalScrollableContainer.current
+                                    }
+                                }
+                            }
+                        )
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(isOuterInScrollableContainer).isFalse()
+            assertThat(isInnerInScrollableContainer).isTrue()
         }
     }
 

@@ -87,21 +87,3 @@ class ModifierInfo(
     val coordinates: LayoutCoordinates,
     val extra: Any? = null
 )
-
-/**
- * The info about the graphics layers used by tooling.
- */
-interface GraphicLayerInfo {
-    /**
-     * The ID of the layer. This is used by tooling to match a layer to the associated
-     * LayoutNode.
-     */
-    val layerId: Long
-
-    /**
-     * The uniqueDrawingId of the owner view of this graphics layer. This is used by
-     * tooling to match a layer to the associated owner AndroidComposeView.
-     */
-    val ownerViewId: Long
-        get() = 0
-}

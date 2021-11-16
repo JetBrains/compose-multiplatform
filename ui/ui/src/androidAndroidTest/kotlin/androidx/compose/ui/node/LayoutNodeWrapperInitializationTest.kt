@@ -20,11 +20,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusModifier
 import androidx.compose.ui.focus.FocusStateImpl
 import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.input.pointer.PointerInteropFilter
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -89,6 +92,24 @@ class LayoutNodeWrapperInitializationTest {
     }
 
     @Test
+    fun initializeIsCalledWhenOnGloballyPositionedNodeIsCreated() {
+        // Arrange.
+        lateinit var layoutCoordinates: LayoutCoordinates
+
+        // Act.
+        rule.setContent {
+            Box(modifier = Modifier.onGloballyPositioned { layoutCoordinates = it })
+        }
+
+        // Assert.
+        rule.runOnIdle {
+            val layoutNodeWrapper = layoutCoordinates as LayoutNodeWrapper
+            val callbacks = layoutNodeWrapper.layoutNode.getOrCreateOnPositionedCallbacks()
+            assertThat(callbacks.asMutableList()).isNotEmpty()
+        }
+    }
+
+    @Test
     fun initializeIsCalledWhenFocusNodeIsReused() {
         // Arrange.
         lateinit var focusModifier: FocusModifier
@@ -144,6 +165,27 @@ class LayoutNodeWrapperInitializationTest {
         // Assert.
         rule.runOnIdle {
             assertThat(pointerInputModifier.pointerInputFilter.layoutCoordinates).isNotNull()
+        }
+    }
+
+    @Test
+    fun initializeIsCalledWhenOnGloballyPositionedNodeIsReused() {
+        // Arrange.
+        lateinit var layoutCoordinates: LayoutCoordinates
+        lateinit var scope: RecomposeScope
+        rule.setContent {
+            scope = currentRecomposeScope
+            Box(modifier = Modifier.onGloballyPositioned { layoutCoordinates = it })
+        }
+
+        // Act.
+        rule.runOnIdle { scope.invalidate() }
+
+        // Assert.
+        rule.runOnIdle {
+            val layoutNodeWrapper = layoutCoordinates as LayoutNodeWrapper
+            val callbacks = layoutNodeWrapper.layoutNode.getOrCreateOnPositionedCallbacks()
+            assertThat(callbacks.asMutableList()).isNotEmpty()
         }
     }
 }

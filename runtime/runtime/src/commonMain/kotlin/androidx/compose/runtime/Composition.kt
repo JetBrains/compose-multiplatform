@@ -498,9 +498,9 @@ internal class CompositionImpl(
                     manager.dispatchAbandons()
                 }
                 composer.dispose()
-                parent.unregisterComposition(this)
             }
         }
+        parent.unregisterComposition(this)
     }
 
     override val hasInvalidations get() = synchronized(lock) { invalidations.size > 0 }

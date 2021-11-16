@@ -81,8 +81,6 @@ class ButtonScreenshotTest {
 
     @Test
     fun ripple() {
-        rule.mainClock.autoAdvance = false
-
         rule.setMaterialContent {
             Box(Modifier.requiredSize(200.dp, 100.dp).wrapContentSize()) {
                 Button(onClick = { }) { }
@@ -92,9 +90,6 @@ class ButtonScreenshotTest {
         // Start ripple
         rule.onNode(hasClickAction())
             .performTouchInput { down(center) }
-
-        // Advance past the tap timeout
-        rule.mainClock.advanceTimeBy(100)
 
         rule.waitForIdle()
         // Ripples are drawn on the RenderThread, not the main (UI) thread, so we can't

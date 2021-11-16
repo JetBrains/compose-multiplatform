@@ -373,6 +373,10 @@ internal abstract class AndroidViewHolder(
             MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
         }
     }
+
+    // TODO: b/203141462 - consume whether the AndroidView() is inside a scrollable container, and
+    //  use that to set this. In the meantime set true as the defensive default.
+    override fun shouldDelayChildPressedState(): Boolean = true
 }
 
 private fun View.layoutAccordingTo(layoutNode: LayoutNode) {

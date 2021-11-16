@@ -17,8 +17,8 @@
 package androidx.compose.ui.demos.focus
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -40,6 +40,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.input.InputMode.Companion.Keyboard
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.unit.dp
 
@@ -74,7 +75,7 @@ fun ConditionalFocusabilityDemo() {
             modifier = Modifier
                 .focusAwareBackground()
                 .focusRequester(item1)
-                .clickable { item1.requestFocus() }
+                .pointerInput(item1) { detectTapGestures { item1.requestFocus() } }
                 .focusable()
         )
         Row {
@@ -85,7 +86,7 @@ fun ConditionalFocusabilityDemo() {
                 modifier = Modifier
                     .focusAwareBackground()
                     .focusRequester(item2)
-                    .clickable { item2.requestFocus() }
+                    .pointerInput(item2) { detectTapGestures { item2.requestFocus() } }
                     .focusProperties { canFocus = item2active }
                     .focusable()
             )
@@ -98,7 +99,7 @@ fun ConditionalFocusabilityDemo() {
             modifier = Modifier
                 .focusAwareBackground()
                 .focusRequester(item3)
-                .clickable { item3.requestFocus() }
+                .pointerInput(item3) { detectTapGestures { item3.requestFocus() } }
                 .focusProperties { canFocus = localInputModeManager.inputMode == Keyboard }
                 .focusable()
         )
@@ -107,9 +108,11 @@ fun ConditionalFocusabilityDemo() {
             modifier = Modifier
                 .focusAwareBackground()
                 .focusRequester(item4)
-                .clickable {
-                    if (localInputModeManager.requestInputMode(Keyboard)) {
-                        item4.requestFocus()
+                .pointerInput(item4) {
+                    detectTapGestures {
+                        if (localInputModeManager.requestInputMode(Keyboard)) {
+                            item4.requestFocus()
+                        }
                     }
                 }
                 .focusProperties { canFocus = localInputModeManager.inputMode == Keyboard }

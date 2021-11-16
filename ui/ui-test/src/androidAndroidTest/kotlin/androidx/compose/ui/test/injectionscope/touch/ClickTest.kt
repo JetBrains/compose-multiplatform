@@ -97,13 +97,12 @@ class ClickTest(private val config: TestConfig) {
     }
 
     private fun SinglePointerInputRecorder.assertIsClick(position: Offset) {
-        assertThat(events).hasSize(3)
+        assertThat(events).hasSize(2)
         val t0 = events[0].timestamp
         val id = events[0].id
 
         events[0].verify(t0 + 0, id, true, position)
-        events[1].verify(t0 + eventPeriodMillis, id, true, position)
-        events[2].verify(t0 + eventPeriodMillis, id, false, position)
+        events[1].verify(t0 + eventPeriodMillis, id, false, position)
     }
 
     private fun ComposeTestRule.click(tag: String) {

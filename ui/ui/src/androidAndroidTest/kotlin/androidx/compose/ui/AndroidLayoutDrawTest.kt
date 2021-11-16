@@ -3555,6 +3555,26 @@ class AndroidLayoutDrawTest {
         }
     }
 
+    @Test
+    fun androidComposeViewIsTransitionGroup() {
+        // ensure that the android compose view is a transition group.
+
+        val latch = CountDownLatch(1)
+        activityTestRule.runOnUiThread {
+            activity.setContent {
+                Layout({}) { _, _ ->
+                    layout(10, 10) {
+                        latch.countDown()
+                    }
+                }
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+
+        val composeView = activityTestRule.findAndroidComposeView()
+        assertTrue(composeView.isTransitionGroup)
+    }
+
     private fun Modifier.layout(onLayout: () -> Unit) = layout { measurable, constraints ->
         val placeable = measurable.measure(constraints)
         layout(placeable.width, placeable.height) {

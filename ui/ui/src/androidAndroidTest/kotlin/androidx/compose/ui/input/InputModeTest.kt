@@ -103,10 +103,8 @@ class InputModeTest(private val param: Param) {
         }
 
         // Assert
-        rule.runOnIdle {
-            assertThat(requestGranted).isTrue()
-            assertThat(inputModeManager.inputMode).isEqualTo(Keyboard)
-        }
+        rule.runOnIdle { assertThat(requestGranted).isTrue() }
+        rule.waitUntil { inputModeManager.inputMode == Keyboard }
     }
 
     private fun ComposeContentTestRule.setContentWithInputManager(

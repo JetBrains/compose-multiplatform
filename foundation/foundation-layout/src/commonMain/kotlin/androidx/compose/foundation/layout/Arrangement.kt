@@ -303,7 +303,9 @@ object Arrangement {
      */
     @Stable
     fun spacedBy(space: Dp): HorizontalOrVertical =
-        SpacedAligned(space, true, null)
+        SpacedAligned(space, true) { size, layoutDirection ->
+            Alignment.Start.align(0, size, layoutDirection)
+        }
 
     /**
      * Place children horizontally such that each two adjacent ones are spaced by a fixed [space]

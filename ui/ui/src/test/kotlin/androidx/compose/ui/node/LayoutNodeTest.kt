@@ -37,6 +37,7 @@ import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerIconService
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.layout.AlignmentLine
@@ -2274,6 +2275,8 @@ private class MockOwner(
         get() = Density(1f)
     override val textInputService: TextInputService
         get() = TODO("Not yet implemented")
+    override val pointerIconService: PointerIconService
+        get() = TODO("Not yet implemented")
     override val focusManager: FocusManager
         get() = TODO("Not yet implemented")
     override val windowInfo: WindowInfo
@@ -2310,7 +2313,7 @@ private class MockOwner(
 
     override fun requestFocus(): Boolean = false
 
-    override fun measureAndLayout() {
+    override fun measureAndLayout(sendPointerUpdate: Boolean) {
     }
 
     override fun createLayer(
@@ -2318,12 +2321,6 @@ private class MockOwner(
         invalidateParentLayer: () -> Unit
     ): OwnedLayer {
         return object : OwnedLayer {
-            override val layerId: Long
-                get() = 0
-
-            override val ownerViewId: Long
-                get() = 0
-
             override fun updateLayerProperties(
                 scaleX: Float,
                 scaleY: Float,

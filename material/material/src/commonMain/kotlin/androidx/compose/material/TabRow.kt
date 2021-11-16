@@ -467,11 +467,13 @@ private class ScrollableTabData(
                 // Scrolls to the tab with [tabPosition], trying to place it in the center of the
                 // screen or as close to the center as possible.
                 val calculatedOffset = it.calculateTabOffset(density, edgeOffset, tabPositions)
-                coroutineScope.launch {
-                    scrollState.animateScrollTo(
-                        calculatedOffset,
-                        animationSpec = ScrollableTabRowScrollSpec
-                    )
+                if (scrollState.value != calculatedOffset) {
+                    coroutineScope.launch {
+                        scrollState.animateScrollTo(
+                            calculatedOffset,
+                            animationSpec = ScrollableTabRowScrollSpec
+                        )
+                    }
                 }
             }
         }

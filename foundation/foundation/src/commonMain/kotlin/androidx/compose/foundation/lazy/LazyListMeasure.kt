@@ -37,8 +37,8 @@ internal fun measureLazyList(
     itemsCount: Int,
     itemProvider: LazyMeasuredItemProvider,
     mainAxisMaxSize: Int,
-    startContentPadding: Int,
-    endContentPadding: Int,
+    beforeContentPadding: Int,
+    afterContentPadding: Int,
     firstVisibleItemIndex: DataIndex,
     firstVisibleItemScrollOffset: Int,
     scrollToBeConsumed: Float,
@@ -50,10 +50,11 @@ internal fun measureLazyList(
     reverseLayout: Boolean,
     density: Density,
     layoutDirection: LayoutDirection,
+    placementAnimator: LazyListItemPlacementAnimator,
     layout: (Int, Int, Placeable.PlacementScope.() -> Unit) -> MeasureResult
 ): LazyListMeasureResult {
-    require(startContentPadding >= 0)
-    require(endContentPadding >= 0)
+    require(beforeContentPadding >= 0)
+    require(afterContentPadding >= 0)
     if (itemsCount <= 0) {
         // empty data set. reset the current scroll and report zero size
         return LazyListMeasureResult(
@@ -63,8 +64,8 @@ internal fun measureLazyList(
             consumedScroll = 0f,
             measureResult = layout(constraints.minWidth, constraints.minHeight) {},
             visibleItemsInfo = emptyList(),
-            viewportStartOffset = -startContentPadding,
-            viewportEndOffset = endContentPadding,
+            viewportStartOffset = -beforeContentPadding,
+            viewportEndOffset = afterContentPadding,
             totalItemsCount = 0,
         )
     } else {
@@ -95,10 +96,10 @@ internal fun measureLazyList(
 
         // include the start padding so we compose items in the padding area. before starting
         // scrolling forward we would remove it back
-        currentFirstItemScrollOffset -= startContentPadding
+        currentFirstItemScrollOffset -= beforeContentPadding
 
-        // define min and max offsets (min offset currently includes startPadding)
-        val minOffset = -startContentPadding
+        // define min and max offsets (min offset currently includes beforeContentPadding)
+        val minOffset = -beforeContentPadding
         val maxOffset = mainAxisMaxSize
 
         // max of cross axis sizes of all visible items
@@ -122,11 +123,11 @@ internal fun measureLazyList(
             currentFirstItemScrollOffset = minOffset
         }
 
-        // neutralize previously added start padding as we stopped filling the start padding area
-        currentFirstItemScrollOffset += startContentPadding
+        // neutralize previously added start padding as we stopped filling the before content padding
+        currentFirstItemScrollOffset += beforeContentPadding
 
         var index = currentFirstItemIndex
-        val maxMainAxis = maxOffset + endContentPadding
+        val maxMainAxis = maxOffset + afterContentPadding
         var mainAxisUsed = -currentFirstItemScrollOffset
 
         // first we need to skip items we already composed while composing backward
@@ -190,9 +191,9 @@ internal fun measureLazyList(
         val visibleItemsScrollOffset = -currentFirstItemScrollOffset
         var firstItem = visibleItems.firstOrNull()
 
-        // even if we compose items to fill the start padding area we should ignore items fully
+        // even if we compose items to fill before content padding we should ignore items fully
         // located there for the state's scroll position calculation (first item + first offset)
-        if (startContentPadding > 0) {
+        if (beforeContentPadding > 0) {
             for (i in visibleItems.indices) {
                 val size = visibleItems[i].sizeWithSpacings
                 if (size <= currentFirstItemScrollOffset && i != visibleItems.lastIndex) {
@@ -228,7 +229,7 @@ internal fun measureLazyList(
                 composedVisibleItems = positionedItems,
                 itemProvider = itemProvider,
                 headerIndexes = headerIndexes,
-                startContentPadding = startContentPadding,
+                beforeContentPadding = beforeContentPadding,
                 layoutWidth = layoutWidth,
                 layoutHeight = layoutHeight
             )
@@ -236,7 +237,16 @@ internal fun measureLazyList(
             null
         }
 
-        val maximumVisibleOffset = minOf(mainAxisUsed, mainAxisMaxSize) + endContentPadding
+        placementAnimator.onMeasured(
+            consumedScroll = consumedScroll.toInt(),
+            layoutWidth = layoutWidth,
+            layoutHeight = layoutHeight,
+            reverseLayout = reverseLayout,
+            positionedItems = positionedItems,
+            itemProvider = itemProvider
+        )
+
+        val maximumVisibleOffset = minOf(mainAxisUsed, mainAxisMaxSize) + afterContentPadding
 
         return LazyListMeasureResult(
             firstVisibleItem = firstItem,
@@ -252,7 +262,7 @@ internal fun measureLazyList(
                 // the header item should be placed (drawn) after all other items
                 headerItem?.place(this)
             },
-            viewportStartOffset = -startContentPadding,
+            viewportStartOffset = -beforeContentPadding,
             viewportEndOffset = maximumVisibleOffset,
             visibleItemsInfo = positionedItems,
             totalItemsCount = itemsCount,

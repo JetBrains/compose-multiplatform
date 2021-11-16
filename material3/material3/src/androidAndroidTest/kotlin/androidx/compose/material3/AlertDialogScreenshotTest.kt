@@ -17,17 +17,13 @@
 package androidx.compose.material3
 
 import android.os.Build
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.testutils.assertAgainstGolden
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
@@ -63,12 +59,15 @@ class AlertDialogScreenshotTest {
                                 "which presents the details regarding the Dialog's purpose."
                         )
                     },
-                    // TODO(b/198216553): Wrap with Material 3 TextButton when available.
                     confirmButton = {
-                        Text("Confirm", Modifier.padding(TextButtonContentPadding))
+                        TextButton(onClick = { /* doSomething() */ }) {
+                            Text("Confirm")
+                        }
                     },
                     dismissButton = {
-                        Text("Dismiss", Modifier.padding(TextButtonContentPadding))
+                        TextButton(onClick = { /* doSomething() */ }) {
+                            Text("Dismiss")
+                        }
                     }
                 )
             }
@@ -92,12 +91,15 @@ class AlertDialogScreenshotTest {
                                 "which presents the details regarding the Dialog's purpose."
                         )
                     },
-                    // TODO(b/198216553): Wrap with Material 3 TextButton when available.
                     confirmButton = {
-                        Text("Confirm", Modifier.padding(TextButtonContentPadding))
+                        TextButton(onClick = { /* doSomething() */ }) {
+                            Text("Confirm")
+                        }
                     },
                     dismissButton = {
-                        Text("Dismiss", Modifier.padding(TextButtonContentPadding))
+                        TextButton(onClick = { /* doSomething() */ }) {
+                            Text("Dismiss")
+                        }
                     }
                 )
             }
@@ -122,12 +124,15 @@ class AlertDialogScreenshotTest {
                                 "which presents the details regarding the Dialog's purpose."
                         )
                     },
-                    // TODO(b/198216553): Wrap with Material 3 TextButton when available.
                     confirmButton = {
-                        Text("Confirm", Modifier.padding(TextButtonContentPadding))
+                        TextButton(onClick = { /* doSomething() */ }) {
+                            Text("Confirm")
+                        }
                     },
                     dismissButton = {
-                        Text("Dismiss", Modifier.padding(TextButtonContentPadding))
+                        TextButton(onClick = { /* doSomething() */ }) {
+                            Text("Dismiss")
+                        }
                     }
                 )
             }
@@ -152,12 +157,15 @@ class AlertDialogScreenshotTest {
                                 "which presents the details regarding the Dialog's purpose."
                         )
                     },
-                    // TODO(b/198216553): Wrap with Material 3 TextButton when available.
                     confirmButton = {
-                        Text("Confirm", Modifier.padding(TextButtonContentPadding))
+                        TextButton(onClick = { /* doSomething() */ }) {
+                            Text("Confirm")
+                        }
                     },
                     dismissButton = {
-                        Text("Dismiss", Modifier.padding(TextButtonContentPadding))
+                        TextButton(onClick = { /* doSomething() */ }) {
+                            Text("Dismiss")
+                        }
                     }
                 )
             }
@@ -171,13 +179,4 @@ class AlertDialogScreenshotTest {
             .captureToImage()
             .assertAgainstGolden(screenshotRule, goldenIdentifier)
     }
-
-    // TODO(b/198216553): Remove once Material 3 TextButton is available.
-    private val TextButtonContentPadding =
-        PaddingValues(
-            start = 8.dp,
-            top = 16.dp,
-            end = 8.dp,
-            bottom = 16.dp,
-        )
 }

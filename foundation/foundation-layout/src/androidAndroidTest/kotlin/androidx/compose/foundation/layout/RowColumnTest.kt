@@ -2795,6 +2795,41 @@ class RowColumnTest : LayoutTest() {
         }
         assertTrue(latch.await(1, TimeUnit.SECONDS))
     }
+
+    @Test
+    fun testRow_withSpacedByArrangement_rtl() = with(density) {
+        val spacePx = 10f
+        val space = spacePx.toDp()
+        val bufferPx = 15f
+        val buffer = bufferPx.toDp()
+        val sizePx = 20f
+        val size = sizePx.toDp()
+        val latch = CountDownLatch(2)
+        show {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                Column {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(space),
+                        modifier = Modifier.requiredWidth(size * 2 + space + buffer)
+                    ) {
+                        Box(
+                            Modifier.requiredSize(size).onGloballyPositioned {
+                                assertEquals(sizePx + spacePx + bufferPx, it.positionInParent().x)
+                                latch.countDown()
+                            }
+                        )
+                        Box(
+                            Modifier.requiredSize(size).onGloballyPositioned {
+                                assertEquals(bufferPx, it.positionInParent().x)
+                                latch.countDown()
+                            }
+                        )
+                    }
+                }
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+    }
     // endregion
 
     // region Main axis alignment tests in Column
@@ -3331,6 +3366,41 @@ class RowColumnTest : LayoutTest() {
 
         assertEquals(IntSize(childSize, childSize), containerSize.value)
     }
+
+    @Test
+    fun testColumn_withSpacedByArrangement_rtl() = with(density) {
+        val spacePx = 10f
+        val space = spacePx.toDp()
+        val sizePx = 20f
+        val size = sizePx.toDp()
+        val latch = CountDownLatch(2)
+        show {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                // Nothing should change compared to the same ltr test. (just the size of the
+                // Column as we are doing fillMaxHeight()).
+                Row {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(space),
+                        modifier = Modifier.fillMaxHeight()
+                    ) {
+                        Box(
+                            Modifier.requiredSize(size).onGloballyPositioned {
+                                assertEquals(0f, it.positionInParent().x)
+                                latch.countDown()
+                            }
+                        )
+                        Box(
+                            Modifier.requiredSize(size).onGloballyPositioned {
+                                assertEquals(sizePx + spacePx, it.positionInParent().y)
+                                latch.countDown()
+                            }
+                        )
+                    }
+                }
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+    }
     // endregion
 
     // region Intrinsic measurement tests
@@ -3706,6 +3776,28 @@ class RowColumnTest : LayoutTest() {
     }
 
     @Test
+    fun testRow_withArrangementSpacing_height() = with(density) {
+        val spacing = 5
+        val rowWidth = 15
+        val latch = CountDownLatch(1)
+        var rowHeight = 0
+        show {
+            Row(
+                modifier = Modifier.width(rowWidth.toDp()).height(IntrinsicSize.Min).onSizeChanged {
+                    rowHeight = it.height
+                    latch.countDown()
+                },
+                horizontalArrangement = Arrangement.spacedBy(spacing.toDp())
+            ) {
+                Box(Modifier) // Empty box
+                Box(Modifier.width(rowWidth.toDp()).aspectRatio(1f))
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        assertEquals(rowWidth - spacing, rowHeight)
+    }
+
+    @Test
     fun testColumn_withNoWeightChildren_hasCorrectIntrinsicMeasurements() = with(density) {
         testIntrinsics(
             @Composable {
@@ -4050,6 +4142,29 @@ class RowColumnTest : LayoutTest() {
             assertEquals(childSize * 3 + 2 * spacing, minIntrinsicHeight(Constraints.Infinity))
             assertEquals(childSize * 3 + 2 * spacing, maxIntrinsicHeight(Constraints.Infinity))
         }
+    }
+
+    @Test
+    fun testColumn_withArrangementSpacing_width() = with(density) {
+        val spacing = 5
+        val columnHeight = 15
+        val latch = CountDownLatch(1)
+        var columnWidth = 0
+        show {
+            Column(
+                modifier = Modifier.height(columnHeight.toDp()).width(IntrinsicSize.Min)
+                    .onSizeChanged {
+                        columnWidth = it.width
+                        latch.countDown()
+                    },
+                verticalArrangement = Arrangement.spacedBy(spacing.toDp())
+            ) {
+                Box(Modifier) // Empty box
+                Box(Modifier.height(columnHeight.toDp()).aspectRatio(1f))
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        assertEquals(columnHeight - spacing, columnWidth)
     }
 
     @Test

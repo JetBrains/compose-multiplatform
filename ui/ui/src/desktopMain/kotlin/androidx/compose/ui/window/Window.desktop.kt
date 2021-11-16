@@ -91,6 +91,9 @@ import javax.swing.JMenuBar
  * will leave the composition.
  * @param title Title in the titlebar of the window
  * @param icon Icon in the titlebar of the window (for platforms which support this)
+ * @param undecorated Disables or enables decorations for this window.
+ * @param transparent Disables or enables window transparency. Transparency should be set
+ * only if window is undecorated, otherwise an exception will be thrown.
  * @param resizable Can window be resized by the user (application still can resize the window
  * changing [state])
  * @param enabled Can window react to input events
@@ -114,6 +117,7 @@ fun Window(
     title: String = "Untitled",
     icon: Painter? = null,
     undecorated: Boolean = false,
+    transparent: Boolean = false,
     resizable: Boolean = true,
     enabled: Boolean = true,
     focusable: Boolean = true,
@@ -126,6 +130,7 @@ fun Window(
     val currentTitle by rememberUpdatedState(title)
     val currentIcon by rememberUpdatedState(icon)
     val currentUndecorated by rememberUpdatedState(undecorated)
+    val currentTransparent by rememberUpdatedState(transparent)
     val currentResizable by rememberUpdatedState(resizable)
     val currentEnabled by rememberUpdatedState(enabled)
     val currentFocusable by rememberUpdatedState(focusable)
@@ -172,6 +177,7 @@ fun Window(
                 set(currentTitle, window::setTitle)
                 set(currentIcon, window::setIcon)
                 set(currentUndecorated, window::setUndecoratedSafely)
+                set(currentTransparent, window::isTransparent::set)
                 set(currentResizable, window::setResizable)
                 set(currentEnabled, window::setEnabled)
                 set(currentFocusable, window::setFocusable)
@@ -213,6 +219,9 @@ fun Window(
  * will leave the composition.
  * @param title Title in the titlebar of the window
  * @param icon Icon in the titlebar of the window (for platforms which support this)
+ * @param undecorated Disables or enables decorations for this window.
+ * @param transparent Disables or enables window transparency. Transparency should be set
+ * only if window is undecorated, otherwise an exception will be thrown.
  * @param resizable Can window be resized by the user (application still can resize the window
  * changing [state])
  * @param enabled Can window react to input events
@@ -234,6 +243,7 @@ fun singleWindowApplication(
     title: String = "Untitled",
     icon: Painter? = null,
     undecorated: Boolean = false,
+    transparent: Boolean = false,
     resizable: Boolean = true,
     enabled: Boolean = true,
     focusable: Boolean = true,
@@ -249,6 +259,7 @@ fun singleWindowApplication(
         title,
         icon,
         undecorated,
+        transparent,
         resizable,
         enabled,
         focusable,

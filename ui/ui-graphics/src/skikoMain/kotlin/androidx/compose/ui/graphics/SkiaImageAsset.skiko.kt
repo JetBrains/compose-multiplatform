@@ -110,7 +110,7 @@ private class SkiaBackedImageBitmap(val bitmap: Bitmap) : ImageBitmap {
         )
         val imageInfo = ImageInfo(colorInfo, width, height)
         val bytesPerPixel = 4
-        val bytes = bitmap.readPixels(imageInfo, stride * bytesPerPixel.toLong(), startX, startY)!!
+        val bytes = bitmap.readPixels(imageInfo, stride * bytesPerPixel, startX, startY)!!
         bytes.putBytesInto(buffer, bufferOffset, bytes.size / bytesPerPixel)
     }
 }

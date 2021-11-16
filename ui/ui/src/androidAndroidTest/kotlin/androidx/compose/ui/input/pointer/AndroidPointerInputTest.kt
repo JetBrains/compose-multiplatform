@@ -19,7 +19,9 @@ package androidx.compose.ui.input.pointer
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.view.InputDevice
 import android.view.MotionEvent
+import android.view.MotionEvent.ACTION_CANCEL
 import android.view.MotionEvent.ACTION_DOWN
 import android.view.MotionEvent.ACTION_HOVER_ENTER
 import android.view.MotionEvent.ACTION_HOVER_EXIT
@@ -27,12 +29,15 @@ import android.view.MotionEvent.ACTION_HOVER_MOVE
 import android.view.MotionEvent.ACTION_MOVE
 import android.view.MotionEvent.ACTION_POINTER_INDEX_SHIFT
 import android.view.MotionEvent.ACTION_UP
+import android.view.MotionEvent.TOOL_TYPE_FINGER
+import android.view.MotionEvent.TOOL_TYPE_MOUSE
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
@@ -761,6 +766,59 @@ class AndroidPointerInputTest {
         }
     }
 
+    private fun dispatchStylusEvents(
+        layoutCoordinates: LayoutCoordinates,
+        offset: Offset,
+        vararg actions: Int
+    ) {
+        rule.runOnUiThread {
+            val root = layoutCoordinates.findRoot()
+            val pos = root.localPositionOf(layoutCoordinates, offset)
+            val androidComposeView = findAndroidComposeView(container) as AndroidComposeView
+
+            for (action in actions) {
+                val event = MotionEvent(
+                    0,
+                    action,
+                    1,
+                    0,
+                    arrayOf(PointerProperties(0).also {
+                        it.toolType = MotionEvent.TOOL_TYPE_STYLUS
+                    }),
+                    arrayOf(PointerCoords(pos.x, pos.y))
+                )
+
+                when (action) {
+                    ACTION_HOVER_ENTER, ACTION_HOVER_MOVE, ACTION_HOVER_EXIT ->
+                        androidComposeView.dispatchHoverEvent(event)
+                    else -> androidComposeView.dispatchTouchEvent(event)
+                }
+            }
+        }
+    }
+
+    private fun dispatchTouchEvent(
+        action: Int,
+        layoutCoordinates: LayoutCoordinates,
+        offset: Offset = Offset.Zero
+    ) {
+        rule.runOnUiThread {
+            val root = layoutCoordinates.findRoot()
+            val pos = root.localPositionOf(layoutCoordinates, offset)
+            val event = MotionEvent(
+                0,
+                action,
+                1,
+                0,
+                arrayOf(PointerProperties(0).also { it.toolType = MotionEvent.TOOL_TYPE_FINGER }),
+                arrayOf(PointerCoords(pos.x, pos.y))
+            )
+
+            val androidComposeView = findAndroidComposeView(container) as AndroidComposeView
+            androidComposeView.dispatchTouchEvent(event)
+        }
+    }
+
     @Test
     fun dispatchHoverEnter() {
         var layoutCoordinates: LayoutCoordinates? = null
@@ -1022,7 +1080,7 @@ class AndroidPointerInputTest {
                         Modifier
                             .align(Alignment.BottomCenter)
                             .size(50.dp)
-                            .graphicsLayer { translationY = 25.dp.toPx() }
+                            .graphicsLayer { translationY = 25.dp.roundToPx().toFloat() }
                             .pointerInput(Unit) {
                                 awaitPointerEventScope {
                                     while (true) {
@@ -1043,7 +1101,7 @@ class AndroidPointerInputTest {
         val coords = innerCoordinates!!
         dispatchMouseEvent(ACTION_HOVER_ENTER, coords)
         dispatchMouseEvent(ACTION_DOWN, coords)
-        dispatchMouseEvent(ACTION_MOVE, coords, Offset(0f, coords.size.height / 2f - 1f))
+        dispatchMouseEvent(ACTION_MOVE, coords, Offset(0f, coords.size.height / 2 - 1f))
         dispatchMouseEvent(ACTION_MOVE, coords, Offset(0f, coords.size.height - 1f))
         dispatchMouseEvent(ACTION_UP, coords, Offset(0f, coords.size.height - 1f))
         rule.runOnUiThread {
@@ -1068,7 +1126,7 @@ class AndroidPointerInputTest {
                         Box(
                             Modifier
                                 .requiredSize(50.dp)
-                                .graphicsLayer { translationY = 25.dp.toPx() }
+                                .graphicsLayer { translationY = 25.dp.roundToPx().toFloat() }
                                 .pointerInput(Unit) {
                                     awaitPointerEventScope {
                                         while (true) {
@@ -1100,6 +1158,415 @@ class AndroidPointerInputTest {
             assertThat(eventLog[2].type).isEqualTo(PointerEventType.Move)
             assertThat(eventLog[3].type).isEqualTo(PointerEventType.Release)
             assertThat(eventLog[4].type).isEqualTo(PointerEventType.Exit)
+        }
+    }
+
+    private fun setSimpleLayout(eventLog: MutableList<PointerEvent>): LayoutCoordinates {
+        var innerCoordinates: LayoutCoordinates? = null
+        val latch = CountDownLatch(1)
+        rule.runOnUiThread {
+            container.setContent {
+                Box(Modifier.fillMaxSize()
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                val event = awaitPointerEvent()
+                                event.changes[0].consumeAllChanges()
+                                eventLog += event
+                            }
+                        }
+                    }.onGloballyPositioned {
+                        innerCoordinates = it
+                        latch.countDown()
+                    }
+                )
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        return innerCoordinates!!
+    }
+
+    @Test
+    fun cancelOnDeviceChange() {
+        // When a pointer has had a surprise removal, a "cancel" event should be sent if it was
+        // pressed.
+        val eventLog = mutableListOf<PointerEvent>()
+        val coords = setSimpleLayout(eventLog)
+
+        dispatchMouseEvent(ACTION_HOVER_ENTER, coords)
+        dispatchMouseEvent(ACTION_DOWN, coords)
+        dispatchMouseEvent(ACTION_MOVE, coords, Offset(0f, 1f))
+
+        val motionEvent = MotionEvent(
+            5,
+            ACTION_DOWN,
+            1,
+            0,
+            arrayOf(PointerProperties(10).also { it.toolType = TOOL_TYPE_FINGER }),
+            arrayOf(PointerCoords(1f, 1f))
+        )
+
+        container.dispatchTouchEvent(motionEvent)
+        rule.runOnUiThread {
+            assertThat(eventLog).hasSize(5)
+            assertThat(eventLog[0].type).isEqualTo(PointerEventType.Enter)
+            assertThat(eventLog[1].type).isEqualTo(PointerEventType.Press)
+            assertThat(eventLog[2].type).isEqualTo(PointerEventType.Move)
+            assertThat(eventLog[3].type).isEqualTo(PointerEventType.Release)
+            assertThat(eventLog[4].type).isEqualTo(PointerEventType.Press)
+        }
+    }
+
+    @Test
+    fun testSyntheticEventPosition() {
+        val eventLog = mutableListOf<PointerEvent>()
+        val coords = setSimpleLayout(eventLog)
+        dispatchMouseEvent(ACTION_DOWN, coords)
+
+        rule.runOnUiThread {
+            assertThat(eventLog).hasSize(2)
+            assertThat(eventLog[0].changes[0].position).isEqualTo(eventLog[1].changes[0].position)
+        }
+    }
+
+    @Test
+    fun testStylusHoverExitDueToPress() {
+        val eventLog = mutableListOf<PointerEvent>()
+        val coords = setSimpleLayout(eventLog)
+
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_ENTER)
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_EXIT, ACTION_DOWN)
+
+        rule.runOnUiThread {
+            assertThat(eventLog).hasSize(2)
+            assertThat(eventLog[0].type).isEqualTo(PointerEventType.Enter)
+            assertThat(eventLog[1].type).isEqualTo(PointerEventType.Press)
+        }
+    }
+
+    @Test
+    fun testStylusHoverExitNoFollowingEvent() {
+        val eventLog = mutableListOf<PointerEvent>()
+        val coords = setSimpleLayout(eventLog)
+
+        // Exit followed by nothing should just send the exit
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_ENTER)
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_EXIT)
+
+        rule.runOnUiThread {
+            assertThat(eventLog).hasSize(2)
+            assertThat(eventLog[0].type).isEqualTo(PointerEventType.Enter)
+            assertThat(eventLog[1].type).isEqualTo(PointerEventType.Exit)
+        }
+    }
+
+    @Test
+    fun testStylusHoverExitWithFollowingHoverEvent() {
+        val eventLog = mutableListOf<PointerEvent>()
+        val coords = setSimpleLayout(eventLog)
+
+        // Exit immediately followed by enter with the same device should send both
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_ENTER)
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_EXIT, ACTION_HOVER_ENTER)
+
+        rule.runOnUiThread {
+            assertThat(eventLog).hasSize(3)
+            assertThat(eventLog[0].type).isEqualTo(PointerEventType.Enter)
+            assertThat(eventLog[1].type).isEqualTo(PointerEventType.Exit)
+            assertThat(eventLog[2].type).isEqualTo(PointerEventType.Enter)
+        }
+    }
+
+    @Test
+    fun testStylusHoverExitWithFollowingTouchEvent() {
+        val eventLog = mutableListOf<PointerEvent>()
+        val coords = setSimpleLayout(eventLog)
+
+        // Exit followed by cancel should send both
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_ENTER)
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_EXIT, ACTION_CANCEL)
+
+        rule.runOnUiThread {
+            assertThat(eventLog).hasSize(2)
+            assertThat(eventLog[0].type).isEqualTo(PointerEventType.Enter)
+            assertThat(eventLog[1].type).isEqualTo(PointerEventType.Exit)
+        }
+    }
+
+    @Test
+    fun testStylusHoverExitWithFollowingDownOnDifferentDevice() {
+        val eventLog = mutableListOf<PointerEvent>()
+        val coords = setSimpleLayout(eventLog)
+
+        // Exit followed by a different device should send the exit
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_ENTER)
+        rule.runOnUiThread {
+            val root = coords.findRoot()
+            val pos = root.localPositionOf(coords, Offset.Zero)
+            val androidComposeView = findAndroidComposeView(container) as AndroidComposeView
+            val exit = MotionEvent(
+                0,
+                ACTION_HOVER_EXIT,
+                1,
+                0,
+                arrayOf(PointerProperties(0).also {
+                    it.toolType = MotionEvent.TOOL_TYPE_STYLUS
+                }),
+                arrayOf(PointerCoords(pos.x, pos.y))
+            )
+
+            androidComposeView.dispatchHoverEvent(exit)
+
+            val down = MotionEvent(
+                0,
+                ACTION_DOWN,
+                1,
+                0,
+                arrayOf(PointerProperties(0).also {
+                    it.toolType = MotionEvent.TOOL_TYPE_FINGER
+                }),
+                arrayOf(PointerCoords(pos.x, pos.y))
+            )
+            androidComposeView.dispatchTouchEvent(down)
+        }
+
+        rule.runOnUiThread {
+            assertThat(eventLog).hasSize(3)
+            assertThat(eventLog[0].type).isEqualTo(PointerEventType.Enter)
+            assertThat(eventLog[1].type).isEqualTo(PointerEventType.Exit)
+            assertThat(eventLog[2].type).isEqualTo(PointerEventType.Press)
+        }
+    }
+
+    @Test
+    fun syntheticEventSentAfterUp() {
+        val eventLog = mutableListOf<PointerEvent>()
+        val coords = setSimpleLayout(eventLog)
+
+        dispatchMouseEvent(ACTION_HOVER_ENTER, coords)
+        dispatchMouseEvent(ACTION_DOWN, coords)
+        dispatchMouseEvent(ACTION_UP, coords)
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_ENTER)
+
+        rule.runOnUiThread {
+            assertThat(eventLog).hasSize(5)
+            assertThat(eventLog[0].type).isEqualTo(PointerEventType.Enter)
+            assertThat(eventLog[1].type).isEqualTo(PointerEventType.Press)
+            assertThat(eventLog[2].type).isEqualTo(PointerEventType.Release)
+            assertThat(eventLog[3].type).isEqualTo(PointerEventType.Exit)
+            assertThat(eventLog[4].type).isEqualTo(PointerEventType.Enter)
+        }
+    }
+
+    @Test
+    fun clippedHasNoInputIfLargeEnough() {
+        val eventLog = mutableListOf<PointerEventType>()
+        var innerCoordinates: LayoutCoordinates? = null
+        val latch = CountDownLatch(1)
+        rule.runOnUiThread {
+            container.setContent {
+                Column(Modifier.fillMaxSize()) {
+                    Box(Modifier.size(50.dp).pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                awaitPointerEvent()
+                            }
+                        }
+                    })
+                    Box(Modifier.size(50.dp).clipToBounds()) {
+                        Box(Modifier.size(50.dp)
+                            .graphicsLayer {
+                                translationY = -25.dp.roundToPx().toFloat()
+                            }
+                            .pointerInput(Unit) {
+                                awaitPointerEventScope {
+                                    while (true) {
+                                        val event = awaitPointerEvent()
+                                        event.changes[0].consumeAllChanges()
+                                        eventLog += event.type
+                                    }
+                                }
+                            }.onGloballyPositioned {
+                                innerCoordinates = it
+                                latch.countDown()
+                            }
+                        )
+                    }
+                }
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+
+        val coords = innerCoordinates!!
+
+        // Hit the top Box
+        dispatchMouseEvent(ACTION_HOVER_ENTER, coords, Offset(0f, -1f))
+
+        // Hit the bottom box, but clipped
+        dispatchMouseEvent(ACTION_HOVER_MOVE, coords)
+        dispatchMouseEvent(ACTION_HOVER_MOVE, coords,
+            Offset(0f, (coords.size.height / 2 - 1).toFloat())
+        )
+
+        rule.runOnUiThread {
+            assertThat(eventLog).isEmpty()
+        }
+
+        // Now hit the box in the unclipped region
+        dispatchMouseEvent(ACTION_HOVER_MOVE, coords,
+            Offset(0f, (coords.size.height / 2 + 1).toFloat())
+        )
+
+        // Now hit the bottom of the clipped region
+        dispatchMouseEvent(ACTION_HOVER_MOVE, coords,
+            Offset(0f, (coords.size.height - 1).toFloat())
+        )
+
+        // Now leave
+        dispatchMouseEvent(ACTION_HOVER_MOVE, coords,
+            Offset(0f, coords.size.height.toFloat() + 1f)
+        )
+
+        rule.runOnUiThread {
+            assertThat(eventLog).containsExactly(
+                PointerEventType.Enter, PointerEventType.Move, PointerEventType.Exit
+            )
+        }
+    }
+
+    @Test
+    fun unclippedTakesPrecedenceWithMinimumTouchTarget() {
+        val eventLog = mutableListOf<PointerEventType>()
+        var innerCoordinates: LayoutCoordinates? = null
+        val latch = CountDownLatch(1)
+        rule.runOnUiThread {
+            container.setContent {
+                Column(Modifier.fillMaxSize()) {
+                    Box(Modifier.size(50.dp).pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                awaitPointerEvent()
+                            }
+                        }
+                    })
+                    Box(Modifier.size(20.dp).clipToBounds()) {
+                        Box(Modifier.size(20.dp)
+                            .graphicsLayer {
+                                translationY = -10.dp.roundToPx().toFloat()
+                            }
+                            .pointerInput(Unit) {
+                                awaitPointerEventScope {
+                                    while (true) {
+                                        val event = awaitPointerEvent()
+                                        event.changes[0].consumeAllChanges()
+                                        eventLog += event.type
+                                    }
+                                }
+                            }.onGloballyPositioned {
+                                innerCoordinates = it
+                                latch.countDown()
+                            }
+                        )
+                    }
+                }
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+
+        val coords = innerCoordinates!!
+
+        // Hit the top Box, but in the minimum touch target area of the bottom Box
+        dispatchTouchEvent(ACTION_DOWN, coords, Offset(0f, -1f))
+        dispatchTouchEvent(ACTION_UP, coords, Offset(0f, -1f))
+
+        // Hit the top Box in the clipped region of the bottom Box
+        dispatchMouseEvent(ACTION_DOWN, coords)
+        dispatchMouseEvent(ACTION_UP, coords)
+
+        rule.runOnUiThread {
+            assertThat(eventLog).isEmpty()
+        }
+
+        // Hit the bottom box in the unclipped region
+        val topOfUnclipped = Offset(0f, (coords.size.height / 2 + 1).toFloat())
+        dispatchMouseEvent(ACTION_DOWN, coords, topOfUnclipped)
+        dispatchMouseEvent(ACTION_UP, coords, topOfUnclipped)
+
+        // Continue to the bottom of the bottom Box
+        val bottomOfBox = Offset(0f, (coords.size.height - 1).toFloat())
+        dispatchMouseEvent(ACTION_DOWN, coords, bottomOfBox)
+        dispatchMouseEvent(ACTION_UP, coords, bottomOfBox)
+
+        // Now exit the bottom box
+        val justBelow = Offset(0f, (coords.size.height + 1).toFloat())
+        dispatchMouseEvent(ACTION_DOWN, coords, justBelow)
+        dispatchMouseEvent(ACTION_UP, coords, justBelow)
+
+        rule.runOnUiThread {
+            assertThat(eventLog).containsExactly(
+                PointerEventType.Press,
+                PointerEventType.Release,
+                PointerEventType.Press,
+                PointerEventType.Release,
+                PointerEventType.Press,
+                PointerEventType.Release,
+            )
+        }
+    }
+
+    @Test
+    fun stylusEnterExitPointerArea() {
+        // Stylus hover enter/exit events should be sent to pointer input areas
+        val eventLog = mutableListOf<PointerEvent>()
+        var innerCoordinates: LayoutCoordinates? = null
+        val latch = CountDownLatch(1)
+        rule.runOnUiThread {
+            container.setContent {
+                Box(Modifier.fillMaxSize()
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                awaitPointerEvent()
+                            }
+                        }
+                    }
+                ) {
+                    Box(Modifier.size(50.dp).align(AbsoluteAlignment.BottomRight)
+                        .pointerInput(Unit) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    val event = awaitPointerEvent()
+                                    event.changes.forEach { it.consumeAllChanges() }
+                                    eventLog += event
+                                }
+                            }
+                        }.onGloballyPositioned {
+                            innerCoordinates = it
+                            latch.countDown()
+                        }
+                    )
+                }
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+
+        val coords = innerCoordinates!!
+        val outside = Offset(-100f, -100f)
+        dispatchStylusEvents(coords, outside, ACTION_HOVER_ENTER)
+        rule.runOnUiThread {
+            // The event didn't land inside the box, so it shouldn't get the hover enter
+            assertThat(eventLog).isEmpty()
+        }
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_MOVE)
+        dispatchStylusEvents(coords, Offset.Zero, ACTION_HOVER_EXIT, ACTION_DOWN)
+        dispatchStylusEvents(coords, outside, ACTION_MOVE)
+        dispatchStylusEvents(coords, outside, ACTION_UP, ACTION_HOVER_ENTER)
+        rule.runOnUiThread {
+            assertThat(eventLog).hasSize(4)
+            assertThat(eventLog[0].type).isEqualTo(PointerEventType.Enter)
+            assertThat(eventLog[1].type).isEqualTo(PointerEventType.Press)
+            assertThat(eventLog[2].type).isEqualTo(PointerEventType.Exit)
+            assertThat(eventLog[3].type).isEqualTo(PointerEventType.Release)
         }
     }
 
@@ -1232,6 +1699,11 @@ private fun MotionEvent(
     } else {
         0
     }
+    val source = if (pointerProperties[0].toolType == TOOL_TYPE_MOUSE) {
+        InputDevice.SOURCE_MOUSE
+    } else {
+        InputDevice.SOURCE_TOUCHSCREEN
+    }
     return MotionEvent.obtain(
         0,
         eventTime.toLong(),
@@ -1245,7 +1717,7 @@ private fun MotionEvent(
         0f,
         0,
         0,
-        0,
+        source,
         0
     )
 }
