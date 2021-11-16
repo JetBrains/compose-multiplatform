@@ -16,22 +16,15 @@
 
 package androidx.compose.animation.graphics.vector
 
-import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.RenderVectorGroup
-import androidx.compose.ui.graphics.vector.VectorGroup
-import androidx.compose.ui.graphics.vector.VectorConfig
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.util.fastMaxBy
 
 /**
  * Animated vector graphics object that is generated as a result of
  * [androidx.compose.animation.graphics.res.loadAnimatedVectorResource].
- * It can be composed and rendered by [painterFor].
+ * It can be composed and rendered by `rememberAnimatedVectorPainter`.
  *
  * @param imageVector The [ImageVector] to be animated. This is represented with the
  * `android:drawable` parameter of an `<animated-vector>` element.
@@ -54,44 +47,9 @@ class AnimatedImageVector internal constructor(
     }?.animator?.totalDuration ?: 0
 
     /**
-     * Creates and remembers a [Painter] to render this [AnimatedImageVector]. It renders the image
-     * either at the start or the end of all the animations depending on the [atEnd]. Changes to
-     * [atEnd] are animated.
-     *
-     * @param atEnd Whether the animated vector should be rendered at the end of all its animations.
-     *
-     * @sample androidx.compose.animation.graphics.samples.AnimatedVectorSample
+     * Provide an empty companion object to hang platform-specific companion extensions onto.
      */
-    @Composable
-    fun painterFor(atEnd: Boolean): Painter {
-        return painterFor(atEnd) { group, overrides ->
-            RenderVectorGroup(group, overrides)
-        }
-    }
-
-    @Composable
-    internal fun painterFor(
-        atEnd: Boolean,
-        render: @Composable (VectorGroup, Map<String, VectorConfig>) -> Unit
-    ): Painter {
-        return rememberVectorPainter(
-            defaultWidth = imageVector.defaultWidth,
-            defaultHeight = imageVector.defaultHeight,
-            viewportWidth = imageVector.viewportWidth,
-            viewportHeight = imageVector.viewportHeight,
-            name = imageVector.name,
-            tintColor = imageVector.tintColor,
-            tintBlendMode = imageVector.tintBlendMode,
-        ) { _, _ ->
-            val transition = updateTransition(atEnd, label = imageVector.name)
-            render(
-                imageVector.root,
-                targets.associate { target ->
-                    target.name to target.animator.createVectorConfig(transition, totalDuration)
-                }
-            )
-        }
-    }
+    companion object {} // ktlint-disable no-empty-class-body
 }
 
 /**

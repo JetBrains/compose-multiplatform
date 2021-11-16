@@ -20,18 +20,16 @@ import android.content.res.Resources
 import android.util.Xml
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.animation.graphics.vector.compat.parseAnimatedImageVector
 import androidx.compose.animation.graphics.vector.compat.seekToStartTag
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import org.xmlpull.v1.XmlPullParserException
 
 /**
  * Load an [AnimatedImageVector] from an Android resource id.
- *
- * Note: This API is transient and will be likely removed for encouraging async resource loading.
  *
  * @param id the resource identifier
  * @return an animated vector drawable resource.
@@ -40,7 +38,9 @@ import org.xmlpull.v1.XmlPullParserException
  */
 @ExperimentalAnimationGraphicsApi
 @Composable
-fun animatedVectorResource(@DrawableRes id: Int): AnimatedImageVector {
+fun AnimatedImageVector.Companion.animatedVectorResource(
+    @DrawableRes id: Int
+): AnimatedImageVector {
     val context = LocalContext.current
     val res = context.resources
     val theme = context.theme

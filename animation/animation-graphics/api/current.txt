@@ -1,6 +1,9 @@
 // Signature format: 4.0
 package androidx.compose.animation.graphics.res {
 
+  public final class AnimatedVectorPainterResources_androidKt {
+  }
+
   public final class AnimatedVectorResources_androidKt {
   }
 
