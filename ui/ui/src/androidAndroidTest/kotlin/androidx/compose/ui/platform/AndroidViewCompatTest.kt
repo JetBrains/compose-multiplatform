@@ -60,6 +60,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.anyChangeConsumed
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -769,6 +772,53 @@ class AndroidViewCompatTest {
         }
 
         rule.runOnIdle { assertEquals(invalidatesDuringScroll + 1, view!!.draws) }
+    }
+
+    @Test
+    fun viewGetsEventsBeforeParent() {
+        val parentEvents = mutableListOf<Pair<PointerEventType, Boolean>>()
+        val viewEvents = mutableListOf<Int>()
+        rule.setContent {
+            Box(Modifier.fillMaxSize().pointerInput(Unit) {
+                awaitPointerEventScope {
+                    while (true) {
+                        val event = awaitPointerEvent()
+                        parentEvents += event.type to event.changes.any { it.anyChangeConsumed() }
+                    }
+                }
+            }) {
+                AndroidView(
+                    factory = { context ->
+                        object : View(context) {
+                            override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+                                viewEvents += event.actionMasked
+                                return true
+                            }
+                        }
+                    },
+                    modifier = Modifier.fillMaxSize().testTag("Tag")
+                )
+            }
+        }
+
+        rule.onNodeWithTag("Tag").performTouchInput {
+            down(Offset.Zero)
+            moveTo(Offset(10f, 10f))
+            up()
+        }
+
+        rule.runOnIdle {
+            assertThat(viewEvents).containsExactly(
+                ACTION_DOWN,
+                ACTION_MOVE,
+                ACTION_UP
+            )
+            assertThat(parentEvents).containsExactly(
+                PointerEventType.Press to true,
+                PointerEventType.Move to true,
+                PointerEventType.Release to true
+            )
+        }
     }
 
     @Test
