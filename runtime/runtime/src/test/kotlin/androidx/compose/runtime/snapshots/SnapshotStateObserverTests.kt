@@ -426,6 +426,46 @@ class SnapshotStateObserverTests {
         }
     }
 
+    @Test
+    fun readingNestedDerivedStateFromAnImmediatelyRerunningObserver() {
+        var changes = 0
+
+        val state = mutableStateOf(0)
+        val derivedState = derivedStateOf { state.value }
+        val nestedDerivedState = derivedStateOf { derivedState.value }
+
+        val stateObserver = SnapshotStateObserver { it() }
+        try {
+            stateObserver.start()
+
+            val observer = object : (Any) -> Unit {
+                override fun invoke(affected: Any) {
+                    assertEquals(this, affected)
+                    assertEquals(0, changes)
+                    changes++
+                    readWithObservation()
+                }
+
+                fun readWithObservation() {
+                    stateObserver.observeReads(this, this) {
+                        // read the value
+                        nestedDerivedState.value
+                    }
+                }
+            }
+
+            state.value++
+            observer.readWithObservation()
+
+            Snapshot.notifyObjectsInitialized()
+            Snapshot.sendApplyNotifications()
+
+            assertEquals(1, changes)
+        } finally {
+            stateObserver.stop()
+        }
+    }
+
     private fun runSimpleTest(
         block: (modelObserver: SnapshotStateObserver, data: MutableState<Int>) -> Unit
     ) {
