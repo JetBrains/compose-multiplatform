@@ -260,7 +260,7 @@ object Release {
                     getParams(
                         project,
                         project.getDistributionDirectory(),
-                        fileNamePrefix = Release.GLOBAL_ZIP_PREFIX
+                        fileNamePrefix = GLOBAL_ZIP_PREFIX
                     ).copy(
                         includeMetadata = true
                     )
@@ -340,20 +340,8 @@ private fun groupToTaskNameSuffix(group: String): String {
     return group
         .split('.')
         .joinToString("") {
-            it.replaceFirstChar {
-                if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
-            }
-        }
-}
-/**
- * Converts the project name into a readable task name
- */
-private fun projectToNameSuffix(project: Project): String {
-    return project.path
-        .split(":", "-")
-        .joinToString("") {
-            it.replaceFirstChar {
-                if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+            it.replaceFirstChar { char ->
+                if (char.isLowerCase()) char.titlecase(Locale.getDefault()) else char.toString()
             }
         }
 }

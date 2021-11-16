@@ -91,11 +91,6 @@ const val USE_MAX_DEP_VERSIONS = "androidx.useMaxDepVersions"
 const val WRITE_VERSIONED_API_FILES = "androidx.writeVersionedApiFiles"
 
 /**
- * Specifies the type of Android Studio to use for the project's Studio task
- */
-const val STUDIO_TYPE = "androidx.studio.type"
-
-/**
  * Build id used to pull SNAPSHOT versions to substitute project dependencies in Playground projects
  */
 const val PLAYGROUND_SNAPSHOT_BUILD_ID = "androidx.playground.snapshotBuildId"
@@ -133,6 +128,16 @@ const val KMP_GITHUB_BUILD = "androidx.github.build"
  */
 const val KMP_ENABLE_MAC = "androidx.kmp.mac.enabled"
 
+/**
+ * If true, include js targets when building KMP
+ */
+const val KMP_ENABLE_JS = "androidx.kmp.js.enabled"
+
+/**
+ * If true, include linux targets when building KMP
+ */
+const val KMP_ENABLE_LINUX = "androidx.kmp.linux.enabled"
+
 val ALL_ANDROIDX_PROPERTIES = setOf(
     ALL_WARNINGS_AS_ERRORS,
     ALTERNATIVE_PROJECT_URL,
@@ -157,7 +162,9 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     PLAYGROUND_METALAVA_BUILD_ID,
     PLAYGROUND_DOKKA_BUILD_ID,
     KMP_GITHUB_BUILD,
-    KMP_ENABLE_MAC
+    KMP_ENABLE_MAC,
+    KMP_ENABLE_JS,
+    KMP_ENABLE_LINUX
 )
 
 /**
@@ -237,24 +244,4 @@ fun Project.isDocumentationEnabled(): Boolean {
  */
 fun Project.usingMaxDepVersions(): Boolean {
     return project.hasProperty(USE_MAX_DEP_VERSIONS)
-}
-
-/**
- * Returns the Studio type for the project's studio task
- */
-fun Project.studioType() = StudioType.findType(
-    findProperty(STUDIO_TYPE)?.toString()
-)
-
-enum class StudioType {
-    ANDROIDX,
-    PLAYGROUND;
-
-    companion object {
-        fun findType(value: String?) = when (value) {
-            "playground" -> PLAYGROUND
-            null, "androidx" -> ANDROIDX
-            else -> error("Invalid project type $value")
-        }
-    }
 }

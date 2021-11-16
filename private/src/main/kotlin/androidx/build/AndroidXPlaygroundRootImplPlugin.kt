@@ -119,7 +119,7 @@ class AndroidXPlaygroundRootImplPlugin : Plugin<Project> {
             if (sections.size >= 3) {
                 val group = sections
                     // Filter empty sections as many declarations start with ':'
-                    .filter { !it.isBlank() }
+                    .filter { it.isNotBlank() }
                     // Last element is the artifact.
                     .dropLast(1)
                     .joinToString(".")
@@ -155,7 +155,7 @@ class AndroidXPlaygroundRootImplPlugin : Plugin<Project> {
         return if (metadataCacheFile.exists()) {
             metadataCacheFile.readText(Charsets.UTF_8)
         } else {
-            val metadataUrl = "${repos.snapshots}/$groupPath/$modulePath/maven-metadata.xml"
+            val metadataUrl = "${repos.snapshots.url}/$groupPath/$modulePath/maven-metadata.xml"
             URL(metadataUrl).openStream().use {
                 val parsedMetadata = DOMBuilder.parse(it.reader())
                 val versionNodes = parsedMetadata.getElementsByTagName("latest")
@@ -174,32 +174,50 @@ class AndroidXPlaygroundRootImplPlugin : Plugin<Project> {
     }
 
     private fun RepositoryHandler.addPlaygroundRepositories() {
-        repos.all.forEach { repoUrl ->
-            maven {
-                it.url = URI(repoUrl)
-                it.metadataSources {
+        repos.all.forEach { playgroundRepository ->
+            maven { repository ->
+                repository.url = URI(playgroundRepository.url)
+                repository.metadataSources {
                     it.mavenPom()
                     it.artifact()
+                }
+                repository.content {
+                    it.includeGroupByRegex(playgroundRepository.includeGroupRegex)
                 }
             }
         }
         google()
         mavenCentral()
-        @Suppress("DEPRECATION") // b/181908259
-        jcenter()
+        gradlePluginPortal()
     }
 
     private class PlaygroundRepositories(
         props: PlaygroundProperties
     ) {
-        val snapshots =
-            "https://androidx.dev/snapshots/builds/${props.snapshotBuildId}/artifacts/repository"
-        val metalava = "https://androidx.dev/metalava/builds/${props.metalavaBuildId}/artifacts" +
-            "/repo/m2repository"
-        val doclava = "https://androidx.dev/dokka/builds/${props.dokkaBuildId}/artifacts/repository"
-        val prebuilts = "https://androidx.dev/storage/prebuilts/androidx/internal/repository"
+        val snapshots = PlaygroundRepository(
+            "https://androidx.dev/snapshots/builds/${props.snapshotBuildId}/artifacts/repository",
+            includeGroupRegex = """androidx\..*"""
+        )
+        val metalava = PlaygroundRepository(
+            "https://androidx.dev/metalava/builds/${props.metalavaBuildId}/artifacts" +
+                "/repo/m2repository",
+            includeGroupRegex = """com\.android\.tools\.metalava"""
+        )
+        val doclava = PlaygroundRepository(
+            "https://androidx.dev/dokka/builds/${props.dokkaBuildId}/artifacts/repository",
+            includeGroupRegex = """org\.jetbrains\.dokka"""
+        )
+        val prebuilts = PlaygroundRepository(
+            "https://androidx.dev/storage/prebuilts/androidx/internal/repository",
+            includeGroupRegex = """androidx\..*"""
+        )
         val all = listOf(snapshots, metalava, doclava, prebuilts)
     }
+
+    private data class PlaygroundRepository(
+        val url: String,
+        val includeGroupRegex: String
+    )
 
     private data class PlaygroundProperties(
         val snapshotBuildId: String,

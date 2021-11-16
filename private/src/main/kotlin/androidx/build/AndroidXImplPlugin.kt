@@ -49,6 +49,7 @@ import com.android.build.gradle.TestExtension
 import com.android.build.gradle.TestPlugin
 import com.android.build.gradle.TestedExtension
 import com.android.build.gradle.internal.tasks.AnalyticsRecordingTask
+import com.android.build.gradle.internal.tasks.ListingFileRedirectTask
 import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.Plugin
@@ -204,16 +205,18 @@ class AndroidXImplPlugin : Plugin<Project> {
                 }
             }
         }
-        task.systemProperty("robolectric.offline", "true")
-        val robolectricDependencies =
-            File(
-                project.getPrebuiltsRoot(),
-                "androidx/external/org/robolectric/android-all-instrumented"
+        if (!StudioType.isPlayground(project)) { // For non-playground setup use robolectric offline
+            task.systemProperty("robolectric.offline", "true")
+            val robolectricDependencies =
+                File(
+                    project.getPrebuiltsRoot(),
+                    "androidx/external/org/robolectric/android-all-instrumented"
+                )
+            task.systemProperty(
+                "robolectric.dependency.dir",
+                robolectricDependencies.absolutePath
             )
-        task.systemProperty(
-            "robolectric.dependency.dir",
-            robolectricDependencies.absolutePath
-        )
+        }
     }
 
     private fun configureWithKotlinPlugin(
@@ -224,10 +227,6 @@ class AndroidXImplPlugin : Plugin<Project> {
         project.tasks.withType(KotlinCompile::class.java).configureEach { task ->
             task.kotlinOptions.jvmTarget = "1.8"
             project.configureJavaCompilationWarnings(task)
-
-            // Not directly impacting us, but a bunch of issues like KT-46512, probably prudent
-            // for us to just disable until Kotlin 1.5.10+ to avoid end users hitting users
-            task.kotlinOptions.freeCompilerArgs += listOf("-Xsam-conversions=class")
         }
         project.afterEvaluate {
             val isAndroidProject = project.plugins.hasPlugin(LibraryPlugin::class.java) ||
@@ -251,15 +250,17 @@ class AndroidXImplPlugin : Plugin<Project> {
 
     @Suppress("UnstableApiUsage") // AGP DSL APIs
     private fun configureWithAppPlugin(project: Project, androidXExtension: AndroidXExtension) {
-        val appExtension = project.extensions.getByType<AppExtension>().apply {
+        project.extensions.getByType<AppExtension>().apply {
             configureAndroidBaseOptions(project, androidXExtension)
             configureAndroidApplicationOptions(project)
         }
 
         project.extensions.getByType<ApplicationAndroidComponentsExtension>().apply {
             onVariants { it.configureLicensePackaging() }
+            finalizeDsl {
+                project.configureAndroidProjectForLint(it.lint, androidXExtension)
+            }
         }
-        project.configureAndroidProjectForLint(appExtension.lintOptions, androidXExtension)
     }
 
     private fun configureWithTestPlugin(
@@ -308,6 +309,7 @@ class AndroidXImplPlugin : Plugin<Project> {
                 variant.enableUnitTest = false
             }
             onVariants { it.configureLicensePackaging() }
+            finalizeDsl { project.configureAndroidProjectForLint(it.lint, androidXExtension) }
         }
 
         project.configurePublicResourcesStub(libraryExtension)
@@ -336,8 +338,7 @@ class AndroidXImplPlugin : Plugin<Project> {
             }
         }
 
-        // Standard lint, docs, resource API, and Metalava configuration for AndroidX projects.
-        project.configureAndroidProjectForLint(libraryExtension.lintOptions, androidXExtension)
+        // Standard docs, resource API, and Metalava configuration for AndroidX projects.
         project.configureProjectForApiTasks(
             LibraryApiTaskConfig(libraryExtension),
             androidXExtension
@@ -537,10 +538,12 @@ class AndroidXImplPlugin : Plugin<Project> {
         packageApplicationProvider.get().let { packageTask ->
             AffectedModuleDetector.configureTaskGuard(packageTask)
             // Skip copying AndroidTest apks if they have no source code (no tests to run).
-            if (testApk && !project.hasAndroidTestSourceCode()) {
-                return
+            if (!testApk || project.hasAndroidTestSourceCode()) {
+                addToTestZips(project, packageTask)
             }
-            addToTestZips(project, packageTask)
+        }
+        project.tasks.withType(ListingFileRedirectTask::class.java).forEach {
+            AffectedModuleDetector.configureTaskGuard(it)
         }
     }
 
@@ -590,16 +593,6 @@ class AndroidXImplPlugin : Plugin<Project> {
             versionName = "1.0"
         }
 
-        @Suppress("DEPRECATION") // lintOptions methods
-        lintOptions.apply {
-            isAbortOnError = true
-
-            val baseline = project.lintBaseline
-            if (baseline.exists()) {
-                baseline(baseline)
-            }
-        }
-
         project.addAppApkToTestConfigGeneration()
 
         val buildTestApksTask = project.rootProject.tasks.named(BUILD_TEST_APKS_TASK)
@@ -628,26 +621,6 @@ class AndroidXImplPlugin : Plugin<Project> {
             }
         }
     }
-
-    private fun Project.createVerifyDependencyVersionsTask():
-        TaskProvider<VerifyDependencyVersionsTask>? {
-            /**
-             * Ignore -Pandroidx.useMaxDepVersions when verifying dependency versions because it is a
-             * hypothetical build which is only intended to check for forward compatibility.
-             */
-            if (project.usingMaxDepVersions()) {
-                return null
-            }
-
-            val taskProvider = tasks.register(
-                "verifyDependencyVersions",
-                VerifyDependencyVersionsTask::class.java
-            ) { task ->
-                task.version.set(project.version.toString())
-            }
-            addToBuildOnServer(taskProvider)
-            return taskProvider
-        }
 
     // Task that creates a json file of a project's dependencies
     private fun Project.addCreateLibraryBuildInfoFileTask(extension: AndroidXExtension) {
@@ -895,10 +868,7 @@ private const val GROUP_PREFIX = "androidx."
  * Validates the project structure against Jetpack guidelines.
  */
 fun Project.validateProjectStructure(groupId: String) {
-    // TODO(b/197253160): Re-enable this check for playground. For unknown reasons in playground
-    //  builds, automatically generated parent projects such as :activity are incorrectly
-    //  inheriting their children's build file which causes the AndroidXPlugin to get applied.
-    if (studioType() == StudioType.PLAYGROUND || !project.isValidateProjectStructureEnabled()) {
+    if (!project.isValidateProjectStructureEnabled()) {
         return
     }
 

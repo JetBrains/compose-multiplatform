@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package androidx.build.dependencies
+@file:JvmName("AndroidXPublicGradleProperties")
 
-lateinit var guavaVersion: String
-val GUAVA_VERSION get() = guavaVersion
+package androidx.build
 
-lateinit var kspVersion: String
-val KSP_VERSION get() = kspVersion
-
-lateinit var kotlinVersion: String
-val KOTLIN_VERSION get() = kotlinVersion
-val KOTLIN_STDLIB get() = "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-
-lateinit var agpVersion: String
-val AGP_LATEST get() = "com.android.tools.build:gradle:$agpVersion"
+/**
+ * Specifies the type of Android Studio to use for the project's Studio task
+ */
+const val STUDIO_TYPE = "androidx.studio.type"

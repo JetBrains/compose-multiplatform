@@ -29,8 +29,8 @@ import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.extra
-import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.named
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import java.util.Locale
 
@@ -81,12 +81,24 @@ fun Project.configureSourceJarForAndroid(extension: LibraryExtension) {
  * Sets up a source jar task for a Java library project.
  */
 fun Project.configureSourceJarForJava() {
-    val sourceJar = tasks.register("sourceJar", Jar::class.java) {
-        it.archiveClassifier.set("sources")
-        val extension = extensions.getByType<JavaPluginExtension>()
-        it.from(extension.sourceSets.getByName("main").allSource.srcDirs)
+    val sourceJar = tasks.register("sourceJar", Jar::class.java) { task ->
+        task.archiveClassifier.set("sources")
+
         // Do not allow source files with duplicate names, information would be lost otherwise.
-        it.duplicatesStrategy = DuplicatesStrategy.FAIL
+        // Different sourceSets in KMP should use different platform infixes, see b/203764756
+        task.duplicatesStrategy = DuplicatesStrategy.FAIL
+
+        extensions.findByType(JavaPluginExtension::class.java)?.let { extension ->
+            task.from(extension.sourceSets.getByName("main").allSource.srcDirs)
+        }
+
+        extensions.findByType(KotlinMultiplatformExtension::class.java)?.let { extension ->
+            for (sourceSetName in listOf("commonMain", "jvmMain")) {
+                extension.sourceSets.findByName(sourceSetName)?.let { sourceSet ->
+                    task.from(sourceSet.kotlin.srcDirs)
+                }
+            }
+        }
     }
     registerSourcesVariant(sourceJar)
 }

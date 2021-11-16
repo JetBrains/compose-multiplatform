@@ -41,6 +41,8 @@ allprojects {
                     // Details: KT-46445 and https://github.com/gradle/gradle/issues/17052
                     "-Xsam-conversions=class"
             ]
+            languageVersion = "1.5"
+            apiVersion = "1.5"
         }
     }
 }

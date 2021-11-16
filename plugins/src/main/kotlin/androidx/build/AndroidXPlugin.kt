@@ -36,4 +36,14 @@ class AndroidXPlugin : Plugin<Project> {
             )
         )
     }
+
+    companion object {
+        /**
+         * @return `true` if running in a Playground (Github) setup, `false` otherwise.
+         */
+        @JvmStatic
+        fun isPlayground(project: Project): Boolean {
+            return StudioType.isPlayground(project)
+        }
+    }
 }

@@ -29,7 +29,7 @@ import java.io.File
 /**
  * Finds the outputs of every task and saves this mapping into a file
  */
-abstract class ListTaskOutputsTask() : DefaultTask() {
+abstract class ListTaskOutputsTask : DefaultTask() {
     @OutputFile
     val outputFile: Property<File> = project.objects.property(File::class.java)
     @Input
@@ -48,11 +48,11 @@ abstract class ListTaskOutputsTask() : DefaultTask() {
     }
 
     fun removePrefix(prefix: String) {
-        removePrefixes.add(prefix + "/")
+        removePrefixes.add("$prefix/")
     }
 
     // Given a map from output file to Task, formats into a String
-    fun formatTasks(tasksByOutput: Map<File, Task>): String {
+    private fun formatTasks(tasksByOutput: Map<File, Task>): String {
         val messages: MutableList<String> = mutableListOf()
         for ((output, task) in tasksByOutput) {
             var filePath = output.path
@@ -67,12 +67,11 @@ abstract class ListTaskOutputsTask() : DefaultTask() {
             )
         }
         messages.sort()
-        val text = messages.joinToString("\n")
-        return text
+        return messages.joinToString("\n")
     }
 
     // Given a list of columns, indents and joins them to be easy to read
-    fun formatInColumns(columns: List<String>): String {
+    private fun formatInColumns(columns: List<String>): String {
         val components = mutableListOf<String>()
         var textLength = 0
         for (column in columns) {
@@ -85,7 +84,7 @@ abstract class ListTaskOutputsTask() : DefaultTask() {
             components.add(extraSpaces)
             textLength = roundedTextLength
             components.add(column)
-            textLength += column.length.toInt()
+            textLength += column.length
         }
         return components.joinToString("")
     }
@@ -160,7 +159,7 @@ fun Project.findAllTasksByOutput(): Map<File, Task> {
                     )
                 }
             }
-            tasksByOutput.put(otherTaskOutput, otherTask)
+            tasksByOutput[otherTaskOutput] = otherTask
         }
     }
     return tasksByOutput

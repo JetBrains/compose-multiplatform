@@ -32,7 +32,11 @@ import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.options.Option
 import java.io.File
 
-val bundlingAttribute = Attribute.of("org.gradle.dependency.bundling", String::class.java)
+val bundlingAttribute: Attribute<String> =
+    Attribute.of(
+        "org.gradle.dependency.bundling",
+        String::class.java
+    )
 
 private fun Project.getKtlintConfiguration(): Configuration {
     return configurations.findByName("ktlint") ?: configurations.create("ktlint") {

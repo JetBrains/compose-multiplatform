@@ -45,10 +45,7 @@ fun Project.getRequiredCompatibilityApiFile(): File? {
  * Same as getRequiredCompatibilityApiFile but also contains a restricted API file
  */
 fun Project.getRequiredCompatibilityApiLocation(): ApiLocation? {
-    val publicFile = project.getRequiredCompatibilityApiFile()
-    if (publicFile == null) {
-        return null
-    }
+    val publicFile = project.getRequiredCompatibilityApiFile() ?: return null
     return ApiLocation.fromPublicApiFile(publicFile)
 }
 
@@ -69,7 +66,7 @@ fun getApiFileVersion(version: Version): Version {
     }
     var extra = ""
     if (version.patch == 0 && version.extra != null) {
-        extra = version.extra
+        extra = version.extra!!
     }
     return Version(version.major, version.minor, 0, extra)
 }
