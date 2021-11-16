@@ -1,0 +1,41 @@
+// Signature format: 4.0
+package androidx.compose.material.window {
+
+  public final class AndroidSizeClass_androidKt {
+    method @androidx.compose.material.window.ExperimentalMaterialWindowApi @androidx.compose.runtime.Composable public static androidx.compose.material.window.HeightSizeClass rememberHeightSizeClass(android.app.Activity);
+    method @androidx.compose.material.window.ExperimentalMaterialWindowApi @androidx.compose.runtime.Composable public static androidx.compose.material.window.SizeClass rememberSizeClass(android.app.Activity);
+    method @androidx.compose.material.window.ExperimentalMaterialWindowApi @androidx.compose.runtime.Composable public static androidx.compose.material.window.WidthSizeClass rememberWidthSizeClass(android.app.Activity);
+  }
+
+  @kotlin.RequiresOptIn(message="This material-window API is experimental and is likely to change or to be removed in" + " the future.") public @interface ExperimentalMaterialWindowApi {
+  }
+
+  public enum HeightSizeClass {
+    enum_constant public static final androidx.compose.material.window.HeightSizeClass Compact;
+    enum_constant public static final androidx.compose.material.window.HeightSizeClass Expanded;
+    enum_constant public static final androidx.compose.material.window.HeightSizeClass Medium;
+  }
+
+  @androidx.compose.runtime.Immutable public final class SizeClass {
+    method public androidx.compose.material.window.HeightSizeClass getHeight();
+    method public androidx.compose.material.window.WidthSizeClass getWidth();
+    property public final androidx.compose.material.window.HeightSizeClass height;
+    property public final androidx.compose.material.window.WidthSizeClass width;
+    field public static final androidx.compose.material.window.SizeClass.Companion Companion;
+  }
+
+  public static final class SizeClass.Companion {
+    method @androidx.compose.material.window.ExperimentalMaterialWindowApi @org.jetbrains.annotations.TestOnly public androidx.compose.material.window.SizeClass calculateFromSize(long size);
+  }
+
+  public final class TestOnly_jvmKt {
+  }
+
+  public enum WidthSizeClass {
+    enum_constant public static final androidx.compose.material.window.WidthSizeClass Compact;
+    enum_constant public static final androidx.compose.material.window.WidthSizeClass Expanded;
+    enum_constant public static final androidx.compose.material.window.WidthSizeClass Medium;
+  }
+
+}
+
