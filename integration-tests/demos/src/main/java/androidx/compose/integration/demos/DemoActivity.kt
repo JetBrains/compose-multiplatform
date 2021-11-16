@@ -17,22 +17,23 @@
 package androidx.compose.integration.demos
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.view.Window
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.integration.demos.common.ActivityDemo
 import androidx.compose.integration.demos.common.Demo
 import androidx.compose.integration.demos.common.DemoCategory
-import androidx.compose.material.Colors
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,12 +46,12 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.preference.PreferenceManager
 
 /**
  * Main [Activity] containing all Compose related demos.
@@ -75,18 +76,19 @@ class DemoActivity : FragmentActivity() {
             ) {
                 Navigator(AllDemosCategory, onBackPressedDispatcher, activityStarter)
             }
-            val demoColors = remember {
-                DemoColors().also {
-                    lifecycle.addObserver(
-                        LifecycleEventObserver { _, event ->
-                            if (event == Lifecycle.Event.ON_RESUME) {
-                                it.loadColorsFromSharedPreferences(this)
-                            }
-                        }
-                    )
+            val isDynamicThemeOn = remember { mutableStateOf(IsDynamicThemingAvailable) }
+            DisposableEffect(lifecycle) {
+                val obs = LifecycleEventObserver { _, event ->
+                    if (event == Lifecycle.Event.ON_RESUME) {
+                        isDynamicThemeOn.value = isDynamicThemeSettingOn(applicationContext)
+                    }
+                }
+                lifecycle.addObserver(obs)
+                onDispose {
+                    lifecycle.removeObserver(obs)
                 }
             }
-            DemoTheme(demoColors, window) {
+            DemoTheme(isDynamicThemeOn.value, window) {
                 val filteringMode = rememberSaveable(
                     saver = FilterMode.Saver(onBackPressedDispatcher)
                 ) {
@@ -122,19 +124,26 @@ class DemoActivity : FragmentActivity() {
 
 @Composable
 private fun DemoTheme(
-    demoColors: DemoColors,
+    isDynamicThemeOn: Boolean,
     window: Window,
     content: @Composable () -> Unit
 ) {
-    MaterialTheme(demoColors.colors) {
-        val statusBarColor = with(MaterialTheme.colors) {
-            (if (isLight) primaryVariant else Color.Black).toArgb()
+    val isDarkMode = isSystemInDarkTheme()
+
+    @Suppress("NewApi")
+    val colorScheme =
+        if (isDynamicThemeOn) {
+            val context = LocalContext.current
+            if (isDarkMode) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        } else {
+            if (isDarkMode) darkColorScheme() else lightColorScheme()
         }
-        SideEffect {
-            window.statusBarColor = statusBarColor
-        }
-        content()
+
+    SideEffect {
+        window.statusBarColor =
+            (if (isDarkMode) Color.Black else colorScheme.inversePrimary).toArgb()
     }
+    MaterialTheme(colorScheme = colorScheme, content = content)
 }
 
 private class Navigator private constructor(
@@ -254,95 +263,3 @@ private class FilterMode(backDispatcher: OnBackPressedDispatcher, initialValue: 
         )
     }
 }
-
-/**
- * Returns a [DemoColors] from the values saved to [SharedPreferences]. If a given color is
- * not present in the [SharedPreferences], its default value as defined in [Colors]
- * will be returned.
- */
-fun DemoColors.loadColorsFromSharedPreferences(context: Context) {
-    val sharedPreferences =
-        PreferenceManager.getDefaultSharedPreferences(context)
-
-    fun getColorsFromSharedPreferences(isLightTheme: Boolean): Colors {
-        val function = if (isLightTheme) ::reflectLightColors else ::reflectDarkColors
-        val parametersToSet = function.parameters.mapNotNull { parameter ->
-            val savedValue = sharedPreferences.getString(parameter.name + isLightTheme, "")
-            if (savedValue.isNullOrBlank()) {
-                null
-            } else {
-                // TODO: should be a Color(savedValue.toLong(16)) when b/154329050 is fixed
-                val parsedColor = savedValue.toLong(16)
-                parameter to parsedColor
-            }
-        }.toMap()
-        return function.callBy(parametersToSet)
-    }
-
-    light = getColorsFromSharedPreferences(true)
-    dark = getColorsFromSharedPreferences(false)
-}
-
-/**
- * TODO: remove after b/154329050 is fixed
- * Inline classes don't play well with reflection, so we want boxed classes for our
- * call to [lightColors].
- */
-internal fun reflectLightColors(
-    primary: Long = 0xFF6200EE,
-    primaryVariant: Long = 0xFF3700B3,
-    secondary: Long = 0xFF03DAC6,
-    secondaryVariant: Long = 0xFF018786,
-    background: Long = 0xFFFFFFFF,
-    surface: Long = 0xFFFFFFFF,
-    error: Long = 0xFFB00020,
-    onPrimary: Long = 0xFFFFFFFF,
-    onSecondary: Long = 0xFF000000,
-    onBackground: Long = 0xFF000000,
-    onSurface: Long = 0xFF000000,
-    onError: Long = 0xFFFFFFFF
-) = lightColors(
-    primary = Color(primary),
-    primaryVariant = Color(primaryVariant),
-    secondary = Color(secondary),
-    secondaryVariant = Color(secondaryVariant),
-    background = Color(background),
-    surface = Color(surface),
-    error = Color(error),
-    onPrimary = Color(onPrimary),
-    onSecondary = Color(onSecondary),
-    onBackground = Color(onBackground),
-    onSurface = Color(onSurface),
-    onError = Color(onError)
-)
-
-/**
- * TODO: remove after b/154329050 is fixed
- * Inline classes don't play well with reflection, so we want boxed classes for our
- * call to [darkColors].
- */
-internal fun reflectDarkColors(
-    primary: Long = 0xFFBB86FC,
-    primaryVariant: Long = 0xFF3700B3,
-    secondary: Long = 0xFF03DAC6,
-    background: Long = 0xFF121212,
-    surface: Long = 0xFF121212,
-    error: Long = 0xFFCF6679,
-    onPrimary: Long = 0xFF000000,
-    onSecondary: Long = 0xFF000000,
-    onBackground: Long = 0xFFFFFFFF,
-    onSurface: Long = 0xFFFFFFFF,
-    onError: Long = 0xFF000000
-) = darkColors(
-    primary = Color(primary),
-    primaryVariant = Color(primaryVariant),
-    secondary = Color(secondary),
-    background = Color(background),
-    surface = Color(surface),
-    error = Color(error),
-    onPrimary = Color(onPrimary),
-    onSecondary = Color(onSecondary),
-    onBackground = Color(onBackground),
-    onSurface = Color(onSurface),
-    onError = Color(onError)
-)
