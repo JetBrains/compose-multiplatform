@@ -70,7 +70,7 @@ dependencies {
         testImplementation(libs.truth)
         testImplementation(libs.mockitoCore)
         testImplementation(libs.mockitoKotlin)
-        testImplementation(libs.robolectric)
+        testImplementation("org.robolectric:robolectric:4.6.1") // TODO(b/205731854): fix tests to work with SDK 31 and robolectric 4.7
         testImplementation(project(":compose:ui:ui-test-junit4"))
         testImplementation(project(":compose:test-utils"))
 
