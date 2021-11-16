@@ -48,8 +48,6 @@ class TrivialStartupBenchmark(
     companion object {
         @Parameterized.Parameters(name = "startup={0},compilation={1}")
         @JvmStatic
-        fun parameters() = createStartupCompilationParams(
-            compilationModes = COMPOSE_COMPILATION_MODES
-        )
+        fun parameters() = createStartupCompilationParams()
     }
 }

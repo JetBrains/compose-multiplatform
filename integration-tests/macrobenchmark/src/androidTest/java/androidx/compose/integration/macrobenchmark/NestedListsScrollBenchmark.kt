@@ -84,8 +84,6 @@ class NestedListsScrollBenchmark(
 
         @Parameterized.Parameters(name = "compilation={0}")
         @JvmStatic
-        fun parameters() = createCompilationParams(
-            compilationModes = COMPOSE_COMPILATION_MODES
-        )
+        fun parameters() = createCompilationParams()
     }
 }
