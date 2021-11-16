@@ -17,6 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.ModifierLocalScrollableContainer
 import androidx.compose.foundation.gestures.Orientation
@@ -60,6 +61,7 @@ import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.junit.After
@@ -1536,6 +1538,108 @@ class ScrollableTest {
         rule.runOnIdle {
             // third animation finished
             assertThat(total).isEqualTo(100)
+        }
+    }
+
+    @Test
+    fun scrollable_cancellingAnimateScrollUpdatesIsScrollInProgress() {
+        rule.mainClock.autoAdvance = false
+
+        var total = 0f
+        val controller = ScrollableState(
+            consumeScrollDelta = {
+                total += it
+                it
+            }
+        )
+        rule.setContentAndGetScope {
+            Box(
+                modifier = Modifier
+                    .size(100.dp).scrollable(
+                        state = controller,
+                        orientation = Orientation.Horizontal
+                    )
+            )
+        }
+
+        lateinit var animateJob: Job
+
+        rule.runOnIdle {
+            animateJob = scope.launch {
+                controller.animateScrollBy(
+                    100f,
+                    tween(1000)
+                )
+            }
+        }
+
+        rule.mainClock.advanceTimeBy(500)
+        rule.runOnIdle {
+            assertThat(controller.isScrollInProgress).isTrue()
+        }
+
+        // Stop halfway through the animation
+        animateJob.cancel()
+
+        rule.runOnIdle {
+            assertThat(controller.isScrollInProgress).isFalse()
+        }
+    }
+
+    @Test
+    fun scrollable_preemptingAnimateScrollUpdatesIsScrollInProgress() {
+        rule.mainClock.autoAdvance = false
+
+        var total = 0f
+        val controller = ScrollableState(
+            consumeScrollDelta = {
+                total += it
+                it
+            }
+        )
+        rule.setContentAndGetScope {
+            Box(
+                modifier = Modifier
+                    .size(100.dp).scrollable(
+                        state = controller,
+                        orientation = Orientation.Horizontal
+                    )
+            )
+        }
+
+        rule.runOnIdle {
+            scope.launch {
+                controller.animateScrollBy(
+                    100f,
+                    tween(1000)
+                )
+            }
+        }
+
+        rule.mainClock.advanceTimeBy(500)
+        rule.runOnIdle {
+            assertThat(total).isGreaterThan(0f)
+            assertThat(total).isLessThan(100f)
+            assertThat(controller.isScrollInProgress).isTrue()
+            scope.launch {
+                controller.animateScrollBy(
+                    -100f,
+                    tween(1000)
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(controller.isScrollInProgress).isTrue()
+        }
+
+        rule.mainClock.advanceTimeBy(1000)
+        rule.mainClock.advanceTimeByFrame()
+
+        rule.runOnIdle {
+            assertThat(total).isGreaterThan(-75f)
+            assertThat(total).isLessThan(0f)
+            assertThat(controller.isScrollInProgress).isFalse()
         }
     }
 
