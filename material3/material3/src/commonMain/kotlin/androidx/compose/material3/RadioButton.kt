@@ -91,7 +91,7 @@ fun RadioButton(
                 interactionSource = interactionSource,
                 indication = rememberRipple(
                     bounded = false,
-                    radius = RadioButtonRippleRadius
+                    radius = RadioButtonTokens.StateLayerSize / 2
                 )
             )
         } else {
@@ -240,7 +240,6 @@ private class DefaultRadioButtonColors(
 
 private const val RadioAnimationDuration = 100
 
-private val RadioButtonRippleRadius = 24.dp
 private val RadioButtonPadding = 2.dp
 private val RadioButtonDotSize = 12.dp
 private val RadioStrokeWidth = 2.dp
