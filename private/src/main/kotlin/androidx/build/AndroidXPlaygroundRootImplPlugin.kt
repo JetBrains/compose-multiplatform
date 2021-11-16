@@ -25,8 +25,6 @@ import groovy.xml.DOMBuilder
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.DependencySubstitution
-import org.gradle.api.artifacts.component.ModuleComponentSelector
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.kotlin.dsl.KotlinClosure1
 import org.gradle.kotlin.dsl.extra
@@ -87,8 +85,12 @@ class AndroidXPlaygroundRootImplPlugin : Plugin<Project> {
         project.repositories.addPlaygroundRepositories()
         project.extra.set(PROJECT_OR_ARTIFACT_EXT_NAME, projectOrArtifactClosure)
         project.configurations.all { configuration ->
-            configuration.resolutionStrategy.dependencySubstitution.all { substitution ->
-                substitution.replaceIfSnapshot()
+            configuration.resolutionStrategy.eachDependency { details ->
+                val requested = details.requested
+                if (requested.version == SNAPSHOT_MARKER) {
+                    val snapshotVersion = findSnapshotVersion(requested.group, requested.name)
+                    details.useVersion(snapshotVersion)
+                }
             }
         }
     }
@@ -127,14 +129,6 @@ class AndroidXPlaygroundRootImplPlugin : Plugin<Project> {
             }
 
             throw GradleException("projectOrArtifact cannot find/replace project $path")
-        }
-    }
-
-    private fun DependencySubstitution.replaceIfSnapshot() {
-        val requested = this.requested
-        if (requested is ModuleComponentSelector && requested.version == SNAPSHOT_MARKER) {
-            val snapshotVersion = findSnapshotVersion(requested.group, requested.module)
-            useTarget("${requested.group}:${requested.module}:$snapshotVersion")
         }
     }
 
