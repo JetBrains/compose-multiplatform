@@ -23,6 +23,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.lazy.list.IntervalHolder
+import androidx.compose.foundation.lazy.list.MutableIntervalList
+import androidx.compose.foundation.lazy.list.intervalForIndex
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
