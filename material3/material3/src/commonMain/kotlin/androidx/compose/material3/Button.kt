@@ -19,7 +19,6 @@ package androidx.compose.material3
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.interaction.Interaction
@@ -56,7 +55,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-
 import kotlinx.coroutines.flow.collect
 
 /**
@@ -128,16 +126,12 @@ fun Button(
         shadowElevation = shadowElevation,
         tonalElevation = tonalElevation,
         border = border,
-    ) {
-        val clickAndSemanticsModifier =
-            Modifier.clickable(
-                interactionSource = interactionSource,
-                indication = rememberRipple(),
-                enabled = true,
-                onClickLabel = null,
-                role = Role.Button,
-                onClick = onClick
-            )
+        onClick = onClick,
+        enabled = enabled,
+        role = Role.Button,
+        interactionSource = interactionSource,
+        indication = rememberRipple(),
+        ) {
         CompositionLocalProvider(LocalContentColor provides contentColor) {
             ProvideTextStyle(value = Typography.LabelLarge) {
                 Row(
@@ -145,7 +139,6 @@ fun Button(
                         minWidth = ButtonDefaults.MinWidth,
                         minHeight = ButtonDefaults.MinHeight
                     )
-                        .then(clickAndSemanticsModifier)
                         .padding(contentPadding),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
