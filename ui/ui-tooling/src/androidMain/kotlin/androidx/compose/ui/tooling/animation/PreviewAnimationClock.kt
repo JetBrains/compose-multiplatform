@@ -265,12 +265,12 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
     fun getTransitions(animation: ComposeAnimation, stepMillis: Long): List<TransitionInfo> {
         if (trackedTransitions.contains(animation)) {
             val transition = (animation as TransitionComposeAnimation).animationObject
-            return transition.animations.mapNotNull {
+            return transition.allAnimations().map {
                 it.createTransitionInfo(stepMillis)
             }
         } else if (trackedAnimatedVisibility.contains(animation)) {
             (animation as AnimatedVisibilityComposeAnimation).childTransition?.let { child ->
-                return child.animations.mapNotNull {
+                return child.allAnimations().map {
                     it.createTransitionInfo(stepMillis)
                 }
             }
