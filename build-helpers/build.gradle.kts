@@ -14,6 +14,8 @@ subprojects {
     plugins.withType(JavaBasePlugin::class.java) {
         afterEvaluate {
             configureIfExists<JavaPluginExtension> {
+                sourceCompatibility = JavaVersion.VERSION_1_8
+                targetCompatibility = JavaVersion.VERSION_1_8
                 if (sourceSets.names.contains(SourceSet.MAIN_SOURCE_SET_NAME)) {
                     withJavadocJar()
                     withSourcesJar()
