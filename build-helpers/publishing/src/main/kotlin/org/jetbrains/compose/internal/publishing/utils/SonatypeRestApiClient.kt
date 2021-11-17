@@ -80,7 +80,8 @@ class SonatypeRestApiClient(
         logger.info("Closing repository '${repo.id}'")
         buildRequest("service/local/staging/bulk/close") {
             val request = "{\"data\":{\"stagedRepositoryIds\":[\"${repo.id}\"]}}"
-            post(Xml.serialize(request).toRequestBody(Json.mediaType))
+            post(request.toRequestBody(Json.mediaType))
+                .addHeader("Accept", Json.mediaType.toString())
         }.execute { responseBody ->
             logger.info("Finished closing repository '${repo.id}': '${responseBody.string()}'")
         }
