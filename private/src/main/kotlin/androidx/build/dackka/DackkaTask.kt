@@ -174,7 +174,7 @@ fun runDackkaWithArgs(
 }
 
 @Suppress("UnstableApiUsage")
-abstract class DackkaWorkAction @Inject constructor (
+abstract class DackkaWorkAction @Inject constructor(
     private val execOperations: ExecOperations
 ) : WorkAction<DackkaParams> {
     override fun execute() {
