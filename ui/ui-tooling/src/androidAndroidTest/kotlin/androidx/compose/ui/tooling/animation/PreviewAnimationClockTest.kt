@@ -212,7 +212,7 @@ class PreviewAnimationClockTest {
         )
 
         transitions = testClock.getTransitions(offsetAnimation!!, 200)
-        val offset = transitions.single()
+        val offset = transitions.single { it.label == "myOffset" }
         // We're animating from O1 (0) to O2 (100), 800ms being the animation duration.
         assertEquals("myOffset", offset.label)
         assertEquals(0, offset.startTimeMillis)
@@ -221,6 +221,17 @@ class PreviewAnimationClockTest {
         assertArrayEquals(
             arrayOf(0L, 200L, 400L, 600L, 800L),
             offset.values.keys.sorted().toTypedArray()
+        )
+
+        val grandChild = transitions.single { it.label == "grandchild" }
+        // We're animating from O1 (1.dp) to O2 (9.dp), 900ms being the animation duration.
+        assertEquals("grandchild", grandChild.label)
+        assertEquals(0, grandChild.startTimeMillis)
+        assertEquals(900, grandChild.endTimeMillis)
+        assertEquals("androidx.compose.animation.core.TweenSpec", grandChild.specType)
+        assertArrayEquals(
+            arrayOf(0L, 200L, 400L, 600L, 800L, 900L),
+            grandChild.values.keys.sorted().toTypedArray()
         )
 
         val animatedVisibilityComposeAnimation = testClock.trackedAnimatedVisibility.single()
@@ -486,8 +497,10 @@ class PreviewAnimationClockTest {
         }
 
         child1.createChildTransition { it }
-            .animateDp(label = "grandchild") { parentState ->
-                if (parentState) 1.dp else 3.dp
+            .animateDp(label = "grandchild", transitionSpec = {
+                tween(durationMillis = 900, easing = LinearEasing)
+            }) { parentState ->
+                if (parentState) 1.dp else 9.dp
             }
 
         transition.createChildTransition { it }
