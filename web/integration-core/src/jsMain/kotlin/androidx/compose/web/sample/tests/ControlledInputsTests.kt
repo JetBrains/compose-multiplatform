@@ -137,6 +137,36 @@ class ControlledInputsTests {
         }
     }
 
+    val checkBoxMutableValueChangesThroughOnChange by testCase {
+        var checked by remember { mutableStateOf(false) }
+
+        P { TestText(checked.toString()) }
+
+        Div {
+            CheckboxInput(checked = checked) {
+                id("checkbox")
+                onChange { event ->
+                    checked = event.value
+                }
+            }
+        }
+    }
+
+    val checkBoxMutableValueChangesForEveryOnChange by testCase {
+        var checked by remember { mutableStateOf(true) }
+
+        P { TestText(checked.toString()) }
+
+        Div {
+            CheckboxInput(checked = checked) {
+                id("checkbox")
+                onChange { event ->
+                    checked = event.value
+                }
+            }
+        }
+    }
+
     val checkBoxDefaultCheckedChangesDoesntAffectState by testCase {
         var checked by remember { mutableStateOf(true) }
 
@@ -184,6 +214,29 @@ class ControlledInputsTests {
                 id("radio2")
                 name("group1")
                 onInput { checked = 2 }
+            }
+        }
+    }
+
+    val radioMutableCheckedChangesThroughOnChange by testCase {
+        var checked by remember { mutableStateOf(0) }
+
+        TestText("Checked - $checked")
+
+        Div {
+            RadioInput(checked = checked == 1) {
+                id("radio1")
+                name("group1")
+                onChange { event ->
+                    if (event.value) checked = 1
+                }
+            }
+            RadioInput(checked = checked == 2) {
+                id("radio2")
+                name("group1")
+                onChange { event ->
+                    if (event.value) checked = 2
+                }
             }
         }
     }

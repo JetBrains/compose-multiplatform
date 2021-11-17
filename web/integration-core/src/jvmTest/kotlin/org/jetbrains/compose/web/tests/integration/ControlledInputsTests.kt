@@ -146,6 +146,41 @@ class ControlledInputsTests : BaseIntegrationTests() {
     }
 
     @ResolveDrivers
+    fun checkBoxMutableValueChangesThroughOnChange(driver: WebDriver) {
+        driver.openTestPage("checkBoxMutableValueChangesThroughOnChange")
+        driver.waitTextToBe(value = "false")
+
+        val checkbox = driver.findElement(By.id("checkbox"))
+        check(!checkbox.isSelected)
+
+        checkbox.click()
+
+        driver.waitTextToBe(value = "true")
+        check(checkbox.isSelected)
+    }
+
+    @ResolveDrivers
+    fun checkBoxMutableValueChangesForEveryOnChange(driver: WebDriver) {
+        driver.openTestPage("checkBoxMutableValueChangesForEveryOnChange")
+        driver.waitTextToBe(value = "true")
+
+        val checkbox = driver.findElement(By.id("checkbox"))
+        check(checkbox.isSelected)
+
+        checkbox.click()
+        driver.waitTextToBe(value = "false")
+        check(!checkbox.isSelected)
+
+        checkbox.click()
+        driver.waitTextToBe(value = "true")
+        check(checkbox.isSelected)
+
+        checkbox.click()
+        driver.waitTextToBe(value = "false")
+        check(!checkbox.isSelected)
+    }
+
+    @ResolveDrivers
     fun checkBoxDefaultCheckedChangesDoesntAffectState(driver: WebDriver) {
         driver.openTestPage("checkBoxDefaultCheckedChangesDoesntAffectState")
         driver.waitTextToBe(value = "true")
@@ -194,6 +229,30 @@ class ControlledInputsTests : BaseIntegrationTests() {
 
     @ResolveDrivers
     fun radioMutableCheckedChanges(driver: WebDriver) {
+        driver.openTestPage("radioMutableCheckedChanges")
+        driver.waitTextToBe(value = "Checked - 0")
+
+        val radio1 = driver.findElement(By.id("radio1"))
+        val radio2 = driver.findElement(By.id("radio2"))
+
+        check(!radio1.isSelected)
+        check(!radio2.isSelected)
+
+        radio2.click()
+        driver.waitTextToBe(value = "Checked - 2")
+
+        check(!radio1.isSelected)
+        check(radio2.isSelected)
+
+        radio1.click()
+        driver.waitTextToBe(value = "Checked - 1")
+
+        check(radio1.isSelected)
+        check(!radio2.isSelected)
+    }
+
+    @ResolveDrivers
+    fun radioMutableCheckedChangesThroughOnChange(driver: WebDriver) {
         driver.openTestPage("radioMutableCheckedChanges")
         driver.waitTextToBe(value = "Checked - 0")
 
