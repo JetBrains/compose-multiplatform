@@ -310,7 +310,7 @@ object ButtonDefaults {
     val MinWidth = 64.dp
 
     /**
-     * The default min width applied for the [Button].
+     * The default min height applied for the [Button].
      * Note that you can override it by applying Modifier.heightIn directly on [Button].
      */
     val MinHeight = 36.dp
