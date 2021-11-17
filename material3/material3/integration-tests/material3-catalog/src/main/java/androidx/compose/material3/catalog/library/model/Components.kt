@@ -67,6 +67,19 @@ private val Color = Component(
     examples = ColorExamples
 )
 
+private val Checkboxes = Component(
+    id = nextId(),
+    name = "Checkboxes",
+    description = "Checkboxes allow the user to select one or more items from a set or turn an " +
+        "option on or off.",
+    // No checkbox icon
+    tintIcon = true,
+    guidelinesUrl = "$ComponentGuidelinesUrl/checkboxes",
+    docsUrl = "$DocsUrl#checkbox",
+    sourceUrl = "$Material3SourceUrl/Checkbox.kt",
+    examples = CheckboxesExamples
+)
+
 private val Dialogs = Component(
     id = nextId(),
     name = "Dialogs",
@@ -171,6 +184,7 @@ private val TopAppBar = Component(
 /** Components for the catalog, ordered alphabetically by name. */
 val Components = listOf(
     Buttons,
+    Checkboxes,
     Color,
     Dialogs,
     ExtendedFloatingActionButton,
