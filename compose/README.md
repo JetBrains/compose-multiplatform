@@ -33,7 +33,7 @@ export JAVA_HOME=<JDK_home> // it should point to Java 11 and contain /include/j
 ```
 androidx.compose.multiplatformEnabled=true
 # note that https://android.googlesource.com/platform/frameworks/support build doesn't work with androidx.compose.jsCompilerTestsEnabled)
-androidx.compose.jsCompilerTestsEnabled=true
+jetbrains.compose.jsCompilerTestsEnabled=true
 androidx.validateProjectStructure=false
 ```
 4. Open `compose` folder in Android Studio (not `compose/frameworks/support`)
