@@ -92,7 +92,7 @@ fun DemoApp(
         }
     ) { innerPadding ->
         val modifier = Modifier.padding(innerPadding)
-        DemoContent(modifier, currentDemo, isFiltering, filterText, onNavigateToDemo)
+        DemoContent(modifier, currentDemo, isFiltering, filterText, onNavigateToDemo, onNavigateUp)
     }
 }
 
@@ -102,7 +102,8 @@ private fun DemoContent(
     currentDemo: Demo,
     isFiltering: Boolean,
     filterText: String,
-    onNavigate: (Demo) -> Unit
+    onNavigate: (Demo) -> Unit,
+    onNavigateUp: () -> Unit
 ) {
     Crossfade(isFiltering to currentDemo) { (filtering, demo) ->
         Surface(modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
@@ -113,19 +114,19 @@ private fun DemoContent(
                     onNavigate = onNavigate
                 )
             } else {
-                DisplayDemo(demo, onNavigate)
+                DisplayDemo(demo, onNavigate, onNavigateUp)
             }
         }
     }
 }
 
 @Composable
-private fun DisplayDemo(demo: Demo, onNavigate: (Demo) -> Unit) {
+private fun DisplayDemo(demo: Demo, onNavigate: (Demo) -> Unit, onNavigateUp: () -> Unit) {
     when (demo) {
         is ActivityDemo<*> -> {
             /* should never get here as activity demos are not added to the backstack*/
         }
-        is ComposableDemo -> demo.content()
+        is ComposableDemo -> demo.content(onNavigateUp)
         is DemoCategory -> DisplayDemoCategory(demo, onNavigate)
         is FragmentDemo<*> -> {
             lateinit var view: FragmentContainerView

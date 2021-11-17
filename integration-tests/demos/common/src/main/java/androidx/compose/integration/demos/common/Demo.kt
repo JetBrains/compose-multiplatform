@@ -45,7 +45,8 @@ class FragmentDemo<T : Fragment>(title: String, val fragmentClass: KClass<T>) : 
 /**
  * Demo that displays [Composable] [content] when selected.
  */
-class ComposableDemo(title: String, val content: @Composable () -> Unit) : Demo(title)
+class ComposableDemo(title: String, val content: @Composable (onNavigateUp: () -> Unit) -> Unit) :
+    Demo(title)
 
 /**
  * A category of [Demo]s, that will display a list of [demos] when selected.
