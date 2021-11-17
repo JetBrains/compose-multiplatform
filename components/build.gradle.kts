@@ -10,7 +10,7 @@ buildscript {
     dependencies {
         classpath("org.jetbrains.compose:compose-gradle-plugin:$composeVersion")
         // __KOTLIN_COMPOSE_VERSION__
-        classpath(kotlin("gradle-plugin", version = "1.6.0-RC2"))
+        classpath(kotlin("gradle-plugin", version = "1.6.0"))
     }
 }
 
