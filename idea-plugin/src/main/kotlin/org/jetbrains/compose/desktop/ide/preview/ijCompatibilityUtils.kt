@@ -7,13 +7,10 @@ package org.jetbrains.compose.desktop.ide.preview
 
 import com.intellij.openapi.externalSystem.model.Key
 import com.intellij.openapi.externalSystem.model.project.AbstractNamedData
-import kotlin.reflect.KProperty1
-import kotlin.reflect.full.companionObject
-import kotlin.reflect.full.companionObjectInstance
-import kotlin.reflect.full.memberProperties
+import java.lang.reflect.Modifier
 
 internal val kotlinTargetDataKey: Key<out AbstractNamedData> = run {
-    val klass = try {
+    val kotlinTargetDataClass = try {
         Class.forName("org.jetbrains.kotlin.idea.gradle.configuration.KotlinTargetData")
     } catch (e: ClassNotFoundException) {
         try {
@@ -21,12 +18,13 @@ internal val kotlinTargetDataKey: Key<out AbstractNamedData> = run {
         } catch (e: ClassNotFoundException) {
             error("Could not find 'KotlinTargetData' class")
         }
-    }.kotlin
-    val companionKlass = klass.companionObject
-        ?: error("Cannot find '${klass.qualifiedName}.Companion")
-    val keyProperty = companionKlass.memberProperties.find { it.name == "KEY" }
-        ?: error("Cannot find '${klass.qualifiedName}.Companion.KEY'")
+    }
+    val companionField = kotlinTargetDataClass.fields.firstOrNull { Modifier.isStatic(it.modifiers) && it.name == "Companion" }
+        ?: error("'${kotlinTargetDataClass.canonicalName}.Companion")
+    val companionInstance = companionField.get(kotlinTargetDataClass)
+    val companionClass = companionInstance.javaClass
+    val getKeyMethod = companionClass.methods.firstOrNull { it.name == "getKEY" }
+        ?: error("Cannot find '${kotlinTargetDataClass.canonicalName}.Companion.getKEY'")
     @Suppress("UNCHECKED_CAST")
-    (keyProperty as KProperty1<Any, Key<out AbstractNamedData>>)
-        .get(klass.companionObjectInstance!!)
+    getKeyMethod.invoke(companionInstance) as Key<out AbstractNamedData>
 }

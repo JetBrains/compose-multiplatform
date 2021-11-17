@@ -18,7 +18,6 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.compose:preview-rpc")
-    implementation(kotlin("reflect"))
 }
 
 intellij {
