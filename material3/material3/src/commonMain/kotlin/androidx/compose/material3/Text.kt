@@ -104,24 +104,35 @@ fun Text(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     style: TextStyle = LocalTextStyle.current
 ) {
-    Text(
-        AnnotatedString(text),
+
+    val textColor = color.takeOrElse {
+        style.color.takeOrElse {
+            LocalContentColor.current
+        }
+    }
+    // NOTE(text-perf-review): It might be worthwhile writing a bespoke merge implementation that
+    // will avoid reallocating if all of the options here are the defaults
+    val mergedStyle = style.merge(
+        TextStyle(
+            color = textColor,
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            textAlign = textAlign,
+            lineHeight = lineHeight,
+            fontFamily = fontFamily,
+            textDecoration = textDecoration,
+            fontStyle = fontStyle,
+            letterSpacing = letterSpacing
+        )
+    )
+    BasicText(
+        text,
         modifier,
-        color,
-        fontSize,
-        fontStyle,
-        fontWeight,
-        fontFamily,
-        letterSpacing,
-        textDecoration,
-        textAlign,
-        lineHeight,
+        mergedStyle,
+        onTextLayout,
         overflow,
         softWrap,
         maxLines,
-        emptyMap(),
-        onTextLayout,
-        style
     )
 }
 
@@ -200,6 +211,8 @@ fun Text(
             LocalContentColor.current
         }
     }
+    // NOTE(text-perf-review): It might be worthwhile writing a bespoke merge implementation that
+    // will avoid reallocating if all of the options here are the defaults
     val mergedStyle = style.merge(
         TextStyle(
             color = textColor,
