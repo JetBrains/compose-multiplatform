@@ -23,6 +23,7 @@ import android.view.MotionEvent.ACTION_HOVER_MOVE
 import android.view.MotionEvent.ACTION_UP
 import android.view.View
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
@@ -311,7 +312,6 @@ internal class OnCancelEntry(
     val pointerInputFilter: PointerInputFilter
 ) : LogEntry()
 
-@Suppress("EXPERIMENTAL_API_USAGE_FUTURE_ERROR")
 internal fun internalPointerEventOf(vararg changes: PointerInputChange): InternalPointerEvent {
     val event = if (changes.any { it.changedToUpIgnoreConsumed() }) {
         MotionEventUp
@@ -320,6 +320,7 @@ internal fun internalPointerEventOf(vararg changes: PointerInputChange): Interna
     }
 
     val pointers = changes.map {
+        @OptIn(ExperimentalComposeUiApi::class)
         PointerInputEventData(
             id = it.id,
             uptime = it.uptimeMillis,
@@ -352,7 +353,7 @@ internal fun hoverInternalPointerEvent(
         PointerType.Mouse
     )
 
-    @Suppress("EXPERIMENTAL_API_USAGE_FUTURE_ERROR")
+    @OptIn(ExperimentalComposeUiApi::class)
     val pointer = PointerInputEventData(
         id = change.id,
         uptime = change.uptimeMillis,
