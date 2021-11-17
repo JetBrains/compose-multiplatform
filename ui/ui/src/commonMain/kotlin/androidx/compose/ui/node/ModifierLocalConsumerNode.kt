@@ -27,7 +27,7 @@ internal class ModifierLocalConsumerNode(
 
     override fun onModifierChanged() {
         super.onModifierChanged()
-        if (isAttached) notifyConsumerOfChanges()
+        notifyConsumerOfChanges()
     }
 
     override fun attach() {
@@ -39,6 +39,10 @@ internal class ModifierLocalConsumerNode(
         get() = onModifierLocalRead(this)
 
     private fun notifyConsumerOfChanges() {
+        // If the node is not attached, we don't notify the consumers.
+        // Ultimately when the node is attached, this function will be called again.
+        if (!isAttached) return
+
         layoutNode.requireOwner().snapshotObserver.observeReads(this, onReadValuesChanged) {
             modifier.onModifierLocalsUpdated(this)
         }
