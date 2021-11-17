@@ -32,7 +32,7 @@ export JAVA_HOME=<JDK_home> // it should point to Java 11 and contain /include/j
 3. Set gradle properties in ~/.gradle/gradle.properties:
 ```
 androidx.compose.multiplatformEnabled=true
-# note that https://android.googlesource.com/platform/frameworks/support build doesn't work with androidx.compose.jsCompilerTestsEnabled)
+# note that https://android.googlesource.com/platform/frameworks/support build doesn't work with jetbrains.compose.jsCompilerTestsEnabled)
 jetbrains.compose.jsCompilerTestsEnabled=true
 androidx.validateProjectStructure=false
 ```
