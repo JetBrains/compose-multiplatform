@@ -121,6 +121,41 @@ class LayoutNodeModifierBenchmark(
         }
     }
 
+    @Test
+    fun setDrawModifiersToSameValue() {
+        modifiers = mutableListOf<Modifier>().apply {
+            repeat(numberOfModifiers) {
+                this += Modifier.drawBehind { }
+            }
+        }
+        combinedModifier = modifiers.fold<Modifier, Modifier>(Modifier) { acc, modifier ->
+            acc.then(modifier)
+        }
+
+        val altModifier = mutableListOf<Modifier>().apply {
+            repeat(numberOfModifiers) {
+                this += Modifier.drawBehind { }
+            }
+        }.fold<Modifier, Modifier>(Modifier) { acc, modifier ->
+            acc.then(modifier)
+        }
+
+        rule.activityTestRule.runOnUiThread {
+            rule.activityTestRule.activity.setContent {
+                TestModifierUpdaterLayout {
+                    testModifierUpdater = it
+                }
+            }
+        }
+
+        rule.activityTestRule.runOnUiThread {
+            rule.benchmarkRule.measureRepeated {
+                testModifierUpdater.updateModifier(combinedModifier)
+                testModifierUpdater.updateModifier(altModifier)
+            }
+        }
+    }
+
     class SimpleAndroidBenchmarkRule() : TestRule {
         @Suppress("DEPRECATION")
         val activityTestRule =

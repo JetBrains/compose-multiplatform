@@ -36,27 +36,36 @@ internal class LayoutNodeDrawScope(
     // draw calls for all composables.
     // As a result there could be thread safety concerns here for multi-threaded drawing
     // scenarios, generally a single ComponentDrawScope should be shared for a particular thread
-    private var wrapped: LayoutNodeWrapper? = null
+    private var drawEntity: DrawEntity? = null
 
     override fun drawContent() {
-        drawIntoCanvas { canvas -> wrapped?.draw(canvas) }
+        drawIntoCanvas { canvas ->
+            val drawEntity = drawEntity!!
+            val nextDrawEntity = drawEntity.next
+            if (nextDrawEntity != null) {
+                nextDrawEntity.draw(canvas)
+            } else {
+                drawEntity.layoutNodeWrapper.performDraw(canvas)
+            }
+        }
     }
 
     internal inline fun draw(
         canvas: Canvas,
         size: Size,
-        LayoutNodeWrapper: LayoutNodeWrapper,
+        layoutNodeWrapper: LayoutNodeWrapper,
+        drawEntity: DrawEntity,
         block: DrawScope.() -> Unit
     ) {
-        val previousWrapper = wrapped
-        wrapped = LayoutNodeWrapper
+        val previousDrawEntity = this.drawEntity
+        this.drawEntity = drawEntity
         canvasDrawScope.draw(
-            LayoutNodeWrapper.measureScope,
-            LayoutNodeWrapper.measureScope.layoutDirection,
+            layoutNodeWrapper.measureScope,
+            layoutNodeWrapper.measureScope.layoutDirection,
             canvas,
             size,
             block
         )
-        wrapped = previousWrapper
+        this.drawEntity = previousDrawEntity
     }
 }

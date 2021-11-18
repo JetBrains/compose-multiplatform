@@ -154,6 +154,7 @@ internal abstract class LayoutNodeWrapper(
         }
         layoutNode.owner?.onLayoutChange(layoutNode)
         measuredSize = IntSize(width, height)
+        drawEntityHead?.onMeasureResultChanged(width, height)
     }
 
     var position: IntOffset = IntOffset.Zero
@@ -190,6 +191,11 @@ internal abstract class LayoutNodeWrapper(
 
     private val snapshotObserver get() = layoutNode.requireOwner().snapshotObserver
 
+    /**
+     * The head of the DrawEntity linked list
+     */
+    var drawEntityHead: DrawEntity? = null
+
     protected inline fun performingMeasure(
         constraints: Constraints,
         block: () -> Placeable
@@ -211,6 +217,14 @@ internal abstract class LayoutNodeWrapper(
         } else {
             apparentToRealOffset.y
         }
+    }
+
+    /**
+     * An initialization function that is called when the [LayoutNodeWrapper] is initially created,
+     * and also called when the [LayoutNodeWrapper] is re-used.
+     */
+    open fun onInitialize() {
+        layer?.invalidate()
     }
 
     /**
@@ -252,12 +266,23 @@ internal abstract class LayoutNodeWrapper(
             val x = position.x.toFloat()
             val y = position.y.toFloat()
             canvas.translate(x, y)
-            performDraw(canvas)
+            drawContainedDrawModifiers(canvas)
             canvas.translate(-x, -y)
         }
     }
 
-    protected abstract fun performDraw(canvas: Canvas)
+    private fun drawContainedDrawModifiers(canvas: Canvas) {
+        val head = drawEntityHead
+        if (head == null) {
+            performDraw(canvas)
+        } else {
+            head.draw(canvas)
+        }
+    }
+
+    open fun performDraw(canvas: Canvas) {
+        wrapped?.draw(canvas)
+    }
 
     open fun onPlaced() {}
 
@@ -266,7 +291,7 @@ internal abstract class LayoutNodeWrapper(
     override fun invoke(canvas: Canvas) {
         if (layoutNode.isPlaced) {
             snapshotObserver.observeReads(this, onCommitAffectingLayer) {
-                performDraw(canvas)
+                drawContainedDrawModifiers(canvas)
             }
             lastLayerDrawingWasSkipped = false
         } else {

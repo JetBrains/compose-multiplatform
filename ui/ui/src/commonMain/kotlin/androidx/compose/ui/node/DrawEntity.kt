@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,21 @@ import androidx.compose.ui.draw.DrawCacheModifier
 import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.toSize
 
-internal class ModifiedDrawNode(
-    wrapped: LayoutNodeWrapper,
-    drawModifier: DrawModifier
-) : DelegatingLayoutNodeWrapper<DrawModifier>(wrapped, drawModifier), OwnerScope {
+internal class DrawEntity(
+    val layoutNodeWrapper: LayoutNodeWrapper,
+    val modifier: DrawModifier
+) : OwnerScope {
+    private val layoutNode: LayoutNode
+        get() = layoutNodeWrapper.layoutNode
+
+    private val size: IntSize
+        get() = layoutNodeWrapper.size
+
+    var next: DrawEntity? = null
 
     private var cacheDrawModifier: DrawCacheModifier? = updateCacheDrawModifier()
 
@@ -38,7 +46,7 @@ internal class ModifiedDrawNode(
 
         override val layoutDirection: LayoutDirection get() = layoutNode.layoutDirection
 
-        override val size: Size get() = measuredSize.toSize()
+        override val size: Size get() = layoutNodeWrapper.size.toSize()
     }
 
     // Flag to determine if the cache should be re-built
@@ -71,30 +79,30 @@ internal class ModifiedDrawNode(
         }
     }
 
-    override fun onInitialize() {
-        super.onInitialize()
+    fun onInitialize() {
         cacheDrawModifier = updateCacheDrawModifier()
         invalidateCache = true
+        next?.onInitialize()
     }
 
-    override fun onMeasureResultChanged(width: Int, height: Int) {
-        super.onMeasureResultChanged(width, height)
+    fun onMeasureResultChanged(width: Int, height: Int) {
         invalidateCache = true
+        next?.onMeasureResultChanged(width, height)
     }
 
     // This is not thread safe
-    override fun performDraw(canvas: Canvas) {
-        val size = measuredSize.toSize()
+    fun draw(canvas: Canvas) {
+        val size = size.toSize()
         if (cacheDrawModifier != null && invalidateCache) {
             layoutNode.requireOwner().snapshotObserver.observeReads(
                 this,
-                onCommitAffectingModifiedDrawNode,
+                onCommitAffectingDrawEntity,
                 updateCache
             )
         }
 
         val drawScope = layoutNode.mDrawScope
-        drawScope.draw(canvas, size, wrapped) {
+        drawScope.draw(canvas, size, layoutNodeWrapper, this) {
             with(drawScope) {
                 with(modifier) {
                     draw()
@@ -107,15 +115,15 @@ internal class ModifiedDrawNode(
         // Callback invoked whenever a state parameter that is read within the cache
         // execution callback is updated. This marks the cache flag as dirty and
         // invalidates the current layer.
-        private val onCommitAffectingModifiedDrawNode: (ModifiedDrawNode) -> Unit =
-            { modifiedDrawNode ->
-                if (modifiedDrawNode.isValid) {
-                    modifiedDrawNode.invalidateCache = true
-                    modifiedDrawNode.invalidateLayer()
+        private val onCommitAffectingDrawEntity: (DrawEntity) -> Unit =
+            { drawEntity ->
+                if (drawEntity.isValid) {
+                    drawEntity.invalidateCache = true
+                    drawEntity.layoutNodeWrapper.invalidateLayer()
                 }
             }
     }
 
     override val isValid: Boolean
-        get() = isAttached
+        get() = layoutNodeWrapper.isAttached
 }
