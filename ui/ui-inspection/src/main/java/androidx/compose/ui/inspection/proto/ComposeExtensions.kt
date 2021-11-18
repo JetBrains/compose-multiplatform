@@ -18,6 +18,7 @@ package androidx.compose.ui.inspection.proto
 
 import android.view.inspector.WindowInspector
 import androidx.annotation.VisibleForTesting
+import androidx.compose.ui.inspection.ComposeLayoutInspector.CacheTree
 import androidx.compose.ui.inspection.LambdaLocation
 import androidx.compose.ui.inspection.inspector.InspectorNode
 import androidx.compose.ui.inspection.inspector.NodeParameter
@@ -28,6 +29,7 @@ import androidx.compose.ui.inspection.inspector.systemPackages
 import androidx.compose.ui.unit.IntOffset
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Bounds
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.ComposableNode
+import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.ComposableRoot
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.LambdaValue
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Parameter
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.ParameterReference
@@ -233,12 +235,14 @@ fun NodeParameterReference.convert(): ParameterReference {
     }.build()
 }
 
-fun Iterable<InspectorNode>.toComposableNodes(
+internal fun CacheTree.toComposableRoot(
     stringTable: StringTable,
     windowPos: IntOffset
-): List<ComposableNode> {
-    return this.map { it.toComposableNode(stringTable, windowPos) }
-}
+): ComposableRoot = ComposableRoot.newBuilder().also { root ->
+    root.viewId = viewParent.uniqueDrawingId
+    root.addAllNodes(nodes.map { it.toComposableNode(stringTable, windowPos) })
+    root.addAllViewsToSkip(viewsToSkip)
+}.build()
 
 fun Iterable<NodeParameter>.convertAll(stringTable: StringTable): List<Parameter> {
     return this.map { it.convert(stringTable) }
