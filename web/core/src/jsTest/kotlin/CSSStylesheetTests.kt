@@ -7,7 +7,8 @@ package org.jetbrains.compose.web.core.tests
 
 import kotlinx.browser.window
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.css.selectors.desc
+import org.jetbrains.compose.web.css.selectors.*
+import org.jetbrains.compose.web.css.selectors.plus
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.stringPresentation
 import org.w3c.dom.HTMLElement
@@ -93,6 +94,27 @@ object AppStylesheet : StyleSheet() {
         color(Color.green)
         desc(self, "h1") style {
             color(Color.lime)
+        }
+    }
+
+    val parent by style {
+        (sibling(self, self)) {
+            color(Color.red)
+        }
+    }
+
+    val child by style {
+        (className(parent) + ":hover " + self) {  // Selector + String,  Combine + Selector -> ".parent:hover .child"
+            color(Color.lime)
+        }
+        (className(parent) + self + ":hover") {  // Selector + Selector, Combine + String -> ".parent.child:hover"
+            color(Color.yellow)
+        }
+        ("h1 " + (className(parent) + ":hover")) { // String + Combine -> ".child h1 .parent:hover"
+            color(Color.lavender)
+        }
+        (self + (" div" + id("el"))) {  // Selector + Combine, String + Selector -> ".child div#el"
+            color(Color.green)
         }
     }
 }
@@ -223,6 +245,70 @@ class CSSVariableTests {
                 }
             """.trimIndent(),
             "Nested selector with implicit self isn't generated correctly"
+        )
+    }
+
+    @Test
+    fun testCombine() = runTest {
+        val generatedRules = AppStylesheet.cssRules.map { it.stringPresentation() }
+
+        // Selector + String,  Combine + Selector
+        assertContains(
+            generatedRules,
+            """
+                .AppStylesheet-parent:hover .AppStylesheet-child {
+                    color: lime;
+                }
+            """.trimIndent(),
+            "Selector isn't generated correctly"
+        )
+
+        // Selector + Selector, Combine + String
+        assertContains(
+            generatedRules,
+            """
+                .AppStylesheet-parent.AppStylesheet-child:hover {
+                    color: yellow;
+                }
+            """.trimIndent(),
+            "Selector isn't generated correctly"
+        )
+
+        // String + Combine
+        assertContains(
+            generatedRules,
+            """
+                .AppStylesheet-child h1 .AppStylesheet-parent:hover {
+                    color: lavender;
+                }
+            """.trimIndent(),
+            "Selector isn't generated correctly"
+        )
+
+        // Selector + Combine, String + Selector
+        assertContains(
+            generatedRules,
+            """
+                .AppStylesheet-child div#el {
+                    color: green;
+                }
+            """.trimIndent(),
+            "Selector isn't generated correctly"
+        )
+    }
+
+    @Test
+    fun testSibling() = runTest {
+        val generatedRules = AppStylesheet.cssRules.map { it.stringPresentation() }
+
+        assertContains(
+            generatedRules,
+            """
+                .AppStylesheet-parent ~ .AppStylesheet-parent {
+                    color: red;
+                }
+            """.trimIndent(),
+            "Sibling selector isn't generated correctly"
         )
     }
 }
