@@ -245,8 +245,11 @@ private class DefaultTransformableState(
     ): Unit = coroutineScope {
         transformMutex.mutateWith(transformScope, transformPriority) {
             isTransformingState.value = true
-            block()
-            isTransformingState.value = false
+            try {
+                block()
+            } finally {
+                isTransformingState.value = false
+            }
         }
     }
 
