@@ -4,8 +4,8 @@ import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 import java.io.File
 import java.net.URL
 
-private val CHROME_DRIVER_VERSION = "94.0.4606.61"
-private val GECKO_DRIVER_VERSION = "0.29.1"
+private val CHROME_DRIVER_VERSION = "96.0.4664.45"
+private val GECKO_DRIVER_VERSION = "0.30.0"
 
 private fun download(url: String, file: File) {
     println("downloading ${url} to ${file}")
