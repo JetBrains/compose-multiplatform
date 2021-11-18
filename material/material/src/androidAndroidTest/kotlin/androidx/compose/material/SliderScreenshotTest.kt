@@ -223,4 +223,27 @@ class SliderScreenshotTest {
         }
         assertSliderAgainstGolden("rangeSlider_fullRange")
     }
+
+    @Test
+    @ExperimentalMaterialApi
+    fun rangeSliderTest_steps_customColors() {
+        rule.setMaterialContent {
+            Box(wrap.testTag(wrapperTestTag)) {
+                var position by remember { mutableStateOf(30f..70f) }
+                RangeSlider(
+                    values = position,
+                    valueRange = 0f..100f,
+                    onValueChange = { position = it }, steps = 9,
+                    colors = SliderDefaults.colors(
+                        thumbColor = Color.Blue,
+                        activeTrackColor = Color.Red,
+                        inactiveTrackColor = Color.Yellow,
+                        activeTickColor = Color.Magenta,
+                        inactiveTickColor = Color.Cyan
+                    )
+                )
+            }
+        }
+        assertSliderAgainstGolden("rangeSlider_steps_customColors")
+    }
 }
