@@ -34,6 +34,7 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -43,6 +44,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -181,7 +183,27 @@ private object InteropUiSnippet5 {
     }
 }
 
-private object InteropUiSnippet6 {
+@Composable
+fun InteropUiSnippet6(showCautionIcon: Boolean) {
+    if (showCautionIcon) {
+        CautionIcon(/* ... */)
+    }
+}
+
+@Composable
+fun InteropUiSnippet7() {
+    var isEnabled by rememberSaveable { mutableStateOf(false) }
+
+    Column {
+        ImageWithEnabledOverlay(isEnabled)
+        ControlPanelWithToggle(
+            isEnabled = isEnabled,
+            onEnabledChanged = { isEnabled = it }
+        )
+    }
+}
+
+private object InteropUiSnippet8 {
     @Composable
     fun MyComposable() {
         BoxWithConstraints {
@@ -196,7 +218,7 @@ private object InteropUiSnippet6 {
     }
 }
 
-private object InteropUiSnippet7 {
+private object InteropUiSnippet9 {
     // import androidx.compose.ui.platform.ComposeView
 
     class MyComposeAdapter : RecyclerView.Adapter<MyComposeViewHolder>() {
@@ -233,7 +255,7 @@ private object InteropUiSnippet7 {
     }
 }
 
-private object InteropUiSnippet8 {
+private object InteropUiSnippet10 {
     // import androidx.compose.ui.platform.ViewCompositionStrategy
 
     class MyComposeViewHolder(
@@ -293,6 +315,21 @@ private fun ProvideWindowInsets(content: @Composable () -> Unit) {
 
 @Composable
 private fun Icon() {
+}
+
+@Composable
+private fun CautionIcon() {
+}
+
+@Composable
+private fun ImageWithEnabledOverlay(isEnabled: Boolean) {
+}
+
+@Composable
+private fun ControlPanelWithToggle(
+    isEnabled: Boolean,
+    onEnabledChanged: (Boolean) -> Unit
+) {
 }
 
 private class WindowCompat {
