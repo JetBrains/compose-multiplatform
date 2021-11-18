@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.gestures
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.input.pointer.consumePositionChange
 import kotlinx.coroutines.delay
@@ -108,10 +109,12 @@ class TapGestureDetectorTest {
     /**
      * Clicking in the region should result in the callback being invoked.
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     @Test
     fun normalTap() = util.executeInComposition {
         val down = down(5f, 5f)
         assertTrue(down.consumed.downChange)
+        assertTrue(down.isConsumed)
 
         assertTrue(pressed)
         assertFalse(tapped)
@@ -119,6 +122,7 @@ class TapGestureDetectorTest {
 
         val up = down.up(50)
         assertTrue(up.consumed.downChange)
+        assertTrue(up.isConsumed)
 
         assertTrue(tapped)
         assertTrue(released)
@@ -224,6 +228,7 @@ class TapGestureDetectorTest {
      * Pressing in the region, sliding out and then lifting should result in
      * the callback not being invoked
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     @Test
     fun tapMiss() = util.executeInComposition {
         val up = down(5f, 5f)
@@ -235,6 +240,7 @@ class TapGestureDetectorTest {
         assertFalse(released)
         assertFalse(tapped)
         assertFalse(up.consumed.downChange)
+        assertFalse(up.isConsumed)
     }
 
     /**
@@ -467,9 +473,46 @@ class TapGestureDetectorTest {
         assertTrue(canceled)
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
+    @Test
+    fun consumedChange_MotionTap() = util.executeInComposition {
+        down(5f, 5f)
+            .moveTo(6f, 2f) {
+                consume()
+            }
+            .up(50)
+
+        assertFalse(tapped)
+        assertTrue(pressed)
+        assertFalse(released)
+        assertTrue(canceled)
+    }
+
+    /**
+     * Clicking in the region with the up already consumed should result in the callback not
+     * being invoked.
+     */
+    @OptIn(ExperimentalComposeUiApi::class)
+    @Test
+    fun consumedChange_upTap() = util.executeInComposition {
+        val down = down(5f, 5f)
+
+        assertFalse(tapped)
+        assertTrue(pressed)
+
+        down.up {
+            consume()
+        }
+
+        assertFalse(tapped)
+        assertFalse(released)
+        assertTrue(canceled)
+    }
+
     /**
      * Ensure that two-finger taps work.
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     @Test
     fun twoFingerTap() = util.executeInComposition {
         val down = down(1f, 1f)
@@ -480,16 +523,19 @@ class TapGestureDetectorTest {
 
         val down2 = down(9f, 5f)
         assertFalse(down2.consumed.downChange)
+        assertFalse(down2.isConsumed)
 
         assertFalse(pressed)
 
         val up = down.up()
         assertFalse(up.consumed.downChange)
+        assertFalse(up.isConsumed)
         assertFalse(tapped)
         assertFalse(released)
 
         val up2 = down2.up()
         assertTrue(up2.consumed.downChange)
+        assertTrue(up2.isConsumed)
 
         assertTrue(tapped)
         assertTrue(released)

@@ -27,7 +27,6 @@ import androidx.compose.ui.input.pointer.PointerEventPass.Final
 import androidx.compose.ui.input.pointer.PointerEventPass.Initial
 import androidx.compose.ui.input.pointer.PointerEventPass.Main
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.unit.IntSize
 
 /**
@@ -108,7 +107,7 @@ abstract class PointerInputFilter {
 /**
  * Describes a pointer input change event that has occurred at a particular point in time.
  */
-expect class PointerEvent @OptIn(InternalCoreApi::class) internal constructor(
+expect class PointerEvent internal constructor(
     changes: List<PointerInputChange>,
     internalPointerEvent: InternalPointerEvent?
 ) {
@@ -263,7 +262,7 @@ expect val PointerKeyboardModifiers.isNumLockOn: Boolean
 /**
  * The device type that produces a [PointerInputChange], such as a mouse or stylus.
  */
-inline class PointerType internal constructor(private val value: Int) {
+inline class PointerType private constructor(private val value: Int) {
 
     override fun toString(): String = when (value) {
         1 -> "Touch"
@@ -304,7 +303,7 @@ inline class PointerType internal constructor(private val value: Int) {
 /**
  * Indicates the primary reason that the [PointerEvent] was sent.
  */
-inline class PointerEventType(internal val value: Int) {
+inline class PointerEventType private constructor(internal val value: Int) {
     companion object {
         /**
          * An unknown reason for the event.
@@ -344,14 +343,25 @@ inline class PointerEventType(internal val value: Int) {
          * [Enter], [Exit], and [Enter] will be received.
          */
         val Exit = PointerEventType(5)
+
+        /**
+         * A scroll event was sent. This can happen, for example, due to a mouse scroll wheel.
+         * This event indicates that the [PointerInputChange.scrollDelta]'s [Offset] is non-zero.
+         */
+        @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+        @ExperimentalComposeUiApi
+        @get:ExperimentalComposeUiApi
+        val Scroll = PointerEventType(6)
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun toString(): String = when (this) {
         Press -> "Press"
         Release -> "Release"
         Move -> "Move"
         Enter -> "Enter"
         Exit -> "Exit"
+        Scroll -> "Scroll"
         else -> "Unknown"
     }
 }
@@ -419,8 +429,41 @@ class PointerInputChange(
         get() = _historical ?: listOf()
     private var _historical: List<HistoricalChange>? = null
 
+    /**
+     * The amount of scroll wheel movement in the horizontal and vertical directions.
+     */
+    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
     @ExperimentalComposeUiApi
-    constructor(
+    @get:ExperimentalComposeUiApi
+    val scrollDelta: Offset
+        get() = _scrollDelta
+    private var _scrollDelta: Offset = Offset.Zero
+
+    /**
+     * Indicates whether the change was consumed or not. Note that the change must be consumed in
+     * full as there's no partial consumption system provided.
+     */
+    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @ExperimentalComposeUiApi
+    @get:ExperimentalComposeUiApi
+    val isConsumed: Boolean
+        get() = consumed.downChange || consumed.positionChange
+
+    /**
+     * Consume change event, claiming all the corresponding change info to the caller. This is
+     * usually needed when, button, when being clicked, consumed the "up" event so no other parents
+     * of this button could consume this "up" again.
+     *
+     * "Consumption" is just an indication of the claim and each pointer input handler
+     * implementation must manually check this flag to respect it.
+     */
+    @ExperimentalComposeUiApi
+    fun consume() {
+        consumed.downChange = true
+        consumed.positionChange = true
+    }
+
+    internal constructor(
         id: PointerId,
         uptimeMillis: Long,
         position: Offset,
@@ -430,7 +473,8 @@ class PointerInputChange(
         previousPressed: Boolean,
         consumed: ConsumedData,
         type: PointerType,
-        historical: List<HistoricalChange>
+        historical: List<HistoricalChange>,
+        scrollDelta: Offset,
     ) : this(
         id,
         uptimeMillis,
@@ -443,6 +487,7 @@ class PointerInputChange(
         type
     ) {
         _historical = historical
+        _scrollDelta = scrollDelta
     }
 
     fun copy(
@@ -465,7 +510,8 @@ class PointerInputChange(
         previousPressed,
         consumed,
         type,
-        this.historical
+        this.historical,
+        this.scrollDelta
     )
 
     @ExperimentalComposeUiApi
@@ -490,7 +536,34 @@ class PointerInputChange(
         previousPressed,
         consumed,
         type,
-        historical
+        historical,
+        this.scrollDelta
+    )
+
+    internal fun copy(
+        id: PointerId = this.id,
+        currentTime: Long = this.uptimeMillis,
+        currentPosition: Offset = this.position,
+        currentPressed: Boolean = this.pressed,
+        previousTime: Long = this.previousUptimeMillis,
+        previousPosition: Offset = this.previousPosition,
+        previousPressed: Boolean = this.previousPressed,
+        consumed: ConsumedData = this.consumed,
+        type: PointerType = this.type,
+        historical: List<HistoricalChange> = this.historical,
+        scrollDelta: Offset
+    ): PointerInputChange = PointerInputChange(
+        id,
+        currentTime,
+        currentPosition,
+        currentPressed,
+        previousTime,
+        previousPosition,
+        previousPressed,
+        consumed,
+        type,
+        historical,
+        scrollDelta
     )
 
     override fun toString(): String {
@@ -503,7 +576,8 @@ class PointerInputChange(
             "previousPressed=$previousPressed, " +
             "consumed=$consumed, " +
             "type=$type, " +
-            "historical=$historical)"
+            "historical=$historical," +
+            "scrollDelta=$scrollDelta)"
     }
 }
 

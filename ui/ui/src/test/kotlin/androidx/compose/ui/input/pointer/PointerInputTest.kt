@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.input.pointer
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Offset
 import com.google.common.truth.FailureMetadata
 import com.google.common.truth.Subject
@@ -345,6 +346,16 @@ class PointerInputTest {
         val pointerInputChange =
             createPointerInputChange(8f, 16f, true, 2f, 4f, false, 0f, 0f, false)
         assertThat(pointerInputChange.anyChangeConsumed()).isFalse()
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    @Test
+    fun consume_noChanges_returnsTrue() {
+        val pointerInputChange =
+            createPointerInputChange(8f, 16f, true, 8f, 16f, true, 0f, 0f, false)
+        pointerInputChange.consume()
+        assertThat(pointerInputChange.isConsumed).isTrue()
+        assertThat(pointerInputChange.anyChangeConsumed()).isTrue()
     }
 
     @Test

@@ -147,7 +147,8 @@ private class PointerInputChangeEventProducer {
                     previousDown,
                     ConsumedData(),
                     it.type,
-                    it.historical
+                    it.historical,
+                    it.scrollDelta
                 )
             if (it.down) {
                 previousPointerInputData[it.id] = PointerInputData(
