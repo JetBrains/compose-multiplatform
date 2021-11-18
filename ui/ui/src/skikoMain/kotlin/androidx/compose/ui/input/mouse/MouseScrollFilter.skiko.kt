@@ -18,15 +18,14 @@
 
 package androidx.compose.ui.input.mouse
 
-import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
-import androidx.compose.ui.input.pointer.PointerInputModifier
-import androidx.compose.ui.input.pointer.PointerEvent
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.PointerInputFilter
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntSize
+import java.awt.event.MouseWheelEvent
 
 /**
  * Indicates distance by which we should scroll some container.
@@ -78,6 +77,10 @@ class MouseScrollEvent(
     val orientation: MouseScrollOrientation
 )
 
+// TODO(demin): how easy-to-use scroll API should look like?
+//  maybe something like Modifier.pointerScroll { delta: Offset -> } ?
+//  or Modifier.pointerInput(Unit) { scroll { delta: Offset ->  } }
+//  ?
 /**
  * Adding this [modifier][Modifier] to the [modifier][Modifier] parameter of a component will
  * allow it to intercept scroll events from mouse wheel and touchpad.
@@ -100,31 +103,40 @@ fun Modifier.mouseScrollFilter(
          */
         bounds: IntSize
     ) -> Boolean
-): Modifier = composed {
-    val filter = remember(::MouseScrollEventFilter)
-    filter.onMouseScroll = onMouseScroll
-    MousePointerInputModifierImpl(filter)
-}
-
-internal class MouseScrollEventFilter : PointerInputFilter() {
-    lateinit var onMouseScroll: (MouseScrollEvent, IntSize) -> Boolean
-
-    override fun onPointerEvent(
-        pointerEvent: PointerEvent,
-        pass: PointerEventPass,
-        bounds: IntSize
-    ) = Unit
-
-    override fun onCancel() = Unit
-
-    fun onMouseScroll(event: MouseScrollEvent): Boolean {
-        return isAttached && onMouseScroll(event, size)
+): Modifier = pointerInput(onMouseScroll) {
+    awaitPointerEventScope {
+        while (true) {
+            val event = awaitPointerEvent()
+            val mouseEvent = (event.mouseEvent as? MouseWheelEvent) ?: continue
+            val mouseChange = event.changes.find { it.type == PointerType.Mouse }
+            val isScroll = event.type == PointerEventType.Scroll
+            if (isScroll && mouseChange != null && !mouseChange.isConsumed) {
+                val legacyEvent = mouseEvent.toLegacyEvent(mouseChange.scrollDelta)
+                if (onMouseScroll(legacyEvent, size)) {
+                    mouseChange.consume()
+                }
+            }
+        }
     }
 }
 
-private data class MousePointerInputModifierImpl(
-    override val pointerInputFilter: PointerInputFilter
-) : PointerInputModifier
+private fun MouseWheelEvent.toLegacyEvent(scrollDelta: Offset): MouseScrollEvent {
+    val value = if (scrollDelta.x != 0f) scrollDelta.x else scrollDelta.y
+    return MouseScrollEvent(
+        delta = if (scrollType == MouseWheelEvent.WHEEL_BLOCK_SCROLL) {
+            MouseScrollUnit.Page(value * scrollAmount)
+        } else {
+            MouseScrollUnit.Line(value * scrollAmount)
+        },
+
+        // There are no other way to detect horizontal scrolling in AWT
+        orientation = if (isShiftDown || scrollDelta.x != 0f) {
+            MouseScrollOrientation.Horizontal
+        } else {
+            MouseScrollOrientation.Vertical
+        }
+    )
+}
 
 @ExperimentalComposeUiApi
 enum class MouseScrollOrientation {
