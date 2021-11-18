@@ -17,7 +17,7 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.ui.components.JBLoadingPanel
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.*
-import org.jetbrains.kotlin.idea.framework.GRADLE_SYSTEM_ID
+import org.jetbrains.plugins.gradle.util.GradleConstants
 import javax.swing.JComponent
 import javax.swing.event.AncestorEvent
 import javax.swing.event.AncestorListener
@@ -140,7 +140,7 @@ private class ConfigurePreviewTaskNameCacheInvalidator(
 ) : ExternalSystemTaskNotificationListenerAdapter(null) {
     override fun onStart(id: ExternalSystemTaskId, workingDir: String?) {
         if (
-            id.projectSystemId == GRADLE_SYSTEM_ID &&
+            id.projectSystemId == GradleConstants.SYSTEM_ID &&
             id.type == ExternalSystemTaskType.RESOLVE_PROJECT
         ) {
             configurePreviewTaskNameCache.invalidate()

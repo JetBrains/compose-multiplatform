@@ -6,7 +6,7 @@ plugins {
     `maven-publish`
     `java-gradle-plugin`
     id("org.jetbrains.kotlin.jvm")
-    id("com.github.johnrengelman.shadow")
+    id("com.github.johnrengelman.shadow") apply false
 }
 
 repositories {
@@ -34,7 +34,7 @@ dependencies {
     embedded("de.undercouch:gradle-download-task:4.1.2")
 }
 
-val shadow = tasks.named<ShadowJar>("shadowJar") {
+val shadowJar by tasks.registering(ShadowJar::class) {
     val fromPackage = "de.undercouch"
     val toPackage = "org.jetbrains.compose.internal.publishing.$fromPackage"
     relocate(fromPackage, toPackage)
@@ -44,7 +44,7 @@ val shadow = tasks.named<ShadowJar>("shadowJar") {
 }
 
 val jar = tasks.named<Jar>("jar") {
-    dependsOn(shadow)
-    from(zipTree(shadow.get().archiveFile))
+    dependsOn(shadowJar)
+    from(zipTree(shadowJar.get().archiveFile))
     this.duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }

@@ -13,7 +13,6 @@ import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.util.concurrency.annotations.RequiresReadLock
-import org.jetbrains.kotlin.idea.configuration.KotlinTargetData
 import org.jetbrains.plugins.gradle.settings.GradleSettings
 import org.jetbrains.plugins.gradle.util.GradleConstants
 
@@ -30,7 +29,7 @@ internal class ConfigurePreviewTaskNameProviderImpl : ConfigurePreviewTaskNamePr
         val modulePath = ExternalSystemApiUtil.getExternalProjectPath(module) ?: return null
         val moduleNode = moduleDataNodeOrNull(module.project, modulePath)
         if (moduleNode != null) {
-            val target = ExternalSystemApiUtil.getChildren(moduleNode, KotlinTargetData.KEY).singleOrNull()
+            val target = ExternalSystemApiUtil.getChildren(moduleNode, kotlinTargetDataKey).singleOrNull()
             if (target != null) {
                 return previewTaskName(target.data.externalName)
             }
