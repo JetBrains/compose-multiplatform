@@ -23,7 +23,7 @@ object LibraryVersions {
     val ACTIVITY = Version("1.5.0-alpha01")
     val ADS_IDENTIFIER = Version("1.0.0-alpha05")
     val ANNOTATION = Version("1.4.0-alpha01")
-    val ANNOTATION_EXPERIMENTAL = Version("1.2.0-beta02")
+    val ANNOTATION_EXPERIMENTAL = Version("1.2.0-rc01")
     val APPCOMPAT = Version("1.5.0-alpha01")
     val APPSEARCH = Version("1.0.0-alpha05")
     val ARCH_CORE = Version("2.2.0-alpha01")
