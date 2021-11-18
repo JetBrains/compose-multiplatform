@@ -256,6 +256,9 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
 
     /**
      * Makes sure the passed [layoutNode] and its subtree is remeasured and has the final sizes.
+     *
+     * The node or some of the nodes in its subtree can still be kept unmeasured if they are
+     * not placed and don't affect the parent size. See [requestRemeasure] for details.
      */
     fun forceMeasureTheSubtree(layoutNode: LayoutNode) {
         // if there is nothing in `relayoutNodes` everything is remeasured.
@@ -273,8 +276,13 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
                 remeasureAndRelayoutIfNeeded(child)
             }
 
-            // run recursively for the subtree.
-            forceMeasureTheSubtree(child)
+            // if the child is still in NeedsRemeasure state then this child remeasure wasn't
+            // needed. it can happen for example when this child is not placed and can't affect
+            // the parent size. we can skip the whole subtree.
+            if (child.layoutState != NeedsRemeasure) {
+                // run recursively for the subtree.
+                forceMeasureTheSubtree(child)
+            }
         }
 
         // if the child was resized during the remeasurement it could request a remeasure on
@@ -283,8 +291,6 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
         if (layoutNode.layoutState == NeedsRemeasure && relayoutNodes.remove(layoutNode)) {
             remeasureAndRelayoutIfNeeded(layoutNode)
         }
-
-        require(layoutNode.layoutState != NeedsRemeasure)
     }
 
     /**
