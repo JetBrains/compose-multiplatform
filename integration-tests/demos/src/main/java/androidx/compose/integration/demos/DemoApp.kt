@@ -18,10 +18,15 @@ package androidx.compose.integration.demos
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -31,28 +36,31 @@ import androidx.compose.integration.demos.common.Demo
 import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.integration.demos.common.FragmentDemo
 import androidx.compose.integration.demos.common.allLaunchableDemos
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.ListItem
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallTopAppBar
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.LayoutDirection
@@ -61,6 +69,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentContainerView
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DemoApp(
     currentDemo: Demo,
@@ -77,11 +86,14 @@ fun DemoApp(
 
     var filterText by rememberSaveable { mutableStateOf("") }
 
+    val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior() }
+
     Scaffold(
         topBar = {
             DemoAppBar(
                 title = backStackTitle,
-                navigationIcon = navigationIcon,
+                scrollBehavior = scrollBehavior,
+                navigationIcon = navigationIcon ?: {},
                 launchSettings = launchSettings,
                 isFiltering = isFiltering,
                 filterText = filterText,
@@ -89,7 +101,8 @@ fun DemoApp(
                 onStartFiltering = onStartFiltering,
                 onEndFiltering = onEndFiltering
             )
-        }
+        },
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
         val modifier = Modifier.padding(innerPadding)
         DemoContent(modifier, currentDemo, isFiltering, filterText, onNavigateToDemo, onNavigateUp)
@@ -106,7 +119,7 @@ private fun DemoContent(
     onNavigateUp: () -> Unit
 ) {
     Crossfade(isFiltering to currentDemo) { (filtering, demo) ->
-        Surface(modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
+        Surface(modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             if (filtering) {
                 DemoFilter(
                     launchableDemos = AllDemosCategory.allLaunchableDemos(),
@@ -121,12 +134,26 @@ private fun DemoContent(
 }
 
 @Composable
+fun Material2LegacyTheme(content: @Composable () -> Unit) {
+    val material2Colors =
+        if (isSystemInDarkTheme()) {
+            androidx.compose.material.darkColors()
+        } else {
+            androidx.compose.material.lightColors()
+        }
+    androidx.compose.material.MaterialTheme(colors = material2Colors, content = content)
+}
+
+@Composable
 private fun DisplayDemo(demo: Demo, onNavigate: (Demo) -> Unit, onNavigateUp: () -> Unit) {
     when (demo) {
         is ActivityDemo<*> -> {
             /* should never get here as activity demos are not added to the backstack*/
         }
-        is ComposableDemo -> demo.content(onNavigateUp)
+        is ComposableDemo ->
+            // provide material 2 as well for interop, find a way to
+            // remove it when all demos migrated to m3
+            Material2LegacyTheme { demo.content(onNavigateUp) }
         is DemoCategory -> DisplayDemoCategory(demo, onNavigate)
         is FragmentDemo<*> -> {
             lateinit var view: FragmentContainerView
@@ -156,21 +183,16 @@ private fun DisplayDemo(demo: Demo, onNavigate: (Demo) -> Unit, onNavigateUp: ()
 }
 
 @Composable
-@OptIn(ExperimentalMaterialApi::class)
 private fun DisplayDemoCategory(category: DemoCategory, onNavigate: (Demo) -> Unit) {
-    // TODO: migrate to LazyColumn after b/175671850
+    // TODO: migrate to LazyColumn after DemoTests are rewritten to accommodate laziness
     Column(Modifier.verticalScroll(rememberScrollState())) {
         category.demos.forEach { demo ->
-            ListItem(
-                text = {
-                    Text(
-                        modifier = Modifier.height(56.dp)
-                            .wrapContentSize(Alignment.Center),
-                        text = demo.title
-                    )
-                },
-                modifier = Modifier.clickable { onNavigate(demo) }
-            )
+            ListItem(onClick = { onNavigate(demo) }) {
+                Text(
+                    modifier = Modifier.height(56.dp).wrapContentSize(Alignment.Center),
+                    text = demo.title
+                )
+            }
         }
     }
 }
@@ -179,7 +201,8 @@ private fun DisplayDemoCategory(category: DemoCategory, onNavigate: (Demo) -> Un
 @Composable
 private fun DemoAppBar(
     title: String,
-    navigationIcon: @Composable (() -> Unit)?,
+    scrollBehavior: TopAppBarScrollBehavior,
+    navigationIcon: @Composable () -> Unit,
     isFiltering: Boolean,
     filterText: String,
     onFilter: (String) -> Unit,
@@ -191,13 +214,15 @@ private fun DemoAppBar(
         FilterAppBar(
             filterText = filterText,
             onFilter = onFilter,
-            onClose = onEndFiltering
+            onClose = onEndFiltering,
+            scrollBehavior = scrollBehavior
         )
     } else {
-        TopAppBar(
+        SmallTopAppBar(
             title = {
                 Text(title, Modifier.testTag(Tags.AppBarTitle))
             },
+            scrollBehavior = scrollBehavior,
             navigationIcon = navigationIcon,
             actions = {
                 AppBarIcons.Filter(onClick = onStartFiltering)
@@ -232,4 +257,21 @@ private object AppBarIcons {
             Icon(Icons.Filled.Settings, null)
         }
     }
+}
+
+@Composable
+internal fun ListItem(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable (() -> Unit)
+) {
+    Box(
+        modifier
+            .heightIn(min = 48.dp)
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp)
+            .wrapContentHeight(Alignment.CenterVertically),
+        contentAlignment = Alignment.CenterStart
+    ) { content() }
 }
