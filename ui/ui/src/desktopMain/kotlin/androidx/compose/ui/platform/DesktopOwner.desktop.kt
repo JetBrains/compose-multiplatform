@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.platform
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.awt.awtEventOrNull
 import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.key.KeyEvent
@@ -23,6 +24,7 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.AwtCursor
 import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.PointerIconDefaults
 import java.awt.Cursor
 
 internal actual fun sendKeyEvent(
@@ -40,16 +42,27 @@ internal actual fun sendKeyEvent(
     return keyInputModifier.processKeyInput(keyEvent)
 }
 
-private val defaultCursor = Cursor(Cursor.DEFAULT_CURSOR)
+internal actual fun commitPointerIcon(
+    containerCursor: PlatformComponentWithCursor?
+) {
+    containerCursor?.commitCursor()
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+internal actual fun getPointerIcon(
+    containerCursor: PlatformComponentWithCursor?
+): PointerIcon {
+    return containerCursor?.let { AwtCursor(it.desiredCursor) }
+        ?: PointerIconDefaults.Default
+}
 
 internal actual fun setPointerIcon(
     containerCursor: PlatformComponentWithCursor?,
     icon: PointerIcon?
 ) {
     when (icon) {
-        is AwtCursor -> containerCursor?.componentCursor = icon.cursor
-        else -> if (containerCursor?.componentCursor != defaultCursor) {
-            containerCursor?.componentCursor = defaultCursor
+        is AwtCursor -> {
+            containerCursor?.desiredCursor = icon.cursor
         }
     }
 }

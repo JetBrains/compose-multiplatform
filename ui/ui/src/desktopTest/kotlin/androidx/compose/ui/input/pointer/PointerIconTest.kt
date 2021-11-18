@@ -90,7 +90,7 @@ class PointerIconTest {
             }
 
             scene.sendPointerEvent(PointerEventType.Move, Offset(5f, 5f))
-            assertThat(component.componentCursor.type).isEqualTo(Cursor.TEXT_CURSOR)
+            assertThat(component.desiredCursor.type).isEqualTo(Cursor.TEXT_CURSOR)
         } finally {
             scene.close()
         }
@@ -119,7 +119,7 @@ class PointerIconTest {
 
             scene.sendPointerEvent(PointerEventType.Move, Offset(5f, 5f))
             scene.sendPointerEvent(PointerEventType.Move, Offset(5f, 5f))
-            assertThat(component.componentCursor.type).isEqualTo(Cursor.TEXT_CURSOR)
+            assertThat(component.desiredCursor.type).isEqualTo(Cursor.TEXT_CURSOR)
         } finally {
             scene.close()
         }
