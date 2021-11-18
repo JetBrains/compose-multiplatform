@@ -32,6 +32,7 @@ import android.view.MotionEvent.ACTION_DOWN
 import android.view.MotionEvent.ACTION_HOVER_ENTER
 import android.view.MotionEvent.ACTION_HOVER_EXIT
 import android.view.MotionEvent.ACTION_HOVER_MOVE
+import android.view.MotionEvent.ACTION_SCROLL
 import android.view.MotionEvent.ACTION_MOVE
 import android.view.MotionEvent.ACTION_POINTER_UP
 import android.view.MotionEvent.ACTION_UP
@@ -1014,6 +1015,14 @@ internal class AndroidComposeView(context: Context) :
 
     override fun autofill(values: SparseArray<AutofillValue>) {
         if (autofillSupported()) _autofill?.performAutofill(values)
+    }
+
+    override fun dispatchGenericMotionEvent(event: MotionEvent): Boolean {
+        return if (event.actionMasked == ACTION_SCROLL) {
+            handleMotionEvent(event).dispatchedToAPointerInputModifier
+        } else {
+            super.dispatchGenericMotionEvent(event)
+        }
     }
 
     // TODO(shepshapard): Test this method.

@@ -27,6 +27,7 @@ import android.view.MotionEvent.ACTION_HOVER_EXIT
 import android.view.MotionEvent.ACTION_HOVER_MOVE
 import android.view.MotionEvent.ACTION_POINTER_DOWN
 import android.view.MotionEvent.ACTION_POINTER_UP
+import android.view.MotionEvent.ACTION_SCROLL
 import android.view.MotionEvent.ACTION_UP
 import android.view.MotionEvent.TOOL_TYPE_ERASER
 import android.view.MotionEvent.TOOL_TYPE_FINGER
@@ -95,6 +96,7 @@ internal class MotionEventAdapter {
 
         val isHover = action == ACTION_HOVER_EXIT || action == ACTION_HOVER_MOVE ||
             action == ACTION_HOVER_ENTER
+        val isScroll = action == ACTION_SCROLL
 
         if (isHover) {
             val hoverId = motionEvent.getPointerId(motionEvent.actionIndex)
@@ -117,7 +119,11 @@ internal class MotionEventAdapter {
                     positionCalculator,
                     motionEvent,
                     i,
-                    !isHover && i != upIndex
+                    // "pressed" means:
+                    // 1. we're not hovered
+                    // 2. we didn't get UP event for a pointer
+                    // 3. button on the mouse is pressed BUT it's not a "scroll" simulated button
+                    !isHover && i != upIndex && (!isScroll || motionEvent.buttonState != 0)
                 )
             )
         }
@@ -277,6 +283,17 @@ internal class MotionEventAdapter {
                 }
             }
         }
+        val scrollDelta = if (motionEvent.actionMasked == ACTION_SCROLL) {
+            val x = motionEvent.getAxisValue(MotionEvent.AXIS_HSCROLL)
+            val y = motionEvent.getAxisValue(MotionEvent.AXIS_VSCROLL)
+            // NOTE: we revert the scroll offset because android is special compared to other
+            // platforms and send the reversed sign for up and down mouse wheel scroll. In order to
+            // support better x-platform mouse scroll, we revert to be in line with desktop
+            // platforms.
+            Offset(x, y) * -1f
+        } else {
+            Offset.Zero
+        }
 
         val issuesEnterExit = canHover.get(motionEvent.getPointerId(index), false)
         return PointerInputEventData(
@@ -287,7 +304,8 @@ internal class MotionEventAdapter {
             pressed,
             toolType,
             issuesEnterExit,
-            historical
+            historical,
+            scrollDelta
         )
     }
 }
