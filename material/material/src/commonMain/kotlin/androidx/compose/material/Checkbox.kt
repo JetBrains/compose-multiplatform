@@ -54,6 +54,7 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import kotlin.math.floor
+import kotlin.math.max
 
 /**
  * <a href="https://material.io/components/checkboxes" class="external" target="_blank">Material Design checkbox</a>.
@@ -322,7 +323,8 @@ private fun DrawScope.drawBox(
         boxColor,
         topLeft = Offset(strokeWidth, strokeWidth),
         size = Size(checkboxSize - strokeWidth * 2, checkboxSize - strokeWidth * 2),
-        cornerRadius = CornerRadius(radius / 2),
+        // Set the inner radius to be equal to the outer radius - border's stroke width.
+        cornerRadius = CornerRadius(max(0f, radius - strokeWidth)),
         style = Fill
     )
     drawRoundRect(
