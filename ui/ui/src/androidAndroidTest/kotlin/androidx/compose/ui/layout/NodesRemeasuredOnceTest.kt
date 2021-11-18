@@ -119,6 +119,34 @@ class NodesRemeasuredOnceTest {
             assertThat(remeasurements).isEqualTo(2)
         }
     }
+
+    @Test
+    fun remeasuringChildWithExtraLayer_notPlacedChild() {
+        val height = mutableStateOf(10)
+        var remeasurements = 0
+
+        rule.setContent {
+            WrapChild(onMeasured = { actualHeight ->
+                assertThat(actualHeight).isEqualTo(height.value)
+                remeasurements++
+            }) {
+                NotPlaceChild(height) {
+                    WrapChild {
+                        Child(height)
+                    }
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(remeasurements).isEqualTo(1)
+            height.value = 20
+        }
+
+        rule.runOnIdle {
+            assertThat(remeasurements).isEqualTo(2)
+        }
+    }
 }
 
 @Composable
@@ -129,6 +157,16 @@ private fun WrapChild(onMeasured: (Int) -> Unit = {}, content: @Composable () ->
         onMeasured(placeable.height)
         layout(placeable.width, placeable.height) {
             placeable.place(0, 0)
+        }
+    }
+}
+
+@Composable
+private fun NotPlaceChild(height: State<Int>, content: @Composable () -> Unit) {
+    Layout(content = content) { measurables, constraints ->
+        layout(constraints.maxWidth, height.value) {
+            measurables.first()
+                .measure(constraints.copy(minHeight = 0, maxHeight = Constraints.Infinity))
         }
     }
 }
