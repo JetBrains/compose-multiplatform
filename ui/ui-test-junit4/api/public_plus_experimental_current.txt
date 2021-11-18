@@ -76,7 +76,7 @@ package androidx.compose.ui.test.junit4 {
 
 package androidx.compose.ui.test.junit4.android {
 
-  public final class ComposeNotIdleException extends java.lang.Throwable {
+  public final class ComposeNotIdleException extends java.lang.Exception {
     ctor public ComposeNotIdleException(String? message, Throwable? cause);
   }
 
