@@ -38,6 +38,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
@@ -49,6 +50,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.draw.DrawModifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
@@ -3573,6 +3575,76 @@ class AndroidLayoutDrawTest {
 
         val composeView = activityTestRule.findAndroidComposeView()
         assertTrue(composeView.isTransitionGroup)
+    }
+
+    @Test
+    fun drawnInCorrectLayer() {
+        var innerDrawLatch = CountDownLatch(1)
+        var outerDrawLatch = CountDownLatch(1)
+        var outerColor by mutableStateOf(Color.Blue)
+        var innerColor by mutableStateOf(Color.White)
+        activityTestRule.runOnUiThread {
+            activity.setContent {
+                with(LocalDensity.current) {
+                    Box(Modifier.size(30.toDp())
+                        .drawBehind {
+                            drawRect(outerColor)
+                            outerDrawLatch.countDown()
+                        }
+                        .drawLatchModifier()
+                        .padding(10.toDp())
+                        .clipToBounds()
+                        .drawBehind {
+                            // clipped by the layer
+                            drawRect(innerColor, Offset(-10f, -10f), Size(30f, 30f))
+                            innerDrawLatch.countDown()
+                        }
+                        .drawLatchModifier()
+                        .size(10.toDp())
+                    )
+                }
+            }
+        }
+        assertTrue(innerDrawLatch.await(1, TimeUnit.SECONDS))
+        assertTrue(outerDrawLatch.await(1, TimeUnit.SECONDS))
+
+        validateSquareColors(
+            outerColor = Color.Blue,
+            innerColor = Color.White,
+            size = 10
+        )
+
+        innerDrawLatch = CountDownLatch(1)
+        outerDrawLatch = CountDownLatch(1)
+        drawLatch = CountDownLatch(1)
+
+        // changing the inner color should only affect the inner layer
+        innerColor = Color.Yellow
+
+        assertTrue(innerDrawLatch.await(1, TimeUnit.SECONDS))
+
+        validateSquareColors(
+            outerColor = Color.Blue,
+            innerColor = Color.Yellow,
+            size = 10
+        )
+
+        assertEquals(1, outerDrawLatch.count)
+        innerDrawLatch = CountDownLatch(1)
+        drawLatch = CountDownLatch(1)
+
+        // changing the outer color should only affect the outer layer
+        outerColor = Color.Red
+
+        assertTrue(outerDrawLatch.await(1, TimeUnit.SECONDS))
+
+        validateSquareColors(
+            outerColor = Color.Red,
+            innerColor = Color.Yellow,
+            size = 10
+        )
+
+        assertEquals(1, innerDrawLatch.count)
     }
 
     private fun Modifier.layout(onLayout: () -> Unit) = layout { measurable, constraints ->
