@@ -406,7 +406,7 @@ The following platform-specific options are available
     * `menuGroup = "my-example-menu-group"` — a menu group for the application;
     * `appRelease = "1"` — a release value for the rpm package, or a revision value for the deb package;
     * `appCategory = "CATEGORY"` — a group value for the rpm package, or a section value for the deb package;
-    * `rpmLicenseType = "TYPE_OF_LICENSE"` — a type of license for the rpm package;
+    * `licenseType = "TYPE_OF_LICENSE"` — a type of license for the rpm and deb package;
     * `debPackageVersion = "DEB_VERSION"` — a deb-specific package version 
       (see the section `Specifying package version` for details);
     * `rpmPackageVersion = "RPM_VERSION"` — a rpm-specific package version

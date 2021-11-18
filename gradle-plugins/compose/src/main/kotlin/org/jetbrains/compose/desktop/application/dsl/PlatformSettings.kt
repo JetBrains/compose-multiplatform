@@ -59,7 +59,7 @@ open class LinuxPlatformSettings @Inject constructor(objects: ObjectFactory): Pl
     var appCategory: String? = null
     var debMaintainer: String? = null
     var menuGroup: String? = null
-    var rpmLicenseType: String? = null
+    var licenseType: String? = null
     var debPackageVersion: String? = null
     var rpmPackageVersion: String? = null
 }

@@ -268,7 +268,7 @@ internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
                 linuxDebMaintainer.set(provider { linux.debMaintainer })
                 linuxMenuGroup.set(provider { linux.menuGroup })
                 linuxPackageName.set(provider { linux.packageName })
-                linuxRpmLicenseType.set(provider { linux.rpmLicenseType })
+                linuxLicenseType.set(provider { linux.licenseType })
                 iconFile.set(linux.iconFile.orElse(DefaultIcons.forLinux(project)))
                 installationPath.set(linux.installationPath)
             }

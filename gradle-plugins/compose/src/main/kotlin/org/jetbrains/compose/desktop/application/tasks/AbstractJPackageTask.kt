@@ -117,7 +117,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
-    val linuxRpmLicenseType: Property<String?> = objects.nullableProperty()
+    val linuxLicenseType: Property<String?> = objects.nullableProperty()
 
     @get:Input
     @get:Optional
@@ -288,7 +288,7 @@ abstract class AbstractJPackageTask @Inject constructor(
                     cliArg("--linux-app-category", linuxAppCategory)
                     cliArg("--linux-deb-maintainer", linuxDebMaintainer)
                     cliArg("--linux-menu-group", linuxMenuGroup)
-                    cliArg("--linux-rpm-license-type", linuxRpmLicenseType)
+                    cliArg("--linux-license-type", linuxLicenseType)
                 }
                 OS.Windows -> {
                     cliArg("--win-dir-chooser", winDirChooser)
@@ -476,7 +476,7 @@ abstract class AbstractJPackageTask @Inject constructor(
         plist[PlistKeys.CFBundlePackageType] = "APPL"
         val packageVersion = packageVersion.get()!!
         plist[PlistKeys.CFBundleShortVersionString] = packageVersion
-        plist[PlistKeys.LSApplicationCategoryType] = "Unknown"
+        plist[PlistKeys.LSApplicationCategoryType] = linuxLicenseType.orNull ?: "Unknown"
         plist[PlistKeys.CFBundleVersion] = packageVersion
         val year = Calendar.getInstance().get(Calendar.YEAR)
         plist[PlistKeys.NSHumanReadableCopyright] = packageCopyright.orNull
