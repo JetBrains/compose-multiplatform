@@ -33,13 +33,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.input.mouse.MouseScrollOrientation
-import androidx.compose.ui.input.mouse.MouseScrollUnit
-import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.InternalTestApi
@@ -432,10 +430,10 @@ class ScrollbarTest {
 
     @OptIn(InternalTestApi::class, ExperimentalComposeUiApi::class)
     private fun ComposeTestRule.performMouseScroll(x: Int, y: Int, delta: Float) {
-        (this as DesktopComposeTestRule).scene.sendPointerScrollEvent(
+        (this as DesktopComposeTestRule).scene.sendPointerEvent(
+            PointerEventType.Move,
             Offset(x.toFloat(), y.toFloat()),
-            MouseScrollUnit.Line(delta),
-            MouseScrollOrientation.Vertical
+            scrollDelta = Offset(x = 0f, y = delta)
         )
     }
 
