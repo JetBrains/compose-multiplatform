@@ -44,6 +44,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
@@ -51,6 +52,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.MouseButton
+import androidx.compose.ui.test.MouseInjectionScope
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
@@ -236,6 +239,66 @@ class ToggleableTest {
         rule.runOnIdle {
             assertThat(checked).isEqualTo(false)
         }
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun toggleableTest_mouseToggle() {
+        var checked = true
+        val onCheckedChange: (Boolean) -> Unit = { checked = it }
+
+        rule.setContent {
+            Box {
+                Box(
+                    Modifier.toggleable(value = checked, onValueChange = onCheckedChange),
+                    content = {
+                        BasicText("ToggleableText")
+                    }
+                )
+            }
+        }
+
+        rule.onNode(isToggleable())
+            .performMouseInput { click() }
+
+        rule.runOnIdle {
+            assertThat(checked).isEqualTo(false)
+        }
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun toggleableTest_mouseSecondaryToggle() {
+        var checked = true
+        val onCheckedChange: (Boolean) -> Unit = { checked = it }
+
+        rule.setContent {
+            Box {
+                Box(
+                    Modifier.toggleable(value = checked, onValueChange = onCheckedChange),
+                    content = {
+                        BasicText("ToggleableText")
+                    }
+                )
+            }
+        }
+
+        rule.onNode(isToggleable())
+            .performMouseInput { secondaryClick() }
+
+        rule.runOnIdle {
+            assertThat(checked).isEqualTo(true)
+        }
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    private fun MouseInjectionScope.secondaryClick(position: Offset = center) {
+        if (position.isSpecified) {
+            updatePointerTo(position)
+        }
+        press(MouseButton.Secondary)
+        advanceEventTime(60L)
+        release(MouseButton.Secondary)
     }
 
     @Test

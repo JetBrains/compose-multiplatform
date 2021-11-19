@@ -18,11 +18,13 @@ package androidx.compose.foundation.gestures
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.AwaitPointerEventScope
-import androidx.compose.ui.input.pointer.PointerEventTimeoutCancellationException
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventTimeoutCancellationException
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.PointerType
+import androidx.compose.ui.input.pointer.isPrimaryPressed
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.changedToDownIgnoreConsumed
 import androidx.compose.ui.input.pointer.changedToUp
@@ -241,6 +243,7 @@ internal suspend fun PointerInputScope.detectTapAndPress(
 /**
  * Reads events until the first down is received. If [requireUnconsumed] is `true` and the first
  * down is consumed in the [PointerEventPass.Main] pass, that gesture is ignored.
+ * If it was down caused by [PointerType.Mouse], this function reacts only on primary button.
  */
 suspend fun AwaitPointerEventScope.awaitFirstDown(
     requireUnconsumed: Boolean = true
@@ -254,12 +257,16 @@ internal suspend fun AwaitPointerEventScope.awaitFirstDownOnPass(
     var event: PointerEvent
     do {
         event = awaitPointerEvent(pass)
-    } while (
-        !event.changes.fastAll {
-            if (requireUnconsumed) it.changedToDown() else it.changedToDownIgnoreConsumed()
-        }
-    )
+    } while (!event.isPrimaryChangedDown(requireUnconsumed))
     return event.changes[0]
+}
+
+private fun PointerEvent.isPrimaryChangedDown(requireUnconsumed: Boolean): Boolean {
+    val primaryButtonCausesDown = changes.fastAll { it.type == PointerType.Mouse }
+    val changedToDown = changes.fastAll {
+        if (requireUnconsumed) it.changedToDown() else it.changedToDownIgnoreConsumed()
+    }
+    return changedToDown && (buttons.isPrimaryPressed || !primaryButtonCausesDown)
 }
 
 /**

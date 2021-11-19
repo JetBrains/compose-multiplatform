@@ -43,6 +43,8 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.isSpecified
+import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
@@ -53,6 +55,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.MouseButton
+import androidx.compose.ui.test.MouseInjectionScope
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
@@ -202,6 +206,80 @@ class ClickableTest {
         rule.runOnIdle {
             assertThat(counter).isEqualTo(2)
         }
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun clickableTest_mousePrimaryClick() {
+        var counter = 0
+        val onClick: () -> Unit = {
+            ++counter
+        }
+
+        rule.setContent {
+            Box {
+                BasicText(
+                    "ClickableText",
+                    modifier = Modifier.testTag("myClickable").clickable(onClick = onClick)
+                )
+            }
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performMouseInput { click() }
+
+        rule.runOnIdle {
+            assertThat(counter).isEqualTo(1)
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performMouseInput { click() }
+
+        rule.runOnIdle {
+            assertThat(counter).isEqualTo(2)
+        }
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun clickableTest_mouseSecondaryClick() {
+        var counter = 0
+        val onClick: () -> Unit = {
+            ++counter
+        }
+
+        rule.setContent {
+            Box {
+                BasicText(
+                    "ClickableText",
+                    modifier = Modifier.testTag("myClickable").clickable(onClick = onClick)
+                )
+            }
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performMouseInput { secondaryClick() }
+
+        rule.runOnIdle {
+            assertThat(counter).isEqualTo(0)
+        }
+
+        rule.onNodeWithTag("myClickable")
+            .performMouseInput { secondaryClick() }
+
+        rule.runOnIdle {
+            assertThat(counter).isEqualTo(0)
+        }
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    private fun MouseInjectionScope.secondaryClick(position: Offset = center) {
+        if (position.isSpecified) {
+            updatePointerTo(position)
+        }
+        press(MouseButton.Secondary)
+        advanceEventTime(60L)
+        release(MouseButton.Secondary)
     }
 
     @Test
