@@ -98,8 +98,8 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerIconDefaults
 import androidx.compose.ui.input.pointer.isBackPressed
 import androidx.compose.ui.input.pointer.isForwardPressed
+import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.Placeholder
@@ -351,25 +351,18 @@ private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
                     "   }\n" +
                     "}",
                 fontFamily = italicFont,
-                modifier = Modifier.padding(10.dp).pointerInput(Unit) {
-                    awaitPointerEventScope {
-                        while (true) {
-                            val event = awaitPointerEvent()
-                            val position = event.changes.first().position
-                            when (event.type) {
-                                PointerEventType.Move -> {
-                                    overText = "Move position: $position"
-                                }
-                                PointerEventType.Enter -> {
-                                    overText = "Over enter"
-                                }
-                                PointerEventType.Exit -> {
-                                    overText = "Over exit"
-                                }
-                            }
-                        }
+                modifier = Modifier
+                    .padding(10.dp)
+                    .onPointerEvent(PointerEventType.Move) {
+                        val position = it.changes.first().position
+                        overText = "Move position: $position"
                     }
-                }
+                    .onPointerEvent(PointerEventType.Enter) {
+                        overText = "Over enter"
+                    }
+                    .onPointerEvent(PointerEventType.Exit) {
+                        overText = "Over exit"
+                    }
             )
         }
         Text(

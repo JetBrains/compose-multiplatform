@@ -38,6 +38,7 @@ import androidx.compose.ui.input.pointer.PointerButtons
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
+import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.sendKeyEvent
 import androidx.compose.ui.sendMouseEvent
@@ -620,20 +621,6 @@ class WindowInputEventTest {
         Toolkit.getDefaultToolkit().getLockingKeyState(mask)
     } catch (_: Exception) {
         false
-    }
-
-    private fun Modifier.onPointerEvent(
-        eventType: PointerEventType,
-        onEvent: AwaitPointerEventScope.(event: PointerEvent) -> Unit
-    ) = pointerInput(eventType, onEvent) {
-        awaitPointerEventScope {
-            while (true) {
-                val event = awaitPointerEvent()
-                if (event.type == eventType) {
-                    onEvent(event)
-                }
-            }
-        }
     }
 
     /**

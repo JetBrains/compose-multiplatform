@@ -54,12 +54,10 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.keyEvent
-import androidx.compose.ui.input.pointer.AwaitPointerEventScope
 import androidx.compose.ui.input.pointer.PointerButtons
-import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.platform.renderingTest
@@ -613,20 +611,6 @@ class ComposeSceneTest {
         composeRule.runOnIdle {
             assertThat(field1FocusState!!.isFocused).isTrue()
             assertThat(field2FocusState!!.isFocused).isFalse()
-        }
-    }
-
-    private fun Modifier.onPointerEvent(
-        eventType: PointerEventType,
-        onEvent: AwaitPointerEventScope.(event: PointerEvent) -> Unit
-    ) = pointerInput(eventType, onEvent) {
-        awaitPointerEventScope {
-            while (true) {
-                val event = awaitPointerEvent()
-                if (event.type == eventType) {
-                    onEvent(event)
-                }
-            }
         }
     }
 }

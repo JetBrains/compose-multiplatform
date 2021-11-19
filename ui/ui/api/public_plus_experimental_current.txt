@@ -1872,6 +1872,7 @@ package androidx.compose.ui.input.pointer {
   }
 
   public final class SuspendingPointerInputFilterKt {
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.ui.Modifier onPointerEvent(androidx.compose.ui.Modifier, int eventType, optional androidx.compose.ui.input.pointer.PointerEventPass pass, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.AwaitPointerEventScope,? super androidx.compose.ui.input.pointer.PointerEvent,kotlin.Unit> onEvent);
     method @Deprecated public static androidx.compose.ui.Modifier pointerInput(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
     method public static androidx.compose.ui.Modifier pointerInput(androidx.compose.ui.Modifier, Object? key1, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
     method public static androidx.compose.ui.Modifier pointerInput(androidx.compose.ui.Modifier, Object? key1, Object? key2, kotlin.jvm.functions.Function2<? super androidx.compose.ui.input.pointer.PointerInputScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
