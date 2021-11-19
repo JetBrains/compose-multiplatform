@@ -113,6 +113,7 @@ class AndroidXImplPlugin : Plugin<Project> {
 
         project.configureTaskTimeouts()
         project.configureMavenArtifactUpload(extension)
+        project.configureExportLibraryGroupsToXml()
         project.configureExternalDependencyLicenseCheck()
         project.configureProjectStructureValidation(extension)
         project.configureProjectVersionValidation(extension)
@@ -392,6 +393,17 @@ class AndroidXImplPlugin : Plugin<Project> {
         }
 
         project.addToProjectMap(extension)
+    }
+
+    private fun Project.configureExportLibraryGroupsToXml() {
+        project.tasks.register(
+            "exportLibraryGroupsToXml",
+            ExportLibraryGroupsToXmlTask::class.java
+        ) { task ->
+            task.libraryGroupFile = project.file("${project.getSupportRootFolder()}" +
+                "/buildSrc/public/src/main/kotlin/androidx/build/LibraryGroups.kt")
+            task.xmlOutputFile = project.file("${project.buildDir}/lint/library-groups.xml")
+        }
     }
 
     private fun Project.configureProjectStructureValidation(
