@@ -903,7 +903,7 @@ fun Project.validateProjectStructure(groupId: String) {
 fun AndroidXExtension.validateMavenVersion() {
     val mavenGroup = mavenGroup
     val mavenVersion = mavenVersion
-    val forcedVersion = mavenGroup?.forcedVersion
+    val forcedVersion = mavenGroup?.atomicGroupVersion
     if (forcedVersion != null && forcedVersion == mavenVersion) {
         throw GradleException(
             """

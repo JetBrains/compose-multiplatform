@@ -26,6 +26,7 @@ configurations {
 }
 
 dependencies {
+    cacheableApi(libs.toml)
     cacheableApi(libs.androidGradlePluginz)
     cacheableImplementation(libs.dexMemberList)
     cacheableApi(libs.kotlinGradlePluginz)
