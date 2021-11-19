@@ -50,6 +50,7 @@ object LibraryVersions {
     val CORE_ANIMATION_TESTING = Version("1.0.0-alpha03")
     val CORE_APPDIGEST = Version("1.0.0-alpha01")
     val CORE_GOOGLE_SHORTCUTS = Version("1.1.0-alpha02")
+    val CORE_PERFORMANCE = Version("1.0.0-alpha01")
     val CORE_REMOTEVIEWS = Version("1.0.0-alpha01")
     val CORE_ROLE = Version("1.1.0-alpha02")
     val CORE_SPLASHSCREEN = Version("1.0.0-alpha03")
