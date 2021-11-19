@@ -70,7 +70,10 @@ fun IconButton(
                     enabled = enabled,
                     role = Role.Button,
                     interactionSource = interactionSource,
-                    indication = rememberRipple(bounded = false, radius = RippleRadius)
+                    indication = rememberRipple(
+                        bounded = false,
+                        radius = IconButton.StateLayerSize / 2
+                    )
                 ),
         contentAlignment = Alignment.Center
     ) {
@@ -121,7 +124,10 @@ fun IconToggleButton(
                     enabled = enabled,
                     role = Role.Checkbox,
                     interactionSource = interactionSource,
-                    indication = rememberRipple(bounded = false, radius = RippleRadius)
+                    indication = rememberRipple(
+                        bounded = false,
+                        radius = IconButton.StateLayerSize / 2
+                    )
                 ),
         contentAlignment = Alignment.Center
     ) {
@@ -134,6 +140,3 @@ fun IconToggleButton(
         CompositionLocalProvider(LocalContentColor provides contentColor, content = content)
     }
 }
-
-// Default radius of an unbounded ripple in an IconButton
-private val RippleRadius = IconButton.StateLayerSize
