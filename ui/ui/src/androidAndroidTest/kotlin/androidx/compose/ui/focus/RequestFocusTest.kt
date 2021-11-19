@@ -49,7 +49,7 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
         // Arrange.
         val focusModifier = FocusModifier(Active)
         rule.setFocusableContent {
-            Box(modifier = focusModifier)
+            Box(Modifier.focusTarget(focusModifier))
         }
 
         // Act.
@@ -69,7 +69,7 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
         // Arrange.
         val focusModifier = FocusModifier(Captured)
         rule.setFocusableContent {
-            Box(modifier = focusModifier)
+            Box(Modifier.focusTarget(focusModifier))
         }
 
         // Act.
@@ -88,7 +88,10 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
         // Arrange.
         val focusModifier = FocusModifier(Inactive)
         rule.setFocusableContent {
-            Box(modifier = Modifier.focusProperties { canFocus = false }.then(focusModifier))
+            Box(Modifier
+                .focusProperties { canFocus = false }
+                .focusTarget(focusModifier)
+            )
         }
 
         // Act.
@@ -107,7 +110,7 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
         // Arrange.
         val focusModifier = FocusModifier(ActiveParent)
         rule.setFocusableContent {
-            Box(modifier = focusModifier)
+            Box(Modifier.focusTarget(focusModifier))
         }
 
         // Act.
@@ -122,8 +125,8 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
         val focusModifier = FocusModifier(ActiveParent)
         val childFocusModifier = FocusModifier(Active)
         rule.setFocusableContent {
-            Box(modifier = focusModifier) {
-                Box(modifier = childFocusModifier)
+            Box(Modifier.focusTarget(focusModifier)) {
+                Box(Modifier.focusTarget(childFocusModifier))
             }
         }
         rule.runOnIdle {
@@ -157,7 +160,7 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
         // Arrange.
         val focusModifier = FocusModifier(DeactivatedParent)
         rule.setFocusableContent {
-            Box(modifier = focusModifier)
+            Box(Modifier.focusTarget(focusModifier))
         }
 
         // Act.
@@ -172,8 +175,11 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
         val focusModifier = FocusModifier(ActiveParent)
         val childFocusModifier = FocusModifier(Active)
         rule.setFocusableContent {
-            Box(modifier = Modifier.focusProperties { canFocus = false }.then(focusModifier)) {
-                Box(modifier = childFocusModifier)
+            Box(Modifier
+                .focusProperties { canFocus = false }
+                .focusTarget(focusModifier)
+            ) {
+                Box(Modifier.focusTarget(childFocusModifier))
             }
         }
         rule.runOnIdle {
@@ -187,9 +193,9 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
 
         // Assert.
         rule.runOnIdle {
-           // Unchanged.
-           assertThat(focusModifier.focusState).isEqualTo(DeactivatedParent)
-           assertThat(childFocusModifier.focusState).isEqualTo(Active)
+            // Unchanged.
+            assertThat(focusModifier.focusState).isEqualTo(DeactivatedParent)
+            assertThat(childFocusModifier.focusState).isEqualTo(Active)
         }
     }
 
@@ -200,9 +206,12 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
         val childFocusModifier = FocusModifier(Active)
         val grandchildFocusModifier = FocusModifier(Inactive)
         rule.setFocusableContent {
-            Box(modifier = Modifier.focusProperties { canFocus = false }.then(focusModifier)) {
-                Box(modifier = childFocusModifier) {
-                    Box(modifier = grandchildFocusModifier)
+            Box(Modifier
+                .focusProperties { canFocus = false }
+                .focusTarget(focusModifier)
+            ) {
+                Box(Modifier.focusTarget(childFocusModifier)) {
+                    Box(Modifier.focusTarget(grandchildFocusModifier))
                 }
             }
         }
@@ -238,7 +247,7 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
         // Arrange.
         val rootFocusModifier = FocusModifier(Inactive)
         rule.setFocusableContent {
-            Box(modifier = rootFocusModifier)
+            Box(Modifier.focusTarget(rootFocusModifier))
         }
 
         // Act.
@@ -258,8 +267,8 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
         val rootFocusModifier = FocusModifier(Inactive)
         val childFocusModifier = FocusModifier(Inactive)
         rule.setFocusableContent {
-            Box(modifier = rootFocusModifier) {
-                Box(modifier = childFocusModifier)
+            Box(Modifier.focusTarget(rootFocusModifier)) {
+                Box(Modifier.focusTarget(childFocusModifier))
             }
         }
 
@@ -291,9 +300,9 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
         val focusModifier = FocusModifier(Inactive)
         val childFocusModifier = FocusModifier(Inactive)
         rule.setFocusableContent {
-            Box(modifier = parentFocusModifier) {
-                Box(modifier = focusModifier) {
-                    Box(modifier = childFocusModifier)
+            Box(Modifier.focusTarget(parentFocusModifier)) {
+                Box(Modifier.focusTarget(focusModifier)) {
+                    Box(Modifier.focusTarget(childFocusModifier))
                 }
             }
         }
@@ -325,7 +334,7 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
         // Arrange.
         val rootFocusModifier = FocusModifier(Inactive)
         rule.setFocusableContent {
-            Box(modifier = rootFocusModifier)
+            Box(Modifier.focusTarget(rootFocusModifier))
         }
 
         // Act.
@@ -345,8 +354,8 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
         val rootFocusModifier = FocusModifier(Inactive)
         val childFocusModifier = FocusModifier(Inactive)
         rule.setFocusableContent {
-            Box(modifier = rootFocusModifier) {
-                Box(modifier = childFocusModifier)
+            Box(Modifier.focusTarget(rootFocusModifier)) {
+                Box(Modifier.focusTarget(childFocusModifier))
             }
         }
 
@@ -371,9 +380,9 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
         val parentFocusModifier = FocusModifier(Inactive)
         val childFocusModifier = FocusModifier(Inactive)
         rule.setFocusableContent {
-            Box(modifier = grandParentFocusModifier) {
-                Box(modifier = parentFocusModifier) {
-                    Box(modifier = childFocusModifier)
+            Box(Modifier.focusTarget(grandParentFocusModifier)) {
+                Box(Modifier.focusTarget(parentFocusModifier)) {
+                    Box(Modifier.focusTarget(childFocusModifier))
                 }
             }
         }
@@ -399,9 +408,9 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
         val parentFocusModifier = FocusModifier(Inactive)
         val childFocusModifier = FocusModifier(Inactive)
         rule.setFocusableContent {
-            Box(modifier = grandParentFocusModifier) {
-                Box(modifier = parentFocusModifier) {
-                    Box(modifier = childFocusModifier)
+            Box(Modifier.focusTarget(grandParentFocusModifier)) {
+                Box(Modifier.focusTarget(parentFocusModifier)) {
+                    Box(Modifier.focusTarget(childFocusModifier))
                 }
             }
         }
@@ -423,9 +432,9 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
         val parentFocusModifier = FocusModifier(Inactive)
         val childFocusModifier = FocusModifier(Inactive)
         rule.setFocusableContent {
-            Box(modifier = grandParentFocusModifier) {
-                Box(modifier = parentFocusModifier) {
-                    Box(modifier = childFocusModifier)
+            Box(Modifier.focusTarget(grandParentFocusModifier)) {
+                Box(Modifier.focusTarget(parentFocusModifier)) {
+                    Box(Modifier.focusTarget(childFocusModifier))
                 }
             }
         }
@@ -447,8 +456,8 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
         val parentFocusModifier = FocusModifier(Active)
         val focusModifier = FocusModifier(Inactive)
         rule.setFocusableContent {
-            Box(modifier = parentFocusModifier) {
-                Box(modifier = focusModifier)
+            Box(Modifier.focusTarget(parentFocusModifier)) {
+                Box(Modifier.focusTarget(focusModifier))
             }
         }
 
@@ -470,8 +479,8 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
         val parentFocusModifier = FocusModifier(ActiveParent)
         val focusModifier = FocusModifier(Active)
         rule.setFocusableContent {
-            Box(modifier = parentFocusModifier) {
-                Box(modifier = focusModifier)
+            Box(Modifier.focusTarget(parentFocusModifier)) {
+                Box(Modifier.focusTarget(focusModifier))
             }
         }
         rule.runOnIdle {
@@ -504,8 +513,8 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
         val parentFocusModifier = FocusModifier(ActiveParent)
         val focusModifier = FocusModifier(Captured)
         rule.setFocusableContent {
-            Box(modifier = parentFocusModifier) {
-                Box(modifier = focusModifier)
+            Box(Modifier.focusTarget(parentFocusModifier)) {
+                Box(Modifier.focusTarget(focusModifier))
             }
         }
         rule.runOnIdle {
@@ -531,9 +540,9 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
         val focusModifier = FocusModifier(Inactive)
         val siblingModifier = FocusModifier(Active)
         rule.setFocusableContent {
-            Box(modifier = parentFocusModifier) {
-                Box(modifier = focusModifier)
-                Box(modifier = siblingModifier)
+            Box(Modifier.focusTarget(parentFocusModifier)) {
+                Box(Modifier.focusTarget(focusModifier))
+                Box(Modifier.focusTarget(siblingModifier))
             }
         }
         rule.runOnIdle {
@@ -560,9 +569,9 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
         val focusModifier = FocusModifier(Inactive)
         val siblingModifier = FocusModifier(Captured)
         rule.setFocusableContent {
-            Box(modifier = parentFocusModifier) {
-                Box(modifier = focusModifier)
-                Box(modifier = siblingModifier)
+            Box(Modifier.focusTarget(parentFocusModifier)) {
+                Box(Modifier.focusTarget(focusModifier))
+                Box(Modifier.focusTarget(siblingModifier))
             }
         }
         rule.runOnIdle {
@@ -591,12 +600,12 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
         val auntModifier = FocusModifier(ActiveParent)
         val cousinModifier = FocusModifier(Active)
         rule.setFocusableContent {
-            Box(modifier = grandParentModifier) {
-                Box(modifier = parentModifier) {
-                    Box(modifier = focusModifier)
+            Box(Modifier.focusTarget(grandParentModifier)) {
+                Box(Modifier.focusTarget(parentModifier)) {
+                    Box(Modifier.focusTarget(focusModifier))
                 }
-                Box(modifier = auntModifier) {
-                    Box(modifier = cousinModifier)
+                Box(Modifier.focusTarget(auntModifier)) {
+                    Box(Modifier.focusTarget(cousinModifier))
                 }
             }
         }
@@ -630,9 +639,9 @@ class RequestFocusTest(private val propagateFocus: Boolean) {
         val parentModifier = FocusModifier(Inactive)
         val focusModifier = FocusModifier(Inactive)
         rule.setFocusableContent {
-            Box(modifier = grandParentModifier) {
-                Box(modifier = parentModifier) {
-                    Box(modifier = focusModifier)
+            Box(Modifier.focusTarget(grandParentModifier)) {
+                Box(Modifier.focusTarget(parentModifier)) {
+                    Box(Modifier.focusTarget(focusModifier))
                 }
             }
         }

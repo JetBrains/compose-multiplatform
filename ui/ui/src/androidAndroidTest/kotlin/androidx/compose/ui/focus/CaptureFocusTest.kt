@@ -44,10 +44,10 @@ class CaptureFocusTest {
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
-                modifier = Modifier
+                Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(FocusModifier(Active))
+                    .focusTarget(FocusModifier(Active))
             )
         }
 
@@ -71,10 +71,10 @@ class CaptureFocusTest {
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
-                modifier = Modifier
+                Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(FocusModifier(ActiveParent))
+                    .focusTarget(FocusModifier(ActiveParent))
             )
         }
 
@@ -98,10 +98,10 @@ class CaptureFocusTest {
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
-                modifier = Modifier
+                Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(FocusModifier(Captured))
+                    .focusTarget(FocusModifier(Captured))
             )
         }
 
@@ -124,7 +124,7 @@ class CaptureFocusTest {
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
-                modifier = Modifier
+                Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
                     .focusProperties { canFocus = false }
@@ -154,15 +154,16 @@ class CaptureFocusTest {
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
-                modifier = Modifier
+                Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
                     .focusProperties { canFocus = false }
                     .focusable()
             ) {
-                Box(modifier = Modifier
-                    .focusRequester(initialFocus)
-                    .focusable()
+                Box(
+                    Modifier
+                        .focusRequester(initialFocus)
+                        .focusable()
                 )
             }
         }
@@ -189,10 +190,10 @@ class CaptureFocusTest {
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
-                modifier = Modifier
+                Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(FocusModifier(Inactive))
+                    .focusTarget(FocusModifier(Inactive))
             )
         }
 

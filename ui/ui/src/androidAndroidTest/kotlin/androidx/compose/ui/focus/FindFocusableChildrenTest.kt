@@ -51,12 +51,12 @@ class FindFocusableChildrenTest(private val excludeDeactivated: Boolean) {
         // layoutNode--focusNode1--focusNode2--focusNode3--focusNode4
         rule.setContent {
             Box(
-                modifier = Modifier
-                .then(focusModifier1)
-                .focusProperties { canFocus = false }
-                .then(focusModifier2)
-                .then(focusModifier3)
-                .then(focusModifier4)
+                Modifier
+                    .focusTarget(focusModifier1)
+                    .focusProperties { canFocus = false }
+                    .focusTarget(focusModifier2)
+                    .focusTarget(focusModifier3)
+                    .focusTarget(focusModifier4)
             )
         }
 
@@ -84,12 +84,12 @@ class FindFocusableChildrenTest(private val excludeDeactivated: Boolean) {
         // layoutNode--focusNode1--nonFocusNode--focusNode2--focusNode3
         rule.setContent {
             Box(
-                modifier = Modifier
-                    .then(focusModifier1)
+                Modifier
+                    .focusTarget(focusModifier1)
                     .background(color = Red)
                     .focusProperties { canFocus = false }
-                    .then(focusModifier2)
-                    .then(focusModifier3)
+                    .focusTarget(focusModifier2)
+                    .focusTarget(focusModifier3)
             )
         }
 
@@ -121,16 +121,18 @@ class FindFocusableChildrenTest(private val excludeDeactivated: Boolean) {
         val focusModifier3 = FocusModifier(Inactive)
         val focusModifier4 = FocusModifier(Inactive)
         rule.setContent {
-            Box(modifier = parentFocusModifier) {
-                Box(modifier = Modifier
-                    .focusProperties { canFocus = false }
-                    .then(focusModifier1)
-                    .then(focusModifier2)
+            Box(Modifier.focusTarget(parentFocusModifier)) {
+                Box(
+                    Modifier
+                        .focusProperties { canFocus = false }
+                        .focusTarget(focusModifier1)
+                        .focusTarget(focusModifier2)
                 )
-                Box(modifier = Modifier
-                    .then(focusModifier3)
-                    .focusProperties { canFocus = false }
-                    .then(focusModifier4)
+                Box(
+                    Modifier
+                        .focusTarget(focusModifier3)
+                        .focusProperties { canFocus = false }
+                        .focusTarget(focusModifier4)
                 )
             }
         }
