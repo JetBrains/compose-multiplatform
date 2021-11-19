@@ -181,19 +181,6 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
     "validateProperties",
     "tasks",
 
-    ":benchmark:benchmark-common:generateReleaseProtos",
-    ":benchmark:benchmark-common:generateDebugProtos",
-    ":benchmark:benchmark-common:compileReleaseKotlin",
-    ":benchmark:benchmark-common:compileDebugKotlin",
-    ":benchmark:benchmark-common:compileReleaseJavaWithJavac",
-    ":benchmark:benchmark-common:compileDebugJavaWithJavac",
-    ":benchmark:benchmark-common:extractReleaseAnnotations",
-    ":benchmark:benchmark-common:extractDebugAnnotations",
-    ":benchmark:benchmark-common:generateApi",
-    ":benchmark:benchmark-common:runErrorProne",
-    ":benchmark:benchmark-common:lintAnalyzeDebug",
-    ":benchmark:benchmark-common:lintDebug",
-
     // More information about the fact that these dokka tasks rerun can be found at b/167569304
     "dokkaKotlinDocs",
     "zipDokkaDocs",
