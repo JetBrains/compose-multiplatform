@@ -381,10 +381,6 @@ package androidx.compose.ui.text {
     property public final long size;
   }
 
-  public final class TextLayoutResultKt {
-    method @Deprecated public static androidx.compose.ui.text.TextLayoutResult createTextLayoutResult(optional androidx.compose.ui.text.TextLayoutInput layoutInput, optional androidx.compose.ui.text.MultiParagraph multiParagraph, optional long size);
-  }
-
   public final class TextPainter {
     method public void paint(androidx.compose.ui.graphics.Canvas canvas, androidx.compose.ui.text.TextLayoutResult textLayoutResult);
     field public static final androidx.compose.ui.text.TextPainter INSTANCE;
@@ -512,7 +508,23 @@ package androidx.compose.ui.text.android.style {
 
 package androidx.compose.ui.text.font {
 
+  public abstract class AndroidFont implements androidx.compose.ui.text.font.Font {
+    ctor public AndroidFont(int loadingStrategy);
+    method public final int getLoadingStrategy();
+    method public abstract androidx.compose.ui.text.font.AndroidFont.TypefaceLoader getTypefaceLoader();
+    property public final int loadingStrategy;
+    property public abstract androidx.compose.ui.text.font.AndroidFont.TypefaceLoader typefaceLoader;
+  }
+
+  public static interface AndroidFont.TypefaceLoader {
+    method public android.graphics.Typeface? load(android.content.Context context, androidx.compose.ui.text.font.AndroidFont font);
+    method public suspend Object? loadAsync(android.content.Context context, androidx.compose.ui.text.font.AndroidFont font, kotlin.coroutines.Continuation<? super android.graphics.Typeface> p);
+  }
+
   public final class AndroidFontKt {
+  }
+
+  public final class AndroidFontUtils_androidKt {
   }
 
   public final class AndroidTypeface_androidKt {
@@ -529,10 +541,14 @@ package androidx.compose.ui.text.font {
     method public androidx.compose.ui.text.font.FontWeight getWeight();
     property public abstract int style;
     property public abstract androidx.compose.ui.text.font.FontWeight weight;
+    field public static final androidx.compose.ui.text.font.Font.Companion Companion;
+  }
+
+  public static final class Font.Companion {
   }
 
   public static interface Font.ResourceLoader {
-    method public Object load(androidx.compose.ui.text.font.Font font);
+    method @Deprecated public default Object load(androidx.compose.ui.text.font.Font font);
   }
 
   @androidx.compose.runtime.Immutable public abstract sealed class FontFamily {
@@ -597,6 +613,9 @@ package androidx.compose.ui.text.font {
     property public final int None;
     property public final int Style;
     property public final int Weight;
+  }
+
+  public final class FontSynthesis_androidKt {
   }
 
   @androidx.compose.runtime.Immutable public final class FontWeight implements java.lang.Comparable<androidx.compose.ui.text.font.FontWeight> {

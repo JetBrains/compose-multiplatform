@@ -2287,6 +2287,10 @@ package androidx.compose.ui.platform {
     property public static final androidx.compose.runtime.ProvidableCompositionLocal<android.view.View> LocalView;
   }
 
+  public final class AndroidFontResourceLoader_androidKt {
+    method @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font.ResourceLoader AndroidResourceLoader(androidx.compose.ui.text.font.Font.Companion, android.content.Context context);
+  }
+
   public final class AndroidUiDispatcher extends kotlinx.coroutines.CoroutineDispatcher {
     method public void dispatch(kotlin.coroutines.CoroutineContext context, Runnable block);
     method public android.view.Choreographer getChoreographer();
@@ -2455,6 +2459,12 @@ package androidx.compose.ui.platform {
     method public infix androidx.compose.runtime.ProvidedValue<androidx.compose.ui.platform.SoftwareKeyboardController> provides(androidx.compose.ui.platform.SoftwareKeyboardController softwareKeyboardController);
     property @androidx.compose.runtime.Composable public final androidx.compose.ui.platform.SoftwareKeyboardController? current;
     field public static final androidx.compose.ui.platform.LocalSoftwareKeyboardController INSTANCE;
+  }
+
+  public final class ResourceFontLoadException extends java.lang.RuntimeException {
+    ctor public ResourceFontLoadException(androidx.compose.ui.text.font.Font font, int reason);
+    method public int getReason();
+    property public final int reason;
   }
 
   public final class ShapeContainingUtilKt {

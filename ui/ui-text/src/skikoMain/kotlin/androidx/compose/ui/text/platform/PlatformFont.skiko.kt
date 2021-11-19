@@ -16,8 +16,10 @@
 package androidx.compose.ui.text.platform
 
 import androidx.compose.ui.text.Cache
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontListFontFamily
+import androidx.compose.ui.text.font.FontLoad
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.GenericFontFamily
@@ -54,6 +56,9 @@ class LoadedFont internal constructor(
     override val weight: FontWeight,
     override val style: FontStyle
 ) : PlatformFont() {
+    @ExperimentalTextApi
+    override val fontLoad: FontLoad = FontLoad.Blocking
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is LoadedFont) return false
@@ -164,8 +169,23 @@ class FontLoader : Font.ResourceLoader {
     //  proper interfaces or they are broken (.makeFromFile(*, 1) always fails)
     //  2. variable fonts. for them we also need to extend definition interfaces to support
     //  custom variation settings
+    // 3. async fonts. fonts that load with fallback using FontFamily.Resolver.
     override fun load(font: Font): SkTypeface =
         loadFromTypefacesCache(font)
+
+    @ExperimentalTextApi
+    override fun loadOrNull(font: Font): SkTypeface? =
+        kotlin.runCatching { load(font) }.getOrNull()
+
+    @ExperimentalTextApi
+    override suspend fun loadAsync(font: Font): SkTypeface =
+        // TODO: add a developer-friendly API similar to AndroidFont that allows introduction of new
+        // font resource description types
+        load(font)
+
+    @ExperimentalTextApi
+    override val cacheKey: String?
+        get() = null
 
     internal fun findTypeface(
         fontFamily: FontFamily,

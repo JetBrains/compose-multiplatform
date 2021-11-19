@@ -444,38 +444,3 @@ class TextLayoutResult constructor(
             ")"
     }
 }
-
-@Deprecated(
-    "Unused public function which was added for testing. The function does not do " +
-        "anything usable for Compose text APIs. The function is now deprecated and will be " +
-        "removed soon"
-)
-fun createTextLayoutResult(
-    layoutInput: TextLayoutInput =
-        TextLayoutInput(
-            text = AnnotatedString(""),
-            style = TextStyle(),
-            placeholders = emptyList(),
-            maxLines = 1,
-            softWrap = false,
-            overflow = TextOverflow.Clip,
-            density = Density(1f),
-            layoutDirection = LayoutDirection.Ltr,
-            resourceLoader = object : Font.ResourceLoader {
-                override fun load(font: Font): Any {
-                    return false
-                }
-            },
-            constraints = Constraints()
-        ),
-    multiParagraph: MultiParagraph = MultiParagraph(
-        annotatedString = layoutInput.text,
-        style = layoutInput.style,
-        width = 0f,
-        density = layoutInput.density,
-        resourceLoader = layoutInput.resourceLoader
-    ),
-    size: IntSize = IntSize.Zero
-): TextLayoutResult = TextLayoutResult(
-    layoutInput, multiParagraph, size
-)

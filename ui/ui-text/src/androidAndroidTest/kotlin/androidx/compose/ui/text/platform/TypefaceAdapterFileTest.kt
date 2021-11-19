@@ -17,6 +17,7 @@ package androidx.compose.ui.text.platform
 
 import android.content.Context
 import android.os.ParcelFileDescriptor
+import androidx.compose.ui.platform.AndroidResourceLoader
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.toFontFamily
@@ -24,7 +25,6 @@ import androidx.compose.ui.text.matchers.assertThat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
-import com.nhaarman.mockitokotlin2.mock
 import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
@@ -39,7 +39,9 @@ class TypefaceAdapterFileTest {
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val assetFontPath = "subdirectory/asset_font.ttf"
     private val tmpFontPath = "tmp_file_font.ttf"
-    private fun TypefaceAdapter() = TypefaceAdapter(resourceLoader = mock())
+    private fun TypefaceAdapter() = TypefaceAdapter(
+        resourceLoader = Font.AndroidResourceLoader(context)
+    )
 
     @Before
     fun setup() {

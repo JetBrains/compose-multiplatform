@@ -16,42 +16,82 @@
 
 package androidx.compose.ui.platform
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Typeface
-import android.os.Build
-import androidx.annotation.DoNotInline
-import androidx.annotation.RequiresApi
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.font.AndroidFont
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.ResourceFont
 import androidx.core.content.res.ResourcesCompat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
  * Android implementation for [Font.ResourceLoader]. It is designed to load only [ResourceFont].
  */
-internal class AndroidFontResourceLoader(private val context: Context) : Font.ResourceLoader {
-    override fun load(font: Font): Typeface {
+internal class AndroidFontResourceLoader(
+    private val context: Context
+) : Font.ResourceLoader {
+
+    @ExperimentalTextApi
+    override fun loadOrNull(font: Font): Typeface? {
         return when (font) {
-            is ResourceFont ->
-                if (Build.VERSION.SDK_INT >= 26) {
-                    AndroidFontResourceLoaderHelper.create(context, font.resId)
-                } else {
-                    ResourcesCompat.getFont(context, font.resId)!!
-                }
+            is AndroidFont -> font.typefaceLoader.load(context, font)
+            is ResourceFont -> runCatching { font.load(context) }.getOrNull()
+            else -> null
+        }
+    }
+
+    @ExperimentalTextApi
+    override suspend fun loadAsync(font: Font): Typeface? {
+        return when (font) {
+            is AndroidFont -> font.typefaceLoader.loadAsync(context, font)
+            is ResourceFont -> font.loadAsync(context)
             else -> throw IllegalArgumentException("Unknown font type: $font")
         }
     }
+
+    @ExperimentalTextApi
+    override val cacheKey: String? = null
 }
 
 /**
- * This class is here to ensure that the classes that use this API will get verified and can be
- * AOT compiled. It is expected that this class will soft-fail verification, but the classes
- * which use this method will pass.
+ * This is typically provided by [LocalFontLoader].
+ *
+ * This function is available for preloading fonts prior to starting compose, such as an Application
+ * context.
+ *
+ * All instances of this will share the same font cache when passed to FontFamily.Resolver. This is
+ * the "platform default" loader on Android with respect to [Font.ResourceLoader.cacheKey].
  */
-@RequiresApi(26)
-private object AndroidFontResourceLoaderHelper {
-    @RequiresApi(26)
-    @DoNotInline
-    fun create(context: Context, resourceId: Int): Typeface {
-        return context.resources.getFont(resourceId)
+@ExperimentalTextApi
+fun Font.Companion.AndroidResourceLoader(
+    @SuppressLint("ContextFirst") context: Context
+): Font.ResourceLoader = AndroidFontResourceLoader(context.applicationContext)
+
+private fun ResourceFont.load(context: Context): Typeface =
+    ResourcesCompat.getFont(context, resId)!!
+
+class ResourceFontLoadException(font: Font, val reason: Int) :
+    RuntimeException("Unable to load font $font (reason=$reason)")
+
+// TODO(seanmcq): Move to core-ktx to dedup
+@OptIn(ExperimentalCoroutinesApi::class)
+private suspend fun ResourceFont.loadAsync(context: Context): Typeface {
+    return suspendCancellableCoroutine { continuation ->
+        ResourcesCompat.getFont(context, resId, object : ResourcesCompat.FontCallback() {
+            override fun onFontRetrieved(typeface: Typeface) {
+                continuation.resume(typeface) {
+                    /* ignore */
+                }
+            }
+
+            override fun onFontRetrievalFailed(reason: Int) {
+                continuation.cancel(
+                    ResourceFontLoadException(this@loadAsync, reason)
+                )
+            }
+        }, null)
     }
 }

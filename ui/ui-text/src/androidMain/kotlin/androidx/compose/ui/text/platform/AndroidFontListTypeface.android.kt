@@ -25,10 +25,8 @@ import androidx.annotation.RequiresApi
 import androidx.collection.LruCache
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.android.InternalPlatformTextApi
-import androidx.compose.ui.text.font.AndroidAssetFont
-import androidx.compose.ui.text.font.AndroidFileDescriptorFont
-import androidx.compose.ui.text.font.AndroidFileFont
 import androidx.compose.ui.text.font.AndroidFont
+import androidx.compose.ui.text.font.AndroidPreloadedFont
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontListFontFamily
@@ -113,7 +111,7 @@ internal object AndroidTypefaceCache {
         val key = getKey(context, font)
 
         key?.let {
-            cache.get(key)?.let { return it }
+            cache[key]?.let { return it }
         }
 
         val typeface = when (font) {
@@ -124,9 +122,9 @@ internal object AndroidTypefaceCache {
                 } else {
                     ResourcesCompat.getFont(context, font.resId)!!
                 }
-            is AndroidFont -> font.typeface
+            is AndroidFont -> font.typefaceLoader.load(context, font)
             else -> throw IllegalArgumentException("Unknown font type: $font")
-        }
+        } ?: throw IllegalArgumentException("Unable to load font $font")
 
         key?.let { cache.put(key, typeface) }
 
@@ -143,12 +141,7 @@ internal object AndroidTypefaceCache {
                 context.resources.getValue(font.resId, value, true)
                 "res:${value.string?.toString()!!}"
             }
-            is AndroidAssetFont -> {
-                "asset:${font.path}"
-            }
-            // do not cache File based Fonts, since the user might change the font
-            is AndroidFileFont -> null
-            is AndroidFileDescriptorFont -> null
+            is AndroidPreloadedFont -> font.cacheKey
             else -> throw IllegalArgumentException("Unknown font type: $font")
         }
     }

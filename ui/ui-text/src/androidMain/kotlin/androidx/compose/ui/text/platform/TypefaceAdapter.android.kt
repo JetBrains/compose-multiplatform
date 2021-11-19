@@ -21,7 +21,7 @@ import android.os.Build
 import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.collection.LruCache
-import androidx.compose.ui.text.font.AndroidFont
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.DefaultFontFamily
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -32,7 +32,6 @@ import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.GenericFontFamily
 import androidx.compose.ui.text.font.LoadedFontFamily
-import androidx.compose.ui.text.font.ResourceFont
 
 /**
  * Creates a Typeface based on generic font family or a custom [FontFamily].
@@ -233,6 +232,7 @@ internal open class TypefaceAdapter(
      * @param fontSynthesis [FontSynthesis] which attributes of the font family to synthesize
      *        custom fonts for if they are not already present in the font family
      */
+    @OptIn(ExperimentalTextApi::class)
     private fun create(
         fontStyle: FontStyle = FontStyle.Normal,
         fontWeight: FontWeight = FontWeight.Normal,
@@ -242,11 +242,7 @@ internal open class TypefaceAdapter(
         val font = fontMatcher.matchFont(fontFamily, fontWeight, fontStyle)
 
         val typeface = try {
-            when (font) {
-                is ResourceFont -> resourceLoader.load(font) as Typeface
-                is AndroidFont -> font.typeface
-                else -> throw IllegalStateException("Unknown font type: $font")
-            }
+            resourceLoader.loadOrNull(font)!! as Typeface
         } catch (e: Exception) {
             throw IllegalStateException("Cannot create Typeface from $font", e)
         }

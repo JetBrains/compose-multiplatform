@@ -22,7 +22,9 @@ import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.platform.AndroidResourceLoader
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.SpanStyle
@@ -54,13 +56,6 @@ class ParagraphBenchmark(
             arrayOf(TextType.PlainText),
             arrayOf(Alphabet.Latin, Alphabet.Cjk)
         )
-
-        // A fake resource loader required to construct Paragraph
-        val resourceLoader = object : Font.ResourceLoader {
-            override fun load(font: Font): Any {
-                return false
-            }
-        }
     }
 
     @get:Rule
@@ -115,6 +110,7 @@ class ParagraphBenchmark(
         )
     }
 
+    @OptIn(ExperimentalTextApi::class)
     private fun paragraphIntrinsics(
         text: String,
         spanStyles: List<AnnotatedString.Range<SpanStyle>>
@@ -123,7 +119,7 @@ class ParagraphBenchmark(
             text = text,
             density = Density(density = instrumentationContext.resources.displayMetrics.density),
             style = TextStyle(fontSize = fontSize),
-            resourceLoader = resourceLoader,
+            resourceLoader = Font.AndroidResourceLoader(instrumentationContext),
             spanStyles = spanStyles
         )
     }

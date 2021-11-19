@@ -2155,6 +2155,9 @@ package androidx.compose.ui.platform {
     property public static final androidx.compose.runtime.ProvidableCompositionLocal<android.view.View> LocalView;
   }
 
+  public final class AndroidFontResourceLoader_androidKt {
+  }
+
   public final class AndroidUiDispatcher extends kotlinx.coroutines.CoroutineDispatcher {
     method public void dispatch(kotlin.coroutines.CoroutineContext context, Runnable block);
     method public android.view.Choreographer getChoreographer();
@@ -2313,6 +2316,12 @@ package androidx.compose.ui.platform {
   }
 
   public final class JvmActuals_jvmKt {
+  }
+
+  public final class ResourceFontLoadException extends java.lang.RuntimeException {
+    ctor public ResourceFontLoadException(androidx.compose.ui.text.font.Font font, int reason);
+    method public int getReason();
+    property public final int reason;
   }
 
   public final class ShapeContainingUtilKt {
