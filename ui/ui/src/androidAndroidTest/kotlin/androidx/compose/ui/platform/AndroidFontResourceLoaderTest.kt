@@ -37,7 +37,7 @@ class AndroidFontResourceLoaderTest {
     @Test
     fun test_font_loading_from_res() {
         val loader = AndroidFontResourceLoader(context)
-        val typeface = loader.loadOrNull(
+        val typeface = loader.loadBlocking(
             Font(
                 resId = R.font.sample_font,
                 weight = FontWeight.Normal,

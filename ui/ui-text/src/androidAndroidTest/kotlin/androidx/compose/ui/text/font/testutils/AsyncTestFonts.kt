@@ -43,7 +43,7 @@ class AsyncTestTypefaceLoader : AndroidFont.TypefaceLoader {
     internal val optionalRequests = mutableListOf<OptionalFauxFont>()
     internal val optionalAsyncRequests = mutableListOf<Font>()
 
-    override fun load(context: Context, font: AndroidFont): Typeface? {
+    override fun loadBlocking(context: Context, font: AndroidFont): Typeface? {
         val result = when (font) {
             is OptionalFauxFont -> {
                 optionalRequests.add(font)
@@ -59,7 +59,7 @@ class AsyncTestTypefaceLoader : AndroidFont.TypefaceLoader {
         return result
     }
 
-    override suspend fun loadAsync(context: Context, font: AndroidFont): Typeface? {
+    override suspend fun awaitLoad(context: Context, font: AndroidFont): Typeface? {
         val result = when (font) {
             is OptionalFauxFont -> {
                 optionalAsyncRequests.add(font)

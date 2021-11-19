@@ -529,8 +529,8 @@ package androidx.compose.ui.text.font {
   }
 
   public static interface AndroidFont.TypefaceLoader {
-    method public android.graphics.Typeface? load(android.content.Context context, androidx.compose.ui.text.font.AndroidFont font);
-    method public suspend Object? loadAsync(android.content.Context context, androidx.compose.ui.text.font.AndroidFont font, kotlin.coroutines.Continuation<? super android.graphics.Typeface> p);
+    method public suspend Object? awaitLoad(android.content.Context context, androidx.compose.ui.text.font.AndroidFont font, kotlin.coroutines.Continuation<? super android.graphics.Typeface> p);
+    method public android.graphics.Typeface? loadBlocking(android.content.Context context, androidx.compose.ui.text.font.AndroidFont font);
   }
 
   public final class AndroidFontKt {
@@ -566,10 +566,10 @@ package androidx.compose.ui.text.font {
   }
 
   public static interface Font.ResourceLoader {
+    method @androidx.compose.ui.text.ExperimentalTextApi public suspend Object? awaitLoad(androidx.compose.ui.text.font.Font font, kotlin.coroutines.Continuation<? super java.lang.Object> p);
     method @androidx.compose.ui.text.ExperimentalTextApi public String? getCacheKey();
     method @Deprecated public default Object load(androidx.compose.ui.text.font.Font font);
-    method @androidx.compose.ui.text.ExperimentalTextApi public suspend Object? loadAsync(androidx.compose.ui.text.font.Font font, kotlin.coroutines.Continuation<? super java.lang.Object> p);
-    method @androidx.compose.ui.text.ExperimentalTextApi public Object? loadOrNull(androidx.compose.ui.text.font.Font font);
+    method @androidx.compose.ui.text.ExperimentalTextApi public Object? loadBlocking(androidx.compose.ui.text.font.Font font);
     property @androidx.compose.ui.text.ExperimentalTextApi public abstract String? cacheKey;
   }
 
@@ -582,14 +582,22 @@ package androidx.compose.ui.text.font {
   public static final class FontFamily.Companion {
     method public androidx.compose.ui.text.font.GenericFontFamily getCursive();
     method public androidx.compose.ui.text.font.SystemFontFamily getDefault();
+    method @androidx.compose.ui.text.ExperimentalTextApi public androidx.compose.ui.text.font.FontFamily.Resolver getGlobalResolver();
     method public androidx.compose.ui.text.font.GenericFontFamily getMonospace();
     method public androidx.compose.ui.text.font.GenericFontFamily getSansSerif();
     method public androidx.compose.ui.text.font.GenericFontFamily getSerif();
     property public final androidx.compose.ui.text.font.GenericFontFamily Cursive;
     property public final androidx.compose.ui.text.font.SystemFontFamily Default;
+    property @androidx.compose.ui.text.ExperimentalTextApi public final androidx.compose.ui.text.font.FontFamily.Resolver GlobalResolver;
     property public final androidx.compose.ui.text.font.GenericFontFamily Monospace;
     property public final androidx.compose.ui.text.font.GenericFontFamily SansSerif;
     property public final androidx.compose.ui.text.font.GenericFontFamily Serif;
+  }
+
+  @androidx.compose.ui.text.ExperimentalTextApi public static sealed interface FontFamily.Resolver {
+    method public suspend Object? preload(androidx.compose.ui.text.font.FontFamily fontFamily, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public Object resolve(androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional androidx.compose.ui.text.font.FontWeight fontWeight, optional int fontStyle, optional int fontSynthesis);
+    method public void setAsyncLoadContext(optional kotlin.coroutines.CoroutineContext context);
   }
 
   public final class FontFamilyKt {
@@ -607,6 +615,9 @@ package androidx.compose.ui.text.font {
   @androidx.compose.runtime.Immutable public final class FontListFontFamily extends androidx.compose.ui.text.font.FileBasedFontFamily implements kotlin.jvm.internal.markers.KMappedMarker java.util.List<androidx.compose.ui.text.font.Font> {
     method public java.util.List<androidx.compose.ui.text.font.Font> getFonts();
     property public final java.util.List<androidx.compose.ui.text.font.Font> fonts;
+  }
+
+  public final class FontListFontFamilyTypefaceAdapterKt {
   }
 
   @androidx.compose.ui.text.ExperimentalTextApi @kotlin.jvm.JvmInline public final value class FontLoadingStrategy {
@@ -721,7 +732,7 @@ package androidx.compose.ui.text.font {
 
   public final class ResourceFont implements androidx.compose.ui.text.font.Font {
     method public androidx.compose.ui.text.font.ResourceFont copy(optional int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
-    method @androidx.compose.ui.text.ExperimentalTextApi public androidx.compose.ui.text.font.ResourceFont copy(optional int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional int style, optional int fontLoad);
+    method @androidx.compose.ui.text.ExperimentalTextApi public androidx.compose.ui.text.font.ResourceFont copy(optional int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional int style, optional int loadingStrategy);
     method @androidx.compose.ui.text.ExperimentalTextApi public int getLoadingStrategy();
     method public int getResId();
     method public int getStyle();

@@ -21,7 +21,7 @@ import androidx.compose.ui.text.ExpireAfterAccessCache
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontListFontFamily
-import androidx.compose.ui.text.font.FontLoad
+import androidx.compose.ui.text.font.FontLoadingStrategy
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.util.fastForEach
@@ -89,7 +89,7 @@ class ResourceFont internal constructor(
         get() = name
 
     @ExperimentalTextApi
-    override val fontLoad: FontLoad = FontLoad.Blocking
+    override val loadingStrategy: FontLoadingStrategy = FontLoadingStrategy.Blocking
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -153,7 +153,7 @@ class FileFont internal constructor(
         get() = file.toString()
 
     @ExperimentalTextApi
-    override val fontLoad: FontLoad = FontLoad.Blocking
+    override val loadingStrategy: FontLoadingStrategy = FontLoadingStrategy.Blocking
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

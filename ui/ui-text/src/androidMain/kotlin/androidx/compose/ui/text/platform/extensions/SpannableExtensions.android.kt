@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.text.platform.extensions
 
+import android.graphics.Typeface
 import android.os.Build
 import android.text.Spannable
 import android.text.Spanned
@@ -45,13 +46,14 @@ import androidx.compose.ui.text.android.style.SkewXSpan
 import androidx.compose.ui.text.android.style.TextDecorationSpan
 import androidx.compose.ui.text.android.style.TypefaceSpan
 import androidx.compose.ui.text.fastFilter
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily.Companion.GlobalResolver
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intersect
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.intl.LocaleList
-import androidx.compose.ui.text.platform.TypefaceAdapter
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
@@ -139,10 +141,10 @@ internal fun Spannable.setSpanStyles(
     contextTextStyle: TextStyle,
     spanStyles: List<AnnotatedString.Range<SpanStyle>>,
     density: Density,
-    typefaceAdapter: TypefaceAdapter
+    resourceLoader: Font.ResourceLoader
 ) {
 
-    setFontAttributes(contextTextStyle, spanStyles, typefaceAdapter)
+    setFontAttributes(contextTextStyle, spanStyles, resourceLoader)
 
     // LetterSpacingSpanPx/LetterSpacingSpanSP has lower priority than normal spans. Because
     // letterSpacing relies on the fontSize on [Paint] to compute Px/Sp from Em. So it must be
@@ -226,13 +228,13 @@ private fun Spannable.setSpanStyle(
  * @param contextTextStyle the global [TextStyle] for the entire string.
  * @param spanStyles the [spanStyles] to be applied, this function will first filter out the font
  * related [SpanStyle]s and then apply them to this [Spannable].
- * @param typefaceAdapter the [TypefaceAdapter] used to resolve font.
+ * @param resourceLoader the [Font.ResourceLoader] used to resolve font.
  */
-@OptIn(InternalPlatformTextApi::class)
+@OptIn(InternalPlatformTextApi::class, androidx.compose.ui.text.ExperimentalTextApi::class)
 private fun Spannable.setFontAttributes(
     contextTextStyle: TextStyle,
     spanStyles: List<AnnotatedString.Range<SpanStyle>>,
-    typefaceAdapter: TypefaceAdapter
+    resourceLoader: Font.ResourceLoader
 ) {
     val fontRelatedSpanStyles = spanStyles.fastFilter {
         it.item.hasFontAttributes() || it.item.fontSynthesis != null
@@ -257,12 +259,13 @@ private fun Spannable.setFontAttributes(
     ) { spanStyle, start, end ->
         setSpan(
             TypefaceSpan(
-                typefaceAdapter.create(
+                GlobalResolver.resolve(
+                    resourceLoader = resourceLoader,
                     fontFamily = spanStyle.fontFamily,
                     fontWeight = spanStyle.fontWeight ?: FontWeight.Normal,
                     fontStyle = spanStyle.fontStyle ?: FontStyle.Normal,
                     fontSynthesis = spanStyle.fontSynthesis ?: FontSynthesis.All
-                )
+                ) as Typeface
             ),
             start,
             end,

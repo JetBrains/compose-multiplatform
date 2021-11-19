@@ -23,6 +23,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.TypefaceHelperMethodsApi28
+import androidx.compose.ui.text.font.getAndroidTypefaceStyle
 
 /**
  * An implementation of [AndroidTypeface] for [DefaultFontFamily]
@@ -39,10 +41,10 @@ internal class AndroidDefaultTypeface : AndroidTypeface {
     ): Typeface {
         return if (Build.VERSION.SDK_INT < 28) {
             Typeface.defaultFromStyle(
-                TypefaceAdapter.getTypefaceStyle(fontWeight, fontStyle)
+                getAndroidTypefaceStyle(fontWeight, fontStyle)
             )
         } else {
-            TypefaceAdapterHelperMethods.create(
+            TypefaceHelperMethodsApi28.create(
                 Typeface.DEFAULT,
                 fontWeight.weight,
                 fontStyle == FontStyle.Italic

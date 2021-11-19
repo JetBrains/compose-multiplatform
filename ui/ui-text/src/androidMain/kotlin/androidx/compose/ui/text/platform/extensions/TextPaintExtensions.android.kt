@@ -19,24 +19,26 @@ package androidx.compose.ui.text.platform.extensions
 import android.graphics.Typeface
 import android.os.Build
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily.Companion.GlobalResolver
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.platform.AndroidTextPaint
-import androidx.compose.ui.text.platform.TypefaceAdapter
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 
-@Suppress("DEPRECATION")
+@OptIn(ExperimentalTextApi::class)
 internal fun AndroidTextPaint.applySpanStyle(
     style: SpanStyle,
-    typefaceAdapter: TypefaceAdapter,
+    resourceLoader: Font.ResourceLoader,
     density: Density
 ): SpanStyle {
     when (style.fontSize.type) {
@@ -50,7 +52,13 @@ internal fun AndroidTextPaint.applySpanStyle(
     }
 
     if (style.hasFontAttributes()) {
-        typeface = createTypeface(style, typefaceAdapter)
+        typeface = GlobalResolver.resolve(
+            resourceLoader = resourceLoader,
+            fontFamily = style.fontFamily,
+            fontWeight = style.fontWeight ?: FontWeight.Normal,
+            fontStyle = style.fontStyle ?: FontStyle.Normal,
+            fontSynthesis = style.fontSynthesis ?: FontSynthesis.All
+        ) as Typeface
     }
 
     if (style.localeList != null && style.localeList != LocaleList.current) {
@@ -117,13 +125,4 @@ internal fun AndroidTextPaint.applySpanStyle(
  */
 internal fun SpanStyle.hasFontAttributes(): Boolean {
     return fontFamily != null || fontStyle != null || fontWeight != null
-}
-
-private fun createTypeface(style: SpanStyle, typefaceAdapter: TypefaceAdapter): Typeface {
-    return typefaceAdapter.create(
-        fontFamily = style.fontFamily,
-        fontWeight = style.fontWeight ?: FontWeight.Normal,
-        fontStyle = style.fontStyle ?: FontStyle.Normal,
-        fontSynthesis = style.fontSynthesis ?: FontSynthesis.All
-    )
 }

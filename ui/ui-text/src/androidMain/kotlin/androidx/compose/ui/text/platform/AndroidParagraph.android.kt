@@ -76,7 +76,7 @@ internal class AndroidParagraph constructor(
         maxLines: Int,
         ellipsis: Boolean,
         width: Float,
-        typefaceAdapter: TypefaceAdapter,
+        resourceLoader: Font.ResourceLoader,
         density: Density
     ) : this(
         paragraphIntrinsics = AndroidParagraphIntrinsics(
@@ -84,7 +84,7 @@ internal class AndroidParagraph constructor(
             style = style,
             placeholders = placeholders,
             spanStyles = spanStyles,
-            typefaceAdapter = typefaceAdapter,
+            resourceLoader = resourceLoader,
             density = density
         ),
         maxLines = maxLines,
@@ -382,9 +382,7 @@ internal actual fun ActualParagraph(
         style = style,
         placeholders = placeholders,
         spanStyles = spanStyles,
-        typefaceAdapter = TypefaceAdapter(
-            resourceLoader = resourceLoader
-        ),
+        resourceLoader = resourceLoader,
         density = density
     ),
     maxLines,

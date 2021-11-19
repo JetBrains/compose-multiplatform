@@ -24,8 +24,8 @@ import androidx.compose.ui.text.font.AndroidFont
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.ResourceFont
 import androidx.core.content.res.ResourcesCompat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 /**
  * Android implementation for [Font.ResourceLoader]. It is designed to load only [ResourceFont].
@@ -35,18 +35,18 @@ internal class AndroidFontResourceLoader(
 ) : Font.ResourceLoader {
 
     @ExperimentalTextApi
-    override fun loadOrNull(font: Font): Typeface? {
+    override fun loadBlocking(font: Font): Typeface? {
         return when (font) {
-            is AndroidFont -> font.typefaceLoader.load(context, font)
+            is AndroidFont -> font.typefaceLoader.loadBlocking(context, font)
             is ResourceFont -> runCatching { font.load(context) }.getOrNull()
             else -> null
         }
     }
 
     @ExperimentalTextApi
-    override suspend fun loadAsync(font: Font): Typeface? {
+    override suspend fun awaitLoad(font: Font): Typeface? {
         return when (font) {
-            is AndroidFont -> font.typefaceLoader.loadAsync(context, font)
+            is AndroidFont -> font.typefaceLoader.awaitLoad(context, font)
             is ResourceFont -> font.loadAsync(context)
             else -> throw IllegalArgumentException("Unknown font type: $font")
         }
@@ -73,23 +73,17 @@ fun Font.Companion.AndroidResourceLoader(
 private fun ResourceFont.load(context: Context): Typeface =
     ResourcesCompat.getFont(context, resId)!!
 
-class ResourceFontLoadException(font: Font, val reason: Int) :
-    RuntimeException("Unable to load font $font (reason=$reason)")
-
 // TODO(seanmcq): Move to core-ktx to dedup
-@OptIn(ExperimentalCoroutinesApi::class)
 private suspend fun ResourceFont.loadAsync(context: Context): Typeface {
     return suspendCancellableCoroutine { continuation ->
         ResourcesCompat.getFont(context, resId, object : ResourcesCompat.FontCallback() {
             override fun onFontRetrieved(typeface: Typeface) {
-                continuation.resume(typeface) {
-                    /* ignore */
-                }
+                continuation.resume(typeface)
             }
 
             override fun onFontRetrievalFailed(reason: Int) {
                 continuation.cancel(
-                    ResourceFontLoadException(this@loadAsync, reason)
+                    IllegalStateException("Unable to load font ${this@loadAsync} (reason=$reason)")
                 )
             }
         }, null)

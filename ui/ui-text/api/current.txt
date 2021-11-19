@@ -517,8 +517,8 @@ package androidx.compose.ui.text.font {
   }
 
   public static interface AndroidFont.TypefaceLoader {
-    method public android.graphics.Typeface? load(android.content.Context context, androidx.compose.ui.text.font.AndroidFont font);
-    method public suspend Object? loadAsync(android.content.Context context, androidx.compose.ui.text.font.AndroidFont font, kotlin.coroutines.Continuation<? super android.graphics.Typeface> p);
+    method public suspend Object? awaitLoad(android.content.Context context, androidx.compose.ui.text.font.AndroidFont font, kotlin.coroutines.Continuation<? super android.graphics.Typeface> p);
+    method public android.graphics.Typeface? loadBlocking(android.content.Context context, androidx.compose.ui.text.font.AndroidFont font);
   }
 
   public final class AndroidFontKt {
@@ -584,6 +584,9 @@ package androidx.compose.ui.text.font {
   @androidx.compose.runtime.Immutable public final class FontListFontFamily extends androidx.compose.ui.text.font.FileBasedFontFamily implements kotlin.jvm.internal.markers.KMappedMarker java.util.List<androidx.compose.ui.text.font.Font> {
     method public java.util.List<androidx.compose.ui.text.font.Font> getFonts();
     property public final java.util.List<androidx.compose.ui.text.font.Font> fonts;
+  }
+
+  public final class FontListFontFamilyTypefaceAdapterKt {
   }
 
   public final inline class FontStyle {

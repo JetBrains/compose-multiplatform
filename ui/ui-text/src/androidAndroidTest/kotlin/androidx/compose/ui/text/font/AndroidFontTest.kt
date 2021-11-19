@@ -73,7 +73,7 @@ class AndroidFontTest {
     @Test
     fun test_load_from_assets() {
         val font = makeAssetFont()
-        assertThat(font.typefaceLoader.load(context, font)).isNotNull()
+        assertThat(font.typefaceLoader.loadBlocking(context, font)).isNotNull()
     }
 
     @Test
@@ -85,8 +85,8 @@ class AndroidFontTest {
     @Test
     fun assetFont_returnsSameInstance() {
         val font = makeAssetFont()
-        val typeface1 = font.typefaceLoader.load(context, font)
-        val typeface2 = font.typefaceLoader.load(context, font)
+        val typeface1 = font.typefaceLoader.loadBlocking(context, font)
+        val typeface2 = font.typefaceLoader.loadBlocking(context, font)
         assertThat(typeface1).isSameInstanceAs(typeface2)
     }
 
@@ -94,7 +94,7 @@ class AndroidFontTest {
     fun assetFont_doesntThrowForAsync() {
         val font = makeAssetFont()
         // don't care about result, but it's not supposed to throw
-        font.typefaceLoader.load(context, font)
+        font.typefaceLoader.loadBlocking(context, font)
     }
 
     private fun makeFileFont(): AndroidFont {
@@ -105,7 +105,7 @@ class AndroidFontTest {
     @Test
     fun test_load_from_file() {
         val font = makeFileFont()
-        assertThat(font.typefaceLoader.load(context, font)).isNotNull()
+        assertThat(font.typefaceLoader.loadBlocking(context, font)).isNotNull()
     }
 
     @Test
@@ -118,14 +118,14 @@ class AndroidFontTest {
     fun fileFont_doesntThrowForAsync() {
         val font = makeFileFont()
         // don't care about result, but it's not supposed to throw
-        font.typefaceLoader.load(context, font)
+        font.typefaceLoader.loadBlocking(context, font)
     }
 
     @Test
     fun fileFont_returnsSameInstance() {
         val font = makeFileFont()
-        val typeface1 = font.typefaceLoader.load(context, font)
-        val typeface2 = font.typefaceLoader.load(context, font)
+        val typeface1 = font.typefaceLoader.loadBlocking(context, font)
+        val typeface2 = font.typefaceLoader.loadBlocking(context, font)
         assertThat(typeface1).isSameInstanceAs(typeface2)
     }
 
@@ -134,8 +134,8 @@ class AndroidFontTest {
         val font = makeFileFont()
         val font2 = makeFileFont()
         val loader = font.typefaceLoader
-        val typeface1 = loader.load(context, font)
-        val typeface2 = loader.load(context, font2)
+        val typeface1 = loader.loadBlocking(context, font)
+        val typeface2 = loader.loadBlocking(context, font2)
         assertThat(typeface1).isNotSameInstanceAs(typeface2)
     }
 
@@ -151,7 +151,7 @@ class AndroidFontTest {
     @MediumTest
     fun test_load_from_file_descriptor() {
         val font = makeFileDescriptorFont()
-        val typeface = font.typefaceLoader.load(context, font)
+        val typeface = font.typefaceLoader.loadBlocking(context, font)
         assertThat(typeface).isNotNull()
     }
 
@@ -168,8 +168,8 @@ class AndroidFontTest {
     @MediumTest
     fun fileDescriptor_returnsSameInstance() {
         val font = makeFileDescriptorFont()
-        val typeface1 = font.typefaceLoader.load(context, font)
-        val typeface2 = font.typefaceLoader.load(context, font)
+        val typeface1 = font.typefaceLoader.loadBlocking(context, font)
+        val typeface2 = font.typefaceLoader.loadBlocking(context, font)
         assertThat(typeface1).isSameInstanceAs(typeface2)
     }
 
@@ -180,8 +180,8 @@ class AndroidFontTest {
         val font = makeFileDescriptorFont()
         val font2 = makeFileDescriptorFont()
         val loader = font.typefaceLoader
-        val typeface1 = loader.load(context, font)
-        val typeface2 = loader.load(context, font2)
+        val typeface1 = loader.loadBlocking(context, font)
+        val typeface2 = loader.loadBlocking(context, font2)
         assertThat(typeface1).isNotSameInstanceAs(typeface2)
     }
 
@@ -191,6 +191,6 @@ class AndroidFontTest {
     fun fileDescriptorFont_doesntThrowForAsync() {
         val font = makeFileDescriptorFont()
         // don't care about result, but it's not supposed to throw
-        font.typefaceLoader.load(context, font)
+        font.typefaceLoader.loadBlocking(context, font)
     }
 }

@@ -2282,12 +2282,6 @@ package androidx.compose.ui.platform {
   public final class JvmActuals_jvmKt {
   }
 
-  public final class ResourceFontLoadException extends java.lang.RuntimeException {
-    ctor public ResourceFontLoadException(androidx.compose.ui.text.font.Font font, int reason);
-    method public int getReason();
-    property public final int reason;
-  }
-
   public final class ShapeContainingUtilKt {
   }
 

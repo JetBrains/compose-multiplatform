@@ -28,7 +28,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class GenerifFontFamilyCacheTest {
+@Suppress("DEPRECATION")
+class GenericFontFamilyCacheTest {
 
     @Test
     @Suppress("DEPRECATION")

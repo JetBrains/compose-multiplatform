@@ -63,6 +63,7 @@ class AndroidTypefaceSubsetTest {
         fontFamily: FontFamily,
         necessaryStyles: List<Pair<FontWeight, FontStyle>>? = null
     ): AndroidTypeface {
+        @Suppress("DEPRECATION")
         return Typeface(context, fontFamily, necessaryStyles) as AndroidTypeface
     }
 

@@ -25,16 +25,21 @@ import androidx.annotation.RequiresApi
 import androidx.collection.LruCache
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.android.InternalPlatformTextApi
+import androidx.compose.ui.text.fastDistinctBy
+import androidx.compose.ui.text.fastFilter
+import androidx.compose.ui.text.fastFilterNotNull
 import androidx.compose.ui.text.font.AndroidFont
 import androidx.compose.ui.text.font.AndroidPreloadedFont
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontListFontFamily
+import androidx.compose.ui.text.font.FontLoadingStrategy
 import androidx.compose.ui.text.font.FontMatcher
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.ResourceFont
+import androidx.compose.ui.text.font.synthesizeTypeface
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 import androidx.core.content.res.ResourcesCompat
@@ -43,6 +48,7 @@ import androidx.core.content.res.ResourcesCompat
  * An implementation of [AndroidTypeface] for [FontListFontFamily]
  */
 // internal constructor for injecting FontMatcher for testing purpose
+@OptIn(ExperimentalTextApi::class)
 @Suppress("DEPRECATION")
 @Deprecated("This is not supported after downloadable fonts.")
 internal class AndroidFontListTypeface(
@@ -58,9 +64,17 @@ internal class AndroidFontListTypeface(
     private val loadedTypefaces: Map<Font, Typeface>
 
     init {
-        val targetFonts = necessaryStyles?.fastMap { (weight, style) ->
-            fontMatcher.matchFont(fontFamily, weight, style)
-        }?.let { LinkedHashSet(it).toList() } ?: fontFamily.fonts
+        val blockingFonts = fontFamily.fonts.fastFilter {
+            it.loadingStrategy == FontLoadingStrategy.Blocking
+        }
+        val matchedFonts: List<Font>? = necessaryStyles?.fastMap { (weight, style) ->
+            fontMatcher.matchFont(blockingFonts, weight, style).firstOrNull()
+        }?.fastFilterNotNull()?.fastDistinctBy { it }
+        val targetFonts = matchedFonts ?: blockingFonts
+
+        if (targetFonts.isEmpty()) {
+            throw IllegalStateException("Could not match font")
+        }
         val typefaces = mutableMapOf<Font, Typeface>()
 
         targetFonts.fastForEach {
@@ -81,15 +95,11 @@ internal class AndroidFontListTypeface(
         fontStyle: FontStyle,
         synthesis: FontSynthesis
     ): Typeface {
-        val font = fontMatcher.matchFont(loadedTypefaces.keys, fontWeight, fontStyle)
-        val typeface = loadedTypefaces.get(font)
+        val font = fontMatcher.matchFont(ArrayList(loadedTypefaces.keys), fontWeight, fontStyle)
+            .firstOrNull() ?: throw IllegalStateException("Could not load font")
+        val typeface = loadedTypefaces[font]
         requireNotNull(typeface)
-        if ((font.weight == fontWeight && font.style == fontStyle) ||
-            synthesis == FontSynthesis.None
-        ) {
-            return typeface
-        }
-        return TypefaceAdapter.synthesize(typeface, font, fontWeight, fontStyle, synthesis)
+        return synthesis.synthesizeTypeface(typeface, font, fontWeight, fontStyle) as Typeface
     }
 }
 
@@ -122,7 +132,7 @@ internal object AndroidTypefaceCache {
                 } else {
                     ResourcesCompat.getFont(context, font.resId)!!
                 }
-            is AndroidFont -> font.typefaceLoader.load(context, font)
+            is AndroidFont -> font.typefaceLoader.loadBlocking(context, font)
             else -> throw IllegalArgumentException("Unknown font type: $font")
         } ?: throw IllegalArgumentException("Unable to load font $font")
 

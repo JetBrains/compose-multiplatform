@@ -25,6 +25,8 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.GenericFontFamily
+import androidx.compose.ui.text.font.TypefaceHelperMethodsApi28
+import androidx.compose.ui.text.font.getAndroidTypefaceStyle
 
 /**
  * An implementation of [AndroidTypeface] for [GenericFontFamily]
@@ -71,10 +73,10 @@ internal class AndroidGenericFontFamilyTypeface(
         if (Build.VERSION.SDK_INT < 28) {
             Typeface.create(
                 nativeTypeface,
-                TypefaceAdapter.getTypefaceStyle(fontWeight, fontStyle)
+                getAndroidTypefaceStyle(fontWeight, fontStyle)
             )
         } else {
-            TypefaceAdapterHelperMethods.create(
+            TypefaceHelperMethodsApi28.create(
                 nativeTypeface,
                 fontWeight.weight,
                 fontStyle == FontStyle.Italic

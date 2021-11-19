@@ -16,18 +16,111 @@
 
 package androidx.compose.ui.text.font
 
+import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.text.fastDistinctBy
+import androidx.compose.ui.text.ExperimentalTextApi
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
- * The base class of the font families.
+ * The primary typography interface for Compose applications.
  *
+ * // TODO(seanmcq): Comment here about how it all works
  * @see FontListFontFamily
  * @see GenericFontFamily
+ * @see FontFamily.GlobalResolver
  */
 @Immutable
 sealed class FontFamily(canLoadSynchronously: Boolean) {
+
+    /**
+     * Main interface for resolving [FontFamily] into a platform-specific typeface for use in
+     * Compose-based applications.
+     *
+     * Fonts are loaded via [Resolver.resolve] from a FontFamily and a type request, and return a
+     * platform-specific typeface.
+     *
+     * Fonts may be preloaded by calling [Resolver.preload] to avoid text reflow when async fonts
+     * load.
+     */
+    @ExperimentalTextApi
+    sealed interface Resolver {
+        /**
+         * Preloading resolves and caches all fonts reachable in a [FontFamily].
+         *
+         * Fonts are consider reachable if they are included in the fallback chain for any call to
+         * [resolve].
+         *
+         * This method will suspend until:
+         *
+         * 1. All [FontLoad.Async] fonts that are reachable have completed loading, or failed to
+         * load
+         * 2. All reachable fonts in the fallback chain have been loaded and inserted into the
+         * cache
+         *
+         * After returning, all fonts with [FontLoad.Async] and [FontLoad.OptionalLocal] will be
+         * permanently cached. In contrast to [resolve] this method will throw when a reachable
+         * [FontLoad.Async] font fails to resolve.
+         *
+         * All fonts with [FontLoad.Blocking] will be cached with normal eviction rules.
+         *
+         * @throws IllegalStateException if any reachable font fails to load
+         * @param fontFamily the family to resolve all fonts from
+         * @param resourceLoader to load resolved fonts, typically pass LocalFontLoader.current
+         */
+        suspend fun preload(
+            fontFamily: FontFamily,
+            resourceLoader: Font.ResourceLoader
+        )
+
+        /**
+         * Resolves a typeface using any appropriate logic for the [FontFamily].
+         *
+         * Callers must assume that this method reads from compose State and should ensure calls
+         * are made in a restartable context. On restart, call this function with the same
+         * parameters to get the new result.
+         *
+         * [FontListFontFamily] will always resolve using fallback chains and load using
+         * [Font.ResourceLoader].
+         *
+         * Platform specific [FontFamily] will resolve according to platform behavior, as documented
+         * for each [FontFamily].
+         *
+         * @param resourceLoader to load resolved fonts into typefaces
+         * @param fontFamily family to resolve
+         * @param fontWeight desired font weight
+         * @param fontStyle desired font style
+         * @param fontSynthesis configuration for font synthesis
+         * @throws IllegalStateException if the FontFamily cannot resolve a to a typeface
+         * @return platform-specific Typeface such as [android.graphics.Typeface]
+         */
+        fun resolve(
+            resourceLoader: Font.ResourceLoader,
+            fontFamily: FontFamily? = null,
+            fontWeight: FontWeight = FontWeight.Normal,
+            fontStyle: FontStyle = FontStyle.Normal,
+            fontSynthesis: FontSynthesis = FontSynthesis.All
+        ): Any
+
+        /**
+         * Set the coroutine context used for loading async fonts.
+         *
+         * Any current fonts loading will continue in the prior context. New requests will run in
+         * the new context.
+         *
+         * Any [kotlinx.coroutines.CoroutineExceptionHandler] provided will be called with
+         * exceptions related to fallback font loading. These exceptions are not fatal, and indicate
+         * that font fallback continued to the next font load.
+         *
+         * 1. Any [kotlinx.coroutines.Job] will be removed
+         * 2. If no [kotlinx.coroutines.CoroutineExceptionHandler] is provided, a default
+         * implementation will be added that ignores all exceptions.
+         *
+         * @param context to run load requests on
+         */
+        fun setAsyncLoadContext(context: CoroutineContext = EmptyCoroutineContext)
+    }
     companion object {
         /**
          * The platform default font.
@@ -72,6 +165,22 @@ sealed class FontFamily(canLoadSynchronously: Boolean) {
          * See [CSS cursive](https://www.w3.org/TR/css-fonts-3/#cursive)
          */
         val Cursive = GenericFontFamily("cursive")
+
+        /**
+         * Global font resolver for displaying text in a style.
+         *
+         * This may be used to load platform-specific typefaces that can be used to draw styled
+         * text.
+         *
+         * @see FontFamily.Resolver
+         */
+        @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+        @get:ExperimentalTextApi
+        @ExperimentalTextApi
+        var GlobalResolver: Resolver = FontFamilyResolverImpl()
+            @ExperimentalTextApi
+            @VisibleForTesting
+            internal set
     }
 
     @Suppress("CanBePrimaryConstructorProperty") // for deprecation
@@ -100,15 +209,16 @@ sealed class SystemFontFamily : FontFamily(true)
  */
 @Immutable
 class FontListFontFamily internal constructor(
-    val fonts: List<Font>
+    fonts: List<Font>
 ) : FileBasedFontFamily(), List<Font> by fonts {
     init {
         check(fonts.isNotEmpty()) { "At least one font should be passed to FontFamily" }
-        check(fonts.fastDistinctBy { Pair(it.weight, it.style) }.size == fonts.size) {
-            "There cannot be two fonts with the same FontWeight and FontStyle in the same " +
-                "FontFamily"
-        }
     }
+
+    /**
+     * The fallback list of fonts used for resolving typefaces for this FontFamily.
+     */
+    val fonts: List<Font> = ArrayList(fonts)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -117,7 +117,7 @@ abstract class AndroidFont @OptIn(ExperimentalTextApi::class) constructor(
      * Loader for loading an [AndroidFont] and producing an [android.graphics.Typeface].
      *
      * This interface is not intended to be used by application developers for text display. To load
-     * a typeface for display use [FontFamily.Companion.Resolver].
+     * a typeface for display use [FontFamily.Companion.GlobalResolver].
      *
      * [TypefaceLoader] allows the introduction of new types of font descriptors for use in
      * [FontListFontFamily]. A [TypefaceLoader] allows a new subclass of [AndroidFont] to be used by
@@ -130,8 +130,8 @@ abstract class AndroidFont @OptIn(ExperimentalTextApi::class) constructor(
      * on some devices.
      * - [FontLoadingStrategy.Async] [Font] that loads a font from a backend via a network request.
      *
-     * During resolution from [FontFamily.Companion.Resolver], an [AndroidFont] subclass will be
-     * queried for an appropriate loader by [Font.Companion.AndroidResourceLoader].
+     * During resolution from [FontFamily.Companion.GlobalResolver], an [AndroidFont] subclass will
+     * be queried for an appropriate loader by [Font.Companion.AndroidResourceLoader].
      *
      * The loader attached to an instance of an [AndroidFont] is only required to be able to load
      * that instance, though it is advised to create one loader for all instances of the same
@@ -140,25 +140,22 @@ abstract class AndroidFont @OptIn(ExperimentalTextApi::class) constructor(
      */
     interface TypefaceLoader {
         /**
-         * Immediately load the font in a blocking manner such that it will be available in the next
-         * frame.
+         * Immediately load the font in a blocking manner such that it will be available this frame.
          *
-         * This is used to load [FontLoadingStrategy.Blocking] and
-         * [FontLoadingStrategy.OptionalLocal] fonts which must resolve font loading immediately
-         * with no fallback. This method is allowed to perform small amounts of I/O to load a font
-         * file from disk.
+         * This method will be called on a UI-critical thread, however it has been determined that
+         * this font is required for the current frame. This method is allowed to perform small
+         * amounts of I/O to load a font file from disk.
          *
          * This method should never perform expensive I/O operations, such as loading from a remote
-         * source. To fetch from a remote source, require [FontLoadingStrategy.Async] and provide
-         * [loadAsync].
-         *
-         * Subclasses may choose to cache or precompute this result.
+         * source. If expensive operations are required to complete the font, this method may choose
+         * to throw. Note that this method will never be called for fonts with
+         * [FontLoadingStrategy.Async].
          *
          * This method may throw a [RuntimeException] if the font fails to load, though it is
          * preferred to return null if the font is [FontLoadingStrategy.OptionalLocal] for
          * performance.
          *
-         * It is possible for [load] to be called for the same instance of [AndroidFont] in
+         * It is possible for [loadBlocking] to be called for the same instance of [AndroidFont] in
          * parallel. Implementations should support parallel concurrent loads, or de-dup.
          *
          * @param context current Android context for loading the font
@@ -166,39 +163,35 @@ abstract class AndroidFont @OptIn(ExperimentalTextApi::class) constructor(
          * @return [android.graphics.Typeface] for loaded font, or null if the font fails to load
          * @throws RuntimeException subclass may optionally be thrown if the font fails to load
          */
-        fun load(context: Context, font: AndroidFont): Typeface?
+        fun loadBlocking(context: Context, font: AndroidFont): Typeface?
 
         /**
-         * Asynchronously load the font, from either local or remote sources.
+         * Asynchronously load the font, from either local or remote sources such that it will cause
+         * text reflow when loading completes.
          *
-         * This will be called for [FontLoadingStrategy.Async] fonts during async fallback
-         * resolution, and all loaders should ensure this method is implemented for all
-         * [AndroidFont] subtypes that allow [FontLoadingStrategy.Async].
+         * This method will be called on a UI-critical thread, and should not block the thread for
+         * font loading from sources slower than the local filesystem. More expensive loads should
+         * dispatch to an appropriate thread.
          *
          * This method is always called in a timeout context and must return it's final value within
          * 15 seconds. If the Typeface is not resolved within 15 seconds, the async load is
-         * cancelled and considered a permanent failure and will not be retried by normal font
-         * resolution.
+         * cancelled and considered a permanent failure. Implementations should use structured
+         * concurrency to cooperatively cancel work.
          *
-         * Subclasses may choose to cache this result.
-         *
-         * Subclasses should not precompute this result (load the font prior to first the first call
-         * of [loadAsync]).
-         *
-         * Compose does not know what resources are required to satisfy a font async load.
+         * Compose does not know what resources are required to satisfy a font load.
          * Subclasses implementing [FontLoadingStrategy.Async] behavior should ensure requests are
          * de-duped for the same resource.
          *
-         * It is possible for the same [AndroidFont] to call [loadAsync] in parallel, and
-         * implementations should either de-dupe or handle multithreaded execution.
+         * It is possible for [awaitLoad] to be called for the same instance of [AndroidFont] in
+         * parallel. Implementations should support parallel concurrent loads, or de-dup.
          *
          * @param context current Android context for loading the font
          * @param font the font to load which contains this loader as [AndroidFont.typefaceLoader]
          * @return [android.graphics.Typeface] for loaded font, or null if not available
-         * @throws RuntimeException subclass if font should be loadable and load fails
+         * @throws RuntimeException subclass may optionally be thrown if the font fails to load
          *
          */
-        suspend fun loadAsync(context: Context, font: AndroidFont): Typeface?
+        suspend fun awaitLoad(context: Context, font: AndroidFont): Typeface?
     }
 }
 
@@ -210,11 +203,11 @@ internal abstract class AndroidPreloadedFont : AndroidFont(Blocking) {
 }
 
 private object AndroidPreloadedFontTypefaceLoader : AndroidFont.TypefaceLoader {
-    override fun load(context: Context, font: AndroidFont): Typeface? =
+    override fun loadBlocking(context: Context, font: AndroidFont): Typeface? =
         (font as? AndroidPreloadedFont)?.typefaceInternal
 
-    override suspend fun loadAsync(context: Context, font: AndroidFont): Typeface? =
-        load(context, font)
+    override suspend fun awaitLoad(context: Context, font: AndroidFont): Typeface? =
+        loadBlocking(context, font)
 }
 
 @OptIn(ExperimentalTextApi::class)

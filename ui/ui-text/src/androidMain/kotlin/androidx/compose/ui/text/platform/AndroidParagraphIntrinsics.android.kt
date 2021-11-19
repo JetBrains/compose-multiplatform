@@ -41,7 +41,7 @@ internal class AndroidParagraphIntrinsics(
     val style: TextStyle,
     val spanStyles: List<AnnotatedString.Range<SpanStyle>>,
     val placeholders: List<AnnotatedString.Range<Placeholder>>,
-    val typefaceAdapter: TypefaceAdapter,
+    val resourceLoader: Font.ResourceLoader,
     val density: Density
 ) : ParagraphIntrinsics {
 
@@ -65,7 +65,7 @@ internal class AndroidParagraphIntrinsics(
     init {
         val notAppliedStyle = textPaint.applySpanStyle(
             style = style.toSpanStyle(),
-            typefaceAdapter = typefaceAdapter,
+            resourceLoader = resourceLoader,
             density = density
         )
 
@@ -84,7 +84,7 @@ internal class AndroidParagraphIntrinsics(
             ) + spanStyles,
             placeholders = placeholders,
             density = density,
-            typefaceAdapter = typefaceAdapter
+            resourceLoader = resourceLoader
         )
 
         layoutIntrinsics = LayoutIntrinsics(charSequence, textPaint, textDirectionHeuristic)
@@ -131,9 +131,7 @@ internal actual fun ActualParagraphIntrinsics(
     text = text,
     style = style,
     placeholders = placeholders,
-    typefaceAdapter = TypefaceAdapter(
-        resourceLoader = resourceLoader
-    ),
+    resourceLoader = resourceLoader,
     spanStyles = spanStyles,
     density = density
 )
