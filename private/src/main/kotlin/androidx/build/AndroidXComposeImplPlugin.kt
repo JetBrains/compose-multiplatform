@@ -178,16 +178,13 @@ class AndroidXComposeImplPlugin : Plugin<Project> {
                 }
             }
 
-            // TODO(148540713): remove this exclusion when Lint can support using multiple lint jars
-            configurations.getByName("lintChecks").exclude(
-                mapOf("module" to "lint-checks")
-            )
             // TODO: figure out how to apply this to multiplatform modules
             dependencies.add(
                 "lintChecks",
                 project.dependencies.project(
                     mapOf(
                         "path" to ":compose:lint:internal-lint-checks",
+                        // TODO(b/206617878) remove this shadow configuration
                         "configuration" to "shadow"
                     )
                 )
