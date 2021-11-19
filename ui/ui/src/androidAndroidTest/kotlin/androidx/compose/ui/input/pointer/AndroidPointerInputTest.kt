@@ -1190,39 +1190,48 @@ class AndroidPointerInputTest {
 
     @Test
     fun hoverPressEnterRelease() {
-        var outerCoordinates: LayoutCoordinates? = null
-        var innerCoordinates: LayoutCoordinates? = null
+        var missCoordinates: LayoutCoordinates? = null
+        var hitCoordinates: LayoutCoordinates? = null
         val latch = CountDownLatch(1)
         val eventLog = mutableListOf<PointerEvent>()
         rule.runOnUiThread {
             container.setContent {
-                Box(
-                    Modifier.fillMaxSize().onGloballyPositioned {
-                        outerCoordinates = it
-                        latch.countDown()
-                    }
-                ) {
+                Box(Modifier.fillMaxSize()) {
                     Box(
-                        Modifier.align(Alignment.Center).size(50.dp).pointerInput(Unit) {
-                            awaitPointerEventScope {
-                                while (true) {
-                                    val event = awaitPointerEvent()
-                                    event.changes[0].consumeAllChanges()
-                                    eventLog += event
+                        Modifier.align(AbsoluteAlignment.TopLeft).size(50.dp)
+                            .pointerInput(Unit) {
+                                awaitPointerEventScope {
+                                    while (true) {
+                                        awaitPointerEvent()
+                                    }
                                 }
+                            }.onGloballyPositioned {
+                                missCoordinates = it
+                                latch.countDown()
                             }
-                        }.onGloballyPositioned { innerCoordinates = it }
+                    )
+                    Box(
+                        Modifier.align(AbsoluteAlignment.BottomRight).size(50.dp)
+                            .pointerInput(Unit) {
+                                awaitPointerEventScope {
+                                    while (true) {
+                                        val event = awaitPointerEvent()
+                                        event.changes[0].consumeAllChanges()
+                                        eventLog += event
+                                    }
+                                }
+                            }.onGloballyPositioned { hitCoordinates = it }
                     )
                 }
             }
         }
         assertTrue(latch.await(1, TimeUnit.SECONDS))
-        dispatchMouseEvent(ACTION_HOVER_ENTER, outerCoordinates!!)
-        dispatchMouseEvent(ACTION_HOVER_EXIT, outerCoordinates!!)
-        dispatchMouseEvent(ACTION_DOWN, outerCoordinates!!)
-        dispatchMouseEvent(ACTION_MOVE, innerCoordinates!!)
-        dispatchMouseEvent(ACTION_UP, innerCoordinates!!)
-        dispatchMouseEvent(ACTION_HOVER_ENTER, innerCoordinates!!)
+        dispatchMouseEvent(ACTION_HOVER_ENTER, missCoordinates!!)
+        dispatchMouseEvent(ACTION_HOVER_EXIT, missCoordinates!!)
+        dispatchMouseEvent(ACTION_DOWN, missCoordinates!!)
+        dispatchMouseEvent(ACTION_MOVE, hitCoordinates!!)
+        dispatchMouseEvent(ACTION_UP, hitCoordinates!!)
+        dispatchMouseEvent(ACTION_HOVER_ENTER, hitCoordinates!!)
         rule.runOnUiThread {
             assertThat(eventLog).hasSize(1)
             assertThat(eventLog[0].type).isEqualTo(PointerEventType.Enter)
@@ -1732,6 +1741,71 @@ class AndroidPointerInputTest {
             assertThat(eventLog[1].type).isEqualTo(PointerEventType.Press)
             assertThat(eventLog[2].type).isEqualTo(PointerEventType.Exit)
             assertThat(eventLog[3].type).isEqualTo(PointerEventType.Release)
+        }
+    }
+
+    @Test
+    fun restartStreamAfterNotProcessing() {
+        // Stylus hover enter/exit events should be sent to pointer input areas
+        val eventLog = mutableListOf<PointerEvent>()
+        var hitCoordinates: LayoutCoordinates? = null
+        var missCoordinates: LayoutCoordinates? = null
+        val latch = CountDownLatch(2)
+        rule.runOnUiThread {
+            container.setContent {
+                Box(Modifier.fillMaxSize()) {
+                    Box(Modifier.size(50.dp).align(AbsoluteAlignment.TopLeft)
+                        .pointerInput(Unit) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    val event = awaitPointerEvent()
+                                    event.changes.forEach { it.consumeAllChanges() }
+                                    eventLog += event
+                                }
+                            }
+                        }.onGloballyPositioned {
+                            hitCoordinates = it
+                            latch.countDown()
+                        }
+                    )
+                    Box(Modifier.size(50.dp).align(AbsoluteAlignment.BottomRight)
+                        .onGloballyPositioned {
+                            missCoordinates = it
+                            latch.countDown()
+                        }
+                    )
+                }
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+        val miss = missCoordinates!!
+        val hit = hitCoordinates!!
+
+        // This should hit
+        dispatchTouchEvent(ACTION_DOWN, hit)
+        dispatchTouchEvent(ACTION_UP, hit)
+
+        // This should miss
+        dispatchTouchEvent(ACTION_DOWN, miss)
+
+        // This should hit
+        dispatchTouchEvent(ACTION_DOWN, hit)
+
+        rule.runOnUiThread {
+            assertThat(eventLog).hasSize(3)
+            val down1 = eventLog[0]
+            val up1 = eventLog[1]
+            val down2 = eventLog[2]
+            assertThat(down1.changes).hasSize(1)
+            assertThat(up1.changes).hasSize(1)
+            assertThat(down2.changes).hasSize(1)
+
+            assertThat(down1.type).isEqualTo(PointerEventType.Press)
+            assertThat(up1.type).isEqualTo(PointerEventType.Release)
+            assertThat(down2.type).isEqualTo(PointerEventType.Press)
+
+            assertThat(up1.changes[0].id).isEqualTo(down1.changes[0].id)
+            assertThat(down2.changes[0].id.value).isEqualTo(down1.changes[0].id.value + 2)
         }
     }
 
