@@ -34,6 +34,7 @@ import android.view.MotionEvent.ACTION_HOVER_EXIT
 import android.view.MotionEvent.ACTION_HOVER_MOVE
 import android.view.MotionEvent.ACTION_SCROLL
 import android.view.MotionEvent.ACTION_MOVE
+import android.view.MotionEvent.ACTION_POINTER_DOWN
 import android.view.MotionEvent.ACTION_POINTER_UP
 import android.view.MotionEvent.ACTION_UP
 import android.view.MotionEvent.TOOL_TYPE_MOUSE
@@ -1151,11 +1152,21 @@ internal class AndroidComposeView(context: Context) :
                 lastDownPointerPosition = it
             }
 
-            pointerInputEventProcessor.process(
+            val result = pointerInputEventProcessor.process(
                 pointerInputEvent,
                 this,
                 isInBounds(motionEvent)
             )
+            val action = motionEvent.actionMasked
+            if ((action == ACTION_DOWN || action == ACTION_POINTER_DOWN) &&
+                !result.dispatchedToAPointerInputModifier
+            ) {
+                // We aren't handling the pointer, so the event stream has ended for us.
+                // The next time we receive a pointer event, it should be considered a new
+                // pointer.
+                motionEventAdapter.endStream(motionEvent.getPointerId(motionEvent.actionIndex))
+            }
+            result
         } else {
             pointerInputEventProcessor.processCancel()
             ProcessResult(

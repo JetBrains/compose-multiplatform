@@ -138,6 +138,15 @@ internal class MotionEventAdapter {
     }
 
     /**
+     * An ACTION_DOWN or ACTION_POINTER_DOWN was received, but not handled, so the stream should
+     * be considered ended.
+     */
+    fun endStream(pointerId: Int) {
+        canHover.delete(pointerId)
+        motionEventToComposePointerIdMap.delete(pointerId)
+    }
+
+    /**
      * Add any new pointer IDs.
      */
     private fun addFreshIds(motionEvent: MotionEvent) {
@@ -173,7 +182,7 @@ internal class MotionEventAdapter {
                 val actionIndex = motionEvent.actionIndex
                 val pointerId = motionEvent.getPointerId(actionIndex)
                 if (!canHover.get(pointerId, false)) {
-                    motionEventToComposePointerIdMap.delete(motionEvent.getPointerId(actionIndex))
+                    motionEventToComposePointerIdMap.delete(pointerId)
                     canHover.delete(pointerId)
                 }
             }
