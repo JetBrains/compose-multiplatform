@@ -15,7 +15,6 @@
  */
 
 
-import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import androidx.build.Publish
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
