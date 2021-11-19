@@ -17,6 +17,7 @@
 package androidx.compose.ui.tooling
 
 import android.app.Activity
+import android.os.Build
 import android.os.Bundle
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.ui.tooling.animation.PreviewAnimationClock
@@ -336,10 +337,14 @@ class ComposeViewAdapterTest {
                 onDraw = { onDrawCounter++ }
             )
         }
+
+        // API before 22, might issue an additional draw under testing.
+        val expectedDrawCount = if (Build.VERSION.SDK_INT < 22) 2 else 1
         repeat(5) {
             activityTestRule.runOnUiThread {
                 assertEquals(1, compositionCount.get())
-                assertTrue("At most, 1 draw is expected", onDrawCounter < 2)
+                assertTrue("At most, $expectedDrawCount draw is expected ($onDrawCounter happened)",
+                    onDrawCounter <= expectedDrawCount)
             }
             Thread.sleep(250)
         }
