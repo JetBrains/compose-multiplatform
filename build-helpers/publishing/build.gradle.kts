@@ -40,6 +40,7 @@ val shadowJar by tasks.registering(ShadowJar::class) {
     relocate(fromPackage, toPackage)
     archiveClassifier.set("shadow")
     configurations = listOf(embeddedDependencies)
+    from(sourceSets["main"]!!.output)
     exclude("META-INF/gradle-plugins/de.undercouch.download.properties")
 }
 
