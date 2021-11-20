@@ -28,11 +28,16 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.isUnspecified
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlin.math.floor
 
 @Suppress("ModifierInspectorInfo")
 internal fun Modifier.cursor(
@@ -59,17 +64,22 @@ internal fun Modifier.cursor(
                     .originalToTransformed(value.selection.start)
                 val cursorRect = state.layoutResult?.value?.getCursorRect(transformedOffset)
                     ?: Rect(0f, 0f, 0f, 0f)
-                val cursorWidth = DefaultCursorThickness.toPx()
+                val cursorWidth = floor(DefaultCursorThickness.toPx()).coerceAtLeast(1f)
                 val cursorX = (cursorRect.left + cursorWidth / 2)
                     .coerceAtMost(size.width - cursorWidth / 2)
 
-                drawLine(
-                    cursorBrush,
-                    Offset(cursorX, cursorRect.top),
-                    Offset(cursorX, cursorRect.bottom),
-                    alpha = cursorAlphaValue,
-                    strokeWidth = cursorWidth
-                )
+                // TODO(demin): check how it looks on android before upstream
+                drawIntoCanvas {
+                    it.drawLine(
+                        Offset(cursorX, cursorRect.top),
+                        Offset(cursorX, cursorRect.bottom),
+                        Paint().apply {
+                            cursorBrush.applyTo(size, this, cursorAlphaValue)
+                            strokeWidth = cursorWidth
+                            isAntiAlias = false
+                        }
+                    )
+                }
             }
         }
     } else {
@@ -87,4 +97,4 @@ private val cursorAnimationSpec: AnimationSpec<Float> = infiniteRepeatable(
     }
 )
 
-internal val DefaultCursorThickness = 2.dp
+internal expect val DefaultCursorThickness: Dp
