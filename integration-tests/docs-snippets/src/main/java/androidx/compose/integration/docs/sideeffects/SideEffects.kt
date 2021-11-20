@@ -238,7 +238,7 @@ private object SideEffectsSnippet7 {
 
         // Calculate high priority tasks only when the todoTasks or highPriorityKeywords
         // change, not on every recomposition
-        val highPriorityTasks by remember(todoTasks, highPriorityKeywords) {
+        val highPriorityTasks by remember {
             derivedStateOf { todoTasks.filter { it.containsWord(highPriorityKeywords) } }
         }
 
