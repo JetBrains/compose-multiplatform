@@ -88,7 +88,6 @@ fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
         it.enabled = false
     }
     tasks.register("lintAnalyzeDebug") {
-        it.dependsOn(lintTask)
         it.enabled = false
     }
     tasks.register("lintRelease") {
@@ -108,7 +107,6 @@ fun Project.configureAndroidProjectForLint(lint: Lint, extension: AndroidXExtens
         setUpLintDebugIfNeeded()
     }
     tasks.register("lintAnalyze") {
-        it.dependsOn("lintDebug")
         it.enabled = false
     }
     configureLint(lint, extension)
