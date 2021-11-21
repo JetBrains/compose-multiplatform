@@ -26,6 +26,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.awt.awtEventOrNull
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.window.rememberCursorPositionProvider
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
+import java.awt.event.KeyEvent
 
 /**
  * A Material Design [dropdown menu](https://material.io/components/menus#dropdown-menu).
@@ -101,7 +103,15 @@ fun DropdownMenu(
         Popup(
             focusable = focusable,
             onDismissRequest = onDismissRequest,
-            popupPositionProvider = popupPositionProvider
+            popupPositionProvider = popupPositionProvider,
+            onKeyEvent = {
+                if (it.awtEventOrNull?.keyCode == KeyEvent.VK_ESCAPE) {
+                    onDismissRequest()
+                    true
+                } else {
+                    false
+                }
+            },
         ) {
             DropdownMenuContent(
                 expandedStates = expandedStates,
@@ -179,7 +189,15 @@ fun CursorDropdownMenu(
         Popup(
             focusable = focusable,
             onDismissRequest = onDismissRequest,
-            popupPositionProvider = rememberCursorPositionProvider()
+            popupPositionProvider = rememberCursorPositionProvider(),
+            onKeyEvent = {
+                if (it.awtEventOrNull?.keyCode == KeyEvent.VK_ESCAPE) {
+                    onDismissRequest()
+                    true
+                } else {
+                    false
+                }
+            },
         ) {
             DropdownMenuContent(
                 expandedStates = expandedStates,
