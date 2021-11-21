@@ -246,9 +246,8 @@ internal class Node(val pointerInputNode: PointerInputModifierNode) : NodeParent
     private val relevantChanges: MutableMap<PointerId, PointerInputChange> = mutableMapOf()
     private var coordinates: LayoutCoordinates? = null
     private var pointerEvent: PointerEvent? = null
-    private var wasIn = false
     private var isIn = true
-    private var hasExited = true
+    private var hasEntered = false
 
     override fun dispatchMainEventPass(
         changes: Map<PointerId, PointerInputChange>,
@@ -392,23 +391,19 @@ internal class Node(val pointerInputNode: PointerInputModifierNode) : NodeParent
                 @Suppress("DEPRECATION")
                 isIn = !enterExitChange.isOutOfBounds(size)
             }
-            if (isIn != wasIn &&
-                (
-                    event.type == PointerEventType.Move ||
-                        event.type == PointerEventType.Enter ||
-                        event.type == PointerEventType.Exit
-                    )
+            if (event.type == PointerEventType.Move ||
+                event.type == PointerEventType.Enter ||
+                event.type == PointerEventType.Exit
             ) {
-                event.type = if (isIn) {
-                    PointerEventType.Enter
-                } else {
-                    PointerEventType.Exit
+                event.type = when {
+                    !hasEntered && isIn -> PointerEventType.Enter
+                    hasEntered && !isIn -> PointerEventType.Exit
+                    else -> PointerEventType.Move
                 }
-            } else if (event.type == PointerEventType.Enter && wasIn && !hasExited) {
-                event.type = PointerEventType.Move // We already knew that it was in.
-            } else if (event.type == PointerEventType.Exit && isIn && enterExitChange.pressed) {
-                event.type = PointerEventType.Move // We are still in.
             }
+
+            if (event.type == PointerEventType.Enter) hasEntered = true
+            if (event.type == PointerEventType.Exit) hasEntered = false
         }
         pointerEvent = event
     }
@@ -465,8 +460,6 @@ internal class Node(val pointerInputNode: PointerInputModifierNode) : NodeParent
 
         val event = pointerEvent ?: return
 
-        wasIn = isIn
-
         event.changes.fastForEach { change ->
             // If the pointer is released and doesn't support hover OR
             // the pointer supports over and is released outside the area
@@ -478,7 +471,6 @@ internal class Node(val pointerInputNode: PointerInputModifierNode) : NodeParent
         }
 
         isIn = false
-        hasExited = event.type == PointerEventType.Exit
     }
 
     override fun toString(): String {

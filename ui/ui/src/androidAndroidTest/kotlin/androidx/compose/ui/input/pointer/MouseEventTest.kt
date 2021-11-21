@@ -83,7 +83,7 @@ class MouseEventTest {
     }
 
     @Test
-    fun absentExitSent() {
+    fun dontSendExitWhenWePress() {
         // Sometimes the ACTION_HOVER_EXIT isn't sent when a touch event comes after a mouse event.
 
         val events = mutableListOf<PointerEventType>()
@@ -114,7 +114,7 @@ class MouseEventTest {
 
         assertThat(events).hasSize(4)
         assertThat(events[0]).isEqualTo(PointerEventType.Enter)
-        assertThat(events[1]).isEqualTo(PointerEventType.Exit)
+        assertThat(events[1]).isEqualTo(PointerEventType.Move)
         assertThat(events[2]).isEqualTo(PointerEventType.Press)
         assertThat(events[3]).isEqualTo(PointerEventType.Release)
     }
@@ -222,7 +222,7 @@ class MouseEventTest {
 
         rule.onNodeWithTag(tag).performMouseInput {
             moveTo(Offset.Zero)
-            exit()
+            exit(Offset(-1f, -1f))
         }
 
         assertThat(events).hasSize(2)
