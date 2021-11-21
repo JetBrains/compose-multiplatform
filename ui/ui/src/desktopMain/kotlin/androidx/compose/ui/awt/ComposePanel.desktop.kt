@@ -17,6 +17,8 @@ package androidx.compose.ui.awt
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.window.WindowExceptionHandler
 import org.jetbrains.skiko.ClipComponent
 import org.jetbrains.skiko.GraphicsApi
 import java.awt.Color
@@ -66,6 +68,18 @@ class ComposePanel : JLayeredPane() {
         initContent()
     }
 
+    /**
+     * Handler to catch uncaught exceptions during rendering frames, handling events,
+     * or processing background Compose operations. If null, then exceptions throw
+     * further up the call stack.
+     */
+    @ExperimentalComposeUiApi
+    var exceptionHandler: WindowExceptionHandler? = null
+        set(value) {
+            field = value
+            layer?.exceptionHandler = value
+        }
+
     private fun initContent() {
         if (layer != null && content != null) {
             layer!!.setContent {
@@ -93,6 +107,7 @@ class ComposePanel : JLayeredPane() {
         super.remove(component)
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun addNotify() {
         super.addNotify()
 
@@ -100,6 +115,7 @@ class ComposePanel : JLayeredPane() {
         // content.
         layer = ComposeLayer().apply {
             component.setSize(width, height)
+            exceptionHandler = this@ComposePanel.exceptionHandler
         }
         initContent()
         super.add(layer!!.component, Integer.valueOf(1))

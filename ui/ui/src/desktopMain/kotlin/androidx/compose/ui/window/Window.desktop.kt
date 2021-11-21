@@ -362,10 +362,14 @@ fun Window(
     content: @Composable FrameWindowScope.() -> Unit
 ) {
     val currentLocals by rememberUpdatedState(currentCompositionLocalContext)
+    val windowExceptionHandlerFactory by rememberUpdatedState(
+        LocalWindowExceptionHandlerFactory.current
+    )
     AwtWindow(
         visible = visible,
         create = {
             create().apply {
+                this.exceptionHandler = windowExceptionHandlerFactory.exceptionHandler(this)
                 setContent(onPreviewKeyEvent, onKeyEvent) {
                     CompositionLocalProvider(currentLocals) {
                         content()
@@ -375,6 +379,8 @@ fun Window(
         },
         dispose = dispose,
         update = {
+            it.exceptionHandler = windowExceptionHandlerFactory.exceptionHandler(it)
+
             update(it)
 
             if (!it.isDisplayable) {

@@ -18,9 +18,11 @@ package androidx.compose.ui.awt
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.window.LocalWindow
 import androidx.compose.ui.window.UndecoratedWindowResizer
+import androidx.compose.ui.window.WindowExceptionHandler
 import org.jetbrains.skiko.ClipComponent
 import org.jetbrains.skiko.GraphicsApi
 import org.jetbrains.skiko.OS
@@ -142,6 +144,13 @@ internal class ComposeWindowDelegate(
             action()
         }
     }
+
+    @ExperimentalComposeUiApi
+    var exceptionHandler: WindowExceptionHandler?
+        get() = layer.exceptionHandler
+        set(value) {
+            layer.exceptionHandler = value
+        }
 
     val windowHandle: Long
         get() = layer.component.windowHandle

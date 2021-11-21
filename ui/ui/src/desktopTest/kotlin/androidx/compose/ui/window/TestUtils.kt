@@ -16,11 +16,13 @@
 
 package androidx.compose.ui.window
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
+import java.awt.GraphicsEnvironment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,7 +35,6 @@ import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.yield
 import org.junit.Assume.assumeFalse
-import java.awt.GraphicsEnvironment
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal fun runApplicationTest(
@@ -53,63 +54,72 @@ internal fun runApplicationTest(
 
     runBlocking(Dispatchers.Swing) {
         withTimeout(30000) {
-            val testScope = WindowTestScope(this, useDelay)
-            if (testScope.isOpen) {
-                testScope.body()
+            val exceptionHandler = TestExceptionHandler()
+            withExceptionHandler(exceptionHandler) {
+                val scope = WindowTestScope(this, useDelay, exceptionHandler)
+                scope.body()
+                scope.exitTestApplication()
             }
+            exceptionHandler.throwIfCaught()
         }
     }
 }
 
-/* Snippet that demonstrated the issue with window state listening on Linux
+private inline fun withExceptionHandler(
+    handler: Thread.UncaughtExceptionHandler,
+    body: () -> Unit
+) {
+    val old = Thread.currentThread().uncaughtExceptionHandler
+    Thread.currentThread().uncaughtExceptionHandler = handler
+    try {
+        body()
+    } finally {
+        Thread.currentThread().uncaughtExceptionHandler = old
+    }
+}
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.swing.Swing
-import kotlinx.coroutines.yield
-import java.awt.Point
-import java.awt.event.ComponentAdapter
-import java.awt.event.ComponentEvent
-import javax.swing.JFrame
+internal class TestExceptionHandler : Thread.UncaughtExceptionHandler {
+    private var exception: Throwable? = null
 
-fun main()  {
-    runBlocking(Dispatchers.Swing) {
-        repeat(10) {
-            val actions = mutableListOf<String>()
-            val frame = JFrame()
-            frame.addComponentListener(object : ComponentAdapter() {
-                override fun componentMoved(e: ComponentEvent?) {
-                    actions.add(frame.x.toString())
-                }
-            })
-            frame.location = Point(200, 200)
-            frame.isVisible = true
-            yield()
-//                delay(200)
-            actions.add("set300")
-            frame.location = Point(300, 300)
-            delay(200)
-            /**
-             * output is [200, set300, 300, 200, 300] on Linux
-             * (see 200, 300 at the end, they are unexpected events that make impossible to write
-             * robust tests without delays)
-             */
-            println(actions)
-            frame.dispose()
+    fun throwIfCaught() {
+        exception?.also {
+            throw it
+        }
+    }
+
+    override fun uncaughtException(thread: Thread, throwable: Throwable) {
+        if (exception != null) {
+            exception?.addSuppressed(throwable)
+        } else {
+            exception = throwable
         }
     }
 }
-*/
 
 internal class WindowTestScope(
     private val scope: CoroutineScope,
-    private val useDelay: Boolean
+    private val useDelay: Boolean,
+    private val exceptionHandler: TestExceptionHandler
 ) : CoroutineScope by CoroutineScope(scope.coroutineContext + Job()) {
     var isOpen by mutableStateOf(true)
     private val initialRecomposers = Recomposer.runningRecomposers.value
 
+    // TODO(demin) replace launchApplication to launchTestApplication in all tests,
+    //  because we don't close the window with simple launchApplication
+    fun launchTestApplication(
+        content: @Composable ApplicationScope.() -> Unit
+    ) = launchApplication {
+        if (isOpen) {
+            content()
+        }
+    }
+
+    // TODO(demin) remove when we migrate from launchApplication to launchTestApplication (see TODO above)
     fun exitApplication() {
+        isOpen = false
+    }
+
+    fun exitTestApplication() {
         isOpen = false
     }
 
@@ -132,5 +142,7 @@ internal class WindowTestScope(
         for (recomposerInfo in Recomposer.runningRecomposers.value - initialRecomposers) {
             recomposerInfo.state.takeWhile { it > Recomposer.State.Idle }.collect()
         }
+
+        exceptionHandler.throwIfCaught()
     }
 }

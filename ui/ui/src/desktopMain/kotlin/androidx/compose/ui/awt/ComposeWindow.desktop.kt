@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.window.FrameWindowScope
+import androidx.compose.ui.window.WindowExceptionHandler
 import androidx.compose.ui.window.WindowPlacement
 import org.jetbrains.skiko.GraphicsApi
 import java.awt.Component
@@ -47,6 +48,14 @@ class ComposeWindow(
     override fun add(component: Component) = delegate.add(component)
 
     override fun remove(component: Component) = delegate.remove(component)
+
+    /**
+     * Handler to catch uncaught exceptions during rendering frames, handling events,
+     * or processing background Compose operations. If null, then exceptions throw
+     * further up the call stack.
+     */
+    @ExperimentalComposeUiApi
+    var exceptionHandler: WindowExceptionHandler? by delegate::exceptionHandler
 
     /**
      * Composes the given composable into the ComposeWindow.
