@@ -52,7 +52,7 @@ class FocusRequester {
      */
     fun requestFocus() {
         check(focusRequesterNodes.isNotEmpty()) { focusRequesterNotInitialized }
-        focusRequesterNodes.forEach { it.findFocusNode()?.requestFocus(propagateFocus = false) }
+        focusRequesterNodes.forEach { it.findFocusNode()?.requestFocus() }
     }
 
     /**

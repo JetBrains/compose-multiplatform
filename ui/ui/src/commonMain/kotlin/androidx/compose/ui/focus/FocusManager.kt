@@ -173,8 +173,8 @@ internal class FocusManagerImpl(
 
         checkNotNull(destination.findParentFocusNode()) { "Move focus landed at the root." }
 
-        // If we found a potential next item, call requestFocus() to move focus to it.
-        destination.requestFocus(propagateFocus = false)
+        // If we found a potential next item, move focus to it.
+        destination.requestFocus()
         return true
     }
 

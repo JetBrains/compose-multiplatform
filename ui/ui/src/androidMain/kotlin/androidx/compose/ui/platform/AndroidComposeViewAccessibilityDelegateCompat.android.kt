@@ -1238,7 +1238,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             AccessibilityNodeInfoCompat.ACTION_FOCUS -> {
                 if (node.unmergedConfig.getOrNull(SemanticsProperties.Focused) == false) {
                     node.layoutNode.outerLayoutNodeWrapper.findLastFocusWrapper()
-                        ?.requestFocus(propagateFocus = false) ?: return false
+                        ?.requestFocus() ?: return false
                     return true
                 } else {
                     return false
