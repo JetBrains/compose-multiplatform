@@ -53,7 +53,7 @@ fun PublishingExtension.configurePublishing(project: Project) {
             credentials {
                 username =
                     System.getenv("COMPOSE_INTERNAL_REPO_USERNAME")
-                        ?: System.getenv("COMPOSE_REPO_KEY")
+                        ?: System.getenv("COMPOSE_REPO_USERNAME")
                         ?: ""
                 password =
                     System.getenv("COMPOSE_INTERNAL_REPO_KEY")
