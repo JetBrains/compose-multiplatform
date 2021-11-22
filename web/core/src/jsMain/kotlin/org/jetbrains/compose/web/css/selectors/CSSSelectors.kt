@@ -248,8 +248,22 @@ fun combine(vararg selectors: CSSSelector) = CSSSelector.Combine(selectors.toMut
 operator fun CSSSelector.plus(selector: CSSSelector) = combine(this, selector)
 operator fun String.plus(selector: CSSSelector) = combine(selector(this), selector)
 operator fun CSSSelector.plus(selector: String) = combine(this, selector(selector))
-operator fun CSSSelector.Combine.plus(selector: CSSSelector) { this.selectors.add(selector) }
-operator fun CSSSelector.Combine.plus(selector: String) { this.selectors.add(selector(selector)) }
+operator fun CSSSelector.plus(selector: CSSSelector.Combine): CSSSelector.Combine {
+    selector.selectors.add(0, this)
+    return selector
+}
+operator fun String.plus(selector: CSSSelector.Combine): CSSSelector.Combine {
+    selector.selectors.add(0, selector(this))
+    return selector
+}
+operator fun CSSSelector.Combine.plus(selector: CSSSelector): CSSSelector.Combine {
+    this.selectors.add(selector)
+    return this
+}
+operator fun CSSSelector.Combine.plus(selector: String): CSSSelector.Combine {
+    this.selectors.add(selector(selector))
+    return this
+}
 
 fun universal() = CSSSelector.Universal
 fun type(type: String) = CSSSelector.Type(type)
@@ -277,7 +291,7 @@ fun desc(parent: String, selected: String) =
 
 fun child(parent: CSSSelector, selected: CSSSelector) =
     CSSSelector.Child(parent, selected)
-fun sibling(sibling: CSSSelector, selected: CSSSelector) = CSSSelector.Descendant(sibling, selected)
+fun sibling(sibling: CSSSelector, selected: CSSSelector) = CSSSelector.Sibling(sibling, selected)
 fun adjacent(sibling: CSSSelector, selected: CSSSelector) = CSSSelector.Adjacent(sibling, selected)
 
 fun not(selector: CSSSelector) = CSSSelector.PseudoClass.Not(selector)
