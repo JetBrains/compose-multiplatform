@@ -45,7 +45,10 @@ abstract class DownloadFromSpaceMavenRepoTask : DefaultTask() {
         }
 
         val destinationDir = module.localDir
-        if (destinationDir.exists()) {
+
+        if (destinationDir.isFile)
+            error("Destination dir is a file: $destinationDir")
+        else if (destinationDir.exists()) {
             if (module.version.endsWith("-SNAPSHOT")) {
                 destinationDir.deleteRecursively()
             } else {
@@ -65,6 +68,8 @@ abstract class DownloadFromSpaceMavenRepoTask : DefaultTask() {
                     }
                 }
             }
+        } else {
+            destinationDir.mkdirs()
         }
 
         DownloadAction(project, this).apply {
