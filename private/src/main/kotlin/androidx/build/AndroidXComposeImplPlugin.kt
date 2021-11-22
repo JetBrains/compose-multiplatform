@@ -146,6 +146,7 @@ class AndroidXComposeImplPlugin : Plugin<Project> {
                     error.add("ModifierFactoryReturnType")
                     error.add("ModifierFactoryExtensionFunction")
                     error.add("ModifierParameter")
+                    error.add("MutableCollectionMutableState")
                     error.add("UnnecessaryComposedModifier")
 
                     // Paths we want to enable ListIterator checks for - for higher level
