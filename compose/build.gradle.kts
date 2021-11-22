@@ -29,6 +29,7 @@ tasks.register("publishComposeJb") {
     listOf(
         ":compose:animation:animation",
         ":compose:animation:animation-core",
+        ":compose:animation:animation-graphics",
         ":compose:foundation:foundation",
         ":compose:foundation:foundation-layout",
         ":compose:material:material",
