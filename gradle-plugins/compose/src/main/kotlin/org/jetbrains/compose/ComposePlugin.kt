@@ -157,7 +157,7 @@ class ComposePlugin : Plugin<Project> {
     }
 
     object Dependencies {
-        val desktop = DesktopDependencies"
+        val desktop = DesktopDependencies
         val animation get() = composeDependency("org.jetbrains.compose.animation:animation")
         val animationGraphics get() = composeDependency("org.jetbrains.compose.animation:animation-graphics")
         val foundation get() = composeDependency("org.jetbrains.compose.foundation:foundation")
