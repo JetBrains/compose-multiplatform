@@ -70,7 +70,7 @@ internal class FocusManagerImpl(
      */
     val modifier: Modifier
         // TODO(b/168831247): return an empty Modifier when there are no focusable children.
-        get() = focusModifier
+        get() = Modifier.focusTarget(focusModifier)
 
     lateinit var layoutDirection: LayoutDirection
 
@@ -152,21 +152,21 @@ internal class FocusManagerImpl(
         if (destination == null) {
             // Check if we need to wrap around (no destination and a non-root item is focused)
             if (focusModifier.focusState.hasFocus && !focusModifier.focusState.isFocused) {
-                    // Next and Previous wraps around.
-                    return when (focusDirection) {
-                        Next, Previous -> {
-                            // Clear Focus to send focus the root node.
-                            // Wrap around by requesting focus for the root and then calling moveFocus.
-                            clearFocus(force = false)
+                // Next and Previous wraps around.
+                return when (focusDirection) {
+                    Next, Previous -> {
+                        // Clear Focus to send focus the root node.
+                        // Wrap around by requesting focus for the root and then calling moveFocus.
+                        clearFocus(force = false)
 
-                            if (focusModifier.focusState.isFocused) {
-                                moveFocus(focusDirection)
-                            } else {
-                                false
-                            }
+                        if (focusModifier.focusState.isFocused) {
+                            moveFocus(focusDirection)
+                        } else {
+                            false
                         }
-                        else -> false
                     }
+                    else -> false
+                }
             }
             return false
         }

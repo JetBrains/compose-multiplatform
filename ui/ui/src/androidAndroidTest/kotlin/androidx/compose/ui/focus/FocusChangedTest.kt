@@ -46,7 +46,7 @@ class FocusChangedTest {
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(FocusModifier(Active))
+                    .focusTarget(FocusModifier(Active))
             )
         }
 
@@ -106,7 +106,7 @@ class FocusChangedTest {
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(FocusModifier(Captured))
+                    .focusTarget(FocusModifier(Captured))
             )
         }
 
@@ -196,7 +196,7 @@ class FocusChangedTest {
                 modifier = Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(FocusModifier(Inactive))
+                    .focusTarget(FocusModifier(Inactive))
             )
         }
 
@@ -236,7 +236,7 @@ class FocusChangedTest {
                                 .onFocusChanged { focusState5 = it }
                                 .onFocusChanged { focusState6 = it }
                                 .focusRequester(focusRequester)
-                                .then(FocusModifier(Inactive))
+                                .focusTarget(FocusModifier(Inactive))
                         )
                     }
                 }
