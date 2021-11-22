@@ -91,6 +91,7 @@ class ComposePlugin : Plugin<Project> {
                     listOf(
                         "androidx.compose.animation:animation",
                         "androidx.compose.animation:animation-core",
+                        "androidx.compose.animation:animation-graphics",
                         "androidx.compose.compiler:compiler",
                         "androidx.compose.compiler:compiler-hosted",
                         "androidx.compose.foundation:foundation",
@@ -98,7 +99,8 @@ class ComposePlugin : Plugin<Project> {
                         "androidx.compose.material:material",
                         "androidx.compose.material:material-icons-core",
                         "androidx.compose.material:material-icons-extended",
-                        "androidx.compose.material:material-ripple",
+                        "androidx.compose.material:material-ripple",",
+                        "androidx.compose.material:material3",
                         "androidx.compose.runtime:runtime",
                         "androidx.compose.runtime:runtime-saveable",
                         "androidx.compose.ui:ui",
@@ -155,8 +157,9 @@ class ComposePlugin : Plugin<Project> {
     }
 
     object Dependencies {
-        val desktop = DesktopDependencies
+        val desktop = DesktopDependencies"
         val animation get() = composeDependency("org.jetbrains.compose.animation:animation")
+        val animationGraphics get() = composeDependency("org.jetbrains.compose.animation:animation-graphics")
         val foundation get() = composeDependency("org.jetbrains.compose.foundation:foundation")
         val material get() = composeDependency("org.jetbrains.compose.material:material")
         @ExperimentalComposeLibrary
