@@ -99,7 +99,7 @@ class ComposePlugin : Plugin<Project> {
                         "androidx.compose.material:material",
                         "androidx.compose.material:material-icons-core",
                         "androidx.compose.material:material-icons-extended",
-                        "androidx.compose.material:material-ripple",",
+                        "androidx.compose.material:material-ripple",
                         "androidx.compose.material:material3",
                         "androidx.compose.runtime:runtime",
                         "androidx.compose.runtime:runtime-saveable",
