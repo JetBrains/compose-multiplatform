@@ -502,6 +502,10 @@ internal class AndroidComposeView(context: Context) :
         ViewCompat.setAccessibilityDelegate(this, accessibilityDelegate)
         ViewRootForTest.onViewCreatedCallback?.invoke(this)
         root.attach(this)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // Support for this feature in Compose is tracked here: b/207654434
+            AndroidComposeViewForceDarkModeQ.disallowForceDark(this)
+        }
     }
 
     override fun onResume(owner: LifecycleOwner) {
@@ -1595,7 +1599,7 @@ var textInputServiceFactory: (PlatformTextInputService) -> TextInputService =
  * which use this method will pass.
  */
 @RequiresApi(Build.VERSION_CODES.O)
-internal object AndroidComposeViewVerificationHelperMethodsO {
+private object AndroidComposeViewVerificationHelperMethodsO {
     @RequiresApi(Build.VERSION_CODES.O)
     @DoNotInline
     fun focusable(view: View, focusable: Int, defaultFocusHighlightEnabled: Boolean) {
@@ -1606,7 +1610,7 @@ internal object AndroidComposeViewVerificationHelperMethodsO {
 }
 
 @RequiresApi(Build.VERSION_CODES.N)
-internal object AndroidComposeViewVerificationHelperMethodsN {
+private object AndroidComposeViewVerificationHelperMethodsN {
     @DoNotInline
     @RequiresApi(Build.VERSION_CODES.N)
     fun setPointerIcon(view: View, icon: PointerIcon?) {
@@ -1625,6 +1629,15 @@ internal object AndroidComposeViewVerificationHelperMethodsN {
         if (view.pointerIcon != iconToSet) {
             view.pointerIcon = iconToSet
         }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.Q)
+private object AndroidComposeViewForceDarkModeQ {
+    @DoNotInline
+    @RequiresApi(Build.VERSION_CODES.Q)
+    fun disallowForceDark(view: View) {
+        view.isForceDarkAllowed = false
     }
 }
 
