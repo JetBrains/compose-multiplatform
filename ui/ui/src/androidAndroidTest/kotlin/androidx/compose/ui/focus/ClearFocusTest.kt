@@ -50,7 +50,7 @@ class ClearFocusTest(private val forced: Boolean) {
         // Arrange.
         val modifier = FocusModifier(Active)
         rule.setFocusableContent {
-            Box(modifier = modifier)
+            Box(Modifier.focusTarget(modifier))
         }
 
         // Act.
@@ -71,8 +71,8 @@ class ClearFocusTest(private val forced: Boolean) {
         val parent = FocusModifier(ActiveParent)
         val modifier = FocusModifier(Active)
         rule.setFocusableContent {
-            Box(modifier = parent) {
-                Box(modifier = modifier)
+            Box(Modifier.focusTarget(parent)) {
+                Box(Modifier.focusTarget(modifier))
             }
             SideEffect {
                 parent.focusedChild = modifier.focusNode
@@ -96,7 +96,7 @@ class ClearFocusTest(private val forced: Boolean) {
         // Arrange.
         val modifier = FocusModifier(ActiveParent)
         rule.setFocusableContent {
-            Box(modifier = modifier)
+            Box(Modifier.focusTarget(modifier))
         }
 
         // Act.
@@ -112,9 +112,9 @@ class ClearFocusTest(private val forced: Boolean) {
         val modifier = FocusModifier(ActiveParent)
         val child = FocusModifier(Active)
         rule.setFocusableContent {
-            Box(modifier = parent) {
-                Box(modifier = modifier) {
-                    Box(modifier = child)
+            Box(Modifier.focusTarget(parent)) {
+                Box(Modifier.focusTarget(modifier)) {
+                    Box(Modifier.focusTarget(child))
                 }
             }
             SideEffect {
@@ -144,10 +144,10 @@ class ClearFocusTest(private val forced: Boolean) {
         val grandchild = FocusModifier(ActiveParent)
         val greatGrandchild = FocusModifier(Active)
         rule.setFocusableContent {
-            Box(modifier = modifier) {
-                Box(modifier = child) {
-                    Box(modifier = grandchild) {
-                        Box(modifier = greatGrandchild)
+            Box(Modifier.focusTarget(modifier)) {
+                Box(Modifier.focusTarget(child)) {
+                    Box(Modifier.focusTarget(grandchild)) {
+                        Box(Modifier.focusTarget(greatGrandchild))
                     }
                 }
             }
@@ -181,7 +181,7 @@ class ClearFocusTest(private val forced: Boolean) {
         // Arrange.
         val modifier = FocusModifier(Captured)
         rule.setFocusableContent {
-            Box(modifier = modifier)
+            Box(Modifier.focusTarget(modifier))
         }
 
         // Act.
@@ -210,8 +210,8 @@ class ClearFocusTest(private val forced: Boolean) {
         val parent = FocusModifier(ActiveParent)
         val modifier = FocusModifier(Captured)
         rule.setFocusableContent {
-            Box(modifier = parent) {
-                Box(modifier = modifier)
+            Box(Modifier.focusTarget(parent)) {
+                Box(Modifier.focusTarget(modifier))
             }
             SideEffect {
                 parent.focusedChild = modifier.focusNode
@@ -243,7 +243,7 @@ class ClearFocusTest(private val forced: Boolean) {
         // Arrange.
         val modifier = FocusModifier(Inactive)
         rule.setFocusableContent {
-            Box(modifier = modifier)
+            Box(Modifier.focusTarget(modifier))
         }
 
         // Act.
@@ -263,7 +263,11 @@ class ClearFocusTest(private val forced: Boolean) {
         // Arrange.
         val modifier = FocusModifier(Inactive)
         rule.setFocusableContent {
-            Box(modifier = Modifier.focusProperties { canFocus = false }.then(modifier))
+            Box(
+                Modifier
+                    .focusProperties { canFocus = false }
+                    .focusTarget(modifier)
+            )
         }
 
         // Act.
@@ -283,7 +287,7 @@ class ClearFocusTest(private val forced: Boolean) {
         // Arrange.
         val modifier = FocusModifier(DeactivatedParent)
         rule.setFocusableContent {
-            Box(modifier = modifier)
+            Box(Modifier.focusTarget(modifier))
         }
 
         // Act.
@@ -299,9 +303,13 @@ class ClearFocusTest(private val forced: Boolean) {
         val modifier = FocusModifier(ActiveParent)
         val child = FocusModifier(Active)
         rule.setFocusableContent {
-            Box(modifier = parent) {
-                Box(modifier = Modifier.focusProperties { canFocus = false }.then(modifier)) {
-                    Box(modifier = child)
+            Box(Modifier.focusTarget(parent)) {
+                Box(
+                    Modifier
+                        .focusProperties { canFocus = false }
+                        .focusTarget(modifier)
+                ) {
+                    Box(Modifier.focusTarget(child))
                 }
             }
             SideEffect {
@@ -330,9 +338,15 @@ class ClearFocusTest(private val forced: Boolean) {
         val modifier = FocusModifier(ActiveParent)
         val child = FocusModifier(Active)
         rule.setFocusableContent {
-            Box(modifier = Modifier.focusProperties { canFocus = false }.then(parent)) {
-                Box(modifier = Modifier.focusProperties { canFocus = false }.then(modifier)) {
-                    Box(modifier = child)
+            Box(Modifier
+                .focusProperties { canFocus = false }
+                .focusTarget(parent)
+            ) {
+                Box(Modifier
+                    .focusProperties { canFocus = false }
+                    .focusTarget(modifier)
+                ) {
+                    Box(Modifier.focusTarget(child))
                 }
             }
             SideEffect {
@@ -363,14 +377,17 @@ class ClearFocusTest(private val forced: Boolean) {
         val greatGrandchild = FocusModifier(ActiveParent)
         val greatGreatGrandchild = FocusModifier(Active)
         rule.setFocusableContent {
-            Box(modifier = Modifier.focusProperties { canFocus = false }.then(modifier)) {
-                Box(modifier = child) {
-                    Box(modifier = Modifier
+            Box(Modifier
+                .focusProperties { canFocus = false }
+                .focusTarget(modifier)
+            ) {
+                Box(modifier = Modifier.focusTarget(child)) {
+                    Box(Modifier
                         .focusProperties { canFocus = false }
-                        .then(grandchild)
+                        .focusTarget(grandchild)
                     ) {
-                        Box(modifier = greatGrandchild) {
-                            Box(modifier = greatGreatGrandchild)
+                        Box(Modifier.focusTarget(greatGrandchild)) {
+                            Box(Modifier.focusTarget(greatGreatGrandchild))
                         }
                     }
                 }

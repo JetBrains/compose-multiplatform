@@ -43,10 +43,10 @@ class FreeFocusTest {
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
-                modifier = Modifier
+                Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(FocusModifier(Active))
+                    .focusTarget(FocusModifier(Active))
             )
         }
 
@@ -67,10 +67,10 @@ class FreeFocusTest {
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
-                modifier = Modifier
+                Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(FocusModifier(ActiveParent))
+                    .focusTarget(FocusModifier(ActiveParent))
             )
         }
 
@@ -91,10 +91,10 @@ class FreeFocusTest {
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
-                modifier = Modifier
+                Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(FocusModifier(Captured))
+                    .focusTarget(FocusModifier(Captured))
             )
         }
 
@@ -115,11 +115,11 @@ class FreeFocusTest {
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
-                modifier = Modifier
+                Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
                     .focusProperties { canFocus = false }
-                    .then(FocusModifier(Inactive))
+                    .focusTarget(FocusModifier(Inactive))
             )
         }
 
@@ -140,10 +140,10 @@ class FreeFocusTest {
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
-                modifier = Modifier
+                Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(FocusModifier(Inactive))
+                    .focusTarget(FocusModifier(Inactive))
             )
         }
 

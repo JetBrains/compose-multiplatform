@@ -30,7 +30,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import kotlin.jvm.JvmStatic
 
 @RunWith(Parameterized::class)
 class FocusManagerTest(private val initialFocusState: FocusState) {
