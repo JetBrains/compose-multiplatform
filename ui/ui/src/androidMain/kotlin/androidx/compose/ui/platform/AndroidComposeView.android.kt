@@ -592,15 +592,15 @@ internal class AndroidComposeView(context: Context) :
             view,
             object : AccessibilityDelegateCompat() {
                 override fun onInitializeAccessibilityNodeInfo(
-                    host: View?,
-                    info: AccessibilityNodeInfoCompat?
+                    host: View,
+                    info: AccessibilityNodeInfoCompat
                 ) {
                     super.onInitializeAccessibilityNodeInfo(host, info)
                     var parentId = SemanticsNode(layoutNode.outerSemantics!!, false).parent!!.id
                     if (parentId == semanticsOwner.unmergedRootSemanticsNode.id) {
                         parentId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     }
-                    info!!.setParent(thisView, parentId)
+                    info.setParent(thisView, parentId)
                 }
             }
         )
