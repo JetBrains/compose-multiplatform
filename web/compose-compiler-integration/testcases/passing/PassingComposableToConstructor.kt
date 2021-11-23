@@ -4,17 +4,19 @@
 import androidx.compose.runtime.Composable
 
 fun main() {
-    val instance = testCase {  }
+    var set = mutableSetOf<Int>()
+
+    val instance = testCase {
+        set.add(1)
+    }
     val instance2 = TestCase2()
 
     callComposable {
         instance.composable()
         instance2.composable()
+        set.add(2)
     }
-}
-
-fun callComposable(content: @Composable () -> Unit) {
-    // does nothing
+    require(intArrayOf(1, 2).all { it in set }) { "Failed when running composables" }
 }
 
 // @Module:Lib
