@@ -2216,7 +2216,7 @@ class AndroidAccessibilityTest {
                 dialogComposeView = LocalView.current as AndroidComposeView
                 delegate = ViewCompat.getAccessibilityDelegate(dialogComposeView!!) as
                     AndroidComposeViewAccessibilityDelegateCompat
-                provider = delegate.getAccessibilityNodeProvider(dialogComposeView).provider
+                provider = delegate.getAccessibilityNodeProvider(dialogComposeView!!).provider
                     as AccessibilityNodeProvider
 
                 with(LocalDensity.current) {

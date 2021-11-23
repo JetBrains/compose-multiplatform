@@ -1545,7 +1545,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         sendEventForVirtualView(previousVirtualViewId, AccessibilityEvent.TYPE_VIEW_HOVER_EXIT)
     }
 
-    override fun getAccessibilityNodeProvider(host: View?): AccessibilityNodeProviderCompat {
+    override fun getAccessibilityNodeProvider(host: View): AccessibilityNodeProviderCompat {
         return nodeProvider
     }
 
