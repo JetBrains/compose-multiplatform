@@ -137,6 +137,9 @@ class AndroidXImplPlugin : Plugin<Project> {
     private fun configureTestTask(project: Project, task: Test) {
         AffectedModuleDetector.configureTaskGuard(task)
 
+        // Robolectric 1.7 increased heap size requirements, see b/207169653.
+        task.maxHeapSize = "2g"
+
         val xmlReportDestDir = project.getHostTestResultDirectory()
         val archiveName = "${project.path.asFilenamePrefix()}_${task.name}.zip"
         if (project.isDisplayTestOutput()) {
