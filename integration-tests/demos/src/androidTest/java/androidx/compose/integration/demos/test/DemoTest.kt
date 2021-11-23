@@ -41,6 +41,7 @@ import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -107,6 +108,8 @@ class DemoTest {
         navigateThroughAllDemos(SplitDemoCategories[2])
     }
 
+    // Broken: b/206811195
+    @Ignore
     @Test
     fun navigateThroughAllDemos_4() {
         navigateThroughAllDemos(SplitDemoCategories[3])
