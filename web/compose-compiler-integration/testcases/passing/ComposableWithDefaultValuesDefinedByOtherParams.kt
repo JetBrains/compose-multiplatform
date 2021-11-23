@@ -7,18 +7,19 @@ fun main() {
     callComposable {
         ComposableWithDefaultParamsDefinedByOtherParams("a")
     }
+    require(result == "aa") { "Actual result was - $result"}
 }
 
-fun callComposable(content: @Composable () -> Unit) {
-    val c = content
-}
 
 // @Module:Lib
 import androidx.compose.runtime.Composable
+
+var result = ""
 
 @Composable
 fun ComposableWithDefaultParamsDefinedByOtherParams(
     a: String,
     b: String = a
 ) {
+    result = a + b
 }

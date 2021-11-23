@@ -1,21 +1,28 @@
 // @Module:Main
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.currentComposer
-import androidx.compose.runtime.Composer
+import androidx.compose.runtime.*
 
 fun main() {
+    var set = mutableSetOf<Int>()
     callComposable {
-
-        FooTakesTypedComposableLambda { "text" }
-        FooTakesTypedComposableLambda2(10) { it + 100 }
-        FooTakesTypedExtesionComposableLambda<String, Any, Unit>("text", Any()) { }
-        MySelect<String>(emptyList(), {})
+        FooTakesTypedComposableLambda {
+            set.add(1)
+            "text"
+        }
+        FooTakesTypedComposableLambda2(10) {
+            set.add(2)
+            it + 100
+        }
+        FooTakesTypedExtesionComposableLambda<String, Any, Unit>("text", Any()) {
+            set.add(3)
+        }
+        MySelect<String>(listOf("1")) {
+            set.add(4)
+        }
     }
+
+    require(intArrayOf(1, 2, 3, 4).all { it in set }) { "Failed when running composables" }
 }
 
-fun callComposable(content: @Composable () -> Unit) {
-    val c = content
-}
 
 // @Module:Lib
 import androidx.compose.runtime.Composable
@@ -41,4 +48,5 @@ fun <T> MySelect(
     options: List<T>,
     onChange: (T) -> Unit
 ) {
+    onChange(options.first())
 }
