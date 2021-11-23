@@ -25,7 +25,7 @@ import javax.xml.parsers.DocumentBuilderFactory
 /**
  * Synchronously load an xml vector image from some [inputSource].
  *
- * XML Vector Image is came from Android world. See:
+ * XML Vector Image came from Android world. See:
  * https://developer.android.com/guide/topics/graphics/vector-drawable-resources
  *
  * On desktop it is fully implemented except there is no resource linking
