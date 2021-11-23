@@ -8,3 +8,7 @@ plugins {
 dependencies {
     implementation(compose.desktop.currentOs)
 }
+
+compose.desktop.application {
+    mainClass = "PreviewKt"
+}
