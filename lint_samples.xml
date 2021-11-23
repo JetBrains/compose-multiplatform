@@ -16,24 +16,20 @@
   -->
 
 <!--
-  Please copy any lint rules added here to all other modules local lint.xml
-  files and lint_samples.xml (if applicable).
-   -->
+  This configuration is applied to LibraryType.SAMPLES projects which must run
+  specific lint checks on dependencies, but don't want the full suite running.
+  -->
 <lint>
     <issue id="LintBaseline" severity="ignore">
         <ignore regexp=".* filtered out because .* listed in the baseline file.*"/>
     </issue>
-    <!-- Disable all lint checks on tests by default. -->
+    <!-- Disable all lint checks in non-sample projects. -->
     <issue id="all">
-        <ignore path="**/src/test/**" />
-        <ignore path="**/src/androidTest/**" />
-        <!-- Required for Kotlin multi-platform tests. -->
-        <ignore path="**/src/androidAndroidTest/**" />
-        <!-- Required for AppSearch icing tests. -->
-        <ignore path="**/java/tests/**" />
+        <ignore regexp="^((?!samples).)*$" />
     </issue>
-    <!-- Re-enable high-priority checks for tests (and everything else). -->
-    <issue id="NewApi" severity="fatal" />
-    <issue id="WrongThread" severity="fatal" />
-    <issue id="MissingTestSizeAnnotation" severity="fatal" />
+    <!-- Re-enable sampled lint checks for all projects. -->
+    <issue id="InvalidSamplesLocation" severity="fatal" />
+    <issue id="MultipleSampledFunctions" severity="fatal" />
+    <issue id="UnresolvedSampleLink" severity="fatal" />
+    <issue id="ObsoleteSampledAnnotation" severity="fatal" />
 </lint>
