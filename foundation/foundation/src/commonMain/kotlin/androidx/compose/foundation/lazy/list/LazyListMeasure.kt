@@ -159,7 +159,9 @@ internal fun measureLazyList(
             val toScrollBack = maxOffset - mainAxisUsed
             currentFirstItemScrollOffset -= toScrollBack
             mainAxisUsed += toScrollBack
-            while (currentFirstItemScrollOffset < 0 && currentFirstItemIndex > DataIndex(0)) {
+            while (currentFirstItemScrollOffset < beforeContentPadding &&
+                currentFirstItemIndex > DataIndex(0)
+            ) {
                 val previousIndex = DataIndex(currentFirstItemIndex.value - 1)
                 val measuredItem = itemProvider.getAndMeasure(previousIndex)
                 visibleItems.add(0, measuredItem)
