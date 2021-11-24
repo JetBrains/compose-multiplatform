@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.platform.Font
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -276,6 +277,45 @@ class DesktopParagraphTest {
         for (i in 1 until paragraph.lineCount) {
             Truth.assertThat(paragraph.getLineHeight(i)).isEqualTo(firstLineHeight)
         }
+    }
+
+    @Test
+    fun applies_baseline_shift_to_spans() {
+        val helper = buildAnnotatedString {
+            append("text")
+            withStyle(SpanStyle(baselineShift = BaselineShift.Superscript, fontSize = 16.sp)) {
+                append("text")
+            }
+            withStyle(SpanStyle(baselineShift = BaselineShift.Subscript, fontSize = 16.sp)) {
+                append("text")
+            }
+            append("\ntext")
+            withStyle(SpanStyle(baselineShift = BaselineShift.Superscript, fontSize = 16.sp)) {
+                append("text")
+            }
+            withStyle(SpanStyle(baselineShift = BaselineShift.Subscript, fontSize = 16.sp)) {
+                append("text")
+            }
+        }
+        val textStyle = TextStyle(
+            fontFamily = fontFamilyMeasureFont,
+            fontSize = 16.sp
+        )
+        val paragraph = simpleParagraph(text = helper.text, spanStyles = helper.spanStyles, style = textStyle)
+        val paragraphWithoutStyles = simpleParagraph(helper.text, textStyle)
+
+        val firstLineTop = paragraph.getLineTop(0)
+        val firstLineBottom = paragraph.getLineBottom(0)
+        val secondLineTop = paragraph.getLineTop(1)
+        val secondLineBottom = paragraph.getLineBottom(1)
+
+        Truth.assertThat(firstLineBottom - firstLineTop).isEqualTo(19.0f)
+        Truth.assertThat(paragraphWithoutStyles.getLineTop(0)).isNotEqualTo(firstLineTop)
+        Truth.assertThat(paragraphWithoutStyles.getLineBottom(0)).isNotEqualTo(firstLineBottom)
+
+        Truth.assertThat(firstLineBottom - firstLineTop).isEqualTo(19.0f)
+        Truth.assertThat(paragraphWithoutStyles.getLineTop(1)).isNotEqualTo(secondLineTop)
+        Truth.assertThat(paragraphWithoutStyles.getLineBottom(1)).isNotEqualTo(secondLineBottom)
     }
 
     private fun simpleParagraph(
