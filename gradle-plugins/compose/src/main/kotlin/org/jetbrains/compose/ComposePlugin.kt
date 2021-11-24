@@ -205,7 +205,7 @@ class ComposePlugin : Plugin<Project> {
             composeDependency("org.jetbrains.compose.web:web-svg")
         }
 
-        @Deprecated("compose.web.web-widgets API is not deprecated")
+        @Deprecated("compose.web.web-widgets API is deprecated")
         val widgets by lazy {
             composeDependency("org.jetbrains.compose.web:web-widgets")
         }
