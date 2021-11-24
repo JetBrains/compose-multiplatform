@@ -16,7 +16,7 @@ fun main() {
         instance2.composable()
         set.add(2)
     }
-    require(intArrayOf(1, 2).all { it in set }) { "Failed when running composables" }
+    require(setOf(1, 2) == set) { "Failed when running composables" }
 }
 
 // @Module:Lib
