@@ -8,6 +8,7 @@ package org.jetbrains.compose.desktop.application.dsl
 import org.gradle.api.Action
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.ProjectLayout
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import java.util.*
 import javax.inject.Inject
@@ -26,6 +27,7 @@ open class NativeDistributions @Inject constructor(
     var vendor: String? = null
     var packageVersion: String? = null
     val appResourcesRootDir: DirectoryProperty = objects.directoryProperty()
+    val licenseFile: RegularFileProperty = objects.fileProperty()
 
     val outputBaseDir: DirectoryProperty = objects.directoryProperty().apply {
         set(layout.buildDirectory.dir("compose/binaries"))

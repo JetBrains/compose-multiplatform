@@ -241,6 +241,7 @@ The following properties are available in the `nativeDistributions` DSL block:
 * `description` — application's description (default value: none);
 * `copyright` — application's copyright (default value: none);
 * `vendor` — application's vendor (default value: none).
+* `licenseFile` — application's license (default value: none).
 
 ``` kotlin
 compose.desktop {
@@ -251,6 +252,7 @@ compose.desktop {
             description = "Compose Example App"
             copyright = "© 2020 My Name. All rights reserved."
             vendor = "Example vendor"
+            licenseFile.set(project.file("LICENSE.txt"))
         }
     }
 }

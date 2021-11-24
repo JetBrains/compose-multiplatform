@@ -212,6 +212,7 @@ internal fun AbstractJPackageTask.configurePackagingTask(
         packageCopyright.set(provider { executables.copyright })
         packageVendor.set(provider { executables.vendor })
         packageVersion.set(packageVersionFor(project, app, targetFormat))
+        licenseFile.set(executables.licenseFile)
     }
 
     destinationDir.set(app.nativeDistributions.outputBaseDir.map { it.dir("${app.name}/${targetFormat.outputDirName}") })
