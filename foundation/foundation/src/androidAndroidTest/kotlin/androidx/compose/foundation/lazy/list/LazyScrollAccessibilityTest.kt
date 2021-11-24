@@ -16,6 +16,10 @@
 
 package androidx.compose.foundation.lazy.list
 
+import android.R.id.accessibilityActionScrollDown
+import android.R.id.accessibilityActionScrollLeft
+import android.R.id.accessibilityActionScrollRight
+import android.R.id.accessibilityActionScrollUp
 import android.view.View
 import android.view.accessibility.AccessibilityNodeProvider
 import androidx.activity.ComponentActivity
@@ -25,9 +29,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,8 +51,10 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.ACTION_SCROLL_FORWARD
 import androidx.test.filters.MediumTest
+import com.google.common.truth.IterableSubject
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -100,32 +108,59 @@ class LazyScrollAccessibilityTest(private val config: TestConfig) {
 
     @Test
     fun scrollForward() {
-        testRelativeDirection(58, AccessibilityNodeInfoCompat.ACTION_SCROLL_FORWARD)
+        testRelativeDirection(58, ACTION_SCROLL_FORWARD)
     }
 
     @Test
     fun scrollBackward() {
-        testRelativeDirection(41, AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD)
+        testRelativeDirection(41, ACTION_SCROLL_BACKWARD)
     }
 
     @Test
     fun scrollRight() {
-        testAbsoluteDirection(58, android.R.id.accessibilityActionScrollRight, config.horizontal)
+        testAbsoluteDirection(58, accessibilityActionScrollRight, config.horizontal)
     }
 
     @Test
     fun scrollLeft() {
-        testAbsoluteDirection(41, android.R.id.accessibilityActionScrollLeft, config.horizontal)
+        testAbsoluteDirection(41, accessibilityActionScrollLeft, config.horizontal)
     }
 
     @Test
     fun scrollDown() {
-        testAbsoluteDirection(58, android.R.id.accessibilityActionScrollDown, config.vertical)
+        testAbsoluteDirection(58, accessibilityActionScrollDown, config.vertical)
     }
 
     @Test
     fun scrollUp() {
-        testAbsoluteDirection(41, android.R.id.accessibilityActionScrollUp, config.vertical)
+        testAbsoluteDirection(41, accessibilityActionScrollUp, config.vertical)
+    }
+
+    @Test
+    fun verifyScrollActionsAtStart() {
+        createScrollableContent_StartAtStart()
+        verifyNodeInfoScrollActions(
+            expectForward = !config.reversed,
+            expectBackward = config.reversed
+        )
+    }
+
+    @Test
+    fun verifyScrollActionsInMiddle() {
+        createScrollableContent_StartInMiddle()
+        verifyNodeInfoScrollActions(
+            expectForward = true,
+            expectBackward = true
+        )
+    }
+
+    @Test
+    fun verifyScrollActionsAtEnd() {
+        createScrollableContent_StartAtEnd()
+        verifyNodeInfoScrollActions(
+            expectForward = config.reversed,
+            expectBackward = !config.reversed
+        )
     }
 
     /**
@@ -190,12 +225,98 @@ class LazyScrollAccessibilityTest(private val config: TestConfig) {
     }
 
     /**
-     * Creates a Row/Column with a viewport of 100.dp, containing 100 items each 17.dp in size.
-     * The items have a text with their index (ASC), and the viewport starts in the middle of the
-     * scrollable. All properties from [config] are applied. The viewport has padding around it
-     * to make sure scroll distance doesn't include padding.
+     * Checks if all of the scroll actions are present or not according to what we expect based on
+     * [expectForward] and [expectBackward]. The scroll actions that are checked are forward,
+     * backward, left, right, up and down. The expectation parameters must already account for
+     * [reversing][TestConfig.reversed].
+     */
+    private fun verifyNodeInfoScrollActions(expectForward: Boolean, expectBackward: Boolean) {
+        val nodeInfo = rule.onNodeWithTag(scrollerTag).withSemanticsNode {
+            rule.runOnUiThread {
+                accessibilityNodeProvider.createAccessibilityNodeInfo(id)
+            }
+        }
+
+        val actions = nodeInfo.actionList.map { it.id }
+
+        assertThat(actions).contains(expectForward, ACTION_SCROLL_FORWARD)
+        assertThat(actions).contains(expectBackward, ACTION_SCROLL_BACKWARD)
+
+        if (config.horizontal) {
+            val expectLeft = if (config.rtl) expectForward else expectBackward
+            val expectRight = if (config.rtl) expectBackward else expectForward
+            assertThat(actions).contains(expectLeft, accessibilityActionScrollLeft)
+            assertThat(actions).contains(expectRight, accessibilityActionScrollRight)
+            assertThat(actions).contains(false, accessibilityActionScrollDown)
+            assertThat(actions).contains(false, accessibilityActionScrollUp)
+        } else {
+            assertThat(actions).contains(false, accessibilityActionScrollLeft)
+            assertThat(actions).contains(false, accessibilityActionScrollRight)
+            assertThat(actions).contains(expectForward, accessibilityActionScrollDown)
+            assertThat(actions).contains(expectBackward, accessibilityActionScrollUp)
+        }
+    }
+
+    private fun IterableSubject.contains(expectPresent: Boolean, element: Any) {
+        if (expectPresent) {
+            contains(element)
+        } else {
+            doesNotContain(element)
+        }
+    }
+
+    /**
+     * Creates a Row/Column that starts at the first item, according to [createScrollableContent]
+     */
+    private fun createScrollableContent_StartAtStart() {
+        createScrollableContent {
+            // Start at the start:
+            // -> pretty basic
+            rememberLazyListState(0, 0)
+        }
+    }
+
+    /**
+     * Creates a Row/Column that starts in the middle, according to [createScrollableContent]
      */
     private fun createScrollableContent_StartInMiddle() {
+        createScrollableContent {
+            // Start at the middle:
+            // Content size: 100 items * 21dp per item = 2100dp
+            // Viewport size: 200dp rect - 50dp padding on both sides = 100dp
+            // Content outside viewport: 2100dp - 100dp = 2000dp
+            // -> centered when 1000dp on either side, which is 47 items + 13dp
+            rememberLazyListState(
+                47,
+                with(LocalDensity.current) { 13.dp.roundToPx() }
+            )
+        }
+    }
+
+    /**
+     * Creates a Row/Column that starts at the last item, according to [createScrollableContent]
+     */
+    private fun createScrollableContent_StartAtEnd() {
+        createScrollableContent {
+            // Start at the end:
+            // Content size: 100 items * 21dp per item = 2100dp
+            // Viewport size: 200dp rect - 50dp padding on both sides = 100dp
+            // Content outside viewport: 2100dp - 100dp = 2000dp
+            // -> at the end when offset at 2000dp, which is 95 items + 5dp
+            rememberLazyListState(
+                95,
+                with(LocalDensity.current) { 5.dp.roundToPx() }
+            )
+        }
+    }
+
+    /**
+     * Creates a Row/Column with a viewport of 100.dp, containing 100 items each 17.dp in size.
+     * The items have a text with their index (ASC), and where the viewport starts is determined
+     * by the given [lambda][rememberLazyListState]. All properties from [config] are applied.
+     * The viewport has padding around it to make sure scroll distance doesn't include padding.
+     */
+    private fun createScrollableContent(rememberLazyListState: @Composable () -> LazyListState) {
         rule.setContent {
             composeView = LocalView.current
             val lazyContent: LazyListScope.() -> Unit = {
@@ -206,15 +327,7 @@ class LazyScrollAccessibilityTest(private val config: TestConfig) {
                 }
             }
 
-            // Start at the middle:
-            // Content size: 100 items * 21dp per item = 2100dp
-            // Viewport size: 200dp rect - 50dp padding on both sides = 100dp
-            // Content outside viewport: 2100dp - 100dp = 2000dp
-            // -> centered when 1000dp on either side, which is 47 items + 13dp
-            val state = rememberLazyListState(
-                47,
-                with(LocalDensity.current) { 13.dp.roundToPx() }
-            )
+            val state = rememberLazyListState()
 
             Box(Modifier.requiredSize(200.dp).background(Color.White)) {
                 val direction = if (config.rtl) LayoutDirection.Rtl else LayoutDirection.Ltr
