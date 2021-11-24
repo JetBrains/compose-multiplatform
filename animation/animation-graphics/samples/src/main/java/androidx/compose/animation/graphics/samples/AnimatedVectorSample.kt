@@ -20,6 +20,8 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.Sampled
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
+import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
+import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.size
@@ -38,10 +40,10 @@ fun AnimatedVectorSample() {
     @OptIn(ExperimentalAnimationGraphicsApi::class)
     @Composable
     fun AnimatedVector(@DrawableRes drawableId: Int) {
-        val image = animatedVectorResource(drawableId)
+        val image = AnimatedImageVector.animatedVectorResource(drawableId)
         var atEnd by remember { mutableStateOf(false) }
         Image(
-            painter = image.painterFor(atEnd),
+            painter = rememberAnimatedVectorPainter(image, atEnd),
             contentDescription = "Your content description",
             modifier = Modifier.size(64.dp).clickable {
                 atEnd = !atEnd
