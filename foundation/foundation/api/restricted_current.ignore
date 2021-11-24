@@ -1,11 +1,17 @@
 // Baseline format: 1.0
-InvalidNullConversion: androidx.compose.foundation.ImageKt#Image(androidx.compose.ui.graphics.ImageBitmap, String, androidx.compose.ui.Modifier, androidx.compose.ui.Alignment, androidx.compose.ui.layout.ContentScale, float, androidx.compose.ui.graphics.ColorFilter) parameter #1:
-    Attempted to change parameter from @Nullable to @NonNull: incompatible change for parameter contentDescription in androidx.compose.foundation.ImageKt.Image(androidx.compose.ui.graphics.ImageBitmap bitmap, String contentDescription, androidx.compose.ui.Modifier modifier, androidx.compose.ui.Alignment alignment, androidx.compose.ui.layout.ContentScale contentScale, float alpha, androidx.compose.ui.graphics.ColorFilter colorFilter)
-
-
-RemovedClass: androidx.compose.foundation.gestures.RelativeVelocityTrackerKt:
-    Removed class androidx.compose.foundation.gestures.RelativeVelocityTrackerKt
-RemovedClass: androidx.compose.foundation.lazy.LazyListItemContentFactoryKt:
-    Removed class androidx.compose.foundation.lazy.LazyListItemContentFactoryKt
-RemovedClass: androidx.compose.foundation.lazy.LazyListPrefetcher_androidKt:
-    Removed class androidx.compose.foundation.lazy.LazyListPrefetcher_androidKt
+RemovedClass: androidx.compose.foundation.lazy.IntervalListKt:
+    Removed class androidx.compose.foundation.lazy.IntervalListKt
+RemovedClass: androidx.compose.foundation.lazy.LazyListHeadersKt:
+    Removed class androidx.compose.foundation.lazy.LazyListHeadersKt
+RemovedClass: androidx.compose.foundation.lazy.LazyListItemPlacementAnimatorKt:
+    Removed class androidx.compose.foundation.lazy.LazyListItemPlacementAnimatorKt
+RemovedClass: androidx.compose.foundation.lazy.LazyListItemsProviderImplKt:
+    Removed class androidx.compose.foundation.lazy.LazyListItemsProviderImplKt
+RemovedClass: androidx.compose.foundation.lazy.LazyListKt:
+    Removed class androidx.compose.foundation.lazy.LazyListKt
+RemovedClass: androidx.compose.foundation.lazy.LazyListMeasureKt:
+    Removed class androidx.compose.foundation.lazy.LazyListMeasureKt
+RemovedClass: androidx.compose.foundation.lazy.LazyListScrollingKt:
+    Removed class androidx.compose.foundation.lazy.LazyListScrollingKt
+RemovedClass: androidx.compose.foundation.lazy.LazySemanticsKt:
+    Removed class androidx.compose.foundation.lazy.LazySemanticsKt
