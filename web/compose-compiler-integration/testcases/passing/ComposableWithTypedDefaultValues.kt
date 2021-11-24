@@ -1,16 +1,21 @@
 // @Module:Main
+// fixed in https://github.com/JetBrains/androidx/pull/118
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.Composer
 
 fun main() {
-    callComposable {
-        ComposableWithTypedDefaultValue<String>({})
-    }
-}
+    var called = false
 
-fun callComposable(content: @Composable () -> Unit) {
-    val c = content
+    callComposable {
+        ComposableWithTypedDefaultValue<String>({ it ->
+            check(it.value == null)
+            called = true
+        })
+    }
+
+    require(called) { "Failed when running composables" }
 }
 
 // @Module:Lib
@@ -39,5 +44,7 @@ class NullWrapper<T> : NullableWrapper<T>() {
 fun <T> ComposableWithTypedDefaultValue(
     onChange: (NullableWrapper<T>) -> Unit,
     valueWrapper: NullableWrapper<T> = NullWrapper()
-) {}
+) {
+    onChange(valueWrapper)
+}
 

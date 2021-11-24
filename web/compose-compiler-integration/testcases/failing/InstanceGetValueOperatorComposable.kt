@@ -17,7 +17,3 @@ fun main() {
         val router by Router()
     }
 }
-
-fun callComposable(content: @Composable () -> Unit) {
-    // does nothing
-}

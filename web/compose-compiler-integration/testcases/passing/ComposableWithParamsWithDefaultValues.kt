@@ -15,7 +15,7 @@ fun main() {
         ComposableWithDifferentDefaultValuesForParameters(a = Any())
         ComposableWithReturnAndWithDefaultLambda().invoke()
     }
-    require(intArrayOf(1, 2, 3, 4, 5, 6, 7).all { it in set }) { "Failed when running composables - ${set.joinToString()}" }
+    require(setOf(1, 2, 3, 4, 5, 6, 7) == set) { "Failed when running composables - ${set.joinToString()}" }
 }
 
 // @Module:Lib

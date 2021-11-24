@@ -20,7 +20,7 @@ fun main() {
         }
     }
 
-    require(intArrayOf(1, 2, 3, 4).all { it in set }) { "Failed when running composables" }
+    require(setOf(1, 2, 3, 4) == set) { "Failed when running composables" }
 }
 
 

@@ -2,6 +2,7 @@
 
 // https://github.com/JetBrains/compose-jb/issues/1226
 
+// TODO: move this to passing cases after kotlin 1.6.0
 import kotlin.reflect.KProperty
 import androidx.compose.runtime.Composable
 
@@ -20,8 +21,4 @@ fun main() {
             onChange = {}
         )
     }
-}
-
-fun callComposable(content: @Composable () -> Unit) {
-    // does nothing
 }
