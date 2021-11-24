@@ -48,7 +48,6 @@ private const val ENABLE_FLAG_NAME = VERIFY_UP_TO_DATE
 val ALLOW_RERUNNING_TASKS = setOf(
     "buildOnServer",
     "checkExternalLicenses",
-    "createArchive",
     "createDiffArchiveForAll",
     "createProjectZip",
     "externalNativeBuildDebug",
@@ -87,7 +86,6 @@ val ALLOW_RERUNNING_TASKS = setOf(
     "generatePomFileForMetadataPublication",
     "generatePomFileForSafeargsJavaPluginMarkerMavenPublication",
     "generatePomFileForSafeargsKotlinPluginMarkerMavenPublication",
-    "partiallyDejetifyArchive",
     "publishBenchmarkPluginMarkerMavenPublicationToMavenRepository",
     "publishAndroidDebugPublicationToMavenRepository",
     "publishAndroidReleasePublicationToMavenRepository",
@@ -111,7 +109,6 @@ val ALLOW_RERUNNING_TASKS = setOf(
      */
     "relocateShadowJar",
     "testDebugUnitTest",
-    "stripArchiveForPartialDejetification",
     "verifyDependencyVersions",
     "zipConstrainedTestConfigsWithApks",
     "zipTestConfigsWithApks",
@@ -201,7 +198,13 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
     "lintWithKspDebug",
     "lintTargetSdk29Debug",
     "lintTargetSdk30Debug",
-    "lintTargetSdkLatestDebug"
+    "lintTargetSdkLatestDebug",
+
+    // We know that these tasks are never up to date due to maven-metadata.xml changing
+    // https://github.com/gradle/gradle/issues/11203
+    "partiallyDejetifyArchive",
+    "stripArchiveForPartialDejetification",
+    "createArchive"
 )
 
 @Suppress("UnstableApiUsage") // usage of BuildService that's incubating
