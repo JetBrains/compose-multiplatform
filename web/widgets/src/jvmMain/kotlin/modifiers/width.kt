@@ -8,6 +8,7 @@ import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 import org.jetbrains.compose.common.ui.unit.implementation
 
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 actual fun Modifier.width(size: Dp): Modifier = castOrCreate().apply {
     modifier = modifier.width(size.implementation)
 }

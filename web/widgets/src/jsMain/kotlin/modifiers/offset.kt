@@ -9,6 +9,7 @@ import org.jetbrains.compose.web.css.marginLeft
 import org.jetbrains.compose.web.css.px
 
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 actual fun Modifier.offset(x: Dp, y: Dp): Modifier = castOrCreate().apply {
     add {
         marginLeft(x.value.px)

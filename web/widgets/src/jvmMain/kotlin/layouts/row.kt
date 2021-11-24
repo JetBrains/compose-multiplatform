@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row as JRow
 
 @Composable
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 internal actual fun RowActual(
     modifier: Modifier,
     horizontalArrangement: Arrangement.Horizontal,

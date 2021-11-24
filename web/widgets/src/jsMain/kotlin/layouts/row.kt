@@ -22,6 +22,7 @@ private fun Alignment.Vertical.asClassName() = when (this) {
 
 @Composable
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 internal actual fun RowActual(
     modifier: Modifier,
     horizontalArrangement: Arrangement.Horizontal,

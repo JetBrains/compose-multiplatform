@@ -10,6 +10,7 @@ import androidx.compose.foundation.border
 import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 actual fun Modifier.border(size: Dp, color: Color): Modifier = castOrCreate().apply {
     modifier = modifier.border(size.implementation, color.implementation)
 }

@@ -6,6 +6,7 @@ import org.jetbrains.compose.common.ui.Modifier
 
 @Composable
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 internal expect fun SliderActual(
     value: Float,
     onValueChange: (Float) -> Unit,

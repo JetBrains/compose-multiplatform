@@ -8,6 +8,7 @@ import org.jetbrains.compose.common.ui.unit.TextUnit
 
 @Composable
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 fun Text(
     text: String,
     modifier: Modifier = Modifier.Companion,

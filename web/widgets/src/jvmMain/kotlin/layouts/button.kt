@@ -8,6 +8,7 @@ import androidx.compose.material.Button as JButton
 
 @Composable
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 internal actual fun ButtonActual(
     modifier: Modifier,
     onClick: () -> Unit,

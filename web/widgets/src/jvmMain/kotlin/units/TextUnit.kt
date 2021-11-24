@@ -6,6 +6,7 @@ import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 val TextUnit.implementation: JTextUnit
     get() = when (unitType) {
         TextUnitType.Em -> (value).em
