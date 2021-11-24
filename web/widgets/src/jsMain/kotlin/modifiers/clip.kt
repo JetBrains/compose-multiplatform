@@ -9,6 +9,7 @@ import org.jetbrains.compose.web.css.borderRadius
 import org.jetbrains.compose.web.css.percent
 
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 actual fun Modifier.clip(shape: Shape): Modifier = castOrCreate().apply {
     when (shape) {
         CircleShape -> add {

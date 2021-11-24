@@ -6,6 +6,7 @@ import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 
 @Composable
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 fun Box(
     modifier: Modifier = Modifier.Companion,
     content: @Composable () -> Unit

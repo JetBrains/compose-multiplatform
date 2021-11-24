@@ -8,6 +8,7 @@ import org.jetbrains.compose.common.ui.asAttributeBuilderApplier
 
 @Composable
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 internal actual fun BoxActual(modifier: Modifier, content: @Composable () -> Unit) {
     Div(
         attrs = modifier.asAttributeBuilderApplier()

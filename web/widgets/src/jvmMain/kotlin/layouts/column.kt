@@ -8,6 +8,7 @@ import org.jetbrains.compose.common.ui.implementation
 
 @Composable
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 internal actual fun ColumnActual(modifier: Modifier, content: @Composable () -> Unit) {
     JColumn(modifier = modifier.implementation) {
         content.invoke()

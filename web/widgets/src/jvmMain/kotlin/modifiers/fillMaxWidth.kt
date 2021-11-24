@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 actual fun Modifier.fillMaxWidth(): Modifier = castOrCreate().apply {
     modifier = modifier.fillMaxWidth()
 }

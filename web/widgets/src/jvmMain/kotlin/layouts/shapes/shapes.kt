@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Shape as JShape
 import androidx.compose.foundation.shape.CircleShape as JCircleShape
 
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 val Shape.implementation: JShape
     get() = when (this) {
         CircleShape -> JCircleShape

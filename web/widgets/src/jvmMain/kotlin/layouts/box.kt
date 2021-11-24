@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box as JBox
 
 @Composable
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 internal actual fun BoxActual(modifier: Modifier, content: @Composable () -> Unit) {
     JBox(modifier.implementation) {
         content.invoke()

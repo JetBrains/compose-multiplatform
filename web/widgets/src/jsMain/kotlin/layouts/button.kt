@@ -7,6 +7,7 @@ import org.jetbrains.compose.web.dom.Button
 
 @Composable
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 actual fun ButtonActual(
     modifier: Modifier,
     onClick: () -> Unit,

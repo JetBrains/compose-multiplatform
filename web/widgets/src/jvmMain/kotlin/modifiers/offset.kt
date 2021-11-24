@@ -8,6 +8,7 @@ import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 import org.jetbrains.compose.common.ui.unit.implementation
 
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 actual fun Modifier.offset(x: Dp, y: Dp): Modifier = castOrCreate().apply {
     modifier = modifier.offset(x.implementation, y.implementation)
 }

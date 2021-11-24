@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.size
 import org.jetbrains.compose.common.internal.castOrCreate
 
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 actual fun Modifier.size(width: Dp, height: Dp): Modifier = castOrCreate().apply {
     modifier = modifier.size(width.implementation, height.implementation)
 }

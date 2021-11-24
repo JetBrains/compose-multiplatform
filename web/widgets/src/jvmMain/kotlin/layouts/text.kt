@@ -12,6 +12,7 @@ import org.jetbrains.compose.common.ui.unit.implementation
 
 @Composable
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 internal actual fun TextActual(
     text: String,
     modifier: Modifier,

@@ -13,6 +13,7 @@ import org.jetbrains.compose.web.css.px
 
 import org.jetbrains.compose.web.css.StyleSheet
 
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 object Styles : StyleSheet() {
     val columnClass = "compose-web-column"
 

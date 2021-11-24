@@ -9,15 +9,18 @@ import org.jetbrains.compose.common.internal.castOrCreate
 import androidx.compose.foundation.layout.padding
 
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 actual fun Modifier.background(color: Color): Modifier = castOrCreate().apply {
     modifier = modifier.background(color.implementation)
 }
 
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 actual fun Modifier.padding(all: Dp): Modifier = castOrCreate().apply {
     modifier = modifier.padding(all.implementation)
 }
 
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 val Modifier.implementation
     get() = castOrCreate().modifier

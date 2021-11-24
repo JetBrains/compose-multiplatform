@@ -11,6 +11,7 @@ import org.jetbrains.compose.web.css.border
 import org.jetbrains.compose.web.css.Color.RGB
 
 @ExperimentalComposeWebWidgetsApi
+@Deprecated(message = "compose.web.web-widgets API is deprecated")
 actual fun Modifier.border(size: Dp, color: Color): Modifier = castOrCreate().apply {
     add {
         border(size.value.px, LineStyle.Solid, RGB(color.red, color.green, color.blue))
