@@ -49,6 +49,7 @@ import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -150,17 +151,19 @@ private fun FrameWindowScope.App() {
     MaterialTheme {
         Scaffold(
             topBar = {
-                TopAppBar(
-                    title = {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Image(
-                                painterResource("androidx/compose/desktop/example/star.svg"),
-                                contentDescription = "Star"
-                            )
-                            Text(title)
+                WindowDraggableArea {
+                    TopAppBar(
+                        title = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Image(
+                                    painterResource("androidx/compose/desktop/example/star.svg"),
+                                    contentDescription = "Star"
+                                )
+                                Text(title)
+                            }
                         }
-                    }
-                )
+                    )
+                }
             },
             floatingActionButton = {
                 ExtendedFloatingActionButton(
