@@ -1,11 +1,13 @@
 package org.jetbrains.compose.common.ui
 
+import org.jetbrains.compose.annotations.webWidgetsDeprecationMessage
+
 @ExperimentalComposeWebWidgetsApi
-@Deprecated(message = "compose.web.web-widgets API is deprecated")
+@Deprecated(message = webWidgetsDeprecationMessage)
 interface Alignment {
-    @Deprecated(message = "compose.web.web-widgets API is deprecated")
+    @Deprecated(message = webWidgetsDeprecationMessage)
     interface Vertical : Alignment
-    @Deprecated(message = "compose.web.web-widgets API is deprecated")
+    @Deprecated(message = webWidgetsDeprecationMessage)
     interface Horizontal : Alignment
 
     companion object {
