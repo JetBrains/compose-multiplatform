@@ -190,6 +190,21 @@ enum class Scope(val str: String) {
     Colgroup("colgroup")
 }
 
+/**
+ * see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/inputmode
+ */
+enum class InputMode(val str: String) {
+    None("none"),
+    Text("text"), // default
+    Decimal("decimal"),
+    Numeric("numeric"),
+    Tel("tel"),
+    Search("search"),
+    Email("email"),
+    Url("url"),
+    ;
+}
+
 
 /**
  * https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/autocomplete

@@ -1,25 +1,21 @@
 package org.jetbrains.compose.web.core.tests
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import kotlinx.browser.document
 import kotlinx.dom.clear
-import org.jetbrains.compose.web.attributes.AttrsBuilder
-import org.jetbrains.compose.web.attributes.disabled
-import org.jetbrains.compose.web.attributes.forId
-import org.jetbrains.compose.web.attributes.value
+import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.dom.Button
-import org.jetbrains.compose.web.dom.Div
-import org.jetbrains.compose.web.dom.Label
-import org.jetbrains.compose.web.dom.Text
+import org.jetbrains.compose.web.dom.*
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import org.jetbrains.compose.web.testutils.*
+import org.w3c.dom.HTMLInputElement
 
 class AttributesTests {
 
@@ -403,5 +399,37 @@ class AttributesTests {
             expected = "<button style=\"color: red;\" value=\"buttonValue\" class=\"a b\">Button</button>",
             actual = currentChild().outerHTML
         )
+    }
+
+    @Test
+    fun inputMode() = runTest {
+        @Composable
+        fun TestInput(mode: InputMode) {
+            Input(type = InputType.Text) {
+                inputMode(mode)
+            }
+        }
+
+        val mode = mutableStateOf<InputMode?>(null)
+        composition {
+            if (mode.value != null) TestInput(mode.value!!)
+        }
+
+        suspend fun check(setMode: InputMode, value: String) {
+            mode.value = setMode
+            waitForRecompositionComplete()
+            assertEquals(
+                value,
+                (root.firstChild as HTMLInputElement).getAttribute("inputmode")
+            )
+        }
+
+        check(InputMode.None, "none")
+        check(InputMode.Text, "text")
+        check(InputMode.Decimal, "decimal")
+        check(InputMode.Numeric, "numeric")
+        check(InputMode.Tel, "tel")
+        check(InputMode.Search, "search")
+        check(InputMode.Url, "url")
     }
 }

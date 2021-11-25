@@ -62,6 +62,16 @@ open class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
     fun spellCheck(value: Boolean) = attr(SPELLCHECK, value.toString())
 
     /**
+     * see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/inputmode
+     */
+    fun inputMode(value: String) = attr("inputmode", value)
+
+    /**
+     * see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/inputmode
+     */
+    fun inputMode(value: InputMode) = attr("inputmode", value.str)
+
+    /**
      * [ref] can be used to retrieve a reference to a html element.
      * The lambda that `ref` takes in is not Composable. It will be called only once when an element added into a composition.
      * Likewise, the lambda passed in `onDispose` will be called only once when an element leaves the composition.
