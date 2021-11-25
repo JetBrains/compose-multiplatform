@@ -80,7 +80,8 @@ open class StyleSheet(
 
     @Suppress("EqualsOrHashCode")
     class CSSSelfSelector(var selector: CSSSelector? = null) : CSSSelector() {
-        override fun toString(): String = selector.toString()
+        override fun toString(): String = throw IllegalStateException("You can't concatenate `String + CSSSelector` which contains `self` or `root`. Use `selector(<your string>)` to convert `String` to `CSSSelector` for proper work.")
+        override fun asString(): String = selector?.asString() ?: throw IllegalStateException("You can't instantiate self without actual selector")
         override fun equals(other: Any?): Boolean {
             return other is CSSSelfSelector
         }
@@ -157,7 +158,12 @@ fun buildCSS(
     cssRule: CSSBuilder.() -> Unit
 ): Pair<StyleHolder, CSSRuleDeclarationList> {
     val styleSheet = StyleSheetBuilderImpl()
-    val builder = CSSBuilderImpl(thisClass, thisContext, styleSheet)
+    // workaround because of problems with plus operator overloading
+    val root = if (thisClass is StyleSheet.CSSSelfSelector) thisClass else StyleSheet.CSSSelfSelector(thisClass)
+    // workaround because of problems with plus operator overloading
+    val self = if (thisContext is StyleSheet.CSSSelfSelector) thisContext else StyleSheet.CSSSelfSelector(thisContext)
+
+    val builder = CSSBuilderImpl(root, self, styleSheet)
     builder.cssRule()
     return builder to styleSheet.cssRules
 }
