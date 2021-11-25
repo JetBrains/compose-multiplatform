@@ -736,6 +736,10 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         fun ScrollAxisRange.canScrollForward(): Boolean {
             return value() < maxValue() && !reverseScrolling || value() > 0f && reverseScrolling
         }
+        // Will the scrollable scroll when ACTION_SCROLL_BACKWARD is performed?
+        fun ScrollAxisRange.canScrollBackward(): Boolean {
+            return value() > 0f && !reverseScrolling || value() < maxValue() && reverseScrolling
+        }
 
         val xScrollState =
             semanticsNode.unmergedConfig.getOrNull(SemanticsProperties.HorizontalScrollAxisRange)
@@ -760,7 +764,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                             AccessibilityActionCompat.ACTION_SCROLL_LEFT
                         }
                     )
-                } else {
+                }
+                if (xScrollState.canScrollBackward()) {
                     info.addAction(AccessibilityActionCompat.ACTION_SCROLL_BACKWARD)
                     info.addAction(
                         if (!semanticsNode.isRtl) {
@@ -788,7 +793,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 if (yScrollState.canScrollForward()) {
                     info.addAction(AccessibilityActionCompat.ACTION_SCROLL_FORWARD)
                     info.addAction(AccessibilityActionCompat.ACTION_SCROLL_DOWN)
-                } else {
+                }
+                if (yScrollState.canScrollBackward()) {
                     info.addAction(AccessibilityActionCompat.ACTION_SCROLL_BACKWARD)
                     info.addAction(AccessibilityActionCompat.ACTION_SCROLL_UP)
                 }
