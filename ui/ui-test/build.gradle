@@ -56,6 +56,7 @@ dependencies {
         implementation(project(":compose:ui:ui-util"))
         implementation("androidx.annotation:annotation:1.1.0")
         implementation(libs.espressoCore)
+        implementation(libs.testMonitor)
 
         testImplementation(project(":compose:test-utils"))
         testImplementation(libs.truth)
@@ -102,6 +103,7 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
                 implementation("androidx.annotation:annotation:1.1.0")
                 implementation(libs.espressoCore)
+                implementation(libs.testMonitor)
             }
 
             androidCommonTest.dependencies {
