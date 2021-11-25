@@ -59,6 +59,35 @@ internal suspend fun LazyListState.doSmoothScrollToItem(
             }
             val forward = index > firstVisibleItemIndex
             val target = if (forward) targetDistancePx else -targetDistancePx
+
+            fun isOvershot(): Boolean {
+                // Did we scroll past the item?
+                @Suppress("RedundantIf") // It's way easier to understand the logic this way
+                return if (forward) {
+                    if (firstVisibleItemIndex > index) {
+                        true
+                    } else if (
+                        firstVisibleItemIndex == index &&
+                        firstVisibleItemScrollOffset > scrollOffset
+                    ) {
+                        true
+                    } else {
+                        false
+                    }
+                } else { // backward
+                    if (firstVisibleItemIndex < index) {
+                        true
+                    } else if (
+                        firstVisibleItemIndex == index &&
+                        firstVisibleItemScrollOffset < scrollOffset
+                    ) {
+                        true
+                    } else {
+                        false
+                    }
+                }
+            }
+
             var loops = 1
             while (loop) {
                 val anim = AnimationState(
@@ -90,7 +119,7 @@ internal suspend fun LazyListState.doSmoothScrollToItem(
                         targetItem = getTargetItem()
                         if (targetItem != null) {
                             debugLog { "Found the item after performing scrollBy()" }
-                        } else {
+                        } else if (isOvershot()) {
                             if (delta != consumed) {
                                 debugLog { "Hit end without finding the item" }
                                 cancelAnimation()
@@ -132,35 +161,10 @@ internal suspend fun LazyListState.doSmoothScrollToItem(
                             }
                         }
                     }
-                    // Did we scroll past the item?
-                    @Suppress("RedundantIf") // It's way easier to understand the logic this way
-                    val overshot = if (forward) {
-                        if (firstVisibleItemIndex > index) {
-                            true
-                        } else if (
-                            firstVisibleItemIndex == index &&
-                            firstVisibleItemScrollOffset > scrollOffset
-                        ) {
-                            true
-                        } else {
-                            false
-                        }
-                    } else { // backward
-                        if (firstVisibleItemIndex < index) {
-                            true
-                        } else if (
-                            firstVisibleItemIndex == index &&
-                            firstVisibleItemScrollOffset < scrollOffset
-                        ) {
-                            true
-                        } else {
-                            false
-                        }
-                    }
 
                     // We don't throw ItemFoundInScroll when we snap, because once we've snapped to
                     // the final position, there's no need to animate to it.
-                    if (overshot) {
+                    if (isOvershot()) {
                         debugLog { "Overshot" }
                         snapToItemIndexInternal(index = index, scrollOffset = scrollOffset)
                         loop = false
