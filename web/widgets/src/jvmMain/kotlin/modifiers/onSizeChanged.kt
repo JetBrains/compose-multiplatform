@@ -4,10 +4,11 @@ import org.jetbrains.compose.common.ui.Modifier
 import org.jetbrains.compose.common.ui.unit.IntSize
 import org.jetbrains.compose.common.internal.castOrCreate
 import androidx.compose.ui.layout.onSizeChanged
+import org.jetbrains.compose.annotations.webWidgetsDeprecationMessage
 import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 
 @ExperimentalComposeWebWidgetsApi
-@Deprecated(message = "compose.web.web-widgets API is deprecated")
+@Deprecated(message = webWidgetsDeprecationMessage)
 actual fun Modifier.onSizeChanged(
     onSizeChanged: (IntSize) -> Unit
 ): Modifier = castOrCreate().apply {

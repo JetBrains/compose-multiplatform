@@ -1,6 +1,7 @@
 package org.jetbrains.compose.common.material
 
 import androidx.compose.runtime.Composable
+import org.jetbrains.compose.annotations.webWidgetsDeprecationMessage
 import androidx.compose.material.Text as JText
 import org.jetbrains.compose.common.ui.Modifier
 import org.jetbrains.compose.common.ui.implementation
@@ -12,7 +13,7 @@ import org.jetbrains.compose.common.ui.unit.implementation
 
 @Composable
 @ExperimentalComposeWebWidgetsApi
-@Deprecated(message = "compose.web.web-widgets API is deprecated")
+@Deprecated(message = webWidgetsDeprecationMessage)
 internal actual fun TextActual(
     text: String,
     modifier: Modifier,

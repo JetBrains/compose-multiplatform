@@ -1,12 +1,13 @@
 package org.jetbrains.compose.common.internal
 
+import org.jetbrains.compose.annotations.webWidgetsDeprecationMessage
 import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 import org.jetbrains.compose.common.ui.Modifier
 import org.jetbrains.compose.web.css.StyleBuilder
 import org.jetbrains.compose.web.attributes.AttrsBuilder
 
 @ExperimentalComposeWebWidgetsApi
-@Deprecated(message = "compose.web.web-widgets API is deprecated")
+@Deprecated(message = webWidgetsDeprecationMessage)
 class ActualModifier : Modifier {
     val styleHandlers = mutableListOf<StyleBuilder.() -> Unit>()
     val attrHandlers = mutableListOf<AttrsBuilder<*>.() -> Unit>()
@@ -21,5 +22,5 @@ class ActualModifier : Modifier {
 }
 
 @ExperimentalComposeWebWidgetsApi
-@Deprecated(message = "compose.web.web-widgets API is deprecated")
+@Deprecated(message = webWidgetsDeprecationMessage)
 fun Modifier.castOrCreate(): ActualModifier = (this as? ActualModifier) ?: ActualModifier()

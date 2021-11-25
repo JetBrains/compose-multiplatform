@@ -2,6 +2,7 @@ package org.jetbrains.compose.common.foundation.layout
 
 import org.jetbrains.compose.common.ui.Modifier
 import androidx.compose.runtime.Composable
+import org.jetbrains.compose.annotations.webWidgetsDeprecationMessage
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.common.ui.Alignment
 import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
@@ -22,7 +23,7 @@ private fun Alignment.Vertical.asClassName() = when (this) {
 
 @Composable
 @ExperimentalComposeWebWidgetsApi
-@Deprecated(message = "compose.web.web-widgets API is deprecated")
+@Deprecated(message = webWidgetsDeprecationMessage)
 internal actual fun RowActual(
     modifier: Modifier,
     horizontalArrangement: Arrangement.Horizontal,

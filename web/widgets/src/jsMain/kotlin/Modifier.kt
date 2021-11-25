@@ -1,5 +1,6 @@
 package org.jetbrains.compose.common.ui
 
+import org.jetbrains.compose.annotations.webWidgetsDeprecationMessage
 import org.jetbrains.compose.common.ui.unit.Dp
 import org.jetbrains.compose.common.core.graphics.Color
 import org.jetbrains.compose.web.css.backgroundColor
@@ -10,7 +11,7 @@ import org.jetbrains.compose.common.internal.castOrCreate
 import org.jetbrains.compose.web.attributes.AttrsBuilder
 
 @ExperimentalComposeWebWidgetsApi
-@Deprecated(message = "compose.web.web-widgets API is deprecated")
+@Deprecated(message = webWidgetsDeprecationMessage)
 actual fun Modifier.background(color: Color): Modifier = castOrCreate().apply {
     add {
         backgroundColor(RGB(color.red, color.green, color.blue))
@@ -18,7 +19,7 @@ actual fun Modifier.background(color: Color): Modifier = castOrCreate().apply {
 }
 
 @ExperimentalComposeWebWidgetsApi
-@Deprecated(message = "compose.web.web-widgets API is deprecated")
+@Deprecated(message = webWidgetsDeprecationMessage)
 fun Modifier.asAttributeBuilderApplier(
     passThroughHandler: (AttrsBuilder<*>.() -> Unit)? = null
 ): AttrsBuilder<*>.() -> Unit =
@@ -37,7 +38,7 @@ fun Modifier.asAttributeBuilderApplier(
     }
 
 @ExperimentalComposeWebWidgetsApi
-@Deprecated(message = "compose.web.web-widgets API is deprecated")
+@Deprecated(message = webWidgetsDeprecationMessage)
 actual fun Modifier.padding(all: Dp): Modifier = castOrCreate().apply {
     // yes, it's not a typo, what Modifier.padding does is actually adding margin
     add {
