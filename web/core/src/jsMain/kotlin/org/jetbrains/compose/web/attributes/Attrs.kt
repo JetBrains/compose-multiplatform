@@ -95,17 +95,15 @@ fun AttrsBuilder<HTMLFormElement>.target(value: FormTarget) =
     attr("target", value.targetStr)
 
 fun AttrsBuilder<HTMLFormElement>.onSubmit(
-    options: Options = Options.DEFAULT,
     listener: (SyntheticSubmitEvent) -> Unit
 ) {
-    addEventListener(eventName = EventsListenerBuilder.SUBMIT, options = options, listener = listener)
+    addEventListener(eventName = EventsListenerBuilder.SUBMIT, listener = listener)
 }
 
 fun AttrsBuilder<HTMLFormElement>.onReset(
-    options: Options = Options.DEFAULT,
     listener: (SyntheticSubmitEvent) -> Unit
 ) {
-    addEventListener(eventName = EventsListenerBuilder.RESET, options = options, listener = listener)
+    addEventListener(eventName = EventsListenerBuilder.RESET, listener = listener)
 }
 
 /* Input attributes */
