@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.layout.LazyLayout
@@ -41,12 +40,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.constrainHeight
+import androidx.compose.ui.unit.constrainWidth
+import androidx.compose.ui.unit.offset
 
 @Composable
 internal fun LazyList(
@@ -135,8 +137,7 @@ internal fun LazyList(
                 flingBehavior = flingBehavior,
                 state = state,
                 overScrollController = overScrollController
-            )
-            .padding(contentPadding),
+            ),
         state = innerState,
         prefetchPolicy = state.prefetchPolicy,
         measurePolicy = measurePolicy,
@@ -182,8 +183,26 @@ private fun rememberLazyListMeasurePolicy(
     verticalArrangement,
     placementAnimator
 ) {
-    LazyMeasurePolicy { placeablesProvider, constraints ->
-        constraints.assertNotNestingScrollableContainers(isVertical)
+    LazyMeasurePolicy { placeablesProvider, containerConstraints ->
+        containerConstraints.assertNotNestingScrollableContainers(isVertical)
+
+        // resolve content paddings
+        val startPadding = contentPadding.calculateStartPadding(layoutDirection).roundToPx()
+        val endPadding = contentPadding.calculateEndPadding(layoutDirection).roundToPx()
+        val topPadding = contentPadding.calculateTopPadding().roundToPx()
+        val bottomPadding = contentPadding.calculateBottomPadding().roundToPx()
+        val totalVerticalPadding = topPadding + bottomPadding
+        val totalHorizontalPadding = startPadding + endPadding
+        val totalMainAxisPadding = if (isVertical) totalVerticalPadding else totalHorizontalPadding
+        val beforeContentPadding = when {
+            isVertical && !reverseLayout -> topPadding
+            isVertical && reverseLayout -> bottomPadding
+            !isVertical && !reverseLayout -> startPadding
+            else -> endPadding // !isVertical && reverseLayout
+        }
+        val afterContentPadding = totalMainAxisPadding - beforeContentPadding
+        val contentConstraints =
+            containerConstraints.offset(-totalHorizontalPadding, -totalVerticalPadding)
 
         val itemsProvider = stateOfItemsProvider.value
         state.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
@@ -192,23 +211,8 @@ private fun rememberLazyListMeasurePolicy(
         state.density = this
 
         // this will update the scope object if the constrains have been changed
-        itemScope.update(this, constraints)
+        itemScope.update(this, contentConstraints)
 
-        val rawBeforeContentPadding = if (isVertical) {
-            contentPadding.calculateTopPadding()
-        } else {
-            contentPadding.calculateStartPadding(layoutDirection)
-        }.roundToPx()
-        val rawAfterContentPadding = if (isVertical) {
-            contentPadding.calculateBottomPadding()
-        } else {
-            contentPadding.calculateEndPadding(layoutDirection)
-        }.roundToPx()
-        val beforeContentPadding =
-            if (reverseLayout) rawAfterContentPadding else rawBeforeContentPadding
-        val afterContentPadding =
-            if (reverseLayout) rawBeforeContentPadding else rawAfterContentPadding
-        val mainAxisMaxSize = (if (isVertical) constraints.maxHeight else constraints.maxWidth)
         val spaceBetweenItemsDp = if (isVertical) {
             requireNotNull(verticalArrangement).spacing
         } else {
@@ -219,7 +223,7 @@ private fun rememberLazyListMeasurePolicy(
         val itemsCount = itemsProvider.itemsCount
 
         val itemProvider = LazyMeasuredItemProvider(
-            constraints,
+            contentConstraints,
             isVertical,
             itemsProvider,
             placeablesProvider
@@ -238,22 +242,30 @@ private fun rememberLazyListMeasurePolicy(
                 beforeContentPadding = beforeContentPadding,
                 afterContentPadding = afterContentPadding,
                 spacing = spacing,
+                visualOffset = IntOffset(startPadding, topPadding),
                 key = key,
                 placementAnimator = placementAnimator
             )
         }
         state.prefetchPolicy?.constraints = itemProvider.childConstraints
 
+        // can be negative if the content padding is larger than the max size from constraints
+        val mainAxisAvailableSize = if (isVertical) {
+            containerConstraints.maxHeight - totalVerticalPadding
+        } else {
+            containerConstraints.maxWidth - totalHorizontalPadding
+        }
+
         measureLazyList(
             itemsCount = itemsCount,
             itemProvider = itemProvider,
-            mainAxisMaxSize = mainAxisMaxSize,
+            mainAxisAvailableSize = mainAxisAvailableSize,
             beforeContentPadding = beforeContentPadding,
             afterContentPadding = afterContentPadding,
             firstVisibleItemIndex = state.firstVisibleItemIndexNonObservable,
             firstVisibleItemScrollOffset = state.firstVisibleItemScrollOffsetNonObservable,
             scrollToBeConsumed = state.scrollToBeConsumed,
-            constraints = constraints,
+            constraints = contentConstraints,
             isVertical = isVertical,
             headerIndexes = itemsProvider.headerIndexes,
             verticalArrangement = verticalArrangement,
@@ -262,10 +274,23 @@ private fun rememberLazyListMeasurePolicy(
             density = this,
             layoutDirection = layoutDirection,
             placementAnimator = placementAnimator,
-            layout = { width, height, placement -> layout(width, height, emptyMap(), placement) }
+            layout = { width, height, placement ->
+                layout(
+                    containerConstraints.constrainWidth(width + totalHorizontalPadding),
+                    containerConstraints.constrainHeight(height + totalVerticalPadding),
+                    emptyMap(),
+                    placement
+                )
+            }
         ).also {
             state.applyMeasureResult(it)
-            refreshOverScrollInfo(overScrollController, it, contentPadding)
+            refreshOverScrollInfo(
+                overScrollController,
+                it,
+                containerConstraints,
+                totalHorizontalPadding,
+                totalVerticalPadding
+            )
         }.lazyLayoutMeasureResult
     }
 }
@@ -277,27 +302,21 @@ private fun Ref<LazyItemScopeImpl>.update(density: Density, constraints: Constra
     }
 }
 
-private fun IntrinsicMeasureScope.refreshOverScrollInfo(
+private fun refreshOverScrollInfo(
     overScrollController: OverScrollController,
     result: LazyListMeasureResult,
-    contentPadding: PaddingValues
+    constraints: Constraints,
+    totalHorizontalPadding: Int,
+    totalVerticalPadding: Int
 ) {
-    val verticalPadding =
-        contentPadding.calculateTopPadding() +
-            contentPadding.calculateBottomPadding()
-
-    val horizontalPadding =
-        contentPadding.calculateLeftPadding(layoutDirection) +
-            contentPadding.calculateRightPadding(layoutDirection)
-
     val canScrollForward = result.canScrollForward
     val canScrollBackward = (result.firstVisibleItem?.index ?: 0) != 0 ||
         result.firstVisibleItemScrollOffset != 0
 
     overScrollController.refreshContainerInfo(
         Size(
-            result.width.toFloat() + horizontalPadding.roundToPx(),
-            result.height.toFloat() + verticalPadding.roundToPx()
+            constraints.constrainWidth(result.width + totalHorizontalPadding).toFloat(),
+            constraints.constrainHeight(result.height + totalVerticalPadding).toFloat()
         ),
         canScrollForward || canScrollBackward
     )
