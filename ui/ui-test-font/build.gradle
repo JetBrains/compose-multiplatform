@@ -16,6 +16,7 @@
 
 import androidx.build.AndroidXComposePlugin
 import androidx.build.LibraryGroups
+import androidx.build.LibraryType
 import androidx.build.Publish
 import androidx.build.RunApiTasks
 
@@ -49,6 +50,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
 androidx {
     name = "Compose Test Font resources"
+    type = LibraryType.INTERNAL_TEST_LIBRARY
     publish = Publish.NONE
     mavenGroup = LibraryGroups.Compose.UI
     inceptionYear = "2020"

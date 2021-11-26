@@ -15,6 +15,7 @@
  */
 
 import androidx.build.AndroidXComposePlugin
+import androidx.build.LibraryType
 import androidx.build.Publish
 
 plugins {
@@ -99,6 +100,7 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
 androidx {
     name = "Compose Internal Test Utils"
+    type = LibraryType.INTERNAL_TEST_LIBRARY
     publish = Publish.NONE
     inceptionYear = "2020"
     description = "Compose internal test utils."
