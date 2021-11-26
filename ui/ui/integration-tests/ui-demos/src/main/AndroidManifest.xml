@@ -34,6 +34,10 @@
             android:configChanges="orientation|screenSize"
             android:label="ComposeScrollInAndroidScrollSameOrientation Activity" />
         <activity
+            android:name=".viewinterop.ComposeScrollInAndroidScrollSameOrientationHorizontal"
+            android:configChanges="orientation|screenSize"
+            android:label="ComposeScrollInAndroidScrollSameOrientation Pager Activity" />
+        <activity
             android:name=".viewinterop.ComposeScrollInAndroidScrollDifferentOrientation"
             android:configChanges="orientation|screenSize"
             android:label="ComposeScrollInAndroidScrollDifferentOrientation Activity" />
