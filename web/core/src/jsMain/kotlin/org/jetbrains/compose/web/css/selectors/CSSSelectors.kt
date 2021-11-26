@@ -21,7 +21,7 @@ sealed class Nth {
     }
 }
 
-open class CSSSelector {
+abstract class CSSSelector {
     override fun equals(other: Any?): Boolean {
         return this === other || asString() == (other as? CSSSelector)?.asString()
     }

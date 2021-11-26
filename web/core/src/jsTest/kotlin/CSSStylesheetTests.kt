@@ -312,18 +312,13 @@ class CSSVariableTests {
 
     @Test
     fun testStringPlusCSSSelectorConcatenation() {
-        assertTrue("Concatenation of String + CSSSelector should be restricted.") {
-            try {
-                object : StyleSheet() {
-                    val myClass by style {
-                        ("h1" + self) {
-                            color(Color.green)
-                        }
+        assertFailsWith<IllegalStateException>("Concatenation of String + CSSSelector should be restricted.") {
+            object : StyleSheet() {
+                val myClass by style {
+                    ("h1" + self) {
+                        color(Color.green)
                     }
                 }
-                false
-            } catch (e: Throwable) {
-                e is IllegalStateException
             }
         }
     }
