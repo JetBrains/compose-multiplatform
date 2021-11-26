@@ -236,11 +236,12 @@ internal actual val typefacesCache: Cache<String, SkTypeface> =
     )
 
 private fun typefaceResource(resourceName: String): SkTypeface {
-    val resource = Thread
-        .currentThread()
-        .contextClassLoader
-        .getResourceAsStream(resourceName) ?: error("Can't load font from $resourceName")
-    val bytes = resource.readAllBytes()
+    val contextClassLoader = Thread.currentThread().contextClassLoader!!
+    val resource = contextClassLoader.getResourceAsStream(resourceName)
+        ?: (::typefaceResource.javaClass).getResourceAsStream(resourceName)
+        ?: error("Can't load font from $resourceName")
+
+    val bytes = resource.use { it.readAllBytes() }
     return SkTypeface.makeFromData(Data.makeFromBytes(bytes))
 }
 

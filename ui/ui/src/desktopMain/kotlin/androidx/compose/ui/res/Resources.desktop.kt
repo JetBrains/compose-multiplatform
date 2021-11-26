@@ -116,7 +116,10 @@ class ClassLoaderResourceLoader : ResourceLoader {
     override fun load(resourcePath: String): InputStream {
         // TODO(https://github.com/JetBrains/compose-jb/issues/618): probably we shouldn't use
         //  contextClassLoader here, as it is not defined in threads created by non-JVM
-        return Thread.currentThread().contextClassLoader!!.getResourceAsStream(resourcePath)
+        val contextClassLoader = Thread.currentThread().contextClassLoader!!
+        val resource = contextClassLoader.getResourceAsStream(resourcePath)
+            ?: (::ClassLoaderResourceLoader.javaClass).getResourceAsStream(resourcePath)
+        return requireNotNull(resource) { "Resource $resourcePath not found" }
     }
 }
 
