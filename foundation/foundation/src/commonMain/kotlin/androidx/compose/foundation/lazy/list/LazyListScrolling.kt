@@ -119,7 +119,7 @@ internal suspend fun LazyListState.doSmoothScrollToItem(
                         targetItem = getTargetItem()
                         if (targetItem != null) {
                             debugLog { "Found the item after performing scrollBy()" }
-                        } else if (isOvershot()) {
+                        } else if (!isOvershot()) {
                             if (delta != consumed) {
                                 debugLog { "Hit end without finding the item" }
                                 cancelAnimation()
