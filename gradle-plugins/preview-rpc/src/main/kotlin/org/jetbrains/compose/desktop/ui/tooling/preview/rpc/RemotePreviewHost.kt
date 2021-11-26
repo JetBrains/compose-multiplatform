@@ -7,16 +7,12 @@ package org.jetbrains.compose.desktop.ui.tooling.preview.rpc
 
 import java.io.File
 import java.lang.RuntimeException
-import java.lang.reflect.Method
 import java.net.SocketTimeoutException
 import java.net.URLClassLoader
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.thread
 import kotlin.system.exitProcess
 import kotlin.system.measureTimeMillis
-import kotlin.time.DurationUnit
-import kotlin.time.ExperimentalTime
-import kotlin.time.measureTimedValue
 
 val PREVIEW_HOST_CLASS_NAME: String
     get() = PreviewHost::class.java.canonicalName
@@ -111,6 +107,20 @@ internal class PreviewHost(private val log: PreviewLogger, connection: RemoteCon
         request: FrameRequest
     ): ByteArray {
         val classloader = classloaderProvider.getClassloader(classpath)
+        val thread = Thread.currentThread()
+        val prevContextClassloader = thread.contextClassLoader
+        thread.contextClassLoader = classloader
+        return try {
+            renderFrame(classloader, request)
+        } finally {
+            thread.contextClassLoader = prevContextClassloader
+        }
+    }
+
+    private fun renderFrame(
+        classloader: ClassLoader,
+        request: FrameRequest
+    ): ByteArray {
         val previewFacade = classloader.loadClass(PREVIEW_FACADE_CLASS_NAME)
         val renderArgsClasses = arrayOf(
             String::class.java,
