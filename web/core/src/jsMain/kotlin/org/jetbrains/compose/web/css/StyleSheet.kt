@@ -79,7 +79,7 @@ open class StyleSheet(
     }
 
     @Suppress("EqualsOrHashCode")
-    class CSSSelfSelector(var selector: CSSSelector? = null) : CSSSelector() {
+    internal class CSSSelfSelector(var selector: CSSSelector? = null) : CSSSelector() {
         override fun toString(): String = throw IllegalStateException("You can't concatenate `String + CSSSelector` which contains `self` or `root`. Use `selector(<your string>)` to convert `String` to `CSSSelector` for proper work. https://github.com/JetBrains/compose-jb/issues/1440")
         override fun asString(): String = selector?.asString() ?: throw IllegalStateException("You can't instantiate self")
         override fun equals(other: Any?): Boolean {
