@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 7.1.0-beta02" type="baseline" client="gradle" dependencies="false" name="AGP (7.1.0-beta02)" variant="all" version="7.1.0-beta02">
+<issues format="6" by="lint 7.1.0-beta03" type="baseline" client="gradle" dependencies="false" name="AGP (7.1.0-beta03)" variant="all" version="7.1.0-beta03">
 
     <issue
         id="VisibleForTests"
@@ -32,17 +32,6 @@
             file="src/androidMain/kotlin/androidx/compose/ui/test/AndroidAssertions.android.kt"
             line="65"
             column="49"/>
-    </issue>
-
-    <issue
-        id="VisibleForTests"
-        message="This method should only be accessed from tests or within private scope"
-        errorLine1="    val view = (node.root as ViewRootForTest).view"
-        errorLine2="                                              ~~~~">
-        <location
-            file="src/androidMain/kotlin/androidx/compose/ui/test/AndroidImageHelpers.android.kt"
-            line="56"
-            column="47"/>
     </issue>
 
     <issue
