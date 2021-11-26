@@ -24,168 +24,168 @@ open class EventsListenerBuilder {
 
     /* Mouse Events */
 
-    fun onContextMenu(options: Options = Options.DEFAULT, listener: SyntheticMouseEventListener) {
-        listeners.add(MouseEventListener(CONTEXTMENU, options, listener))
+    fun onContextMenu(listener: SyntheticMouseEventListener) {
+        listeners.add(MouseEventListener(CONTEXTMENU, listener))
     }
 
-    fun onClick(options: Options = Options.DEFAULT, listener: SyntheticMouseEventListener) {
-        listeners.add(MouseEventListener(CLICK, options, listener))
+    fun onClick(listener: SyntheticMouseEventListener) {
+        listeners.add(MouseEventListener(CLICK, listener))
     }
 
-    fun onDoubleClick(options: Options = Options.DEFAULT, listener: SyntheticMouseEventListener) {
-        listeners.add(MouseEventListener(DBLCLICK, options, listener))
+    fun onDoubleClick(listener: SyntheticMouseEventListener) {
+        listeners.add(MouseEventListener(DBLCLICK, listener))
     }
 
-    fun onMouseDown(options: Options = Options.DEFAULT, listener: SyntheticMouseEventListener) {
-        listeners.add(MouseEventListener(MOUSEDOWN, options, listener))
+    fun onMouseDown(listener: SyntheticMouseEventListener) {
+        listeners.add(MouseEventListener(MOUSEDOWN, listener))
     }
 
-    fun onMouseUp(options: Options = Options.DEFAULT, listener: SyntheticMouseEventListener) {
-        listeners.add(MouseEventListener(MOUSEUP, options, listener))
+    fun onMouseUp(listener: SyntheticMouseEventListener) {
+        listeners.add(MouseEventListener(MOUSEUP, listener))
     }
 
-    fun onMouseEnter(options: Options = Options.DEFAULT, listener: SyntheticMouseEventListener) {
-        listeners.add(MouseEventListener(MOUSEENTER, options, listener))
+    fun onMouseEnter(listener: SyntheticMouseEventListener) {
+        listeners.add(MouseEventListener(MOUSEENTER, listener))
     }
 
-    fun onMouseLeave(options: Options = Options.DEFAULT, listener: SyntheticMouseEventListener) {
-        listeners.add(MouseEventListener(MOUSELEAVE, options, listener))
+    fun onMouseLeave(listener: SyntheticMouseEventListener) {
+        listeners.add(MouseEventListener(MOUSELEAVE, listener))
     }
 
-    fun onMouseMove(options: Options = Options.DEFAULT, listener: SyntheticMouseEventListener) {
-        listeners.add(MouseEventListener(MOUSEMOVE, options, listener))
+    fun onMouseMove(listener: SyntheticMouseEventListener) {
+        listeners.add(MouseEventListener(MOUSEMOVE, listener))
     }
 
-    fun onMouseOut(options: Options = Options.DEFAULT, listener: SyntheticMouseEventListener) {
-        listeners.add(MouseEventListener(MOUSEOUT, options, listener))
+    fun onMouseOut(listener: SyntheticMouseEventListener) {
+        listeners.add(MouseEventListener(MOUSEOUT, listener))
     }
 
-    fun onMouseOver(options: Options = Options.DEFAULT, listener: SyntheticMouseEventListener) {
-        listeners.add(MouseEventListener(MOUSEOVER, options, listener))
+    fun onMouseOver(listener: SyntheticMouseEventListener) {
+        listeners.add(MouseEventListener(MOUSEOVER, listener))
     }
 
-    fun onWheel(options: Options = Options.DEFAULT, listener: SyntheticWheelEventListener) {
-        listeners.add(MouseWheelEventListener(WHEEL, options, listener))
+    fun onWheel(listener: SyntheticWheelEventListener) {
+        listeners.add(MouseWheelEventListener(WHEEL, listener))
     }
 
     /* Drag Events */
 
-    fun onDrag(options: Options = Options.DEFAULT, listener: SyntheticDragEventListener) {
-        listeners.add(DragEventListener(DRAG, options, listener))
+    fun onDrag(listener: SyntheticDragEventListener) {
+        listeners.add(DragEventListener(DRAG, listener))
     }
 
-    fun onDrop(options: Options = Options.DEFAULT, listener: SyntheticDragEventListener) {
-        listeners.add(DragEventListener(DROP, options, listener))
+    fun onDrop(listener: SyntheticDragEventListener) {
+        listeners.add(DragEventListener(DROP, listener))
     }
 
-    fun onDragStart(options: Options = Options.DEFAULT, listener: SyntheticDragEventListener) {
-        listeners.add(DragEventListener(DRAGSTART, options, listener))
+    fun onDragStart(listener: SyntheticDragEventListener) {
+        listeners.add(DragEventListener(DRAGSTART, listener))
     }
 
-    fun onDragEnd(options: Options = Options.DEFAULT, listener: SyntheticDragEventListener) {
-        listeners.add(DragEventListener(DRAGEND, options, listener))
+    fun onDragEnd(listener: SyntheticDragEventListener) {
+        listeners.add(DragEventListener(DRAGEND, listener))
     }
 
-    fun onDragOver(options: Options = Options.DEFAULT, listener: SyntheticDragEventListener) {
-        listeners.add(DragEventListener(DRAGOVER, options, listener))
+    fun onDragOver(listener: SyntheticDragEventListener) {
+        listeners.add(DragEventListener(DRAGOVER, listener))
     }
 
-    fun onDragEnter(options: Options = Options.DEFAULT, listener: SyntheticDragEventListener) {
-        listeners.add(DragEventListener(DRAGENTER, options, listener))
+    fun onDragEnter(listener: SyntheticDragEventListener) {
+        listeners.add(DragEventListener(DRAGENTER, listener))
     }
 
-    fun onDragLeave(options: Options = Options.DEFAULT, listener: SyntheticDragEventListener) {
-        listeners.add(DragEventListener(DRAGLEAVE, options, listener))
+    fun onDragLeave(listener: SyntheticDragEventListener) {
+        listeners.add(DragEventListener(DRAGLEAVE, listener))
     }
 
     /* End of Drag Events */
 
     /* Clipboard Events */
 
-    fun onCopy(options: Options = Options.DEFAULT, listener: (SyntheticClipboardEvent) -> Unit) {
-        listeners.add(ClipboardEventListener(COPY, options, listener))
+    fun onCopy(listener: (SyntheticClipboardEvent) -> Unit) {
+        listeners.add(ClipboardEventListener(COPY, listener))
     }
 
-    fun onCut(options: Options = Options.DEFAULT, listener: (SyntheticClipboardEvent) -> Unit) {
-        listeners.add(ClipboardEventListener(CUT, options, listener))
+    fun onCut(listener: (SyntheticClipboardEvent) -> Unit) {
+        listeners.add(ClipboardEventListener(CUT, listener))
     }
 
-    fun onPaste(options: Options = Options.DEFAULT, listener: (SyntheticClipboardEvent) -> Unit) {
-        listeners.add(ClipboardEventListener(PASTE, options, listener))
+    fun onPaste(listener: (SyntheticClipboardEvent) -> Unit) {
+        listeners.add(ClipboardEventListener(PASTE, listener))
     }
 
     /* End of Clipboard Events */
 
     /* Keyboard Events */
 
-    fun onKeyDown(options: Options = Options.DEFAULT, listener: (SyntheticKeyboardEvent) -> Unit) {
-        listeners.add(KeyboardEventListener(KEYDOWN, options, listener))
+    fun onKeyDown(listener: (SyntheticKeyboardEvent) -> Unit) {
+        listeners.add(KeyboardEventListener(KEYDOWN, listener))
     }
 
-    fun onKeyUp(options: Options = Options.DEFAULT, listener: (SyntheticKeyboardEvent) -> Unit) {
-        listeners.add(KeyboardEventListener(KEYUP, options, listener))
+    fun onKeyUp(listener: (SyntheticKeyboardEvent) -> Unit) {
+        listeners.add(KeyboardEventListener(KEYUP, listener))
     }
 
     /* End of Keyboard Events */
 
     /* Focus Events */
 
-    fun onFocus(options: Options = Options.DEFAULT, listener: (SyntheticFocusEvent) -> Unit) {
-        listeners.add(FocusEventListener(FOCUS, options, listener))
+    fun onFocus(listener: (SyntheticFocusEvent) -> Unit) {
+        listeners.add(FocusEventListener(FOCUS, listener))
     }
 
-    fun onBlur(options: Options = Options.DEFAULT, listener: (SyntheticFocusEvent) -> Unit) {
-        listeners.add(FocusEventListener(BLUR, options, listener))
+    fun onBlur(listener: (SyntheticFocusEvent) -> Unit) {
+        listeners.add(FocusEventListener(BLUR, listener))
     }
 
-    fun onFocusIn(options: Options = Options.DEFAULT, listener: (SyntheticFocusEvent) -> Unit) {
-        listeners.add(FocusEventListener(FOCUSIN, options, listener))
+    fun onFocusIn(listener: (SyntheticFocusEvent) -> Unit) {
+        listeners.add(FocusEventListener(FOCUSIN, listener))
     }
 
-    fun onFocusOut(options: Options = Options.DEFAULT, listener: (SyntheticFocusEvent) -> Unit) {
-        listeners.add(FocusEventListener(FOCUSOUT, options, listener))
+    fun onFocusOut(listener: (SyntheticFocusEvent) -> Unit) {
+        listeners.add(FocusEventListener(FOCUSOUT, listener))
     }
 
     /* End of Focus Events */
 
     /* Touch Events */
 
-    fun onTouchCancel(options: Options = Options.DEFAULT, listener: (SyntheticTouchEvent) -> Unit) {
-        listeners.add(TouchEventListener(TOUCHCANCEL, options, listener))
+    fun onTouchCancel(listener: (SyntheticTouchEvent) -> Unit) {
+        listeners.add(TouchEventListener(TOUCHCANCEL, listener))
     }
 
-    fun onTouchMove(options: Options = Options.DEFAULT, listener: (SyntheticTouchEvent) -> Unit) {
-        listeners.add(TouchEventListener(TOUCHMOVE, options, listener))
+    fun onTouchMove(listener: (SyntheticTouchEvent) -> Unit) {
+        listeners.add(TouchEventListener(TOUCHMOVE, listener))
     }
 
-    fun onTouchEnd(options: Options = Options.DEFAULT, listener: (SyntheticTouchEvent) -> Unit) {
-        listeners.add(TouchEventListener(TOUCHEND, options, listener))
+    fun onTouchEnd(listener: (SyntheticTouchEvent) -> Unit) {
+        listeners.add(TouchEventListener(TOUCHEND, listener))
     }
 
-    fun onTouchStart(options: Options = Options.DEFAULT, listener: (SyntheticTouchEvent) -> Unit) {
-        listeners.add(TouchEventListener(TOUCHSTART, options, listener))
+    fun onTouchStart(listener: (SyntheticTouchEvent) -> Unit) {
+        listeners.add(TouchEventListener(TOUCHSTART, listener))
     }
 
     /* End of Touch Events */
 
     /* Animation Events */
 
-    fun onAnimationEnd(options: Options = Options.DEFAULT, listener: (SyntheticAnimationEvent) -> Unit) {
-        listeners.add(AnimationEventListener(ANIMATIONEND, options, listener))
+    fun onAnimationEnd(listener: (SyntheticAnimationEvent) -> Unit) {
+        listeners.add(AnimationEventListener(ANIMATIONEND, listener))
     }
 
-    fun onAnimationIteration(options: Options = Options.DEFAULT, listener: (SyntheticAnimationEvent) -> Unit) {
-        listeners.add(AnimationEventListener(ANIMATIONITERATION, options, listener))
+    fun onAnimationIteration(listener: (SyntheticAnimationEvent) -> Unit) {
+        listeners.add(AnimationEventListener(ANIMATIONITERATION, listener))
     }
 
-    fun onAnimationStart(options: Options = Options.DEFAULT, listener: (SyntheticAnimationEvent) -> Unit) {
-        listeners.add(AnimationEventListener(ANIMATIONSTART, options, listener))
+    fun onAnimationStart(listener: (SyntheticAnimationEvent) -> Unit) {
+        listeners.add(AnimationEventListener(ANIMATIONSTART, listener))
     }
 
     /* End of Animation Events */
 
-    fun onScroll(options: Options = Options.DEFAULT, listener: (SyntheticEvent<EventTarget>) -> Unit) {
-        listeners.add(SyntheticEventListener(SCROLL, options, listener))
+    fun onScroll(listener: (SyntheticEvent<EventTarget>) -> Unit) {
+        listeners.add(SyntheticEventListener(SCROLL, listener))
     }
 
     internal fun collectListeners(): List<SyntheticEventListener<*>> = listeners
@@ -198,18 +198,16 @@ open class EventsListenerBuilder {
      */
     fun <T : SyntheticEvent<out EventTarget>> addEventListener(
         eventName: String,
-        options: Options = Options.DEFAULT,
         listener: (T) -> Unit
     ) {
-        listeners.add(SyntheticEventListener(eventName, options, listener))
+        listeners.add(SyntheticEventListener(eventName, listener))
     }
 
     fun addEventListener(
         eventName: String,
-        options: Options = Options.DEFAULT,
         listener: (SyntheticEvent<EventTarget>) -> Unit
     ) {
-        listeners.add(SyntheticEventListener(eventName, options, listener))
+        listeners.add(SyntheticEventListener(eventName, listener))
     }
 
     internal fun copyListenersFrom(from: EventsListenerBuilder) {

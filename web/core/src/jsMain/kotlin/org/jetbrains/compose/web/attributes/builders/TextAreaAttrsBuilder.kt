@@ -24,30 +24,26 @@ class TextAreaAttrsBuilder : AttrsBuilder<HTMLTextAreaElement>() {
     }
 
     fun onInput(
-        options: Options = Options.DEFAULT,
         listener: (SyntheticInputEvent<String, HTMLTextAreaElement>) -> Unit
     ) {
-        listeners.add(InputEventListener(INPUT, options, InputType.Text, listener))
+        listeners.add(InputEventListener(INPUT, InputType.Text, listener))
     }
 
     fun onChange(
-        options: Options = Options.DEFAULT,
         listener: (SyntheticChangeEvent<String, HTMLTextAreaElement>) -> Unit
     ) {
-        listeners.add(ChangeEventListener(options, InputType.Text, listener))
+        listeners.add(ChangeEventListener(InputType.Text, listener))
     }
 
     fun onBeforeInput(
-        options: Options = Options.DEFAULT,
         listener: (SyntheticInputEvent<String, HTMLTextAreaElement>) -> Unit
     ) {
-        listeners.add(InputEventListener(BEFOREINPUT, options, InputType.Text, listener))
+        listeners.add(InputEventListener(BEFOREINPUT, InputType.Text, listener))
     }
 
     fun onSelect(
-        options: Options = Options.DEFAULT,
         listener: (SyntheticSelectEvent<HTMLTextAreaElement>) -> Unit
     ) {
-        listeners.add(SelectEventListener(options, listener))
+        listeners.add(SelectEventListener(listener))
     }
 }

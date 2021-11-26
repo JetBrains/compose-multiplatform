@@ -69,38 +69,33 @@ class InputAttrsBuilder<ValueType>(
     }
 
     fun onInvalid(
-        options: Options = Options.DEFAULT,
         listener: (SyntheticEvent<HTMLInputElement>) -> Unit
     ) {
-        addEventListener(INVALID, options, listener)
+        addEventListener(INVALID, listener)
     }
 
     fun onInput(
-        options: Options = Options.DEFAULT,
         listener: (SyntheticInputEvent<ValueType, HTMLInputElement>) -> Unit
     ) {
-        listeners.add(InputEventListener(eventName = INPUT, options, inputType, listener))
+        listeners.add(InputEventListener(eventName = INPUT, inputType, listener))
     }
 
     fun onChange(
-        options: Options = Options.DEFAULT,
         listener: (SyntheticChangeEvent<ValueType, HTMLInputElement>) -> Unit
     ) {
-        listeners.add(ChangeEventListener(options, inputType, listener))
+        listeners.add(ChangeEventListener(inputType, listener))
     }
 
     fun onBeforeInput(
-        options: Options = Options.DEFAULT,
         listener: (SyntheticInputEvent<ValueType, HTMLInputElement>) -> Unit
     ) {
-        listeners.add(InputEventListener(eventName = BEFOREINPUT, options, inputType, listener))
+        listeners.add(InputEventListener(eventName = BEFOREINPUT, inputType, listener))
     }
 
     fun onSelect(
-        options: Options = Options.DEFAULT,
         listener: (SyntheticSelectEvent<HTMLInputElement>) -> Unit
     ) {
-        listeners.add(SelectEventListener(options, listener))
+        listeners.add(SelectEventListener(listener))
     }
 }
 
