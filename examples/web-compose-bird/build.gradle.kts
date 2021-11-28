@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
 
 plugins {
     kotlin("multiplatform") version "1.5.31"
-    id("org.jetbrains.compose") version "1.0.0-rc5"
+    id("org.jetbrains.compose") version "0.0.0-feature-test28112021-dev491"
 }
 group = "com.theapache64.composebird"
 version = "1.0.0-alpha01"

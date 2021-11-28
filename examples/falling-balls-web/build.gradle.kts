@@ -4,7 +4,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     kotlin("multiplatform") version "1.5.31"
-    id("org.jetbrains.compose") version "1.0.0-rc5"
+    id("org.jetbrains.compose") version "0.0.0-feature-test28112021-dev491"
 }
 
 version = "1.0-SNAPSHOT"
