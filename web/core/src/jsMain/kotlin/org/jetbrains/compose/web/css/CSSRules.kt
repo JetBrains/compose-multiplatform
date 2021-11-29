@@ -22,7 +22,7 @@ data class CSSStyleRuleDeclaration(
     override val style: StyleHolder
 ) : CSSRuleDeclaration, CSSStyledRuleDeclaration {
     override val header
-        get() = selector.toString()
+        get() = selector.asString()
 }
 
 interface CSSGroupingRuleDeclaration: CSSRuleDeclaration {

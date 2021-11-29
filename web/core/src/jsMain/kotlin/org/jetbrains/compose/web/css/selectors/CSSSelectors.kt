@@ -21,14 +21,19 @@ sealed class Nth {
     }
 }
 
-open class CSSSelector {
+abstract class CSSSelector {
     override fun equals(other: Any?): Boolean {
-        return this === other || toString() == other.toString()
+        return this === other || asString() == (other as? CSSSelector)?.asString()
     }
 
     internal open fun contains(other: CSSSelector, strict: Boolean = false): Boolean {
         return if (strict) this === other else this == other
     }
+
+    // This method made for workaround because of possible concatenation of `String + CSSSelector`,
+    // so `toString` is called for such operator, but we are calling `asString` for instantiation.
+    // `toString` is reloaded for CSSSelfSelector
+    internal open fun asString(): String = toString()
 
     data class Raw(val selector: String) : CSSSelector() {
         override fun toString(): String = selector
@@ -77,6 +82,7 @@ open class CSSSelector {
             contains(this, other, selectors, strict)
 
         override fun toString(): String = selectors.joinToString("")
+        override fun asString(): String = selectors.joinToString("") { it.asString() }
     }
 
     data class Group(val selectors: List<CSSSelector>) : CSSSelector() {
@@ -84,6 +90,7 @@ open class CSSSelector {
             contains(this, other, selectors, strict)
 
         override fun toString(): String = selectors.joinToString(", ")
+        override fun asString(): String = selectors.joinToString(", ") { it.asString() }
     }
 
     data class Descendant(val parent: CSSSelector, val selected: CSSSelector) : CSSSelector() {
@@ -91,6 +98,7 @@ open class CSSSelector {
             contains(this, other, listOf(parent, selected), strict)
 
         override fun toString(): String = "$parent $selected"
+        override fun asString(): String = "${parent.asString()} ${selected.asString()}"
     }
 
     data class Child(val parent: CSSSelector, val selected: CSSSelector) : CSSSelector() {
@@ -98,6 +106,7 @@ open class CSSSelector {
             contains(this, other, listOf(parent, selected), strict)
 
         override fun toString(): String = "$parent > $selected"
+        override fun asString(): String = "${parent.asString()} > ${selected.asString()}"
     }
 
     data class Sibling(val prev: CSSSelector, val selected: CSSSelector) : CSSSelector() {
@@ -105,6 +114,7 @@ open class CSSSelector {
             contains(this, other, listOf(prev, selected), strict)
 
         override fun toString(): String = "$prev ~ $selected"
+        override fun asString(): String = "${prev.asString()} ~ ${selected.asString()}"
     }
 
     data class Adjacent(val prev: CSSSelector, val selected: CSSSelector) : CSSSelector() {
@@ -112,6 +122,7 @@ open class CSSSelector {
             contains(this, other, listOf(prev, selected), strict)
 
         override fun toString(): String = "$prev + $selected"
+        override fun asString(): String = "${prev.asString()} + ${selected.asString()}"
     }
 
     open class PseudoClass(val name: String) : CSSSelector() {
@@ -202,7 +213,7 @@ open class CSSSelector {
             override fun contains(other: CSSSelector, strict: Boolean): Boolean =
                 contains(this, other, listOf(selector), strict)
 
-            override fun argsStr() = "$selector"
+            override fun argsStr() = "${selector.asString()}"
         }
 
         // Etc
@@ -238,7 +249,7 @@ open class CSSSelector {
             override fun contains(other: CSSSelector, strict: Boolean): Boolean =
                 contains(this, other, listOf(selector), strict)
 
-            override fun argsStr() = selector.toString()
+            override fun argsStr() = selector.asString()
         }
     }
 }
@@ -246,14 +257,9 @@ open class CSSSelector {
 fun selector(selector: String) = CSSSelector.Raw(selector)
 fun combine(vararg selectors: CSSSelector) = CSSSelector.Combine(selectors.toMutableList())
 operator fun CSSSelector.plus(selector: CSSSelector) = combine(this, selector)
-operator fun String.plus(selector: CSSSelector) = combine(selector(this), selector)
 operator fun CSSSelector.plus(selector: String) = combine(this, selector(selector))
 operator fun CSSSelector.plus(selector: CSSSelector.Combine): CSSSelector.Combine {
     selector.selectors.add(0, this)
-    return selector
-}
-operator fun String.plus(selector: CSSSelector.Combine): CSSSelector.Combine {
-    selector.selectors.add(0, selector(this))
     return selector
 }
 operator fun CSSSelector.Combine.plus(selector: CSSSelector): CSSSelector.Combine {

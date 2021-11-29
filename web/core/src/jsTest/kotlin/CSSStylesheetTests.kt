@@ -13,10 +13,8 @@ import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.stringPresentation
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
-import kotlin.test.Test
-import kotlin.test.assertEquals
 import org.jetbrains.compose.web.testutils.*
-import kotlin.test.assertContains
+import kotlin.test.*
 
 object AppCSSVariables {
     val width by variable<CSSUnitValue>()
@@ -310,5 +308,18 @@ class CSSVariableTests {
             """.trimIndent(),
             "Sibling selector isn't generated correctly"
         )
+    }
+
+    @Test
+    fun testStringPlusCSSSelectorConcatenation() {
+        assertFailsWith<IllegalStateException>("Concatenation of String + CSSSelector should be restricted.") {
+            object : StyleSheet() {
+                val myClass by style {
+                    ("h1" + self) {
+                        color(Color.green)
+                    }
+                }
+            }
+        }
     }
 }
