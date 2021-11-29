@@ -5,9 +5,4 @@
 
 package org.jetbrains.compose.desktop.ui.tooling.preview.rpc
 
-internal object ExitCodes {
-    const val OK = 0
-    const val COULD_NOT_CONNECT_TO_PREVIEW_MANAGER = 1
-    const val RECEIVER_FATAL_ERROR = 2
-    const val SENDER_FATAL_ERROR = 3
-}
+class PreviewException(message: String) : RuntimeException(message)

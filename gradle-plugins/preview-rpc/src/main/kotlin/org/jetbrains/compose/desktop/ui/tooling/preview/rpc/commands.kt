@@ -32,14 +32,30 @@ internal fun RemoteConnection.sendFrame(frame: RenderedFrame) {
     sendData(frame.bytes)
 }
 
-internal fun RemoteConnection.receiveFrame(fn: (RenderedFrame) -> Unit) {
+internal fun RemoteConnection.sendError(e: Exception) {
+    sendCommand(Command.Type.ERROR)
+    sendUtf8StringData(e.stackTraceString)
+}
+
+internal fun RemoteConnection.receiveFrame(
+    onFrame: (RenderedFrame) -> Unit,
+    onError: (String) -> Unit
+) {
     receiveCommand { (type, args) ->
-        if (type == Command.Type.FRAME) {
-            receiveData { bytes ->
-                val (w, h) = args
-                val frame = RenderedFrame(bytes, width = w.toInt(), height = h.toInt())
-                fn(frame)
+        when (type) {
+            Command.Type.FRAME -> {
+                receiveData { bytes ->
+                    val (w, h) = args
+                    val frame = RenderedFrame(bytes, width = w.toInt(), height = h.toInt())
+                    onFrame(frame)
+                }
             }
+            Command.Type.ERROR -> {
+                receiveUtf8StringData { stacktrace ->
+                    onError(stacktrace)
+                }
+            }
+            else -> error("Received unexpected command type: $type")
         }
     }
 }

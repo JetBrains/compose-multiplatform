@@ -69,31 +69,46 @@ internal class PreviewHost(private val log: PreviewLogger, connection: RemoteCon
                 Thread.sleep(DEFAULT_SLEEP_DELAY_MS)
             } catch (e: InterruptedException) {
                 continue
-            }
-        }
-    }
-
-    val receiverThread = thread {
-        try {
-            while (connection.isAlive) {
-                try {
-                    connection.receivePreviewRequest(
-                        onPreviewClasspath = {
-                            previewClasspath.set(it)
-                            senderThread.interrupt()
-                        },
-                        onFrameRequest = {
-                            previewRequest.set(it)
-                            senderThread.interrupt()
-                        }
-                    )
-                } catch (e: SocketTimeoutException) {
-                    continue
+            } catch (e: Exception) {
+                if (connection.isAlive) {
+                    connection.sendError(e)
+                } else {
+                    throw IllegalStateException("Could not report an exception: IDE connection is not alive", e)
                 }
             }
-        } catch (e: Throwable) {
-            e.printStackTrace(System.err)
-            exitProcess(1)
+        }
+    }.setUpUnhandledExceptionHandler(ExitCodes.SENDER_FATAL_ERROR)
+
+    val receiverThread = thread {
+        while (connection.isAlive) {
+            try {
+                connection.receivePreviewRequest(
+                    onPreviewClasspath = {
+                        previewClasspath.set(it)
+                        senderThread.interrupt()
+                    },
+                    onFrameRequest = {
+                        previewRequest.set(it)
+                        senderThread.interrupt()
+                    }
+                )
+            } catch (e: SocketTimeoutException) {
+                continue
+            } catch (e: InterruptedException) {
+                continue
+            }
+        }
+    }.setUpUnhandledExceptionHandler(ExitCodes.RECEIVER_FATAL_ERROR)
+
+    private fun Thread.setUpUnhandledExceptionHandler(exitCode: Int): Thread = apply {
+        uncaughtExceptionHandler = Thread.UncaughtExceptionHandler { t, e ->
+            try {
+                System.err.println()
+                System.err.println(PREVIEW_START_OF_STACKTRACE_MARKER)
+                e.printStackTrace(System.err)
+            } finally {
+                exitProcess(exitCode)
+            }
         }
     }
 

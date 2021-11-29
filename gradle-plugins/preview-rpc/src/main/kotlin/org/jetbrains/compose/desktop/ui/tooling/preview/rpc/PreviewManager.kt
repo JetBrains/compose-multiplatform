@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.desktop.ui.tooling.preview.rpc
 
+import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.utils.RingBuffer
 import java.io.IOException
 import java.net.ServerSocket
 import java.net.SocketTimeoutException
@@ -49,8 +50,10 @@ private data class RunningPreview(
 }
 
 class PreviewManagerImpl(
-    private val previewListener: PreviewListener = PreviewListenerBase()
+    private val previewListener: PreviewListener = PreviewListenerBase(),
+    private val errorReporter: PreviewErrorReporter = StderrPreviewErrorReporter
 ) : PreviewManager {
+    // todo: add quiet mode
     private val log = PrintStreamLogger("SERVER")
     private val previewSocket = newServerSocket()
     private val gradleCallbackSocket = newServerSocket()
@@ -78,9 +81,9 @@ class PreviewManagerImpl(
                 PREVIEW_HOST_CLASS_NAME,
                 previewSocket.localPort.toString()
             ).apply {
-                // todo: non verbose mode
-                redirectOutput(ProcessBuilder.Redirect.INHERIT)
-                redirectError(ProcessBuilder.Redirect.INHERIT)
+                redirectOutput(ProcessBuilder.Redirect.PIPE)
+                redirectError(ProcessBuilder.Redirect.PIPE)
+                redirectErrorStream(true)
             }.start()
 
         val runningPreview = runningPreview.get()
@@ -90,6 +93,39 @@ class PreviewManagerImpl(
             val connection = tryAcceptConnection(previewSocket, "PREVIEW")
             connection?.receiveAttach(listener = previewListener) {
                 this.runningPreview.set(RunningPreview(connection, process))
+            }
+            val processLogLines = RingBuffer<String>(512)
+            val exception = StringBuilder()
+            var exceptionMarker = false
+            process.inputStream.bufferedReader().forEachLine { line ->
+                if (exceptionMarker) {
+                    exception.appendLine(line)
+                } else {
+                    if (line.startsWith(PREVIEW_START_OF_STACKTRACE_MARKER)) {
+                        exceptionMarker = true
+                    } else {
+                        processLogLines.add(line)
+                    }
+                }
+            }
+            while (process.isAlive) {
+                process.waitFor(5, TimeUnit.SECONDS)
+                if (process.isAlive) {
+                    process.destroyForcibly()
+                    process.waitFor(5, TimeUnit.SECONDS)
+                }
+            }
+            if (process.isAlive) error("Preview process does not finish!")
+
+            val exitCode = process.exitValue()
+            if (exitCode != ExitCodes.OK) {
+                val errorMessage = buildString {
+                    appendLine("Preview process exited unexpectedly: exitCode=$exitCode")
+                    if (exceptionMarker) {
+                        appendLine(exception)
+                    }
+                }
+                errorReporter.report(PreviewException(errorMessage), details = processLogLines.joinToString("\n"))
             }
         }
     }
@@ -115,13 +151,21 @@ class PreviewManagerImpl(
 
     private val receivePreviewResponseThread = repeatWhileAliveThread("receivePreviewResponse") {
         withLivePreviewConnection {
-            receiveFrame { renderedFrame ->
-                inProcessRequest.get()?.let { request ->
-                    processedRequest.set(request)
-                    inProcessRequest.compareAndSet(request, null)
+            receiveFrame(
+                onFrame = { renderedFrame ->
+                    inProcessRequest.get()?.let { request ->
+                        processedRequest.set(request)
+                        inProcessRequest.compareAndSet(request, null)
+                    }
+                    previewListener.onRenderedFrame(renderedFrame)
+                },
+                onError = { error ->
+                    errorReporter.report(PreviewException(error))
+                    previewHostConfig.set(null)
+                    previewClasspath.set(null)
+                    inProcessRequest.set(null)
                 }
-                previewListener.onRenderedFrame(renderedFrame)
-            }
+            )
         }
     }
 
@@ -244,12 +288,12 @@ class PreviewManagerImpl(
                 Thread.sleep(sleepDelayMs)
             } catch (e: InterruptedException) {
                 continue
-            } catch (e: Throwable) {
-                e.printStackTrace(System.err)
-                break
             }
         }
     }.also {
+        it.uncaughtExceptionHandler = Thread.UncaughtExceptionHandler { thread, e ->
+            errorReporter.report(e)
+        }
         threads.add(it)
         it.start()
     }

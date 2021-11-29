@@ -5,4 +5,4 @@
 
 package org.jetbrains.compose.desktop.ui.tooling.preview.rpc
 
-const val PROTOCOL_VERSION = 1
+const val PROTOCOL_VERSION = 2

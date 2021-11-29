@@ -9,6 +9,7 @@ data class Command(val type: Type, val args: List<String>) {
     enum class Type {
         ATTACH,
         FRAME,
+        ERROR,
         PREVIEW_CONFIG,
         PREVIEW_CLASSPATH,
         PREVIEW_FQ_NAME,

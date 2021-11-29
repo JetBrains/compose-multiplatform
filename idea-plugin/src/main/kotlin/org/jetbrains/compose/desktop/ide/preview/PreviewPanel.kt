@@ -29,7 +29,7 @@ internal class PreviewPanel : JPanel() {
         }
     }
 
-    fun previewImage(image: BufferedImage, imageDimension: Dimension) {
+    fun previewImage(image: BufferedImage?, imageDimension: Dimension?) {
         synchronized(this) {
             this.image = image
             this.imageDimension = imageDimension
