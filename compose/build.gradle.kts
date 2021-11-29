@@ -4,22 +4,7 @@ fun Task.dependsOnComposeTask(name: String) = dependsOn(composeBuild.task(name))
 val isOelPublication = project.findProperty("oel.publication") == "true"
 val isWebExist = composeBuild.projectDir.resolve(".jbWebExistsMarker").exists()
 
-// To show all projects which use `xxx` task, run:
-// ./gradlew -p frameworks/support help --task xxx
-
-tasks.register("publishComposeJb") {
-    dependsOnComposeTask(":compose:compiler:compiler:publishMavenPublicationToMavenRepository")
-    dependsOnComposeTask(":compose:compiler:compiler-hosted:publishMavenPublicationToMavenRepository")
-    dependsOnComposeTask(":compose:ui:ui-tooling-data:publishMavenPublicationToMavenRepository")
-
-    dependsOnComposeTask(":compose:desktop:desktop:publishKotlinMultiplatformPublicationToMavenRepository")
-    dependsOnComposeTask(":compose:desktop:desktop:publishJvmPublicationToMavenRepository")
-    dependsOnComposeTask(":compose:desktop:desktop:publishJvmlinux-x64PublicationToMavenRepository")
-    dependsOnComposeTask(":compose:desktop:desktop:publishJvmlinux-arm64PublicationToMavenRepository")
-    dependsOnComposeTask(":compose:desktop:desktop:publishJvmmacos-x64PublicationToMavenRepository")
-    dependsOnComposeTask(":compose:desktop:desktop:publishJvmmacos-arm64PublicationToMavenRepository")
-    dependsOnComposeTask(":compose:desktop:desktop:publishJvmwindows-x64PublicationToMavenRepository")
-
+val publishableComponents =
     listOf(
         ":compose:animation:animation",
         ":compose:animation:animation-core",
@@ -40,7 +25,25 @@ tasks.register("publishComposeJb") {
         ":compose:ui:ui-tooling-preview",
         ":compose:ui:ui-unit",
         ":compose:ui:ui-util",
-    ).forEach {
+    )
+
+// To show all projects which use `xxx` task, run:
+// ./gradlew -p frameworks/support help --task xxx
+
+tasks.register("publishComposeJb") {
+    dependsOnComposeTask(":compose:compiler:compiler:publishMavenPublicationToMavenRepository")
+    dependsOnComposeTask(":compose:compiler:compiler-hosted:publishMavenPublicationToMavenRepository")
+    dependsOnComposeTask(":compose:ui:ui-tooling-data:publishMavenPublicationToMavenRepository")
+
+    dependsOnComposeTask(":compose:desktop:desktop:publishKotlinMultiplatformPublicationToMavenRepository")
+    dependsOnComposeTask(":compose:desktop:desktop:publishJvmPublicationToMavenRepository")
+    dependsOnComposeTask(":compose:desktop:desktop:publishJvmlinux-x64PublicationToMavenRepository")
+    dependsOnComposeTask(":compose:desktop:desktop:publishJvmlinux-arm64PublicationToMavenRepository")
+    dependsOnComposeTask(":compose:desktop:desktop:publishJvmmacos-x64PublicationToMavenRepository")
+    dependsOnComposeTask(":compose:desktop:desktop:publishJvmmacos-arm64PublicationToMavenRepository")
+    dependsOnComposeTask(":compose:desktop:desktop:publishJvmwindows-x64PublicationToMavenRepository")
+
+    publishableComponents.forEach {
         dependsOnComposeTask("$it:publishKotlinMultiplatformPublicationToMavenRepository")
         dependsOnComposeTask("$it:publishDesktopPublicationToMavenRepository")
 
