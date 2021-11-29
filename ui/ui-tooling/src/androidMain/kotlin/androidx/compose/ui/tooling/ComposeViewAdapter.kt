@@ -358,7 +358,7 @@ internal class ComposeViewAdapter : FrameLayout {
         if (::clock.isInitialized) {
             transitions.forEach { clock.trackTransition(it) }
             animatedVisibilityParentTransitions.forEach {
-                clock.trackAnimatedVisibility(it)
+                clock.trackAnimatedVisibility(it, ::requestLayout)
             }
         }
     }
