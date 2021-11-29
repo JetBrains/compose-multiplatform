@@ -13,7 +13,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import org.jetbrains.compose.web.testutils.*
 
-class CSSUnitApiTests {
+class CSSUnitApiTests : CSSUnitsConversionScope, CSSOperationsScope {
     // TODO: Cover CSS.Q, CSS.khz and CSS.hz after we'll get rid from polyfill
 
     @Test

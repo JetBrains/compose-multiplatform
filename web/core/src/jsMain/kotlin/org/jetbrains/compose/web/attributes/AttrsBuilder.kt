@@ -2,6 +2,8 @@ package org.jetbrains.compose.web.attributes
 
 import androidx.compose.runtime.DisposableEffectResult
 import androidx.compose.runtime.DisposableEffectScope
+import org.jetbrains.compose.web.css.CSSOperationsScope
+import org.jetbrains.compose.web.css.CSSUnitsConversionScope
 import org.jetbrains.compose.web.css.StyleBuilder
 import org.jetbrains.compose.web.css.StyleBuilderImpl
 import org.w3c.dom.Element
@@ -17,7 +19,7 @@ import org.w3c.dom.HTMLElement
  * are extracted to a separate methods.
  *
  */
-open class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
+open class AttrsBuilder<TElement : Element> : EventsListenerBuilder(), CSSUnitsConversionScope, CSSOperationsScope {
     internal val attributesMap = mutableMapOf<String, String>()
     internal val styleBuilder = StyleBuilderImpl()
 

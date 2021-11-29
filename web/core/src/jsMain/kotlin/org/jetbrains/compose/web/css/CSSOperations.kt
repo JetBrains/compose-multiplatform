@@ -5,16 +5,6 @@
 
 package org.jetbrains.compose.web.css
 
-operator fun <T: CSSUnit> CSSSizeValue<T>.times(num: Number): CSSSizeValue<T> = CSSUnitValueTyped(value * num.toFloat(), unit)
-operator fun <T: CSSUnit> Number.times(unit: CSSSizeValue<T>): CSSSizeValue<T> = CSSUnitValueTyped(unit.value * toFloat(), unit.unit)
-
-operator fun <T: CSSUnit> CSSSizeValue<T>.div(num: Number): CSSSizeValue<T> = CSSUnitValueTyped(value / num.toFloat(), unit)
-
-operator fun <T: CSSUnit> CSSSizeValue<T>.plus(b: CSSSizeValue<T>): CSSSizeValue<T> = CSSUnitValueTyped(value + b.value, unit)
-operator fun <T: CSSUnit> CSSSizeValue<T>.minus(b: CSSSizeValue<T>): CSSSizeValue<T> = CSSUnitValueTyped(value - b.value, unit)
-operator fun <T: CSSUnit> CSSSizeValue<T>.unaryMinus(): CSSSizeValue<T> = CSSUnitValueTyped(-value, unit)
-operator fun <T: CSSUnit> CSSSizeValue<T>.unaryPlus(): CSSSizeValue<T> = CSSUnitValueTyped(value, unit)
-
 external interface CSSCalcOperation<T : CSSUnit>: CSSNumericValue<T>
 
 data class CSSCalcValue<T : CSSUnit>(
@@ -52,20 +42,34 @@ private data class CSSDiv<T : CSSUnit>(
     override fun toString(): String = "($l / $r)"
 }
 
-operator fun <T: CSSUnit> CSSNumericValue<out T>.plus(b: CSSNumericValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSPlus(this, b))
-operator fun <T: CSSUnit> CSSCalcValue<out T>.plus(b: CSSNumericValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSPlus(this.op, b))
-operator fun <T: CSSUnit> CSSNumericValue<out T>.plus(b: CSSCalcValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSPlus(this, b.op))
+/**
+ * This interface is not supposed to be implemented by any classes
+ */
+interface CSSOperationsScope {
+    operator fun <T: CSSUnit> CSSNumericValue<out T>.plus(b: CSSNumericValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSPlus(this, b))
+    operator fun <T: CSSUnit> CSSCalcValue<out T>.plus(b: CSSNumericValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSPlus(this.op, b))
+    operator fun <T: CSSUnit> CSSNumericValue<out T>.plus(b: CSSCalcValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSPlus(this, b.op))
 
-operator fun <T: CSSUnit> CSSNumericValue<out T>.minus(b: CSSNumericValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSMinus(this, b))
-operator fun <T: CSSUnit> CSSCalcValue<out T>.minus(b: CSSNumericValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSMinus(this.op, b))
-operator fun <T: CSSUnit> CSSNumericValue<out T>.minus(b: CSSCalcValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSMinus(this, b.op))
+    operator fun <T: CSSUnit> CSSNumericValue<out T>.minus(b: CSSNumericValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSMinus(this, b))
+    operator fun <T: CSSUnit> CSSCalcValue<out T>.minus(b: CSSNumericValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSMinus(this.op, b))
+    operator fun <T: CSSUnit> CSSNumericValue<out T>.minus(b: CSSCalcValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSMinus(this, b.op))
 
-operator fun <T: CSSUnit> CSSCalcValue<out T>.times(b: Number): CSSCalcValue<T> = CSSCalcValue(CSSTimes(this.op, b))
-operator fun <T: CSSUnit> Number.times(b: CSSCalcValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSTimes(b.op, this, false))
+    operator fun <T: CSSUnit> CSSCalcValue<out T>.times(b: Number): CSSCalcValue<T> = CSSCalcValue(CSSTimes(this.op, b))
+    operator fun <T: CSSUnit> Number.times(b: CSSCalcValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSTimes(b.op, this, false))
 
-operator fun <T: CSSUnit> CSSNumericValue<T>.div(b: Number): CSSCalcValue<T> = CSSCalcValue(CSSDiv(this, b))
-operator fun <T: CSSUnit> CSSCalcValue<out T>.div(b: Number): CSSCalcValue<T> = CSSCalcValue(CSSDiv(this.op, b))
+    operator fun <T: CSSUnit> CSSNumericValue<T>.div(b: Number): CSSCalcValue<T> = CSSCalcValue(CSSDiv(this, b))
+    operator fun <T: CSSUnit> CSSCalcValue<out T>.div(b: Number): CSSCalcValue<T> = CSSCalcValue(CSSDiv(this.op, b))
 
-operator fun <T: CSSUnit> CSSNumericValue<T>.times(b: Number): CSSCalcValue<T> = CSSCalcValue(CSSTimes(this, b))
-operator fun <T: CSSUnit> Number.times(b: CSSNumericValue<T>): CSSCalcValue<T> = CSSCalcValue(CSSTimes(b, this, false))
+    operator fun <T: CSSUnit> CSSNumericValue<T>.times(b: Number): CSSCalcValue<T> = CSSCalcValue(CSSTimes(this, b))
+    operator fun <T: CSSUnit> Number.times(b: CSSNumericValue<T>): CSSCalcValue<T> = CSSCalcValue(CSSTimes(b, this, false))
 
+    operator fun <T: CSSUnit> CSSSizeValue<T>.times(num: Number): CSSSizeValue<T> = CSSUnitValueTyped(value * num.toFloat(), unit)
+    operator fun <T: CSSUnit> Number.times(unit: CSSSizeValue<T>): CSSSizeValue<T> = CSSUnitValueTyped(unit.value * toFloat(), unit.unit)
+
+    operator fun <T: CSSUnit> CSSSizeValue<T>.div(num: Number): CSSSizeValue<T> = CSSUnitValueTyped(value / num.toFloat(), unit)
+
+    operator fun <T: CSSUnit> CSSSizeValue<T>.plus(b: CSSSizeValue<T>): CSSSizeValue<T> = CSSUnitValueTyped(value + b.value, unit)
+    operator fun <T: CSSUnit> CSSSizeValue<T>.minus(b: CSSSizeValue<T>): CSSSizeValue<T> = CSSUnitValueTyped(value - b.value, unit)
+    operator fun <T: CSSUnit> CSSSizeValue<T>.unaryMinus(): CSSSizeValue<T> = CSSUnitValueTyped(-value, unit)
+    operator fun <T: CSSUnit> CSSSizeValue<T>.unaryPlus(): CSSSizeValue<T> = CSSUnitValueTyped(value, unit)
+}

@@ -7,7 +7,6 @@ import org.jetbrains.compose.common.internal.castOrCreate
 import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 import org.jetbrains.compose.web.css.marginTop
 import org.jetbrains.compose.web.css.marginLeft
-import org.jetbrains.compose.web.css.px
 
 @ExperimentalComposeWebWidgetsApi
 @Deprecated(message = webWidgetsDeprecationMessage)

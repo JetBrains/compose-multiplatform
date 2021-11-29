@@ -10,7 +10,11 @@ interface CSSRulesHolder {
     }
 }
 
-interface GenericStyleSheetBuilder<TBuilder> : CSSRulesHolder {
+interface GenericStyleSheetBuilder<TBuilder> :
+    CSSRulesHolder,
+    CSSUnitsConversionScope,
+    CSSOperationsScope
+{
     fun buildRules(
         rulesBuild: GenericStyleSheetBuilder<TBuilder>.() -> Unit
     ): CSSRuleDeclarationList

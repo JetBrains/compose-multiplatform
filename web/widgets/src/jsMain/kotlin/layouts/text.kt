@@ -14,8 +14,6 @@ import org.jetbrains.compose.web.css.fontSize
 import org.jetbrains.compose.web.css.Color.RGB
 import org.jetbrains.compose.common.ui.unit.TextUnit
 import org.jetbrains.compose.common.ui.unit.TextUnitType
-import org.jetbrains.compose.web.css.em
-import org.jetbrains.compose.web.css.px
 
 @Composable
 @ExperimentalComposeWebWidgetsApi

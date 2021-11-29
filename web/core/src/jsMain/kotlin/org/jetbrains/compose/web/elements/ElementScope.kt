@@ -10,8 +10,9 @@ import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
+import org.jetbrains.compose.web.css.CSSOperationsScope
+import org.jetbrains.compose.web.css.CSSUnitsConversionScope
 import org.w3c.dom.Element
-import org.w3c.dom.HTMLElement
 
 interface DOMScope<out TElement : Element>
 
@@ -28,7 +29,7 @@ interface DOMScope<out TElement : Element>
  * }
  * ```
  */
-interface ElementScope<out TElement : Element> : DOMScope<TElement> {
+interface ElementScope<out TElement : Element> : DOMScope<TElement>, CSSUnitsConversionScope, CSSOperationsScope {
 
     /**
      * A side effect of composition that must run for any new unique value of [key]

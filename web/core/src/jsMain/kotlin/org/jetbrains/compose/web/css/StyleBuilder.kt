@@ -7,9 +7,7 @@
 
 package org.jetbrains.compose.web.css
 
-import org.jetbrains.compose.web.internal.runtime.DomElementWrapper
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
-import org.w3c.dom.css.CSSStyleDeclaration
 import kotlin.properties.ReadOnlyProperty
 
 /**
@@ -18,7 +16,8 @@ import kotlin.properties.ReadOnlyProperty
  * 1. Add inlined css properties to the element (@see [property])
  * 2. Set values to CSS variables (@see [variable])
  */
-interface StyleBuilder {
+@OptIn(ComposeWebInternalApi::class)
+interface StyleBuilder : CSSUnitsConversionScope, CSSOperationsScope {
     /**
      * Adds arbitrary CSS property to the inline style of the element
      * @param propertyName - the name of css property as [per spec](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference)

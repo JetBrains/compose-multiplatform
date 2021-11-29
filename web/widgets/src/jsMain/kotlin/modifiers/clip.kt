@@ -7,7 +7,6 @@ import org.jetbrains.compose.annotations.webWidgetsDeprecationMessage
 import org.jetbrains.compose.common.internal.castOrCreate
 import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 import org.jetbrains.compose.web.css.borderRadius
-import org.jetbrains.compose.web.css.percent
 
 @ExperimentalComposeWebWidgetsApi
 @Deprecated(message = webWidgetsDeprecationMessage)

@@ -13,7 +13,6 @@ import org.jetbrains.compose.web.css.mediaMaxWidth
 import org.jetbrains.compose.web.css.media
 import org.jetbrains.compose.web.css.mediaMinHeight
 import org.jetbrains.compose.web.css.mediaMinWidth
-import org.jetbrains.compose.web.css.px
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

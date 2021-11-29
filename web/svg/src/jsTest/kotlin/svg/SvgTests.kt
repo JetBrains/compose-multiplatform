@@ -7,8 +7,6 @@ package org.jetbrains.compose.web.core.tests.svg
 
 import org.jetbrains.compose.web.ExperimentalComposeWebSvgApi
 import org.jetbrains.compose.web.css.opacity
-import org.jetbrains.compose.web.css.percent
-import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.svg.*
 import org.jetbrains.compose.web.testutils.*
 import org.w3c.dom.svg.SVGCircleElement
