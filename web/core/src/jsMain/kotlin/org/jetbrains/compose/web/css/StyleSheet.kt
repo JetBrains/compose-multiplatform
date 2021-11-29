@@ -6,7 +6,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import org.jetbrains.compose.web.ExperimentalComposeWebStyleApi
 import org.jetbrains.compose.web.css.selectors.CSSSelector
-import org.jetbrains.compose.web.css.selectors.className
 import org.jetbrains.compose.web.dom.Style
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
@@ -100,7 +99,7 @@ open class StyleSheet(
         return if (cssRule != null) {
             cssRule.selector.unsafeCast<CSSSelector.CSSClass>().className
         } else {
-            val classNameSelector = className("auto-${counter++}")
+            val classNameSelector = CSSSelector.CSSClass("auto-${counter++}")
             selfSelector.selector = classNameSelector
             add(classNameSelector, style)
             newCssRules.forEach { add(it) }
@@ -115,7 +114,7 @@ open class StyleSheet(
             property: KProperty<*>
         ): ReadOnlyProperty<Any?, String> {
             val sheetName = if (usePrefix) "${sheet::class.simpleName}-" else ""
-            val selector = className("$sheetName${property.name}")
+            val selector = CSSSelector.CSSClass("$sheetName${property.name}")
             val (properties, rules) = buildCSS(selector, selector, cssBuilder)
             sheet.add(selector, properties)
             rules.forEach { sheet.add(it) }

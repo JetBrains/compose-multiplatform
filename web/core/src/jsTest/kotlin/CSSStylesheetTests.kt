@@ -7,8 +7,6 @@ package org.jetbrains.compose.web.core.tests
 
 import kotlinx.browser.window
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.css.selectors.*
-import org.jetbrains.compose.web.css.selectors.plus
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.stringPresentation
 import org.w3c.dom.HTMLElement
