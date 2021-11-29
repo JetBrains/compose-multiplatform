@@ -9,6 +9,7 @@ import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.externalSystem.model.task.*
 import com.intellij.openapi.externalSystem.service.notification.ExternalSystemProgressNotificationManager
 import com.intellij.openapi.module.Module
@@ -24,12 +25,16 @@ import javax.swing.event.AncestorListener
 
 @Service
 class PreviewStateService(private val myProject: Project) : Disposable {
+    private val idePreviewLogger = Logger.getInstance("org.jetbrains.compose.desktop.ide.preview")
     private val previewListener = CompositePreviewListener()
-    private val previewManager: PreviewManager = PreviewManagerImpl(previewListener)
+    private val errorReporter = IdePreviewErrorReporter(idePreviewLogger, this)
+    private val previewManager: PreviewManager = PreviewManagerImpl(previewListener, errorReporter)
     val gradleCallbackPort: Int
         get() = previewManager.gradleCallbackPort
     private val configurePreviewTaskNameCache =
         ConfigurePreviewTaskNameCache(ConfigurePreviewTaskNameProviderImpl())
+    private var previewPanel: PreviewPanel? = null
+    private var loadingPanel: JBLoadingPanel? = null
 
     init {
         val projectRefreshListener = ConfigurePreviewTaskNameCacheInvalidator(configurePreviewTaskNameCache)
@@ -44,12 +49,17 @@ class PreviewStateService(private val myProject: Project) : Disposable {
     override fun dispose() {
         previewManager.close()
         configurePreviewTaskNameCache.invalidate()
+        previewPanel = null
+        loadingPanel = null
     }
 
     internal fun registerPreviewPanels(
         previewPanel: PreviewPanel,
         loadingPanel: JBLoadingPanel
     ) {
+        this.previewPanel = previewPanel
+        this.loadingPanel = loadingPanel
+
         val previewResizeListener = PreviewResizeListener(previewManager)
         previewPanel.addAncestorListener(previewResizeListener)
         Disposer.register(this) { previewPanel.removeAncestorListener(previewResizeListener) }
@@ -71,6 +81,11 @@ class PreviewStateService(private val myProject: Project) : Disposable {
                 }
             }
         })
+    }
+
+    internal fun clearPreviewOnError() {
+        loadingPanel?.stopLoading()
+        previewPanel?.previewImage(null, null)
     }
 
     internal fun buildStarted() {

@@ -11,3 +11,4 @@ internal const val MAX_CMD_SIZE = 8 * 1024
 // 100 Mb should be enough even for 8K screenshots
 internal const val MAX_BINARY_SIZE = 100 * 1024 * 1024
 internal const val MAX_BUF_SIZE = 8 * 1024
+internal const val PREVIEW_START_OF_STACKTRACE_MARKER = "<!--START OF COMPOSE PREVIEW PROCESS FATAL EXCEPTION--!>"
