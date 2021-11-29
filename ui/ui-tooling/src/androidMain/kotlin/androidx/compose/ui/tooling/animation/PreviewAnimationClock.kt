@@ -107,7 +107,7 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
         notifySubscribe(composeAnimation)
     }
 
-    fun trackAnimatedVisibility(parent: Transition<Any>) {
+    fun trackAnimatedVisibility(parent: Transition<Any>, onSeek: () -> Unit = {}) {
         synchronized(animatedVisibilityStatesLock) {
             if (animatedVisibilityStates.containsKey(parent)) {
                 if (DEBUG) {
@@ -136,6 +136,7 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
             targetState = target,
             0
         )
+        onSeek()
         trackedAnimatedVisibility.add(composeAnimation)
         notifySubscribe(composeAnimation)
     }
