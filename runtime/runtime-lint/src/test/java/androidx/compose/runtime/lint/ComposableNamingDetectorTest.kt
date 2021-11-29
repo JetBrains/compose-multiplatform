@@ -161,5 +161,29 @@ Fix for src/androidx/compose/runtime/foo/test.kt line 7: Change to getInt:
             .run()
             .expectClean()
     }
+
+    @Test
+    fun ignoreOperatorComposableFunctions() {
+        lint().files(
+            kotlin(
+                """
+                package androidx.compose.runtime.foo
+
+                import androidx.compose.runtime.Composable
+
+                object Test {
+                    @Composable
+                    operator fun invoke() {}
+
+                    @Composable
+                    operator fun unaryPlus() {}
+                }
+            """
+            ),
+            Stubs.Composable
+        )
+            .run()
+            .expectClean()
+    }
 }
 /* ktlint-enable max-line-length */

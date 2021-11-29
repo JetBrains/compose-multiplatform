@@ -48,6 +48,9 @@ class ComposableNamingDetector : Detector(), SourceCodeScanner {
             // Ignore non-composable functions
             if (!node.isComposable) return
 
+            // Ignore operator functions, as their name is case sensitive and cannot be changed
+            if (context.evaluator.isOperator(node)) return
+
             val name = node.name
 
             val capitalizedFunctionName = name.first().isUpperCase()
