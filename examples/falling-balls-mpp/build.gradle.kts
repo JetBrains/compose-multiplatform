@@ -57,6 +57,19 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation("androidx.compose.runtime:runtime-macosx64:1.1.0-beta04")
+                implementation("androidx.compose.ui:ui-macosx64:1.1.0-beta04")
+                implementation("androidx.compose.ui:ui-graphics-macosx64:1.1.0-beta04")
+                implementation("androidx.compose.ui:ui-text-macosx64:1.1.0-beta04")
+                implementation("androidx.compose.ui:ui-util-macosx64:1.1.0-beta04")
+                implementation("androidx.compose.ui:ui-geometry-macosx64:1.1.0-beta04")
+                implementation("androidx.compose.ui:ui-unit-macosx64:1.1.0-beta04")
+                implementation("androidx.compose.foundation:foundation-macosx64:1.1.0-beta04")
+                implementation("androidx.compose.material:material-macosx64:1.1.0-beta04")
+
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0-RC")
+                implementation("org.jetbrains.skiko:skiko:0.5.12")
+
                 implementation(kotlin("stdlib-common"))
             }
         }
@@ -87,20 +100,6 @@ kotlin {
         }
         val macosX64Main by getting {
             dependsOn(macosMain)
-            dependencies {
-                implementation("androidx.compose.runtime:runtime-macosx64:1.1.0-beta04")
-                implementation("androidx.compose.ui:ui-macosx64:1.1.0-beta04")
-                implementation("androidx.compose.ui:ui-graphics-macosx64:1.1.0-beta04")
-                implementation("androidx.compose.ui:ui-text-macosx64:1.1.0-beta04")
-                implementation("androidx.compose.ui:ui-util-macosx64:1.1.0-beta04")
-                implementation("androidx.compose.ui:ui-geometry-macosx64:1.1.0-beta04")
-                implementation("androidx.compose.ui:ui-unit-macosx64:1.1.0-beta04")
-                implementation("androidx.compose.foundation:foundation-macosx64:1.1.0-beta04")
-                implementation("androidx.compose.material:material-macosx64:1.1.0-beta04")
-
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0-RC")
-                implementation("org.jetbrains.skiko:skiko:0.5.12")
-            }
         }
         val uikitMain by creating {
             dependsOn(nativeMain)
