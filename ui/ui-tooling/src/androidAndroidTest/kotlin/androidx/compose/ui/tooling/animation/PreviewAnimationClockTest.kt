@@ -170,6 +170,20 @@ class PreviewAnimationClockTest {
     }
 
     @Test
+    fun onSeekCallbackCalledWhenTrackingAnimatedVisibility() {
+        var animatedVisibility: Transition<Any>? = null
+        var onSeekCalls = 0
+        composeRule.setContent {
+            animatedVisibility = createAnimationVisibility(1000)
+        }
+
+        composeRule.waitForIdle()
+        assertEquals(0, onSeekCalls)
+        testClock.trackAnimatedVisibility(animatedVisibility!!) { onSeekCalls++ }
+        assertEquals(1, onSeekCalls)
+    }
+
+    @Test
     fun getTransitions() {
         var rotationAnimation: ComposeAnimation? = null
         var offsetAnimation: ComposeAnimation? = null
