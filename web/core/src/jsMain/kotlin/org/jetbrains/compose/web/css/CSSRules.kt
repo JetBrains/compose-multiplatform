@@ -32,7 +32,7 @@ interface CSSGroupingRuleDeclaration: CSSRuleDeclaration {
 typealias CSSRuleDeclarationList = List<CSSRuleDeclaration>
 typealias MutableCSSRuleDeclarationList = MutableList<CSSRuleDeclaration>
 
-fun buildCSSStyleRule(cssRule: CSSStyleRuleBuilder.() -> Unit): StyleHolder {
+internal fun buildCSSStyleRule(cssRule: CSSStyleRuleBuilder.() -> Unit): StyleHolder {
     val builder = CSSRuleBuilderImpl()
     builder.cssRule()
     return builder

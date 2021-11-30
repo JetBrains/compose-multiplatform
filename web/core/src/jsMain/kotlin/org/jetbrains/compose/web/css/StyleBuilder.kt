@@ -57,7 +57,7 @@ interface StyleBuilder {
     }
 }
 
-inline fun variableValue(variableName: String, fallback: StylePropertyValue? = null) =
+internal inline fun variableValue(variableName: String, fallback: StylePropertyValue? = null) =
     "var(--$variableName${fallback?.let { ", $it" } ?: ""})"
 
 external interface CSSVariableValueAs<out T : StylePropertyValue>
@@ -169,7 +169,7 @@ data class StylePropertyDeclaration(
 typealias StylePropertyList = List<StylePropertyDeclaration>
 typealias MutableStylePropertyList = MutableList<StylePropertyDeclaration>
 
-fun StylePropertyList.nativeEquals(properties: StylePropertyList): Boolean {
+internal fun StylePropertyList.nativeEquals(properties: StylePropertyList): Boolean {
     if (this.size != properties.size) return false
 
     var index = 0
