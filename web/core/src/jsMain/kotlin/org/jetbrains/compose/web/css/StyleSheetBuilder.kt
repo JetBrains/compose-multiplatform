@@ -37,19 +37,27 @@ interface GenericStyleSheetBuilder<TBuilder> : CSSRulesHolder, SelectorsScope {
 interface SelectorsScope {
     fun selector(selector: String): CSSSelector = CSSSelector.Raw(selector)
     fun combine(vararg selectors: CSSSelector): CSSSelector = CSSSelector.Combine(selectors.toMutableList())
-    operator fun CSSSelector.plus(selector: CSSSelector): CSSSelector = combine(this, selector)
-    operator fun CSSSelector.plus(selector: String): CSSSelector = combine(this, selector(selector))
-    operator fun CSSSelector.plus(selector: CSSSelector.Combine): CSSSelector {
-        selector.selectors.add(0, this)
-        return selector
+
+    operator fun CSSSelector.plus(selector: CSSSelector): CSSSelector {
+        if (this is CSSSelector.Combine) {
+            this.selectors.add(selector)
+            return this
+        }
+        return if (selector is CSSSelector.Combine) {
+            selector.selectors.add(0, this)
+            selector
+        } else {
+            combine(this, selector)
+        }
     }
-    operator fun CSSSelector.Combine.plus(selector: CSSSelector): CSSSelector {
-        this.selectors.add(selector)
-        return this
-    }
-    operator fun CSSSelector.Combine.plus(selector: String): CSSSelector {
-        this.selectors.add(selector(selector))
-        return this
+
+    operator fun CSSSelector.plus(selector: String): CSSSelector {
+        if (this is CSSSelector.Combine) {
+            this.selectors.add(selector(selector))
+            return this
+        }
+
+        return combine(this, selector(selector))
     }
 
     fun universal(): CSSSelector = CSSSelector.Universal
