@@ -97,7 +97,7 @@ inline fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.media(
     media(feature(name, value), rulesBuild)
 }
 
-fun feature(
+fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.feature(
     name: String,
     value: StylePropertyValue? = null
 ) = CSSMediaQuery.MediaFeature(name, value)
@@ -110,7 +110,7 @@ inline fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.media(
     media(combine(*mediaList), rulesBuild)
 }
 
-fun combine(
+fun <TBuilder> GenericStyleSheetBuilder<TBuilder>.combine(
     vararg mediaList: CSSMediaQuery
 ) = CSSMediaQuery.Combine(mediaList.toMutableList())
 
