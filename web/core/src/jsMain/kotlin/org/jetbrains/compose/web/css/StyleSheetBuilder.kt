@@ -77,7 +77,7 @@ interface SelectorsScope {
         value: String? = null,
         operator: CSSSelector.Attribute.Operator = CSSSelector.Attribute.Operator.Equals,
         caseSensitive: Boolean = true
-    ): CSSSelector = CSSSelector.Attribute(name, value, operator, caseSensitive)
+    ): CSSSelector = CSSSelector.AttributeInternal(name, value, operator, caseSensitive)
 
     fun attrEquals(name: String, value: String? = null, caseSensitive: Boolean = true) =
         attr(name, value, CSSSelector.Attribute.Operator.Equals, caseSensitive)
@@ -117,129 +117,129 @@ interface SelectorsScope {
 
     // Location pseudo-classes
     val anyLink: CSSSelector
-        get() = CSSSelector.PseudoClass("any-link")
+        get() = CSSSelector.PseudoClassInternal("any-link")
     val link: CSSSelector
-        get() = CSSSelector.PseudoClass("link")
+        get() = CSSSelector.PseudoClassInternal("link")
     val visited: CSSSelector
-        get() = CSSSelector.PseudoClass("visited")
+        get() = CSSSelector.PseudoClassInternal("visited")
     val localLink: CSSSelector
-        get() = CSSSelector.PseudoClass("local-link")
+        get() = CSSSelector.PseudoClassInternal("local-link")
     val target: CSSSelector
-        get() = CSSSelector.PseudoClass("target")
+        get() = CSSSelector.PseudoClassInternal("target")
     val targetWithin: CSSSelector
-        get() = CSSSelector.PseudoClass("target-within")
+        get() = CSSSelector.PseudoClassInternal("target-within")
     val scope: CSSSelector
-        get() = CSSSelector.PseudoClass("scope")
+        get() = CSSSelector.PseudoClassInternal("scope")
 
     // User action pseudo-classes
     val hover: CSSSelector
-        get() = CSSSelector.PseudoClass("hover")
+        get() = CSSSelector.PseudoClassInternal("hover")
     val active: CSSSelector
-        get() = CSSSelector.PseudoClass("active")
+        get() = CSSSelector.PseudoClassInternal("active")
     val focus: CSSSelector
-        get() = CSSSelector.PseudoClass("focus")
+        get() = CSSSelector.PseudoClassInternal("focus")
     val focusVisible: CSSSelector
-        get() = CSSSelector.PseudoClass("focus-visible")
+        get() = CSSSelector.PseudoClassInternal("focus-visible")
 
     // Resource state pseudo-classes
     val playing: CSSSelector
-        get() = CSSSelector.PseudoClass("playing")
+        get() = CSSSelector.PseudoClassInternal("playing")
     val paused: CSSSelector
-        get() = CSSSelector.PseudoClass("paused")
+        get() = CSSSelector.PseudoClassInternal("paused")
 
     // The input pseudo-classes
     val autofill: CSSSelector
-        get() = CSSSelector.PseudoClass("autofill")
+        get() = CSSSelector.PseudoClassInternal("autofill")
     val enabled: CSSSelector
-        get() = CSSSelector.PseudoClass("enabled")
+        get() = CSSSelector.PseudoClassInternal("enabled")
     val disabled: CSSSelector
-        get() = CSSSelector.PseudoClass("disabled")
+        get() = CSSSelector.PseudoClassInternal("disabled")
     val readOnly: CSSSelector
-        get() = CSSSelector.PseudoClass("read-only")
+        get() = CSSSelector.PseudoClassInternal("read-only")
     val readWrite: CSSSelector
-        get() = CSSSelector.PseudoClass("read-write")
+        get() = CSSSelector.PseudoClassInternal("read-write")
     val placeholderShown: CSSSelector
-        get() = CSSSelector.PseudoClass("placeholder-shown")
+        get() = CSSSelector.PseudoClassInternal("placeholder-shown")
     val default: CSSSelector
-        get() = CSSSelector.PseudoClass("default")
+        get() = CSSSelector.PseudoClassInternal("default")
     val checked: CSSSelector
-        get() = CSSSelector.PseudoClass("checked")
+        get() = CSSSelector.PseudoClassInternal("checked")
     val indeterminate: CSSSelector
-        get() = CSSSelector.PseudoClass("indeterminate")
+        get() = CSSSelector.PseudoClassInternal("indeterminate")
     val blank: CSSSelector
-        get() = CSSSelector.PseudoClass("blank")
+        get() = CSSSelector.PseudoClassInternal("blank")
     val valid: CSSSelector
-        get() = CSSSelector.PseudoClass("valid")
+        get() = CSSSelector.PseudoClassInternal("valid")
     val invalid: CSSSelector
-        get() = CSSSelector.PseudoClass("invalid")
+        get() = CSSSelector.PseudoClassInternal("invalid")
     val inRange: CSSSelector
-        get() = CSSSelector.PseudoClass("in-range")
+        get() = CSSSelector.PseudoClassInternal("in-range")
     val outOfRange: CSSSelector
-        get() = CSSSelector.PseudoClass("out-of-range")
+        get() = CSSSelector.PseudoClassInternal("out-of-range")
     val required: CSSSelector
-        get() = CSSSelector.PseudoClass("required")
+        get() = CSSSelector.PseudoClassInternal("required")
     val optional: CSSSelector
-        get() = CSSSelector.PseudoClass("optional")
+        get() = CSSSelector.PseudoClassInternal("optional")
     val userInvalid: CSSSelector
-        get() = CSSSelector.PseudoClass("user-invalid")
+        get() = CSSSelector.PseudoClassInternal("user-invalid")
 
     // Tree-structural pseudo-classes
     val root: CSSSelector
-        get() = CSSSelector.PseudoClass("root")
+        get() = CSSSelector.PseudoClassInternal("root")
     val empty: CSSSelector
-        get() = CSSSelector.PseudoClass("empty")
+        get() = CSSSelector.PseudoClassInternal("empty")
     val first: CSSSelector
-        get() = CSSSelector.PseudoClass("first")
+        get() = CSSSelector.PseudoClassInternal("first")
     val firstChild: CSSSelector
-        get() = CSSSelector.PseudoClass("first-child")
+        get() = CSSSelector.PseudoClassInternal("first-child")
     val lastChild: CSSSelector
-        get() = CSSSelector.PseudoClass("last-child")
+        get() = CSSSelector.PseudoClassInternal("last-child")
     val onlyChild: CSSSelector
-        get() = CSSSelector.PseudoClass("only-child")
+        get() = CSSSelector.PseudoClassInternal("only-child")
     val firstOfType: CSSSelector
-        get() = CSSSelector.PseudoClass("first-of-type")
+        get() = CSSSelector.PseudoClassInternal("first-of-type")
     val lastOfType: CSSSelector
-        get() = CSSSelector.PseudoClass("last-of-type")
+        get() = CSSSelector.PseudoClassInternal("last-of-type")
     val onlyOfType: CSSSelector
-        get() = CSSSelector.PseudoClass("only-of-type")
+        get() = CSSSelector.PseudoClassInternal("only-of-type")
     val host: CSSSelector
-        get() = CSSSelector.PseudoClass("host")
+        get() = CSSSelector.PseudoClassInternal("host")
 
     // Etc
     val defined: CSSSelector
-        get() = CSSSelector.PseudoClass("defined")
+        get() = CSSSelector.PseudoClassInternal("defined")
     val left: CSSSelector
-        get() = CSSSelector.PseudoClass("left")
+        get() = CSSSelector.PseudoClassInternal("left")
     val right: CSSSelector
-        get() = CSSSelector.PseudoClass("right")
+        get() = CSSSelector.PseudoClassInternal("right")
 
-    fun lang(langCode: LanguageCode): CSSSelector = CSSSelector.PseudoClass.Lang(langCode)
-    fun nthChild(nth: Nth): CSSSelector = CSSSelector.PseudoClass.NthChild(nth)
-    fun nthLastChild(nth: Nth): CSSSelector = CSSSelector.PseudoClass.NthLastChild(nth)
-    fun nthOfType(nth: Nth): CSSSelector = CSSSelector.PseudoClass.NthOfType(nth)
-    fun nthLastOfType(nth: Nth): CSSSelector = CSSSelector.PseudoClass.NthLastOfType(nth)
-    fun host(selector: CSSSelector): CSSSelector = CSSSelector.PseudoClass.Host(selector)
-    fun not(selector: CSSSelector): CSSSelector = CSSSelector.PseudoClass.Not(selector)
+    fun lang(langCode: LanguageCode): CSSSelector = CSSSelector.PseudoClassInternal.Lang(langCode)
+    fun nthChild(nth: Nth): CSSSelector = CSSSelector.PseudoClassInternal.NthChild(nth)
+    fun nthLastChild(nth: Nth): CSSSelector = CSSSelector.PseudoClassInternal.NthLastChild(nth)
+    fun nthOfType(nth: Nth): CSSSelector = CSSSelector.PseudoClassInternal.NthOfType(nth)
+    fun nthLastOfType(nth: Nth): CSSSelector = CSSSelector.PseudoClassInternal.NthLastOfType(nth)
+    fun host(selector: CSSSelector): CSSSelector = CSSSelector.PseudoClassInternal.Host(selector)
+    fun not(selector: CSSSelector): CSSSelector = CSSSelector.PseudoClassInternal.Not(selector)
 
     // Pseudo Element
     val after: CSSSelector
-        get() = CSSSelector.PseudoElement("after")
+        get() = CSSSelector.PseudoElementInternal("after")
     val before: CSSSelector
-        get() = CSSSelector.PseudoElement("before")
+        get() = CSSSelector.PseudoElementInternal("before")
     val cue: CSSSelector
-        get() = CSSSelector.PseudoElement("cue")
+        get() = CSSSelector.PseudoElementInternal("cue")
     val cueRegion: CSSSelector
-        get() = CSSSelector.PseudoElement("cue-region")
+        get() = CSSSelector.PseudoElementInternal("cue-region")
     val firstLetter: CSSSelector
-        get() = CSSSelector.PseudoElement("first-letter")
+        get() = CSSSelector.PseudoElementInternal("first-letter")
     val firstLine: CSSSelector
-        get() = CSSSelector.PseudoElement("first-line")
+        get() = CSSSelector.PseudoElementInternal("first-line")
     val fileSelectorButton: CSSSelector
-        get() = CSSSelector.PseudoElement("file-selector-button")
+        get() = CSSSelector.PseudoElementInternal("file-selector-button")
     val selection: CSSSelector
-        get() = CSSSelector.PseudoElement("selection")
+        get() = CSSSelector.PseudoElementInternal("selection")
 
-    fun slotted(selector: CSSSelector): CSSSelector = CSSSelector.PseudoElement.Slotted(selector)
+    fun slotted(selector: CSSSelector): CSSSelector = CSSSelector.PseudoElementInternal.Slotted(selector)
 }
 
 interface StyleSheetBuilder : CSSRulesHolder, GenericStyleSheetBuilder<CSSStyleRuleBuilder> {
