@@ -216,7 +216,8 @@ fun Project.validateAllAndroidxArgumentsAreRecognized() {
  * artifacts to be tracked and displayed on test dashboards in a different format
  */
 fun Project.isDisplayTestOutput(): Boolean =
-    (project.findProperty(DISPLAY_TEST_OUTPUT) as? String)?.toBoolean() ?: true
+    (providers.gradleProperty(DISPLAY_TEST_OUTPUT).forUseAtConfigurationTime().orNull)?.toBoolean()
+        ?: true
 
 /**
  * Returns whether the project should write versioned API files, e.g. `1.1.0-alpha01.txt`.
