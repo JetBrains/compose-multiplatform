@@ -246,29 +246,35 @@ private class ScrollingLogic(
 
     fun Float.reverseIfNeeded(): Float = if (reverseDirection) this * -1 else this
 
+    fun Offset.reverseIfNeeded(): Offset = if (reverseDirection) this * -1f else this
+
     fun ScrollScope.dispatchScroll(
-        scrollDelta: Float,
+        scrollDelta: Offset,
         pointerPosition: Offset?,
         source: NestedScrollSource
-    ): Float {
+    ): Offset {
         val overScrollPreConsumed =
             overScrollController
-                ?.consumePreScroll(scrollDelta.toOffset(), pointerPosition, source)
-                ?.toFloat()
-                ?: 0f
+                ?.consumePreScroll(scrollDelta, pointerPosition, source)
+                ?: Offset.Zero
+
         val afterPreOverscroll = scrollDelta - overScrollPreConsumed
         val nestedScrollDispatcher = nestedScrollDispatcher.value
         val preConsumedByParent = nestedScrollDispatcher
-            .dispatchPreScroll(afterPreOverscroll.toOffset(), source)
+            .dispatchPreScroll(afterPreOverscroll, source)
 
-        val scrollAvailable = afterPreOverscroll - preConsumedByParent.toFloat()
-        val consumed = scrollBy(scrollAvailable.reverseIfNeeded()).reverseIfNeeded()
-        val leftForParent = scrollAvailable - consumed
+        val scrollAvailable = afterPreOverscroll - preConsumedByParent
+
+        // Consume on a single axis
+        val axisConsumed =
+            scrollBy(scrollAvailable.reverseIfNeeded().toFloat()).toOffset().reverseIfNeeded()
+
+        val leftForParent = scrollAvailable - axisConsumed
         val parentConsumed = nestedScrollDispatcher
-            .dispatchPostScroll(consumed.toOffset(), leftForParent.toOffset(), source)
+            .dispatchPostScroll(axisConsumed, leftForParent, source)
         overScrollController?.consumePostScroll(
-            scrollAvailable.toOffset(),
-            (leftForParent - parentConsumed.toFloat()).toOffset(),
+            scrollAvailable,
+            (leftForParent - parentConsumed),
             pointerPosition,
             source
         )
@@ -302,13 +308,13 @@ private class ScrollingLogic(
     suspend fun doFlingAnimation(available: Velocity): Velocity {
         var result: Velocity = available
         scrollableState.scroll {
-            val outerScopeScroll: (Float) -> Float = { delta ->
+            val outerScopeScroll: (Offset) -> Offset = { delta ->
                 val consumed = this.dispatchScroll(delta.reverseIfNeeded(), null, Fling)
                 delta - consumed.reverseIfNeeded()
             }
             val scope = object : ScrollScope {
                 override fun scrollBy(pixels: Float): Float {
-                    return outerScopeScroll.invoke(pixels)
+                    return outerScopeScroll.invoke(pixels.toOffset()).toFloat()
                 }
             }
             with(scope) {
@@ -336,7 +342,7 @@ private class ScrollDraggableState(
     override fun dragBy(pixels: Float, pointerPosition: Offset) {
         with(scrollLogic.value) {
             with(latestScrollScope) {
-                dispatchScroll(pixels, pointerPosition, Drag)
+                dispatchScroll(pixels.toOffset(), pointerPosition, Drag)
             }
         }
     }
