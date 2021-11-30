@@ -2,6 +2,7 @@ package org.jetbrains.compose.web.core.tests
 
 import kotlinx.browser.window
 import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.selectors.*
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.P
 import org.jetbrains.compose.web.dom.Span
@@ -20,6 +21,26 @@ class CssSelectorsTests {
                 color(Color.red)
             }
         }
+    }
+
+    @Test
+    fun testPlusOperator() = runTest {
+        assertEquals("h1:hover", (selector("h1") + hover()).toString())
+
+        assertEquals(
+            "h1:hover:enabled",
+            ((selector("h1") + hover()) + CSSSelector.PseudoClass.enabled).toString()
+        )
+
+        assertEquals(
+            "h1:hover",
+            (selector("h1") + ":hover").toString()
+        )
+
+        assertEquals(
+            "h1:hover:enabled",
+            ((selector("h1") + hover()) + ":enabled").toString()
+        )
     }
 
     @Test
