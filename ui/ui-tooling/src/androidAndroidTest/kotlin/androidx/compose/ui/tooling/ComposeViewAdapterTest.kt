@@ -154,6 +154,20 @@ class ComposeViewAdapterTest {
     }
 
     @Test
+    fun animatedContentIsIgnored() {
+        assertRendersCorrectly(
+            "androidx.compose.ui.tooling.TestAnimationPreviewKt",
+            "AnimatedContentPreview"
+        )
+
+        activityTestRule.runOnUiThread {
+            // Verify that this composable has no animations, since we should ignore
+            // AnimatedContent animations
+            assertFalse(composeViewAdapter.hasAnimations())
+        }
+    }
+
+    @Test
     fun transitionAnimationsAreSubscribedToTheClock() {
         checkTransitionIsSubscribed("CheckBoxPreview", "checkBoxAnim")
     }
