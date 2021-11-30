@@ -233,7 +233,7 @@ fun main() = singleWindowApplication {
 ```
 <img alt="Application running" src="mouse_event.gif" height="500" />
 
-If you need to listen left/right clicks simultaneously, you should listen raw events:
+If you need to listen left/right clicks simultaneously, you should listen for raw events:
 ```
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -315,7 +315,7 @@ fun main() = singleWindowApplication {
 *Note that onPointerEvent is experimental and can be changed in the future. For more stable API look at [Modifier.pointerInput](#listenining-raw-events-in-commonmain-via-modifierpointerinput)*.
 
 ### Listenining raw events in commonMain via Modifier.pointerInput
-Multiplatform source set commonMain doesn't support experimental `Modifier.onPointerInput` yet. Instead of it you can use stable Modifier.pointerInput:
+In the snippets above we use `Modifier.onPointerEvent`, which is a helper function to subscribe to some type of pointer events. It is a shorter variant of `Modifier.pointerInput`. For now it is experimental, and desktop-only (you can't use it in commonMain code). If you need to subscribe to events in commonMain or you need stable API, you can use `Modifier.pointerInput`:
 
 ```kotlin
 import androidx.compose.foundation.layout.Column
