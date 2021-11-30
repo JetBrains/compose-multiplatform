@@ -75,7 +75,7 @@ open class StyleSheet(
     protected fun keyframes(cssKeyframes: CSSKeyframesBuilder.() -> Unit) = CSSKeyframesHolder(usePrefix, cssKeyframes)
 
     companion object {
-        var counter = 0
+        private var counter = 0
     }
 
     @Suppress("EqualsOrHashCode")
@@ -152,7 +152,7 @@ open class StyleSheet(
         StyleSheet().apply(rulesBuild).cssRules
 }
 
-fun buildCSS(
+internal fun buildCSS(
     thisClass: CSSSelector,
     thisContext: CSSSelector,
     cssRule: CSSBuilder.() -> Unit

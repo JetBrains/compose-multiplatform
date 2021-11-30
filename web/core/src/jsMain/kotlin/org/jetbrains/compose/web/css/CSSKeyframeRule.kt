@@ -67,7 +67,7 @@ class CSSKeyframesBuilder() {
     }
 }
 
-fun buildKeyframes(name: String, builder: CSSKeyframesBuilder.() -> Unit): CSSKeyframesRuleDeclaration {
+internal fun buildKeyframes(name: String, builder: CSSKeyframesBuilder.() -> Unit): CSSKeyframesRuleDeclaration {
     val frames = CSSKeyframesBuilder(builder).frames
     return CSSKeyframesRuleDeclaration(name, frames)
 }

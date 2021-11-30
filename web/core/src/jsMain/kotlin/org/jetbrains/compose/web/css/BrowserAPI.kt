@@ -10,18 +10,18 @@ import org.w3c.dom.css.CSSRule
 import org.w3c.dom.css.CSSRuleList
 
 
-external class CSSKeyframesRule: CSSRule {
+internal external class CSSKeyframesRule: CSSRule {
     val name: String
     val cssRules: CSSRuleList
 }
 
-inline fun CSSKeyframesRule.appendRule(cssRule: String) {
+internal inline fun CSSKeyframesRule.appendRule(cssRule: String) {
     this.asDynamic().appendRule(cssRule)
 }
 
 @Suppress("NOTHING_TO_INLINE")
-inline fun <T : Any> jsObject(): T =
+internal inline fun <T : Any> jsObject(): T =
     js("({})")
 
-inline fun <T : Any> jsObject(builder: T.() -> Unit): T =
+internal inline fun <T : Any> jsObject(builder: T.() -> Unit): T =
     jsObject<T>().apply(builder)
