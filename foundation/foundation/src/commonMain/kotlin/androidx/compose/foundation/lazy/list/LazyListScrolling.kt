@@ -16,17 +16,22 @@
 
 package androidx.compose.foundation.lazy.list
 
-import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationState
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.animateTo
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.copy
 import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastFirstOrNull
+import androidx.compose.ui.util.fastSumBy
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.math.abs
 
-private class ItemFoundInScroll(val item: LazyListItemInfo) : CancellationException()
+private class ItemFoundInScroll(
+    val item: LazyListItemInfo,
+    val previousAnimation: AnimationState<Float, AnimationVector1D>
+) : CancellationException()
 
 private val TargetDistance = 2500.dp
 private val BoundDistance = 1500.dp
@@ -42,23 +47,22 @@ internal suspend fun LazyListState.doSmoothScrollToItem(
     index: Int,
     scrollOffset: Int
 ) {
-    val animationSpec: AnimationSpec<Float> = spring()
+    require(index >= 0f) { "Index should be non-negative ($index)" }
     fun getTargetItem() = layoutInfo.visibleItemsInfo.fastFirstOrNull {
         it.index == index
     }
     scroll {
-        val targetDistancePx = with(density) { TargetDistance.toPx() }
-        val boundDistancePx = with(density) { BoundDistance.toPx() }
-        var loop = true
-        var prevVelocity = 0f
         try {
+            val targetDistancePx = with(density) { TargetDistance.toPx() }
+            val boundDistancePx = with(density) { BoundDistance.toPx() }
+            var loop = true
+            var anim = AnimationState(0f)
             val targetItemInitialInfo = getTargetItem()
             if (targetItemInitialInfo != null) {
                 // It's already visible, just animate directly
-                throw ItemFoundInScroll(targetItemInitialInfo)
+                throw ItemFoundInScroll(targetItemInitialInfo, anim)
             }
             val forward = index > firstVisibleItemIndex
-            val target = if (forward) targetDistancePx else -targetDistancePx
 
             fun isOvershot(): Boolean {
                 // Did we scroll past the item?
@@ -89,15 +93,28 @@ internal suspend fun LazyListState.doSmoothScrollToItem(
             }
 
             var loops = 1
-            while (loop) {
-                val anim = AnimationState(
-                    initialValue = 0f,
-                    initialVelocity = prevVelocity
-                )
+            while (loop && layoutInfo.totalItemsCount > 0) {
+                val visibleItems = layoutInfo.visibleItemsInfo
+                val averageSize = visibleItems.fastSumBy { it.size } / visibleItems.size
+                val indexesDiff = index - firstVisibleItemIndex
+                val expectedDistance = (averageSize * indexesDiff).toFloat() +
+                    scrollOffset - firstVisibleItemScrollOffset
+                val target = if (abs(expectedDistance) < targetDistancePx) {
+                    expectedDistance
+                } else {
+                    if (forward) targetDistancePx else -targetDistancePx
+                }
+
+                debugLog {
+                    "Scrolling to index=$index offset=$scrollOffset from " +
+                        "index=$firstVisibleItemIndex offset=$firstVisibleItemScrollOffset with " +
+                        "averageSize=$averageSize and calculated target=$target"
+                }
+
+                anim = anim.copy(value = 0f)
                 var prevValue = 0f
                 anim.animateTo(
                     target,
-                    animationSpec = animationSpec,
                     sequentialAnimation = (anim.velocity != 0f)
                 ) {
                     // If we haven't found the item yet, check if it's visible.
@@ -172,24 +189,20 @@ internal suspend fun LazyListState.doSmoothScrollToItem(
                         return@animateTo
                     } else if (targetItem != null) {
                         debugLog { "Found item" }
-                        throw ItemFoundInScroll(targetItem)
+                        throw ItemFoundInScroll(targetItem, anim)
                     }
                 }
 
-                prevVelocity = anim.velocity
                 loops++
             }
         } catch (itemFound: ItemFoundInScroll) {
             // We found it, animate to it
             // Bring to the requested position - will be automatically stopped if not possible
-            val anim = AnimationState(
-                initialValue = 0f,
-                initialVelocity = prevVelocity
-            )
+            val anim = itemFound.previousAnimation.copy(value = 0f)
             val target = (itemFound.item.offset + scrollOffset).toFloat()
             var prevValue = 0f
             debugLog {
-                "Seeking by $target at velocity $prevVelocity, sequential: ${anim.velocity != 0f}"
+                "Seeking by $target at velocity ${itemFound.previousAnimation.velocity}"
             }
             anim.animateTo(target, sequentialAnimation = (anim.velocity != 0f)) {
                 // Springs can overshoot their target, clamp to the desired range
