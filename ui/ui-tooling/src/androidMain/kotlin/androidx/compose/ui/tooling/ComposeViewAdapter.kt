@@ -325,6 +325,7 @@ internal class ComposeViewAdapter : FrameLayout {
         val slotTrees = slotTableRecord.store.map { it.asTree() }
         val transitions = mutableSetOf<Transition<Any>>()
         val animatedVisibilityParentTransitions = mutableSetOf<Transition<Any>>()
+        val animatedContentParentTransitions = mutableSetOf<Transition<Any>>()
         // Check all the slot tables, since some animations might not be present in the same
         // table as the one containing the `@Composable` being previewed, e.g. when they're
         // defined using sub-composition.
@@ -347,10 +348,24 @@ internal class ComposeViewAdapter : FrameLayout {
                 }.findTransitionObjects()
             )
 
+            animatedContentParentTransitions.addAll(
+                tree.findAll {
+                    it.name == "AnimatedContent" && it.location != null
+                }.mapNotNull {
+                    it.children.firstOrNull { updateTransitionCall ->
+                        updateTransitionCall.name == UPDATE_TRANSITION_FUNCTION_NAME
+                    }
+                }.findTransitionObjects()
+            )
+
             // Remove all AnimatedVisibility parent transitions from the transitions list,
             // otherwise we'd duplicate them in the Android Studio Animation Preview because we
             // will track them separately.
             transitions.removeAll(animatedVisibilityParentTransitions)
+
+            // Remove all AnimatedContent parent transitions from the transitions list, so we can
+            // ignore these animations while support is not added to Animation Preview.
+            transitions.removeAll(animatedContentParentTransitions)
         }
 
         hasAnimations = transitions.isNotEmpty() || animatedVisibilityParentTransitions.isNotEmpty()
