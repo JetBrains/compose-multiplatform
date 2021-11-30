@@ -254,56 +254,6 @@ abstract class CSSSelector {
     }
 }
 
-fun selector(selector: String) = CSSSelector.Raw(selector)
-fun combine(vararg selectors: CSSSelector) = CSSSelector.Combine(selectors.toMutableList())
-operator fun CSSSelector.plus(selector: CSSSelector) = combine(this, selector)
-operator fun CSSSelector.plus(selector: String) = combine(this, selector(selector))
-operator fun CSSSelector.plus(selector: CSSSelector.Combine): CSSSelector.Combine {
-    selector.selectors.add(0, this)
-    return selector
-}
-operator fun CSSSelector.Combine.plus(selector: CSSSelector): CSSSelector.Combine {
-    this.selectors.add(selector)
-    return this
-}
-operator fun CSSSelector.Combine.plus(selector: String): CSSSelector.Combine {
-    this.selectors.add(selector(selector))
-    return this
-}
-
-fun universal() = CSSSelector.Universal
-fun type(type: String) = CSSSelector.Type(type)
-fun className(className: String) = CSSSelector.CSSClass(className)
-fun id(id: String) = CSSSelector.Id(id)
-fun attr(
-    name: String,
-    value: String? = null,
-    operator: CSSSelector.Attribute.Operator = CSSSelector.Attribute.Operator.Equals,
-    caseSensitive: Boolean = true
-) = CSSSelector.Attribute(name, value, operator, caseSensitive)
-fun group(vararg selectors: CSSSelector) = CSSSelector.Group(selectors.toList())
-
-@Deprecated("Replaced with `desc`", ReplaceWith("desc(parent, selected)"))
-fun descendant(parent: CSSSelector, selected: CSSSelector) =
-    desc(parent, selected)
-fun desc(parent: CSSSelector, selected: CSSSelector) =
-    CSSSelector.Descendant(parent, selected)
-fun desc(parent: CSSSelector, selected: String) =
-    desc(parent, selector(selected))
-fun desc(parent: String, selected: CSSSelector) =
-    desc(selector(parent), selected)
-fun desc(parent: String, selected: String) =
-    desc(selector(parent), selector(selected))
-
-fun child(parent: CSSSelector, selected: CSSSelector) =
-    CSSSelector.Child(parent, selected)
-fun sibling(sibling: CSSSelector, selected: CSSSelector) = CSSSelector.Sibling(sibling, selected)
-fun adjacent(sibling: CSSSelector, selected: CSSSelector) = CSSSelector.Adjacent(sibling, selected)
-
-fun not(selector: CSSSelector) = CSSSelector.PseudoClass.Not(selector)
-fun hover() = CSSSelector.PseudoClass.hover
-fun hover(selector: CSSSelector) = selector + hover()
-
 @Suppress("SuspiciousEqualsCombination")
 private fun contains(that: CSSSelector, other: CSSSelector, children: List<CSSSelector>, strict: Boolean): Boolean {
     return that === other || // exactly same selector

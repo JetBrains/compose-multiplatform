@@ -1,7 +1,6 @@
 package org.jetbrains.compose.web.css
 
 import org.jetbrains.compose.web.css.selectors.CSSSelector
-import org.jetbrains.compose.web.css.selectors.desc
 
 interface CSSBuilder : CSSStyleRuleBuilder, GenericStyleSheetBuilder<CSSBuilder> {
     val root: CSSSelector

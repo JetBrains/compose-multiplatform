@@ -25,22 +25,31 @@ class CssSelectorsTests {
 
     @Test
     fun testPlusOperator() = runTest {
-        assertEquals("h1:hover", (selector("h1") + hover()).toString())
+        val selectorScope = object : SelectorsScope {}
 
-        assertEquals(
-            "h1:hover:enabled",
-            ((selector("h1") + hover()) + CSSSelector.PseudoClass.enabled).toString()
-        )
+        with(selectorScope) {
+            assertEquals("h1:hover", (selector("h1") + hover()).toString())
 
-        assertEquals(
-            "h1:hover",
-            (selector("h1") + ":hover").toString()
-        )
+            assertEquals(
+                "h1:hover:enabled",
+                ((selector("h1") + hover()) + CSSSelector.PseudoClass.enabled).toString()
+            )
 
-        assertEquals(
-            "h1:hover:enabled",
-            ((selector("h1") + hover()) + ":enabled").toString()
-        )
+            assertEquals(
+                "h1:hover",
+                (selector("h1") + ":hover").toString()
+            )
+
+            assertEquals(
+                "h1:hover:enabled",
+                ((selector("h1") + hover()) + ":enabled").toString()
+            )
+
+            assertEquals(
+                "h1:hover:enabled",
+                (selector("h1") + combine(hover(), selector(":enabled"))).toString()
+            )
+        }
     }
 
     @Test
