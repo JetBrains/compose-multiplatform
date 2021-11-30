@@ -3,26 +3,25 @@ package org.jetbrains.compose.web.css
 import org.jetbrains.compose.web.css.selectors.CSSSelector
 
 interface CSSBuilder : CSSStyleRuleBuilder, GenericStyleSheetBuilder<CSSBuilder> {
-    val root: CSSSelector
     val self: CSSSelector
 }
 
 class CSSBuilderImpl(
-    override val root: CSSSelector,
+    private val currentRoot: CSSSelector,
     override val self: CSSSelector,
     rulesHolder: CSSRulesHolder
 ) : CSSRuleBuilderImpl(), CSSBuilder, CSSRulesHolder by rulesHolder {
     override fun style(selector: CSSSelector, cssRule: CSSBuilder.() -> Unit) {
-        val resolvedSelector = if (selector.contains(self, true) || selector.contains(root, true)) {
+        val resolvedSelector = if (selector.contains(self, true) || selector.contains(currentRoot, true)) {
             selector
         } else {
             desc(self, selector)
         }
-        val (style, rules) = buildCSS(root, resolvedSelector, cssRule)
+        val (style, rules) = buildCSS(currentRoot, resolvedSelector, cssRule)
         rules.forEach { add(it) }
         add(resolvedSelector, style)
     }
 
     override fun buildRules(rulesBuild: GenericStyleSheetBuilder<CSSBuilder>.() -> Unit) =
-        CSSBuilderImpl(root, self, StyleSheetBuilderImpl()).apply(rulesBuild).cssRules
+        CSSBuilderImpl(currentRoot, self, StyleSheetBuilderImpl()).apply(rulesBuild).cssRules
 }
