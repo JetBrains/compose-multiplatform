@@ -17,6 +17,7 @@
 package androidx.compose.foundation.lazy.layout
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -100,6 +101,11 @@ internal class LazyLayoutItemContentFactory(
                 if (key == this.key) {
                     val content = itemsProvider.getContent(index)
                     saveableStateHolder.SaveableStateProvider(key, content)
+                }
+            }
+            DisposableEffect(key) {
+                onDispose {
+                    lambdasCache.remove(key)
                 }
             }
         }
