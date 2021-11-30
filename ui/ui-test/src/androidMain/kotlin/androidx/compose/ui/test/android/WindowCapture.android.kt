@@ -33,6 +33,7 @@ import androidx.compose.ui.test.ComposeTimeoutException
 import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.MainTestClock
 import androidx.compose.ui.test.TestContext
+import androidx.test.platform.graphics.HardwareRendererCompat
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -41,10 +42,27 @@ internal fun Window.captureRegionToImage(
     testContext: TestContext,
     boundsInWindow: Rect,
 ): ImageBitmap {
-    // First force drawing to happen
-    decorView.forceRedraw(testContext)
-    // Then we generate the bitmap
-    return generateBitmap(boundsInWindow).asImageBitmap()
+    // Turn on hardware rendering, if necessary
+    return withDrawingEnabled {
+        // First force drawing to happen
+        decorView.forceRedraw(testContext)
+        // Then we generate the bitmap
+        generateBitmap(boundsInWindow).asImageBitmap()
+    }
+}
+
+private fun <R> withDrawingEnabled(block: () -> R): R {
+    val wasDrawingEnabled = HardwareRendererCompat.isDrawingEnabled()
+    try {
+        if (!wasDrawingEnabled) {
+            HardwareRendererCompat.setDrawingEnabled(true)
+        }
+        return block.invoke()
+    } finally {
+        if (!wasDrawingEnabled) {
+            HardwareRendererCompat.setDrawingEnabled(false)
+        }
+    }
 }
 
 private fun View.forceRedraw(testContext: TestContext) {
