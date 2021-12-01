@@ -174,8 +174,9 @@ fun TextBox(text: String = "Item") {
 
 ## Tooltips
 
-You can add tooltip to any components using `BoxWithTooltip`. Basically `BoxWithTooltip` is a `Box` with the ability to show a tooltip, and has the same arguments and behavior as `Box`.
-The main arguments of the `BoxWithTooltip` function:
+You can add tooltip to any components using `TooltipArea`. `TooltipArea` is similar to a `Box`, but with the ability to show a tooltip.
+
+The main arguments of the `TooltipArea` function:
  - tooltip - composable content representing tooltip
  - tooltipPlacement - describes how to place tooltip. You can specify an anchor (the mouse cursor or the component), an offset and an alignment
  - delay - time delay in milliseconds after which the tooltip will be shown (default is 500 ms)
