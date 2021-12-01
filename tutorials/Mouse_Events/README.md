@@ -9,8 +9,7 @@ in Compose for Desktop.
 
 ### Click listeners
 
-Click listeners are available in both Compose on Android and Compose for Desktop,
-so code like this will work on both platforms:
+Click listeners are available in both Compose on Android and Compose for Desktop, so code like this will work on both platforms:
 
 ```kotlin
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -64,10 +63,7 @@ fun main() = singleWindowApplication {
 
 ### Mouse move listeners
 
-As typically mouse and other positional pointers are only available on desktop platforms,
-the following code will only work with Compose for Desktop.
-Let's create a window and install a pointer move filter on it that changes the background
-color according to the mouse pointer position:
+Let's create a window and install a pointer move listener on it that changes the background color according to the mouse pointer position:
 ```kotlin
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -81,7 +77,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerMoveFilter
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.window.singleWindowApplication
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -92,15 +89,14 @@ fun main() = singleWindowApplication {
             .wrapContentSize(Alignment.Center)
             .fillMaxSize()
             .background(color = color)
-            .pointerMoveFilter(
-                onMove = {
-                    color = Color(it.x.toInt() % 256, it.y.toInt() % 256, 0)
-                    false
-                }
-            )
+            .onPointerEvent(PointerEventType.Move) {
+                val position = it.changes.first().position
+                color = Color(position.x.toInt() % 256, position.y.toInt() % 256, 0)
+            }
     )
 }
 ```
+*Note that onPointerEvent is experimental and can be changed in the future. For more stable API look at [Modifier.pointerInput](#listenining-raw-events-in-commonmain-via-modifierpointerinput)*.
 
 <img alt="Application running" src="mouse_move.gif" height="519" />
 
@@ -120,7 +116,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerMoveFilter
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -138,16 +135,8 @@ fun main() = singleWindowApplication {
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(color = if (active) Color.Green else Color.White)
-                    .pointerMoveFilter(
-                        onEnter = {
-                            active = true
-                            false
-                        },
-                        onExit = {
-                            active = false
-                            false
-                        }
-                    ),
+                    .onPointerEvent(PointerEventType.Enter) { active = true }
+                    .onPointerEvent(PointerEventType.Exit) { active = false },
                 fontSize = 30.sp,
                 fontStyle = if (active) FontStyle.Italic else FontStyle.Normal,
                 text = "Item $index"
@@ -156,7 +145,43 @@ fun main() = singleWindowApplication {
     }
 }
 ```
+*Note that onPointerEvent is experimental and can be changed in the future. For more stable API look at [Modifier.pointerInput](#listenining-raw-events-in-commonmain-via-modifierpointerinput)*.
+
 <img alt="Application running" src="mouse_enter.gif" height="500" />
+
+### Mouse scroll listeners
+```kotlin
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.onPointerEvent
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.singleWindowApplication
+
+@OptIn(ExperimentalComposeUiApi::class)
+fun main() = singleWindowApplication {
+    var number by remember { mutableStateOf(0f) }
+    Box(
+        Modifier
+            .fillMaxSize()
+            .onPointerEvent(PointerEventType.Scroll) {
+                number += it.changes.first().scrollDelta.y
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        Text("Scroll to change the number: $number", fontSize = 30.sp)
+    }
+}
+```
+*Note that onPointerEvent is experimental and can be changed in the future. For more stable API look at [Modifier.pointerInput](#listenining-raw-events-in-commonmain-via-modifierpointerinput)*.
 
 ### Mouse right/middle clicks and keyboard modifiers
 
@@ -208,11 +233,8 @@ fun main() = singleWindowApplication {
 ```
 <img alt="Application running" src="mouse_event.gif" height="500" />
 
-### Swing interoperability
-
-Compose for Desktop uses Swing underneath and allows to access raw AWT events:
-
-```kotlin
+If you need to listen left/right clicks simultaneously, you should listen for raw events:
+```
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Text
@@ -221,26 +243,114 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.*
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.isPrimaryPressed
+import androidx.compose.ui.input.pointer.isSecondaryPressed
+import androidx.compose.ui.input.pointer.onPointerEvent
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.singleWindowApplication
 
+@OptIn(ExperimentalComposeUiApi::class)
+fun main() = singleWindowApplication {
+    var text by remember { mutableStateOf("Press me") }
+
+    Box(
+        Modifier
+            .fillMaxSize()
+            .onPointerEvent(PointerEventType.Press) {
+                val position = it.changes.first().position
+                text = when {
+                    it.buttons.isPrimaryPressed &&
+                            it.buttons.isSecondaryPressed -> "Left+Right click $position"
+                    it.buttons.isSecondaryPressed -> "Right click $position"
+                    it.buttons.isPrimaryPressed -> "Left click $position"
+                    else -> text
+                }
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text, fontSize = 30.sp)
+    }
+}
+```
+*Note that onPointerEvent is experimental and can be changed in the future. For more stable API look at [Modifier.pointerInput](#listenining-raw-events-in-commonmain-via-modifierpointerinput)*.
+
+### Swing interoperability
+
+Compose for Desktop uses Swing underneath and allows to access raw AWT events:
+```
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.awt.awtEvent
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.onPointerEvent
+import androidx.compose.ui.window.singleWindowApplication
+
+@OptIn(ExperimentalComposeUiApi::class)
 fun main() = singleWindowApplication {
     var text by remember { mutableStateOf("") }
 
     Box(
-        Modifier.fillMaxSize().pointerInput(Unit) {
-            while (true) {
-                val event = awaitPointerEventScope { awaitPointerEvent() }
-                val awtEvent = event.mouseEvent
-                if (event.type == PointerEventType.Press) {
-                    text = awtEvent?.locationOnScreen?.toString().orEmpty()
-                }
-            }
-        },
+        Modifier
+            .fillMaxSize()
+            .onPointerEvent(PointerEventType.Press) {
+                text = it.awtEvent.locationOnScreen?.toString().orEmpty()
+            },
         contentAlignment = Alignment.Center
     ) {
         Text(text)
+    }
+}
+```
+*Note that onPointerEvent is experimental and can be changed in the future. For more stable API look at [Modifier.pointerInput](#listenining-raw-events-in-commonmain-via-modifierpointerinput)*.
+
+### Listenining raw events in commonMain via Modifier.pointerInput
+In the snippets above we use `Modifier.onPointerEvent`, which is a helper function to subscribe to some type of pointer events. It is a shorter variant of `Modifier.pointerInput`. For now it is experimental, and desktop-only (you can't use it in commonMain code). If you need to subscribe to events in commonMain or you need stable API, you can use `Modifier.pointerInput`:
+
+```kotlin
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Text
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.window.singleWindowApplication
+
+fun main() = singleWindowApplication {
+    val list = remember { mutableStateListOf<String>() }
+
+    Column(
+        Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                awaitPointerEventScope {
+                    while (true) {
+                        val event = awaitPointerEvent()
+                        val position = event.changes.first().position
+                        // on every relayout Compose will send synthetic Move event,
+                        // so we skip it to avoid event spam
+                        if (event.type != PointerEventType.Move) {
+                            list.add(0, "${event.type} $position")
+                        }
+                    }
+                }
+            },
+    ) {
+        for (item in list.take(20)) {
+            Text(item)
+        }
     }
 }
 ```
