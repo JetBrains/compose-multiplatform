@@ -17,33 +17,20 @@
 package androidx.compose.foundation.lazy.list
 
 import android.os.Build
-import androidx.compose.animation.core.snap
 import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.ScrollableDefaults
-import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyItemScope
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -55,7 +42,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.WithTouchSlop
-import androidx.compose.testutils.assertIsEqualTo
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -68,14 +54,11 @@ import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
-import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
-import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.StateRestorationTester
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTouchInput
@@ -92,9 +75,7 @@ import com.google.common.collect.Range
 import com.google.common.truth.IntegerSubject
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -102,15 +83,9 @@ import java.util.concurrent.CountDownLatch
 
 @LargeTest
 @RunWith(Parameterized::class)
-class LazyListTest(private val orientation: Orientation) {
+class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(orientation) {
     private val LazyListTag = "LazyListTag"
     private val firstItemTag = "firstItemTag"
-
-    @get:Rule
-    val rule = createComposeRule()
-
-    private val vertical: Boolean
-        get() = orientation == Orientation.Vertical
 
     @Test
     fun lazyListShowsCombinedItems() {
@@ -1530,109 +1505,6 @@ class LazyListTest(private val orientation: Orientation) {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
         fun params() = arrayOf(Orientation.Vertical, Orientation.Horizontal)
-    }
-
-    private fun Modifier.mainAxisSize(size: Dp) =
-        if (vertical) {
-            this.height(size)
-        } else {
-            this.width(size)
-        }
-
-    private fun Modifier.crossAxisSize(size: Dp) =
-        if (vertical) {
-            this.width(size)
-        } else {
-            this.height(size)
-        }
-
-    private fun Modifier.fillMaxCrossAxis() =
-        if (vertical) {
-            this.fillMaxWidth()
-        } else {
-            this.fillMaxHeight()
-        }
-
-    private fun LazyItemScope.fillParentMaxCrossAxis() =
-        if (vertical) {
-            Modifier.fillParentMaxWidth()
-        } else {
-            Modifier.fillParentMaxHeight()
-        }
-
-    private fun SemanticsNodeInteraction.scrollMainAxisBy(distance: Dp) {
-        if (vertical) {
-            this.scrollBy(y = distance, density = rule.density)
-        } else {
-            this.scrollBy(x = distance, density = rule.density)
-        }
-    }
-
-    private fun SemanticsNodeInteraction.assertMainAxisSizeIsEqualTo(expectedSize: Dp) =
-        if (vertical) {
-            assertHeightIsEqualTo(expectedSize)
-        } else {
-            assertWidthIsEqualTo(expectedSize)
-        }
-
-    private fun SemanticsNodeInteraction.assertCrossAxisSizeIsEqualTo(expectedSize: Dp) =
-        if (vertical) {
-            assertWidthIsEqualTo(expectedSize)
-        } else {
-            assertHeightIsEqualTo(expectedSize)
-        }
-
-    private fun SemanticsNodeInteraction.assertStartPositionIsAlmost(expected: Dp) {
-        val position = if (vertical) {
-            getUnclippedBoundsInRoot().top
-        } else {
-            getUnclippedBoundsInRoot().left
-        }
-        position.assertIsEqualTo(expected, tolerance = 1.dp)
-    }
-
-    private fun SemanticsNodeInteraction.assertStartPositionInRootIsEqualTo(expectedStart: Dp) =
-        if (vertical) {
-            assertTopPositionInRootIsEqualTo(expectedStart)
-        } else {
-            assertLeftPositionInRootIsEqualTo(expectedStart)
-        }
-
-    private fun LazyListState.scrollBy(offset: Dp) {
-        runBlocking(Dispatchers.Main + AutoTestFrameClock()) {
-            animateScrollBy(with(rule.density) { offset.roundToPx().toFloat() }, snap())
-        }
-    }
-
-    @Suppress("NOTHING_TO_INLINE")
-    @Composable
-    private inline fun LazyColumnOrRow(
-        modifier: Modifier = Modifier,
-        state: LazyListState = rememberLazyListState(),
-        contentPadding: PaddingValues = PaddingValues(0.dp),
-        reverseLayout: Boolean = false,
-        flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
-        noinline content: LazyListScope.() -> Unit
-    ) {
-        if (vertical) {
-            LazyColumn(
-                modifier = modifier,
-                state = state,
-                contentPadding = contentPadding,
-                reverseLayout = reverseLayout,
-                flingBehavior = flingBehavior,
-                content = content
-            )
-        } else {
-            LazyRow(
-                modifier = modifier,
-                state = state,
-                contentPadding = contentPadding,
-                reverseLayout = reverseLayout,
-                flingBehavior = flingBehavior,
-                content = content
-            )
-        }
     }
 }
 
