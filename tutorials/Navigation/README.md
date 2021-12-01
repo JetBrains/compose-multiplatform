@@ -285,7 +285,7 @@ fun RootUi(root: Root) {
 }
 ```
 
-Application and Root initialisation:
+Application and Root initialization:
 
 ``` kotlin
 import androidx.compose.desktop.DesktopTheme
