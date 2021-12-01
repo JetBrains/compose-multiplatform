@@ -2,7 +2,10 @@
 
 package org.jetbrains.compose.web.css.selectors
 
-import org.jetbrains.compose.web.css.LanguageCode
+import org.jetbrains.compose.web.css.SelectorsScope
+
+internal const val webCssSelectorsDeprecationMessage = "Consider using a property from SelectorsScope"
+private val selectorScope = object : SelectorsScope {}
 
 sealed class Nth {
     data class Functional(val a: Int? = null, val b: Int? = null) {
@@ -30,29 +33,21 @@ abstract class CSSSelector internal constructor() {
         return if (strict) this === other else this == other
     }
 
+    @Suppress("SuspiciousEqualsCombination")
+    protected fun contains(that: CSSSelector, other: CSSSelector, children: List<CSSSelector>, strict: Boolean): Boolean {
+        return that === other || // exactly same selector
+                children.any { it.contains(other, strict) } || // contains it in children
+                (!strict && that == other) // equals structurally
+    }
+
+
     // This method made for workaround because of possible concatenation of `String + CSSSelector`,
     // so `toString` is called for such operator, but we are calling `asString` for instantiation.
     // `toString` is reloaded for CSSSelfSelector
     internal open fun asString(): String = toString()
 
-    internal data class Raw internal constructor(val selector: String) : CSSSelector() {
-        override fun toString(): String = selector
-    }
-
-    internal object Universal : CSSSelector() {
-        override fun toString(): String = "*"
-    }
-
-    internal data class Type internal constructor(val type: String) : CSSSelector() {
-        override fun toString(): String = type
-    }
-
     internal data class CSSClass internal constructor(val className: String) : CSSSelector() {
         override fun toString(): String = ".$className"
-    }
-
-    internal data class Id internal constructor(val id: String) : CSSSelector() {
-        override fun toString(): String = "#$id"
     }
 
     object Attribute {
@@ -66,261 +61,122 @@ abstract class CSSSelector internal constructor() {
         }
     }
 
-    internal data class AttributeInternal internal constructor(
-        val name: String,
-        val value: String? = null,
-        val operator: Attribute.Operator = Attribute.Operator.Equals,
-        val caseSensitive: Boolean = true
-    ) : CSSSelector() {
-
-        override fun toString(): String {
-            val valueStr = value?.let {
-                "${operator.value}$value${if (!caseSensitive) " i" else ""}"
-            } ?: ""
-            return "[$name$valueStr]"
-        }
-    }
-
-    internal data class Combine internal constructor(val selectors: MutableList<CSSSelector>) : CSSSelector() {
-        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-            contains(this, other, selectors, strict)
-
-        override fun toString(): String = selectors.joinToString("")
-        override fun asString(): String = selectors.joinToString("") { it.asString() }
-    }
-
-    internal data class Group internal constructor(val selectors: List<CSSSelector>) : CSSSelector() {
-        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-            contains(this, other, selectors, strict)
-
-        override fun toString(): String = selectors.joinToString(", ")
-        override fun asString(): String = selectors.joinToString(", ") { it.asString() }
-    }
-
-    internal data class Descendant internal constructor(val parent: CSSSelector, val selected: CSSSelector) :
-        CSSSelector() {
-        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-            contains(this, other, listOf(parent, selected), strict)
-
-        override fun toString(): String = "$parent $selected"
-        override fun asString(): String = "${parent.asString()} ${selected.asString()}"
-    }
-
-    internal data class Child internal constructor(val parent: CSSSelector, val selected: CSSSelector) : CSSSelector() {
-        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-            contains(this, other, listOf(parent, selected), strict)
-
-        override fun toString(): String = "$parent > $selected"
-        override fun asString(): String = "${parent.asString()} > ${selected.asString()}"
-    }
-
-    internal data class Sibling internal constructor(val prev: CSSSelector, val selected: CSSSelector) : CSSSelector() {
-        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-            contains(this, other, listOf(prev, selected), strict)
-
-        override fun toString(): String = "$prev ~ $selected"
-        override fun asString(): String = "${prev.asString()} ~ ${selected.asString()}"
-    }
-
-    internal data class Adjacent internal constructor(val prev: CSSSelector, val selected: CSSSelector) :
-        CSSSelector() {
-        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-            contains(this, other, listOf(prev, selected), strict)
-
-        override fun toString(): String = "$prev + $selected"
-        override fun asString(): String = "${prev.asString()} + ${selected.asString()}"
-    }
-
     object PseudoClass {
         // Location pseudo-classes
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val anyLink : CSSSelector = PseudoClassInternal("any-link")
+        val anyLink : CSSSelector = selectorScope.anyLink
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val link : CSSSelector = PseudoClassInternal("link")
+        val link : CSSSelector = selectorScope.link
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val visited : CSSSelector = PseudoClassInternal("visited")
+        val visited : CSSSelector = selectorScope.visited
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val localLink : CSSSelector = PseudoClassInternal("local-link")
+        val localLink : CSSSelector = selectorScope.localLink
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val target : CSSSelector = PseudoClassInternal("target")
+        val target : CSSSelector = selectorScope.target
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val targetWithin : CSSSelector = PseudoClassInternal("target-within")
+        val targetWithin : CSSSelector = selectorScope.targetWithin
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val scope : CSSSelector = PseudoClassInternal("scope")
+        val scope : CSSSelector = selectorScope.scope
 
         // User action pseudo-classes
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val hover : CSSSelector = PseudoClassInternal("hover")
+        val hover : CSSSelector = selectorScope.hover
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val active : CSSSelector = PseudoClassInternal("active")
+        val active : CSSSelector = selectorScope.active
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val focus : CSSSelector = PseudoClassInternal("focus")
+        val focus : CSSSelector = selectorScope.focus
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val focusVisible : CSSSelector = PseudoClassInternal("focus-visible")
+        val focusVisible : CSSSelector = selectorScope.focusVisible
 
         // Resource state pseudo-classes
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val playing : CSSSelector = PseudoClassInternal("playing")
+        val playing : CSSSelector = selectorScope.playing
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val paused : CSSSelector = PseudoClassInternal("paused")
+        val paused : CSSSelector = selectorScope.paused
 
         // The input pseudo-classes
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val autofill : CSSSelector = PseudoClassInternal("autofill")
+        val autofill : CSSSelector = selectorScope.autofill
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val enabled : CSSSelector = PseudoClassInternal("enabled")
+        val enabled : CSSSelector = selectorScope.enabled
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val disabled : CSSSelector = PseudoClassInternal("disabled")
+        val disabled : CSSSelector = selectorScope.disabled
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val readOnly : CSSSelector = PseudoClassInternal("read-only")
+        val readOnly : CSSSelector = selectorScope.readOnly
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val readWrite : CSSSelector = PseudoClassInternal("read-write")
+        val readWrite : CSSSelector = selectorScope.readWrite
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val placeholderShown : CSSSelector = PseudoClassInternal("placeholder-shown")
+        val placeholderShown : CSSSelector = selectorScope.placeholderShown
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val default : CSSSelector = PseudoClassInternal("default")
+        val default : CSSSelector = selectorScope.default
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val checked : CSSSelector = PseudoClassInternal("checked")
+        val checked : CSSSelector = selectorScope.checked
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val indeterminate : CSSSelector = PseudoClassInternal("indeterminate")
+        val indeterminate : CSSSelector = selectorScope.indeterminate
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val blank : CSSSelector = PseudoClassInternal("blank")
+        val blank : CSSSelector = selectorScope.blank
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val valid : CSSSelector = PseudoClassInternal("valid")
+        val valid : CSSSelector = selectorScope.valid
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val invalid : CSSSelector = PseudoClassInternal("invalid")
+        val invalid : CSSSelector = selectorScope.invalid
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val inRange : CSSSelector = PseudoClassInternal("in-range")
+        val inRange : CSSSelector = selectorScope.invalid
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val outOfRange : CSSSelector = PseudoClassInternal("out-of-range")
+        val outOfRange : CSSSelector = selectorScope.outOfRange
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val required : CSSSelector = PseudoClassInternal("required")
+        val required : CSSSelector = selectorScope.required
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val optional : CSSSelector = PseudoClassInternal("optional")
+        val optional : CSSSelector = selectorScope.optional
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val userInvalid : CSSSelector = PseudoClassInternal("user-invalid")
+        val userInvalid : CSSSelector = selectorScope.userInvalid
 
         // Tree-structural pseudo-classes
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val root : CSSSelector = PseudoClassInternal("root")
+        val root : CSSSelector = selectorScope.root
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val empty : CSSSelector = PseudoClassInternal("empty")
+        val empty : CSSSelector = selectorScope.empty
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val first : CSSSelector = PseudoClassInternal("first")
+        val first : CSSSelector = selectorScope.first
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val firstChild : CSSSelector = PseudoClassInternal("first-child")
+        val firstChild : CSSSelector = selectorScope.firstChild
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val lastChild : CSSSelector = PseudoClassInternal("last-child")
+        val lastChild : CSSSelector = selectorScope.lastChild
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val onlyChild : CSSSelector = PseudoClassInternal("only-child")
+        val onlyChild : CSSSelector = selectorScope.onlyChild
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val firstOfType : CSSSelector = PseudoClassInternal("first-of-type")
+        val firstOfType : CSSSelector = selectorScope.firstOfType
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val lastOfType : CSSSelector = PseudoClassInternal("last-of-type")
+        val lastOfType : CSSSelector = selectorScope.lastOfType
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val onlyOfType : CSSSelector = PseudoClassInternal("only-of-type")
+        val onlyOfType : CSSSelector = selectorScope.onlyOfType
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val host : CSSSelector = PseudoClassInternal("host")
+        val host : CSSSelector = selectorScope.host
 
         // Etc
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val defined : CSSSelector = PseudoClassInternal("defined")
+        val defined : CSSSelector = selectorScope.defined
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val left : CSSSelector = PseudoClassInternal("left")
+        val left : CSSSelector = selectorScope.left
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val right : CSSSelector = PseudoClassInternal("right")
-    }
-
-    internal open class PseudoClassInternal internal constructor(val name: String) : CSSSelector() {
-        override fun equals(other: Any?): Boolean {
-            return if (other is PseudoClassInternal) {
-                name == other.name && argsStr() == other.argsStr()
-            } else false
-        }
-        open fun argsStr(): String? = null
-        override fun toString(): String = ":$name${argsStr()?.let { "($it)" } ?: ""}"
-
-        // Linguistic pseudo-classes
-        internal class Lang internal constructor(val langCode: LanguageCode) : PseudoClassInternal("lang") {
-            override fun argsStr() = langCode
-        }
-
-        // Tree-structural pseudo-classes
-        internal class NthChild internal constructor(val nth: Nth) : PseudoClassInternal("nth-child") {
-            override fun argsStr() = "$nth"
-        }
-
-        internal class NthLastChild internal constructor(val nth: Nth) : PseudoClassInternal("nth-last-child") {
-            override fun argsStr() = "$nth"
-        }
-
-        internal class NthOfType internal constructor(val nth: Nth) : PseudoClassInternal("nth-of-type") {
-            override fun argsStr() = "$nth"
-        }
-
-        internal class NthLastOfType internal constructor(val nth: Nth) : PseudoClassInternal("nth-last-of-type") {
-            override fun argsStr() = "$nth"
-        }
-
-        internal class Host internal constructor(val selector: CSSSelector) : PseudoClassInternal("host") {
-            override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-                contains(this, other, listOf(selector), strict)
-
-            override fun argsStr() = "${selector.asString()}"
-        }
-
-        // Etc
-        internal class Not internal constructor(val selector: CSSSelector) : PseudoClassInternal("not") {
-            override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-                contains(this, other, listOf(selector), strict)
-
-            override fun argsStr() = "$selector"
-        }
+        val right : CSSSelector = selectorScope.right
     }
 
     object PseudoElement {
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val after : CSSSelector = PseudoElementInternal("after")
+        val after : CSSSelector = selectorScope.after
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val before : CSSSelector = PseudoElementInternal("before")
+        val before : CSSSelector = selectorScope.before
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val cue : CSSSelector = PseudoElementInternal("cue")
+        val cue : CSSSelector = selectorScope.cue
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val cueRegion : CSSSelector = PseudoElementInternal("cue-region")
+        val cueRegion : CSSSelector = selectorScope.cueRegion
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val firstLetter : CSSSelector = PseudoElementInternal("first-letter")
+        val firstLetter : CSSSelector = selectorScope.firstLetter
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val firstLine : CSSSelector = PseudoElementInternal("first-line")
+        val firstLine : CSSSelector = selectorScope.firstLine
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val fileSelectorButton : CSSSelector = PseudoElementInternal("file-selector-button")
+        val fileSelectorButton : CSSSelector = selectorScope.fileSelectorButton
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val selection : CSSSelector = PseudoElementInternal("selection")
-    }
-
-    internal open class PseudoElementInternal internal constructor(val name: String) : CSSSelector() {
-        override fun equals(other: Any?): Boolean {
-            return if (other is PseudoElementInternal) {
-                name == other.name && argsStr() == other.argsStr()
-            } else false
-        }
-
-        open fun argsStr(): String? = null
-        override fun toString(): String = "::$name${argsStr()?.let { "($it)" } ?: ""}"
-
-        internal class Slotted internal constructor(val selector: CSSSelector) : PseudoElementInternal("slotted") {
-            override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-                contains(this, other, listOf(selector), strict)
-
-            override fun argsStr() = selector.asString()
-        }
+        val selection : CSSSelector = selectorScope.selection
     }
 }
-
-@Suppress("SuspiciousEqualsCombination")
-private fun contains(that: CSSSelector, other: CSSSelector, children: List<CSSSelector>, strict: Boolean): Boolean {
-    return that === other || // exactly same selector
-            children.any { it.contains(other, strict) } || // contains it in children
-            (!strict && that == other) // equals structurally
-}
-
-internal const val webCssSelectorsDeprecationMessage = "Consider using a property from SelectorsScope"
