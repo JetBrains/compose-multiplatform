@@ -39,10 +39,6 @@ abstract class CSSSelector internal constructor() {
         override fun toString(): String = ".$className"
     }
 
-    internal data class Id internal constructor(val id: String) : CSSSelector() {
-        override fun toString(): String = "#$id"
-    }
-
     object Attribute {
         enum class Operator(val value: String) {
             Equals("="),
@@ -172,6 +168,10 @@ abstract class CSSSelector internal constructor() {
         @Deprecated(webCssSelectorsDeprecationMessage)
         val selection : CSSSelector = PseudoElementInternal("selection")
     }
+}
+
+internal data class Id internal constructor(val id: String) : CSSSelector() {
+    override fun toString(): String = "#$id"
 }
 
 internal data class Type internal constructor(val type: String) : CSSSelector() {

@@ -69,7 +69,7 @@ interface SelectorsScope {
 
     fun type(type: String): CSSSelector = Type(type)
     fun className(className: String): CSSSelector = CSSSelector.CSSClass(className)
-    fun id(id: String): CSSSelector = CSSSelector.Id(id)
+    fun id(id: String): CSSSelector = Id(id)
 
     fun attr(
         name: String,
