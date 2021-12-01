@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableState
@@ -186,7 +185,6 @@ class LazyListState constructor(
      * positive offset refers to forward scroll, so in a top-to-bottom list, positive offset will
      * scroll the item further upward (taking it partly offscreen).
      */
-    @OptIn(ExperimentalFoundationApi::class)
     suspend fun scrollToItem(
         /*@IntRange(from = 0)*/
         index: Int,
@@ -212,7 +210,6 @@ class LazyListState constructor(
      *
      * If [scroll] is called from elsewhere, this will be canceled.
      */
-    @OptIn(ExperimentalFoundationApi::class)
     override suspend fun scroll(
         scrollPriority: MutatePriority,
         block: suspend ScrollScope.() -> Unit
