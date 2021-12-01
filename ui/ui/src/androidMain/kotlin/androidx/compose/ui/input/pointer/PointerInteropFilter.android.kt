@@ -213,16 +213,30 @@ internal class PointerInteropFilter : PointerInputModifier {
                 pass: PointerEventPass,
                 bounds: IntSize
             ) {
-                when (pass) {
-                    PointerEventPass.Initial -> { } // Don't do anything
-                    PointerEventPass.Main -> if (state != DispatchToViewState.NotDispatching) {
+                val changes = pointerEvent.changes
+
+                // If we were told to disallow intercept, or if the event was a down or up event,
+                // we dispatch to Android as early as possible.  If the event is a move event and
+                // we can still intercept, we dispatch to Android after we have a chance to
+                // intercept due to movement.
+                val dispatchDuringInitialTunnel = disallowIntercept ||
+                    changes.fastAny {
+                        it.changedToDownIgnoreConsumed() || it.changedToUpIgnoreConsumed()
+                    }
+
+                if (state !== DispatchToViewState.NotDispatching) {
+                    if (pass == PointerEventPass.Initial && dispatchDuringInitialTunnel) {
                         dispatchToView(pointerEvent)
                     }
-                    PointerEventPass.Final -> {
-                        // If nothing is pressed, then the "event stream" has ended and we reset.
-                        if (pointerEvent.changes.fastAll { !it.pressed }) {
-                            reset()
-                        }
+                    if (pass == PointerEventPass.Final && !dispatchDuringInitialTunnel) {
+                        dispatchToView(pointerEvent)
+                    }
+                }
+                if (pass == PointerEventPass.Final) {
+                    // If all of the changes were up changes, then the "event stream" has ended
+                    // and we reset.
+                    if (changes.fastAll { it.changedToUpIgnoreConsumed() }) {
+                        reset()
                     }
                 }
             }
@@ -281,7 +295,7 @@ internal class PointerInteropFilter : PointerInputModifier {
                         this.layoutCoordinates?.localToRoot(Offset.Zero)
                             ?: error("layoutCoordinates not set")
                     ) { motionEvent ->
-                        if (motionEvent.actionMasked == ACTION_DOWN) {
+                        if (motionEvent.actionMasked == MotionEvent.ACTION_DOWN) {
                             // If the action is ACTION_DOWN, we care about the return value of
                             // onTouchEvent and use it to set our initial dispatching state.
                             state = if (onTouchEvent(motionEvent)) {
