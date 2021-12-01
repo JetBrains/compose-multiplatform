@@ -1,9 +1,6 @@
 package org.jetbrains.compose.web.css
 
-import org.jetbrains.compose.web.css.selectors.CSSSelector
-import org.jetbrains.compose.web.css.selectors.Nth
-import org.jetbrains.compose.web.css.selectors.PseudoClassInternal
-import org.jetbrains.compose.web.css.selectors.PseudoElementInternal
+import org.jetbrains.compose.web.css.selectors.*
 
 interface CSSRulesHolder {
     val cssRules: CSSRuleDeclarationList
@@ -39,14 +36,14 @@ interface GenericStyleSheetBuilder<TBuilder> : CSSRulesHolder, SelectorsScope {
 
 interface SelectorsScope {
     fun selector(selector: String): CSSSelector = CSSSelector.Raw(selector)
-    fun combine(vararg selectors: CSSSelector): CSSSelector = CSSSelector.Combine(selectors.toMutableList())
+    fun combine(vararg selectors: CSSSelector): CSSSelector = Combine(selectors.toMutableList())
 
     operator fun CSSSelector.plus(selector: CSSSelector): CSSSelector {
-        if (this is CSSSelector.Combine) {
+        if (this is Combine) {
             this.selectors.add(selector)
             return this
         }
-        return if (selector is CSSSelector.Combine) {
+        return if (selector is Combine) {
             selector.selectors.add(0, this)
             selector
         } else {
@@ -55,7 +52,7 @@ interface SelectorsScope {
     }
 
     operator fun CSSSelector.plus(selector: String): CSSSelector {
-        if (this is CSSSelector.Combine) {
+        if (this is Combine) {
             this.selectors.add(selector(selector))
             return this
         }
@@ -79,7 +76,7 @@ interface SelectorsScope {
         value: String? = null,
         operator: CSSSelector.Attribute.Operator = CSSSelector.Attribute.Operator.Equals,
         caseSensitive: Boolean = true
-    ): CSSSelector = CSSSelector.AttributeInternal(name, value, operator, caseSensitive)
+    ): CSSSelector = AttributeInternal(name, value, operator, caseSensitive)
 
     fun attrEquals(name: String, value: String? = null, caseSensitive: Boolean = true) =
         attr(name, value, CSSSelector.Attribute.Operator.Equals, caseSensitive)
@@ -99,18 +96,18 @@ interface SelectorsScope {
     fun attrContains(name: String, value: String? = null, caseSensitive: Boolean = true) =
         attr(name, value, CSSSelector.Attribute.Operator.Contains, caseSensitive)
 
-    fun group(vararg selectors: CSSSelector): CSSSelector = CSSSelector.Group(selectors.toList())
+    fun group(vararg selectors: CSSSelector): CSSSelector = Group(selectors.toList())
 
     @Deprecated("Replaced with `desc`", ReplaceWith("desc(parent, selected)"))
     fun descendant(parent: CSSSelector, selected: CSSSelector): CSSSelector = desc(parent, selected)
-    fun desc(parent: CSSSelector, selected: CSSSelector): CSSSelector = CSSSelector.Descendant(parent, selected)
+    fun desc(parent: CSSSelector, selected: CSSSelector): CSSSelector = Descendant(parent, selected)
     fun desc(parent: CSSSelector, selected: String): CSSSelector = desc(parent, selector(selected))
     fun desc(parent: String, selected: CSSSelector): CSSSelector = desc(selector(parent), selected)
     fun desc(parent: String, selected: String): CSSSelector = desc(selector(parent), selector(selected))
 
-    fun child(parent: CSSSelector, selected: CSSSelector): CSSSelector = CSSSelector.Child(parent, selected)
-    fun sibling(sibling: CSSSelector, selected: CSSSelector): CSSSelector = CSSSelector.Sibling(sibling, selected)
-    fun adjacent(sibling: CSSSelector, selected: CSSSelector): CSSSelector = CSSSelector.Adjacent(sibling, selected)
+    fun child(parent: CSSSelector, selected: CSSSelector): CSSSelector = Child(parent, selected)
+    fun sibling(sibling: CSSSelector, selected: CSSSelector): CSSSelector = Sibling(sibling, selected)
+    fun adjacent(sibling: CSSSelector, selected: CSSSelector): CSSSelector = Adjacent(sibling, selected)
 
     @JsName("returnHoverSelector")
     @Deprecated("Use hover property", replaceWith = ReplaceWith("hover"))

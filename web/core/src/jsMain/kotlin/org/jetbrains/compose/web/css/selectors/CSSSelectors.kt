@@ -66,71 +66,6 @@ abstract class CSSSelector internal constructor() {
         }
     }
 
-    internal data class AttributeInternal internal constructor(
-        val name: String,
-        val value: String? = null,
-        val operator: Attribute.Operator = Attribute.Operator.Equals,
-        val caseSensitive: Boolean = true
-    ) : CSSSelector() {
-
-        override fun toString(): String {
-            val valueStr = value?.let {
-                "${operator.value}$value${if (!caseSensitive) " i" else ""}"
-            } ?: ""
-            return "[$name$valueStr]"
-        }
-    }
-
-    internal data class Combine internal constructor(val selectors: MutableList<CSSSelector>) : CSSSelector() {
-        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-            contains(this, other, selectors, strict)
-
-        override fun toString(): String = selectors.joinToString("")
-        override fun asString(): String = selectors.joinToString("") { it.asString() }
-    }
-
-    internal data class Group internal constructor(val selectors: List<CSSSelector>) : CSSSelector() {
-        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-            contains(this, other, selectors, strict)
-
-        override fun toString(): String = selectors.joinToString(", ")
-        override fun asString(): String = selectors.joinToString(", ") { it.asString() }
-    }
-
-    internal data class Descendant internal constructor(val parent: CSSSelector, val selected: CSSSelector) :
-        CSSSelector() {
-        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-            contains(this, other, listOf(parent, selected), strict)
-
-        override fun toString(): String = "$parent $selected"
-        override fun asString(): String = "${parent.asString()} ${selected.asString()}"
-    }
-
-    internal data class Child internal constructor(val parent: CSSSelector, val selected: CSSSelector) : CSSSelector() {
-        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-            contains(this, other, listOf(parent, selected), strict)
-
-        override fun toString(): String = "$parent > $selected"
-        override fun asString(): String = "${parent.asString()} > ${selected.asString()}"
-    }
-
-    internal data class Sibling internal constructor(val prev: CSSSelector, val selected: CSSSelector) : CSSSelector() {
-        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-            contains(this, other, listOf(prev, selected), strict)
-
-        override fun toString(): String = "$prev ~ $selected"
-        override fun asString(): String = "${prev.asString()} ~ ${selected.asString()}"
-    }
-
-    internal data class Adjacent internal constructor(val prev: CSSSelector, val selected: CSSSelector) :
-        CSSSelector() {
-        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-            contains(this, other, listOf(prev, selected), strict)
-
-        override fun toString(): String = "$prev + $selected"
-        override fun asString(): String = "${prev.asString()} + ${selected.asString()}"
-    }
-
     object PseudoClass {
         // Location pseudo-classes
         @Deprecated(webCssSelectorsDeprecationMessage)
@@ -251,6 +186,70 @@ abstract class CSSSelector internal constructor() {
     }
 }
 
+internal data class AttributeInternal internal constructor(
+    val name: String,
+    val value: String? = null,
+    val operator: Attribute.Operator = Attribute.Operator.Equals,
+    val caseSensitive: Boolean = true
+) : CSSSelector() {
+
+    override fun toString(): String {
+        val valueStr = value?.let {
+            "${operator.value}$value${if (!caseSensitive) " i" else ""}"
+        } ?: ""
+        return "[$name$valueStr]"
+    }
+}
+
+internal data class Combine internal constructor(val selectors: MutableList<CSSSelector>) : CSSSelector() {
+    override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+        contains(this, other, selectors, strict)
+
+    override fun toString(): String = selectors.joinToString("")
+    override fun asString(): String = selectors.joinToString("") { it.asString() }
+}
+
+internal data class Group internal constructor(val selectors: List<CSSSelector>) : CSSSelector() {
+    override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+        contains(this, other, selectors, strict)
+
+    override fun toString(): String = selectors.joinToString(", ")
+    override fun asString(): String = selectors.joinToString(", ") { it.asString() }
+}
+
+internal data class Descendant internal constructor(val parent: CSSSelector, val selected: CSSSelector) :
+    CSSSelector() {
+    override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+        contains(this, other, listOf(parent, selected), strict)
+
+    override fun toString(): String = "$parent $selected"
+    override fun asString(): String = "${parent.asString()} ${selected.asString()}"
+}
+
+internal data class Child internal constructor(val parent: CSSSelector, val selected: CSSSelector) : CSSSelector() {
+    override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+        contains(this, other, listOf(parent, selected), strict)
+
+    override fun toString(): String = "$parent > $selected"
+    override fun asString(): String = "${parent.asString()} > ${selected.asString()}"
+}
+
+internal data class Sibling internal constructor(val prev: CSSSelector, val selected: CSSSelector) : CSSSelector() {
+    override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+        contains(this, other, listOf(prev, selected), strict)
+
+    override fun toString(): String = "$prev ~ $selected"
+    override fun asString(): String = "${prev.asString()} ~ ${selected.asString()}"
+}
+
+internal data class Adjacent internal constructor(val prev: CSSSelector, val selected: CSSSelector) :
+    CSSSelector() {
+    override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+        contains(this, other, listOf(prev, selected), strict)
+
+    override fun toString(): String = "$prev + $selected"
+    override fun asString(): String = "${prev.asString()} + ${selected.asString()}"
+}
 
 internal open class PseudoClassInternal internal constructor(val name: String) : CSSSelector() {
     override fun equals(other: Any?): Boolean {
