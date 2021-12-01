@@ -2,8 +2,10 @@
 
 package org.jetbrains.compose.web.css.selectors
 
-import org.jetbrains.compose.web.css.LanguageCode
 import org.jetbrains.compose.web.css.SelectorsScope
+
+internal const val webCssSelectorsDeprecationMessage = "Consider using a property from SelectorsScope"
+private val selectorScope = object : SelectorsScope {}
 
 sealed class Nth {
     data class Functional(val a: Int? = null, val b: Int? = null) {
@@ -21,8 +23,6 @@ sealed class Nth {
         override fun toString(): String = "even"
     }
 }
-
-private val selectorScope = object : SelectorsScope {}
 
 abstract class CSSSelector internal constructor() {
     override fun equals(other: Any?): Boolean {
@@ -180,5 +180,3 @@ abstract class CSSSelector internal constructor() {
         val selection : CSSSelector = selectorScope.selection
     }
 }
-
-internal const val webCssSelectorsDeprecationMessage = "Consider using a property from SelectorsScope"
