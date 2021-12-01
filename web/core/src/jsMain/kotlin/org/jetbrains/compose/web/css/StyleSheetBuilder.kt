@@ -273,6 +273,23 @@ private data class Group(val selectors: List<CSSSelector>) : CSSSelector() {
     override fun asString(): String = selectors.joinToString(", ") { it.asString() }
 }
 
+private data class Descendant(val parent: CSSSelector, val selected: CSSSelector) :
+    CSSSelector() {
+    override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+        contains(this, other, listOf(parent, selected), strict)
+
+    override fun toString(): String = "$parent $selected"
+    override fun asString(): String = "${parent.asString()} ${selected.asString()}"
+}
+
+private data class Child(val parent: CSSSelector, val selected: CSSSelector) : CSSSelector() {
+    override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+        contains(this, other, listOf(parent, selected), strict)
+
+    override fun toString(): String = "$parent > $selected"
+    override fun asString(): String = "${parent.asString()} > ${selected.asString()}"
+}
+
 interface StyleSheetBuilder : CSSRulesHolder, GenericStyleSheetBuilder<CSSStyleRuleBuilder> {
     override fun style(selector: CSSSelector, cssRule: CSSStyleRuleBuilder.() -> Unit) {
         add(selector, buildCSSStyleRule(cssRule))
