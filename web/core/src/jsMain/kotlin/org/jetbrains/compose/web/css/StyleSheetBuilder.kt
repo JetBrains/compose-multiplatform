@@ -26,16 +26,16 @@ interface GenericStyleSheetBuilder<TBuilder> : CSSRulesHolder, SelectorsScope {
     }
 
     operator fun String.invoke(cssRule: TBuilder.() -> Unit) {
-        style(CSSSelector.Raw(this), cssRule)
+        style(Raw(this), cssRule)
     }
 
     infix fun String.style(cssRule: TBuilder.() -> Unit) {
-        style(CSSSelector.Raw(this), cssRule)
+        style(Raw(this), cssRule)
     }
 }
 
 interface SelectorsScope {
-    fun selector(selector: String): CSSSelector = CSSSelector.Raw(selector)
+    fun selector(selector: String): CSSSelector = Raw(selector)
     fun combine(vararg selectors: CSSSelector): CSSSelector = Combine(selectors.toMutableList())
 
     operator fun CSSSelector.plus(selector: CSSSelector): CSSSelector {
