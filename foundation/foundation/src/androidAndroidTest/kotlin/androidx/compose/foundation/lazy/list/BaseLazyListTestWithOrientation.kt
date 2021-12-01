@@ -167,6 +167,12 @@ open class BaseLazyListTestWithOrientation(private val orientation: Orientation)
         }
     }
 
+    fun LazyListState.scrollTo(index: Int) {
+        runBlocking(Dispatchers.Main + AutoTestFrameClock()) {
+            scrollToItem(index)
+        }
+    }
+
     @Composable
     fun LazyColumnOrRow(
         modifier: Modifier = Modifier,
