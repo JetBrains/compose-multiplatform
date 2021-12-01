@@ -241,11 +241,11 @@ interface SelectorsScope {
     fun slotted(selector: CSSSelector): CSSSelector = PseudoElementInternal.Slotted(selector)
 }
 
-private data class Id constructor(val id: String) : CSSSelector() {
+private data class Id(val id: String) : CSSSelector() {
     override fun toString(): String = "#$id"
 }
 
-private data class Type constructor(val type: String) : CSSSelector() {
+private data class Type(val type: String) : CSSSelector() {
     override fun toString(): String = type
 }
 
@@ -253,8 +253,24 @@ private object Universal : CSSSelector() {
     override fun toString(): String = "*"
 }
 
-private data class Raw constructor(val selector: String) : CSSSelector() {
+private data class Raw(val selector: String) : CSSSelector() {
     override fun toString(): String = selector
+}
+
+private data class Combine(val selectors: MutableList<CSSSelector>) : CSSSelector() {
+    override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+        contains(this, other, selectors, strict)
+
+    override fun toString(): String = selectors.joinToString("")
+    override fun asString(): String = selectors.joinToString("") { it.asString() }
+}
+
+private data class Group(val selectors: List<CSSSelector>) : CSSSelector() {
+    override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+        contains(this, other, selectors, strict)
+
+    override fun toString(): String = selectors.joinToString(", ")
+    override fun asString(): String = selectors.joinToString(", ") { it.asString() }
 }
 
 interface StyleSheetBuilder : CSSRulesHolder, GenericStyleSheetBuilder<CSSStyleRuleBuilder> {

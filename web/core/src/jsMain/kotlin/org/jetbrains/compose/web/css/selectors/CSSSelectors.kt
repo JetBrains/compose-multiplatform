@@ -194,22 +194,6 @@ internal data class AttributeInternal internal constructor(
     }
 }
 
-internal data class Combine internal constructor(val selectors: MutableList<CSSSelector>) : CSSSelector() {
-    override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-        contains(this, other, selectors, strict)
-
-    override fun toString(): String = selectors.joinToString("")
-    override fun asString(): String = selectors.joinToString("") { it.asString() }
-}
-
-internal data class Group internal constructor(val selectors: List<CSSSelector>) : CSSSelector() {
-    override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-        contains(this, other, selectors, strict)
-
-    override fun toString(): String = selectors.joinToString(", ")
-    override fun asString(): String = selectors.joinToString(", ") { it.asString() }
-}
-
 internal data class Descendant internal constructor(val parent: CSSSelector, val selected: CSSSelector) :
     CSSSelector() {
     override fun contains(other: CSSSelector, strict: Boolean): Boolean =
