@@ -296,23 +296,23 @@ abstract class CSSSelector internal constructor() {
         @Deprecated(webCssSelectorsDeprecationMessage)
         val selection : CSSSelector = PseudoElementInternal("selection")
     }
+}
 
-    internal open class PseudoElementInternal internal constructor(val name: String) : CSSSelector() {
-        override fun equals(other: Any?): Boolean {
-            return if (other is PseudoElementInternal) {
-                name == other.name && argsStr() == other.argsStr()
-            } else false
-        }
+internal open class PseudoElementInternal internal constructor(val name: String) : CSSSelector() {
+    override fun equals(other: Any?): Boolean {
+        return if (other is PseudoElementInternal) {
+            name == other.name && argsStr() == other.argsStr()
+        } else false
+    }
 
-        open fun argsStr(): String? = null
-        override fun toString(): String = "::$name${argsStr()?.let { "($it)" } ?: ""}"
+    open fun argsStr(): String? = null
+    override fun toString(): String = "::$name${argsStr()?.let { "($it)" } ?: ""}"
 
-        internal class Slotted internal constructor(val selector: CSSSelector) : PseudoElementInternal("slotted") {
-            override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-                contains(this, other, listOf(selector), strict)
+    internal class Slotted internal constructor(val selector: CSSSelector) : PseudoElementInternal("slotted") {
+        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+            contains(this, other, listOf(selector), strict)
 
-            override fun argsStr() = selector.asString()
-        }
+        override fun argsStr() = selector.asString()
     }
 }
 

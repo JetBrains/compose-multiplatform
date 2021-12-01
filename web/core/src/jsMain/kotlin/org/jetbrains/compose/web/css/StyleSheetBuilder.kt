@@ -2,6 +2,7 @@ package org.jetbrains.compose.web.css
 
 import org.jetbrains.compose.web.css.selectors.CSSSelector
 import org.jetbrains.compose.web.css.selectors.Nth
+import org.jetbrains.compose.web.css.selectors.PseudoElementInternal
 
 interface CSSRulesHolder {
     val cssRules: CSSRuleDeclarationList
@@ -223,23 +224,23 @@ interface SelectorsScope {
 
     // Pseudo Element
     val after: CSSSelector
-        get() = CSSSelector.PseudoElementInternal("after")
+        get() = PseudoElementInternal("after")
     val before: CSSSelector
-        get() = CSSSelector.PseudoElementInternal("before")
+        get() = PseudoElementInternal("before")
     val cue: CSSSelector
-        get() = CSSSelector.PseudoElementInternal("cue")
+        get() = PseudoElementInternal("cue")
     val cueRegion: CSSSelector
-        get() = CSSSelector.PseudoElementInternal("cue-region")
+        get() = PseudoElementInternal("cue-region")
     val firstLetter: CSSSelector
-        get() = CSSSelector.PseudoElementInternal("first-letter")
+        get() = PseudoElementInternal("first-letter")
     val firstLine: CSSSelector
-        get() = CSSSelector.PseudoElementInternal("first-line")
+        get() = PseudoElementInternal("first-line")
     val fileSelectorButton: CSSSelector
-        get() = CSSSelector.PseudoElementInternal("file-selector-button")
+        get() = PseudoElementInternal("file-selector-button")
     val selection: CSSSelector
-        get() = CSSSelector.PseudoElementInternal("selection")
+        get() = PseudoElementInternal("selection")
 
-    fun slotted(selector: CSSSelector): CSSSelector = CSSSelector.PseudoElementInternal.Slotted(selector)
+    fun slotted(selector: CSSSelector): CSSSelector = PseudoElementInternal.Slotted(selector)
 }
 
 interface StyleSheetBuilder : CSSRulesHolder, GenericStyleSheetBuilder<CSSStyleRuleBuilder> {
