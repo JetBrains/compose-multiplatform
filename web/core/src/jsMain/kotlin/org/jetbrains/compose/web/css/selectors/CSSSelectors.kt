@@ -178,22 +178,6 @@ abstract class CSSSelector internal constructor() {
     }
 }
 
-
-internal data class AttributeInternal internal constructor(
-    val name: String,
-    val value: String? = null,
-    val operator: Attribute.Operator = Attribute.Operator.Equals,
-    val caseSensitive: Boolean = true
-) : CSSSelector() {
-
-    override fun toString(): String {
-        val valueStr = value?.let {
-            "${operator.value}$value${if (!caseSensitive) " i" else ""}"
-        } ?: ""
-        return "[$name$valueStr]"
-    }
-}
-
 internal open class PseudoClassInternal internal constructor(val name: String) : CSSSelector() {
     override fun equals(other: Any?): Boolean {
         return if (other is PseudoClassInternal) {

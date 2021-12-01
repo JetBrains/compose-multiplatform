@@ -76,7 +76,7 @@ interface SelectorsScope {
         value: String? = null,
         operator: CSSSelector.Attribute.Operator = CSSSelector.Attribute.Operator.Equals,
         caseSensitive: Boolean = true
-    ): CSSSelector = AttributeInternal(name, value, operator, caseSensitive)
+    ): CSSSelector = Attribute(name, value, operator, caseSensitive)
 
     fun attrEquals(name: String, value: String? = null, caseSensitive: Boolean = true) =
         attr(name, value, CSSSelector.Attribute.Operator.Equals, caseSensitive)
@@ -304,6 +304,21 @@ private data class Adjacent(val prev: CSSSelector, val selected: CSSSelector) : 
 
     override fun toString(): String = "$prev + $selected"
     override fun asString(): String = "${prev.asString()} + ${selected.asString()}"
+}
+
+private data class Attribute(
+    val name: String,
+    val value: String? = null,
+    val operator: Attribute.Operator = Attribute.Operator.Equals,
+    val caseSensitive: Boolean = true
+) : CSSSelector() {
+
+    override fun toString(): String {
+        val valueStr = value?.let {
+            "${operator.value}$value${if (!caseSensitive) " i" else ""}"
+        } ?: ""
+        return "[$name$valueStr]"
+    }
 }
 
 
