@@ -35,10 +35,6 @@ abstract class CSSSelector internal constructor() {
     // `toString` is reloaded for CSSSelfSelector
     internal open fun asString(): String = toString()
 
-    internal object Universal : CSSSelector() {
-        override fun toString(): String = "*"
-    }
-
     internal data class Type internal constructor(val type: String) : CSSSelector() {
         override fun toString(): String = type
     }
@@ -182,6 +178,10 @@ abstract class CSSSelector internal constructor() {
     }
 }
 
+
+internal object Universal : CSSSelector() {
+    override fun toString(): String = "*"
+}
 
 internal data class Raw internal constructor(val selector: String) : CSSSelector() {
     override fun toString(): String = selector

@@ -62,10 +62,10 @@ interface SelectorsScope {
 
     @JsName("returnUniversalSelector")
     @Deprecated("Use universal property", replaceWith = ReplaceWith("universal"))
-    fun universal(): CSSSelector = CSSSelector.Universal
+    fun universal(): CSSSelector = Universal
 
     val universal: CSSSelector
-        get() = CSSSelector.Universal
+        get() = Universal
 
     fun type(type: String): CSSSelector = CSSSelector.Type(type)
     fun className(className: String): CSSSelector = CSSSelector.CSSClass(className)
