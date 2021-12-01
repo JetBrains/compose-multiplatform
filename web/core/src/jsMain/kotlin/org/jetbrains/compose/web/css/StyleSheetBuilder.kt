@@ -368,6 +368,25 @@ private open class PseudoClassInternal(val name: String) : CSSSelector() {
     }
 }
 
+private open class PseudoElementInternal(val name: String) : CSSSelector() {
+    override fun equals(other: Any?): Boolean {
+        return if (other is PseudoElementInternal) {
+            name == other.name && argsStr() == other.argsStr()
+        } else false
+    }
+
+    open fun argsStr(): String? = null
+    override fun toString(): String = "::$name${argsStr()?.let { "($it)" } ?: ""}"
+
+    class Slotted internal constructor(val selector: CSSSelector) : PseudoElementInternal("slotted") {
+        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+            contains(this, other, listOf(selector), strict)
+
+        override fun argsStr() = selector.asString()
+    }
+}
+
+
 interface StyleSheetBuilder : CSSRulesHolder, GenericStyleSheetBuilder<CSSStyleRuleBuilder> {
     override fun style(selector: CSSSelector, cssRule: CSSStyleRuleBuilder.() -> Unit) {
         add(selector, buildCSSStyleRule(cssRule))

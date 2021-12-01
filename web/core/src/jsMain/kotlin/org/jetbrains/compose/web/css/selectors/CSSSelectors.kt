@@ -163,39 +163,21 @@ abstract class CSSSelector internal constructor() {
 
     object PseudoElement {
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val after : CSSSelector = PseudoElementInternal("after")
+        val after : CSSSelector = selectorScope.after
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val before : CSSSelector = PseudoElementInternal("before")
+        val before : CSSSelector = selectorScope.before
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val cue : CSSSelector = PseudoElementInternal("cue")
+        val cue : CSSSelector = selectorScope.cue
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val cueRegion : CSSSelector = PseudoElementInternal("cue-region")
+        val cueRegion : CSSSelector = selectorScope.cueRegion
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val firstLetter : CSSSelector = PseudoElementInternal("first-letter")
+        val firstLetter : CSSSelector = selectorScope.firstLetter
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val firstLine : CSSSelector = PseudoElementInternal("first-line")
+        val firstLine : CSSSelector = selectorScope.firstLine
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val fileSelectorButton : CSSSelector = PseudoElementInternal("file-selector-button")
+        val fileSelectorButton : CSSSelector = selectorScope.fileSelectorButton
         @Deprecated(webCssSelectorsDeprecationMessage)
-        val selection : CSSSelector = PseudoElementInternal("selection")
-    }
-}
-
-internal open class PseudoElementInternal internal constructor(val name: String) : CSSSelector() {
-    override fun equals(other: Any?): Boolean {
-        return if (other is PseudoElementInternal) {
-            name == other.name && argsStr() == other.argsStr()
-        } else false
-    }
-
-    open fun argsStr(): String? = null
-    override fun toString(): String = "::$name${argsStr()?.let { "($it)" } ?: ""}"
-
-    internal class Slotted internal constructor(val selector: CSSSelector) : PseudoElementInternal("slotted") {
-        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-            contains(this, other, listOf(selector), strict)
-
-        override fun argsStr() = selector.asString()
+        val selection : CSSSelector = selectorScope.selection
     }
 }
 
