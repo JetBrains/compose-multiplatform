@@ -30,6 +30,14 @@ abstract class CSSSelector internal constructor() {
         return if (strict) this === other else this == other
     }
 
+    @Suppress("SuspiciousEqualsCombination")
+    protected fun contains(that: CSSSelector, other: CSSSelector, children: List<CSSSelector>, strict: Boolean): Boolean {
+        return that === other || // exactly same selector
+                children.any { it.contains(other, strict) } || // contains it in children
+                (!strict && that == other) // equals structurally
+    }
+
+
     // This method made for workaround because of possible concatenation of `String + CSSSelector`,
     // so `toString` is called for such operator, but we are calling `asString` for instantiation.
     // `toString` is reloaded for CSSSelfSelector
@@ -299,13 +307,6 @@ internal open class PseudoElementInternal internal constructor(val name: String)
 
         override fun argsStr() = selector.asString()
     }
-}
-
-@Suppress("SuspiciousEqualsCombination")
-private fun contains(that: CSSSelector, other: CSSSelector, children: List<CSSSelector>, strict: Boolean): Boolean {
-    return that === other || // exactly same selector
-            children.any { it.contains(other, strict) } || // contains it in children
-            (!strict && that == other) // equals structurally
 }
 
 internal const val webCssSelectorsDeprecationMessage = "Consider using a property from SelectorsScope"
