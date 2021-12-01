@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION") // https://github.com/JetBrains/compose-jb/issues/1514
+
 package androidx.compose.ui.window.window
 
 import androidx.compose.foundation.layout.Box
