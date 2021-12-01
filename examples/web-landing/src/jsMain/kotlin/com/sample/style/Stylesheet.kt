@@ -58,7 +58,7 @@ object AppStylesheet : StyleSheet() {
             )
         }
 
-        CSSSelector.Universal style {
+        universal style {
             AppCSSVariables.wtColorGreyLight(Color("#f4f4f4"))
             AppCSSVariables.wtColorGreyDark(Color("#323236"))
             AppCSSVariables.wtOffsetTopUnit(24.px)
@@ -67,16 +67,15 @@ object AppStylesheet : StyleSheet() {
         }
 
         media(mediaMaxWidth(640.px)) {
-            CSSSelector.Universal style {
+            universal style {
                 AppCSSVariables.wtOffsetTopUnit(16.px)
                 AppCSSVariables.wtFlowUnit(16.px)
             }
         }
 
-        CSSSelector.Attribute(
+        attrContains(
             name = "class",
-            value = "wtCol",
-            operator = CSSSelector.Attribute.Operator.Contains
+            value = "wtCol"
         ) style {
             marginRight(AppCSSVariables.wtHorizontalLayoutGutter.value())
             marginLeft(AppCSSVariables.wtHorizontalLayoutGutter.value())

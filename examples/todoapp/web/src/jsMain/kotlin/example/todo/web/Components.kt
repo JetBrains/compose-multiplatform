@@ -2,8 +2,8 @@ package example.todo.web
 
 import androidx.compose.runtime.Composable
 import org.jetbrains.compose.common.material.Text
+import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 import org.jetbrains.compose.web.attributes.InputType
-import org.jetbrains.compose.web.attributes.checked
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.JustifyContent
@@ -42,7 +42,7 @@ fun MaterialCheckbox(
                 type = InputType.Checkbox,
                 attrs = {
                     classes("filled-in")
-                    if (checked) checked()
+                    checked(checked)
                     onChange { onCheckedChange(it.value) }
                 }
             )
@@ -66,6 +66,7 @@ fun Card(attrs: AttrBuilderContext<*> = {}, content: @Composable () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalComposeWebWidgetsApi::class)
 @Composable
 fun MaterialTextArea(
     id: String,
