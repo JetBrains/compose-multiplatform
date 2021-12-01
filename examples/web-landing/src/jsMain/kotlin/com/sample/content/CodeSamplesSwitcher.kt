@@ -4,9 +4,6 @@ import androidx.compose.runtime.Composable
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.attributes.name
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.css.selectors.CSSSelector
-import org.jetbrains.compose.web.css.selectors.descendant
-import org.jetbrains.compose.web.css.selectors.selector
 import org.jetbrains.compose.web.dom.Form
 import org.jetbrains.compose.web.dom.Input
 import org.jetbrains.compose.web.dom.Label
@@ -28,7 +25,7 @@ object SwitcherStylesheet : StyleSheet(AppStylesheet) {
             }
         }
 
-        descendant(self, CSSSelector.Type("label")) style {
+        desc(self, type("label")) style {
             display(DisplayStyle.InlineBlock)
             width(SwitcherVariables.labelWidth.value(56.px))
             padding(SwitcherVariables.labelPadding.value(10.px))
@@ -53,11 +50,14 @@ object SwitcherStylesheet : StyleSheet(AppStylesheet) {
             borderRadius(22.px, 22.px, 22.px)
         }
 
-        descendant(self, selector("input[type=\"radio\"]")) style {
+        type("input") + attrEquals(name = "type", value = "radio") style {
             display(DisplayStyle.None)
         }
 
-        descendant(self, selector("input[type=\"radio\"]:checked + label")) style {
+        adjacent(
+            sibling = type("input") + attrEquals(name = "type", value = "radio") + checked,
+            selected = type("label")
+        ) style {
             border {
                 style(LineStyle.Solid)
                 width(3.px)
