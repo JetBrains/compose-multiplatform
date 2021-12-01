@@ -231,53 +231,6 @@ abstract class CSSSelector internal constructor() {
         val right : CSSSelector = PseudoClassInternal("right")
     }
 
-    internal open class PseudoClassInternal internal constructor(val name: String) : CSSSelector() {
-        override fun equals(other: Any?): Boolean {
-            return if (other is PseudoClassInternal) {
-                name == other.name && argsStr() == other.argsStr()
-            } else false
-        }
-        open fun argsStr(): String? = null
-        override fun toString(): String = ":$name${argsStr()?.let { "($it)" } ?: ""}"
-
-        // Linguistic pseudo-classes
-        internal class Lang internal constructor(val langCode: LanguageCode) : PseudoClassInternal("lang") {
-            override fun argsStr() = langCode
-        }
-
-        // Tree-structural pseudo-classes
-        internal class NthChild internal constructor(val nth: Nth) : PseudoClassInternal("nth-child") {
-            override fun argsStr() = "$nth"
-        }
-
-        internal class NthLastChild internal constructor(val nth: Nth) : PseudoClassInternal("nth-last-child") {
-            override fun argsStr() = "$nth"
-        }
-
-        internal class NthOfType internal constructor(val nth: Nth) : PseudoClassInternal("nth-of-type") {
-            override fun argsStr() = "$nth"
-        }
-
-        internal class NthLastOfType internal constructor(val nth: Nth) : PseudoClassInternal("nth-last-of-type") {
-            override fun argsStr() = "$nth"
-        }
-
-        internal class Host internal constructor(val selector: CSSSelector) : PseudoClassInternal("host") {
-            override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-                contains(this, other, listOf(selector), strict)
-
-            override fun argsStr() = "${selector.asString()}"
-        }
-
-        // Etc
-        internal class Not internal constructor(val selector: CSSSelector) : PseudoClassInternal("not") {
-            override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-                contains(this, other, listOf(selector), strict)
-
-            override fun argsStr() = "$selector"
-        }
-    }
-
     object PseudoElement {
         @Deprecated(webCssSelectorsDeprecationMessage)
         val after : CSSSelector = PseudoElementInternal("after")
@@ -295,6 +248,54 @@ abstract class CSSSelector internal constructor() {
         val fileSelectorButton : CSSSelector = PseudoElementInternal("file-selector-button")
         @Deprecated(webCssSelectorsDeprecationMessage)
         val selection : CSSSelector = PseudoElementInternal("selection")
+    }
+}
+
+
+internal open class PseudoClassInternal internal constructor(val name: String) : CSSSelector() {
+    override fun equals(other: Any?): Boolean {
+        return if (other is PseudoClassInternal) {
+            name == other.name && argsStr() == other.argsStr()
+        } else false
+    }
+    open fun argsStr(): String? = null
+    override fun toString(): String = ":$name${argsStr()?.let { "($it)" } ?: ""}"
+
+    // Linguistic pseudo-classes
+    internal class Lang internal constructor(val langCode: LanguageCode) : PseudoClassInternal("lang") {
+        override fun argsStr() = langCode
+    }
+
+    // Tree-structural pseudo-classes
+    internal class NthChild internal constructor(val nth: Nth) : PseudoClassInternal("nth-child") {
+        override fun argsStr() = "$nth"
+    }
+
+    internal class NthLastChild internal constructor(val nth: Nth) : PseudoClassInternal("nth-last-child") {
+        override fun argsStr() = "$nth"
+    }
+
+    internal class NthOfType internal constructor(val nth: Nth) : PseudoClassInternal("nth-of-type") {
+        override fun argsStr() = "$nth"
+    }
+
+    internal class NthLastOfType internal constructor(val nth: Nth) : PseudoClassInternal("nth-last-of-type") {
+        override fun argsStr() = "$nth"
+    }
+
+    internal class Host internal constructor(val selector: CSSSelector) : PseudoClassInternal("host") {
+        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+            contains(this, other, listOf(selector), strict)
+
+        override fun argsStr() = "${selector.asString()}"
+    }
+
+    // Etc
+    internal class Not internal constructor(val selector: CSSSelector) : PseudoClassInternal("not") {
+        override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+            contains(this, other, listOf(selector), strict)
+
+        override fun argsStr() = "$selector"
     }
 }
 
