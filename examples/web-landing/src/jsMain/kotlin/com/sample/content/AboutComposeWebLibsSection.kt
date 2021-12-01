@@ -8,6 +8,8 @@ import com.sample.components.Card
 import com.sample.components.ContainerInSection
 import com.sample.components.LinkOnCard
 import com.sample.style.*
+import org.jetbrains.compose.web.attributes.ATarget
+import org.jetbrains.compose.web.attributes.target
 import org.jetbrains.compose.web.css.paddingTop
 
 data class CardWithListPresentation(
@@ -37,6 +39,30 @@ private fun createAboutComposeWebCards(): List<CardWithListPresentation> {
     )
 }
 
+private fun createFeaturesList(): List<String> {
+    return listOf(
+        "Same reactive engine that is used on Android/Desktop allows using a common codebase.",
+        "Framework for rich UI creation for Kotlin/JS.",
+        "Convenient Kotlin DOM DSL that covers all common frontend development scenarios.",
+        "Comprehensive CSS-in-Kotlin/JS API."
+    )
+}
+
+
+@Composable
+private fun FeatureDescriptionBlock(description: String) {
+    Div(attrs = {
+        classes(WtCols.wtCol3, WtCols.wtColMd6, WtCols.wtColSm12, WtOffsets.wtTopOffset48)
+    }) {
+        Img(src = "compose_bullet.svg")
+        P(attrs = {
+            classes(WtTexts.wtText1, WtTexts.wtText1HardnessHard, WtOffsets.wtTopOffset12)
+        }) {
+            Text(description)
+        }
+    }
+}
+
 @Composable
 fun ComposeWebLibraries() {
     ContainerInSection(WtSections.wtSectionBgGrayLight) {
@@ -56,22 +82,21 @@ fun ComposeWebLibraries() {
                     Text("Compose for Web allows you to build reactive user interfaces for the web in Kotlin, using the concepts and APIs of Jetpack Compose to express the state, behavior, and logic of your application.")
                 }
             }
-
-            Div(attrs = {
-                classes(WtCols.wtCol6, WtCols.wtColMd6, WtCols.wtColSm12, WtOffsets.wtTopOffset24)
-            }) {
-                P(attrs = {
-                    classes(WtTexts.wtText1)
-                }) {
-                    Text("Compose for Web provides multiple ways of declaring user interfaces in Kotlin code, allowing you to have full control over your website layout with a declarative DOM API, or use versions of the widgets you already know from Jetpack Compose for Desktop and Android.\n")
-                }
-            }
         }
 
         Div(attrs = {
-            classes(WtRows.wtRow, WtRows.wtRowSizeM, WtOffsets.wtTopOffset48)
+            classes(WtRows.wtRow, WtRows.wtRowSizeM, WtOffsets.wtTopOffset24)
         }) {
-            createAboutComposeWebCards().forEach { CardWithList(it) }
+            createFeaturesList().forEach {
+                FeatureDescriptionBlock(it)
+            }
+        }
+
+        A(attrs = {
+            classes(WtTexts.wtButton, WtTexts.wtButtonThemeLight, WtOffsets.wtTopOffset48, WtOffsets.wtTopOffsetSm24)
+            target(ATarget.Blank)
+        }, href = "https://github.com/JetBrains/compose-jb/blob/master/FEATURES.md#features-currently-available-in-compose-for-web") {
+            Text("See all features")
         }
     }
 }

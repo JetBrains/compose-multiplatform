@@ -23,6 +23,12 @@ object WtOffsets : StyleSheet(AppStylesheet) {
         marginTop(48.px)
     }
 
+    val wtTopOffset12 by style {
+        self style {
+            marginTop(12.px)
+        }
+    }
+
     val wtTopOffsetSm12 by style {
         media(mediaMaxWidth(640.px)) {
             self style {

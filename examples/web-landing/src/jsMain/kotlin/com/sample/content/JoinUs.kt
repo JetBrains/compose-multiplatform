@@ -29,7 +29,7 @@ fun JoinUs() {
                             classes(WtTexts.wtLink)
                             target(ATarget.Blank)
                         }) {
-                            Text("Compose for Desktop")
+                            Text("Compose Multiplatform")
                         }
                     }
                 }

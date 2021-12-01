@@ -45,9 +45,9 @@ fun Intro() {
                     }) {
                         Text("Web")
 
-                        Span(attrs = { classes(AppStylesheet.composeTitleTag) }) {
-                            Text("Technology preview")
-                        }
+//                        Span(attrs = { classes(AppStylesheet.composeTitleTag) }) {
+//                            Text("Technology preview")
+//                        }
                     }
                 }
                 Div({
@@ -95,11 +95,11 @@ private fun IntroAboutComposeWeb() {
             Text(
                 "Compose for Web simplifies and accelerates UI development for web applications, " +
                         "and aims to enable UI code sharing between web, desktop, and Android applications " +
-                        "in the future. Currently in technology preview."
+                        "in the future."
             )
         }
 
-            ComposeWebStatusMessage()
+            //ComposeWebStatusMessage()
 
             IntroCodeSample()
 
