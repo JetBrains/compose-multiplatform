@@ -287,7 +287,7 @@ internal open class PseudoClassInternal internal constructor(val name: String) :
         override fun contains(other: CSSSelector, strict: Boolean): Boolean =
             contains(this, other, listOf(selector), strict)
 
-        override fun argsStr() = "${selector.asString()}"
+        override fun argsStr() = selector.asString()
     }
 
     // Etc
