@@ -78,7 +78,7 @@ Note the annotation `@OptIn(ExperimentalComposeUiApi::class)`. Some keys related
 
 ## Window-scoped events
 
-`Window`,`singleWindowApplication` and `Dialog` functions have a `onPreviewKeyEvent` and a `onKeyEvent` properties. It is possible to use them to define keyboard event handlers that are always active in the current window. You possibly want to use `onPreviewKeyEvent` here to intercept events. Here is an example:
+`Window`, `singleWindowApplication` and `Dialog` functions have a `onPreviewKeyEvent` and a `onKeyEvent` properties. It is possible to use them to define keyboard event handlers that are always active in the current window. You possibly want to use `onPreviewKeyEvent` here to intercept events. Here is an example:
 
 ``` kotlin
 import androidx.compose.foundation.layout.Arrangement
