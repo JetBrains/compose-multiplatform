@@ -428,10 +428,353 @@ class LazyListsContentPaddingTest(orientation: Orientation) :
             .assertMainAxisSizeIsEqualTo(itemSize)
     }
 
+    @Test
+    fun totalPaddingLargerParentSize_initialState() {
+        lateinit var state: LazyListState
+        rule.setContent {
+            state = rememberLazyListState()
+            Box(modifier = Modifier.testTag(ContainerTag).size(itemSize * 1.5f)) {
+                LazyColumnOrRow(
+                    state = state,
+                    contentPadding = PaddingValues(mainAxis = itemSize)
+                ) {
+                    items(4) {
+                        Box(Modifier.testTag("$it").size(itemSize))
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0")
+            .assertStartPositionInRootIsEqualTo(itemSize)
+
+        rule.onNodeWithTag("1")
+            .assertDoesNotExist()
+
+        rule.runOnIdle {
+            state.assertScrollPosition(0, 0.dp)
+            state.assertVisibleItems(0 to 0.dp)
+            state.assertLayoutInfoOffsetRange(-itemSize, itemSize * 0.5f)
+        }
+    }
+
+    @Test
+    fun totalPaddingLargerParentSize_scrollByPadding() {
+        lateinit var state: LazyListState
+        rule.setContent {
+            state = rememberLazyListState()
+            Box(modifier = Modifier.testTag(ContainerTag).size(itemSize * 1.5f)) {
+                LazyColumnOrRow(
+                    state = state,
+                    contentPadding = PaddingValues(mainAxis = itemSize)
+                ) {
+                    items(4) {
+                        Box(Modifier.testTag("$it").size(itemSize))
+                    }
+                }
+            }
+        }
+
+        state.scrollBy(itemSize)
+
+        rule.onNodeWithTag("0")
+            .assertStartPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("1")
+            .assertStartPositionInRootIsEqualTo(itemSize)
+
+        rule.onNodeWithTag("2")
+            .assertIsNotDisplayed()
+
+        rule.runOnIdle {
+            state.assertScrollPosition(1, 0.dp)
+            state.assertVisibleItems(0 to -itemSize, 1 to 0.dp)
+        }
+    }
+
+    @Test
+    fun totalPaddingLargerParentSize_scrollToLastItem() {
+        lateinit var state: LazyListState
+        rule.setContent {
+            state = rememberLazyListState()
+            Box(modifier = Modifier.testTag(ContainerTag).size(itemSize * 1.5f)) {
+                LazyColumnOrRow(
+                    state = state,
+                    contentPadding = PaddingValues(mainAxis = itemSize)
+                ) {
+                    items(4) {
+                        Box(Modifier.testTag("$it").size(itemSize))
+                    }
+                }
+            }
+        }
+
+        state.scrollTo(3)
+
+        rule.onNodeWithTag("1")
+            .assertDoesNotExist()
+
+        rule.onNodeWithTag("2")
+            .assertStartPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("3")
+            .assertStartPositionInRootIsEqualTo(itemSize)
+
+        rule.runOnIdle {
+            state.assertScrollPosition(3, 0.dp)
+            state.assertVisibleItems(2 to -itemSize, 3 to 0.dp)
+        }
+    }
+
+    @Test
+    fun totalPaddingLargerParentSize_scrollToLastItemByDelta() {
+        lateinit var state: LazyListState
+        rule.setContent {
+            state = rememberLazyListState()
+            Box(modifier = Modifier.testTag(ContainerTag).size(itemSize * 1.5f)) {
+                LazyColumnOrRow(
+                    state = state,
+                    contentPadding = PaddingValues(mainAxis = itemSize)
+                ) {
+                    items(4) {
+                        Box(Modifier.testTag("$it").size(itemSize))
+                    }
+                }
+            }
+        }
+
+        state.scrollBy(itemSize * 3)
+
+        rule.onNodeWithTag("1")
+            .assertIsNotDisplayed()
+
+        rule.onNodeWithTag("2")
+            .assertStartPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("3")
+            .assertStartPositionInRootIsEqualTo(itemSize)
+
+        rule.runOnIdle {
+            state.assertScrollPosition(3, 0.dp)
+            state.assertVisibleItems(2 to -itemSize, 3 to 0.dp)
+        }
+    }
+
+    @Test
+    fun totalPaddingLargerParentSize_scrollTillTheEnd() {
+        // the whole end content padding is displayed
+        lateinit var state: LazyListState
+        rule.setContent {
+            state = rememberLazyListState()
+            Box(modifier = Modifier.testTag(ContainerTag).size(itemSize * 1.5f)) {
+                LazyColumnOrRow(
+                    state = state,
+                    contentPadding = PaddingValues(mainAxis = itemSize)
+                ) {
+                    items(4) {
+                        Box(Modifier.testTag("$it").size(itemSize))
+                    }
+                }
+            }
+        }
+
+        state.scrollBy(itemSize * 4.5f)
+
+        rule.onNodeWithTag("2")
+            .assertIsNotDisplayed()
+
+        rule.onNodeWithTag("3")
+            .assertStartPositionInRootIsEqualTo(-itemSize * 0.5f)
+
+        rule.runOnIdle {
+            state.assertScrollPosition(3, itemSize * 1.5f)
+            state.assertVisibleItems(3 to -itemSize * 1.5f)
+        }
+    }
+
+    @Test
+    fun eachPaddingLargerParentSize_initialState() {
+        lateinit var state: LazyListState
+        rule.setContent {
+            state = rememberLazyListState()
+            Box(modifier = Modifier.testTag(ContainerTag).size(itemSize * 1.5f)) {
+                LazyColumnOrRow(
+                    state = state,
+                    contentPadding = PaddingValues(mainAxis = itemSize * 2)
+                ) {
+                    items(4) {
+                        Box(Modifier.testTag("$it").size(itemSize))
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0")
+            .assertIsNotDisplayed()
+
+        rule.runOnIdle {
+            state.assertScrollPosition(0, 0.dp)
+            state.assertVisibleItems(0 to 0.dp)
+            state.assertLayoutInfoOffsetRange(-itemSize * 2, -itemSize * 0.5f)
+        }
+    }
+
+    @Test
+    fun eachPaddingLargerParentSize_scrollByPadding() {
+        lateinit var state: LazyListState
+        rule.setContent {
+            state = rememberLazyListState()
+            Box(modifier = Modifier.testTag(ContainerTag).size(itemSize * 1.5f)) {
+                LazyColumnOrRow(
+                    state = state,
+                    contentPadding = PaddingValues(mainAxis = itemSize * 2)
+                ) {
+                    items(4) {
+                        Box(Modifier.testTag("$it").size(itemSize))
+                    }
+                }
+            }
+        }
+
+        state.scrollBy(itemSize * 2)
+
+        rule.onNodeWithTag("0")
+            .assertStartPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("1")
+            .assertStartPositionInRootIsEqualTo(itemSize)
+
+        rule.onNodeWithTag("2")
+            .assertIsNotDisplayed()
+
+        rule.runOnIdle {
+            state.assertScrollPosition(2, 0.dp)
+            state.assertVisibleItems(0 to -itemSize * 2, 1 to -itemSize, 2 to 0.dp)
+        }
+    }
+
+    @Test
+    fun eachPaddingLargerParentSize_scrollToLastItem() {
+        lateinit var state: LazyListState
+        rule.setContent {
+            state = rememberLazyListState()
+            Box(modifier = Modifier.testTag(ContainerTag).size(itemSize * 1.5f)) {
+                LazyColumnOrRow(
+                    state = state,
+                    contentPadding = PaddingValues(mainAxis = itemSize * 2)
+                ) {
+                    items(4) {
+                        Box(Modifier.testTag("$it").size(itemSize))
+                    }
+                }
+            }
+        }
+
+        state.scrollTo(3)
+
+        rule.onNodeWithTag("0")
+            .assertIsNotDisplayed()
+
+        rule.onNodeWithTag("1")
+            .assertStartPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("2")
+            .assertStartPositionInRootIsEqualTo(itemSize)
+
+        rule.onNodeWithTag("3")
+            .assertIsNotDisplayed()
+
+        rule.runOnIdle {
+            state.assertScrollPosition(3, 0.dp)
+            state.assertVisibleItems(1 to -itemSize * 2, 2 to -itemSize, 3 to 0.dp)
+        }
+    }
+
+    @Test
+    fun eachPaddingLargerParentSize_scrollToLastItemByDelta() {
+        lateinit var state: LazyListState
+        rule.setContent {
+            state = rememberLazyListState()
+            Box(modifier = Modifier.testTag(ContainerTag).size(itemSize * 1.5f)) {
+                LazyColumnOrRow(
+                    state = state,
+                    contentPadding = PaddingValues(mainAxis = itemSize * 2)
+                ) {
+                    items(4) {
+                        Box(Modifier.testTag("$it").size(itemSize))
+                    }
+                }
+            }
+        }
+
+        state.scrollBy(itemSize * 3)
+
+        rule.onNodeWithTag("0")
+            .assertIsNotDisplayed()
+
+        rule.onNodeWithTag("1")
+            .assertStartPositionInRootIsEqualTo(0.dp)
+
+        rule.onNodeWithTag("2")
+            .assertStartPositionInRootIsEqualTo(itemSize)
+
+        rule.onNodeWithTag("3")
+            .assertIsNotDisplayed()
+
+        rule.runOnIdle {
+            state.assertScrollPosition(3, 0.dp)
+            state.assertVisibleItems(1 to -itemSize * 2, 2 to -itemSize, 3 to 0.dp)
+        }
+    }
+
+    @Test
+    fun eachPaddingLargerParentSize_scrollTillTheEnd() {
+        // only the end content padding is displayed
+        lateinit var state: LazyListState
+        rule.setContent {
+            state = rememberLazyListState()
+            Box(modifier = Modifier.testTag(ContainerTag).size(itemSize * 1.5f)) {
+                LazyColumnOrRow(
+                    state = state,
+                    contentPadding = PaddingValues(mainAxis = itemSize * 2)
+                ) {
+                    items(4) {
+                        Box(Modifier.testTag("$it").size(itemSize))
+                    }
+                }
+            }
+        }
+
+        state.scrollBy(
+            itemSize * 1.5f + // container size
+                itemSize * 2 + // start padding
+                itemSize * 3 // all items
+        )
+
+        rule.onNodeWithTag("3")
+            .assertIsNotDisplayed()
+
+        rule.runOnIdle {
+            state.assertScrollPosition(3, itemSize * 3.5f)
+            state.assertVisibleItems(3 to -itemSize * 3.5f)
+        }
+    }
+
     private fun LazyListState.assertScrollPosition(index: Int, offset: Dp) = with(rule.density) {
         assertThat(firstVisibleItemIndex).isEqualTo(index)
         assertThat(firstVisibleItemScrollOffset.toDp().value).isWithin(0.5f).of(offset.value)
     }
+
+    private fun LazyListState.assertLayoutInfoOffsetRange(from: Dp, to: Dp) = with(rule.density) {
+        assertThat(layoutInfo.viewportStartOffset to layoutInfo.viewportEndOffset)
+            .isEqualTo(from.roundToPx() to to.roundToPx())
+    }
+
+    private fun LazyListState.assertVisibleItems(vararg expected: Pair<Int, Dp>) =
+        with(rule.density) {
+            assertThat(layoutInfo.visibleItemsInfo.map { it.index to it.offset })
+                .isEqualTo(expected.map { it.first to it.second.roundToPx() })
+        }
 
     companion object {
         @JvmStatic
