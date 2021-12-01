@@ -67,7 +67,7 @@ interface SelectorsScope {
     val universal: CSSSelector
         get() = Universal
 
-    fun type(type: String): CSSSelector = CSSSelector.Type(type)
+    fun type(type: String): CSSSelector = Type(type)
     fun className(className: String): CSSSelector = CSSSelector.CSSClass(className)
     fun id(id: String): CSSSelector = CSSSelector.Id(id)
 
