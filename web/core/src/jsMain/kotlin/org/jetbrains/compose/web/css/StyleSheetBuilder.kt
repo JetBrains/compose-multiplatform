@@ -241,6 +241,22 @@ interface SelectorsScope {
     fun slotted(selector: CSSSelector): CSSSelector = PseudoElementInternal.Slotted(selector)
 }
 
+private data class Id constructor(val id: String) : CSSSelector() {
+    override fun toString(): String = "#$id"
+}
+
+private data class Type constructor(val type: String) : CSSSelector() {
+    override fun toString(): String = type
+}
+
+private object Universal : CSSSelector() {
+    override fun toString(): String = "*"
+}
+
+private data class Raw constructor(val selector: String) : CSSSelector() {
+    override fun toString(): String = selector
+}
+
 interface StyleSheetBuilder : CSSRulesHolder, GenericStyleSheetBuilder<CSSStyleRuleBuilder> {
     override fun style(selector: CSSSelector, cssRule: CSSStyleRuleBuilder.() -> Unit) {
         add(selector, buildCSSStyleRule(cssRule))

@@ -170,21 +170,6 @@ abstract class CSSSelector internal constructor() {
     }
 }
 
-internal data class Id internal constructor(val id: String) : CSSSelector() {
-    override fun toString(): String = "#$id"
-}
-
-internal data class Type internal constructor(val type: String) : CSSSelector() {
-    override fun toString(): String = type
-}
-
-internal object Universal : CSSSelector() {
-    override fun toString(): String = "*"
-}
-
-internal data class Raw internal constructor(val selector: String) : CSSSelector() {
-    override fun toString(): String = selector
-}
 
 internal data class AttributeInternal internal constructor(
     val name: String,
