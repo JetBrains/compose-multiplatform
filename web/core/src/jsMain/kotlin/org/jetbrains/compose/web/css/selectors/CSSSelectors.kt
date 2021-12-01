@@ -194,23 +194,6 @@ internal data class AttributeInternal internal constructor(
     }
 }
 
-internal data class Sibling internal constructor(val prev: CSSSelector, val selected: CSSSelector) : CSSSelector() {
-    override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-        contains(this, other, listOf(prev, selected), strict)
-
-    override fun toString(): String = "$prev ~ $selected"
-    override fun asString(): String = "${prev.asString()} ~ ${selected.asString()}"
-}
-
-internal data class Adjacent internal constructor(val prev: CSSSelector, val selected: CSSSelector) :
-    CSSSelector() {
-    override fun contains(other: CSSSelector, strict: Boolean): Boolean =
-        contains(this, other, listOf(prev, selected), strict)
-
-    override fun toString(): String = "$prev + $selected"
-    override fun asString(): String = "${prev.asString()} + ${selected.asString()}"
-}
-
 internal open class PseudoClassInternal internal constructor(val name: String) : CSSSelector() {
     override fun equals(other: Any?): Boolean {
         return if (other is PseudoClassInternal) {

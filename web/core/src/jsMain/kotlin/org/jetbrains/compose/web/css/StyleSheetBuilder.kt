@@ -290,6 +290,23 @@ private data class Child(val parent: CSSSelector, val selected: CSSSelector) : C
     override fun asString(): String = "${parent.asString()} > ${selected.asString()}"
 }
 
+private data class Sibling(val prev: CSSSelector, val selected: CSSSelector) : CSSSelector() {
+    override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+        contains(this, other, listOf(prev, selected), strict)
+
+    override fun toString(): String = "$prev ~ $selected"
+    override fun asString(): String = "${prev.asString()} ~ ${selected.asString()}"
+}
+
+private data class Adjacent(val prev: CSSSelector, val selected: CSSSelector) : CSSSelector() {
+    override fun contains(other: CSSSelector, strict: Boolean): Boolean =
+        contains(this, other, listOf(prev, selected), strict)
+
+    override fun toString(): String = "$prev + $selected"
+    override fun asString(): String = "${prev.asString()} + ${selected.asString()}"
+}
+
+
 interface StyleSheetBuilder : CSSRulesHolder, GenericStyleSheetBuilder<CSSStyleRuleBuilder> {
     override fun style(selector: CSSSelector, cssRule: CSSStyleRuleBuilder.() -> Unit) {
         add(selector, buildCSSStyleRule(cssRule))
