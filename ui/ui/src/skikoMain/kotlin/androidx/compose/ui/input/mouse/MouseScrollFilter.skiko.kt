@@ -15,6 +15,7 @@
  */
 
 @file:OptIn(ExperimentalComposeUiApi::class)
+@file:Suppress("DEPRECATION") // https://github.com/JetBrains/compose-jb/issues/1514
 
 package androidx.compose.ui.input.mouse
 
@@ -30,7 +31,10 @@ import java.awt.event.MouseWheelEvent
 /**
  * Indicates distance by which we should scroll some container.
  */
-@ExperimentalComposeUiApi
+@Deprecated(
+    "Use Modifier.pointerInput + PointerEventType.Scroll." +
+        "See the comment to mouseScrollFilter"
+)
 sealed class MouseScrollUnit {
     /**
      * Indicates that scrolling should be performed by [value] lines.
@@ -41,7 +45,10 @@ sealed class MouseScrollUnit {
      * dependent on the container's bounds (in which scroll event occurs),
      * or by one real text line in some document.
      */
-    @ExperimentalComposeUiApi
+    @Deprecated(
+        "Use Modifier.pointerInput + PointerEventType.Scroll." +
+            "See the comment to mouseScrollFilter"
+    )
     data class Line(val value: Float) : MouseScrollUnit()
 
     /**
@@ -52,14 +59,20 @@ sealed class MouseScrollUnit {
      * Scrolling by one page usually means that we should scroll by one container's height
      * (in which scroll event occurs), or by one real page in some document.
      */
-    @ExperimentalComposeUiApi
+    @Deprecated(
+        "Use Modifier.pointerInput + PointerEventType.Scroll." +
+            "See the comment to mouseScrollFilter"
+    )
     data class Page(val value: Float) : MouseScrollUnit()
 }
 
 /**
  * Mouse wheel or touchpad event.
  */
-@ExperimentalComposeUiApi
+@Deprecated(
+    "Use Modifier.pointerInput + PointerEventType.Scroll." +
+    "See the comment to mouseScrollFilter"
+)
 class MouseScrollEvent(
     /**
      * Change of mouse scroll.
@@ -90,7 +103,26 @@ class MouseScrollEvent(
  * While implementing this callback, return true to stop propagation of this event. If you return
  * false, the scroll event will be sent to this [mouseScrollFilter]'s parent.
  */
-@ExperimentalComposeUiApi
+@Deprecated(
+    "Use Modifier.pointerInput + PointerEventType.Scroll",
+    replaceWith = ReplaceWith(
+        "pointerInput(Unit) { \n" +
+        "     awaitPointerEventScope {\n" +
+        "         while (true) {\n" +
+        "             val event = awaitPointerEvent()\n" +
+        "             if (event.type == PointerEventType.Scroll) {\n" +
+        "                 val scrollDelta = event.changes.first().scrollDelta\n" +
+        "                 val bounds = this.size\n" +
+        "                 if (onMouseScroll(scrollDelta, bounds)) {\n" +
+        "                      event.changes.first().consume()\n" +
+        "                 }\n" +
+        "             }\n" +
+        "         }\n" +
+        "     }\n" +
+        "}",
+        "androidx.compose.ui.input.pointer.pointerInput"
+    )
+)
 fun Modifier.mouseScrollFilter(
     onMouseScroll: (
         /**
@@ -138,7 +170,10 @@ private fun MouseWheelEvent.toLegacyEvent(scrollDelta: Offset): MouseScrollEvent
     )
 }
 
-@ExperimentalComposeUiApi
+@Deprecated(
+    "Use Modifier.pointerInput + PointerEventType.Scroll." +
+        "See the comment to mouseScrollFilter"
+)
 enum class MouseScrollOrientation {
     Vertical, Horizontal
 }

@@ -24,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -208,7 +207,6 @@ interface TooltipPlacement {
         private val alignment: Alignment = Alignment.BottomEnd,
         private val windowMargin: Dp = 4.dp
     ) : TooltipPlacement {
-        @OptIn(ExperimentalComposeUiApi::class)
         @Composable
         override fun positionProvider() = rememberCursorPositionProvider(
             offset,
@@ -231,7 +229,6 @@ interface TooltipPlacement {
         private val alignment: Alignment = Alignment.BottomCenter,
         private val offset: DpOffset = DpOffset.Zero
     ) : TooltipPlacement {
-        @OptIn(ExperimentalComposeUiApi::class)
         @Composable
         override fun positionProvider() = rememberComponentRectPositionProvider(
             anchor,
