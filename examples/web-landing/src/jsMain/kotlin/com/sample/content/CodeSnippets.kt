@@ -72,7 +72,7 @@ private val DeclareAndUseStylesheet = CodeSnippetData(
 private val DeclareAndUseCssVariable = CodeSnippetData(
     title = "Declare and use CSS variables",
     source = """
-        object MyVariables : CSSVariables {
+        object MyVariables {
             val contentBackgroundColor by variable<Color>() /* declare a variable */
         }
         
@@ -190,7 +190,7 @@ private val allSnippets = arrayOf(
     DeclareAndUseCssVariable,
     HoverSelectorAndMedia,
     DefineCssClassInComponent,
-    LayoutsSample
+    //LayoutsSample
 )
 
 private var currentCodeSnippet: CodeSnippetData by mutableStateOf(allSnippets[0])

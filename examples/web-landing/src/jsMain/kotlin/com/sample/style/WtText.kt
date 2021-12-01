@@ -61,6 +61,10 @@ object WtTexts : StyleSheet(AppStylesheet) {
         )
     }
 
+    val wtText1HardnessHard by style {
+        color(rgb(15, 16, 17))
+    }
+
     val wtText1ThemeDark by style {
         color(rgba(255, 255, 255, 0.6))
     }
@@ -195,6 +199,20 @@ object WtTexts : StyleSheet(AppStylesheet) {
 
         hover(self) style {
             backgroundColor(rgba(39, 40, 44, .7))
+        }
+    }
+
+    val wtButtonThemeLight by style {
+        color(Color("#27282c"))
+        backgroundColor(Color("transparent"))
+        border {
+            style(LineStyle.Solid)
+            width(1.px)
+            color(Color("#27282c"))
+        }
+
+        hover(self) style {
+            backgroundColor(rgba(39,40,44,.05))
         }
     }
 
