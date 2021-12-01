@@ -65,7 +65,7 @@ fun main() {
 
     glfwDispatcher.runLoop()
 
-    composeScene.dispose()
+    composeScene.close()
     glfwDestroyWindow(windowHandle)
 
     exitProcess(0)
