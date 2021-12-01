@@ -6,7 +6,7 @@ In this tutorial, we will show you how to use desktop-specific components of Com
 
 ## Scrollbars
 
-You can apply scrollbars to scrollable components. The scrollbar and scrollable components share a common state to synchronize with each other. For example, `VerticalScrollbar` can be attached to `Modifier.verticalScroll`, and `LazyColumnFor` and `HorizontalScrollbar` can be attached to `Modifier.horizontalScroll` and `LazyRowFor`.
+You can apply scrollbars to scrollable components. The scrollbar and scrollable components share a common state to synchronize with each other. For example, `VerticalScrollbar` can be attached to `Modifier.verticalScroll`, and `LazyColumn` and `HorizontalScrollbar` can be attached to `Modifier.horizontalScroll` and `LazyRow`.
 
 ```kotlin
 import androidx.compose.foundation.HorizontalScrollbar
