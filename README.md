@@ -28,7 +28,7 @@ Preview functionality (check your application UI without building/running it) fo
        * [widgets gallery](examples/widgets-gallery) - Gallery of standard widgets
        * [IDEA plugin](examples/intellij-plugin) - Plugin for IDEA using Compose for Desktop
    * [gradle-plugins](gradle-plugins) - a plugin, simplifying usage of Compose Multiplatform with Gradle
-   * [templates](templates) - new application templates (see `desktop-template/build_and_run_from_cli_example.sh` for using without Gradle)
+   * [templates](templates) - new application templates
    * [tutorials](tutorials) - tutorials on using Compose Multiplatform
        * [Getting started](tutorials/Getting_Started)
        * [Image and icon manipulations](tutorials/Image_And_Icons_Manipulations)
@@ -49,6 +49,7 @@ Preview functionality (check your application UI without building/running it) fo
        * [cef](experimental/cef) - CEF integration in Jetpack Compose (somewhat outdated)
        * [Video Player](experimental/components/VideoPlayer)
        * [LWJGL integration](experimental/lwjgl-integration) - An example showing how to integrate Compose with [LWJGL](https://www.lwjgl.org)
+       * [CLI example](build_from_cli) - An example showing how to build Compose without Gradle
        
 ## Getting latest version of Compose Multiplatform ##
 

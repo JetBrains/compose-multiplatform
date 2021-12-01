@@ -28,12 +28,11 @@ COROUTINES_VERSION=1.3.6
 COLLECTIONS_VERSION=0.3
 SPACE_REPO="https://public.jetbrains.space/p/compose/packages/maven/"
 MAVEN_CENTRAL="https://repo1.maven.org/maven2"
-BINTRAY_KOTLINX="https://dl.bintray.com/kotlin/kotlinx"
 
 mavenDep "$SPACE_REPO" "org/jetbrains/skiko" "skiko-jvm-runtime-$PLATFORM" "$SKIKO_VERSION"
 mavenDep "$SPACE_REPO" "org/jetbrains/compose" "compose-full" "$COMPOSE_VERSION"
 mavenDep "$SPACE_REPO" "org/jetbrains/compose" "compose-compiler-hosted" "$COMPOSE_VERSION"
-mavenDep "$BINTRAY_KOTLINX" "org/jetbrains/kotlinx" "kotlinx-collections-immutable-jvm" "$COLLECTIONS_VERSION"
+mavenDep "$MAVEN_CENTRAL" "org/jetbrains/kotlinx" "kotlinx-collections-immutable-jvm" "$COLLECTIONS_VERSION"
 mavenDep "$MAVEN_CENTRAL" "org/jetbrains/kotlinx" "kotlinx-coroutines-core" "$COROUTINES_VERSION"
 mavenDep "$MAVEN_CENTRAL" "org/jetbrains/kotlin" "kotlin-stdlib" "$KOTLIN_VERSION"
 if [ ! -f "deps/kotlin-compiler-$KOTLIN_VERSION.zip" ]; then
