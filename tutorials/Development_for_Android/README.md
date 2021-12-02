@@ -40,7 +40,7 @@ However please note, that Kotlin Compiler version used for Android must match.
 For multiplatform Android modules using AGP `4.1.3` with the block like
 ```kotlin
 dependencies {
-   classpath("com.android.tools.build:gradle:4.1.3")
+    classpath("com.android.tools.build:gradle:4.1.3")
 }
 ```
 is recommended. We're working on providing compatibility with more recent AGP versions, see [KT-49835](https://youtrack.jetbrains.com/issue/KT-49835) and 
