@@ -8,7 +8,7 @@ This tutorial covers topic of using Compose Multiplatform for multiplatform buil
 
 Compose Multiplatform build doesn't contain any Android artifacts. 
 Instead it references Jetpack Compose Android artifacts [published by Google](https://developer.android.com/jetpack/compose).
-This way we ensure that libraries built for Android using Jetpack libraries are compatible with Android Multiplatform.
+This way we ensure that libraries built for Android using Jetpack libraries are compatible with Compose Multiplatform.
 
 ## Usage
 
