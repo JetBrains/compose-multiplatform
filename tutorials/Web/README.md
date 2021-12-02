@@ -14,7 +14,7 @@ Compose for Web provides multiple ways of declaring user interfaces in Kotlin co
 
 [Style DSL](Style_Dsl/README.md) - about styling the composable components in web
 
-[Using test-utils](Using_Test_Utils/README.md) - how to use test-utils for DOM DSL unit testing
+[Using test-utils](Using_Test_Utils/README.md) - about unit testing for @Composable components based on HTML DOM
 
 ## Examples:
 - Compose For Web [landing page](https://compose-web.ui.pages.jetbrains.team/). Also have a look at [source code](https://github.com/JetBrains/compose-jb/tree/master/examples/web-landing)
