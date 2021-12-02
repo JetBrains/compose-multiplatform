@@ -85,6 +85,7 @@ object LibraryVersions {
     val LEANBACK_GRID = Version("1.0.0-alpha02")
     val LEGACY = Version("1.1.0-alpha01")
     val LOCALBROADCASTMANAGER = Version("1.1.0-rc01")
+    val LIBYUV = Version("0.1.0-dev01")
     val LIFECYCLE = Version("2.5.0-alpha01")
     val LIFECYCLE_VIEWMODEL_COMPOSE = Version("2.5.0-alpha01")
     val LIFECYCLE_EXTENSIONS = Version("2.2.0")
