@@ -21,9 +21,11 @@
    * [Context Menu](tutorials/Context_Menu/README.md)  
 
 ### Features currently available in Compose for Web
-   * [Intro](tutorials/Web/Building_UI/README.md)
+   * [Intro: HTML DOM DSL](tutorials/Web/Building_UI/README.md)
    * [Event handling](tutorials/Web/Events_Handling/README.md)
-   * [CSS](tutorials/Web/Style_Dsl/README.md)
+   * [Style DSL](tutorials/Web/Style_Dsl/README.md)
+   * [Controlled and Uncontrolled Inputs](tutorials/Web/Controlled_Uncontrolled_Inputs/README.md)
+   * [Test Utils](tutorials/Web/Using_Test_Utils/README.md)
 
 
 Follow individual tutorials to understand how to use particular feature.
