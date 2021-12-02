@@ -11,7 +11,11 @@ Compose Multiplatform doesn't contain any Android artifacts. Instead it referenc
 ## Usage
 
 Jetpack Compose interoperability is enabled on publication level - nothing needs to be explicitly enabled. 
+
+
 The easiest way to start is to use Kotlin Project Wizard with Compose Multiplatform template - one of the target platform is Android. 
+
+
 Another option is to take [multiplatform template](https://github.com/JetBrains/compose-jb/tree/master/templates/multiplatform-template)
 
 
