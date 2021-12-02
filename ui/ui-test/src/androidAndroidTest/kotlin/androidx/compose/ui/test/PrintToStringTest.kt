@@ -106,7 +106,7 @@ class PrintToStringTest {
 
     @Test
     fun printHierarchy() {
-        rule.setContent {
+        rule.setContentWithoutMinimumTouchTarget {
             Column(Modifier.semantics { this.disabled(); this.testTag = "column" }) {
                 Box(Modifier.semantics { this.disabled(); this.testTag = "box" }) {
                     Button(onClick = {}) {
@@ -130,6 +130,7 @@ class PrintToStringTest {
                     | [Disabled]
                     |  |-Node #X at (l=X, t=X, r=X, b=X)px
                     |    Role = 'Button'
+                    |    Focused = 'false'
                     |    Text = '[Button]'
                     |    Actions = [OnClick, GetTextLayoutResult]
                     |    MergeDescendants = 'true'

@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.compositeOver
@@ -193,6 +194,52 @@ class BitmapPainterTest {
         assertEquals(Color.Blue, bottomRightMap[49, 0])
         assertEquals(Color.Blue, bottomRightMap[0, 49])
         assertEquals(Color.Blue, bottomRightMap[49, 49])
+    }
+
+    @Test
+    fun testFilterQualityNone() {
+        val sampleBitmap = ImageBitmap(3, 3)
+        val canvas = androidx.compose.ui.graphics.Canvas(sampleBitmap)
+        val samplePaint = Paint().apply {
+            color = Color.White
+        }
+
+        canvas.drawRect(0f, 0f, 3f, 3f, samplePaint)
+
+        samplePaint.color = Color.Red
+        canvas.drawRect(0f, 0f, 1f, 1f, samplePaint)
+
+        samplePaint.color = Color.Blue
+        canvas.drawRect(1f, 1f, 2f, 2f, samplePaint)
+
+        samplePaint.color = Color.Green
+        canvas.drawRect(2f, 2f, 3f, 3f, samplePaint)
+
+        val bitmapPainter = BitmapPainter(sampleBitmap, filterQuality = FilterQuality.None)
+
+        val dstBitmap = ImageBitmap(90, 90)
+        val dstCanvas = Canvas(dstBitmap)
+        dstCanvas.drawRect(0f, 0f, 90f, 90f, Paint().apply { color = Color.White })
+        drawPainter(bitmapPainter, dstCanvas, size = Size(90f, 90f))
+
+        val pixelMap = dstBitmap.toPixelMap()
+        for (i in 0 until 30) {
+            for (j in 0 until 30) {
+                assertEquals(Color.Red, pixelMap[i, j])
+            }
+        }
+
+        for (i in 30 until 60) {
+            for (j in 30 until 60) {
+                assertEquals(Color.Blue, pixelMap[i, j])
+            }
+        }
+
+        for (i in 60 until 90) {
+            for (j in 60 until 90) {
+                assertEquals(Color.Green, pixelMap[i, j])
+            }
+        }
     }
 
     @Test

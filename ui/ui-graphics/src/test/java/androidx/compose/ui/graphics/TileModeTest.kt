@@ -29,5 +29,6 @@ class TileModeTest {
         assertEquals("Clamp", TileMode.Clamp.toString())
         assertEquals("Mirror", TileMode.Mirror.toString())
         assertEquals("Repeated", TileMode.Repeated.toString())
+        assertEquals("Decal", TileMode.Decal.toString())
     }
 }

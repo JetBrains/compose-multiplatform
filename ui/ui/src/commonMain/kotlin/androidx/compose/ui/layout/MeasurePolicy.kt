@@ -58,8 +58,8 @@ fun interface MeasurePolicy {
      * [Measurable.measure] method. This method takes the [Constraints] which the child should
      * respect; different children can be measured with different constraints.
      * Measuring a child returns a [Placeable], which reveals the size chosen by the child as a
-     * result of its own measurement. According to the children sizes, the parent is defining the
-     * positioning of the children, by [placing][Placeable.PlacementScope.place] the [Placeable]s in
+     * result of its own measurement. According to the children sizes, the parent defines the
+     * position of the children, by [placing][Placeable.PlacementScope.place] the [Placeable]s in
      * the [MeasureResult.placeChildren] of the returned [MeasureResult]. Therefore the parent needs
      * to measure its children with appropriate [Constraints], such that whatever valid sizes
      * children choose, they can be laid out correctly according to the parent's layout algorithm.

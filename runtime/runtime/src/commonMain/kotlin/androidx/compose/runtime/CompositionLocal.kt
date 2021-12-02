@@ -197,6 +197,19 @@ fun <T> staticCompositionLocalOf(defaultFactory: () -> T): ProvidableComposition
     StaticProvidableCompositionLocal(defaultFactory)
 
 /**
+ * Stores [CompositionLocal]'s and their values.
+ *
+ * Can be obtained via [currentCompositionLocalContext] and passed to another composition
+ * via [CompositionLocalProvider].
+ *
+ * [CompositionLocalContext] is immutable and won't be changed after its obtaining.
+ */
+@Stable
+class CompositionLocalContext internal constructor(
+    internal val compositionLocals: CompositionLocalMap
+)
+
+/**
  * [CompositionLocalProvider] binds values to [ProvidableCompositionLocal] keys. Reading the
  * [CompositionLocal] using [CompositionLocal.current] will return the value provided in
  * [CompositionLocalProvider]'s [values] parameter for all composable functions called directly
@@ -214,4 +227,28 @@ fun CompositionLocalProvider(vararg values: ProvidedValue<*>, content: @Composab
     currentComposer.startProviders(values)
     content()
     currentComposer.endProviders()
+}
+
+/**
+ * [CompositionLocalProvider] binds values to [CompositionLocal]'s, provided by [context].
+ * Reading the [CompositionLocal] using [CompositionLocal.current] will return the value provided in
+ * values stored inside [context] for all composable functions called directly
+ * or indirectly in the [content] lambda.
+ *
+ * @sample androidx.compose.runtime.samples.compositionLocalProvider
+ *
+ * @see CompositionLocal
+ * @see compositionLocalOf
+ * @see staticCompositionLocalOf
+ */
+@Suppress("UNCHECKED_CAST")
+@Composable
+@OptIn(InternalComposeApi::class)
+fun CompositionLocalProvider(context: CompositionLocalContext, content: @Composable () -> Unit) {
+    CompositionLocalProvider(
+        *context.compositionLocals
+            .map { it.key as ProvidableCompositionLocal<Any?> provides it.value.value }
+            .toTypedArray(),
+        content = content
+    )
 }

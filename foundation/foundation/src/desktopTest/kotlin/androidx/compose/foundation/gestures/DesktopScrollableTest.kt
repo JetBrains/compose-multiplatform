@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION") // https://github.com/JetBrains/compose-jb/issues/1514
+
 package androidx.compose.foundation.gestures
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.mouse.MouseScrollEvent
-import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.input.mouse.MouseScrollOrientation
-import androidx.compose.ui.platform.DesktopPlatform
+import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.platform.TestComposeWindow
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -34,17 +37,15 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import kotlin.math.sqrt
 
+@OptIn(ExperimentalComposeUiApi::class)
 @RunWith(JUnit4::class)
 class DesktopScrollableTest {
     private val density = 2f
 
-    private fun window(
-        platform: DesktopPlatform
-    ) = TestComposeWindow(
+    private fun window() = TestComposeWindow(
         width = 100,
         height = 100,
-        density = Density(density),
-        desktopPlatform = platform
+        density = Density(density)
     )
 
     private fun scrollLineLinux(bounds: Dp) = sqrt(bounds.value * density)
@@ -54,18 +55,22 @@ class DesktopScrollableTest {
 
     @Test
     fun `linux, scroll vertical`() {
-        val window = window(platform = DesktopPlatform.Linux)
+        val window = window()
         val context = TestColumn()
 
         window.setContent {
-            Box(
-                Modifier
-                    .scrollable(
-                        orientation = Orientation.Vertical,
-                        state = context.controller()
-                    )
-                    .size(10.dp, 20.dp)
-            )
+            CompositionLocalProvider(
+                LocalMouseScrollConfig provides MouseScrollableConfig.LinuxGnome
+            ) {
+                Box(
+                    Modifier
+                        .scrollable(
+                            orientation = Orientation.Vertical,
+                            state = context.controller()
+                        )
+                        .size(10.dp, 20.dp)
+                )
+            }
         }
 
         window.onMouseScroll(
@@ -87,18 +92,22 @@ class DesktopScrollableTest {
 
     @Test
     fun `windows, scroll vertical`() {
-        val window = window(platform = DesktopPlatform.Windows)
+        val window = window()
         val context = TestColumn()
 
         window.setContent {
-            Box(
-                Modifier
-                    .scrollable(
-                        orientation = Orientation.Vertical,
-                        state = context.controller()
-                    )
-                    .size(10.dp, 20.dp)
-            )
+            CompositionLocalProvider(
+                LocalMouseScrollConfig provides MouseScrollableConfig.WindowsWinUI
+            ) {
+                Box(
+                    Modifier
+                        .scrollable(
+                            orientation = Orientation.Vertical,
+                            state = context.controller()
+                        )
+                        .size(10.dp, 20.dp)
+                )
+            }
         }
 
         window.onMouseScroll(
@@ -120,18 +129,22 @@ class DesktopScrollableTest {
 
     @Test
     fun `windows, scroll one page vertical`() {
-        val window = window(platform = DesktopPlatform.Windows)
+        val window = window()
         val context = TestColumn()
 
         window.setContent {
-            Box(
-                Modifier
-                    .scrollable(
-                        orientation = Orientation.Vertical,
-                        state = context.controller()
-                    )
-                    .size(10.dp, 20.dp)
-            )
+            CompositionLocalProvider(
+                LocalMouseScrollConfig provides MouseScrollableConfig.WindowsWinUI
+            ) {
+                Box(
+                    Modifier
+                        .scrollable(
+                            orientation = Orientation.Vertical,
+                            state = context.controller()
+                        )
+                        .size(10.dp, 20.dp)
+                )
+            }
         }
 
         window.onMouseScroll(
@@ -145,18 +158,22 @@ class DesktopScrollableTest {
 
     @Test
     fun `macOS, scroll vertical`() {
-        val window = window(platform = DesktopPlatform.MacOS)
+        val window = window()
         val context = TestColumn()
 
         window.setContent {
-            Box(
-                Modifier
-                    .scrollable(
-                        orientation = Orientation.Vertical,
-                        state = context.controller()
-                    )
-                    .size(10.dp, 20.dp)
-            )
+            CompositionLocalProvider(
+                LocalMouseScrollConfig provides MouseScrollableConfig.MacOSCocoa
+            ) {
+                Box(
+                    Modifier
+                        .scrollable(
+                            orientation = Orientation.Vertical,
+                            state = context.controller()
+                        )
+                        .size(10.dp, 20.dp)
+                )
+            }
         }
 
         window.onMouseScroll(
@@ -170,18 +187,22 @@ class DesktopScrollableTest {
 
     @Test
     fun `scroll with different orientation`() {
-        val window = window(platform = DesktopPlatform.Linux)
+        val window = window()
         val column = TestColumn()
 
         window.setContent {
-            Box(
-                Modifier
-                    .scrollable(
-                        orientation = Orientation.Vertical,
-                        state = column.controller()
-                    )
-                    .size(10.dp, 20.dp)
-            )
+            CompositionLocalProvider(
+                LocalMouseScrollConfig provides MouseScrollableConfig.LinuxGnome
+            ) {
+                Box(
+                    Modifier
+                        .scrollable(
+                            orientation = Orientation.Vertical,
+                            state = column.controller()
+                        )
+                        .size(10.dp, 20.dp)
+                )
+            }
         }
 
         window.onMouseScroll(

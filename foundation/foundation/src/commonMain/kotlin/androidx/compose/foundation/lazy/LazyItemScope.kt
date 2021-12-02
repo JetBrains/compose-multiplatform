@@ -16,9 +16,15 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.VisibilityThreshold
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.IntOffset
 
 /**
  * Receiver scope being used by the item content parameter of LazyColumn/Row.
@@ -28,8 +34,8 @@ import androidx.compose.ui.unit.Constraints
 interface LazyItemScope {
     /**
      * Have the content fill the [Constraints.maxWidth] and [Constraints.maxHeight] of the parent
-     * measurement constraints by setting the [minimum width][Constraints.minWidth] to be equal to the
-     * [maximum width][Constraints.maxWidth] multiplied by [fraction] and the [minimum
+     * measurement constraints by setting the [minimum width][Constraints.minWidth] to be equal to
+     * the [maximum width][Constraints.maxWidth] multiplied by [fraction] and the [minimum
      * height][Constraints.minHeight] to be equal to the [maximum height][Constraints.maxHeight]
      * multiplied by [fraction]. Note that, by default, the [fraction] is 1, so the modifier will
      * make the content fill the whole available space. [fraction] must be between `0` and `1`.
@@ -70,5 +76,24 @@ interface LazyItemScope {
     fun Modifier.fillParentMaxHeight(
         /*@FloatRange(from = 0.0, to = 1.0)*/
         fraction: Float = 1f
+    ): Modifier
+
+    /**
+     * This modifier animates the item placement within the Lazy list.
+     *
+     * When you provide a key via [LazyListScope.item]/[LazyListScope.items] this modifier will
+     * enable item reordering animations. Aside from item reordering all other position changes
+     * caused by events like arrangement or alignment changes will also be animated.
+     *
+     * @sample androidx.compose.foundation.samples.ItemPlacementAnimationSample
+     *
+     * @param animationSpec a finite animation that will be used to animate the item placement.
+     */
+    @ExperimentalFoundationApi
+    fun Modifier.animateItemPlacement(
+        animationSpec: FiniteAnimationSpec<IntOffset> = spring(
+            stiffness = Spring.StiffnessMediumLow,
+            visibilityThreshold = IntOffset.VisibilityThreshold
+        )
     ): Modifier
 }

@@ -18,7 +18,6 @@
 
 package androidx.compose.lint
 
-import androidx.build.lint.AndroidXIssueRegistry
 import com.android.tools.lint.client.api.IssueRegistry
 import com.android.tools.lint.client.api.Vendor
 import com.android.tools.lint.detector.api.CURRENT_API
@@ -26,13 +25,13 @@ import com.android.tools.lint.detector.api.Issue
 
 class ComposeIssueRegistry : IssueRegistry() {
     override val minApi = CURRENT_API
-    override val api = 10
+    override val api = 11
     override val issues get(): List<Issue> {
         return listOf(
             ListIteratorDetector.ISSUE,
             ModifierInspectorInfoDetector.ISSUE,
             UnnecessaryLambdaCreationDetector.ISSUE,
-        ) + AndroidXIssueRegistry.Issues
+        )
     }
     override val vendor = Vendor(
         vendorName = "Jetpack Compose",

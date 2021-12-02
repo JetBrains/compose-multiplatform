@@ -15,6 +15,7 @@
  */
 
 import androidx.build.Publish
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("AndroidXPlugin")
@@ -26,10 +27,13 @@ plugins {
 dependencies {
     implementation("androidx.appcompat:appcompat:1.2.0")
     implementation("androidx.activity:activity-ktx:1.1.0")
+    implementation("androidx.recyclerview:recyclerview:1.2.1")
 
     kotlinPlugin(project(":compose:compiler:compiler"))
+    implementation(project(":compose:animation:animation-graphics"))
     implementation(project(":compose:foundation:foundation-layout"))
     implementation(project(":compose:material:material"))
+    implementation(project(":compose:material3:material3"))
     implementation(project(":compose:material:material-icons-extended"))
     implementation(project(":compose:runtime:runtime"))
     implementation(project(":compose:runtime:runtime-livedata"))
@@ -38,12 +42,13 @@ dependencies {
     implementation(project(":compose:ui:ui-tooling-preview"))
     implementation(project(":compose:ui:ui-viewbinding"))
     implementation(project(":navigation:navigation-compose"))
-    implementation(project(":activity:activity-compose"))
+    implementation("androidx.activity:activity-compose:1.3.1")
     implementation(project(":lifecycle:lifecycle-viewmodel-compose"))
     implementation(project(":paging:paging-compose"))
 
     implementation(libs.kotlinStdlib)
     implementation(libs.kotlinReflect)
+    implementation(libs.testCore)
     implementation(libs.testRules)
     implementation(libs.espressoCore)
     implementation(libs.junit)
@@ -58,3 +63,13 @@ androidx {
 
 android.defaultConfig.minSdkVersion 21
 android.buildFeatures.viewBinding true
+
+// needed only while https://youtrack.jetbrains.com/issue/KT-47000 isn't resolved which is
+// targeted to 1.6
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs += [
+                "-Xjvm-default=enable",
+        ]
+    }
+}

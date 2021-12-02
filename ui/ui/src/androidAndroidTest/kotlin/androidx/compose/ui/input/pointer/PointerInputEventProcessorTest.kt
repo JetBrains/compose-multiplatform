@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.input.pointer
 
+import android.view.InputDevice
+import android.view.KeyEvent as AndroidKeyEvent
 import android.view.MotionEvent
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -24,9 +26,9 @@ import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
@@ -34,6 +36,7 @@ import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.node.LayoutNodeDrawScope
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
@@ -109,6 +112,7 @@ class PointerInputEventProcessorTest {
     }
 
     @Test
+    @OptIn(ExperimentalComposeUiApi::class)
     fun pointerTypePassed() {
         val pointerTypes = listOf(
             PointerType.Unknown,
@@ -2984,8 +2988,174 @@ class PointerInputEventProcessorTest {
         assertThat(processResult1.anyMovementConsumed).isFalse()
     }
 
-    private fun MotionEventAdapter.convertToPointerInputEvent(motionEvent: MotionEvent) =
-        convertToPointerInputEvent(motionEvent, positionCalculator)
+    @Test
+    fun buttonsPressed() {
+        // Arrange
+        val pointerInputFilter = PointerInputFilterMock()
+        val layoutNode = LayoutNode(
+            0,
+            0,
+            500,
+            500,
+            PointerInputModifierImpl2(
+                pointerInputFilter
+            )
+        )
+        addToRoot(layoutNode)
+
+        class ButtonValidation(
+            vararg pressedValues: Int,
+            val primary: Boolean = false,
+            val secondary: Boolean = false,
+            val tertiary: Boolean = false,
+            val back: Boolean = false,
+            val forward: Boolean = false,
+            val anyPressed: Boolean = true,
+        ) {
+            val pressedValues = pressedValues
+        }
+
+        val buttonCheckerMap = mapOf(
+            MotionEvent.BUTTON_PRIMARY to ButtonValidation(0, primary = true),
+            MotionEvent.BUTTON_SECONDARY to ButtonValidation(1, secondary = true),
+            MotionEvent.BUTTON_TERTIARY to ButtonValidation(2, tertiary = true),
+            MotionEvent.BUTTON_STYLUS_PRIMARY to ButtonValidation(0, primary = true),
+            MotionEvent.BUTTON_STYLUS_SECONDARY to ButtonValidation(1, secondary = true),
+            MotionEvent.BUTTON_BACK to ButtonValidation(3, back = true),
+            MotionEvent.BUTTON_FORWARD to ButtonValidation(4, forward = true),
+            MotionEvent.BUTTON_PRIMARY or MotionEvent.BUTTON_TERTIARY to
+                ButtonValidation(0, 2, primary = true, tertiary = true),
+            0 to ButtonValidation(anyPressed = false)
+        )
+
+        for (entry in buttonCheckerMap) {
+            val buttonState = entry.key
+            val validator = entry.value
+            val event = PointerInputEvent(
+                0,
+                listOf(PointerInputEventData(0, 0L, Offset.Zero, true)),
+                MotionEvent.obtain(
+                    0L,
+                    0L,
+                    MotionEvent.ACTION_DOWN,
+                    1,
+                    arrayOf(PointerProperties(1, MotionEvent.TOOL_TYPE_MOUSE)),
+                    arrayOf(PointerCoords(0f, 0f)),
+                    0,
+                    buttonState,
+                    0.1f,
+                    0.1f,
+                    0,
+                    0,
+                    InputDevice.SOURCE_MOUSE,
+                    0
+                )
+            )
+            pointerInputEventProcessor.process(event)
+
+            with((pointerInputFilter.log.last() as OnPointerEventEntry).pointerEvent.buttons) {
+                assertThat(isPrimaryPressed).isEqualTo(validator.primary)
+                assertThat(isSecondaryPressed).isEqualTo(validator.secondary)
+                assertThat(isTertiaryPressed).isEqualTo(validator.tertiary)
+                assertThat(isBackPressed).isEqualTo(validator.back)
+                assertThat(isForwardPressed).isEqualTo(validator.forward)
+                assertThat(areAnyPressed).isEqualTo(validator.anyPressed)
+                val firstIndex = validator.pressedValues.firstOrNull() ?: -1
+                val lastIndex = validator.pressedValues.lastOrNull() ?: -1
+                assertThat(indexOfFirstPressed()).isEqualTo(firstIndex)
+                assertThat(indexOfLastPressed()).isEqualTo(lastIndex)
+                for (i in 0..10) {
+                    assertThat(isPressed(i)).isEqualTo(validator.pressedValues.contains(i))
+                }
+            }
+        }
+    }
+
+    @Test
+    fun metaState() {
+        // Arrange
+        val pointerInputFilter = PointerInputFilterMock()
+        val layoutNode = LayoutNode(
+            0,
+            0,
+            500,
+            500,
+            PointerInputModifierImpl2(
+                pointerInputFilter
+            )
+        )
+        addToRoot(layoutNode)
+
+        class MetaValidation(
+            val control: Boolean = false,
+            val meta: Boolean = false,
+            val alt: Boolean = false,
+            val shift: Boolean = false,
+            val sym: Boolean = false,
+            val function: Boolean = false,
+            val capsLock: Boolean = false,
+            val scrollLock: Boolean = false,
+            val numLock: Boolean = false
+        )
+
+        val buttonCheckerMap = mapOf(
+            AndroidKeyEvent.META_CTRL_ON to MetaValidation(control = true),
+            AndroidKeyEvent.META_META_ON to MetaValidation(meta = true),
+            AndroidKeyEvent.META_ALT_ON to MetaValidation(alt = true),
+            AndroidKeyEvent.META_SYM_ON to MetaValidation(sym = true),
+            AndroidKeyEvent.META_SHIFT_ON to MetaValidation(shift = true),
+            AndroidKeyEvent.META_FUNCTION_ON to MetaValidation(function = true),
+            AndroidKeyEvent.META_CAPS_LOCK_ON to MetaValidation(capsLock = true),
+            AndroidKeyEvent.META_SCROLL_LOCK_ON to MetaValidation(scrollLock = true),
+            AndroidKeyEvent.META_NUM_LOCK_ON to MetaValidation(numLock = true),
+            AndroidKeyEvent.META_CTRL_ON or AndroidKeyEvent.META_SHIFT_ON or
+                AndroidKeyEvent.META_NUM_LOCK_ON to
+                MetaValidation(control = true, shift = true, numLock = true),
+            0 to MetaValidation(),
+        )
+
+        for (entry in buttonCheckerMap) {
+            val metaState = entry.key
+            val validator = entry.value
+            val event = PointerInputEvent(
+                0,
+                listOf(PointerInputEventData(0, 0L, Offset.Zero, true)),
+                MotionEvent.obtain(
+                    0L,
+                    0L,
+                    MotionEvent.ACTION_DOWN,
+                    1,
+                    arrayOf(PointerProperties(1, MotionEvent.TOOL_TYPE_MOUSE)),
+                    arrayOf(PointerCoords(0f, 0f)),
+                    metaState,
+                    0,
+                    0.1f,
+                    0.1f,
+                    0,
+                    0,
+                    InputDevice.SOURCE_MOUSE,
+                    0
+                )
+            )
+            pointerInputEventProcessor.process(event)
+
+            val keyboardModifiers = (pointerInputFilter.log.last() as OnPointerEventEntry)
+                .pointerEvent.keyboardModifiers
+            with(keyboardModifiers) {
+                assertThat(isCtrlPressed).isEqualTo(validator.control)
+                assertThat(isMetaPressed).isEqualTo(validator.meta)
+                assertThat(isAltPressed).isEqualTo(validator.alt)
+                assertThat(isAltGraphPressed).isFalse()
+                assertThat(isSymPressed).isEqualTo(validator.sym)
+                assertThat(isShiftPressed).isEqualTo(validator.shift)
+                assertThat(isFunctionPressed).isEqualTo(validator.function)
+                assertThat(isCapsLockOn).isEqualTo(validator.capsLock)
+                assertThat(isScrollLockOn).isEqualTo(validator.scrollLock)
+                assertThat(isNumLockOn).isEqualTo(validator.numLock)
+            }
+        }
+    }
+
     private fun PointerInputEventProcessor.process(event: PointerInputEvent) =
         process(event, positionCalculator)
 }
@@ -2993,7 +3163,7 @@ class PointerInputEventProcessorTest {
 private class PointerInputModifierImpl2(override val pointerInputFilter: PointerInputFilter) :
     PointerInputModifier
 
-private fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Modifier) =
+internal fun LayoutNode(x: Int, y: Int, x2: Int, y2: Int, modifier: Modifier = Modifier) =
     LayoutNode().apply {
         this.modifier = Modifier.layout { measurable, constraints ->
             val placeable = measurable.measure(constraints)
@@ -3029,6 +3199,8 @@ private class TestOwner : Owner {
         get() = TODO("Not yet implemented")
     override val hapticFeedBack: HapticFeedback
         get() = TODO("Not yet implemented")
+    override val inputModeManager: InputModeManager
+        get() = TODO("Not yet implemented")
     override val clipboardManager: ClipboardManager
         get() = TODO("Not yet implemented")
     override val accessibilityManager: AccessibilityManager
@@ -3042,6 +3214,8 @@ private class TestOwner : Owner {
     override val density: Density
         get() = Density(1f)
     override val textInputService: TextInputService
+        get() = TODO("Not yet implemented")
+    override val pointerIconService: PointerIconService
         get() = TODO("Not yet implemented")
     override val focusManager: FocusManager
         get() = TODO("Not yet implemented")
@@ -3075,8 +3249,12 @@ private class TestOwner : Owner {
     override fun calculateLocalPosition(positionInWindow: Offset): Offset =
         positionInWindow - position.toOffset()
 
-    override fun measureAndLayout() {
+    override fun measureAndLayout(sendPointerUpdate: Boolean) {
         delegate.measureAndLayout()
+    }
+
+    override fun forceMeasureTheSubtree(layoutNode: LayoutNode) {
+        delegate.forceMeasureTheSubtree(layoutNode)
     }
 
     override fun createLayer(
@@ -3096,16 +3274,14 @@ private class TestOwner : Owner {
         TODO("Not yet implemented")
     }
 
-    override fun requestRectangleOnScreen(rect: Rect) {
-        TODO("Not yet implemented")
-    }
-
     override val measureIteration: Long
         get() = 0
 
     override val viewConfiguration: ViewConfiguration
         get() = TODO("Not yet implemented")
     override val snapshotObserver = OwnerSnapshotObserver { it.invoke() }
+
+    override val sharedDrawScope = LayoutNodeDrawScope()
 }
 
 private fun List<LogEntry>.verifyOnPointerEventCall(

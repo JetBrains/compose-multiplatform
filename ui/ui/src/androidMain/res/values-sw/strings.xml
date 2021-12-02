@@ -26,7 +26,9 @@
     <string name="in_progress" msgid="6827826412747255547">"Inaendelea"</string>
     <string name="tab" msgid="1672349317127674378">"Kichupo"</string>
     <string name="navigation_menu" msgid="542007171693138492">"Menyu ya kusogeza"</string>
+    <string name="dropdown_menu" msgid="1890207353314751437">"Menyu kunjuzi"</string>
     <string name="close_drawer" msgid="406453423630273620">"Funga menyu ya kusogeza"</string>
     <string name="close_sheet" msgid="7573152094250666567">"Funga laha"</string>
     <string name="default_error_message" msgid="8038256446254964252">"Ulichoweka si sahihi"</string>
+    <string name="default_popup_window_title" msgid="6312721426453364202">"Dirisha Ibukizi"</string>
 </resources>

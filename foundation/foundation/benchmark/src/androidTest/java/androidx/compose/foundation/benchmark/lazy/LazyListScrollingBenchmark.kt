@@ -20,6 +20,8 @@ import android.os.Build
 import android.view.MotionEvent
 import android.view.View
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.FlingBehavior
+import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -45,9 +47,9 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
-import androidx.test.filters.SdkSuppress
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assume
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -107,11 +109,11 @@ class LazyListScrollingBenchmark(
         }
     }
 
-    // this test makes sense only when run on the Android version which supports RenderNodes
-    // as this tests how efficiently we move RenderNodes.
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     @Test
     fun drawAfterScroll_noNewItems() {
+        // this test makes sense only when run on the Android version which supports RenderNodes
+        // as this tests how efficiently we move RenderNodes.
+        Assume.assumeTrue(supportsRenderNode || supportsMRenderNode)
         benchmarkRule.toggleStateBenchmarkDraw {
             ListRemeasureTestCase(
                 addNewItemOnToggle = false,
@@ -121,11 +123,11 @@ class LazyListScrollingBenchmark(
         }
     }
 
-    // this test makes sense only when run on the Android version which supports RenderNodes
-    // as this tests how efficiently we move RenderNodes.
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     @Test
     fun drawAfterScroll_newItemComposed() {
+        // this test makes sense only when run on the Android version which supports RenderNodes
+        // as this tests how efficiently we move RenderNodes.
+        Assume.assumeTrue(supportsRenderNode || supportsMRenderNode)
         benchmarkRule.toggleStateBenchmarkDraw {
             ListRemeasureTestCase(
                 addNewItemOnToggle = true,
@@ -143,6 +145,11 @@ class LazyListScrollingBenchmark(
                 LazyColumn,
                 LazyRow
             )
+
+        // Copied from AndroidComposeTestCaseRunner
+        private val supportsRenderNode = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+        private val supportsMRenderNode = Build.VERSION.SDK_INT < Build.VERSION_CODES.P &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
     }
 }
 
@@ -160,7 +167,11 @@ private val LazyColumn = LazyListScrollingTestCase(
     "LazyColumn",
     isVertical = true
 ) { state ->
-    LazyColumn(state = state, modifier = Modifier.requiredHeight(400.dp).fillMaxWidth()) {
+    LazyColumn(
+        state = state,
+        modifier = Modifier.requiredHeight(400.dp).fillMaxWidth(),
+        flingBehavior = NoFlingBehavior
+    ) {
         item {
             FirstLargeItem()
         }
@@ -174,13 +185,23 @@ private val LazyRow = LazyListScrollingTestCase(
     "LazyRow",
     isVertical = false
 ) { state ->
-    LazyRow(state = state, modifier = Modifier.requiredWidth(400.dp).fillMaxHeight()) {
+    LazyRow(
+        state = state,
+        modifier = Modifier.requiredWidth(400.dp).fillMaxHeight(),
+        flingBehavior = NoFlingBehavior
+    ) {
         item {
             FirstLargeItem()
         }
         items(items) {
             RegularItem()
         }
+    }
+}
+
+private object NoFlingBehavior : FlingBehavior {
+    override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
+        return 0f
     }
 }
 
@@ -200,6 +221,7 @@ private fun ComposeBenchmarkRule.toggleStateBenchmark(
             runWithTimingDisabled {
                 assertNoPendingChanges()
                 getTestCase().afterToggle()
+                assertNoPendingChanges()
             }
         }
     }

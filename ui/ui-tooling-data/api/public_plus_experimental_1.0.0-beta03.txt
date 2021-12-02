@@ -29,7 +29,7 @@ package androidx.compose.ui.tooling.data {
     ctor public JoinedKey(Object? left, Object? right);
     method public Object? component1();
     method public Object? component2();
-    method @androidx.compose.ui.tooling.data.UiToolingDataApi public androidx.compose.ui.tooling.data.JoinedKey copy(Object? left, Object? right);
+    method public androidx.compose.ui.tooling.data.JoinedKey copy(Object? left, Object? right);
     method public Object? getLeft();
     method public Object? getRight();
     property public final Object? left;
@@ -44,7 +44,7 @@ package androidx.compose.ui.tooling.data {
   }
 
   @androidx.compose.ui.tooling.data.UiToolingDataApi public final class ParameterInformation {
-    ctor public ParameterInformation(String name, Object? value, boolean fromDefault, boolean p, boolean compared, String? inlineClass, boolean stable);
+    ctor public ParameterInformation(String name, Object? value, boolean fromDefault, boolean static, boolean compared, String? inlineClass, boolean stable);
     method public String component1();
     method public Object? component2();
     method public boolean component3();
@@ -52,7 +52,7 @@ package androidx.compose.ui.tooling.data {
     method public boolean component5();
     method public String? component6();
     method public boolean component7();
-    method @androidx.compose.ui.tooling.data.UiToolingDataApi public androidx.compose.ui.tooling.data.ParameterInformation copy(String name, Object? value, boolean fromDefault, boolean p, boolean compared, String? inlineClass, boolean stable);
+    method public androidx.compose.ui.tooling.data.ParameterInformation copy(String name, Object? value, boolean fromDefault, boolean static, boolean compared, String? inlineClass, boolean stable);
     method public boolean getCompared();
     method public boolean getFromDefault();
     method public String? getInlineClass();
@@ -81,7 +81,7 @@ package androidx.compose.ui.tooling.data {
     method public int component3();
     method public String? component4();
     method public int component5();
-    method @androidx.compose.ui.tooling.data.UiToolingDataApi public androidx.compose.ui.tooling.data.SourceLocation copy(int lineNumber, int offset, int length, String? sourceFile, int packageHash);
+    method public androidx.compose.ui.tooling.data.SourceLocation copy(int lineNumber, int offset, int length, String? sourceFile, int packageHash);
     method public int getLength();
     method public int getLineNumber();
     method public int getOffset();

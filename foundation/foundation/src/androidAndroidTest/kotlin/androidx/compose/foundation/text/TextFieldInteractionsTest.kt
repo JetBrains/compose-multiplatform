@@ -31,15 +31,10 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.cancel
-import androidx.compose.ui.test.center
-import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.moveBy
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performGesture
-import androidx.compose.ui.test.up
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -85,7 +80,7 @@ class TextFieldInteractionsTest {
             assertThat(interactions).isEmpty()
         }
         rule.onNodeWithTag(testTag)
-            .performGesture {
+            .performTouchInput {
                 down(center)
             }
         rule.runOnIdle {
@@ -93,7 +88,7 @@ class TextFieldInteractionsTest {
             assertThat(interactions.filterIsInstance<PressInteraction.Press>()).hasSize(1)
         }
         rule.onNodeWithTag(testTag)
-            .performGesture {
+            .performTouchInput {
                 up()
             }
         rule.runOnIdle {
@@ -127,7 +122,7 @@ class TextFieldInteractionsTest {
             assertThat(interactions).isEmpty()
         }
         rule.onNodeWithTag(testTag)
-            .performGesture {
+            .performTouchInput {
                 down(center)
             }
         rule.runOnIdle {
@@ -135,7 +130,7 @@ class TextFieldInteractionsTest {
             assertThat(interactions.filterIsInstance<PressInteraction.Press>()).hasSize(1)
         }
         rule.onNodeWithTag(testTag)
-            .performGesture {
+            .performTouchInput {
                 cancel()
             }
         rule.runOnIdle {
@@ -214,7 +209,7 @@ class TextFieldInteractionsTest {
             assertThat(interactions).isEmpty()
         }
         rule.onNodeWithTag(testTag)
-            .performGesture {
+            .performTouchInput {
                 down(center)
                 moveBy(Offset(x = 100f, y = 0f))
             }
@@ -223,7 +218,7 @@ class TextFieldInteractionsTest {
             assertThat(interactions.filterIsInstance<DragInteraction.Start>()).hasSize(1)
         }
         rule.onNodeWithTag(testTag)
-            .performGesture {
+            .performTouchInput {
                 up()
             }
         rule.runOnIdle {
@@ -258,7 +253,7 @@ class TextFieldInteractionsTest {
             assertThat(interactions).isEmpty()
         }
         rule.onNodeWithTag(testTag)
-            .performGesture {
+            .performTouchInput {
                 down(center)
                 moveBy(Offset(x = 100f, y = 0f))
             }
@@ -267,7 +262,7 @@ class TextFieldInteractionsTest {
             assertThat(interactions.filterIsInstance<DragInteraction.Start>()).hasSize(1)
         }
         rule.onNodeWithTag(testTag)
-            .performGesture {
+            .performTouchInput {
                 cancel()
             }
         rule.runOnIdle {
@@ -302,7 +297,7 @@ class TextFieldInteractionsTest {
             assertThat(interactions).isEmpty()
         }
         rule.onNodeWithTag(testTag)
-            .performGesture {
+            .performTouchInput {
                 down(center)
                 moveBy(Offset(x = 0f, y = 150f))
             }
@@ -311,7 +306,7 @@ class TextFieldInteractionsTest {
             assertThat(interactions.filterIsInstance<DragInteraction.Start>()).hasSize(1)
         }
         rule.onNodeWithTag(testTag)
-            .performGesture {
+            .performTouchInput {
                 up()
             }
         rule.runOnIdle {
@@ -346,7 +341,7 @@ class TextFieldInteractionsTest {
             assertThat(interactions).isEmpty()
         }
         rule.onNodeWithTag(testTag)
-            .performGesture {
+            .performTouchInput {
                 down(center)
                 moveBy(Offset(x = 0f, y = 150f))
             }
@@ -355,7 +350,7 @@ class TextFieldInteractionsTest {
             assertThat(interactions.filterIsInstance<DragInteraction.Start>()).hasSize(1)
         }
         rule.onNodeWithTag(testTag)
-            .performGesture {
+            .performTouchInput {
                 cancel()
             }
         rule.runOnIdle {

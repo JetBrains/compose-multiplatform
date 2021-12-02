@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION") // https://github.com/JetBrains/compose-jb/issues/1514
+
 package androidx.compose.ui.input.mouse
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.TestComposeWindow
 import androidx.compose.ui.unit.Density
@@ -28,6 +31,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
+@OptIn(ExperimentalComposeUiApi::class)
 @RunWith(JUnit4::class)
 class MouseScrollFilterTest {
     private val window = TestComposeWindow(width = 100, height = 100, density = Density(2f))

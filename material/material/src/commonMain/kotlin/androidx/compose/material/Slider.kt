@@ -27,11 +27,11 @@ import androidx.compose.foundation.gestures.DragScope
 import androidx.compose.foundation.gestures.DraggableState
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.awaitHorizontalTouchSlopOrCancellation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.gestures.horizontalDrag
+import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.Interaction
@@ -75,6 +75,7 @@ import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.input.pointer.AwaitPointerEventScope
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputChange
+import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
@@ -118,7 +119,7 @@ import kotlin.math.abs
  * coerced to this range.
  * @param onValueChange lambda in which value should be updated
  * @param modifier modifiers for the Slider layout
- * @param enabled whether or not component is enabled and can we interacted with or not
+ * @param enabled whether or not component is enabled and can be interacted with or not
  * @param valueRange range of values that Slider value can take. Passed [value] will be coerced to
  * this range
  * @param steps if greater than 0, specifies the amounts of discrete values, evenly distributed
@@ -154,6 +155,7 @@ fun Slider(
     }
     BoxWithConstraints(
         modifier
+            .minimumTouchTargetSize()
             .requiredSizeIn(minWidth = ThumbRadius * 2, minHeight = ThumbRadius * 2)
             .sliderSemantics(value, tickFractions, enabled, onValueChange, valueRange, steps)
             .focusable(enabled, interactionSource)
@@ -624,6 +626,7 @@ private fun SliderThumb(
                     interactionSource = interactionSource,
                     indication = rememberRipple(bounded = false, radius = ThumbRippleRadius)
                 )
+                .hoverable(interactionSource = interactionSource)
                 .shadow(if (enabled) elevation else 0.dp, CircleShape, clip = false)
                 .background(colors.thumbColor(enabled).value, CircleShape)
         )
@@ -675,17 +678,18 @@ private fun Track(
             trackStrokeWidth,
             StrokeCap.Round
         )
-        tickFractions.groupBy { it > positionFractionEnd }.forEach { (afterFraction, list) ->
-            drawPoints(
-                list.map {
-                    Offset(lerp(sliderStart, sliderEnd, it).x, center.y)
-                },
-                PointMode.Points,
-                (if (afterFraction) inactiveTickColor else activeTickColor).value,
-                trackStrokeWidth,
-                StrokeCap.Round
-            )
-        }
+        tickFractions.groupBy { it > positionFractionEnd || it < positionFractionStart }
+            .forEach { (outsideFraction, list) ->
+                drawPoints(
+                    list.map {
+                        Offset(lerp(sliderStart, sliderEnd, it).x, center.y)
+                    },
+                    PointMode.Points,
+                    (if (outsideFraction) inactiveTickColor else activeTickColor).value,
+                    trackStrokeWidth,
+                    StrokeCap.Round
+                )
+            }
     }
 }
 
@@ -703,14 +707,15 @@ private fun snapValueToTick(
 }
 
 private suspend fun AwaitPointerEventScope.awaitSlop(
-    id: PointerId
+    id: PointerId,
+    type: PointerType
 ): Pair<PointerInputChange, Float>? {
     var initialDelta = 0f
-    val postTouchSlop = { pointerInput: PointerInputChange, offset: Float ->
+    val postPointerSlop = { pointerInput: PointerInputChange, offset: Float ->
         pointerInput.consumePositionChange()
         initialDelta = offset
     }
-    val afterSlopResult = awaitHorizontalTouchSlopOrCancellation(id, postTouchSlop)
+    val afterSlopResult = awaitHorizontalPointerSlopOrCancellation(id, type, postPointerSlop)
     return if (afterSlopResult != null) afterSlopResult to initialDelta else null
 }
 
@@ -754,7 +759,7 @@ private fun Modifier.sliderSemantics(
     steps: Int = 0
 ): Modifier {
     val coerced = value.coerceIn(valueRange.start, valueRange.endInclusive)
-    return semantics(mergeDescendants = true) {
+    return semantics {
         if (!enabled) disabled()
         setProgress(
             action = { targetValue ->
@@ -862,7 +867,7 @@ private fun Modifier.rangeSliderPressDragModifier(
                         var draggingStart = true
                         val pointerEvent = awaitFirstDown(requireUnconsumed = false)
                         val interaction = PressInteraction.Press(pointerEvent.position)
-                        val slop = viewConfiguration.touchSlop
+                        val slop = viewConfiguration.pointerSlop(pointerEvent.type)
                         val posX =
                             if (isRtl) maxPx - pointerEvent.position.x else pointerEvent.position.x
 
@@ -880,7 +885,7 @@ private fun Modifier.rangeSliderPressDragModifier(
                             thumbCaptured = true
                         }
 
-                        awaitSlop(pointerEvent.id)?.let {
+                        awaitSlop(pointerEvent.id, pointerEvent.type)?.let {
                             if (thumbCaptured) {
                                 onDrag(draggingStart, if (isRtl) -it.second else it.second)
                             } else {

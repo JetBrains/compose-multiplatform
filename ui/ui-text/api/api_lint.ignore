@@ -25,16 +25,8 @@ GetterOnBuilder: androidx.compose.ui.text.AnnotatedString.Builder#getLength():
     Getter should be on the built object, not the builder: method androidx.compose.ui.text.AnnotatedString.Builder.getLength()
 
 
-KotlinOperator: androidx.compose.ui.text.font.FontListFontFamily#contains(androidx.compose.ui.text.font.Font):
-    Note that adding the `operator` keyword would allow calling this method using operator syntax
-
-
 MissingBuildMethod: androidx.compose.ui.text.AnnotatedString.Builder:
     androidx.compose.ui.text.AnnotatedString.Builder does not declare a `build()` method, but builder classes are expected to
-
-
-MissingNullability: androidx.compose.ui.text.style.BaselineShift#toString-impl(float):
-    Missing nullability on method `toString-impl` return
 
 
 NullableCollection: androidx.compose.ui.text.SpanStyle#getLocaleList():

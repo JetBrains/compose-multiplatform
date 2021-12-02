@@ -67,7 +67,7 @@ internal class DepthSortedSet(
         set.add(node)
     }
 
-    fun remove(node: LayoutNode) {
+    fun remove(node: LayoutNode): Boolean {
         check(node.isAttached)
         val contains = set.remove(node)
         if (extraAssertions) {
@@ -78,6 +78,7 @@ internal class DepthSortedSet(
                 check(usedDepth == null)
             }
         }
+        return contains
     }
 
     fun pop(): LayoutNode {

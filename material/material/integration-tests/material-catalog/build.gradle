@@ -19,7 +19,7 @@ import androidx.build.Publish
 
 plugins {
     id("AndroidXPlugin")
-    id("com.android.application")
+    id("com.android.library")
     id("AndroidXComposePlugin")
     id("org.jetbrains.kotlin.android")
 }
@@ -27,18 +27,18 @@ plugins {
 dependencies {
     kotlinPlugin project(":compose:compiler:compiler")
     implementation(libs.kotlinStdlib)
-
-    implementation project(":compose:integration-tests:demos:common")
+    implementation project(":core:core")
+    implementation project(":compose:runtime:runtime")
     implementation project(":compose:ui:ui")
     implementation project(":compose:material:material")
     implementation project(":compose:material:material:material-samples")
-    implementation project(":activity:activity-compose")
     implementation project(":navigation:navigation-compose")
+    implementation "com.google.accompanist:accompanist-insets:0.18.0"
 }
 
 androidx {
-    name = "Compose Material catalog"
+    name = "Compose Material Catalog"
     publish = Publish.NONE
     inceptionYear = "2021"
-    description = "This is a project for a Compose Material catalog."
+    description = "This is a project for the Compose Material Catalog."
 }

@@ -15,17 +15,9 @@
   ~ limitations under the License.
   -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="androidx.compose.animation.core.benchmark">
-
-    <!--
-      ~ Important: disable debuggable for accurate performance results
-      -->
-    <application
-            android:debuggable="false"
-            tools:replace="android:debuggable">
-        <!-- enable profileableByShell for non-intrusive profiling tools -->
-        <!--suppress AndroidElementNotAllowed -->
+    <application>
+        <!-- enable profiling by shell for non-intrusive profiling tools -->
         <profileable android:shell="true"/>
     </application>
 </manifest>

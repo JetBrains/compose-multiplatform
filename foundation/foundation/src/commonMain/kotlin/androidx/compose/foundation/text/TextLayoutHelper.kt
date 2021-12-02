@@ -53,6 +53,8 @@ internal fun TextLayoutResult.canReuse(
     constraints: Constraints
 ): Boolean {
 
+    // NOTE(text-perf-review): might make sense to short-circuit instance equality here
+
     // Check if this is created from the same parameter.
     val layoutInput = this.layoutInput
     if (!(
@@ -84,7 +86,8 @@ internal fun TextLayoutResult.canReuse(
  * Returns true if text layout created with this TextStyle can be reused for the [other] TextStyle.
  */
 internal fun TextStyle.canReuseLayout(other: TextStyle): Boolean {
-    return fontSize == other.fontSize &&
+    return (this === other) || (
+        fontSize == other.fontSize &&
         fontWeight == other.fontWeight &&
         fontStyle == other.fontStyle &&
         fontSynthesis == other.fontSynthesis &&
@@ -99,4 +102,5 @@ internal fun TextStyle.canReuseLayout(other: TextStyle): Boolean {
         textDirection == other.textDirection &&
         lineHeight == other.lineHeight &&
         textIndent == other.textIndent
+        )
 }

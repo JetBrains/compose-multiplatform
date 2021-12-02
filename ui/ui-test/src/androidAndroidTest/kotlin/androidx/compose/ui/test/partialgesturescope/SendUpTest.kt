@@ -19,27 +19,28 @@ package androidx.compose.ui.test.partialgesturescope
 import android.os.SystemClock.sleep
 import androidx.compose.testutils.expectError
 import androidx.compose.ui.geometry.Offset
-import androidx.test.filters.MediumTest
 import androidx.compose.ui.test.cancel
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.down
-import androidx.compose.ui.test.inputdispatcher.verifyNoGestureInProgress
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.partialgesturescope.Common.partialGesture
 import androidx.compose.ui.test.up
 import androidx.compose.ui.test.util.ClickableTestBox
-import androidx.compose.ui.test.util.InputDispatcherTestRule
+import androidx.compose.ui.test.util.ClickableTestBox.defaultTag
 import androidx.compose.ui.test.util.MultiPointerInputRecorder
+import androidx.compose.ui.test.util.assertNoTouchGestureInProgress
 import androidx.compose.ui.test.util.assertTimestampsAreIncreasing
 import androidx.compose.ui.test.util.verify
+import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TestRule
 
 /**
  * Tests if [up] works
  */
+@Suppress("DEPRECATION")
 @MediumTest
 class SendUpTest {
     companion object {
@@ -49,9 +50,6 @@ class SendUpTest {
 
     @get:Rule
     val rule = createComposeRule()
-
-    @get:Rule
-    val inputDispatcherRule: TestRule = InputDispatcherTestRule()
 
     private val recorder = MultiPointerInputRecorder()
 
@@ -85,7 +83,7 @@ class SendUpTest {
         }
 
         // And no gesture is in progress
-        rule.partialGesture { inputDispatcher.verifyNoGestureInProgress() }
+        rule.onNodeWithTag(defaultTag).assertNoTouchGestureInProgress()
     }
 
     @Test
@@ -116,7 +114,7 @@ class SendUpTest {
         }
 
         // And no gesture is in progress
-        rule.partialGesture { inputDispatcher.verifyNoGestureInProgress() }
+        rule.onNodeWithTag(defaultTag).assertNoTouchGestureInProgress()
     }
 
     @Test

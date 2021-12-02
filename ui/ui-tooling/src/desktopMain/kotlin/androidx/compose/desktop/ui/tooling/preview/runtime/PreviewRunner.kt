@@ -16,10 +16,13 @@
 
 package androidx.compose.desktop.ui.tooling.preview.runtime
 
-import androidx.compose.desktop.Window
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentComposer
 import androidx.compose.ui.tooling.CommonPreviewUtils.invokeComposableViaReflection
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.launchApplication
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 
 internal class PreviewRunner {
     companion object {
@@ -42,8 +45,11 @@ internal class PreviewRunner {
                 )
             }
 
-            Window {
-                previewComposition()
+            @OptIn(DelicateCoroutinesApi::class)
+            GlobalScope.launchApplication {
+                Window(onCloseRequest = ::exitApplication) {
+                    previewComposition()
+                }
             }
         }
     }

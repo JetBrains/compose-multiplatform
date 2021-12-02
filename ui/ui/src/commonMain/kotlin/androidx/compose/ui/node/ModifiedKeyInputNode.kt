@@ -19,10 +19,13 @@ package androidx.compose.ui.node
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyInputModifier
 
-internal class ModifiedKeyInputNode(wrapped: LayoutNodeWrapper, modifier: KeyInputModifier) :
-    DelegatingLayoutNodeWrapper<KeyInputModifier>(wrapped, modifier) {
+internal class ModifiedKeyInputNode(
+    wrapped: LayoutNodeWrapper,
+    modifier: KeyInputModifier
+) : DelegatingLayoutNodeWrapper<KeyInputModifier>(wrapped, modifier) {
 
-    init {
+    override fun onInitialize() {
+        super.onInitialize()
         modifier.keyInputNode = this
     }
 

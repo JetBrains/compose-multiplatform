@@ -29,13 +29,15 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.VertexMode
 import androidx.compose.ui.graphics.Vertices
-import androidx.compose.ui.graphics.imageFromResource
+import androidx.compose.ui.graphics.loadResourceBitmap
 import androidx.compose.ui.graphics.withSave
 import androidx.compose.ui.graphics.withSaveLayer
+import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import org.junit.Test
 
+@OptIn(InternalTestApi::class)
 class DesktopCanvasTest : DesktopGraphicsTest() {
     private val canvas: Canvas = initCanvas(widthPx = 16, heightPx = 16)
 
@@ -95,12 +97,12 @@ class DesktopCanvasTest : DesktopGraphicsTest() {
     @Test
     fun drawImage() {
         canvas.drawImage(
-            image = imageFromResource("androidx/compose/desktop/test.png"),
+            image = loadResourceBitmap("androidx/compose/desktop/test.png"),
             topLeftOffset = Offset(2f, 4f),
             paint = redPaint
         )
         canvas.drawImage(
-            image = imageFromResource("androidx/compose/desktop/test.png"),
+            image = loadResourceBitmap("androidx/compose/desktop/test.png"),
             topLeftOffset = Offset(-2f, 0f),
             paint = redPaint
         )
@@ -111,7 +113,7 @@ class DesktopCanvasTest : DesktopGraphicsTest() {
     @Test
     fun drawImageRect() {
         canvas.drawImageRect(
-            image = imageFromResource("androidx/compose/desktop/test.png"),
+            image = loadResourceBitmap("androidx/compose/desktop/test.png"),
             srcOffset = IntOffset(0, 2),
             srcSize = IntSize(2, 4),
             dstOffset = IntOffset(0, 4),

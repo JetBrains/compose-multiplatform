@@ -16,6 +16,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="androidx.compose.ui.tooling.data.test">
     <application>
-        <activity android:name="androidx.compose.ui.tooling.data.TestActivity" />
+        <activity android:name="androidx.compose.ui.tooling.data.TestActivity" android:exported="true"/>
     </application>
 </manifest>

@@ -72,7 +72,7 @@ fun <T : Any> rememberSaveable(
     val finalKey = if (!key.isNullOrEmpty()) {
         key
     } else {
-        currentCompositeKeyHash.toString()
+        currentCompositeKeyHash.toString(MaxSupportedRadix)
     }
     @Suppress("UNCHECKED_CAST")
     (saver as Saver<T, Any>)
@@ -189,3 +189,8 @@ private fun SaveableStateRegistry.requireCanBeSaved(value: Any?) {
         )
     }
 }
+
+/**
+ * The maximum radix available for conversion to and from strings.
+ */
+private val MaxSupportedRadix = 36

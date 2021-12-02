@@ -17,6 +17,8 @@
 package androidx.compose.foundation
 
 import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -147,12 +149,16 @@ private object NoIndication : Indication {
 private object DefaultDebugIndication : Indication {
 
     private class DefaultDebugIndicationInstance(
-        private val isPressed: State<Boolean>
+        private val isPressed: State<Boolean>,
+        private val isHovered: State<Boolean>,
+        private val isFocused: State<Boolean>,
     ) : IndicationInstance {
         override fun ContentDrawScope.drawIndication() {
             drawContent()
             if (isPressed.value) {
                 drawRect(color = Color.Black.copy(alpha = 0.3f), size = size)
+            } else if (isHovered.value || isFocused.value) {
+                drawRect(color = Color.Black.copy(alpha = 0.1f), size = size)
             }
         }
     }
@@ -160,8 +166,10 @@ private object DefaultDebugIndication : Indication {
     @Composable
     override fun rememberUpdatedInstance(interactionSource: InteractionSource): IndicationInstance {
         val isPressed = interactionSource.collectIsPressedAsState()
+        val isHovered = interactionSource.collectIsHoveredAsState()
+        val isFocused = interactionSource.collectIsFocusedAsState()
         return remember(interactionSource) {
-            DefaultDebugIndicationInstance(isPressed)
+            DefaultDebugIndicationInstance(isPressed, isHovered, isFocused)
         }
     }
 }

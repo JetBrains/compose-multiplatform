@@ -29,21 +29,21 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.compose.testutils.captureToImage
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.testutils.captureToImage
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import org.junit.Assert.assertTrue
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -297,7 +297,7 @@ class AndroidCanvasTest {
             0f,
             width.toFloat(),
             height.toFloat(),
-            android.graphics.Paint().apply {
+            frameworkPaint().apply {
                 isAntiAlias = true
                 color = android.graphics.Color.BLUE
                 pathEffect = android.graphics.CornerPathEffect(radius)
@@ -305,12 +305,12 @@ class AndroidCanvasTest {
         )
 
         val composePixels = imageBitmap.toPixelMap()
-        for (i in 0 until 80) {
-            for (j in 0 until 80) {
+        for (i in 0 until width) {
+            for (j in 0 until height) {
                 assertEquals(
                     "invalid color at i: " + i + ", " + j,
-                    composePixels[i, j].toArgb(),
-                    androidBitmap.getPixel(i, j)
+                    composePixels[i, j],
+                    Color(androidBitmap.getPixel(i, j)),
                 )
             }
         }
@@ -342,7 +342,7 @@ class AndroidCanvasTest {
             0f,
             width.toFloat(),
             height.toFloat(),
-            android.graphics.Paint().apply {
+            frameworkPaint().apply {
                 isAntiAlias = true
                 color = android.graphics.Color.BLUE
                 pathEffect = android.graphics.DashPathEffect(floatArrayOf(10f, 5f), 8f)
@@ -391,7 +391,7 @@ class AndroidCanvasTest {
             0f,
             width.toFloat(),
             height.toFloat(),
-            android.graphics.Paint().apply {
+            frameworkPaint().apply {
                 isAntiAlias = true
                 color = android.graphics.Color.BLUE
                 pathEffect =
@@ -450,7 +450,7 @@ class AndroidCanvasTest {
             0f,
             width.toFloat(),
             height.toFloat(),
-            android.graphics.Paint().apply {
+            frameworkPaint().apply {
                 isAntiAlias = true
                 color = android.graphics.Color.BLUE
                 pathEffect =
@@ -505,7 +505,7 @@ class AndroidCanvasTest {
             0f,
             width.toFloat(),
             height.toFloat(),
-            android.graphics.Paint().apply {
+            frameworkPaint().apply {
                 isAntiAlias = true
                 color = android.graphics.Color.BLUE
                 colorFilter = PorterDuffColorFilter(Color.Magenta.toArgb(), PorterDuff.Mode.SRC_IN)
@@ -550,7 +550,7 @@ class AndroidCanvasTest {
             0f,
             width.toFloat(),
             height.toFloat(),
-            android.graphics.Paint().apply {
+            frameworkPaint().apply {
                 isAntiAlias = true
                 color = android.graphics.Color.BLUE
                 colorFilter = LightingColorFilter(Color.Red.toArgb(), Color.Blue.toArgb())
@@ -597,7 +597,7 @@ class AndroidCanvasTest {
             0f,
             width.toFloat(),
             height.toFloat(),
-            android.graphics.Paint().apply {
+            frameworkPaint().apply {
                 isAntiAlias = true
                 color = android.graphics.Color.BLUE
                 colorFilter = ColorMatrixColorFilter(colorMatrix.values)
@@ -615,6 +615,13 @@ class AndroidCanvasTest {
             }
         }
     }
+
+    fun frameworkPaint(): android.graphics.Paint =
+        android.graphics.Paint(
+            android.graphics.Paint.ANTI_ALIAS_FLAG or
+                android.graphics.Paint.DITHER_FLAG or
+                android.graphics.Paint.FILTER_BITMAP_FLAG
+        )
 
     class EnableDisableZViewGroup @JvmOverloads constructor(
         val drawLatch: CountDownLatch,

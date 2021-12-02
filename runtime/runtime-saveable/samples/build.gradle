@@ -26,14 +26,14 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
+    kotlinPlugin projectOrArtifact(":compose:compiler:compiler")
 
     implementation(libs.kotlinStdlib)
 
-    compileOnly project(":annotation:annotation-sampled")
+    compileOnly projectOrArtifact(":annotation:annotation-sampled")
 
-    implementation project(":compose:foundation:foundation")
-    implementation project(":compose:material:material")
+    implementation projectOrArtifact(":compose:foundation:foundation")
+    implementation projectOrArtifact(":compose:material:material")
     implementation project(":compose:runtime:runtime")
     implementation project(":compose:runtime:runtime-saveable")
 }

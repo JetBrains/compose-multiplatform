@@ -43,6 +43,10 @@ object ComposeConfiguration {
         )
     val SOURCE_INFORMATION_ENABLED_KEY =
         CompilerConfigurationKey<Boolean>("Include source information in generated code")
+    val METRICS_DESTINATION_KEY =
+        CompilerConfigurationKey<String>("Directory to save compose build metrics")
+    val REPORTS_DESTINATION_KEY =
+        CompilerConfigurationKey<String>("Directory to save compose build reports")
     val INTRINSIC_REMEMBER_OPTIMIZATION_ENABLED_KEY =
         CompilerConfigurationKey<Boolean>("Enable optimization to treat remember as an intrinsic")
     val SUPPRESS_KOTLIN_VERSION_COMPATIBILITY_CHECK =
@@ -75,6 +79,20 @@ class ComposeCommandLineProcessor : CommandLineProcessor {
             required = false,
             allowMultipleOccurrences = false
         )
+        val METRICS_DESTINATION_OPTION = CliOption(
+            "metricsDestination",
+            "<path>",
+            "Save compose build metrics to this folder",
+            required = false,
+            allowMultipleOccurrences = false
+        )
+        val REPORTS_DESTINATION_OPTION = CliOption(
+            "reportsDestination",
+            "<path>",
+            "Save compose build reports to this folder",
+            required = false,
+            allowMultipleOccurrences = false
+        )
         val INTRINSIC_REMEMBER_OPTIMIZATION_ENABLED_OPTION = CliOption(
             "intrinsicRemember",
             "<true|false>",
@@ -103,6 +121,8 @@ class ComposeCommandLineProcessor : CommandLineProcessor {
         LIVE_LITERALS_ENABLED_OPTION,
         LIVE_LITERALS_V2_ENABLED_OPTION,
         SOURCE_INFORMATION_ENABLED_OPTION,
+        METRICS_DESTINATION_OPTION,
+        REPORTS_DESTINATION_OPTION,
         INTRINSIC_REMEMBER_OPTIMIZATION_ENABLED_OPTION,
         SUPPRESS_KOTLIN_VERSION_CHECK_ENABLED_OPTION,
         DECOYS_ENABLED_OPTION,
@@ -124,6 +144,14 @@ class ComposeCommandLineProcessor : CommandLineProcessor {
         SOURCE_INFORMATION_ENABLED_OPTION -> configuration.put(
             ComposeConfiguration.SOURCE_INFORMATION_ENABLED_KEY,
             value == "true"
+        )
+        METRICS_DESTINATION_OPTION -> configuration.put(
+            ComposeConfiguration.METRICS_DESTINATION_KEY,
+            value
+        )
+        REPORTS_DESTINATION_OPTION -> configuration.put(
+            ComposeConfiguration.REPORTS_DESTINATION_KEY,
+            value
         )
         INTRINSIC_REMEMBER_OPTIMIZATION_ENABLED_OPTION -> configuration.put(
             ComposeConfiguration.INTRINSIC_REMEMBER_OPTIMIZATION_ENABLED_KEY,
@@ -159,7 +187,7 @@ class ComposeComponentRegistrar : ComponentRegistrar {
             project: Project,
             configuration: CompilerConfiguration
         ) {
-            val KOTLIN_VERSION_EXPECTATION = "1.5.31"
+            val KOTLIN_VERSION_EXPECTATION = "1.6.0"
             KotlinCompilerVersion.getVersion()?.let { version ->
                 val suppressKotlinVersionCheck = configuration.get(
                     ComposeConfiguration.SUPPRESS_KOTLIN_VERSION_COMPATIBILITY_CHECK,
@@ -204,6 +232,18 @@ class ComposeComponentRegistrar : ComponentRegistrar {
                 ComposeConfiguration.DECOYS_ENABLED_KEY,
                 false
             )
+            val metricsDestination = configuration.get(
+                ComposeConfiguration.METRICS_DESTINATION_KEY,
+                ""
+            ).let {
+                if (it.isBlank()) null else it
+            }
+            val reportsDestination = configuration.get(
+                ComposeConfiguration.REPORTS_DESTINATION_KEY,
+                ""
+            ).let {
+                if (it.isBlank()) null else it
+            }
 
             StorageComponentContainerContributor.registerExtension(
                 project,
@@ -217,7 +257,7 @@ class ComposeComponentRegistrar : ComponentRegistrar {
                 project,
                 ComposeDiagnosticSuppressor()
             )
-            @Suppress("EXPERIMENTAL_API_USAGE_FUTURE_ERROR")
+            @Suppress("EXPERIMENTAL_API_USAGE_ERROR")
             TypeResolutionInterceptor.registerExtension(
                 project,
                 @Suppress("IllegalExperimentalApiUsage")
@@ -231,6 +271,8 @@ class ComposeComponentRegistrar : ComponentRegistrar {
                     sourceInformationEnabled = sourceInformationEnabled,
                     intrinsicRememberEnabled = intrinsicRememberEnabled,
                     decoysEnabled = decoysEnabled,
+                    metricsDestination = metricsDestination,
+                    reportsDestination = reportsDestination,
                 )
             )
             DescriptorSerializerPlugin.registerExtension(

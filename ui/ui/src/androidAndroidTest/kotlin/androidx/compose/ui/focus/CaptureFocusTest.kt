@@ -16,12 +16,12 @@
 
 package androidx.compose.ui.focus
 
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusStateImpl.Active
 import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
 import androidx.compose.ui.focus.FocusStateImpl.Captured
-import androidx.compose.ui.focus.FocusStateImpl.Disabled
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -44,10 +44,10 @@ class CaptureFocusTest {
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
-                modifier = Modifier
+                Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(FocusModifier(Active))
+                    .focusTarget(FocusModifier(Active))
             )
         }
 
@@ -60,6 +60,7 @@ class CaptureFocusTest {
         rule.runOnIdle {
             assertThat(success).isTrue()
             assertThat(focusState.isCaptured).isTrue()
+            assertThat(focusState.isFocused).isTrue()
         }
     }
 
@@ -70,10 +71,10 @@ class CaptureFocusTest {
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
-                modifier = Modifier
+                Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(FocusModifier(ActiveParent))
+                    .focusTarget(FocusModifier(ActiveParent))
             )
         }
 
@@ -85,6 +86,7 @@ class CaptureFocusTest {
         // Assert.
         rule.runOnIdle {
             assertThat(success).isFalse()
+            assertThat(focusState.isCaptured).isFalse()
             assertThat(focusState.hasFocus).isTrue()
         }
     }
@@ -96,10 +98,10 @@ class CaptureFocusTest {
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
-                modifier = Modifier
+                Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(FocusModifier(Captured))
+                    .focusTarget(FocusModifier(Captured))
             )
         }
 
@@ -116,16 +118,17 @@ class CaptureFocusTest {
     }
 
     @Test
-    fun disabled_captureFocus_retainsStateAsDisabled() {
+    fun deactivated_captureFocus_retainsStateAsDeactivated() {
         // Arrange.
         lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
-                modifier = Modifier
+                Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(FocusModifier(Disabled))
+                    .focusProperties { canFocus = false }
+                    .focusable()
             )
         }
 
@@ -137,7 +140,46 @@ class CaptureFocusTest {
         // Assert.
         rule.runOnIdle {
             assertThat(success).isFalse()
-            assertThat(focusState).isEqualTo(Disabled)
+            assertThat(focusState.isCaptured).isFalse()
+            assertThat(focusState.isFocused).isFalse()
+            assertThat(focusState.isDeactivated).isTrue()
+        }
+    }
+
+    @Test
+    fun deactivatedParent_captureFocus_retainsStateAsDeactivatedParent() {
+        // Arrange.
+        lateinit var focusState: FocusState
+        val initialFocus = FocusRequester()
+        val focusRequester = FocusRequester()
+        rule.setFocusableContent {
+            Box(
+                Modifier
+                    .onFocusChanged { focusState = it }
+                    .focusRequester(focusRequester)
+                    .focusProperties { canFocus = false }
+                    .focusable()
+            ) {
+                Box(
+                    Modifier
+                        .focusRequester(initialFocus)
+                        .focusable()
+                )
+            }
+        }
+        rule.runOnIdle { initialFocus.requestFocus() }
+
+        // Act.
+        val success = rule.runOnIdle {
+            focusRequester.captureFocus()
+        }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(success).isFalse()
+            assertThat(focusState.isCaptured).isFalse()
+            assertThat(focusState.hasFocus).isTrue()
+            assertThat(focusState.isDeactivated).isTrue()
         }
     }
 
@@ -148,10 +190,10 @@ class CaptureFocusTest {
         val focusRequester = FocusRequester()
         rule.setFocusableContent {
             Box(
-                modifier = Modifier
+                Modifier
                     .onFocusChanged { focusState = it }
                     .focusRequester(focusRequester)
-                    .then(FocusModifier(Inactive))
+                    .focusTarget(FocusModifier(Inactive))
             )
         }
 
@@ -163,7 +205,11 @@ class CaptureFocusTest {
         // Assert.
         rule.runOnIdle {
             assertThat(success).isFalse()
+            assertThat(focusState.isCaptured).isFalse()
             assertThat(focusState.isFocused).isFalse()
         }
     }
 }
+
+private val FocusState.isDeactivated: Boolean
+    get() = (this as FocusStateImpl).isDeactivated

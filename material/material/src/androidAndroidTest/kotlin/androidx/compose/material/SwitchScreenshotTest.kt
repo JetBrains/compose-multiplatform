@@ -26,19 +26,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.center
-import androidx.compose.ui.test.down
 import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.move
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performGesture
-import androidx.compose.ui.test.up
+import androidx.compose.ui.test.performMouseInput
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -139,20 +139,15 @@ class SwitchScreenshotTest {
 
     @Test
     fun switchTest_pressed() {
-        rule.mainClock.autoAdvance = false
-
         rule.setMaterialContent {
             Box(wrapperModifier) {
                 Switch(checked = false, enabled = true, onCheckedChange = { })
             }
         }
 
-        rule.onNode(isToggleable()).performGesture {
+        rule.onNode(isToggleable()).performTouchInput {
             down(center)
         }
-
-        // Advance past the tap timeout
-        rule.mainClock.advanceTimeBy(100)
 
         // Ripples are drawn on the RenderThread, not the main (UI) thread, so we can't wait for
         // synchronization. Instead just wait until after the ripples are finished animating.
@@ -197,8 +192,8 @@ class SwitchScreenshotTest {
 
         rule.onNode(isToggleable())
             // split click into (down) and (move, up) to enforce a composition in between
-            .performGesture { down(center) }
-            .performGesture { move(); up() }
+            .performTouchInput { down(center) }
+            .performTouchInput { move(); up() }
 
         rule.waitForIdle()
         rule.mainClock.advanceTimeBy(milliseconds = 96)
@@ -226,8 +221,8 @@ class SwitchScreenshotTest {
 
         rule.onNode(isToggleable())
             // split click into (down) and (move, up) to enforce a composition in between
-            .performGesture { down(center) }
-            .performGesture { move(); up() }
+            .performTouchInput { down(center) }
+            .performTouchInput { move(); up() }
 
         rule.waitForIdle()
         rule.mainClock.advanceTimeBy(milliseconds = 96)
@@ -237,6 +232,52 @@ class SwitchScreenshotTest {
         Thread.sleep(300)
 
         assertToggeableAgainstGolden("switch_animateToUnchecked")
+    }
+
+    @Test
+    fun switchTest_hover() {
+        rule.setMaterialContent {
+            Box(wrapperModifier) {
+                Switch(
+                    checked = true,
+                    onCheckedChange = { }
+                )
+            }
+        }
+
+        rule.onNode(isToggleable())
+            .performMouseInput { enter(center) }
+
+        rule.waitForIdle()
+
+        assertToggeableAgainstGolden("switch_hover")
+    }
+
+    @Test
+    fun switchTest_focus() {
+        val focusRequester = FocusRequester()
+
+        rule.setMaterialContent {
+            Box(wrapperModifier) {
+                Switch(
+                    checked = true,
+                    onCheckedChange = { },
+                    modifier = Modifier
+                        // Normally this is only focusable in non-touch mode, so let's force it to
+                        // always be focusable so we can test how it appears
+                        .focusProperties { canFocus = true }
+                        .focusRequester(focusRequester)
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            focusRequester.requestFocus()
+        }
+
+        rule.waitForIdle()
+
+        assertToggeableAgainstGolden("switch_focus")
     }
 
     private fun assertToggeableAgainstGolden(goldenName: String) {

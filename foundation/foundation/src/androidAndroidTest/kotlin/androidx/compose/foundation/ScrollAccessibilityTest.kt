@@ -16,6 +16,10 @@
 
 package androidx.compose.foundation
 
+import android.R.id.accessibilityActionScrollDown
+import android.R.id.accessibilityActionScrollLeft
+import android.R.id.accessibilityActionScrollRight
+import android.R.id.accessibilityActionScrollUp
 import android.view.View
 import android.view.accessibility.AccessibilityNodeProvider
 import androidx.activity.ComponentActivity
@@ -44,8 +48,10 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.ACTION_SCROLL_FORWARD
 import androidx.test.filters.MediumTest
+import com.google.common.truth.IterableSubject
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -88,53 +94,70 @@ class ScrollAccessibilityTest(private val config: TestConfig) {
     private val scrollerTag = "ScrollerTest"
     private var composeView: View? = null
     private val accessibilityNodeProvider: AccessibilityNodeProvider
-        get() = ViewCompat
-            .getAccessibilityDelegate(composeView!!)!!
-            .getAccessibilityNodeProvider(composeView)
-            .provider as AccessibilityNodeProvider
+        get() = checkNotNull(composeView) {
+            "composeView not initialized. Did `composeView = LocalView.current` not work?"
+        }.let { composeView ->
+            ViewCompat
+                .getAccessibilityDelegate(composeView)!!
+                .getAccessibilityNodeProvider(composeView)!!
+                .provider as AccessibilityNodeProvider
+        }
 
     @Test
     fun scrollForward() {
-        testRelativeDirection(55, AccessibilityNodeInfoCompat.ACTION_SCROLL_FORWARD)
+        testScrollAction(55, ACTION_SCROLL_FORWARD)
     }
 
     @Test
     fun scrollBackward() {
-        testRelativeDirection(45, AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD)
+        testScrollAction(45, ACTION_SCROLL_BACKWARD)
     }
 
     @Test
     fun scrollRight() {
-        testAbsoluteDirection(55, android.R.id.accessibilityActionScrollRight, config.horizontal)
+        testAbsoluteDirection(55, accessibilityActionScrollRight, config.horizontal)
     }
 
     @Test
     fun scrollLeft() {
-        testAbsoluteDirection(45, android.R.id.accessibilityActionScrollLeft, config.horizontal)
+        testAbsoluteDirection(45, accessibilityActionScrollLeft, config.horizontal)
     }
 
     @Test
     fun scrollDown() {
-        testAbsoluteDirection(55, android.R.id.accessibilityActionScrollDown, config.vertical)
+        testAbsoluteDirection(55, accessibilityActionScrollDown, config.vertical)
     }
 
     @Test
     fun scrollUp() {
-        testAbsoluteDirection(45, android.R.id.accessibilityActionScrollUp, config.vertical)
+        testAbsoluteDirection(45, accessibilityActionScrollUp, config.vertical)
     }
 
-    /**
-     * Setup the test, run the given [accessibilityAction], and check if the [canonicalTarget]
-     * has been reached. The canonical target is the item that we expect to see when moving
-     * forward in a non-reversed scrollable (e.g. down in vertical orientation or right in
-     * horizontal orientation in LTR). The actual target is either the canonical target or the
-     * target that is as far from the middle of the scrollable as the canonical target, but on
-     * the other side of the middle. For testing relative directions, this mirroring is done if
-     * the scroll is [reversed][TestConfig.reversed].
-     */
-    private fun testRelativeDirection(canonicalTarget: Int, accessibilityAction: Int) {
-        val target = if (!config.reversed) canonicalTarget else 100 - canonicalTarget - 1
-        testScrollAction(target, accessibilityAction)
+    @Test
+    fun verifyScrollActionsAtStart() {
+        createScrollableContent_StartAtStart()
+        verifyNodeInfoScrollActions(
+            expectForward = !config.reversed,
+            expectBackward = config.reversed
+        )
+    }
+
+    @Test
+    fun verifyScrollActionsInMiddle() {
+        createScrollableContent_StartInMiddle()
+        verifyNodeInfoScrollActions(
+            expectForward = true,
+            expectBackward = true
+        )
+    }
+
+    @Test
+    fun verifyScrollActionsAtEnd() {
+        createScrollableContent_StartAtEnd()
+        verifyNodeInfoScrollActions(
+            expectForward = config.reversed,
+            expectBackward = !config.reversed
+        )
     }
 
     /**
@@ -169,7 +192,6 @@ class ScrollAccessibilityTest(private val config: TestConfig) {
         createScrollableContent_StartInMiddle()
         rule.onNodeWithText("$target").assertIsNotDisplayed()
 
-        waitForSubtreeEventToSend()
         val returnValue = rule.onNodeWithTag(scrollerTag).withSemanticsNode {
             accessibilityNodeProvider.performAction(id, accessibilityAction, null)
         }
@@ -183,12 +205,100 @@ class ScrollAccessibilityTest(private val config: TestConfig) {
     }
 
     /**
-     * Creates a Row/Column with a viewport of 100.dp, containing 100 items each 17.dp in size.
-     * The items have a text with their index (ASC), and the viewport starts in the middle of the
-     * scrollable. All properties from [config] are applied. The viewport has padding around it
-     * to make sure scroll distance doesn't include padding.
+     * Checks if all of the scroll actions are present or not according to what we expect based on
+     * [expectForward] and [expectBackward]. The scroll actions that are checked are forward,
+     * backward, left, right, up and down. The expectation parameters must already account for
+     * [reversing][TestConfig.reversed].
+     */
+    private fun verifyNodeInfoScrollActions(expectForward: Boolean, expectBackward: Boolean) {
+        val nodeInfo = rule.onNodeWithTag(scrollerTag).withSemanticsNode {
+            rule.runOnUiThread {
+                accessibilityNodeProvider.createAccessibilityNodeInfo(id)
+            }
+        }
+
+        val actions = nodeInfo.actionList.map { it.id }
+
+        assertThat(actions).contains(expectForward, ACTION_SCROLL_FORWARD)
+        assertThat(actions).contains(expectBackward, ACTION_SCROLL_BACKWARD)
+
+        if (config.horizontal) {
+            val expectLeft = if (config.rtl) expectForward else expectBackward
+            val expectRight = if (config.rtl) expectBackward else expectForward
+            assertThat(actions).contains(expectLeft, accessibilityActionScrollLeft)
+            assertThat(actions).contains(expectRight, accessibilityActionScrollRight)
+            assertThat(actions).contains(false, accessibilityActionScrollDown)
+            assertThat(actions).contains(false, accessibilityActionScrollUp)
+        } else {
+            assertThat(actions).contains(false, accessibilityActionScrollLeft)
+            assertThat(actions).contains(false, accessibilityActionScrollRight)
+            assertThat(actions).contains(expectForward, accessibilityActionScrollDown)
+            assertThat(actions).contains(expectBackward, accessibilityActionScrollUp)
+        }
+    }
+
+    private fun IterableSubject.contains(expectPresent: Boolean, element: Any) {
+        if (expectPresent) {
+            contains(element)
+        } else {
+            doesNotContain(element)
+        }
+    }
+
+    /**
+     * Creates a Row/Column that starts at offset 0, according to [createScrollableContent]
+     */
+    private fun createScrollableContent_StartAtStart() {
+        createScrollableContent {
+            // Start at the start:
+            // -> pretty basic
+            rememberScrollState(0)
+        }
+    }
+
+    /**
+     * Creates a Row/Column that starts in the middle, according to [createScrollableContent]
      */
     private fun createScrollableContent_StartInMiddle() {
+        createScrollableContent {
+            with(LocalDensity.current) {
+                // Start at the middle:
+                // Content size: 100 boxes * 17dp per box = 1700dp
+                val contentSize = 100 * 17.dp.roundToPx()
+                // Viewport size: 300dp box - 100dp padding on both sides = 100dp
+                val viewportSize = 300.dp.roundToPx() - 2 * 100.dp.roundToPx()
+                // Content outside viewport: 1700dp - 100dp = 1600dp
+                // -> centered when 800dp on either side
+                rememberScrollState((contentSize - viewportSize) / 2)
+            }
+        }
+    }
+
+    /**
+     * Creates a Row/Column that starts at the max offset, according to [createScrollableContent]
+     */
+    private fun createScrollableContent_StartAtEnd() {
+        createScrollableContent {
+            with(LocalDensity.current) {
+                // Start at the end:
+                // Content size: 100 boxes * 17dp per box = 1700dp
+                val contentSize = 100 * 17.dp.roundToPx()
+                // Viewport size: 300dp box - 100dp padding on both sides = 100dp
+                val viewportSize = 300.dp.roundToPx() - 2 * 100.dp.roundToPx()
+                // Content outside viewport: 1700dp - 100dp = 1600dp
+                // -> at the end when offset at 1600dp
+                rememberScrollState(contentSize - viewportSize)
+            }
+        }
+    }
+
+    /**
+     * Creates a Row/Column with a viewport of 100.dp, containing 100 items each 17.dp in size.
+     * The items have a text with their index (ASC), and where the viewport starts is determined
+     * by the given [lambda][rememberScrollState]. All properties from [config] are applied. The
+     * viewport has padding around it to make sure scroll distance doesn't include padding.
+     */
+    private fun createScrollableContent(rememberScrollState: @Composable () -> ScrollState) {
         rule.setContent {
             composeView = LocalView.current
             val content = @Composable {
@@ -199,12 +309,7 @@ class ScrollAccessibilityTest(private val config: TestConfig) {
                 }
             }
 
-            // Start at the middle:
-            // Content size: 100 boxes * 17dp per box = 1700dp
-            // Viewport size: 300dp box - 100dp padding on both sides = 100dp
-            // Content outside viewport: 1700dp - 100dp = 1600dp
-            // -> centered when 800dp on either side
-            val state = rememberScrollState(with(LocalDensity.current) { 800.dp.roundToPx() })
+            val state = rememberScrollState()
 
             Box(Modifier.requiredSize(300.dp).background(Color.White)) {
                 if (config.horizontal) {
@@ -231,12 +336,5 @@ class ScrollAccessibilityTest(private val config: TestConfig) {
 
     private fun <T> SemanticsNodeInteraction.withSemanticsNode(block: SemanticsNode.() -> T): T {
         return block.invoke(fetchSemanticsNode())
-    }
-
-    private fun waitForSubtreeEventToSend() {
-        // When the subtree events are sent, we will also update our previousSemanticsNodes,
-        // which will affect our next accessibility events from semantics tree comparison.
-        rule.mainClock.advanceTimeBy(1000)
-        rule.waitForIdle()
     }
 }

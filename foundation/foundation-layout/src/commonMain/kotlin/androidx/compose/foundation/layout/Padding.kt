@@ -244,7 +244,7 @@ interface PaddingValues {
                 31 + bottom.hashCode()
 
         override fun toString() =
-            "PaddingValues.Absolute(left=$left, top=$top, right=$right, bottom=$bottom"
+            "PaddingValues.Absolute(left=$left, top=$top, right=$right, bottom=$bottom)"
     }
 }
 
@@ -331,7 +331,7 @@ internal class PaddingValuesImpl(
     override fun hashCode() =
         ((start.hashCode() * 31 + top.hashCode()) * 31 + end.hashCode()) * 31 + bottom.hashCode()
 
-    override fun toString() = "PaddingValues(start=$start, top=$top, end=$end, bottom=$bottom"
+    override fun toString() = "PaddingValues(start=$start, top=$top, end=$end, bottom=$bottom)"
 }
 
 private class PaddingModifier(

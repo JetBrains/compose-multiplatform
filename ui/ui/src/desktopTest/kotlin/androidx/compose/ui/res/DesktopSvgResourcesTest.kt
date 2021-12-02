@@ -24,15 +24,17 @@ import androidx.compose.ui.isLinux
 import androidx.compose.ui.isWindows
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.TestComposeWindow
+import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
 import androidx.compose.ui.unit.dp
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
 
+@OptIn(InternalTestApi::class)
 class DesktopSvgResourcesTest {
     @get:Rule
-    val screenshotRule = DesktopScreenshotTestRule("ui/ui-desktop/res")
+    val screenshotRule = DesktopScreenshotTestRule("compose/ui/ui-desktop/res")
 
     @Test
     fun `load SVG with specified size`() {
@@ -41,7 +43,7 @@ class DesktopSvgResourcesTest {
         val window = TestComposeWindow(width = 200, height = 200)
         window.setContent {
             Image(
-                svgResource("androidx/compose/ui/res/star-size-100.svg"),
+                painterResource("androidx/compose/ui/res/star-size-100.svg"),
                 contentDescription = "Star"
             )
         }
@@ -55,7 +57,7 @@ class DesktopSvgResourcesTest {
         val window = TestComposeWindow(width = 200, height = 200)
         window.setContent {
             Image(
-                svgResource("androidx/compose/ui/res/star-size-unspecified.svg"),
+                painterResource("androidx/compose/ui/res/star-size-unspecified.svg"),
                 contentDescription = "Star"
             )
         }
@@ -69,7 +71,7 @@ class DesktopSvgResourcesTest {
         val window = TestComposeWindow(width = 200, height = 200)
         window.setContent {
             Image(
-                svgResource("androidx/compose/ui/res/star-viewbox-unspecified.svg"),
+                painterResource("androidx/compose/ui/res/star-viewbox-unspecified.svg"),
                 contentDescription = "Star"
             )
         }
@@ -83,7 +85,7 @@ class DesktopSvgResourcesTest {
         val window = TestComposeWindow(width = 200, height = 200)
         window.setContent {
             Image(
-                svgResource("androidx/compose/ui/res/star-size-100.svg"),
+                painterResource("androidx/compose/ui/res/star-size-100.svg"),
                 contentDescription = "Star",
                 modifier = Modifier.size(50.dp)
             )
@@ -98,7 +100,7 @@ class DesktopSvgResourcesTest {
         val window = TestComposeWindow(width = 200, height = 300)
         window.setContent {
             Image(
-                svgResource("androidx/compose/ui/res/star-size-100.svg"),
+                painterResource("androidx/compose/ui/res/star-size-100.svg"),
                 contentDescription = "Star",
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier.fillMaxSize()
@@ -114,7 +116,7 @@ class DesktopSvgResourcesTest {
         val window = TestComposeWindow(width = 200, height = 300)
         window.setContent {
             Image(
-                svgResource("androidx/compose/ui/res/star-viewbox-unspecified.svg"),
+                painterResource("androidx/compose/ui/res/star-viewbox-unspecified.svg"),
                 contentDescription = "Star",
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier.fillMaxSize()

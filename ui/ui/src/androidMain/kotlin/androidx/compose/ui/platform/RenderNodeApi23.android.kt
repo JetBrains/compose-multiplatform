@@ -24,6 +24,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.RenderEffect
 
 /**
  * RenderNode on M-O devices, where RenderNode isn't officially supported. This class uses
@@ -64,6 +65,7 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
             renderNode.setLeftTopRightBottom(0, 0, 0, 0)
             renderNode.offsetLeftAndRight(0)
             renderNode.offsetTopAndBottom(0)
+            renderNode.discardDisplayList()
             needToValidateAccess = false // only need to do this once
         }
         if (testFailCreateRenderNode) {
@@ -79,6 +81,13 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
     override var bottom: Int = 0
     override val width: Int get() = right - left
     override val height: Int get() = bottom - top
+
+    // API level 23 does not support RenderEffect so keep the field around for consistency
+    // however, it will not be applied to the rendered result. Consumers are encouraged
+    // to use the RenderEffect.isSupported API before consuming a [RenderEffect] instance.
+    // If RenderEffect is used on an unsupported API level, it should act as a no-op and not
+    // crash the compose application
+    override var renderEffect: RenderEffect? = null
 
     override var scaleX: Float
         get() = renderNode.scaleX
@@ -253,8 +262,13 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
             // No getter on RenderNode for clipToBounds, always return the value we have configured
             // on it since this is a write only field
             clipToBounds = clipToBounds,
-            alpha = renderNode.alpha
+            alpha = renderNode.alpha,
+            renderEffect = renderEffect
         )
+
+    override fun discardDisplayList() {
+        renderNode.discardDisplayList()
+    }
 
     companion object {
         // Used by tests to force failing creating a RenderNode to simulate a device that

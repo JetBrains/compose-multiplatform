@@ -18,7 +18,6 @@ package androidx.compose.ui.tooling
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.tooling.CompositionData
-import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.tooling.LocalInspectionTables
@@ -38,7 +37,6 @@ internal interface CompositionDataRecord {
 }
 
 private class CompositionDataRecordImpl : CompositionDataRecord {
-    @OptIn(InternalComposeApi::class)
     override val store: MutableSet<CompositionData> =
         Collections.newSetFromMap(WeakHashMap())
 }
@@ -53,7 +51,6 @@ private class CompositionDataRecordImpl : CompositionDataRecord {
  * @suppress
  */
 @Composable
-@OptIn(InternalComposeApi::class)
 internal fun Inspectable(
     compositionDataRecord: CompositionDataRecord,
     content: @Composable () -> Unit
@@ -72,6 +69,8 @@ internal fun Inspectable(
  * A wrapper for inspection-mode-only behavior. The children of this component will only be included
  * in the composition when the composition is in inspection mode.
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
+@Deprecated("This method should not be used in application code and will be removed soon.")
 @Composable
 fun InInspectionModeOnly(content: @Composable () -> Unit) {
     if (LocalInspectionMode.current) {

@@ -23,14 +23,22 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.testutils.TestViewConfiguration
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.text
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.util.expectErrorMessage
 import androidx.compose.ui.test.util.expectErrorMessageStartsWith
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.DpSize
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import org.junit.Rule
@@ -79,7 +87,7 @@ class ErrorMessagesTest {
 
         expectErrorMessage(
             """
-                Failed to perform a gesture.
+                Failed to inject touch input.
                 Reason: Expected exactly '1' node but could not find any node that satisfies: (TestTag = 'MyButton3')
             """.trimIndent()
 
@@ -97,7 +105,7 @@ class ErrorMessagesTest {
 
         expectErrorMessage(
             """
-                Failed to perform a gesture.
+                Failed to inject touch input.
                 Reason: Expected exactly '1' node but could not find any node that satisfies: ((TestTag = 'MyButton3') && (OnClick is defined))
             """.trimIndent()
         ) {
@@ -108,13 +116,13 @@ class ErrorMessagesTest {
 
     @Test
     fun findByText_doClick_butMoreThanOneElementFound() {
-        rule.setContent {
+        rule.setContentWithoutMinimumTouchTarget {
             ComposeSimpleCase()
         }
 
         expectErrorMessageStartsWith(
             """
-                Failed to perform a gesture.
+                Failed to inject touch input.
                 Reason: Expected exactly '1' node but found '2' nodes that satisfy: (Text + EditableText contains 'Toggle' (ignoreCase: false))
                 Nodes found:
                 1) Node #X at (l=X, t=X, r=X, b=X)px, Tag: 'MyButton'
@@ -144,7 +152,7 @@ class ErrorMessagesTest {
 
     @Test
     fun findByTag_assertDoesNotExist_butElementFound() {
-        rule.setContent {
+        rule.setContentWithoutMinimumTouchTarget {
             ComposeSimpleCase()
         }
 
@@ -163,7 +171,7 @@ class ErrorMessagesTest {
 
     @Test
     fun findAll_assertMultiple_butIsDifferentAmount() {
-        rule.setContent {
+        rule.setContentWithoutMinimumTouchTarget {
             ComposeSimpleCase()
         }
 
@@ -211,7 +219,7 @@ class ErrorMessagesTest {
 
         expectErrorMessage(
             """
-                Failed to perform a gesture.
+                Failed to inject touch input.
                 The node is no longer in the tree, last known semantics:
                 Node #X at (l=X, t=X, r=X, b=X)px
                 Text = '[Hello]'
@@ -280,6 +288,59 @@ class ErrorMessagesTest {
         }
     }
 
+    @Test
+    fun findByTag_assertExists_noElementFoundButFoundInMerged() {
+        rule.setContent {
+            ComposeMerged()
+        }
+
+        expectErrorMessage(
+            """
+                Failed: assertExists.
+                Reason: Expected exactly '1' node but could not find any node that satisfies: (Text + EditableText contains 'Banana' (ignoreCase: false))
+                However, the unmerged tree contains '1' node that matches. Are you missing `useUnmergedNode = true` in your finder?
+            """.trimIndent()
+        ) {
+            rule.onNodeWithText("Banana")
+                .assertExists()
+        }
+    }
+    @Test
+    fun findByTag_assertExists_NoElementFoundButMultipleFoundInMerged() {
+        rule.setContent {
+            ComposeMerged(5)
+        }
+
+        expectErrorMessage(
+            """
+                Failed: assertExists.
+                Reason: Expected exactly '1' node but could not find any node that satisfies: (Text + EditableText contains 'Banana' (ignoreCase: false))
+                However, the unmerged tree contains '5' nodes that match. Are you missing `useUnmergedNode = true` in your finder?
+            """.trimIndent()
+        ) {
+            rule.onNodeWithText("Banana")
+                .assertExists()
+        }
+    }
+
+    @Test
+    fun findByTag_performAction_NoElementFoundButFoundInMerged() {
+        rule.setContent {
+            ComposeMerged()
+        }
+
+        expectErrorMessage(
+            """
+                Failed to inject touch input.
+                Reason: Expected exactly '1' node but could not find any node that satisfies: (Text + EditableText contains 'Banana' (ignoreCase: false))
+                However, the unmerged tree contains '1' node that matches. Are you missing `useUnmergedNode = true` in your finder?
+            """.trimIndent()
+        ) {
+            rule.onNodeWithText("Banana")
+                .performClick()
+        }
+    }
+
     @Composable
     fun ComposeSimpleCase() {
         MaterialTheme {
@@ -313,6 +374,21 @@ class ErrorMessagesTest {
     }
 
     @Composable
+    fun ComposeMerged(numberOfTexts: Int = 1) {
+        Column {
+            TestButton(
+                modifier = Modifier
+                    .testTag("MyButton")
+                    .clearAndSetSemantics { text = AnnotatedString("Not Banana") }
+            ) {
+                repeat(numberOfTexts) {
+                    Text("Banana")
+                }
+            }
+        }
+    }
+
+    @Composable
     fun TestButton(
         modifier: Modifier = Modifier,
         onClick: (() -> Unit)? = null,
@@ -323,5 +399,24 @@ class ErrorMessagesTest {
                 Box { content() }
             }
         }
+    }
+}
+
+fun ComposeContentTestRule.setContentWithoutMinimumTouchTarget(
+    composable: @Composable () -> Unit
+) {
+    setContent {
+        val oldViewConfiguration = LocalViewConfiguration.current
+        val viewConfiguration = TestViewConfiguration(
+            longPressTimeoutMillis = oldViewConfiguration.longPressTimeoutMillis,
+            doubleTapTimeoutMillis = oldViewConfiguration.doubleTapTimeoutMillis,
+            doubleTapMinTimeMillis = oldViewConfiguration.doubleTapMinTimeMillis,
+            touchSlop = oldViewConfiguration.touchSlop,
+            minimumTouchTargetSize = DpSize.Zero
+        )
+        CompositionLocalProvider(
+            LocalViewConfiguration provides viewConfiguration,
+            content = composable
+        )
     }
 }

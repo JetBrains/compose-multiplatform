@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.CoreText
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TEST_FONT_FAMILY
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
@@ -36,12 +36,11 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.center
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.longClick
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -50,7 +49,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.mock
@@ -89,14 +87,14 @@ class SelectionContainerFocusTest {
             fontSize.toPx() / 2
         }
         rule.onNode(hasTestTag("selectionContainer1"))
-            .performGesture { longClick(Offset(x = positionInText, y = positionInText)) }
+            .performTouchInput { longClick(Offset(x = positionInText, y = positionInText)) }
         rule.runOnIdle {
             assertThat(selection1.value).isNotNull()
         }
 
         // Act.
         rule.onNode(hasTestTag("box"))
-            .performGesture { click(center) }
+            .performTouchInput { click(center) }
 
         // Assert.
         rule.runOnIdle {
@@ -109,7 +107,6 @@ class SelectionContainerFocusTest {
         }
     }
 
-    @FlakyTest(bugId = 179770443)
     @Test
     fun select_anotherContainer_cancelOld() {
         // Setup. Long press to create a selection.
@@ -120,14 +117,14 @@ class SelectionContainerFocusTest {
             fontSize.toPx() / 2
         }
         rule.onNode(hasTestTag("selectionContainer1"))
-            .performGesture { longClick(Offset(x = positionInText, y = positionInText)) }
+            .performTouchInput { longClick(Offset(x = positionInText, y = positionInText)) }
         rule.runOnIdle {
             assertThat(selection1.value).isNotNull()
         }
 
         // Act.
         rule.onNode(hasTestTag("selectionContainer2"))
-            .performGesture { longClick(Offset(x = positionInText, y = positionInText)) }
+            .performTouchInput { longClick(Offset(x = positionInText, y = positionInText)) }
 
         // Assert.
         rule.runOnIdle {
@@ -163,7 +160,7 @@ class SelectionContainerFocusTest {
                         }
                     ) {
                         Column {
-                            CoreText(
+                            BasicText(
                                 AnnotatedString(textContent),
                                 Modifier.fillMaxWidth(),
                                 style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
@@ -186,7 +183,7 @@ class SelectionContainerFocusTest {
                             selection2.value = it
                         }
                     ) {
-                        CoreText(
+                        BasicText(
                             AnnotatedString(textContent),
                             Modifier.fillMaxWidth(),
                             style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),

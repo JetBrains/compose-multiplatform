@@ -53,6 +53,29 @@ class MapSaverTest {
             onlyInts.save(User("John", 30))
         }
     }
+
+    @Test
+    fun nullableMapItemsAreSupported() {
+        val original = NullableUser(null, 30)
+        val saved = with(NullableUserSaver) {
+            allowingScope.save(original)
+        }
+
+        assertThat(saved).isNotNull()
+        assertThat(NullableUserSaver.restore(saved!!))
+            .isEqualTo(original)
+    }
+
+    @Test
+    fun nullableTypeIsSupported() {
+        val saved = with(NullableUserSaver) {
+            allowingScope.save(null)
+        }
+
+        assertThat(saved).isNotNull()
+        assertThat(NullableUserSaver.restore(saved!!))
+            .isEqualTo(NullableUser(null, null))
+    }
 }
 
 private data class User(val name: String, val age: Int)
@@ -63,5 +86,16 @@ private val UserSaver = run {
     mapSaver(
         save = { mapOf(nameKey to it.name, ageKey to it.age) },
         restore = { User(it[nameKey] as String, it[ageKey] as Int) }
+    )
+}
+
+private data class NullableUser(val name: String?, val age: Int?)
+
+private val NullableUserSaver = run {
+    val nameKey = "Name"
+    val ageKey = "Age"
+    mapSaver<NullableUser?>(
+        save = { mapOf(nameKey to it?.name, ageKey to it?.age) },
+        restore = { NullableUser(it[nameKey] as String?, it[ageKey] as Int?) }
     )
 }

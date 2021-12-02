@@ -27,14 +27,14 @@ plugins {
 AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
-    kotlinPlugin(project(":compose:compiler:compiler"))
+    kotlinPlugin(projectOrArtifact(":compose:compiler:compiler"))
 
     if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-        androidTestImplementation(project(":compose:ui:ui"))
-        androidTestImplementation(project(":compose:ui:ui-test-junit4"))
+        androidTestImplementation(projectOrArtifact(":compose:ui:ui"))
+        androidTestImplementation(projectOrArtifact(":compose:ui:ui-test-junit4"))
         androidTestImplementation(project(":compose:runtime:runtime"))
-        androidTestImplementation(project(":compose:test-utils"))
-        androidTestImplementation(project(":activity:activity-compose"))
+        androidTestImplementation(projectOrArtifact(":compose:test-utils"))
+        androidTestImplementation(projectOrArtifact(":activity:activity-compose"))
 
         androidTestImplementation(libs.junit)
         androidTestImplementation(libs.kotlinTestJunit)
@@ -61,7 +61,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             commonMain.dependencies {
                 implementation(libs.kotlinStdlibCommon)
                 implementation(libs.kotlinCoroutinesCore)
-                implementation(project(":compose:ui:ui"))
+                implementation(projectOrArtifact(":compose:ui:ui"))
             }
             jvmMain.dependencies {
                 implementation(libs.kotlinStdlib)
@@ -87,10 +87,10 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(kotlin("test-junit"))
             }
             androidAndroidTest.dependencies {
-                implementation(project(":compose:ui:ui"))
-                implementation(project(":compose:ui:ui-test-junit4"))
-                implementation(project(":compose:test-utils"))
-                implementation(project(":activity:activity-compose"))
+                implementation(projectOrArtifact(":compose:ui:ui"))
+                implementation(projectOrArtifact(":compose:ui:ui-test-junit4"))
+                implementation(projectOrArtifact(":compose:test-utils"))
+                implementation(projectOrArtifact(":activity:activity-compose"))
                 implementation(libs.testExtJunit)
                 implementation(libs.testRules)
                 implementation(libs.testRunner)

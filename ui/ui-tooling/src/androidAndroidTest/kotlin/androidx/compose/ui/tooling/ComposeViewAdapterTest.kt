@@ -17,10 +17,11 @@
 package androidx.compose.ui.tooling
 
 import android.app.Activity
+import android.os.Build
 import android.os.Bundle
 import androidx.compose.animation.core.InternalAnimationApi
-import androidx.compose.ui.tooling.data.UiToolingDataApi
 import androidx.compose.ui.tooling.animation.PreviewAnimationClock
+import androidx.compose.ui.tooling.data.UiToolingDataApi
 import androidx.compose.ui.tooling.test.R
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
@@ -121,31 +122,63 @@ class ComposeViewAdapterTest {
     }
 
     @Test
-    fun animatedVisibilityIsIgnored() {
+    fun animatedVisibilityIsTracked() {
+        val clock = PreviewAnimationClock()
+
+        activityTestRule.runOnUiThread {
+            composeViewAdapter.init(
+                "androidx.compose.ui.tooling.TestAnimationPreviewKt",
+                "AnimatedVisibilityPreview"
+            )
+            composeViewAdapter.clock = clock
+            assertFalse(composeViewAdapter.hasAnimations())
+            assertTrue(clock.trackedAnimatedVisibility.isEmpty())
+        }
+
+        waitFor("Composable to have animations", 1, TimeUnit.SECONDS) {
+            // Handle the case where onLayout was called too soon. Calling requestLayout will
+            // make sure onLayout will be called again.
+            composeViewAdapter.requestLayout()
+            composeViewAdapter.hasAnimations()
+        }
+
+        activityTestRule.runOnUiThread {
+            val animation = clock.trackedAnimatedVisibility.single()
+            assertEquals("My Animated Visibility", animation.label)
+        }
+    }
+
+    @Test
+    fun transitionAnimatedVisibilityIsTrackedAsTransition() {
+        checkTransitionIsSubscribed("TransitionAnimatedVisibilityPreview", "transition.AV")
+    }
+
+    @Test
+    fun animatedContentIsIgnored() {
         assertRendersCorrectly(
             "androidx.compose.ui.tooling.TestAnimationPreviewKt",
-            "AnimatedVisibilityPreview"
+            "AnimatedContentPreview"
         )
 
         activityTestRule.runOnUiThread {
             // Verify that this composable has no animations, since we should ignore
-            // AnimatedVisibility animations
+            // AnimatedContent animations
             assertFalse(composeViewAdapter.hasAnimations())
         }
     }
 
     @Test
     fun transitionAnimationsAreSubscribedToTheClock() {
-        checkComposableAnimationIsSubscribed("CheckBoxPreview")
+        checkTransitionIsSubscribed("CheckBoxPreview", "checkBoxAnim")
     }
 
     @Test
     fun transitionAnimationsWithSubcomposition() {
-        checkComposableAnimationIsSubscribed("CheckBoxScaffoldPreview")
+        checkTransitionIsSubscribed("CheckBoxScaffoldPreview", "checkBoxAnim")
     }
 
     @OptIn(InternalAnimationApi::class)
-    private fun checkComposableAnimationIsSubscribed(composableName: String) {
+    private fun checkTransitionIsSubscribed(composableName: String, label: String) {
         val clock = PreviewAnimationClock()
 
         activityTestRule.runOnUiThread {
@@ -166,8 +199,8 @@ class ComposeViewAdapterTest {
         }
 
         activityTestRule.runOnUiThread {
-            val animation = clock.trackedTransitions.keys.single()
-            assertEquals("checkBoxAnim", animation.label)
+            val animation = clock.trackedTransitions.single()
+            assertEquals(label, animation.label)
         }
     }
 
@@ -294,6 +327,14 @@ class ComposeViewAdapterTest {
         )
     }
 
+    @Test
+    fun viewModelPreviewRendersCorrectly() {
+        assertRendersCorrectly(
+            "androidx.compose.ui.tooling.SimpleComposablePreviewKt",
+            "ViewModelPreview"
+        )
+    }
+
     /**
      * Check that no re-composition happens without forcing it.
      */
@@ -310,10 +351,14 @@ class ComposeViewAdapterTest {
                 onDraw = { onDrawCounter++ }
             )
         }
+
+        // API before 22, might issue an additional draw under testing.
+        val expectedDrawCount = if (Build.VERSION.SDK_INT < 22) 2 else 1
         repeat(5) {
             activityTestRule.runOnUiThread {
                 assertEquals(1, compositionCount.get())
-                assertTrue("At most, 1 draw is expected", onDrawCounter < 2)
+                assertTrue("At most, $expectedDrawCount draw is expected ($onDrawCounter happened)",
+                    onDrawCounter <= expectedDrawCount)
             }
             Thread.sleep(250)
         }

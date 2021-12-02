@@ -38,7 +38,7 @@ import androidx.compose.ui.test.onChildAt
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onParent
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeUp
@@ -428,7 +428,7 @@ class ModalBottomSheetTest {
         }
 
         rule.onNodeWithTag(sheetTag)
-            .performGesture { swipeDown() }
+            .performTouchInput { swipeDown() }
 
         advanceClock()
 
@@ -499,7 +499,7 @@ class ModalBottomSheetTest {
         }
 
         rule.onNodeWithTag(sheetTag)
-            .performGesture { swipeDown() }
+            .performTouchInput { swipeDown() }
 
         advanceClock()
 
@@ -542,7 +542,7 @@ class ModalBottomSheetTest {
         }
 
         rule.onNodeWithTag(sheetTag)
-            .performGesture { swipeDown() }
+            .performTouchInput { swipeDown() }
 
         advanceClock()
 
@@ -589,7 +589,7 @@ class ModalBottomSheetTest {
         }
 
         rule.onNodeWithTag(sheetTag)
-            .performGesture { swipeUp() }
+            .performTouchInput { swipeUp() }
 
         advanceClock()
 
@@ -678,7 +678,7 @@ class ModalBottomSheetTest {
             )
         }
 
-        rule.onNodeWithTag(topTag).performGesture {
+        rule.onNodeWithTag(topTag).performTouchInput {
             swipeDown()
             swipeDown()
         }

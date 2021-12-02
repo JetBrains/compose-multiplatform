@@ -16,23 +16,25 @@
 
 package androidx.compose.ui.window
 
-import androidx.compose.desktop.AppManager
-import androidx.compose.desktop.AppWindow
-import androidx.compose.desktop.ComposeWindow
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.currentCompositionLocalContext
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.awt.ComposeWindow
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.ComponentUpdater
+import androidx.compose.ui.util.setIcon
 import androidx.compose.ui.util.setPositionSafely
 import androidx.compose.ui.util.setSizeSafely
 import androidx.compose.ui.util.setUndecoratedSafely
-import java.awt.Image
 import java.awt.Window
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
@@ -89,6 +91,9 @@ import javax.swing.JMenuBar
  * will leave the composition.
  * @param title Title in the titlebar of the window
  * @param icon Icon in the titlebar of the window (for platforms which support this)
+ * @param undecorated Disables or enables decorations for this window.
+ * @param transparent Disables or enables window transparency. Transparency should be set
+ * only if window is undecorated, otherwise an exception will be thrown.
  * @param resizable Can window be resized by the user (application still can resize the window
  * changing [state])
  * @param enabled Can window react to input events
@@ -103,32 +108,29 @@ import javax.swing.JMenuBar
  * keyboard. While implementing this callback, return true to stop propagation of this event.
  * If you return false, the key event will be sent to this [onKeyEvent]'s parent.
  * @param content Content of the window
- *
- * This API is experimental and will eventually replace [AppWindow] / [AppManager]
  */
-@Suppress("unused")
-@ExperimentalComposeUiApi
 @Composable
-fun ApplicationScope.Window(
+fun Window(
     onCloseRequest: () -> Unit,
     state: WindowState = rememberWindowState(),
     visible: Boolean = true,
     title: String = "Untitled",
-    // TODO(demin): can we replace this by icon: Painter? What to do with different densities?
-    icon: Image? = null,
+    icon: Painter? = null,
     undecorated: Boolean = false,
+    transparent: Boolean = false,
     resizable: Boolean = true,
     enabled: Boolean = true,
     focusable: Boolean = true,
     alwaysOnTop: Boolean = false,
     onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
     onKeyEvent: (KeyEvent) -> Boolean = { false },
-    content: @Composable WindowScope.() -> Unit
+    content: @Composable FrameWindowScope.() -> Unit
 ) {
     val currentState by rememberUpdatedState(state)
     val currentTitle by rememberUpdatedState(title)
     val currentIcon by rememberUpdatedState(icon)
     val currentUndecorated by rememberUpdatedState(undecorated)
+    val currentTransparent by rememberUpdatedState(transparent)
     val currentResizable by rememberUpdatedState(resizable)
     val currentEnabled by rememberUpdatedState(enabled)
     val currentFocusable by rememberUpdatedState(focusable)
@@ -160,7 +162,7 @@ fun ApplicationScope.Window(
                         // because fullscreen changing doesn't
                         // fire windowStateChanged, only componentResized
                         currentState.placement = placement
-                        currentState.size = WindowSize(width.dp, height.dp)
+                        currentState.size = DpSize(width.dp, height.dp)
                     }
 
                     override fun componentMoved(e: ComponentEvent) {
@@ -173,8 +175,9 @@ fun ApplicationScope.Window(
         update = { window ->
             updater.update {
                 set(currentTitle, window::setTitle)
-                set(currentIcon, window::setIconImage)
+                set(currentIcon, window::setIcon)
                 set(currentUndecorated, window::setUndecoratedSafely)
+                set(currentTransparent, window::isTransparent::set)
                 set(currentResizable, window::setResizable)
                 set(currentEnabled, window::setEnabled)
                 set(currentFocusable, window::setFocusable)
@@ -186,6 +189,84 @@ fun ApplicationScope.Window(
             }
         },
         content = content
+    )
+}
+
+/**
+ * An entry point for the Compose application with single window.
+ *
+ * If you need to change attributes of the window in runtime, or need a custom closing logic, use
+ * Composable `Window` in `application` entry point instead:
+ * ```
+ * application {
+ *     Window(...) { }
+ * }
+ * ```
+ *
+ * @param state The state object to be used to control or observe the window's state
+ * When size/position/status is changed by the user, state will be updated.
+ * When size/position/status of the window is changed by the application (changing state),
+ * the native window will update its corresponding properties.
+ * If application changes, for example [WindowState.placement], then after the next
+ * recomposition, [WindowState.size] will be changed to correspond the real size of the window.
+ * If [WindowState.position] is not [WindowPosition.isSpecified], then after the first show on the
+ * screen [WindowState.position] will be set to the absolute values.
+ * @param visible Is [Window] visible to user.
+ * If `false`:
+ * - internal state of [Window] is preserved and will be restored next time the window
+ * will be visible;
+ * - native resources will not be released. They will be released only when [Window]
+ * will leave the composition.
+ * @param title Title in the titlebar of the window
+ * @param icon Icon in the titlebar of the window (for platforms which support this)
+ * @param undecorated Disables or enables decorations for this window.
+ * @param transparent Disables or enables window transparency. Transparency should be set
+ * only if window is undecorated, otherwise an exception will be thrown.
+ * @param resizable Can window be resized by the user (application still can resize the window
+ * changing [state])
+ * @param enabled Can window react to input events
+ * @param focusable Can window receive focus
+ * @param alwaysOnTop Should window always be on top of another windows
+ * @param onPreviewKeyEvent This callback is invoked when the user interacts with the hardware
+ * keyboard. It gives ancestors of a focused component the chance to intercept a [KeyEvent].
+ * Return true to stop propagation of this event. If you return false, the key event will be
+ * sent to this [onPreviewKeyEvent]'s child. If none of the children consume the event,
+ * it will be sent back up to the root using the onKeyEvent callback.
+ * @param onKeyEvent This callback is invoked when the user interacts with the hardware
+ * keyboard. While implementing this callback, return true to stop propagation of this event.
+ * If you return false, the key event will be sent to this [onKeyEvent]'s parent.
+ * @param content Content of the window
+ */
+fun singleWindowApplication(
+    state: WindowState = WindowState(),
+    visible: Boolean = true,
+    title: String = "Untitled",
+    icon: Painter? = null,
+    undecorated: Boolean = false,
+    transparent: Boolean = false,
+    resizable: Boolean = true,
+    enabled: Boolean = true,
+    focusable: Boolean = true,
+    alwaysOnTop: Boolean = false,
+    onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
+    onKeyEvent: (KeyEvent) -> Boolean = { false },
+    content: @Composable FrameWindowScope.() -> Unit
+) = application {
+    Window(
+        ::exitApplication,
+        state,
+        visible,
+        title,
+        icon,
+        undecorated,
+        transparent,
+        resizable,
+        enabled,
+        focusable,
+        alwaysOnTop,
+        onPreviewKeyEvent,
+        onKeyEvent,
+        content
     )
 }
 
@@ -204,8 +285,6 @@ fun ApplicationScope.Window(
  *
  * Window is needed for creating window's that still can't be created with
  * the default Compose function [androidx.compose.ui.window.Window]
- *
- * This API is experimental and will eventually replace [AppWindow] / [AppManager].
  *
  * @param visible Is [ComposeWindow] visible to user.
  * If `false`:
@@ -227,28 +306,27 @@ fun ApplicationScope.Window(
  * @param update The callback to be invoked after the layout is inflated.
  * @param content Composable content of the creating window.
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Suppress("unused")
-@ExperimentalComposeUiApi
 @Composable
-fun ApplicationScope.Window(
+fun Window(
     visible: Boolean = true,
     onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
     onKeyEvent: (KeyEvent) -> Boolean = { false },
     create: () -> ComposeWindow,
     dispose: (ComposeWindow) -> Unit,
     update: (ComposeWindow) -> Unit = {},
-    content: @Composable WindowScope.() -> Unit
+    content: @Composable FrameWindowScope.() -> Unit
 ) {
-    val composition = rememberCompositionContext()
+    val currentLocals by rememberUpdatedState(currentCompositionLocalContext)
     AwtWindow(
         visible = visible,
         create = {
             create().apply {
-                val scope = object : WindowScope {
-                    override val window: ComposeWindow get() = this@apply
-                }
-                setContent(composition, onPreviewKeyEvent, onKeyEvent) {
-                    scope.content()
+                setContent(onPreviewKeyEvent, onKeyEvent) {
+                    CompositionLocalProvider(currentLocals) {
+                        content()
+                    }
                 }
             }
         },
@@ -260,13 +338,11 @@ fun ApplicationScope.Window(
 /**
  * Receiver scope which is used by [androidx.compose.ui.window.Window].
  */
-interface WindowScope : OwnerWindowScope {
+interface FrameWindowScope : WindowScope {
     /**
      * [ComposeWindow] that was created inside [androidx.compose.ui.window.Window].
      */
-    val window: ComposeWindow
-
-    override val ownerWindow: Window get() = window
+    override val window: ComposeWindow
 }
 
 /**
@@ -275,7 +351,7 @@ interface WindowScope : OwnerWindowScope {
  * @param content content of the menu bar (list of menus)
  */
 @Composable
-fun WindowScope.MenuBar(content: @Composable MenuBarScope.() -> Unit) {
+fun FrameWindowScope.MenuBar(content: @Composable MenuBarScope.() -> Unit) {
     val parentComposition = rememberCompositionContext()
 
     DisposableEffect(Unit) {

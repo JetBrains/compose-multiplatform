@@ -76,7 +76,7 @@ class TextMultiStyleBenchmark(
                     hasMetricAffectingStyle = true
                 )
             }
-            TextInColumnTestCase(
+            AnnotatedTextInColumnTestCase(
                 texts = texts,
                 width = width,
                 fontSize = fontSize

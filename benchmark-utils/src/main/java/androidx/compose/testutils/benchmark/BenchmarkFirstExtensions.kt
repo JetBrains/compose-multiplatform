@@ -29,6 +29,35 @@ import androidx.compose.testutils.doFramesUntilNoChangesPending
 import org.junit.Assert.assertTrue
 
 /**
+ * Measures the time to draw the first pixel right after the given test case is added to an
+ * already existing hierarchy. This benchmarks the full compose -> measure -> layout -> draw cycle.
+ */
+fun ComposeBenchmarkRule.benchmarkToFirstPixel(caseFactory: () -> LayeredComposeTestCase) {
+    runBenchmarkFor(LayeredCaseAdapter.of(caseFactory)) {
+        measureRepeated {
+            runWithTimingDisabled {
+                doFramesUntilNoChangesPending()
+                // Add the content to benchmark
+                getTestCase().addMeasuredContent()
+            }
+
+            recomposeUntilNoChangesPending()
+            requestLayout()
+            measure()
+            layout()
+            drawPrepare()
+            draw()
+
+            runWithTimingDisabled {
+                drawFinish()
+                assertNoPendingChanges()
+                disposeContent()
+            }
+        }
+    }
+}
+
+/**
  * Measures the time of the first composition right after the given test case is added to an
  * already existing hierarchy.
  */

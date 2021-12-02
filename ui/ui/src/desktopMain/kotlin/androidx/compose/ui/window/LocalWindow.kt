@@ -16,9 +16,9 @@
 
 package androidx.compose.ui.window
 
-import androidx.compose.desktop.ComposeDialog
-import androidx.compose.desktop.ComposePanel
-import androidx.compose.desktop.ComposeWindow
+import androidx.compose.ui.awt.ComposeDialog
+import androidx.compose.ui.awt.ComposePanel
+import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.runtime.compositionLocalOf
 import java.awt.Window
 

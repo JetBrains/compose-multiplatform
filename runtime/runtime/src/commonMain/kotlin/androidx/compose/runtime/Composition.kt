@@ -472,9 +472,11 @@ internal class CompositionImpl(
     override fun composeContent(content: @Composable () -> Unit) {
         // TODO: This should raise a signal to any currently running recompose calls
         // to halt and return
-        synchronized(lock) {
-            drainPendingModificationsForCompositionLocked()
-            composer.composeContent(takeInvalidations(), content)
+        trackAbandonedValues {
+            synchronized(lock) {
+                drainPendingModificationsForCompositionLocked()
+                composer.composeContent(takeInvalidations(), content)
+            }
         }
     }
 
@@ -483,19 +485,22 @@ internal class CompositionImpl(
             if (!disposed) {
                 disposed = true
                 composable = {}
-                if (slotTable.groupsSize > 0) {
+                val nonEmptySlotTable = slotTable.groupsSize > 0
+                if (nonEmptySlotTable || abandonSet.isNotEmpty()) {
                     val manager = RememberEventDispatcher(abandonSet)
-                    slotTable.write { writer ->
-                        writer.removeCurrentGroup(manager)
+                    if (nonEmptySlotTable) {
+                        slotTable.write { writer ->
+                            writer.removeCurrentGroup(manager)
+                        }
+                        applier.clear()
+                        manager.dispatchRememberObservers()
                     }
-                    applier.clear()
-                    manager.dispatchRememberObservers()
+                    manager.dispatchAbandons()
                 }
                 composer.dispose()
-                parent.unregisterComposition(this)
-                parent.unregisterComposition(this)
             }
         }
+        parent.unregisterComposition(this)
     }
 
     override val hasInvalidations get() = synchronized(lock) { invalidations.size > 0 }
@@ -611,9 +616,11 @@ internal class CompositionImpl(
 
     override fun recompose(): Boolean = synchronized(lock) {
         drainPendingModificationsForCompositionLocked()
-        composer.recompose(takeInvalidations()).also { shouldDrain ->
-            // Apply would normally do this for us; do it now if apply shouldn't happen.
-            if (!shouldDrain) drainPendingModificationsLocked()
+        trackAbandonedValues {
+            composer.recompose(takeInvalidations()).also { shouldDrain ->
+                // Apply would normally do this for us; do it now if apply shouldn't happen.
+                if (!shouldDrain) drainPendingModificationsLocked()
+            }
         }
     }
 
@@ -721,6 +728,19 @@ internal class CompositionImpl(
                     "Misaligned anchor $anchor in scope $scope encountered, scope found at " +
                         "$dataIndex"
                 }
+            }
+        }
+    }
+
+    private inline fun <T> trackAbandonedValues(block: () -> T): T {
+        var success = false
+        return try {
+            block().also {
+                success = true
+            }
+        } finally {
+            if (!success && abandonSet.isNotEmpty()) {
+                RememberEventDispatcher(abandonSet).dispatchAbandons()
             }
         }
     }

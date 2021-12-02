@@ -71,6 +71,11 @@ import androidx.compose.ui.text.input.VisualTransformation
  * hit target area, use the decoration box:
  * @sample androidx.compose.foundation.samples.TextFieldWithIconSample
  *
+ * In order to create formatted text field, for example for entering a phone number or a social
+ * security number, use a [visualTransformation] parameter. Below is the example of the text field
+ * for entering a credit card number:
+ * @sample androidx.compose.foundation.samples.CreditCardSample
+ *
  * @param value the input [String] text to be shown in the text field
  * @param onValueChange the callback that is triggered when the input service updates the text. An
  * updated text comes as a parameter of the callback

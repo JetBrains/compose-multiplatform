@@ -53,6 +53,16 @@ class VersionChecker(val context: IrPluginContext) {
             3303 to "1.0.3",
             3304 to "1.0.4",
             3305 to "1.0.5",
+            4000 to "1.1.0-alpha01",
+            4100 to "1.1.0-alpha02",
+            4200 to "1.1.0-alpha03",
+            4300 to "1.1.0-alpha04",
+            4400 to "1.1.0-alpha05",
+            4500 to "1.1.0-alpha06",
+            4600 to "1.1.0-beta01",
+            4700 to "1.1.0-beta02",
+            4800 to "1.1.0-beta03",
+            4900 to "1.1.0-beta04",
         )
 
         /**
@@ -65,8 +75,7 @@ class VersionChecker(val context: IrPluginContext) {
          * The maven version string of this compiler. This string should be updated before/after every
          * release.
          */
-        const val compilerVersion: String = "1.0.5"
-
+        const val compilerVersion: String = "1.1.0-beta04"
         private val minimumRuntimeVersion: String
             get() = versionTable[minimumRuntimeVersionInt] ?: "unknown"
     }
@@ -82,7 +91,7 @@ class VersionChecker(val context: IrPluginContext) {
             // all, so we check for the presence of the Composer class here to try and check for the
             // case that an older version of Compose runtime is available.
             val composerClass = context.referenceClass(ComposeFqNames.Composer)
-            if (composerClass == null) {
+            if (composerClass != null) {
                 outdatedRuntimeWithUnknownVersionNumber()
             } else {
                 noRuntimeOnClasspathError()

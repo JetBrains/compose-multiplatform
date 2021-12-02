@@ -20,6 +20,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.util.packFloats
 import androidx.compose.ui.util.unpackFloat1
 import androidx.compose.ui.util.unpackFloat2
@@ -27,14 +28,21 @@ import androidx.compose.ui.util.unpackFloat2
 /**
  * Constructs an [WindowSize] from [width] and [height] [Dp] values.
  */
+@Suppress("DEPRECATION")
+@Deprecated(
+    "Use DpSize",
+    replaceWith = ReplaceWith("DpSize(width, height)", "androidx.compose.ui.unit.DpSize")
+)
 fun WindowSize(
     /**
-     * The width of the window in [Dp].
+     * The width of the window in [Dp]. If it is [Dp.Unspecified] then the width of the window
+     * will determined by the inner content.
      */
     width: Dp,
 
     /**
-     * The height of the window in [Dp].
+     * The height of the window in [Dp]. If it is [Dp.Unspecified] then the height of the window
+     * will determined by the inner content.
      */
     height: Dp
 ) = WindowSize(packFloats(width.value, height.value))
@@ -44,16 +52,26 @@ fun WindowSize(
  */
 @Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
+@Deprecated("Use DpSize", replaceWith = ReplaceWith("DpSize", "androidx.compose.ui.unit.DpSize"))
 inline class WindowSize internal constructor(@PublishedApi internal val packedValue: Long) {
     /**
-     * The width of the window in [Dp].
+     * `true` if the window size has specified values
+     *
+     * `false` if the window size are not yet determined ([width] or [height] are [Dp.Unspecified])
+     */
+    val isSpecified: Boolean get() = width.isSpecified && height.isSpecified
+
+    /**
+     * The width of the window in [Dp]. If it is [Dp.Unspecified] then the width of the window
+     * will determined by the inner content.
      */
     @Stable
     val width: Dp
         get() = unpackFloat1(packedValue).dp
 
     /**
-     * The height of the window in [Dp].
+     * The height of the window in [Dp]. If it is [Dp.Unspecified] then the height of the window
+     * will determined by the inner content.
      */
     @Stable
     val height: Dp
@@ -69,6 +87,7 @@ inline class WindowSize internal constructor(@PublishedApi internal val packedVa
      * Returns a copy of this [WindowSize] instance optionally overriding the
      * [width] or [height] parameter.
      */
+    @Suppress("DEPRECATION")
     fun copy(
         width: Dp = this.width,
         height: Dp = this.height

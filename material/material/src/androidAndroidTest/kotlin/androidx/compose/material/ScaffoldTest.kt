@@ -44,7 +44,7 @@ import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
 import androidx.compose.ui.unit.IntSize
@@ -206,11 +206,11 @@ class ScaffoldTest {
             }
         }
         assertThat(drawerChildPosition.x).isLessThan(0f)
-        rule.onNodeWithTag(scaffoldTag).performGesture {
+        rule.onNodeWithTag(scaffoldTag).performTouchInput {
             swipeRight()
         }
         assertThat(drawerChildPosition.x).isLessThan(0f)
-        rule.onNodeWithTag(scaffoldTag).performGesture {
+        rule.onNodeWithTag(scaffoldTag).performTouchInput {
             swipeLeft()
         }
         assertThat(drawerChildPosition.x).isLessThan(0f)
@@ -219,11 +219,11 @@ class ScaffoldTest {
             drawerGesturedEnabledState.value = true
         }
 
-        rule.onNodeWithTag(scaffoldTag).performGesture {
+        rule.onNodeWithTag(scaffoldTag).performTouchInput {
             swipeRight()
         }
         assertThat(drawerChildPosition.x).isEqualTo(0f)
-        rule.onNodeWithTag(scaffoldTag).performGesture {
+        rule.onNodeWithTag(scaffoldTag).performTouchInput {
             swipeLeft()
         }
         assertThat(drawerChildPosition.x).isLessThan(0f)

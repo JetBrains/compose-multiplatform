@@ -16,10 +16,14 @@
 
 package androidx.compose.ui.input.pointer
 
+import android.view.InputDevice
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_DOWN
+import android.view.MotionEvent.ACTION_HOVER_MOVE
+import android.view.MotionEvent.ACTION_UP
 import android.view.View
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
@@ -85,6 +89,44 @@ internal fun catchThrowable(lambda: () -> Unit): Throwable? {
  * are actually needed.
  */
 internal val MotionEventDouble = MotionEvent.obtain(0L, 0L, ACTION_DOWN, 0f, 0f, 0)
+
+/**
+ * To be used to construct types that require a MotionEvent but where only the ACTION_UP
+ * type is needed.
+ */
+internal val MotionEventUp = MotionEvent.obtain(0L, 0L, ACTION_UP, 0f, 0f, 0)
+
+/**
+ * To be used to construct types that require a MotionEvent but where we only care if the event
+ * is a hover event.
+ */
+internal val MotionEventHover = createHoverMotionEvent(ACTION_HOVER_MOVE, 0f, 0f)
+
+fun createHoverMotionEvent(action: Int, x: Float, y: Float): MotionEvent {
+    val pointerProperties = MotionEvent.PointerProperties().apply {
+        toolType = MotionEvent.TOOL_TYPE_MOUSE
+    }
+    val pointerCoords = MotionEvent.PointerCoords().also {
+        it.x = x
+        it.y = y
+    }
+    return MotionEvent.obtain(
+        0L /* downTime */,
+        0L /* eventTime */,
+        action,
+        1 /* pointerCount */,
+        arrayOf(pointerProperties),
+        arrayOf(pointerCoords),
+        0 /* metaState */,
+        0 /* buttonState */,
+        0f /* xPrecision */,
+        0f /* yPrecision */,
+        0 /* deviceId */,
+        0 /* edgeFlags */,
+        InputDevice.SOURCE_MOUSE,
+        0 /* flags */
+    )
+}
 
 internal fun Modifier.spyGestureFilter(
     callback: (PointerEventPass) -> Unit
@@ -194,13 +236,32 @@ internal fun PointerEvent.deepCopy() =
         changes.map {
             it.deepCopy()
         },
-        motionEvent = motionEvent
-    )
+        internalPointerEvent = internalPointerEvent
+    ).also { it.type = type }
 
 internal fun pointerEventOf(
     vararg changes: PointerInputChange,
     motionEvent: MotionEvent = MotionEventDouble
-) = PointerEvent(changes.toList(), motionEvent)
+) = PointerEvent(changes.toList(),
+    InternalPointerEvent(changes.map { it.id to it }.toMap(), motionEvent))
+
+internal fun InternalPointerEvent(
+    changes: Map<PointerId, PointerInputChange>,
+    motionEvent: MotionEvent
+): InternalPointerEvent {
+    val pointers = changes.values.map {
+        PointerInputEventData(
+            id = it.id,
+            uptime = it.uptimeMillis,
+            positionOnScreen = it.position,
+            position = it.position,
+            down = it.pressed,
+            type = it.type
+        )
+    }
+    val pointer = PointerInputEvent(pointers[0].uptime, pointers, motionEvent)
+    return InternalPointerEvent(changes, pointer)
+}
 
 internal class PointerInputFilterMock(
     val log: MutableList<LogEntry> = mutableListOf(),
@@ -251,8 +312,65 @@ internal class OnCancelEntry(
     val pointerInputFilter: PointerInputFilter
 ) : LogEntry()
 
-internal fun internalPointerEventOf(vararg changes: PointerInputChange) =
-    InternalPointerEvent(changes.toList().associateBy { it.id }.toMutableMap(), MotionEventDouble)
+internal fun internalPointerEventOf(vararg changes: PointerInputChange): InternalPointerEvent {
+    val event = if (changes.any { it.changedToUpIgnoreConsumed() }) {
+        MotionEventUp
+    } else {
+        MotionEventDouble
+    }
+
+    val pointers = changes.map {
+        @OptIn(ExperimentalComposeUiApi::class)
+        PointerInputEventData(
+            id = it.id,
+            uptime = it.uptimeMillis,
+            positionOnScreen = it.position,
+            position = it.position,
+            down = it.pressed,
+            type = it.type,
+            issuesEnterExit = false,
+            historical = emptyList()
+        )
+    }
+    val pointerEvent = PointerInputEvent(0L, pointers, event)
+    return InternalPointerEvent(changes.toList().associateBy { it.id }.toMutableMap(), pointerEvent)
+}
+
+internal fun hoverInternalPointerEvent(
+    action: Int = ACTION_HOVER_MOVE,
+    x: Float = 0f,
+    y: Float = 0f
+): InternalPointerEvent {
+    val change = PointerInputChange(
+        PointerId(0),
+        0L,
+        Offset(x, y),
+        false,
+        0L,
+        Offset(0f, 0f),
+        false,
+        ConsumedData(),
+        PointerType.Mouse
+    )
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    val pointer = PointerInputEventData(
+        id = change.id,
+        uptime = change.uptimeMillis,
+        positionOnScreen = change.position,
+        position = change.position,
+        down = change.pressed,
+        type = change.type,
+        issuesEnterExit = true,
+        historical = emptyList()
+    )
+    val pointerEvent = PointerInputEvent(0L, listOf(pointer), createHoverMotionEvent(action, x, y))
+
+    return InternalPointerEvent(
+        mutableMapOf(change.id to change),
+        pointerEvent
+    )
+}
 
 internal class PointerEventSubject(
     metaData: FailureMetadata,

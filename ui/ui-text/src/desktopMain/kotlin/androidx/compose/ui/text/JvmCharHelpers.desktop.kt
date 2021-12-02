@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.text
 
-import org.jetbrains.skija.BreakIterator
+import org.jetbrains.skia.BreakIterator
 
 internal actual fun String.findPrecedingBreak(index: Int): Int {
     val it = BreakIterator.makeCharacterInstance()

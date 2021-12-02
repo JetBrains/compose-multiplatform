@@ -542,10 +542,8 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
 
         // Assert.
         rule.runOnIdle {
-            // TODO(b/170155659): After implementing one-dimensional focus search, update this test
-            //  so that item2 is focused.
-            assertThat(item1Focused).isTrue()
-            assertThat(item2Focused).isFalse()
+            assertThat(item1Focused).isFalse()
+            assertThat(item2Focused).isTrue()
             assertThat(item3Focused).isFalse()
         }
     }

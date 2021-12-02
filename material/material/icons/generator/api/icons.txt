@@ -41,6 +41,7 @@ Filled.AddToQueue
 Filled.Addchart
 Filled.Adjust
 Filled.AdminPanelSettings
+Filled.AdsClick
 Filled.Agriculture
 Filled.Air
 Filled.AirlineSeatFlat
@@ -51,6 +52,8 @@ Filled.AirlineSeatLegroomNormal
 Filled.AirlineSeatLegroomReduced
 Filled.AirlineSeatReclineExtra
 Filled.AirlineSeatReclineNormal
+Filled.AirlineStops
+Filled.Airlines
 Filled.AirplaneTicket
 Filled.AirplanemodeActive
 Filled.AirplanemodeInactive
@@ -86,8 +89,10 @@ Filled.AppRegistration
 Filled.AppSettingsAlt
 Filled.Approval
 Filled.Apps
+Filled.AppsOutage
 Filled.Architecture
 Filled.Archive
+Filled.AreaChart
 Filled.ArrowBack
 Filled.ArrowBackIos
 Filled.ArrowBackIosNew
@@ -137,6 +142,7 @@ Filled.AutofpsSelect
 Filled.Autorenew
 Filled.AvTimer
 Filled.BabyChangingStation
+Filled.BackHand
 Filled.Backpack
 Filled.Backspace
 Filled.Backup
@@ -214,6 +220,7 @@ Filled.BrightnessLow
 Filled.BrightnessMedium
 Filled.BrokenImage
 Filled.BrowserNotSupported
+Filled.BrowserUpdated
 Filled.BrunchDining
 Filled.Brush
 Filled.BubbleChart
@@ -287,6 +294,8 @@ Filled.CheckBox
 Filled.CheckBoxOutlineBlank
 Filled.CheckCircle
 Filled.CheckCircleOutline
+Filled.Checklist
+Filled.ChecklistRtl
 Filled.Checkroom
 Filled.ChevronLeft
 Filled.ChevronRight
@@ -312,6 +321,7 @@ Filled.CloudDownload
 Filled.CloudOff
 Filled.CloudQueue
 Filled.CloudUpload
+Filled.Co2
 Filled.Code
 Filled.CodeOff
 Filled.Coffee
@@ -322,15 +332,18 @@ Filled.ColorLens
 Filled.Colorize
 Filled.Comment
 Filled.CommentBank
+Filled.CommentsDisabled
 Filled.Commute
 Filled.Compare
 Filled.CompareArrows
 Filled.CompassCalibration
+Filled.Compost
 Filled.Compress
 Filled.Computer
 Filled.ConfirmationNumber
 Filled.ConnectWithoutContact
 Filled.ConnectedTv
+Filled.ConnectingAirports
 Filled.Construction
 Filled.ContactMail
 Filled.ContactPage
@@ -369,10 +382,12 @@ Filled.CropOriginal
 Filled.CropPortrait
 Filled.CropRotate
 Filled.CropSquare
+Filled.CrueltyFree
 Filled.Dangerous
 Filled.DarkMode
 Filled.Dashboard
 Filled.DashboardCustomize
+Filled.DataExploration
 Filled.DataSaverOff
 Filled.DataSaverOn
 Filled.DataUsage
@@ -422,6 +437,7 @@ Filled.DirectionsTransitFilled
 Filled.DirectionsWalk
 Filled.DirtyLens
 Filled.DisabledByDefault
+Filled.DisabledVisible
 Filled.DiscFull
 Filled.Dns
 Filled.DoDisturb
@@ -436,6 +452,7 @@ Filled.DoNotDisturbOnTotalSilence
 Filled.DoNotStep
 Filled.DoNotTouch
 Filled.Dock
+Filled.DocumentScanner
 Filled.Domain
 Filled.DomainDisabled
 Filled.DomainVerification
@@ -457,8 +474,10 @@ Filled.Downloading
 Filled.Drafts
 Filled.DragHandle
 Filled.DragIndicator
+Filled.Draw
 Filled.DriveEta
 Filled.DriveFileMove
+Filled.DriveFileMoveRtl
 Filled.DriveFileRenameOutline
 Filled.DriveFolderUpload
 Filled.Dry
@@ -476,8 +495,10 @@ Filled.EdgesensorHigh
 Filled.EdgesensorLow
 Filled.Edit
 Filled.EditAttributes
+Filled.EditCalendar
 Filled.EditLocation
 Filled.EditLocationAlt
+Filled.EditNote
 Filled.EditNotifications
 Filled.EditOff
 Filled.EditRoad
@@ -491,6 +512,7 @@ Filled.ElectricScooter
 Filled.ElectricalServices
 Filled.Elevator
 Filled.Email
+Filled.Emergency
 Filled.EmojiEmotions
 Filled.EmojiEvents
 Filled.EmojiFlags
@@ -517,6 +539,7 @@ Filled.EventNote
 Filled.EventSeat
 Filled.ExitToApp
 Filled.Expand
+Filled.ExpandCircleDown
 Filled.ExpandLess
 Filled.ExpandMore
 Filled.Explicit
@@ -587,6 +610,7 @@ Filled.FireExtinguisher
 Filled.Fireplace
 Filled.FirstPage
 Filled.FitScreen
+Filled.Fitbit
 Filled.FitnessCenter
 Filled.Flag
 Filled.Flaky
@@ -598,6 +622,7 @@ Filled.FlashlightOff
 Filled.FlashlightOn
 Filled.Flatware
 Filled.Flight
+Filled.FlightClass
 Filled.FlightLand
 Filled.FlightTakeoff
 Filled.Flip
@@ -649,6 +674,8 @@ Filled.Forward5
 Filled.ForwardToInbox
 Filled.Foundation
 Filled.FreeBreakfast
+Filled.FreeCancellation
+Filled.FrontHand
 Filled.Fullscreen
 Filled.FullscreenExit
 Filled.Functions
@@ -658,9 +685,11 @@ Filled.Gamepad
 Filled.Games
 Filled.Garage
 Filled.Gavel
+Filled.GeneratingTokens
 Filled.Gesture
 Filled.GetApp
 Filled.Gif
+Filled.GifBox
 Filled.Gite
 Filled.GolfCourse
 Filled.GppBad
@@ -683,6 +712,8 @@ Filled.GridOn
 Filled.GridView
 Filled.Group
 Filled.GroupAdd
+Filled.GroupOff
+Filled.GroupRemove
 Filled.GroupWork
 Filled.Groups
 Filled.HMobiledata
@@ -736,6 +767,7 @@ Filled.HorizontalRule
 Filled.HorizontalSplit
 Filled.HotTub
 Filled.Hotel
+Filled.HotelClass
 Filled.HourglassBottom
 Filled.HourglassDisabled
 Filled.HourglassEmpty
@@ -748,6 +780,7 @@ Filled.HowToReg
 Filled.HowToVote
 Filled.Http
 Filled.Https
+Filled.Hub
 Filled.Hvac
 Filled.IceSkating
 Filled.Icecream
@@ -760,6 +793,7 @@ Filled.ImportContacts
 Filled.ImportExport
 Filled.ImportantDevices
 Filled.Inbox
+Filled.IncompleteCircle
 Filled.IndeterminateCheckBox
 Filled.Info
 Filled.Input
@@ -773,6 +807,8 @@ Filled.InsertLink
 Filled.InsertPhoto
 Filled.Insights
 Filled.IntegrationInstructions
+Filled.Interests
+Filled.InterpreterMode
 Filled.Inventory
 Filled.Inventory2
 Filled.InvertColors
@@ -781,6 +817,7 @@ Filled.IosShare
 Filled.Iron
 Filled.Iso
 Filled.Kayaking
+Filled.KebabDining
 Filled.Keyboard
 Filled.KeyboardAlt
 Filled.KeyboardArrowDown
@@ -941,6 +978,7 @@ Filled.ModeComment
 Filled.ModeEdit
 Filled.ModeEditOutline
 Filled.ModeNight
+Filled.ModeOfTravel
 Filled.ModeStandby
 Filled.ModelTraining
 Filled.MonetizationOn
@@ -991,6 +1029,7 @@ Filled.NetworkCell
 Filled.NetworkCheck
 Filled.NetworkLocked
 Filled.NetworkWifi
+Filled.NewLabel
 Filled.NewReleases
 Filled.NextPlan
 Filled.NextWeek
@@ -1106,6 +1145,7 @@ Filled.PersonPinCircle
 Filled.PersonRemove
 Filled.PersonRemoveAlt1
 Filled.PersonSearch
+Filled.PersonalInjury
 Filled.PersonalVideo
 Filled.PestControl
 Filled.PestControlRodent
@@ -1147,6 +1187,8 @@ Filled.PieChart
 Filled.PieChartOutline
 Filled.Pin
 Filled.PinDrop
+Filled.PinEnd
+Filled.PinInvoke
 Filled.PivotTableChart
 Filled.Place
 Filled.Plagiarism
@@ -1159,6 +1201,8 @@ Filled.PlayForWork
 Filled.PlayLesson
 Filled.PlaylistAdd
 Filled.PlaylistAddCheck
+Filled.PlaylistAddCheckCircle
+Filled.PlaylistAddCircle
 Filled.PlaylistPlay
 Filled.Plumbing
 Filled.PlusOne
@@ -1185,6 +1229,7 @@ Filled.Print
 Filled.PrintDisabled
 Filled.PriorityHigh
 Filled.PrivacyTip
+Filled.PrivateConnectivity
 Filled.ProductionQuantityLimits
 Filled.Psychology
 Filled.Public
@@ -1214,11 +1259,13 @@ Filled.RateReview
 Filled.RawOff
 Filled.RawOn
 Filled.ReadMore
+Filled.RealEstateAgent
 Filled.Receipt
 Filled.ReceiptLong
 Filled.RecentActors
 Filled.Recommend
 Filled.RecordVoiceOver
+Filled.Recycling
 Filled.Redeem
 Filled.Redo
 Filled.ReduceCapacity
@@ -1413,12 +1460,15 @@ Filled.Soap
 Filled.SocialDistance
 Filled.Sort
 Filled.SortByAlpha
+Filled.SoupKitchen
 Filled.Source
 Filled.South
+Filled.SouthAmerica
 Filled.SouthEast
 Filled.SouthWest
 Filled.Spa
 Filled.SpaceBar
+Filled.SpaceDashboard
 Filled.Speaker
 Filled.SpeakerGroup
 Filled.SpeakerNotes
@@ -1427,6 +1477,7 @@ Filled.SpeakerPhone
 Filled.Speed
 Filled.Spellcheck
 Filled.Splitscreen
+Filled.Spoke
 Filled.Sports
 Filled.SportsBar
 Filled.SportsBaseball
@@ -1498,6 +1549,8 @@ Filled.SwapHorizontalCircle
 Filled.SwapVert
 Filled.SwapVerticalCircle
 Filled.Swipe
+Filled.SwitchAccessShortcut
+Filled.SwitchAccessShortcutAdd
 Filled.SwitchAccount
 Filled.SwitchCamera
 Filled.SwitchLeft
@@ -1560,11 +1613,13 @@ Filled.Timer10Select
 Filled.Timer3
 Filled.Timer3Select
 Filled.TimerOff
+Filled.TipsAndUpdates
 Filled.Title
 Filled.Toc
 Filled.Today
 Filled.ToggleOff
 Filled.ToggleOn
+Filled.Token
 Filled.Toll
 Filled.Tonality
 Filled.Topic
@@ -1609,6 +1664,7 @@ Filled.Upload
 Filled.UploadFile
 Filled.Usb
 Filled.UsbOff
+Filled.Vaccines
 Filled.Verified
 Filled.VerifiedUser
 Filled.VerticalAlignBottom
@@ -1666,8 +1722,10 @@ Filled.Watch
 Filled.WatchLater
 Filled.Water
 Filled.WaterDamage
+Filled.WaterDrop
 Filled.WaterfallChart
 Filled.Waves
+Filled.WavingHand
 Filled.WbAuto
 Filled.WbCloudy
 Filled.WbIncandescent
@@ -1699,6 +1757,7 @@ Filled.WineBar
 Filled.Work
 Filled.WorkOff
 Filled.WorkOutline
+Filled.WorkspacePremium
 Filled.Workspaces
 Filled.WrapText
 Filled.WrongLocation
@@ -1806,6 +1865,7 @@ Outlined.AddToQueue
 Outlined.Addchart
 Outlined.Adjust
 Outlined.AdminPanelSettings
+Outlined.AdsClick
 Outlined.Agriculture
 Outlined.Air
 Outlined.AirlineSeatFlat
@@ -1816,6 +1876,8 @@ Outlined.AirlineSeatLegroomNormal
 Outlined.AirlineSeatLegroomReduced
 Outlined.AirlineSeatReclineExtra
 Outlined.AirlineSeatReclineNormal
+Outlined.AirlineStops
+Outlined.Airlines
 Outlined.AirplaneTicket
 Outlined.AirplanemodeActive
 Outlined.AirplanemodeInactive
@@ -1851,8 +1913,10 @@ Outlined.AppRegistration
 Outlined.AppSettingsAlt
 Outlined.Approval
 Outlined.Apps
+Outlined.AppsOutage
 Outlined.Architecture
 Outlined.Archive
+Outlined.AreaChart
 Outlined.ArrowBack
 Outlined.ArrowBackIos
 Outlined.ArrowBackIosNew
@@ -1902,6 +1966,7 @@ Outlined.AutofpsSelect
 Outlined.Autorenew
 Outlined.AvTimer
 Outlined.BabyChangingStation
+Outlined.BackHand
 Outlined.Backpack
 Outlined.Backspace
 Outlined.Backup
@@ -1979,6 +2044,7 @@ Outlined.BrightnessLow
 Outlined.BrightnessMedium
 Outlined.BrokenImage
 Outlined.BrowserNotSupported
+Outlined.BrowserUpdated
 Outlined.BrunchDining
 Outlined.Brush
 Outlined.BubbleChart
@@ -2052,6 +2118,8 @@ Outlined.CheckBox
 Outlined.CheckBoxOutlineBlank
 Outlined.CheckCircle
 Outlined.CheckCircleOutline
+Outlined.Checklist
+Outlined.ChecklistRtl
 Outlined.Checkroom
 Outlined.ChevronLeft
 Outlined.ChevronRight
@@ -2077,6 +2145,7 @@ Outlined.CloudDownload
 Outlined.CloudOff
 Outlined.CloudQueue
 Outlined.CloudUpload
+Outlined.Co2
 Outlined.Code
 Outlined.CodeOff
 Outlined.Coffee
@@ -2087,15 +2156,18 @@ Outlined.ColorLens
 Outlined.Colorize
 Outlined.Comment
 Outlined.CommentBank
+Outlined.CommentsDisabled
 Outlined.Commute
 Outlined.Compare
 Outlined.CompareArrows
 Outlined.CompassCalibration
+Outlined.Compost
 Outlined.Compress
 Outlined.Computer
 Outlined.ConfirmationNumber
 Outlined.ConnectWithoutContact
 Outlined.ConnectedTv
+Outlined.ConnectingAirports
 Outlined.Construction
 Outlined.ContactMail
 Outlined.ContactPage
@@ -2134,10 +2206,12 @@ Outlined.CropOriginal
 Outlined.CropPortrait
 Outlined.CropRotate
 Outlined.CropSquare
+Outlined.CrueltyFree
 Outlined.Dangerous
 Outlined.DarkMode
 Outlined.Dashboard
 Outlined.DashboardCustomize
+Outlined.DataExploration
 Outlined.DataSaverOff
 Outlined.DataSaverOn
 Outlined.DataUsage
@@ -2187,6 +2261,7 @@ Outlined.DirectionsTransitFilled
 Outlined.DirectionsWalk
 Outlined.DirtyLens
 Outlined.DisabledByDefault
+Outlined.DisabledVisible
 Outlined.DiscFull
 Outlined.Dns
 Outlined.DoDisturb
@@ -2201,6 +2276,7 @@ Outlined.DoNotDisturbOnTotalSilence
 Outlined.DoNotStep
 Outlined.DoNotTouch
 Outlined.Dock
+Outlined.DocumentScanner
 Outlined.Domain
 Outlined.DomainDisabled
 Outlined.DomainVerification
@@ -2222,8 +2298,10 @@ Outlined.Downloading
 Outlined.Drafts
 Outlined.DragHandle
 Outlined.DragIndicator
+Outlined.Draw
 Outlined.DriveEta
 Outlined.DriveFileMove
+Outlined.DriveFileMoveRtl
 Outlined.DriveFileRenameOutline
 Outlined.DriveFolderUpload
 Outlined.Dry
@@ -2241,8 +2319,10 @@ Outlined.EdgesensorHigh
 Outlined.EdgesensorLow
 Outlined.Edit
 Outlined.EditAttributes
+Outlined.EditCalendar
 Outlined.EditLocation
 Outlined.EditLocationAlt
+Outlined.EditNote
 Outlined.EditNotifications
 Outlined.EditOff
 Outlined.EditRoad
@@ -2256,6 +2336,7 @@ Outlined.ElectricScooter
 Outlined.ElectricalServices
 Outlined.Elevator
 Outlined.Email
+Outlined.Emergency
 Outlined.EmojiEmotions
 Outlined.EmojiEvents
 Outlined.EmojiFlags
@@ -2282,6 +2363,7 @@ Outlined.EventNote
 Outlined.EventSeat
 Outlined.ExitToApp
 Outlined.Expand
+Outlined.ExpandCircleDown
 Outlined.ExpandLess
 Outlined.ExpandMore
 Outlined.Explicit
@@ -2352,6 +2434,7 @@ Outlined.FireExtinguisher
 Outlined.Fireplace
 Outlined.FirstPage
 Outlined.FitScreen
+Outlined.Fitbit
 Outlined.FitnessCenter
 Outlined.Flag
 Outlined.Flaky
@@ -2363,6 +2446,7 @@ Outlined.FlashlightOff
 Outlined.FlashlightOn
 Outlined.Flatware
 Outlined.Flight
+Outlined.FlightClass
 Outlined.FlightLand
 Outlined.FlightTakeoff
 Outlined.Flip
@@ -2414,6 +2498,8 @@ Outlined.Forward5
 Outlined.ForwardToInbox
 Outlined.Foundation
 Outlined.FreeBreakfast
+Outlined.FreeCancellation
+Outlined.FrontHand
 Outlined.Fullscreen
 Outlined.FullscreenExit
 Outlined.Functions
@@ -2423,9 +2509,11 @@ Outlined.Gamepad
 Outlined.Games
 Outlined.Garage
 Outlined.Gavel
+Outlined.GeneratingTokens
 Outlined.Gesture
 Outlined.GetApp
 Outlined.Gif
+Outlined.GifBox
 Outlined.Gite
 Outlined.GolfCourse
 Outlined.GppBad
@@ -2448,6 +2536,8 @@ Outlined.GridOn
 Outlined.GridView
 Outlined.Group
 Outlined.GroupAdd
+Outlined.GroupOff
+Outlined.GroupRemove
 Outlined.GroupWork
 Outlined.Groups
 Outlined.HMobiledata
@@ -2501,6 +2591,7 @@ Outlined.HorizontalRule
 Outlined.HorizontalSplit
 Outlined.HotTub
 Outlined.Hotel
+Outlined.HotelClass
 Outlined.HourglassBottom
 Outlined.HourglassDisabled
 Outlined.HourglassEmpty
@@ -2513,6 +2604,7 @@ Outlined.HowToReg
 Outlined.HowToVote
 Outlined.Http
 Outlined.Https
+Outlined.Hub
 Outlined.Hvac
 Outlined.IceSkating
 Outlined.Icecream
@@ -2525,6 +2617,7 @@ Outlined.ImportContacts
 Outlined.ImportExport
 Outlined.ImportantDevices
 Outlined.Inbox
+Outlined.IncompleteCircle
 Outlined.IndeterminateCheckBox
 Outlined.Info
 Outlined.Input
@@ -2538,6 +2631,8 @@ Outlined.InsertLink
 Outlined.InsertPhoto
 Outlined.Insights
 Outlined.IntegrationInstructions
+Outlined.Interests
+Outlined.InterpreterMode
 Outlined.Inventory
 Outlined.Inventory2
 Outlined.InvertColors
@@ -2546,6 +2641,7 @@ Outlined.IosShare
 Outlined.Iron
 Outlined.Iso
 Outlined.Kayaking
+Outlined.KebabDining
 Outlined.Keyboard
 Outlined.KeyboardAlt
 Outlined.KeyboardArrowDown
@@ -2706,6 +2802,7 @@ Outlined.ModeComment
 Outlined.ModeEdit
 Outlined.ModeEditOutline
 Outlined.ModeNight
+Outlined.ModeOfTravel
 Outlined.ModeStandby
 Outlined.ModelTraining
 Outlined.MonetizationOn
@@ -2756,6 +2853,7 @@ Outlined.NetworkCell
 Outlined.NetworkCheck
 Outlined.NetworkLocked
 Outlined.NetworkWifi
+Outlined.NewLabel
 Outlined.NewReleases
 Outlined.NextPlan
 Outlined.NextWeek
@@ -2871,6 +2969,7 @@ Outlined.PersonPinCircle
 Outlined.PersonRemove
 Outlined.PersonRemoveAlt1
 Outlined.PersonSearch
+Outlined.PersonalInjury
 Outlined.PersonalVideo
 Outlined.PestControl
 Outlined.PestControlRodent
@@ -2912,6 +3011,8 @@ Outlined.PieChart
 Outlined.PieChartOutline
 Outlined.Pin
 Outlined.PinDrop
+Outlined.PinEnd
+Outlined.PinInvoke
 Outlined.PivotTableChart
 Outlined.Place
 Outlined.Plagiarism
@@ -2924,6 +3025,8 @@ Outlined.PlayForWork
 Outlined.PlayLesson
 Outlined.PlaylistAdd
 Outlined.PlaylistAddCheck
+Outlined.PlaylistAddCheckCircle
+Outlined.PlaylistAddCircle
 Outlined.PlaylistPlay
 Outlined.Plumbing
 Outlined.PlusOne
@@ -2950,6 +3053,7 @@ Outlined.Print
 Outlined.PrintDisabled
 Outlined.PriorityHigh
 Outlined.PrivacyTip
+Outlined.PrivateConnectivity
 Outlined.ProductionQuantityLimits
 Outlined.Psychology
 Outlined.Public
@@ -2979,11 +3083,13 @@ Outlined.RateReview
 Outlined.RawOff
 Outlined.RawOn
 Outlined.ReadMore
+Outlined.RealEstateAgent
 Outlined.Receipt
 Outlined.ReceiptLong
 Outlined.RecentActors
 Outlined.Recommend
 Outlined.RecordVoiceOver
+Outlined.Recycling
 Outlined.Redeem
 Outlined.Redo
 Outlined.ReduceCapacity
@@ -3178,12 +3284,15 @@ Outlined.Soap
 Outlined.SocialDistance
 Outlined.Sort
 Outlined.SortByAlpha
+Outlined.SoupKitchen
 Outlined.Source
 Outlined.South
+Outlined.SouthAmerica
 Outlined.SouthEast
 Outlined.SouthWest
 Outlined.Spa
 Outlined.SpaceBar
+Outlined.SpaceDashboard
 Outlined.Speaker
 Outlined.SpeakerGroup
 Outlined.SpeakerNotes
@@ -3192,6 +3301,7 @@ Outlined.SpeakerPhone
 Outlined.Speed
 Outlined.Spellcheck
 Outlined.Splitscreen
+Outlined.Spoke
 Outlined.Sports
 Outlined.SportsBar
 Outlined.SportsBaseball
@@ -3263,6 +3373,8 @@ Outlined.SwapHorizontalCircle
 Outlined.SwapVert
 Outlined.SwapVerticalCircle
 Outlined.Swipe
+Outlined.SwitchAccessShortcut
+Outlined.SwitchAccessShortcutAdd
 Outlined.SwitchAccount
 Outlined.SwitchCamera
 Outlined.SwitchLeft
@@ -3325,11 +3437,13 @@ Outlined.Timer10Select
 Outlined.Timer3
 Outlined.Timer3Select
 Outlined.TimerOff
+Outlined.TipsAndUpdates
 Outlined.Title
 Outlined.Toc
 Outlined.Today
 Outlined.ToggleOff
 Outlined.ToggleOn
+Outlined.Token
 Outlined.Toll
 Outlined.Tonality
 Outlined.Topic
@@ -3374,6 +3488,7 @@ Outlined.Upload
 Outlined.UploadFile
 Outlined.Usb
 Outlined.UsbOff
+Outlined.Vaccines
 Outlined.Verified
 Outlined.VerifiedUser
 Outlined.VerticalAlignBottom
@@ -3431,8 +3546,10 @@ Outlined.Watch
 Outlined.WatchLater
 Outlined.Water
 Outlined.WaterDamage
+Outlined.WaterDrop
 Outlined.WaterfallChart
 Outlined.Waves
+Outlined.WavingHand
 Outlined.WbAuto
 Outlined.WbCloudy
 Outlined.WbIncandescent
@@ -3464,6 +3581,7 @@ Outlined.WineBar
 Outlined.Work
 Outlined.WorkOff
 Outlined.WorkOutline
+Outlined.WorkspacePremium
 Outlined.Workspaces
 Outlined.WrapText
 Outlined.WrongLocation
@@ -3571,6 +3689,7 @@ Rounded.AddToQueue
 Rounded.Addchart
 Rounded.Adjust
 Rounded.AdminPanelSettings
+Rounded.AdsClick
 Rounded.Agriculture
 Rounded.Air
 Rounded.AirlineSeatFlat
@@ -3581,6 +3700,8 @@ Rounded.AirlineSeatLegroomNormal
 Rounded.AirlineSeatLegroomReduced
 Rounded.AirlineSeatReclineExtra
 Rounded.AirlineSeatReclineNormal
+Rounded.AirlineStops
+Rounded.Airlines
 Rounded.AirplaneTicket
 Rounded.AirplanemodeActive
 Rounded.AirplanemodeInactive
@@ -3616,8 +3737,10 @@ Rounded.AppRegistration
 Rounded.AppSettingsAlt
 Rounded.Approval
 Rounded.Apps
+Rounded.AppsOutage
 Rounded.Architecture
 Rounded.Archive
+Rounded.AreaChart
 Rounded.ArrowBack
 Rounded.ArrowBackIos
 Rounded.ArrowBackIosNew
@@ -3667,6 +3790,7 @@ Rounded.AutofpsSelect
 Rounded.Autorenew
 Rounded.AvTimer
 Rounded.BabyChangingStation
+Rounded.BackHand
 Rounded.Backpack
 Rounded.Backspace
 Rounded.Backup
@@ -3744,6 +3868,7 @@ Rounded.BrightnessLow
 Rounded.BrightnessMedium
 Rounded.BrokenImage
 Rounded.BrowserNotSupported
+Rounded.BrowserUpdated
 Rounded.BrunchDining
 Rounded.Brush
 Rounded.BubbleChart
@@ -3817,6 +3942,8 @@ Rounded.CheckBox
 Rounded.CheckBoxOutlineBlank
 Rounded.CheckCircle
 Rounded.CheckCircleOutline
+Rounded.Checklist
+Rounded.ChecklistRtl
 Rounded.Checkroom
 Rounded.ChevronLeft
 Rounded.ChevronRight
@@ -3842,6 +3969,7 @@ Rounded.CloudDownload
 Rounded.CloudOff
 Rounded.CloudQueue
 Rounded.CloudUpload
+Rounded.Co2
 Rounded.Code
 Rounded.CodeOff
 Rounded.Coffee
@@ -3852,15 +3980,18 @@ Rounded.ColorLens
 Rounded.Colorize
 Rounded.Comment
 Rounded.CommentBank
+Rounded.CommentsDisabled
 Rounded.Commute
 Rounded.Compare
 Rounded.CompareArrows
 Rounded.CompassCalibration
+Rounded.Compost
 Rounded.Compress
 Rounded.Computer
 Rounded.ConfirmationNumber
 Rounded.ConnectWithoutContact
 Rounded.ConnectedTv
+Rounded.ConnectingAirports
 Rounded.Construction
 Rounded.ContactMail
 Rounded.ContactPage
@@ -3899,10 +4030,12 @@ Rounded.CropOriginal
 Rounded.CropPortrait
 Rounded.CropRotate
 Rounded.CropSquare
+Rounded.CrueltyFree
 Rounded.Dangerous
 Rounded.DarkMode
 Rounded.Dashboard
 Rounded.DashboardCustomize
+Rounded.DataExploration
 Rounded.DataSaverOff
 Rounded.DataSaverOn
 Rounded.DataUsage
@@ -3952,6 +4085,7 @@ Rounded.DirectionsTransitFilled
 Rounded.DirectionsWalk
 Rounded.DirtyLens
 Rounded.DisabledByDefault
+Rounded.DisabledVisible
 Rounded.DiscFull
 Rounded.Dns
 Rounded.DoDisturb
@@ -3966,6 +4100,7 @@ Rounded.DoNotDisturbOnTotalSilence
 Rounded.DoNotStep
 Rounded.DoNotTouch
 Rounded.Dock
+Rounded.DocumentScanner
 Rounded.Domain
 Rounded.DomainDisabled
 Rounded.DomainVerification
@@ -3987,8 +4122,10 @@ Rounded.Downloading
 Rounded.Drafts
 Rounded.DragHandle
 Rounded.DragIndicator
+Rounded.Draw
 Rounded.DriveEta
 Rounded.DriveFileMove
+Rounded.DriveFileMoveRtl
 Rounded.DriveFileRenameOutline
 Rounded.DriveFolderUpload
 Rounded.Dry
@@ -4006,8 +4143,10 @@ Rounded.EdgesensorHigh
 Rounded.EdgesensorLow
 Rounded.Edit
 Rounded.EditAttributes
+Rounded.EditCalendar
 Rounded.EditLocation
 Rounded.EditLocationAlt
+Rounded.EditNote
 Rounded.EditNotifications
 Rounded.EditOff
 Rounded.EditRoad
@@ -4021,6 +4160,7 @@ Rounded.ElectricScooter
 Rounded.ElectricalServices
 Rounded.Elevator
 Rounded.Email
+Rounded.Emergency
 Rounded.EmojiEmotions
 Rounded.EmojiEvents
 Rounded.EmojiFlags
@@ -4047,6 +4187,7 @@ Rounded.EventNote
 Rounded.EventSeat
 Rounded.ExitToApp
 Rounded.Expand
+Rounded.ExpandCircleDown
 Rounded.ExpandLess
 Rounded.ExpandMore
 Rounded.Explicit
@@ -4117,6 +4258,7 @@ Rounded.FireExtinguisher
 Rounded.Fireplace
 Rounded.FirstPage
 Rounded.FitScreen
+Rounded.Fitbit
 Rounded.FitnessCenter
 Rounded.Flag
 Rounded.Flaky
@@ -4128,6 +4270,7 @@ Rounded.FlashlightOff
 Rounded.FlashlightOn
 Rounded.Flatware
 Rounded.Flight
+Rounded.FlightClass
 Rounded.FlightLand
 Rounded.FlightTakeoff
 Rounded.Flip
@@ -4179,6 +4322,8 @@ Rounded.Forward5
 Rounded.ForwardToInbox
 Rounded.Foundation
 Rounded.FreeBreakfast
+Rounded.FreeCancellation
+Rounded.FrontHand
 Rounded.Fullscreen
 Rounded.FullscreenExit
 Rounded.Functions
@@ -4188,9 +4333,11 @@ Rounded.Gamepad
 Rounded.Games
 Rounded.Garage
 Rounded.Gavel
+Rounded.GeneratingTokens
 Rounded.Gesture
 Rounded.GetApp
 Rounded.Gif
+Rounded.GifBox
 Rounded.Gite
 Rounded.GolfCourse
 Rounded.GppBad
@@ -4213,6 +4360,8 @@ Rounded.GridOn
 Rounded.GridView
 Rounded.Group
 Rounded.GroupAdd
+Rounded.GroupOff
+Rounded.GroupRemove
 Rounded.GroupWork
 Rounded.Groups
 Rounded.HMobiledata
@@ -4266,6 +4415,7 @@ Rounded.HorizontalRule
 Rounded.HorizontalSplit
 Rounded.HotTub
 Rounded.Hotel
+Rounded.HotelClass
 Rounded.HourglassBottom
 Rounded.HourglassDisabled
 Rounded.HourglassEmpty
@@ -4278,6 +4428,7 @@ Rounded.HowToReg
 Rounded.HowToVote
 Rounded.Http
 Rounded.Https
+Rounded.Hub
 Rounded.Hvac
 Rounded.IceSkating
 Rounded.Icecream
@@ -4290,6 +4441,7 @@ Rounded.ImportContacts
 Rounded.ImportExport
 Rounded.ImportantDevices
 Rounded.Inbox
+Rounded.IncompleteCircle
 Rounded.IndeterminateCheckBox
 Rounded.Info
 Rounded.Input
@@ -4303,6 +4455,8 @@ Rounded.InsertLink
 Rounded.InsertPhoto
 Rounded.Insights
 Rounded.IntegrationInstructions
+Rounded.Interests
+Rounded.InterpreterMode
 Rounded.Inventory
 Rounded.Inventory2
 Rounded.InvertColors
@@ -4311,6 +4465,7 @@ Rounded.IosShare
 Rounded.Iron
 Rounded.Iso
 Rounded.Kayaking
+Rounded.KebabDining
 Rounded.Keyboard
 Rounded.KeyboardAlt
 Rounded.KeyboardArrowDown
@@ -4471,6 +4626,7 @@ Rounded.ModeComment
 Rounded.ModeEdit
 Rounded.ModeEditOutline
 Rounded.ModeNight
+Rounded.ModeOfTravel
 Rounded.ModeStandby
 Rounded.ModelTraining
 Rounded.MonetizationOn
@@ -4521,6 +4677,7 @@ Rounded.NetworkCell
 Rounded.NetworkCheck
 Rounded.NetworkLocked
 Rounded.NetworkWifi
+Rounded.NewLabel
 Rounded.NewReleases
 Rounded.NextPlan
 Rounded.NextWeek
@@ -4636,6 +4793,7 @@ Rounded.PersonPinCircle
 Rounded.PersonRemove
 Rounded.PersonRemoveAlt1
 Rounded.PersonSearch
+Rounded.PersonalInjury
 Rounded.PersonalVideo
 Rounded.PestControl
 Rounded.PestControlRodent
@@ -4677,6 +4835,8 @@ Rounded.PieChart
 Rounded.PieChartOutline
 Rounded.Pin
 Rounded.PinDrop
+Rounded.PinEnd
+Rounded.PinInvoke
 Rounded.PivotTableChart
 Rounded.Place
 Rounded.Plagiarism
@@ -4689,6 +4849,8 @@ Rounded.PlayForWork
 Rounded.PlayLesson
 Rounded.PlaylistAdd
 Rounded.PlaylistAddCheck
+Rounded.PlaylistAddCheckCircle
+Rounded.PlaylistAddCircle
 Rounded.PlaylistPlay
 Rounded.Plumbing
 Rounded.PlusOne
@@ -4715,6 +4877,7 @@ Rounded.Print
 Rounded.PrintDisabled
 Rounded.PriorityHigh
 Rounded.PrivacyTip
+Rounded.PrivateConnectivity
 Rounded.ProductionQuantityLimits
 Rounded.Psychology
 Rounded.Public
@@ -4744,11 +4907,13 @@ Rounded.RateReview
 Rounded.RawOff
 Rounded.RawOn
 Rounded.ReadMore
+Rounded.RealEstateAgent
 Rounded.Receipt
 Rounded.ReceiptLong
 Rounded.RecentActors
 Rounded.Recommend
 Rounded.RecordVoiceOver
+Rounded.Recycling
 Rounded.Redeem
 Rounded.Redo
 Rounded.ReduceCapacity
@@ -4943,12 +5108,15 @@ Rounded.Soap
 Rounded.SocialDistance
 Rounded.Sort
 Rounded.SortByAlpha
+Rounded.SoupKitchen
 Rounded.Source
 Rounded.South
+Rounded.SouthAmerica
 Rounded.SouthEast
 Rounded.SouthWest
 Rounded.Spa
 Rounded.SpaceBar
+Rounded.SpaceDashboard
 Rounded.Speaker
 Rounded.SpeakerGroup
 Rounded.SpeakerNotes
@@ -4957,6 +5125,7 @@ Rounded.SpeakerPhone
 Rounded.Speed
 Rounded.Spellcheck
 Rounded.Splitscreen
+Rounded.Spoke
 Rounded.Sports
 Rounded.SportsBar
 Rounded.SportsBaseball
@@ -5028,6 +5197,8 @@ Rounded.SwapHorizontalCircle
 Rounded.SwapVert
 Rounded.SwapVerticalCircle
 Rounded.Swipe
+Rounded.SwitchAccessShortcut
+Rounded.SwitchAccessShortcutAdd
 Rounded.SwitchAccount
 Rounded.SwitchCamera
 Rounded.SwitchLeft
@@ -5090,11 +5261,13 @@ Rounded.Timer10Select
 Rounded.Timer3
 Rounded.Timer3Select
 Rounded.TimerOff
+Rounded.TipsAndUpdates
 Rounded.Title
 Rounded.Toc
 Rounded.Today
 Rounded.ToggleOff
 Rounded.ToggleOn
+Rounded.Token
 Rounded.Toll
 Rounded.Tonality
 Rounded.Topic
@@ -5139,6 +5312,7 @@ Rounded.Upload
 Rounded.UploadFile
 Rounded.Usb
 Rounded.UsbOff
+Rounded.Vaccines
 Rounded.Verified
 Rounded.VerifiedUser
 Rounded.VerticalAlignBottom
@@ -5196,8 +5370,10 @@ Rounded.Watch
 Rounded.WatchLater
 Rounded.Water
 Rounded.WaterDamage
+Rounded.WaterDrop
 Rounded.WaterfallChart
 Rounded.Waves
+Rounded.WavingHand
 Rounded.WbAuto
 Rounded.WbCloudy
 Rounded.WbIncandescent
@@ -5229,6 +5405,7 @@ Rounded.WineBar
 Rounded.Work
 Rounded.WorkOff
 Rounded.WorkOutline
+Rounded.WorkspacePremium
 Rounded.Workspaces
 Rounded.WrapText
 Rounded.WrongLocation
@@ -5336,6 +5513,7 @@ Sharp.AddToQueue
 Sharp.Addchart
 Sharp.Adjust
 Sharp.AdminPanelSettings
+Sharp.AdsClick
 Sharp.Agriculture
 Sharp.Air
 Sharp.AirlineSeatFlat
@@ -5346,6 +5524,8 @@ Sharp.AirlineSeatLegroomNormal
 Sharp.AirlineSeatLegroomReduced
 Sharp.AirlineSeatReclineExtra
 Sharp.AirlineSeatReclineNormal
+Sharp.AirlineStops
+Sharp.Airlines
 Sharp.AirplaneTicket
 Sharp.AirplanemodeActive
 Sharp.AirplanemodeInactive
@@ -5381,8 +5561,10 @@ Sharp.AppRegistration
 Sharp.AppSettingsAlt
 Sharp.Approval
 Sharp.Apps
+Sharp.AppsOutage
 Sharp.Architecture
 Sharp.Archive
+Sharp.AreaChart
 Sharp.ArrowBack
 Sharp.ArrowBackIos
 Sharp.ArrowBackIosNew
@@ -5432,6 +5614,7 @@ Sharp.AutofpsSelect
 Sharp.Autorenew
 Sharp.AvTimer
 Sharp.BabyChangingStation
+Sharp.BackHand
 Sharp.Backpack
 Sharp.Backspace
 Sharp.Backup
@@ -5509,6 +5692,7 @@ Sharp.BrightnessLow
 Sharp.BrightnessMedium
 Sharp.BrokenImage
 Sharp.BrowserNotSupported
+Sharp.BrowserUpdated
 Sharp.BrunchDining
 Sharp.Brush
 Sharp.BubbleChart
@@ -5582,6 +5766,8 @@ Sharp.CheckBox
 Sharp.CheckBoxOutlineBlank
 Sharp.CheckCircle
 Sharp.CheckCircleOutline
+Sharp.Checklist
+Sharp.ChecklistRtl
 Sharp.Checkroom
 Sharp.ChevronLeft
 Sharp.ChevronRight
@@ -5607,6 +5793,7 @@ Sharp.CloudDownload
 Sharp.CloudOff
 Sharp.CloudQueue
 Sharp.CloudUpload
+Sharp.Co2
 Sharp.Code
 Sharp.CodeOff
 Sharp.Coffee
@@ -5617,15 +5804,18 @@ Sharp.ColorLens
 Sharp.Colorize
 Sharp.Comment
 Sharp.CommentBank
+Sharp.CommentsDisabled
 Sharp.Commute
 Sharp.Compare
 Sharp.CompareArrows
 Sharp.CompassCalibration
+Sharp.Compost
 Sharp.Compress
 Sharp.Computer
 Sharp.ConfirmationNumber
 Sharp.ConnectWithoutContact
 Sharp.ConnectedTv
+Sharp.ConnectingAirports
 Sharp.Construction
 Sharp.ContactMail
 Sharp.ContactPage
@@ -5664,10 +5854,12 @@ Sharp.CropOriginal
 Sharp.CropPortrait
 Sharp.CropRotate
 Sharp.CropSquare
+Sharp.CrueltyFree
 Sharp.Dangerous
 Sharp.DarkMode
 Sharp.Dashboard
 Sharp.DashboardCustomize
+Sharp.DataExploration
 Sharp.DataSaverOff
 Sharp.DataSaverOn
 Sharp.DataUsage
@@ -5717,6 +5909,7 @@ Sharp.DirectionsTransitFilled
 Sharp.DirectionsWalk
 Sharp.DirtyLens
 Sharp.DisabledByDefault
+Sharp.DisabledVisible
 Sharp.DiscFull
 Sharp.Dns
 Sharp.DoDisturb
@@ -5731,6 +5924,7 @@ Sharp.DoNotDisturbOnTotalSilence
 Sharp.DoNotStep
 Sharp.DoNotTouch
 Sharp.Dock
+Sharp.DocumentScanner
 Sharp.Domain
 Sharp.DomainDisabled
 Sharp.DomainVerification
@@ -5752,8 +5946,10 @@ Sharp.Downloading
 Sharp.Drafts
 Sharp.DragHandle
 Sharp.DragIndicator
+Sharp.Draw
 Sharp.DriveEta
 Sharp.DriveFileMove
+Sharp.DriveFileMoveRtl
 Sharp.DriveFileRenameOutline
 Sharp.DriveFolderUpload
 Sharp.Dry
@@ -5771,8 +5967,10 @@ Sharp.EdgesensorHigh
 Sharp.EdgesensorLow
 Sharp.Edit
 Sharp.EditAttributes
+Sharp.EditCalendar
 Sharp.EditLocation
 Sharp.EditLocationAlt
+Sharp.EditNote
 Sharp.EditNotifications
 Sharp.EditOff
 Sharp.EditRoad
@@ -5786,6 +5984,7 @@ Sharp.ElectricScooter
 Sharp.ElectricalServices
 Sharp.Elevator
 Sharp.Email
+Sharp.Emergency
 Sharp.EmojiEmotions
 Sharp.EmojiEvents
 Sharp.EmojiFlags
@@ -5812,6 +6011,7 @@ Sharp.EventNote
 Sharp.EventSeat
 Sharp.ExitToApp
 Sharp.Expand
+Sharp.ExpandCircleDown
 Sharp.ExpandLess
 Sharp.ExpandMore
 Sharp.Explicit
@@ -5882,6 +6082,7 @@ Sharp.FireExtinguisher
 Sharp.Fireplace
 Sharp.FirstPage
 Sharp.FitScreen
+Sharp.Fitbit
 Sharp.FitnessCenter
 Sharp.Flag
 Sharp.Flaky
@@ -5893,6 +6094,7 @@ Sharp.FlashlightOff
 Sharp.FlashlightOn
 Sharp.Flatware
 Sharp.Flight
+Sharp.FlightClass
 Sharp.FlightLand
 Sharp.FlightTakeoff
 Sharp.Flip
@@ -5944,6 +6146,8 @@ Sharp.Forward5
 Sharp.ForwardToInbox
 Sharp.Foundation
 Sharp.FreeBreakfast
+Sharp.FreeCancellation
+Sharp.FrontHand
 Sharp.Fullscreen
 Sharp.FullscreenExit
 Sharp.Functions
@@ -5953,9 +6157,11 @@ Sharp.Gamepad
 Sharp.Games
 Sharp.Garage
 Sharp.Gavel
+Sharp.GeneratingTokens
 Sharp.Gesture
 Sharp.GetApp
 Sharp.Gif
+Sharp.GifBox
 Sharp.Gite
 Sharp.GolfCourse
 Sharp.GppBad
@@ -5978,6 +6184,8 @@ Sharp.GridOn
 Sharp.GridView
 Sharp.Group
 Sharp.GroupAdd
+Sharp.GroupOff
+Sharp.GroupRemove
 Sharp.GroupWork
 Sharp.Groups
 Sharp.HMobiledata
@@ -6031,6 +6239,7 @@ Sharp.HorizontalRule
 Sharp.HorizontalSplit
 Sharp.HotTub
 Sharp.Hotel
+Sharp.HotelClass
 Sharp.HourglassBottom
 Sharp.HourglassDisabled
 Sharp.HourglassEmpty
@@ -6043,6 +6252,7 @@ Sharp.HowToReg
 Sharp.HowToVote
 Sharp.Http
 Sharp.Https
+Sharp.Hub
 Sharp.Hvac
 Sharp.IceSkating
 Sharp.Icecream
@@ -6055,6 +6265,7 @@ Sharp.ImportContacts
 Sharp.ImportExport
 Sharp.ImportantDevices
 Sharp.Inbox
+Sharp.IncompleteCircle
 Sharp.IndeterminateCheckBox
 Sharp.Info
 Sharp.Input
@@ -6068,6 +6279,8 @@ Sharp.InsertLink
 Sharp.InsertPhoto
 Sharp.Insights
 Sharp.IntegrationInstructions
+Sharp.Interests
+Sharp.InterpreterMode
 Sharp.Inventory
 Sharp.Inventory2
 Sharp.InvertColors
@@ -6076,6 +6289,7 @@ Sharp.IosShare
 Sharp.Iron
 Sharp.Iso
 Sharp.Kayaking
+Sharp.KebabDining
 Sharp.Keyboard
 Sharp.KeyboardAlt
 Sharp.KeyboardArrowDown
@@ -6236,6 +6450,7 @@ Sharp.ModeComment
 Sharp.ModeEdit
 Sharp.ModeEditOutline
 Sharp.ModeNight
+Sharp.ModeOfTravel
 Sharp.ModeStandby
 Sharp.ModelTraining
 Sharp.MonetizationOn
@@ -6286,6 +6501,7 @@ Sharp.NetworkCell
 Sharp.NetworkCheck
 Sharp.NetworkLocked
 Sharp.NetworkWifi
+Sharp.NewLabel
 Sharp.NewReleases
 Sharp.NextPlan
 Sharp.NextWeek
@@ -6401,6 +6617,7 @@ Sharp.PersonPinCircle
 Sharp.PersonRemove
 Sharp.PersonRemoveAlt1
 Sharp.PersonSearch
+Sharp.PersonalInjury
 Sharp.PersonalVideo
 Sharp.PestControl
 Sharp.PestControlRodent
@@ -6442,6 +6659,8 @@ Sharp.PieChart
 Sharp.PieChartOutline
 Sharp.Pin
 Sharp.PinDrop
+Sharp.PinEnd
+Sharp.PinInvoke
 Sharp.PivotTableChart
 Sharp.Place
 Sharp.Plagiarism
@@ -6454,6 +6673,8 @@ Sharp.PlayForWork
 Sharp.PlayLesson
 Sharp.PlaylistAdd
 Sharp.PlaylistAddCheck
+Sharp.PlaylistAddCheckCircle
+Sharp.PlaylistAddCircle
 Sharp.PlaylistPlay
 Sharp.Plumbing
 Sharp.PlusOne
@@ -6480,6 +6701,7 @@ Sharp.Print
 Sharp.PrintDisabled
 Sharp.PriorityHigh
 Sharp.PrivacyTip
+Sharp.PrivateConnectivity
 Sharp.ProductionQuantityLimits
 Sharp.Psychology
 Sharp.Public
@@ -6509,11 +6731,13 @@ Sharp.RateReview
 Sharp.RawOff
 Sharp.RawOn
 Sharp.ReadMore
+Sharp.RealEstateAgent
 Sharp.Receipt
 Sharp.ReceiptLong
 Sharp.RecentActors
 Sharp.Recommend
 Sharp.RecordVoiceOver
+Sharp.Recycling
 Sharp.Redeem
 Sharp.Redo
 Sharp.ReduceCapacity
@@ -6708,12 +6932,15 @@ Sharp.Soap
 Sharp.SocialDistance
 Sharp.Sort
 Sharp.SortByAlpha
+Sharp.SoupKitchen
 Sharp.Source
 Sharp.South
+Sharp.SouthAmerica
 Sharp.SouthEast
 Sharp.SouthWest
 Sharp.Spa
 Sharp.SpaceBar
+Sharp.SpaceDashboard
 Sharp.Speaker
 Sharp.SpeakerGroup
 Sharp.SpeakerNotes
@@ -6722,6 +6949,7 @@ Sharp.SpeakerPhone
 Sharp.Speed
 Sharp.Spellcheck
 Sharp.Splitscreen
+Sharp.Spoke
 Sharp.Sports
 Sharp.SportsBar
 Sharp.SportsBaseball
@@ -6793,6 +7021,8 @@ Sharp.SwapHorizontalCircle
 Sharp.SwapVert
 Sharp.SwapVerticalCircle
 Sharp.Swipe
+Sharp.SwitchAccessShortcut
+Sharp.SwitchAccessShortcutAdd
 Sharp.SwitchAccount
 Sharp.SwitchCamera
 Sharp.SwitchLeft
@@ -6855,11 +7085,13 @@ Sharp.Timer10Select
 Sharp.Timer3
 Sharp.Timer3Select
 Sharp.TimerOff
+Sharp.TipsAndUpdates
 Sharp.Title
 Sharp.Toc
 Sharp.Today
 Sharp.ToggleOff
 Sharp.ToggleOn
+Sharp.Token
 Sharp.Toll
 Sharp.Tonality
 Sharp.Topic
@@ -6904,6 +7136,7 @@ Sharp.Upload
 Sharp.UploadFile
 Sharp.Usb
 Sharp.UsbOff
+Sharp.Vaccines
 Sharp.Verified
 Sharp.VerifiedUser
 Sharp.VerticalAlignBottom
@@ -6961,8 +7194,10 @@ Sharp.Watch
 Sharp.WatchLater
 Sharp.Water
 Sharp.WaterDamage
+Sharp.WaterDrop
 Sharp.WaterfallChart
 Sharp.Waves
+Sharp.WavingHand
 Sharp.WbAuto
 Sharp.WbCloudy
 Sharp.WbIncandescent
@@ -6994,6 +7229,7 @@ Sharp.WineBar
 Sharp.Work
 Sharp.WorkOff
 Sharp.WorkOutline
+Sharp.WorkspacePremium
 Sharp.Workspaces
 Sharp.WrapText
 Sharp.WrongLocation
@@ -7101,6 +7337,7 @@ TwoTone.AddToQueue
 TwoTone.Addchart
 TwoTone.Adjust
 TwoTone.AdminPanelSettings
+TwoTone.AdsClick
 TwoTone.Agriculture
 TwoTone.Air
 TwoTone.AirlineSeatFlat
@@ -7111,6 +7348,8 @@ TwoTone.AirlineSeatLegroomNormal
 TwoTone.AirlineSeatLegroomReduced
 TwoTone.AirlineSeatReclineExtra
 TwoTone.AirlineSeatReclineNormal
+TwoTone.AirlineStops
+TwoTone.Airlines
 TwoTone.AirplaneTicket
 TwoTone.AirplanemodeActive
 TwoTone.AirplanemodeInactive
@@ -7146,8 +7385,10 @@ TwoTone.AppRegistration
 TwoTone.AppSettingsAlt
 TwoTone.Approval
 TwoTone.Apps
+TwoTone.AppsOutage
 TwoTone.Architecture
 TwoTone.Archive
+TwoTone.AreaChart
 TwoTone.ArrowBack
 TwoTone.ArrowBackIos
 TwoTone.ArrowBackIosNew
@@ -7197,6 +7438,7 @@ TwoTone.AutofpsSelect
 TwoTone.Autorenew
 TwoTone.AvTimer
 TwoTone.BabyChangingStation
+TwoTone.BackHand
 TwoTone.Backpack
 TwoTone.Backspace
 TwoTone.Backup
@@ -7274,6 +7516,7 @@ TwoTone.BrightnessLow
 TwoTone.BrightnessMedium
 TwoTone.BrokenImage
 TwoTone.BrowserNotSupported
+TwoTone.BrowserUpdated
 TwoTone.BrunchDining
 TwoTone.Brush
 TwoTone.BubbleChart
@@ -7347,6 +7590,8 @@ TwoTone.CheckBox
 TwoTone.CheckBoxOutlineBlank
 TwoTone.CheckCircle
 TwoTone.CheckCircleOutline
+TwoTone.Checklist
+TwoTone.ChecklistRtl
 TwoTone.Checkroom
 TwoTone.ChevronLeft
 TwoTone.ChevronRight
@@ -7372,6 +7617,7 @@ TwoTone.CloudDownload
 TwoTone.CloudOff
 TwoTone.CloudQueue
 TwoTone.CloudUpload
+TwoTone.Co2
 TwoTone.Code
 TwoTone.CodeOff
 TwoTone.Coffee
@@ -7382,15 +7628,18 @@ TwoTone.ColorLens
 TwoTone.Colorize
 TwoTone.Comment
 TwoTone.CommentBank
+TwoTone.CommentsDisabled
 TwoTone.Commute
 TwoTone.Compare
 TwoTone.CompareArrows
 TwoTone.CompassCalibration
+TwoTone.Compost
 TwoTone.Compress
 TwoTone.Computer
 TwoTone.ConfirmationNumber
 TwoTone.ConnectWithoutContact
 TwoTone.ConnectedTv
+TwoTone.ConnectingAirports
 TwoTone.Construction
 TwoTone.ContactMail
 TwoTone.ContactPage
@@ -7429,10 +7678,12 @@ TwoTone.CropOriginal
 TwoTone.CropPortrait
 TwoTone.CropRotate
 TwoTone.CropSquare
+TwoTone.CrueltyFree
 TwoTone.Dangerous
 TwoTone.DarkMode
 TwoTone.Dashboard
 TwoTone.DashboardCustomize
+TwoTone.DataExploration
 TwoTone.DataSaverOff
 TwoTone.DataSaverOn
 TwoTone.DataUsage
@@ -7482,6 +7733,7 @@ TwoTone.DirectionsTransitFilled
 TwoTone.DirectionsWalk
 TwoTone.DirtyLens
 TwoTone.DisabledByDefault
+TwoTone.DisabledVisible
 TwoTone.DiscFull
 TwoTone.Dns
 TwoTone.DoDisturb
@@ -7496,6 +7748,7 @@ TwoTone.DoNotDisturbOnTotalSilence
 TwoTone.DoNotStep
 TwoTone.DoNotTouch
 TwoTone.Dock
+TwoTone.DocumentScanner
 TwoTone.Domain
 TwoTone.DomainDisabled
 TwoTone.DomainVerification
@@ -7517,8 +7770,10 @@ TwoTone.Downloading
 TwoTone.Drafts
 TwoTone.DragHandle
 TwoTone.DragIndicator
+TwoTone.Draw
 TwoTone.DriveEta
 TwoTone.DriveFileMove
+TwoTone.DriveFileMoveRtl
 TwoTone.DriveFileRenameOutline
 TwoTone.DriveFolderUpload
 TwoTone.Dry
@@ -7536,8 +7791,10 @@ TwoTone.EdgesensorHigh
 TwoTone.EdgesensorLow
 TwoTone.Edit
 TwoTone.EditAttributes
+TwoTone.EditCalendar
 TwoTone.EditLocation
 TwoTone.EditLocationAlt
+TwoTone.EditNote
 TwoTone.EditNotifications
 TwoTone.EditOff
 TwoTone.EditRoad
@@ -7551,6 +7808,7 @@ TwoTone.ElectricScooter
 TwoTone.ElectricalServices
 TwoTone.Elevator
 TwoTone.Email
+TwoTone.Emergency
 TwoTone.EmojiEmotions
 TwoTone.EmojiEvents
 TwoTone.EmojiFlags
@@ -7577,6 +7835,7 @@ TwoTone.EventNote
 TwoTone.EventSeat
 TwoTone.ExitToApp
 TwoTone.Expand
+TwoTone.ExpandCircleDown
 TwoTone.ExpandLess
 TwoTone.ExpandMore
 TwoTone.Explicit
@@ -7647,6 +7906,7 @@ TwoTone.FireExtinguisher
 TwoTone.Fireplace
 TwoTone.FirstPage
 TwoTone.FitScreen
+TwoTone.Fitbit
 TwoTone.FitnessCenter
 TwoTone.Flag
 TwoTone.Flaky
@@ -7658,6 +7918,7 @@ TwoTone.FlashlightOff
 TwoTone.FlashlightOn
 TwoTone.Flatware
 TwoTone.Flight
+TwoTone.FlightClass
 TwoTone.FlightLand
 TwoTone.FlightTakeoff
 TwoTone.Flip
@@ -7709,6 +7970,8 @@ TwoTone.Forward5
 TwoTone.ForwardToInbox
 TwoTone.Foundation
 TwoTone.FreeBreakfast
+TwoTone.FreeCancellation
+TwoTone.FrontHand
 TwoTone.Fullscreen
 TwoTone.FullscreenExit
 TwoTone.Functions
@@ -7718,9 +7981,11 @@ TwoTone.Gamepad
 TwoTone.Games
 TwoTone.Garage
 TwoTone.Gavel
+TwoTone.GeneratingTokens
 TwoTone.Gesture
 TwoTone.GetApp
 TwoTone.Gif
+TwoTone.GifBox
 TwoTone.Gite
 TwoTone.GolfCourse
 TwoTone.GppBad
@@ -7743,6 +8008,8 @@ TwoTone.GridOn
 TwoTone.GridView
 TwoTone.Group
 TwoTone.GroupAdd
+TwoTone.GroupOff
+TwoTone.GroupRemove
 TwoTone.GroupWork
 TwoTone.Groups
 TwoTone.HMobiledata
@@ -7796,6 +8063,7 @@ TwoTone.HorizontalRule
 TwoTone.HorizontalSplit
 TwoTone.HotTub
 TwoTone.Hotel
+TwoTone.HotelClass
 TwoTone.HourglassBottom
 TwoTone.HourglassDisabled
 TwoTone.HourglassEmpty
@@ -7808,6 +8076,7 @@ TwoTone.HowToReg
 TwoTone.HowToVote
 TwoTone.Http
 TwoTone.Https
+TwoTone.Hub
 TwoTone.Hvac
 TwoTone.IceSkating
 TwoTone.Icecream
@@ -7820,6 +8089,7 @@ TwoTone.ImportContacts
 TwoTone.ImportExport
 TwoTone.ImportantDevices
 TwoTone.Inbox
+TwoTone.IncompleteCircle
 TwoTone.IndeterminateCheckBox
 TwoTone.Info
 TwoTone.Input
@@ -7833,6 +8103,8 @@ TwoTone.InsertLink
 TwoTone.InsertPhoto
 TwoTone.Insights
 TwoTone.IntegrationInstructions
+TwoTone.Interests
+TwoTone.InterpreterMode
 TwoTone.Inventory
 TwoTone.Inventory2
 TwoTone.InvertColors
@@ -7841,6 +8113,7 @@ TwoTone.IosShare
 TwoTone.Iron
 TwoTone.Iso
 TwoTone.Kayaking
+TwoTone.KebabDining
 TwoTone.Keyboard
 TwoTone.KeyboardAlt
 TwoTone.KeyboardArrowDown
@@ -8001,6 +8274,7 @@ TwoTone.ModeComment
 TwoTone.ModeEdit
 TwoTone.ModeEditOutline
 TwoTone.ModeNight
+TwoTone.ModeOfTravel
 TwoTone.ModeStandby
 TwoTone.ModelTraining
 TwoTone.MonetizationOn
@@ -8051,6 +8325,7 @@ TwoTone.NetworkCell
 TwoTone.NetworkCheck
 TwoTone.NetworkLocked
 TwoTone.NetworkWifi
+TwoTone.NewLabel
 TwoTone.NewReleases
 TwoTone.NextPlan
 TwoTone.NextWeek
@@ -8166,6 +8441,7 @@ TwoTone.PersonPinCircle
 TwoTone.PersonRemove
 TwoTone.PersonRemoveAlt1
 TwoTone.PersonSearch
+TwoTone.PersonalInjury
 TwoTone.PersonalVideo
 TwoTone.PestControl
 TwoTone.PestControlRodent
@@ -8207,6 +8483,8 @@ TwoTone.PieChart
 TwoTone.PieChartOutline
 TwoTone.Pin
 TwoTone.PinDrop
+TwoTone.PinEnd
+TwoTone.PinInvoke
 TwoTone.PivotTableChart
 TwoTone.Place
 TwoTone.Plagiarism
@@ -8219,6 +8497,8 @@ TwoTone.PlayForWork
 TwoTone.PlayLesson
 TwoTone.PlaylistAdd
 TwoTone.PlaylistAddCheck
+TwoTone.PlaylistAddCheckCircle
+TwoTone.PlaylistAddCircle
 TwoTone.PlaylistPlay
 TwoTone.Plumbing
 TwoTone.PlusOne
@@ -8245,6 +8525,7 @@ TwoTone.Print
 TwoTone.PrintDisabled
 TwoTone.PriorityHigh
 TwoTone.PrivacyTip
+TwoTone.PrivateConnectivity
 TwoTone.ProductionQuantityLimits
 TwoTone.Psychology
 TwoTone.Public
@@ -8274,11 +8555,13 @@ TwoTone.RateReview
 TwoTone.RawOff
 TwoTone.RawOn
 TwoTone.ReadMore
+TwoTone.RealEstateAgent
 TwoTone.Receipt
 TwoTone.ReceiptLong
 TwoTone.RecentActors
 TwoTone.Recommend
 TwoTone.RecordVoiceOver
+TwoTone.Recycling
 TwoTone.Redeem
 TwoTone.Redo
 TwoTone.ReduceCapacity
@@ -8473,12 +8756,15 @@ TwoTone.Soap
 TwoTone.SocialDistance
 TwoTone.Sort
 TwoTone.SortByAlpha
+TwoTone.SoupKitchen
 TwoTone.Source
 TwoTone.South
+TwoTone.SouthAmerica
 TwoTone.SouthEast
 TwoTone.SouthWest
 TwoTone.Spa
 TwoTone.SpaceBar
+TwoTone.SpaceDashboard
 TwoTone.Speaker
 TwoTone.SpeakerGroup
 TwoTone.SpeakerNotes
@@ -8487,6 +8773,7 @@ TwoTone.SpeakerPhone
 TwoTone.Speed
 TwoTone.Spellcheck
 TwoTone.Splitscreen
+TwoTone.Spoke
 TwoTone.Sports
 TwoTone.SportsBar
 TwoTone.SportsBaseball
@@ -8558,6 +8845,8 @@ TwoTone.SwapHorizontalCircle
 TwoTone.SwapVert
 TwoTone.SwapVerticalCircle
 TwoTone.Swipe
+TwoTone.SwitchAccessShortcut
+TwoTone.SwitchAccessShortcutAdd
 TwoTone.SwitchAccount
 TwoTone.SwitchCamera
 TwoTone.SwitchLeft
@@ -8620,11 +8909,13 @@ TwoTone.Timer10Select
 TwoTone.Timer3
 TwoTone.Timer3Select
 TwoTone.TimerOff
+TwoTone.TipsAndUpdates
 TwoTone.Title
 TwoTone.Toc
 TwoTone.Today
 TwoTone.ToggleOff
 TwoTone.ToggleOn
+TwoTone.Token
 TwoTone.Toll
 TwoTone.Tonality
 TwoTone.Topic
@@ -8669,6 +8960,7 @@ TwoTone.Upload
 TwoTone.UploadFile
 TwoTone.Usb
 TwoTone.UsbOff
+TwoTone.Vaccines
 TwoTone.Verified
 TwoTone.VerifiedUser
 TwoTone.VerticalAlignBottom
@@ -8726,8 +9018,10 @@ TwoTone.Watch
 TwoTone.WatchLater
 TwoTone.Water
 TwoTone.WaterDamage
+TwoTone.WaterDrop
 TwoTone.WaterfallChart
 TwoTone.Waves
+TwoTone.WavingHand
 TwoTone.WbAuto
 TwoTone.WbCloudy
 TwoTone.WbIncandescent
@@ -8759,6 +9053,7 @@ TwoTone.WineBar
 TwoTone.Work
 TwoTone.WorkOff
 TwoTone.WorkOutline
+TwoTone.WorkspacePremium
 TwoTone.Workspaces
 TwoTone.WrapText
 TwoTone.WrongLocation

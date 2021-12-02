@@ -17,24 +17,23 @@
 package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.material.BadgeBox
+import androidx.compose.material.Badge
+import androidx.compose.material.BadgedBox
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
 
-@OptIn(ExperimentalMaterialApi::class)
 @Sampled
 @Composable
 fun BottomNavigationItemWithBadge() {
     BottomNavigation {
         BottomNavigationItem(
             icon = {
-                BadgeBox(badgeContent = { Text("8") }) {
+                BadgedBox(badge = { Badge { Text("8") } }) {
                     Icon(
                         Icons.Filled.Favorite,
                         contentDescription = "Favorite"

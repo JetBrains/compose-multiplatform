@@ -112,6 +112,10 @@ internal fun setCollectionItemInfo(node: SemanticsNode, info: AccessibilityNodeI
     }
 }
 
+internal fun SemanticsNode.hasCollectionInfo() =
+    config.getOrNull(SemanticsProperties.CollectionInfo) != null ||
+        config.getOrNull(SemanticsProperties.SelectableGroup) != null
+
 /** A naïve algorithm to determine if elements are stacked vertically or horizontally */
 private fun calculateIfHorizontallyStacked(items: List<SemanticsNode>): Boolean {
     if (items.count() < 2) return true

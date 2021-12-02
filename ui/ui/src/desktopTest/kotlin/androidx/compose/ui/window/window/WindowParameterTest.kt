@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.window.window
 
-import androidx.compose.desktop.ComposeWindow
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -25,7 +24,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.readFirstPixel
+import androidx.compose.ui.testImage
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.launchApplication
@@ -33,7 +36,6 @@ import androidx.compose.ui.window.runApplicationTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import java.awt.event.WindowEvent
-import java.awt.image.BufferedImage
 
 @OptIn(ExperimentalComposeUiApi::class)
 class WindowParameterTest {
@@ -64,19 +66,10 @@ class WindowParameterTest {
     fun `change icon`() = runApplicationTest {
         var window: ComposeWindow? = null
 
-        val redIcon = BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB).apply {
-            val graphics = createGraphics()
-            graphics.background = java.awt.Color.RED
-            graphics.clearRect(0, 0, 100, 100)
-        }
+        val redIcon = testImage(Color.Red)
+        val blueIcon = testImage(Color.Blue)
 
-        val blueIcon = BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB).apply {
-            val graphics = createGraphics()
-            graphics.background = java.awt.Color.BLUE
-            graphics.clearRect(0, 0, 100, 100)
-        }
-
-        var icon by mutableStateOf(redIcon)
+        var icon: Painter? by mutableStateOf(redIcon)
 
         launchApplication {
             Window(onCloseRequest = ::exitApplication, icon = icon) {
@@ -86,11 +79,15 @@ class WindowParameterTest {
         }
 
         awaitIdle()
-        assertThat(window?.iconImage).isEqualTo(redIcon)
+        assertThat(window?.iconImage?.readFirstPixel()).isEqualTo(Color.Red)
 
         icon = blueIcon
         awaitIdle()
-        assertThat(window?.iconImage).isEqualTo(blueIcon)
+        assertThat(window?.iconImage?.readFirstPixel()).isEqualTo(Color.Blue)
+
+        icon = null
+        awaitIdle()
+        assertThat(window?.iconImage?.readFirstPixel()).isEqualTo(null)
 
         window?.dispatchEvent(WindowEvent(window, WindowEvent.WINDOW_CLOSING))
     }

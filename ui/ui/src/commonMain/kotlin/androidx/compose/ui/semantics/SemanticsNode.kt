@@ -19,14 +19,15 @@ package androidx.compose.ui.semantics
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.AlignmentLine
-import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.LayoutInfo
+import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNodeWrapper
 import androidx.compose.ui.node.RootForTest
+import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastForEach
 
@@ -82,6 +83,16 @@ class SemanticsNode internal constructor(
     // GEOMETRY
 
     /**
+     * The rectangle of the touchable area.
+     *
+     * If this is a clickable region, this is the rectangle that accepts touch input. This can
+     * be larger than [size] when the layout is less than
+     * [ViewConfiguration.minimumTouchTargetSize]
+     */
+    val touchBoundsInRoot: Rect
+        get() = findWrapperToGetBounds().touchBoundsInRoot()
+
+    /**
      * The size of the bounding box for this node, with no clipping applied
      */
     val size: IntSize get() = findWrapperToGetBounds().size
@@ -94,7 +105,7 @@ class SemanticsNode internal constructor(
     val boundsInRoot: Rect
         get() {
             if (!layoutNode.isAttached) return Rect.Zero
-            return this.findWrapperToGetBounds().boundsInRoot()
+            return findWrapperToGetBounds().boundsInRoot()
         }
 
     /**
@@ -161,7 +172,7 @@ class SemanticsNode internal constructor(
             unmergedChildren().fastForEach { child ->
                 // Don't merge children that themselves merge all their descendants (because that
                 // indicates they're independently screen-reader-focusable).
-                if (!child.isFake && !child.isMergingSemanticsOfDescendants) {
+                if (!child.isMergingSemanticsOfDescendants) {
                     mergedConfig.mergeChild(child.unmergedConfig)
                     child.mergeConfig(mergedConfig)
                 }
@@ -172,7 +183,10 @@ class SemanticsNode internal constructor(
     private val isMergingSemanticsOfDescendants: Boolean
         get() = mergingEnabled && unmergedConfig.isMergingSemanticsOfDescendants
 
-    internal fun unmergedChildren(sortByBounds: Boolean = false): List<SemanticsNode> {
+    internal fun unmergedChildren(
+        sortByBounds: Boolean = false,
+        includeFakeNodes: Boolean = false
+    ): List<SemanticsNode> {
         if (this.isFake) return listOf()
         val unmergedChildren: MutableList<SemanticsNode> = mutableListOf()
 
@@ -185,7 +199,9 @@ class SemanticsNode internal constructor(
             unmergedChildren.add(SemanticsNode(semanticsChild, mergingEnabled))
         }
 
-        emitFakeNodes(unmergedChildren)
+        if (includeFakeNodes) {
+            emitFakeNodes(unmergedChildren)
+        }
 
         return unmergedChildren
     }
@@ -199,7 +215,11 @@ class SemanticsNode internal constructor(
     // TODO(b/184376083): This is too expensive for a val (full subtree recreation every call);
     //               optimize this when the merging algorithm is improved.
     val children: List<SemanticsNode>
-        get() = getChildren(sortByBounds = false, includeReplacedSemantics = !mergingEnabled)
+        get() = getChildren(
+            sortByBounds = false,
+            includeReplacedSemantics = !mergingEnabled,
+            includeFakeNodes = false
+        )
 
     /**
      * Contains the children in inverse hit test order (i.e. paint order).
@@ -209,7 +229,11 @@ class SemanticsNode internal constructor(
      * This property is primarily used in Accessibility delegate.
      */
     internal val replacedChildren: List<SemanticsNode>
-        get() = getChildren(sortByBounds = false, includeReplacedSemantics = false)
+        get() = getChildren(
+            sortByBounds = false,
+            includeReplacedSemantics = false,
+            includeFakeNodes = true
+        )
 
     /**
      * Similar to [replacedChildren] but children are sorted by bounds: top to down, left to
@@ -218,11 +242,27 @@ class SemanticsNode internal constructor(
     // TODO(b/184376083): This is too expensive for a val (full subtree recreation every call);
     //               optimize this when the merging algorithm is improved.
     internal val replacedChildrenSortedByBounds: List<SemanticsNode>
-        get() = getChildren(sortByBounds = true, includeReplacedSemantics = false)
+        get() = getChildren(
+            sortByBounds = true,
+            includeReplacedSemantics = false,
+            includeFakeNodes = true
+        )
 
+    /**
+     * @param sortByBounds if true, nodes in the result list will be sorted with respect to their
+     * bounds. Otherwise children will be in the order they are added to the composition
+     * @param includeReplacedSemantics if true, the result will contain children of nodes marked
+     * as [clearAndSetSemantics]. For accessibility we always use false, but in testing and
+     * debugging we should be able to investigate both
+     * @param includeFakeNodes if true, the tree will include fake nodes. For accessibility we
+     * set to true, but for testing purposes we don't want to expose the fake nodes and therefore
+     * set to false. When Talkback can properly handle unmerged tree, fake nodes will be removed
+     * and so will be this parameter.
+     */
     private fun getChildren(
         sortByBounds: Boolean,
-        includeReplacedSemantics: Boolean
+        includeReplacedSemantics: Boolean,
+        includeFakeNodes: Boolean
     ): List<SemanticsNode> {
         if (!includeReplacedSemantics && unmergedConfig.isClearingSemantics) {
             return listOf()
@@ -235,7 +275,7 @@ class SemanticsNode internal constructor(
             return findOneLayerOfMergingSemanticsNodes(sortByBounds = sortByBounds)
         }
 
-        return unmergedChildren(sortByBounds)
+        return unmergedChildren(sortByBounds, includeFakeNodes)
     }
 
     /**
@@ -290,7 +330,7 @@ class SemanticsNode internal constructor(
      * of use cases it means that accessibility bounds will be equal to the clickable area.
      * Otherwise the outermost semantics will be used to report bounds, size and position.
      */
-    private fun findWrapperToGetBounds(): LayoutNodeWrapper {
+    internal fun findWrapperToGetBounds(): SemanticsWrapper {
         return if (unmergedConfig.isMergingSemanticsOfDescendants) {
             layoutNode.outerMergingSemantics ?: outerSemanticsNodeWrapper
         } else {

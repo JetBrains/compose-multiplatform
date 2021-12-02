@@ -23,9 +23,13 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.GOLDEN_MATERIAL
+import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.setMaterialContent
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.testutils.assertAgainstGolden
@@ -36,21 +40,17 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.center
-import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.move
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
-import androidx.compose.ui.test.up
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
@@ -81,8 +81,9 @@ class TextFieldScreenshotTest {
     fun textField_withInput() {
         rule.setMaterialContent {
             Box(Modifier.semantics(mergeDescendants = true) {}.testTag(TextFieldTag)) {
+                val text = "Text"
                 TextField(
-                    value = "Text",
+                    value = TextFieldValue(text = text, selection = TextRange(text.length)),
                     onValueChange = {},
                     label = { Text("Label") },
                     modifier = Modifier.requiredWidth(280.dp)
@@ -150,8 +151,9 @@ class TextFieldScreenshotTest {
     @Test
     fun textField_error_focused() {
         rule.setMaterialContent {
+            val text = "Input"
             TextField(
-                value = "Input",
+                value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 label = { Text("Label") },
                 isError = true,
@@ -183,8 +185,9 @@ class TextFieldScreenshotTest {
     fun textField_textColor_fallbackToContentColor() {
         rule.setMaterialContent {
             CompositionLocalProvider(LocalContentColor provides Color.Green) {
+                val text = "Hello, world!"
                 TextField(
-                    value = "Hello, world!",
+                    value = TextFieldValue(text = text, selection = TextRange(text.length)),
                     onValueChange = {},
                     modifier = Modifier.requiredWidth(280.dp).testTag(TextFieldTag)
                 )
@@ -197,8 +200,9 @@ class TextFieldScreenshotTest {
     @Test
     fun textField_multiLine_withLabel_textAlignedToTop() {
         rule.setMaterialContent {
+            val text = "Text"
             TextField(
-                value = "Text",
+                value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 label = { Text("Label") },
                 modifier = Modifier.requiredHeight(300.dp)
@@ -213,8 +217,9 @@ class TextFieldScreenshotTest {
     @Test
     fun textField_multiLine_withoutLabel_textAlignedToTop() {
         rule.setMaterialContent {
+            val text = "Text"
             TextField(
-                value = "Text",
+                value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 modifier = Modifier.requiredHeight(300.dp)
                     .requiredWidth(280.dp)
@@ -281,8 +286,9 @@ class TextFieldScreenshotTest {
     @Test
     fun textField_singleLine_withLabel_textAlignedToTop() {
         rule.setMaterialContent {
+            val text = "Text"
             TextField(
-                value = "Text",
+                value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 singleLine = true,
                 label = { Text("Label") },
@@ -296,8 +302,9 @@ class TextFieldScreenshotTest {
     @Test
     fun textField_singleLine_withoutLabel_textCenteredVertically() {
         rule.setMaterialContent {
+            val text = "Text"
             TextField(
-                value = "Text",
+                value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 singleLine = true,
                 modifier = Modifier.requiredWidth(280.dp).testTag(TextFieldTag)
@@ -404,7 +411,7 @@ class TextFieldScreenshotTest {
 
         rule.mainClock.autoAdvance = false
 
-        rule.onNodeWithTag(TextFieldTag).performGesture { swipeLeft() }
+        rule.onNodeWithTag(TextFieldTag).performTouchInput { swipeLeft() }
 
         // wait for swipe to finish
         rule.waitForIdle()
@@ -445,7 +452,6 @@ class TextFieldScreenshotTest {
         assertAgainstGolden("textField_readOnly_focused")
     }
 
-    @FlakyTest(bugId = 178510985)
     @Test
     fun textField_readOnly_scrolled() {
         rule.setContent {
@@ -460,7 +466,7 @@ class TextFieldScreenshotTest {
         }
         rule.mainClock.autoAdvance = false
 
-        rule.onNodeWithTag(TextFieldTag).performGesture { swipeLeft() }
+        rule.onNodeWithTag(TextFieldTag).performTouchInput { swipeLeft() }
 
         // wait for swipe to finish
         rule.waitForIdle()
@@ -472,8 +478,9 @@ class TextFieldScreenshotTest {
     @Test
     fun textField_textCenterAligned() {
         rule.setMaterialContent {
+            val text = "Hello world"
             TextField(
-                value = "Hello world",
+                value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 modifier = Modifier.width(300.dp).testTag(TextFieldTag),
                 textStyle = TextStyle(textAlign = TextAlign.Center),
@@ -487,8 +494,9 @@ class TextFieldScreenshotTest {
     @Test
     fun textField_textAlignedToEnd() {
         rule.setMaterialContent {
+            val text = "Hello world"
             TextField(
-                value = "Hello world",
+                value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 modifier = Modifier.fillMaxWidth().testTag(TextFieldTag),
                 textStyle = TextStyle(textAlign = TextAlign.End),
@@ -499,9 +507,42 @@ class TextFieldScreenshotTest {
         assertAgainstGolden("textField_textAlignedToEnd")
     }
 
+    @Test
+    fun textField_leadingTrailingIcons() {
+        rule.setMaterialContent {
+            TextField(
+                value = "",
+                onValueChange = {},
+                label = { Text("Label") },
+                modifier = Modifier.width(300.dp).testTag(TextFieldTag),
+                leadingIcon = { Icon(Icons.Default.Call, null) },
+                trailingIcon = { Icon(Icons.Default.Clear, null) }
+            )
+        }
+
+        assertAgainstGolden("textField_leadingTrailingIcons")
+    }
+
+    @Test
+    fun textField_leadingTrailingIcons_error() {
+        rule.setMaterialContent {
+            TextField(
+                value = "",
+                onValueChange = {},
+                label = { Text("Label") },
+                modifier = Modifier.width(300.dp).testTag(TextFieldTag),
+                leadingIcon = { Icon(Icons.Default.Call, null) },
+                trailingIcon = { Icon(Icons.Default.Clear, null) },
+                isError = true
+            )
+        }
+
+        assertAgainstGolden("textField_leadingTrailingIcons_error")
+    }
+
     private fun SemanticsNodeInteraction.focus() {
         // split click into (down) and (move, up) to enforce a composition in between
-        this.performGesture { down(center) }.performGesture { move(); up() }
+        this.performTouchInput { down(center) }.performTouchInput { move(); up() }
     }
 
     private fun assertAgainstGolden(goldenIdentifier: String) {

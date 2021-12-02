@@ -18,22 +18,22 @@ package androidx.compose.ui.test.partialgesturescope
 
 import androidx.compose.testutils.expectError
 import androidx.compose.ui.geometry.Offset
-import androidx.test.filters.MediumTest
 import androidx.compose.ui.test.cancel
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.down
-import androidx.compose.ui.test.inputdispatcher.verifyNoGestureInProgress
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.partialgesturescope.Common.partialGesture
 import androidx.compose.ui.test.up
 import androidx.compose.ui.test.util.ClickableTestBox
-import androidx.compose.ui.test.util.InputDispatcherTestRule
+import androidx.compose.ui.test.util.ClickableTestBox.defaultTag
 import androidx.compose.ui.test.util.MultiPointerInputRecorder
+import androidx.compose.ui.test.util.assertNoTouchGestureInProgress
 import androidx.compose.ui.test.util.assertTimestampsAreIncreasing
+import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TestRule
 
 /**
  * Tests if [cancel] works
@@ -48,9 +48,6 @@ class SendCancelTest {
     @get:Rule
     val rule = createComposeRule()
 
-    @get:Rule
-    val inputDispatcherRule: TestRule = InputDispatcherTestRule()
-
     private val recorder = MultiPointerInputRecorder()
 
     @Before
@@ -61,6 +58,7 @@ class SendCancelTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun onePointer() {
         // When we inject a down event followed by a cancel event
@@ -76,9 +74,10 @@ class SendCancelTest {
         }
 
         // And no gesture is in progress
-        rule.partialGesture { inputDispatcher.verifyNoGestureInProgress() }
+        rule.onNodeWithTag(defaultTag).assertNoTouchGestureInProgress()
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun twoPointers() {
         // When we inject two down events followed by a cancel event
@@ -95,9 +94,10 @@ class SendCancelTest {
         }
 
         // And no gesture is in progress
-        rule.partialGesture { inputDispatcher.verifyNoGestureInProgress() }
+        rule.onNodeWithTag(defaultTag).assertNoTouchGestureInProgress()
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun cancelWithoutDown() {
         expectError<IllegalStateException> {
@@ -105,6 +105,7 @@ class SendCancelTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun cancelAfterUp() {
         rule.partialGesture { down(downPosition1) }
@@ -114,6 +115,7 @@ class SendCancelTest {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun cancelAfterCancel() {
         rule.partialGesture { down(downPosition1) }

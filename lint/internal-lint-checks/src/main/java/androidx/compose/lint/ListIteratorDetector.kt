@@ -29,12 +29,12 @@ import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
 import com.intellij.psi.impl.compiled.ClsMethodImpl
 import kotlinx.metadata.KmClassifier
+import org.jetbrains.kotlin.asJava.unwrapped
 import org.jetbrains.kotlin.psi.KtForExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.uast.UCallExpression
 import org.jetbrains.uast.UForEachExpression
 import org.jetbrains.uast.UTypeReferenceExpression
-import org.jetbrains.uast.resolveToUElement
 import org.jetbrains.uast.toUElement
 
 /**
@@ -75,7 +75,7 @@ class ListIteratorDetector : Detector(), SourceCodeScanner {
 
             // We are calling a method on a `List` type
             if (receiverType?.inheritsFrom(JavaList) == true) {
-                when (val method = node.resolveToUElement()?.sourcePsi) {
+                when (val method = node.resolve()?.unwrapped) {
                     // Parsing a class file
                     is ClsMethodImpl -> {
                         method.checkForIterableReceiver(node)

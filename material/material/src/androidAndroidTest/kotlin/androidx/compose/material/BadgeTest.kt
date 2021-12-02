@@ -61,7 +61,6 @@ import org.junit.runner.RunWith
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalMaterialApi::class)
 class BadgeTest {
 
     private val icon = Icons.Filled.Favorite
@@ -132,10 +131,33 @@ class BadgeTest {
     }
 
     @Test
+    fun badgeBox_noContent_position() {
+        rule
+            .setMaterialContent {
+                BadgedBox(badge = { Badge(Modifier.testTag(TestBadgeTag)) }) {
+                    Icon(
+                        icon,
+                        null,
+                        modifier = Modifier.testTag(TestAnchorTag)
+                    )
+                }
+            }
+        val badge = rule.onNodeWithTag(TestBadgeTag)
+        val anchorBounds = rule.onNodeWithTag(TestAnchorTag).getUnclippedBoundsInRoot()
+        val badgeBounds = badge.getUnclippedBoundsInRoot()
+        badge.assertPositionInRootIsEqualTo(
+            expectedLeft =
+                anchorBounds.right + BadgeHorizontalOffset +
+                    max((BadgeRadius - badgeBounds.width) / 2, 0.dp),
+            expectedTop = -badgeBounds.height / 2
+        )
+    }
+
+    @Test
     fun badgeBox_shortContent_position() {
         rule
             .setMaterialContent {
-                BadgeBox(badgeContent = { Text("8") }) {
+                BadgedBox(badge = { Badge { Text("8") } }) {
                     Icon(
                         icon,
                         null,
@@ -162,7 +184,7 @@ class BadgeTest {
     fun badgeBox_longContent_position() {
         rule
             .setMaterialContent {
-                BadgeBox(badgeContent = { Text("999+") }) {
+                BadgedBox(badge = { Badge { Text("999+") } }) {
                     Icon(
                         icon,
                         null,
@@ -253,12 +275,12 @@ class BadgeTest {
     @Test
     fun badge_notMergingDescendants_withOwnContentDescription() {
         rule.setMaterialContent {
-            BadgeBox(
+            BadgedBox(
+                badge = {
+                    Badge { Text("99+") }
+                },
                 modifier = Modifier.testTag(TestBadgeTag).semantics {
                     this.contentDescription = "more than 99 new email"
-                },
-                badgeContent = {
-                    Text("99+")
                 }
             ) {
                 Text(
@@ -277,7 +299,7 @@ class BadgeTest {
     @Test
     fun badgeBox_size() {
         rule.setMaterialContentForSizeAssertions {
-            BadgeBox(badgeContent = { Text("999+") }) {
+            BadgedBox(badge = { Badge { Text("999+") } }) {
                 Icon(icon, null)
             }
         }

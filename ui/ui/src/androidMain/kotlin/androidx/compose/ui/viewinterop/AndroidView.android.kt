@@ -29,7 +29,6 @@ import androidx.compose.runtime.currentCompositeKeyHash
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.saveable.LocalSaveableStateRegistry
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.materialize
 import androidx.compose.ui.node.LayoutNode
@@ -38,6 +37,8 @@ import androidx.compose.ui.node.UiApplier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.platform.ViewRootForInspector
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.LayoutDirection
@@ -45,7 +46,7 @@ import androidx.compose.ui.unit.LayoutDirection
 /**
  * Composes an Android [View] obtained from [factory]. The [factory] block will be called
  * exactly once to obtain the [View] to be composed, and it is also guaranteed to be invoked on
- * the UI thread. Therefore, in addition to creating the [factory], the block can also be used
+ * the UI thread. Therefore, in addition to creating the [View], the [factory] can also be used
  * to perform one-off initializations and [View] constant properties' setting.
  * The [update] block can be run multiple times (on the UI thread as well) due to recomposition,
  * and it is the right place to set [View] properties depending on state. When state changes,
@@ -84,6 +85,14 @@ fun <T : View> AndroidView(
     val stateRegistry = LocalSaveableStateRegistry.current
     val stateKey = currentCompositeKeyHash.toString()
     val viewFactoryHolderRef = remember { Ref<ViewFactoryHolder<T>>() }
+
+    // These locals are initialized from the view tree at the AndroidComposeView hosting this
+    // composition, but they need to be passed to this Android View so that the ViewTree*Owner
+    // functions return the correct owners if different local values were provided by the
+    // composition, e.g. by a navigation library.
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val savedStateRegistryOwner = LocalSavedStateRegistryOwner.current
+
     ComposeNode<LayoutNode, UiApplier>(
         factory = {
             val viewFactoryHolder = ViewFactoryHolder<T>(context, parentReference)
@@ -97,6 +106,10 @@ fun <T : View> AndroidView(
         update = {
             set(materialized) { viewFactoryHolderRef.value!!.modifier = it }
             set(density) { viewFactoryHolderRef.value!!.density = it }
+            set(lifecycleOwner) { viewFactoryHolderRef.value!!.lifecycleOwner = it }
+            set(savedStateRegistryOwner) {
+                viewFactoryHolderRef.value!!.savedStateRegistryOwner = it
+            }
             set(update) { viewFactoryHolderRef.value!!.updateBlock = it }
             set(layoutDirection) {
                 viewFactoryHolderRef.value!!.layoutDirection = when (it) {
@@ -127,7 +140,6 @@ fun <T : View> AndroidView(
  */
 val NoOpUpdate: View.() -> Unit = {}
 
-@OptIn(ExperimentalComposeUiApi::class)
 internal class ViewFactoryHolder<T : View>(
     context: Context,
     parentContext: CompositionContext? = null

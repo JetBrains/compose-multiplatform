@@ -185,7 +185,7 @@ object MenuDefaults {
 
 // Size defaults.
 private val MenuElevation = 8.dp
-private val MenuVerticalMargin = 48.dp
+internal val MenuVerticalMargin = 48.dp
 private val DropdownMenuItemHorizontalPadding = 16.dp
 internal val DropdownMenuVerticalPadding = 8.dp
 private val DropdownMenuItemDefaultMinWidth = 112.dp
@@ -259,9 +259,21 @@ internal data class DropdownMenuPositionProvider(
         val toDisplayRight = windowSize.width - popupContentSize.width
         val toDisplayLeft = 0
         val x = if (layoutDirection == LayoutDirection.Ltr) {
-            sequenceOf(toRight, toLeft, toDisplayRight)
+            sequenceOf(
+                toRight,
+                toLeft,
+                // If the anchor gets outside of the window on the left, we want to position
+                // toDisplayLeft for proximity to the anchor. Otherwise, toDisplayRight.
+                if (anchorBounds.left >= 0) toDisplayRight else toDisplayLeft
+            )
         } else {
-            sequenceOf(toLeft, toRight, toDisplayLeft)
+            sequenceOf(
+                toLeft,
+                toRight,
+                // If the anchor gets outside of the window on the right, we want to position
+                // toDisplayRight for proximity to the anchor. Otherwise, toDisplayLeft.
+                if (anchorBounds.right <= windowSize.width) toDisplayLeft else toDisplayRight
+            )
         }.firstOrNull {
             it >= 0 && it + popupContentSize.width <= windowSize.width
         } ?: toLeft

@@ -27,7 +27,6 @@ import androidx.compose.testutils.benchmark.toggleStateBenchmarkDraw
 import androidx.compose.testutils.benchmark.toggleStateBenchmarkLayout
 import androidx.compose.testutils.benchmark.toggleStateBenchmarkMeasure
 import androidx.compose.testutils.benchmark.toggleStateBenchmarkRecompose
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.benchmark.TextBenchmarkTestRule
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -69,7 +68,7 @@ class TextBasicBenchmark(
              * is created.
              */
             val texts = List(textBenchmarkRule.repeatTimes) {
-                AnnotatedString(textGenerator.nextParagraph(textLength))
+                textGenerator.nextParagraph(textLength)
             }
             TextInColumnTestCase(
                 texts = texts,

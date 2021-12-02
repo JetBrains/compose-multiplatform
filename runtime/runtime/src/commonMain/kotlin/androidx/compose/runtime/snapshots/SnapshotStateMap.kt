@@ -19,6 +19,8 @@ package androidx.compose.runtime.snapshots
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentMap
 import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentHashMapOf
+import androidx.compose.runtime.synchronized
+import kotlin.jvm.JvmName
 
 /**
  * An implementation of [MutableMap] that can be observed and snapshot. This is the result type
@@ -89,6 +91,15 @@ class SnapshotStateMap<K, V> : MutableMap<K, V>, StateObject {
         return true
     }
 
+    /**
+     * An internal function used by the debugger to display the value of the current value of the
+     * mutable state object without triggering read observers.
+     */
+    @Suppress("unused")
+    internal val debuggerDisplayValue: Map<K, V>
+        @JvmName("getDebuggerDisplayValue")
+        get() = withCurrent { map }
+
     private inline fun <R> withCurrent(block: StateMapStateRecord<K, V>.() -> R): R =
         @Suppress("UNCHECKED_CAST")
         (firstStateRecord as StateMapStateRecord<K, V>).withCurrent(block)
@@ -97,23 +108,40 @@ class SnapshotStateMap<K, V> : MutableMap<K, V>, StateObject {
         @Suppress("UNCHECKED_CAST")
         (firstStateRecord as StateMapStateRecord<K, V>).writable(this, block)
 
-    private inline fun <R> mutate(block: (MutableMap<K, V>) -> R): R =
-        withCurrent {
-            val builder = map.builder()
-            val result = block(builder)
-            val newMap = builder.build()
-            if (newMap !== map) writable {
-                map = newMap
-                modification++
+    private inline fun <R> mutate(block: (MutableMap<K, V>) -> R): R {
+        var result: R
+        while (true) {
+            var oldMap: PersistentMap<K, V>? = null
+            var currentModification = 0
+            synchronized(sync) {
+                val current = withCurrent { this }
+                oldMap = current.map
+                currentModification = current.modification
             }
-            result
+            val builder = oldMap!!.builder()
+            result = block(builder)
+            val newMap = builder.build()
+            if (newMap == oldMap || synchronized(sync) {
+                writable {
+                    if (modification == currentModification) {
+                        map = newMap
+                        modification++
+                        true
+                    } else false
+                }
+            }
+            ) break
         }
+        return result
+    }
 
     private inline fun update(block: (PersistentMap<K, V>) -> PersistentMap<K, V>) = withCurrent {
         val newMap = block(map)
-        if (newMap !== map) writable {
-            map = newMap
-            modification++
+        if (newMap !== map) synchronized(sync) {
+            writable {
+                map = newMap
+                modification++
+            }
         }
     }
 
@@ -127,8 +155,10 @@ class SnapshotStateMap<K, V> : MutableMap<K, V>, StateObject {
         override fun assign(value: StateRecord) {
             @Suppress("UNCHECKED_CAST")
             val other = (value as StateMapStateRecord<K, V>)
-            map = other.map
-            modification = other.modification
+            synchronized(sync) {
+                map = other.map
+                modification = other.modification
+            }
         }
 
         override fun create(): StateRecord = StateMapStateRecord(map)
@@ -212,6 +242,20 @@ private class SnapshotMapValueSet<K, V>(
         return elements.all { map.containsValue(it) }
     }
 }
+
+/**
+ * This lock is used to ensure that the value of modification and the map in the state record,
+ * when used together, are atomically read and written.
+ *
+ * A global sync object is used to avoid having to allocate a sync object and initialize a monitor
+ * for each instance the map. This avoids additional allocations but introduces some contention
+ * between maps. As there is already contention on the global snapshot lock to write so the
+ * additional contention introduced by this lock is nominal.
+ *
+ * In code the requires this lock and calls `writable` (or other operation that acquires the
+ * snapshot global lock), this lock *MUST* be acquired first to avoid deadlocks.
+ */
+private val sync = Any()
 
 private abstract class StateMapMutableIterator<K, V>(
     val map: SnapshotStateMap<K, V>,

@@ -18,6 +18,8 @@ package androidx.compose.material
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
+import androidx.compose.foundation.interaction.FocusInteraction
+import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -61,8 +63,7 @@ import kotlinx.coroutines.flow.collect
  *
  * See [ExtendedFloatingActionButton] for an extended FAB that contains text and an optional icon.
  *
- * @param onClick will be called when user clicked on this FAB. The FAB will be disabled
- * when it is null.
+ * @param onClick callback invoked when this FAB is clicked
  * @param modifier [Modifier] to be applied to this FAB.
  * @param interactionSource the [MutableInteractionSource] representing the stream of
  * [Interaction]s for this FAB. You can create and pass in your own remembered
@@ -129,8 +130,7 @@ fun FloatingActionButton(
  * @sample androidx.compose.material.samples.FluidExtendedFab
  *
  * @param text Text label displayed inside this FAB
- * @param onClick will be called when user clicked on this FAB. The FAB will be disabled
- * when it is null.
+ * @param onClick callback invoked when this FAB is clicked
  * @param modifier [Modifier] to be applied to this FAB
  * @param icon Optional icon for this FAB, typically this will be a
  * [Icon].
@@ -168,22 +168,19 @@ fun ExtendedFloatingActionButton(
         contentColor = contentColor,
         elevation = elevation
     ) {
-        Box(
+        val startPadding = if (icon == null) ExtendedFabTextPadding else ExtendedFabIconPadding
+        Row(
             modifier = Modifier.padding(
-                start = ExtendedFabTextPadding,
+                start = startPadding,
                 end = ExtendedFabTextPadding
             ),
-            contentAlignment = Alignment.Center
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            if (icon == null) {
-                text()
-            } else {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    icon()
-                    Spacer(Modifier.width(ExtendedFabIconPadding))
-                    text()
-                }
+            if (icon != null) {
+                icon()
+                Spacer(Modifier.width(ExtendedFabIconPadding))
             }
+            text()
         }
     }
 }
@@ -210,7 +207,6 @@ interface FloatingActionButtonElevation {
  * Contains the default values used by [FloatingActionButton]
  */
 object FloatingActionButtonDefaults {
-    // TODO: b/152525426 add support for focused and hovered states
     /**
      * Creates a [FloatingActionButtonElevation] that will animate between the provided values
      * according to the Material specification.
@@ -220,17 +216,45 @@ object FloatingActionButtonDefaults {
      * @param pressedElevation the elevation to use when the [FloatingActionButton] is
      * pressed.
      */
+    @Deprecated("Use another overload of elevation", level = DeprecationLevel.HIDDEN)
     @Composable
     fun elevation(
         defaultElevation: Dp = 6.dp,
-        pressedElevation: Dp = 12.dp
-        // focused: Dp = 8.dp,
-        // hovered: Dp = 8.dp,
+        pressedElevation: Dp = 12.dp,
+    ): FloatingActionButtonElevation = elevation(
+        defaultElevation,
+        pressedElevation,
+        hoveredElevation = 8.dp,
+        focusedElevation = 8.dp,
+    )
+
+    /**
+     * Creates a [FloatingActionButtonElevation] that will animate between the provided values
+     * according to the Material specification.
+     *
+     * @param defaultElevation the elevation to use when the [FloatingActionButton] has no
+     * [Interaction]s
+     * @param pressedElevation the elevation to use when the [FloatingActionButton] is
+     * pressed.
+     * @param hoveredElevation the elevation to use when the [FloatingActionButton] is
+     * hovered.
+     * @param focusedElevation the elevation to use when the [FloatingActionButton] is
+     * focused.
+     */
+    @Suppress("UNUSED_PARAMETER")
+    @Composable
+    fun elevation(
+        defaultElevation: Dp = 6.dp,
+        pressedElevation: Dp = 12.dp,
+        hoveredElevation: Dp = 8.dp,
+        focusedElevation: Dp = 8.dp,
     ): FloatingActionButtonElevation {
-        return remember(defaultElevation, pressedElevation) {
+        return remember(defaultElevation, pressedElevation, hoveredElevation, focusedElevation) {
             DefaultFloatingActionButtonElevation(
                 defaultElevation = defaultElevation,
-                pressedElevation = pressedElevation
+                pressedElevation = pressedElevation,
+                hoveredElevation = hoveredElevation,
+                focusedElevation = focusedElevation
             )
         }
     }
@@ -243,6 +267,8 @@ object FloatingActionButtonDefaults {
 private class DefaultFloatingActionButtonElevation(
     private val defaultElevation: Dp,
     private val pressedElevation: Dp,
+    private val hoveredElevation: Dp,
+    private val focusedElevation: Dp
 ) : FloatingActionButtonElevation {
     @Composable
     override fun elevation(interactionSource: InteractionSource): State<Dp> {
@@ -250,6 +276,18 @@ private class DefaultFloatingActionButtonElevation(
         LaunchedEffect(interactionSource) {
             interactionSource.interactions.collect { interaction ->
                 when (interaction) {
+                    is HoverInteraction.Enter -> {
+                        interactions.add(interaction)
+                    }
+                    is HoverInteraction.Exit -> {
+                        interactions.remove(interaction.enter)
+                    }
+                    is FocusInteraction.Focus -> {
+                        interactions.add(interaction)
+                    }
+                    is FocusInteraction.Unfocus -> {
+                        interactions.remove(interaction.focus)
+                    }
                     is PressInteraction.Press -> {
                         interactions.add(interaction)
                     }
@@ -267,6 +305,8 @@ private class DefaultFloatingActionButtonElevation(
 
         val target = when (interaction) {
             is PressInteraction.Press -> pressedElevation
+            is HoverInteraction.Enter -> hoveredElevation
+            is FocusInteraction.Focus -> focusedElevation
             else -> defaultElevation
         }
 
@@ -275,6 +315,8 @@ private class DefaultFloatingActionButtonElevation(
         LaunchedEffect(target) {
             val lastInteraction = when (animatable.targetValue) {
                 pressedElevation -> PressInteraction.Press(Offset.Zero)
+                hoveredElevation -> HoverInteraction.Enter()
+                focusedElevation -> FocusInteraction.Focus()
                 else -> null
             }
             animatable.animateElevation(

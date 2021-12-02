@@ -52,19 +52,19 @@ import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.GestureScope
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.TouchInjectionScope
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.center
-import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
@@ -451,13 +451,13 @@ class ScrollTest {
     @Test
     @LargeTest
     fun verticalScroller_swipeUp_swipeDown() {
-        swipeScrollerAndBack(true, GestureScope::swipeUp, GestureScope::swipeDown)
+        swipeScrollerAndBack(true, TouchInjectionScope::swipeUp, TouchInjectionScope::swipeDown)
     }
 
     @Test
     @LargeTest
     fun horizontalScroller_swipeLeft_swipeRight() {
-        swipeScrollerAndBack(false, GestureScope::swipeLeft, GestureScope::swipeRight)
+        swipeScrollerAndBack(false, TouchInjectionScope::swipeLeft, TouchInjectionScope::swipeRight)
     }
 
     @Test
@@ -465,8 +465,8 @@ class ScrollTest {
     fun horizontalScroller_rtl_swipeLeft_swipeRight() {
         swipeScrollerAndBack(
             false,
-            GestureScope::swipeRight,
-            GestureScope::swipeLeft,
+            TouchInjectionScope::swipeRight,
+            TouchInjectionScope::swipeLeft,
             isRtl = true
         )
     }
@@ -600,7 +600,7 @@ class ScrollTest {
         assertThat(scrollState.isScrollInProgress).isEqualTo(false)
 
         rule.onNodeWithTag(scrollerTag)
-            .performGesture { swipeUp() }
+            .performTouchInput { swipeUp() }
 
         assertThat(scrollState.isScrollInProgress).isEqualTo(true)
         val scrollAtFlingStart = scrollState.value
@@ -612,7 +612,7 @@ class ScrollTest {
         val scrollWhenInterruptFling = scrollState.value
         assertThat(scrollWhenInterruptFling).isGreaterThan(scrollAtFlingStart)
         rule.onNodeWithTag(scrollerTag)
-            .performGesture { down(center) }
+            .performTouchInput { down(center) }
 
         // The fling has been stopped:
         rule.mainClock.advanceTimeBy(100)
@@ -651,8 +651,8 @@ class ScrollTest {
 
     private fun swipeScrollerAndBack(
         isVertical: Boolean,
-        firstSwipe: GestureScope.() -> Unit,
-        secondSwipe: GestureScope.() -> Unit,
+        firstSwipe: TouchInjectionScope.() -> Unit,
+        secondSwipe: TouchInjectionScope.() -> Unit,
         isRtl: Boolean = false
     ) {
         rule.mainClock.autoAdvance = false
@@ -663,7 +663,7 @@ class ScrollTest {
         assertThat(scrollState.value).isEqualTo(0)
 
         rule.onNodeWithTag(scrollerTag)
-            .performGesture { firstSwipe() }
+            .performTouchInput { firstSwipe() }
 
         rule.mainClock.advanceTimeBy(5000)
 
@@ -674,7 +674,7 @@ class ScrollTest {
         assertThat(scrolledValue).isGreaterThan(0)
 
         rule.onNodeWithTag(scrollerTag)
-            .performGesture { secondSwipe() }
+            .performTouchInput { secondSwipe() }
 
         rule.mainClock.advanceTimeBy(5000)
 
@@ -682,6 +682,36 @@ class ScrollTest {
             .awaitScrollAnimation(scrollState)
 
         assertThat(scrollState.value).isLessThan(scrolledValue)
+    }
+
+    @Test
+    fun scroller_semanticsScroll_isAnimated() {
+        rule.mainClock.autoAdvance = false
+        val scrollState = ScrollState(initial = 0)
+
+        createScrollableContent(isVertical = true, scrollState = scrollState)
+
+        rule.waitForIdle()
+        assertThat(scrollState.value).isEqualTo(0)
+        assertThat(scrollState.maxValue).isGreaterThan(100) // If this fails, just add more items
+
+        rule.onNodeWithTag(scrollerTag).performSemanticsAction(SemanticsActions.ScrollBy) {
+            it(0f, 100f)
+        }
+
+        // We haven't advanced time yet, make sure it's still zero
+        assertThat(scrollState.value).isEqualTo(0)
+
+        // Advance and make sure we're partway through
+        // Note that we need two frames for the animation to actually happen
+        rule.mainClock.advanceTimeByFrame()
+        rule.mainClock.advanceTimeByFrame()
+        assertThat(scrollState.value).isGreaterThan(0)
+        assertThat(scrollState.value).isLessThan(100)
+
+        // Finish the scroll, make sure we're at the target
+        rule.mainClock.advanceTimeBy(5000)
+        assertThat(scrollState.value).isEqualTo(100)
     }
 
     private fun composeVerticalScroller(

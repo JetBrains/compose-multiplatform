@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":compose:ui:ui"))
     implementation(project(":compose:ui:ui-text"))
     implementation(project(":compose:animation:animation"))
+    implementation(project(":compose:animation:animation-graphics"))
     implementation(project(":compose:animation:animation:animation-samples"))
     implementation(project(":compose:animation:animation-core:animation-core-samples"))
     implementation(project(":compose:foundation:foundation"))

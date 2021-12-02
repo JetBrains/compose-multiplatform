@@ -22,15 +22,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.unit.dp
 
-internal val HANDLE_WIDTH = 25.dp
-internal val HANDLE_HEIGHT = 25.dp
+internal val HandleWidth = 25.dp
+internal val HandleHeight = 25.dp
 
 @Composable
 internal expect fun SelectionHandle(
-    startHandlePosition: Offset?,
-    endHandlePosition: Offset?,
+    position: Offset,
     isStartHandle: Boolean,
-    directions: Pair<ResolvedTextDirection, ResolvedTextDirection>,
+    direction: ResolvedTextDirection,
     handlesCrossed: Boolean,
     modifier: Modifier,
     content: @Composable (() -> Unit)?

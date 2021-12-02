@@ -15,17 +15,42 @@
  */
 package androidx.compose.desktop.examples.popupexample
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.MutableState
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
-import java.lang.Exception
 
 object AppState {
     private val imageRes: String = "androidx/compose/desktop/example/tray.png"
     private var icon: BufferedImage? = null
+
+    var isMainWindowOpen by mutableStateOf(true)
+        private set
+
+    val secondaryWindowIds = mutableStateListOf<Int>()
+
+    private var lastId = 0
+
+    fun openSecondaryWindow() {
+        secondaryWindowIds.add(lastId++)
+    }
+
+    fun closeMainWindow() {
+        isMainWindowOpen = false
+    }
+
+    fun closeSecondaryWindow(id: Int) {
+        secondaryWindowIds.remove(id)
+    }
+
+    fun closeAll() {
+        isMainWindowOpen = false
+        secondaryWindowIds.clear()
+    }
+
     fun image(): BufferedImage {
         if (icon != null) {
             return icon!!
@@ -44,8 +69,6 @@ object AppState {
     }
 
     val wndTitle = mutableStateOf("Desktop Compose Popup")
-    val wndSize = mutableStateOf(IntSize.Zero)
-    val wndPos = mutableStateOf(IntOffset.Zero)
     val popupState = mutableStateOf(false)
     val amount = mutableStateOf(0)
 

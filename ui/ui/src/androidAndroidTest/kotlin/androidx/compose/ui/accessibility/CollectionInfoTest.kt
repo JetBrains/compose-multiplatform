@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.OpenComposeView
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
+import androidx.compose.ui.platform.accessibility.hasCollectionInfo
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.CollectionInfo
 import androidx.compose.ui.semantics.CollectionItemInfo
@@ -293,5 +294,44 @@ class CollectionInfoTest {
         Assert.assertEquals(1, resultCollectionItemInfo.rowSpan)
         Assert.assertEquals(0, resultCollectionItemInfo.columnIndex)
         Assert.assertEquals(1, resultCollectionItemInfo.columnSpan)
+    }
+
+    @Test
+    fun testSemanticsNodeHasCollectionInfo_whenProvidedDirectly() {
+        val tag = "column"
+        rule.setContent {
+            Column(Modifier.testTag(tag).semantics { collectionInfo = CollectionInfo(1, 1) }) {
+                // items
+            }
+        }
+
+        val semanticsNode = rule.onNodeWithTag(tag).fetchSemanticsNode()
+        Assert.assertTrue(semanticsNode.hasCollectionInfo())
+    }
+
+    @Test
+    fun testSemanticsNodeHasCollectionInfo_whenProvidedViaSelectableGroup() {
+        val tag = "column"
+        rule.setContent {
+            Column(Modifier.testTag(tag).selectableGroup()) {
+                // items
+            }
+        }
+
+        val semanticsNode = rule.onNodeWithTag(tag).fetchSemanticsNode()
+        Assert.assertTrue(semanticsNode.hasCollectionInfo())
+    }
+
+    @Test
+    fun testSemanticsNodeHasCollectionInfo_falseWhenNotProvided() {
+        val tag = "column"
+        rule.setContent {
+            Column(Modifier.testTag(tag)) {
+                // items
+            }
+        }
+
+        val semanticsNode = rule.onNodeWithTag(tag).fetchSemanticsNode()
+        Assert.assertFalse(semanticsNode.hasCollectionInfo())
     }
 }

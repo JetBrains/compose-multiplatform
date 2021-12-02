@@ -16,6 +16,13 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.FocusStateImpl.Active
+import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
+import androidx.compose.ui.focus.FocusStateImpl.Captured
+import androidx.compose.ui.focus.FocusStateImpl.Deactivated
+import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
+import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
@@ -31,6 +38,7 @@ import androidx.compose.ui.semantics.SemanticsWrapper
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.util.fastForEach
 
 internal class InnerPlaceable(
     layoutNode: LayoutNode
@@ -51,9 +59,33 @@ internal class InnerPlaceable(
 
     override fun findPreviousFocusWrapper() = wrappedBy?.findPreviousFocusWrapper()
 
-    override fun findNextFocusWrapper(): ModifiedFocusNode? = null
+    override fun findNextFocusWrapper(excludeDeactivated: Boolean): ModifiedFocusNode? = null
 
     override fun findLastFocusWrapper(): ModifiedFocusNode? = findPreviousFocusWrapper()
+
+    // For non-focusable parents, we don't propagate the focus state sent by the child.
+    // Instead we aggregate the focus state of all children.
+    override fun propagateFocusEvent(focusState: FocusState) {
+
+        var focusedChild: ModifiedFocusNode? = null
+        var allChildrenDisabled: Boolean? = null
+        // TODO(b/192681045): Create a utility like fun LayoutNodeWrapper.forEachFocusableChild{...}
+        //  that does not allocate, but just iterates over all the focusable children.
+        focusableChildren(excludeDeactivated = false).fastForEach {
+            when (it.focusState) {
+                Active, ActiveParent, Captured, DeactivatedParent -> {
+                    focusedChild = it
+                    allChildrenDisabled = false
+                }
+                Deactivated -> if (allChildrenDisabled == null) { allChildrenDisabled = true }
+                Inactive -> allChildrenDisabled = false
+            }
+        }
+
+        super.propagateFocusEvent(
+            focusedChild?.focusState ?: if (allChildrenDisabled == true) Deactivated else Inactive
+        )
+    }
 
     override fun findPreviousKeyInputWrapper() = wrappedBy?.findPreviousKeyInputWrapper()
 
@@ -90,7 +122,6 @@ internal class InnerPlaceable(
         // get(line), to obtain the position of the alignment line the wrapper currently needs
         // our position in order ot know how to offset the value we provided).
         if (wrappedBy?.isShallowPlacing == true) return
-
         layoutNode.onNodePlaced()
     }
 
@@ -112,33 +143,69 @@ internal class InnerPlaceable(
 
     override fun hitTest(
         pointerPosition: Offset,
-        hitPointerInputFilters: MutableList<PointerInputFilter>
+        hitTestResult: HitTestResult<PointerInputFilter>,
+        isTouchEvent: Boolean,
+        isInLayer: Boolean
     ) {
-        hitTestSubtree(pointerPosition, hitPointerInputFilters, LayoutNode::hitTest)
+        hitTest(pointerPosition, hitTestResult, isTouchEvent, isInLayer, LayoutNode::hitTest)
     }
 
     override fun hitTestSemantics(
         pointerPosition: Offset,
-        hitSemanticsWrappers: MutableList<SemanticsWrapper>
+        hitSemanticsWrappers: HitTestResult<SemanticsWrapper>,
+        isInLayer: Boolean
     ) {
-        hitTestSubtree(pointerPosition, hitSemanticsWrappers, LayoutNode::hitTestSemantics)
+        hitTest(
+            pointerPosition,
+            hitSemanticsWrappers,
+            true,
+            isInLayer,
+            LayoutNode::hitTestSemantics
+        )
     }
 
-    private inline fun <T> hitTestSubtree(
+    private inline fun <T> hitTest(
         pointerPosition: Offset,
-        hitResult: MutableList<T>,
-        nodeHitTest: LayoutNode.(Offset, MutableList<T>) -> Unit
+        hitTestResult: HitTestResult<T>,
+        isTouchEvent: Boolean,
+        isInLayer: Boolean,
+        childHitTest: LayoutNode.(Offset, HitTestResult<T>, Boolean, Boolean) -> Unit
     ) {
+        var inLayer = isInLayer
+        var hitTestChildren = false
+
         if (withinLayerBounds(pointerPosition)) {
-            val originalSize = hitResult.size
-            // Any because as soon as true is returned, we know we have found a hit path and we must
-            // not add hit results on different paths so we should not even go looking.
-            layoutNode.zSortedChildren.reversedAny { child ->
-                if (child.isPlaced) {
-                    child.nodeHitTest(pointerPosition, hitResult)
-                    hitResult.size > originalSize
-                } else {
-                    false
+            hitTestChildren = true
+        } else if (isTouchEvent &&
+            distanceInMinimumTouchTarget(pointerPosition, minimumTouchTargetSize).isFinite()
+        ) {
+            inLayer = false
+            hitTestChildren = true
+        }
+
+        if (hitTestChildren) {
+            hitTestResult.siblingHits {
+                // Any because as soon as true is returned, we know we have found a hit path and we must
+                // not add hit results on different paths so we should not even go looking.
+                layoutNode.zSortedChildren.reversedAny { child ->
+                    if (child.isPlaced) {
+                        child.childHitTest(pointerPosition, hitTestResult, isTouchEvent, inLayer)
+                        val wasHit = hitTestResult.hasHit()
+                        val continueHitTest: Boolean
+                        if (!wasHit) {
+                            continueHitTest = true
+                        } else if (
+                            child.outerLayoutNodeWrapper.shouldSharePointerInputWithSiblings()
+                        ) {
+                            hitTestResult.acceptHits()
+                            continueHitTest = true
+                        } else {
+                            continueHitTest = false
+                        }
+                        !continueHitTest
+                    } else {
+                        false
+                    }
                 }
             }
         }
@@ -147,6 +214,8 @@ internal class InnerPlaceable(
     override fun getWrappedByCoordinates(): LayoutCoordinates {
         return this
     }
+
+    override fun shouldSharePointerInputWithSiblings(): Boolean = false
 
     internal companion object {
         val innerBoundsPaint = Paint().also { paint ->

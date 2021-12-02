@@ -43,6 +43,7 @@ class TransitionDetectorTest : LintDetectorTest() {
     private val TransitionStub = compiledStub(
         filename = "Transition.kt",
         filepath = "androidx/compose/animation/core",
+        checksum = 0x313a900e,
         """
             package androidx.compose.animation.core
 
@@ -60,32 +61,10 @@ class TransitionDetectorTest : LintDetectorTest() {
             ): Float = 5f
         """,
 """
-        androidx/compose/animation/core/TransitionKt.class:
-        H4sIAAAAAAAAAMVVT1MjRRR/PZkknSHAMAsI2d24stldYGEnZDHqJovLIsho
-        iJZBLhysJmmyA5MeamZCsRcLvfgFvOzN8uDRg6ctD1aKLS9+Jsvy9ZCEQKzC
-        eDFV6fev3++91/36zR9//fobACzDJwQWmKh5rl07Matu48j1ucmE3WCB7QrU
-        eNzc9pjwbSl/GsSBENAP2DEzHSbq5md7B7yK2giB5Lkb33BcFhD4Zrb074EL
-        pUM3cGxhHhw3zP2mqEqlb260uaVC6SJkJfBsUb/WY26DwJ/FypPS1WQLK4Nk
-        VtyuFFauC1ZcHAAxU+H1BhfBZeQvhR1IcdA6i4sI0+MVnj4CyfLv9WflNUVg
-        N7i5Fspsz+EFAndLrlc3D3iw5zEbwZkQbsDOA5XdoNx0HNwVKwYvbH+FgkYg
-        3ZOULQLuCeaYlpAZ+3bVj0OSwET1Ba8etv0/Zx5rcNxI4MFs/5X0lz23k4QR
-        GNVgGHQCI0H3+CpHvErBIBB12B53KIwTMALm1Xmww5wmf/6ygrlzCpPqsx8A
-        CIxl7Mx+5nJzEgudMrKeK4aFQZqWwJ3ruhDD9NdGYLw3aqbG91nTwejf/89v
-        xuq/GdlHhUEmxKUDzSzF4R0C1CpXtlfLa+sEng5QYR9YIQl3IZOAGbh3uQf/
-        oZg4PMC+CR1XOwEozBG43X/vXzVzy91LGOuc0hYPWI0FDO9LaRxHcF4SuUSx
-        fQ4lo6D+xJZcFrnaEoHfW6c5rXWqKXo8JFNKh4R/Xeny4aaRrpUqqUBvnaaU
-        LJlRaetUV+apoRrKppKN5DJU09VU2tCMji4maTaejZ79GFMoDddEjlJF1xBi
-        KHdfT6ZmjBvG2KaCtiQdNigdMVRKZ0dDT9Lx3Dz7jr55TVqnZ98qcS1Kz17l
-        skQWkyPy6ZCK7N/2cfQ29fJ/mHfolu5grZ8EHM2u6IBuvzySk2iys6E7L8pI
-        0KAKpPjmffm2CQxfwD86xDtT19waqkdLtuDlZmOPe9tytsns3SpzdphnS7mt
-        TFTsumBB00P+5hfnE9ESx7Zvo3n1YvgRyFy1dvO6tG0YR071cIsdtQMkLSG4
-        t+Yw3+do1ipu06vyDVvaptuQO33hYAkUUEH+FJiGKMRQeobSEcpRpOl5Y+g1
-        jD00buC6YEzgumi8hWskrxpTP4d+q7jG8Opuwig8Dz/xUeQjiJcKsdMo3Qpj
-        pMGA27hTcuP4V0JuEnURWAux4vBRG40iXcf/tIpCQr6Eq6uegLfhDvIy4Z/Q
-        OYY0P6GqX78C7Re434LZ0oQaRSlmzG9dW0gENnBVQRlJhCWlQrwhTEl+FoZg
-        Ar8LU0gf95T5uKfMPDxsl5nvlpnvlplvlxmBj1HS0DoT7p2GzbDwD8FCuov6
-        BcRd3IWIBY8sMHGFrIX3lLMw2jJu8OFdyO+C7mNrwns+vO/DLR8MHz7w4Umo
-        oT4UfBgP+Ukfij489WHlb+6OIxeBCQAA
+        META-INF/main.kotlin_module:
+        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3Apc8ln5iXUpSfmVKhl5yfW5BfnKqX
+        mJeZm1iSmZ8HFClKFeIJKUrMK84ECXiXcPFyMafl5wuxhaQWl3iXKDFoMQAA
+        iDN6X1gAAAA=
         """,
         """
         androidx/compose/animation/core/Transition＄Segment.class:
@@ -100,6 +79,20 @@ class TransitionDetectorTest : LintDetectorTest() {
         mCUN5zV1P2P1EzsCtxnbjRjgDmP0KwEh1tj62GEMWRPYxg2+d5sqD/caexP3
         2T7leMQ16yN4fVzqY4MRcQ2bfWzh8ghkcQVXR/At1iyuWVy3CH4CEksXNqoC
         AAA=
+        """,
+        """
+        androidx/compose/animation/core/Transition.class:
+        H4sIAAAAAAAAAI1RTW8TMRB99m52023apuUr4atAeygRYtuIU6gqQSWkSAtI
+        bJVLTk7WCm52vWjtVD3mt/APOCFxQBFHfhRivFRCgkt9eOP3PG88Hv/89e07
+        gBfYY+gJnVWlyi7jaVl8Ko2MhVaFsKrUpFQyPquENsrxEIzh4DgdJOfiQsS5
+        0LP4/eRcTu3Lk/8lhva/WgifIThWWtkTBu/g6aiFAGGEBpoMvv2oDMOz5Pod
+        0SXbyby0udLxW2lFJqwgjRcXHr2POWgwsDlJl8qxQ9plR3TJarkZ8Q6PVsuI
+        tx00eWe17PnN1bLN+vyQD5j/uvHjc8DbnvP0qUzKqCbCVM4KqS1D//qN7l+Z
+        QnQZNv7qz+dUxz8tM8mwlSgt3y2KiazOxCQnZScppyIfiUo5fiW2hlrL6jQX
+        xkga11qqZlrYRUVHUVouqql8o1xe98NCW1XIkTKKjK+0Lm3dm8EROI3cLXqV
+        +wHC+8TimtPMel+x9oU2HA8Ig1oM8JCw9ScBEdYp+tgljEi7S7kddPGodnl4
+        XMd7eEJxQOct8myM4Q2xOcQWIdoOtofYwY0xmMFN3BqjYbBucNvgjkFo0PkN
+        zab+FKoCAAA=
         """,
         """
         androidx/compose/animation/core/TransitionKt＄animateFloat＄1.class:
@@ -127,24 +120,32 @@ class TransitionDetectorTest : LintDetectorTest() {
         HwUf114AvnRqlvwHAAA=
         """,
         """
-        androidx/compose/animation/core/Transition.class:
-        H4sIAAAAAAAAAI1RTW8TMRB99m52023apuUr4atAeygRYtuIU6gqQSWkSAtI
-        bJVLTk7WCm52vWjtVD3mt/APOCFxQBFHfhRivFRCgkt9eOP3PG88Hv/89e07
-        gBfYY+gJnVWlyi7jaVl8Ko2MhVaFsKrUpFQyPquENsrxEIzh4DgdJOfiQsS5
-        0LP4/eRcTu3Lk/8lhva/WgifIThWWtkTBu/g6aiFAGGEBpoMvv2oDMOz5Pod
-        0SXbyby0udLxW2lFJqwgjRcXHr2POWgwsDlJl8qxQ9plR3TJarkZ8Q6PVsuI
-        tx00eWe17PnN1bLN+vyQD5j/uvHjc8DbnvP0qUzKqCbCVM4KqS1D//qN7l+Z
-        QnQZNv7qz+dUxz8tM8mwlSgt3y2KiazOxCQnZScppyIfiUo5fiW2hlrL6jQX
-        xkga11qqZlrYRUVHUVouqql8o1xe98NCW1XIkTKKjK+0Lm3dm8EROI3cLXqV
-        +wHC+8TimtPMel+x9oU2HA8Ig1oM8JCw9ScBEdYp+tgljEi7S7kddPGodnl4
-        XMd7eEJxQOct8myM4Q2xOcQWIdoOtofYwY0xmMFN3BqjYbBucNvgjkFo0PkN
-        zab+FKoCAAA=
-        """,
-        """
-        META-INF/main.kotlin_module:
-        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3Apc8ln5iXUpSfmVKhl5yfW5BfnKqX
-        mJeZm1iSmZ8HFClKFeIJKUrMK84ECXiXcPFyMafl5wuxhaQWl3iXKDFoMQAA
-        iDN6X1gAAAA=
+        androidx/compose/animation/core/TransitionKt.class:
+        H4sIAAAAAAAAAMVVT1MjRRR/PZkknSHAMAsI2d24stldYGEnZDHqJovLIsho
+        iJZBLhysJmmyA5MeamZCsRcLvfgFvOzN8uDRg6ctD1aKLS9+Jsvy9ZCEQKzC
+        eDFV6fev3++91/36zR9//fobACzDJwQWmKh5rl07Matu48j1ucmE3WCB7QrU
+        eNzc9pjwbSl/GsSBENAP2DEzHSbq5md7B7yK2giB5Lkb33BcFhD4Zrb074EL
+        pUM3cGxhHhw3zP2mqEqlb260uaVC6SJkJfBsUb/WY26DwJ/FypPS1WQLK4Nk
+        VtyuFFauC1ZcHAAxU+H1BhfBZeQvhR1IcdA6i4sI0+MVnj4CyfLv9WflNUVg
+        N7i5Fspsz+EFAndLrlc3D3iw5zEbwZkQbsDOA5XdoNx0HNwVKwYvbH+FgkYg
+        3ZOULQLuCeaYlpAZ+3bVj0OSwET1Ba8etv0/Zx5rcNxI4MFs/5X0lz23k4QR
+        GNVgGHQCI0H3+CpHvErBIBB12B53KIwTMALm1Xmww5wmf/6ygrlzCpPqsx8A
+        CIxl7Mx+5nJzEgudMrKeK4aFQZqWwJ3ruhDD9NdGYLw3aqbG91nTwejf/89v
+        xuq/GdlHhUEmxKUDzSzF4R0C1CpXtlfLa+sEng5QYR9YIQl3IZOAGbh3uQf/
+        oZg4PMC+CR1XOwEozBG43X/vXzVzy91LGOuc0hYPWI0FDO9LaRxHcF4SuUSx
+        fQ4lo6D+xJZcFrnaEoHfW6c5rXWqKXo8JFNKh4R/Xeny4aaRrpUqqUBvnaaU
+        LJlRaetUV+apoRrKppKN5DJU09VU2tCMji4maTaejZ79GFMoDddEjlJF1xBi
+        KHdfT6ZmjBvG2KaCtiQdNigdMVRKZ0dDT9Lx3Dz7jr55TVqnZ98qcS1Kz17l
+        skQWkyPy6ZCK7N/2cfQ29fJ/mHfolu5grZ8EHM2u6IBuvzySk2iys6E7L8pI
+        0KAKpPjmffm2CQxfwD86xDtT19waqkdLtuDlZmOPe9tytsns3SpzdphnS7mt
+        TFTsumBB00P+5hfnE9ESx7Zvo3n1YvgRyFy1dvO6tG0YR071cIsdtQMkLSG4
+        t+Yw3+do1ipu06vyDVvaptuQO33hYAkUUEH+FJiGKMRQeobSEcpRpOl5Y+g1
+        jD00buC6YEzgumi8hWskrxpTP4d+q7jG8Opuwig8Dz/xUeQjiJcKsdMo3Qpj
+        pMGA27hTcuP4V0JuEnURWAux4vBRG40iXcf/tIpCQr6Eq6uegLfhDvIy4Z/Q
+        OYY0P6GqX78C7Re434LZ0oQaRSlmzG9dW0gENnBVQRlJhCWlQrwhTEl+FoZg
+        Ar8LU0gf95T5uKfMPDxsl5nvlpnvlplvlxmBj1HS0DoT7p2GzbDwD8FCuov6
+        BcRd3IWIBY8sMHGFrIX3lLMw2jJu8OFdyO+C7mNrwns+vO/DLR8MHz7w4Umo
+        oT4UfBgP+Ukfij489WHlb+6OIxeBCQAA
         """
     )
 

@@ -57,7 +57,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.performKeyPress
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.printToLog
@@ -87,7 +87,7 @@ import android.view.KeyEvent.KEYCODE_A as KeyCodeA
 }
 
 private object TestingSnippet3 {
-    // file: app/src/androidTest/java/com/package/MyComposeTest.kt
+    // file: app/src/androidTest/kotlin/com/package/MyComposeTest.kt
 
     class MyComposeTest {
 
@@ -164,7 +164,7 @@ private object TestingSnippet3 {
         performClick(),
         performSemanticsAction(key),
         performKeyPress(keyEvent),
-        performGesture { swipeLeft() }
+        performTouchInput { swipeLeft() }
         // end snippet
     )
 }

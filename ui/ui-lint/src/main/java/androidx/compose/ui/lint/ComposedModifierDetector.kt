@@ -29,13 +29,11 @@ import com.android.tools.lint.detector.api.JavaContext
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
-import com.android.tools.lint.detector.api.UastLintUtils.Companion.tryResolveUDeclaration
 import com.intellij.psi.PsiMethod
 import org.jetbrains.uast.UCallExpression
-import org.jetbrains.uast.UMethod
 import org.jetbrains.uast.USimpleNameReferenceExpression
 import org.jetbrains.uast.getParameterForArgument
-import org.jetbrains.uast.resolveToUElement
+import org.jetbrains.uast.tryResolve
 import org.jetbrains.uast.visitor.AbstractUastVisitor
 import java.util.EnumSet
 
@@ -61,7 +59,7 @@ class ComposedModifierDetector : Detector(), SourceCodeScanner {
              */
             override fun visitCallExpression(
                 node: UCallExpression
-            ): Boolean = (node.resolveToUElement() as? UMethod).hasComposableCall()
+            ): Boolean = (node.tryResolve() as? PsiMethod).hasComposableCall()
 
             /**
              * Visit any simple name reference expressions and see if they resolve to a
@@ -70,17 +68,9 @@ class ComposedModifierDetector : Detector(), SourceCodeScanner {
              */
             override fun visitSimpleNameReferenceExpression(
                 node: USimpleNameReferenceExpression
-            ): Boolean {
-                return try {
-                    (node.tryResolveUDeclaration() as? UMethod).hasComposableCall()
-                } catch (e: NullPointerException) {
-                    // TODO: elvis expressions will throw a NPE if you try and resolve them
-                    // https://youtrack.jetbrains.com/issue/KT-46795
-                    false
-                }
-            }
+            ): Boolean = (node.tryResolve() as? PsiMethod).hasComposableCall()
 
-            private fun UMethod?.hasComposableCall(): Boolean {
+            private fun PsiMethod?.hasComposableCall(): Boolean {
                 if (this?.isComposable == true) {
                     hasComposableCall = true
                 }

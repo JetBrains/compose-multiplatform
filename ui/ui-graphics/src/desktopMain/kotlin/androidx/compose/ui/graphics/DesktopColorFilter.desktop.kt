@@ -16,26 +16,16 @@
 
 package androidx.compose.ui.graphics
 
-import org.jetbrains.skija.ColorFilter as SkijaColorFilter
-
-actual typealias NativeColorFilter = SkijaColorFilter
+import org.jetbrains.skia.ColorFilter as SkiaColorFilter
 
 /**
  * Obtain a reference to the desktop ColorFilter type
  */
-fun ColorFilter.asDesktopColorFilter(): SkijaColorFilter = nativeColorFilter
+@Deprecated("Use asSkiaColorFilter()", replaceWith = ReplaceWith("asSkiaColorFilter()"))
+fun ColorFilter.asDesktopColorFilter(): SkiaColorFilter = nativeColorFilter
 
-fun org.jetbrains.skija.ColorFilter.toComposeColorFilter(): ColorFilter = ColorFilter(this)
-
-internal actual fun actualTintColorFilter(color: Color, blendMode: BlendMode): ColorFilter =
-    ColorFilter(SkijaColorFilter.makeBlend(color.toArgb(), blendMode.toSkija()))
-
-internal actual fun actualColorMatrixColorFilter(colorMatrix: ColorMatrix): ColorFilter =
-    ColorFilter(
-        SkijaColorFilter.makeMatrix(
-            org.jetbrains.skija.ColorMatrix(*colorMatrix.values)
-        )
-    )
-
-internal actual fun actualLightingColorFilter(multiply: Color, add: Color): ColorFilter =
-    ColorFilter(SkijaColorFilter.makeLighting(multiply.toArgb(), add.toArgb()))
+/**
+ * Obtain a [org.jetbrains.skia.ColorFilter] instance from this [ColorFilter]
+ */
+@Deprecated("Use asComposeColorFilter()", replaceWith = ReplaceWith("asComposeColorFilter()"))
+fun SkiaColorFilter.toComposeColorFilter(): ColorFilter = ColorFilter(this)

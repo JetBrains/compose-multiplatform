@@ -22,12 +22,12 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.swipeWithVelocity
 import androidx.compose.ui.test.util.ClickableTestBox
-import androidx.compose.ui.test.util.InputDispatcherTestRule
 import androidx.compose.ui.test.util.SinglePointerInputRecorder
 import androidx.compose.ui.test.util.assertOnlyLastEventIsUp
 import androidx.compose.ui.test.util.assertTimestampsAreIncreasing
@@ -39,7 +39,6 @@ import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TestRule
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import kotlin.math.max
@@ -53,8 +52,7 @@ class SendSwipeVelocityTest(private val config: TestConfig) {
     data class TestConfig(
         val direction: Direction,
         val durationMillis: Long,
-        val velocity: Float,
-        val eventPeriod: Long
+        val velocity: Float
     )
 
     enum class Direction(val from: Offset, val to: Offset) {
@@ -69,19 +67,10 @@ class SendSwipeVelocityTest(private val config: TestConfig) {
         @Parameterized.Parameters(name = "{0}")
         fun createTestSet(): List<TestConfig> {
             return mutableListOf<TestConfig>().apply {
-                for (period in listOf(10L, 7L, 16L)) {
-                    for (direction in Direction.values()) {
-                        for (duration in listOf(100, 500, 1000)) {
-                            for (velocity in listOf(79f, 200f, 1500f, 4691f)) {
-                                add(
-                                    TestConfig(
-                                        direction,
-                                        duration.toLong(),
-                                        velocity,
-                                        period
-                                    )
-                                )
-                            }
+                for (direction in Direction.values()) {
+                    for (duration in listOf(100, 500, 1000)) {
+                        for (velocity in listOf(79f, 200f, 1500f, 4691f)) {
+                            add(TestConfig(direction, duration.toLong(), velocity))
                         }
                     }
                 }
@@ -100,7 +89,6 @@ class SendSwipeVelocityTest(private val config: TestConfig) {
     private val end get() = config.direction.to
     private val duration get() = config.durationMillis
     private val velocity get() = config.velocity
-    private val eventPeriod get() = config.eventPeriod
 
     private val expectedXVelocity = when (config.direction) {
         Direction.LeftToRight -> velocity
@@ -117,9 +105,6 @@ class SendSwipeVelocityTest(private val config: TestConfig) {
     @get:Rule
     val rule = createComposeRule()
 
-    @get:Rule
-    val inputDispatcherRule: TestRule = InputDispatcherTestRule(eventPeriodOverride = eventPeriod)
-
     private val recorder = SinglePointerInputRecorder()
 
     @Test
@@ -130,14 +115,15 @@ class SendSwipeVelocityTest(private val config: TestConfig) {
             }
         }
 
+        @Suppress("DEPRECATION")
         rule.onNodeWithTag(tag).performGesture {
             swipeWithVelocity(start, end, velocity, duration)
         }
 
         rule.runOnIdle {
             recorder.run {
-                val durationMs = duration
-                val minimumEventSize = max(2, (durationMs / eventPeriod).toInt())
+                // The last 100ms is guaranteed to have velocity
+                val minimumEventSize = max(2, (100 / eventPeriodMillis).toInt())
                 assertThat(events.size).isAtLeast(minimumEventSize)
                 assertOnlyLastEventIsUp()
 

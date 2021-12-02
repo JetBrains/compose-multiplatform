@@ -21,6 +21,15 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.os.Build
+import android.view.MotionEvent
+import android.view.MotionEvent.ACTION_DOWN
+import android.view.MotionEvent.ACTION_HOVER_ENTER
+import android.view.MotionEvent.ACTION_HOVER_EXIT
+import android.view.MotionEvent.ACTION_HOVER_MOVE
+import android.view.MotionEvent.ACTION_MOVE
+import android.view.MotionEvent.ACTION_POINTER_DOWN
+import android.view.MotionEvent.ACTION_POINTER_UP
+import android.view.MotionEvent.ACTION_UP
 import android.view.View
 import android.view.View.MeasureSpec
 import android.view.ViewGroup
@@ -65,11 +74,14 @@ import androidx.compose.ui.node.ComposeUiNode
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.Ref
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performMouseInput
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -82,6 +94,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withClassName
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
+import com.google.common.truth.Truth.assertThat
 import junit.framework.TestCase.assertNotNull
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.allOf
@@ -106,6 +119,8 @@ import kotlin.math.roundToInt
 class AndroidViewCompatTest {
     @get:Rule
     val rule = createAndroidComposeRule<TestActivity>()
+
+    private val tag = "TestTag"
 
     @Test
     fun simpleLayoutTest() {
@@ -807,6 +822,70 @@ class AndroidViewCompatTest {
         }
     }
 
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun hoverEventsAreDispatched() {
+        val view = createCaptureEventsView()
+
+        rule.onNodeWithTag(tag).performMouseInput {
+            enter(Offset(5f, 5f))
+            moveTo(Offset(10f, 10f))
+            exit(Offset(10f, 10f))
+        }
+
+        rule.runOnIdle {
+            assertThat(view.hoverEvents).containsExactly(
+                ACTION_HOVER_ENTER,
+                ACTION_HOVER_MOVE,
+                ACTION_HOVER_EXIT
+            )
+        }
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun touchEventsAreDispatched() {
+        val view = createCaptureEventsView()
+
+        rule.onNodeWithTag(tag).performTouchInput {
+            down(1, Offset.Zero)
+            moveTo(1, Offset(10f, 10f))
+            down(2, Offset(10f, 0f))
+            moveTo(2, Offset(0f, 10f))
+            up(1)
+            moveTo(2, Offset.Zero)
+            up(2)
+        }
+
+        rule.runOnIdle {
+            assertThat(view.touchEvents).containsExactly(
+                ACTION_DOWN,
+                ACTION_MOVE,
+                ACTION_POINTER_DOWN,
+                ACTION_MOVE,
+                ACTION_POINTER_UP,
+                ACTION_MOVE,
+                ACTION_UP
+            )
+        }
+    }
+
+    private fun createCaptureEventsView(): CaptureEventsView {
+        lateinit var view: CaptureEventsView
+        rule.setContent {
+            AndroidView(
+                factory = {
+                    view = CaptureEventsView(it)
+                    view
+                },
+                modifier = Modifier.fillMaxSize().testTag(tag)
+            )
+        }
+        return rule.runOnIdle {
+            view
+        }
+    }
+
     class ColoredSquareView(context: Context) : View(context) {
         var size: Int = 100
             set(value) {
@@ -918,6 +997,22 @@ class AndroidViewCompatTest {
                 override val alignmentLines: Map<AlignmentLine, Int> get() = mapOf()
                 override fun placeChildren() {}
             }
+        }
+    }
+
+    private class CaptureEventsView(context: Context) : View(context) {
+        val touchEvents = mutableListOf<Int>()
+        val hoverEvents = mutableListOf<Int>()
+
+        override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+            touchEvents += event.actionMasked
+            super.dispatchTouchEvent(event)
+            return true
+        }
+
+        override fun dispatchHoverEvent(event: MotionEvent): Boolean {
+            hoverEvents += event.actionMasked
+            return super.dispatchHoverEvent(event)
         }
     }
 }

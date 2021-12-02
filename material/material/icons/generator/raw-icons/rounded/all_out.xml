@@ -6,17 +6,5 @@
     android:tint="?attr/colorControlNormal">
   <path
       android:fillColor="@android:color/white"
-      android:pathData="M4,16L4,16c-0.55,0 -1,0.45 -1,1v3c0,0.55 0.45,1 1,1h3c0.55,0 1,-0.45 1,-1v0c0,-0.55 -0.45,-1 -1,-1H5v-2C5,16.45 4.55,16 4,16z"/>
-  <path
-      android:fillColor="@android:color/white"
-      android:pathData="M7,5c0.55,0 1,-0.45 1,-1v0c0,-0.55 -0.45,-1 -1,-1H4C3.45,3 3,3.45 3,4v3c0,0.55 0.45,1 1,1h0c0.55,0 1,-0.45 1,-1V5H7z"/>
-  <path
-      android:fillColor="@android:color/white"
-      android:pathData="M16,4L16,4c0,0.55 0.45,1 1,1h2v2c0,0.55 0.45,1 1,1h0c0.55,0 1,-0.45 1,-1V4c0,-0.55 -0.45,-1 -1,-1h-3C16.45,3 16,3.45 16,4z"/>
-  <path
-      android:fillColor="@android:color/white"
-      android:pathData="M17,19c-0.55,0 -1,0.45 -1,1v0c0,0.55 0.45,1 1,1h3c0.55,0 1,-0.45 1,-1v-3c0,-0.55 -0.45,-1 -1,-1h0c-0.55,0 -1,0.45 -1,1v2H17z"/>
-  <path
-      android:fillColor="@android:color/white"
-      android:pathData="M19,12c0,-3.87 -3.13,-7 -7,-7s-7,3.13 -7,7s3.13,7 7,7S19,15.87 19,12zM12,17c-2.76,0 -5,-2.24 -5,-5s2.24,-5 5,-5s5,2.24 5,5S14.76,17 12,17z"/>
+      android:pathData="M4,4.5L4,8l4,-4L4.5,4c-0.28,0 -0.5,0.22 -0.5,0.5zM16,4l4,4L20,4.5c0,-0.28 -0.22,-0.5 -0.5,-0.5L16,4zM20,19.5L20,16l-4,4h3.5c0.28,0 0.5,-0.22 0.5,-0.5zM4.5,20L8,20l-4,-4v3.5c0,0.28 0.22,0.5 0.5,0.5zM19,12c0,-3.87 -3.13,-7 -7,-7s-7,3.13 -7,7 3.13,7 7,7 7,-3.13 7,-7zM12,17c-2.76,0 -5,-2.24 -5,-5s2.24,-5 5,-5 5,2.24 5,5 -2.24,5 -5,5z"/>
 </vector>

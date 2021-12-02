@@ -37,6 +37,7 @@ val AnimationDemos = DemoCategory(
             listOf(
                 ComposableDemo("Animate Content Size") { AnimateContentSizeDemo() },
                 ComposableDemo("Animate Increment/Decrement") { AnimateIncrementDecrementDemo() },
+                ComposableDemo("Animate Placement") { AnimatedPlacementDemo() },
                 ComposableDemo("Animate Visibility Demo") { AnimatedVisibilityDemo() },
                 ComposableDemo("Animate Visibility Lazy Column Demo") {
                     AnimatedVisibilityLazyColumnDemo()
@@ -44,6 +45,10 @@ val AnimationDemos = DemoCategory(
                 ComposableDemo("Cross Fade") { CrossfadeDemo() },
                 ComposableDemo("Modifier.animateEnterExit Demo") { AnimateEnterExitDemo() },
                 ComposableDemo("Nested Menu") { NestedMenuDemo() },
+                ComposableDemo("Save/Restore in AnimatedContent") {
+                    AnimatedContentWithContentKeyDemo()
+                },
+                ComposableDemo("Scaled Enter/Exit") { ScaleEnterExitDemo() },
                 ComposableDemo("Shrine Cart") { ShrineCartDemo() },
                 ComposableDemo("Screen Transition") { ScreenTransitionDemo() },
             )
@@ -53,10 +58,18 @@ val AnimationDemos = DemoCategory(
             listOf(
                 ComposableDemo("Animated scrolling") { FancyScrollingDemo() },
                 ComposableDemo("animateColorAsState") { SingleValueAnimationDemo() },
+                ComposableDemo("Double Tap To Like") { SuspendDoubleTapToLikeDemo() },
                 ComposableDemo("Follow the tap") { SuspendAnimationDemo() },
                 ComposableDemo("Infinitely Animating") { InfiniteAnimationDemo() },
+                ComposableDemo("Loading Animation Demo") { LoadingAnimationDemo() },
                 ComposableDemo("Spring back scrolling") { SpringBackScrollingDemo() },
                 ComposableDemo("Swipe to dismiss") { SwipeToDismissDemo() },
+            )
+        ),
+        DemoCategory(
+            "Graphics Animation Demos",
+            listOf(
+                ComposableDemo("Animated Vector Graphics") { AnimatedVectorGraphicsDemo() },
             )
         ),
 
@@ -74,10 +87,19 @@ val AnimationDemos = DemoCategory(
         ),
 
         DemoCategory(
+            "Visual Aid \uD83D\uDC40 \uD83D\uDC40",
+            listOf(
+                ComposableDemo("Column Arrangements Demo") { ColumnConfigurationDemo() },
+                ComposableDemo("Row Arrangements Demo (Landscape)") { RowConfigurationDemo() },
+            )
+        ),
+
+        DemoCategory(
             "\uD83C\uDF89 Fun Demos",
             listOf(
                 ComposableDemo("Animated clock") { AnimatedClockDemo() },
                 ComposableDemo("Animated dots") { AnimatedDotsDemo() },
+                ComposableDemo("Chat screen") { ChatScreen() },
                 ComposableDemo("Game of fling") { FlingGame() },
                 ComposableDemo("Spring chain") { SpringChainDemo() },
             )

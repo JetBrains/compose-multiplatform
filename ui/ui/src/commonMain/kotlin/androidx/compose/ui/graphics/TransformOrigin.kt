@@ -33,7 +33,6 @@ fun TransformOrigin(pivotFractionX: Float, pivotFractionY: Float): TransformOrig
  * A two-dimensional position represented as a fraction of the Layer's width and height
  */
 @Suppress("INLINE_CLASS_DEPRECATED", "EXPERIMENTAL_FEATURE_WARNING")
-@OptIn(ExperimentalUnsignedTypes::class)
 @Immutable
 inline class TransformOrigin internal constructor(@PublishedApi internal val packedValue: Long) {
 

@@ -16,13 +16,17 @@
 
 package androidx.compose.ui.input.pointer.util
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerInputChange
+import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.unit.Velocity
 import kotlin.math.abs
 import kotlin.math.sqrt
 
 private const val AssumePointerMoveStoppedMilliseconds: Int = 40
 private const val HistorySize: Int = 20
+// TODO(b/204895043): Keep value in sync with VelocityPathFinder.HorizonMilliSeconds
 private const val HorizonMilliseconds: Int = 100
 private const val MinSampleSize: Int = 3
 
@@ -155,6 +159,22 @@ class VelocityTracker {
             offset = newestSample.point - oldestSample.point
         )
     }
+}
+
+/**
+ * Track the positions and timestamps inside this event change.
+ *
+ * For optimal tracking, this should be called for the DOWN event and all MOVE
+ * events, including any touch-slop-captured MOVE event.
+ *
+ * @param event Pointer change to track.
+ */
+fun VelocityTracker.addPointerInputChange(event: PointerInputChange) {
+    @OptIn(ExperimentalComposeUiApi::class)
+    event.historical.fastForEach {
+        addPosition(it.uptimeMillis, it.position)
+    }
+    addPosition(event.uptimeMillis, event.position)
 }
 
 private data class PointAtTime(val point: Offset, val time: Long)

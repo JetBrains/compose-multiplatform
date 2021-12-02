@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package androidx.compose.desktop.examples.popupexample
 
-import androidx.compose.desktop.AppManager
-import androidx.compose.desktop.AppWindow
-import androidx.compose.desktop.SwingPanel
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.BoxWithTooltip
+import androidx.compose.foundation.TooltipArea
+import androidx.compose.foundation.TooltipPlacement
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,13 +33,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Checkbox
-import androidx.compose.material.ContextMenu
+import androidx.compose.material.CursorDropdownMenu
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -51,39 +53,32 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Notifier
+import androidx.compose.ui.window.ApplicationScope
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.Notification
 import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.WindowDraggableArea
-import androidx.compose.ui.window.v1.Dialog
-import androidx.compose.ui.window.v1.DialogProperties
-import androidx.compose.ui.window.v1.Tray
-import java.awt.Toolkit
+import androidx.compose.ui.window.TrayState
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPlacement
+import androidx.compose.ui.window.WindowScope
+import androidx.compose.ui.window.WindowState
+import androidx.compose.ui.window.rememberWindowState
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import javax.swing.JButton
 
 @Composable
-fun content() {
-    DisposableEffect(Unit) {
-        val tray = Tray().apply {
-            icon(AppState.image())
-            menu(
-                MenuItems.Notify,
-                MenuItems.Increment,
-                MenuItems.Exit
-            )
-        }
-        onDispose {
-            tray.remove()
-        }
-    }
-
+fun WindowScope.Content(
+    windowState: WindowState,
+    trayState: TrayState,
+) {
     val dialogState = remember { mutableStateOf(false) }
 
     Surface(
@@ -108,15 +103,15 @@ fun content() {
                         color = Color(210, 210, 210),
                         size = IntSize(16, 16),
                         onClick = {
-                            AppManager.focusedWindow?.makeFullscreen()
+                            windowState.placement = WindowPlacement.Fullscreen
                         }
                     )
-                    Spacer(modifier = Modifier.width(30.dp))
+                    Spacer(modifier = Modifier.width(3.dp))
                     Button(
                         color = Color(232, 182, 109),
                         size = IntSize(16, 16),
                         onClick = {
-                            AppManager.focusedWindow?.minimize()
+                            windowState.isMinimized = true
                         }
                     )
                     Spacer(modifier = Modifier.width(3.dp))
@@ -124,12 +119,12 @@ fun content() {
                         color = Color(150, 232, 150),
                         size = IntSize(16, 16),
                         onClick = {
-                            AppManager.focusedWindow?.maximize()
+                            windowState.placement = WindowPlacement.Maximized
                         }
                     )
                     Spacer(modifier = Modifier.width(3.dp))
                     Button(
-                        onClick = { AppManager.exit() },
+                        onClick = AppState::closeMainWindow,
                         color = Color(232, 100, 100),
                         size = IntSize(16, 16)
                     )
@@ -143,28 +138,7 @@ fun content() {
                     Spacer(modifier = Modifier.height(30.dp))
                     Button(
                         text = "New window...",
-                        onClick = {
-                            AppWindow(
-                                title = "Second window",
-                                size = IntSize(400, 200),
-                                undecorated = AppState.undecorated.value,
-                                onDismissRequest = {
-                                    println("Second window is dismissed.")
-                                }
-                            ).show {
-                                WindowContent(
-                                    amount = AppState.amount,
-                                    onClose = {
-                                        AppManager.focusedWindow?.close()
-                                    }
-                                )
-                                DisposableEffect(Unit) {
-                                    onDispose {
-                                        println("Dispose composition")
-                                    }
-                                }
-                            }
-                        },
+                        onClick = AppState::openSecondaryWindow,
                         color = Color(26, 198, 188)
                     )
                     Spacer(modifier = Modifier.height(30.dp))
@@ -172,12 +146,16 @@ fun content() {
                         text = "Send notification",
                         onClick = {
                             val message = "There should be your message."
-                            if (AppState.notify.value) {
-                                Notifier().notify("Notification.", message)
-                            } else if (AppState.warn.value) {
-                                Notifier().warn("Warning.", message)
-                            } else {
-                                Notifier().error("Error.", message)
+                            when {
+                                AppState.notify.value -> trayState.sendNotification(
+                                    Notification("Notification.", message)
+                                )
+                                AppState.warn.value -> trayState.sendNotification(
+                                    Notification("Warning.", message, Notification.Type.Warning)
+                                )
+                                else -> trayState.sendNotification(
+                                    Notification("Error.", message, Notification.Type.Error)
+                                )
                             }
                         },
                         color = Color(196, 136, 255)
@@ -185,7 +163,7 @@ fun content() {
                     Spacer(modifier = Modifier.height(30.dp))
                     Button("Increment amount", { AppState.amount.value++ }, Color(150, 232, 150))
                     Spacer(modifier = Modifier.height(30.dp))
-                    Button("Exit app", { AppManager.exit() }, Color(232, 100, 100))
+                    Button("Exit app", AppState::closeAll, Color(232, 100, 100))
                     Spacer(modifier = Modifier.height(30.dp))
                     SwingActionButton("JButton", { AppState.amount.value++ })
                 }
@@ -247,7 +225,7 @@ fun content() {
         ) {
             Row(modifier = Modifier.padding(start = 20.dp)) {
                 TextBox(
-                    text = "Size: ${AppState.wndSize.value}   Location: ${AppState.wndPos.value}"
+                    text = "Size: ${windowState.size}   Location: ${windowState.position}"
                 )
             }
         }
@@ -272,6 +250,7 @@ fun content() {
             dialogState.value = false
             println("Dialog window is dismissed.")
         }
+        @OptIn(ExperimentalMaterialApi::class)
         if (AppState.alertDialog.value) {
             AlertDialog(
                 onDismissRequest = dismiss,
@@ -294,13 +273,11 @@ fun content() {
                     }
                 },
                 shape = RoundedCornerShape(0.dp),
-                backgroundColor = Color(70, 70, 70),
-                modifier = Modifier.fillMaxSize(),
-                properties = DialogProperties(title = "Alert Dialog")
+                backgroundColor = Color(70, 70, 70)
             )
         } else {
             Dialog(
-                onDismissRequest = dismiss
+                onCloseRequest = dismiss
             ) {
                 WindowContent(
                     AppState.amount,
@@ -375,7 +352,8 @@ fun Button(
     color: Color = Color(10, 162, 232),
     size: IntSize = IntSize(200, 35)
 ) {
-    BoxWithTooltip(
+    @OptIn(ExperimentalFoundationApi::class)
+    TooltipArea(
         tooltip = {
             Surface(
                 color = Color(210, 210, 210),
@@ -412,13 +390,19 @@ fun TextBox(text: String = "", modifier: Modifier = Modifier.height(30.dp)) {
 }
 
 @Composable
+@OptIn(
+    ExperimentalFoundationApi::class
+)
 fun ContextMenu() {
     val items = listOf("Item A", "Item B", "Item C", "Item D", "Item E", "Item F")
     val showMenu = remember { mutableStateOf(false) }
     val selectedIndex = remember { mutableStateOf(0) }
-    BoxWithTooltip(
-        delay = 100,
-        offset = DpOffset(40.dp, 0.dp),
+    TooltipArea(
+        delayMillis = 100,
+        tooltipPlacement = TooltipPlacement.ComponentRect(
+            anchor = Alignment.TopStart,
+            alignment = Alignment.TopEnd
+        ),
         tooltip = {
             Surface(
                 color = Color(210, 210, 210),
@@ -439,7 +423,7 @@ fun ContextMenu() {
                     .padding(start = 4.dp, end = 4.dp)
                     .clickable(onClick = { showMenu.value = true })
             )
-            ContextMenu(
+            CursorDropdownMenu(
                 expanded = showMenu.value,
                 onDismissRequest = { showMenu.value = false }
             ) {
@@ -537,10 +521,6 @@ fun RadioButton(text: String, state: MutableState<Boolean>) {
     TextBox(text = text)
 }
 
-private fun image(url: String): java.awt.Image {
-    return Toolkit.getDefaultToolkit().getImage(url)
-}
-
 @Composable
 fun SwingActionButton(text: String, action: (() -> Unit)? = null) {
     SwingPanel(
@@ -559,4 +539,21 @@ fun SwingActionButton(text: String, action: (() -> Unit)? = null) {
             component.setText("$text:${AppState.amount.value}")
         }
     )
+}
+
+@Composable
+fun ApplicationScope.SecondaryWindow(onCloseRequest: () -> Unit) = Window(
+    onCloseRequest = onCloseRequest,
+    state = rememberWindowState(size = DpSize(400.dp, 200.dp)),
+    undecorated = AppState.undecorated.value,
+) {
+    WindowContent(
+        amount = AppState.amount,
+        onClose = onCloseRequest
+    )
+    DisposableEffect(Unit) {
+        onDispose {
+            println("Dispose composition")
+        }
+    }
 }

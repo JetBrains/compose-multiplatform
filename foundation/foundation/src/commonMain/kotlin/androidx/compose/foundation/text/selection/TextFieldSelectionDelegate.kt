@@ -43,17 +43,17 @@ internal fun getTextFieldSelection(
         val textRange = TextRange(rawStartOffset, rawEndOffset)
 
         // When the previous selection is null, it's allowed to have collapsed selection.
-        // So we can ignore the SelectionAdjustment.CHARACTER.
-        if (previousSelection == null && adjustment == SelectionAdjustment.CHARACTER) {
+        // So we can ignore the SelectionAdjustment.Character.
+        if (previousSelection == null && adjustment == SelectionAdjustment.Character) {
             return textRange
         }
 
-        return adjustSelection(
+        return adjustment.adjust(
             textLayoutResult = textLayoutResult,
-            textRange = textRange,
+            newRawSelectionRange = textRange,
+            previousHandleOffset = -1,
             isStartHandle = isStartHandle,
-            previousHandlesCrossed = previousSelection?.reversed ?: false,
-            adjustment = adjustment
+            previousSelectionRange = previousSelection
         )
     }
     return TextRange(0, 0)

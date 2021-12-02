@@ -36,7 +36,7 @@ dependencies {
 
         api("androidx.activity:activity:1.2.0")
         api(projectOrArtifact(":compose:ui:ui-test-junit4"))
-        api(project(":test-screenshot"))
+        api(project(":test:screenshot:screenshot"))
 
         implementation(libs.kotlinStdlibCommon)
         implementation(projectOrArtifact(":compose:runtime:runtime"))
@@ -75,9 +75,9 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
             androidMain.dependencies {
                 api("androidx.activity:activity:1.2.0")
-                implementation project(":activity:activity-compose")
+                implementation "androidx.activity:activity-compose:1.3.1"
                 api(projectOrArtifact(":compose:ui:ui-test-junit4"))
-                api(project(":test-screenshot"))
+                api(project(":test:screenshot:screenshot"))
                 // This has stub APIs for access to legacy Android APIs, so we don't want
                 // any dependency on this module.
                 compileOnly(projectOrArtifact(":compose:ui:ui-android-stubs"))
@@ -85,7 +85,7 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.testRules)
             }
 
-            test.dependencies {
+            androidTest.dependencies {
                 implementation(libs.truth)
             }
 

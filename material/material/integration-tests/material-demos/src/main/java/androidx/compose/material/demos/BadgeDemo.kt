@@ -22,12 +22,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.BadgeBox
+import androidx.compose.material.Badge
+import androidx.compose.material.BadgedBox
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LeadingIconTab
@@ -53,7 +53,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BadgeDemo() {
     Column(Modifier.verticalScroll(rememberScrollState())) {
@@ -104,7 +103,7 @@ fun TopAppBarWithBadge(
         navigationIcon = {
             IconButton(onClick = { showNavigationIconBadge = false }) {
                 if (showNavigationIconBadge) {
-                    DemoBadgeBox(null) {
+                    DemoBadgedBox(null) {
                         Icon(Icons.Filled.Menu, contentDescription = "Localized description")
                     }
                 } else {
@@ -118,7 +117,7 @@ fun TopAppBarWithBadge(
                 onClick = onActionIcon1BadgeClick
             ) {
                 if (actionIcon1BadgeCount > 0) {
-                    DemoBadgeBox(actionIcon1BadgeCount.toString()) {
+                    DemoBadgedBox(actionIcon1BadgeCount.toString()) {
                         Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
                     }
                 } else {
@@ -129,7 +128,7 @@ fun TopAppBarWithBadge(
                 onClick = { showActionIcon2Badge = false }
             ) {
                 if (showActionIcon2Badge) {
-                    DemoBadgeBox("99+") {
+                    DemoBadgedBox("99+") {
                         Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
                     }
                 } else {
@@ -172,7 +171,7 @@ fun BottomNavigationWithBadge(
                         } else {
                             when (item) {
                                 "Artists" -> {
-                                    DemoBadgeBox(artistsBadgeCount.toString()) {
+                                    DemoBadgedBox(artistsBadgeCount.toString()) {
                                         Icon(
                                             Icons.Filled.Favorite,
                                             contentDescription = "Localized description"
@@ -180,7 +179,7 @@ fun BottomNavigationWithBadge(
                                     }
                                 }
                                 else -> {
-                                    DemoBadgeBox(
+                                    DemoBadgedBox(
                                         when (index) {
                                             2 -> "99+"
                                             else -> null
@@ -241,7 +240,7 @@ fun TextTabsWithBadge(
                         if (!showBadge) {
                             Text(title)
                         } else {
-                            DemoBadgeBox(
+                            DemoBadgedBox(
                                 when (index) {
                                     1 -> tab1BadgeCount.toString()
                                     2 -> "99+"
@@ -273,7 +272,6 @@ fun TextTabsWithBadge(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LeadingIconTabsWithBadge(
     onTab1BadgeClick: () -> Unit,
@@ -305,7 +303,7 @@ fun LeadingIconTabsWithBadge(
                                 contentDescription = "Localized description"
                             )
                         } else {
-                            DemoBadgeBox(
+                            DemoBadgedBox(
                                 when (index) {
                                     1 -> tab1BadgeCount.toString()
                                     2 -> "99+"
@@ -339,27 +337,29 @@ fun LeadingIconTabsWithBadge(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun DemoBadgeBox(
+private fun DemoBadgedBox(
     badgeText: String?,
     content: @Composable () -> Unit
 ) {
-    if (badgeText.isNullOrEmpty()) {
-        BadgeBox { content() }
-    } else {
-        BadgeBox(
-            badgeContent = {
-                Text(
-                    badgeText,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.semantics {
-                        this.contentDescription = "$badgeText notifications"
-                    }
-                )
-            }
-        ) {
-            content()
+    BadgedBox(
+        badge = {
+            Badge(
+                content =
+                    if (!badgeText.isNullOrEmpty()) {
+                        {
+                            Text(
+                                badgeText,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.semantics {
+                                    this.contentDescription = "$badgeText notifications"
+                                }
+                            )
+                        }
+                    } else null
+            )
         }
+    ) {
+        content()
     }
 }

@@ -18,6 +18,7 @@ package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -306,5 +307,17 @@ fun TextFieldWithHideKeyboardOnImeAction() {
                 // do something here
             }
         )
+    )
+}
+
+@Composable
+fun TextArea() {
+    var text by rememberSaveable { mutableStateOf("This is a very long input that extends beyond " +
+        "the height of the text area.") }
+    TextField(
+        value = text,
+        onValueChange = { text = it },
+        modifier = Modifier.height(100.dp),
+        label = { Text("Label") }
     )
 }

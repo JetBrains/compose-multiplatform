@@ -17,10 +17,13 @@
 package androidx.compose.compiler.plugins.kotlin.lower
 
 import androidx.compose.compiler.plugins.kotlin.KtxNameConventions
+import androidx.compose.compiler.plugins.kotlin.ModuleMetrics
 import androidx.compose.compiler.plugins.kotlin.analysis.ComposeWritableSlices
 import androidx.compose.compiler.plugins.kotlin.irTrace
 import androidx.compose.compiler.plugins.kotlin.lower.decoys.copyWithNewTypeParams
+import androidx.compose.compiler.plugins.kotlin.lower.decoys.didDecoyHaveDefaultForValueParameter
 import androidx.compose.compiler.plugins.kotlin.lower.decoys.isDecoy
+import androidx.compose.compiler.plugins.kotlin.lower.decoys.isDecoyImplementation
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.ir.copyTo
 import org.jetbrains.kotlin.backend.common.ir.copyTypeParametersFrom
@@ -28,6 +31,7 @@ import org.jetbrains.kotlin.backend.common.ir.moveBodyTo
 import org.jetbrains.kotlin.backend.common.ir.remapTypeParameters
 import org.jetbrains.kotlin.backend.jvm.ir.isInlineClassType
 import org.jetbrains.kotlin.backend.jvm.ir.isInlineParameter
+import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyGetterDescriptor
@@ -35,9 +39,7 @@ import org.jetbrains.kotlin.descriptors.PropertySetterDescriptor
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
-import org.jetbrains.kotlin.ir.builders.declarations.addTypeParameter
 import org.jetbrains.kotlin.ir.builders.declarations.addValueParameter
-import org.jetbrains.kotlin.ir.builders.declarations.buildFun
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
@@ -45,8 +47,8 @@ import org.jetbrains.kotlin.ir.declarations.IrOverridableDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.declarations.copyAttributes
-import org.jetbrains.kotlin.ir.declarations.impl.IrExternalPackageFragmentImpl
 import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
+import org.jetbrains.kotlin.ir.descriptors.IrBasedDeclarationDescriptor
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
@@ -66,7 +68,6 @@ import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classOrNull
 import org.jetbrains.kotlin.ir.types.createType
-import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.types.isMarkedNullable
 import org.jetbrains.kotlin.ir.types.isPrimitiveType
 import org.jetbrains.kotlin.ir.types.makeNullable
@@ -79,16 +80,17 @@ import org.jetbrains.kotlin.ir.util.findAnnotation
 import org.jetbrains.kotlin.ir.util.functions
 import org.jetbrains.kotlin.ir.util.isFakeOverride
 import org.jetbrains.kotlin.ir.util.isVararg
+import org.jetbrains.kotlin.ir.util.module
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.load.java.JvmAbi
-import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.platform.js.isJs
 import org.jetbrains.kotlin.platform.jvm.isJvm
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.DescriptorUtils
+import org.jetbrains.kotlin.resolve.multiplatform.ExpectedActualResolver.findCompatibleExpectedForActual
 import org.jetbrains.kotlin.util.OperatorNameConventions
 import kotlin.math.min
 
@@ -98,8 +100,9 @@ class ComposerParamTransformer(
     symbolRemapper: DeepCopySymbolRemapper,
     bindingTrace: BindingTrace,
     private val decoysEnabled: Boolean,
+    metrics: ModuleMetrics,
 ) :
-    AbstractComposeLowering(context, symbolRemapper, bindingTrace),
+    AbstractComposeLowering(context, symbolRemapper, bindingTrace, metrics),
     ModuleLoweringPass {
 
     /**
@@ -282,17 +285,13 @@ class ComposerParamTransformer(
             }
         }
 
-        val coerceIntrinsic = unsafeCoerceIntrinsic
-        if (coerceIntrinsic != null) {
+        if (context.platform.isJvm()) {
             val underlyingType = unboxInlineClass()
-            return IrCallImpl.fromSymbolOwner(startOffset, endOffset, this, coerceIntrinsic).also {
-                it.putTypeArgument(0, underlyingType) // from
-                it.putTypeArgument(1, this) // to
-                it.putValueArgument(
-                    0,
-                    IrConstImpl.defaultValueForType(startOffset, endOffset, underlyingType)
-                )
-            }
+            return coerceInlineClasses(
+                IrConstImpl.defaultValueForType(startOffset, endOffset, underlyingType),
+                underlyingType,
+                this
+            )
         } else {
             val ctor = classSymbol.constructors.first()
             val underlyingType = getUnderlyingType(classSymbol.owner)
@@ -311,28 +310,6 @@ class ComposerParamTransformer(
             ).also {
                 it.putValueArgument(0, underlyingType.defaultValue(startOffset, endOffset))
             }
-        }
-    }
-
-    // Construct a reference to the JVM specific <unsafe-coerce> intrinsic.
-    // This code should be kept in sync with the declaration in JvmSymbols.kt.
-    private val unsafeCoerceIntrinsic: IrSimpleFunctionSymbol? by lazy {
-        if (context.platform.isJvm()) {
-            context.irFactory.buildFun {
-                name = Name.special("<unsafe-coerce>")
-                origin = IrDeclarationOrigin.IR_BUILTINS_STUB
-            }.apply {
-                parent = IrExternalPackageFragmentImpl.createEmptyExternalPackageFragment(
-                    currentModule!!.descriptor,
-                    FqName("kotlin.jvm.internal")
-                )
-                val src = addTypeParameter("T", context.irBuiltIns.anyNType)
-                val dst = addTypeParameter("R", context.irBuiltIns.anyNType)
-                addValueParameter("v", src.defaultType)
-                returnType = dst.defaultType
-            }.symbol
-        } else {
-            null
         }
     }
 
@@ -484,13 +461,17 @@ class ComposerParamTransformer(
     }
 
     private fun IrFunction.requiresDefaultParameter(): Boolean {
+        val expectDescriptor = expectDescriptor()
         // we only add a default mask parameter if one of the parameters has a default
         // expression. Note that if this is a "fake override" method, then only the overridden
         // symbols will have the default value expressions
         return this is IrSimpleFunction && (
-            valueParameters.any {
-                it.defaultValue != null
-            } || overriddenSymbols.any { it.owner.requiresDefaultParameter() }
+            valueParameters.any { it.defaultValue != null } ||
+                (
+                    expectDescriptor != null &&
+                        expectDescriptor.valueParameters.any { it.declaresDefaultValue() }
+                    ) ||
+                overriddenSymbols.any { it.owner.requiresDefaultParameter() }
             )
     }
 
@@ -499,6 +480,11 @@ class ComposerParamTransformer(
         // have it as well...
         if (this !is IrSimpleFunction) return false
         if (valueParameters[index].defaultValue != null) return true
+
+        if (context.platform.isJs() && this.isDecoyImplementation()) {
+            if (didDecoyHaveDefaultForValueParameter(index)) return true
+        }
+
         return overriddenSymbols.any {
             it.owner.hasDefaultExpressionDefinedForValueParameter(index)
         }
@@ -576,7 +562,7 @@ class ComposerParamTransformer(
             }
 
             // $default[n]
-            if (fn.requiresDefaultParameter()) {
+            if (oldFn.requiresDefaultParameter()) {
                 val defaults = KtxNameConventions.DEFAULT_PARAMETER.identifier
                 for (i in 0 until defaultParamCount(realParams)) {
                     fn.addValueParameter(
@@ -675,6 +661,14 @@ class ComposerParamTransformer(
         }
         return false
     }
+
+    @OptIn(ObsoleteDescriptorBasedAPI::class)
+    private fun IrFunction.expectDescriptor(): CallableDescriptor? =
+        if (descriptor !is IrBasedDeclarationDescriptor<*>) {
+            descriptor.findCompatibleExpectedForActual(module).singleOrNull() as? CallableDescriptor
+        } else {
+            null
+        }
 
     /**
      * With klibs, composable functions are always deserialized from IR instead of being restored

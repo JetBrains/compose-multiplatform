@@ -16,38 +16,53 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
 
 internal class PointerInputDelegatingWrapper(
     wrapped: LayoutNodeWrapper,
-    pointerInputModifier: PointerInputModifier
-) : DelegatingLayoutNodeWrapper<PointerInputModifier>(wrapped, pointerInputModifier) {
+    modifier: PointerInputModifier
+) : DelegatingLayoutNodeWrapper<PointerInputModifier>(wrapped, modifier) {
 
-    init {
-        pointerInputModifier.pointerInputFilter.layoutCoordinates = this
+    override fun onInitialize() {
+        super.onInitialize()
+        modifier.pointerInputFilter.layoutCoordinates = this
     }
-
-    override var modifier: PointerInputModifier
-        get() = super.modifier
-        set(value) {
-            super.modifier = value
-            value.pointerInputFilter.layoutCoordinates = this
-        }
 
     override fun hitTest(
         pointerPosition: Offset,
-        hitPointerInputFilters: MutableList<PointerInputFilter>
+        hitTestResult: HitTestResult<PointerInputFilter>,
+        isTouchEvent: Boolean,
+        isInLayer: Boolean
     ) {
-        if (isPointerInBounds(pointerPosition) && withinLayerBounds(pointerPosition)) {
-            // If the pointer is in bounds, we hit the pointer input filter, so add it!
-            hitPointerInputFilters.add(modifier.pointerInputFilter)
-
-            // Also, keep looking to see if we also might hit any children.
-            // This avoids checking layer bounds twice as when we call super.hitTest()
-            val positionInWrapped = wrapped.fromParentPosition(pointerPosition)
-            wrapped.hitTest(positionInWrapped, hitPointerInputFilters)
+        hitTestInMinimumTouchTarget(
+            pointerPosition,
+            hitTestResult,
+            modifier.pointerInputFilter.interceptOutOfBoundsChildEvents,
+            isTouchEvent,
+            isInLayer,
+            modifier.pointerInputFilter
+        ) { inLayer ->
+            hitTestChild(pointerPosition, hitTestResult, isTouchEvent, inLayer)
         }
     }
+
+    private fun hitTestChild(
+        pointerPosition: Offset,
+        hitTestResult: HitTestResult<PointerInputFilter>,
+        isTouchEvent: Boolean,
+        isInLayer: Boolean
+    ) {
+        // Also, keep looking to see if we also might hit any children.
+        // This avoids checking layer bounds twice as when we call super.hitTest()
+        val positionInWrapped = wrapped.fromParentPosition(pointerPosition)
+        wrapped.hitTest(positionInWrapped, hitTestResult, isTouchEvent, isInLayer)
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    override fun shouldSharePointerInputWithSiblings(): Boolean =
+        modifier.pointerInputFilter.shareWithSiblings ||
+            wrapped.shouldSharePointerInputWithSiblings()
 }

@@ -85,7 +85,7 @@ import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
@@ -108,11 +108,13 @@ import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.input.CommitTextCommand
 import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextFieldValue.Companion.Saver
 import androidx.compose.ui.text.input.TextInputService
+import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.BaselineShift
@@ -121,6 +123,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.TextIndent
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.text.withAnnotation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Density
@@ -600,7 +603,6 @@ class TextFieldTest {
         rule.onNodeWithTag(Tag)
             .assertEditableTextEquals("")
             .performSemanticsAction(SemanticsActions.SetText) { it(hello) }
-        rule.onNodeWithTag(Tag)
             .assertEditableTextEquals(hello.text)
             .assert(
                 SemanticsMatcher.expectValue(
@@ -611,7 +613,6 @@ class TextFieldTest {
 
         rule.onNodeWithTag(Tag)
             .performSemanticsAction(SemanticsActions.SetSelection) { it(1, 3, true) }
-        rule.onNodeWithTag(Tag)
             .assert(
                 SemanticsMatcher.expectValue(
                     SemanticsProperties.TextSelectionRange,
@@ -722,6 +723,26 @@ class TextFieldTest {
             .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.CutText))
     }
 
+    @Test
+    fun semantics_transformedText() {
+        rule.setContent {
+            BasicTextField(
+                modifier = Modifier.testTag(Tag),
+                value = TextFieldValue("Hello"),
+                onValueChange = {},
+                visualTransformation = { text ->
+                    TransformedText(
+                        text.toUpperCase(LocaleList("en_US")),
+                        OffsetMapping.Identity
+                    )
+                }
+            )
+        }
+
+        rule.onNodeWithTag(Tag)
+            .assertTextEquals("HELLO")
+    }
+
     @LargeTest
     @Test
     fun semantics_longClick() {
@@ -819,7 +840,7 @@ class TextFieldTest {
 
         // click outside core text field area
         rule.onNodeWithTag("label", useUnmergedTree = true)
-            .performGesture {
+            .performTouchInput {
                 click(Offset.Zero)
             }
 

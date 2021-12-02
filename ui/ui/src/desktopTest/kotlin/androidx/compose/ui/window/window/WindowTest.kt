@@ -16,39 +16,39 @@
 
 package androidx.compose.ui.window.window
 
-import androidx.compose.desktop.ComposeWindow
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.Button
+import androidx.compose.material.Slider
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.LeakDetector
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.focusTarget
+import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowSize
 import androidx.compose.ui.window.launchApplication
 import androidx.compose.ui.window.rememberWindowState
 import androidx.compose.ui.window.runApplicationTest
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.swing.Swing
+import org.junit.Assume.assumeFalse
 import org.junit.Test
 import java.awt.Dimension
-import java.awt.event.KeyEvent
-import java.awt.event.KeyEvent.KEY_LOCATION_STANDARD
+import java.awt.GraphicsEnvironment
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
@@ -248,35 +248,125 @@ class WindowTest {
     }
 
     @Test
-    fun `pass composition local to windows`() = runApplicationTest {
-        var actualValue1: Int? = null
+    fun `open nested window`() = runApplicationTest {
+        var window1: ComposeWindow? = null
+        var window2: ComposeWindow? = null
 
         var isOpen by mutableStateOf(true)
-        var testValue by mutableStateOf(0)
-        val localTestValue = compositionLocalOf { testValue }
+        var isNestedOpen by mutableStateOf(true)
 
         launchApplication {
             if (isOpen) {
-                CompositionLocalProvider(localTestValue provides testValue) {
-                    Window(
-                        onCloseRequest = {},
-                        state = rememberWindowState(
-                            size = WindowSize(600.dp, 600.dp),
-                        )
-                    ) {
-                        actualValue1 = localTestValue.current
-                        Box(Modifier.size(32.dp).background(Color.Red))
+                Window(
+                    onCloseRequest = {},
+                    state = rememberWindowState(
+                        size = DpSize(600.dp, 600.dp),
+                    )
+                ) {
+                    window1 = this.window
+                    Box(Modifier.size(32.dp).background(Color.Red))
+
+                    if (isNestedOpen) {
+                        Window(
+                            onCloseRequest = {},
+                            state = rememberWindowState(
+                                size = DpSize(300.dp, 300.dp),
+                            )
+                        ) {
+                            window2 = this.window
+                            Box(Modifier.size(32.dp).background(Color.Blue))
+                        }
                     }
                 }
             }
         }
 
         awaitIdle()
-        assertThat(actualValue1).isEqualTo(0)
+        assertThat(window1?.isShowing).isTrue()
+        assertThat(window2?.isShowing).isTrue()
 
-        testValue = 42
+        isNestedOpen = false
+        awaitIdle()
+        assertThat(window1?.isShowing).isTrue()
+        assertThat(window2?.isShowing).isFalse()
+
+        isNestedOpen = true
+        awaitIdle()
+        assertThat(window1?.isShowing).isTrue()
+        assertThat(window2?.isShowing).isTrue()
+
+        isOpen = false
+        awaitIdle()
+        assertThat(window1?.isShowing).isFalse()
+        assertThat(window2?.isShowing).isFalse()
+    }
+
+    @Test
+    fun `pass composition local to windows`() = runApplicationTest {
+        var actualValue1: Int? = null
+        var actualValue2: Int? = null
+        var actualValue3: Int? = null
+
+        var isOpen by mutableStateOf(true)
+        val local1TestValue = compositionLocalOf { 0 }
+        val local2TestValue = compositionLocalOf { 0 }
+        var locals by mutableStateOf(arrayOf(local1TestValue provides 1))
+
+        launchApplication {
+            if (isOpen) {
+                CompositionLocalProvider(*locals) {
+                    Window(
+                        onCloseRequest = {},
+                        state = rememberWindowState(
+                            size = DpSize(600.dp, 600.dp),
+                        )
+                    ) {
+                        actualValue1 = local1TestValue.current
+                        actualValue2 = local2TestValue.current
+                        Box(Modifier.size(32.dp).background(Color.Red))
+
+                        Window(
+                            onCloseRequest = {},
+                            state = rememberWindowState(
+                                size = DpSize(300.dp, 300.dp),
+                            )
+                        ) {
+                            actualValue3 = local1TestValue.current
+                            Box(Modifier.size(32.dp).background(Color.Blue))
+                        }
+                    }
+                }
+            }
+        }
+
+        awaitIdle()
+        assertThat(actualValue1).isEqualTo(1)
+        assertThat(actualValue2).isEqualTo(0)
+        assertThat(actualValue3).isEqualTo(1)
+
+        locals = arrayOf(local1TestValue provides 42)
         awaitIdle()
         assertThat(actualValue1).isEqualTo(42)
+        assertThat(actualValue2).isEqualTo(0)
+        assertThat(actualValue3).isEqualTo(42)
+
+        locals = arrayOf(local1TestValue provides 43)
+        awaitIdle()
+        assertThat(actualValue1).isEqualTo(43)
+        assertThat(actualValue2).isEqualTo(0)
+        assertThat(actualValue3).isEqualTo(43)
+
+        locals = arrayOf(local1TestValue provides 43, local2TestValue provides 12)
+        awaitIdle()
+        assertThat(actualValue1).isEqualTo(43)
+        assertThat(actualValue2).isEqualTo(12)
+        assertThat(actualValue3).isEqualTo(43)
+
+        locals = emptyArray()
+        awaitIdle()
+        assertThat(actualValue1).isEqualTo(0)
+        assertThat(actualValue2).isEqualTo(0)
+        assertThat(actualValue3).isEqualTo(0)
 
         isOpen = false
     }
@@ -311,158 +401,32 @@ class WindowTest {
         assertThat(disposeCount).isEqualTo(1)
     }
 
-    @Test
-    fun `catch key handlers`() = runApplicationTest {
-        var window: ComposeWindow? = null
-        val onKeyEventKeys = mutableSetOf<Key>()
-        val onPreviewKeyEventKeys = mutableSetOf<Key>()
+    @Test(timeout = 30000)
+    fun `window dispose should not cause a memory leak`() {
+        assumeFalse(GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance)
 
-        fun clear() {
-            onKeyEventKeys.clear()
-            onPreviewKeyEventKeys.clear()
-        }
+        val leakDetector = LeakDetector()
 
-        launchApplication {
-            Window(
-                onCloseRequest = ::exitApplication,
-                onPreviewKeyEvent = {
-                    onPreviewKeyEventKeys.add(it.key)
-                    it.key == Key.Q
-                },
-                onKeyEvent = {
-                    onKeyEventKeys.add(it.key)
-                    it.key == Key.W
+        val oldRecomposers = Recomposer.runningRecomposers.value
+
+        runBlocking(Dispatchers.Swing) {
+            repeat(10) {
+                val window = ComposeWindow()
+                window.size = Dimension(200, 200)
+                window.isVisible = true
+                window.setContent {
+                    Button({}) {}
+                    Slider(0f, {})
                 }
-            ) {
-                window = this.window
+                window.dispose()
+                leakDetector.observeObject(window)
             }
-        }
 
-        awaitIdle()
-
-        window?.sendKey(KeyEvent.VK_Q)
-        awaitIdle()
-        assertThat(onPreviewKeyEventKeys).isEqualTo(setOf(Key.Q))
-        assertThat(onKeyEventKeys).isEqualTo(emptySet<Key>())
-
-        clear()
-        window?.sendKey(KeyEvent.VK_W)
-        awaitIdle()
-        assertThat(onPreviewKeyEventKeys).isEqualTo(setOf(Key.W))
-        assertThat(onKeyEventKeys).isEqualTo(setOf(Key.W))
-
-        clear()
-        window?.sendKey(KeyEvent.VK_E)
-        awaitIdle()
-        assertThat(onPreviewKeyEventKeys).isEqualTo(setOf(Key.E))
-        assertThat(onKeyEventKeys).isEqualTo(setOf(Key.E))
-
-        exitApplication()
-    }
-
-    @Test
-    fun `catch key handlers with focused node`() = runApplicationTest {
-        var window: ComposeWindow? = null
-        val onWindowKeyEventKeys = mutableSetOf<Key>()
-        val onWindowPreviewKeyEventKeys = mutableSetOf<Key>()
-        val onNodeKeyEventKeys = mutableSetOf<Key>()
-        val onNodePreviewKeyEventKeys = mutableSetOf<Key>()
-
-        fun clear() {
-            onWindowKeyEventKeys.clear()
-            onWindowPreviewKeyEventKeys.clear()
-            onNodeKeyEventKeys.clear()
-            onNodePreviewKeyEventKeys.clear()
-        }
-
-        launchApplication {
-            Window(
-                onCloseRequest = ::exitApplication,
-                onPreviewKeyEvent = {
-                    onWindowPreviewKeyEventKeys.add(it.key)
-                    it.key == Key.Q
-                },
-                onKeyEvent = {
-                    onWindowKeyEventKeys.add(it.key)
-                    it.key == Key.W
-                },
-            ) {
-                window = this.window
-
-                val focusRequester = remember(::FocusRequester)
-                LaunchedEffect(Unit) {
-                    focusRequester.requestFocus()
-                }
-
-                Box(
-                    Modifier
-                        .focusRequester(focusRequester)
-                        .focusTarget()
-                        .onPreviewKeyEvent {
-                            onNodePreviewKeyEventKeys.add(it.key)
-                            it.key == Key.E
-                        }
-                        .onKeyEvent {
-                            onNodeKeyEventKeys.add(it.key)
-                            it.key == Key.R
-                        }
-                )
+            while (Recomposer.runningRecomposers.value != oldRecomposers) {
+                delay(100)
             }
+
+            assertThat(leakDetector.noLeak()).isTrue()
         }
-
-        awaitIdle()
-
-        window?.sendKey(KeyEvent.VK_Q)
-        awaitIdle()
-        assertThat(onWindowPreviewKeyEventKeys).isEqualTo(setOf(Key.Q))
-        assertThat(onNodePreviewKeyEventKeys).isEqualTo(emptySet<Key>())
-        assertThat(onNodeKeyEventKeys).isEqualTo(emptySet<Key>())
-        assertThat(onWindowKeyEventKeys).isEqualTo(emptySet<Key>())
-
-        clear()
-        window?.sendKey(KeyEvent.VK_W)
-        awaitIdle()
-        assertThat(onWindowPreviewKeyEventKeys).isEqualTo(setOf(Key.W))
-        assertThat(onNodePreviewKeyEventKeys).isEqualTo(setOf(Key.W))
-        assertThat(onNodeKeyEventKeys).isEqualTo(setOf(Key.W))
-        assertThat(onWindowKeyEventKeys).isEqualTo(setOf(Key.W))
-
-        clear()
-        window?.sendKey(KeyEvent.VK_E)
-        awaitIdle()
-        assertThat(onWindowPreviewKeyEventKeys).isEqualTo(setOf(Key.E))
-        assertThat(onNodePreviewKeyEventKeys).isEqualTo(setOf(Key.E))
-        assertThat(onNodeKeyEventKeys).isEqualTo(emptySet<Key>())
-        assertThat(onWindowKeyEventKeys).isEqualTo(emptySet<Key>())
-
-        clear()
-        window?.sendKey(KeyEvent.VK_R)
-        awaitIdle()
-        assertThat(onWindowPreviewKeyEventKeys).isEqualTo(setOf(Key.R))
-        assertThat(onNodePreviewKeyEventKeys).isEqualTo(setOf(Key.R))
-        assertThat(onNodeKeyEventKeys).isEqualTo(setOf(Key.R))
-        assertThat(onWindowKeyEventKeys).isEqualTo(emptySet<Key>())
-
-        clear()
-        window?.sendKey(KeyEvent.VK_T)
-        awaitIdle()
-        assertThat(onWindowPreviewKeyEventKeys).isEqualTo(setOf(Key.T))
-        assertThat(onNodePreviewKeyEventKeys).isEqualTo(setOf(Key.T))
-        assertThat(onNodeKeyEventKeys).isEqualTo(setOf(Key.T))
-        assertThat(onWindowKeyEventKeys).isEqualTo(setOf(Key.T))
-
-        exitApplication()
     }
-
-    private fun ComposeWindow.sendKey(code: Int) = layer.owners.onKeyPressed(
-        KeyEvent(
-            layer.wrapped,
-            KeyEvent.KEY_PRESSED,
-            0,
-            0,
-            code,
-            code.toChar(),
-            KEY_LOCATION_STANDARD
-        )
-    )
 }

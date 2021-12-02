@@ -465,38 +465,72 @@ internal class TrieNode<K, V>(
         }
     }
 
-    private fun mutablePutAllFromOtherNodeCell(other: TrieNode<K, V>,
-                                               positionMask: Int,
-                                               shift: Int,
-                                               intersectionCounter: DeltaCounter,
-                                               mutator: PersistentHashMapBuilder<K, V>): TrieNode<K, V> {
-        return when {
-            other.hasNodeAt(positionMask) -> {
-                mutablePutAll(
-                        other.nodeAtIndex(other.nodeIndex(positionMask)),
-                        shift + LOG_MAX_BRANCHING_FACTOR,
-                        intersectionCounter,
-                        mutator
-                )
-            }
-            other.hasEntryAt(positionMask) -> {
-                val keyIndex = other.entryKeyIndex(positionMask)
-                val key = other.keyAtIndex(keyIndex)
-                val value = other.valueAtKeyIndex(keyIndex)
-                val oldSize = mutator.size
-                val newNode = mutablePut(
-                        key.hashCode(),
-                        key,
-                        value,
-                        shift + LOG_MAX_BRANCHING_FACTOR,
-                        mutator
-                )
-                if (mutator.size == oldSize) {
-                    intersectionCounter.count++
+    /**
+     * Updates the cell of this node at [positionMask] with entries from the cell of [otherNode] at [positionMask].
+     */
+    private fun mutablePutAllFromOtherNodeCell(
+        otherNode: TrieNode<K, V>,
+        positionMask: Int,
+        shift: Int,
+        intersectionCounter: DeltaCounter,
+        mutator: PersistentHashMapBuilder<K, V>
+    ): TrieNode<K, V> = when {
+        this.hasNodeAt(positionMask) -> {
+            val targetNode = this.nodeAtIndex(nodeIndex(positionMask))
+            when {
+                otherNode.hasNodeAt(positionMask) -> {
+                    val otherTargetNode = otherNode.nodeAtIndex(otherNode.nodeIndex(positionMask))
+                    targetNode.mutablePutAll(otherTargetNode, shift + LOG_MAX_BRANCHING_FACTOR, intersectionCounter, mutator)
                 }
-                newNode
+                otherNode.hasEntryAt(positionMask) -> {
+                    val keyIndex = otherNode.entryKeyIndex(positionMask)
+                    val key = otherNode.keyAtIndex(keyIndex)
+                    val value = otherNode.valueAtKeyIndex(keyIndex)
+                    val oldSize = mutator.size
+                    targetNode.mutablePut(key.hashCode(), key, value, shift + LOG_MAX_BRANCHING_FACTOR, mutator).also {
+                        if (mutator.size == oldSize) intersectionCounter.count++
+                    }
+                }
+                else -> targetNode
             }
-            else -> this
+        }
+
+        otherNode.hasNodeAt(positionMask) -> {
+            val otherTargetNode = otherNode.nodeAtIndex(otherNode.nodeIndex(positionMask))
+            when {
+                this.hasEntryAt(positionMask) -> {
+                    // if otherTargetNode already has a value associated with the key, do not put this entry
+                    val keyIndex = this.entryKeyIndex(positionMask)
+                    val key = this.keyAtIndex(keyIndex)
+                    if (otherTargetNode.containsKey(key.hashCode(), key, shift + LOG_MAX_BRANCHING_FACTOR)) {
+                        intersectionCounter.count++
+                        otherTargetNode
+                    } else {
+                        val value = this.valueAtKeyIndex(keyIndex)
+                        otherTargetNode.mutablePut(key.hashCode(), key, value, shift + LOG_MAX_BRANCHING_FACTOR, mutator)
+                    }
+                }
+                else -> otherTargetNode
+            }
+        }
+
+        else -> { // two entries, and they are not equal by key. See (**) in mutablePutAll
+            val thisKeyIndex = this.entryKeyIndex(positionMask)
+            val thisKey = this.keyAtIndex(thisKeyIndex)
+            val thisValue = this.valueAtKeyIndex(thisKeyIndex)
+            val otherKeyIndex = otherNode.entryKeyIndex(positionMask)
+            val otherKey = otherNode.keyAtIndex(otherKeyIndex)
+            val otherValue = otherNode.valueAtKeyIndex(otherKeyIndex)
+            makeNode(
+                thisKey.hashCode(),
+                thisKey,
+                thisValue,
+                otherKey.hashCode(),
+                otherKey,
+                otherValue,
+                shift + LOG_MAX_BRANCHING_FACTOR,
+                mutator.ownership
+            )
         }
     }
 
@@ -580,7 +614,7 @@ internal class TrieNode<K, V>(
         // but not in the new data nodes
         var newDataMap = dataMap xor otherNode.dataMap and newNodeMap.inv()
         // (**) now, this is tricky: we have a number of entry-entry pairs and we don't know yet whether
-        // they result in an entry (if they are equal) or a new node (if they are not)
+        // they result in an entry (if keys are equal) or a new node (if they are not)
         // but we want to keep it to single allocation, so we check and mark equal ones here
         (dataMap and otherNode.dataMap).forEachOneBit { positionMask, _ ->
             val leftKey = this.keyAtIndex(this.entryKeyIndex(positionMask))
@@ -591,7 +625,7 @@ internal class TrieNode<K, V>(
             else newNodeMap = newNodeMap or positionMask
             // we can use this later to skip calling equals() again
         }
-        assert(newNodeMap and newDataMap == 0)
+        check(newNodeMap and newDataMap == 0)
         val mutableNode = when {
             this.ownedBy == mutator.ownership && this.dataMap == newDataMap && this.nodeMap == newNodeMap -> this
             else -> {
@@ -601,36 +635,7 @@ internal class TrieNode<K, V>(
         }
         newNodeMap.forEachOneBit { positionMask, index ->
             val newNodeIndex = mutableNode.buffer.size - 1 - index
-            mutableNode.buffer[newNodeIndex] = when {
-                hasNodeAt(positionMask) -> {
-                    val before = nodeAtIndex(nodeIndex(positionMask))
-                    before.mutablePutAllFromOtherNodeCell(otherNode, positionMask, shift, intersectionCounter, mutator)
-                }
-
-                otherNode.hasNodeAt(positionMask) -> {
-                    val before = otherNode.nodeAtIndex(otherNode.nodeIndex(positionMask))
-                    before.mutablePutAllFromOtherNodeCell(this, positionMask, shift, intersectionCounter, mutator)
-                }
-
-                else -> { // two entries, and they are not equal by key (see ** above)
-                    val thisKeyIndex = this.entryKeyIndex(positionMask)
-                    val thisKey = this.keyAtIndex(thisKeyIndex)
-                    val thisValue = this.valueAtKeyIndex(thisKeyIndex)
-                    val otherKeyIndex = otherNode.entryKeyIndex(positionMask)
-                    val otherKey = otherNode.keyAtIndex(otherKeyIndex)
-                    val otherValue = otherNode.valueAtKeyIndex(otherKeyIndex)
-                    makeNode(
-                            thisKey.hashCode(),
-                            thisKey,
-                            thisValue,
-                            otherKey.hashCode(),
-                            otherKey,
-                            otherValue,
-                            shift + LOG_MAX_BRANCHING_FACTOR,
-                            mutator.ownership
-                    )
-                }
-            }
+            mutableNode.buffer[newNodeIndex] = mutablePutAllFromOtherNodeCell(otherNode, positionMask, shift, intersectionCounter, mutator)
         }
         newDataMap.forEachOneBit { positionMask, index ->
             val newKeyIndex = index * ENTRY_SIZE

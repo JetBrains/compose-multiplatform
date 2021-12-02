@@ -33,7 +33,6 @@ import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.annotation.VisibleForTesting
-import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.Transition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
@@ -48,17 +47,18 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalFontLoader
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.tooling.CommonPreviewUtils.invokeComposableViaReflection
+import androidx.compose.ui.tooling.animation.PreviewAnimationClock
 import androidx.compose.ui.tooling.data.Group
 import androidx.compose.ui.tooling.data.SourceLocation
 import androidx.compose.ui.tooling.data.UiToolingDataApi
 import androidx.compose.ui.tooling.data.asTree
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import androidx.compose.ui.tooling.animation.PreviewAnimationClock
 import androidx.compose.ui.unit.IntRect
 import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
@@ -311,7 +311,6 @@ internal class ComposeViewAdapter : FrameLayout {
      * the ones we've got source information for.
      */
     @Suppress("UNCHECKED_CAST")
-    @OptIn(InternalAnimationApi::class)
     private fun findAndTrackTransitions() {
         @Suppress("UNCHECKED_CAST")
         fun List<Group>.findTransitionObjects(): List<Transition<Any>> {
@@ -325,6 +324,8 @@ internal class ComposeViewAdapter : FrameLayout {
 
         val slotTrees = slotTableRecord.store.map { it.asTree() }
         val transitions = mutableSetOf<Transition<Any>>()
+        val animatedVisibilityParentTransitions = mutableSetOf<Transition<Any>>()
+        val animatedContentParentTransitions = mutableSetOf<Transition<Any>>()
         // Check all the slot tables, since some animations might not be present in the same
         // table as the one containing the `@Composable` being previewed, e.g. when they're
         // defined using sub-composition.
@@ -337,7 +338,7 @@ internal class ComposeViewAdapter : FrameLayout {
             )
             // Find `AnimatedVisibility` calls in the user code, i.e. when source location is
             // known. Then, find the underlying `updateTransition` it uses.
-            val animatedVisibilityParentTransitions =
+            animatedVisibilityParentTransitions.addAll(
                 tree.findAll {
                     it.name == "AnimatedVisibility" && it.location != null
                 }.mapNotNull {
@@ -345,15 +346,35 @@ internal class ComposeViewAdapter : FrameLayout {
                         updateTransitionCall.name == UPDATE_TRANSITION_FUNCTION_NAME
                     }
                 }.findTransitionObjects()
+            )
+
+            animatedContentParentTransitions.addAll(
+                tree.findAll {
+                    it.name == "AnimatedContent" && it.location != null
+                }.mapNotNull {
+                    it.children.firstOrNull { updateTransitionCall ->
+                        updateTransitionCall.name == UPDATE_TRANSITION_FUNCTION_NAME
+                    }
+                }.findTransitionObjects()
+            )
+
             // Remove all AnimatedVisibility parent transitions from the transitions list,
-            // otherwise we'd list them in the Animation Preview in Android Studio, but we don't
-            // support inspecting child transitions yet.
+            // otherwise we'd duplicate them in the Android Studio Animation Preview because we
+            // will track them separately.
             transitions.removeAll(animatedVisibilityParentTransitions)
+
+            // Remove all AnimatedContent parent transitions from the transitions list, so we can
+            // ignore these animations while support is not added to Animation Preview.
+            transitions.removeAll(animatedContentParentTransitions)
         }
-        hasAnimations = transitions.isNotEmpty()
+
+        hasAnimations = transitions.isNotEmpty() || animatedVisibilityParentTransitions.isNotEmpty()
         // Make the `PreviewAnimationClock` track all the transitions found.
         if (::clock.isInitialized) {
             transitions.forEach { clock.trackTransition(it) }
+            animatedVisibilityParentTransitions.forEach {
+                clock.trackAnimatedVisibility(it, ::requestLayout)
+            }
         }
     }
 
@@ -404,6 +425,7 @@ internal class ComposeViewAdapter : FrameLayout {
         }
     }
 
+    @Suppress("BanUncheckedReflection")
     private fun Any.invokeGetDesignInfo(x: Int, y: Int): String? {
         return this.getDesignInfoMethodOrNull()?.let { designInfoMethod ->
             try {
@@ -620,6 +642,7 @@ internal class ComposeViewAdapter : FrameLayout {
         if (::clock.isInitialized) {
             clock.dispose()
         }
+        FakeViewModelStoreOwner.viewModelStore.clear()
     }
 
     /**
@@ -705,8 +728,10 @@ internal class ComposeViewAdapter : FrameLayout {
         override fun getLifecycle(): Lifecycle = lifecycle
     }
 
-    private val FakeViewModelStoreOwner = ViewModelStoreOwner {
-        throw IllegalStateException("ViewModels creation is not supported in Preview")
+    private val FakeViewModelStoreOwner = object : ViewModelStoreOwner {
+        private val viewModelStore = ViewModelStore()
+
+        override fun getViewModelStore() = viewModelStore
     }
 
     private val FakeOnBackPressedDispatcherOwner = object : OnBackPressedDispatcherOwner {

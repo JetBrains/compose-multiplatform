@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Paint
@@ -35,6 +36,7 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.DrawScope.Companion.DefaultFilterQuality
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -231,6 +233,30 @@ class CanvasDrawScope : DrawScope {
         dstOffset,
         dstSize,
         configurePaint(null, style, alpha, colorFilter, blendMode)
+    )
+
+    /**
+     * @see [DrawScope.drawImage]
+     */
+    override fun drawImage(
+        image: ImageBitmap,
+        srcOffset: IntOffset,
+        srcSize: IntSize,
+        dstOffset: IntOffset,
+        dstSize: IntSize,
+        /*FloatRange(from = 0.0, to = 1.0)*/
+        alpha: Float,
+        style: DrawStyle,
+        colorFilter: ColorFilter?,
+        blendMode: BlendMode,
+        filterQuality: FilterQuality
+    ) = drawParams.canvas.drawImageRect(
+        image,
+        srcOffset,
+        srcSize,
+        dstOffset,
+        dstSize,
+        configurePaint(null, style, alpha, colorFilter, blendMode, filterQuality)
     )
 
     /**
@@ -590,7 +616,8 @@ class CanvasDrawScope : DrawScope {
         /*FloatRange(from = 0.0, to = 1.0)*/
         alpha: Float,
         colorFilter: ColorFilter?,
-        blendMode: BlendMode
+        blendMode: BlendMode,
+        filterQuality: FilterQuality = DefaultFilterQuality
     ): Paint = selectPaint(style).apply {
         if (brush != null) {
             brush.applyTo(size, this, alpha)
@@ -599,6 +626,7 @@ class CanvasDrawScope : DrawScope {
         }
         if (this.colorFilter != colorFilter) this.colorFilter = colorFilter
         if (this.blendMode != blendMode) this.blendMode = blendMode
+        if (this.filterQuality != filterQuality) this.filterQuality = filterQuality
     }
 
     /**
@@ -611,7 +639,8 @@ class CanvasDrawScope : DrawScope {
         /*FloatRange(from = 0.0, to = 1.0)*/
         alpha: Float,
         colorFilter: ColorFilter?,
-        blendMode: BlendMode
+        blendMode: BlendMode,
+        filterQuality: FilterQuality = DefaultFilterQuality
     ): Paint = selectPaint(style).apply {
         // Modulate the color alpha directly
         // instead of configuring a separate alpha parameter
@@ -620,6 +649,7 @@ class CanvasDrawScope : DrawScope {
         if (this.shader != null) this.shader = null
         if (this.colorFilter != colorFilter) this.colorFilter = colorFilter
         if (this.blendMode != blendMode) this.blendMode = blendMode
+        if (this.filterQuality != filterQuality) this.filterQuality = filterQuality
     }
 
     private fun configureStrokePaint(
@@ -632,7 +662,8 @@ class CanvasDrawScope : DrawScope {
         /*FloatRange(from = 0.0, to = 1.0)*/
         alpha: Float,
         colorFilter: ColorFilter?,
-        blendMode: BlendMode
+        blendMode: BlendMode,
+        filterQuality: FilterQuality = DefaultFilterQuality
     ) =
         obtainStrokePaint().apply {
             // Modulate the color alpha directly
@@ -647,6 +678,7 @@ class CanvasDrawScope : DrawScope {
             if (this.strokeCap != cap) this.strokeCap = cap
             if (this.strokeJoin != join) this.strokeJoin = join
             if (this.pathEffect != pathEffect) this.pathEffect = pathEffect
+            if (this.filterQuality != filterQuality) this.filterQuality = filterQuality
         }
 
     private fun configureStrokePaint(
@@ -659,7 +691,8 @@ class CanvasDrawScope : DrawScope {
         /*FloatRange(from = 0.0, to = 1.0)*/
         alpha: Float,
         colorFilter: ColorFilter?,
-        blendMode: BlendMode
+        blendMode: BlendMode,
+        filterQuality: FilterQuality = DefaultFilterQuality
     ) = obtainStrokePaint().apply {
         if (brush != null) {
             brush.applyTo(size, this, alpha)
@@ -673,6 +706,7 @@ class CanvasDrawScope : DrawScope {
         if (this.strokeCap != cap) this.strokeCap = cap
         if (this.strokeJoin != join) this.strokeJoin = join
         if (this.pathEffect != pathEffect) this.pathEffect = pathEffect
+        if (this.filterQuality != filterQuality) this.filterQuality = filterQuality
     }
 
     /**

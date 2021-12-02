@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.text
 
+import androidx.compose.foundation.DesktopPlatform
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.isAltPressed
@@ -23,7 +24,6 @@ import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.isMetaPressed
 import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
-import androidx.compose.ui.platform.DesktopPlatform
 import java.awt.event.KeyEvent as AwtKeyEvent
 
 internal actual val platformDefaultKeyMapping: KeyMapping =
@@ -33,6 +33,11 @@ internal actual val platformDefaultKeyMapping: KeyMapping =
             object : KeyMapping {
                 override fun map(event: KeyEvent): KeyCommand? {
                     return when {
+                        event.isMetaPressed && event.isCtrlPressed ->
+                            when (event.key) {
+                                MappedKeys.Space -> KeyCommand.CHARACTER_PALETTE
+                                else -> null
+                            }
                         event.isShiftPressed && event.isAltPressed ->
                             when (event.key) {
                                 MappedKeys.DirectionLeft -> KeyCommand.SELECT_LEFT_WORD
@@ -160,4 +165,5 @@ internal actual object MappedKeys {
     actual val Cut: Key = Key(AwtKeyEvent.VK_CUT)
     val Copy: Key = Key(AwtKeyEvent.VK_COPY)
     actual val Tab: Key = Key(AwtKeyEvent.VK_TAB)
+    val Space: Key = Key(AwtKeyEvent.VK_SPACE)
 }

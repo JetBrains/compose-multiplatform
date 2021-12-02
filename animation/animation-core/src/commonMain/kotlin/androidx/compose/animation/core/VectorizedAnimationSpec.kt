@@ -353,14 +353,30 @@ private const val InfiniteIterations: Int = Int.MAX_VALUE
  * This animation takes another [VectorizedDurationBasedAnimationSpec] and plays it
  * __infinite__ times.
  *
+ * initialStartOffset can be used to either delay the start of the animation or to fast forward
+ * the animation to a given play time. This start offset will **not** be repeated, whereas the delay
+ * in the [animation] (if any) will be repeated. By default, the amount of offset is 0.
+ *
  * @param animation the [VectorizedAnimationSpec] describing each repetition iteration.
  * @param repeatMode whether animation should repeat by starting from the beginning (i.e.
  *                  [RepeatMode.Restart]) or from the end (i.e. [RepeatMode.Reverse])
+ * @param initialStartOffset offsets the start of the animation
  */
 class VectorizedInfiniteRepeatableSpec<V : AnimationVector>(
     private val animation: VectorizedDurationBasedAnimationSpec<V>,
-    private val repeatMode: RepeatMode = RepeatMode.Restart
+    private val repeatMode: RepeatMode = RepeatMode.Restart,
+    initialStartOffset: StartOffset = StartOffset(0)
 ) : VectorizedAnimationSpec<V> {
+    @Deprecated(
+        level = DeprecationLevel.HIDDEN,
+        message = "This method has been deprecated in favor of the constructor that" +
+            " accepts start offset."
+    )
+    constructor(
+        animation: VectorizedDurationBasedAnimationSpec<V>,
+        repeatMode: RepeatMode = RepeatMode.Restart
+    ) : this(animation, repeatMode, StartOffset(0))
+
     override val isInfinite: Boolean get() = true
 
     /**
@@ -369,12 +385,19 @@ class VectorizedInfiniteRepeatableSpec<V : AnimationVector>(
     internal val durationNanos: Long =
         (animation.delayMillis + animation.durationMillis) * MillisToNanos
 
+    private val initialOffsetNanos = initialStartOffset.value * MillisToNanos
+
     private fun repetitionPlayTimeNanos(playTimeNanos: Long): Long {
-        val repeatsCount = playTimeNanos / durationNanos
-        if (repeatMode == RepeatMode.Restart || repeatsCount % 2 == 0L) {
-            return playTimeNanos - repeatsCount * durationNanos
+        if (playTimeNanos + initialOffsetNanos <= 0) {
+            return 0
         } else {
-            return (repeatsCount + 1) * durationNanos - playTimeNanos
+            val postOffsetPlayTimeNanos = playTimeNanos + initialOffsetNanos
+            val repeatsCount = postOffsetPlayTimeNanos / durationNanos
+            if (repeatMode == RepeatMode.Restart || repeatsCount % 2 == 0L) {
+                return postOffsetPlayTimeNanos - repeatsCount * durationNanos
+            } else {
+                return (repeatsCount + 1) * durationNanos - postOffsetPlayTimeNanos
+            }
         }
     }
 
@@ -383,10 +406,10 @@ class VectorizedInfiniteRepeatableSpec<V : AnimationVector>(
         start: V,
         startVelocity: V,
         end: V
-    ): V = if (playTimeNanos > durationNanos) {
+    ): V = if (playTimeNanos + initialOffsetNanos > durationNanos) {
         // Start velocity of the 2nd and subsequent iteration will be the velocity at the end
         // of the first iteration, instead of the initial velocity.
-        getVelocityFromNanos(durationNanos, start, startVelocity, end)
+        getVelocityFromNanos(durationNanos - initialOffsetNanos, start, startVelocity, end)
     } else {
         startVelocity
     }
@@ -433,16 +456,33 @@ class VectorizedInfiniteRepeatableSpec<V : AnimationVector>(
  * __odd__ number of iterations. Otherwise, the animation may jump to the end value when it finishes
  * the last iteration.
  *
+ * initialStartOffset can be used to either delay the start of the animation or to fast forward
+ * the animation to a given play time. This start offset will **not** be repeated, whereas the delay
+ * in the [animation] (if any) will be repeated. By default, the amount of offset is 0.
+ *
+ *
  * @param iterations the count of iterations. Should be at least 1.
  * @param animation the [VectorizedAnimationSpec] describing each repetition iteration.
  * @param repeatMode whether animation should repeat by starting from the beginning (i.e.
  *                  [RepeatMode.Restart]) or from the end (i.e. [RepeatMode.Reverse])
+ * @param initialStartOffset offsets the start of the animation
  */
 class VectorizedRepeatableSpec<V : AnimationVector>(
     private val iterations: Int,
     private val animation: VectorizedDurationBasedAnimationSpec<V>,
-    private val repeatMode: RepeatMode = RepeatMode.Restart
+    private val repeatMode: RepeatMode = RepeatMode.Restart,
+    initialStartOffset: StartOffset = StartOffset(0)
 ) : VectorizedFiniteAnimationSpec<V> {
+    @Deprecated(
+        level = DeprecationLevel.HIDDEN,
+        message = "This method has been deprecated in favor of the constructor that accepts" +
+            " start offset."
+    )
+    constructor(
+        iterations: Int,
+        animation: VectorizedDurationBasedAnimationSpec<V>,
+        repeatMode: RepeatMode = RepeatMode.Restart
+    ) : this(iterations, animation, repeatMode, StartOffset(0))
 
     init {
         if (iterations < 1) {
@@ -450,15 +490,24 @@ class VectorizedRepeatableSpec<V : AnimationVector>(
         }
     }
 
+    // Per-iteration duration
     internal val durationNanos: Long =
         (animation.delayMillis + animation.durationMillis) * MillisToNanos
 
+    // Fast forward amount. Delay type => negative offset
+    private val initialOffsetNanos = initialStartOffset.value * MillisToNanos
+
     private fun repetitionPlayTimeNanos(playTimeNanos: Long): Long {
-        val repeatsCount = min(playTimeNanos / durationNanos, iterations - 1L)
-        if (repeatMode == RepeatMode.Restart || repeatsCount % 2 == 0L) {
-            return playTimeNanos - repeatsCount * durationNanos
+        if (playTimeNanos + initialOffsetNanos <= 0) {
+            return 0
         } else {
-            return (repeatsCount + 1) * durationNanos - playTimeNanos
+            val postOffsetPlayTimeNanos = playTimeNanos + initialOffsetNanos
+            val repeatsCount = min(postOffsetPlayTimeNanos / durationNanos, iterations - 1L)
+            if (repeatMode == RepeatMode.Restart || repeatsCount % 2 == 0L) {
+                return postOffsetPlayTimeNanos - repeatsCount * durationNanos
+            } else {
+                return (repeatsCount + 1) * durationNanos - postOffsetPlayTimeNanos
+            }
         }
     }
 
@@ -467,10 +516,10 @@ class VectorizedRepeatableSpec<V : AnimationVector>(
         start: V,
         startVelocity: V,
         end: V
-    ): V = if (playTimeNanos > durationNanos) {
+    ): V = if (playTimeNanos + initialOffsetNanos > durationNanos) {
         // Start velocity of the 2nd and subsequent iteration will be the velocity at the end
         // of the first iteration, instead of the initial velocity.
-        getVelocityFromNanos(durationNanos, start, startVelocity, end)
+        getVelocityFromNanos(durationNanos - initialOffsetNanos, start, startVelocity, end)
     } else
         startVelocity
 
@@ -504,7 +553,7 @@ class VectorizedRepeatableSpec<V : AnimationVector>(
 
     @Suppress("MethodNameUnits")
     override fun getDurationNanos(initialValue: V, targetValue: V, initialVelocity: V): Long {
-        return iterations * durationNanos
+        return iterations * durationNanos - initialOffsetNanos
     }
 }
 
@@ -522,6 +571,12 @@ object Spring {
      * force.
      */
     const val StiffnessMedium = 1500f
+
+    /**
+     * Stiffness constant for medium-low stiff spring. This is the default stiffness for springs
+     * used in enter/exit transitions.
+     */
+    const val StiffnessMediumLow = 400f
 
     /**
      * Stiffness constant for a spring with low stiffness.

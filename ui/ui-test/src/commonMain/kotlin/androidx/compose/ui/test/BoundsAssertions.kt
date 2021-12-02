@@ -49,6 +49,32 @@ fun SemanticsNodeInteraction.assertHeightIsEqualTo(expectedHeight: Dp): Semantic
         it.height.assertIsEqualTo(expectedHeight, "height")
     }
 }
+
+/**
+ * Asserts that the touch bounds of this node has width equal to [expectedWidth].
+ *
+ * @throws AssertionError if comparison fails.
+ */
+fun SemanticsNodeInteraction.assertTouchWidthIsEqualTo(
+    expectedWidth: Dp
+): SemanticsNodeInteraction {
+    return withTouchBoundsInRoot {
+        it.width.assertIsEqualTo(expectedWidth, "width")
+    }
+}
+
+/**
+ * Asserts that the touch bounds of this node has height equal to [expectedHeight].
+ *
+ * @throws AssertionError if comparison fails.
+ */
+fun SemanticsNodeInteraction.assertTouchHeightIsEqualTo(
+    expectedHeight: Dp
+): SemanticsNodeInteraction {
+    return withTouchBoundsInRoot {
+        it.height.assertIsEqualTo(expectedHeight, "height")
+    }
+}
 /**
  * Asserts that the layout of this node has width that is greater than or equal to
  * [expectedMinWidth].
@@ -138,6 +164,19 @@ fun SemanticsNodeInteraction.getUnclippedBoundsInRoot(): DpRect {
 }
 
 /**
+ * Returns the bounds of the layout of this node as clipped to the root. The bounds are relative to
+ * the root composable.
+ */
+fun SemanticsNodeInteraction.getBoundsInRoot(): DpRect {
+    val node = fetchSemanticsNode("Failed to retrieve bounds of the node.")
+    return with(node.root!!.density) {
+        node.boundsInRoot.let {
+            DpRect(it.left.toDp(), it.top.toDp(), it.right.toDp(), it.bottom.toDp())
+        }
+    }
+}
+
+/**
  * Returns the position of an [alignment line][AlignmentLine], or [Dp.Unspecified] if the line is
  * not provided.
  */
@@ -166,6 +205,19 @@ private fun SemanticsNodeInteraction.withUnclippedBoundsInRoot(
     val node = fetchSemanticsNode("Failed to retrieve bounds of the node.")
     val bounds = with(node.root!!.density) {
         node.unclippedBoundsInRoot.let {
+            DpRect(it.left.toDp(), it.top.toDp(), it.right.toDp(), it.bottom.toDp())
+        }
+    }
+    assertion.invoke(bounds)
+    return this
+}
+
+private fun SemanticsNodeInteraction.withTouchBoundsInRoot(
+    assertion: (DpRect) -> Unit
+): SemanticsNodeInteraction {
+    val node = fetchSemanticsNode("Failed to retrieve bounds of the node.")
+    val bounds = with(node.root!!.density) {
+        node.touchBoundsInRoot.let {
             DpRect(it.left.toDp(), it.top.toDp(), it.right.toDp(), it.bottom.toDp())
         }
     }
@@ -209,7 +261,7 @@ private fun Dp.isWithinTolerance(reference: Dp, tolerance: Dp): Boolean {
  *
  * @throws AssertionError if comparison fails.
  */
-private fun Dp.assertIsEqualTo(expected: Dp, subject: String, tolerance: Dp = Dp(.5f)) {
+fun Dp.assertIsEqualTo(expected: Dp, subject: String, tolerance: Dp = Dp(.5f)) {
     if (!isWithinTolerance(expected, tolerance)) {
         // Comparison failed, report the error in DPs
         throw AssertionError(

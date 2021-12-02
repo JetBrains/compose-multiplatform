@@ -80,7 +80,7 @@ internal class SelectionRegistrarImpl : SelectionRegistrar {
      * If the first offset is null it means that the start of selection is unknown for the caller.
      */
     internal var onSelectionUpdateCallback: (
-        (LayoutCoordinates, Offset?, Offset, SelectionAdjustment) -> Unit
+        (LayoutCoordinates, Offset, Offset, Boolean, SelectionAdjustment) -> Boolean
     )? = null
 
     /**
@@ -183,29 +183,18 @@ internal class SelectionRegistrarImpl : SelectionRegistrar {
 
     override fun notifySelectionUpdate(
         layoutCoordinates: LayoutCoordinates,
-        endPosition: Offset,
+        newPosition: Offset,
+        previousPosition: Offset,
+        isStartHandle: Boolean,
         adjustment: SelectionAdjustment
-    ) {
-        onSelectionUpdateCallback?.invoke(
+    ): Boolean {
+        return onSelectionUpdateCallback?.invoke(
             layoutCoordinates,
-            null,
-            endPosition,
+            newPosition,
+            previousPosition,
+            isStartHandle,
             adjustment
-        )
-    }
-
-    override fun notifySelectionUpdate(
-        layoutCoordinates: LayoutCoordinates,
-        startPosition: Offset,
-        endPosition: Offset,
-        adjustment: SelectionAdjustment
-    ) {
-        onSelectionUpdateCallback?.invoke(
-            layoutCoordinates,
-            startPosition,
-            endPosition,
-            adjustment
-        )
+        ) ?: true
     }
 
     override fun notifySelectionUpdateEnd() {

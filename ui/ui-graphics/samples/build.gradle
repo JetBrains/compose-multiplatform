@@ -32,7 +32,7 @@ dependencies {
     compileOnly(project(":annotation:annotation-sampled"))
 
     api(project(":compose:ui:ui-unit"))
-    implementation(project(":compose:foundation:foundation"))
+    implementation("androidx.compose.foundation:foundation:1.0.0")
     implementation(project(":compose:runtime:runtime"))
     implementation(project(":compose:ui:ui-graphics"))
     implementation(project(":compose:ui:ui-util"))

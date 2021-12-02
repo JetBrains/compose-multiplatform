@@ -18,12 +18,12 @@ import androidx.build.LibraryGroups
 import androidx.build.LibraryType
 import androidx.build.LibraryVersions
 import androidx.build.RunApiTasks
+import androidx.build.BuildOnServerKt
 import androidx.build.SupportConfigKt
-
-import static androidx.build.AndroidXPlugin.BUILD_ON_SERVER_TASK
 
 plugins {
     id("AndroidXPlugin")
+    id("java") // https://github.com/gradle/gradle/issues/18622
     id("AndroidXComposePlugin")
     id("kotlin-multiplatform")
 }
@@ -45,6 +45,7 @@ kotlin {
             api(project(":compose:material:material"))
             api(project(":compose:runtime:runtime"))
             api(project(":compose:ui:ui"))
+            api(project(":compose:ui:ui-tooling-preview"))
         }
 
         jvmMain.dependencies {
@@ -94,12 +95,14 @@ androidx {
 PublicationContainer.metaClass.jvmOs = { name, skikoDeps ->
     delegate.create("jvm$name", MavenPublication) {
         artifactId = "${project.name}-jvm-$name"
+        def projectGroup = project.group
+        def projectName = project.name
         pom {
             withXml {
                 def dependenciesNode = asNode().appendNode("dependencies")
                 def desktopDependency = dependenciesNode.appendNode("dependency")
-                desktopDependency.appendNode("groupId", group)
-                desktopDependency.appendNode("artifactId", project.name)
+                desktopDependency.appendNode("groupId", projectGroup)
+                desktopDependency.appendNode("artifactId", projectName)
                 desktopDependency.appendNode("version", LibraryVersions.COMPOSE)
                 desktopDependency.appendNode("scope", "compile")
                 for (skiko in skikoDeps) {
@@ -120,6 +123,7 @@ afterEvaluate {
     publishing {
         publications {
             it.jvmOs("linux-x64", [libs.skikoLinuxX64])
+            it.jvmOs("linux-arm64", [libs.skikoLinuxArm64])
             it.jvmOs("macos-x64", [libs.skikoMacOsX64])
             it.jvmOs("macos-arm64", [libs.skikoMacOsArm64])
             it.jvmOs("windows-x64", [libs.skikoWindowsX64])
@@ -127,7 +131,4 @@ afterEvaluate {
     }
 }
 
-def projectPath = project.path
-rootProject.tasks.named(BUILD_ON_SERVER_TASK).configure {
-    dependsOn("$projectPath:jvmJar")
-}
+BuildOnServerKt.addToBuildOnServer(project, "${project.path}:jvmJar")

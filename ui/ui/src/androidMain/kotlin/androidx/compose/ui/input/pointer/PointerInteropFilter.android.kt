@@ -18,6 +18,13 @@ package androidx.compose.ui.input.pointer
 
 import android.os.SystemClock
 import android.view.MotionEvent
+import android.view.MotionEvent.ACTION_CANCEL
+import android.view.MotionEvent.ACTION_DOWN
+import android.view.MotionEvent.ACTION_MOVE
+import android.view.MotionEvent.ACTION_OUTSIDE
+import android.view.MotionEvent.ACTION_POINTER_DOWN
+import android.view.MotionEvent.ACTION_POINTER_UP
+import android.view.MotionEvent.ACTION_UP
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewParent
@@ -96,7 +103,21 @@ class RequestDisallowInterceptTouchEvent : (Boolean) -> Unit {
 internal fun Modifier.pointerInteropFilter(view: AndroidViewHolder): Modifier {
     val filter = PointerInteropFilter()
     filter.onTouchEvent = { motionEvent ->
-        view.dispatchTouchEvent(motionEvent)
+        when (motionEvent.actionMasked) {
+            ACTION_DOWN,
+            ACTION_POINTER_DOWN,
+            ACTION_MOVE,
+            ACTION_UP,
+            ACTION_POINTER_UP,
+            ACTION_OUTSIDE,
+            ACTION_CANCEL -> view.dispatchTouchEvent(motionEvent)
+            // ACTION_HOVER_ENTER,
+            // ACTION_HOVER_MOVE,
+            // ACTION_HOVER_EXIT,
+            // ACTION_BUTTON_PRESS,
+            // ACTION_BUTTON_RELEASE,
+            else -> view.dispatchGenericMotionEvent(motionEvent)
+        }
     }
     val requestDisallowInterceptTouchEvent = RequestDisallowInterceptTouchEvent()
     filter.requestDisallowInterceptTouchEvent = requestDisallowInterceptTouchEvent
@@ -183,6 +204,9 @@ internal class PointerInteropFilter : PointerInputModifier {
         object : PointerInputFilter() {
 
             private var state = DispatchToViewState.Unknown
+
+            override val shareWithSiblings
+                get() = true
 
             override fun onPointerEvent(
                 pointerEvent: PointerEvent,
@@ -290,8 +314,36 @@ internal class PointerInteropFilter : PointerInputModifier {
                         changes.fastForEach {
                             it.consumeAllChanges()
                         }
+                        pointerEvent.internalPointerEvent?.suppressMovementConsumption =
+                            !disallowIntercept
                     }
                 }
             }
         }
 }
+
+/**
+ * Calls [watcher] with each [MotionEvent] that the layout area or any child [pointerInput]
+ * receives. The [MotionEvent] may or may not have been transformed to the local coordinate system.
+ * The Compose View will be considered as handling the [MotionEvent] in the area that the
+ * [motionEventSpy] is active.
+ *
+ * This method can only be used to observe [MotionEvent]s and can not be used to capture an event
+ * stream. Use [pointerInteropFilter] to handle [MotionEvent]s and consume the events.
+ *
+ * [watcher] is called during the [PointerEventPass.Initial] pass.
+ *
+ * Developers should prefer to use [pointerInput] to handle pointer input processing within
+ * Compose. [motionEventSpy] is only useful as part of Android View interoperability.
+ */
+@ExperimentalComposeUiApi
+fun Modifier.motionEventSpy(watcher: (motionEvent: MotionEvent) -> Unit): Modifier =
+    this.pointerInput(watcher) {
+        interceptOutOfBoundsChildEvents = true
+        awaitPointerEventScope {
+            while (true) {
+                val event = awaitPointerEvent(PointerEventPass.Initial)
+                event.motionEvent?.let(watcher)
+            }
+        }
+    }

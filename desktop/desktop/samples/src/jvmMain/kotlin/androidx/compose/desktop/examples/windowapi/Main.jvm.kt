@@ -48,6 +48,7 @@ fun main() = application {
             }
             Column {
                 Button("setIcon", ::setIcon)
+                Button("setAwtIcon", ::setAwtIcon)
                 Button("setParameters", ::setParameters)
                 Button("setPosition", ::setPosition)
                 Button("initiallyCenteredWindow", ::initiallyCenteredWindow)

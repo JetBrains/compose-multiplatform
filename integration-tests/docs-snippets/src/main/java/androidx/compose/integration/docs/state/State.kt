@@ -19,40 +19,33 @@
 
 package androidx.compose.integration.docs.state
 
-import android.os.Bundle
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.animateContentSize
+import android.content.res.Resources
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.launch
 
 /**
  * This file lets DevRel track changes to snippets present in
@@ -62,97 +55,78 @@ import androidx.lifecycle.viewmodel.compose.viewModel
  */
 
 private object StateSnippet1 {
-    class HelloViewModel : ViewModel() {
-
-        // LiveData holds state which is observed by the UI
-        // (state flows down from ViewModel)
-        private val _name = MutableLiveData("")
-        val name: LiveData<String> = _name
-
-        // onNameChanged is an event we're defining that the UI can invoke
-        // (events flow up from UI)
-        fun onNameChanged(newName: String) {
-            _name.value = newName
-        }
-    }
-
-    class HelloActivity : AppCompatActivity() {
-        val helloViewModel by viewModels<HelloViewModel>()
-
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-            // binding represents the activity layout, inflated with ViewBinding
-            binding.textInput.doAfterTextChanged {
-                helloViewModel.onNameChanged(it.toString())
-            }
-
-            helloViewModel.name.observe(this) { name ->
-                binding.helloText.text = "Hello, $name"
-            }
-        }
-    }
-}
-
-private object StateSnippet2 {
-    class HelloViewModel : ViewModel() {
-
-        // LiveData holds state which is observed by the UI
-        // (state flows down from ViewModel)
-        private val _name = MutableLiveData("")
-        val name: LiveData<String> = _name
-
-        // onNameChanged is an event we're defining that the UI can invoke
-        // (events flow up from UI)
-        fun onNameChanged(newName: String) {
-            _name.value = newName
-        }
-    }
-
     @Composable
-    fun HelloScreen(helloViewModel: HelloViewModel = viewModel()) {
-        // by default, viewModel() follows the Lifecycle as the Activity or Fragment
-        // that calls HelloScreen(). This lifecycle can be modified by callers of HelloScreen.
-
-        // name is the _current_ value of [helloViewModel.name]
-        // with an initial value of ""
-        val name: String by helloViewModel.name.observeAsState("")
-
-        Column {
-            Text(text = name)
-            TextField(
-                value = name,
-                onValueChange = { helloViewModel.onNameChanged(it) },
+    fun HelloContent() {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "Hello!",
+                modifier = Modifier.padding(bottom = 8.dp),
+                style = MaterialTheme.typography.h5
+            )
+            OutlinedTextField(
+                value = "",
+                onValueChange = { },
                 label = { Text("Name") }
             )
         }
     }
 }
 
-@Composable private fun StateSnippets3And4() {
-    val name: String by helloViewModel.name.observeAsState("")
-    val nameState: State<String> = helloViewModel.name.observeAsState("")
+private object StateSnippet2 {
+    /*
+     * MutableState is part of the API, so StateSnippet2 can't have the exact code
+     * for the published documentation. Instead, use the following commented code
+     * in the doc. If FakeState<T> changes, update the commented code accordingly.
+     *
+    interface MutableState<T> : State<T> {
+        override var value: T
+    }
+     */
+    interface FakeState<T> : State<T> {
+        override var value: T
+    }
+
+    interface FakeMutableState<T> : MutableState<String>
 }
 
-private object StateSnippet5 {
+private object StateSnippet3 {
     @Composable
-    fun HelloScreen(helloViewModel: HelloViewModel = viewModel()) {
-        // helloViewModel follows the Lifecycle as the Activity or Fragment that calls this
-        // composable function. This lifecycle can be modified by callers of HelloScreen.
+    fun HelloContent() {
+        Column(modifier = Modifier.padding(16.dp)) {
+            var name by remember { mutableStateOf("") }
+            if (name.isNotEmpty()) {
+                Text(
+                    text = "Hello, $name!",
+                    modifier = Modifier.padding(bottom = 8.dp),
+                    style = MaterialTheme.typography.h5
+                )
+            }
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { Text("Name") }
+            )
+        }
+    }
+}
 
-        // name is the _current_ value of [helloViewModel.name]
-        val name: String by helloViewModel.name.observeAsState("")
+private object StateSnippet4 {
+    @Composable
+    fun HelloScreen() {
+        var name by rememberSaveable { mutableStateOf("") }
 
-        HelloInput(name = name, onNameChange = { helloViewModel.onNameChanged(it) })
+        HelloContent(name = name, onNameChange = { name = it })
     }
 
     @Composable
-    fun HelloInput(
-        name: String, /* state */
-        onNameChange: (String) -> Unit /* event */
-    ) {
-        Column {
-            Text(name)
-            TextField(
+    fun HelloContent(name: String, onNameChange: (String) -> Unit) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "Hello, $name",
+                modifier = Modifier.padding(bottom = 8.dp),
+                style = MaterialTheme.typography.h5
+            )
+            OutlinedTextField(
                 value = name,
                 onValueChange = onNameChange,
                 label = { Text("Name") }
@@ -161,171 +135,141 @@ private object StateSnippet5 {
     }
 }
 
+private object StateSnippet5 {
+    @Parcelize
+    data class City(val name: String, val country: String) : Parcelable
+
+    @Composable
+    fun CityScreen() {
+        var selectedCity = rememberSaveable {
+            mutableStateOf(City("Madrid", "Spain"))
+        }
+    }
+}
+
 private object StateSnippet6 {
-    @Composable
-    fun FancyText(text: String) {
-        // by passing text as a parameter to remember, it will re-run the calculation on
-        // recomposition if text has changed since the last recomposition
-        val formattedText = remember(text) { computeTextFormatting(text) }
-        /*...*/
-    }
-}
+    data class City(val name: String, val country: String)
 
-private object StateSnippet7 {
-    @Composable
-    fun ExpandingCard(title: String, body: String) {
-        // expanded is "internal state" for ExpandingCard
-        var expanded by remember { mutableStateOf(false) }
-
-        // describe the card for the current state of expanded
-        Card {
-            Column(
-                Modifier
-                    .width(280.dp)
-                    .animateContentSize() // automatically animate size when it changes
-                    .padding(top = 16.dp, start = 16.dp, end = 16.dp)
-            ) {
-                Text(text = title)
-
-                // content of the card depends on the current value of expanded
-                if (expanded) {
-                    // TODO: show body & collapse icon
-                } else {
-                    // TODO: show expand icon
-                }
-            }
-        }
-    }
-}
-
-@Composable private fun StateSnippets8and9() {
-    var expanded: Boolean by remember { mutableStateOf(false) }
-
-    val expandedState: MutableState<Boolean> = remember { mutableStateOf(false) }
-}
-
-private object StateSnippet10 {
-    /* Part of the API. Look for changes below.
-    interface MutableState<T> : State<T> {
-        override var value: T
-    }
-     */
-    interface FakeState<T> : State<T> {
-        override var value: T
-    }
-    interface FakeMutableState<T> : MutableState<String>
-}
-
-private object StateSnippet11 {
-    @Composable
-    fun ExpandingCard(title: String, body: String) {
-        var expanded by remember { mutableStateOf(false) }
-
-        // describe the card for the current state of expanded
-        Card {
-            Column(
-                Modifier
-                    .width(280.dp)
-                    .animateContentSize() // automatically animate size when it changes
-                    .padding(top = 16.dp, start = 16.dp, end = 16.dp)
-            ) {
-                Text(text = title)
-
-                // content of the card depends on the current value of expanded
-                if (expanded) {
-                    Text(text = body, Modifier.padding(top = 8.dp))
-                    // change expanded in response to click events
-                    IconButton(onClick = { expanded = false }, modifier = Modifier.fillMaxWidth()) {
-                        Icon(
-                            Icons.Default.ExpandLess,
-                            contentDescription = stringResource(R.string.expand_less)
-                        )
-                    }
-                } else {
-                    // change expanded in response to click events
-                    IconButton(onClick = { expanded = true }, modifier = Modifier.fillMaxWidth()) {
-                        Icon(
-                            Icons.Default.ExpandMore,
-                            contentDescription = stringResource(R.string.expand_more)
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-private object StateSnippet12 {
-    // this stateful composable is only responsible for holding internal state
-    // and defers the UI to the stateless composable
-    @Composable
-    fun ExpandingCard(title: String, body: String) {
-        var expanded by remember { mutableStateOf(false) }
-        ExpandingCard(
-            title = title,
-            body = body,
-            expanded = expanded,
-            onExpand = { expanded = true },
-            onCollapse = { expanded = false }
+    val CitySaver = run {
+        val nameKey = "Name"
+        val countryKey = "Country"
+        mapSaver(
+            save = { mapOf(nameKey to it.name, countryKey to it.country) },
+            restore = { City(it[nameKey] as String, it[countryKey] as String) }
         )
     }
 
-    // this stateless composable is responsible for describing the UI based on the state
-    // passed to it and firing events in response to the buttons being pressed
     @Composable
-    fun ExpandingCard(
-        title: String,
-        body: String,
-        expanded: Boolean,
-        onExpand: () -> Unit,
-        onCollapse: () -> Unit
+    fun CityScreen() {
+        var selectedCity = rememberSaveable(stateSaver = CitySaver) {
+            mutableStateOf(City("Madrid", "Spain"))
+        }
+    }
+}
+
+@Composable
+private fun StateSnippets7() {
+    data class City(val name: String, val country: String)
+
+    val CitySaver = listSaver<City, Any>(
+        save = { listOf(it.name, it.country) },
+        restore = { City(it[0] as String, it[1] as String) }
+    )
+
+    @Composable
+    fun CityScreen() {
+        var selectedCity = rememberSaveable(stateSaver = CitySaver) {
+            mutableStateOf(City("Madrid", "Spain"))
+        }
+    }
+}
+
+@Composable
+private fun StateSnippets8() {
+    @Composable
+    fun MyApp() {
+        MyTheme {
+            val scaffoldState = rememberScaffoldState()
+            val coroutineScope = rememberCoroutineScope()
+
+            Scaffold(scaffoldState = scaffoldState) {
+                MyContent(
+                    showSnackbar = { message ->
+                        coroutineScope.launch {
+                            scaffoldState.snackbarHostState.showSnackbar(message)
+                        }
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun StateSnippets9() {
+
+    // Plain class that manages App's UI logic and UI elements' state
+    class MyAppState(
+        val scaffoldState: ScaffoldState,
+        val navController: NavHostController,
+        private val resources: Resources,
+        /* ... */
     ) {
-        Card {
-            Column(
-                Modifier
-                    .width(280.dp)
-                    .animateContentSize() // automatically animate size when it changes
-                    .padding(top = 16.dp, start = 16.dp, end = 16.dp)
-            ) {
-                Text(title)
-                if (expanded) {
-                    Spacer(Modifier.height(8.dp))
-                    Text(body)
-                    IconButton(onClick = onCollapse, modifier = Modifier.fillMaxWidth()) {
-                        Icon(
-                            Icons.Default.ExpandLess,
-                            contentDescription = stringResource(R.string.expand_less)
-                        )
-                    }
-                } else {
-                    IconButton(onClick = onExpand, modifier = Modifier.fillMaxWidth()) {
-                        Icon(
-                            Icons.Default.ExpandMore,
-                            contentDescription = stringResource(R.string.expand_more)
-                        )
-                    }
-                }
-            }
-        }
+        val bottomBarTabs = /* State */
+            // DO NOT COPY IN DAC
+            Unit
+
+        // Logic to decide when to show the bottom bar
+        val shouldShowBottomBar: Boolean
+            get() = /* ... */
+                // DO NOT COPY IN DAC
+                false
+
+        // Navigation logic, which is a type of UI logic
+        fun navigateToBottomBarRoute(route: String) { /* ... */ }
+
+        // Show snackbar using Resources
+        fun showSnackbar(message: String) { /* ... */ }
+    }
+
+    @Composable
+    fun rememberMyAppState(
+        scaffoldState: ScaffoldState = rememberScaffoldState(),
+        navController: NavHostController = rememberNavController(),
+        resources: Resources = LocalContext.current.resources,
+        /* ... */
+    ) = remember(scaffoldState, navController, resources, /* ... */) {
+        MyAppState(scaffoldState, navController, resources, /* ... */)
     }
 }
 
-private object StateSnippet13 {
+@Composable
+private fun StateSnippets10() {
     @Composable
-    fun ExpandingCard(title: String, body: String) {
-        var expanded by rememberSaveable { mutableStateOf(false) }
-        ExpandingCard(
-            title = title,
-            body = body,
-            expanded = expanded,
-            onExpand = { expanded = true },
-            onCollapse = { expanded = false }
-        )
+    fun MyApp() {
+        MyTheme {
+            val myAppState = rememberMyAppState()
+            Scaffold(
+                scaffoldState = myAppState.scaffoldState,
+                bottomBar = {
+                    if (myAppState.shouldShowBottomBar) {
+                        BottomBar(
+                            tabs = myAppState.bottomBarTabs,
+                            navigateToRoute = {
+                                myAppState.navigateToBottomBarRoute(it)
+                            }
+                        )
+                    }
+                }
+            ) {
+                NavHost(navController = myAppState.navController, "initial") { /* ... */ }
+            }
+        }
     }
 }
 
 /*
-Fakes needed for snippets to build:
+ * Fakes needed for snippets to build:
  */
 
 private object binding {
@@ -334,39 +278,41 @@ private object binding {
     }
 
     object textInput {
-        fun doAfterTextChanged(function: () -> Unit) { }
+        fun doAfterTextChanged(function: () -> Unit) {}
     }
 }
 
-private object R {
-    object string {
-        const val expand_less = 0
-        const val expand_more = 1
-    }
+@Composable
+private fun MyTheme(content: @Composable () -> Unit) {}
+
+@Composable
+private fun MyContent(showSnackbar: (String) -> Unit) {}
+
+@Composable
+private fun BottomBar(tabs: Unit, navigateToRoute: (String) -> Unit) {}
+
+@Composable
+private fun rememberMyAppState(
+    scaffoldState: ScaffoldState = rememberScaffoldState(),
+    navController: NavHostController = rememberNavController(),
+    resources: Resources = LocalContext.current.resources
+) = remember(scaffoldState, navController, resources) {
+    MyAppState(scaffoldState, navController, resources)
 }
 
-private const val it = 1
-private lateinit var helloViewModel: StateSnippet2.HelloViewModel
-private fun computeTextFormatting(st: String): String = ""
-
-private fun ExpandingCard(
-    title: String,
-    body: String,
-    expanded: Boolean,
-    onExpand: () -> Unit,
-    onCollapse: () -> Unit
-) { }
-
-private class HelloViewModel : ViewModel() {
-
-    // LiveData holds state which is observed by the UI
-    // (state flows down from ViewModel)
-    private val _name = MutableLiveData("")
-    val name: LiveData<String> = _name
-
-    // onNameChanged is an event we're defining that the UI can invoke
-    // (events flow up from UI)
-    fun onNameChanged(newName: String) {
-        _name.value = newName
-    }
+private class MyAppState(
+    val scaffoldState: ScaffoldState,
+    val navController: NavHostController,
+    private val resources: Resources,
+) {
+    val shouldShowBottomBar: Boolean = false
+    val bottomBarTabs = Unit
+    fun navigateToBottomBarRoute(route: String) {}
 }
+
+/**
+ * Add fake Parcelize and Parcelable to avoid adding AndroidX wide dependency on
+ * kotlin-parcelize just for snippets
+ */
+private annotation class Parcelize
+private interface Parcelable

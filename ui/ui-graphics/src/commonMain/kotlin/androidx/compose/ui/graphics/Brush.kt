@@ -24,10 +24,20 @@ import androidx.compose.ui.geometry.center
 import androidx.compose.ui.geometry.isFinite
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.geometry.isUnspecified
-import androidx.compose.ui.unit.center
+import kotlin.math.abs
 
 @Immutable
 sealed class Brush {
+
+    /**
+     * Return the intrinsic size of the [Brush].
+     * If the there is no intrinsic size (i.e. filling bounds with an arbitrary color) return
+     * [Size.Unspecified].
+     * If there is no intrinsic size in a single dimension, return [Size] with
+     * [Float.NaN] in the desired dimension.
+     */
+    open val intrinsicSize: Size = Size.Unspecified
+
     abstract fun applyTo(size: Size, p: Paint, alpha: Float)
 
     companion object {
@@ -51,7 +61,7 @@ sealed class Brush {
          *
          * @param colorStops Colors and their offset in the gradient area
          * @param start Starting position of the linear gradient. This can be set to
-         * [Offset.Infinite] to position at the far right and bottom of the drawing area
+         * [Offset.Zero] to position at the far left and top of the drawing area
          * @param end Ending position of the linear gradient. This can be set to
          * [Offset.Infinite] to position at the far right and bottom of the drawing area
          * @param tileMode Determines the behavior for how the shader is to fill a region outside
@@ -87,7 +97,7 @@ sealed class Brush {
          *
          * @param colors Colors to be rendered as part of the gradient
          * @param start Starting position of the linear gradient. This can be set to
-         * [Offset.Infinite] to position at the far right and bottom of the drawing area
+         * [Offset.Zero] to position at the far left and top of the drawing area
          * @param end Ending position of the linear gradient. This can be set to
          * [Offset.Infinite] to position at the far right and bottom of the drawing area
          * @param tileMode Determines the behavior for how the shader is to fill a region outside
@@ -434,6 +444,13 @@ class LinearGradient internal constructor(
     private val tileMode: TileMode = TileMode.Clamp
 ) : ShaderBrush() {
 
+    override val intrinsicSize: Size
+        get() =
+            Size(
+                if (start.x.isFinite() && end.x.isFinite()) abs(start.x - end.x) else Float.NaN,
+                if (start.y.isFinite() && end.y.isFinite()) abs(start.y - end.y) else Float.NaN
+            )
+
     override fun createShader(size: Size): Shader {
         val startX = if (start.x == Float.POSITIVE_INFINITY) size.width else start.x
         val startY = if (start.y == Float.POSITIVE_INFINITY) size.height else start.y
@@ -492,6 +509,9 @@ class RadialGradient internal constructor(
     private val radius: Float,
     private val tileMode: TileMode = TileMode.Clamp
 ) : ShaderBrush() {
+
+    override val intrinsicSize: Size
+        get() = if (radius.isFinite()) Size(radius * 2, radius * 2) else Size.Unspecified
 
     override fun createShader(size: Size): Shader {
         val centerX: Float

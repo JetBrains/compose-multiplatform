@@ -100,6 +100,7 @@ internal object CommonPreviewUtils {
      * Calls the method on the given [instance]. If the method accepts default values, this function
      * will call it with the correct options set.
      */
+    @Suppress("BanUncheckedReflection")
     private fun Method.invokeComposableMethod(
         instance: Any?,
         composer: Composer,

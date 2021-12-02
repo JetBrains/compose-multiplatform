@@ -25,6 +25,7 @@ import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.MonotonicFrameClock
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.withRunningRecomposer
 import kotlinx.coroutines.channels.Channel
@@ -202,6 +203,129 @@ class ComposedModifierTest {
                 )
             }
         }
+    }
+
+    @ExperimentalComposeUiApi
+    @Test
+    fun keyedComposedModifiersAreEqual() {
+        val key1 = Any()
+        val key2 = Any()
+        val key3 = Any()
+        val keyN = Array<Any?>(10) { Any() }
+        assertEquals(
+            Modifier.composed("name", key1) { Modifier },
+            Modifier.composed("name", key1) { Modifier }
+        )
+        assertEquals(
+            Modifier.composed("name", key1, key2) { Modifier },
+            Modifier.composed("name", key1, key2) { Modifier }
+        )
+        assertEquals(
+            Modifier.composed("name", key1, key2, key3) { Modifier },
+            Modifier.composed("name", key1, key2, key3) { Modifier }
+        )
+        assertEquals(
+            Modifier.composed("name", *keyN) { Modifier },
+            Modifier.composed("name", *keyN) { Modifier }
+        )
+    }
+
+    @ExperimentalComposeUiApi
+    @Test
+    fun mismatchedKeyedComposedModifiersAreNotEqual() {
+        val key1 = Any()
+        val key2 = Any()
+        val key3 = Any()
+        val keyN = Array<Any?>(10) { Any() }
+        assertNotEquals(
+            Modifier.composed("name", key1) { Modifier },
+            Modifier.composed("namey mcnameface", key1) { Modifier }
+        )
+        assertNotEquals(
+            Modifier.composed("name", key1) { Modifier },
+            Modifier.composed("name", key2) { Modifier }
+        )
+        assertNotEquals(
+            Modifier.composed("name", key1, key2) { Modifier },
+            Modifier.composed("namey mcnameface", key1, key2) { Modifier }
+        )
+        assertNotEquals(
+            Modifier.composed("name", key1, key2) { Modifier },
+            Modifier.composed("name", Any(), key2) { Modifier }
+        )
+        assertNotEquals(
+            Modifier.composed("name", key1, key2) { Modifier },
+            Modifier.composed("name", key1, Any()) { Modifier }
+        )
+        assertNotEquals(
+            Modifier.composed("name", key1, key2, key3) { Modifier },
+            Modifier.composed("namey mcnameface", key1, key2, key3) { Modifier }
+        )
+        assertNotEquals(
+            Modifier.composed("name", key1, key2, key3) { Modifier },
+            Modifier.composed("name", Any(), key2, key3) { Modifier }
+        )
+        assertNotEquals(
+            Modifier.composed("name", key1, key2, key3) { Modifier },
+            Modifier.composed("name", key1, Any(), key3) { Modifier }
+        )
+        assertNotEquals(
+            Modifier.composed("name", key1, key2, key3) { Modifier },
+            Modifier.composed("name", key1, key2, Any()) { Modifier }
+        )
+        assertNotEquals(
+            Modifier.composed("name", *keyN) { Modifier },
+            Modifier.composed("namey mcnameface", *keyN) { Modifier },
+        )
+        repeat(keyN.size) { i ->
+            assertNotEquals(
+                Modifier.composed("name", *keyN) { Modifier },
+                Modifier.composed("name", *(keyN.copyOf().also { it[i] = Any() })) { Modifier }
+            )
+        }
+    }
+
+    @ExperimentalComposeUiApi
+    @Test
+    fun recomposingKeyedComposedModifierSkips() = runBlocking {
+        // Manually invalidate the composition instead of using mutableStateOf
+        // Snapshot-based recomposition requires explicit snapshot commits/global write observers.
+        lateinit var scope: RecomposeScope
+
+        val frameClock = TestFrameClock()
+        withContext(frameClock) {
+            withRunningRecomposer { recomposer ->
+                var composeCount = 0
+                var childComposeCount = 0
+                // Use the same lambda instance; the capture used here is unstable
+                // and would prevent skipping.
+                val increment: (Modifier) -> Unit = { childComposeCount++ }
+                val key = Any()
+
+                compose(recomposer) {
+                    scope = currentRecomposeScope
+                    SideEffect { composeCount++ }
+                    ModifiedComposable(Modifier.composed("name", key) { Modifier }, increment)
+                }
+
+                assertEquals("initial compositions", 1, composeCount)
+                assertEquals("initial child compositions", 1, childComposeCount)
+
+                scope.invalidate()
+                frameClock.frame(0L)
+
+                assertEquals("recomposed compositions", 2, composeCount)
+                assertEquals("recomposed child compositions", 1, childComposeCount)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ModifiedComposable(modifier: Modifier, onComposed: (Modifier) -> Unit) {
+    SideEffect {
+        // Use the modifier parameter so that compiler optimizations don't ignore it
+        onComposed(modifier)
     }
 }
 

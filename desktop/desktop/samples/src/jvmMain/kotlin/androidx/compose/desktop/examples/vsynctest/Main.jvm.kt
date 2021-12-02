@@ -15,10 +15,9 @@
  */
 package androidx.compose.desktop.examples.vsynctest
 
-import androidx.compose.desktop.LocalAppWindow
-import androidx.compose.desktop.Window
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,23 +29,31 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.ApplicationScope
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
 
-private val frameLogCount = 1000
-private val red = Color(255, 128, 128)
-private val cyan = Color(128, 255, 255)
+private val FrameLogCount = 1000
 
-fun main() {
-    window()
-    window()
+fun main() = application {
+    AppWindow()
+    AppWindow()
 }
 
-fun window() {
-    var t1 = Long.MAX_VALUE
-    val frameDeltas = ArrayList<Long>(10000)
-    var heuristicExpectedFrameTime = -1L
+@Composable
+private fun ApplicationScope.AppWindow() {
+    val state = remember {
+        object {
+            var t1 = Long.MAX_VALUE
+            val frameDeltas = ArrayList<Long>(10000)
+            var heuristicExpectedFrameTime = -1L
+        }
+    }
 
-    fun logFrame() {
+    fun logFrame() = with(state) {
         val t2 = System.nanoTime()
         val dt = (t2 - t1).coerceAtLeast(0)
         frameDeltas.add(dt)
@@ -58,7 +65,7 @@ fun window() {
             println("Too long frame %.2f (expected %.2f)".format(dtMillis, expectedMillis))
         }
 
-        if (frameDeltas.size % frameLogCount == 0) {
+        if (frameDeltas.size % FrameLogCount == 0) {
             val fps = 1E9 / frameDeltas.average()
 
             // it is more precise than
@@ -74,11 +81,13 @@ fun window() {
         }
     }
 
-    Window(size = IntSize(800, 200)) {
-        val window = LocalAppWindow.current
-        val width = (LocalDensity.current.density * window.window.width).toInt()
+    Window(
+        onCloseRequest = ::exitApplication,
+        state = rememberWindowState(size = DpSize(800.dp, 200.dp))
+    ) {
+        val width = (LocalDensity.current.density * window.width).toInt()
         val singleFrameMillis = remember {
-            1000 / window.window.graphicsConfiguration.device.displayMode.refreshRate
+            1000 / window.graphicsConfiguration.device.displayMode.refreshRate
         }
         var position1 by remember { mutableStateOf(0L) }
         var position2 by remember { mutableStateOf(0L) }
@@ -102,7 +111,7 @@ fun window() {
             drawRect(Color.Red, Offset(position2.toFloat(), 50f), Size(32f, 32f))
 
             // test similar to https://www.vsynctester.com/
-            drawRect(if (isOddFrame) red else cyan, Offset(10f, 120f), Size(50f, 50f))
+            drawRect(if (isOddFrame) Color.Red else Color.Cyan, Offset(10f, 120f), Size(50f, 50f))
             isOddFrame = !isOddFrame
 
             logFrame()

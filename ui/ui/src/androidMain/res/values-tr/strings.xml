@@ -26,7 +26,9 @@
     <string name="in_progress" msgid="6827826412747255547">"Devam ediyor"</string>
     <string name="tab" msgid="1672349317127674378">"Sekme"</string>
     <string name="navigation_menu" msgid="542007171693138492">"Gezinme menüsü"</string>
+    <string name="dropdown_menu" msgid="1890207353314751437">"Açılır menü"</string>
     <string name="close_drawer" msgid="406453423630273620">"Gezinme menüsünü kapat"</string>
     <string name="close_sheet" msgid="7573152094250666567">"Sayfayı kapat"</string>
     <string name="default_error_message" msgid="8038256446254964252">"Geçersiz giriş"</string>
+    <string name="default_popup_window_title" msgid="6312721426453364202">"Pop-up Pencere"</string>
 </resources>

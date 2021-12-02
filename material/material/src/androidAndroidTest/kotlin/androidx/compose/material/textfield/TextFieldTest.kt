@@ -49,6 +49,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TextFieldPadding
+import androidx.compose.material.Typography
 import androidx.compose.material.getString
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -93,7 +94,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
@@ -266,7 +267,7 @@ class TextFieldTest {
         }
 
         // Click on (2, 2) which is Surface area and outside input area
-        rule.onNodeWithTag(TextfieldTag).performGesture {
+        rule.onNodeWithTag(TextfieldTag).performTouchInput {
             click(Offset(2f, 2f))
         }
 
@@ -1251,12 +1252,11 @@ class TextFieldTest {
     }
 
     @Test
-    fun testTextField_doesNotCrash_rowHeightWithMinIntrinsics() {
-        var textFieldSize: IntSize? = null
+    fun testTextField_withLabel_doesNotCrash_rowHeightWithMinIntrinsics() {
+        var size: IntSize? = null
         var dividerSize: IntSize? = null
         rule.setMaterialContent {
-            val text = remember { mutableStateOf("") }
-            Box {
+            Box(Modifier.onGloballyPositioned { size = it.size }) {
                 Row(Modifier.height(IntrinsicSize.Min)) {
                     Divider(
                         modifier = Modifier
@@ -1265,10 +1265,9 @@ class TextFieldTest {
                             .onGloballyPositioned { dividerSize = it.size }
                     )
                     TextField(
-                        value = text.value,
+                        value = "",
                         label = { Text(text = "Label") },
-                        onValueChange = { text.value = it },
-                        modifier = Modifier.onGloballyPositioned { textFieldSize = it.size }
+                        onValueChange = {}
                     )
                 }
             }
@@ -1276,13 +1275,13 @@ class TextFieldTest {
 
         rule.runOnIdle {
             assertThat(dividerSize).isNotNull()
-            assertThat(textFieldSize).isNotNull()
-            assertThat(dividerSize!!.height).isEqualTo(textFieldSize!!.height)
+            assertThat(size).isNotNull()
+            assertThat(dividerSize!!.height).isEqualTo(size!!.height)
         }
     }
 
     @Test
-    fun testTextField_doesNotCrash_columnWidthWithMinIntrinsics() {
+    fun testTextField_withLabel_doesNotCrash_columnWidthWithMinIntrinsics() {
         var textFieldSize: IntSize? = null
         var dividerSize: IntSize? = null
         rule.setMaterialContent {
@@ -1335,6 +1334,252 @@ class TextFieldTest {
 
         rule.onNodeWithTag(TextfieldTag).captureToImage().assertPixels {
             Color.White
+        }
+    }
+
+    @Test
+    fun testTextField_labelStyle() {
+        val unfocusedLabelColor = Color.Blue
+        val focusedLabelColor = Color.Red
+        var textStyle = TextStyle()
+        var contentColor = Color.Unspecified
+
+        val focusRequester = FocusRequester()
+
+        rule.setMaterialContent {
+            TextField(
+                value = "",
+                onValueChange = {},
+                label = {
+                    textStyle = LocalTextStyle.current
+                    contentColor = LocalContentColor.current
+                },
+                modifier = Modifier.focusRequester(focusRequester),
+                colors = TextFieldDefaults.textFieldColors(
+                    unfocusedLabelColor = unfocusedLabelColor, focusedLabelColor = focusedLabelColor
+                )
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(contentColor).isEqualTo(unfocusedLabelColor)
+            assertThat(textStyle.color).isEqualTo(Color.Unspecified)
+        }
+
+        rule.runOnUiThread {
+            focusRequester.requestFocus()
+        }
+
+        rule.runOnIdle {
+            assertThat(contentColor).isEqualTo(focusedLabelColor)
+            assertThat(textStyle.color).isEqualTo(Color.Unspecified)
+        }
+    }
+
+    @Test
+    fun testTextField_labelStyle_whenCaptionStyleColorProvided() {
+        val unfocusedLabelColor = Color.Blue
+        val focusedLabelColor = Color.Red
+        val captionColor = Color.Green
+        var textStyle = TextStyle()
+        var contentColor = Color.Unspecified
+
+        val focusRequester = FocusRequester()
+
+        rule.setMaterialContent {
+            val caption = MaterialTheme.typography.caption.copy(color = captionColor)
+            MaterialTheme(typography = Typography(caption = caption)) {
+                TextField(
+                    value = "",
+                    onValueChange = {},
+                    label = {
+                        textStyle = LocalTextStyle.current
+                        contentColor = LocalContentColor.current
+                    },
+                    modifier = Modifier.focusRequester(focusRequester),
+                    colors = TextFieldDefaults.textFieldColors(
+                        unfocusedLabelColor = unfocusedLabelColor,
+                        focusedLabelColor = focusedLabelColor
+                    )
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(textStyle.color).isEqualTo(unfocusedLabelColor)
+            assertThat(contentColor).isEqualTo(unfocusedLabelColor)
+        }
+
+        rule.runOnUiThread {
+            focusRequester.requestFocus()
+        }
+
+        rule.runOnIdle {
+            assertThat(textStyle.color).isEqualTo(captionColor)
+            assertThat(contentColor).isEqualTo(focusedLabelColor)
+        }
+    }
+
+    @Test
+    fun testTextField_labelStyle_middle_whenCaptionStyleColorProvided() {
+        val expectedLabelColor = Color.Blue
+        val focusedLabelColor = Color.Red
+        var textStyle = TextStyle()
+        var contentColor = Color.Unspecified
+        val focusRequester = FocusRequester()
+
+        rule.mainClock.autoAdvance = false
+        rule.setMaterialContent {
+            val caption = MaterialTheme.typography.caption.copy(color = expectedLabelColor)
+            MaterialTheme(typography = Typography(caption = caption)) {
+                TextField(
+                    value = "",
+                    onValueChange = {},
+                    label = {
+                        textStyle = LocalTextStyle.current
+                        contentColor = LocalContentColor.current
+                    },
+                    modifier = Modifier.focusRequester(focusRequester),
+                    colors = TextFieldDefaults.textFieldColors(
+                        unfocusedLabelColor = expectedLabelColor,
+                        focusedLabelColor = focusedLabelColor
+                    )
+                )
+            }
+        }
+
+        rule.runOnUiThread {
+            focusRequester.requestFocus()
+        }
+
+        // animation duration is 150, advancing by 75 to get into middle of animation
+        rule.mainClock.advanceTimeBy(75)
+
+        rule.runOnIdle {
+            assertThat(textStyle.color).isEqualTo(expectedLabelColor)
+            // color should be a lerp between 'start' and 'end' colors. We check here that it's
+            // not equal to either of them
+            assertThat(contentColor).isNotEqualTo(expectedLabelColor)
+            assertThat(contentColor).isNotEqualTo(focusedLabelColor)
+        }
+    }
+
+    @Test
+    fun testTextField_labelStyle_whenBothTypographiesColorProvided() {
+        val unfocusedLabelColor = Color.Blue
+        val focusedLabelColor = Color.Red
+        val captionColor = Color.Green
+        val subtitleColor = Color.Black
+        var textStyle = TextStyle()
+        var contentColor = Color.Unspecified
+        val focusRequester = FocusRequester()
+
+        rule.setMaterialContent {
+            val caption = MaterialTheme.typography.caption.copy(color = captionColor)
+            val subtitle1 = MaterialTheme.typography.subtitle1.copy(color = subtitleColor)
+            MaterialTheme(typography = Typography(caption = caption, subtitle1 = subtitle1)) {
+                TextField(
+                    value = "",
+                    onValueChange = {},
+                    label = {
+                        textStyle = LocalTextStyle.current
+                        contentColor = LocalContentColor.current
+                    },
+                    modifier = Modifier.focusRequester(focusRequester),
+                    colors = TextFieldDefaults.textFieldColors(
+                        unfocusedLabelColor = unfocusedLabelColor,
+                        focusedLabelColor = focusedLabelColor
+                    )
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(textStyle.color).isEqualTo(subtitleColor)
+            assertThat(contentColor).isEqualTo(unfocusedLabelColor)
+        }
+
+        rule.runOnUiThread {
+            focusRequester.requestFocus()
+        }
+
+        rule.runOnIdle {
+            assertThat(textStyle.color).isEqualTo(captionColor)
+            assertThat(contentColor).isEqualTo(focusedLabelColor)
+        }
+    }
+
+    @Test
+    fun testTextField_intrinsicsMeasurement_correctHeight() {
+        var height = 0
+        rule.setMaterialContent {
+            val text = remember { mutableStateOf("") }
+            Box(Modifier.onGloballyPositioned {
+                height = it.size.height
+            }) {
+                Row(Modifier.height(IntrinsicSize.Min)) {
+                    TextField(
+                        value = text.value,
+                        onValueChange = { text.value = it },
+                        placeholder = { Text("placeholder") }
+                    )
+                    Divider(Modifier.fillMaxHeight())
+                }
+            }
+        }
+
+        with(rule.density) {
+            assertThat(height).isEqualTo((TextFieldDefaults.MinHeight).roundToPx())
+        }
+    }
+
+    @Test
+    fun testTextField_intrinsicsMeasurement_withLeadingIcon_correctHeight() {
+        var height = 0
+        rule.setMaterialContent {
+            val text = remember { mutableStateOf("") }
+            Box(Modifier.onGloballyPositioned {
+                height = it.size.height
+            }) {
+                Row(Modifier.height(IntrinsicSize.Min)) {
+                    TextField(
+                        value = text.value,
+                        onValueChange = { text.value = it },
+                        placeholder = { Text("placeholder") },
+                        leadingIcon = { Icon(Icons.Default.Favorite, null) }
+                    )
+                    Divider(Modifier.fillMaxHeight())
+                }
+            }
+        }
+
+        with(rule.density) {
+            assertThat(height).isEqualTo((TextFieldDefaults.MinHeight).roundToPx())
+        }
+    }
+
+    @Test
+    fun testTextField_intrinsicsMeasurement_withTrailingIcon_correctHeight() {
+        var height = 0
+        rule.setMaterialContent {
+            val text = remember { mutableStateOf("") }
+            Box(Modifier.onGloballyPositioned {
+                height = it.size.height
+            }) {
+                Row(Modifier.height(IntrinsicSize.Min)) {
+                    TextField(
+                        value = text.value,
+                        onValueChange = { text.value = it },
+                        placeholder = { Text("placeholder") },
+                        trailingIcon = { Icon(Icons.Default.Favorite, null) }
+                    )
+                    Divider(Modifier.fillMaxHeight())
+                }
+            }
+        }
+
+        with(rule.density) {
+            assertThat(height).isEqualTo((TextFieldDefaults.MinHeight).roundToPx())
         }
     }
 }

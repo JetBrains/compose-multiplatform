@@ -152,7 +152,7 @@ abstract class Painter {
      * If the there is no intrinsic size (i.e. filling bounds with an arbitrary color) return
      * [Size.Unspecified].
      * If there is no intrinsic size in a single dimension, return [Size] with
-     * [Float.POSITIVE_INFINITY] in the desired dimension.
+     * [Float.NaN] in the desired dimension.
      * If a [Painter] does not have an intrinsic size, it will always draw within the full
      * bounds of the destination
      */

@@ -26,13 +26,13 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin(project(":compose:compiler:compiler"))
+    kotlinPlugin(projectOrArtifact(":compose:compiler:compiler"))
 
     implementation(libs.kotlinStdlib)
-    compileOnly(project(":annotation:annotation-sampled"))
-    implementation(project(":compose:foundation:foundation"))
-    implementation(project(":compose:material:material"))
-    implementation(project(":compose:runtime:runtime-rxjava3"))
+    compileOnly(projectOrArtifact(":annotation:annotation-sampled"))
+    implementation("androidx.compose.foundation:foundation:1.0.0")
+    implementation("androidx.compose.material:material:1.0.0")
+    implementation(projectOrArtifact(":compose:runtime:runtime-rxjava3"))
 }
 
 androidx {

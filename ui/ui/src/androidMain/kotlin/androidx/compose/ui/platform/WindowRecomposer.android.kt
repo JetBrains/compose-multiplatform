@@ -261,7 +261,6 @@ private fun View.createLifecycleAwareViewTreeRecomposer(): Recomposer {
         object : LifecycleEventObserver {
             override fun onStateChanged(lifecycleOwner: LifecycleOwner, event: Lifecycle.Event) {
                 val self = this
-                @Suppress("NON_EXHAUSTIVE_WHEN")
                 when (event) {
                     Lifecycle.Event.ON_CREATE ->
                         // Undispatched launch since we've configured this scope
@@ -280,6 +279,15 @@ private fun View.createLifecycleAwareViewTreeRecomposer(): Recomposer {
                     Lifecycle.Event.ON_STOP -> pausableClock?.pause()
                     Lifecycle.Event.ON_DESTROY -> {
                         recomposer.cancel()
+                    }
+                    Lifecycle.Event.ON_PAUSE -> {
+                        // Nothing
+                    }
+                    Lifecycle.Event.ON_RESUME -> {
+                        // Nothing
+                    }
+                    Lifecycle.Event.ON_ANY -> {
+                        // Nothing
                     }
                 }
             }

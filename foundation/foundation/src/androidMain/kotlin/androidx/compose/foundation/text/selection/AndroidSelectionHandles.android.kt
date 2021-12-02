@@ -16,18 +16,25 @@
 
 package androidx.compose.foundation.text.selection
 
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.composed
+import androidx.compose.ui.draw.CacheDrawScope
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.ImageBitmapConfig
+import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
+import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.text.style.ResolvedTextDirection
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
@@ -35,33 +42,36 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
+import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 @Composable
 internal actual fun SelectionHandle(
-    startHandlePosition: Offset?,
-    endHandlePosition: Offset?,
+    position: Offset,
     isStartHandle: Boolean,
-    directions: Pair<ResolvedTextDirection, ResolvedTextDirection>,
+    direction: ResolvedTextDirection,
     handlesCrossed: Boolean,
     modifier: Modifier,
     content: @Composable (() -> Unit)?
 ) {
-    SelectionHandlePopup(
-        startHandlePosition = startHandlePosition,
-        endHandlePosition = endHandlePosition,
-        isStartHandle = isStartHandle,
-        directions = directions,
-        handlesCrossed = handlesCrossed
-    ) {
+    val isLeft = isLeft(isStartHandle, direction, handlesCrossed)
+    // The left selection handle's top right is placed at the given position, and vice versa.
+    val handleReferencePoint = if (isLeft) {
+        HandleReferencePoint.TopRight
+    } else {
+        HandleReferencePoint.TopLeft
+    }
+    HandlePopup(position = position, handleReferencePoint = handleReferencePoint) {
         if (content == null) {
             DefaultSelectionHandle(
                 modifier = modifier,
                 isStartHandle = isStartHandle,
-                directions = directions,
+                direction = direction,
                 handlesCrossed = handlesCrossed
             )
-        } else content()
+        } else {
+            content()
+        }
     }
 }
 
@@ -70,114 +80,141 @@ internal actual fun SelectionHandle(
 internal fun DefaultSelectionHandle(
     modifier: Modifier,
     isStartHandle: Boolean,
-    directions: Pair<ResolvedTextDirection, ResolvedTextDirection>,
+    direction: ResolvedTextDirection,
     handlesCrossed: Boolean
 ) {
-    val selectionHandleCache = remember { SelectionHandleCache() }
-    val handleColor = LocalTextSelectionColors.current.handleColor
-    HandleDrawLayout(modifier = modifier, width = HANDLE_WIDTH, height = HANDLE_HEIGHT) {
-        drawPath(
-            selectionHandleCache.createPath(
-                this,
-                isLeft(isStartHandle, directions, handlesCrossed)
-            ),
-            handleColor
-        )
-    }
+    Spacer(
+        modifier.size(HandleWidth, HandleHeight)
+            .drawSelectionHandle(isStartHandle, direction, handlesCrossed)
+    )
 }
 
-/**
- * Class used to cache a Path object to represent a selection handle
- * based on the given handle direction
- */
-private class SelectionHandleCache {
-    private var path: Path? = null
-    private var left: Boolean = false
-
-    fun createPath(density: Density, left: Boolean): Path {
-        return with(density) {
-            val current = path
-            if (this@SelectionHandleCache.left == left && current != null) {
-                // If we have already created the Path for the correct handle direction
-                // return it
-                current
-            } else {
-                this@SelectionHandleCache.left = left
-                // Otherwise, if this is the first time we are creating the Path
-                // or the current handle direction is different than the one we
-                // previously created, recreate the path and cache the result
-                (current ?: Path().also { path = it }).apply {
-                    reset()
-                    addRect(
-                        Rect(
-                            top = 0f,
-                            bottom = 0.5f * HANDLE_HEIGHT.toPx(),
-                            left = if (left) {
-                                0.5f * HANDLE_WIDTH.toPx()
-                            } else {
-                                0f
-                            },
-                            right = if (left) {
-                                HANDLE_WIDTH.toPx()
-                            } else {
-                                0.5f * HANDLE_WIDTH.toPx()
-                            }
+@Suppress("ModifierInspectorInfo")
+internal fun Modifier.drawSelectionHandle(
+    isStartHandle: Boolean,
+    direction: ResolvedTextDirection,
+    handlesCrossed: Boolean
+) = composed {
+    val handleColor = LocalTextSelectionColors.current.handleColor
+    this.then(
+        Modifier.drawWithCache {
+            val radius = size.width / 2f
+            val handleImage = createHandleImage(radius)
+            val colorFilter = ColorFilter.tint(handleColor)
+            onDrawWithContent {
+                drawContent()
+                val isLeft = isLeft(isStartHandle, direction, handlesCrossed)
+                if (isLeft) {
+                    // Flip the selection handle horizontally.
+                    scale(scaleX = -1f, scaleY = 1f) {
+                        drawImage(
+                            image = handleImage,
+                            colorFilter = colorFilter
                         )
-                    )
-                    addOval(
-                        Rect(
-                            top = 0f,
-                            bottom = HANDLE_HEIGHT.toPx(),
-                            left = 0f,
-                            right = HANDLE_WIDTH.toPx()
-                        )
+                    }
+                } else {
+                    drawImage(
+                        image = handleImage,
+                        colorFilter = colorFilter
                     )
                 }
             }
         }
-    }
+    )
 }
 
 /**
- * Simple container to perform drawing of selection handles. This layout takes size on the screen
- * according to [width] and [height] params and performs drawing in this space as specified in
- * [onCanvas]
+ * The cache for the image mask created to draw selection/cursor handle, so that we don't need to
+ * recreate them.
  */
-@Composable
-private fun HandleDrawLayout(
-    modifier: Modifier,
-    width: Dp,
-    height: Dp,
-    onCanvas: DrawScope.() -> Unit
-) {
-    Layout({}, modifier.drawBehind(onCanvas)) { _, _ ->
-        // take width and height space of the screen and allow draw modifier to draw inside of it
-        layout(width.roundToPx(), height.roundToPx()) {
-            // this layout has no children, only draw modifier.
-        }
+private object HandleImageCache {
+    var imageBitmap: ImageBitmap? = null
+    var canvas: Canvas? = null
+    var canvasDrawScope: CanvasDrawScope? = null
+}
+
+/**
+ * Create an image bitmap for the basic shape of a selection handle or cursor handle. It is an
+ * circle with a rectangle covering its left top part.
+ *
+ * To draw the right selection handle, directly draw this image bitmap.
+ * To draw the left selection handle, mirror the canvas first and then draw this image bitmap.
+ * To draw the cursor handle, translate and rotated the canvas 45 degrees, then draw this image
+ * bitmap.
+ *
+ * @param radius the radius of circle in selection/cursor handle.
+ * CanvasDrawScope objects so that we only recreate them when necessary.
+ */
+internal fun CacheDrawScope.createHandleImage(radius: Float): ImageBitmap {
+    // The edge length of the square bounding box of the selection/cursor handle. This is also
+    // the size of the bitmap needed for the bitmap mask.
+    val edge = ceil(radius).toInt() * 2
+
+    var imageBitmap = HandleImageCache.imageBitmap
+    var canvas = HandleImageCache.canvas
+    var drawScope = HandleImageCache.canvasDrawScope
+
+    // If the cached bitmap is null or too small, we need to create new bitmap.
+    if (
+        imageBitmap == null ||
+        canvas == null ||
+        edge > imageBitmap.width ||
+        edge > imageBitmap.height
+    ) {
+        imageBitmap = ImageBitmap(
+            width = edge,
+            height = edge,
+            config = ImageBitmapConfig.Alpha8
+        )
+        HandleImageCache.imageBitmap = imageBitmap
+        canvas = Canvas(imageBitmap)
+        HandleImageCache.canvas = canvas
     }
+    if (drawScope == null) {
+        drawScope = CanvasDrawScope()
+        HandleImageCache.canvasDrawScope = drawScope
+    }
+
+    drawScope.draw(
+        this,
+        layoutDirection,
+        canvas,
+        Size(imageBitmap.width.toFloat(), imageBitmap.height.toFloat())
+    ) {
+        // Clear the previously rendered portion within this ImageBitmap as we could
+        // be re-using it
+        drawRect(
+            color = Color.Black,
+            size = size,
+            blendMode = BlendMode.Clear
+        )
+
+        // Draw the rectangle at top left.
+        drawRect(
+            color = Color(0xFF000000),
+            topLeft = Offset.Zero,
+            size = Size(radius, radius)
+        )
+        // Draw the circle
+        drawCircle(
+            color = Color(0xFF000000),
+            radius = radius,
+            center = Offset(radius, radius)
+        )
+    }
+    return imageBitmap
 }
 
 @Composable
-private fun SelectionHandlePopup(
-    startHandlePosition: Offset?,
-    endHandlePosition: Offset?,
-    isStartHandle: Boolean,
-    directions: Pair<ResolvedTextDirection, ResolvedTextDirection>,
-    handlesCrossed: Boolean,
+internal fun HandlePopup(
+    position: Offset,
+    handleReferencePoint: HandleReferencePoint,
     content: @Composable () -> Unit
 ) {
-    val offset = (if (isStartHandle) startHandlePosition else endHandlePosition) ?: return
-    val left = isLeft(
-        isStartHandle = isStartHandle,
-        directions = directions,
-        handlesCrossed = handlesCrossed
-    )
+    val intOffset = IntOffset(position.x.roundToInt(), position.y.roundToInt())
 
-    val intOffset = IntOffset(offset.x.roundToInt(), offset.y.roundToInt())
-
-    val popupPositioner = remember(left, intOffset) {
-        SelectionHandlePositionProvider(left, intOffset)
+    val popupPositioner = remember(handleReferencePoint, intOffset) {
+        HandlePositionProvider(handleReferencePoint, intOffset)
     }
 
     Popup(
@@ -191,15 +228,30 @@ private fun SelectionHandlePopup(
 }
 
 /**
- * This [PopupPositionProvider] for [SelectionHandlePopup]. It will position the selection handle
- * to the [offset] in its anchor layout. For left selection handle, the right top corner will be
- * positioned to [offset]. For right selection handle, the left top corner will be positioned to
- * [offset].
+ * The enum that specifies how a selection/cursor handle is placed to its given position.
+ * When this value is [TopLeft], the top left corner of the handle will be placed at the
+ * given position.
+ * When this value is [TopRight], the top right corner of the handle will be placed at the
+ * given position.
+ * When this value is [TopMiddle], the handle top edge's middle point will be placed at the given
+ * position.
+ */
+internal enum class HandleReferencePoint {
+    TopLeft,
+    TopRight,
+    TopMiddle
+}
+
+/**
+ * This [PopupPositionProvider] for [HandlePopup]. It will position the selection handle
+ * to the [offset] in its anchor layout.
+ *
+ * @see HandleReferencePoint
  */
 /*@VisibleForTesting*/
-internal class SelectionHandlePositionProvider(
-    val isLeft: Boolean,
-    val offset: IntOffset
+internal class HandlePositionProvider(
+    private val handleReferencePoint: HandleReferencePoint,
+    private val offset: IntOffset
 ) : PopupPositionProvider {
     override fun calculatePosition(
         anchorBounds: IntRect,
@@ -207,16 +259,22 @@ internal class SelectionHandlePositionProvider(
         layoutDirection: LayoutDirection,
         popupContentSize: IntSize
     ): IntOffset {
-        return if (isLeft) {
-            IntOffset(
-                x = anchorBounds.left + offset.x - popupContentSize.width,
-                y = anchorBounds.top + offset.y
-            )
-        } else {
-            IntOffset(
-                x = anchorBounds.left + offset.x,
-                y = anchorBounds.top + offset.y
-            )
+        return when (handleReferencePoint) {
+            HandleReferencePoint.TopLeft ->
+                IntOffset(
+                    x = anchorBounds.left + offset.x,
+                    y = anchorBounds.top + offset.y
+                )
+            HandleReferencePoint.TopRight ->
+                IntOffset(
+                    x = anchorBounds.left + offset.x - popupContentSize.width,
+                    y = anchorBounds.top + offset.y
+                )
+            HandleReferencePoint.TopMiddle ->
+                IntOffset(
+                    x = anchorBounds.left + offset.x - popupContentSize.width / 2,
+                    y = anchorBounds.top + offset.y
+                )
         }
     }
 }
@@ -226,13 +284,13 @@ internal class SelectionHandlePositionProvider(
  */
 private fun isLeft(
     isStartHandle: Boolean,
-    directions: Pair<ResolvedTextDirection, ResolvedTextDirection>,
+    direction: ResolvedTextDirection,
     handlesCrossed: Boolean
 ): Boolean {
     return if (isStartHandle) {
-        isHandleLtrDirection(directions.first, handlesCrossed)
+        isHandleLtrDirection(direction, handlesCrossed)
     } else {
-        !isHandleLtrDirection(directions.second, handlesCrossed)
+        !isHandleLtrDirection(direction, handlesCrossed)
     }
 }
 

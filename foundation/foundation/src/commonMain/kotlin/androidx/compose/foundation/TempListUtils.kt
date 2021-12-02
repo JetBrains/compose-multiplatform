@@ -25,6 +25,10 @@ import kotlin.contracts.contract
 
 /**
  * Returns a list containing only elements matching the given [predicate].
+ *
+ * **Do not use for collections that come from public APIs**, since they may not support random
+ * access in an efficient way, and this method may actually be a lot slower. Only use for
+ * collections that are created by code we control and are known to support random access.
  */
 @OptIn(ExperimentalContracts::class)
 internal inline fun <T> List<T>.fastFilter(predicate: (T) -> Boolean): List<T> {
@@ -42,6 +46,10 @@ internal inline fun <T> List<T>.fastFilter(predicate: (T) -> Boolean): List<T> {
  *
  * Returns the specified [initial] value if the collection is empty.
  *
+ * **Do not use for collections that come from public APIs**, since they may not support random
+ * access in an efficient way, and this method may actually be a lot slower. Only use for
+ * collections that are created by code we control and are known to support random access.
+ *
  * @param [operation] function that takes current accumulator value and an element, and calculates the next accumulator value.
  */
 @OptIn(ExperimentalContracts::class)
@@ -57,6 +65,10 @@ internal inline fun <T, R> List<T>.fastFold(initial: R, operation: (acc: R, T) -
 /**
  * Returns a list containing the results of applying the given [transform] function
  * to each element in the original collection.
+ *
+ * **Do not use for collections that come from public APIs**, since they may not support random
+ * access in an efficient way, and this method may actually be a lot slower. Only use for
+ * collections that are created by code we control and are known to support random access.
  */
 @OptIn(ExperimentalContracts::class)
 internal inline fun <T, R> List<T>.fastMapIndexedNotNull(
@@ -68,4 +80,24 @@ internal inline fun <T, R> List<T>.fastMapIndexedNotNull(
         transform(index, e)?.let { target += it }
     }
     return target
+}
+
+/**
+ * Returns the largest value among all values produced by selector function applied to each element
+ * in the collection or null if there are no elements.
+ *
+ * **Do not use for collections that come from public APIs**, since they may not support random
+ * access in an efficient way, and this method may actually be a lot slower. Only use for
+ * collections that are created by code we control and are known to support random access.
+ */
+@OptIn(ExperimentalContracts::class)
+internal inline fun <T, R : Comparable<R>> List<T>.fastMaxOfOrNull(selector: (T) -> R): R? {
+    contract { callsInPlace(selector) }
+    if (isEmpty()) return null
+    var maxValue = selector(get(0))
+    for (i in 1..lastIndex) {
+        val v = selector(get(i))
+        if (v > maxValue) maxValue = v
+    }
+    return maxValue
 }

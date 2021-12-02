@@ -17,6 +17,7 @@
 package androidx.compose.ui.geometry
 
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -28,23 +29,23 @@ class OffsetTest {
     @Test
     fun testOffsetCopy() {
         val offset = Offset(100f, 200f)
-        Assert.assertEquals(offset, offset.copy())
+        assertEquals(offset, offset.copy())
     }
 
     @Test
     fun testOffsetCopyOverwriteX() {
         val offset = Offset(100f, 200f)
         val copy = offset.copy(x = 50f)
-        Assert.assertEquals(50f, copy.x)
-        Assert.assertEquals(200f, copy.y)
+        assertEquals(50f, copy.x)
+        assertEquals(200f, copy.y)
     }
 
     @Test
     fun testOffsetCopyOverwriteY() {
         val offset = Offset(100f, 200f)
         val copy = offset.copy(y = 300f)
-        Assert.assertEquals(100f, copy.x)
-        Assert.assertEquals(300f, copy.y)
+        assertEquals(100f, copy.x)
+        assertEquals(300f, copy.y)
     }
 
     @Test
@@ -115,5 +116,10 @@ class OffsetTest {
     @Test
     fun testTakeOrElseFalse() {
         assertTrue(Offset.Unspecified.takeOrElse { Offset(1f, 1f) }.isSpecified)
+    }
+
+    @Test
+    fun testUnspecifiedOffsetToString() {
+        assertEquals("Offset.Unspecified", Offset.Unspecified.toString())
     }
 }

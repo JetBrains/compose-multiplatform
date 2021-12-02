@@ -22,6 +22,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -49,6 +50,8 @@ import androidx.compose.ui.graphics.colorspace.ColorModel
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.platform.inspectable
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -69,6 +72,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.packFloats
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -218,12 +222,21 @@ class ParameterFactoryTest {
                     parameter("x", ParameterType.DimensionDp, 2.5f)
                     parameter("y", ParameterType.DimensionDp, 5.0f)
                 }
+                parameter("intrinsicSize", ParameterType.String, Size::class.java.simpleName) {
+                    val width = 5.0f
+                    val height = 9.5f
+                    parameter("height", ParameterType.Float, height)
+                    parameter("maxDimension", ParameterType.Float, height)
+                    parameter("minDimension", ParameterType.Float, width)
+                    parameter("packedValue", ParameterType.Int64, packFloats(width, height))
+                    parameter("width", ParameterType.Float, width)
+                }
                 parameter("start", ParameterType.String, Offset::class.java.simpleName) {
                     parameter("x", ParameterType.DimensionDp, 0.0f)
                     parameter("y", ParameterType.DimensionDp, 0.25f)
                 }
-                parameter("tileMode", ParameterType.String, "Clamp", index = 4)
-                parameter("createdSize", ParameterType.String, "Unspecified", index = 5)
+                parameter("tileMode", ParameterType.String, "Clamp", index = 5)
+                parameter("createdSize", ParameterType.String, "Unspecified", index = 6)
             }
         }
         // TODO: add tests for RadialGradient & ShaderBrush
@@ -651,6 +664,25 @@ class ParameterFactoryTest {
         validate(create("modifier", Modifier.padding(2.0.dp))) {
             parameter("modifier", ParameterType.String, "") {
                 parameter("padding", ParameterType.DimensionDp, 2.0f)
+            }
+        }
+    }
+
+    @Test
+    fun testWrappedModifier() {
+        fun Modifier.frame(color: Color) = inspectable(
+            debugInspectorInfo {
+                name = "frame"
+                value = color
+            }
+        ) {
+            background(color).border(width = 5.dp, color = color)
+        }
+        validate(create("modifier", Modifier.width(40.dp).frame(Color.Green).height(50.dp))) {
+            parameter("modifier", ParameterType.String, "") {
+                parameter("width", ParameterType.DimensionDp, 40.0f)
+                parameter("frame", ParameterType.Color, Color.Green.toArgb())
+                parameter("height", ParameterType.DimensionDp, 50.0f)
             }
         }
     }

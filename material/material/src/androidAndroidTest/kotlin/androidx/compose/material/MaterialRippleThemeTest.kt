@@ -26,6 +26,8 @@ import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.FocusInteraction
+import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -106,6 +108,50 @@ class MaterialRippleThemeTest {
     }
 
     @Test
+    fun bounded_lightTheme_highLuminance_hovered() {
+        val interactionSource = MutableInteractionSource()
+
+        val contentColor = Color.White
+
+        val scope = rule.setRippleContent(
+            interactionSource = interactionSource,
+            bounded = true,
+            lightTheme = true,
+            contentColor = contentColor
+        )
+
+        assertRippleMatches(
+            scope,
+            interactionSource,
+            HoverInteraction.Enter(),
+            "ripple_bounded_light_highluminance_hovered",
+            calculateResultingRippleColor(contentColor, rippleOpacity = 0.08f)
+        )
+    }
+
+    @Test
+    fun bounded_lightTheme_highLuminance_focused() {
+        val interactionSource = MutableInteractionSource()
+
+        val contentColor = Color.White
+
+        val scope = rule.setRippleContent(
+            interactionSource = interactionSource,
+            bounded = true,
+            lightTheme = true,
+            contentColor = contentColor
+        )
+
+        assertRippleMatches(
+            scope,
+            interactionSource,
+            FocusInteraction.Focus(),
+            "ripple_bounded_light_highluminance_focused",
+            calculateResultingRippleColor(contentColor, rippleOpacity = 0.24f)
+        )
+    }
+
+    @Test
     fun bounded_lightTheme_highLuminance_dragged() {
         val interactionSource = MutableInteractionSource()
 
@@ -145,6 +191,50 @@ class MaterialRippleThemeTest {
             interactionSource,
             PressInteraction.Press(Offset(10f, 10f)),
             "ripple_bounded_light_lowluminance_pressed",
+            calculateResultingRippleColor(contentColor, rippleOpacity = 0.12f)
+        )
+    }
+
+    @Test
+    fun bounded_lightTheme_lowLuminance_hovered() {
+        val interactionSource = MutableInteractionSource()
+
+        val contentColor = Color.Black
+
+        val scope = rule.setRippleContent(
+            interactionSource = interactionSource,
+            bounded = true,
+            lightTheme = true,
+            contentColor = contentColor
+        )
+
+        assertRippleMatches(
+            scope,
+            interactionSource,
+            HoverInteraction.Enter(),
+            "ripple_bounded_light_lowluminance_hovered",
+            calculateResultingRippleColor(contentColor, rippleOpacity = 0.04f)
+        )
+    }
+
+    @Test
+    fun bounded_lightTheme_lowLuminance_focused() {
+        val interactionSource = MutableInteractionSource()
+
+        val contentColor = Color.Black
+
+        val scope = rule.setRippleContent(
+            interactionSource = interactionSource,
+            bounded = true,
+            lightTheme = true,
+            contentColor = contentColor
+        )
+
+        assertRippleMatches(
+            scope,
+            interactionSource,
+            FocusInteraction.Focus(),
+            "ripple_bounded_light_lowluminance_focused",
             calculateResultingRippleColor(contentColor, rippleOpacity = 0.12f)
         )
     }
@@ -194,6 +284,50 @@ class MaterialRippleThemeTest {
     }
 
     @Test
+    fun bounded_darkTheme_highLuminance_hovered() {
+        val interactionSource = MutableInteractionSource()
+
+        val contentColor = Color.White
+
+        val scope = rule.setRippleContent(
+            interactionSource = interactionSource,
+            bounded = true,
+            lightTheme = false,
+            contentColor = contentColor
+        )
+
+        assertRippleMatches(
+            scope,
+            interactionSource,
+            HoverInteraction.Enter(),
+            "ripple_bounded_dark_highluminance_hovered",
+            calculateResultingRippleColor(contentColor, rippleOpacity = 0.04f)
+        )
+    }
+
+    @Test
+    fun bounded_darkTheme_highLuminance_focused() {
+        val interactionSource = MutableInteractionSource()
+
+        val contentColor = Color.White
+
+        val scope = rule.setRippleContent(
+            interactionSource = interactionSource,
+            bounded = true,
+            lightTheme = false,
+            contentColor = contentColor
+        )
+
+        assertRippleMatches(
+            scope,
+            interactionSource,
+            FocusInteraction.Focus(),
+            "ripple_bounded_dark_highluminance_focused",
+            calculateResultingRippleColor(contentColor, rippleOpacity = 0.12f)
+        )
+    }
+
+    @Test
     fun bounded_darkTheme_highLuminance_dragged() {
         val interactionSource = MutableInteractionSource()
 
@@ -235,6 +369,52 @@ class MaterialRippleThemeTest {
             "ripple_bounded_dark_lowluminance_pressed",
             // Low luminance content in dark theme should use a white ripple by default
             calculateResultingRippleColor(Color.White, rippleOpacity = 0.10f)
+        )
+    }
+
+    @Test
+    fun bounded_darkTheme_lowLuminance_hovered() {
+        val interactionSource = MutableInteractionSource()
+
+        val contentColor = Color.Black
+
+        val scope = rule.setRippleContent(
+            interactionSource = interactionSource,
+            bounded = true,
+            lightTheme = false,
+            contentColor = contentColor
+        )
+
+        assertRippleMatches(
+            scope,
+            interactionSource,
+            HoverInteraction.Enter(),
+            "ripple_bounded_dark_lowluminance_hovered",
+            // Low luminance content in dark theme should use a white ripple by default
+            calculateResultingRippleColor(Color.White, rippleOpacity = 0.04f)
+        )
+    }
+
+    @Test
+    fun bounded_darkTheme_lowLuminance_focused() {
+        val interactionSource = MutableInteractionSource()
+
+        val contentColor = Color.Black
+
+        val scope = rule.setRippleContent(
+            interactionSource = interactionSource,
+            bounded = true,
+            lightTheme = false,
+            contentColor = contentColor
+        )
+
+        assertRippleMatches(
+            scope,
+            interactionSource,
+            FocusInteraction.Focus(),
+            "ripple_bounded_dark_lowluminance_focused",
+            // Low luminance content in dark theme should use a white ripple by default
+            calculateResultingRippleColor(Color.White, rippleOpacity = 0.12f)
         )
     }
 
@@ -284,6 +464,50 @@ class MaterialRippleThemeTest {
     }
 
     @Test
+    fun unbounded_lightTheme_highLuminance_hovered() {
+        val interactionSource = MutableInteractionSource()
+
+        val contentColor = Color.White
+
+        val scope = rule.setRippleContent(
+            interactionSource = interactionSource,
+            bounded = false,
+            lightTheme = true,
+            contentColor = contentColor
+        )
+
+        assertRippleMatches(
+            scope,
+            interactionSource,
+            HoverInteraction.Enter(),
+            "ripple_unbounded_light_highluminance_hovered",
+            calculateResultingRippleColor(contentColor, rippleOpacity = 0.08f)
+        )
+    }
+
+    @Test
+    fun unbounded_lightTheme_highLuminance_focused() {
+        val interactionSource = MutableInteractionSource()
+
+        val contentColor = Color.White
+
+        val scope = rule.setRippleContent(
+            interactionSource = interactionSource,
+            bounded = false,
+            lightTheme = true,
+            contentColor = contentColor
+        )
+
+        assertRippleMatches(
+            scope,
+            interactionSource,
+            FocusInteraction.Focus(),
+            "ripple_unbounded_light_highluminance_focused",
+            calculateResultingRippleColor(contentColor, rippleOpacity = 0.24f)
+        )
+    }
+
+    @Test
     fun unbounded_lightTheme_highLuminance_dragged() {
         val interactionSource = MutableInteractionSource()
 
@@ -323,6 +547,50 @@ class MaterialRippleThemeTest {
             interactionSource,
             PressInteraction.Press(Offset(10f, 10f)),
             "ripple_unbounded_light_lowluminance_pressed",
+            calculateResultingRippleColor(contentColor, rippleOpacity = 0.12f)
+        )
+    }
+
+    @Test
+    fun unbounded_lightTheme_lowLuminance_hovered() {
+        val interactionSource = MutableInteractionSource()
+
+        val contentColor = Color.Black
+
+        val scope = rule.setRippleContent(
+            interactionSource = interactionSource,
+            bounded = false,
+            lightTheme = true,
+            contentColor = contentColor
+        )
+
+        assertRippleMatches(
+            scope,
+            interactionSource,
+            HoverInteraction.Enter(),
+            "ripple_unbounded_light_lowluminance_hovered",
+            calculateResultingRippleColor(contentColor, rippleOpacity = 0.04f)
+        )
+    }
+
+    @Test
+    fun unbounded_lightTheme_lowLuminance_focused() {
+        val interactionSource = MutableInteractionSource()
+
+        val contentColor = Color.Black
+
+        val scope = rule.setRippleContent(
+            interactionSource = interactionSource,
+            bounded = false,
+            lightTheme = true,
+            contentColor = contentColor
+        )
+
+        assertRippleMatches(
+            scope,
+            interactionSource,
+            FocusInteraction.Focus(),
+            "ripple_unbounded_light_lowluminance_focused",
             calculateResultingRippleColor(contentColor, rippleOpacity = 0.12f)
         )
     }
@@ -372,6 +640,50 @@ class MaterialRippleThemeTest {
     }
 
     @Test
+    fun unbounded_darkTheme_highLuminance_hovered() {
+        val interactionSource = MutableInteractionSource()
+
+        val contentColor = Color.White
+
+        val scope = rule.setRippleContent(
+            interactionSource = interactionSource,
+            bounded = false,
+            lightTheme = false,
+            contentColor = contentColor
+        )
+
+        assertRippleMatches(
+            scope,
+            interactionSource,
+            HoverInteraction.Enter(),
+            "ripple_unbounded_dark_highluminance_hovered",
+            calculateResultingRippleColor(contentColor, rippleOpacity = 0.04f)
+        )
+    }
+
+    @Test
+    fun unbounded_darkTheme_highLuminance_focused() {
+        val interactionSource = MutableInteractionSource()
+
+        val contentColor = Color.White
+
+        val scope = rule.setRippleContent(
+            interactionSource = interactionSource,
+            bounded = false,
+            lightTheme = false,
+            contentColor = contentColor
+        )
+
+        assertRippleMatches(
+            scope,
+            interactionSource,
+            FocusInteraction.Focus(),
+            "ripple_unbounded_dark_highluminance_focused",
+            calculateResultingRippleColor(contentColor, rippleOpacity = 0.12f)
+        )
+    }
+
+    @Test
     fun unbounded_darkTheme_highLuminance_dragged() {
         val interactionSource = MutableInteractionSource()
 
@@ -413,6 +725,52 @@ class MaterialRippleThemeTest {
             "ripple_unbounded_dark_lowluminance_pressed",
             // Low luminance content in dark theme should use a white ripple by default
             calculateResultingRippleColor(Color.White, rippleOpacity = 0.10f)
+        )
+    }
+
+    @Test
+    fun unbounded_darkTheme_lowLuminance_hovered() {
+        val interactionSource = MutableInteractionSource()
+
+        val contentColor = Color.Black
+
+        val scope = rule.setRippleContent(
+            interactionSource = interactionSource,
+            bounded = false,
+            lightTheme = false,
+            contentColor = contentColor
+        )
+
+        assertRippleMatches(
+            scope,
+            interactionSource,
+            HoverInteraction.Enter(),
+            "ripple_unbounded_dark_lowluminance_hovered",
+            // Low luminance content in dark theme should use a white ripple by default
+            calculateResultingRippleColor(Color.White, rippleOpacity = 0.04f)
+        )
+    }
+
+    @Test
+    fun unbounded_darkTheme_lowLuminance_focused() {
+        val interactionSource = MutableInteractionSource()
+
+        val contentColor = Color.Black
+
+        val scope = rule.setRippleContent(
+            interactionSource = interactionSource,
+            bounded = false,
+            lightTheme = false,
+            contentColor = contentColor
+        )
+
+        assertRippleMatches(
+            scope,
+            interactionSource,
+            FocusInteraction.Focus(),
+            "ripple_unbounded_dark_lowluminance_focused",
+            // Low luminance content in dark theme should use a white ripple by default
+            calculateResultingRippleColor(Color.White, rippleOpacity = 0.12f)
         )
     }
 
@@ -486,6 +844,108 @@ class MaterialRippleThemeTest {
             interactionSource,
             PressInteraction.Press(Offset(10f, 10f)),
             "ripple_customtheme_pressed",
+            expectedColor
+        )
+    }
+
+    @Test
+    fun customRippleTheme_hovered() {
+        val interactionSource = MutableInteractionSource()
+
+        val contentColor = Color.Black
+
+        val rippleColor = Color.Red
+        val expectedAlpha = 0.5f
+        val rippleAlpha = RippleAlpha(expectedAlpha, expectedAlpha, expectedAlpha, expectedAlpha)
+
+        val rippleTheme = object : RippleTheme {
+            @Composable
+            override fun defaultColor() = rippleColor
+
+            @Composable
+            override fun rippleAlpha() = rippleAlpha
+        }
+
+        var scope: CoroutineScope? = null
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            MaterialTheme {
+                CompositionLocalProvider(LocalRippleTheme provides rippleTheme) {
+                    Surface(contentColor = contentColor) {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            RippleBoxWithBackground(
+                                interactionSource,
+                                rememberRipple(),
+                                bounded = true
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        val expectedColor = calculateResultingRippleColor(
+            rippleColor,
+            rippleOpacity = expectedAlpha
+        )
+
+        assertRippleMatches(
+            scope!!,
+            interactionSource,
+            HoverInteraction.Enter(),
+            "ripple_customtheme_hovered",
+            expectedColor
+        )
+    }
+
+    @Test
+    fun customRippleTheme_focused() {
+        val interactionSource = MutableInteractionSource()
+
+        val contentColor = Color.Black
+
+        val rippleColor = Color.Red
+        val expectedAlpha = 0.5f
+        val rippleAlpha = RippleAlpha(expectedAlpha, expectedAlpha, expectedAlpha, expectedAlpha)
+
+        val rippleTheme = object : RippleTheme {
+            @Composable
+            override fun defaultColor() = rippleColor
+
+            @Composable
+            override fun rippleAlpha() = rippleAlpha
+        }
+
+        var scope: CoroutineScope? = null
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            MaterialTheme {
+                CompositionLocalProvider(LocalRippleTheme provides rippleTheme) {
+                    Surface(contentColor = contentColor) {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            RippleBoxWithBackground(
+                                interactionSource,
+                                rememberRipple(),
+                                bounded = true
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        val expectedColor = calculateResultingRippleColor(
+            rippleColor,
+            rippleOpacity = expectedAlpha
+        )
+
+        assertRippleMatches(
+            scope!!,
+            interactionSource,
+            FocusInteraction.Focus(),
+            "ripple_customtheme_focused",
             expectedColor
         )
     }

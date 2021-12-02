@@ -57,11 +57,43 @@ class TwoDimensionalFocusTraversalInTest {
         }
 
         // Act.
-        focusManager.moveFocus(In)
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(In) }
 
         // Assert.
         rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isFalse()
             assertThat(focusedItem.value).isTrue()
+            assertThat(otherItem.value).isFalse()
+        }
+    }
+
+    /**
+     *      ___________________   ____________
+     *     |    focusedItem   |  |           |
+     *     |  ______________  |  |           |
+     *     | | deactivated |  |  | otherItem |
+     *     | |_____________|  |  |           |
+     *     |__________________|  |___________|
+     */
+    @Test
+    fun focusIn_deactivatedChild_doesNotMoveFocus() {
+        // Arrange.
+        val (focusedItem, deactivatedItem, otherItem) = List(3) { mutableStateOf(false) }
+        rule.setContentForTest {
+            FocusableBox(focusedItem, 0, 0, 10, 10, initialFocus) {
+                FocusableBox(deactivatedItem, 10, 0, 10, 10, deactivated = true)
+            }
+            FocusableBox(otherItem, 10, 0, 10, 10)
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(In) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isFalse()
+            assertThat(focusedItem.value).isTrue()
+            assertThat(deactivatedItem.value).isFalse()
             assertThat(otherItem.value).isFalse()
         }
     }
@@ -85,10 +117,11 @@ class TwoDimensionalFocusTraversalInTest {
         }
 
         // Act.
-        focusManager.moveFocus(In)
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(In) }
 
         // Assert.
         rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
             assertThat(focusedItem.value).isFalse()
             assertThat(child.value).isTrue()
         }
@@ -118,13 +151,49 @@ class TwoDimensionalFocusTraversalInTest {
         }
 
         // Act.
-        focusManager.moveFocus(In)
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(In) }
 
         // Assert.
         rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
             assertThat(focusedItem.value).isFalse()
             assertThat(child.value).isTrue()
             assertThat(grandchild.value).isFalse()
+        }
+    }
+
+    /**
+     *      _________________________
+     *     |  focusedItem           |
+     *     |   ___________________  |
+     *     |  |  child           |  |
+     *     |  |   _____________  |  |
+     *     |  |  | grandchild |  |  |
+     *     |  |  |____________|  |  |
+     *     |  |__________________|  |
+     *     |________________________|
+     */
+    @Test
+    fun focusIn_skipsImmediateDeactivatedChild() {
+        // Arrange.
+        val (child, grandchild) = List(2) { mutableStateOf(false) }
+        rule.setContentForTest {
+            FocusableBox(focusedItem, 0, 0, 30, 30, initialFocus) {
+                FocusableBox(child, 10, 10, 10, 10, deactivated = true) {
+                    FocusableBox(grandchild, 10, 10, 10, 10)
+                }
+            }
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(In) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
+            assertThat(focusedItem.value).isFalse()
+            assertThat(child.value).isFalse()
+            assertThat(grandchild.value).isTrue()
         }
     }
 
@@ -157,12 +226,50 @@ class TwoDimensionalFocusTraversalInTest {
         }
 
         // Act.
-        focusManager.moveFocus(In)
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(In) }
 
         // Assert.
         rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
             assertThat(focusedItem.value).isFalse()
             assertThat(children.values).containsExactly(true, false, false, false, false, false)
+        }
+    }
+
+    /**
+     *      _______________________________________
+     *     |  focusedItem                         |
+     *     |   _________   _________   _________  |
+     *     |  | child1 |  | child2 |  | child3 |  |
+     *     |  |________|  |________|  |________|  |
+     *     |   _________   _________   _________  |
+     *     |  | child4 |  | child5 |  | child6 |  |
+     *     |  |________|  |________|  |________|  |
+     *     |______________________________________|
+     */
+    @Test
+    fun focusIn_deactivatedTopLeftChildIsSkipped() {
+        // Arrange.
+        val children = List(6) { mutableStateOf(false) }
+        rule.setContentForTest {
+            FocusableBox(focusedItem, 0, 0, 70, 50, initialFocus) {
+                FocusableBox(children[0], 10, 10, 10, 10, deactivated = true)
+                FocusableBox(children[1], 30, 10, 10, 10)
+                FocusableBox(children[2], 50, 10, 10, 10)
+                FocusableBox(children[3], 10, 30, 10, 10)
+                FocusableBox(children[4], 30, 30, 10, 10)
+                FocusableBox(children[5], 50, 30, 10, 10)
+            }
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(In) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
+            assertThat(focusedItem.value).isFalse()
+            assertThat(children.values).containsExactly(false, true, false, false, false, false)
         }
     }
 

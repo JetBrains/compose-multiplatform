@@ -57,7 +57,13 @@ internal class TextFieldKeyInput(
     private val keyMapping: KeyMapping = platformDefaultKeyMapping,
 ) {
     private fun EditCommand.apply() {
-        state.onValueChange(state.processor.apply(listOf(FinishComposingTextCommand(), this)))
+        val newTextFieldValue = state.processor.apply(listOf(FinishComposingTextCommand(), this))
+        @OptIn(InternalFoundationTextApi::class)
+        if (newTextFieldValue.annotatedString.text != state.textDelegate.text.text) {
+            // Text has been changed, enter the HandleState.None and hide the cursor handle.
+            state.handleState = HandleState.None
+        }
+        state.onValueChange(newTextFieldValue)
     }
 
     private fun typedCommand(event: KeyEvent): CommitTextCommand? =
@@ -170,6 +176,7 @@ internal class TextFieldKeyInput(
                 KeyCommand.REDO -> {
                     undoManager?.redo()?.let { this@TextFieldKeyInput.state.onValueChange(it) }
                 }
+                KeyCommand.CHARACTER_PALETTE -> { showCharacterPalette() }
             }
         }
         undoManager?.forceNextSnapshot()

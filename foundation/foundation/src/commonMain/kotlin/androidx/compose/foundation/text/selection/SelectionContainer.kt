@@ -102,17 +102,30 @@ internal fun SelectionContainer(
                         val observer = remember(isStartHandle) {
                             manager.handleDragObserver(isStartHandle)
                         }
-                        SelectionHandle(
-                            startHandlePosition = manager.startHandlePosition,
-                            endHandlePosition = manager.endHandlePosition,
-                            isStartHandle = isStartHandle,
-                            directions = Pair(it.start.direction, it.end.direction),
-                            handlesCrossed = it.handlesCrossed,
-                            modifier = Modifier.pointerInput(observer) {
-                                detectDragGesturesWithObserver(observer)
-                            },
-                            content = null
-                        )
+                        val position = if (isStartHandle) {
+                            manager.startHandlePosition
+                        } else {
+                            manager.endHandlePosition
+                        }
+
+                        val direction = if (isStartHandle) {
+                            it.start.direction
+                        } else {
+                            it.end.direction
+                        }
+
+                        if (position != null) {
+                            SelectionHandle(
+                                position = position,
+                                isStartHandle = isStartHandle,
+                                direction = direction,
+                                handlesCrossed = it.handlesCrossed,
+                                modifier = Modifier.pointerInput(observer) {
+                                    detectDragGesturesWithObserver(observer)
+                                },
+                                content = null
+                            )
+                        }
                     }
                 }
             }

@@ -259,19 +259,19 @@ class MultiParagraph(
         val paragraphIndex = findParagraphByIndex(paragraphInfoList, start)
         val path = Path()
 
-        paragraphInfoList.fastDrop(paragraphIndex)
-            .fastTakeWhile { it.startIndex < end }
-            .fastFilterNot { it.startIndex == it.endIndex }
-            .fastForEach {
-                with(it) {
-                    path.addPath(
-                        path = paragraph.getPathForRange(
-                            start = start.toLocalIndex(),
-                            end = end.toLocalIndex()
-                        ).toGlobal()
-                    )
-                }
+        for (i in paragraphIndex until paragraphInfoList.size) {
+            val p = paragraphInfoList[i]
+            if (p.startIndex >= end) break
+            if (p.startIndex == p.endIndex) continue
+            with(p) {
+                path.addPath(
+                    path = paragraph.getPathForRange(
+                        start = start.toLocalIndex(),
+                        end = end.toLocalIndex()
+                    ).toGlobal()
+                )
             }
+        }
         return path
     }
 
@@ -424,9 +424,13 @@ class MultiParagraph(
      * http://www.unicode.org/reports/tr29/#Word_Boundaries
      */
     fun getWordBoundary(offset: Int): TextRange {
-        requireIndexInRange(offset)
+        requireIndexInRangeInclusiveEnd(offset)
 
-        val paragraphIndex = findParagraphByIndex(paragraphInfoList, offset)
+        val paragraphIndex = if (offset == annotatedString.length) {
+            paragraphInfoList.lastIndex
+        } else {
+            findParagraphByIndex(paragraphInfoList, offset)
+        }
 
         return with(paragraphInfoList[paragraphIndex]) {
             paragraph.getWordBoundary(offset.toLocalIndex()).toGlobal()
@@ -609,7 +613,7 @@ class MultiParagraph(
  * @return The index of the target [ParagraphInfo] in [paragraphInfoList].
  */
 internal fun findParagraphByIndex(paragraphInfoList: List<ParagraphInfo>, index: Int): Int {
-    return paragraphInfoList.binarySearch { paragraphInfo ->
+    return paragraphInfoList.fastBinarySearch { paragraphInfo ->
         when {
             paragraphInfo.startIndex > index -> 1
             paragraphInfo.endIndex <= index -> -1
@@ -629,7 +633,7 @@ internal fun findParagraphByIndex(paragraphInfoList: List<ParagraphInfo>, index:
  * @return The index of the target [ParagraphInfo] in [paragraphInfoList].
  */
 internal fun findParagraphByY(paragraphInfoList: List<ParagraphInfo>, y: Float): Int {
-    return paragraphInfoList.binarySearch { paragraphInfo ->
+    return paragraphInfoList.fastBinarySearch { paragraphInfo ->
         when {
             paragraphInfo.top > y -> 1
             paragraphInfo.bottom <= y -> -1
@@ -649,13 +653,32 @@ internal fun findParagraphByY(paragraphInfoList: List<ParagraphInfo>, y: Float):
  * @return The index of the target [ParagraphInfo] in [paragraphInfoList].
  */
 internal fun findParagraphByLineIndex(paragraphInfoList: List<ParagraphInfo>, lineIndex: Int): Int {
-    return paragraphInfoList.binarySearch { paragraphInfo ->
+    return paragraphInfoList.fastBinarySearch { paragraphInfo ->
         when {
             paragraphInfo.startLineIndex > lineIndex -> 1
             paragraphInfo.endLineIndex <= lineIndex -> -1
             else -> 0
         }
     }
+}
+
+private inline fun <T> List<T>.fastBinarySearch(comparison: (T) -> Int): Int {
+    var low = 0
+    var high = size - 1
+
+    while (low <= high) {
+        val mid = (low + high).ushr(1) // safe from overflows
+        val midVal = get(mid)
+        val cmp = comparison(midVal)
+
+        if (cmp < 0)
+            low = mid + 1
+        else if (cmp > 0)
+            high = mid - 1
+        else
+            return mid // key found
+    }
+    return -(low + 1) // key not found
 }
 
 /**

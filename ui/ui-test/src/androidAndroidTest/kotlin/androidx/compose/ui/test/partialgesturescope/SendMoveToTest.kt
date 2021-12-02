@@ -19,6 +19,7 @@ package androidx.compose.ui.test.partialgesturescope
 import android.os.SystemClock.sleep
 import androidx.compose.testutils.expectError
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.test.InputDispatcher.Companion.eventPeriodMillis
 import androidx.compose.ui.test.cancel
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -28,7 +29,6 @@ import androidx.compose.ui.test.moveTo
 import androidx.compose.ui.test.partialgesturescope.Common.partialGesture
 import androidx.compose.ui.test.up
 import androidx.compose.ui.test.util.ClickableTestBox
-import androidx.compose.ui.test.util.InputDispatcherTestRule
 import androidx.compose.ui.test.util.MultiPointerInputRecorder
 import androidx.compose.ui.test.util.assertTimestampsAreIncreasing
 import androidx.compose.ui.test.util.verify
@@ -37,13 +37,12 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TestRule
 
 /**
  * Tests if [moveTo] and [movePointerTo] work
  */
 @MediumTest
-class SendMoveToTest() {
+class SendMoveToTest {
     companion object {
         private val downPosition1 = Offset(10f, 10f)
         private val downPosition2 = Offset(20f, 20f)
@@ -53,9 +52,6 @@ class SendMoveToTest() {
 
     @get:Rule
     val rule = createComposeRule()
-
-    @get:Rule
-    val inputDispatcherRule: TestRule = InputDispatcherTestRule()
 
     private val recorder = MultiPointerInputRecorder()
 
@@ -67,6 +63,7 @@ class SendMoveToTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun onePointer() {
         // When we inject a down event followed by a move event
@@ -83,13 +80,14 @@ class SendMoveToTest() {
                 var t = events[0].getPointer(0).timestamp
                 val pointerId = events[0].getPointer(0).id
 
-                t += 10
+                t += eventPeriodMillis
                 assertThat(events[1].pointerCount).isEqualTo(1)
                 events[1].getPointer(0).verify(t, pointerId, true, moveToPosition1)
             }
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun twoPointers_separateMoveEvents() {
         // When we inject two down events followed by two move events
@@ -108,12 +106,12 @@ class SendMoveToTest() {
                 val pointerId1 = events[0].getPointer(0).id
                 val pointerId2 = events[1].getPointer(1).id
 
-                t += 10
+                t += eventPeriodMillis
                 assertThat(events[2].pointerCount).isEqualTo(2)
                 events[2].getPointer(0).verify(t, pointerId1, true, moveToPosition1)
                 events[2].getPointer(1).verify(t, pointerId2, true, downPosition2)
 
-                t += 10
+                t += eventPeriodMillis
                 assertThat(events[3].pointerCount).isEqualTo(2)
                 events[3].getPointer(0).verify(t, pointerId1, true, moveToPosition1)
                 events[3].getPointer(1).verify(t, pointerId2, true, moveToPosition2)
@@ -121,6 +119,7 @@ class SendMoveToTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun twoPointers_oneMoveEvent() {
         // When we inject two down events followed by one move events
@@ -141,7 +140,7 @@ class SendMoveToTest() {
                 val pointerId1 = events[0].getPointer(0).id
                 val pointerId2 = events[1].getPointer(1).id
 
-                t += 10
+                t += eventPeriodMillis
                 assertThat(events[2].pointerCount).isEqualTo(2)
                 events[2].getPointer(0).verify(t, pointerId1, true, moveToPosition1)
                 events[2].getPointer(1).verify(t, pointerId2, true, moveToPosition2)
@@ -149,6 +148,7 @@ class SendMoveToTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun moveToWithoutDown() {
         expectError<IllegalStateException> {
@@ -156,6 +156,7 @@ class SendMoveToTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun moveToWrongPointerId() {
         rule.partialGesture { down(1, downPosition1) }
@@ -164,6 +165,7 @@ class SendMoveToTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun moveToAfterUp() {
         rule.partialGesture { down(downPosition1) }
@@ -173,6 +175,7 @@ class SendMoveToTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun moveToAfterCancel() {
         rule.partialGesture { down(downPosition1) }
@@ -182,6 +185,7 @@ class SendMoveToTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun movePointerToWithoutDown() {
         expectError<IllegalStateException> {
@@ -189,6 +193,7 @@ class SendMoveToTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun movePointerToWrongPointerId() {
         rule.partialGesture { down(1, downPosition1) }
@@ -197,6 +202,7 @@ class SendMoveToTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun movePointerToAfterUp() {
         rule.partialGesture { down(1, downPosition1) }
@@ -206,6 +212,7 @@ class SendMoveToTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun movePointerToAfterCancel() {
         rule.partialGesture { down(1, downPosition1) }

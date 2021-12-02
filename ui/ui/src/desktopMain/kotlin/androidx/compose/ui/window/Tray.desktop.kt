@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.window
 
-import androidx.compose.desktop.AppManager
-import androidx.compose.desktop.AppWindow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
@@ -26,21 +24,37 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.toAwtImage
+import androidx.compose.ui.platform.DesktopPlatform
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
-import java.awt.Image
 import java.awt.PopupMenu
 import java.awt.SystemTray
 import java.awt.TrayIcon
 
+// In fact, this size doesn't affect anything on Windows/Linux, because they request what they
+// need, and not what we provide. It only affects macOs. This size will be scaled in asAwtImage to
+// support DPI=2.0
+// Unfortunately I hadn't enough time to find sources from the official docs
+private val iconSize = when (DesktopPlatform.Current) {
+    // https://doc.qt.io/qt-5/qtwidgets-desktop-systray-example.html (search 22x22)
+    DesktopPlatform.Linux -> Size(22f, 22f)
+    // https://doc.qt.io/qt-5/qtwidgets-desktop-systray-example.html (search 16x16)
+    DesktopPlatform.Windows -> Size(16f, 16f)
+    // https://medium.com/@acwrightdesign/creating-a-macos-menu-bar-application-using-swiftui-54572a5d5f87
+    DesktopPlatform.MacOS -> Size(22f, 22f)
+    DesktopPlatform.Unknown -> Size(32f, 32f)
+}
+
 /**
  * `true` if the platform supports tray icons in the taskbar
  */
-val isTraySupported get() = SystemTray.isSupported()
+val isTraySupported: Boolean get() = SystemTray.isSupported()
 
 // TODO(demin): add mouse click/double-click/right click listeners (can we use PointerInputEvent?)
 /**
@@ -52,11 +66,9 @@ val isTraySupported get() = SystemTray.isSupported()
  * See [isTraySupported] to know if tray icon is supported
  * (for example to show/hide an option in the application settings)
  *
- * This API is experimental and will eventually replace [AppWindow] / [AppManager].
- *
  * @param icon Icon of the tray
  * @param state State to control tray and show notifications
- * @param hint Hint/tooltip that will be shown to the user
+ * @param tooltip Hint/tooltip that will be shown to the user
  * @param menu Context menu of the tray that will be shown to the user on the mouse click (right
  * click on Windows, left click on macOs).
  * If it doesn't contain any items then context menu will not be shown.
@@ -64,12 +76,11 @@ val isTraySupported get() = SystemTray.isSupported()
  * right click on macOs)
  */
 @Suppress("unused")
-@ExperimentalComposeUiApi
 @Composable
 fun ApplicationScope.Tray(
-    icon: Image,
-    state: TrayState = TrayState(),
-    hint: String? = null,
+    icon: Painter,
+    state: TrayState = rememberTrayState(),
+    tooltip: String? = null,
     onAction: () -> Unit = {},
     menu: @Composable MenuScope.() -> Unit = {}
 ) {
@@ -92,8 +103,18 @@ fun ApplicationScope.Tray(
 
     val currentOnAction by rememberUpdatedState(onAction)
 
+    val awtIcon = remember(icon) {
+        // We shouldn't use LocalDensity here because Tray's density doesn't equal it. It
+        // equals to the density of the screen on which it shows. Currently Swing doesn't
+        // provide us such information, it only requests an image with the desired width/height
+        // (see MultiResolutionImage.getResolutionVariant). Resources like svg/xml should look okay
+        // because they don't use absolute '.dp' values to draw, they use values which are
+        // relative to their viewport.
+        icon.toAwtImage(GlobalDensity, GlobalLayoutDirection, iconSize)
+    }
+
     val tray = remember {
-        TrayIcon(icon).apply {
+        TrayIcon(awtIcon).apply {
             isImageAutoSize = true
 
             addActionListener {
@@ -105,8 +126,8 @@ fun ApplicationScope.Tray(
     val currentMenu by rememberUpdatedState(menu)
 
     SideEffect {
-        if (tray.image != icon) tray.image = icon
-        if (tray.toolTip != hint) tray.toolTip = hint
+        if (tray.image != awtIcon) tray.image = awtIcon
+        if (tray.toolTip != tooltip) tray.toolTip = tooltip
     }
 
     val composition = rememberCompositionContext()

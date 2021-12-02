@@ -67,4 +67,42 @@ class CompoundHashKeyTests {
         assertEquals(firstInner, innerKeys)
         assertEquals(firstOuter, outerKeys)
     }
+
+    @Test // b/195185633
+    fun testEnumKeys() = compositionTest {
+        val testClass = EnumTestClass()
+        compose {
+            testClass.Test()
+        }
+
+        val originalKey = testClass.currentKey
+        testClass.scope.invalidate()
+        advance()
+
+        assertEquals(originalKey, testClass.currentKey)
+    }
+}
+
+private class EnumTestClass {
+    var currentKey = 0
+    lateinit var scope: RecomposeScope
+    val state = mutableStateOf(0)
+    private val config = mutableStateOf(Config.A)
+
+    @Composable
+    fun Test() {
+        key(config.value) {
+            Child()
+        }
+    }
+
+    @Composable
+    private fun Child() {
+        scope = currentRecomposeScope
+        currentKey = currentCompositeKeyHash
+    }
+
+    enum class Config {
+        A, B
+    }
 }

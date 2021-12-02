@@ -42,13 +42,10 @@ import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.captureToImage
-import androidx.compose.ui.test.center
-import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performGesture
-import androidx.compose.ui.test.up
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -188,8 +185,6 @@ class CardTest {
 
         var scope: CoroutineScope? = null
 
-        rule.mainClock.autoAdvance = false
-
         rule.setContent {
             scope = rememberCoroutineScope()
             Card(
@@ -212,10 +207,7 @@ class CardTest {
         }
 
         rule.onNodeWithTag("card")
-            .performGesture { down(center) }
-
-        // Advance past the tap timeout
-        rule.mainClock.advanceTimeBy(100)
+            .performTouchInput { down(center) }
 
         rule.runOnIdle {
             Truth.assertThat(interactions).hasSize(1)
@@ -223,7 +215,7 @@ class CardTest {
         }
 
         rule.onNodeWithTag("card")
-            .performGesture { up() }
+            .performTouchInput { up() }
 
         rule.runOnIdle {
             Truth.assertThat(interactions).hasSize(2)

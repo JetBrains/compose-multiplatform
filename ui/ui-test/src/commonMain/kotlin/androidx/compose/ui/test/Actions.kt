@@ -21,7 +21,9 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.semantics.AccessibilityAction
+import androidx.compose.ui.semantics.ScrollAxisRange
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsActions.ScrollBy
 import androidx.compose.ui.semantics.SemanticsActions.ScrollToIndex
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties.HorizontalScrollAxisRange
@@ -29,25 +31,23 @@ import androidx.compose.ui.semantics.SemanticsProperties.IndexForKey
 import androidx.compose.ui.semantics.SemanticsProperties.VerticalScrollAxisRange
 import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.getOrNull
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.toSize
-import kotlin.math.max
-import kotlin.math.min
+import kotlin.jvm.JvmName
+import kotlin.math.abs
+import kotlin.math.sign
+
+internal expect fun SemanticsNodeInteraction.performClickImpl(): SemanticsNodeInteraction
 
 /**
- * Performs a click action on the element represented by the given semantics node.
+ * Performs a click action on the element represented by the given semantics node. Depending on
+ * the platform this may be implemented by a touch click (tap), a mouse click, or another more
+ * appropriate method for that platform.
+ *
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
  */
 fun SemanticsNodeInteraction.performClick(): SemanticsNodeInteraction {
-    // TODO(jellefresen): Replace with semantics action when semantics merging is done
-    // The problem we currently have is that the click action might be defined on a different
-    // semantics node than we're interacting with now, even though it is "semantically" the same.
-    // E.g., findByText(buttonText) finds the Text's semantics node, but the click action is
-    // defined on the wrapping Button's semantics node.
-    // Since in general the intended click action can be on a wrapping node or a child node, we
-    // can't just forward to the correct node, as we don't know if we should search up or down the
-    // tree.
-    return performGesture {
-        click()
-    }
+    return performClickImpl()
 }
 
 /**
@@ -61,61 +61,54 @@ fun SemanticsNodeInteraction.performClick(): SemanticsNodeInteraction {
  * scrollable content, not on the scrollable container.
  *
  * Throws an [AssertionError] if there is no scroll parent.
+ *
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
  */
 fun SemanticsNodeInteraction.performScrollTo(): SemanticsNodeInteraction {
-    // Find a parent node with a scroll action
-    val errorMessageOnFail = "Action performScrollTo() failed."
-    val node = fetchSemanticsNode(errorMessageOnFail)
-    val scrollableNode = node.findClosestParentNode {
+    @OptIn(InternalTestApi::class)
+    fetchSemanticsNode("Action performScrollTo() failed.").scrollToNode(testContext.testOwner)
+    return this
+}
+
+/**
+ * Implementation of [performScrollTo]
+ */
+@OptIn(InternalTestApi::class)
+private fun SemanticsNode.scrollToNode(testOwner: TestOwner) {
+    val scrollableNode = findClosestParentNode {
         hasScrollAction().matches(it)
     } ?: throw AssertionError("Semantic Node has no parent layout with a Scroll SemanticsAction")
 
     // Figure out the (clipped) bounds of the viewPort in its direct parent's content area, in
     // root coordinates. We only want the clipping from the direct parent on the scrollable, not
     // from any other ancestors.
-    val viewPortInParent = scrollableNode.layoutInfo.coordinates.boundsInParent()
+    val viewportInParent = scrollableNode.layoutInfo.coordinates.boundsInParent()
     val parentInRoot = scrollableNode.layoutInfo.coordinates.parentLayoutCoordinates
         ?.positionInRoot() ?: Offset.Zero
+    val viewport = viewportInParent.translate(parentInRoot)
+    val target = Rect(positionInRoot, size.toSize())
 
-    val viewPort = viewPortInParent.translate(parentInRoot)
-    val target = Rect(node.positionInRoot, node.size.toSize())
+    // Given the desired scroll value to align either side of the target with the
+    // viewport, what delta should we go with?
+    // If we need to scroll in opposite directions for both sides, don't scroll at all.
+    // Otherwise, take the delta that scrolls the least amount.
+    fun scrollDelta(a: Float, b: Float): Float =
+        if (sign(a) == sign(b)) if (abs(a) < abs(b)) a else b else 0f
 
-    val mustScrollUp = target.bottom > viewPort.bottom
-    val mustScrollDown = target.top < viewPort.top
-    val mustScrollLeft = target.right > viewPort.right
-    val mustScrollRight = target.left < viewPort.left
+    // Get the desired delta X
+    var dx = scrollDelta(target.left - viewport.left, target.right - viewport.right)
+    // And adjust for reversing properties
+    if (scrollableNode.isReversedHorizontally) dx = -dx
+    if (scrollableNode.isRtl) dx = -dx
 
-    val rawDx = if (mustScrollLeft && !mustScrollRight) {
-        // scroll left: positive dx
-        min(target.left - viewPort.left, target.right - viewPort.right)
-    } else if (mustScrollRight && !mustScrollLeft) {
-        // scroll right: negative dx
-        max(target.left - viewPort.left, target.right - viewPort.right)
-    } else {
-        // already in viewport
-        0f
+    // Get the desired delta Y
+    var dy = scrollDelta(target.top - viewport.top, target.bottom - viewport.bottom)
+    // And adjust for reversing properties
+    if (scrollableNode.isReversedVertically) dy = -dy
+
+    testOwner.runOnUiThread {
+        scrollableNode.config[ScrollBy].action?.invoke(dx, dy)
     }
-
-    val rawDy = if (mustScrollUp && !mustScrollDown) {
-        // scroll up: positive dy
-        min(target.top - viewPort.top, target.bottom - viewPort.bottom)
-    } else if (mustScrollDown && !mustScrollUp) {
-        // scroll down: negative dy
-        max(target.top - viewPort.top, target.bottom - viewPort.bottom)
-    } else {
-        // already in viewport
-        0f
-    }
-
-    val dx = if (scrollableNode.isReversedHorizontally) -rawDx else rawDx
-    val dy = if (scrollableNode.isReversedVertically) -rawDy else rawDy
-
-    @OptIn(InternalTestApi::class)
-    testContext.testOwner.runOnUiThread {
-        scrollableNode.config[SemanticsActions.ScrollBy].action?.invoke(dx, dy)
-    }
-
-    return this
 }
 
 /**
@@ -131,20 +124,27 @@ fun SemanticsNodeInteraction.performScrollTo(): SemanticsNodeInteraction {
  * Throws an [AssertionError] if the node doesn't have [ScrollToIndex] defined.
  *
  * @param index The index of the item to scroll to
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
+ *
  * @see hasScrollToIndexAction
  */
-@ExperimentalTestApi
 fun SemanticsNodeInteraction.performScrollToIndex(index: Int): SemanticsNodeInteraction {
-    val node = fetchSemanticsNode("Failed: performScrollToIndex($index)")
-    requireSemantics(node, ScrollToIndex) {
+    fetchSemanticsNode("Failed: performScrollToIndex($index)").scrollToIndex(index, this)
+    return this
+}
+
+/**
+ * Implementation of [performScrollToIndex]
+ */
+private fun SemanticsNode.scrollToIndex(index: Int, nodeInteraction: SemanticsNodeInteraction) {
+    nodeInteraction.requireSemantics(this, ScrollToIndex) {
         "Failed to scroll to index $index"
     }
 
     @OptIn(InternalTestApi::class)
-    testContext.testOwner.runOnUiThread {
-        node.config[ScrollToIndex].action!!.invoke(index)
+    nodeInteraction.testContext.testOwner.runOnUiThread {
+        config[ScrollToIndex].action!!.invoke(index)
     }
-    return this
 }
 
 /**
@@ -158,9 +158,10 @@ fun SemanticsNodeInteraction.performScrollToIndex(index: Int): SemanticsNodeInte
  * Throws an [AssertionError] if the node doesn't have [IndexForKey] or [ScrollToIndex] defined.
  *
  * @param key The key of the item to scroll to
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
+ *
  * @see hasScrollToKeyAction
  */
-@ExperimentalTestApi
 fun SemanticsNodeInteraction.performScrollToKey(key: Any): SemanticsNodeInteraction {
     val node = fetchSemanticsNode("Failed: performScrollToKey(\"$key\")")
     requireSemantics(node, IndexForKey, ScrollToIndex) {
@@ -181,33 +182,130 @@ fun SemanticsNodeInteraction.performScrollToKey(key: Any): SemanticsNodeInteract
 }
 
 /**
+ * Scrolls a scrollable container to the content that matches the given [matcher]. If the content
+ * isn't yet visible, the scrollable container will be scrolled from the start till the end till
+ * it finds the content we're looking for. It is not defined where in the viewport the content
+ * will be on success of this function, but it will be either fully within the viewport if it is
+ * smaller than the viewport, or it will cover the whole viewport if it is larger than the
+ * viewport. If it doesn't find the content, the scrollable will be left at the end of the
+ * content and an [AssertionError] is thrown.
+ *
+ * This action should be performed on a [node][SemanticsNodeInteraction] that is a scrollable
+ * container, not on a node that is part of the content of that container. If the container is a
+ * lazy container, it must support the semantics actions [ScrollToIndex], [ScrollBy], and either
+ * [HorizontalScrollAxisRange] or [VerticalScrollAxisRange], for example
+ * [LazyColumn][androidx.compose.foundation.lazy.LazyColumn] and
+ * [LazyRow][androidx.compose.foundation.lazy.LazyRow]. If the container is not lazy, it must
+ * support the semantics action [ScrollBy], for example,
+ * [Row][androidx.compose.foundation.layout.Row] or
+ * [Column][androidx.compose.foundation.layout.Column].
+ *
+ * Throws an [AssertionError] if the scrollable node doesn't support the necessary semantics
+ * actions.
+ *
+ * @param matcher A matcher that identifies the content where the scrollable container needs to
+ * scroll to
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method. Note that this is
+ * _not_ an interaction for the node that is identified by the [matcher].
+ *
+ * @see hasScrollToNodeAction
+ */
+fun SemanticsNodeInteraction.performScrollToNode(
+    matcher: SemanticsMatcher
+): SemanticsNodeInteraction {
+    var node = fetchSemanticsNode("Failed: performScrollToNode(${matcher.description})")
+    matcher.findMatchInDescendants(node)?.also {
+        @OptIn(InternalTestApi::class)
+        it.scrollToNode(testContext.testOwner)
+        return this
+    }
+
+    // If this is NOT a lazy list, but we haven't found the node above ..
+    if (!node.isLazyList) {
+        // .. throw an error that the node doesn't exist
+        val msg = "No node found that matches ${matcher.description} in scrollable container"
+        throw AssertionError(buildGeneralErrorMessage(msg, selector, node))
+    }
+
+    // Go to start of the list
+    if (!node.horizontalScrollAxis.isAtStart || !node.verticalScrollAxis.isAtStart) {
+        node.scrollToIndex(0, this)
+    }
+
+    while (true) {
+        // Fetch the node again
+        node = fetchSemanticsNode("Failed: performScrollToNode(${matcher.description})")
+        matcher.findMatchInDescendants(node)?.also {
+            @OptIn(InternalTestApi::class)
+            it.scrollToNode(testContext.testOwner)
+            return this
+        }
+
+        // Are we there yet? Are we there yet? Are we there yet?
+        if (node.horizontalScrollAxis.isAtEnd && node.verticalScrollAxis.isAtEnd) {
+            // If we're finished and we haven't found the node
+            val msg = "No node found that matches ${matcher.description} in scrollable container"
+            throw AssertionError(buildGeneralErrorMessage(msg, selector, node))
+        }
+
+        val viewPortSize = node.layoutInfo.coordinates.boundsInParent().size
+        val dx = node.horizontalScrollAxis?.let { viewPortSize.width } ?: 0f
+        val dy = node.verticalScrollAxis?.let { viewPortSize.height } ?: 0f
+
+        // Scroll one screen
+        @OptIn(InternalTestApi::class)
+        testContext.testOwner.runOnUiThread {
+            node.config[ScrollBy].action?.invoke(dx, dy)
+        }
+    }
+}
+
+/**
  * Executes the (partial) gesture specified in the given [block]. The gesture doesn't need to be
- * complete and can be resumed in a later invocation of [performGesture]. It is the
- * responsibility of the caller to make sure partial gestures don't leave the test in an
- * inconsistent state.
+ * complete and can be resumed in a later invocation of [performGesture]. The event time is
+ * initialized to the current time of the [MainTestClock].
+ *
+ * Be aware that if you split a gesture over multiple invocations of [performGesture], everything
+ * that happens in between will run as if the gesture is still ongoing (imagine a finger still
+ * touching the screen).
  *
  * All events that are injected from the [block] are batched together and sent after [block] is
- * complete. This method blocks until all those events have been injected, which normally takes
- * as long as the duration of the gesture. If an error occurs during execution of [block] or
- * injection of the events, all (subsequent) events are dropped and the error is thrown here.
- *
- * This method must not be called from the main thread. The block will be executed on the same
- * thread as the caller.
+ * complete. This method blocks while the events are injected. If an error occurs during
+ * execution of [block] or injection of the events, all (subsequent) events are dropped and the
+ * error is thrown here.
  *
  * Example usage:
  * ```
- * onNodeWithTag("myWidget")
+ * testRule.onNodeWithTag("myWidget")
  *     .performGesture { swipeUp() }
  *
- * onNodeWithTag("myWidget")
+ * testRule.onNodeWithTag("myWidget")
  *     .performGesture { click(center) }
  *
- * onNodeWithTag("myWidget")
+ * testRule.onNodeWithTag("myWidget")
  *     .performGesture { down(topLeft) }
  *     .assertHasClickAction()
  *     .performGesture { up(topLeft) }
+ *
+ * testRule.onNodeWithTag("myWidget")
+ *     .performGesture { click() }
+ * testRule.mainClock.advanceTimeBy(100)
+ * testRule.onNodeWithTag("myWidget")
+ *     .performGesture(true) { swipeUp() }
  * ```
+ *
+ * @param block A lambda with [GestureScope] as receiver that describes the gesture by
+ * sending all touch events.
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
  */
+@Deprecated(
+    message = "Replaced by performTouchInput",
+    replaceWith = ReplaceWith(
+        "performTouchInput(block)",
+        "import androidx.compose.ui.test.performGesture"
+    )
+)
+@Suppress("DEPRECATION")
 fun SemanticsNodeInteraction.performGesture(
     block: GestureScope.() -> Unit
 ): SemanticsNodeInteraction {
@@ -216,14 +314,178 @@ fun SemanticsNodeInteraction.performGesture(
         try {
             block()
         } finally {
-            try {
-                inputDispatcher.sendAllSynchronous()
-            } finally {
-                dispose()
-            }
+            dispose()
         }
     }
     return this
+}
+
+/**
+ * Executes the touch gesture specified in the given [block]. The gesture doesn't need to be
+ * complete and can be resumed in a later invocation of one of the `perform.*Input` methods. The
+ * event time is initialized to the current time of the [MainTestClock].
+ *
+ * Be aware that if you split a gesture over multiple invocations of `perform.*Input`, everything
+ * that happens in between will run as if the gesture is still ongoing (imagine a finger still
+ * touching the screen).
+ *
+ * All events that are injected from the [block] are batched together and sent after [block] is
+ * complete. This method blocks while the events are injected. If an error occurs during
+ * execution of [block] or injection of the events, all (subsequent) events are dropped and the
+ * error is thrown here.
+ *
+ * Example usage:
+ * ```
+ * // Perform a swipe up
+ * testRule.onNodeWithTag("myWidget")
+ *     .performTouchInput { swipeUp() }
+ *
+ * // Perform a click off-center
+ * testRule.onNodeWithTag("myWidget")
+ *     .performTouchInput { click(percentOffset(.2f, .5f) }
+ *
+ * // Do an assertion while performing a click
+ * testRule.onNodeWithTag("myWidget")
+ *     .performTouchInput { down(topLeft) }
+ *     .assertHasClickAction()
+ *     .performTouchInput { up(topLeft) }
+ *
+ * // Perform a click-and-drag
+ * testRule.onNodeWithTag("myWidget").performTouchInput {
+ *     click()
+ *     advanceEventTime(100)
+ *     swipeUp()
+ * }
+ * ```
+ *
+ * @param block A lambda with [TouchInjectionScope] as receiver that describes the gesture by
+ * sending all touch events.
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
+ *
+ * @see TouchInjectionScope
+ */
+fun SemanticsNodeInteraction.performTouchInput(
+    block: TouchInjectionScope.() -> Unit
+): SemanticsNodeInteraction {
+    val node = fetchSemanticsNode("Failed to inject touch input.")
+    with(MultiModalInjectionScopeImpl(node, testContext)) {
+        try {
+            touch(block)
+        } finally {
+            dispose()
+        }
+    }
+    return this
+}
+
+/**
+ * Executes the mouse gesture specified in the given [block]. The gesture doesn't need to be
+ * complete and can be resumed in a later invocation of one of the `perform.*Input` methods. The
+ * event time is initialized to the current time of the [MainTestClock].
+ *
+ * Be aware that if you split a gesture over multiple invocations of `perform.*Input`, everything
+ * that happens in between will run as if the gesture is still ongoing (imagine a mouse button
+ * still being pressed).
+ *
+ * All events that are injected from the [block] are batched together and sent after [block] is
+ * complete. This method blocks while the events are injected. If an error occurs during
+ * execution of [block] or injection of the events, all (subsequent) events are dropped and the
+ * error is thrown here.
+ *
+ * Example usage:
+ * ```
+ * onNodeWithTag("myWidget")
+ *    .performMouseInput {
+ *        click(center)
+ *    }
+ *
+ * onNodeWithTag("myWidget")
+ *    // Scroll down while the primary mouse button is down:
+ *    .performMouseInput {
+ *        down()
+ *        repeat(6) {
+ *            advanceEventTime()
+ *            scroll(-1f)
+ *        }
+ *        advanceEventTime()
+ *        up()
+ *    }
+ * ```
+ *
+ * @param block A lambda with [MouseInjectionScope] as receiver that describes the gesture by
+ * sending all mouse events.
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
+ *
+ * @see MouseInjectionScope
+ */
+@ExperimentalTestApi
+fun SemanticsNodeInteraction.performMouseInput(
+    block: MouseInjectionScope.() -> Unit
+): SemanticsNodeInteraction {
+    val node = fetchSemanticsNode("Failed to inject mouse input.")
+    with(MultiModalInjectionScopeImpl(node, testContext)) {
+        try {
+            mouse(block)
+        } finally {
+            dispose()
+        }
+    }
+    return this
+}
+
+/**
+ * Executes the multi-modal gesture specified in the given [block]. The gesture doesn't need to be
+ * complete and can be resumed in a later invocation of one of the `perform.*Input` methods. The
+ * event time is initialized to the current time of the [MainTestClock]. If only a single
+ * modality is needed (e.g. touch, mouse, stylus, keyboard, etc), you should use the
+ * `perform.*Input` of that modality instead.
+ *
+ * Functions for each modality can be called by invoking that modality's function, like
+ * [touch][MultiModalInjectionScope.touch] to inject touch events. This allows you to
+ * inject events for each modality.
+ *
+ * Be aware that if you split a gesture over multiple invocations of `perform.*Input`, everything
+ * that happens in between will run as if the gesture is still ongoing (imagine a finger still
+ * touching the screen).
+ *
+ * All events that are injected from the [block] are batched together and sent after [block] is
+ * complete. This method blocks while the events are injected. If an error occurs during
+ * execution of [block] or injection of the events, all (subsequent) events are dropped and the
+ * error is thrown here.
+ *
+ * @param block A lambda with [MultiModalInjectionScope] as receiver that describes the gesture
+ * by sending all multi modal events.
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
+ *
+ * @see MultiModalInjectionScope
+ */
+// TODO(fresen): add example of multi-modal input when Keyboard input is added (touch and mouse
+//  don't work together, so an example with those two doesn't make sense)
+fun SemanticsNodeInteraction.performMultiModalInput(
+    block: MultiModalInjectionScope.() -> Unit
+): SemanticsNodeInteraction {
+    val node = fetchSemanticsNode("Failed to inject multi-modal input.")
+    with(MultiModalInjectionScopeImpl(node, testContext)) {
+        try {
+            block.invoke(this)
+        } finally {
+            dispose()
+        }
+    }
+    return this
+}
+
+@Deprecated(
+    message = "Replaced with same function, but with SemanticsNodeInteraction as return type",
+    level = DeprecationLevel.HIDDEN
+)
+@Suppress("unused")
+@JvmName("performSemanticsAction")
+fun <T : Function<Boolean>> SemanticsNodeInteraction.performSemanticsActionUnit(
+    key: SemanticsPropertyKey<AccessibilityAction<T>>,
+    invocation: (T) -> Unit
+) {
+    performSemanticsAction(key, invocation)
 }
 
 /**
@@ -238,13 +500,14 @@ fun SemanticsNodeInteraction.performGesture(
  * @param key Key of the action to be performed.
  * @param invocation Place where you call your action. In the argument is provided the underlying
  * action from the given Semantics action.
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
  *
  * @throws AssertionError If the semantics action is not defined on this node.
  */
 fun <T : Function<Boolean>> SemanticsNodeInteraction.performSemanticsAction(
     key: SemanticsPropertyKey<AccessibilityAction<T>>,
     invocation: (T) -> Unit
-) {
+): SemanticsNodeInteraction {
     val node = fetchSemanticsNode("Failed to perform ${key.name} action.")
     requireSemantics(node, key) {
         "Failed to perform action ${key.name}"
@@ -254,6 +517,20 @@ fun <T : Function<Boolean>> SemanticsNodeInteraction.performSemanticsAction(
     testContext.testOwner.runOnUiThread {
         node.config[key].action?.let(invocation)
     }
+
+    return this
+}
+
+@Deprecated(
+    message = "Replaced with same function, but with SemanticsNodeInteraction as return type",
+    level = DeprecationLevel.HIDDEN
+)
+@Suppress("unused")
+@JvmName("performSemanticsAction")
+fun SemanticsNodeInteraction.performSemanticsActionUnit(
+    key: SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>
+) {
+    performSemanticsAction(key)
 }
 
 /**
@@ -266,20 +543,40 @@ fun <T : Function<Boolean>> SemanticsNodeInteraction.performSemanticsAction(
  * is blocking until the action is performed
  *
  * @param key Key of the action to be performed.
+ * @return The [SemanticsNodeInteraction] that is the receiver of this method
  *
  * @throws AssertionError If the semantics action is not defined on this node.
  */
 fun SemanticsNodeInteraction.performSemanticsAction(
     key: SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>
-) {
-    performSemanticsAction(key) { it.invoke() }
+): SemanticsNodeInteraction {
+    return performSemanticsAction(key) { it.invoke() }
 }
 
+// TODO(200928505): get a more accurate indication if it is a lazy list
+private val SemanticsNode.isLazyList: Boolean
+    get() = ScrollBy in config && ScrollToIndex in config
+
+private val SemanticsNode.horizontalScrollAxis: ScrollAxisRange?
+    get() = config.getOrNull(HorizontalScrollAxisRange)
+
+private val SemanticsNode.verticalScrollAxis: ScrollAxisRange?
+    get() = config.getOrNull(VerticalScrollAxisRange)
+
 private val SemanticsNode.isReversedHorizontally: Boolean
-    get() = config.getOrNull(HorizontalScrollAxisRange)?.reverseScrolling == true
+    get() = horizontalScrollAxis?.reverseScrolling ?: false
 
 private val SemanticsNode.isReversedVertically: Boolean
-    get() = config.getOrNull(VerticalScrollAxisRange)?.reverseScrolling == true
+    get() = verticalScrollAxis?.reverseScrolling ?: false
+
+private val ScrollAxisRange?.isAtStart: Boolean
+    get() = this?.let { value() == 0f } ?: true
+
+private val ScrollAxisRange?.isAtEnd: Boolean
+    get() = this?.let { value() == maxValue() } ?: true
+
+private val SemanticsNode.isRtl: Boolean
+    get() = layoutInfo.layoutDirection == LayoutDirection.Rtl
 
 private fun SemanticsNodeInteraction.requireSemantics(
     node: SemanticsNode,
@@ -291,4 +588,13 @@ private fun SemanticsNodeInteraction.requireSemantics(
         val msg = "${errorMessage()}, the node is missing [${missingProperties.joinToString()}]"
         throw AssertionError(buildGeneralErrorMessage(msg, selector, node))
     }
+}
+
+@Suppress("NOTHING_TO_INLINE") // Avoids doubling the stack depth for recursive search
+private inline fun SemanticsMatcher.findMatchInDescendants(root: SemanticsNode): SemanticsNode? {
+    return root.children.firstOrNull { it.layoutInfo.isPlaced && findMatchInHierarchy(it) != null }
+}
+
+private fun SemanticsMatcher.findMatchInHierarchy(node: SemanticsNode): SemanticsNode? {
+    return if (matches(node)) node else findMatchInDescendants(node)
 }

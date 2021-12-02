@@ -17,6 +17,7 @@
 
     <application>
         <activity android:name="androidx.compose.ui.inspection.testdata.AndroidViewTestActivity" />
+        <activity android:name="androidx.compose.ui.inspection.testdata.ComposeViewTestActivity" />
         <activity android:name="androidx.compose.ui.inspection.testdata.DialogTestActivity" />
         <activity android:name="androidx.compose.ui.inspection.testdata.ParametersTestActivity" />
         <activity android:name="androidx.compose.ui.inspection.testdata.RippleTestActivity" />

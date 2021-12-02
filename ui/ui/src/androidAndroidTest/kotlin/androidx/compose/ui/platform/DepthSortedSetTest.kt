@@ -18,6 +18,7 @@ package androidx.compose.ui.platform
 
 import androidx.compose.ui.node.DepthSortedSet
 import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.node.LayoutNodeDrawScope
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.add
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -156,6 +157,8 @@ class DepthSortedSetTest {
     }
 
     internal abstract class DepthTestOwner : Owner {
+        override val sharedDrawScope = LayoutNodeDrawScope()
+
         override val root: LayoutNode
             get() = LayoutNode()
     }

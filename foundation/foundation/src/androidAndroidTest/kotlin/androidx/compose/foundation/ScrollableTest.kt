@@ -17,7 +17,9 @@
 package androidx.compose.foundation
 
 import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.FlingBehavior
+import androidx.compose.foundation.gestures.ModifierLocalScrollableContainer
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableState
@@ -41,19 +43,17 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.modifier.ModifierLocalConsumer
+import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.center
-import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.moveBy
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipe
 import androidx.compose.ui.test.swipeWithVelocity
-import androidx.compose.ui.test.up
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -61,6 +61,7 @@ import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.junit.After
@@ -114,7 +115,7 @@ class ScrollableTest {
                 orientation = Orientation.Horizontal
             )
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
@@ -126,7 +127,7 @@ class ScrollableTest {
             assertThat(total).isGreaterThan(0)
             total
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y + 100f),
@@ -137,7 +138,7 @@ class ScrollableTest {
         rule.runOnIdle {
             assertThat(total).isEqualTo(lastTotal)
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x - 100f, this.center.y),
@@ -165,7 +166,7 @@ class ScrollableTest {
                 orientation = Orientation.Horizontal
             )
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
@@ -177,7 +178,7 @@ class ScrollableTest {
             assertThat(total).isLessThan(0)
             total
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y + 100f),
@@ -188,7 +189,7 @@ class ScrollableTest {
         rule.runOnIdle {
             assertThat(total).isEqualTo(lastTotal)
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x - 100f, this.center.y),
@@ -215,7 +216,7 @@ class ScrollableTest {
                 orientation = Orientation.Vertical
             )
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y + 100f),
@@ -227,7 +228,7 @@ class ScrollableTest {
             assertThat(total).isGreaterThan(0)
             total
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
@@ -238,7 +239,7 @@ class ScrollableTest {
         rule.runOnIdle {
             assertThat(total).isEqualTo(lastTotal)
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y - 100f),
@@ -266,7 +267,7 @@ class ScrollableTest {
                 orientation = Orientation.Vertical
             )
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y + 100f),
@@ -278,7 +279,7 @@ class ScrollableTest {
             assertThat(total).isLessThan(0)
             total
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
@@ -289,7 +290,7 @@ class ScrollableTest {
         rule.runOnIdle {
             assertThat(total).isEqualTo(lastTotal)
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y - 100f),
@@ -318,7 +319,7 @@ class ScrollableTest {
                 enabled = enabled.value
             )
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
@@ -330,7 +331,7 @@ class ScrollableTest {
             enabled.value = false
             total
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
@@ -358,7 +359,7 @@ class ScrollableTest {
                 orientation = Orientation.Horizontal
             )
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             swipeWithVelocity(
                 start = this.center,
                 end = Offset(this.center.x + 200f, this.center.y),
@@ -374,14 +375,68 @@ class ScrollableTest {
         val prevAfterSomeFling = total
         assertThat(prevAfterSomeFling).isGreaterThan(prev)
         // don't advance main clock anymore since we're in the middle of the fling. Now interrupt
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             down(this.center)
             moveBy(Offset(115f, 0f))
             up()
         }
         val expected = prevAfterSomeFling + 115
-        rule.mainClock.advanceTimeBy(1000)
         assertThat(total).isEqualTo(expected)
+    }
+
+    @Test
+    fun scrollable_blocksDownEvents_ifFlingingCaught() {
+        rule.mainClock.autoAdvance = false
+        var total = 0f
+        val controller = ScrollableState(
+            consumeScrollDelta = {
+                total += it
+                it
+            }
+        )
+        rule.setContent {
+            Box {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(300.dp)
+                        .scrollable(
+                            orientation = Orientation.Horizontal,
+                            state = controller
+                        )
+                ) {
+                    Box(
+                        modifier = Modifier.size(300.dp)
+                            .testTag(scrollableBoxTag)
+                            .clickable {
+                                assertWithMessage("Clickable shouldn't click when fling caught")
+                                    .fail()
+                            }
+                    )
+                }
+            }
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
+            swipeWithVelocity(
+                start = this.center,
+                end = Offset(this.center.x + 200f, this.center.y),
+                durationMillis = 100,
+                endVelocity = 4000f
+            )
+        }
+        assertThat(total).isGreaterThan(0f)
+        val prev = total
+        // pump frames twice to start fling animation
+        rule.mainClock.advanceTimeByFrame()
+        rule.mainClock.advanceTimeByFrame()
+        val prevAfterSomeFling = total
+        assertThat(prevAfterSomeFling).isGreaterThan(prev)
+        // don't advance main clock anymore since we're in the middle of the fling. Now interrupt
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
+            down(this.center)
+            up()
+        }
+        // shouldn't assert in clickable lambda
     }
 
     @Test
@@ -438,7 +493,7 @@ class ScrollableTest {
                 Modifier
             }
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipeWithVelocity(
                 start = this.center,
                 end = Offset(this.center.x + 200f, this.center.y),
@@ -510,7 +565,7 @@ class ScrollableTest {
                 }
             }
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipeWithVelocity(
                 start = this.center,
                 end = Offset(this.center.x + 200f, this.center.y),
@@ -574,7 +629,7 @@ class ScrollableTest {
         }
 
         // swipe again with velocity
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 200f, this.center.y),
@@ -637,7 +692,7 @@ class ScrollableTest {
             }
         }
 
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 200f, this.center.y),
@@ -707,7 +762,7 @@ class ScrollableTest {
             }
         }
 
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipeWithVelocity(
                 start = this.center,
                 end = Offset(this.center.x + 500f, this.center.y),
@@ -776,7 +831,7 @@ class ScrollableTest {
             }
         }
 
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             this.swipeWithVelocity(
                 start = this.center,
                 end = Offset(this.center.x + 500f, this.center.y),
@@ -901,7 +956,7 @@ class ScrollableTest {
         }
 
         rule.onNodeWithTag(scrollableBoxTag)
-            .performGesture {
+            .performTouchInput {
                 swipe(center, center.copy(x = center.x + 100f))
             }
 
@@ -972,7 +1027,7 @@ class ScrollableTest {
         }
 
         rule.onNodeWithTag(scrollableBoxTag)
-            .performGesture {
+            .performTouchInput {
                 swipe(center, center.copy(x = center.x + 100f))
             }
 
@@ -983,6 +1038,65 @@ class ScrollableTest {
             // but allow nested scroll to propagate up correctly
             assertThat(parentValue).isGreaterThan(0f)
         }
+    }
+
+    @Test
+    fun scrollable_bothOrientations_proxiesPostFling() {
+        val velocityFlung = 5000f
+        val outerState = ScrollableState(consumeScrollDelta = { 0f })
+        val innerState = ScrollableState(consumeScrollDelta = { 0f })
+        val innerFlingBehavior = object : FlingBehavior {
+            override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
+                return initialVelocity
+            }
+        }
+        val parent = object : NestedScrollConnection {
+            override suspend fun onPostFling(
+                consumed: Velocity,
+                available: Velocity
+            ): Velocity {
+                assertThat(consumed.x).isEqualTo(0f)
+                assertThat(available.x).isWithin(0.1f).of(velocityFlung)
+                return available
+            }
+        }
+
+        rule.setContentAndGetScope {
+            Box {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(300.dp)
+                        .nestedScroll(parent)
+                        .scrollable(
+                            state = outerState,
+                            orientation = Orientation.Vertical
+                        )
+                ) {
+                    Box(
+                        modifier = Modifier.size(300.dp)
+                            .testTag(scrollableBoxTag)
+                            .scrollable(
+                                state = innerState,
+                                flingBehavior = innerFlingBehavior,
+                                orientation = Orientation.Horizontal
+                            )
+                    )
+                }
+            }
+        }
+
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
+            this.swipeWithVelocity(
+                start = this.center,
+                end = Offset(this.center.x + 500f, this.center.y),
+                durationMillis = 300,
+                endVelocity = velocityFlung
+            )
+        }
+
+        // all assertions in callback above
+        rule.waitForIdle()
     }
 
     @Test
@@ -1015,7 +1129,7 @@ class ScrollableTest {
         }
 
         rule.onNodeWithTag(scrollableBoxTag)
-            .performGesture {
+            .performTouchInput {
                 down(Offset(visibleSize.width / 4f, visibleSize.height / 2f))
                 moveBy(Offset(visibleSize.width / 2f, 0f))
             }
@@ -1026,7 +1140,7 @@ class ScrollableTest {
         }
 
         rule.onNodeWithTag(scrollableBoxTag)
-            .performGesture {
+            .performTouchInput {
                 up()
             }
 
@@ -1079,7 +1193,7 @@ class ScrollableTest {
         }
 
         rule.onNodeWithTag(scrollableBoxTag)
-            .performGesture {
+            .performTouchInput {
                 down(Offset(visibleSize.width / 4f, visibleSize.height / 2f))
                 moveBy(Offset(visibleSize.width / 2f, 0f))
             }
@@ -1128,13 +1242,14 @@ class ScrollableTest {
                 orientation = Orientation.Horizontal
             )
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             down(this.center)
             moveBy(Offset(115f, 0f))
             up()
         }
         assertThat(flingCalled).isEqualTo(1)
-        assertThat(flingVelocity).isEqualTo(0f)
+        assertThat(flingVelocity).isLessThan(0.01f)
+        assertThat(flingVelocity).isGreaterThan(-0.01f)
     }
 
     @Test
@@ -1162,7 +1277,7 @@ class ScrollableTest {
                 orientation = Orientation.Horizontal
             )
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             swipeWithVelocity(
                 this.center,
                 this.center + Offset(115f, 0f),
@@ -1199,7 +1314,7 @@ class ScrollableTest {
                 orientation = Orientation.Horizontal
             )
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             swipeWithVelocity(
                 this.center,
                 this.center + Offset(115f, 0f),
@@ -1233,7 +1348,7 @@ class ScrollableTest {
                 orientation = Orientation.Horizontal
             )
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             down(center)
             moveBy(Offset(x = 100f, y = 0f))
         }
@@ -1243,7 +1358,7 @@ class ScrollableTest {
             total
         }
 
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             up()
         }
 
@@ -1277,7 +1392,7 @@ class ScrollableTest {
                 orientation = Orientation.Horizontal
             )
         }
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             down(center)
             moveBy(Offset(x = 100f, y = 0f))
         }
@@ -1287,13 +1402,63 @@ class ScrollableTest {
             total
         }
 
-        rule.onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
             up()
         }
 
         rule.runOnIdle {
             assertThat(total).isEqualTo(prevTotal + 123)
             assertThat(returned).isEqualTo(123f)
+        }
+    }
+
+    @Test
+    fun scrollable_setsModifierLocalScrollableContainer() {
+        val controller = ScrollableState { it }
+
+        var isOuterInScrollableContainer: Boolean? = null
+        var isInnerInScrollableContainer: Boolean? = null
+        rule.setContent {
+            Box {
+                Box(
+                    modifier = Modifier
+                        .testTag(scrollableBoxTag)
+                        .size(100.dp)
+                        .then(
+                            object : ModifierLocalConsumer {
+                                override fun onModifierLocalsUpdated(
+                                    scope: ModifierLocalReadScope
+                                ) {
+                                    with(scope) {
+                                        isOuterInScrollableContainer =
+                                            ModifierLocalScrollableContainer.current
+                                    }
+                                }
+                            }
+                        )
+                        .scrollable(
+                            state = controller,
+                            orientation = Orientation.Horizontal
+                        )
+                        .then(
+                            object : ModifierLocalConsumer {
+                                override fun onModifierLocalsUpdated(
+                                    scope: ModifierLocalReadScope
+                                ) {
+                                    with(scope) {
+                                        isInnerInScrollableContainer =
+                                            ModifierLocalScrollableContainer.current
+                                    }
+                                }
+                            }
+                        )
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(isOuterInScrollableContainer).isFalse()
+            assertThat(isInnerInScrollableContainer).isTrue()
         }
     }
 
@@ -1377,6 +1542,108 @@ class ScrollableTest {
     }
 
     @Test
+    fun scrollable_cancellingAnimateScrollUpdatesIsScrollInProgress() {
+        rule.mainClock.autoAdvance = false
+
+        var total = 0f
+        val controller = ScrollableState(
+            consumeScrollDelta = {
+                total += it
+                it
+            }
+        )
+        rule.setContentAndGetScope {
+            Box(
+                modifier = Modifier
+                    .size(100.dp).scrollable(
+                        state = controller,
+                        orientation = Orientation.Horizontal
+                    )
+            )
+        }
+
+        lateinit var animateJob: Job
+
+        rule.runOnIdle {
+            animateJob = scope.launch {
+                controller.animateScrollBy(
+                    100f,
+                    tween(1000)
+                )
+            }
+        }
+
+        rule.mainClock.advanceTimeBy(500)
+        rule.runOnIdle {
+            assertThat(controller.isScrollInProgress).isTrue()
+        }
+
+        // Stop halfway through the animation
+        animateJob.cancel()
+
+        rule.runOnIdle {
+            assertThat(controller.isScrollInProgress).isFalse()
+        }
+    }
+
+    @Test
+    fun scrollable_preemptingAnimateScrollUpdatesIsScrollInProgress() {
+        rule.mainClock.autoAdvance = false
+
+        var total = 0f
+        val controller = ScrollableState(
+            consumeScrollDelta = {
+                total += it
+                it
+            }
+        )
+        rule.setContentAndGetScope {
+            Box(
+                modifier = Modifier
+                    .size(100.dp).scrollable(
+                        state = controller,
+                        orientation = Orientation.Horizontal
+                    )
+            )
+        }
+
+        rule.runOnIdle {
+            scope.launch {
+                controller.animateScrollBy(
+                    100f,
+                    tween(1000)
+                )
+            }
+        }
+
+        rule.mainClock.advanceTimeBy(500)
+        rule.runOnIdle {
+            assertThat(total).isGreaterThan(0f)
+            assertThat(total).isLessThan(100f)
+            assertThat(controller.isScrollInProgress).isTrue()
+            scope.launch {
+                controller.animateScrollBy(
+                    -100f,
+                    tween(1000)
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(controller.isScrollInProgress).isTrue()
+        }
+
+        rule.mainClock.advanceTimeBy(1000)
+        rule.mainClock.advanceTimeByFrame()
+
+        rule.runOnIdle {
+            assertThat(total).isGreaterThan(-75f)
+            assertThat(total).isLessThan(0f)
+            assertThat(controller.isScrollInProgress).isFalse()
+        }
+    }
+
+    @Test
     fun testInspectorValue() {
         val controller = ScrollableState(
             consumeScrollDelta = { it }
@@ -1388,6 +1655,7 @@ class ScrollableTest {
             assertThat(modifier.inspectableElements.map { it.name }.asIterable()).containsExactly(
                 "orientation",
                 "state",
+                "overScrollController",
                 "enabled",
                 "reverseDirection",
                 "flingBehavior",

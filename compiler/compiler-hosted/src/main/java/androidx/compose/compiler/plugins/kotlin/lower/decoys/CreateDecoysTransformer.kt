@@ -17,6 +17,7 @@
 package androidx.compose.compiler.plugins.kotlin.lower.decoys
 
 import androidx.compose.compiler.plugins.kotlin.ComposeFqNames
+import androidx.compose.compiler.plugins.kotlin.ModuleMetrics
 import androidx.compose.compiler.plugins.kotlin.lower.AbstractComposeLowering
 import androidx.compose.compiler.plugins.kotlin.lower.ModuleLoweringPass
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -42,6 +43,10 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
+import org.jetbrains.kotlin.ir.declarations.IrValueParameter
+import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrExpressionBody
+import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.IrType
@@ -49,8 +54,13 @@ import org.jetbrains.kotlin.ir.util.DeepCopySymbolRemapper
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.hasAnnotation
+import org.jetbrains.kotlin.ir.util.hasDefaultValue
+import org.jetbrains.kotlin.ir.util.isEnumClass
 import org.jetbrains.kotlin.ir.util.isLocal
+import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
+import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
+import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.BindingTrace
 
@@ -82,11 +92,13 @@ class CreateDecoysTransformer(
     pluginContext: IrPluginContext,
     symbolRemapper: DeepCopySymbolRemapper,
     bindingTrace: BindingTrace,
-    override val signatureBuilder: IdSignatureSerializer
+    override val signatureBuilder: IdSignatureSerializer,
+    metrics: ModuleMetrics,
 ) : AbstractComposeLowering(
     context = pluginContext,
     symbolRemapper = symbolRemapper,
-    bindingTrace = bindingTrace
+    bindingTrace = bindingTrace,
+    metrics = metrics
 ),
     ModuleLoweringPass,
     DecoyTransformBase {
@@ -99,6 +111,9 @@ class CreateDecoysTransformer(
     private val decoyImplementationAnnotation by lazy {
         getTopLevelClass(DecoyFqNames.DecoyImplementation).owner
     }
+
+    private val decoyImplementationDefaultsBitmaskAnnotation =
+        getTopLevelClass(DecoyFqNames.DecoyImplementationDefaultsBitMask).owner
 
     private val decoyStub by lazy {
         getInternalFunction("illegalDecoyCallException").owner
@@ -172,6 +187,7 @@ class CreateDecoysTransformer(
             name = newName
             returnType = original.returnType
             isPrimary = false
+            isOperator = false
         }
         newFunction.annotations = original.annotations
         newFunction.metadata = original.metadata
@@ -211,7 +227,41 @@ class CreateDecoysTransformer(
 
         newFunction.addDecoyImplementationAnnotation(newName.asString(), original.getSignatureId())
 
+        newFunction.valueParameters.forEach {
+            it.defaultValue?.transformDefaultValue(
+                originalFunction = original,
+                newFunction = newFunction
+            )
+        }
+
         return newFunction
+    }
+
+    /**
+     *  Expressions for default values can use other parameters.
+     *  In such cases we need to ensure that default values expressions use parameters of the new
+     *  function (new/copied value parameters).
+     *
+     *  Example:
+     *  fun Foo(a: String, b: String = a) {...}
+     */
+    private fun IrExpressionBody.transformDefaultValue(
+        originalFunction: IrFunction,
+        newFunction: IrFunction
+    ) {
+        transformChildrenVoid(object : IrElementTransformerVoid() {
+            override fun visitGetValue(expression: IrGetValue): IrExpression {
+                val original = super.visitGetValue(expression)
+                val valueParameter =
+                    (expression.symbol.owner as? IrValueParameter) ?: return original
+
+                val parameterIndex = valueParameter.index
+                if (parameterIndex < 0 || valueParameter.parent != originalFunction) {
+                    return super.visitGetValue(expression)
+                }
+                return irGet(newFunction.valueParameters[parameterIndex])
+            }
+        })
     }
 
     private fun IrFunction.stubBody() {
@@ -245,10 +295,24 @@ class CreateDecoysTransformer(
                 it.putValueArgument(0, irConst(name))
                 it.putValueArgument(1, irConst(signatureId))
             }
+
+        annotations = annotations +
+            IrConstructorCallImpl.fromSymbolOwner(
+                type = decoyImplementationDefaultsBitmaskAnnotation.defaultType,
+                constructorSymbol =
+                    decoyImplementationDefaultsBitmaskAnnotation.constructors.first().symbol
+            ).also {
+                val paramsWithDefaultsBitMask = bitMask(
+                    *valueParameters.map { it.hasDefaultValue() }.toBooleanArray()
+                )
+                it.putValueArgument(0, irConst(paramsWithDefaultsBitMask))
+            }
     }
 
     private fun IrFunction.shouldBeRemapped(): Boolean =
-        !isLocalFunction() && (hasComposableAnnotation() || hasComposableParameter())
+        !isLocalFunction() &&
+            !isEnumConstructor() &&
+            (hasComposableAnnotation() || hasComposableParameter())
 
     private fun IrFunction.isLocalFunction(): Boolean =
         origin == IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA ||
@@ -262,6 +326,9 @@ class CreateDecoysTransformer(
     private fun IrFunction.hasComposableParameter() =
         valueParameters.any { it.type.hasComposable() } ||
             extensionReceiverParameter?.type?.hasComposable() == true
+
+    private fun IrFunction.isEnumConstructor() =
+        this is IrConstructor && parentAsClass.isEnumClass
 
     private fun IrType.hasComposable(): Boolean {
         if (hasAnnotation(ComposeFqNames.Composable)) {

@@ -46,12 +46,14 @@ dependencies {
     })
     androidTestImplementation(libs.kotlinStdlib)
     androidTestImplementation(libs.kotlinCoroutinesAndroid)
+    androidTestImplementation(libs.testCore)
     androidTestImplementation(project(":compose:ui:ui-tooling-data"))
     androidTestImplementation(project(":compose:ui:ui"))
+    androidTestImplementation(project(":compose:ui:ui-util"))
     androidTestImplementation(project(":compose:ui:ui-test-junit4"))
     androidTestImplementation(project(":compose:material:material"))
     androidTestImplementation(project(":inspection:inspection-testing"))
-    androidTestImplementation(project(":activity:activity-compose"))
+    androidTestImplementation("androidx.activity:activity-compose:1.3.1")
     androidTestImplementation(libs.testRunner)
     androidTestImplementation(libs.testExtJunit)
     androidTestImplementation(libs.truth)
@@ -78,7 +80,7 @@ android {
     externalNativeBuild {
         cmake {
             path "src/main/cpp/CMakeLists.txt"
-            version "3.10.2"
+            version "3.18.1"
         }
     }
 
@@ -90,7 +92,6 @@ android {
 
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
-        useIR = true
         freeCompilerArgs += [
                 "-Xopt-in=kotlin.RequiresOptIn",
                 "-P", "plugin:androidx.compose.compiler.plugins.kotlin:sourceInformation=true"

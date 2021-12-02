@@ -1,3 +1,0 @@
-// Baseline format: 1.0
-GetterSetterNames: androidx.compose.ui.tooling.inspector.LayoutInspectorTree#getHideSystemNodes():
-    Symmetric method for `setHideSystemNodes` must be named `isHideSystemNodes`; was `getHideSystemNodes`

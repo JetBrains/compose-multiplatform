@@ -22,6 +22,7 @@ import androidx.compose.lint.test.Stubs
 import androidx.compose.lint.test.compiledStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.checks.infrastructure.TestFile
+import com.android.tools.lint.checks.infrastructure.TestMode
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
 import org.junit.Test
@@ -43,6 +44,7 @@ class ComposableCoroutineCreationDetectorTest : LintDetectorTest() {
     private val coroutineBuildersStub: TestFile = compiledStub(
         filename = "Builders.common.kt",
         filepath = "kotlinx/coroutines",
+        checksum = 0xdb1ff08e,
         """
         package kotlinx.coroutines
 
@@ -57,6 +59,12 @@ class ComposableCoroutineCreationDetectorTest : LintDetectorTest() {
         ) {}
         """,
 """
+        META-INF/main.kotlin_module:
+        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcYlk5iXUpSfmVKhl5yfW5BfnKpX
+        VJpXkpmbqpeWny/EFpJaXOJdwqXOJZSdX5KTmQdSVpRfWpKZl1osJOhUmpmT
+        klpUHA/Um5uf512ixKDFAADN8kOtaQAAAA==
+        """,
+        """
         kotlinx/coroutines/Builders_commonKt.class:
         H4sIAAAAAAAAAK1TXU8TQRQ9M/1aliJlBWyrYpUqX8IW4lsJCRJJGhGNRV54
         MNPtWrbdzpr9aOCN+FP8BfJGfDAE3/xRxrvbLoKagNF9uHvu3XPPnJm5++37
@@ -88,12 +96,6 @@ class ComposableCoroutineCreationDetectorTest : LintDetectorTest() {
         Yd1NivxdUh75NnlOb6NS90iF5JmbwJNL+BfV8v1FMQjygGzrVwGWCAX4WP6z
         +RZVu2f5M/jJJVofsXJRJTg2K3sHD6sfim6AAGunqEW4FuE6Wdxw5mZEkM4p
         WEFnvU3rBYICGwW8n1uFkiGNAgAA
-        """,
-        """
-        META-INF/main.kotlin_module:
-        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcYlk5iXUpSfmVKhl5yfW5BfnKpX
-        VJpXkpmbqpeWny/EFpJaXOJdwqXOJZSdX5KTmQdSVpRfWpKZl1osJOhUmpmT
-        klpUHA/Um5uf512ixKDFAADN8kOtaQAAAA==
         """
     )
 
@@ -154,6 +156,7 @@ class ComposableCoroutineCreationDetectorTest : LintDetectorTest() {
             Stubs.Composable,
             coroutineBuildersStub
         )
+            .skipTestModes(TestMode.TYPE_ALIAS)
             .run()
             .expect(
                 """

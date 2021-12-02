@@ -15,7 +15,9 @@
 
 package androidx.compose.ui.window.window
 
-import androidx.compose.desktop.ComposeWindow
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,23 +25,29 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.awt.ComposeWindow
+import androidx.compose.ui.isLinux
+import androidx.compose.ui.isWindows
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.WindowSize
 import androidx.compose.ui.window.WindowState
-import androidx.compose.ui.window.isLinux
-import androidx.compose.ui.window.isWindows
 import androidx.compose.ui.window.launchApplication
 import androidx.compose.ui.window.rememberWindowState
 import androidx.compose.ui.window.runApplicationTest
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consumeEach
 import org.junit.Assume.assumeTrue
 import org.junit.Test
 import java.awt.Dimension
 import java.awt.Point
 import java.awt.Rectangle
+import java.awt.Window
 import java.awt.event.WindowEvent
 import javax.swing.JFrame
 import kotlin.math.abs
@@ -139,7 +147,7 @@ class WindowStateTest {
     @Test
     fun `set size and position before show`() = runApplicationTest(useDelay = isLinux) {
         val state = WindowState(
-            size = WindowSize(200.dp, 200.dp),
+            size = DpSize(200.dp, 200.dp),
             position = WindowPosition(242.dp, 242.dp)
         )
 
@@ -161,7 +169,7 @@ class WindowStateTest {
     @Test
     fun `change position after show`() = runApplicationTest(useDelay = isLinux) {
         val state = WindowState(
-            size = WindowSize(200.dp, 200.dp),
+            size = DpSize(200.dp, 200.dp),
             position = WindowPosition(200.dp, 200.dp)
         )
         var window: ComposeWindow? = null
@@ -184,7 +192,7 @@ class WindowStateTest {
     @Test
     fun `change size after show`() = runApplicationTest(useDelay = isLinux) {
         val state = WindowState(
-            size = WindowSize(200.dp, 200.dp),
+            size = DpSize(200.dp, 200.dp),
             position = WindowPosition(200.dp, 200.dp)
         )
         var window: ComposeWindow? = null
@@ -197,7 +205,7 @@ class WindowStateTest {
 
         awaitIdle()
 
-        state.size = WindowSize(250.dp, 200.dp)
+        state.size = DpSize(250.dp, 200.dp)
         awaitIdle()
         assertThat(window?.size).isEqualTo(Dimension(250, 200))
 
@@ -212,7 +220,7 @@ class WindowStateTest {
         infix fun Point.maxDistance(other: Point) = max(abs(x - other.x), abs(y - other.y))
 
         val state = WindowState(
-            size = WindowSize(200.dp, 200.dp),
+            size = DpSize(200.dp, 200.dp),
             position = WindowPosition(Alignment.Center)
         )
         var window: ComposeWindow? = null
@@ -231,7 +239,7 @@ class WindowStateTest {
 
     @Test
     fun `remember position after reattach`() = runApplicationTest(useDelay = isLinux) {
-        val state = WindowState(size = WindowSize(200.dp, 200.dp))
+        val state = WindowState(size = DpSize(200.dp, 200.dp))
         var window1: ComposeWindow? = null
         var window2: ComposeWindow? = null
         var isWindow1 by mutableStateOf(true)
@@ -263,7 +271,7 @@ class WindowStateTest {
 
     @Test
     fun `state position should be specified after attach`() = runApplicationTest {
-        val state = WindowState(size = WindowSize(200.dp, 200.dp))
+        val state = WindowState(size = DpSize(200.dp, 200.dp))
 
         launchApplication {
             Window(onCloseRequest = {}, state) {
@@ -284,7 +292,7 @@ class WindowStateTest {
         //  If we set in skiko SkiaLayer.setFullscreen(true) then isFullscreen still returns false
         assumeTrue(isWindows || isLinux)
 
-        val state = WindowState(size = WindowSize(200.dp, 200.dp))
+        val state = WindowState(size = DpSize(200.dp, 200.dp))
         var window: ComposeWindow? = null
 
         launchApplication {
@@ -308,7 +316,7 @@ class WindowStateTest {
 
     @Test
     fun maximize() = runApplicationTest(useDelay = isLinux) {
-        val state = WindowState(size = WindowSize(200.dp, 200.dp))
+        val state = WindowState(size = DpSize(200.dp, 200.dp))
         var window: ComposeWindow? = null
 
         launchApplication {
@@ -332,7 +340,7 @@ class WindowStateTest {
 
     @Test
     fun minimize() = runApplicationTest {
-        val state = WindowState(size = WindowSize(200.dp, 200.dp))
+        val state = WindowState(size = DpSize(200.dp, 200.dp))
         var window: ComposeWindow? = null
 
         launchApplication {
@@ -359,7 +367,7 @@ class WindowStateTest {
         // macOs can't be maximized and minimized at the same time
         assumeTrue(isWindows || isLinux)
 
-        val state = WindowState(size = WindowSize(200.dp, 200.dp))
+        val state = WindowState(size = DpSize(200.dp, 200.dp))
         var window: ComposeWindow? = null
 
         launchApplication {
@@ -396,7 +404,7 @@ class WindowStateTest {
         assumeTrue(isWindows)
 
         val state = WindowState(
-            size = WindowSize(201.dp, 203.dp),
+            size = DpSize(201.dp, 203.dp),
             position = WindowPosition(196.dp, 257.dp)
         )
         var window: ComposeWindow? = null
@@ -432,7 +440,7 @@ class WindowStateTest {
         assumeTrue(isWindows)
 
         val state = WindowState(
-            size = WindowSize(201.dp, 203.dp),
+            size = DpSize(201.dp, 203.dp),
             position = WindowPosition(196.dp, 257.dp)
         )
         var window: ComposeWindow? = null
@@ -465,7 +473,7 @@ class WindowStateTest {
     @Test
     fun `maximize window before show`() = runApplicationTest(useDelay = isLinux) {
         val state = WindowState(
-            size = WindowSize(200.dp, 200.dp),
+            size = DpSize(200.dp, 200.dp),
             position = WindowPosition(Alignment.Center),
             placement = WindowPlacement.Maximized,
         )
@@ -498,7 +506,7 @@ class WindowStateTest {
         assumeTrue(isWindows)
 
         val state = WindowState(
-            size = WindowSize(200.dp, 200.dp),
+            size = DpSize(200.dp, 200.dp),
             position = WindowPosition(Alignment.Center),
             isMinimized = true
         )
@@ -523,7 +531,7 @@ class WindowStateTest {
         assumeTrue(isLinux || isWindows)
 
         val state = WindowState(
-            size = WindowSize(200.dp, 200.dp),
+            size = DpSize(200.dp, 200.dp),
             position = WindowPosition(Alignment.Center),
             placement = WindowPlacement.Fullscreen,
         )
@@ -546,7 +554,7 @@ class WindowStateTest {
         val initialState = WindowState()
         val newState = WindowState(
             placement = WindowPlacement.Maximized,
-            size = WindowSize(42.dp, 42.dp),
+            size = DpSize(42.dp, 42.dp),
             position = WindowPosition(3.dp, 3.dp),
             isMinimized = true,
         )
@@ -596,4 +604,174 @@ class WindowStateTest {
 
         isOpen = false
     }
+
+    @Test
+    fun `set window height by its content`() = runApplicationTest(useDelay = isLinux) {
+        lateinit var window: ComposeWindow
+        val state = WindowState(size = DpSize(300.dp, Dp.Unspecified))
+
+        launchApplication {
+            Window(
+                onCloseRequest = ::exitApplication,
+                state = state
+            ) {
+                window = this.window
+
+                Box(
+                    Modifier
+                        .width(400.dp)
+                        .height(200.dp)
+                )
+            }
+        }
+
+        awaitIdle()
+        assertThat(window.width).isEqualTo(300)
+        assertThat(window.contentSize.height).isEqualTo(200)
+        assertThat(state.size).isEqualTo(DpSize(window.size.width.dp, window.size.height.dp))
+
+        exitApplication()
+    }
+
+    @Test
+    fun `set window width by its content`() = runApplicationTest(useDelay = isLinux) {
+        lateinit var window: ComposeWindow
+        val state = WindowState(size = DpSize(Dp.Unspecified, 300.dp))
+
+        launchApplication {
+            Window(
+                onCloseRequest = ::exitApplication,
+                state = state
+            ) {
+                window = this.window
+
+                Box(
+                    Modifier
+                        .width(400.dp)
+                        .height(200.dp)
+                )
+            }
+        }
+
+        awaitIdle()
+        assertThat(window.height).isEqualTo(300)
+        assertThat(window.contentSize.width).isEqualTo(400)
+        assertThat(state.size).isEqualTo(DpSize(window.size.width.dp, window.size.height.dp))
+
+        exitApplication()
+    }
+
+    @Test
+    fun `set window size by its content`() = runApplicationTest(useDelay = isLinux) {
+        lateinit var window: ComposeWindow
+        val state = WindowState(size = DpSize(Dp.Unspecified, Dp.Unspecified))
+
+        launchApplication {
+            Window(
+                onCloseRequest = ::exitApplication,
+                state = state
+            ) {
+                window = this.window
+
+                Box(
+                    Modifier
+                        .width(400.dp)
+                        .height(200.dp)
+                )
+            }
+        }
+
+        awaitIdle()
+        assertThat(window.contentSize).isEqualTo(Dimension(400, 200))
+        assertThat(state.size).isEqualTo(DpSize(window.size.width.dp, window.size.height.dp))
+
+        exitApplication()
+    }
+
+    @Test
+    fun `set window size by its content when window is on the screen`() = runApplicationTest(
+        useDelay = isLinux
+    ) {
+        lateinit var window: ComposeWindow
+        val state = WindowState(size = DpSize(100.dp, 100.dp))
+
+        launchApplication {
+            Window(
+                onCloseRequest = ::exitApplication,
+                state = state
+            ) {
+                window = this.window
+
+                Box(
+                    Modifier
+                        .width(400.dp)
+                        .height(200.dp)
+                )
+            }
+        }
+
+        awaitIdle()
+
+        state.size = DpSize(Dp.Unspecified, Dp.Unspecified)
+        awaitIdle()
+        assertThat(window.contentSize).isEqualTo(Dimension(400, 200))
+        assertThat(state.size).isEqualTo(DpSize(window.size.width.dp, window.size.height.dp))
+
+        exitApplication()
+    }
+
+    @Test
+    fun `change visible`() = runApplicationTest {
+        lateinit var window: ComposeWindow
+
+        var visible by mutableStateOf(false)
+
+        launchApplication {
+            Window(onCloseRequest = ::exitApplication, visible = visible) {
+                window = this.window
+            }
+        }
+
+        awaitIdle()
+        assertThat(window.isVisible).isEqualTo(false)
+
+        visible = true
+        awaitIdle()
+        assertThat(window.isVisible).isEqualTo(true)
+
+        exitApplication()
+    }
+
+    @Test
+    fun `invisible window should be active`() = runApplicationTest {
+        val receivedNumbers = mutableListOf<Int>()
+
+        val sendChannel = Channel<Int>(Channel.UNLIMITED)
+
+        launchApplication {
+            Window(onCloseRequest = ::exitApplication, visible = false) {
+                LaunchedEffect(Unit) {
+                    sendChannel.consumeEach {
+                        receivedNumbers.add(it)
+                    }
+                }
+            }
+        }
+
+        sendChannel.send(1)
+        awaitIdle()
+        assertThat(receivedNumbers).isEqualTo(listOf(1))
+
+        sendChannel.send(2)
+        awaitIdle()
+        assertThat(receivedNumbers).isEqualTo(listOf(1, 2))
+
+        exitApplication()
+    }
+
+    private val Window.contentSize
+        get() = Dimension(
+            size.width - insets.left - insets.right,
+            size.height - insets.top - insets.bottom,
+        )
 }

@@ -20,6 +20,7 @@ package androidx.compose.lint
 
 import androidx.compose.lint.test.Stubs
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
+import com.android.tools.lint.checks.infrastructure.TestMode
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
 import org.junit.Test
@@ -36,6 +37,8 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     private val inspectableInfoStub = kotlin(
         """
         package androidx.compose.ui.platform
+
+        import androidx.compose.ui.Modifier
 
         val NoInspectorInfo: InspectorInfo.() -> Unit = {}
         val DebugInspectorInfo = false
@@ -96,6 +99,34 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
         ): InspectorInfo.() -> Unit =
             if (DebugInspectorInfo) ({ definitions() }) else NoInspectorInfo
 
+        fun Modifier.inspectable(
+            inspectorInfo: InspectorInfo.() -> Unit = NoInspectorInfo,
+            wrapped: Modifier
+        ): Modifier = this.then(InspectableModifierImpl(inspectorInfo, wrapped))
+
+        /**
+         * Interface for a [Modifier] wrapped for inspector purposes.
+         */
+        interface InspectableModifier {
+            val wrapped: Modifier
+        }
+
+        private class InspectableModifierImpl(
+            inspectorInfo: InspectorInfo.() -> Unit,
+            override val wrapped: Modifier
+        ) : Modifier.Element, InspectableModifier, InspectorValueInfo(inspectorInfo) {
+            override fun <R> foldIn(initial: R, operation: (R, Modifier.Element) -> R): R =
+                wrapped.foldIn(operation(initial, this), operation)
+
+            override fun <R> foldOut(initial: R, operation: (Modifier.Element, R) -> R): R =
+                operation(this, wrapped.foldOut(initial, operation))
+
+            override fun any(predicate: (Modifier.Element) -> Boolean): Boolean =
+                wrapped.any(predicate)
+
+            override fun all(predicate: (Modifier.Element) -> Boolean): Boolean =
+                wrapped.all(predicate)
+        }
         """
     ).indented()
 
@@ -149,6 +180,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
@@ -199,6 +231,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
@@ -233,6 +266,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
@@ -277,6 +311,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
@@ -301,6 +336,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
@@ -369,6 +405,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
@@ -419,6 +456,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
@@ -460,6 +498,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
@@ -519,6 +558,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
@@ -560,6 +600,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
@@ -575,7 +616,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
                 package androidx.compose.ui
 
-                import androidx.compose.runtime.remember
+                import androidx.compose.runtime.*
                 import androidx.compose.ui.Modifier
                 import androidx.compose.ui.platform.InspectorInfo
                 import androidx.compose.ui.platform.InspectorValueInfo
@@ -598,6 +639,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
@@ -606,18 +648,21 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     fun emptyModifier() {
         lint().files(
             Stubs.Modifier,
+            Stubs.Remember,
             composedStub,
+            inspectableInfoStub,
             kotlin(
                 """
                 package androidx.compose.ui
 
-                import androidx.compose.runtime.remember
+                import androidx.compose.runtime.*
                 import androidx.compose.ui.Modifier
 
                 internal actual fun Modifier.width1(width: Int): Modifier = this
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
@@ -646,6 +691,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expectClean()
     }
@@ -674,6 +720,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -709,6 +756,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -749,6 +797,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -790,6 +839,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -831,6 +881,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -872,6 +923,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -914,6 +966,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -955,6 +1008,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -997,6 +1051,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -1037,6 +1092,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -1084,6 +1140,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -1130,6 +1187,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -1196,6 +1254,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                 """
             ).indented()
         )
+            .testModes(TestMode.DEFAULT)
             .run()
             .expect(
                 """
@@ -1209,6 +1268,132 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
                             else -> this.then(BorderModifier(shape, width, brush))
                                               ~~~~~~~~~~~~~~
                     3 errors, 0 warnings
+                """
+            )
+    }
+
+    @Test
+    fun testInspectable() {
+        lint().files(
+            Stubs.Modifier,
+            composedStub,
+            inspectableInfoStub,
+            kotlin(
+                """
+                package mypackage
+
+                import androidx.compose.ui.Modifier
+                import androidx.compose.ui.platform.inspectable
+                import androidx.compose.ui.platform.InspectorInfo
+                import androidx.compose.ui.platform.InspectorValueInfo
+                import androidx.compose.ui.platform.debugInspectorInfo
+
+                fun Modifier.background(color: Int): Modifier = this.then(
+                    Background(color, inspectorInfo = debugInspectorInfo {
+                        name = "background"
+                        value = color
+                    })
+                )
+
+                fun Modifier.border(width: Int, color: Int): Modifier = this.then(
+                    BorderModifier(width, color, inspectorInfo = debugInspectorInfo {
+                        name = "border"
+                        properties["width"] = width
+                        properties["color"] = color
+                    })
+                )
+
+                fun Modifier.frame(color: Int) = this.then(
+                    Modifier.inspectable(
+                        inspectorInfo = debugInspectorInfo {
+                            name = "frame"
+                            value = color
+                        },
+                        wrapped = Modifier.background(color).border(width = 5, color = color)
+                    )
+                )
+
+                private class BackgroundModifier(
+                    color: Int,
+                    inspectorInfo: InspectorInfo.() -> Unit
+                ): Modifier
+
+                private class BorderModifier(
+                    width: Int,
+                    color: Int,
+                    inspectorInfo: InspectorInfo.() -> Unit
+                ): Modifier
+
+                """
+            ).indented()
+        )
+            .testModes(TestMode.DEFAULT)
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun testInspectableWithMissingParameter() {
+        lint().files(
+            Stubs.Modifier,
+            composedStub,
+            inspectableInfoStub,
+            kotlin(
+                """
+                package mypackage
+
+                import androidx.compose.ui.Modifier
+                import androidx.compose.ui.platform.inspectable
+                import androidx.compose.ui.platform.InspectorInfo
+                import androidx.compose.ui.platform.InspectorValueInfo
+                import androidx.compose.ui.platform.debugInspectorInfo
+
+                fun Modifier.background(color: Int): Modifier = this.then(
+                    Background(color, inspectorInfo = debugInspectorInfo {
+                        name = "background"
+                        value = color
+                    })
+                )
+
+                fun Modifier.border(width: Int, color: Int): Modifier = this.then(
+                    BorderModifier(width, color, inspectorInfo = debugInspectorInfo {
+                        name = "border"
+                        properties["width"] = width
+                        properties["color"] = color
+                    })
+                )
+
+                fun Modifier.frame(color: Int) = this.then(
+                    Modifier.inspectable(
+                        inspectorInfo = debugInspectorInfo {
+                            name = "frame"
+                        },
+                        wrapped = Modifier.background(color).border(width = 5, color = color)
+                    )
+                )
+
+                private class BackgroundModifier(
+                    color: Int,
+                    inspectorInfo: InspectorInfo.() -> Unit
+                ): Modifier
+
+                private class BorderModifier(
+                    width: Int,
+                    color: Int,
+                    inspectorInfo: InspectorInfo.() -> Unit
+                ): Modifier
+
+                """
+            ).indented()
+        )
+            .testModes(TestMode.DEFAULT)
+            .run()
+            .expect(
+                """
+                    src/mypackage/BackgroundModifier.kt:26: Error: These lambda arguments are missing in the InspectorInfo: color [ModifierInspectorInfo]
+                            inspectorInfo = debugInspectorInfo {
+                                                               ^
+                    1 errors, 0 warnings
                 """
             )
     }

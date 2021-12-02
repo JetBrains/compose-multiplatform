@@ -42,6 +42,7 @@ class RememberSaveableDetectorTest : LintDetectorTest() {
     private val rememberSaveableStub: TestFile = compiledStub(
         filename = "RememberSaveable.kt",
         filepath = "androidx/compose/runtime/saveable",
+        checksum = 0x90b6d5a7,
         """
         package androidx.compose.runtime.saveable
 
@@ -79,15 +80,10 @@ class RememberSaveableDetectorTest : LintDetectorTest() {
             Any() as Saver<MutableState<T>, MutableState<Any?>>
         """,
 """
-        androidx/compose/runtime/saveable/Saver.class:
-        H4sIAAAAAAAAAI1PTUvDQBB9m/QjjVVT60f9BWIOphZBUBG8CJVKoQEvPW2b
-        tWzbbCS7LT3md3mQnP1R4sTai3pwYd6bffOGmXn/eH0DcIEWwwlXUZrIaBWM
-        k/gl0SJIF8rIWASaLwUfzUUQUpJWwRgebvqpnEjF51e9KV/yYM7VJOiPpmJs
-        rsNv/x+l298Sg/dTq6LE0OjNEjOXKngUhkfccHJa8dKmfVkBZQY2I2kli1+b
-        suicwc+zumu1LNdyKLw8c55beeaXnDzzmO84zLN8q213KIqODsNp75+H03xn
-        czWlmysZ7YPmQMQiHol0o57NDEMtlBPFzSIlkxsmi3Qs7mXRcTxYT3iSWpL5
-        TqnEcCMTpSu0FcpYPxsHhBbx4Rfv44j4kuZVyFMdwu7C6aJGCLeArS7q2B6C
-        aexgd4iShqfR0NjTaH4C2V0QQe0BAAA=
+        META-INF/main.kotlin_module:
+        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcUlkZiXUpSfmVKhl5yfW5BfnKpX
+        VJpXkpmbKsTnW1qSmJSTGlySWJLqXcJlzqWIS61ecWJZKkitkFBQam5qblJq
+        UTBUBKiRl4ulJLW4RIjVLT/fu0SJQYsBAFB+NmSMAAAA
         """,
         """
         androidx/compose/runtime/saveable/RememberSaveableKt.class:
@@ -123,10 +119,15 @@ class RememberSaveableDetectorTest : LintDetectorTest() {
         wsGog48crDuYd1BwcNOh/zoQ9zh9Di57xICDooOwgykHmX8BaeisIyQPAAA=
         """,
         """
-        META-INF/main.kotlin_module:
-        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcUlkZiXUpSfmVKhl5yfW5BfnKpX
-        VJpXkpmbKsTnW1qSmJSTGlySWJLqXcJlzqWIS61ecWJZKkitkFBQam5qblJq
-        UTBUBKiRl4ulJLW4RIjVLT/fu0SJQYsBAFB+NmSMAAAA
+        androidx/compose/runtime/saveable/Saver.class:
+        H4sIAAAAAAAAAI1PTUvDQBB9m/QjjVVT60f9BWIOphZBUBG8CJVKoQEvPW2b
+        tWzbbCS7LT3md3mQnP1R4sTai3pwYd6bffOGmXn/eH0DcIEWwwlXUZrIaBWM
+        k/gl0SJIF8rIWASaLwUfzUUQUpJWwRgebvqpnEjF51e9KV/yYM7VJOiPpmJs
+        rsNv/x+l298Sg/dTq6LE0OjNEjOXKngUhkfccHJa8dKmfVkBZQY2I2kli1+b
+        suicwc+zumu1LNdyKLw8c55beeaXnDzzmO84zLN8q213KIqODsNp75+H03xn
+        czWlmysZ7YPmQMQiHol0o57NDEMtlBPFzSIlkxsmi3Qs7mXRcTxYT3iSWpL5
+        TqnEcCMTpSu0FcpYPxsHhBbx4Rfv44j4kuZVyFMdwu7C6aJGCLeArS7q2B6C
+        aexgd4iShqfR0NjTaH4C2V0QQe0BAAA=
         """
     )
 
@@ -161,7 +162,7 @@ class RememberSaveableDetectorTest : LintDetectorTest() {
             ),
             rememberSaveableStub,
             Stubs.Composable,
-            Stubs.MutableState
+            Stubs.SnapshotState
         )
             .run()
             .expect(
@@ -275,7 +276,7 @@ Fix for src/test/Foo.kt line 22: Change to `stateSaver = fooSaver4`:
             ),
             rememberSaveableStub,
             Stubs.Composable,
-            Stubs.MutableState
+            Stubs.SnapshotState
         )
             .run()
             .expectClean()

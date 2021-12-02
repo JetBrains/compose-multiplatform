@@ -23,7 +23,8 @@ import androidx.compose.ui.focus.FocusDirection.Companion.Up
 import androidx.compose.ui.focus.FocusStateImpl.Active
 import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
 import androidx.compose.ui.focus.FocusStateImpl.Captured
-import androidx.compose.ui.focus.FocusStateImpl.Disabled
+import androidx.compose.ui.focus.FocusStateImpl.Deactivated
+import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.node.ModifiedFocusNode
@@ -31,8 +32,8 @@ import androidx.compose.ui.util.fastForEach
 import kotlin.math.absoluteValue
 import kotlin.math.max
 
-private const val invalidFocusDirection = "This function should only be used for 2-D focus search"
-private const val noActiveChild = "ActiveParent must have a focusedChild"
+private const val InvalidFocusDirection = "This function should only be used for 2-D focus search"
+private const val NoActiveChild = "ActiveParent must have a focusedChild"
 
 /**
  *  Perform a search among the immediate children of this [node][ModifiedFocusNode] in the
@@ -46,25 +47,25 @@ internal fun ModifiedFocusNode.twoDimensionalFocusSearch(
 ): ModifiedFocusNode? {
     return when (focusState) {
         Inactive -> this
-        Disabled -> null
-        ActiveParent -> {
+        Deactivated -> null
+        ActiveParent, DeactivatedParent -> {
             // If the focusedChild is an intermediate parent, we continue searching among it's
             // children, and return a focus node if we find one.
-            val focusedChild = focusedChild ?: error(noActiveChild)
+            val focusedChild = focusedChild ?: error(NoActiveChild)
             if (focusedChild.focusState == ActiveParent) {
                 focusedChild.twoDimensionalFocusSearch(direction)?.let { return it }
             }
 
             // Use the focus rect of the active node as the starting point and pick one of our
             // children as the next focused item.
-            val activeRect = findActiveFocusNode()?.focusRect() ?: error(noActiveChild)
-            focusableChildren().findBestCandidate(activeRect, direction)
+            val activeRect = findActiveFocusNode()?.focusRect() ?: error(NoActiveChild)
+            focusableChildren(excludeDeactivated = true).findBestCandidate(activeRect, direction)
         }
         Active, Captured -> {
             // The 2-D focus search starts form the root. If we reached here, it means that there
             // was no intermediate node that was ActiveParent. This is an initial focus scenario.
             // We need to search among this node's children to find the best focus candidate.
-            val focusableChildren = focusableChildren()
+            val focusableChildren = focusableChildren(excludeDeactivated = true)
 
             // If there are aren't multiple children to choose from, return the first child.
             if (focusableChildren.size <= 1) {
@@ -76,7 +77,7 @@ internal fun ModifiedFocusNode.twoDimensionalFocusSearch(
             val initialFocusRect = when (direction) {
                 Right, Down -> focusRect().topLeft()
                 Left, Up -> focusRect().bottomRight()
-                else -> error(invalidFocusDirection)
+                else -> error(InvalidFocusDirection)
             }
             focusableChildren.findBestCandidate(initialFocusRect, direction)
         }
@@ -97,7 +98,7 @@ private fun List<ModifiedFocusNode>.findBestCandidate(
         Right -> focusRect.translate(-(focusRect.width + 1), 0f)
         Up -> focusRect.translate(0f, focusRect.height + 1)
         Down -> focusRect.translate(0f, -(focusRect.height + 1))
-        else -> error(invalidFocusDirection)
+        else -> error(InvalidFocusDirection)
     }
 
     var searchResult: ModifiedFocusNode? = null
@@ -130,7 +131,7 @@ private fun isBetterCandidate(
         Right -> (focusedRect.left < left || focusedRect.right <= left) && focusedRect.right < right
         Up -> (focusedRect.bottom > bottom || focusedRect.top >= bottom) && focusedRect.top > top
         Down -> (focusedRect.top < top || focusedRect.bottom <= top) && focusedRect.bottom < bottom
-        else -> error(invalidFocusDirection)
+        else -> error(InvalidFocusDirection)
     }
 
     // The distance from the edge furthest in the given direction of source to the edge nearest
@@ -141,7 +142,7 @@ private fun isBetterCandidate(
             Right -> left - focusedRect.right
             Up -> focusedRect.top - bottom
             Down -> top - focusedRect.bottom
-            else -> error(invalidFocusDirection)
+            else -> error(InvalidFocusDirection)
         }
         return max(0.0f, majorAxisDistance)
     }
@@ -153,7 +154,7 @@ private fun isBetterCandidate(
         Left, Right -> (focusedRect.top + focusedRect.height / 2) - (top + height / 2)
         // the distance between the center horizontals
         Up, Down -> (focusedRect.left + focusedRect.width / 2) - (left + width / 2)
-        else -> error(invalidFocusDirection)
+        else -> error(InvalidFocusDirection)
     }
 
     // Fudge-factor opportunity: how to calculate distance given major and minor axis distances.
@@ -197,7 +198,7 @@ private fun beamBeats(
     fun Rect.inSourceBeam() = when (direction) {
         Left, Right -> this.bottom > source.top && this.top < source.bottom
         Up, Down -> this.right > source.left && this.left < source.right
-        else -> error(invalidFocusDirection)
+        else -> error(InvalidFocusDirection)
     }
 
     // Whether the rect is in the direction of search.
@@ -206,7 +207,7 @@ private fun beamBeats(
         Right -> source.right <= left
         Up -> source.top >= bottom
         Down -> source.bottom <= top
-        else -> error(invalidFocusDirection)
+        else -> error(InvalidFocusDirection)
     }
 
     // The distance from the edge furthest in the given direction of source to the edge nearest
@@ -217,7 +218,7 @@ private fun beamBeats(
             Right -> left - source.right
             Up -> source.top - bottom
             Down -> top - source.bottom
-            else -> error(invalidFocusDirection)
+            else -> error(InvalidFocusDirection)
         }
         return max(0.0f, majorAxisDistance)
     }
@@ -231,7 +232,7 @@ private fun beamBeats(
             Right -> right - source.right
             Up -> source.top - top
             Down -> bottom - source.bottom
-            else -> error(invalidFocusDirection)
+            else -> error(InvalidFocusDirection)
         }
         return max(1.0f, majorAxisDistance)
     }

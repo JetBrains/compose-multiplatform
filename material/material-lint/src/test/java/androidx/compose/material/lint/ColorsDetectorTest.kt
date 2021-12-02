@@ -47,10 +47,11 @@ class ColorsDetectorTest : LintDetectorTest() {
     private val ColorsStub = kotlinAndCompiledStub(
         filename = "Colors.kt",
         filepath = "androidx/compose/material",
+        checksum = 0x2f84988c,
         """
             package androidx.compose.material
 
-            import androidx.compose.ui.graphics.Color
+            import androidx.compose.ui.graphics.*
 
             class Colors(
                 primary: Color,
@@ -126,6 +127,12 @@ class ColorsDetectorTest : LintDetectorTest() {
                 false
             )
         """,
+"""
+        META-INF/main.kotlin_module:
+        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcolmZiXUpSfmVKhl5yfW5BfnKqX
+        m1iSWpSZmCPE4Zyfk19U7F3Cpc4li1OZXlp+vhBbSGpxCVihDIbC0ky99KLE
+        gozM5GIhdrCR3iVKDFoMAMec7K6RAAAA
+        """,
         """
         androidx/compose/material/Colors.class:
         H4sIAAAAAAAAAJVUTW8TSRB9Pf6YeGzHdownNmGWrwBJgExA3LJCgrArBZnd
@@ -181,12 +188,6 @@ class ColorsDetectorTest : LintDetectorTest() {
         nCcn71K+iVN4l/IDnMbHlJ+TZV9SfsvIHyl9eMWpf4OVgAI7fon8yU6gKovB
         LIa4IpclSUayrHFlAsLES7g6gR0mRk1cMxEzcd3kH0vUm4ibtj1hImlCNrHT
         RMpEg4lGE70mgibGTAT+BZIgXWjiCwAA
-        """,
-        """
-        META-INF/main.kotlin_module:
-        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcolmZiXUpSfmVKhl5yfW5BfnKqX
-        m1iSWpSZmCPE4Zyfk19U7F3Cpc4li1OZXlp+vhBbSGpxCVihDIbC0ky99KLE
-        gozM5GIhdrCR3iVKDFoMAMec7K6RAAAA
         """
     )
 

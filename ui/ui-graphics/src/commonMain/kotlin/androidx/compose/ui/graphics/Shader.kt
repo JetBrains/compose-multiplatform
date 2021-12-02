@@ -112,6 +112,11 @@ internal expect fun ActualSweepGradientShader(
     colorStops: List<Float>?,
 ): Shader
 
+/**
+ * Creates a Shader using the given [ImageBitmap] as an input texture. If the shader is
+ * to be drawn in an area larger than the size of the [ImageBitmap], the region is filled
+ * in the horizontal and vertical directions based on the [tileModeX] and [tileModeY] parameters.
+ */
 fun ImageShader(
     image: ImageBitmap,
     tileModeX: TileMode = TileMode.Clamp,

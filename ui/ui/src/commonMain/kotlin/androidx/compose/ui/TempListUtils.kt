@@ -27,6 +27,10 @@ import kotlin.contracts.contract
  * to each pair of two adjacent elements in this collection.
  *
  * The returned list is empty if this collection contains less than two elements.
+ *
+ * **Do not use for collections that come from public APIs**, since they may not support random
+ * access in an efficient way, and this method may actually be a lot slower. Only use for
+ * collections that are created by code we control and are known to support random access.
  */
 @OptIn(ExperimentalContracts::class)
 internal inline fun <T, R> List<T>.fastZipWithNext(transform: (T, T) -> R): List<R> {
@@ -50,6 +54,10 @@ internal inline fun <T, R> List<T>.fastZipWithNext(transform: (T, T) -> R): List
  * Throws an exception if this collection is empty. If the collection can be empty in an expected
  * way, please use [reduceOrNull] instead. It returns `null` when its receiver is empty.
  *
+ * **Do not use for collections that come from public APIs**, since they may not support random
+ * access in an efficient way, and this method may actually be a lot slower. Only use for
+ * collections that are created by code we control and are known to support random access.
+ *
  * @param [operation] function that takes current accumulator value and an element,
  * and calculates the next accumulator value.
  */
@@ -71,6 +79,10 @@ internal inline fun <S, T : S> List<T>.fastReduce(operation: (acc: S, T) -> S): 
  * If any of two pairs would have the same key the last one gets added to the map.
  *
  * The returned map preserves the entry iteration order of the original collection.
+ *
+ * **Do not use for collections that come from public APIs**, since they may not support random
+ * access in an efficient way, and this method may actually be a lot slower. Only use for
+ * collections that are created by code we control and are known to support random access.
  */
 @OptIn(ExperimentalContracts::class)
 internal inline fun <T, K, V> List<T>.fastAssociate(transform: (T) -> Pair<K, V>): Map<K, V> {
@@ -86,6 +98,10 @@ internal inline fun <T, K, V> List<T>.fastAssociate(transform: (T) -> Pair<K, V>
  * Returns a list of values built from the elements of `this` collection and the [other] collection with the same index
  * using the provided [transform] function applied to each pair of elements.
  * The returned list has length of the shortest collection.
+ *
+ * **Do not use for collections that come from public APIs**, since they may not support random
+ * access in an efficient way, and this method may actually be a lot slower. Only use for
+ * collections that are created by code we control and are known to support random access.
  */
 @OptIn(ExperimentalContracts::class)
 internal inline fun <T, R, V> List<T>.fastZip(
@@ -104,6 +120,10 @@ internal inline fun <T, R, V> List<T>.fastZip(
 /**
  * Returns a list containing the results of applying the given [transform] function
  * to each element in the original collection.
+ *
+ * **Do not use for collections that come from public APIs**, since they may not support random
+ * access in an efficient way, and this method may actually be a lot slower. Only use for
+ * collections that are created by code we control and are known to support random access.
  */
 @OptIn(ExperimentalContracts::class)
 internal inline fun <T, R> List<T>.fastMapNotNull(transform: (T) -> R?): List<R> {
@@ -122,6 +142,10 @@ internal inline fun <T, R> List<T>.fastMapNotNull(transform: (T) -> R?): List<R>
  * If the collection could be huge, you can specify a non-negative value of [limit], in which case
  * only the first [limit] elements will be appended, followed by the [truncated] string (which
  * defaults to "...").
+ *
+ * **Do not use for collections that come from public APIs**, since they may not support random
+ * access in an efficient way, and this method may actually be a lot slower. Only use for
+ * collections that are created by code we control and are known to support random access.
  */
 internal fun <T> List<T>.fastJoinToString(
     separator: CharSequence = ", ",
@@ -142,6 +166,10 @@ internal fun <T> List<T>.fastJoinToString(
  * If the collection could be huge, you can specify a non-negative value of [limit], in which
  * case only the first [limit] elements will be appended, followed by the [truncated] string
  * (which defaults to "...").
+ *
+ * **Do not use for collections that come from public APIs**, since they may not support random
+ * access in an efficient way, and this method may actually be a lot slower. Only use for
+ * collections that are created by code we control and are known to support random access.
  */
 private fun <T, A : Appendable> List<T>.fastJoinTo(
     buffer: A,

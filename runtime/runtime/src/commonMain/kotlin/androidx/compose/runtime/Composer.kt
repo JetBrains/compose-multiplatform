@@ -326,9 +326,13 @@ interface Composer {
     /**
      * A Compose compiler plugin API. DO NOT call directly.
      *
-     * This is the instance that changes that are calculated by the composer will be played to.
-     * During while invoking [Composable] functions none of the [applier] methods are called.
-     * The changes are made in a batch after the all [Composable] functions have completed.
+     * Changes calculated and recorded during composition and are sent to [applier] which makes
+     * the physical changes to the node tree implied by a composition.
+     *
+     * Composition has two discrete phases, 1) calculate and record changes and 2) making the
+     * changes via the [applier]. While a [Composable] functions is executing, none of the
+     * [applier] methods are called. The recorded changes are sent to the [applier] all at once
+     * after all [Composable] functions have completed.
      */
     @ComposeCompilerApi
     val applier: Applier<*>
@@ -881,16 +885,15 @@ interface Composer {
     fun endProviders()
 
     /**
-     * A Compose internal function. DO NOT call directly.
+     * A tooling API function. DO NOT call directly.
      *
      * The data stored for the composition. This is used by Compose tools, such as the preview and
      * the inspector, to display or interpret the result of composition.
      */
-    @InternalComposeApi
     val compositionData: CompositionData
 
     /**
-     * A Compose internal function. DO NOT call directly.
+     * A tooling API function. DO NOT call directly.
      *
      * Called by the inspector to inform the composer that it should collect additional
      * information about call parameters. By default, only collect parameter information for
@@ -900,7 +903,6 @@ interface Composer {
      * WARNING: calling this will result in a significant number of additional allocations that are
      * typically avoided.
      */
-    @InternalComposeApi
     fun collectParameterInformation()
 
     /**
@@ -1124,7 +1126,7 @@ internal class ComposerImpl(
      */
     @ComposeCompilerApi
     @Suppress("unused")
-    override fun startDefaults() = start(0, null, false, null)
+    override fun startDefaults() = start(defaultsKey, null, false, null)
 
     /**
      *
@@ -1212,7 +1214,9 @@ internal class ComposerImpl(
         parentProvider = parentContext.getCompositionLocalScope()
         providersInvalidStack.push(providersInvalid.asInt())
         providersInvalid = changed(parentProvider)
-        collectParameterInformation = parentContext.collectingParameterInformation
+        if (!collectParameterInformation) {
+            collectParameterInformation = parentContext.collectingParameterInformation
+        }
         resolveCompositionLocal(LocalInspectionTables, parentProvider)?.let {
             it.add(slotTable)
             parentContext.recordInspectionTable(it)
@@ -1283,7 +1287,6 @@ internal class ComposerImpl(
      * Start collecting parameter information. This enables the tools API to always be able to
      * determine the parameter values of composable calls.
      */
-    @InternalComposeApi
     override fun collectParameterInformation() {
         collectParameterInformation = true
     }
@@ -1584,12 +1587,15 @@ internal class ComposerImpl(
             writer.update(value)
             if (value is RememberObserver) {
                 record { _, _, rememberManager -> rememberManager.remembering(value) }
+                abandonSet.add(value)
             }
         } else {
             val groupSlotIndex = reader.groupSlotIndex - 1
+            if (value is RememberObserver) {
+                abandonSet.add(value)
+            }
             recordSlotTableOperation(forParent = true) { _, slots, rememberManager ->
                 if (value is RememberObserver) {
-                    abandonSet.add(value)
                     rememberManager.remembering(value)
                 }
                 when (val previous = slots.set(groupSlotIndex, value)) {
@@ -1615,13 +1621,9 @@ internal class ComposerImpl(
     @PublishedApi
     @OptIn(InternalComposeApi::class)
     internal fun updateCachedValue(value: Any?) {
-        if (inserting && value is RememberObserver) {
-            abandonSet.add(value)
-        }
         updateValue(value)
     }
 
-    @InternalComposeApi
     override val compositionData: CompositionData get() = slotTable
 
     /**
@@ -2362,8 +2364,11 @@ internal class ComposerImpl(
     }
 
     private fun SlotReader.groupCompoundKeyPart(group: Int) =
-        if (hasObjectKey(group)) groupObjectKey(group)?.hashCode() ?: 0
-        else groupKey(group).let {
+        if (hasObjectKey(group)) {
+            groupObjectKey(group)?.let {
+                if (it is Enum<*>) it.ordinal else it.hashCode()
+            } ?: 0
+        } else groupKey(group).let {
             if (it == reuseKey) groupAux(group)?.let { aux ->
                 if (aux == Composer.Empty) it else aux.hashCode()
             } ?: it else it
@@ -2562,7 +2567,7 @@ internal class ComposerImpl(
             isComposing = true
             try {
                 startRoot()
-                // Ignore reads of derivedStatOf recalculations
+                // Ignore reads of derivedStateOf recalculations
                 observeDerivedStateRecalculations(
                     start = {
                         childrenComposing++
@@ -3404,6 +3409,9 @@ private const val nodeKey = 125
 
 // An arbitrary key value for a node used to force the node to be replaced.
 private const val nodeKeyReplace = 126
+
+// An arbitrary key value for a node used to force the node to be replaced.
+private const val defaultsKey = -127
 
 @PublishedApi
 internal const val invocationKey = 200

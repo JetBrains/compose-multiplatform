@@ -19,6 +19,7 @@ package androidx.compose.integration.demos.common
 import android.app.Activity
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
+import androidx.fragment.app.Fragment
 import kotlin.reflect.KClass
 
 /**
@@ -39,10 +40,13 @@ sealed class Demo(val title: String) {
  */
 class ActivityDemo<T : ComponentActivity>(title: String, val activityClass: KClass<T>) : Demo(title)
 
+class FragmentDemo<T : Fragment>(title: String, val fragmentClass: KClass<T>) : Demo(title)
+
 /**
  * Demo that displays [Composable] [content] when selected.
  */
-class ComposableDemo(title: String, val content: @Composable () -> Unit) : Demo(title)
+class ComposableDemo(title: String, val content: @Composable (onNavigateUp: () -> Unit) -> Unit) :
+    Demo(title)
 
 /**
  * A category of [Demo]s, that will display a list of [demos] when selected.

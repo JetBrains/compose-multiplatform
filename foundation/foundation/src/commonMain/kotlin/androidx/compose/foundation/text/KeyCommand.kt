@@ -87,5 +87,6 @@ internal enum class KeyCommand(
     TAB(true),
 
     UNDO(true),
-    REDO(true)
+    REDO(true),
+    CHARACTER_PALETTE(true)
 }

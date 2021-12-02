@@ -22,14 +22,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.fastMapNotNull
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.platform.synchronized
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastAll
 import kotlinx.coroutines.CancellableContinuation
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.ContinuationInterceptor
@@ -38,9 +46,12 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension
 import kotlin.coroutines.createCoroutine
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.math.max
 
 /**
- * Receiver scope for awaiting pointer events in a call to [PointerInputScope.awaitPointerEventScope].
+ * Receiver scope for awaiting pointer events in a call to
+ * [PointerInputScope.awaitPointerEventScope].
  *
  * This is a restricted suspension scope. Code in this scope is always called undispatched and
  * may only suspend for calls to [awaitPointerEvent]. These functions
@@ -55,6 +66,13 @@ interface AwaitPointerEventScope : Density {
      * (0, 0) indicating the upper left corner.
      */
     val size: IntSize
+
+    /*
+     * The additional space applied to each side of the layout area. This can be
+     * non-[zero][Size.Zero] when `minimumTouchTargetSize` is set in [pointerInput].
+     */
+    val extendedTouchPadding: Size
+        get() = Size.Zero
 
     /**
      * The [PointerEvent] from the most recent touch event.
@@ -79,6 +97,24 @@ interface AwaitPointerEventScope : Density {
     suspend fun awaitPointerEvent(
         pass: PointerEventPass = PointerEventPass.Main
     ): PointerEvent
+
+    /**
+     * Runs [block] and returns the result of [block] or `null` if [timeMillis] has passed
+     * before [timeMillis].
+     */
+    suspend fun <T> withTimeoutOrNull(
+        timeMillis: Long,
+        block: suspend AwaitPointerEventScope.() -> T
+    ): T? = block()
+
+    /**
+     * Runs [block] and returns its results. An [PointerEventTimeoutCancellationException] is thrown
+     * if [timeMillis] has passed before [block] completes.
+     */
+    suspend fun <T> withTimeout(
+        timeMillis: Long,
+        block: suspend AwaitPointerEventScope.() -> T
+    ): T = block()
 }
 
 /**
@@ -100,9 +136,29 @@ interface PointerInputScope : Density {
     val size: IntSize
 
     /**
+     * The additional space applied to each side of the layout area when the layout is smaller
+     * than [ViewConfiguration.minimumTouchTargetSize].
+     */
+    val extendedTouchPadding: Size
+        get() = Size.Zero
+
+    /**
      * The [ViewConfiguration] used to tune gesture detectors.
      */
     val viewConfiguration: ViewConfiguration
+
+    /**
+     * Intercept pointer input that children receive even if the pointer is out of bounds.
+     *
+     * If `true`, and a child has been moved out of this layout and receives an event, this
+     * will receive that event. If `false`, a child receiving pointer input outside of the
+     * bounds of this layout will not trigger any events in this.
+     */
+    @Suppress("GetterSetterNames")
+    @get:Suppress("GetterSetterNames")
+    var interceptOutOfBoundsChildEvents: Boolean
+        get() = false
+        set(_) {}
 
     /**
      * Suspend and install a pointer input [block] that can await input events and respond to
@@ -163,7 +219,9 @@ fun Modifier.pointerInput(
     val density = LocalDensity.current
     val viewConfiguration = LocalViewConfiguration.current
     remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.apply {
+        val filter = this
         LaunchedEffect(this, key1) {
+            filter.coroutineScope = this
             block()
         }
     }
@@ -193,9 +251,10 @@ fun Modifier.pointerInput(
 ) {
     val density = LocalDensity.current
     val viewConfiguration = LocalViewConfiguration.current
-    remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.apply {
+    remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.also { filter ->
         LaunchedEffect(this, key1, key2) {
-            block()
+            filter.coroutineScope = this
+            filter.block()
         }
     }
 }
@@ -222,13 +281,13 @@ fun Modifier.pointerInput(
     val density = LocalDensity.current
     val viewConfiguration = LocalViewConfiguration.current
     remember(density) { SuspendingPointerInputFilter(viewConfiguration, density) }.apply {
+        val filter = this
         LaunchedEffect(this, *keys) {
+            filter.coroutineScope = this
             block()
         }
     }
 }
-
-private val DownChangeConsumed = ConsumedData(downChange = true)
 
 private val EmptyPointerEvent = PointerEvent(emptyList())
 
@@ -288,6 +347,23 @@ internal class SuspendingPointerInputFilter(
      * method.
      */
     private var boundsSize: IntSize = IntSize.Zero
+
+    /**
+     * This will be changed immediately on launching, but I always want it to be non-null.
+     */
+    @OptIn(DelicateCoroutinesApi::class)
+    var coroutineScope: CoroutineScope = GlobalScope
+
+    override val extendedTouchPadding: Size
+        get() {
+            val minimumTouchTargetSize = viewConfiguration.minimumTouchTargetSize.toSize()
+            val size = size
+            val horizontal = max(0f, minimumTouchTargetSize.width - size.width) / 2f
+            val vertical = max(0f, minimumTouchTargetSize.height - size.height) / 2f
+            return Size(horizontal, vertical)
+        }
+
+    override var interceptOutOfBoundsChildEvents: Boolean = false
 
     /**
      * Snapshot the current [pointerHandlers] and run [block] on each one.
@@ -350,19 +426,20 @@ internal class SuspendingPointerInputFilter(
     override fun onCancel() {
         // Synthesize a cancel event for whatever state we previously saw, if one is applicable.
         // A cancel event is one where all previously down pointers are now up, the change in
-        // down-ness is consumed, and we omit any pointers that previously went up entirely.
+        // down-ness is consumed. Any pointers that were previously hovering are left unchanged.
         val lastEvent = lastPointerEvent ?: return
 
+        if (lastEvent.changes.fastAll { !it.pressed }) {
+            return // There aren't any pressed pointers, so we don't need to send any events.
+        }
         val newChanges = lastEvent.changes.fastMapNotNull { old ->
-            if (old.pressed) {
-                old.copy(
-                    currentPressed = false,
-                    previousPosition = old.position,
-                    previousTime = old.uptimeMillis,
-                    previousPressed = old.pressed,
-                    consumed = DownChangeConsumed
-                )
-            } else null
+            old.copy(
+                currentPressed = false,
+                previousPosition = old.position,
+                previousTime = old.uptimeMillis,
+                previousPressed = old.pressed,
+                consumed = ConsumedData(downChange = old.pressed)
+            )
         }
 
         val cancelEvent = PointerEvent(newChanges)
@@ -424,6 +501,8 @@ internal class SuspendingPointerInputFilter(
             get() = this@SuspendingPointerInputFilter.boundsSize
         override val viewConfiguration: ViewConfiguration
             get() = this@SuspendingPointerInputFilter.viewConfiguration
+        override val extendedTouchPadding: Size
+            get() = this@SuspendingPointerInputFilter.extendedTouchPadding
 
         fun offerPointerEvent(event: PointerEvent, pass: PointerEventPass) {
             if (pass == awaitPass) {
@@ -457,5 +536,52 @@ internal class SuspendingPointerInputFilter(
             awaitPass = pass
             pointerAwaiter = continuation
         }
+
+        override suspend fun <T> withTimeoutOrNull(
+            timeMillis: Long,
+            block: suspend AwaitPointerEventScope.() -> T
+        ): T? {
+            return try {
+                withTimeout(timeMillis, block)
+            } catch (_: PointerEventTimeoutCancellationException) {
+                null
+            }
+        }
+
+        override suspend fun <T> withTimeout(
+            timeMillis: Long,
+            block: suspend AwaitPointerEventScope.() -> T
+        ): T {
+            if (timeMillis <= 0L) {
+                pointerAwaiter?.resumeWithException(
+                    PointerEventTimeoutCancellationException(timeMillis)
+                )
+            }
+            val job = coroutineScope.launch {
+                // Delay twice because the timeout continuation needs to be lower-priority than
+                // input events, not treated fairly in FIFO order. The second
+                // micro-delay reposts it to the back of the queue, after any input events
+                // that were posted but not processed during the first delay.
+                delay(timeMillis - 1)
+                delay(1)
+
+                pointerAwaiter?.resumeWithException(
+                    PointerEventTimeoutCancellationException(timeMillis)
+                )
+            }
+            try {
+                return block()
+            } finally {
+                job.cancel()
+            }
+        }
     }
 }
+
+/**
+ * An exception thrown from [AwaitPointerEventScope.withTimeout] when the execution time
+ * of the coroutine is too long.
+ */
+class PointerEventTimeoutCancellationException(
+    time: Long
+) : CancellationException("Timed out waiting for $time ms")

@@ -111,6 +111,12 @@ internal class OuterMeasurablePlaceable(
             // We are using the coerced wrapper size here to avoid double offset in layout coop.
             measuredSize = IntSize(outerWrapper.width, outerWrapper.height)
             return sizeChanged
+        } else {
+            // this node doesn't require being remeasured. however in order to make sure we have
+            // the final size we need to also make sure the whole subtree is remeasured as it can
+            // trigger extra remeasure request on our node. we do it now in order to report the
+            // final measured size to our parent without doing extra pass later.
+            owner.forceMeasureTheSubtree(layoutNode)
         }
         return false
     }
@@ -139,16 +145,32 @@ internal class OuterMeasurablePlaceable(
         zIndex: Float,
         layerBlock: (GraphicsLayerScope.() -> Unit)?
     ) {
-        placedOnce = true
         lastPosition = position
         lastZIndex = zIndex
         lastLayerBlock = layerBlock
-        layoutNode.alignmentLines.usedByModifierLayout = false
+
+        if (outerWrapper.wrappedBy?.isShallowPlacing == true) {
+            placeOuterWrapper(position, zIndex, layerBlock)
+        } else {
+            placedOnce = true
+            layoutNode.alignmentLines.usedByModifierLayout = false
+            val owner = layoutNode.requireOwner()
+            owner.snapshotObserver.observeLayoutModifierSnapshotReads(layoutNode) {
+                placeOuterWrapper(position, zIndex, layerBlock)
+            }
+        }
+    }
+
+    private fun placeOuterWrapper(
+        position: IntOffset,
+        zIndex: Float,
+        layerBlock: (GraphicsLayerScope.() -> Unit)?
+    ) {
         with(PlacementScope) {
             if (layerBlock == null) {
-                outerWrapper.place(position, lastZIndex)
+                outerWrapper.place(position, zIndex)
             } else {
-                outerWrapper.placeWithLayer(position, lastZIndex, layerBlock)
+                outerWrapper.placeWithLayer(position, zIndex, layerBlock)
             }
         }
     }

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright 2021 The Android Open Source Project
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<objectAnimator xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="333"
+    android:interpolator="@android:anim/linear_interpolator"
+    android:repeatCount="1"
+    android:repeatMode="reverse"
+    android:startOffset="50">
+    <propertyValuesHolder
+        android:propertyName="translateX"
+        android:valueFrom="0"
+        android:valueTo="100"
+        android:valueType="floatType" />
+    <propertyValuesHolder
+        android:propertyName="translateY"
+        android:valueFrom="0"
+        android:valueTo="200">
+        <keyframe
+            android:fraction="0.3"
+            android:interpolator="@android:anim/decelerate_interpolator"
+            android:value="150" />
+        <keyframe
+            android:fraction="0.6"
+            android:interpolator="@android:anim/accelerate_interpolator"
+            android:value="50" />
+    </propertyValuesHolder>
+    <propertyValuesHolder
+        android:propertyName="colorProperty"
+        android:valueFrom="#ff0000"
+        android:valueTo="#0000ff"
+        android:valueType="colorType" />
+    <propertyValuesHolder
+        android:propertyName="intProperty"
+        android:valueFrom="500"
+        android:valueTo="1000"
+        android:valueType="intType" />
+    <propertyValuesHolder
+        android:propertyName="pathProperty"
+        android:valueFrom="L24,0 L24,24 Z"
+        android:valueTo="L24,24 L0,24 Z"
+        android:valueType="pathType" />
+</objectAnimator>

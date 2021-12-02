@@ -23,6 +23,8 @@ import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.IndicationInstance
 import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.interaction.FocusInteraction
+import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -246,8 +248,19 @@ private class StateLayer(
     private var currentInteraction: Interaction? = null
 
     fun handleInteraction(interaction: Interaction, scope: CoroutineScope) {
-        // TODO: handle hover / focus states
         when (interaction) {
+            is HoverInteraction.Enter -> {
+                interactions.add(interaction)
+            }
+            is HoverInteraction.Exit -> {
+                interactions.remove(interaction.enter)
+            }
+            is FocusInteraction.Focus -> {
+                interactions.add(interaction)
+            }
+            is FocusInteraction.Unfocus -> {
+                interactions.remove(interaction.focus)
+            }
             is DragInteraction.Start -> {
                 interactions.add(interaction)
             }
@@ -266,6 +279,8 @@ private class StateLayer(
         if (currentInteraction != newInteraction) {
             if (newInteraction != null) {
                 val targetAlpha = when (interaction) {
+                    is HoverInteraction.Enter -> rippleAlpha.value.hoveredAlpha
+                    is FocusInteraction.Focus -> rippleAlpha.value.focusedAlpha
                     is DragInteraction.Start -> rippleAlpha.value.draggedAlpha
                     else -> 0f
                 }
@@ -311,27 +326,25 @@ private class StateLayer(
 /**
  * @return the [AnimationSpec] used when transitioning to [interaction], either from a previous
  * state, or no state.
- *
- * TODO: handle hover / focus states
  */
 private fun incomingStateLayerAnimationSpecFor(interaction: Interaction): AnimationSpec<Float> {
-    return if (interaction is DragInteraction.Start) {
-        TweenSpec(durationMillis = 45, easing = LinearEasing)
-    } else {
-        DefaultTweenSpec
+    return when (interaction) {
+        is HoverInteraction.Enter -> DefaultTweenSpec
+        is FocusInteraction.Focus -> TweenSpec(durationMillis = 45, easing = LinearEasing)
+        is DragInteraction.Start -> TweenSpec(durationMillis = 45, easing = LinearEasing)
+        else -> DefaultTweenSpec
     }
 }
 
 /**
  * @return the [AnimationSpec] used when transitioning away from [interaction], to no state.
- *
- * TODO: handle hover / focus states
  */
 private fun outgoingStateLayerAnimationSpecFor(interaction: Interaction?): AnimationSpec<Float> {
-    return if (interaction is DragInteraction.Start) {
-        TweenSpec(durationMillis = 150, easing = LinearEasing)
-    } else {
-        DefaultTweenSpec
+    return when (interaction) {
+        is HoverInteraction.Enter -> DefaultTweenSpec
+        is FocusInteraction.Focus -> DefaultTweenSpec
+        is DragInteraction.Start -> TweenSpec(durationMillis = 150, easing = LinearEasing)
+        else -> DefaultTweenSpec
     }
 }
 

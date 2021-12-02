@@ -18,6 +18,7 @@ package androidx.compose.desktop
 
 import androidx.compose.desktop.AWTDebounceEventQueueTest.Event.Input
 import androidx.compose.desktop.AWTDebounceEventQueueTest.Event.Render
+import androidx.compose.ui.awt.AWTDebounceEventQueue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestCoroutineScope

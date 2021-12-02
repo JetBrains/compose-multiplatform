@@ -43,6 +43,7 @@ class CrossfadeDetectorTest : LintDetectorTest() {
     private val CrossfadeStub = compiledStub(
         filename = "Transition.kt",
         filepath = "androidx/compose/animation",
+        checksum = 0x33cac1e3,
         """
             package androidx.compose.animation
 
@@ -55,6 +56,12 @@ class CrossfadeDetectorTest : LintDetectorTest() {
             ) {}
         """,
 """
+        META-INF/main.kotlin_module:
+        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcUllZiXUpSfmVKhl5yfW5BfnKqX
+        mJeZm1iSmZ8nxBNSlJhXnAlie5dw8XIxp+XnC7GFpBaXeJcoMWgxAACekN3e
+        UwAAAA==
+        """,
+        """
         androidx/compose/animation/TransitionKt.class:
         H4sIAAAAAAAAAIVSW08TQRT+ZnvZdgFZyr0oIhcBUbcQfLHExJAQGisYW3nh
         abpd6vQya3amDY/9Lf4D34wPpvHRH2U8s1RBasIme86Zb77znTNn5uevb98B
@@ -71,12 +78,6 @@ class CrossfadeDetectorTest : LintDetectorTest() {
         Gg4eUzx3RUEO07GETfgM7W/GbBtbQ36G/Db9WSuuk423n8R2DTvkDwmdpepz
         50iUMF/CAlkslpDHUgn38eAcTGEZD8+RUUgprCg8UsgpOAqryoDp38bsatcp
         BAAA
-        """,
-        """
-        META-INF/main.kotlin_module:
-        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcUllZiXUpSfmVKhl5yfW5BfnKqX
-        mJeZm1iSmZ8nxBNSlJhXnAlie5dw8XIxp+XnC7GFpBaXeJcoMWgxAACekN3e
-        UwAAAA==
         """
     )
 

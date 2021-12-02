@@ -20,6 +20,7 @@ package androidx.compose.runtime.lint
 
 import androidx.compose.lint.test.Stubs
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
+import com.android.tools.lint.checks.infrastructure.TestMode
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
 import org.junit.Test
@@ -108,9 +109,10 @@ class UnrememberedMutableStateDetectorTest : LintDetectorTest() {
             """
             ),
             Stubs.Composable,
-            Stubs.MutableState,
+            Stubs.SnapshotState,
             Stubs.Remember
         )
+            .skipTestModes(TestMode.TYPE_ALIAS)
             .run()
             .expect(
                 """
@@ -273,7 +275,7 @@ src/androidx/compose/runtime/foo/{.kt:61: Error: Creating a state object during 
             """
             ),
             Stubs.Composable,
-            Stubs.MutableState,
+            Stubs.SnapshotState,
             Stubs.Remember
         )
             .run()
@@ -361,7 +363,7 @@ src/androidx/compose/runtime/foo/{.kt:61: Error: Creating a state object during 
             """
             ),
             Stubs.Composable,
-            Stubs.MutableState,
+            Stubs.SnapshotState,
             Stubs.Remember
         )
             .run()

@@ -192,26 +192,27 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         }
 
         selectionRegistrar.onSelectionUpdateStartCallback =
-            { layoutCoordinates, startPosition, selectionMode ->
-                val startPositionInContainer = convertToContainerCoordinates(
+            { layoutCoordinates, position, selectionMode ->
+                val positionInContainer = convertToContainerCoordinates(
                     layoutCoordinates,
-                    startPosition
+                    position
                 )
 
-                updateSelection(
-                    startPosition = startPositionInContainer,
-                    endPosition = startPositionInContainer,
-                    isStartHandle = true,
-                    adjustment = selectionMode
-                )
+                if (positionInContainer != null) {
+                    startSelection(
+                        position = positionInContainer,
+                        isStartHandle = false,
+                        adjustment = selectionMode
+                    )
 
-                focusRequester.requestFocus()
-                hideSelectionToolbar()
+                    focusRequester.requestFocus()
+                    hideSelectionToolbar()
+                }
             }
 
         selectionRegistrar.onSelectionUpdateSelectAll =
             { selectableId ->
-                val (newSelection, newSubselection) = mergeSelections(
+                val (newSelection, newSubselection) = selectAll(
                     selectableId = selectableId,
                     previousSelection = selection,
                 )
@@ -225,17 +226,16 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
             }
 
         selectionRegistrar.onSelectionUpdateCallback =
-            { layoutCoordinates, startPosition, endPosition, selectionMode ->
-                val startPositionOrCurrent = if (startPosition == null) {
-                    currentSelectionStartPosition()
-                } else {
-                    convertToContainerCoordinates(layoutCoordinates, startPosition)
-                }
+            { layoutCoordinates, newPosition, previousPosition, isStartHandle, selectionMode ->
+                val newPositionInContainer =
+                    convertToContainerCoordinates(layoutCoordinates, newPosition)
+                val previousPositionInContainer =
+                    convertToContainerCoordinates(layoutCoordinates, previousPosition)
 
                 updateSelection(
-                    startPosition = startPositionOrCurrent,
-                    endPosition = convertToContainerCoordinates(layoutCoordinates, endPosition),
-                    isStartHandle = false,
+                    newPosition = newPositionInContainer,
+                    previousPosition = previousPositionInContainer,
+                    isStartHandle = isStartHandle,
                     adjustment = selectionMode
                 )
             }
@@ -337,49 +337,9 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         return coordinates
     }
 
-    /**
-     * Iterates over the handlers, gets the selection for each Composable, and merges all the
-     * returned [Selection]s.
-     *
-     * @param startPosition [Offset] for the start of the selection
-     * @param endPosition [Offset] for the end of the selection
-     * @param previousSelection previous selection
-     *
-     * @return a [Pair] of a [Selection] object which is constructed by combining all
-     * composables that are selected and a [Map] from selectable key to [Selection]s on the
-     * [Selectable] corresponding to the that key.
-     */
-    // This function is internal for testing purposes.
-    internal fun mergeSelections(
-        startPosition: Offset,
-        endPosition: Offset,
-        adjustment: SelectionAdjustment = SelectionAdjustment.NONE,
-        previousSelection: Selection? = null,
-        isStartHandle: Boolean = true
-    ): Pair<Selection?, Map<Long, Selection>> {
-        val subselections = mutableMapOf<Long, Selection>()
-        val newSelection = selectionRegistrar.sort(requireContainerCoordinates())
-            .fastFold(null) { mergedSelection: Selection?, selectable: Selectable ->
-                val selection = selectable.getSelection(
-                    startPosition = startPosition,
-                    endPosition = endPosition,
-                    containerLayoutCoordinates = requireContainerCoordinates(),
-                    previousSelection = previousSelection,
-                    isStartHandle = isStartHandle,
-                    adjustment = adjustment
-                )
-                selection?.let { subselections[selectable.selectableId] = it }
-                merge(mergedSelection, selection)
-            }
-        if (previousSelection != newSelection) hapticFeedBack?.performHapticFeedback(
-            HapticFeedbackType.TextHandleMove
-        )
-        return Pair(newSelection, subselections)
-    }
-
-    internal fun mergeSelections(
-        previousSelection: Selection? = null,
-        selectableId: Long
+    internal fun selectAll(
+        selectableId: Long,
+        previousSelection: Selection?
     ): Pair<Selection?, Map<Long, Selection>> {
         val subselections = mutableMapOf<Long, Selection>()
         val newSelection = selectionRegistrar.sort(requireContainerCoordinates())
@@ -389,9 +349,9 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 selection?.let { subselections[selectable.selectableId] = it }
                 merge(mergedSelection, selection)
             }
-        if (previousSelection != newSelection) hapticFeedBack?.performHapticFeedback(
-            HapticFeedbackType.TextHandleMove
-        )
+        if (newSelection != previousSelection) {
+            hapticFeedBack?.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        }
         return Pair(newSelection, subselections)
     }
 
@@ -514,7 +474,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
             endTop = localLayoutCoordinates.localToRoot(endTop)
 
             val top = min(startTop.y, endTop.y)
-            val bottom = max(startOffset.y, endOffset.y) + (HANDLE_HEIGHT.value * 4.0).toFloat()
+            val bottom = max(startOffset.y, endOffset.y) + (HandleHeight.value * 4.0).toFloat()
 
             return Rect(
                 left,
@@ -580,45 +540,18 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
             }
 
             override fun onDrag(delta: Offset) {
-                val selection = selection!!
                 dragTotalDistance += delta
-                val startSelectable =
-                    selectionRegistrar.selectableMap[selection.start.selectableId]
-                val endSelectable =
-                    selectionRegistrar.selectableMap[selection.end.selectableId]
-                val currentStart = if (isStartHandle) {
-                    dragBeginPosition + dragTotalDistance
-                } else {
-                    requireContainerCoordinates().localPositionOf(
-                        startSelectable?.getLayoutCoordinates()!!,
-                        getAdjustedCoordinates(
-                            startSelectable.getHandlePosition(
-                                selection = selection,
-                                isStartHandle = true
-                            )
-                        )
-                    )
-                }
-
-                val currentEnd = if (isStartHandle) {
-                    requireContainerCoordinates().localPositionOf(
-                        endSelectable?.getLayoutCoordinates()!!,
-                        getAdjustedCoordinates(
-                            endSelectable.getHandlePosition(
-                                selection = selection,
-                                isStartHandle = false
-                            )
-                        )
-                    )
-                } else {
-                    dragBeginPosition + dragTotalDistance
-                }
-                updateSelection(
-                    startPosition = currentStart,
-                    endPosition = currentEnd,
-                    isStartHandle = isStartHandle
+                val endPosition = dragBeginPosition + dragTotalDistance
+                val consumed = updateSelection(
+                    newPosition = endPosition,
+                    previousPosition = dragBeginPosition,
+                    isStartHandle = isStartHandle,
+                    adjustment = SelectionAdjustment.CharacterWithWordAccelerate
                 )
-                return
+                if (consumed) {
+                    dragBeginPosition = endPosition
+                    dragTotalDistance = Offset.Zero
+                }
             }
 
             override fun onStop() {
@@ -659,24 +592,133 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         return requireContainerCoordinates().localPositionOf(layoutCoordinates, offset)
     }
 
-    private fun updateSelection(
-        startPosition: Offset?,
-        endPosition: Offset?,
-        adjustment: SelectionAdjustment = SelectionAdjustment.NONE,
-        isStartHandle: Boolean = true
+    /**
+     * Cancel the previous selection and start a new selection at the given [position].
+     * It's used for long-press, double-click, triple-click and so on to start selection.
+     *
+     * @param position initial position of the selection. Both start and end handle is considered
+     * at this position.
+     * @param isStartHandle whether it's considered as the start handle moving. This parameter
+     * will influence the [SelectionAdjustment]'s behavior. For example,
+     * [SelectionAdjustment.Character] only adjust the moving handle.
+     * @param adjustment the selection adjustment.
+     */
+    private fun startSelection(
+        position: Offset,
+        isStartHandle: Boolean,
+        adjustment: SelectionAdjustment
     ) {
-        if (startPosition == null || endPosition == null) return
-        val (newSelection, newSubselection) = mergeSelections(
-            startPosition = startPosition,
-            endPosition = endPosition,
-            adjustment = adjustment,
+        updateSelection(
+            startHandlePosition = position,
+            endHandlePosition = position,
+            previousHandlePosition = null,
             isStartHandle = isStartHandle,
-            previousSelection = selection,
+            adjustment = adjustment
         )
+    }
+
+    /**
+     * Updates the selection after one of the selection handle moved.
+     *
+     * @param newPosition the new position of the moving selection handle.
+     * @param previousPosition the previous position of the moving selection handle.
+     * @param isStartHandle whether the moving selection handle is the start handle.
+     * @param adjustment the [SelectionAdjustment] used to adjust the raw selection range and
+     * produce the final selection range.
+     *
+     * @return a boolean representing whether the movement is consumed.
+     *
+     * @see SelectionAdjustment
+     */
+    internal fun updateSelection(
+        newPosition: Offset?,
+        previousPosition: Offset?,
+        isStartHandle: Boolean,
+        adjustment: SelectionAdjustment,
+    ): Boolean {
+        if (newPosition == null) return false
+        val otherHandlePosition = selection?.let { selection ->
+            val otherSelectableId = if (isStartHandle) {
+                selection.end.selectableId
+            } else {
+                selection.start.selectableId
+            }
+            val otherSelectable =
+                selectionRegistrar.selectableMap[otherSelectableId] ?: return@let null
+            convertToContainerCoordinates(
+                otherSelectable.getLayoutCoordinates()!!,
+                getAdjustedCoordinates(
+                    otherSelectable.getHandlePosition(selection, !isStartHandle)
+                )
+            )
+        } ?: return false
+
+        val startHandlePosition = if (isStartHandle) newPosition else otherHandlePosition
+        val endHandlePosition = if (isStartHandle) otherHandlePosition else newPosition
+
+        return updateSelection(
+            startHandlePosition = startHandlePosition,
+            endHandlePosition = endHandlePosition,
+            previousHandlePosition = previousPosition,
+            isStartHandle = isStartHandle,
+            adjustment = adjustment
+        )
+    }
+
+    /**
+     * Updates the selection after one of the selection handle moved.
+     *
+     * To make sure that [SelectionAdjustment] works correctly, it's expected that only one
+     * selection handle is updated each time. The only exception is that when a new selection is
+     * started. In this case, [previousHandlePosition] is always null.
+     *
+     * @param startHandlePosition the position of the start selection handle.
+     * @param endHandlePosition the position of the end selection handle.
+     * @param previousHandlePosition the position of the moving handle before the update.
+     * @param isStartHandle whether the moving selection handle is the start handle.
+     * @param adjustment the [SelectionAdjustment] used to adjust the raw selection range and
+     * produce the final selection range.
+     *
+     * @return a boolean representing whether the movement is consumed. It's useful for the case
+     * where a selection handle is updating consecutively. When the return value is true, it's
+     * expected that the caller will update the [startHandlePosition] to be the given
+     * [endHandlePosition] in following calls.
+     *
+     * @see SelectionAdjustment
+     */
+    internal fun updateSelection(
+        startHandlePosition: Offset,
+        endHandlePosition: Offset,
+        previousHandlePosition: Offset?,
+        isStartHandle: Boolean,
+        adjustment: SelectionAdjustment,
+    ): Boolean {
+        val newSubselections = mutableMapOf<Long, Selection>()
+        var moveConsumed = false
+        val newSelection = selectionRegistrar.sort(requireContainerCoordinates())
+            .fastFold(null) { mergedSelection: Selection?, selectable: Selectable ->
+                val previousSubselection =
+                    selectionRegistrar.subselections[selectable.selectableId]
+                val (selection, consumed) = selectable.updateSelection(
+                    startHandlePosition = startHandlePosition,
+                    endHandlePosition = endHandlePosition,
+                    previousHandlePosition = previousHandlePosition,
+                    isStartHandle = isStartHandle,
+                    containerLayoutCoordinates = requireContainerCoordinates(),
+                    adjustment = adjustment,
+                    previousSelection = previousSubselection,
+                )
+
+                moveConsumed = moveConsumed || consumed
+                selection?.let { newSubselections[selectable.selectableId] = it }
+                merge(mergedSelection, selection)
+            }
         if (newSelection != selection) {
-            selectionRegistrar.subselections = newSubselection
+            hapticFeedBack?.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            selectionRegistrar.subselections = newSubselections
             onSelectionChange(newSelection)
         }
+        return moveConsumed
     }
 }
 

@@ -20,6 +20,7 @@ package androidx.compose.runtime.lint
 
 import androidx.compose.lint.test.Stubs
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
+import com.android.tools.lint.checks.infrastructure.TestMode
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
 import org.junit.Test
@@ -57,6 +58,7 @@ class ComposableLambdaParameterDetectorTest : LintDetectorTest() {
             ),
             Stubs.Composable
         )
+            .skipTestModes(TestMode.TYPE_ALIAS)
             .run()
             .expect(
                 """
@@ -93,6 +95,7 @@ Fix for src/androidx/compose/ui/foo/test.kt line 7: Rename text to content:
             ),
             Stubs.Composable
         )
+            .skipTestModes(TestMode.TYPE_ALIAS)
             .run()
             .expect(
                 """
@@ -121,6 +124,7 @@ src/androidx/compose/ui/foo/test.kt:7: Warning: Composable lambda parameter shou
             ),
             Stubs.Composable
         )
+            .skipTestModes(TestMode.TYPE_ALIAS)
             .run()
             .expect(
                 """
@@ -226,6 +230,7 @@ Fix for src/androidx/compose/ui/foo/Foo.kt line 9: Rename text to content:
             ),
             Stubs.Composable
         )
+            .skipTestModes(TestMode.TYPE_ALIAS)
             .run()
             .expect(
                 """

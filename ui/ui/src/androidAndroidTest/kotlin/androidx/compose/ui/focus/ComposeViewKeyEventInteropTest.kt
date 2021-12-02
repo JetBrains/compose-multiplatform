@@ -18,10 +18,12 @@ package androidx.compose.ui.focus
 
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key.Companion.Back
 import androidx.compose.ui.input.key.Key.Companion.DirectionRight
 import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.test.TestActivity
@@ -110,6 +112,56 @@ class ComposeViewKeyEventInteropTest {
 
         // Act.
         val keyEvent = AndroidKeyEvent(KeyDown, DirectionRight.nativeKeyCode)
+        rule.activity.dispatchKeyEvent(keyEvent)
+
+        // Assert.
+        assertThat(rule.activity.receivedKeyEvent).isNull()
+    }
+
+    @Test
+    fun composeView_doesNotConsumeBackKeyEvent_ifFocusMovesToRoot() {
+        // Arrange.
+        val (item1, item2) = FocusRequester.createRefs()
+        rule.activityRule.scenario.onActivity { activity ->
+            activity.setContent {
+                BasicText(
+                    text = "Item 1",
+                    modifier = Modifier
+                        .focusOrder(item1) { down = item2 }
+                        .focusable()
+                )
+            }
+        }
+        rule.runOnIdle { item1.requestFocus() }
+
+        // Act.
+        val keyEvent = AndroidKeyEvent(KeyDown, Back.nativeKeyCode)
+        rule.activity.dispatchKeyEvent(keyEvent)
+
+        // Assert.
+        assertThat(rule.activity.receivedKeyEvent).isEqualTo(keyEvent)
+    }
+
+    @Test
+    fun composeView_consumesBackKeyEvent_ifFocusMovesToNonRoot() {
+        // Arrange.
+        val (item1, item2) = FocusRequester.createRefs()
+        rule.activityRule.scenario.onActivity { activity ->
+            activity.setContent {
+                Box(Modifier.focusable()) {
+                    BasicText(
+                        text = "Item 1",
+                        modifier = Modifier
+                            .focusOrder(item1) { down = item2 }
+                            .focusable()
+                    )
+                }
+            }
+        }
+        rule.runOnIdle { item1.requestFocus() }
+
+        // Act.
+        val keyEvent = AndroidKeyEvent(KeyDown, Back.nativeKeyCode)
         rule.activity.dispatchKeyEvent(keyEvent)
 
         // Assert.

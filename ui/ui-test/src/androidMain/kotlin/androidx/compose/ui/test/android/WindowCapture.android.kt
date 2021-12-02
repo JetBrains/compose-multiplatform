@@ -16,9 +16,6 @@
 
 package androidx.compose.ui.test.android
 
-import android.app.Activity
-import android.content.Context
-import android.content.ContextWrapper
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.os.Build
@@ -36,62 +33,80 @@ import androidx.compose.ui.test.ComposeTimeoutException
 import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.MainTestClock
 import androidx.compose.ui.test.TestContext
+import androidx.test.platform.graphics.HardwareRendererCompat
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RequiresApi(Build.VERSION_CODES.O)
-internal fun captureRegionToImage(
+internal fun Window.captureRegionToImage(
     testContext: TestContext,
-    captureRectInWindow: Rect,
-    view: View,
-    window: Window? = null
+    boundsInWindow: Rect,
 ): ImageBitmap {
-    fun Context.getActivity(): Activity? {
-        return when (this) {
-            is Activity -> this
-            is ContextWrapper -> this.baseContext.getActivity()
-            else -> null
+    // Turn on hardware rendering, if necessary
+    return withDrawingEnabled {
+        // First force drawing to happen
+        decorView.forceRedraw(testContext)
+        // Then we generate the bitmap
+        generateBitmap(boundsInWindow).asImageBitmap()
+    }
+}
+
+private fun <R> withDrawingEnabled(block: () -> R): R {
+    val wasDrawingEnabled = HardwareRendererCompat.isDrawingEnabled()
+    try {
+        if (!wasDrawingEnabled) {
+            HardwareRendererCompat.setDrawingEnabled(true)
+        }
+        return block.invoke()
+    } finally {
+        if (!wasDrawingEnabled) {
+            HardwareRendererCompat.setDrawingEnabled(false)
         }
     }
+}
 
-    val windowToCapture = window ?: (view.context.getActivity()!!.window)
-    val handler = Handler(Looper.getMainLooper())
-
-    // first we wait for the drawing to happen
+private fun View.forceRedraw(testContext: TestContext) {
     var drawDone = false
-    val decorView = windowToCapture.decorView
     handler.post {
-        if (Build.VERSION.SDK_INT >= 29 && decorView.isHardwareAccelerated) {
-            FrameCommitCallbackHelper.registerFrameCommitCallback(decorView.viewTreeObserver) {
+        if (Build.VERSION.SDK_INT >= 29 && isHardwareAccelerated) {
+            FrameCommitCallbackHelper.registerFrameCommitCallback(viewTreeObserver) {
                 drawDone = true
             }
         } else {
-            decorView.viewTreeObserver.addOnDrawListener(object : ViewTreeObserver.OnDrawListener {
+            viewTreeObserver.addOnDrawListener(object : ViewTreeObserver.OnDrawListener {
                 var handled = false
                 override fun onDraw() {
                     if (!handled) {
                         handled = true
-                        handler.post {
+                        handler.postAtFrontOfQueue {
                             drawDone = true
-                            decorView.viewTreeObserver.removeOnDrawListener(this)
+                            viewTreeObserver.removeOnDrawListener(this)
                         }
                     }
                 }
             })
         }
-        decorView.invalidate()
+        invalidate()
     }
 
     @OptIn(InternalTestApi::class)
     testContext.testOwner.mainClock.waitUntil(timeoutMillis = 2_000) { drawDone }
+}
 
-    // and then request the pixel copy of the drawn buffer
-    val destBitmap = Bitmap.createBitmap(
-        captureRectInWindow.width(),
-        captureRectInWindow.height(),
-        Bitmap.Config.ARGB_8888
-    )
+@RequiresApi(Build.VERSION_CODES.O)
+private fun Window.generateBitmap(boundsInWindow: Rect): Bitmap {
+    val destBitmap =
+        Bitmap.createBitmap(
+            boundsInWindow.width(),
+            boundsInWindow.height(),
+            Bitmap.Config.ARGB_8888
+        )
+    generateBitmapFromPixelCopy(boundsInWindow, destBitmap)
+    return destBitmap
+}
 
+@RequiresApi(Build.VERSION_CODES.O)
+private fun Window.generateBitmapFromPixelCopy(boundsInWindow: Rect, destBitmap: Bitmap) {
     val latch = CountDownLatch(1)
     var copyResult = 0
     val onCopyFinished = PixelCopy.OnPixelCopyFinishedListener { result ->
@@ -99,11 +114,11 @@ internal fun captureRegionToImage(
         latch.countDown()
     }
     PixelCopyHelper.request(
-        windowToCapture,
-        captureRectInWindow,
+        this,
+        boundsInWindow,
         destBitmap,
         onCopyFinished,
-        handler
+        Handler(Looper.getMainLooper())
     )
 
     if (!latch.await(1, TimeUnit.SECONDS)) {
@@ -112,7 +127,6 @@ internal fun captureRegionToImage(
     if (copyResult != PixelCopy.SUCCESS) {
         throw AssertionError("PixelCopy failed!")
     }
-    return destBitmap.asImageBitmap()
 }
 
 // Unfortunately this is a copy paste from AndroidComposeTestRule. At this moment it is a bit
@@ -133,7 +147,7 @@ private fun MainTestClock.waitUntil(timeoutMillis: Long, condition: () -> Boolea
     }
 }
 
-@RequiresApi(29)
+@RequiresApi(Build.VERSION_CODES.Q)
 private object FrameCommitCallbackHelper {
     @DoNotInline
     fun registerFrameCommitCallback(viewTreeObserver: ViewTreeObserver, runnable: Runnable) {

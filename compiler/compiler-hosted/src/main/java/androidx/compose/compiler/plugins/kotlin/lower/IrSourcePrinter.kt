@@ -19,6 +19,7 @@ package androidx.compose.compiler.plugins.kotlin.lower
 import androidx.compose.compiler.plugins.kotlin.KtxNameConventions
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.ir.IrBuiltIns
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrAnnotationContainer
@@ -39,7 +40,6 @@ import org.jetbrains.kotlin.ir.declarations.IrTypeAlias
 import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.declarations.IrVariable
-import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrBlockBody
 import org.jetbrains.kotlin.ir.expressions.IrBranch
@@ -115,7 +115,7 @@ import kotlin.math.abs
 
 fun IrElement.dumpSrc(): String {
     val sb = StringBuilder()
-    accept(IrSourcePrinterVisitor(sb), null)
+    accept(IrSourcePrinterVisitor(sb, "%tab%"), null)
     return sb
         .toString()
         // replace tabs at beginning of line with white space
@@ -132,10 +132,11 @@ fun IrElement.dumpSrc(): String {
 }
 
 @Suppress("DEPRECATION")
-private class IrSourcePrinterVisitor(
-    out: Appendable
+class IrSourcePrinterVisitor(
+    out: Appendable,
+    indentUnit: String = "  ",
 ) : IrElementVisitorVoid {
-    private val printer = Printer(out, "%tab%")
+    private val printer = Printer(out, indentUnit)
 
     private fun IrElement.print() {
         accept(this@IrSourcePrinterVisitor, null)
@@ -143,6 +144,8 @@ private class IrSourcePrinterVisitor(
     private fun print(obj: Any?) = printer.print(obj)
     private fun println(obj: Any?) = printer.println(obj)
     private fun println() = printer.println()
+
+    fun printType(type: IrType) = type.renderSrc()
 
     private inline fun indented(body: () -> Unit) {
         printer.pushIndent()
@@ -558,6 +561,9 @@ private class IrSourcePrinterVisitor(
             IrTypeOperator.SAM_CONVERSION -> {
                 expression.argument.print()
             }
+            IrTypeOperator.IMPLICIT_NOTNULL -> {
+                expression.argument.print()
+            }
             else -> error("Unknown type operator: ${expression.operator}")
         }
     }
@@ -784,7 +790,15 @@ private class IrSourcePrinterVisitor(
             }
             IrStatementOrigin.SAFE_CALL -> {
                 val lhs = expression.statements[0] as IrVariable
-                val rhs = expression.statements[1] as IrWhen
+                val rhsStatement = expression.statements[1]
+                val rhs = when (rhsStatement) {
+                    is IrBlock -> {
+                        rhsStatement.statements[1]
+                    }
+                    else -> {
+                        rhsStatement
+                    }
+                } as IrWhen
                 val call = rhs.branches.last().result as? IrCall
                 if (call == null) {
                     expression.statements.printJoin("\n")

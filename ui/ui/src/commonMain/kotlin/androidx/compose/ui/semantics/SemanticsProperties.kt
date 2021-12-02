@@ -176,7 +176,6 @@ object SemanticsProperties {
         }
     )
 
-    // TODO(b/178121203) might need to be transformed text
     /**
      * @see SemanticsPropertyReceiver.editableText
      */
@@ -530,7 +529,11 @@ class ScrollAxisRange(
     val value: () -> Float,
     val maxValue: () -> Float,
     val reverseScrolling: Boolean = false
-)
+) {
+    override fun toString(): String =
+        "ScrollAxisRange(value=${value()}, maxValue=${maxValue()}, " +
+            "reverseScrolling=$reverseScrolling)"
+}
 
 /**
  * The type of user interface element. Accessibility services might use this to describe the
@@ -780,7 +783,8 @@ var SemanticsPropertyReceiver.text: AnnotatedString
     set(value) { set(SemanticsProperties.Text, listOf(value)) }
 
 /**
- * Input text of the text field. It must be real text entered by the user instead of
+ * Input text of the text field with visual transformation applied to it. It must be a real text
+ * entered by the user with visual transformation applied on top of the input text instead of a
  * developer-set content description.
  */
 var SemanticsPropertyReceiver.editableText by SemanticsProperties.EditableText
@@ -824,8 +828,7 @@ var SemanticsPropertyReceiver.collectionItemInfo by SemanticsProperties.Collecti
  *
  * The presence of this property indicates that the element is toggleable.
  */
-var SemanticsPropertyReceiver.toggleableState
-by SemanticsProperties.ToggleableState
+var SemanticsPropertyReceiver.toggleableState by SemanticsProperties.ToggleableState
 
 /**
  * The node is marked as a password.

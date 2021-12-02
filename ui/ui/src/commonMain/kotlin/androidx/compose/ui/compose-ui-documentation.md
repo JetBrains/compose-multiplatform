@@ -19,4 +19,4 @@ In this page, you'll find documentation for types, properties, and functions ava
 
 If you're looking for guidance instead, check out the following Compose guides:
 * <a href="https://developer.android.com/jetpack/compose/interop" class="external" target="_blank">Adopting Compose in your app</a>.
-* <a href="https://developer.android.com/jetpack/compose/interop-apis" class="external" target="_blank">Interoperability APIs</a>.
+* <a href="https://developer.android.com/jetpack/compose/interop/interop-apis" class="external" target="_blank">Interoperability APIs</a>.

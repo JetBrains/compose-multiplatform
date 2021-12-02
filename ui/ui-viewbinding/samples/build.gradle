@@ -37,7 +37,7 @@ dependencies {
 
     androidTestImplementation(project(":compose:foundation:foundation"))
     androidTestImplementation(project(":compose:test-utils"))
-    androidTestImplementation(project(":activity:activity-compose"))
+    androidTestImplementation("androidx.activity:activity-compose:1.3.1")
     androidTestImplementation(project(":internal-testutils-runtime"))
     androidTestImplementation(libs.testRunner)
     androidTestImplementation(libs.junit)

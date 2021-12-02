@@ -100,10 +100,7 @@ class SelectionHandlesTest {
                 DefaultSelectionHandle(
                     modifier = Modifier,
                     isStartHandle = true,
-                    directions = Pair(
-                        selectionLtrHandleDirection.start.direction,
-                        selectionLtrHandleDirection.end.direction
-                    ),
+                    direction = selectionLtrHandleDirection.start.direction,
                     handlesCrossed = selectionLtrHandleDirection.handlesCrossed
                 )
             }
@@ -124,10 +121,7 @@ class SelectionHandlesTest {
                 DefaultSelectionHandle(
                     modifier = Modifier,
                     isStartHandle = true,
-                    directions = Pair(
-                        selectionRtlHandleDirection.start.direction,
-                        selectionRtlHandleDirection.end.direction
-                    ),
+                    direction = selectionRtlHandleDirection.start.direction,
                     handlesCrossed = selectionRtlHandleDirection.handlesCrossed
                 )
             }
@@ -148,10 +142,7 @@ class SelectionHandlesTest {
                 DefaultSelectionHandle(
                     modifier = Modifier,
                     isStartHandle = false,
-                    directions = Pair(
-                        selectionLtrHandleDirection.start.direction,
-                        selectionLtrHandleDirection.end.direction
-                    ),
+                    direction = selectionLtrHandleDirection.end.direction,
                     handlesCrossed = selectionLtrHandleDirection.handlesCrossed
                 )
             }
@@ -172,10 +163,7 @@ class SelectionHandlesTest {
                 DefaultSelectionHandle(
                     modifier = Modifier,
                     isStartHandle = false,
-                    directions = Pair(
-                        selectionRtlHandleDirection.start.direction,
-                        selectionRtlHandleDirection.end.direction
-                    ),
+                    direction = selectionRtlHandleDirection.end.direction,
                     handlesCrossed = selectionRtlHandleDirection.handlesCrossed
                 )
             }

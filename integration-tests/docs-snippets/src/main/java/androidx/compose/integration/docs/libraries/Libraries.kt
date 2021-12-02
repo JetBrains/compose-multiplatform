@@ -26,17 +26,22 @@ package androidx.compose.integration.docs.libraries
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntSize
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -134,9 +139,8 @@ private object LibrariesSnippet6 {
             navigation(startDestination = innerStartRoute, route = "Parent") {
                 // ...
                 composable("exampleWithRoute") { backStackEntry ->
-                    val parentViewModel = hiltViewModel<ParentViewModel>(
-                        navController.getBackStackEntry("Parent")
-                    )
+                    val parentEntry = remember { navController.getBackStackEntry("Parent") }
+                    val parentViewModel = hiltViewModel<ParentViewModel>(parentEntry)
                     ExampleWithRouteScreen(parentViewModel)
                 }
             }
@@ -159,17 +163,29 @@ private object LibrariesSnippet7 {
 private object LibrariesSnippet8 {
     @Composable
     fun MyExample() {
-        CoilImage(
+        val painter = rememberImagePainter(
             data = "https://picsum.photos/300/300",
-            loading = {
-                Box(Modifier.fillMaxSize()) {
-                    CircularProgressIndicator(Modifier.align(Alignment.Center))
-                }
-            },
-            error = {
-                Image(painterResource(R.drawable.ic_error), contentDescription = "Error")
+            builder = {
+                crossfade(true)
             }
         )
+
+        Box {
+            Image(
+                painter = painter,
+                contentDescription = stringResource(R.string.image_content_desc),
+            )
+
+            when (painter.state) {
+                is ImagePainter.State.Loading -> {
+                    // Display a circular progress indicator whilst loading
+                    CircularProgressIndicator(Modifier.align(Alignment.Center))
+                }
+                is ImagePainter.State.Error -> {
+                    // If you wish to display some content if the request fails
+                }
+            }
+        }
     }
 }
 
@@ -180,6 +196,9 @@ Fakes needed for snippets to build:
 private object R {
     object drawable {
         const val ic_error = 1
+    }
+    object string {
+        const val image_content_desc = 2
     }
 }
 
@@ -226,15 +245,6 @@ private fun ExampleWithRouteScreen(vm: ParentViewModel) {
     TODO()
 }
 
-@Composable
-private fun CoilImage(
-    data: String,
-    error: @Composable () -> Unit,
-    loading: @Composable () -> Unit
-) {
-    TODO()
-}
-
 private val navController: NavHostController = TODO()
 private val innerStartRoute: String = TODO()
 private val startRoute: String = TODO()
@@ -242,3 +252,27 @@ private val startRoute: String = TODO()
 private class PagingData<T>
 
 private fun Flow<PagingData<String>>.collectAsLazyPagingItems() = listOf("")
+
+// Coil
+interface ImageRequest { interface Builder }
+
+@Composable
+fun rememberImagePainter(
+    data: Any?,
+    builder: ImageRequest.Builder.() -> Unit = {},
+): LoadPainter { TODO() }
+fun ImageRequest.Builder.crossfade(enable: Boolean): Nothing = TODO()
+
+fun interface Loader<R> {
+    fun load(request: R, size: IntSize): Flow<ImagePainter.State>
+}
+abstract class LoadPainter : Painter() {
+    var state: ImagePainter.State by mutableStateOf(ImagePainter.State.Loading)
+        private set
+}
+interface ImagePainter {
+    sealed class State {
+        object Loading : State()
+        object Error : State()
+    }
+}

@@ -48,12 +48,18 @@ class ModifierDeclarationDetectorTest : LintDetectorTest() {
     private val DensityStub = compiledStub(
         filename = "Density.kt",
         filepath = "androidx/compose/ui/unit",
+        checksum = 0xaa534a7a,
         """
             package androidx.compose.ui.unit
 
             interface Density
         """,
-"""
+        """
+        META-INF/main.kotlin_module:
+        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcIlnpiXUpSfmVKhl5yfW5BfnKpX
+        mqmXlp8vxOmWn++SWJLoXaLEoMUAAALEmjo+AAAA
+        """,
+        """
         androidx/compose/ui/unit/Density.class:
         H4sIAAAAAAAAAIVOTUvDQBB9s7FNjV+pH1Bv4g9w2+LNkyBCoCIoeMlpm6yy
         Tbor3U2pt/4uD9KzP0qcqHdn4M17M/DefH69fwC4xDHhTNly4Uy5koWbvzqv
@@ -61,11 +67,6 @@ class ModifierDeclarationDetectorTest : LintDetectorTest() {
         RuxNLXQIVPFqZVo1ZFaOCCebdS8RA5GIlNnzYLMeiyG1xzHhfPLfP5wBQvKn
         LqrA4tE1i0LfmloTTh8aG8xcPxlvprW+ttYFFYyzvssZ2MJvCRz+YB9HPEds
         2eHu5ogyxBl6jNhuIcmwg90c5LGH/RzC48Aj/QaMxaG1RAEAAA==
-        """,
-        """
-        META-INF/main.kotlin_module:
-        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcIlnpiXUpSfmVKhl5yfW5BfnKpX
-        mqmXlp8vxOmWn++SWJLoXaLEoMUAAALEmjo+AAAA
         """
     )
 
@@ -73,6 +74,7 @@ class ModifierDeclarationDetectorTest : LintDetectorTest() {
     private val MeasurableAndParentDataModifierStub = compiledStub(
         filename = "Measurable.kt",
         filepath = "androidx/compose/ui/layout",
+        checksum = 0xd1bf915a,
         """
             package androidx.compose.ui.layout
 
@@ -88,6 +90,23 @@ class ModifierDeclarationDetectorTest : LintDetectorTest() {
             }
         """,
 """
+        META-INF/main.kotlin_module:
+        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcIlnpiXUpSfmVKhl5yfW5BfnKpX
+        mqmXlp8vxOmWn++SWJLoXaLEoMUAAALEmjo+AAAA
+        """,
+        """
+        androidx/compose/ui/layout/Measurable.class:
+        H4sIAAAAAAAAAI1PwU7bQBB9YzuO65Li0AAJvVK1veAEcaInpAopUmirIKFK
+        OW2SJdrE2UXedURv+ZYe+hE9oChHPgoxRkhB7aV7eDPz5s3Om/uHP3cATtAi
+        vBd6nBs1vk1HZn5jrEwLlWbipylceiGFLXIxzGQVREimYiG4pyfpt+FUjlwV
+        PqE2ke67yKV2X4QThMbHT72/hZ8Jhz2TT9KpdMNcKG1TobVxwinD+dciy8ot
+        LKv3ZsZlSvNuJ8b8IXPefOGzXSqhQqAZU7eqrNqcjTuEzmq5FXtNL/aS1TL2
+        Ij+6bq6Wx16b+o3EOwia1KYf69/B+lcYHgSRnwTl4DHhQ++/zmcTIMQ3L86s
+        bbpHM0d41y+0U3PZ1QtlFbNnmwN59NIU+Uieq0wSWs/Sq3+EIdtCgPIRW6wg
+        5LV7XJWxytHD/hPuosnxlNmIVa8G8LuIu3jNiK0Sal28wfYAZJGgPkDFYsfi
+        rUXDlnn4CLI2KhoDAgAA
+        """,
+        """
         androidx/compose/ui/layout/ParentDataModifier＄DefaultImpls.class:
         H4sIAAAAAAAAAKVSW08TQRT+pqW01FZKtSii9UKVXoSVxCf7ZECTTdpKxPTF
         p+nuUKbdnSGzsw3+Kx+JD8Znf5TxbGkQK0GJm+y5f9/MnHO+//jyFcBLOAyv
@@ -104,18 +123,6 @@ class ModifierDeclarationDetectorTest : LintDetectorTest() {
         zf2PSLt44KJKEg9dPMJjF09+As+nXNieBAAA
         """,
         """
-        androidx/compose/ui/layout/Measurable.class:
-        H4sIAAAAAAAAAI1PwU7bQBB9YzuO65Li0AAJvVK1veAEcaInpAopUmirIKFK
-        OW2SJdrE2UXedURv+ZYe+hE9oChHPgoxRkhB7aV7eDPz5s3Om/uHP3cATtAi
-        vBd6nBs1vk1HZn5jrEwLlWbipylceiGFLXIxzGQVREimYiG4pyfpt+FUjlwV
-        PqE2ke67yKV2X4QThMbHT72/hZ8Jhz2TT9KpdMNcKG1TobVxwinD+dciy8ot
-        LKv3ZsZlSvNuJ8b8IXPefOGzXSqhQqAZU7eqrNqcjTuEzmq5FXtNL/aS1TL2
-        Ij+6bq6Wx16b+o3EOwia1KYf69/B+lcYHgSRnwTl4DHhQ++/zmcTIMQ3L86s
-        bbpHM0d41y+0U3PZ1QtlFbNnmwN59NIU+Uieq0wSWs/Sq3+EIdtCgPIRW6wg
-        5LV7XJWxytHD/hPuosnxlNmIVa8G8LuIu3jNiK0Sal28wfYAZJGgPkDFYsfi
-        rUXDlnn4CLI2KhoDAgAA
-        """,
-        """
         androidx/compose/ui/layout/ParentDataModifier.class:
         H4sIAAAAAAAAAJVRTW/TQBB963w4mARSKJC0fLWNqoIEDhEnqh4QAdUogQok
         Ljlt4k21ib0beddRc8vv4oBy5kchxgHUkgYQh52d9/xmdjzv67fPXwA8xx7D
@@ -129,11 +136,6 @@ class ModifierDeclarationDetectorTest : LintDetectorTest() {
         9kXaOPK0lGJma57BRYmY+4SKxF6h+wGdikPAyyRLKoeHFD1C2yS+izp2CDu4
         h126j4i/igLKPeQCVAJco4jrWagG2MCNHpjBTWz2UDS4ZXDbwDW4Y1AzqH8H
         FbjiFqEDAAA=
-        """,
-        """
-        META-INF/main.kotlin_module:
-        H4sIAAAAAAAAAGNgYGBmYGBgBGJWKM3ApcIlnpiXUpSfmVKhl5yfW5BfnKpX
-        mqmXlp8vxOmWn++SWJLoXaLEoMUAAALEmjo+AAAA
         """
     )
 

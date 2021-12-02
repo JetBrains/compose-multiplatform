@@ -20,10 +20,12 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.OverScrollController
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.gestures.rememberOverScrollController
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.InteractionSource
@@ -260,17 +262,14 @@ private fun Modifier.scroll(
     isVertical: Boolean
 ) = composed(
     factory = {
+        val overScrollController = rememberOverScrollController()
         val coroutineScope = rememberCoroutineScope()
-        val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-        // Add RTL to the mix: if horizontal and RTL, reverse reverseScrolling
-        val resolvedReverseScrolling =
-            if (!isVertical && isRtl) !reverseScrolling else reverseScrolling
         val semantics = Modifier.semantics {
             if (isScrollable) {
                 val accessibilityScrollState = ScrollAxisRange(
                     value = { state.value.toFloat() },
                     maxValue = { state.maxValue.toFloat() },
-                    reverseScrolling = resolvedReverseScrolling
+                    reverseScrolling = reverseScrolling
                 )
                 if (isVertical) {
                     this.verticalScrollAxisRange = accessibilityScrollState
@@ -282,9 +281,9 @@ private fun Modifier.scroll(
                     action = { x: Float, y: Float ->
                         coroutineScope.launch {
                             if (isVertical) {
-                                (state as ScrollableState).scrollBy(y)
+                                (state as ScrollableState).animateScrollBy(y)
                             } else {
-                                (state as ScrollableState).scrollBy(x)
+                                (state as ScrollableState).animateScrollBy(x)
                             }
                         }
                         return@scrollBy true
@@ -294,15 +293,26 @@ private fun Modifier.scroll(
         }
         val scrolling = Modifier.scrollable(
             orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
-            // reverse scroll to have a "natural" gesture that goes reversed to layout
-            reverseDirection = !resolvedReverseScrolling,
+            reverseDirection = run {
+                // A finger moves with the content, not with the viewport. Therefore,
+                // always reverse once to have "natural" gesture that goes reversed to layout
+                var reverseDirection = !reverseScrolling
+                // But if rtl and horizontal, things move the other way around
+                val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+                if (isRtl && !isVertical) {
+                    reverseDirection = !reverseDirection
+                }
+                reverseDirection
+            },
             enabled = isScrollable,
             interactionSource = state.internalInteractionSource,
             flingBehavior = flingBehavior,
-            state = state
+            state = state,
+            overScrollController = overScrollController
         )
-        val layout = ScrollingLayoutModifier(state, reverseScrolling, isVertical)
-        semantics.then(scrolling).clipScrollableContainer(isVertical).then(layout)
+        val layout =
+            ScrollingLayoutModifier(state, reverseScrolling, isVertical, overScrollController)
+        semantics.clipScrollableContainer(isVertical).then(scrolling).then(layout)
     },
     inspectorInfo = debugInspectorInfo {
         name = "scroll"
@@ -317,7 +327,8 @@ private fun Modifier.scroll(
 private data class ScrollingLayoutModifier(
     val scrollerState: ScrollState,
     val isReversed: Boolean,
-    val isVertical: Boolean
+    val isVertical: Boolean,
+    val overScrollController: OverScrollController
 ) : LayoutModifier {
     override fun MeasureScope.measure(
         measurable: Measurable,
@@ -334,6 +345,8 @@ private data class ScrollingLayoutModifier(
         val scrollHeight = placeable.height - height
         val scrollWidth = placeable.width - width
         val side = if (isVertical) scrollHeight else scrollWidth
+        overScrollController
+            .refreshContainerInfo(Size(width.toFloat(), height.toFloat()), side != 0)
         return layout(width, height) {
             scrollerState.maxValue = side
             val scroll = scrollerState.value.coerceIn(0, side)
@@ -368,19 +381,27 @@ private data class ScrollingLayoutModifier(
 internal fun Constraints.assertNotNestingScrollableContainers(isVertical: Boolean) {
     if (isVertical) {
         check(maxHeight != Constraints.Infinity) {
-            "Nesting scrollable in the same direction layouts like LazyColumn and Column(Modifier" +
-                ".verticalScroll()) is not allowed. If you want to add a header before the list " +
-                "of items please take a look on LazyColumn component which has a DSL api which" +
-                " allows to first add a header via item() function and then the list of " +
-                "items via items()."
+            "Vertically scrollable component was measured with an infinity maximum height " +
+                "constraints, which is disallowed. One of the common reasons is nesting layouts " +
+                "like LazyColumn and Column(Modifier.verticalScroll()). If you want to add a " +
+                "header before the list of items please add a header as a separate item() before " +
+                "the main items() inside the LazyColumn scope. There are could be other reasons " +
+                "for this to happen: your ComposeView was added into a LinearLayout with some " +
+                "weight, you applied Modifier.wrapContentSize(unbounded = true) or wrote a " +
+                "custom layout. Please try to remove the source of infinite constraints in the " +
+                "hierarchy above the scrolling container."
         }
     } else {
         check(maxWidth != Constraints.Infinity) {
-            "Nesting scrollable in the same direction layouts like LazyRow and Row(Modifier" +
-                ".horizontalScroll() is not allowed. If you want to add a header before the list " +
-                "of items please take a look on LazyRow component which has a DSL api which " +
-                "allows to first add a fixed element via item() function and then the " +
-                "list of items via items()."
+            "Horizontally scrollable component was measured with an infinity maximum width " +
+                "constraints, which is disallowed. One of the common reasons is nesting layouts " +
+                "like LazyRow and Row(Modifier.horizontalScroll()). If you want to add a " +
+                "header before the list of items please add a header as a separate item() before " +
+                "the main items() inside the LazyRow scope. There are could be other reasons " +
+                "for this to happen: your ComposeView was added into a LinearLayout with some " +
+                "weight, you applied Modifier.wrapContentSize(unbounded = true) or wrote a " +
+                "custom layout. Please try to remove the source of infinite constraints in the " +
+                "hierarchy above the scrolling container."
         }
     }
 }

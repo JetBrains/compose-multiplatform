@@ -10,7 +10,7 @@ Build Jetpack Compose UIs with ready to use Material Design Components. This is 
 
 In this page, you'll find documentation for types, properties, and functions available in the `androidx.compose.material` package.
 
-For more information, check out the <a href="https://developer.android.com/jetpack/compose/themes" class="external" target="_blank">Theming in Compose</a> guide.
+For more information, check out the <a href="https://developer.android.com/jetpack/compose/themes/material" class="external" target="_blank">Material Theming in Compose</a> guide.
 
 ## Overview
 
@@ -83,4 +83,3 @@ Material Design defines the qualities that can be expressed by UI regions, surfa
 | ---- | -------- | --------------- |
 | **Surfaces** | [Surface] | Material surface |
 | **Layout** | [Scaffold] | Basic Material Design visual layout structure |
-

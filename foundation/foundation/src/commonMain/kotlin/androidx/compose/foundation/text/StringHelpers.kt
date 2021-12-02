@@ -25,7 +25,7 @@ internal expect fun String.findPrecedingBreak(index: Int): Int
 
 internal expect fun String.findFollowingBreak(index: Int): Int
 
-internal fun String.findParagraphStart(startIndex: Int): Int {
+internal fun CharSequence.findParagraphStart(startIndex: Int): Int {
     for (index in startIndex - 1 downTo 1) {
         if (this[index - 1] == '\n') {
             return index
@@ -34,7 +34,7 @@ internal fun String.findParagraphStart(startIndex: Int): Int {
     return 0
 }
 
-internal fun String.findParagraphEnd(startIndex: Int): Int {
+internal fun CharSequence.findParagraphEnd(startIndex: Int): Int {
     for (index in startIndex + 1 until this.length) {
         if (this[index] == '\n') {
             return index
@@ -48,6 +48,6 @@ internal fun String.findParagraphEnd(startIndex: Int): Int {
  *
  * Paragraphs are separated by Line Feed character (\n).
  */
-internal fun String.getParagraphBoundary(index: Int): TextRange {
+internal fun CharSequence.getParagraphBoundary(index: Int): TextRange {
     return TextRange(findParagraphStart(index), findParagraphEnd(index))
 }

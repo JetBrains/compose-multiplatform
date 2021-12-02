@@ -38,6 +38,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
@@ -49,6 +50,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.draw.DrawModifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
@@ -254,7 +256,8 @@ class AndroidLayoutDrawTest {
                 shape = RectangleShape,
                 clip = true,
                 layoutDirection = LayoutDirection.Ltr,
-                density = Density(1f)
+                density = Density(1f),
+                renderEffect = null
             )
         }
         // Verify that the camera distance is applied properly even after accounting for
@@ -2920,8 +2923,8 @@ class AndroidLayoutDrawTest {
     @Test
     fun makingItemLarger() {
         var height by mutableStateOf(30)
-        var actualHeight = 0
         var latch = CountDownLatch(1)
+        var composeView: View? = null
         activityTestRule.runOnUiThread {
             val linearLayout = LinearLayout(activity)
             linearLayout.orientation = LinearLayout.VERTICAL
@@ -2943,29 +2946,30 @@ class AndroidLayoutDrawTest {
                     10000f
                 )
             )
-            child.viewTreeObserver.addOnPreDrawListener {
-                actualHeight = child.measuredHeight
-                latch.countDown()
-                true
-            }
             child.setContent {
-                Layout({}) { _, constraints ->
+                Layout(
+                    {},
+                    Modifier.onGloballyPositioned {
+                        latch.countDown()
+                    }
+                ) { _, constraints ->
                     layout(constraints.maxWidth, height.coerceAtMost(constraints.maxHeight)) {}
                 }
             }
+            composeView = child
         }
 
         assertTrue(latch.await(1, TimeUnit.SECONDS))
         latch = CountDownLatch(1)
 
         activityTestRule.runOnUiThread {
-            assertEquals(height, actualHeight)
+            assertEquals(height, composeView!!.measuredHeight)
             height = 60
         }
 
         assertTrue(latch.await(1, TimeUnit.SECONDS))
         activityTestRule.runOnUiThread {
-            assertEquals(height, actualHeight)
+            assertEquals(height, composeView!!.measuredHeight)
         }
     }
 
@@ -3510,6 +3514,145 @@ class AndroidLayoutDrawTest {
 
         assertTrue(latch.await(10000, TimeUnit.SECONDS))
         assertEquals(2, parentRemeasures)
+    }
+
+    @Test
+    fun updatingModifierIsNotCausingParentsRelayout() {
+        var parentLayoutsCount = 0
+        var latch = CountDownLatch(1)
+        var modifier by mutableStateOf(Modifier.layout(onLayout = { println("1") }))
+        val parentMeasurePolicy = MeasurePolicy { measurables, constraints ->
+            val placeable = measurables.first().measure(constraints)
+            layout(placeable.width, placeable.height) {
+                parentLayoutsCount++
+                placeable.place(0, 0)
+            }
+        }
+        activityTestRule.runOnUiThread {
+            activity.setContent {
+                Layout(
+                    content = {
+                        Layout({}, modifier) { _, _ ->
+                            layout(10, 10) {
+                                latch.countDown()
+                            }
+                        }
+                    },
+                    measurePolicy = parentMeasurePolicy
+                )
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+
+        latch = CountDownLatch(1)
+        activityTestRule.runOnUiThread {
+            assertEquals(1, parentLayoutsCount)
+            modifier = Modifier.layout(onLayout = { println("2") })
+        }
+
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+
+        activityTestRule.runOnUiThread {
+            assertEquals(1, parentLayoutsCount)
+        }
+    }
+
+    @Test
+    fun androidComposeViewIsTransitionGroup() {
+        // ensure that the android compose view is a transition group.
+
+        val latch = CountDownLatch(1)
+        activityTestRule.runOnUiThread {
+            activity.setContent {
+                Layout({}) { _, _ ->
+                    layout(10, 10) {
+                        latch.countDown()
+                    }
+                }
+            }
+        }
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+
+        val composeView = activityTestRule.findAndroidComposeView()
+        assertTrue(composeView.isTransitionGroup)
+    }
+
+    @Test
+    fun drawnInCorrectLayer() {
+        var innerDrawLatch = CountDownLatch(1)
+        var outerDrawLatch = CountDownLatch(1)
+        var outerColor by mutableStateOf(Color.Blue)
+        var innerColor by mutableStateOf(Color.White)
+        activityTestRule.runOnUiThread {
+            activity.setContent {
+                with(LocalDensity.current) {
+                    Box(Modifier.size(30.toDp())
+                        .drawBehind {
+                            drawRect(outerColor)
+                            outerDrawLatch.countDown()
+                        }
+                        .drawLatchModifier()
+                        .padding(10.toDp())
+                        .clipToBounds()
+                        .drawBehind {
+                            // clipped by the layer
+                            drawRect(innerColor, Offset(-10f, -10f), Size(30f, 30f))
+                            innerDrawLatch.countDown()
+                        }
+                        .drawLatchModifier()
+                        .size(10.toDp())
+                    )
+                }
+            }
+        }
+        assertTrue(innerDrawLatch.await(1, TimeUnit.SECONDS))
+        assertTrue(outerDrawLatch.await(1, TimeUnit.SECONDS))
+
+        validateSquareColors(
+            outerColor = Color.Blue,
+            innerColor = Color.White,
+            size = 10
+        )
+
+        innerDrawLatch = CountDownLatch(1)
+        outerDrawLatch = CountDownLatch(1)
+        drawLatch = CountDownLatch(1)
+
+        // changing the inner color should only affect the inner layer
+        innerColor = Color.Yellow
+
+        assertTrue(innerDrawLatch.await(1, TimeUnit.SECONDS))
+
+        validateSquareColors(
+            outerColor = Color.Blue,
+            innerColor = Color.Yellow,
+            size = 10
+        )
+
+        assertEquals(1, outerDrawLatch.count)
+        innerDrawLatch = CountDownLatch(1)
+        drawLatch = CountDownLatch(1)
+
+        // changing the outer color should only affect the outer layer
+        outerColor = Color.Red
+
+        assertTrue(outerDrawLatch.await(1, TimeUnit.SECONDS))
+
+        validateSquareColors(
+            outerColor = Color.Red,
+            innerColor = Color.Yellow,
+            size = 10
+        )
+
+        assertEquals(1, innerDrawLatch.count)
+    }
+
+    private fun Modifier.layout(onLayout: () -> Unit) = layout { measurable, constraints ->
+        val placeable = measurable.measure(constraints)
+        layout(placeable.width, placeable.height) {
+            onLayout()
+            placeable.place(0, 0)
+        }
     }
 
     private fun composeSquares(model: SquareModel) {

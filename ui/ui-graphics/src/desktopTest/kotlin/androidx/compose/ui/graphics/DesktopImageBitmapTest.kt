@@ -18,11 +18,13 @@ package androidx.compose.ui.graphics
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
+import androidx.compose.ui.test.InternalTestApi
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+@OptIn(InternalTestApi::class)
 class DesktopImageBitmapTest : DesktopGraphicsTest() {
     private val canvas: Canvas = initCanvas(widthPx = 16, heightPx = 16)
 
@@ -31,7 +33,7 @@ class DesktopImageBitmapTest : DesktopGraphicsTest() {
         val asset = ImageBitmap(width = 8, height = 8, config = ImageBitmapConfig.Alpha8)
         val assetCanvas = Canvas(asset)
         assetCanvas.drawImage(
-            imageFromResource("androidx/compose/desktop/test.png"),
+            loadResourceBitmap("androidx/compose/desktop/test.png"),
             Offset(4f, 4f),
             Paint()
         )
@@ -45,7 +47,7 @@ class DesktopImageBitmapTest : DesktopGraphicsTest() {
         val asset = ImageBitmap(width = 8, height = 8, colorSpace = ColorSpaces.DisplayP3)
         val assetCanvas = Canvas(asset)
         assetCanvas.drawImage(
-            imageFromResource("androidx/compose/desktop/test.png"),
+            loadResourceBitmap("androidx/compose/desktop/test.png"),
             Offset(4f, 4f),
             Paint()
         )
@@ -59,7 +61,7 @@ class DesktopImageBitmapTest : DesktopGraphicsTest() {
         val asset = ImageBitmap(width = 8, height = 8)
         val assetCanvas = Canvas(asset)
         assetCanvas.drawImage(
-            imageFromResource("androidx/compose/desktop/test.png"),
+            loadResourceBitmap("androidx/compose/desktop/test.png"),
             Offset(4f, 4f),
             Paint()
         )
@@ -70,13 +72,13 @@ class DesktopImageBitmapTest : DesktopGraphicsTest() {
 
     @Test(expected = RuntimeException::class)
     fun `cannot draw on loaded ImageBitmap`() {
-        val asset = imageFromResource("androidx/compose/desktop/test.png")
+        val asset = loadResourceBitmap("androidx/compose/desktop/test.png")
         Canvas(asset)
     }
 
     @Test
     fun `attributes of loaded asset`() {
-        val asset = imageFromResource("androidx/compose/desktop/test.png")
+        val asset = loadResourceBitmap("androidx/compose/desktop/test.png")
         assertEquals(8, asset.width)
         assertEquals(8, asset.height)
         assertTrue(asset.hasAlpha)
@@ -86,7 +88,7 @@ class DesktopImageBitmapTest : DesktopGraphicsTest() {
 
     @Test
     fun `read pixels of loaded asset`() {
-        val asset = imageFromResource("androidx/compose/desktop/test.png")
+        val asset = loadResourceBitmap("androidx/compose/desktop/test.png")
 
         val array = IntArray(5)
         asset.readPixels(array, startX = 0, startY = 0, width = 1, height = 1, bufferOffset = 0)
@@ -114,7 +116,7 @@ class DesktopImageBitmapTest : DesktopGraphicsTest() {
 
     @Test
     fun `read pixels of loaded asset with different stride`() {
-        val asset = imageFromResource("androidx/compose/desktop/test.png")
+        val asset = loadResourceBitmap("androidx/compose/desktop/test.png")
 
         val array = IntArray(6)
         asset.readPixels(array, startX = 3, startY = 3, width = 2, height = 2, stride = 3)

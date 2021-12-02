@@ -57,6 +57,7 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
         androidTestImplementation(project(":compose:ui:ui-test-font"))
         androidTestImplementation(project(":compose:ui:ui-test-junit4"))
+        androidTestImplementation(libs.testCore)
         androidTestImplementation(libs.testRules)
         androidTestImplementation(libs.testRunner)
         androidTestImplementation(libs.espressoCore)
@@ -65,6 +66,8 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         androidTestImplementation(libs.mockitoCore)
         androidTestImplementation(libs.truth)
         androidTestImplementation(libs.mockitoKotlin)
+
+        samples(projectOrArtifact(":compose:ui:ui-text:ui-text-samples"))
     }
 
     android {
@@ -101,7 +104,17 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.kotlinStdlib)
             }
 
-            desktopMain.dependsOn(jvmMain)
+            skikoMain {
+                dependsOn(commonMain)
+                dependencies {
+                    api(libs.skikoCommon)
+                }
+            }
+
+            desktopMain {
+                dependsOn(skikoMain)
+                dependsOn(jvmMain)
+            }
             androidMain.dependsOn(jvmMain)
 
             androidMain.dependencies {
@@ -145,6 +158,9 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(project(":compose:ui:ui-test-font"))
             }
         }
+    }
+    dependencies {
+        samples(projectOrArtifact(":compose:ui:ui-text:ui-text-samples"))
     }
 }
 

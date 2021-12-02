@@ -224,9 +224,9 @@ class SideEffectTests : BaseComposeTest() {
                     "DisposableEffect:b2",
                     "DisposableEffect:b1",
                     "recompose",
+                    "onDispose:b1",
                     "onDispose:b2",
                     "onDispose:a2",
-                    "onDispose:b1",
                     "onDispose:a1",
                     "DisposableEffect:a1",
                     "DisposableEffect:b1"

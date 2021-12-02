@@ -31,7 +31,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -94,7 +94,7 @@ class MaterialTextSelectionColorsScreenshotTest {
         }
 
         rule.onNodeWithText(Text)
-            .performGesture {
+            .performTouchInput {
                 longClick()
             }
 
@@ -113,7 +113,7 @@ class MaterialTextSelectionColorsScreenshotTest {
         }
 
         rule.onNodeWithText(Text)
-            .performGesture {
+            .performTouchInput {
                 longClick()
             }
 
@@ -132,7 +132,7 @@ class MaterialTextSelectionColorsScreenshotTest {
 
         // Click once to focus text field
         rule.onNodeWithText(Text)
-            .performGesture {
+            .performTouchInput {
                 click()
                 longClick()
             }
@@ -152,7 +152,7 @@ class MaterialTextSelectionColorsScreenshotTest {
 
         // Click once to focus text field
         rule.onNodeWithText(Text)
-            .performGesture {
+            .performTouchInput {
                 click()
                 longClick()
             }
@@ -172,7 +172,7 @@ class MaterialTextSelectionColorsScreenshotTest {
 
         // Click once to focus text field
         rule.onNodeWithText(Text)
-            .performGesture {
+            .performTouchInput {
                 click()
                 longClick()
             }
@@ -192,7 +192,7 @@ class MaterialTextSelectionColorsScreenshotTest {
 
         // Click once to focus text field
         rule.onNodeWithText(Text)
-            .performGesture {
+            .performTouchInput {
                 click()
                 longClick()
             }

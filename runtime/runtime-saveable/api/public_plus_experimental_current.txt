@@ -37,6 +37,7 @@ package androidx.compose.runtime.saveable {
   public final class SaveableStateRegistryKt {
     method public static androidx.compose.runtime.saveable.SaveableStateRegistry SaveableStateRegistry(java.util.Map<java.lang.String,? extends java.util.List<?>>? restoredValues, kotlin.jvm.functions.Function1<java.lang.Object,java.lang.Boolean> canBeSaved);
     method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.runtime.saveable.SaveableStateRegistry> getLocalSaveableStateRegistry();
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.runtime.saveable.SaveableStateRegistry> LocalSaveableStateRegistry;
   }
 
   public interface Saver<Original, Saveable> {

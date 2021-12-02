@@ -56,22 +56,22 @@ internal interface DecoyTransformBase {
 
     fun IrFunction.getSignatureId(): Long {
         val signature = symbol.signature
-            ?: signatureBuilder.composeSignatureForDeclaration(this)
+            ?: signatureBuilder.composeSignatureForDeclaration(this, false)
 
         return signature.getSignatureId()
     }
 
     private fun IdSignature.getSignatureId(): Long {
         return when (this) {
-            is IdSignature.PublicSignature -> id!!
             is IdSignature.AccessorSignature -> accessorSignature.id!!
             is IdSignature.FileLocalSignature -> id
             is IdSignature.ScopeLocalDeclaration -> id.toLong()
             is IdSignature.SpecialFakeOverrideSignature -> memberSignature.getSignatureId()
-            is IdSignature.GlobalFileLocalSignature -> TODO()
             is IdSignature.LoweredDeclarationSignature -> TODO()
             is IdSignature.FileSignature -> TODO()
-            is IdSignature.GlobalScopeLocalDeclaration -> TODO()
+            is IdSignature.CommonSignature -> id!!
+            is IdSignature.CompositeSignature -> this.getSignatureId()
+            is IdSignature.LocalSignature -> this.getSignatureId()
         }
     }
 
@@ -111,7 +111,7 @@ internal interface DecoyTransformBase {
             "Could not find local implementation for $implementationName"
         }
         // top-level
-        val idSig = IdSignature.PublicSignature(
+        val idSig = IdSignature.CommonSignature(
             packageFqName = signature[0],
             declarationFqName = signature[1],
             id = signature[2].toLongOrNull(),
@@ -179,6 +179,25 @@ internal interface DecoyTransformBase {
 @OptIn(ObsoleteDescriptorBasedAPI::class)
 fun IrDeclaration.isDecoy(): Boolean =
     hasAnnotationSafe(DecoyFqNames.Decoy)
+
+@OptIn(ObsoleteDescriptorBasedAPI::class)
+fun IrDeclaration.isDecoyImplementation(): Boolean =
+    hasAnnotationSafe(DecoyFqNames.DecoyImplementation)
+
+private fun IrFunction.getDecoyImplementationDefaultValuesBitMask(): Int? {
+    val annotation = getAnnotation(DecoyFqNames.DecoyImplementationDefaultsBitMask) ?: return null
+
+    @Suppress("UNCHECKED_CAST")
+    val paramsDefaultsBitMask = annotation.getValueArgument(0) as IrConst<Int>
+
+    return paramsDefaultsBitMask.value
+}
+
+fun IrFunction.didDecoyHaveDefaultForValueParameter(paramIndex: Int): Boolean {
+    return getDecoyImplementationDefaultValuesBitMask()?.let {
+        it.shr(paramIndex).and(1) == 1
+    } ?: false
+}
 
 inline fun <reified T : IrElement> T.copyWithNewTypeParams(
     source: IrFunction,

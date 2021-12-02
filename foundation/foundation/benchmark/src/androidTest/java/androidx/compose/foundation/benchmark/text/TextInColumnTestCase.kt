@@ -29,7 +29,6 @@ import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 
@@ -37,7 +36,7 @@ import androidx.compose.ui.unit.TextUnit
  * The benchmark test case for [Text], where the input is a plain string.
  */
 class TextInColumnTestCase(
-    private val texts: List<AnnotatedString>,
+    private val texts: List<String>,
     private val width: Dp,
     private val fontSize: TextUnit
 ) : LayeredComposeTestCase(), ToggleableTestCase {

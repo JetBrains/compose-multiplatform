@@ -37,20 +37,25 @@ import androidx.compose.ui.platform.debugInspectorInfo
  * The [Row] layout is able to assign children widths according to their weights provided
  * using the [RowScope.weight] modifier. If a child is not provided a weight, it will be
  * asked for its preferred width before the sizes of the children with weights are calculated
- * proportionally to their weight based on the remaining available space.
+ * proportionally to their weight based on the remaining available space. Note that if the
+ * [Row] is horizontally scrollable or part of a horizontally scrollable container, any provided
+ * weights will be disregarded as the remaining available space will be infinite.
  *
  * When none of its children have weights, a [Row] will be as small as possible to fit its
  * children one next to the other. In order to change the width of the [Row], use the
- * [Modifier.requiredWidth] modifiers; e.g. to make it fill the available width [Modifier.fillMaxWidth]
+ * [Modifier.width] modifiers; e.g. to make it fill the available width [Modifier.fillMaxWidth]
  * can be used. If at least one child of a [Row] has a [weight][RowScope.weight], the [Row] will
  * fill the available width, so there is no need for [Modifier.fillMaxWidth]. However, if [Row]'s
- * size should be limited, the [Modifier.requiredWidth] or [Modifier.requiredSize] layout modifiers should be
+ * size should be limited, the [Modifier.width] or [Modifier.size] layout modifiers should be
  * applied.
  *
  * When the size of the [Row] is larger than the sum of its children sizes, a
  * [horizontalArrangement] can be specified to define the positioning of the children inside
  * the [Row]. See [Arrangement] for available positioning behaviors; a custom arrangement can
- * also be defined using the constructor of [Arrangement].
+ * also be defined using the constructor of [Arrangement]. Below is an illustration of
+ * different horizontal arrangements:
+ *
+ * ![Row arrangements](https://developer.android.com/images/reference/androidx/compose/foundation/layout/row_arrangement_visualization.gif)
  *
  * Example usage:
  *

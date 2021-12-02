@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.runtime.InternalComposeApi
+import androidx.compose.ui.Modifier
 
 /**
  * An empty [InspectorInfo] DSL.
@@ -125,5 +125,38 @@ abstract class InspectorValueInfo(private val info: InspectorInfo.() -> Unit) : 
 inline fun debugInspectorInfo(
     crossinline definitions: InspectorInfo.() -> Unit
 ): InspectorInfo.() -> Unit =
-    @OptIn(InternalComposeApi::class)
     if (isDebugInspectorInfoEnabled) ({ definitions() }) else NoInspectorInfo
+
+/**
+ * Use this to group a common set of modifiers and provide [InspectorInfo] for the resulting
+ * modifier.
+ *
+ * @sample androidx.compose.ui.samples.InspectableModifierSample
+ */
+inline fun Modifier.inspectable(
+    noinline inspectorInfo: InspectorInfo.() -> Unit,
+    factory: Modifier.() -> Modifier
+): Modifier = inspectableWrapper(inspectorInfo, factory(Modifier))
+
+/**
+ * Do not use this explicitly. Instead use [Modifier.inspectable].
+ */
+@PublishedApi
+internal fun Modifier.inspectableWrapper(
+    inspectorInfo: InspectorInfo.() -> Unit,
+    wrapped: Modifier
+): Modifier {
+    val begin = InspectableModifier(inspectorInfo)
+    return then(begin).then(wrapped).then(begin.end)
+}
+
+/**
+ * Annotates a range of modifiers in a chain with inspector metadata.
+ */
+class InspectableModifier(
+    inspectorInfo: InspectorInfo.() -> Unit
+) : Modifier.Element, InspectorValueInfo(inspectorInfo) {
+    inner class End : Modifier.Element
+
+    val end = End()
+}

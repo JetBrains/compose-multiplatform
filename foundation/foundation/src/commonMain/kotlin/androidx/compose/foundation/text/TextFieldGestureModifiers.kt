@@ -53,5 +53,5 @@ internal fun Modifier.mouseDragGestureDetector(
     observer: MouseSelectionObserver,
     enabled: Boolean
 ) = if (enabled) Modifier.pointerInput(observer) {
-    mouseSelectionDetector(observer, false)
+    mouseSelectionDetector(observer)
 } else this

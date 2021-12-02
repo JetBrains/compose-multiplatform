@@ -92,4 +92,6 @@ internal class AndroidViewsHandler(context: Context) : ViewGroup(context) {
             }
         }
     }
+
+    override fun shouldDelayChildPressedState(): Boolean = false
 }

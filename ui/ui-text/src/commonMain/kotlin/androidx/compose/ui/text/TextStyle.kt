@@ -80,6 +80,12 @@ private val DefaultColor = Color.Black
  * @see SpanStyle
  * @see ParagraphStyle
  */
+// NOTE(text-perf-review): I suggest we implement this class as
+//     class TextStyle(val spanStyle: SpanStyle, val paragraphStyle: ParagraphStyle)
+// This would allow for more efficient merge implementations where we don't have to reallocate
+// each of the parts, and we always end up calling toSpanStyle() and toParagraphStyle() anyway.
+// This would also result in a slightly better equals implementation when we are comparing things
+// with shared parts (ie, "Structural sharing")
 @Immutable
 class TextStyle(
     val color: Color = Color.Unspecified,

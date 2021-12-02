@@ -21,6 +21,7 @@ package androidx.compose.animation.core.lint
 import androidx.compose.lint.test.Stubs
 import androidx.compose.lint.test.compiledStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
+import com.android.tools.lint.checks.infrastructure.TestMode
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
 import org.junit.Test
@@ -43,6 +44,7 @@ class UnrememberedAnimatableDetectorTest : LintDetectorTest() {
     private val AnimatableStub = compiledStub(
         filename = "Animatable.kt",
         filepath = "androidx/compose/animation/core",
+        checksum = 0xfbab86fa,
         """
             package androidx.compose.animation.core
 
@@ -54,6 +56,13 @@ class UnrememberedAnimatableDetectorTest : LintDetectorTest() {
             fun Animatable(initialValue: Float): Animatable<Float, Any> = Animatable(initialValue)
         """,
 """
+        META-INF/main.kotlin_module:
+        H4sIAAAAAAAAAHWLuwrCQBBFR6IIo9UWIiIIKRQs1sYfEMt0CraySYY4sI+w
+        D/DzXVGrYHG5cDgHAAoAGOVNvg94xJWyrXfcPmXjTO8CSWXZqMjOisWVbafp
+        pnSi049WEQ+4+V9l4knMP76qNeVgi8tB4JONbEjghQyZmnz2drgeeIll51X/
+        4CaI6dlp9xZnOI4UoijuVSxhDy8wojKE3QAAAA==
+        """,
+        """
         androidx/compose/animation/core/Animatable.class:
         H4sIAAAAAAAAAI1SW08TQRT+ZrvdtmsLSwUpeENFbQuyaHwgQky8xKRJQQJN
         X4gPQzvitNtdsjNt8MXwN3z1F2iiIfHBEB/9UcYz23qjPpjNzrnMmfN95/Lt
@@ -86,13 +95,6 @@ class UnrememberedAnimatableDetectorTest : LintDetectorTest() {
         tfTyHyFOyNEa3EMyZzF8HBDihJnz7eg7gm/ONzym2KjIFp5QbN8IsEUZ8LTS
         NHG4Vt2p8LMqRnhO+zvXPum3R/AH2BkgpIjdATq4N8B9PBiBFXiIRyPUC7f2
         CuxXa+sP0YZpjAsDAAA=
-        """,
-        """
-        META-INF/main.kotlin_module:
-        H4sIAAAAAAAAAHWLuwrCQBBFR3zBIBZbiIgQsFCwWBt/QCzTqdhvkiEO7CPs
-        A/x8V9QqWNx74XIOAAwBYJAz/i7gEVfKNt5x85S1M50LJJVloyI7KxZXtq2m
-        u9KJTr+3jHjA4r+VH09i9uFVpSkLW1z2BJ9sZEMCL2TIVOQzt8N1j0ssW6+6
-        B9dBTM9Ouzc4x1GkEMXklruMG9jDC9/F7r/gAAAA
         """
     )
 
@@ -100,6 +102,7 @@ class UnrememberedAnimatableDetectorTest : LintDetectorTest() {
     private val AnimatableColorStub = compiledStub(
         filename = "SingleValueAnimation.kt",
         filepath = "androidx/compose/animation",
+        checksum = 0x285b4455,
         """
             package androidx.compose.animation
 
@@ -109,6 +112,13 @@ class UnrememberedAnimatableDetectorTest : LintDetectorTest() {
             fun Animatable(initialValue: Color): Animatable<Color, Any> = Animatable(initialValue)
         """,
 """
+        META-INF/main.kotlin_module:
+        H4sIAAAAAAAAAHWLuwrCQBBFR3zBIBZbiIgQsFCwWBt/QCzTqdhvkiEO7CPs
+        A/x8V9QqWNx74XIOAAwBYJAz/i7gEVfKNt5x85S1M50LJJVloyI7KxZXtq2m
+        u9KJTr+3jHjA4r+VH09i9uFVpSkLW1z2BJ9sZEMCL2TIVOQzt8N1j0ssW6+6
+        B9dBTM9Ouzc4x1GkEMXklruMG9jDC9/F7r/gAAAA
+        """,
+        """
         androidx/compose/animation/SingleValueAnimationKt.class:
         H4sIAAAAAAAAAJVTXU8TQRQ9s223Zam0VFEoigooHwLbEh8wJUSCMSkWTESb
         GB7MtF3rtNsZMjvb8Ej8J/oLfJNoYgi++aOMdwuExBKFTfbOuXfPnXPvzN1f
@@ -125,13 +135,6 @@ class UnrememberedAnimatableDetectorTest : LintDetectorTest() {
         dzhvJw6RZQn2FTe+RDeEWbI2JQBJzJFN93AGI7hJ63yPk8SjU1aq5y/07EMs
         0vo0OhISG91FrIyxMvJkMV7GbdwpYwJ3d8EC3MP9XSQDTAaYCjAd4EGAkQCJ
         APYfAm5eAJQEAAA=
-        """,
-        """
-        META-INF/main.kotlin_module:
-        H4sIAAAAAAAAAHWLuwrCQBBFR3zBIBZbiIgQsFCwWBt/QCzTqdhvkiEO7CPs
-        A/x8V9QqWNx74XIOAAwBYJAz/i7gEVfKNt5x85S1M50LJJVloyI7KxZXtq2m
-        u9KJTr+3jHjA4r+VH09i9uFVpSkLW1z2BJ9sZEMCL2TIVOQzt8N1j0ssW6+6
-        B9dBTM9Ouzc4x1GkEMXklruMG9jDC9/F7r/gAAAA
         """
     )
 
@@ -229,6 +232,7 @@ class UnrememberedAnimatableDetectorTest : LintDetectorTest() {
             Stubs.Composable,
             Stubs.Remember
         )
+            .skipTestModes(TestMode.TYPE_ALIAS)
             .run()
             .expect(
                 """

@@ -19,13 +19,17 @@ package androidx.compose.material
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
@@ -40,13 +44,16 @@ import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.assertTouchHeightIsEqualTo
+import androidx.compose.ui.test.assertTouchWidthIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.isFocusable
 import androidx.compose.ui.test.isNotFocusable
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
 import androidx.compose.ui.unit.LayoutDirection
@@ -190,13 +197,75 @@ class SwitchTest {
     }
 
     @Test
-    fun switch_materialSizes_whenChecked() {
-        materialSizesTestForValue(true)
+    fun switch_materialSizes_whenChecked_minimumTouchTarget() {
+        materialSizesTestForValue(
+            checked = true,
+            clickable = true,
+            minimumTouchTarget = true
+        )
     }
 
     @Test
-    fun switch_materialSizes_whenUnchecked() {
-        materialSizesTestForValue(false)
+    fun switch_materialSizes_whenChecked_withoutMinimumTouchTarget() {
+        materialSizesTestForValue(
+            checked = true,
+            clickable = true,
+            minimumTouchTarget = false
+        )
+    }
+
+    @Test
+    fun switch_materialSizes_whenUnchecked_minimumTouchTarget() {
+        materialSizesTestForValue(
+            checked = false,
+            clickable = true,
+            minimumTouchTarget = true
+        )
+    }
+
+    @Test
+    fun switch_materialSizes_whenUnchecked_withoutMinimumTouchTarget() {
+        materialSizesTestForValue(
+            checked = false,
+            clickable = true,
+            minimumTouchTarget = false
+        )
+    }
+
+    @Test
+    fun switch_materialSizes_whenChecked_notClickable_minimumTouchTarget() {
+        materialSizesTestForValue(
+            checked = true,
+            clickable = false,
+            minimumTouchTarget = true
+        )
+    }
+
+    @Test
+    fun switch_materialSizes_whenChecked_notClickable_withoutMinimumTouchTarget() {
+        materialSizesTestForValue(
+            checked = true,
+            clickable = false,
+            minimumTouchTarget = false
+        )
+    }
+
+    @Test
+    fun switch_materialSizes_whenUnchecked_notClickable_minimumTouchTarget() {
+        materialSizesTestForValue(
+            checked = false,
+            clickable = false,
+            minimumTouchTarget = true
+        )
+    }
+
+    @Test
+    fun switch_materialSizes_whenUnchecked_notClickable_withoutMinimumTouchTarget() {
+        materialSizesTestForValue(
+            checked = false,
+            clickable = false,
+            minimumTouchTarget = false
+        )
     }
 
     @Test
@@ -215,14 +284,14 @@ class SwitchTest {
         }
 
         rule.onNodeWithTag(defaultSwitchTag)
-            .performGesture { swipeRight() }
+            .performTouchInput { swipeRight() }
 
         rule.runOnIdle {
             Truth.assertThat(state.value).isEqualTo(true)
         }
 
         rule.onNodeWithTag(defaultSwitchTag)
-            .performGesture { swipeLeft() }
+            .performTouchInput { swipeLeft() }
 
         rule.runOnIdle {
             Truth.assertThat(state.value).isEqualTo(false)
@@ -247,14 +316,14 @@ class SwitchTest {
         }
 
         rule.onNodeWithTag(defaultSwitchTag)
-            .performGesture { swipeLeft() }
+            .performTouchInput { swipeLeft() }
 
         rule.runOnIdle {
             Truth.assertThat(state.value).isEqualTo(true)
         }
 
         rule.onNodeWithTag(defaultSwitchTag)
-            .performGesture { swipeRight() }
+            .performTouchInput { swipeRight() }
 
         rule.runOnIdle {
             Truth.assertThat(state.value).isEqualTo(false)
@@ -316,11 +385,66 @@ class SwitchTest {
         rule.onNodeWithTag("2").assertIsOff()
     }
 
-    private fun materialSizesTestForValue(checked: Boolean) {
+    @OptIn(ExperimentalMaterialApi::class)
+    private fun materialSizesTestForValue(
+        checked: Boolean,
+        clickable: Boolean,
+        minimumTouchTarget: Boolean
+    ) = with(rule.density) {
         rule.setMaterialContentForSizeAssertions {
-            Switch(checked = checked, onCheckedChange = {}, enabled = false)
+            CompositionLocalProvider(
+                LocalMinimumTouchTargetEnforcement provides minimumTouchTarget
+            ) {
+                Switch(
+                    checked = checked,
+                    onCheckedChange = if (clickable) { {} } else null,
+                    enabled = false
+                )
+            }
+        }.run {
+            if (clickable && minimumTouchTarget) {
+                assertIsSquareWithSize(48.dp)
+            } else {
+                // The padding should be 2 DP, but we round to pixels when determining layout
+                val paddingInPixels = 2.dp.roundToPx()
+
+                // Convert back to DP so that we have an exact DP value to work with. We don't
+                // want to multiply the error by two (one for each padding), so we get the exact
+                // padding based on the expected pixels consumed by the padding.
+                val paddingInDp = paddingInPixels.toDp()
+                assertWidthIsEqualTo(34.dp + paddingInDp * 2)
+                assertHeightIsEqualTo(20.dp + paddingInDp * 2)
+            }
         }
-            .assertWidthIsEqualTo(34.dp + 2.dp * 2)
-            .assertHeightIsEqualTo(20.dp + 2.dp * 2)
+    }
+
+    /**
+     * A switch should have a minimum touch target of 48 DP x 48 DP and the reported size
+     * should match that, despite the fact that we force the size to be smaller.
+     */
+    @Test
+    fun switch_minTouchTargetArea(): Unit = with(rule.density) {
+        var checked by mutableStateOf(false)
+        rule.setMaterialContent {
+            // Box is needed because otherwise the control will be expanded to fill its parent
+            Box(Modifier.fillMaxSize()) {
+                Switch(
+                    modifier = Modifier.align(Alignment.Center)
+                        .testTag(defaultSwitchTag)
+                        .requiredSize(2.dp),
+                    checked = checked,
+                    onCheckedChange = { checked = it }
+                )
+            }
+        }
+        rule.onNodeWithTag(defaultSwitchTag)
+            .assertIsOff()
+            .assertWidthIsEqualTo(2.dp)
+            .assertHeightIsEqualTo(2.dp)
+            .assertTouchWidthIsEqualTo(48.dp)
+            .assertTouchHeightIsEqualTo(48.dp)
+            .performTouchInput {
+                click(position = Offset(-1f, -1f))
+            }.assertIsOn()
     }
 }

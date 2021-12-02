@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,59 +16,19 @@
 
 package androidx.compose.ui.test.junit4
 
-import androidx.compose.ui.test.ComposeTimeoutException
-import androidx.compose.ui.test.MainTestClock
 import androidx.compose.ui.test.TestMonotonicFrameClock
 import androidx.compose.ui.test.frameDelayMillis
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlin.math.ceil
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class MainTestClockImpl(
-    private val testDispatcher: TestCoroutineDispatcher,
-    private val frameClock: TestMonotonicFrameClock
-) : MainTestClock {
-
-    override val currentTime: Long
-        get() = testDispatcher.currentTime
-
-    override var autoAdvance: Boolean = true
-
+    testDispatcher: TestCoroutineDispatcher,
+    frameClock: TestMonotonicFrameClock
+) : AbstractMainTestClock(
+    testDispatcher,
+    frameClock.frameDelayMillis,
+    ::runOnUiThread
+) {
     internal val hasAwaiters = frameClock.hasAwaiters
-
-    override fun advanceTimeByFrame() {
-        advanceDispatcher(frameClock.frameDelayMillis)
-    }
-
-    override fun advanceTimeBy(milliseconds: Long, ignoreFrameDuration: Boolean) {
-        val actualDelay = if (ignoreFrameDuration) {
-            milliseconds
-        } else {
-            ceil(
-                milliseconds.toDouble() / frameClock.frameDelayMillis
-            ).toLong() * frameClock.frameDelayMillis
-        }
-        advanceDispatcher(actualDelay)
-    }
-
-    override fun advanceTimeUntil(timeoutMillis: Long, condition: () -> Boolean) {
-        val startTime = currentTime
-        runOnUiThread {
-            while (!condition()) {
-                advanceDispatcher(frameClock.frameDelayMillis)
-                if (currentTime - startTime > timeoutMillis) {
-                    throw ComposeTimeoutException(
-                        "Condition still not satisfied after $timeoutMillis ms"
-                    )
-                }
-            }
-        }
-    }
-
-    internal fun advanceDispatcher(millis: Long) {
-        runOnUiThread {
-            testDispatcher.advanceTimeBy(millis)
-        }
-    }
 }

@@ -17,8 +17,10 @@
 package androidx.compose.ui.test.junit4
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.FlingBehavior
+import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,6 +34,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Text
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,15 +48,10 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.bottomCenter
-import androidx.compose.ui.test.down
-import androidx.compose.ui.test.moveTo
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.percentOffset
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performGesture
-import androidx.compose.ui.test.up
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.test.espresso.AppNotIdleException
 import androidx.test.espresso.IdlingPolicies
@@ -185,6 +183,7 @@ class RobolectricComposeTest {
      * Check that scrolling and controlling the clock works: a scrollable receives a swipe while
      * the clock is paused, when the clock is resumed it performs the fling.
      */
+    @OptIn(ExperimentalFoundationApi::class)
     @Test
     fun testControlledScrolling() {
         // Define constants used in the test
@@ -196,15 +195,18 @@ class RobolectricComposeTest {
         // Set content: a list where the fling is always the same, regardless of the swipe
         rule.setContent {
             WithTouchSlop(touchSlop = touchSlop) {
-                Box(Modifier.fillMaxSize()) {
-                    Column(
-                        Modifier.requiredSize(200.dp).verticalScroll(
-                            scrollState,
-                            flingBehavior = flingBehavior
-                        ).testTag("list")
-                    ) {
-                        repeat(n) {
-                            Spacer(Modifier.fillMaxWidth().height(30.dp))
+                // turn off visual overscroll for calculation correctness
+                CompositionLocalProvider(LocalOverScrollConfiguration provides null) {
+                    Box(Modifier.fillMaxSize()) {
+                        Column(
+                            Modifier.requiredSize(200.dp).verticalScroll(
+                                scrollState,
+                                flingBehavior = flingBehavior
+                            ).testTag("list")
+                        ) {
+                            repeat(n) {
+                                Spacer(Modifier.fillMaxWidth().height(30.dp))
+                            }
                         }
                     }
                 }
@@ -214,7 +216,7 @@ class RobolectricComposeTest {
         // Stop auto advancing and perform a swipe. The list will "freeze" in the position where
         // it was at the end of the swipe
         rule.mainClock.autoAdvance = false
-        rule.onNodeWithTag("list").performGesture {
+        rule.onNodeWithTag("list").performTouchInput {
             down(bottomCenter)
             repeat(10) {
                 moveTo(bottomCenter - percentOffset(y = (it + 1) / 10f))

@@ -16,11 +16,16 @@
 
 package androidx.compose.runtime
 
+import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentHashMapOf
+import androidx.compose.runtime.mock.EmptyApplier
+import androidx.compose.runtime.mock.TestMonotonicFrameClock
 import androidx.compose.runtime.mock.Text
 import androidx.compose.runtime.mock.compositionTest
 import androidx.compose.runtime.mock.expectChanges
 import androidx.compose.runtime.mock.expectNoChanges
 import androidx.compose.runtime.mock.validate
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlin.test.assertEquals
 import kotlin.test.Test
 import kotlin.test.assertFalse
@@ -527,6 +532,116 @@ class CompositionLocalTests {
         // Ensure the old providerUpdates is not longer contains old values.
         state.value++
         advance()
+    }
+
+    @Test // Regression test for b/193433239
+    fun canProvideManyProvidersSimultaneously() {
+        val locals = (1..1000).map { compositionLocalOf { 2 } }
+        val LocalTest = compositionLocalOf<Int> { error("") }
+
+        @Composable
+        fun Test() {
+            CompositionLocalProvider(
+                LocalTest provides 1,
+            ) {
+                CompositionLocalProvider(
+                    *locals.map { it provides 3 }.toTypedArray(),
+                    LocalTest provides 2,
+                ) {
+                    assertEquals(2, LocalTest.current)
+                }
+            }
+        }
+    }
+
+    @Test // Regression test for b/193433239
+    fun testTheUnderlyingPropertiesOfPersistentHashMap() {
+        val p = persistentHashMapOf<Int, Int>(99 to 1)
+        val e = Array(101) { it }.map { it to it }
+        val c = persistentHashMapOf(*e.toTypedArray())
+        val n = p.builder().apply { putAll(c) }.build()
+        repeat(101) {
+            assertEquals(it, n[it])
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun testProvideAllLocals() = compositionTest {
+        val local1 = compositionLocalOf { 0 }
+        val local2 = compositionLocalOf { 0 }
+        val staticLocal = staticCompositionLocalOf { 0 }
+
+        var provided: Array<ProvidedValue<Int>> by mutableStateOf(emptyArray())
+
+        var actualValues = emptySet<Any>()
+
+        @Composable
+        fun LocalsConsumer() {
+            val locals by rememberUpdatedState(currentCompositionLocalContext)
+            DisposableEffect(Unit) {
+                val context = coroutineContext + TestMonotonicFrameClock(this@compositionTest)
+                val recomposer = Recomposer(context)
+                launch(context) {
+                    recomposer.runRecomposeAndApplyChanges()
+                }
+                val composition2 = Composition(EmptyApplier(), recomposer)
+                composition2.setContent {
+                    CompositionLocalProvider(locals) {
+                        actualValues = setOf(
+                            local1.current,
+                            local2.current,
+                            staticLocal.current,
+                        )
+                    }
+                }
+                onDispose {
+                    composition2.dispose()
+                    recomposer.cancel()
+                }
+            }
+        }
+
+        compose {
+            CompositionLocalProvider(*provided) {
+                LocalsConsumer()
+            }
+        }
+
+        advance()
+        assertEquals(setOf(0, 0, 0), actualValues)
+
+        provided = arrayOf(local1 provides 1)
+        advance()
+        assertEquals(setOf(1, 0, 0), actualValues)
+
+        provided = arrayOf(local1 provides 2)
+        advance()
+        assertEquals(setOf(2, 0, 0), actualValues)
+
+        provided = arrayOf(local1 provides 2, staticLocal provides 1)
+        advance()
+        assertEquals(setOf(2, 0, 1), actualValues)
+
+        provided = arrayOf(local1 provides 2, staticLocal provides 2)
+        advance()
+        assertEquals(setOf(2, 0, 2), actualValues)
+
+        provided = arrayOf(local1 provides 1, staticLocal provides 1)
+        advance()
+        assertEquals(setOf(1, 0, 1), actualValues)
+
+        provided = arrayOf(local1 provides 1, local2 provides 1, staticLocal provides 1)
+        advance()
+        assertEquals(setOf(1, 1, 1), actualValues)
+
+        provided = arrayOf(local1 provides 1, staticLocal provides 1)
+        advance()
+        assertEquals(setOf(1, 0, 1), actualValues)
+
+        provided = emptyArray()
+        advance()
+        assertEquals(setOf(0, 0, 0), actualValues)
     }
 }
 
