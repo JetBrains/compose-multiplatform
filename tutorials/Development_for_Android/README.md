@@ -46,4 +46,4 @@ dependencies {
 }
 ```
 is recommended. We're working on providing compatibility with more recent AGP versions, see [KT-49835](https://youtrack.jetbrains.com/issue/KT-49835) and 
-[KT-49789](https://youtrack.jetbrains.com/issue/KT-49798).
+[KT-49789](https://youtrack.jetbrains.com/issue/KT-49798). Also if one uses IntelliJ IDEA bundled Android plugin may have compatibility issues with recent AGP. 
