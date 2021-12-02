@@ -12,6 +12,8 @@ Compose for Web provides multiple ways of declaring user interfaces in Kotlin co
 
 [Handing Events](Events_Handling/README.md) - a short overview of Events handling with compose web
 
+[Controlled and Uncontrolled inputs](Controlled_Uncontrolled_Inputs/README.md) - overview of Controlled and Uncontrolled inputs
+
 [Style DSL](Style_Dsl/README.md) - about styling the composable components in web
 
 [Using test-utils](Using_Test_Utils/README.md) - about unit testing for @Composable components based on HTML DOM
