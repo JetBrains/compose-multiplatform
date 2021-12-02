@@ -16,9 +16,11 @@
 
 package androidx.compose.material3
 
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.material.ripple.RippleTheme
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.tokens.State
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -63,10 +65,13 @@ fun MaterialTheme(
     }.apply {
         updateColorSchemeFrom(colorScheme)
     }
+    val rippleIndication = rememberRipple()
     CompositionLocalProvider(
         LocalColorScheme provides rememberedColorScheme,
-        LocalTypography provides typography,
+        LocalIndication provides rippleIndication,
         LocalRippleTheme provides MaterialRippleTheme,
+        LocalTypography provides typography,
+
     ) {
         ProvideTextStyle(value = typography.bodyLarge, content = content)
     }
