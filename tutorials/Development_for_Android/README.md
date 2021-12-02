@@ -26,7 +26,7 @@ To see how it could be achieved see the [multiplatform template](https://github.
 Compose Multiplatform `1.0.0` references Jetpack Compose `1.1.0-beta02`. If one wants to use a different version, they could explicitly 
 override Jetpack Compose dependencies to the Android module (or to the androidMain sourceset in MPP module) like this:
 
-```kotlin
+``` kotlin
 dependencies {
     implementation("androidx.compose.material:material:1.1.0-beta04")
 }
@@ -38,7 +38,7 @@ However please note, that Kotlin Compiler version used for Android must match.
 ## Android Gradle Plugin (AGP) version
 
 For multiplatform Android modules using AGP `4.1.3` with the block like
-```kotlin
+``` kotlin
 dependencies {
     classpath("com.android.tools.build:gradle:4.1.3")
 }
