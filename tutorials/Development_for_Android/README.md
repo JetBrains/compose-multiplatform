@@ -22,8 +22,8 @@ To see how it could be achieved see [multiplatform template](https://github.com/
 
 ## Versioning
 
-Compose Multiplatform 1.0.0 references Jetpack Compose 1.1.0-beta02. If you want to use higher version, you could explicitly 
-add Jetpack Compose dependencies to the Android module like this
+Compose Multiplatform 1.0.0 references Jetpack Compose `1.1.0-beta02`. If one wants to use a different version, they could explicitly 
+override Jetpack Compose dependencies to the Android module like this
 
 ```kotlin
 configurations.all {
