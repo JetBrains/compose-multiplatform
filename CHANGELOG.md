@@ -2,7 +2,7 @@
 ## Desktop
 ### Features
 - [Experimental support for material3](https://github.com/JetBrains/compose-jb/issues/1335)
-- [All clickable components are focusable and reacts to Enter key](https://android-review.googlesource.com/c/platform/frameworks/support/+/1858797)
+- [All clickable components are focusable and react to Enter key](https://android-review.googlesource.com/c/platform/frameworks/support/+/1858797)
 - [All clickable/draggable components no longer react to right clicks by default](https://github.com/JetBrains/compose-jb/issues/832)
 - [Show the default error dialog when an error occurs](https://github.com/JetBrains/compose-jb/issues/663)
 - [ContextMenu, AlertDialog, DropdownMenu close on Esc key by default](https://github.com/JetBrains/compose-jb/issues/1379)
