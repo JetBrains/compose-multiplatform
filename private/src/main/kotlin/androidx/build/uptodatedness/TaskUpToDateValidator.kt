@@ -48,7 +48,6 @@ private const val ENABLE_FLAG_NAME = VERIFY_UP_TO_DATE
 val ALLOW_RERUNNING_TASKS = setOf(
     "buildOnServer",
     "checkExternalLicenses",
-    "createArchive",
     "createDiffArchiveForAll",
     "createProjectZip",
     "externalNativeBuildDebug",
@@ -87,7 +86,6 @@ val ALLOW_RERUNNING_TASKS = setOf(
     "generatePomFileForMetadataPublication",
     "generatePomFileForSafeargsJavaPluginMarkerMavenPublication",
     "generatePomFileForSafeargsKotlinPluginMarkerMavenPublication",
-    "partiallyDejetifyArchive",
     "publishBenchmarkPluginMarkerMavenPublicationToMavenRepository",
     "publishAndroidDebugPublicationToMavenRepository",
     "publishAndroidReleasePublicationToMavenRepository",
@@ -111,7 +109,6 @@ val ALLOW_RERUNNING_TASKS = setOf(
      */
     "relocateShadowJar",
     "testDebugUnitTest",
-    "stripArchiveForPartialDejetification",
     "verifyDependencyVersions",
     "zipConstrainedTestConfigsWithApks",
     "zipTestConfigsWithApks",
@@ -181,19 +178,6 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
     "validateProperties",
     "tasks",
 
-    ":benchmark:benchmark-common:generateReleaseProtos",
-    ":benchmark:benchmark-common:generateDebugProtos",
-    ":benchmark:benchmark-common:compileReleaseKotlin",
-    ":benchmark:benchmark-common:compileDebugKotlin",
-    ":benchmark:benchmark-common:compileReleaseJavaWithJavac",
-    ":benchmark:benchmark-common:compileDebugJavaWithJavac",
-    ":benchmark:benchmark-common:extractReleaseAnnotations",
-    ":benchmark:benchmark-common:extractDebugAnnotations",
-    ":benchmark:benchmark-common:generateApi",
-    ":benchmark:benchmark-common:runErrorProne",
-    ":benchmark:benchmark-common:lintAnalyzeDebug",
-    ":benchmark:benchmark-common:lintDebug",
-
     // More information about the fact that these dokka tasks rerun can be found at b/167569304
     "dokkaKotlinDocs",
     "zipDokkaDocs",
@@ -211,7 +195,16 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
     "lintWithoutExpandProjectionDebug",
     "lintWithNullAwareTypeConverterDebug",
     "lintWithKaptDebug",
-    "lintWithKspDebug"
+    "lintWithKspDebug",
+    "lintTargetSdk29Debug",
+    "lintTargetSdk30Debug",
+    "lintTargetSdkLatestDebug",
+
+    // We know that these tasks are never up to date due to maven-metadata.xml changing
+    // https://github.com/gradle/gradle/issues/11203
+    "partiallyDejetifyArchive",
+    "stripArchiveForPartialDejetification",
+    "createArchive"
 )
 
 @Suppress("UnstableApiUsage") // usage of BuildService that's incubating
@@ -252,6 +245,8 @@ abstract class TaskUpToDateValidator :
     companion object {
         // Tells whether to create a TaskUpToDateValidator listener
         private fun shouldEnable(project: Project): Boolean {
+            // forUseAtConfigurationTime() is deprecated in Gradle 7.4, but we still use 7.3
+            @Suppress("DEPRECATION")
             return project.providers.gradleProperty(ENABLE_FLAG_NAME)
                 .forUseAtConfigurationTime().isPresent
         }

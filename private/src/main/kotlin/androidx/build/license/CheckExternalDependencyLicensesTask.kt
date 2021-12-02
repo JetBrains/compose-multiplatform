@@ -104,11 +104,14 @@ fun Project.configureExternalDependencyLicenseCheck() {
         task.prebuiltsRoot.set(File(project.getCheckoutRoot(), "prebuilts").absolutePath)
 
         task.filesToCheck.from(
-            project.provider({
+            project.provider {
                 val checkerConfig = project.configurations.detachedConfiguration()
                 checkerConfig.isCanBeConsumed = false
                 checkerConfig.attributes {
-                    it.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.JAVA_RUNTIME))
+                    it.attribute(
+                        Usage.USAGE_ATTRIBUTE,
+                        project.objects.named<Usage>(Usage.JAVA_RUNTIME)
+                    )
                 }
 
                 project
@@ -136,7 +139,7 @@ fun Project.configureExternalDependencyLicenseCheck() {
                 }
 
                 dependencyArtifacts
-            })
+            }
         )
     }
 }

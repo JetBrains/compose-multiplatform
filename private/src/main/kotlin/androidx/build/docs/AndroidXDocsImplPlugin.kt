@@ -169,10 +169,13 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             Sync::class.java
         ) { task ->
             val sources = docsConfiguration.incoming.artifactView { }.files
+            // Store archiveOperations into a local variable to prevent access to the plugin
+            // during the task execution, as that breaks configuration caching.
+            val localVar = archiveOperations
             task.from(
                 sources.elements.map { jars ->
                     jars.map {
-                        archiveOperations.zipTree(it).matching {
+                        localVar.zipTree(it).matching {
                             // Filter out files that documentation tools cannot process.
                             it.exclude("**/*.MF")
                             it.exclude("**/*.aidl")
@@ -206,13 +209,15 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
         docsConfiguration: Configuration
     ): TaskProvider<Sync> {
         return project.tasks.register("unzipSourcesForDackka", Sync::class.java) { task ->
-
             val sources = docsConfiguration.incoming.artifactView { }.files
 
+            // Store archiveOperations into a local variable to prevent access to the plugin
+            // during the task execution, as that breaks configuration caching.
+            val localVar = archiveOperations
             task.from(
                 sources.elements.map { jars ->
                     jars.map {
-                        archiveOperations.zipTree(it)
+                        localVar.zipTree(it)
                     }
                 }
             )
@@ -248,11 +253,18 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             isTransitive = false
             isCanBeConsumed = false
             attributes {
-                it.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.JAVA_RUNTIME))
                 it.attribute(
-                    Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.DOCUMENTATION)
+                    Usage.USAGE_ATTRIBUTE,
+                    project.objects.named<Usage>(Usage.JAVA_RUNTIME)
                 )
-                it.attribute(DocsType.DOCS_TYPE_ATTRIBUTE, project.objects.named(DocsType.SOURCES))
+                it.attribute(
+                    Category.CATEGORY_ATTRIBUTE,
+                    project.objects.named<Category>(Category.DOCUMENTATION)
+                )
+                it.attribute(
+                    DocsType.DOCS_TYPE_ATTRIBUTE,
+                    project.objects.named<DocsType>(DocsType.SOURCES)
+                )
             }
         }
         docsSourcesConfiguration = project.configurations.create("docs-sources") {
@@ -267,11 +279,18 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
         fun Configuration.setResolveClasspathForUsage(usage: String) {
             isCanBeConsumed = false
             attributes {
-                it.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(usage))
                 it.attribute(
-                    Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.LIBRARY)
+                    Usage.USAGE_ATTRIBUTE,
+                    project.objects.named<Usage>(usage)
                 )
-                it.attribute(BuildTypeAttr.ATTRIBUTE, project.objects.named("release"))
+                it.attribute(
+                    Category.CATEGORY_ATTRIBUTE,
+                    project.objects.named<Category>(Category.LIBRARY)
+                )
+                it.attribute(
+                    BuildTypeAttr.ATTRIBUTE,
+                    project.objects.named<BuildTypeAttr>("release")
+                )
             }
             extendsFrom(docsConfiguration, samplesConfiguration, stubsConfiguration)
         }
