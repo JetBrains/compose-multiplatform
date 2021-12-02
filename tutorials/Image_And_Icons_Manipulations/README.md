@@ -30,9 +30,9 @@ fun main() = singleWindowApplication {
 
 <img alt="Resources" src="image_from_resources.png" height="375" />
 
-## Loading images from device storage asynchronously
+## Loading images from device storage or network asynchronously
 
-To load an image stored in the device memory you can use `loadImageBitmap`, `loadSvgPainter` or `loadXmlImageVector`. The example below shows how to use them to load an image asynchronously.
+To load an image stored in the device memory (or from network) you can use `loadImageBitmap`, `loadSvgPainter` or `loadXmlImageVector`. The example below shows how to use them to load an image asynchronously.
 
 ```kotlin
 import androidx.compose.foundation.Image
@@ -61,6 +61,7 @@ import kotlinx.coroutines.withContext
 import org.xml.sax.InputSource
 import java.io.File
 import java.io.IOException
+import java.net.URL
 
 fun main() = singleWindowApplication {
     val density = LocalDensity.current
@@ -72,7 +73,7 @@ fun main() = singleWindowApplication {
             modifier = Modifier.width(200.dp)
         )
         AsyncImage(
-            load = { loadSvgPainter(File("idea-logo.svg"), density) },
+            load = { loadSvgPainter("https://github.com/JetBrains/compose-jb/raw/master/artwork/idea-logo.svg", density) },
             painterFor = { it },
             contentDescription = "Idea logo",
             contentScale = ContentScale.FillWidth,
@@ -101,6 +102,8 @@ fun <T> AsyncImage(
             try {
                 load()
             } catch (e: IOException) {
+                // instead of printing to console, you can also write this to log,
+                // or show some error placeholder
                 e.printStackTrace()
                 null
             }
@@ -117,6 +120,8 @@ fun <T> AsyncImage(
     }
 }
 
+/* Loading from file with java.io API */
+
 fun loadImageBitmap(file: File): ImageBitmap =
     file.inputStream().buffered().use(::loadImageBitmap)
 
@@ -125,6 +130,37 @@ fun loadSvgPainter(file: File, density: Density): Painter =
 
 fun loadXmlImageVector(file: File, density: Density): ImageVector =
     file.inputStream().buffered().use { loadXmlImageVector(InputSource(it), density) }
+
+/* Loading from network with java.net API */
+
+fun loadImageBitmap(url: String): ImageBitmap =
+    URL(url).openStream().buffered().use(::loadImageBitmap)
+
+fun loadSvgPainter(url: String, density: Density): Painter =
+    URL(url).openStream().buffered().use { loadSvgPainter(it, density) }
+
+fun loadXmlImageVector(url: String, density: Density): ImageVector =
+    URL(url).openStream().buffered().use { loadXmlImageVector(InputSource(it), density) }
+
+/* Loading from network with Ktor client API (https://ktor.io/docs/client.html). */
+
+/*
+
+suspend fun loadImageBitmap(url: String): ImageBitmap =
+    urlStream(url).use(::loadImageBitmap)
+
+suspend fun loadSvgPainter(url: String, density: Density): Painter =
+    urlStream(url).use { loadSvgPainter(it, density) }
+
+suspend fun loadXmlImageVector(url: String, density: Density): ImageVector =
+    urlStream(url).use { loadXmlImageVector(InputSource(it), density) }
+
+@OptIn(KtorExperimentalAPI::class)
+private suspend fun urlStream(url: String) = HttpClient(CIO).use {
+    ByteArrayInputStream(it.get(url))
+}
+
+ */
 ```
 
 <img alt="Storage" src="image_from_resources2.png" height="356" />
