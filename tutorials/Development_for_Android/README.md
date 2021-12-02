@@ -17,7 +17,7 @@ Jetpack Compose interoperability is enabled on the publication level - nothing n
 The easiest way to start is to use Kotlin Project Wizard with Compose Multiplatform template - one of the target platform is Android. 
 
 
-Another option is to take [multiplatform template](https://github.com/JetBrains/compose-jb/tree/master/templates/multiplatform-template)
+To see how it could be achieved see [multiplatform template](https://github.com/JetBrains/compose-jb/tree/master/templates/multiplatform-template).
 
 
 ## Versioning
@@ -36,3 +36,13 @@ configurations.all {
 
 However please note, that Kotlin Compiler version used for Android must match.  
 
+## Android Gradle Plugin (AGP) version
+
+Currently, Using AGP 4.1.3 with block like
+```kotlin
+dependencies {
+        classpath("com.android.tools.build:gradle:4.1.3")
+}
+```
+is recommended. We're working on providing compatibility with more recent AGP versions, see [KT-49835](https://youtrack.jetbrains.com/issue/KT-49835) and 
+[KT-49789](https://youtrack.jetbrains.com/issue/KT-49798).
