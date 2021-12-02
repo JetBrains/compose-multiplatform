@@ -129,6 +129,11 @@ Use the command line to run:
 ./gradlew jsBrowserRun
 ```
 
+Instead of manually compiling and executing a Kotlin/JS project every time you want to see the changes you made, you can use the continuous compilation mode:
+```shell
+./gradlew jsBrowserRun --continuous
+```
+
 Or run it from the IDE:
 
 <img alt="" src="run_project.png" height="500" />
