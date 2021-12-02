@@ -1,3 +1,26 @@
+# 1.0.0 (Dec 2021)
+## Desktop
+### Features
+- [Experimental support for material3](https://github.com/JetBrains/compose-jb/issues/1335)
+- [All clickable components are focusable and reacts to Enter key](https://android-review.googlesource.com/c/platform/frameworks/support/+/1858797)
+- [All clickable/draggable components no longer react to right clicks by default](https://github.com/JetBrains/compose-jb/issues/832)
+- [Show the default error dialog when an error occurs](https://github.com/JetBrains/compose-jb/issues/663)
+- [ContextMenu, AlertDialog, DropdownMenu close on Esc key by default](https://github.com/JetBrains/compose-jb/issues/1379)
+- [Application by default calls exitProcess after its Composable is disposed](https://github.com/JetBrains/androidx/pull/69)
+
+### API changes
+- [Introduced experimental onPointerEvent (will replace mouseScrollFilter/pointerMoveFilter in the future)](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Mouse_Events#mouse-scroll-listeners)
+- [Introduced PointerEventType.Scroll, which can be used in common code](https://android-review.googlesource.com/c/platform/frameworks/support/+/1864680)
+- [MouseEvent.mouseEvent and KeyEvent.nativeKeyEvent are replaced by MouseEvent.awtEvent and KeyEvent.awtEvent](https://github.com/JetBrains/androidx/pull/87/files)
+- [Experimental overload for loading resources painterResource(String, ResourceLoader)](https://github.com/JetBrains/androidx/blob/e2a3108b92d4c54b5780f9eeceb1712845961cd7/compose/ui/ui/src/desktopMain/kotlin/androidx/compose/ui/res/PainterResources.desktop.kt#L64)
+
+## Web
+### API changes
+- compose.web.widgets is deprecated
+- All CSSSelectors can't be instantiated via constructor now (they're private). [Please use functions provided in SelectorsScope instead](https://github.com/JetBrains/compose-jb/blob/master/web/core/src/jsMain/kotlin/org/jetbrains/compose/web/css/StyleSheetBuilder.kt#L37)
+- [Some functions were made internal (either not related to compose-web or not intended for usage in apps):  buildCSS , StylePropertyList.nativeEquals , variableValue ,  buildCSSStyleRule , buildKeyframes , jsObject , CSSKeyframesRule.appendRule](https://github.com/JetBrains/compose-jb/pull/1509/files)
+- CSSMediaRule: functions feature  and combine  were made extensions functions on GenericStyleSheetBuilder. This makes them consistent with the rest of functions which create CSSMediaQuery.MediaFeature  instances
+
 # 1.0.0-beta (Oct 2021)
 ## Common
 - no Android artifacts are published anymore. Google-published artifacts are referenced instead. This approach eliminates compatibility issues.
