@@ -1,8 +1,5 @@
 # Building the UI with Compose Web
 
-**The API is not finalized, and breaking changes can be expected**
-
-## Introduction
 
 In this tutorial we will look at several examples that use the Composable DOM DSL to describe the user interface for your web application.
 

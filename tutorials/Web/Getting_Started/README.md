@@ -1,9 +1,5 @@
 # Getting Started With Compose for Web
 
-**The API is not finalized, and breaking changes can be expected**
-
-## Introduction
-
 In this tutorial, we will create a simple web UI application using the Compose UI framework.
 
 

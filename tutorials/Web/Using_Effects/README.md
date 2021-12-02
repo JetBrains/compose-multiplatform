@@ -1,7 +1,5 @@
 # Using Effects in Compose Web
-**The API is not finalized, and breaking changes can be expected**
 
-## Introduction
 Compose for Web introduces a few dom-specific effects on top of [existing effects from Compose](https://developer.android.com/jetpack/compose/side-effects).
 
 

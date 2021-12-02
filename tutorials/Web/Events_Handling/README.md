@@ -1,7 +1,5 @@
 # Events handling in Compose Web
 
-**The API is not finalized, and breaking changes can be expected**
-
 You can add event listeners in the `attrs` block:
 
 #### onClick
