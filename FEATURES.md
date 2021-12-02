@@ -32,7 +32,7 @@ Follow individual tutorials to understand how to use particular feature.
 
 ### Limitations
 
-Following limitations apply to Alpha release.
+Following limitations apply to 1.0 release.
 
   * Only 64-bit x86 Windows is supported
   * Only JDK 11 or later is supported due to the memory management scheme used in Skia bindings
@@ -46,3 +46,4 @@ Following limitations apply to Alpha release.
 * M2 works only with Gradle 6.4 or later (6.7 is the latest tested version).
 * M3 works only with Gradle 6.4 or later (6.8 is the latest tested version).
 * Alpha works with Gradle 6.7 or later (7.1 is the latest tested version).
+* 1.0.0 works with Gradle 6.7 or later (7.2 is the latest tested version).
