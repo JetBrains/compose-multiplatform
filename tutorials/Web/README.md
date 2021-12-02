@@ -16,11 +16,18 @@ Compose for Web provides multiple ways of declaring user interfaces in Kotlin co
 
 [Using test-utils](Using_Test_Utils/README.md) - how to use test-utils for DOM DSL unit testing
 
+## Examples:
+- Compose For Web [landing page](https://compose-web.ui.pages.jetbrains.team/). Also have a look at [source code](https://github.com/JetBrains/compose-jb/tree/master/examples/web-landing)
+- Compose For Web and React integration -  [source code](https://github.com/JetBrains/compose-jb/tree/master/examples/web-with-react)
+- Bird game - [source code](https://github.com/JetBrains/compose-jb/tree/master/examples/web-compose-bird)
+- TODO app. (MPP: android, desktop, web) - [source code](https://github.com/JetBrains/compose-jb/tree/master/examples/todoapp-lite)
+- Falling Balls game (uses deprecated widgets API) - [source code](https://github.com/JetBrains/compose-jb/tree/master/examples/falling-balls-web)
+
 ## What's included:
 
 ### Module `compose.runtime`
 It provides fundamental building blocks of Compose's programming model and state management.
-`Compose for Web` uses Jetpack's runtime implementation.
+`Compose for Web` uses Compose's runtime implementation.
 
 **Dependency:**
 
