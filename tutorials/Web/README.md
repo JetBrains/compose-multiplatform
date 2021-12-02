@@ -10,3 +10,5 @@
 [Handing Events](Events_Handling/README.md) - a short overview of Events handling with compose web
 
 [Style DSL](Style_Dsl/README.md) - about styling the composable components in web
+
+[Using test-utils](Using_Test_Utils/README.md) - how to use test-utils for DOM DSL unit testing
