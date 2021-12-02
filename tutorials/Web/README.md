@@ -23,7 +23,7 @@ Compose for Web provides multiple ways of declaring user interfaces in Kotlin co
 - TODO app. (MPP: android, desktop, web) - [source code](https://github.com/JetBrains/compose-jb/tree/master/examples/todoapp-lite)
 - Falling Balls game (uses deprecated widgets API) - [source code](https://github.com/JetBrains/compose-jb/tree/master/examples/falling-balls-web)
 
-## What's included:
+## What's included (modules):
 
 ### Module `compose.runtime`
 It provides fundamental building blocks of Compose's programming model and state management.
