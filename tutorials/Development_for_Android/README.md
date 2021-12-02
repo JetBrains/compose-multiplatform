@@ -23,6 +23,6 @@ This is it. During compilation for Android platform, Jetpack Compose artifacts w
 
 ## Versioning
 
-Compose Multiplatform 1.0 references Jetpack Compose 1.1.0-beta02. If you want to use higher version, you could explicitly 
+Compose Multiplatform 1.0.0 references Jetpack Compose 1.1.0-beta02. If you want to use higher version, you could explicitly 
 add Jetpack Compose dependencies to the Android module. However please note, that Kotlin Compiler compatibility should be considered.  
 
