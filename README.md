@@ -43,7 +43,6 @@ Preview functionality (check your application UI without building/running it) fo
        * [Signing and notarization](tutorials/Signing_and_notarization_on_macOS)
        * [Swing interoperability](tutorials/Swing_Integration)
        * [Development for Android](tutorials/Development_for_Android)
-       * 
    * [components](components) - custom components of Compose Multiplatform
        * [Split Pane](components/SplitPane)
    * [experimental](experimental) - experimental components and examples
