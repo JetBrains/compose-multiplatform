@@ -40,7 +40,7 @@ class FocusEventCountTest {
     val rule = createComposeRule()
 
     @Test
-    fun initially_onFocusEventIsCalledThrice() {
+    fun initially_onFocusEventIsCalledOnce() {
         // Arrange.
         val focusStates = mutableListOf<FocusState>()
         val focusRequester = FocusRequester()
@@ -57,7 +57,6 @@ class FocusEventCountTest {
         rule.runOnIdle {
             assertThat(focusStates).containsExactly(
                 Inactive, // triggered by onFocusEvent node's onModifierChanged().
-                Inactive, // triggered by focus node's attach().
             )
         }
     }
@@ -201,7 +200,7 @@ class FocusEventCountTest {
     }
 
     @Test
-    fun addingFocusTarget_onFocusEventIsCalledThrice() {
+    fun addingFocusTarget_onFocusEventIsCalledTwice() {
         // Arrange.
         val focusStates = mutableListOf<FocusState>()
         var addFocusTarget by mutableStateOf(false)
@@ -220,7 +219,6 @@ class FocusEventCountTest {
         // Assert.
         rule.runOnIdle {
             assertThat(focusStates).containsExactly(
-                Inactive, // triggered by focus node's attach().
                 Inactive, // triggered by onFocusEvent node's onModifierChanged().
                 Inactive, // triggered by focus node's onModifierChanged().
             )

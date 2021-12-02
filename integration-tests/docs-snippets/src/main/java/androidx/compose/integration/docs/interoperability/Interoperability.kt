@@ -35,8 +35,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.integration.docs.databinding.ExampleLayoutBinding
@@ -53,6 +53,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.lifecycle.MutableLiveData
@@ -66,7 +67,7 @@ import androidx.lifecycle.ViewModel
  */
 
 private object InteropSnippet1 {
-    class ExampleActivity : AppCompatActivity() {
+    class ExampleActivity : ComponentActivity() {
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
 
@@ -87,22 +88,34 @@ private object InteropSnippet1 {
 private object InteropSnippet2 {
     class ExampleFragment : Fragment() {
 
+        private var _binding: FragmentExampleBinding? = null
+        // This property is only valid between onCreateView and onDestroyView.
+        private val binding get() = _binding!!
+
         override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
         ): View {
-            // Inflate the layout for this fragment
-            return inflater.inflate(
-                R.layout.fragment_example, container, false
-            ).apply {
-                findViewById<ComposeView>(R.id.compose_view).setContent {
+            _binding = FragmentExampleBinding.inflate(inflater, container, false)
+            val view = binding.root
+            binding.composeView.apply {
+                // Dispose of the Composition when the view's LifecycleOwner
+                // is destroyed
+                setViewCompositionStrategy(DisposeOnViewTreeLifecycleDestroyed)
+                setContent {
                     // In Compose world
                     MaterialTheme {
                         Text("Hello Compose!")
                     }
                 }
             }
+            return view
+        }
+
+        override fun onDestroyView() {
+            super.onDestroyView()
+            _binding = null
         }
     }
 }
@@ -116,6 +129,9 @@ private object InteropSnippet3 {
             savedInstanceState: Bundle?
         ): View {
             return ComposeView(requireContext()).apply {
+                // Dispose of the Composition when the view's LifecycleOwner
+                // is destroyed
+                setViewCompositionStrategy(DisposeOnViewTreeLifecycleDestroyed)
                 setContent {
                     MaterialTheme {
                         // In Compose world
@@ -206,7 +222,7 @@ private object InteropSnippet7 {
 
 /* ktlint-disable indent */
 private object InteropSnippet8 {
-    class ExampleActivity : AppCompatActivity() {
+    class ExampleActivity : ComponentActivity() {
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             // get data from savedInstanceState
@@ -228,7 +244,7 @@ private object InteropSnippet8 {
     }
 }
 
-private object InteropSnippet19 {
+private object InteropSnippet9 {
     @Composable
     fun SystemBroadcastReceiver(
         systemAction: String,
@@ -347,4 +363,18 @@ private open class Fragment {
     }
 
     fun requireContext(): Context = TODO()
+
+    open fun onDestroyView() { }
+}
+
+private class FragmentExampleBinding {
+    val root: View = TODO()
+    var composeView: ComposeView
+    companion object {
+        fun inflate(
+            li: LayoutInflater,
+            container: ViewGroup?,
+            boolean: Boolean
+        ): FragmentExampleBinding { TODO() }
+    }
 }

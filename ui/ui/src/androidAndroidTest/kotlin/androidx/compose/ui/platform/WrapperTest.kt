@@ -18,12 +18,11 @@ package androidx.compose.ui.platform
 import android.widget.FrameLayout
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.currentRecomposeScope
-import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
@@ -36,7 +35,6 @@ import androidx.test.filters.MediumTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
@@ -150,27 +148,21 @@ class WrapperTest {
         }
     }
 
-    @Suppress("DEPRECATION")
     @Test
-    @Ignore("b/159106722")
     fun compositionLinked_whenParentProvided() {
         val composedLatch = CountDownLatch(1)
         var value = 0f
 
         activityScenario.onActivity {
-            val frameLayout = FrameLayout(it)
+            val compositionLocal = compositionLocalOf<Float> { error("not set") }
+            val composeView = ComposeView(it)
+            composeView.setContent {
+                value = compositionLocal.current
+                composedLatch.countDown()
+            }
             it.setContent {
-                val compositionLocal = compositionLocalOf<Float> { error("not set") }
                 CompositionLocalProvider(compositionLocal provides 1f) {
-                    val composition = rememberCompositionContext()
-
-                    AndroidView({ frameLayout })
-                    SideEffect {
-                        frameLayout.setContent(composition) {
-                            value = compositionLocal.current
-                            composedLatch.countDown()
-                        }
-                    }
+                    AndroidView({ composeView })
                 }
             }
         }

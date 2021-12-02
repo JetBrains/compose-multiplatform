@@ -23,6 +23,7 @@ import androidx.compose.material3.samples.AlertDialogSample
 import androidx.compose.material3.samples.AlertDialogWithIconSample
 import androidx.compose.material3.samples.ButtonSample
 import androidx.compose.material3.samples.ButtonWithIconSample
+import androidx.compose.material3.samples.CheckboxSample
 import androidx.compose.material3.samples.ColorSchemeSample
 import androidx.compose.material3.samples.EnterAlwaysSmallTopAppBar
 import androidx.compose.material3.samples.ElevatedButtonSample
@@ -40,10 +41,13 @@ import androidx.compose.material3.samples.NavigationRailWithOnlySelectedLabelsSa
 import androidx.compose.material3.samples.OutlinedButtonSample
 import androidx.compose.material3.samples.NavigationDrawerSample
 import androidx.compose.material3.samples.PinnedSmallTopAppBar
+import androidx.compose.material3.samples.RadioButtonSample
+import androidx.compose.material3.samples.RadioGroupSample
 import androidx.compose.material3.samples.SimpleCenterAlignedTopAppBar
 import androidx.compose.material3.samples.SimpleSmallTopAppBar
 import androidx.compose.material3.samples.SmallFloatingActionButtonSample
 import androidx.compose.material3.samples.TextButtonSample
+import androidx.compose.material3.samples.TriStateCheckboxSample
 import androidx.compose.runtime.Composable
 
 data class Example(
@@ -99,6 +103,25 @@ val ColorExamples =
             sourceUrl = ColorExampleSourceUrl,
         ) { ColorSchemeSample() },
     )
+
+private const val CheckboxesExampleDescription = "Checkboxes examples"
+private const val CheckboxesExampleSourceUrl = "$SampleSourceUrl/CheckboxSamples.kt"
+val CheckboxesExamples = listOf(
+    Example(
+        name = ::CheckboxSample.name,
+        description = CheckboxesExampleDescription,
+        sourceUrl = CheckboxesExampleSourceUrl
+    ) {
+        CheckboxSample()
+    },
+    Example(
+        name = ::TriStateCheckboxSample.name,
+        description = CheckboxesExampleDescription,
+        sourceUrl = CheckboxesExampleSourceUrl
+    ) {
+        TriStateCheckboxSample()
+    }
+)
 
 private const val DialogExampleDescription = "Dialog examples"
 private const val DialogExampleSourceUrl = "$SampleSourceUrl/AlertDialogSamples.kt"
@@ -232,4 +255,23 @@ val NavigationDrawerExamples = listOf(
     ) {
         NavigationDrawerSample()
     }
+)
+
+private const val RadioButtonsExampleDescription = "Radio buttons examples"
+private const val RadioButtonsExampleSourceUrl = "$SampleSourceUrl/RadioButtonSamples.kt"
+val RadioButtonsExamples = listOf(
+    Example(
+        name = ::RadioButtonSample.name,
+        description = RadioButtonsExampleDescription,
+        sourceUrl = RadioButtonsExampleSourceUrl
+    ) {
+        RadioButtonSample()
+    },
+    Example(
+        name = ::RadioGroupSample.name,
+        description = RadioButtonsExampleDescription,
+        sourceUrl = RadioButtonsExampleSourceUrl
+    ) {
+        RadioGroupSample()
+    },
 )

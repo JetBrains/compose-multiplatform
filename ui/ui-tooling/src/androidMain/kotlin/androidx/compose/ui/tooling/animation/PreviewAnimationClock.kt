@@ -107,7 +107,7 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
         notifySubscribe(composeAnimation)
     }
 
-    fun trackAnimatedVisibility(parent: Transition<Any>) {
+    fun trackAnimatedVisibility(parent: Transition<Any>, onSeek: () -> Unit = {}) {
         synchronized(animatedVisibilityStatesLock) {
             if (animatedVisibilityStates.containsKey(parent)) {
                 if (DEBUG) {
@@ -136,6 +136,7 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
             targetState = target,
             0
         )
+        onSeek()
         trackedAnimatedVisibility.add(composeAnimation)
         notifySubscribe(composeAnimation)
     }
@@ -265,12 +266,12 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
     fun getTransitions(animation: ComposeAnimation, stepMillis: Long): List<TransitionInfo> {
         if (trackedTransitions.contains(animation)) {
             val transition = (animation as TransitionComposeAnimation).animationObject
-            return transition.animations.mapNotNull {
+            return transition.allAnimations().map {
                 it.createTransitionInfo(stepMillis)
             }
         } else if (trackedAnimatedVisibility.contains(animation)) {
             (animation as AnimatedVisibilityComposeAnimation).childTransition?.let { child ->
-                return child.animations.mapNotNull {
+                return child.allAnimations().map {
                     it.createTransitionInfo(stepMillis)
                 }
             }

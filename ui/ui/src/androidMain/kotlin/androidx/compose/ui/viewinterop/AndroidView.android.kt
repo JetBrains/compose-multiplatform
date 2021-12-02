@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.LayoutDirection
 /**
  * Composes an Android [View] obtained from [factory]. The [factory] block will be called
  * exactly once to obtain the [View] to be composed, and it is also guaranteed to be invoked on
- * the UI thread. Therefore, in addition to creating the [factory], the block can also be used
+ * the UI thread. Therefore, in addition to creating the [View], the [factory] can also be used
  * to perform one-off initializations and [View] constant properties' setting.
  * The [update] block can be run multiple times (on the UI thread as well) due to recomposition,
  * and it is the right place to set [View] properties depending on state. When state changes,

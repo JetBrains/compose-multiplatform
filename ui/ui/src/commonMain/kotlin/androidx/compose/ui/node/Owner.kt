@@ -182,6 +182,11 @@ internal interface Owner {
     fun measureAndLayout(sendPointerUpdate: Boolean = true)
 
     /**
+     * Makes sure the passed [layoutNode] and its subtree is remeasured and has the final sizes.
+     */
+    fun forceMeasureTheSubtree(layoutNode: LayoutNode)
+
+    /**
      * Creates an [OwnedLayer] which will be drawing the passed [drawBlock].
      */
     fun createLayer(drawBlock: (Canvas) -> Unit, invalidateParentLayer: () -> Unit): OwnedLayer

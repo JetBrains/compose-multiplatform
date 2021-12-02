@@ -221,7 +221,7 @@ private fun StateSnippets9() {
 
         // Logic to decide when to show the bottom bar
         val shouldShowBottomBar: Boolean
-            @Composable get() = /* ... */
+            get() = /* ... */
                 // DO NOT COPY IN DAC
                 false
 

@@ -32,7 +32,9 @@ import android.view.MotionEvent.ACTION_DOWN
 import android.view.MotionEvent.ACTION_HOVER_ENTER
 import android.view.MotionEvent.ACTION_HOVER_EXIT
 import android.view.MotionEvent.ACTION_HOVER_MOVE
+import android.view.MotionEvent.ACTION_SCROLL
 import android.view.MotionEvent.ACTION_MOVE
+import android.view.MotionEvent.ACTION_POINTER_DOWN
 import android.view.MotionEvent.ACTION_POINTER_UP
 import android.view.MotionEvent.ACTION_UP
 import android.view.MotionEvent.TOOL_TYPE_MOUSE
@@ -500,6 +502,10 @@ internal class AndroidComposeView(context: Context) :
         ViewCompat.setAccessibilityDelegate(this, accessibilityDelegate)
         ViewRootForTest.onViewCreatedCallback?.invoke(this)
         root.attach(this)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // Support for this feature in Compose is tracked here: b/207654434
+            AndroidComposeViewForceDarkModeQ.disallowForceDark(this)
+        }
     }
 
     override fun onResume(owner: LifecycleOwner) {
@@ -590,15 +596,15 @@ internal class AndroidComposeView(context: Context) :
             view,
             object : AccessibilityDelegateCompat() {
                 override fun onInitializeAccessibilityNodeInfo(
-                    host: View?,
-                    info: AccessibilityNodeInfoCompat?
+                    host: View,
+                    info: AccessibilityNodeInfoCompat
                 ) {
                     super.onInitializeAccessibilityNodeInfo(host, info)
                     var parentId = SemanticsNode(layoutNode.outerSemantics!!, false).parent!!.id
                     if (parentId == semanticsOwner.unmergedRootSemanticsNode.id) {
                         parentId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     }
-                    info!!.setParent(thisView, parentId)
+                    info.setParent(thisView, parentId)
                 }
             }
         )
@@ -658,6 +664,10 @@ internal class AndroidComposeView(context: Context) :
             requestLayout()
         }
         measureAndLayoutDelegate.dispatchOnPositionedCallbacks()
+    }
+
+    override fun forceMeasureTheSubtree(layoutNode: LayoutNode) {
+        measureAndLayoutDelegate.forceMeasureTheSubtree(layoutNode)
     }
 
     override fun onRequestMeasure(layoutNode: LayoutNode) {
@@ -1012,6 +1022,14 @@ internal class AndroidComposeView(context: Context) :
         if (autofillSupported()) _autofill?.performAutofill(values)
     }
 
+    override fun dispatchGenericMotionEvent(event: MotionEvent): Boolean {
+        return if (event.actionMasked == ACTION_SCROLL) {
+            handleMotionEvent(event).dispatchedToAPointerInputModifier
+        } else {
+            super.dispatchGenericMotionEvent(event)
+        }
+    }
+
     // TODO(shepshapard): Test this method.
     override fun dispatchTouchEvent(motionEvent: MotionEvent): Boolean {
         if (hoverExitReceived) {
@@ -1138,11 +1156,21 @@ internal class AndroidComposeView(context: Context) :
                 lastDownPointerPosition = it
             }
 
-            pointerInputEventProcessor.process(
+            val result = pointerInputEventProcessor.process(
                 pointerInputEvent,
                 this,
                 isInBounds(motionEvent)
             )
+            val action = motionEvent.actionMasked
+            if ((action == ACTION_DOWN || action == ACTION_POINTER_DOWN) &&
+                !result.dispatchedToAPointerInputModifier
+            ) {
+                // We aren't handling the pointer, so the event stream has ended for us.
+                // The next time we receive a pointer event, it should be considered a new
+                // pointer.
+                motionEventAdapter.endStream(motionEvent.getPointerId(motionEvent.actionIndex))
+            }
+            result
         } else {
             pointerInputEventProcessor.processCancel()
             ProcessResult(
@@ -1571,7 +1599,7 @@ var textInputServiceFactory: (PlatformTextInputService) -> TextInputService =
  * which use this method will pass.
  */
 @RequiresApi(Build.VERSION_CODES.O)
-internal object AndroidComposeViewVerificationHelperMethodsO {
+private object AndroidComposeViewVerificationHelperMethodsO {
     @RequiresApi(Build.VERSION_CODES.O)
     @DoNotInline
     fun focusable(view: View, focusable: Int, defaultFocusHighlightEnabled: Boolean) {
@@ -1582,7 +1610,7 @@ internal object AndroidComposeViewVerificationHelperMethodsO {
 }
 
 @RequiresApi(Build.VERSION_CODES.N)
-internal object AndroidComposeViewVerificationHelperMethodsN {
+private object AndroidComposeViewVerificationHelperMethodsN {
     @DoNotInline
     @RequiresApi(Build.VERSION_CODES.N)
     fun setPointerIcon(view: View, icon: PointerIcon?) {
@@ -1601,6 +1629,15 @@ internal object AndroidComposeViewVerificationHelperMethodsN {
         if (view.pointerIcon != iconToSet) {
             view.pointerIcon = iconToSet
         }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.Q)
+private object AndroidComposeViewForceDarkModeQ {
+    @DoNotInline
+    @RequiresApi(Build.VERSION_CODES.Q)
+    fun disallowForceDark(view: View) {
+        view.isForceDarkAllowed = false
     }
 }
 

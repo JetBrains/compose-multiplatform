@@ -19,6 +19,7 @@ package androidx.compose.ui.node
 import androidx.compose.ui.focus.FocusEventModifier
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
+import androidx.compose.ui.focus.ModifierLocalHasFocusEventListener
 import androidx.compose.ui.focus.searchChildrenForFocusNode
 
 internal class ModifiedFocusEventNode(
@@ -28,7 +29,11 @@ internal class ModifiedFocusEventNode(
 
     override fun propagateFocusEvent(focusState: FocusState) {
         modifier.onFocusEvent(focusState)
-        super.propagateFocusEvent(focusState)
+
+        // Propagate the event up the hierarchy only if parents have focus event listeners.
+        if (onModifierLocalRead(ModifierLocalHasFocusEventListener)) {
+            super.propagateFocusEvent(focusState)
+        }
     }
 
     override fun onModifierChanged() {

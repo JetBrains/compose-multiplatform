@@ -67,7 +67,7 @@ internal actual fun createSubcomposition(
  * @param parent The [Recomposer] or parent composition reference.
  * @param content Composable that will be the content of the view.
  */
-internal fun ViewGroup.setContent(
+internal fun AbstractComposeView.setContent(
     parent: CompositionContext,
     content: @Composable () -> Unit
 ): Composition {

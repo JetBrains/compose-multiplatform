@@ -383,7 +383,7 @@ class SubcomposeLayoutState(
 
     internal fun disposeCurrentNodes() {
         nodeToNodeState.values.forEach {
-            it.composition!!.dispose()
+            it.composition?.dispose()
         }
         nodeToNodeState.clear()
         slotIdToNode.clear()

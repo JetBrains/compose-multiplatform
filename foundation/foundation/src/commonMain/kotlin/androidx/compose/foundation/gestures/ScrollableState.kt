@@ -144,8 +144,11 @@ private class DefaultScrollableState(val onDelta: (Float) -> Float) : Scrollable
     ): Unit = coroutineScope {
         scrollMutex.mutateWith(scrollScope, scrollPriority) {
             isScrollingState.value = true
-            block()
-            isScrollingState.value = false
+            try {
+                block()
+            } finally {
+                isScrollingState.value = false
+            }
         }
     }
 

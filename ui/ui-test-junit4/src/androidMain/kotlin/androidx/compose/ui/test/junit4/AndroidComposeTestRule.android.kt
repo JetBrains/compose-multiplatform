@@ -40,11 +40,6 @@ import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.TestMonotonicFrameClock
 import androidx.compose.ui.test.TestOwner
 import androidx.compose.ui.test.createTestContext
-import androidx.compose.ui.test.junit4.android.ComposeIdlingResource
-import androidx.compose.ui.test.junit4.android.ComposeRootRegistry
-import androidx.compose.ui.test.junit4.android.EspressoLink
-import androidx.compose.ui.test.junit4.android.awaitComposeRoots
-import androidx.compose.ui.test.junit4.android.waitForComposeRoots
 import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.Density

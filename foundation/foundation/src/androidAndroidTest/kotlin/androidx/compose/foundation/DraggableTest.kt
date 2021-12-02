@@ -37,8 +37,10 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performMouseInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipe
 import androidx.compose.ui.test.swipeWithVelocity
@@ -322,6 +324,35 @@ class DraggableTest {
         rule.runOnIdle {
             // should be exactly 100 as there's no slop
             assertThat(total).isGreaterThan(0f)
+            assertThat(dragStopped).isEqualTo(1f)
+        }
+    }
+
+    // regression test for b/176971558
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun draggable_immediateStart_callsStopWithoutSlop() {
+        var total = 0f
+        var dragStopped = 0f
+        var dragStarted = 0f
+        setDraggableContent {
+            Modifier.draggable(
+                Orientation.Horizontal,
+                onDragStopped = { dragStopped += 1 },
+                onDragStarted = { dragStarted += 1 },
+                startDragImmediately = true
+            ) { total += it }
+        }
+        rule.onNodeWithTag(draggableBoxTag).performMouseInput {
+            this.press()
+        }
+        rule.runOnIdle {
+            assertThat(dragStarted).isEqualTo(1f)
+        }
+        rule.onNodeWithTag(draggableBoxTag).performMouseInput {
+            this.release()
+        }
+        rule.runOnIdle {
             assertThat(dragStopped).isEqualTo(1f)
         }
     }

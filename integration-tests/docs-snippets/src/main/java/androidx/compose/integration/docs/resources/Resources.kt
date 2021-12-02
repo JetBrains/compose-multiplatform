@@ -25,6 +25,8 @@ package androidx.compose.integration.docs.resources
 
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
+import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
+import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
@@ -136,10 +138,10 @@ private fun ResourcesSnippet7() {
     // - res/drawable/animated_vector.xml
 
     // In your Compose code
-    val image = animatedVectorResource(id = R.drawable.animated_vector)
+    val image = AnimatedImageVector.animatedVectorResource(id = R.drawable.animated_vector)
     val atEnd by remember { mutableStateOf(false) }
     Icon(
-        painter = image.painterFor(atEnd = atEnd),
+        painter = rememberAnimatedVectorPainter(image, atEnd),
         contentDescription = null // decorative element
     )
 }

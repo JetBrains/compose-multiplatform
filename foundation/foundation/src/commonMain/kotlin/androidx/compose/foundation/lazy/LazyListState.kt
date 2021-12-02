@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableState
@@ -24,6 +23,12 @@ import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchPolicy
 import androidx.compose.foundation.lazy.layout.LazyLayoutState
+import androidx.compose.foundation.lazy.list.DataIndex
+import androidx.compose.foundation.lazy.list.LazyListItemPlacementAnimator
+import androidx.compose.foundation.lazy.list.LazyListItemsProvider
+import androidx.compose.foundation.lazy.list.LazyListMeasureResult
+import androidx.compose.foundation.lazy.list.LazyListScrollPosition
+import androidx.compose.foundation.lazy.list.doSmoothScrollToItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -175,18 +180,14 @@ class LazyListState constructor(
      * Instantly brings the item at [index] to the top of the viewport, offset by [scrollOffset]
      * pixels.
      *
-     * Cancels the currently running scroll, if any, and suspends until the cancellation is
-     * complete.
-     *
-     * @param index the data index to snap to. Must be between 0 and the number of elements.
-     * @param scrollOffset the number of pixels past the start of the item to snap to. Must
-     * not be negative.
+     * @param index the index to which to scroll. Must be non-negative.
+     * @param scrollOffset the offset that the item should end up after the scroll. Note that
+     * positive offset refers to forward scroll, so in a top-to-bottom list, positive offset will
+     * scroll the item further upward (taking it partly offscreen).
      */
-    @OptIn(ExperimentalFoundationApi::class)
     suspend fun scrollToItem(
         /*@IntRange(from = 0)*/
         index: Int,
-        /*@IntRange(from = 0)*/
         scrollOffset: Int = 0
     ) {
         return scrollableState.scroll {
@@ -207,12 +208,8 @@ class LazyListState constructor(
      * performed within a [scroll] block (even if they don't call any other methods on this
      * object) in order to guarantee that mutual exclusion is enforced.
      *
-     * Cancels the currently running scroll, if any, and suspends until the cancellation is
-     * complete.
-     *
      * If [scroll] is called from elsewhere, this will be canceled.
      */
-    @OptIn(ExperimentalFoundationApi::class)
     override suspend fun scroll(
         scrollPriority: MutatePriority,
         block: suspend ScrollScope.() -> Unit
@@ -300,16 +297,14 @@ class LazyListState constructor(
     /**
      * Animate (smooth scroll) to the given item.
      *
-     * @param index the index to which to scroll
-     * @param scrollOffset the offset that the item should end up after the scroll (same as
-     * [scrollToItem]) - note that positive offset refers to forward scroll, so in a
-     * top-to-bottom list, positive offset will scroll the item further upward (taking it partly
-     * offscreen)
+     * @param index the index to which to scroll. Must be non-negative.
+     * @param scrollOffset the offset that the item should end up after the scroll. Note that
+     * positive offset refers to forward scroll, so in a top-to-bottom list, positive offset will
+     * scroll the item further upward (taking it partly offscreen)
      */
     suspend fun animateScrollToItem(
         /*@IntRange(from = 0)*/
         index: Int,
-        /*@IntRange(from = 0)*/
         scrollOffset: Int = 0
     ) {
         doSmoothScrollToItem(index, scrollOffset)

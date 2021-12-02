@@ -125,7 +125,7 @@ interface Modifier {
      *
      * @sample androidx.compose.ui.samples.ModifierParameterSample
      */
-    // The companion object implements `Modifier` so that it may be used  as the start of a
+    // The companion object implements `Modifier` so that it may be used as the start of a
     // modifier extension factory expression.
     companion object : Modifier {
         override fun <R> foldIn(initial: R, operation: (R, Element) -> R): R = initial

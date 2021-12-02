@@ -47,20 +47,16 @@ import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.input.mouse.MouseScrollEvent
-import androidx.compose.ui.input.mouse.MouseScrollEventFilter
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.PointerIconDefaults
 import androidx.compose.ui.input.pointer.PointerIconService
 import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventProcessor
-import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PositionCalculator
 import androidx.compose.ui.input.pointer.ProcessResult
 import androidx.compose.ui.input.pointer.TestPointerInputEventData
 import androidx.compose.ui.layout.RootMeasurePolicy
-import androidx.compose.ui.node.HitTestResult
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNodeDrawScope
@@ -284,6 +280,10 @@ internal class SkiaBasedOwner(
         measureAndLayoutDelegate.dispatchOnPositionedCallbacks()
     }
 
+    override fun forceMeasureTheSubtree(layoutNode: LayoutNode) {
+        measureAndLayoutDelegate.forceMeasureTheSubtree(layoutNode)
+    }
+
     override fun onRequestMeasure(layoutNode: LayoutNode) {
         if (measureAndLayoutDelegate.requestRemeasure(layoutNode)) {
             requestLayout()
@@ -399,31 +399,6 @@ internal class SkiaBasedOwner(
                 pointers.map { it.toPointerInputEventData() }
             )
         )
-    }
-
-    // TODO(demin): This is likely temporary. After PointerInputEvent can handle mouse events
-    //  (scroll in particular), we can replace it with processPointerInput. see b/166105940
-    internal fun onMouseScroll(
-        position: Offset,
-        event: MouseScrollEvent,
-        pointerInputEvent: PointerInputEvent
-    ) {
-        measureAndLayout()
-        sendSyntheticEvents()
-        lastPointerEvent = pointerInputEvent
-
-        val inputFilters = HitTestResult<PointerInputFilter>()
-        root.hitTest(position, inputFilters)
-
-        for (
-            filter in inputFilters
-                .asReversed()
-                .asSequence()
-                .filterIsInstance<MouseScrollEventFilter>()
-        ) {
-            val isConsumed = filter.onMouseScroll(event)
-            if (isConsumed) break
-        }
     }
 
     override val pointerIconService: PointerIconService =

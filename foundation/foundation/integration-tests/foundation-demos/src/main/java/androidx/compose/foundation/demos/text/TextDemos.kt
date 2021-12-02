@@ -42,7 +42,10 @@ val TextDemos = DemoCategory(
                 ComposableDemo("Min/Max Lines") { BasicTextFieldMinMaxDemo() },
                 ComposableDemo("Ime SingleLine") { ImeSingleLineDemo() },
                 ComposableDemo("Capitalization/AutoCorrect") { CapitalizationAutoCorrectDemo() },
-                ComposableDemo("TextFieldValue") { TextFieldValueDemo() }
+                ComposableDemo("TextFieldValue") { TextFieldValueDemo() },
+                ComposableDemo("Inside Dialog") { onNavigateUp ->
+                    DialogInputFieldDemo(onNavigateUp)
+                },
             )
         ),
         ComposableDemo("Text Accessibility") { TextAccessibilityDemo() }

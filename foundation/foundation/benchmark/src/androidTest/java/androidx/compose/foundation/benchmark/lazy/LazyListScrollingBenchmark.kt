@@ -20,6 +20,8 @@ import android.os.Build
 import android.view.MotionEvent
 import android.view.View
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.FlingBehavior
+import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -165,7 +167,11 @@ private val LazyColumn = LazyListScrollingTestCase(
     "LazyColumn",
     isVertical = true
 ) { state ->
-    LazyColumn(state = state, modifier = Modifier.requiredHeight(400.dp).fillMaxWidth()) {
+    LazyColumn(
+        state = state,
+        modifier = Modifier.requiredHeight(400.dp).fillMaxWidth(),
+        flingBehavior = NoFlingBehavior
+    ) {
         item {
             FirstLargeItem()
         }
@@ -179,13 +185,23 @@ private val LazyRow = LazyListScrollingTestCase(
     "LazyRow",
     isVertical = false
 ) { state ->
-    LazyRow(state = state, modifier = Modifier.requiredWidth(400.dp).fillMaxHeight()) {
+    LazyRow(
+        state = state,
+        modifier = Modifier.requiredWidth(400.dp).fillMaxHeight(),
+        flingBehavior = NoFlingBehavior
+    ) {
         item {
             FirstLargeItem()
         }
         items(items) {
             RegularItem()
         }
+    }
+}
+
+private object NoFlingBehavior : FlingBehavior {
+    override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
+        return 0f
     }
 }
 
@@ -205,6 +221,7 @@ private fun ComposeBenchmarkRule.toggleStateBenchmark(
             runWithTimingDisabled {
                 assertNoPendingChanges()
                 getTestCase().afterToggle()
+                assertNoPendingChanges()
             }
         }
     }

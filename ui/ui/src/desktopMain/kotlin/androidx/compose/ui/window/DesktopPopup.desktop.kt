@@ -230,7 +230,6 @@ private fun PopupLayout(
  * @param alignment The alignment of the popup relative to the current cursor position.
  * @param windowMargin Defines the area within the window that limits the placement of the popup.
  */
-@ExperimentalComposeUiApi
 @Composable
 fun rememberCursorPositionProvider(
     offset: DpOffset = DpOffset.Zero,
@@ -293,7 +292,6 @@ fun rememberCursorPositionProvider(
  * @param alignment The alignment of the popup relative to the [anchor] point.
  * @param offset [DpOffset] to be added to the position of the popup.
  */
-@ExperimentalComposeUiApi
 @Composable
 fun rememberComponentRectPositionProvider(
     anchor: Alignment = Alignment.BottomCenter,

@@ -47,6 +47,9 @@ fun mutatorMutexStateObject() {
                 _range = value.coerceAtLeast(0)
             }
 
+        var isScrolling by mutableStateOf(false)
+            private set
+
         private val mutatorMutex = MutatorMutex()
 
         /**
@@ -54,7 +57,17 @@ fun mutatorMutexStateObject() {
          */
         suspend fun <R> scroll(
             block: suspend () -> R
-        ): R = mutatorMutex.mutate(block = block)
+        ): R = mutatorMutex.mutate {
+            isScrolling = true
+            try {
+                block()
+            } finally {
+                // MutatorMutex.mutate ensures mutual exclusion between blocks.
+                // By setting back to false in the finally block inside mutate, we ensure that we
+                // reset the state upon cancellation before the next block starts to run (if any).
+                isScrolling = false
+            }
+        }
     }
 
     /**

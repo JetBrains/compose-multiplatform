@@ -736,6 +736,10 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         fun ScrollAxisRange.canScrollForward(): Boolean {
             return value() < maxValue() && !reverseScrolling || value() > 0f && reverseScrolling
         }
+        // Will the scrollable scroll when ACTION_SCROLL_BACKWARD is performed?
+        fun ScrollAxisRange.canScrollBackward(): Boolean {
+            return value() > 0f && !reverseScrolling || value() < maxValue() && reverseScrolling
+        }
 
         val xScrollState =
             semanticsNode.unmergedConfig.getOrNull(SemanticsProperties.HorizontalScrollAxisRange)
@@ -760,7 +764,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                             AccessibilityActionCompat.ACTION_SCROLL_LEFT
                         }
                     )
-                } else {
+                }
+                if (xScrollState.canScrollBackward()) {
                     info.addAction(AccessibilityActionCompat.ACTION_SCROLL_BACKWARD)
                     info.addAction(
                         if (!semanticsNode.isRtl) {
@@ -788,7 +793,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 if (yScrollState.canScrollForward()) {
                     info.addAction(AccessibilityActionCompat.ACTION_SCROLL_FORWARD)
                     info.addAction(AccessibilityActionCompat.ACTION_SCROLL_DOWN)
-                } else {
+                }
+                if (yScrollState.canScrollBackward()) {
                     info.addAction(AccessibilityActionCompat.ACTION_SCROLL_BACKWARD)
                     info.addAction(AccessibilityActionCompat.ACTION_SCROLL_UP)
                 }
@@ -1238,7 +1244,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             AccessibilityNodeInfoCompat.ACTION_FOCUS -> {
                 if (node.unmergedConfig.getOrNull(SemanticsProperties.Focused) == false) {
                     node.layoutNode.outerLayoutNodeWrapper.findLastFocusWrapper()
-                        ?.requestFocus(propagateFocus = false) ?: return false
+                        ?.requestFocus() ?: return false
                     return true
                 } else {
                     return false
@@ -1545,7 +1551,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         sendEventForVirtualView(previousVirtualViewId, AccessibilityEvent.TYPE_VIEW_HOVER_EXIT)
     }
 
-    override fun getAccessibilityNodeProvider(host: View?): AccessibilityNodeProviderCompat {
+    override fun getAccessibilityNodeProvider(host: View): AccessibilityNodeProviderCompat {
         return nodeProvider
     }
 

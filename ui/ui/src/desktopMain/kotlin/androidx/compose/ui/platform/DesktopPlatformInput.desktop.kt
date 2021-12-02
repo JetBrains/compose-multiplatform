@@ -47,7 +47,7 @@ internal actual interface PlatformInputComponent {
     val density: Density
 }
 
-internal actual class PlatformInput actual constructor (val component: PlatformComponent) :
+internal actual class PlatformInput actual constructor(val component: PlatformComponent) :
     PlatformTextInputService {
     data class CurrentInput(
         var value: TextFieldValue,

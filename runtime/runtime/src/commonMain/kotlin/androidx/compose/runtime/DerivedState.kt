@@ -56,6 +56,8 @@ private typealias DerivedStateObservers = Pair<(DerivedState<*>) -> Unit, (Deriv
 
 private val derivedStateObservers = SnapshotThreadLocal<PersistentList<DerivedStateObservers>>()
 
+private val isCalculationBlockRunning = SnapshotThreadLocal<Boolean>()
+
 private class DerivedSnapshotState<T>(
     private val calculation: () -> T
 ) : StateObject, DerivedState<T> {
@@ -105,16 +107,25 @@ private class DerivedSnapshotState<T>(
             @Suppress("UNCHECKED_CAST")
             return readable
         }
+        val nestedCalculationBlockCall = isCalculationBlockRunning.get() ?: false
+
         val newDependencies = HashSet<StateObject>()
         val result = notifyObservers(this) {
-            Snapshot.observe(
+            if (!nestedCalculationBlockCall) {
+                isCalculationBlockRunning.set(true)
+            }
+            val result = Snapshot.observe(
                 {
                     if (it === this)
-                        error("A derived state cannot calculation cannot read itself")
+                        error("A derived state calculation cannot read itself")
                     if (it is StateObject) newDependencies.add(it)
                 },
                 null, calculation
             )
+            if (!nestedCalculationBlockCall) {
+                isCalculationBlockRunning.set(false)
+            }
+            result
         }
 
         val written = sync {
@@ -125,7 +136,9 @@ private class DerivedSnapshotState<T>(
             writable.result = result
             writable
         }
-        Snapshot.notifyObjectsInitialized()
+        if (!nestedCalculationBlockCall) {
+            Snapshot.notifyObjectsInitialized()
+        }
 
         return written
     }

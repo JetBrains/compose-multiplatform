@@ -678,17 +678,18 @@ private fun Track(
             trackStrokeWidth,
             StrokeCap.Round
         )
-        tickFractions.groupBy { it > positionFractionEnd }.forEach { (afterFraction, list) ->
-            drawPoints(
-                list.map {
-                    Offset(lerp(sliderStart, sliderEnd, it).x, center.y)
-                },
-                PointMode.Points,
-                (if (afterFraction) inactiveTickColor else activeTickColor).value,
-                trackStrokeWidth,
-                StrokeCap.Round
-            )
-        }
+        tickFractions.groupBy { it > positionFractionEnd || it < positionFractionStart }
+            .forEach { (outsideFraction, list) ->
+                drawPoints(
+                    list.map {
+                        Offset(lerp(sliderStart, sliderEnd, it).x, center.y)
+                    },
+                    PointMode.Points,
+                    (if (outsideFraction) inactiveTickColor else activeTickColor).value,
+                    trackStrokeWidth,
+                    StrokeCap.Round
+                )
+            }
     }
 }
 

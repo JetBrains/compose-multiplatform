@@ -20,7 +20,6 @@ package androidx.compose.foundation.gestures
 
 import androidx.compose.foundation.DesktopPlatform
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.input.mouse.MouseScrollOrientation
@@ -42,7 +41,6 @@ internal val LocalMouseScrollConfig = compositionLocalOf { MouseScrollableConfig
 // TODO(demin): implement touchpad bounce physics on MacOS
 // TODO(demin): maybe we need to differentiate different linux environments (Gnome/KDE)
 // TODO(demin): do we need support real line scrolling (i.e. scroll by 3 text lines)?
-@OptIn(ExperimentalComposeUiApi::class)
 internal actual fun Modifier.mouseScrollable(
     orientation: Orientation,
     onScroll: (Float) -> Unit
@@ -65,7 +63,6 @@ internal actual fun Modifier.mouseScrollable(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 private fun isOrientationEqual(
     orientation: Orientation,
     mouseOrientation: MouseScrollOrientation
@@ -77,7 +74,6 @@ private fun isOrientationEqual(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 private fun MouseScrollableConfig.offsetOf(
     unit: MouseScrollUnit,
     bounds: Int,

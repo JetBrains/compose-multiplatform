@@ -25,7 +25,6 @@ plugins {
 dependencies {
     compileOnly(libs.androidLintApi)
     compileOnly(libs.kotlinStdlib)
-    api(project(":lint-checks"))
     implementation(project(":compose:lint:common"))
 
     testImplementation(project(":compose:lint:common-test"))

@@ -17,6 +17,8 @@
 package androidx.compose.ui.focus
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.modifier.ModifierLocalProvider
+import androidx.compose.ui.modifier.ProvidableModifierLocal
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
@@ -34,10 +36,12 @@ interface FocusEventModifier : Modifier.Element {
 internal class FocusEventModifierImpl(
     val onFocusEvent: (FocusState) -> Unit,
     inspectorInfo: InspectorInfo.() -> Unit
-) : FocusEventModifier, InspectorValueInfo(inspectorInfo) {
+) : FocusEventModifier, ModifierLocalProvider<Boolean>, InspectorValueInfo(inspectorInfo) {
     override fun onFocusEvent(focusState: FocusState) {
         onFocusEvent.invoke(focusState)
     }
+    override val key: ProvidableModifierLocal<Boolean> get() = ModifierLocalHasFocusEventListener
+    override val value: Boolean get() = true
 }
 
 /**

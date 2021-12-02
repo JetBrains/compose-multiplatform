@@ -653,11 +653,20 @@ internal class LayoutNode(
             val addedCallback = hasNewPositioningCallback()
             onPositionedCallbacks?.clear()
 
+            innerLayoutNodeWrapper.onInitialize()
+
             // Create a new chain of LayoutNodeWrappers, reusing existing ones from wrappers
             // when possible.
             val outerWrapper = modifier.foldOut(innerLayoutNodeWrapper) { mod, toWrap ->
                 if (mod is RemeasurementModifier) {
                     mod.onRemeasurementAvailable(this)
+                }
+
+                if (mod is DrawModifier) {
+                    val drawEntity = DrawEntity(toWrap, mod)
+                    drawEntity.next = toWrap.drawEntityHead
+                    toWrap.drawEntityHead = drawEntity
+                    drawEntity.onInitialize()
                 }
 
                 // Re-use the layoutNodeWrapper if possible.
@@ -685,10 +694,6 @@ internal class LayoutNode(
                     wrapper = ModifierLocalConsumerNode(wrapper, mod)
                         .initialize()
                         .assignChained(toWrap)
-                }
-                if (mod is DrawModifier) {
-                    wrapper = ModifiedDrawNode(wrapper, mod)
-                        .initialize()
                 }
                 if (mod is FocusModifier) {
                     wrapper = ModifiedFocusNode(wrapper, mod)
@@ -1176,8 +1181,23 @@ internal class LayoutNode(
         val infoList = mutableVectorOf<ModifierInfo>()
         forEachDelegate { wrapper ->
             wrapper as DelegatingLayoutNodeWrapper<*>
-            val info = ModifierInfo(wrapper.modifier, wrapper, wrapper.layer)
+            val layer = wrapper.layer
+            val info = ModifierInfo(wrapper.modifier, wrapper, layer)
             infoList += info
+            var node = wrapper.drawEntityHead // head
+            while (node != null) {
+                infoList += ModifierInfo(node.modifier, wrapper, layer)
+                node = node.next
+            }
+        }
+        var innerNode = innerLayoutNodeWrapper.drawEntityHead
+        while (innerNode != null) {
+            infoList += ModifierInfo(
+                innerNode.modifier,
+                innerLayoutNodeWrapper,
+                innerLayoutNodeWrapper.layer
+            )
+            innerNode = innerNode.next
         }
         return infoList.asMutableList()
     }
@@ -1243,7 +1263,9 @@ internal class LayoutNode(
     private fun copyWrappersToCache() {
         forEachDelegate {
             wrapperCache += it as DelegatingLayoutNodeWrapper<*>
+            it.drawEntityHead = null
         }
+        innerLayoutNodeWrapper.drawEntityHead = null
     }
 
     private fun markReusedModifiers(modifier: Modifier) {
@@ -1330,7 +1352,7 @@ internal class LayoutNode(
         forEachDelegateIncludingInner {
             if (it.layer != null) {
                 return false
-            } else if (it is ModifiedDrawNode) {
+            } else if (it.drawEntityHead != null) {
                 return true
             }
         }

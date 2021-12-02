@@ -46,7 +46,10 @@ actual data class PointerEvent internal constructor(
     internal actual constructor(
         changes: List<PointerInputChange>,
         internalPointerEvent: InternalPointerEvent?
-    ) : this(changes, internalPointerEvent?.mouseEvent) {
+    ) : this(
+        changes,
+        internalPointerEvent?.mouseEvent
+    ) {
         this.type = internalPointerEvent?.type ?: PointerEventType.Unknown
     }
 
@@ -57,7 +60,10 @@ actual data class PointerEvent internal constructor(
     /**
      * @param changes The changes.
      */
-    actual constructor(changes: List<PointerInputChange>) : this(changes, mouseEvent = null)
+    actual constructor(changes: List<PointerInputChange>) : this(
+        changes,
+        mouseEvent = null
+    )
 
     actual var type: PointerEventType = PointerEventType.Unknown
         internal set
