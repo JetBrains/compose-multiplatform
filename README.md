@@ -42,7 +42,8 @@ Preview functionality (check your application UI without building/running it) fo
        * [Building native distribution](tutorials/Native_distributions_and_local_execution)
        * [Signing and notarization](tutorials/Signing_and_notarization_on_macOS)
        * [Swing interoperability](tutorials/Swing_Integration)
-       * [Navigation](tutorials/Navigation)
+       * [Development for Android](tutorials/Development_for_Android)
+       * 
    * [components](components) - custom components of Compose Multiplatform
        * [Split Pane](components/SplitPane)
    * [experimental](experimental) - experimental components and examples
