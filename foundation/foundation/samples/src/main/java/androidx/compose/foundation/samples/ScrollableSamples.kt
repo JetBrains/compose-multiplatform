@@ -47,6 +47,8 @@ fun ScrollableSample() {
                 orientation = Orientation.Vertical,
                 // state for Scrollable, describes how consume scroll amount
                 state = rememberScrollableState { delta ->
+                    // use the scroll data and indicate how much this element consumed.
+                    // unconsumed deltas will be propagated to nested scrollables (if present)
                     offset.value = offset.value + delta // update the state
                     delta // indicate that we consumed all the pixels available
                 }
@@ -54,6 +56,10 @@ fun ScrollableSample() {
             .background(Color.LightGray),
         contentAlignment = Alignment.Center
     ) {
+        // Modifier.scrollable is not opinionated about its children's layouts. It will however
+        // promote nested scrolling capabilities if those children also use the modifier.
+        // The modifier will not change any layouts so one must handle any desired changes through
+        // the delta values in the scrollable state
         Text(offset.value.roundToInt().toString(), style = TextStyle(fontSize = 32.sp))
     }
 }
