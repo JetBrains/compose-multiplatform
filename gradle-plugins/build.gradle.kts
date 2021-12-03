@@ -1,7 +1,6 @@
 import com.gradle.publish.PluginBundleExtension
 
 plugins {
-    // __KOTLIN_COMPOSE_VERSION__
     kotlin("jvm") version "1.5.10" apply false
     id("com.gradle.plugin-publish") version "0.17.0" apply false
 }

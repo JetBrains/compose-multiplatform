@@ -50,18 +50,31 @@ fun cloneTemplate(template: String, index: Int, content: String): File {
   return tempDir
 }
 
+@OptIn(ExperimentalStdlibApi::class)
 fun checkDirs(dirs: List<String>, template: String, buildCmd: String = "build") {
   val snippets = findSnippets(dirs)
   snippets.forEachIndexed { index, snippet ->
     println("process snippet $index at ${snippet.file}:${snippet.lineNumber} with $template")
     snippet.tempDir = cloneTemplate(template, index, snippet.content)
     val isWin = System.getProperty("os.name").startsWith("Win")
-    val procBuilder = if (isWin) {
-        ProcessBuilder("gradlew.bat",  "$buildCmd")
-    } else {
-        ProcessBuilder("bash", "./gradlew", "$buildCmd")
+    val args = buildList {
+        if (isWin) {
+            add("gradlew.bat")
+        } else {
+            add("bash")
+            add("./gradlew")
+        }
+
+        add(buildCmd)
+
+        project.findProperty("kotlin.version")?.also {
+            add("-Pkotlin.version=$it")
+        }
+        project.findProperty("compose.version")?.also {
+            add("-Pcompose.version=$it")
+        }
     }
-    val proc = procBuilder
+    val proc = ProcessBuilder(*args.toTypedArray())
       .directory(snippet.tempDir)
       .redirectOutput(ProcessBuilder.Redirect.PIPE)
       .redirectError(ProcessBuilder.Redirect.PIPE)

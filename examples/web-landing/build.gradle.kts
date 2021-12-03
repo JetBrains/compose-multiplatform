@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
 
 plugins {
-    kotlin("multiplatform") version "1.5.31"
-    id("org.jetbrains.compose") version "1.0.0"
+    kotlin("multiplatform")
+    id("org.jetbrains.compose")
 }
 
 repositories {

@@ -1,17 +1,16 @@
 package org.jetbrains.compose.common.demo
 
-import androidx.compose.desktop.Window
-import androidx.compose.ui.unit.IntSize
-import org.jetbrains.compose.demo.falling.views.fallingBalls
-import org.jetbrains.compose.demo.falling.Game
 import androidx.compose.runtime.remember
+import androidx.compose.ui.window.singleWindowApplication
+import org.jetbrains.compose.demo.falling.Game
+import org.jetbrains.compose.demo.falling.views.fallingBalls
 
 class JvmGame : Game() {
     override fun now() = System.nanoTime()
 }
 
 fun main() {
-    Window(title = "Demo", size = IntSize(600, 400)) {
+    singleWindowApplication(title = "Demo") {
         fallingBalls(
             remember {
                 JvmGame().apply {

@@ -4,9 +4,7 @@ import de.undercouch.gradle.tasks.download.Download
 import kotlin.text.capitalize
 
 plugins {
-    // __KOTLIN_COMPOSE_VERSION__
     kotlin("jvm") version "1.5.21"
-    // __LATEST_COMPOSE_RELEASE_VERSION__
     id("org.jetbrains.compose") version "1.0.0-alpha1"
     id("de.undercouch.download") version "4.1.1"
     application

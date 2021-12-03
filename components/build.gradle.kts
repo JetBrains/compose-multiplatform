@@ -1,19 +1,3 @@
-buildscript {
-    val composeVersion = property("compose.version")
-
-    repositories {
-        google()
-        mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    }
-
-    dependencies {
-        classpath("org.jetbrains.compose:compose-gradle-plugin:$composeVersion")
-        // __KOTLIN_COMPOSE_VERSION__
-        classpath(kotlin("gradle-plugin", version = "1.5.31"))
-    }
-}
-
 subprojects {
     version = findProperty("deploy.version") ?: property("compose.version")!!
 

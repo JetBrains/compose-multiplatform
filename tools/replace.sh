@@ -1,13 +1,51 @@
 #!/bin/bash
+
+# Replace hard-coded Compose version in Compose repo projects. Usage: ./replace.sh 1.0.0-rc6
+
 ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"/..
-COMPOSE_OLDVER=0.4.0-rc2
-COMPOSE_NEWVER=0.4.0
-find -E $ROOT  -regex '.*\.(kts|properties|kt)' -exec sed -i '' -e "s/$COMPOSE_OLDVER/$COMPOSE_NEWVER/g" {} \;
-APPCOMPAT_OLDVER=1.1.0
-APPCOMPAT_NEWVER=1.3.0-beta01
-find -E $ROOT  -regex '.*\.(kts|properties|kt)' -exec sed -i '' -e "s/$APPCOMPAT_OLDVER/$APPCOMPAT_NEWVER/g" {} \;
-KOTLIN_OLDVER=1.5.10
-KOTLIN_NEWVER=1.5.10
-find -E $ROOT  -regex '.*\.(kts|properties|kt)' -exec sed -i '' -e "s/$KOTLIN_OLDVER/$KOTLIN_NEWVER/g" {} \;
-git grep -C 1 __KOTLIN_COMPOSE_VERSION__ $ROOT
-git grep -C 1 __LATEST_COMPOSE_RELEASE_VERSION__ $ROOT
+
+# Add folders which should contain up-to-date versions
+declare -a folders=(
+    "templates"
+    "examples"
+    "gradle-plugins"
+    "components"
+    "ci"
+    "web"
+    "tutorials"
+)
+
+if [ -z "$@" ]; then
+echo "Specify Compose version. For example: ./replace.sh 1.0.0-rc6"
+exit 1
+fi
+COMPOSE_VERSION=$@
+
+if [[ $OSTYPE == 'darwin'* ]]; then
+    SED=gsed
+else
+    SED=sed
+fi
+
+replaceCompose() {
+    $SED -i -e "s/$1/$2/g" $3
+}
+
+replaceComposeInFile() {
+    echo "Replace in $1"
+    replaceCompose '^compose.version=.*' 'compose.version='"$COMPOSE_VERSION"'' $1
+    replaceCompose '^COMPOSE_CORE_VERSION=.*' 'COMPOSE_CORE_VERSION='"$COMPOSE_VERSION"'' $1
+    replaceCompose '^COMPOSE_WEB_VERSION=.*' 'COMPOSE_WEB_VERSION='"$COMPOSE_VERSION"'' $1
+    replaceCompose 'id("org.jetbrains.compose") version ".*"' 'id("org.jetbrains.compose") version "'"$COMPOSE_VERSION"'"' $1
+    replaceCompose '"org.jetbrains.compose:compose-gradle-plugin:.*"' '"org.jetbrains.compose:compose-gradle-plugin:'"$COMPOSE_VERSION"'"' $1
+}
+
+replaceComposeInFolder() {
+    find $ROOT/$1 -wholename $2 -not -path "**/build**" -not -path "**/.gradle**" | while read file; do replaceComposeInFile "$file"; done
+}
+
+for folder in "${folders[@]}"
+do
+   replaceComposeInFolder $folder "**gradle.properties"
+   replaceComposeInFolder $folder "**README.md"
+done
