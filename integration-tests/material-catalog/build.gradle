@@ -29,8 +29,8 @@ plugins {
 android {
     defaultConfig {
         applicationId "androidx.compose.material.catalog"
-        versionCode 2000
-        versionName "2.0.0"
+        versionCode 2001
+        versionName "2.0.1"
     }
     buildTypes {
         release {
