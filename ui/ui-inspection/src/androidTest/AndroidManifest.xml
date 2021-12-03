@@ -21,6 +21,8 @@
         <activity android:name="androidx.compose.ui.inspection.testdata.DialogTestActivity" />
         <activity android:name="androidx.compose.ui.inspection.testdata.ParametersTestActivity" />
         <activity android:name="androidx.compose.ui.inspection.testdata.RippleTestActivity" />
+        <activity android:name="androidx.compose.ui.inspection.testdata.RecompositionTestActivity"
+            />
         <activity android:name="androidx.compose.ui.inspection.testdata.TestActivity"
             android:theme="@style/TestTheme"/>
     </application>
