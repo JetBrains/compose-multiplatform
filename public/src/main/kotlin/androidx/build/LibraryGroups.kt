@@ -135,6 +135,8 @@ data class LibraryGroup(
     val group: String = "unspecified",
     val forcedVersion: Version?,
 ) : java.io.Serializable {
+
+    // Denotes if the LibraryGroup is atomic
     val requireSameVersion = (forcedVersion != null)
 
     companion object {
