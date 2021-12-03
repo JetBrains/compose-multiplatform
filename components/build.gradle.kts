@@ -1,5 +1,6 @@
 buildscript {
-    val composeVersion = property("compose.version")
+    val kotlinVersion by settings("kotlin.version")
+    val composeVersion by settings("compose.version")
 
     repositories {
         google()
@@ -9,7 +10,6 @@ buildscript {
 
     dependencies {
         classpath("org.jetbrains.compose:compose-gradle-plugin:$composeVersion")
-        // __KOTLIN_COMPOSE_VERSION__
         classpath(kotlin("gradle-plugin", version = "1.5.31"))
     }
 }

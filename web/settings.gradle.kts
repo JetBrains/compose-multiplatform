@@ -14,11 +14,13 @@ pluginManagement {
 
     resolutionStrategy {
         eachPlugin {
+            val kotlinVersion = extra["kotlin.version"] as String
+            val composeVersion = extra["compose.version"] as String
             if (requested.id.id == "org.jetbrains.compose") {
-                println("[build] compose core version: ${extra["COMPOSE_CORE_VERSION"]}")
-                useModule("org.jetbrains.compose:org.jetbrains.compose.gradle.plugin:${extra["COMPOSE_CORE_VERSION"]}")
+                println("[build] compose core version: $composeVersion")
+                useModule("org.jetbrains.compose:org.jetbrains.compose.gradle.plugin:${extra["compose.version"]}")
             } else if (requested.id.id == "org.jetbrains.kotlin.multiplatform") {
-                useModule("org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin:1.5.31")
+                useModule("org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin:$kotlinVersion")
             }
         }
     }

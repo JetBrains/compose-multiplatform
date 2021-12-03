@@ -1,8 +1,8 @@
 import org.gradle.api.tasks.testing.AbstractTestTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
-val COMPOSE_CORE_VERSION: String by project
-val COMPOSE_WEB_VERSION: String by project
+val COMPOSE_CORE_VERSION: String = project.property("compose.version")!!.toString()
+val COMPOSE_WEB_VERSION: String = project.property("compose.version")!!.toString()
 val COMPOSE_REPO_USERNAME: String? by project
 val COMPOSE_REPO_KEY: String? by project
 val COMPOSE_WEB_BUILD_WITH_SAMPLES = project.property("compose.web.buildSamples")!!.toString().toBoolean()
