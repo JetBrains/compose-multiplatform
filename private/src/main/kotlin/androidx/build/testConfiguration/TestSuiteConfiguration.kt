@@ -98,7 +98,7 @@ fun Project.createTestConfigurationGenerationTask(
                 detector.getSubset(task)
             }
         )
-        AffectedModuleDetector.configureTaskGuard(task)
+        AffectedModuleDetector.configureTaskGuard(task, allowSkippingForVersionBumps = true)
     }
     // Disable xml generation for projects that have no test sources
     this.afterEvaluate {
@@ -187,7 +187,7 @@ private fun getOrCreateMediaTestConfigTask(project: Project, isMedia2: Boolean):
                 "support-$mediaPrefix-test${AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK}",
                 GenerateMediaTestConfigurationTask::class.java
             ) { task ->
-                AffectedModuleDetector.configureTaskGuard(task)
+                AffectedModuleDetector.configureTaskGuard(task, allowSkippingForVersionBumps = true)
                 val detector = AffectedModuleDetector.getInstance(project)
                 task.affectedModuleDetectorSubset.set(
                     project.provider {
@@ -284,7 +284,7 @@ fun Project.createOrUpdateMediaTestConfigurationGenerationTask(
         )
         it.minSdk.set(minSdk)
         it.testRunner.set(testRunner)
-        AffectedModuleDetector.configureTaskGuard(it)
+        AffectedModuleDetector.configureTaskGuard(it, allowSkippingForVersionBumps = true)
     }
 }
 
@@ -338,7 +338,7 @@ private fun Project.configureMacrobenchmarkConfigTask(
                 }
             )
 
-            AffectedModuleDetector.configureTaskGuard(task)
+            AffectedModuleDetector.configureTaskGuard(task, allowSkippingForVersionBumps = true)
         }
         // Disable xml generation for projects that have no test sources
         this.afterEvaluate {
