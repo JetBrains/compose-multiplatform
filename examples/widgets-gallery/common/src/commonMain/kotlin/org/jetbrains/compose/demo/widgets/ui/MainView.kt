@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.compose.material.LocalContentColor
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -32,8 +32,8 @@ import org.jetbrains.compose.demo.widgets.ui.utils.withoutWidthConstraints
 
 @Composable
 fun MainView() {
-    DisableSelection {
-        WidgetGalleryTheme {
+    WidgetGalleryTheme {
+        Surface {
             WidgetsPanel()
         }
     }
