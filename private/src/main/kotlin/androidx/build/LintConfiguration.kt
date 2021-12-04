@@ -233,7 +233,15 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension) {
         // We run lint on each library, so we don't want transitive checking of each dependency
         checkDependencies = false
 
-        fatal.add("VisibleForTests")
+        if (
+            extension.type == LibraryType.PUBLISHED_TEST_LIBRARY ||
+            extension.type == LibraryType.INTERNAL_TEST_LIBRARY
+        ) {
+            // Test libraries are allowed to call @VisibleForTests code
+            disable.add("VisibleForTests")
+        } else {
+            fatal.add("VisibleForTests")
+        }
 
         // Disable dependency checks that suggest to change them. We want libraries to be
         // intentional with their dependency version bumps.
