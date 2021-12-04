@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.test
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
@@ -56,7 +55,6 @@ fun SemanticsNodeInteraction.captureToImage(): ImageBitmap {
         )
     }
 
-    @SuppressLint("VisibleForTests")
     val view = (node.root as ViewRootForTest).view
 
     // If we are in dialog use its window to capture the bitmap
