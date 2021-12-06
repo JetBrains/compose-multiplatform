@@ -1,20 +1,23 @@
-object Deps {
 
+// We store Kotlin and Compose versions in gradle.properties to 
+// be able to override them on CI.
+// You probably won't need this, so you can get rid of `project` in this file.
+import org.gradle.api.Project
+
+object Deps {
     object JetBrains {
-        object Kotlin {
-            // __KOTLIN_COMPOSE_VERSION__
-            private const val VERSION = "1.5.31"
-            const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$VERSION"
-            const val testCommon = "org.jetbrains.kotlin:kotlin-test-common:$VERSION"
-            const val testJunit = "org.jetbrains.kotlin:kotlin-test-junit:$VERSION"
-            const val testJs = "org.jetbrains.kotlin:kotlin-test-js:$VERSION"
-            const val testAnnotationsCommon = "org.jetbrains.kotlin:kotlin-test-annotations-common:$VERSION"
+        class Kotlin(private val project: Project) {
+            private val VERSION = project.properties["kotlin.version"]
+            val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$VERSION"
+            val testCommon = "org.jetbrains.kotlin:kotlin-test-common:$VERSION"
+            val testJunit = "org.jetbrains.kotlin:kotlin-test-junit:$VERSION"
+            val testJs = "org.jetbrains.kotlin:kotlin-test-js:$VERSION"
+            val testAnnotationsCommon = "org.jetbrains.kotlin:kotlin-test-annotations-common:$VERSION"
         }
 
-        object Compose {
-            // __LATEST_COMPOSE_RELEASE_VERSION__
-            private const val VERSION = "1.0.0"
-            const val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
+        class Compose(private val project: Project) {
+            private val VERSION = project.properties["compose.version"]
+            val gradlePlugin = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
         }
     }
 
