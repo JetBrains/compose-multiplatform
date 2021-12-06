@@ -78,13 +78,13 @@ abstract class AffectedModuleDetector(
     /**
      * Returns whether this project was affected by current changes.
      */
-    abstract fun shouldInclude(project: String): Boolean
+    abstract fun shouldInclude(project: String, allowSkippingForVersionBumps: Boolean): Boolean
 
     /**
      * Returns whether this task was affected by current changes.
      */
-    open fun shouldInclude(task: Task): Boolean {
-        val include = shouldInclude(task.project.path)
+    open fun shouldInclude(task: Task, allowSkippingForVersionBumps: Boolean): Boolean {
+        val include = shouldInclude(task.project.path, allowSkippingForVersionBumps)
         val inclusionVerb = if (include) "Including" else "Excluding"
         logger?.info(
             "$inclusionVerb task ${task.path}"
@@ -195,10 +195,10 @@ abstract class AffectedModuleDetector(
          */
         @Throws(GradleException::class)
         @JvmStatic
-        fun configureTaskGuard(task: Task) {
+        fun configureTaskGuard(task: Task, allowSkippingForVersionBumps: Boolean = false) {
             val detector = getInstance(task.project)
             task.onlyIf {
-                detector.shouldInclude(task)
+                detector.shouldInclude(task, allowSkippingForVersionBumps)
             }
         }
     }
@@ -234,11 +234,11 @@ class AffectedModuleDetectorWrapper : AffectedModuleDetector(logger = null) {
     override fun getSubset(projectPath: String): ProjectSubset {
         return getOrThrow().getSubset(projectPath)
     }
-    override fun shouldInclude(project: String): Boolean {
-        return getOrThrow().shouldInclude(project)
+    override fun shouldInclude(project: String, allowSkippingForVersionBumps: Boolean): Boolean {
+        return getOrThrow().shouldInclude(project, allowSkippingForVersionBumps)
     }
-    override fun shouldInclude(task: Task): Boolean {
-        return getOrThrow().shouldInclude(task)
+    override fun shouldInclude(task: Task, allowSkippingForVersionBumps: Boolean): Boolean {
+        return getOrThrow().shouldInclude(task, allowSkippingForVersionBumps)
     }
 }
 
@@ -264,6 +264,10 @@ abstract class AffectedModuleDetectorLoader :
 
     val detector: AffectedModuleDetector by lazy {
         val logger = FileLogger(parameters.log)
+        val versionsFile = File(parameters.rootDir, AffectedModuleDetectorImpl.libraryVersions)
+        if (!versionsFile.exists()) {
+            throw GradleException("${versionsFile.absolutePath} seems to be missing. Did it move?")
+        }
         if (parameters.acceptAll) {
             AcceptAll(null)
         } else {
@@ -301,7 +305,7 @@ abstract class AffectedModuleDetectorLoader :
 private class AcceptAll(
     logger: Logger? = null
 ) : AffectedModuleDetector(logger) {
-    override fun shouldInclude(project: String): Boolean {
+    override fun shouldInclude(project: String, allowSkippingForVersionBumps: Boolean): Boolean {
         logger?.info("[AcceptAll] acceptAll.shouldInclude returning true")
         return true
     }
@@ -357,6 +361,18 @@ class AffectedModuleDetectorImpl constructor(
     // Files tracked by git that are not expected to effect the build, thus require no consideration
     private var ignoredFiles: MutableSet<String> = mutableSetOf()
 
+    private val onlyVersionBumpFiles: Boolean by lazy {
+        val changedFiles = changedFilesProvider() ?: return@lazy false
+        for (filePath in changedFiles) {
+            if (!(filePath == libraryVersions ||
+                    filePath.endsWith("txt") && filePath.contains("/api/"))
+            ) {
+                return@lazy false
+            }
+        }
+        true
+    }
+
     val buildAll by lazy {
         shouldBuildAll()
     }
@@ -365,11 +381,11 @@ class AffectedModuleDetectorImpl constructor(
         lookupProjectSetsFromPaths(cobuiltTestPaths)
     }
 
-    private val buildContainsNonProjectFileChanges by lazy {
-        unknownFiles.isNotEmpty()
-    }
-
-    override fun shouldInclude(project: String): Boolean {
+    override fun shouldInclude(project: String, allowSkippingForVersionBumps: Boolean): Boolean {
+        if (project != ":" && allowSkippingForVersionBumps && onlyVersionBumpFiles) {
+            logger?.info("Skipping a task for $project as only version bump files changed")
+            return false
+        }
         return if (project == ":" || buildAll) {
             true
         } else {
@@ -538,6 +554,8 @@ class AffectedModuleDetectorImpl constructor(
     }
 
     companion object {
+        val libraryVersions = "buildSrc/public/src/main/kotlin/androidx/build/LibraryVersions.kt"
+
         // Project paths that we always build if they exist
         val ALWAYS_BUILD_IF_EXISTS = setOf(
             // placeholder test project to ensure no failure due to no instrumentation.
