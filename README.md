@@ -43,6 +43,13 @@ Preview functionality (check your application UI without building/running it) fo
        * [Signing and notarization](tutorials/Signing_and_notarization_on_macOS)
        * [Swing interoperability](tutorials/Swing_Integration)
        * [Development for Android](tutorials/Development_for_Android)
+   * [tutorials: compose for web](tutorials/Web) - tutorials on using Compose for Web
+       * [Getting started with Compose for Web](tutorials/Web/Getting_Started) 
+       * [Building web UI](tutorials/Web/Building_UI)
+       * [Handling Events](tutorials/Web/Events_Handling)
+       * [Controlled and Uncontrolled inputs](tutorials/Web/Controlled_Uncontrolled_Inputs)
+       * [Style DSL](tutorials/Web/Style_Dsl)
+       * [Using test-utils](tutorials/Web/Using_Test_Utils)
    * [components](components) - custom components of Compose Multiplatform
        * [Split Pane](components/SplitPane)
    * [experimental](experimental) - experimental components and examples
