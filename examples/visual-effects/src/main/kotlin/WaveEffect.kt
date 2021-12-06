@@ -1,4 +1,5 @@
-// Copyright 2000-2021 JetBrains s.r.o. and contributors. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file.
+package org.jetbrains.compose.demo.visuals
+
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -10,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerMoveFilter
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -18,18 +18,6 @@ import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 import kotlin.math.*
-
-@Composable
-@Preview
-fun App() {
-//    var text by remember { mutableStateOf("Hello, World\t!") }
-//    Column {
-//        Text(text)
-//        TextField(text, {text = it})
-//    }
-    val lol = remember { mutableStateOf("") }
-    OutlinedTextField(lol.value, onValueChange = { lol.value = it })
-}
 
 class ColorSettings {
     var enabled by mutableStateOf(true)
@@ -47,26 +35,25 @@ class State {
     }
 }
 
-fun main() = application {
-    content(::exitApplication)
-}
+
 
 @Composable
-fun content(onCloseRequest: () -> Unit) {
+fun WaveEffect(onCloseRequest: () -> Unit, showControls: Boolean) {
     var windowState = remember { WindowState(width = 1200.dp, height = 800.dp) }
     Window(onCloseRequest = {}, undecorated = true, transparent = true, state = windowState) {
         Grid()
     }
 
-
-    Window(
-        onCloseRequest = onCloseRequest,
-        state = WindowState(width = 200.dp, height = 400.dp, position = WindowPosition(1400.dp, 200.dp))
-    ) {
-        Column {
-            settingPanel(State.red, "Red")
-            settingPanel(State.green, "Green")
-            settingPanel(State.blue, "Blue")
+    if (showControls) {
+        Window(
+            onCloseRequest = onCloseRequest,
+            state = WindowState(width = 200.dp, height = 400.dp, position = WindowPosition(1400.dp, 200.dp))
+        ) {
+            Column {
+                settingPanel(State.red, "Red")
+                settingPanel(State.green, "Green")
+                settingPanel(State.blue, "Blue")
+            }
         }
     }
 }
@@ -128,10 +115,9 @@ fun Grid() {
         color = Color(0, 0, 0),
         shape = RoundedCornerShape(20.dp)
     ) {
-        with(LocalDensity.current) {
             Box(Modifier.fillMaxSize()) {
-                var x = 10 //initial position
-                var y = 10 //initial position
+                var x = 10 // initial position
+                var y = 10 // initial position
                 val shift = 25
                 var evenRow = false
                 var pointerOffsetX = (centerX / 2)
@@ -140,37 +126,15 @@ fun Grid() {
                     x = if (evenRow) 10 + shift else 10
                     while (x < 1190) {
                         var size: Int = size(x, y, time, pointerOffsetX, pointerOffsety)
-//                        var color = color(x, y, time, pointerOffsetX, pointerOffsety)
                         var color = color3(x, y, time, pointerOffsetX, pointerOffsety)
                         dot(size, Modifier.offset(x.dp, y.dp), color, time)
-                        x = x + shift * 2
+                        x += shift * 2
                     }
-                    y = y + shift
+                    y += shift
                     evenRow = !evenRow
                 }
-                var angle = (time.toDouble() / (6 * 10000000)) % 360
-                var alpha = (1.5 + sin(time.toDouble() / (10 * 100000000))) / 2.5
-                var scale = 0.5 + ((time.toDouble() / (12 * 10000000)) % 100) / 20
-                var scale1 = if (scale - 1 > 0.5) (scale - 1) else scale + 2
-                var scale2 = if (scale - 2 > 0.5) (scale - 2) else scale + 1
-
-//                for (i in 0..10) {
-//                    Text("Compose",
-//                        androidx.compose.ui.Modifier.offset(200.dp, 400.dp).rotate((-angle+9*i).toFloat())
-//                            .scale((scale-i.toFloat()/2).toFloat()).alpha((exp(-1*i.toFloat()/2))),
-//                        color = Color.White, fontWeight = FontWeight.Bold
-//                    )
-//                    Text("Multiplatform", androidx.compose.ui.Modifier.offset(600.dp, 200.dp).rotate(((angle-9*i)).toFloat())
-//                        .scale((scale1-i.toFloat()/2).toFloat()).alpha((exp(-1*i.toFloat()/2))),
-//                        color = Color.White, fontWeight = FontWeight.Bold)
-//                    Text("1.0", androidx.compose.ui.Modifier.offset(1000.dp, 500.dp).rotate((angle-180-9*i).toFloat()).
-//                        scale((scale2-i.toFloat()/2).toFloat()).alpha(exp(-1*i.toFloat()/2)),
-//                        color = Color.White, fontWeight = FontWeight.Bold)
-//                }
-
                 highPanel(pointerOffsetX, pointerOffsety)
             }
-        }
 
         LaunchedEffect(Unit) {
             while (true) {
@@ -257,8 +221,6 @@ fun dot(size: Int, modifier: Modifier, color: Color, time: Long) {
 }
 
 fun size(x: Int, y: Int, time: Long, mouseX: Int, mouseY: Int): Int {
-    var x0 = (200 + time / 4000000) % 1200
-    var y0 = (200 + time / 7000000) % 800
     val addSize = 3
     var result = 5
     if (y > 550 && x < 550) return result
@@ -267,16 +229,12 @@ fun size(x: Int, y: Int, time: Long, mouseX: Int, mouseY: Int): Int {
     val scale: Double = (if (distance2 < 1) {
         addSize * (1 - distance2)
     } else 0.toDouble())
-    result =
-        result /*+ (addSize * (1 + sin(x.toDouble() / 100 - time.toDouble() / (80*10000000)))).toInt()*/ + (if (State.mouseUsed) round(
-            7.5 * scale
-        ).toInt() else 0)
+    result += (if (State.mouseUsed) round(7.5 * scale).toInt() else 0)
     return result
 }
 
-fun color(x: Int, y: Int, time: Long, mouseX: Int, mouseY: Int): Color { //first pattern
-    val distance = sqrt((x - mouseX) * (x - mouseX) + (y - mouseY) * (y - mouseY).toDouble())
-    val fade = 1.0//if (distance < 200) (1 - distance/200) else 0.0
+fun color(x: Int, y: Int, time: Long, mouseX: Int, mouseY: Int): Color {
+    val fade = 1.0
     var red = getColorComponent(x, y, 600, 400, time, State.red, fade)
     var green = getColorComponent(x, y, 600, 400, time, State.green, fade)
     var blue = getColorComponent(x, y, 600, 400, time, State.blue, fade)
@@ -293,7 +251,6 @@ fun getColorComponent(x: Int, y: Int, x0: Int, y0: Int, time: Long, settings: Co
 
 fun color2(x: Int, y: Int, time: Long, mouseX: Int, mouseY: Int): Color { //another pattern
     if (!State.mouseUsed) return Color.White
-//    if (y > 650) return Color.White
     val distance = sqrt(((x - mouseX) * (x - mouseX) + (y - mouseY) * (y - mouseY)).toDouble())
     val fade = exp(-1 * distance * distance / 150000)
     var red =

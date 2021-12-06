@@ -6,5 +6,5 @@ pluginManagement {
     }
     
 }
-rootProject.name = "compose-demo"
+rootProject.name = "visual-effects"
 
