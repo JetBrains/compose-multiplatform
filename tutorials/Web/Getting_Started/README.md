@@ -141,3 +141,25 @@ Or run it from the IDE:
 The browser will open `localhost:8080`:
 
 <img alt="" src="run_result.png" height="500" />
+
+## Common issues when running the project
+
+#### [webpack-cli] Unable to load '@webpack-cli/serve' command
+https://youtrack.jetbrains.com/issue/KT-49124
+```
+[webpack-cli] Unable to load '@webpack-cli/serve' command
+[webpack-cli] TypeError: options.forEach is not a function
+...
+```
+There is a temporary workaround:
+```
+In build.gradle.kts:
+
+// a temporary workaround for a bug in jsRun invocation - see https://youtrack.jetbrains.com/issue/KT-48273
+afterEvaluate {
+    rootProject.extensions.configure<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension> {
+        versions.webpackDevServer.version = "4.0.0"
+        versions.webpackCli.version = "4.9.0"
+    }
+}
+```
