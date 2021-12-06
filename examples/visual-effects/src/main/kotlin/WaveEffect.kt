@@ -16,26 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
-import androidx.compose.ui.window.application
 import kotlin.math.*
-
-class ColorSettings {
-    var enabled by mutableStateOf(true)
-    var waveLength by mutableStateOf(30.0)
-    var simple by mutableStateOf(true)
-    var period by mutableStateOf(80.0)
-}
-
-class State {
-    companion object {
-        var red by mutableStateOf(ColorSettings())
-        var green by mutableStateOf(ColorSettings())
-        var blue by mutableStateOf(ColorSettings())
-        var mouseUsed by mutableStateOf(false)
-    }
-}
-
-
 
 @Composable
 fun WaveEffect(onCloseRequest: () -> Unit, showControls: Boolean) {
@@ -50,31 +31,11 @@ fun WaveEffect(onCloseRequest: () -> Unit, showControls: Boolean) {
             state = WindowState(width = 200.dp, height = 400.dp, position = WindowPosition(1400.dp, 200.dp))
         ) {
             Column {
-                settingPanel(State.red, "Red")
-                settingPanel(State.green, "Green")
-                settingPanel(State.blue, "Blue")
+                SettingsPanel(State.red, "Red")
+                SettingsPanel(State.green, "Green")
+                SettingsPanel(State.blue, "Blue")
             }
         }
-    }
-}
-
-
-@Composable
-fun settingPanel(settings: ColorSettings, name: String) {
-    Row {
-        Text(name)
-        Checkbox(settings.enabled, onCheckedChange = { settings.enabled = it })
-        Checkbox(settings.simple, onCheckedChange = { settings.simple = it })
-        Slider(
-            (settings.waveLength.toFloat() - 10) / 90,
-            { settings.waveLength = 10 + 90 * it.toDouble() },
-            Modifier.width(100.dp)
-        )
-        Slider(
-            (settings.period.toFloat() - 10) / 90,
-            { settings.period = 10 + 90 * it.toDouble() },
-            Modifier.width(100.dp)
-        )
     }
 }
 
@@ -98,7 +59,6 @@ fun Grid() {
         if (centerX > 2600) centerX = 2600
         vX =
             (vX * (1 - (time - prevTime).toDouble() / 500000000) + 10 * (mouseX - centerX) * (time - prevTime) / 1000000000).toInt()
-//        centerY = (centerY + (mouseY - centerY) * (time - prevTime) / 1000000000).toInt()
         centerY = (centerY + vY * (time - prevTime) / 1000000000).toInt()
         if (centerY < -100) centerY = -100
         if (centerY > 1800) centerY = 1800
@@ -125,15 +85,15 @@ fun Grid() {
                 while (y < 790) {
                     x = if (evenRow) 10 + shift else 10
                     while (x < 1190) {
-                        var size: Int = size(x, y, time, pointerOffsetX, pointerOffsety)
-                        var color = color3(x, y, time, pointerOffsetX, pointerOffsety)
-                        dot(size, Modifier.offset(x.dp, y.dp), color, time)
+                        var size: Int = size(x, y, pointerOffsetX, pointerOffsety)
+                        var color = boxColor(x, y, time, pointerOffsetX, pointerOffsety)
+                        Dot(size, Modifier.offset(x.dp, y.dp), color, time)
                         x += shift * 2
                     }
                     y += shift
                     evenRow = !evenRow
                 }
-                highPanel(pointerOffsetX, pointerOffsety)
+                HighPanel(pointerOffsetX, pointerOffsety)
             }
 
         LaunchedEffect(Unit) {
@@ -148,8 +108,7 @@ fun Grid() {
 }
 
 @Composable
-fun highPanel(mouseX: Int, mouseY: Int) {
-    var color = Color(0xFE, 0x28, 0x57)
+fun HighPanel(mouseX: Int, mouseY: Int) {
     Text(
         "Compose",
         androidx.compose.ui.Modifier.offset(270.dp, 600.dp).scale(7.0f).alpha(alpha(mouseX, mouseY, 270, 700)),
@@ -170,14 +129,14 @@ fun highPanel(mouseX: Int, mouseY: Int) {
     )
 }
 
-fun alpha(mouseX: Int, mouseY: Int, x: Int, y: Int): Float {
+private fun alpha(mouseX: Int, mouseY: Int, x: Int, y: Int): Float {
     var d = distance(mouseX, mouseY, x, y)
     if (d > 450) return 0.0f
     d = d / 450 - 0.1
     return (1 - d * d).toFloat()
 }
 
-fun colorMouse(mouseX: Int, mouseY: Int, x: Int, y: Int): Color {
+private fun colorMouse(mouseX: Int, mouseY: Int, x: Int, y: Int): Color {
     var d = distance(mouseX, mouseY, x, y) / 450
     val color1 = Color(0x6B, 0x57, 0xFF)
     val color2 = Color(0xFE, 0x28, 0x57)
@@ -187,15 +146,9 @@ fun colorMouse(mouseX: Int, mouseY: Int, x: Int, y: Int): Color {
     if (d > 0.66) return balancedColor(3 * d - 2, color1, color2)
     if (d > 0.33) return balancedColor(3 * d - 1, color2, color3)
     return balancedColor(3 * d, color3, color4)
-//    val red = ((color1.red * d + color2.red * (1-d))*255).toInt()
-//    val green = ((color1.green * d + color2.green * (1-d))*255).toInt()
-//    val blue = ((color1.blue * d + color2.blue * (1-d))*255).toInt()
-//    return Color(red, green, blue)
-
-//    return balancedColor(d, color1, color2)
 }
 
-fun balancedColor(d: Double, color1: Color, color2: Color): Color {
+private fun balancedColor(d: Double, color1: Color, color2: Color): Color {
     if (d > 1) return color1
     if (d < 0) return color2
     val red = ((color1.red * d + color2.red * (1 - d)) * 255).toInt()
@@ -205,12 +158,12 @@ fun balancedColor(d: Double, color1: Color, color2: Color): Color {
 }
 
 
-fun distance(x1: Int, y1: Int, x2: Int, y2: Int): Double {
+private fun distance(x1: Int, y1: Int, x2: Int, y2: Int): Double {
     return sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2).toDouble())
 }
 
 @Composable
-fun dot(size: Int, modifier: Modifier, color: Color, time: Long) {
+fun Dot(size: Int, modifier: Modifier, color: Color, time: Long) {
     Box(
         modifier.rotate(time.toFloat() / (15 * 10000000)).clip(RoundedCornerShape((3 + size / 20).dp))
             .size(width = size.dp, height = size.dp)
@@ -220,7 +173,7 @@ fun dot(size: Int, modifier: Modifier, color: Color, time: Long) {
     }
 }
 
-fun size(x: Int, y: Int, time: Long, mouseX: Int, mouseY: Int): Int {
+private fun size(x: Int, y: Int, mouseX: Int, mouseY: Int): Int {
     val addSize = 3
     var result = 5
     if (y > 550 && x < 550) return result
@@ -233,36 +186,7 @@ fun size(x: Int, y: Int, time: Long, mouseX: Int, mouseY: Int): Int {
     return result
 }
 
-fun color(x: Int, y: Int, time: Long, mouseX: Int, mouseY: Int): Color {
-    val fade = 1.0
-    var red = getColorComponent(x, y, 600, 400, time, State.red, fade)
-    var green = getColorComponent(x, y, 600, 400, time, State.green, fade)
-    var blue = getColorComponent(x, y, 600, 400, time, State.blue, fade)
-    return Color(red, green, blue, 0xFF)
-}
-
-fun getColorComponent(x: Int, y: Int, x0: Int, y0: Int, time: Long, settings: ColorSettings, fade: Double): Int {
-    var distance =
-        if (!settings.simple) sqrt((x - x0) * (x - x0) + (y - y0) * (y - y0).toDouble()) else (x - x0).toDouble()
-    val result =
-        if (settings.enabled) round(255 * (1 + cos(distance / settings.waveLength - time.toDouble() / (settings.period * 10000000))) / 2).toInt() else 0
-    return (255 - (255 - result) * fade).toInt()
-}
-
-fun color2(x: Int, y: Int, time: Long, mouseX: Int, mouseY: Int): Color { //another pattern
-    if (!State.mouseUsed) return Color.White
-    val distance = sqrt(((x - mouseX) * (x - mouseX) + (y - mouseY) * (y - mouseY)).toDouble())
-    val fade = exp(-1 * distance * distance / 150000)
-    var red =
-        255 - ((255 - ((1 + sin(12 * distance / 450 - (time.toDouble() / (3 * 100000000)))) / 2 * 255).toInt()) * fade).toInt()
-    var green =
-        255 - ((255 - ((1 + sin(2 + 12 * distance / 450 - (time.toDouble() / (4 * 100000000)))) / 2 * 255).toInt()) * fade).toInt()
-    var blue =
-        255 - ((255 - ((1 + sin(4 + 12 * distance / 450 - (time.toDouble() / (5 * 100000000)))) / 2 * 255).toInt()) * fade).toInt()
-    return Color(red, green, blue, 0xFF)
-}
-
-fun color3(x: Int, y: Int, time: Long, mouseX: Int, mouseY: Int): Color { //another pattern
+private fun boxColor(x: Int, y: Int, time: Long, mouseX: Int, mouseY: Int): Color {
     if (!State.mouseUsed) return Color.White
 
     val color1 = Color(0x6B, 0x57, 0xFF)
@@ -294,4 +218,38 @@ fun color3(x: Int, y: Int, time: Long, mouseX: Int, mouseY: Int): Color { //anot
     return balancedColor(fade, color, Color.White)
 }
 
+internal class ColorSettings {
+    var enabled by mutableStateOf(true)
+    var waveLength by mutableStateOf(30.0)
+    var simple by mutableStateOf(true)
+    var period by mutableStateOf(80.0)
+}
+
+private class State {
+    companion object {
+        var red by mutableStateOf(ColorSettings())
+        var green by mutableStateOf(ColorSettings())
+        var blue by mutableStateOf(ColorSettings())
+        var mouseUsed by mutableStateOf(false)
+    }
+}
+
+@Composable
+internal fun SettingsPanel(settings: ColorSettings, name: String) {
+    Row {
+        Text(name)
+        Checkbox(settings.enabled, onCheckedChange = { settings.enabled = it })
+        Checkbox(settings.simple, onCheckedChange = { settings.simple = it })
+        Slider(
+            (settings.waveLength.toFloat() - 10) / 90,
+            { settings.waveLength = 10 + 90 * it.toDouble() },
+            Modifier.width(100.dp)
+        )
+        Slider(
+            (settings.period.toFloat() - 10) / 90,
+            { settings.period = 10 + 90 * it.toDouble() },
+            Modifier.width(100.dp)
+        )
+    }
+}
 
