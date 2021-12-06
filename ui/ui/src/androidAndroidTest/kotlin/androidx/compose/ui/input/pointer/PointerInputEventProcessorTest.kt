@@ -3025,6 +3025,8 @@ class PointerInputEventProcessorTest {
             MotionEvent.BUTTON_FORWARD to ButtonValidation(4, forward = true),
             MotionEvent.BUTTON_PRIMARY or MotionEvent.BUTTON_TERTIARY to
                 ButtonValidation(0, 2, primary = true, tertiary = true),
+            MotionEvent.BUTTON_BACK or MotionEvent.BUTTON_STYLUS_PRIMARY to
+                ButtonValidation(0, 3, primary = true, back = true),
             0 to ButtonValidation(anyPressed = false)
         )
 
