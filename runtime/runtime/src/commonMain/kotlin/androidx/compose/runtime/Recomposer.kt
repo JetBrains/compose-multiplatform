@@ -25,6 +25,7 @@ import androidx.compose.runtime.snapshots.fastMap
 import androidx.compose.runtime.snapshots.fastMapNotNull
 import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentSetOf
+import androidx.compose.runtime.snapshots.fastAny
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -309,6 +310,14 @@ class Recomposer(
             get() = this@Recomposer.hasPendingWork
         override val changeCount: Long
             get() = this@Recomposer.changeCount
+        fun invalidateGroupsWithKey(key: Int): Boolean {
+            val compositions: List<ControlledComposition> = synchronized(stateLock) {
+                knownCompositions.toMutableList()
+            }
+            return compositions
+                .fastMapNotNull { it as? CompositionImpl }
+                .fastAny { it.invalidateGroupsWithKey(key) }
+        }
         fun saveStateAndDisposeForHotReload(): List<HotReloadable> {
             val compositions: List<ControlledComposition> = synchronized(stateLock) {
                 knownCompositions.toMutableList()
@@ -951,6 +960,14 @@ class Recomposer(
             val holders = token as List<HotReloadable>
             holders.fastForEach { it.resetContent() }
             holders.fastForEach { it.recompose() }
+        }
+
+        internal fun invalidateGroupsWithKey(key: Int): Boolean {
+            var result = false
+            _runningRecomposers.value.forEach {
+                result = it.invalidateGroupsWithKey(key) || result
+            }
+            return result
         }
     }
 }

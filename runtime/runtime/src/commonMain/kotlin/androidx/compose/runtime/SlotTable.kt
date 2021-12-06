@@ -262,6 +262,72 @@ internal class SlotTable : CompositionData, Iterable<CompositionGroup> {
     }
 
     /**
+     * Modifies the current slot table such that every group with the target key will be invalidated, and
+     * when recomposed, the content of those groups will be disposed and re-inserted.
+     *
+     * This is currently only used for developer tooling such as Live Edit to invalidate groups which
+     * we know will no longer have the same structure so we want to remove them before recomposing.
+     */
+    internal fun invalidateGroupsWithKey(target: Int): Boolean {
+        val anchors = mutableListOf<Anchor>()
+        // invalidate groups
+        read { reader ->
+            fun scanGroup() {
+                val key = reader.groupKey
+                if (key == target) {
+                    anchors.add(reader.anchor())
+                    invalidateGroup(reader.currentGroup)
+                    reader.skipGroup()
+                    return
+                }
+                reader.startGroup()
+                while (!reader.isGroupEnd) {
+                    scanGroup()
+                }
+                reader.endGroup()
+            }
+            scanGroup()
+        }
+        // bash keys
+        write { writer ->
+            writer.startGroup()
+            anchors.fastForEach { anchor ->
+                if (anchor.toIndexFor(writer) >= writer.currentGroup) {
+                    writer.seek(anchor)
+                    writer.bashGroup()
+                }
+            }
+            writer.skipToGroupEnd()
+            writer.endGroup()
+        }
+
+        return true
+    }
+
+    /**
+     * Finds the nearest recompose scope to the provided group and invalidates it
+     */
+    private fun invalidateGroup(group: Int): Anchor? {
+        var current = group
+        // for each parent up the spine
+        while (current >= 0) {
+            for (data in DataIterator(this, current)) {
+                if (data is RecomposeScopeImpl) {
+                    data.requiresRecompose = true
+                    val result = data.invalidateForResult(null)
+                    if (result != InvalidationResult.IGNORED) {
+                        // even though this is nullable, the anchor will not be null if
+                        // the invalidation wasn't ignored
+                        return data.anchor
+                    }
+                }
+            }
+            current = groups.parentAnchor(current)
+        }
+        return null
+    }
+
+    /**
      * A debugging aid to validate the internal structure of the slot table. Throws an exception
      * if the slot table is not in the expected shape.
      */
@@ -1450,6 +1516,18 @@ internal class SlotWriter(
     }
 
     /**
+     * Wraps every child group of the current group with a group of a different key.
+     */
+    internal fun bashGroup() {
+        startGroup()
+        while (!isGroupEnd) {
+            insertParentGroup(-3)
+            skipGroup()
+        }
+        endGroup()
+    }
+
+    /**
      * If the start of a group was skipped using [skip], calling [ensureStarted] puts the writer
      * into the same state as if [startGroup] or [startNode] was called on the group starting at
      * [index]. If, after starting, the group, [currentGroup] is not a the end of the group or
@@ -1802,6 +1880,68 @@ internal class SlotWriter(
             this.currentGroup = currentGroup + groupsToMove
             this.currentSlot = currentSlot + slotsToMove
             anchors
+        }
+    }
+
+    /**
+     * Insert a parent group for the rest of the children in the current group. After this call
+     * all remaining children of the current group will be parented by a new group and the
+     * [currentSlot] will be moved to after the group inserted.
+     */
+    fun insertParentGroup(key: Int) {
+        runtimeCheck(insertCount == 0) { "Writer cannot be inserting" }
+        if (isGroupEnd) {
+            beginInsert()
+            startGroup(key)
+            endGroup()
+            endInsert()
+        } else {
+            val currentGroup = currentGroup
+            val parent = groups.parent(currentGroup)
+            val currentGroupEnd = parent + groupSize(parent)
+            val remainingSize = currentGroupEnd - currentGroup
+            var nodeCount = 0
+            var currentNewChild = currentGroup
+            while (currentNewChild < currentGroupEnd) {
+                val newChildAddress = groupIndexToAddress(currentNewChild)
+                nodeCount += groups.nodeCount(newChildAddress)
+                currentNewChild += groups.groupSize(newChildAddress)
+            }
+            val currentSlot = groups.dataAnchor(groupIndexToAddress(currentGroup))
+            beginInsert()
+            insertGroups(1)
+            endInsert()
+            val currentAddress = groupIndexToAddress(currentGroup)
+            groups.initGroup(
+                address = currentAddress,
+                key = key,
+                isNode = false,
+                hasDataKey = false,
+                hasData = false,
+                parentAnchor = parent,
+                dataAnchor = currentSlot
+            )
+
+            // Update the size of the group to cover the remaining children
+            groups.updateGroupSize(currentAddress, remainingSize + 1)
+            groups.updateNodeCount(currentAddress, nodeCount)
+
+            // Update the parent to account for the new group
+            val parentAddress = groupIndexToAddress(parent)
+            addToGroupSizeAlongSpine(parentAddress, 1)
+            fixParentAnchorsFor(parent, currentGroupEnd, currentGroup)
+            this.currentGroup = currentGroupEnd
+        }
+    }
+
+    fun addToGroupSizeAlongSpine(address: Int, amount: Int) {
+        var addr = address
+        while (addr > 0) {
+            groups.updateGroupSize(addr, groups.groupSize(addr) + amount)
+            val parentAnchor = groups.parentAnchor(addr)
+            val parentGroup = parentAnchorToIndex(parentAnchor)
+            val parentAddress = groupIndexToAddress(parentGroup)
+            addr = parentAddress
         }
     }
 
@@ -2438,22 +2578,7 @@ private class GroupIterator(
                     table.slots[table.groups.nodeIndex(group)] else
                     null
 
-            override val data: Iterable<Any?> get() {
-                val start = table.groups.dataAnchor(group)
-                val end = if (group + 1 < table.groupsSize)
-                    table.groups.dataAnchor(group + 1) else table.slotsSize
-                return object : Iterable<Any?>, Iterator<Any?> {
-                    var index = start
-                    override fun iterator(): Iterator<Any?> = this
-                    override fun hasNext(): Boolean = index < end
-                    override fun next(): Any? =
-                        (
-                            if (index >= 0 && index < table.slots.size)
-                                table.slots[index]
-                            else null
-                            ).also { index++ }
-                }
-            }
+            override val data: Iterable<Any?> get() = DataIterator(table, group)
 
             override val compositionGroups: Iterable<CompositionGroup> get() = this
 
@@ -2473,6 +2598,23 @@ private class GroupIterator(
             throw ConcurrentModificationException()
         }
     }
+}
+
+private class DataIterator(
+    val table: SlotTable,
+    val group: Int,
+) : Iterable<Any?>, Iterator<Any?> {
+    val start = table.groups.dataAnchor(group)
+    val end = if (group + 1 < table.groupsSize)
+        table.groups.dataAnchor(group + 1) else table.slotsSize
+    var index = start
+    override fun iterator(): Iterator<Any?> = this
+    override fun hasNext(): Boolean = index < end
+    override fun next(): Any? = (
+        if (index >= 0 && index < table.slots.size)
+            table.slots[index]
+        else null
+    ).also { index++ }
 }
 
 // Parent -1 is reserved to be the root parent index so the anchor must pivot on -2.
@@ -2642,6 +2784,14 @@ private fun IntArray.initGroup(
     this[arrayIndex + ParentAnchor_Offset] = parentAnchor
     this[arrayIndex + Size_Offset] = 0
     this[arrayIndex + DataAnchor_Offset] = dataAnchor
+}
+
+private fun IntArray.updateGroupKey(
+    address: Int,
+    key: Int,
+) {
+    val arrayIndex = address * Group_Fields_Size
+    this[arrayIndex + Key_Offset] = key
 }
 
 private inline fun ArrayList<Anchor>.getOrAdd(
