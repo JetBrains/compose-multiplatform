@@ -89,3 +89,11 @@ tasks.named<Test>("jvmTest") {
         }
     }
 }
+
+// a temporary workaround for a bug in jsRun invocation - see https://youtrack.jetbrains.com/issue/KT-48273
+afterEvaluate {
+    rootProject.extensions.configure<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension> {
+        versions.webpackDevServer.version = "4.0.0"
+        versions.webpackCli.version = "4.9.0"
+    }
+}
