@@ -84,6 +84,15 @@ internal inline fun <T, R> List<T>.fastMap(transform: (T) -> R): List<R> {
     return target
 }
 
+@OptIn(ExperimentalContracts::class)
+internal inline fun <T> List<T>.fastAny(predicate: (T) -> Boolean): Boolean {
+    contract { callsInPlace(predicate) }
+    fastForEach {
+        if (predicate(it)) return true
+    }
+    return false
+}
+
 /**
  * Creates a string from all the elements separated using [separator] and using the given [prefix]
  * and [postfix] if supplied.

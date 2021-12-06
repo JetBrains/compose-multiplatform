@@ -2386,6 +2386,15 @@ internal class ComposerImpl(
         return false
     }
 
+    @TestOnly
+    internal fun parentKey(): Int {
+        return if (inserting) {
+            writer.groupKey(writer.parent)
+        } else {
+            reader.groupKey(reader.parent)
+        }
+    }
+
     /**
      * Skip a group. Skips the group at the current location. This is only valid to call if the
      * composition is not inserting.

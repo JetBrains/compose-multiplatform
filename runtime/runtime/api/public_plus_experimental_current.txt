@@ -693,6 +693,20 @@ package androidx.compose.runtime.internal {
     method @androidx.compose.runtime.ComposeCompilerApi public static Void illegalDecoyCallException(String fName);
   }
 
+  @androidx.compose.runtime.ComposeCompilerApi @kotlin.annotation.Repeatable @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.RUNTIME) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget.CLASS) public @interface FunctionKeyMeta {
+    method public abstract int endOffset();
+    method public abstract int key();
+    method public abstract int startOffset();
+    property public abstract int endOffset;
+    property public abstract int key;
+    property public abstract int startOffset;
+  }
+
+  @androidx.compose.runtime.ComposeCompilerApi @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.RUNTIME) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget.CLASS) public @interface FunctionKeyMetaClass {
+    method public abstract String file();
+    property public abstract String file;
+  }
+
   @androidx.compose.runtime.ComposeCompilerApi @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.RUNTIME) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget.CLASS) public @interface LiveLiteralFileInfo {
     method public abstract String file();
     property public abstract String file;
