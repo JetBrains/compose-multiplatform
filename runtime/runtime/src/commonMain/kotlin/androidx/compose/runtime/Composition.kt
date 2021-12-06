@@ -685,8 +685,7 @@ internal class CompositionImpl(
         val anchor = scope.anchor
         if (anchor == null || !slotTable.ownsAnchor(anchor) || !anchor.valid)
             return InvalidationResult.IGNORED // The scope has not yet entered the composition
-        val location = anchor.toIndexFor(slotTable)
-        if (location < 0)
+        if (!anchor.valid)
             return InvalidationResult.IGNORED // The scope was removed from the composition
         if (!scope.canRecompose)
             return InvalidationResult.IGNORED // The scope isn't able to be recomposed/invalidated
