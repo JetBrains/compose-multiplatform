@@ -1,0 +1,7 @@
+
+subprojects {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
