@@ -1,10 +1,13 @@
 import org.gradle.api.tasks.testing.AbstractTestTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.jetbrains.compose.gradle.kotlinKarmaConfig
 
 val COMPOSE_WEB_VERSION: String by project
 val COMPOSE_REPO_USERNAME: String? by project
 val COMPOSE_REPO_KEY: String? by project
 val COMPOSE_WEB_BUILD_WITH_SAMPLES = project.property("compose.web.buildSamples")!!.toString().toBoolean()
+
+kotlinKarmaConfig.rootDir = rootProject.rootDir.toString()
 
 apply<jetbrains.compose.web.gradle.SeleniumDriverPlugin>()
 
