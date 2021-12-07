@@ -860,12 +860,6 @@ package androidx.compose.foundation.text {
   public final class TextFieldKeyInput_androidKt {
   }
 
-  public final class TextFieldMagnifierKt {
-  }
-
-  public final class TextFieldMagnifier_androidKt {
-  }
-
   public final class TextFieldPressGestureFilterKt {
   }
 
@@ -912,6 +906,9 @@ package androidx.compose.foundation.text.selection {
   }
 
   public final class SelectionHandlesKt {
+  }
+
+  public final class SelectionMagnifierKt {
   }
 
   public final class SelectionManagerKt {
