@@ -1,22 +1,50 @@
+
 pluginManagement {
+    val COMPOSE_CORE_VERSION: String by settings
+    println("[build] compose core version: $COMPOSE_CORE_VERSION")
+
+    // pluginManagement section won't see outer scope, hence the FQ names
+    fun properties(path: String): java.util.Properties? {
+        val localPropertiesFile = File(path)
+        if (!localPropertiesFile.exists()) {
+            return null
+        }
+        return java.io.FileInputStream(localPropertiesFile).use() { inputStream ->
+            val props = java.util.Properties()
+            props.load(inputStream)
+            props
+        }
+    }
+
+    val localProperties: java.util.Properties? = properties("local.properties")
+    
+
+    val repos = (localProperties?.getProperty("compose.web.repos"))?.split(File.pathSeparator)
+
     repositories {
         gradlePluginPortal()
         mavenCentral()
-        mavenLocal()
+
+        repos?.forEach { urlPath ->
+            maven {
+                url = uri(urlPath)
+            }
+        }
+
         maven {
             url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         }
         maven {
             url = uri("https://packages.jetbrains.team/maven/p/ui/dev")
         }
+
         google()
     }
 
     resolutionStrategy {
         eachPlugin {
             if (requested.id.id == "org.jetbrains.compose") {
-                println("[build] compose core version: ${extra["COMPOSE_CORE_VERSION"]}")
-                useModule("org.jetbrains.compose:org.jetbrains.compose.gradle.plugin:${extra["COMPOSE_CORE_VERSION"]}")
+                useModule("org.jetbrains.compose:org.jetbrains.compose.gradle.plugin:$COMPOSE_CORE_VERSION")
             } else if (requested.id.id == "org.jetbrains.kotlin.multiplatform") {
                 useModule("org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin:1.5.31")
             }
