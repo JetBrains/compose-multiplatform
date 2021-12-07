@@ -221,12 +221,10 @@ class GitClientImpl(
             // wait potentially a little bit longer in case Git was waiting for us to
             // read its response before it exited
             proc.waitFor(10, TimeUnit.SECONDS)
-            if (stderr != "") {
-                logger?.error("Response: $message")
-            } else {
-                logger?.info("Response: $message")
+            logger?.info("Response: $message")
+            check(proc.exitValue() == 0) {
+                "Nonzero exit value running git command. Response: $message"
             }
-            check(proc.exitValue() == 0) { "Nonzero exit value running git command." }
             return stdout
         }
         override fun executeAndParse(command: String): List<String> {
