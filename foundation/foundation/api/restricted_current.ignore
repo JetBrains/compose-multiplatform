@@ -15,3 +15,7 @@ RemovedClass: androidx.compose.foundation.lazy.LazyListScrollingKt:
     Removed class androidx.compose.foundation.lazy.LazyListScrollingKt
 RemovedClass: androidx.compose.foundation.lazy.LazySemanticsKt:
     Removed class androidx.compose.foundation.lazy.LazySemanticsKt
+RemovedClass: androidx.compose.foundation.text.TextFieldMagnifierKt:
+    Removed class androidx.compose.foundation.text.TextFieldMagnifierKt
+RemovedClass: androidx.compose.foundation.text.TextFieldMagnifier_androidKt:
+    Removed class androidx.compose.foundation.text.TextFieldMagnifier_androidKt
