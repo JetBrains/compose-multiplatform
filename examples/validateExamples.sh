@@ -4,9 +4,15 @@
 
 set -euo pipefail
 
+if [ -z "$@" ]; then
+echo "Specify Compose version. For example: ./validateExamples.sh 1.0.0"
+exit 1
+fi
+COMPOSE_VERSION=$@
+
 runGradle() {
     pushd $1
-    ./gradlew $2
+    ./gradlew $2 -Pcompose.version=$COMPOSE_VERSION
     popd
 }
 
