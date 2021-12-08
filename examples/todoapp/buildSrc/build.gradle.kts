@@ -10,8 +10,8 @@ repositories {
 }
 
 dependencies {
-    implementation(Deps.JetBrains.Compose.gradlePlugin)
-    implementation(Deps.JetBrains.Kotlin.gradlePlugin)
+    implementation(Deps.JetBrains.Compose(project).gradlePlugin)
+    implementation(Deps.JetBrains.Kotlin(project).gradlePlugin)
     implementation(Deps.Android.Tools.Build.gradlePlugin)
     implementation(Deps.Squareup.SQLDelight.gradlePlugin)
 }

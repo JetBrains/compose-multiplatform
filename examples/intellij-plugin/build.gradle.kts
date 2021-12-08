@@ -3,9 +3,8 @@ import org.jetbrains.compose.compose
 plugins {
     id("org.jetbrains.intellij") version "1.1.4"
     java
-    kotlin("jvm") version "1.5.31"
-    // __LATEST_COMPOSE_RELEASE_VERSION__
-    id("org.jetbrains.compose") version "1.0.0"
+    kotlin("jvm")
+    id("org.jetbrains.compose")
     id("idea")
 }
 
