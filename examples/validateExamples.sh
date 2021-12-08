@@ -17,7 +17,6 @@ runGradle() {
 }
 
 runGradle codeviewer package
-runGradle falling-balls package
 runGradle falling-balls-web build
 runGradle imageviewer package
 runGradle intellij-plugin build
