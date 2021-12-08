@@ -1,3 +1,5 @@
+import org.jetbrains.compose.gradle.standardConf
+
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
@@ -13,9 +15,7 @@ kotlin {
         browser() {
             testTask {
                 useKarma {
-                    useConfigDirectory("${rootProject.projectDir}/test-utils/conf/karma.config.common.d")
-                    useChromeHeadless()
-                    useFirefox()
+                    standardConf()
                 }
             }
         }
