@@ -33,12 +33,10 @@ internal actual class ComposeWindow : UIViewController {
     constructor(coder: NSCoder) : super(coder)
 
     override fun touchesBegan(touches: Set<*>, withEvent: UIEvent?) {
-        println("touchesBegan: $withEvent")
         super.touchesBegan(touches, withEvent)
     }
 
     override fun touchesEnded(touches: Set<*>, withEvent: UIEvent?) {
-        println("touchesEnded $withEvent")
         super.touchesEnded(touches, withEvent)
     }
 

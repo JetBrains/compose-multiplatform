@@ -25,6 +25,7 @@ import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.platform.PlatformComponent
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.getTimeMilliseconds
+import androidx.compose.ui.input.pointer.PointerEventType
 import kotlinx.coroutines.CoroutineDispatcher
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.SkiaLayer
@@ -32,7 +33,9 @@ import org.jetbrains.skiko.SkikoView
 import org.jetbrains.skiko.SkikoInputEvent
 import org.jetbrains.skiko.SkikoKeyboardEvent
 import org.jetbrains.skiko.SkikoPointerEvent
+import org.jetbrains.skiko.SkikoGestureEvent
 import org.jetbrains.skiko.SkikoPointerEventKind
+import org.jetbrains.skiko.SkikoGestureEventKind
 
 internal class ComposeLayer {
     private var isDisposed = false
@@ -52,6 +55,39 @@ internal class ComposeLayer {
 
         override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
             TODO("need scene.sendKeyEvent")
+        }
+
+        override fun onGestureEvent(event: SkikoGestureEvent) {
+            when (event.kind) {
+                SkikoGestureEventKind.TAP -> {
+                    // uikit doesn't give us a TAP press, so we send the Press event ourselves.
+                    scene.sendPointerEvent(
+                        eventType = PointerEventType.Press,
+                        // TODO: account for the proper density.
+                        position = Offset(event.x.toFloat(), event.y.toFloat()), // * density,
+                        timeMillis = getTimeMilliseconds(),
+                        type = PointerType.Touch,
+                        nativeEvent = event
+                    )
+                    scene.sendPointerEvent(
+                        eventType = event.state.toCompose(),
+                        // TODO: account for the proper density.
+                        position = Offset(event.x.toFloat(), event.y.toFloat()), // * density,
+                        timeMillis = getTimeMilliseconds(),
+                        type = PointerType.Touch,
+                        nativeEvent = event
+                    )
+                }
+                SkikoGestureEventKind.LONGPRESS ->
+                    scene.sendPointerEvent(
+                        eventType = event.state.toCompose(),
+                        // TODO: account for the proper density.
+                        position = Offset(event.x.toFloat(), event.y.toFloat()), // * density,
+                        timeMillis = getTimeMilliseconds(),
+                        type = PointerType.Touch,
+                        nativeEvent = event
+                    )
+            }
         }
 
         override fun onPointerEvent(event: SkikoPointerEvent) {

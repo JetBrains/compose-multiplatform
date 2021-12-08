@@ -51,7 +51,7 @@ internal actual fun pointerInputEvent(
                 scrollDelta = scrollDelta
             )
         ),
-        nativeEvent as SkikoPointerEvent?
+        nativeEvent as? SkikoPointerEvent
     )
 }
 
