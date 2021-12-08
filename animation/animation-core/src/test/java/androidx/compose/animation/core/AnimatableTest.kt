@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import com.google.common.truth.Truth.assertThat
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
@@ -291,5 +292,35 @@ class AnimatableTest {
             animatable.snapTo(animatable.lowerBound!! - 100f)
         }
         assertEquals(animatable.lowerBound!!, animatable.value)
+    }
+
+    @Test
+    fun animationResult_toString() {
+        val animatable = AnimationResult(
+            endReason = AnimationEndReason.Finished,
+            endState = AnimationState(42f)
+        )
+        val string = animatable.toString()
+        assertThat(string).contains(AnimationResult::class.java.simpleName)
+        assertThat(string).contains("endReason=Finished")
+        assertThat(string).contains("endState=")
+    }
+
+    @Test
+    fun animationState_toString() {
+        val state = AnimationState(
+            initialValue = 42f,
+            initialVelocity = 2f,
+            lastFrameTimeNanos = 4000L,
+            finishedTimeNanos = 3000L,
+            isRunning = true
+        )
+        val string = state.toString()
+        assertThat(string).contains(AnimationState::class.java.simpleName)
+        assertThat(string).contains("value=42.0")
+        assertThat(string).contains("velocity=2.0")
+        assertThat(string).contains("lastFrameTimeNanos=4000")
+        assertThat(string).contains("finishedTimeNanos=3000")
+        assertThat(string).contains("isRunning=true")
     }
 }
