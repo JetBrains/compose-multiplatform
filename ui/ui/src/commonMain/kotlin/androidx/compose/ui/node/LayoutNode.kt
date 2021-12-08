@@ -175,9 +175,6 @@ internal class LayoutNode(
      */
     internal var layoutState = Ready
 
-    internal val wasMeasuredDuringThisIteration: Boolean
-        get() = requireOwner().measureIteration == outerMeasurablePlaceable.measureIteration
-
     /**
      * A cache of modifiers to be used when setting and reusing previous modifiers.
      */
@@ -853,8 +850,20 @@ internal class LayoutNode(
      * Place this layout node again on the same position it was placed last time
      */
     internal fun replace() {
-        outerMeasurablePlaceable.replace()
+        try {
+            relayoutWithoutParentInProgress = true
+            outerMeasurablePlaceable.replace()
+        } finally {
+            relayoutWithoutParentInProgress = false
+        }
     }
+
+    /**
+     * Is true during [replace] invocation. Helps to differentiate between the cases when our
+     * parent is measuring us during the measure block, and when we are remeasured individually
+     * because of some change. This could be useful to know if we need to record the placing order.
+     */
+    private var relayoutWithoutParentInProgress = false
 
     internal fun draw(canvas: Canvas) = outerLayoutNodeWrapper.draw(canvas)
 
@@ -936,7 +945,7 @@ internal class LayoutNode(
         }
 
         if (parent != null) {
-            if (parent.layoutState == LayingOut) {
+            if (!relayoutWithoutParentInProgress && parent.layoutState == LayingOut) {
                 // the parent is currently placing its children
                 check(placeOrder == NotPlacedPlaceOrder) {
                     "Place was called on a node which was placed already"
@@ -944,8 +953,9 @@ internal class LayoutNode(
                 placeOrder = parent.nextChildPlaceOrder
                 parent.nextChildPlaceOrder++
             }
-            // if parent is not laying out we were asked to be relaid out without affecting the
-            // parent. this means our placeOrder didn't change since the last time parent placed us
+            // if relayoutWithoutParentInProgress is true we were asked to be relaid out without
+            // affecting the parent. this means our placeOrder didn't change since the last time
+            // parent placed us.
         } else {
             // parent is null for the root node
             placeOrder = 0
@@ -973,6 +983,11 @@ internal class LayoutNode(
                     child.previousPlaceOrder = child.placeOrder
                     child.placeOrder = NotPlacedPlaceOrder
                     child.alignmentLines.usedDuringParentLayout = false
+                    // before rerunning the user's layout block reset previous measuredByParent
+                    // for children which we measured in the layout block during the last run.
+                    if (child.measuredByParent == UsageByParent.InLayoutBlock) {
+                        child.measuredByParent = UsageByParent.NotUsed
+                    }
                 }
 
                 innerLayoutNodeWrapper.measureResult.placeChildren()

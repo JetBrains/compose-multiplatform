@@ -147,6 +147,84 @@ class NodesRemeasuredOnceTest {
             assertThat(remeasurements).isEqualTo(2)
         }
     }
+
+    @Test
+    fun remeasuringChildDuringLayoutWithExtraLayer() {
+        val height = mutableStateOf(10)
+        var remeasurements = 0
+
+        rule.setContent {
+            WrapChildMeasureDuringLayout(onMeasured = { actualHeight ->
+                assertThat(actualHeight).isEqualTo(height.value)
+                remeasurements++
+            }) {
+                WrapChild {
+                    Child(height)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(remeasurements).isEqualTo(1)
+            height.value = 20
+        }
+
+        rule.runOnIdle {
+            assertThat(remeasurements).isEqualTo(2)
+        }
+    }
+
+    @Test
+    fun remeasuringChildDuringLayout() {
+        val height = mutableStateOf(10)
+        var expectedHeight = 10
+        var remeasurements = 0
+
+        rule.setContent {
+            WrapChildMeasureDuringLayout(onMeasured = { actualHeight ->
+                assertThat(actualHeight).isEqualTo(expectedHeight)
+                remeasurements++
+            }) {
+                Child(height)
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(remeasurements).isEqualTo(1)
+            expectedHeight = 20
+            height.value = 20
+        }
+
+        rule.runOnIdle {
+            assertThat(remeasurements).isEqualTo(2)
+        }
+    }
+
+    @Test
+    fun remeasuringChildDuringLayoutWithExtraLayerUsingIntrinsics() {
+        val height = mutableStateOf(10)
+        var remeasurements = 0
+
+        rule.setContent {
+            IntrinsicSizeAndMeasureDuringLayout(onMeasured = { actualHeight ->
+                assertThat(actualHeight).isEqualTo(height.value)
+                remeasurements++
+            }) {
+                WrapChild {
+                    Child(height)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(remeasurements).isEqualTo(1)
+            height.value = 20
+        }
+
+        rule.runOnIdle {
+            assertThat(remeasurements).isEqualTo(2)
+        }
+    }
 }
 
 @Composable
@@ -156,6 +234,38 @@ private fun WrapChild(onMeasured: (Int) -> Unit = {}, content: @Composable () ->
             .measure(constraints.copy(minHeight = 0, maxHeight = Constraints.Infinity))
         onMeasured(placeable.height)
         layout(placeable.width, placeable.height) {
+            placeable.place(0, 0)
+        }
+    }
+}
+
+@Composable
+private fun WrapChildMeasureDuringLayout(
+    onMeasured: (Int) -> Unit = {},
+    content: @Composable () -> Unit
+) {
+    Layout(content = content) { measurables, constraints ->
+        layout(constraints.maxWidth, constraints.maxHeight) {
+            val placeable = measurables.first()
+                .measure(constraints.copy(minHeight = 0, maxHeight = Constraints.Infinity))
+            onMeasured(placeable.height)
+            placeable.place(0, 0)
+        }
+    }
+}
+
+@Composable
+private fun IntrinsicSizeAndMeasureDuringLayout(
+    onMeasured: (Int) -> Unit = {},
+    content: @Composable () -> Unit
+) {
+    Layout(content = content) { measurables, constraints ->
+        val width = measurables.first().maxIntrinsicWidth(constraints.maxWidth)
+        val height = measurables.first().maxIntrinsicHeight(constraints.maxHeight)
+        layout(width, height) {
+            val placeable = measurables.first()
+                .measure(constraints.copy(minHeight = 0, maxHeight = Constraints.Infinity))
+            onMeasured(placeable.height)
             placeable.place(0, 0)
         }
     }
