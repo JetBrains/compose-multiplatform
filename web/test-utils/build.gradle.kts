@@ -16,7 +16,6 @@ kotlin {
             testTask {
                 useKarma {
                     standardConf()
-                    useFirefox()
                 }
             }
         }
