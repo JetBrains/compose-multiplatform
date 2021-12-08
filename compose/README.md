@@ -44,6 +44,7 @@ androidx.validateProjectStructure=false
 ## Scripts
 Publish artifacts to the local directory `out/androidx/build/support_repo/org/jetbrains/compose`:
 ```
+export COMPOSE_CUSTOM_VERSION=0.0.0-custom
 ./scripts/publish
 ```
 (on Windows it doesn't build at the moment, the issue is in the line `packageInspector(project, project(":compose:ui:ui-inspection")` in `compose/frameworks/support/compose/ui/ui/build.gradle`)
