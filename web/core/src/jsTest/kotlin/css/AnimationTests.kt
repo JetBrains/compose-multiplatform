@@ -8,12 +8,11 @@ import org.jetbrains.compose.web.ExperimentalComposeWebApi
 import org.jetbrains.compose.web.testutils.*
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.stringPresentation
-import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLStyleElement
 import org.w3c.dom.css.CSSStyleSheet
 import org.w3c.dom.get
 import kotlin.test.Test
-import kotlin.test.assertContains
+import kotlin.test.assertEquals
 
 object AnimationsStyleSheet : StyleSheet() {
     val bounce by keyframes {
@@ -41,8 +40,8 @@ class AnimationTests {
     fun animationClassGenerated() = runTest {
         val generatedRules = AnimationsStyleSheet.cssRules.map { it.stringPresentation() }
 
-        assertContains(
-            generatedRules,
+
+        assertEquals(
             """
                 @keyframes AnimationsStyleSheet-bounce {
                     from {
@@ -53,15 +52,17 @@ class AnimationTests {
                     }
                 }
             """.trimIndent(),
+            generatedRules[0],
             "Animation keyframes wasn't generated correctly"
         )
-        assertContains(
-            generatedRules,
+
+        assertEquals(
             """
                 .AnimationsStyleSheet-animationClass {
                     animation: AnimationsStyleSheet-bounce 2s ease-in alternate;
                 }
             """.trimIndent(),
+            generatedRules[1],
             "Animation class wasn't generated correctly"
         )
     }
@@ -78,21 +79,22 @@ class AnimationTests {
             cssRules?.item(it)?.cssText ?: ""
         }
 
-        assertContains(
-            rules,
+        assertEquals(
             """
                 @keyframes AnimationsStyleSheet-bounce { 
                   0% { transform: translateX(50%); }
                   100% { transform: translateX(-50%); }
                 }
             """.trimIndent(),
+            rules[0],
             "Animation keyframes wasn't injected correctly"
         )
-        assertContains(
-            rules,
+
+        assertEquals(
             """
                 .AnimationsStyleSheet-animationClass { animation: 2s ease-in 0s 1 alternate none running AnimationsStyleSheet-bounce; }
             """.trimIndent(),
+            rules[1],
             "Animation class wasn't injected correctly"
         )
     }
