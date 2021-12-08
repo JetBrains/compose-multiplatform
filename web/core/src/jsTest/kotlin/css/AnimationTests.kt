@@ -38,30 +38,17 @@ object AnimationsStyleSheet : StyleSheet() {
 class AnimationTests {
     @Test
     fun animationClassGenerated() = runTest {
-        val generatedRules = AnimationsStyleSheet.cssRules.map { it.stringPresentation() }
+        val generatedRules = AnimationsStyleSheet.cssRules.map { it.stringPresentation(indent = " ", delimiter = "") }
 
 
         assertEquals(
-            """
-                @keyframes AnimationsStyleSheet-bounce {
-                    from {
-                        transform: translateX(50%);
-                    }
-                    to {
-                        transform: translateX(-50%);
-                    }
-                }
-            """.trimIndent(),
+            "@keyframes AnimationsStyleSheet-bounce { from {  transform: translateX(50%); } to {  transform: translateX(-50%); }}",
             generatedRules[0],
             "Animation keyframes wasn't generated correctly"
         )
 
         assertEquals(
-            """
-                .AnimationsStyleSheet-animationClass {
-                    animation: AnimationsStyleSheet-bounce 2s ease-in alternate;
-                }
-            """.trimIndent(),
+            ".AnimationsStyleSheet-animationClass { animation: AnimationsStyleSheet-bounce 2s ease-in alternate;}",
             generatedRules[1],
             "Animation class wasn't generated correctly"
         )
@@ -76,24 +63,17 @@ class AnimationTests {
         val el = root.children[0] as HTMLStyleElement
         val cssRules = (el.sheet as? CSSStyleSheet)?.cssRules
         val rules = (0 until (cssRules?.length ?: 0)).map {
-            cssRules?.item(it)?.cssText ?: ""
+            cssRules?.item(it)?.cssText?.replace("\n", "") ?: ""
         }
 
         assertEquals(
-            """
-                @keyframes AnimationsStyleSheet-bounce { 
-                  0% { transform: translateX(50%); }
-                  100% { transform: translateX(-50%); }
-                }
-            """.trimIndent(),
+            "@keyframes AnimationsStyleSheet-bounce {0% { transform: translateX(50%); }100% { transform: translateX(-50%); }}",
             rules[0],
             "Animation keyframes wasn't injected correctly"
         )
 
         assertEquals(
-            """
-                .AnimationsStyleSheet-animationClass { animation: 2s ease-in 0s 1 alternate none running AnimationsStyleSheet-bounce; }
-            """.trimIndent(),
+            ".AnimationsStyleSheet-animationClass { animation: 2s ease-in 0s 1 alternate none running AnimationsStyleSheet-bounce; }".trimIndent(),
             rules[1],
             "Animation class wasn't injected correctly"
         )
