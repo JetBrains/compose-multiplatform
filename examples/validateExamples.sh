@@ -19,7 +19,6 @@ runGradle() {
 runGradle codeviewer package
 runGradle falling-balls-web build
 runGradle imageviewer package
-runGradle intellij-plugin build
 runGradle issues package
 runGradle notepad package
 runGradle todoapp-lite package
