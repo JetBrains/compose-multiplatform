@@ -132,7 +132,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 false
             }
         }
-        .selectionMagnifier(this)
+        .then(if (shouldShowMagnifier) Modifier.selectionMagnifier(this) else Modifier)
 
     private var previousPosition: Offset? = null
     /**
@@ -188,6 +188,8 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
      */
     var draggingHandle: Handle? by mutableStateOf(null)
         private set
+
+    private val shouldShowMagnifier get() = draggingHandle != null
 
     init {
         selectionRegistrar.onPositionChangeCallback = { selectableId ->
