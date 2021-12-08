@@ -12,6 +12,7 @@ import org.w3c.dom.HTMLStyleElement
 import org.w3c.dom.css.CSSStyleSheet
 import org.w3c.dom.get
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
 object AnimationsStyleSheet : StyleSheet() {
@@ -41,16 +42,12 @@ class AnimationTests {
         val generatedRules = AnimationsStyleSheet.cssRules.map { it.stringPresentation(indent = " ", delimiter = "") }
 
 
-        assertEquals(
-            "@keyframes AnimationsStyleSheet-bounce { from {  transform: translateX(50%); } to {  transform: translateX(-50%); }}",
-            generatedRules[0],
-            "Animation keyframes wasn't generated correctly"
-        )
-
-        assertEquals(
-            ".AnimationsStyleSheet-animationClass { animation: AnimationsStyleSheet-bounce 2s ease-in alternate;}",
-            generatedRules[1],
-            "Animation class wasn't generated correctly"
+        assertContentEquals(
+            listOf(
+                "@keyframes AnimationsStyleSheet-bounce { from {  transform: translateX(50%); } to {  transform: translateX(-50%); }}",
+                ".AnimationsStyleSheet-animationClass { animation: AnimationsStyleSheet-bounce 2s ease-in alternate;}"
+            ),
+            generatedRules
         )
     }
 
@@ -66,9 +63,10 @@ class AnimationTests {
             cssRules?.item(it)?.cssText?.replace("\n", "") ?: ""
         }
 
+        // TODO: we need to come up with test that not relying on any kind of formatting
         assertEquals(
             "@keyframes AnimationsStyleSheet-bounce {0% { transform: translateX(50%); }100% { transform: translateX(-50%); }}",
-            rules[0],
+            rules[0].replace("   0%", "0%").replace("  100%", "100%"),
             "Animation keyframes wasn't injected correctly"
         )
 
