@@ -12,7 +12,7 @@ kotlin {
                 useKarma {
                     useConfigDirectory("${rootProject.projectDir}/test-utils/conf/karma.config.common.d")
                     useChromeHeadless()
-                    //useFirefox()
+                    useFirefox()
                 }
             }
         }

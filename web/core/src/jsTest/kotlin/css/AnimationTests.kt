@@ -8,12 +8,12 @@ import org.jetbrains.compose.web.ExperimentalComposeWebApi
 import org.jetbrains.compose.web.testutils.*
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.stringPresentation
-import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLStyleElement
 import org.w3c.dom.css.CSSStyleSheet
 import org.w3c.dom.get
 import kotlin.test.Test
-import kotlin.test.assertContains
+import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
 
 object AnimationsStyleSheet : StyleSheet() {
     val bounce by keyframes {
@@ -39,30 +39,15 @@ object AnimationsStyleSheet : StyleSheet() {
 class AnimationTests {
     @Test
     fun animationClassGenerated() = runTest {
-        val generatedRules = AnimationsStyleSheet.cssRules.map { it.stringPresentation() }
+        val generatedRules = AnimationsStyleSheet.cssRules.map { it.stringPresentation(indent = " ", delimiter = "") }
 
-        assertContains(
-            generatedRules,
-            """
-                @keyframes AnimationsStyleSheet-bounce {
-                    from {
-                        transform: translateX(50%);
-                    }
-                    to {
-                        transform: translateX(-50%);
-                    }
-                }
-            """.trimIndent(),
-            "Animation keyframes wasn't generated correctly"
-        )
-        assertContains(
-            generatedRules,
-            """
-                .AnimationsStyleSheet-animationClass {
-                    animation: AnimationsStyleSheet-bounce 2s ease-in alternate;
-                }
-            """.trimIndent(),
-            "Animation class wasn't generated correctly"
+
+        assertContentEquals(
+            listOf(
+                "@keyframes AnimationsStyleSheet-bounce { from {  transform: translateX(50%); } to {  transform: translateX(-50%); }}",
+                ".AnimationsStyleSheet-animationClass { animation: AnimationsStyleSheet-bounce 2s ease-in alternate;}"
+            ),
+            generatedRules
         )
     }
 
@@ -75,24 +60,19 @@ class AnimationTests {
         val el = root.children[0] as HTMLStyleElement
         val cssRules = (el.sheet as? CSSStyleSheet)?.cssRules
         val rules = (0 until (cssRules?.length ?: 0)).map {
-            cssRules?.item(it)?.cssText ?: ""
+            cssRules?.item(it)?.cssText?.replace("\n", "") ?: ""
         }
 
-        assertContains(
-            rules,
-            """
-                @keyframes AnimationsStyleSheet-bounce { 
-                  0% { transform: translateX(50%); }
-                  100% { transform: translateX(-50%); }
-                }
-            """.trimIndent(),
+        // TODO: we need to come up with test that not relying on any kind of formatting
+        assertEquals(
+            "@keyframes AnimationsStyleSheet-bounce {0% { transform: translateX(50%); }100% { transform: translateX(-50%); }}",
+            rules[0].replace("   0%", "0%").replace("  100%", "100%"),
             "Animation keyframes wasn't injected correctly"
         )
-        assertContains(
-            rules,
-            """
-                .AnimationsStyleSheet-animationClass { animation: 2s ease-in 0s 1 alternate none running AnimationsStyleSheet-bounce; }
-            """.trimIndent(),
+
+        assertEquals(
+            ".AnimationsStyleSheet-animationClass { animation: 2s ease-in 0s 1 alternate none running AnimationsStyleSheet-bounce; }".trimIndent(),
+            rules[1],
             "Animation class wasn't injected correctly"
         )
     }
