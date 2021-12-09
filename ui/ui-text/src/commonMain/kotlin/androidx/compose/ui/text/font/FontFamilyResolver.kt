@@ -70,7 +70,7 @@ internal class FontFamilyResolverImpl(
         fontWeight: FontWeight,
         fontStyle: FontStyle,
         fontSynthesis: FontSynthesis,
-    ): Any {
+    ): State<Any> {
         val typeRequest = TypefaceRequest(
             fontFamily,
             fontWeight,
@@ -108,15 +108,10 @@ internal data class TypefaceRequest(
     val resourceLoaderCacheKey: String?
 )
 
-internal sealed interface TypefaceResult {
-    class Immutable(internal val value: Any) : TypefaceResult
-    class Async(internal val state: State<Any>) : TypefaceResult
-
-    val valueWithStateRead: Any
-        get() = when (this) {
-            is Immutable -> value
-            is Async -> state.value
-        }
+internal sealed interface TypefaceResult : State<Any> {
+    // Immutable results present as State, but don't trigger a read observer
+    class Immutable(override val value: Any) : TypefaceResult
+    class Async(internal val current: State<Any>) : TypefaceResult, State<Any> by current
 }
 
 internal class TypefaceRequestCache {
@@ -127,10 +122,10 @@ internal class TypefaceRequestCache {
     fun runCached(
         typefaceRequest: TypefaceRequest,
         resolveTypeface: ((TypefaceResult) -> Unit) -> TypefaceResult
-    ): Any {
+    ): State<Any> {
         synchronized(lock) {
             resultCache.get(typefaceRequest)?.let {
-                return it.valueWithStateRead
+                return it
             }
         }
         // this is not run synchronized as it incurs expected file system reads.
@@ -164,7 +159,7 @@ internal class TypefaceRequestCache {
                 resultCache.put(typefaceRequest, currentTypefaceResult)
             }
         }
-        return currentTypefaceResult.valueWithStateRead
+        return currentTypefaceResult
     }
 
     fun preWarmCache(

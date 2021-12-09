@@ -56,5 +56,5 @@ internal fun TypefaceRequestCache.getImmutableResultFor(
         return result
     }
     assertThat(result).isInstanceOf(Immutable::class.java)
-    return result.valueWithStateRead
+    return result.value
 }

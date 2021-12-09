@@ -19,6 +19,7 @@ package androidx.compose.ui.text.font
 import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
 import androidx.compose.ui.text.ExperimentalTextApi
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -77,10 +78,6 @@ sealed class FontFamily(canLoadSynchronously: Boolean) {
         /**
          * Resolves a typeface using any appropriate logic for the [FontFamily].
          *
-         * Callers must assume that this method reads from compose State and should ensure calls
-         * are made in a restartable context. On restart, call this function with the same
-         * parameters to get the new result.
-         *
          * [FontListFontFamily] will always resolve using fallback chains and load using
          * [Font.ResourceLoader].
          *
@@ -101,7 +98,7 @@ sealed class FontFamily(canLoadSynchronously: Boolean) {
             fontWeight: FontWeight = FontWeight.Normal,
             fontStyle: FontStyle = FontStyle.Normal,
             fontSynthesis: FontSynthesis = FontSynthesis.All
-        ): Any
+        ): State<Any>
 
         /**
          * Set the coroutine context used for loading async fonts.

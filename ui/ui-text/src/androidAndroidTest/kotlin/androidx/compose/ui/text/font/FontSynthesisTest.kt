@@ -43,7 +43,7 @@ class FontSynthesisTest {
             font.weight,
             font.style,
             fontSynthesis = FontSynthesis.None
-        ) as Typeface
+        ).value as Typeface
     }
 
     @Test

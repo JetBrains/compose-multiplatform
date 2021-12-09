@@ -249,7 +249,7 @@ private fun List<Font>.firstImmediatelyAvailable(
         typefaceRequest.fontWeight,
         typefaceRequest.fontStyle,
         typefaceRequest.fontSynthesis
-    )
+    ).value
     return asyncFontsToLoad to fallbackTypeface
 }
 

@@ -38,7 +38,7 @@ internal class TypefaceResultSubject private constructor(
         check("isNotNull())").that(subject).isNotNull()
         check("is TypefaceResult.Immutable").that(subject)
             .isInstanceOf(Immutable::class.java)
-        check(".value == $expectedInstance").that(subject?.valueWithStateRead)
+        check(".value == $expectedInstance").that(subject?.value)
             .isSameInstanceAs(expectedInstance)
     }
 
@@ -53,7 +53,7 @@ internal class TypefaceResultSubject private constructor(
         check("is TypefaceResult.Async").that(subject)
             .isInstanceOf(Async::class.java)
         check("$subject === $expectedInstance")
-            .that(subject?.valueWithStateRead)
+            .that(subject?.value)
             .isSameInstanceAs(expectedInstance)
     }
 
@@ -68,6 +68,6 @@ internal class TypefaceResultSubject private constructor(
         is Immutable ->
             "TypefaceResult.Immutable(value=${subject.value})"
         is Async ->
-            "TypefaceResult.Immutable(currentState=${subject.state.value})"
+            "TypefaceResult.Immutable(currentState=${subject.current.value})"
     }
 }

@@ -120,7 +120,7 @@ private fun SpannableString.setSpanStyle(
                     resourceLoader = resourceLoader,
                     fontFamily = spanStyle.fontFamily,
                     fontSynthesis = spanStyle.fontSynthesis ?: FontSynthesis.All
-                ) as Typeface
+                ).value as Typeface
                 setSpan(
                     Api28Impl.createTypefaceSpan(typeface),
                     start,

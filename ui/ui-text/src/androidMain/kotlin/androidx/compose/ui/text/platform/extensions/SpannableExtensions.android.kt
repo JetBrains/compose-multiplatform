@@ -265,7 +265,7 @@ private fun Spannable.setFontAttributes(
                     fontWeight = spanStyle.fontWeight ?: FontWeight.Normal,
                     fontStyle = spanStyle.fontStyle ?: FontStyle.Normal,
                     fontSynthesis = spanStyle.fontSynthesis ?: FontSynthesis.All
-                ) as Typeface
+                ).value as Typeface
             ),
             start,
             end,

@@ -596,7 +596,7 @@ package androidx.compose.ui.text.font {
 
   @androidx.compose.ui.text.ExperimentalTextApi public static sealed interface FontFamily.Resolver {
     method public suspend Object? preload(androidx.compose.ui.text.font.FontFamily fontFamily, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public Object resolve(androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional androidx.compose.ui.text.font.FontWeight fontWeight, optional int fontStyle, optional int fontSynthesis);
+    method public androidx.compose.runtime.State<java.lang.Object> resolve(androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional androidx.compose.ui.text.font.FontWeight fontWeight, optional int fontStyle, optional int fontSynthesis);
     method public void setAsyncLoadContext(optional kotlin.coroutines.CoroutineContext context);
   }
 

@@ -86,7 +86,7 @@ class FontFamilyResolverImplTest {
             fontWeight,
             fontStyle,
             fontSynthesis
-        ) as Typeface
+        ).value as Typeface
     }
 
     @Test

@@ -58,7 +58,7 @@ internal fun AndroidTextPaint.applySpanStyle(
             fontWeight = style.fontWeight ?: FontWeight.Normal,
             fontStyle = style.fontStyle ?: FontStyle.Normal,
             fontSynthesis = style.fontSynthesis ?: FontSynthesis.All
-        ) as Typeface
+        ).value as Typeface
     }
 
     if (style.localeList != null && style.localeList != LocaleList.current) {

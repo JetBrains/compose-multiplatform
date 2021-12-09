@@ -66,7 +66,7 @@ class FontFamilyResolverFileTest {
             fontWeight,
             fontStyle,
             fontSynthesis
-        ) as Typeface
+        ).value as Typeface
     }
 
     private fun deleteFile() {
