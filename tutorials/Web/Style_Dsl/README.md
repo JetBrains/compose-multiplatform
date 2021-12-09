@@ -74,7 +74,7 @@ The Style DSL also provides a way to combine and unify selectors:
 object AppStylesheet : StyleSheet() {
     
     init {
-        // CSSSelector.Universal can be used instead of "*"
+        // `universal` can be used instead of "*": `universal style {}`
         "*" style { 
             fontSize(15.px)
             padding(0.px)
