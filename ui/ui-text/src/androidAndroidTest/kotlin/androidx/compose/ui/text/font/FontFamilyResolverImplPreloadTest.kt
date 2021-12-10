@@ -32,7 +32,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
@@ -78,7 +77,7 @@ class FontFamilyResolverImplPreloadTest {
         scope.runBlockingTest {
             subject.preload(fontFamily, resourceLoader)
         }
-        assertThat(typefaceCache.resultCache.size()).isEqualTo(1)
+        assertThat(typefaceCache.size).isEqualTo(1)
         val cacheResult = typefaceCache.getImmutableResultFor(
             fontFamily,
             FontWeight.W100,
@@ -90,10 +89,10 @@ class FontFamilyResolverImplPreloadTest {
     @Test
     fun preload_insertsTypefaceIntoCache_onlyForFontWeightAndStyle() {
         val fontFamily = FontTestData.FONT_100_REGULAR.toFontFamily()
-        runBlocking {
+        scope.runBlockingTest {
             subject.preload(fontFamily, resourceLoader)
         }
-        assertThat(typefaceCache.resultCache.size()).isEqualTo(1)
+        assertThat(typefaceCache.size).isEqualTo(1)
         val cacheResult = typefaceCache.getImmutableResultFor(
             fontFamily,
             FontWeight.W200,
@@ -111,10 +110,10 @@ class FontFamilyResolverImplPreloadTest {
             FontTestData.FONT_400_REGULAR,
             FontTestData.FONT_500_REGULAR
         )
-        runBlocking {
+        scope.runBlockingTest {
             subject.preload(fontFamily, resourceLoader)
         }
-        assertThat(typefaceCache.resultCache.size()).isEqualTo(5)
+        assertThat(typefaceCache.size).isEqualTo(5)
         for (weight in 100..500 step 100) {
             val cacheResult = typefaceCache.getImmutableResultFor(
                 fontFamily,
@@ -137,19 +136,19 @@ class FontFamilyResolverImplPreloadTest {
 
         assertThat(typefaceLoader.pendingRequestsFor(font)).hasSize(1)
         // at this point, the request is out but font cache hasn't started
-        assertThat(typefaceCache.resultCache.size()).isEqualTo(0)
+        assertThat(typefaceCache.size).isEqualTo(0)
 
         assertThat(preloadResult.isActive).isTrue()
 
         typefaceLoader.completeOne(font, Typeface.MONOSPACE)
 
-        runBlocking {
+        scope.runBlockingTest {
             preloadResult.await()
         }
 
         // at this point, result is back, and preload() has returned, so the main typeface
         // cache contains the result
-        assertThat(typefaceCache.resultCache.size()).isEqualTo(1)
+        assertThat(typefaceCache.size).isEqualTo(1)
 
         val typefaceResult = typefaceCache.getImmutableResultFor(
             fontFamily,
@@ -174,7 +173,7 @@ class FontFamilyResolverImplPreloadTest {
 
         typefaceLoader.completeOne(font, Typeface.MONOSPACE)
 
-        runBlocking {
+        scope.runBlockingTest {
             preloadResult.await()
         }
 
@@ -222,7 +221,7 @@ class FontFamilyResolverImplPreloadTest {
             subject.preload(fontFamily, resourceLoader)
         }
 
-        runBlocking {
+        scope.runBlockingTest {
             preloadResult.await()
         }
 
@@ -256,7 +255,7 @@ class FontFamilyResolverImplPreloadTest {
         testScope.runCurrent() // past yield on optionalFont
         typefaceLoader.completeOne(fallbackFont, Typeface.MONOSPACE)
 
-        runBlocking {
+        scope.runBlockingTest {
             preloadResult.await()
         }
 
@@ -289,7 +288,7 @@ class FontFamilyResolverImplPreloadTest {
             subject.preload(fontFamily, resourceLoader)
         }
 
-        runBlocking {
+        scope.runBlockingTest {
             preloadResult.await()
         }
 

@@ -43,7 +43,7 @@ internal fun TypefaceRequestCache.getImmutableResultFor(
     fontSynthesis: FontSynthesis = FontSynthesis.All,
     resourceLoader: Font.ResourceLoader
 ): Any? {
-    val result = resultCache.get(
+    val result = get(
         TypefaceRequest(
             fontFamily = fontFamily,
             fontWeight = fontWeight,

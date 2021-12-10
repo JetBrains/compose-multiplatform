@@ -108,7 +108,7 @@ interface Font {
          * Loaders that return the same results for all fonts as the platform default may return
          * null.
          *
-         * This cache key ensures that [FontFamily.Companion.GlobalResolver] can lookup cache
+         * This cache key ensures that [FontFamily.Companion.Resolver] can lookup cache
          * results per-loader.
          */
         @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")

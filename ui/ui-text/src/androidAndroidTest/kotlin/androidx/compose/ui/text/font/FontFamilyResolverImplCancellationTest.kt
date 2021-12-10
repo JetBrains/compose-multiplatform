@@ -75,7 +75,7 @@ class FontFamilyResolverImplCancellationTest {
         val fontFamily = asyncFont.toFontFamily()
         subject.resolve(resourceLoader, fontFamily)
 
-        fun currentCacheItem(): TypefaceResult = typefaceRequestCache.resultCache.get(
+        fun currentCacheItem(): TypefaceResult = typefaceRequestCache.get(
             TypefaceRequest(
                 fontFamily,
                 FontWeight.Normal,
@@ -83,7 +83,7 @@ class FontFamilyResolverImplCancellationTest {
                 FontSynthesis.All,
                 resourceLoader.cacheKey
             )
-        )
+        )!!
 
         scope.runCurrent()
         val beforeCacheEntry = currentCacheItem()

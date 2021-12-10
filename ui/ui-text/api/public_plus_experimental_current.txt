@@ -518,6 +518,16 @@ package androidx.compose.ui.text.android.style {
 
 }
 
+package androidx.compose.ui.text.caches {
+
+  public final class ContainerHelpersKt {
+  }
+
+  public final class SimpleArrayMapKt {
+  }
+
+}
+
 package androidx.compose.ui.text.font {
 
   public abstract class AndroidFont implements androidx.compose.ui.text.font.Font {
@@ -1104,6 +1114,9 @@ package androidx.compose.ui.text.platform {
   }
 
   public final class AndroidStringDelegate_androidKt {
+  }
+
+  public final class Synchronization_jvmKt {
   }
 
 }

@@ -29,7 +29,6 @@ import androidx.compose.ui.text.ExperimentalTextApi
 @ExperimentalTextApi
 @kotlin.jvm.JvmInline
 value class FontLoadingStrategy private constructor(val value: Int) {
-
     override fun toString(): String {
         return when (this) {
             Blocking -> "Blocking"

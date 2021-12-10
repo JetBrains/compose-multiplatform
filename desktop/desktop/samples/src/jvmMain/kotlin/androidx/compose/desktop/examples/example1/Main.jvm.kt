@@ -98,12 +98,14 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.platform.Font
 import androidx.compose.ui.text.platform.FontLoader
 import androidx.compose.ui.text.style.TextAlign
@@ -130,11 +132,29 @@ val italicFont = try {
     FontFamily(
         Font("NotoSans-Italic.ttf").also {
             // Check that font is loadable.
-            FontLoader().load(it)
+            @OptIn(ExperimentalTextApi::class)
+            FontLoader().loadBlocking(it)!!
         }
     )
 } catch (e: Exception) {
-    FontFamily.SansSerif
+    println("Failed to load font $e")
+    FontFamily.Cursive
+}
+
+val dispatchedFonts = try {
+    FontFamily(
+        Font("NotoSans-Italic.ttf", style = FontStyle.Italic).also {
+            @OptIn(ExperimentalTextApi::class)
+            FontLoader().loadBlocking(it)!!
+        },
+        Font("NotoSans-Regular.ttf", style = FontStyle.Normal).also {
+            @OptIn(ExperimentalTextApi::class)
+            FontLoader().loadBlocking(it)!!
+        }
+    )
+} catch (e: Exception) {
+    println("Failed to load font $e")
+    null
 }
 
 fun main() = singleWindowApplication(
@@ -366,6 +386,20 @@ private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
                         }
                     }
                 }
+            )
+        }
+        if (dispatchedFonts != null) {
+            Text(
+                text = buildAnnotatedString {
+                    append("resolved: NotoSans-Regular.ttf ")
+                    pushStyle(
+                        SpanStyle(
+                            fontStyle = FontStyle.Italic
+                        )
+                    )
+                    append("NotoSans-italic.ttf.")
+                },
+                fontFamily = dispatchedFonts,
             )
         }
 

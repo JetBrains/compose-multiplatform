@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.text.font
 
-import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.text.fastFilter
 
 /**
@@ -99,7 +98,7 @@ internal class FontMatcher {
     }
 
     @Suppress("NOTHING_TO_INLINE")
-    @VisibleForTesting
+    // @VisibleForTesting
     internal inline fun List<Font>.filterByClosestWeight(
         fontWeight: FontWeight,
         preferBelow: Boolean,

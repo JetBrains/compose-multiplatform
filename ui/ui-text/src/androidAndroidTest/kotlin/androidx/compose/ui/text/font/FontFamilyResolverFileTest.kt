@@ -21,7 +21,6 @@ import android.graphics.Typeface
 import android.os.ParcelFileDescriptor
 import androidx.compose.ui.platform.AndroidResourceLoader
 import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.font.FontFamily.Companion.GlobalResolver
 import androidx.compose.ui.text.matchers.assertThat
 import androidx.compose.ui.text.platform.bitmap
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -60,7 +59,7 @@ class FontFamilyResolverFileTest {
         fontStyle: FontStyle = FontStyle.Normal,
         fontSynthesis: FontSynthesis = FontSynthesis.All
     ): Typeface {
-        return GlobalResolver.resolve(
+        return FontFamily.GlobalResolver.resolve(
             resourceLoader,
             fontFamily,
             fontWeight,

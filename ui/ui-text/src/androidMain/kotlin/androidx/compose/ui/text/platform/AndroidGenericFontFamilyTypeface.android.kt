@@ -18,8 +18,6 @@ package androidx.compose.ui.text.platform
 
 import android.graphics.Typeface
 import android.os.Build
-import androidx.annotation.GuardedBy
-import androidx.collection.SparseArrayCompat
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
@@ -42,32 +40,10 @@ internal class AndroidGenericFontFamilyTypeface(
         fontWeight: FontWeight,
         fontStyle: FontStyle,
         synthesis: FontSynthesis
-    ): Typeface = getOrPut(fontWeight, fontStyle)
+    ): Typeface = buildStyledTypeface(fontWeight, fontStyle)
 
     // Platform never return null with Typeface.create
     private val nativeTypeface = Typeface.create(fontFamily.name, Typeface.NORMAL)!!
-
-    // TODO multiple TypefaceCache's, would be good to unify
-    // Cached styled Typeface.
-    private val lock = Any()
-    @GuardedBy("lock") private val styledCache = SparseArrayCompat<Typeface>(4)
-
-    /**
-     * Returns the cached Typeface if cached, otherwise build new one, put it to cache, then
-     * return it.
-     *
-     * @param fontWeight the weight of the font.
-     * @param fontStyle the style of the font
-     * @return a cached typeface.
-     */
-    fun getOrPut(fontWeight: FontWeight, fontStyle: FontStyle): Typeface {
-        val key = fontWeight.weight shl 1 or if (fontStyle == FontStyle.Italic) 1 else 0
-        synchronized(lock) {
-            return styledCache.get(key) ?: buildStyledTypeface(fontWeight, fontStyle).also {
-                styledCache.append(key, it)
-            }
-        }
-    }
 
     private fun buildStyledTypeface(fontWeight: FontWeight, fontStyle: FontStyle) =
         if (Build.VERSION.SDK_INT < 28) {

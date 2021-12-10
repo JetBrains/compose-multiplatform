@@ -121,7 +121,7 @@ internal object AndroidTypefaceCache {
         val key = getKey(context, font)
 
         key?.let {
-            cache[key]?.let { return it }
+            cache.get(key)?.let { return it }
         }
 
         val typeface = when (font) {

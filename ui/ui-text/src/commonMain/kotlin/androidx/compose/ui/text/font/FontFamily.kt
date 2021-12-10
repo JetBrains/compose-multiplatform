@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.text.font
 
-import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
@@ -30,7 +29,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * // TODO(seanmcq): Comment here about how it all works
  * @see FontListFontFamily
  * @see GenericFontFamily
- * @see FontFamily.GlobalResolver
+ * @see FontFamily.Resolver
  */
 @Immutable
 sealed class FontFamily(canLoadSynchronously: Boolean) {
@@ -176,7 +175,7 @@ sealed class FontFamily(canLoadSynchronously: Boolean) {
         @ExperimentalTextApi
         var GlobalResolver: Resolver = FontFamilyResolverImpl()
             @ExperimentalTextApi
-            @VisibleForTesting
+            // @VisibleForTesting
             internal set
     }
 

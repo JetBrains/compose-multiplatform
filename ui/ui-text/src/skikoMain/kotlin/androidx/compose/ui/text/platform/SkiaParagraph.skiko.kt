@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toComposeRect
 import androidx.compose.ui.text.AnnotatedString.Range
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.Placeholder
@@ -262,7 +263,6 @@ internal class SkiaParagraph(
             ?: 0
 
     override fun getLineForVerticalPosition(vertical: Float): Int {
-        println("Paragraph.getLineForVerticalPosition $vertical")
         return 0
     }
 
@@ -434,14 +434,11 @@ internal data class ComputedStyle(
         shadow = spanStyle.shadow
     )
 
+    @OptIn(ExperimentalTextApi::class)
     fun toSkTextStyle(fontLoader: FontLoader): SkTextStyle {
         val res = SkTextStyle()
         if (color != Color.Unspecified) {
             res.color = color.toArgb()
-        }
-        fontFamily?.let {
-            val fontFamilies = fontLoader.ensureRegistered(it)
-            res.fontFamilies = fontFamilies.toTypedArray()
         }
         fontStyle?.let {
             res.fontStyle = it.toSkFontStyle()
@@ -466,6 +463,18 @@ internal data class ComputedStyle(
         }
 
         res.fontSize = fontSize
+        fontFamily?.let {
+            @Suppress("UNCHECKED_CAST")
+            val resolved = FontFamily.GlobalResolver.resolve(
+                fontLoader,
+                it,
+                fontWeight ?: FontWeight.Normal,
+                fontStyle ?: FontStyle.Normal,
+                fontSynthesis ?: FontSynthesis.None
+            ).value as Pair<List<String>, Typeface>
+            val (fontFamilies, _) = resolved
+            res.fontFamilies = fontFamilies.toTypedArray()
+        }
         return res
     }
 
@@ -534,6 +543,7 @@ internal class ParagraphBuilder(
      * positions line and maintaining a list of active styles while building a paragraph. This list
      * of active styles is being compiled into single SkParagraph's style for every chunk of text
      */
+    @OptIn(ExperimentalTextApi::class)
     fun build(): SkParagraph {
         initialStyle = textStyle.toSpanStyle().withDefaultFontSize()
         defaultStyle = ComputedStyle(density, initialStyle)
@@ -561,8 +571,14 @@ internal class ParagraphBuilder(
 
             when (op) {
                 is Op.StyleAdd -> {
-                    // cached SkTextStyled could was loaded with a different font loader
-                    ensureFontsAreRegistered(fontLoader, op.style)
+                    // FontLoader may have changed, so ensure that Font resolution is still valid
+                    FontFamily.GlobalResolver.resolve(
+                        fontLoader,
+                        op.style.fontFamily,
+                        op.style.fontWeight ?: FontWeight.Normal,
+                        op.style.fontStyle ?: FontStyle.Normal,
+                        op.style.fontSynthesis ?: FontSynthesis.All
+                    )
                     pb.pushStyle(makeSkTextStyle(op.style))
                 }
                 is Op.PutPlaceholder -> {
@@ -592,12 +608,6 @@ internal class ParagraphBuilder(
         }
 
         return pb.build()
-    }
-
-    private fun ensureFontsAreRegistered(fontLoader: FontLoader, style: ComputedStyle) {
-        style.fontFamily?.let {
-            fontLoader.ensureRegistered(it)
-        }
     }
 
     private sealed class Op {
@@ -757,14 +767,19 @@ internal class ParagraphBuilder(
         }
     }
 
+    @OptIn(ExperimentalTextApi::class)
     internal val defaultFont by lazy {
-        val typeface = textStyle.fontFamily?.let {
-            fontLoader.findTypeface(
-                fontFamily = it,
+        val loadResult = textStyle.fontFamily?.let {
+            @Suppress("UNCHECKED_CAST")
+            FontFamily.GlobalResolver.resolve(
+                fontLoader,
+                it,
                 textStyle.fontWeight ?: FontWeight.Normal,
-                textStyle.fontStyle ?: FontStyle.Normal
-            )
-        } ?: Typeface.makeDefault()
+                textStyle.fontStyle ?: FontStyle.Normal,
+                textStyle.fontSynthesis ?: FontSynthesis.All
+            ).value as Pair<*, Typeface>
+        }
+        val typeface = loadResult?.second
         SkFont(typeface, defaultStyle.fontSize)
     }
 

@@ -21,7 +21,6 @@ import android.os.Build
 import androidx.compose.ui.platform.AndroidResourceLoader
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.FontTestData
-import androidx.compose.ui.text.font.FontFamily.Companion.GlobalResolver
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -37,7 +36,7 @@ class FontSynthesisTest {
     private val context = InstrumentationRegistry.getInstrumentation().context
 
     private fun loadFont(font: Font): Pair<Font, Typeface> {
-        return font to GlobalResolver.resolve(
+        return font to FontFamily.GlobalResolver.resolve(
             Font.AndroidResourceLoader(context),
             font.toFontFamily(),
             font.weight,

@@ -16,10 +16,11 @@
 
 package androidx.compose.ui.text.font
 
-import android.util.LruCache
-import androidx.annotation.GuardedBy
 import androidx.compose.runtime.State
 import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.caches.LruCache
+import androidx.compose.ui.text.platform.createSynchronizedObject
+import androidx.compose.ui.text.platform.synchronized
 import androidx.compose.ui.util.fastMap
 import kotlin.coroutines.CoroutineContext
 
@@ -98,7 +99,7 @@ internal class FontFamilyResolverImpl(
 }
 
 @ExperimentalTextApi
-internal expect class PlatformFontFamilyTypefaceAdapter : FontFamilyTypefaceAdapter
+internal expect class PlatformFontFamilyTypefaceAdapter() : FontFamilyTypefaceAdapter
 
 internal data class TypefaceRequest(
     val fontFamily: FontFamily?,
@@ -115,9 +116,9 @@ internal sealed interface TypefaceResult : State<Any> {
 }
 
 internal class TypefaceRequestCache {
-    internal val lock = Object()
-    @GuardedBy("lock")
-    internal val resultCache = LruCache<TypefaceRequest, TypefaceResult>(16)
+    internal val lock = createSynchronizedObject()
+    // @GuardedBy("lock")
+    private val resultCache = LruCache<TypefaceRequest, TypefaceResult>(16)
 
     fun runCached(
         typefaceRequest: TypefaceRequest,
@@ -128,7 +129,7 @@ internal class TypefaceRequestCache {
                 return it
             }
         }
-        // this is not run synchronized as it incurs expected file system reads.
+        // this is not run synchronized2 as it incurs expected file system reads.
         //
         // As a result, it is possible the same FontFamily resolution is started twice if this
         // function is entered concurrently. This is explicitly allowed, to avoid creating a global
@@ -187,4 +188,15 @@ internal class TypefaceRequestCache {
             }
         }
     }
+
+    // @VisibleForTesting
+    internal fun get(typefaceRequest: TypefaceRequest) = synchronized(lock) {
+        resultCache.get(typefaceRequest)
+    }
+
+    // @VisibleForTesting
+    internal val size: Int
+        get() = synchronized(lock) {
+            resultCache.size
+        }
 }

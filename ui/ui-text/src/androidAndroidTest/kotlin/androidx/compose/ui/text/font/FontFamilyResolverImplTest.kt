@@ -381,7 +381,7 @@ class FontFamilyResolverImplTest {
             // don't use test resolver for cache busting
             subject.resolve(resourceLoader, fontFamily, FontWeight(weight))
         }
-        assertThat(typefaceCache.resultCache.get(
+        assertThat(typefaceCache.get(
             TypefaceRequest(
                 fontFamily,
                 FontWeight.W100,
@@ -410,7 +410,7 @@ class FontFamilyResolverImplTest {
             subject.resolve(resourceLoader, fontFamily, FontWeight.W100)
             subject.resolve(resourceLoader, fontFamily, FontWeight(weight))
         }
-        assertThat(typefaceCache.resultCache.get(
+        assertThat(typefaceCache.get(
             TypefaceRequest(
                 fontFamily,
                 FontWeight.W100,

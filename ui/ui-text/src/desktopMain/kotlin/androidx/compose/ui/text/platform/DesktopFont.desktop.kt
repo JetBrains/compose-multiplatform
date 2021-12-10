@@ -229,6 +229,17 @@ internal actual val typefacesCache: Cache<String, SkTypeface> =
         60_000_000_000 // 1 minute
     )
 
+// TODO: When updating this module to support multithreading, use an atomic int here
+private var loaderCount = 0
+internal actual fun nextFontLoaderCacheKey(): String? {
+    loaderCount++
+    if (loaderCount == 1) {
+        return null
+    } else {
+        return "androidx.compose.ui.text.platform.FontLoader($loaderCount)"
+    }
+}
+
 private fun typefaceResource(resourceName: String): SkTypeface {
     val resource = Thread
         .currentThread()

@@ -16,17 +16,17 @@
 
 package androidx.compose.ui.text.font
 
-import androidx.annotation.GuardedBy
-import androidx.collection.LruCache
-import androidx.collection.SimpleArrayMap
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.caches.LruCache
+import androidx.compose.ui.text.caches.SimpleArrayMap
 import androidx.compose.ui.text.fastDistinctBy
 import androidx.compose.ui.text.fastFilter
-import androidx.compose.ui.text.font.FontFamily.Companion.GlobalResolver
+import androidx.compose.ui.text.platform.createSynchronizedObject
+import androidx.compose.ui.text.platform.synchronized
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 import kotlinx.coroutines.CancellationException
@@ -239,11 +239,11 @@ private fun List<Font>.firstImmediatelyAvailable(
                         )
                 }
             }
-            else -> throw IllegalStateException("Unknown font type ${font.javaClass.name}")
+            else -> throw IllegalStateException("Unknown font type $font")
         }
     }
     // none of the passed fonts match, fall back to platform font
-    val fallbackTypeface = GlobalResolver.resolve(
+    val fallbackTypeface = FontFamily.GlobalResolver.resolve(
         resourceLoader,
         null, // null is never a FontListFontFamily so we don't recurse
         typefaceRequest.fontWeight,
@@ -344,7 +344,7 @@ internal class AsyncFontListLoader(
  */
 @ExperimentalTextApi
 internal class AsyncTypefaceCache {
-    @JvmInline
+    @kotlin.jvm.JvmInline
     internal value class AsyncTypefaceResult(val result: Any?) {
         val isPermanentFailure: Boolean
             get() = result == null
@@ -357,13 +357,13 @@ internal class AsyncTypefaceCache {
     // 16 is based on the LruCache in TypefaceCompat Android, but no firm logic for this size.
     // After loading, fonts are put into the resultCache to allow reading from a kotlin function
     // context, reducing async fonts overhead cache lookup overhead only while cached
-    @GuardedBy("cacheLock")
+    // @GuardedBy("cacheLock")
     private val resultCache = LruCache<Key, AsyncTypefaceResult>(16)
     // failures and preloads are permanent, so they are stored separately
-    @GuardedBy("cacheLock")
+    // @GuardedBy("cacheLock")
     private val permanentCache = SimpleArrayMap<Key, AsyncTypefaceResult>()
 
-    private val cacheLock = Object()
+    private val cacheLock = createSynchronizedObject()
 
     fun put(
         font: Font,
@@ -384,15 +384,7 @@ internal class AsyncTypefaceCache {
     fun get(font: Font, resourceLoader: Font.ResourceLoader): AsyncTypefaceResult? {
         val key = Key(font, resourceLoader.cacheKey)
         return synchronized(cacheLock) {
-            resultCache[key] ?: permanentCache[key]
-        }
-    }
-
-    fun getAll(fonts: List<Font>, resourceLoader: Font.ResourceLoader): List<AsyncTypefaceResult?> {
-        return synchronized(cacheLock) {
-            fonts.fastMap {
-                val key = Key(it, resourceLoader.cacheKey)
-                resultCache[key] ?: permanentCache[key] }
+            resultCache.get(key) ?: permanentCache[key]
         }
     }
 
@@ -404,7 +396,7 @@ internal class AsyncTypefaceCache {
     ): Any? {
         val key = Key(font, resourceLoader.cacheKey)
         synchronized(cacheLock) {
-            val priorResult = resultCache[key] ?: permanentCache[key]
+            val priorResult = resultCache.get(key) ?: permanentCache[key]
             if (priorResult != null) {
                 return priorResult.result
             }
@@ -432,8 +424,8 @@ internal class AsyncTypefaceCache {
         block: () -> Any?
     ): Any? {
         synchronized(cacheLock) {
-            val priorResult = resultCache[Key(font, resourceLoader.cacheKey)]
-                ?: permanentCache[font]
+            val key = Key(font, resourceLoader.cacheKey)
+            val priorResult = resultCache.get(key) ?: permanentCache[key]
             if (priorResult != null) {
                 return priorResult.result
             }
