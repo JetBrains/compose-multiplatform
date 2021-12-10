@@ -45,6 +45,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateObserver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineDispatcher
@@ -3191,6 +3192,41 @@ class CompositionTests {
         }
 
         thread.interrupt()
+    }
+
+    @Test
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun avoidRaceConditionWhenInvalidating() = compositionTest {
+        var scope: RecomposeScope? = null
+        var count = 0
+        var threadException: Exception? = null
+        val thread = thread {
+            try {
+                while (!Thread.interrupted()) {
+                    scope?.invalidate()
+                    count++
+                }
+            } catch (e: Exception) {
+                threadException = e
+            }
+        }
+
+        compose {
+            scope = currentRecomposeScope
+            Text("Some text")
+            Text("Count $count")
+        }
+
+        repeat(20) {
+            advance(ignorePendingWork = true)
+            delay(1)
+        }
+
+        thread.interrupt()
+        @Suppress("BlockingMethodInNonBlockingContext")
+        thread.join()
+        delay(10)
+        threadException?.let { throw it }
     }
 
     @Test // b/197064250 and others
