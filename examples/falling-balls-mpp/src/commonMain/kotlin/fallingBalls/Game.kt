@@ -1,7 +1,7 @@
-package org.jetbrains.compose.demo.falling
-
-import org.jetbrains.compose.demo.falling.*
-import org.jetbrains.compose.demo.falling.views.*
+/*
+ * Copyright 2020-2021 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -11,19 +11,14 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.graphics.Color
 import kotlin.random.Random
 
-class NativeGame : Game() {
-    override fun now() = kotlin.system.getTimeNanos()
-}
-
-
 private fun Color.Companion.random() =
     Color((0..255).random(), (0..255).random(), (0..255).random())
 
-abstract class Game {
-    internal var previousTime: Long = Long.MAX_VALUE
+class Game(width: Int, height: Int) {
+    private var previousTime: Long = Long.MAX_VALUE
     private var startTime = 0L
 
-    var size by mutableStateOf(IntSize(0, 0))
+    var size by mutableStateOf(IntSize(width, height))
 
     var width: Int
         get() = size.width
@@ -51,8 +46,6 @@ abstract class Game {
     var numBlocks by mutableStateOf(5)
 
     fun isInBoundaries(pieceData: PieceData) = pieceData.position < size.height
-
-    abstract fun now(): Long
 
     fun togglePause() {
         paused = !paused
