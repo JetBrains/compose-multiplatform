@@ -1,3 +1,7 @@
+plugins {
+    kotlin("multiplatform") apply false
+}
+
 val COMPOSE_CORE_VERSION: String by project
 val COMPOSE_WEB_VERSION: String by project
 val COMPOSE_REPO_USERNAME: String? by project
@@ -19,6 +23,10 @@ subprojects {
 
     group = "org.jetbrains.compose.web"
     version = COMPOSE_WEB_VERSION
+
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>() {
+        kotlinOptions.jvmTarget = "11"
+    }
 
     pluginManager.withPlugin("maven-publish") {
         configure<PublishingExtension> {
