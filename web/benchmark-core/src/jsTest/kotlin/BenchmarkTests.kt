@@ -2,6 +2,7 @@ package org.jetbrains.compose.web.tests.benchmarks
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import com.sample.content.AddItems
 import kotlinx.browser.window
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -10,6 +11,7 @@ import org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi
 import org.jetbrains.compose.web.testutils.TestScope
 import org.jetbrains.compose.web.testutils.runTest
 import org.w3c.dom.get
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.Duration
@@ -70,17 +72,17 @@ class BenchmarkTests {
         return duration
     }
 
-    @Test // add1kItems overrides default `repeat` value (was - 5, now - 2) to avoid getting swallowed on CI
+    @Test @Ignore // add1kItems overrides default `repeat` value (was - 5, now - 2) to avoid getting swallowed on CI
     fun add1kItems() = runBenchmark(name = "add1000Items", repeat = 2) {
         addNItems(1000)
     }
 
-    @Test
+    @Test @Ignore
     fun add100Items() = runBenchmark("add100Items") {
         addNItems(100)
     }
 
-    @Test
+    @Test @Ignore
     fun add200Items() = runBenchmark("add200Items") {
         addNItems(200)
     }
@@ -90,7 +92,7 @@ class BenchmarkTests {
         addNItems(500)
     }
 
-    @Test
+    @Test @Ignore
     fun remove1000Items() = runBenchmark("remove1000Items") {
         val addItemsCount = mutableStateOf(1000)
 
@@ -110,7 +112,7 @@ class BenchmarkTests {
         duration
     }
 
-    @Test
+    @Test @Ignore
     fun changeEvery10thItem() = runBenchmark("changeEvery10thItem") {
         val items = mutableStateListOf<String>()
         items.addAll(generateSequence(0) { it + 1 }.map { it.toString() }.take(1000))

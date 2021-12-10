@@ -1,11 +1,12 @@
-package org.jetbrains.compose.web.tests.benchmarks
+/*
+ * Copyright 2020-2021 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
+package com.sample.content
 
 import androidx.compose.runtime.Composable
-import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.css.selectors.*
-import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.dom.*
-import org.jetbrains.compose.web.*
 
 @Composable
 internal fun AddItems(count: Int) {
