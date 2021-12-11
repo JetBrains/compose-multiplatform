@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.text.selection
 
+import androidx.compose.foundation.text.DefaultCursorThickness
 import androidx.compose.foundation.text.Handle
 import androidx.compose.foundation.text.HandleState
 import androidx.compose.foundation.text.InternalFoundationTextApi
@@ -49,6 +50,7 @@ import androidx.compose.ui.text.input.getSelectedText
 import androidx.compose.ui.text.input.getTextAfterSelection
 import androidx.compose.ui.text.input.getTextBeforeSelection
 import androidx.compose.ui.text.style.ResolvedTextDirection
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import kotlin.math.max
 import kotlin.math.min
@@ -555,6 +557,18 @@ internal class TextFieldSelectionManager(
             isStart = isStartHandle,
             areHandlesCrossed = value.selection.reversed
         )
+    }
+
+    internal fun getCursorPosition(density: Density): Offset {
+        val offset = offsetMapping.originalToTransformed(value.selection.start)
+        val layoutResult = state?.layoutResult!!.value
+        val cursorRect = layoutResult.getCursorRect(
+            offset.coerceIn(0, layoutResult.layoutInput.text.length)
+        )
+        val x = with(density) {
+            cursorRect.left + DefaultCursorThickness.toPx() / 2
+        }
+        return Offset(x, cursorRect.bottom)
     }
 
     /**
