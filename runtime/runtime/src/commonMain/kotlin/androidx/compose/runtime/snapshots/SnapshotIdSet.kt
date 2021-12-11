@@ -237,6 +237,33 @@ internal class SnapshotIdSet private constructor(
         }
     }
 
+    fun and(bits: SnapshotIdSet): SnapshotIdSet {
+        if (bits == EMPTY) return EMPTY
+        if (this == EMPTY) return EMPTY
+        return if (bits.lowerBound == this.lowerBound && bits.belowBound === this.belowBound) {
+            val newUpper = this.upperSet and bits.upperSet
+            val newLower = this.lowerSet and bits.lowerSet
+            if (newUpper == 0L && newLower == 0L && this.belowBound == null)
+                EMPTY
+            else
+                SnapshotIdSet(
+                    this.upperSet and bits.upperSet,
+                    this.lowerSet and bits.lowerSet,
+                    this.lowerBound,
+                    this.belowBound
+                )
+        } else {
+            if (this.belowBound == null)
+                this.fold(EMPTY) { previous, index ->
+                    if (bits.get(index)) previous.set(index) else previous
+                }
+            else
+                bits.fold(EMPTY) { previous, index ->
+                    if (this.get(index)) previous.set(index) else previous
+                }
+        }
+    }
+
     /**
      * Produce a set that if the value is set in this set or [bits] (`a | b`)
      */
@@ -282,6 +309,28 @@ internal class SnapshotIdSet private constructor(
             }
         }
     }.iterator()
+
+    inline fun fastForEach(block: (Int) -> Unit) {
+        val belowBound = belowBound
+        if (belowBound != null)
+            for (element in belowBound) {
+                block(element)
+            }
+        if (lowerSet != 0L) {
+            for (index in 0 until Long.SIZE_BITS) {
+                if (lowerSet and (1L shl index) != 0L) {
+                    block(index + lowerBound)
+                }
+            }
+        }
+        if (upperSet != 0L) {
+            for (index in 0 until Long.SIZE_BITS) {
+                if (upperSet and (1L shl index) != 0L) {
+                    block(index + Long.SIZE_BITS + lowerBound)
+                }
+            }
+        }
+    }
 
     fun lowest(default: Int): Int {
         val belowBound = belowBound
