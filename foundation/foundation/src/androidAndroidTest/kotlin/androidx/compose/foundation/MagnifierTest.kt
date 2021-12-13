@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -39,7 +40,9 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
@@ -53,7 +56,6 @@ import org.junit.runner.RunWith
 @OptIn(ExperimentalFoundationApi::class)
 @SuppressLint("NewApi")
 @MediumTest
-@SdkSuppress(minSdkVersion = 28)
 @RunWith(AndroidJUnit4::class)
 class MagnifierTest {
 
@@ -250,6 +252,7 @@ class MagnifierTest {
         assertThat(elements.last()).isInstanceOf(InspectableModifier.End::class.java)
     }
 
+    @SdkSuppress(minSdkVersion = 28)
     @Test
     fun platformMagnifierModifier_recreatesMagnifier_whenDensityChanged() {
         val magnifierFactory = CountingPlatformMagnifierFactory()
@@ -262,6 +265,7 @@ class MagnifierTest {
                         magnifierCenter = { Offset.Unspecified },
                         zoom = Float.NaN,
                         style = MagnifierStyle.Default,
+                        onSizeChanged = null,
                         platformMagnifierFactory = magnifierFactory
                     )
                 )
@@ -279,6 +283,7 @@ class MagnifierTest {
         }
     }
 
+    @SdkSuppress(minSdkVersion = 28)
     @Test
     fun platformMagnifierModifier_recreatesMagnifier_whenConfigurationChanged() {
         val magnifierFactory = CountingPlatformMagnifierFactory()
@@ -290,6 +295,7 @@ class MagnifierTest {
                     magnifierCenter = { Offset.Unspecified },
                     zoom = Float.NaN,
                     style = configuration,
+                    onSizeChanged = null,
                     platformMagnifierFactory = magnifierFactory
                 )
             )
@@ -306,6 +312,7 @@ class MagnifierTest {
         }
     }
 
+    @SdkSuppress(minSdkVersion = 28)
     @Test
     fun platformMagnifierModifier_recreatesMagnifier_whenConfigurationChangedToText() {
         val magnifierFactory = CountingPlatformMagnifierFactory()
@@ -317,6 +324,7 @@ class MagnifierTest {
                     magnifierCenter = { Offset.Unspecified },
                     zoom = Float.NaN,
                     style = style,
+                    onSizeChanged = null,
                     platformMagnifierFactory = magnifierFactory
                 )
             )
@@ -333,6 +341,7 @@ class MagnifierTest {
         }
     }
 
+    @SdkSuppress(minSdkVersion = 28)
     @Test
     fun platformMagnifierModifier_recreatesMagnifier_whenCannotUpdateZoom() {
         val magnifierFactory = CountingPlatformMagnifierFactory()
@@ -344,6 +353,7 @@ class MagnifierTest {
                     magnifierCenter = { Offset.Unspecified },
                     zoom = zoom,
                     style = MagnifierStyle.Default,
+                    onSizeChanged = null,
                     platformMagnifierFactory = magnifierFactory
                 )
             )
@@ -360,6 +370,7 @@ class MagnifierTest {
         }
     }
 
+    @SdkSuppress(minSdkVersion = 28)
     @Test
     fun platformMagnifierModifier_doesNotRecreateMagnifier_whenCanUpdateZoom() {
         val magnifierFactory = CountingPlatformMagnifierFactory(canUpdateZoom = true)
@@ -371,6 +382,7 @@ class MagnifierTest {
                     magnifierCenter = { Offset.Unspecified },
                     zoom = zoom,
                     style = MagnifierStyle.Default,
+                    onSizeChanged = null,
                     platformMagnifierFactory = magnifierFactory
 
                 )
@@ -388,6 +400,7 @@ class MagnifierTest {
         }
     }
 
+    @SdkSuppress(minSdkVersion = 28)
     @Test
     fun platformMagnifierModifier_updatesContent_whenLayerRedrawn() {
         var drawTrigger by mutableStateOf(0)
@@ -406,6 +419,7 @@ class MagnifierTest {
                         magnifierCenter = { Offset.Unspecified },
                         zoom = Float.NaN,
                         style = MagnifierStyle.Default,
+                        onSizeChanged = null,
                         platformMagnifierFactory = PlatformMagnifierFactory(platformMagnifier)
                     )
             )
@@ -423,6 +437,7 @@ class MagnifierTest {
         }
     }
 
+    @SdkSuppress(minSdkVersion = 28)
     @Test
     fun platformMagnifierModifier_doesNotUpdateProperties_whenLayerRedrawn() {
         var drawTrigger by mutableStateOf(0)
@@ -441,6 +456,7 @@ class MagnifierTest {
                         magnifierCenter = { Offset.Unspecified },
                         zoom = Float.NaN,
                         style = MagnifierStyle.Default,
+                        onSizeChanged = null,
                         platformMagnifierFactory = PlatformMagnifierFactory(platformMagnifier)
                     )
             )
@@ -457,6 +473,7 @@ class MagnifierTest {
         }
     }
 
+    @SdkSuppress(minSdkVersion = 28)
     @Test
     fun platformMagnifierModifier_updatesProperties_whenPlacementChanged() {
         var layoutOffset by mutableStateOf(IntOffset.Zero)
@@ -470,6 +487,7 @@ class MagnifierTest {
                         magnifierCenter = { Offset.Unspecified },
                         zoom = Float.NaN,
                         style = MagnifierStyle.Default,
+                        onSizeChanged = null,
                         platformMagnifierFactory = PlatformMagnifierFactory(platformMagnifier)
                     )
             )
@@ -486,6 +504,7 @@ class MagnifierTest {
         }
     }
 
+    @SdkSuppress(minSdkVersion = 28)
     @Test
     fun platformMagnifierModifier_updatesProperties_whenSourceCenterChanged() {
         var sourceCenter by mutableStateOf(Offset(1f, 1f))
@@ -497,6 +516,7 @@ class MagnifierTest {
                     magnifierCenter = { Offset.Unspecified },
                     zoom = Float.NaN,
                     style = MagnifierStyle.Default,
+                    onSizeChanged = null,
                     platformMagnifierFactory = PlatformMagnifierFactory(platformMagnifier)
                 )
             )
@@ -513,6 +533,7 @@ class MagnifierTest {
         }
     }
 
+    @SdkSuppress(minSdkVersion = 28)
     @Test
     fun platformMagnifierModifier_updatesProperties_whenMagnifierCenterChanged() {
         var magnifierCenter by mutableStateOf(Offset(1f, 1f))
@@ -524,6 +545,7 @@ class MagnifierTest {
                     magnifierCenter = { magnifierCenter },
                     zoom = Float.NaN,
                     style = MagnifierStyle.Default,
+                    onSizeChanged = null,
                     platformMagnifierFactory = PlatformMagnifierFactory(platformMagnifier)
                 )
             )
@@ -552,6 +574,7 @@ class MagnifierTest {
                     magnifierCenter = { Offset.Unspecified },
                     zoom = zoom,
                     style = MagnifierStyle.Default,
+                    onSizeChanged = null,
                     platformMagnifierFactory = PlatformMagnifierFactory(
                         platformMagnifier,
                         canUpdateZoom = true
@@ -571,6 +594,7 @@ class MagnifierTest {
         }
     }
 
+    @SdkSuppress(minSdkVersion = 28)
     @Test
     fun platformMagnifierModifier_dismissesMagnifier_whenRemovedFromComposition() {
         var showMagnifier by mutableStateOf(true)
@@ -583,6 +607,7 @@ class MagnifierTest {
                         magnifierCenter = { Offset.Unspecified },
                         zoom = Float.NaN,
                         style = MagnifierStyle.Default,
+                        onSizeChanged = null,
                         platformMagnifierFactory = PlatformMagnifierFactory(platformMagnifier)
                     )
                 } else {
@@ -600,6 +625,7 @@ class MagnifierTest {
         }
     }
 
+    @SdkSuppress(minSdkVersion = 28)
     @Test
     fun platformMagnifierModifier_dismissesMagnifier_whenCenterUnspecified() {
         // Show the magnifier initially and then hide it, to ensure that it's actually dismissed vs
@@ -613,6 +639,7 @@ class MagnifierTest {
                     magnifierCenter = { Offset.Unspecified },
                     zoom = Float.NaN,
                     style = MagnifierStyle.Default,
+                    onSizeChanged = null,
                     platformMagnifierFactory = PlatformMagnifierFactory(platformMagnifier)
                 )
             )
@@ -632,6 +659,7 @@ class MagnifierTest {
         }
     }
 
+    @SdkSuppress(minSdkVersion = 28)
     @Test
     fun platformMagnifierModifier_dismissesMagnifier_whenMagnifierRecreated() {
         var configuration by mutableStateOf(MagnifierStyle(elevation = 1.dp))
@@ -643,6 +671,7 @@ class MagnifierTest {
                     magnifierCenter = { Offset.Unspecified },
                     zoom = Float.NaN,
                     style = configuration,
+                    onSizeChanged = null,
                     platformMagnifierFactory = PlatformMagnifierFactory(platformMagnifier)
                 )
             )
@@ -654,6 +683,80 @@ class MagnifierTest {
 
         rule.runOnIdle {
             assertThat(platformMagnifier.dismissCount).isEqualTo(initialDismissCount + 1)
+        }
+    }
+
+    @SdkSuppress(minSdkVersion = 28)
+    @Test
+    fun platformMagnifierModifier_firesOnSizeChanged_initially() {
+        val magnifierSize = IntSize(10, 11)
+        val sizeEvents = mutableListOf<DpSize>()
+        val platformMagnifier = CountingPlatformMagnifier().apply {
+            size = magnifierSize
+        }
+        rule.setContent {
+            Box(
+                Modifier.magnifier(
+                    sourceCenter = { Offset.Zero },
+                    magnifierCenter = { Offset.Unspecified },
+                    zoom = Float.NaN,
+                    style = MagnifierStyle.Default,
+                    onSizeChanged = { sizeEvents += it },
+                    platformMagnifierFactory = PlatformMagnifierFactory(platformMagnifier)
+                )
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(sizeEvents).containsExactly(
+                with(rule.density) {
+                    magnifierSize.toSize().toDpSize()
+                }
+            )
+        }
+    }
+
+    @SdkSuppress(minSdkVersion = 28)
+    @Test
+    fun platformMagnifierModifier_firesOnSizeChanged_whenNewSizeRequested() {
+        val size1 = IntSize(10, 11)
+        val size2 = size1 * 2
+        var magnifierSize by mutableStateOf(size1)
+        val magnifierDpSize by derivedStateOf {
+            with(rule.density) {
+                magnifierSize.toSize().toDpSize()
+            }
+        }
+        val sizeEvents = mutableListOf<DpSize>()
+        val platformMagnifier = CountingPlatformMagnifier().apply {
+            size = magnifierSize
+        }
+        rule.setContent {
+            Box(
+                Modifier.magnifier(
+                    sourceCenter = { Offset.Zero },
+                    magnifierCenter = { Offset.Unspecified },
+                    zoom = Float.NaN,
+                    style = MagnifierStyle(size = magnifierDpSize),
+                    onSizeChanged = { sizeEvents += it },
+                    platformMagnifierFactory = PlatformMagnifierFactory(platformMagnifier)
+                )
+            )
+        }
+
+        rule.runOnIdle {
+            // Need to update the fake magnifier so it reports the right size when asked…
+            platformMagnifier.size = size2
+            // …and update the mutable state to trigger a recomposition.
+            magnifierSize = size2
+        }
+
+        rule.runOnIdle {
+            assertThat(sizeEvents).containsExactlyElementsIn(
+                listOf(size1, size2).map {
+                    with(rule.density) { it.toSize().toDpSize() }
+                }
+            ).inOrder()
         }
     }
 
@@ -692,6 +795,8 @@ class MagnifierTest {
     }
 
     private object NoopPlatformMagnifier : PlatformMagnifier {
+        override val size: IntSize = IntSize.Zero
+
         override fun updateContent() {
         }
 
@@ -710,6 +815,8 @@ class MagnifierTest {
         var contentUpdateCount = 0
         var propertyUpdateCount = 0
         var dismissCount = 0
+
+        override var size: IntSize = IntSize.Zero
 
         override fun updateContent() {
             contentUpdateCount++
