@@ -3171,7 +3171,7 @@ class CompositionTests {
             }
         }
 
-        for (i in 1..5000) {
+        for (i in 1..1000) {
             runBlocking(TestCoroutineDispatcher()) {
                 localRecomposerTest {
                     @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
