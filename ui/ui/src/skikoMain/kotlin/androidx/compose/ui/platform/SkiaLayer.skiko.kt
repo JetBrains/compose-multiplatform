@@ -56,7 +56,7 @@ import org.jetbrains.skia.ShadowUtils
 internal class SkiaLayer(
     private var density: Density,
     private val invalidateParentLayer: () -> Unit,
-    private val drawBlock: InvokeOnCanvas,
+    private val drawBlock: (Canvas) -> Unit,
     private val onDestroy: () -> Unit = {}
 ) : OwnedLayer {
     private var size = IntSize.Zero

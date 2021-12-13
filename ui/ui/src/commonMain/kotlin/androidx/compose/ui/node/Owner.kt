@@ -229,7 +229,7 @@ internal interface Owner {
     /**
      * Creates an [OwnedLayer] which will be drawing the passed [drawBlock].
      */
-    fun createLayer(drawBlock: InvokeOnCanvas, invalidateParentLayer: () -> Unit): OwnedLayer
+    fun createLayer(drawBlock: (Canvas) -> Unit, invalidateParentLayer: () -> Unit): OwnedLayer
 
     /**
      * The semantics have changed. This function will be called when a SemanticsNode is added to
