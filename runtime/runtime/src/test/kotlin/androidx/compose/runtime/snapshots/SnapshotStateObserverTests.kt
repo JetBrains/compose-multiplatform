@@ -302,7 +302,7 @@ class SnapshotStateObserverTests {
                 }
             }
 
-            for (i in 1..10000) {
+            for (i in 1..1000) {
                 val state1 by mutableStateOf(0)
                 var state2 by mutableStateOf(true)
                 val observer = SnapshotStateObserver({}).apply {
@@ -340,7 +340,7 @@ class SnapshotStateObserverTests {
                 }
             }
 
-            for (i in 1..10000) {
+            for (i in 1..1000) {
                 val state1 by mutableStateOf(0)
                 var state2 by mutableStateOf(true)
                 val observer = SnapshotStateObserver({}).apply {
