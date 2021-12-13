@@ -29,7 +29,7 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class MeasuringPlacingTwiceIsNotAllowed {
+class MeasuringPlacingTwiceIsNotAllowedTest {
 
     @get:Rule
     val rule = createComposeRule()
