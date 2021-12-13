@@ -36,7 +36,7 @@ object AppStylesheet : StyleSheet() {
         lineHeight(24.px)
 
         position(Position.Relative)
-        top((-32).px)
+        top(-32.px)
         marginLeft(8.px)
         fontSize(15.px)
         backgroundColor(rgba(39, 40, 44, .05))
@@ -45,7 +45,7 @@ object AppStylesheet : StyleSheet() {
 
         media(mediaMaxWidth(640.px)) {
             self style {
-                top((-16).px)
+                top(-16.px)
             }
         }
     }
