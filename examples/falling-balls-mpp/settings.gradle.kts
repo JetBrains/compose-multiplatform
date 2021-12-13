@@ -1,5 +1,6 @@
 pluginManagement {
     repositories {
+        mavenLocal()
         gradlePluginPortal()
         mavenCentral()
         maven { url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev") }
@@ -7,5 +8,5 @@ pluginManagement {
     }
 
 }
-rootProject.name = "falling_balls_mpp"
+rootProject.name = "falling-balls-mpp"
 

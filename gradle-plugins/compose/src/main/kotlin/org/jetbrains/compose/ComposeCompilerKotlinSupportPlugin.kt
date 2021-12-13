@@ -14,26 +14,25 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
     override fun getCompilerPluginId(): String =
         "androidx.compose.compiler.plugins.kotlin"
 
+    override fun getPluginArtifactForNative(): SubpluginArtifact =
+        composeCompilerArtifact("compiler-hosted")
+
+    override fun getPluginArtifact(): SubpluginArtifact =
+        composeCompilerArtifact("compiler")
+
+    private fun composeCompilerArtifact(artifactId: String) =
+        SubpluginArtifact(
+            groupId = "org.jetbrains.compose.compiler", artifactId = artifactId, version = composeVersion
+        )
+
     override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean =
         when (kotlinCompilation.target.platformType) {
             KotlinPlatformType.common -> true
             KotlinPlatformType.jvm -> true
             KotlinPlatformType.js -> isApplicableJsTarget(kotlinCompilation.target)
             KotlinPlatformType.androidJvm -> true
-            KotlinPlatformType.native -> false
+            KotlinPlatformType.native -> true
         }
-
-    override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
-        val target = kotlinCompilation.target
-        return target.project.provider {
-            platformPluginOptions[target.platformType] ?: emptyList()
-        }
-    }
-
-    override fun getPluginArtifact(): SubpluginArtifact =
-        SubpluginArtifact(
-            groupId = "org.jetbrains.compose.compiler", artifactId = "compiler", version = composeVersion
-        )
 
     private fun isApplicableJsTarget(kotlinTarget: KotlinTarget): Boolean {
         if (kotlinTarget !is KotlinJsIrTarget) return false
@@ -42,6 +41,13 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
         val webExt = project.webExt ?: return false
 
         return kotlinTarget in webExt.targetsToConfigure(project)
+    }
+
+    override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
+        val target = kotlinCompilation.target
+        return target.project.provider {
+            platformPluginOptions[target.platformType] ?: emptyList()
+        }
     }
 
     private val platformPluginOptions = mapOf(

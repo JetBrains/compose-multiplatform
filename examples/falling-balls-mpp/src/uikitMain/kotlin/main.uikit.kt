@@ -1,6 +1,10 @@
-// Use `xcodegen` first, then `open ./SkikoSample.xcodeproj` and then Run button in XCode.
-package androidx.compose.native.demo
+/*
+ * Copyright 2020-2021 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
 
+// Use `xcodegen` first, then `open ./SkikoSample.xcodeproj` and then Run button in XCode.
+import androidx.compose.runtime.remember
 import androidx.compose.ui.window.Application
 import kotlinx.cinterop.*
 import platform.UIKit.*
@@ -32,7 +36,14 @@ class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
     override fun application(application: UIApplication, didFinishLaunchingWithOptions: Map<Any?, *>?): Boolean {
         window = UIWindow(frame = UIScreen.mainScreen.bounds)
         window!!.rootViewController = Application("Compose/Native sample") {
-            myContent()
+            fallingBalls(
+                remember {
+                    utils().apply {
+                        width = 600
+                        height = 400
+                    }
+                }
+            )
         }
         window!!.makeKeyAndVisible()
         return true
