@@ -20,6 +20,18 @@ plugins {
 
 version = "1.0-SNAPSHOT"
 
+val resourcesDir = "$buildDir/resources"
+val skikoWasm by configurations.creating
+
+dependencies {
+    skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:0.6.7")
+}
+
+val unzipTask = tasks.register("unzipWasm", Copy::class) {
+    destinationDir = file(resourcesDir)
+    from(skikoWasm.map { zipTree(it) })
+}
+
 repositories {
     mavenLocal()
     mavenCentral()
@@ -57,6 +69,7 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(compose.material)
                 implementation(compose.runtime)
+                implementation("org.jetbrains.skiko:skiko:0.6.7")
             }
         }
 
@@ -74,9 +87,8 @@ kotlin {
         }
 
         val jsMain by getting {
-            dependencies {
-                implementation(compose.web.core)
-            }
+            resources.setSrcDirs(resources.srcDirs)
+            resources.srcDirs(unzipTask.map { it.destinationDir })
         }
 
         val nativeMain by creating {

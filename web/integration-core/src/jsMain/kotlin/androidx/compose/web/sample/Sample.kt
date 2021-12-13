@@ -11,6 +11,7 @@ import androidx.compose.runtime.setValue
 import org.jetbrains.compose.web.css.selectors.className
 import org.jetbrains.compose.web.css.selectors.hover
 import org.jetbrains.compose.web.css.selectors.plus
+import org.jetbrains.compose.web.ExperimentalComposeWebStyleApi
 import org.jetbrains.compose.web.renderComposableInBody
 import org.jetbrains.compose.web.sample.tests.launchTestCase
 import kotlinx.browser.window
@@ -122,6 +123,7 @@ fun Counter(value: Int) {
     }
 }
 
+@OptIn(ExperimentalComposeWebStyleApi::class)
 fun main() {
     val urlParams = URLSearchParams(window.location.search)
 
