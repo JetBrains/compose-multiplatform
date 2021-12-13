@@ -1,4 +1,3 @@
-
 pluginManagement {
     val COMPOSE_CORE_VERSION: String by settings
     println("[build] compose core version: $COMPOSE_CORE_VERSION")
@@ -24,13 +23,12 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         mavenCentral()
-
         repos?.forEach { urlPath ->
             maven {
                 url = uri(urlPath)
             }
         }
-
+        mavenLocal()
         maven {
             url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         }
