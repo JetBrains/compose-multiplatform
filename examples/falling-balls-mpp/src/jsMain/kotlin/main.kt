@@ -4,20 +4,15 @@
  */
 
 import androidx.compose.runtime.remember
-import kotlinx.browser.document
-import kotlinx.browser.window
-import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.dom.*
-import org.jetbrains.compose.web.renderComposable
-import org.w3c.dom.HTMLElement
+import androidx.compose.ui.window.Window
+import org.jetbrains.skiko.wasm.onWasmReady
 
 fun main() {
-    val root = document.getElementById("root") as HTMLElement
-
-    renderComposable(root = root) {
-        val game = remember { Game(width = 600, height = 600) }
-        fallingBalls(game)
+    onWasmReady {
+        Window("Compose/JS sample") {
+            val game = remember { Game(width = 600, height = 600) }
+            fallingBalls(game)
+        }
     }
 }
 
-actual fun now(): Long = window.performance.now().toLong()
