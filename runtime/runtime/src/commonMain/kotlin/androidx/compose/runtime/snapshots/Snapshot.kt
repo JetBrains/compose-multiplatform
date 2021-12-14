@@ -75,6 +75,7 @@ sealed class Snapshot(
      */
     open fun dispose() {
         disposed = true
+        releasePinnedSnapshot()
     }
 
     /**
@@ -133,6 +134,13 @@ sealed class Snapshot(
     internal var disposed = false
 
     /*
+     *
+     */
+    @Suppress("LeakingThis")
+    private var pinningTrackingHandle =
+        if (id != INVALID_SNAPSHOT) trackPinning(id, invalid) else -1
+
+    /*
      * The read observer for the snapshot if there is one.
      */
     internal abstract val readObserver: ((Any) -> Unit)?
@@ -181,12 +189,23 @@ sealed class Snapshot(
     internal open fun close() {
         sync {
             openSnapshots = openSnapshots.clear(id)
+            releasePinnedSnapshot()
         }
     }
 
     internal fun validateNotDisposed() {
         require(!disposed) { "Cannot use a disposed snapshot" }
     }
+
+    internal fun releasePinnedSnapshot() {
+        if (pinningTrackingHandle >= 0) {
+            releasePinning(pinningTrackingHandle)
+            pinningTrackingHandle = -1
+        }
+    }
+
+    internal fun takeoverPinnedSnapshot(): Int =
+        pinningTrackingHandle.also { pinningTrackingHandle = -1 }
 
     companion object {
         /**
@@ -479,6 +498,28 @@ sealed class Snapshot(
 }
 
 /**
+ * Pin the snapshot and invalid set.
+ *
+ * @return returns a handle that should be passed to [releasePinning] when the snapshot closes or
+ * is disposed.
+ */
+internal fun trackPinning(id: Int, invalid: SnapshotIdSet): Int {
+    val pinned = invalid.lowest(id)
+    return sync {
+        pinningTable.add(pinned)
+    }
+}
+
+/**
+ * Release the [handle] returned by [trackPinning]
+ */
+internal fun releasePinning(handle: Int) {
+    sync {
+        pinningTable.remove(handle)
+    }
+}
+
+/**
  * A snapshot of the values return by mutable states and other state objects. All state object
  * will have the same value in the snapshot as they had when the snapshot was created unless they
  * are explicitly changed in the snapshot.
@@ -681,6 +722,8 @@ open class MutableSnapshot internal constructor(
         sync {
             // Remove itself and previous ids from the open set.
             openSnapshots = openSnapshots.clear(id).andNot(previousIds)
+            releasePinnedSnapshot()
+            releasePreviouslyPinnedSnapshots()
         }
     }
 
@@ -825,6 +868,25 @@ open class MutableSnapshot internal constructor(
         }
     }
 
+    internal fun recordPreviousPinnedSnapshot(id: Int) {
+        if (id >= 0)
+            previousPinnedSnapshots = previousPinnedSnapshots + id
+    }
+
+    internal fun recordPreviousPinnedSnapshots(handles: IntArray) {
+        // Avoid unnecessary copies implied by the `+` below.
+        if (handles.isEmpty()) return
+        val pinned = previousPinnedSnapshots
+        if (pinned.isEmpty()) previousPinnedSnapshots = handles
+        else previousPinnedSnapshots = pinned + handles
+    }
+
+    internal fun releasePreviouslyPinnedSnapshots() {
+        for (index in previousPinnedSnapshots.indices) {
+            releasePinning(previousPinnedSnapshots[index])
+        }
+    }
+
     internal fun recordPreviousList(snapshots: SnapshotIdSet) {
         sync {
             previousIds = previousIds.or(snapshots)
@@ -842,6 +904,11 @@ open class MutableSnapshot internal constructor(
      * then these ids must be removed from the global as well.
      */
     internal var previousIds: SnapshotIdSet = SnapshotIdSet.EMPTY
+
+    /**
+     * A list of the pinned snapshots handles that must be released by this snapshot
+     */
+    internal var previousPinnedSnapshots: IntArray = IntArray(0)
 
     /**
      * The number of pending nested snapshots of this snapshot. To simplify the code, this
@@ -1165,10 +1232,7 @@ internal class GlobalSnapshot(id: Int, invalid: SnapshotIdSet) :
         error("Cannot apply the global snapshot directly. Call Snapshot.advanceGlobalSnapshot")
 
     override fun dispose() {
-        // Disposing the global snapshot is a no-op.
-
-        // The dispose behavior is performed by advancing the global snapshot. This method is
-        // squelched so  calling it from `currentSnapshot` doesn't cause incorrect behavior
+        releasePinnedSnapshot()
     }
 }
 
@@ -1236,7 +1300,9 @@ internal class NestedMutableSnapshot(
 
             // Ensure the ids associated with this snapshot are also applied by the parent.
             parent.recordPrevious(id)
+            parent.recordPreviousPinnedSnapshot(takeoverPinnedSnapshot())
             parent.recordPreviousList(previousIds)
+            parent.recordPreviousPinnedSnapshots(previousPinnedSnapshots)
         }
 
         applied = true
@@ -1382,6 +1448,13 @@ private var openSnapshots = SnapshotIdSet.EMPTY
 /** The first snapshot created must be at least on more than the INVALID_SNAPSHOT */
 private var nextSnapshotId = INVALID_SNAPSHOT + 1
 
+/**
+ * A tracking table for pinned snapshots. A pinned snapshot is the lowest snapshot id that the
+ * snapshot is ignoring by considering them invalid. This is used to calculate when a snapshot
+ * record can be reused.
+ */
+private val pinningTable = SnapshotDoubleIndexHeap()
+
 /** A list of apply observers */
 private val applyObservers = mutableListOf<(Set<Any>, Snapshot) -> Unit>()
 
@@ -1425,6 +1498,7 @@ private fun <T> takeNewGlobalSnapshot(
                 invalid = openSnapshots
             )
         )
+        previousGlobalSnapshot.dispose()
         openSnapshots = openSnapshots.set(globalId)
     }
 
@@ -1534,10 +1608,11 @@ private fun readError(): Nothing {
  * record created in an abandoned snapshot. It is also true if the record is valid in the
  * previous snapshot and is obscured by another record also valid in the previous state record.
  */
-private fun used(state: StateObject, id: Int, invalid: SnapshotIdSet): StateRecord? {
+private fun used(state: StateObject): StateRecord? {
     var current: StateRecord? = state.firstStateRecord
     var validRecord: StateRecord? = null
-    val lowestOpen = invalid.lowest(id)
+    val reuseLimit = pinningTable.lowestOrDefault(nextSnapshotId) - 1
+    val invalid = SnapshotIdSet.EMPTY
     while (current != null) {
         val currentId = current.snapshotId
         if (currentId == INVALID_SNAPSHOT) {
@@ -1545,7 +1620,7 @@ private fun used(state: StateObject, id: Int, invalid: SnapshotIdSet): StateReco
             // immediately.
             return current
         }
-        if (valid(current, lowestOpen, invalid)) {
+        if (valid(current, reuseLimit, invalid)) {
             if (validRecord == null) {
                 validRecord = current
             } else {
@@ -1593,7 +1668,7 @@ internal fun <T : StateRecord> T.overwritableRecord(
 
     if (candidate.snapshotId == id) return candidate
 
-    val newData = newOverwritableRecord(state, snapshot)
+    val newData = newOverwritableRecord(state)
     newData.snapshotId = id
 
     snapshot.recordModified(state)
@@ -1614,13 +1689,13 @@ internal fun <T : StateRecord> T.newWritableRecord(state: StateObject, snapshot:
     // cache the result of readable() as the mutating thread calls to writable() can change the
     // result of readable().
     @Suppress("UNCHECKED_CAST")
-    val newData = newOverwritableRecord(state, snapshot)
+    val newData = newOverwritableRecord(state)
     newData.assign(this)
     newData.snapshotId = snapshot.id
     return newData
 }
 
-internal fun <T : StateRecord> T.newOverwritableRecord(state: StateObject, snapshot: Snapshot): T {
+internal fun <T : StateRecord> T.newOverwritableRecord(state: StateObject): T {
     // Calling used() on a state object might return the same record for each thread calling
     // used() therefore selecting the record to reuse should be guarded.
 
@@ -1633,7 +1708,7 @@ internal fun <T : StateRecord> T.newOverwritableRecord(state: StateObject, snaps
     // cache the result of readable() as the mutating thread calls to writable() can change the
     // result of readable().
     @Suppress("UNCHECKED_CAST")
-    return (used(state, snapshot.id, openSnapshots) as T?)?.apply {
+    return (used(state) as T?)?.apply {
         snapshotId = Int.MAX_VALUE
     } ?: create().apply {
         snapshotId = Int.MAX_VALUE

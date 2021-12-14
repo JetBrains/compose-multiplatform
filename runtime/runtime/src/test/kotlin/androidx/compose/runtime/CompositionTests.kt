@@ -3229,6 +3229,41 @@ class CompositionTests {
         threadException?.let { throw it }
     }
 
+    @Test
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun avoidRaceConditionWhenApplyingSnapshotsInAThread() = compositionTest {
+        val count = mutableStateOf(0)
+        var threadException: Exception? = null
+
+        compose {
+            Text("Some text")
+            Text("Count ${count.value}")
+        }
+
+        val thread = thread {
+            try {
+                while (!Thread.interrupted()) {
+                    Snapshot.withMutableSnapshot {
+                        count.value++
+                    }
+                }
+            } catch (e: Exception) {
+                threadException = e
+            }
+        }
+
+        repeat(200) {
+            advance(ignorePendingWork = true)
+            delay(1)
+        }
+
+        thread.interrupt()
+        @Suppress("BlockingMethodInNonBlockingContext")
+        thread.join()
+        delay(10)
+        threadException?.let { throw it }
+    }
+
     @Test // b/197064250 and others
     fun canInvalidateDuringApplyChanges() = compositionTest {
         var value by mutableStateOf(0)
