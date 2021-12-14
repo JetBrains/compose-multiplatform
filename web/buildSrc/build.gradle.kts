@@ -10,7 +10,7 @@ repositories {
 }
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.6.10-RC"
+    id("org.jetbrains.kotlin.jvm") version "1.6.10"
 }
 
 
@@ -20,5 +20,5 @@ java {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10-RC")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10")
 }

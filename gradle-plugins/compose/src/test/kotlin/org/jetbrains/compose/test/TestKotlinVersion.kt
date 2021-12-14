@@ -7,7 +7,7 @@ package org.jetbrains.compose.test
 
 @Suppress("EnumEntryName")
 enum class TestKotlinVersion(val versionString: String) {
-    Default("1.6.10-RC"),
+    Default("1.6.10"),
     V1_5_31("1.5.31"),
     V1_5_20("1.5.20")
 }
