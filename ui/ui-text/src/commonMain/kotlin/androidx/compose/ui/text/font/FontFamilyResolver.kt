@@ -24,6 +24,20 @@ import androidx.compose.ui.text.platform.synchronized
 import androidx.compose.ui.util.fastMap
 import kotlin.coroutines.CoroutineContext
 
+/**
+ * Global font resolver for displaying text in a style.
+ *
+ * This may be used to load platform-specific typefaces that can be used to draw styled
+ * text.
+ *
+ * @see FontFamily.Resolver
+ */
+@ExperimentalTextApi
+object FontFamilyResolver : FontFamily.Resolver by fontFamilyResolverInstance
+
+@ExperimentalTextApi
+private val fontFamilyResolverInstance: FontFamily.Resolver = FontFamilyResolverImpl()
+
 @ExperimentalTextApi
 internal class FontFamilyResolverImpl(
     private val typefaceRequestCache: TypefaceRequestCache = TypefaceRequestCache(),

@@ -37,6 +37,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontFamilyResolver
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
@@ -465,7 +466,7 @@ internal data class ComputedStyle(
         res.fontSize = fontSize
         fontFamily?.let {
             @Suppress("UNCHECKED_CAST")
-            val resolved = FontFamily.GlobalResolver.resolve(
+            val resolved = FontFamilyResolver.resolve(
                 fontLoader,
                 it,
                 fontWeight ?: FontWeight.Normal,
@@ -572,7 +573,7 @@ internal class ParagraphBuilder(
             when (op) {
                 is Op.StyleAdd -> {
                     // FontLoader may have changed, so ensure that Font resolution is still valid
-                    FontFamily.GlobalResolver.resolve(
+                    FontFamilyResolver.resolve(
                         fontLoader,
                         op.style.fontFamily,
                         op.style.fontWeight ?: FontWeight.Normal,
@@ -771,7 +772,7 @@ internal class ParagraphBuilder(
     internal val defaultFont by lazy {
         val loadResult = textStyle.fontFamily?.let {
             @Suppress("UNCHECKED_CAST")
-            FontFamily.GlobalResolver.resolve(
+            FontFamilyResolver.resolve(
                 fontLoader,
                 it,
                 textStyle.fontWeight ?: FontWeight.Normal,

@@ -36,7 +36,7 @@ class FontSynthesisTest {
     private val context = InstrumentationRegistry.getInstrumentation().context
 
     private fun loadFont(font: Font): Pair<Font, Typeface> {
-        return font to FontFamily.GlobalResolver.resolve(
+        return font to FontFamilyResolver.resolve(
             Font.AndroidResourceLoader(context),
             font.toFontFamily(),
             font.weight,

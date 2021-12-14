@@ -117,7 +117,7 @@ abstract class AndroidFont @OptIn(ExperimentalTextApi::class) constructor(
      * Loader for loading an [AndroidFont] and producing an [android.graphics.Typeface].
      *
      * This interface is not intended to be used by application developers for text display. To load
-     * a typeface for display use [FontFamily.Companion.GlobalResolver].
+     * a typeface for display use [FontFamilyResolver].
      *
      * [TypefaceLoader] allows the introduction of new types of font descriptors for use in
      * [FontListFontFamily]. A [TypefaceLoader] allows a new subclass of [AndroidFont] to be used by
@@ -130,7 +130,7 @@ abstract class AndroidFont @OptIn(ExperimentalTextApi::class) constructor(
      * on some devices.
      * - [FontLoadingStrategy.Async] [Font] that loads a font from a backend via a network request.
      *
-     * During resolution from [FontFamily.Companion.GlobalResolver], an [AndroidFont] subclass will
+     * During resolution from [FontFamilyResolver], an [AndroidFont] subclass will
      * be queried for an appropriate loader by [Font.Companion.AndroidResourceLoader].
      *
      * The loader attached to an instance of an [AndroidFont] is only required to be able to load

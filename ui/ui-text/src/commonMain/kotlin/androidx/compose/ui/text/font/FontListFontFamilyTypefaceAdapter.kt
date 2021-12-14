@@ -243,7 +243,7 @@ private fun List<Font>.firstImmediatelyAvailable(
         }
     }
     // none of the passed fonts match, fall back to platform font
-    val fallbackTypeface = FontFamily.GlobalResolver.resolve(
+    val fallbackTypeface = FontFamilyResolver.resolve(
         resourceLoader,
         null, // null is never a FontListFontFamily so we don't recurse
         typefaceRequest.fontWeight,

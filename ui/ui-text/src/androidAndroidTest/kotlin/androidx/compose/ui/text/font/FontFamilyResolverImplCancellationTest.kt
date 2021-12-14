@@ -66,7 +66,7 @@ class FontFamilyResolverImplCancellationTest {
 
     @After
     fun cleanup() {
-//        scope.cleanupTestCoroutines()
+        scope.cleanupTestCoroutines()
     }
 
     @Test

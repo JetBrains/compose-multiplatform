@@ -47,7 +47,7 @@ import androidx.compose.ui.text.android.style.TextDecorationSpan
 import androidx.compose.ui.text.android.style.TypefaceSpan
 import androidx.compose.ui.text.fastFilter
 import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily.Companion.GlobalResolver
+import androidx.compose.ui.text.font.FontFamilyResolver
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
@@ -259,7 +259,7 @@ private fun Spannable.setFontAttributes(
     ) { spanStyle, start, end ->
         setSpan(
             TypefaceSpan(
-                GlobalResolver.resolve(
+                FontFamilyResolver.resolve(
                     resourceLoader = resourceLoader,
                     fontFamily = spanStyle.fontFamily,
                     fontWeight = spanStyle.fontWeight ?: FontWeight.Normal,

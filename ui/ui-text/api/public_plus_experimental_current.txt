@@ -592,13 +592,11 @@ package androidx.compose.ui.text.font {
   public static final class FontFamily.Companion {
     method public androidx.compose.ui.text.font.GenericFontFamily getCursive();
     method public androidx.compose.ui.text.font.SystemFontFamily getDefault();
-    method @androidx.compose.ui.text.ExperimentalTextApi public androidx.compose.ui.text.font.FontFamily.Resolver getGlobalResolver();
     method public androidx.compose.ui.text.font.GenericFontFamily getMonospace();
     method public androidx.compose.ui.text.font.GenericFontFamily getSansSerif();
     method public androidx.compose.ui.text.font.GenericFontFamily getSerif();
     property public final androidx.compose.ui.text.font.GenericFontFamily Cursive;
     property public final androidx.compose.ui.text.font.SystemFontFamily Default;
-    property @androidx.compose.ui.text.ExperimentalTextApi public final androidx.compose.ui.text.font.FontFamily.Resolver GlobalResolver;
     property public final androidx.compose.ui.text.font.GenericFontFamily Monospace;
     property public final androidx.compose.ui.text.font.GenericFontFamily SansSerif;
     property public final androidx.compose.ui.text.font.GenericFontFamily Serif;
@@ -614,6 +612,13 @@ package androidx.compose.ui.text.font {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily FontFamily(java.util.List<? extends androidx.compose.ui.text.font.Font> fonts);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily FontFamily(androidx.compose.ui.text.font.Font... fonts);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily FontFamily(androidx.compose.ui.text.font.Typeface typeface);
+  }
+
+  @androidx.compose.ui.text.ExperimentalTextApi public final class FontFamilyResolver implements androidx.compose.ui.text.font.FontFamily.Resolver {
+    field public static final androidx.compose.ui.text.font.FontFamilyResolver INSTANCE;
+  }
+
+  public final class FontFamilyResolverKt {
   }
 
   public final class FontKt {

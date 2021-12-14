@@ -59,7 +59,7 @@ class FontFamilyResolverFileTest {
         fontStyle: FontStyle = FontStyle.Normal,
         fontSynthesis: FontSynthesis = FontSynthesis.All
     ): Typeface {
-        return FontFamily.GlobalResolver.resolve(
+        return FontFamilyResolver.resolve(
             resourceLoader,
             fontFamily,
             fontWeight,

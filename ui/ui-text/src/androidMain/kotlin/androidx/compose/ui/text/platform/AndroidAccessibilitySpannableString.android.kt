@@ -33,11 +33,11 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily.Companion.GlobalResolver
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.GenericFontFamily
+import androidx.compose.ui.text.font.FontFamilyResolver
 import androidx.compose.ui.text.font.getAndroidTypefaceStyle
 import androidx.compose.ui.text.platform.extensions.setBackground
 import androidx.compose.ui.text.platform.extensions.setColor
@@ -116,7 +116,7 @@ private fun SpannableString.setSpanStyle(
             )
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                val typeface = GlobalResolver.resolve(
+                val typeface = FontFamilyResolver.resolve(
                     resourceLoader = resourceLoader,
                     fontFamily = spanStyle.fontFamily,
                     fontSynthesis = spanStyle.fontSynthesis ?: FontSynthesis.All

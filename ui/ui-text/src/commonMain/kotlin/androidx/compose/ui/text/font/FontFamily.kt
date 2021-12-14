@@ -161,22 +161,6 @@ sealed class FontFamily(canLoadSynchronously: Boolean) {
          * See [CSS cursive](https://www.w3.org/TR/css-fonts-3/#cursive)
          */
         val Cursive = GenericFontFamily("cursive")
-
-        /**
-         * Global font resolver for displaying text in a style.
-         *
-         * This may be used to load platform-specific typefaces that can be used to draw styled
-         * text.
-         *
-         * @see FontFamily.Resolver
-         */
-        @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
-        @get:ExperimentalTextApi
-        @ExperimentalTextApi
-        var GlobalResolver: Resolver = FontFamilyResolverImpl()
-            @ExperimentalTextApi
-            // @VisibleForTesting
-            internal set
     }
 
     @Suppress("CanBePrimaryConstructorProperty") // for deprecation

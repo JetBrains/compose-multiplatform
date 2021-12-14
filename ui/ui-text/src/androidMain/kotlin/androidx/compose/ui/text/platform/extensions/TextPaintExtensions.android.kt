@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily.Companion.GlobalResolver
+import androidx.compose.ui.text.font.FontFamilyResolver
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
@@ -52,7 +52,7 @@ internal fun AndroidTextPaint.applySpanStyle(
     }
 
     if (style.hasFontAttributes()) {
-        typeface = GlobalResolver.resolve(
+        typeface = FontFamilyResolver.resolve(
             resourceLoader = resourceLoader,
             fontFamily = style.fontFamily,
             fontWeight = style.fontWeight ?: FontWeight.Normal,

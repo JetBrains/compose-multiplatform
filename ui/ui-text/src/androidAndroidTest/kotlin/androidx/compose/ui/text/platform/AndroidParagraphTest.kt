@@ -30,14 +30,12 @@ import androidx.compose.ui.text.android.style.LetterSpacingSpanPx
 import androidx.compose.ui.text.android.style.ShadowSpan
 import androidx.compose.ui.text.android.style.SkewXSpan
 import androidx.compose.ui.text.android.style.TextDecorationSpan
-import androidx.compose.ui.text.font.AsyncTypefaceCache
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontFamilyResolverImpl
-import androidx.compose.ui.text.font.FontListFontFamilyTypefaceAdapter
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.TypefaceRequestCache
+import androidx.compose.ui.text.font.testutils.AsyncTestTypefaceLoader
+import androidx.compose.ui.text.font.testutils.BlockingFauxFont
 import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.matchers.assertThat
@@ -55,14 +53,6 @@ import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.atLeast
-import com.nhaarman.mockitokotlin2.atLeastOnce
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
-import com.nhaarman.mockitokotlin2.whenever
-import org.junit.After
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.math.ceil
@@ -80,24 +70,6 @@ AndroidParagraphTest {
     private val basicFontFamily = BASIC_MEASURE_FONT.toFontFamily()
     private val defaultDensity = Density(density = 1f)
     private val context = InstrumentationRegistry.getInstrumentation().context
-
-    @OptIn(ExperimentalTextApi::class)
-    @Before
-    fun clearTypefaceCache() {
-        // Tests in this file resolve from from mocks, ensure cache is clear before and after test
-        FontFamily.GlobalResolver = FontFamilyResolverImpl(
-            typefaceRequestCache = TypefaceRequestCache(),
-            fontListFontFamilyTypefaceAdapter = FontListFontFamilyTypefaceAdapter(
-                AsyncTypefaceCache()
-            )
-        )
-    }
-
-    @OptIn(ExperimentalTextApi::class)
-    @After
-    fun reset() {
-        FontFamily.GlobalResolver = FontFamilyResolverImpl()
-    }
 
     @OptIn(ExperimentalTextApi::class)
     @Test
@@ -775,14 +747,11 @@ AndroidParagraphTest {
     @Test
     @MediumTest
     fun testEmptyFontFamily() {
-        val resourceLoader = mock<Font.ResourceLoader>()
         val paragraph = simpleParagraph(
             text = "abc",
-            resourceLoader = resourceLoader,
             width = Float.MAX_VALUE
         )
 
-        verifyNoMoreInteractions(resourceLoader)
         assertThat(paragraph.textPaint.typeface).isNull()
     }
 
@@ -790,21 +759,14 @@ AndroidParagraphTest {
     @Test
     @MediumTest
     fun testEmptyFontFamily_withBoldFontWeightSelection() {
-        val resourceLoader = mock<Font.ResourceLoader>()
-
         val paragraph = simpleParagraph(
             text = "abc",
             style = TextStyle(
                 fontFamily = null,
                 fontWeight = FontWeight.Bold
             ),
-            resourceLoader = resourceLoader,
             width = Float.MAX_VALUE
         )
-        verify(resourceLoader, atLeast(0)).cacheKey
-
-        verifyNoMoreInteractions(resourceLoader)
-
         val typeface = paragraph.textPaint.typeface
         assertThat(typeface).isNotNull()
         assertThat(typeface.isBold).isTrue()
@@ -815,20 +777,14 @@ AndroidParagraphTest {
     @Test
     @MediumTest
     fun testEmptyFontFamily_withFontStyleSelection() {
-        val resourceLoader = mock<Font.ResourceLoader>()
-
         val paragraph = simpleParagraph(
             text = "abc",
             style = TextStyle(
                 fontFamily = null,
                 fontStyle = FontStyle.Italic
             ),
-            resourceLoader = resourceLoader,
             width = Float.MAX_VALUE
         )
-
-        verify(resourceLoader, atLeast(0)).cacheKey
-        verifyNoMoreInteractions(resourceLoader)
 
         val typeface = paragraph.textPaint.typeface
         assertThat(typeface).isNotNull()
@@ -840,7 +796,6 @@ AndroidParagraphTest {
     @Test
     @MediumTest
     fun testFontFamily_withGenericFamilyName() {
-        val resourceLoader = mock<Font.ResourceLoader>()
         val fontFamily = FontFamily.SansSerif
 
         val paragraph = simpleParagraph(
@@ -848,12 +803,8 @@ AndroidParagraphTest {
             style = TextStyle(
                 fontFamily = fontFamily
             ),
-            resourceLoader = resourceLoader,
             width = Float.MAX_VALUE
         )
-
-        verify(resourceLoader, atLeast(0)).cacheKey
-        verifyNoMoreInteractions(resourceLoader)
 
         val typeface = paragraph.textPaint.typeface
         assertThat(typeface).isNotNull()
@@ -865,23 +816,21 @@ AndroidParagraphTest {
     @Test
     @MediumTest
     fun testFontFamily_withCustomFont() {
-        val resourceLoader = mock<Font.ResourceLoader>()
-        val actualTypeface = TestFontResourceLoader(context).loadBlocking(BASIC_MEASURE_FONT)
-
-        whenever(resourceLoader.loadBlocking(BASIC_MEASURE_FONT)).thenReturn(actualTypeface)
+        val typefaceLoader = AsyncTestTypefaceLoader()
+        val expectedTypeface: Typeface =
+            TestFontResourceLoader(context).loadBlocking(BASIC_MEASURE_FONT) as Typeface
+        val font = BlockingFauxFont(typefaceLoader, expectedTypeface)
         val paragraph = simpleParagraph(
             text = "abc",
             style = TextStyle(
-                fontFamily = basicFontFamily
+                fontFamily = font.toFontFamily()
             ),
-            resourceLoader = resourceLoader,
             width = Float.MAX_VALUE
         )
 
-        verify(resourceLoader, atLeastOnce()).loadBlocking(BASIC_MEASURE_FONT)
-        val typeface = paragraph.textPaint.typeface
-        assertThat(typeface.isBold).isFalse()
-        assertThat(typeface.isItalic).isFalse()
+        val typeface: Typeface = paragraph.textPaint.typeface
+
+        assertThat(typeface).isSameInstanceAs(expectedTypeface)
     }
 
     @Test
