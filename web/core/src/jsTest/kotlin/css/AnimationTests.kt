@@ -5,9 +5,9 @@
 package org.jetbrains.compose.web.core.tests.css
 
 import org.jetbrains.compose.web.ExperimentalComposeWebApi
-import org.jetbrains.compose.web.testutils.*
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.dom.stringPresentation
+import org.jetbrains.compose.web.css.utils.serializeRules
+import org.jetbrains.compose.web.testutils.runTest
 import org.w3c.dom.HTMLStyleElement
 import org.w3c.dom.css.CSSStyleSheet
 import org.w3c.dom.get
@@ -39,7 +39,7 @@ object AnimationsStyleSheet : StyleSheet() {
 class AnimationTests {
     @Test
     fun animationClassGenerated() = runTest {
-        val generatedRules = AnimationsStyleSheet.cssRules.map { it.stringPresentation(indent = " ", delimiter = "") }
+        val generatedRules = AnimationsStyleSheet.serializeRules()
 
 
         assertContentEquals(
