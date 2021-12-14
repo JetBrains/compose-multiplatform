@@ -69,6 +69,7 @@ import androidx.compose.ui.test.swipeWithVelocity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.collect.Range
@@ -82,8 +83,8 @@ import org.junit.runners.Parameterized
 import java.util.concurrent.CountDownLatch
 
 @LargeTest
-@RunWith(Parameterized::class)
-class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(orientation) {
+@RunWith(AndroidJUnit4::class)
+class LazyListTest() : BaseLazyListTestWithOrientation(Orientation.Vertical) {
     private val LazyListTag = "LazyListTag"
     private val firstItemTag = "firstItemTag"
 
@@ -770,6 +771,27 @@ class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(o
         rule.waitForIdle()
 
         assertThat(state.numMeasurePasses).isEqualTo(initialMeasurePasses + 1)
+    }
+
+    @Test
+    fun onlyOneInitialMeasurePass() {
+        val items by mutableStateOf((1..20).toList())
+        lateinit var state: LazyListState
+        rule.setContent {
+            state = rememberLazyListState()
+            LazyColumnOrRow(
+                Modifier.requiredSize(100.dp).testTag(LazyListTag),
+                state = state
+            ) {
+                items(items) {
+                    Spacer(Modifier.requiredSize(20.dp).testTag("$it"))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(state.numMeasurePasses).isEqualTo(1)
+        }
     }
 
     @Test

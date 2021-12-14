@@ -25,6 +25,7 @@ import androidx.compose.foundation.gestures.EdgeEffectCompat.onPullDistanceCompa
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -89,10 +90,10 @@ private class AndroidEdgeEffectOverScrollController(
         allEffects.fastForEach { it.color = overScrollConfig.glowColor.toArgb() }
     }
 
-    private val redrawSignal = mutableStateOf(0)
+    private val redrawSignal = mutableStateOf(Unit, neverEqualPolicy())
 
     private fun invalidateOverScroll() {
-        redrawSignal.value += 1
+        redrawSignal.value = Unit
     }
 
     override fun release() {
@@ -211,8 +212,8 @@ private class AndroidEdgeEffectOverScrollController(
         if (velocity != Velocity.Zero) invalidateOverScroll()
     }
 
-    private var containerSize by mutableStateOf(Size.Zero)
-    private var isContentScrolls by mutableStateOf(false)
+    private var containerSize = Size.Zero
+    private var isContentScrolls = false
 
     override fun refreshContainerInfo(size: Size, isContentScrolls: Boolean) {
         val differentSize = size != containerSize
@@ -231,7 +232,10 @@ private class AndroidEdgeEffectOverScrollController(
             rightEffectNegation.setSize(size.height.roundToInt(), size.width.roundToInt())
         }
 
-        if (differentScroll || differentSize) release()
+        if (differentScroll || differentSize) {
+            invalidateOverScroll()
+            release()
+        }
     }
 
     override fun DrawScope.drawOverScroll() {
