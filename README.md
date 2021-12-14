@@ -56,7 +56,7 @@ Preview functionality (check your application UI without building/running it) fo
        * [cef](experimental/cef) - CEF integration in Jetpack Compose (somewhat outdated)
        * [Video Player](experimental/components/VideoPlayer)
        * [LWJGL integration](experimental/lwjgl-integration) - An example showing how to integrate Compose with [LWJGL](https://www.lwjgl.org)
-       * [CLI example](build_from_cli) - An example showing how to build Compose without Gradle
+       * [CLI example](experimental/build_from_cli) - An example showing how to build Compose without Gradle
        
 ## Getting latest version of Compose Multiplatform ##
 
