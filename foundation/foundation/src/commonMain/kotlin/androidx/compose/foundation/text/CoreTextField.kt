@@ -512,7 +512,7 @@ internal fun CoreTextField(
         Modifier
     }
 
-    Box(modifier = decorationBoxModifier, propagateMinConstraints = true) {
+    CoreTextFieldRootBox(decorationBoxModifier, manager) {
         decorationBox {
             // Modifiers applied directly to the internal input field implementation. In general,
             // these will most likely include draw, layout and IME related modifiers.
@@ -584,6 +584,17 @@ internal fun CoreTextField(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun CoreTextFieldRootBox(
+    modifier: Modifier,
+    manager: TextFieldSelectionManager,
+    content: @Composable () -> Unit
+) {
+    Box(modifier, propagateMinConstraints = true) {
+        ContextMenuArea(manager, content)
     }
 }
 

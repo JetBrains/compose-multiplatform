@@ -622,6 +622,21 @@ internal class TextFieldSelectionManager(
         }
     }
 
+    fun contextMenuOpenAdjustment(position: Offset) {
+        state?.layoutResult?.let { layoutResult ->
+            val offset = layoutResult.getOffsetForPosition(position)
+            if (!value.selection.contains(offset)) {
+                updateSelection(
+                    value = value,
+                    transformedStartOffset = offset,
+                    transformedEndOffset = offset,
+                    isStartHandle = false,
+                    adjustment = SelectionAdjustment.Word
+                )
+            }
+        }
+    }
+
     /**
      * Check if the text in the text field changed.
      * When the content in the text field is modified, this method returns true.

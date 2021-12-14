@@ -18,6 +18,8 @@ package androidx.compose.desktop.examples.example1
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.TweenSpec
+import androidx.compose.foundation.ContextMenuDataProvider
+import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
@@ -470,30 +472,36 @@ private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
         val text = remember {
             mutableStateOf("Hello \uD83E\uDDD1\uD83C\uDFFF\u200D\uD83E\uDDB0")
         }
-        TextField(
-            value = text.value,
-            onValueChange = { text.value = it },
-            label = { Text(text = "Input2") },
-            placeholder = {
-                Text(text = "Important input")
-            },
-            maxLines = 1,
-            modifier = Modifier.onPreviewKeyEvent {
-                when {
-                    (it.isMetaPressed && it.key == Key.Enter) -> {
-                        if (it.isShiftPressed) {
-                            text.value = "Cleared with shift!"
-                        } else {
-                            text.value = "Cleared!"
-                        }
-                        true
-                    }
-                    else -> false
-                }
-            }.focusOrder(focusItem1) {
-                next = focusItem2
+        ContextMenuDataProvider(
+            items = {
+                listOf(ContextMenuItem("Clear") { text.value = ""; focusItem1.requestFocus() })
             }
-        )
+        ) {
+            TextField(
+                value = text.value,
+                onValueChange = { text.value = it },
+                label = { Text(text = "Input2") },
+                placeholder = {
+                    Text(text = "Important input")
+                },
+                maxLines = 1,
+                modifier = Modifier.onPreviewKeyEvent {
+                    when {
+                        (it.isMetaPressed && it.key == Key.Enter) -> {
+                            if (it.isShiftPressed) {
+                                text.value = "Cleared with shift!"
+                            } else {
+                                text.value = "Cleared!"
+                            }
+                            true
+                        }
+                        else -> false
+                    }
+                }.focusOrder(focusItem1) {
+                    next = focusItem2
+                }
+            )
+        }
 
         var text2 by remember {
             val initText = buildString {

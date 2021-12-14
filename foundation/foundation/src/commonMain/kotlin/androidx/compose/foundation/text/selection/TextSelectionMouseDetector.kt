@@ -28,6 +28,7 @@ import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.consumeDownChange
+import androidx.compose.ui.input.pointer.isPrimaryPressed
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.util.fastAll
 
@@ -127,7 +128,11 @@ private suspend fun AwaitPointerEventScope.awaitMouseEventDown(): PointerEvent {
     do {
         event = awaitPointerEvent(PointerEventPass.Main)
     } while (
-        !event.changes.fastAll { it.type == PointerType.Mouse && it.changedToDown() }
+        !(
+            event.buttons.isPrimaryPressed && event.changes.fastAll {
+                it.type == PointerType.Mouse && it.changedToDown()
+            }
+            )
     )
     return event
 }
