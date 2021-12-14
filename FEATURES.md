@@ -40,6 +40,14 @@ Following limitations apply to 1.0 release.
   
 [comment]: <> (__SUPPORTED_GRADLE_VERSIONS__)
 
+### Kotlin compatibility
+
+Compose version | Kotlin version
+--- | ---
+1.0.0+ | 1.5.31
+1.0.1-rc2+ | 1.6.10
+
+
 ### Gradle plugin compatibility
 
 * M1 works only with Gradle 6.4 and 6.5;
