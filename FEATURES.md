@@ -50,8 +50,4 @@ Compose version | Kotlin version
 
 ### Gradle plugin compatibility
 
-* M1 works only with Gradle 6.4 and 6.5;
-* M2 works only with Gradle 6.4 or later (6.7 is the latest tested version).
-* M3 works only with Gradle 6.4 or later (6.8 is the latest tested version).
-* Alpha works with Gradle 6.7 or later (7.1 is the latest tested version).
 * 1.0.0 works with Gradle 6.7 or later (7.2 is the latest tested version).
