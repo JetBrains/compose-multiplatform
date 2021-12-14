@@ -14,6 +14,7 @@ import kotlinx.browser.window
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.web.ExperimentalComposeWebStyleApi
 import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.*
@@ -119,6 +120,7 @@ fun Counter(value: Int) {
     }
 }
 
+@OptIn(ExperimentalComposeWebStyleApi::class)
 fun main() {
     val urlParams = URLSearchParams(window.location.search)
 

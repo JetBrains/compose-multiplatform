@@ -1,6 +1,6 @@
 // This is a workaround for https://github.com/karma-runner/karma-teamcity-reporter/issues/86
 
-const kotlinReporterModule = require("../../../build/js/packages_imported/kotlin-test-js-runner/1.5.31/karma-kotlin-reporter");
+const kotlinReporterModule = require("../../../build/js/packages_imported/kotlin-test-js-runner/1.6.10/karma-kotlin-reporter");
 
 const KotlinReporter = kotlinReporterModule['reporter:karma-kotlin-reporter'][1];
 
