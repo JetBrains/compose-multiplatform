@@ -357,7 +357,9 @@ fun main() = singleWindowApplication {
 }
 ```
 
-### Advanced click events processing
+### Advanced click events processing (only for Desktop-JVM platform)
+_NB: Please note, that approach described below is temporary and is to be replaced by Compose API in future!_
+
 It is possible to get additional information about mouse event, like number of clicks or state of other mouse buttons at the click time, via awt event. 
 
 ```kotlin
