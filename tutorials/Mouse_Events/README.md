@@ -61,6 +61,8 @@ fun main() = singleWindowApplication {
 
 <img alt="Application running" src="mouse_click.gif" height="500" />
 
+Please note, that advanced click events processing is available on Desktop via AWT interop. See **Advanced click events processing** section below.  
+
 ### Mouse move listeners
 
 Let's create a window and install a pointer move listener on it that changes the background color according to the mouse pointer position:
@@ -350,6 +352,65 @@ fun main() = singleWindowApplication {
     ) {
         for (item in list.take(20)) {
             Text(item)
+        }
+    }
+}
+```
+
+### Advanced click events processing
+It is possible to get additional information about mouse event, like number of clicks or state of other mouse buttons at the click time, via awt event. 
+
+```kotlin
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.singleWindowApplication
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.onPointerEvent
+import androidx.compose.ui.awt.awtEvent
+import androidx.compose.ui.input.pointer.isPrimaryPressed
+import java.awt.event.MouseEvent
+
+@androidx.compose.ui.ExperimentalComposeUiApi
+fun main() = singleWindowApplication {
+    var count by remember { mutableStateOf(0) }
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
+        var text by remember { mutableStateOf("Click magenta box!") }
+        Column {
+            @OptIn(ExperimentalFoundationApi::class)
+            Box(
+                modifier = Modifier
+                    .background(Color.Magenta)
+                    .fillMaxWidth(0.7f)
+                    .fillMaxHeight(0.2f)
+                    .onPointerEvent(PointerEventType.Press) {
+                        when(it.awtEvent.button) {
+                            MouseEvent.BUTTON1 ->
+                                when (it.awtEvent.clickCount) {
+                                    1 -> { text = "Single click"}
+                                    2 -> { text = "Double click"}
+                                }
+                            MouseEvent.BUTTON3 -> { //BUTTON3 is right button
+                                if (it.buttons.isPrimaryPressed) { text = "Right + left click" }
+                                else { text = "Right click" }
+                            }
+                        }
+                    }
+            )
+            Text(text = text, fontSize = 40.sp)
         }
     }
 }
