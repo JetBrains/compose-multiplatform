@@ -2,6 +2,8 @@ plugins {
     id("com.android.library")
 }
 
+initDeps(project)
+
 android {
     compileSdkVersion(31)
 
