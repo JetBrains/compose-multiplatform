@@ -6,6 +6,8 @@ plugins {
     id("org.jetbrains.compose")
 }
 
+initDeps(project)
+
 kotlin {
     jvm("desktop")
     android()
