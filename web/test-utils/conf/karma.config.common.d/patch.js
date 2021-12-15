@@ -9,3 +9,4 @@ config.browserNoActivityTimeout = 10000;
 config.browserDisconnectTimeout = 10000;
 config.browserDisconnectTolerance = 3;
 config.browserConsoleLogOptions = {level: "debug", format: "%b %T: %m", terminal: true};
+config.logLevel = config.LOG_DEBUG;
