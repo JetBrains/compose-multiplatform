@@ -1057,7 +1057,8 @@ private class EnterAlwaysScrollBehavior(val canScroll: () -> Boolean = { true })
                     // Nothing coerced, meaning we're in the middle of top app bar collapse or
                     // expand.
                     offset = coerced
-                    available
+                    // Consume only the scroll on the Y axis.
+                    available.copy(x = 0f)
                 } else {
                     Offset.Zero
                 }
@@ -1122,7 +1123,8 @@ private class ExitUntilCollapsedScrollBehavior(
                     // Nothing coerced, meaning we're in the middle of top app bar collapse or
                     // expand.
                     offset = coerced
-                    available
+                    // Consume only the scroll on the Y axis.
+                    available.copy(x = 0f)
                 } else {
                     Offset.Zero
                 }
