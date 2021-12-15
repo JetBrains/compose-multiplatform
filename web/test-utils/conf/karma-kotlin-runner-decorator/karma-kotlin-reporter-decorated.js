@@ -12,14 +12,28 @@ const NewReporter = function(baseReporterDecorator, config, emitter) {
 
     this.onBrowserLog = (browser, log, type) => {
         if (!this.browserResults[browser.id]) {
-            this.initializeBrowser(browser);
+            this.browserResults[browser.id] = {
+                name: browser.name,
+                log: [],
+                consoleCollector: [],
+                consoleResultCollector: [],
+                lastSuite: null,
+                flowId: 'karmaTC' + hashString(browser.name + ((new Date()).getTime())) + browser.id
+            }
         }
         onBrowserLogOriginal(browser, log, type);
     }
 
     this.onSpecComplete = function (browser, result) {
         if (!this.browserResults[browser.id]) {
-            this.initializeBrowser(browser);
+            this.browserResults[browser.id] = {
+                name: browser.name,
+                log: [],
+                consoleCollector: [],
+                consoleResultCollector: [],
+                lastSuite: null,
+                flowId: 'karmaTC' + hashString(browser.name + ((new Date()).getTime())) + browser.id
+            }
         }
         onSpecCompleteOriginal(browser, result);
     }
