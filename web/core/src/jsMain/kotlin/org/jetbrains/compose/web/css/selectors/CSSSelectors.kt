@@ -8,7 +8,7 @@ internal const val webCssSelectorsDeprecationMessage = "Consider using a propert
 private val selectorScope = object : SelectorsScope {}
 
 sealed class Nth {
-    data class Functional(val a: Int? = null, val b: Int? = null) {
+    data class Functional(val a: Int? = null, val b: Int? = null) : Nth() {
         override fun toString(): String = when {
             a != null && b != null -> "${a}n+$b"
             a != null -> "${a}n"

@@ -15,7 +15,7 @@ import kotlin.test.assertContentEquals
 
 class NthChildTests {
     @Test
-    fun nthChildTest() {
+    fun nthChildOddTest() {
         val styleSheet = object : StyleSheet(usePrefix = false) {
             val someClass by style {
                 color(Color.red)
@@ -28,8 +28,61 @@ class NthChildTests {
         }
 
         assertContentEquals(
-            listOf(".someClass { color: red;}", ".someClass:nth-child(odd) { color: green;}"),
+            listOf(".someClass { color: red;}", ".someClass :nth-child(odd) { color: green;}"),
             styleSheet.serializeRules()
         )
     }
+
+    @Test
+    fun nthChildEvenTest() {
+        val styleSheet = object : StyleSheet(usePrefix = false) {
+            val someClass by style {
+                color(Color.red)
+
+
+                nthChild(Nth.Even) style {
+                    color(Color.green)
+                }
+            }
+        }
+
+        assertContentEquals(
+            listOf(".someClass { color: red;}", ".someClass :nth-child(even) { color: green;}"),
+            styleSheet.serializeRules()
+        )
+    }
+
+    @Test
+    fun nthChildFunctionalTest() {
+        val styleSheet = object : StyleSheet(usePrefix = false) {
+            val someClass by style {
+                color(Color.red)
+
+
+                nthChild(Nth.Functional(2, 3)) style {
+                    color(Color.green)
+                }
+
+                nthChild(Nth.Functional(2)) style {
+                    color(Color.green)
+                }
+
+                nthChild(Nth.Functional(b = 5)) style {
+                    color(Color.green)
+                }
+
+            }
+        }
+
+        assertContentEquals(
+            listOf(
+                ".someClass { color: red;}",
+                ".someClass :nth-child(2n+3) { color: green;}",
+                ".someClass :nth-child(2n) { color: green;}",
+                ".someClass :nth-child(5) { color: green;}"
+            ),
+            styleSheet.serializeRules()
+        )
+    }
+
 }
