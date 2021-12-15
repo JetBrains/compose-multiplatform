@@ -12,14 +12,14 @@ const NewReporter = function(baseReporterDecorator, config, emitter) {
 
     this.onBrowserLog = (browser, log, type) => {
         if (!this.browserResults[browser.id]) {
-            this.initializeBrowser(browser);
+            this.onBrowserStart(browser);
         }
         onBrowserLogOriginal(browser, log, type);
     }
 
     this.onSpecComplete = function (browser, result) {
         if (!this.browserResults[browser.id]) {
-            this.initializeBrowser(browser);
+            this.onBrowserStart(browser);
         }
         onSpecCompleteOriginal(browser, result);
     }
