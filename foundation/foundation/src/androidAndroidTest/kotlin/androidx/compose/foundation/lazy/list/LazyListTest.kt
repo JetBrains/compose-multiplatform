@@ -50,7 +50,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher.Companion.keyIsDefined
+import androidx.compose.ui.test.SemanticsMatcher.Companion.keyNotDefined
 import androidx.compose.ui.test.SemanticsNodeInteraction
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -69,7 +73,6 @@ import androidx.compose.ui.test.swipeWithVelocity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.collect.Range
@@ -83,8 +86,8 @@ import org.junit.runners.Parameterized
 import java.util.concurrent.CountDownLatch
 
 @LargeTest
-@RunWith(AndroidJUnit4::class)
-class LazyListTest() : BaseLazyListTestWithOrientation(Orientation.Vertical) {
+@RunWith(Parameterized::class)
+class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(orientation) {
     private val LazyListTag = "LazyListTag"
     private val firstItemTag = "firstItemTag"
 
@@ -1518,6 +1521,97 @@ class LazyListTest() : BaseLazyListTestWithOrientation(Orientation.Vertical) {
             assertThat(state.firstVisibleItemIndex).isEqualTo(1)
             assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
         }
+    }
+
+    @Test
+    fun pointerInputScrollingIsAllowedWhenUserScrollingIsEnabled() {
+        val itemSize = with(rule.density) { 30.toDp() }
+        rule.setContentWithTestViewConfiguration {
+            LazyColumnOrRow(
+                Modifier.mainAxisSize(itemSize * 3).testTag(LazyListTag),
+                userScrollEnabled = true,
+            ) {
+                items(5) {
+                    Spacer(Modifier.size(itemSize).testTag("$it"))
+                }
+            }
+        }
+
+        rule.onNodeWithTag(LazyListTag).scrollBy(itemSize)
+
+        rule.onNodeWithTag("1")
+            .assertStartPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun pointerInputScrollingIsDisallowedWhenUserScrollingIsDisabled() {
+        val itemSize = with(rule.density) { 30.toDp() }
+        rule.setContentWithTestViewConfiguration {
+            LazyColumnOrRow(
+                Modifier.mainAxisSize(itemSize * 3).testTag(LazyListTag),
+                userScrollEnabled = false,
+            ) {
+                items(5) {
+                    Spacer(Modifier.size(itemSize).testTag("$it"))
+                }
+            }
+        }
+
+        rule.onNodeWithTag(LazyListTag).scrollBy(itemSize)
+
+        rule.onNodeWithTag("1")
+            .assertStartPositionInRootIsEqualTo(itemSize)
+    }
+
+    @Test
+    fun programmaticScrollingIsAllowedWhenUserScrollingIsDisabled() {
+        val itemSize = with(rule.density) { 30.toDp() }
+        lateinit var state: LazyListState
+        rule.setContentWithTestViewConfiguration {
+            LazyColumnOrRow(
+                Modifier.mainAxisSize(itemSize * 3),
+                state = rememberLazyListState().also { state = it },
+                userScrollEnabled = false,
+            ) {
+                items(5) {
+                    Spacer(Modifier.size(itemSize).testTag("$it"))
+                }
+            }
+        }
+
+        state.scrollBy(itemSize)
+
+        rule.onNodeWithTag("1")
+            .assertStartPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun semanticScrollingIsDisallowedWhenUserScrollingIsDisabled() {
+        val itemSize = with(rule.density) { 30.toDp() }
+        rule.setContentWithTestViewConfiguration {
+            LazyColumnOrRow(
+                Modifier.mainAxisSize(itemSize * 3).testTag(LazyListTag),
+                userScrollEnabled = false,
+            ) {
+                items(5) {
+                    Spacer(Modifier.size(itemSize).testTag("$it"))
+                }
+            }
+        }
+
+        rule.onNodeWithTag(LazyListTag)
+            .assert(keyNotDefined(SemanticsActions.ScrollBy))
+            .assert(keyNotDefined(SemanticsActions.ScrollToIndex))
+            // but we still have a read only scroll range property
+            .assert(
+                keyIsDefined(
+                    if (vertical) {
+                        SemanticsProperties.VerticalScrollAxisRange
+                    } else {
+                        SemanticsProperties.HorizontalScrollAxisRange
+                    }
+                )
+            )
     }
 
     // ********************* END OF TESTS *********************
