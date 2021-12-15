@@ -399,10 +399,96 @@ class ModalBottomSheetTest {
     }
 
     @Test
+    fun modalBottomSheet_showAndHide_manually_skipHalfExpanded(): Unit = runBlocking(
+        AutoTestFrameClock()
+    ) {
+        lateinit var sheetState: ModalBottomSheetState
+        rule.setMaterialContent {
+            sheetState = rememberModalBottomSheetState(
+                ModalBottomSheetValue.Hidden,
+                skipHalfExpanded = true
+            )
+            ModalBottomSheetLayout(
+                sheetState = sheetState,
+                content = {},
+                sheetContent = {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .testTag(sheetTag)
+                    )
+                }
+            )
+        }
+
+        assertThat(sheetState.currentValue == ModalBottomSheetValue.Hidden)
+
+        sheetState.show()
+
+        advanceClock()
+
+        assertThat(sheetState.currentValue == ModalBottomSheetValue.Expanded)
+
+        sheetState.hide()
+
+        assertThat(sheetState.currentValue == ModalBottomSheetValue.Hidden)
+    }
+
+    @Test
     fun modalBottomSheet_hideBySwiping() {
         lateinit var sheetState: ModalBottomSheetState
         rule.setMaterialContent {
             sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded)
+            ModalBottomSheetLayout(
+                sheetState = sheetState,
+                content = {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .testTag(contentTag)
+                    )
+                },
+                sheetContent = {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .testTag(sheetTag)
+                    )
+                }
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Expanded)
+        }
+
+        rule.onNodeWithTag(sheetTag)
+            .performTouchInput { swipeDown(endY = rule.rootHeight().toPx() / 2) }
+
+        advanceClock()
+
+        rule.runOnIdle {
+            assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.HalfExpanded)
+        }
+
+        rule.onNodeWithTag(sheetTag)
+            .performTouchInput { swipeDown() }
+
+        advanceClock()
+
+        rule.runOnIdle {
+            assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Hidden)
+        }
+    }
+
+    @Test
+    fun modalBottomSheet_hideBySwiping_skipHalfExpanded() {
+        lateinit var sheetState: ModalBottomSheetState
+        rule.setMaterialContent {
+            sheetState = rememberModalBottomSheetState(
+                ModalBottomSheetValue.Expanded,
+                skipHalfExpanded = true
+            )
             ModalBottomSheetLayout(
                 sheetState = sheetState,
                 content = {
