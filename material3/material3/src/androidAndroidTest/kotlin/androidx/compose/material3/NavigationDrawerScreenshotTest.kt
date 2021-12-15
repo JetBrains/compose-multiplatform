@@ -21,7 +21,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.runtime.Composable
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -67,30 +66,21 @@ class NavigationDrawerScreenshotTest {
         }
     }
 
-    // TODO(b/196872589): Move to MaterialTest
-    private fun ComposeContentTestRule.setMaterialContentWithDarkTheme(
-        modifier: Modifier = Modifier,
-        composable: @Composable () -> Unit,
-    ) {
-        setContent {
-            MaterialTheme(colorScheme = darkColorScheme()) {
-                Surface(modifier = modifier, content = composable)
-            }
-        }
-    }
-
     private fun ComposeContentTestRule.setDarknavigationDrawer(drawerValue: DrawerValue) {
-        setMaterialContentWithDarkTheme {
-            Box(Modifier.requiredSize(400.dp, 32.dp).testTag(ContainerTestTag)) {
-                NavigationDrawer(
-                    drawerState = rememberDrawerState(drawerValue),
-                    drawerContent = {},
-                    content = {
-                        Box(
-                            Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
-                        )
-                    }
-                )
+        setMaterialContent(colorScheme = darkColorScheme()) {
+            Surface {
+                Box(Modifier.requiredSize(400.dp, 32.dp).testTag(ContainerTestTag)) {
+                    NavigationDrawer(
+                        drawerState = rememberDrawerState(drawerValue),
+                        drawerContent = {},
+                        content = {
+                            Box(
+                                Modifier.fillMaxSize()
+                                    .background(MaterialTheme.colorScheme.background)
+                            )
+                        }
+                    )
+                }
             }
         }
     }
