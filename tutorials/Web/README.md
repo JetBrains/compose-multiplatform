@@ -18,6 +18,8 @@ Compose for Web provides multiple ways of declaring user interfaces in Kotlin co
 
 [Using test-utils](Using_Test_Utils/README.md) - about unit testing for @Composable components based on HTML DOM
 
+[Integration with Ktor](https://play.kotlinlang.org/hands-on/Full%20Stack%20Web%20App%20with%20Kotlin%20Multiplatform) - this is actually not a Compose tutorial, but since integration of Kotlin/JS with Ktor is very popular scenario, we decided to add it here
+
 ## Examples:
 - Compose For Web [landing page](https://compose-web.ui.pages.jetbrains.team/). Also have a look at [source code](https://github.com/JetBrains/compose-jb/tree/master/examples/web-landing)
 - Compose For Web and React integration -  [source code](https://github.com/JetBrains/compose-jb/tree/master/examples/web-with-react)
