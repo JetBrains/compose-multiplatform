@@ -19,6 +19,11 @@ package androidx.compose.material3
 import android.os.Build
 import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.tokens.TopAppBarLarge
 import androidx.compose.material3.tokens.TopAppBarMedium
 import androidx.compose.material3.tokens.TopAppBarSmall
@@ -29,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
@@ -47,6 +53,9 @@ import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeLeft
+import androidx.compose.ui.test.swipeRight
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -569,6 +578,101 @@ class AppBarTest {
         )
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun topAppBar_enterAlways_allowHorizontalScroll() {
+        lateinit var state: LazyListState
+        rule.setMaterialContent {
+            state = rememberLazyListState()
+            MultiPageContent(TopAppBarDefaults.enterAlwaysScrollBehavior(), state)
+        }
+
+        rule.onNodeWithTag(LazyListTag).performTouchInput { swipeLeft() }
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(1)
+        }
+
+        rule.onNodeWithTag(LazyListTag).performTouchInput { swipeRight() }
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun topAppBar_exitUntilCollapsed_allowHorizontalScroll() {
+        lateinit var state: LazyListState
+        rule.setMaterialContent {
+            state = rememberLazyListState()
+            MultiPageContent(
+                TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
+                    rememberSplineBasedDecay()
+                ), state
+            )
+        }
+
+        rule.onNodeWithTag(LazyListTag).performTouchInput { swipeLeft() }
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(1)
+        }
+
+        rule.onNodeWithTag(LazyListTag).performTouchInput { swipeRight() }
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun topAppBar_pinned_allowHorizontalScroll() {
+        lateinit var state: LazyListState
+        rule.setMaterialContent {
+            state = rememberLazyListState()
+            MultiPageContent(TopAppBarDefaults.pinnedScrollBehavior(), state)
+        }
+
+        rule.onNodeWithTag(LazyListTag).performTouchInput { swipeLeft() }
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(1)
+        }
+
+        rule.onNodeWithTag(LazyListTag).performTouchInput { swipeRight() }
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    private fun MultiPageContent(scrollBehavior: TopAppBarScrollBehavior, state: LazyListState) {
+        Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                SmallTopAppBar(
+                    modifier = Modifier.testTag(TopAppBarTestTag),
+                    title = { Text(text = "Title") },
+                    scrollBehavior = scrollBehavior,
+                )
+            }
+        ) { contentPadding ->
+            LazyRow(Modifier.fillMaxSize().testTag(LazyListTag), state) {
+                items(2) { page ->
+                    LazyColumn(
+                        modifier = Modifier.fillParentMaxSize(),
+                        contentPadding = contentPadding
+                    ) {
+                        items(50) {
+                            Text(
+                                modifier = Modifier.fillParentMaxWidth(),
+                                text = "Item #$page x $it"
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Checks the app bar's components positioning when it's a [SmallTopAppBar], a
      * [CenterAlignedTopAppBar], or a larger app bar that is scrolled up and collapsed into a small
@@ -861,6 +965,7 @@ class AppBarTest {
     private val AppBarStartAndEndPadding = 4.dp
     private val AppBarTopAndBottomPadding = (TopAppBarSmall.SmallContainerHeight - FakeIconSize) / 2
 
+    private val LazyListTag = "lazyList"
     private val TopAppBarTestTag = "bar"
     private val NavigationIconTestTag = "navigationIcon"
     private val TitleTestTag = "title"
