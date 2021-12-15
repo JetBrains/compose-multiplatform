@@ -2504,14 +2504,16 @@ internal fun SemanticsOwner
 .getAllUncoveredSemanticsNodesToMap(): Map<Int, SemanticsNodeWithAdjustedBounds> {
     val root = unmergedRootSemanticsNode
     val nodes = mutableMapOf<Int, SemanticsNodeWithAdjustedBounds>()
-    if (!root.layoutNode.isPlaced) {
+    if (!root.layoutNode.isPlaced || !root.layoutNode.isAttached) {
         return nodes
     }
     val unaccountedSpace = Region().also { it.set(root.boundsInRoot.toAndroidRect()) }
 
     fun findAllSemanticNodesRecursive(currentNode: SemanticsNode) {
+        val notAttachedOrPlaced =
+            !currentNode.layoutNode.isPlaced || !currentNode.layoutNode.isAttached
         if ((unaccountedSpace.isEmpty && currentNode.id != root.id) ||
-            (!currentNode.layoutNode.isPlaced && !currentNode.isFake)
+            (notAttachedOrPlaced && !currentNode.isFake)
         ) {
             return
         }
