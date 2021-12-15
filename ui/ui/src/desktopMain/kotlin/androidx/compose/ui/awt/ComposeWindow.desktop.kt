@@ -117,7 +117,7 @@ class ComposeWindow : JFrame() {
         get() = layer.component.transparency
         set(value) {
             if (value != layer.component.transparency) {
-                check(isUndecorated) { "Window should be undecorated!" }
+                check(isUndecorated) { "Transparent window should be undecorated!" }
                 check(!isDisplayable) {
                     "Cannot change transparency if window is already displayable."
                 }
