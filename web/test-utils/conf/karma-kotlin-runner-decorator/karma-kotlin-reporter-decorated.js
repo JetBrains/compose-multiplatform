@@ -10,30 +10,27 @@ const NewReporter = function(baseReporterDecorator, config, emitter) {
     const onBrowserLogOriginal = this.onBrowserLog;
     const onSpecCompleteOriginal = this.onSpecComplete;
 
+    const initializeBrowser = function (browser) {
+        reporter.browserResults[browser.id] = {
+            name: browser.name,
+            log: [],
+            consoleCollector: [],
+            consoleResultCollector: [],
+            lastSuite: null,
+            flowId: 'karmaTC' + hashString(browser.name + ((new Date()).getTime())) + browser.id
+        };
+    };
+
     this.onBrowserLog = (browser, log, type) => {
         if (!this.browserResults[browser.id]) {
-            this.browserResults[browser.id] = {
-                name: browser.name,
-                log: [],
-                consoleCollector: [],
-                consoleResultCollector: [],
-                lastSuite: null,
-                flowId: 'karmaTC' + hashString(browser.name + ((new Date()).getTime())) + browser.id
-            }
+            initializeBrowser(browser);
         }
         onBrowserLogOriginal(browser, log, type);
     }
 
     this.onSpecComplete = function (browser, result) {
         if (!this.browserResults[browser.id]) {
-            this.browserResults[browser.id] = {
-                name: browser.name,
-                log: [],
-                consoleCollector: [],
-                consoleResultCollector: [],
-                lastSuite: null,
-                flowId: 'karmaTC' + hashString(browser.name + ((new Date()).getTime())) + browser.id
-            }
+            initializeBrowser(browser);
         }
         onSpecCompleteOriginal(browser, result);
     }
