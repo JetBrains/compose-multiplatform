@@ -133,6 +133,10 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
+    val macAppCategory: Property<String?> = objects.nullableProperty()
+
+    @get:Input
+    @get:Optional
     val packageBuildVersion: Property<String?> = objects.nullableProperty()
 
     @get:Input
@@ -325,6 +329,7 @@ abstract class AbstractJPackageTask @Inject constructor(
                 cliArg("--mac-package-name", macPackageName)
                 cliArg("--mac-package-identifier", nonValidatedMacBundleID)
                 cliArg("--mac-app-store", macAppStore)
+                cliArg("--mac-app-category", macAppCategory)
 
                 macSigner?.let { signer ->
                     cliArg("--mac-sign", true)
@@ -485,7 +490,9 @@ abstract class AbstractJPackageTask @Inject constructor(
         plist[PlistKeys.CFBundlePackageType] = "APPL"
         val packageVersion = packageVersion.get()!!
         plist[PlistKeys.CFBundleShortVersionString] = packageVersion
-        plist[PlistKeys.LSApplicationCategoryType] = "Unknown"
+        // If building for the App Store, use "utilities" as default just like jpackage.
+        val category = macAppCategory.orNull ?: (if (macAppStore.get()!!) "utilities" else null)
+        plist[PlistKeys.LSApplicationCategoryType] = category?.let { "public.app-category.$it" } ?: "Unknown"
         val packageBuildVersion = packageBuildVersion.orNull ?: packageVersion
         plist[PlistKeys.CFBundleVersion] = packageBuildVersion
         val year = Calendar.getInstance().get(Calendar.YEAR)

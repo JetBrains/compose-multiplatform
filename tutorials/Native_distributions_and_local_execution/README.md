@@ -440,6 +440,9 @@ The following platform-specific options are available
       [the corresponding tutorial](/tutorials/Signing_and_notarization_on_macOS/README.md) 
       for details;
     * `appStore = true` — build and sign for the Apple App Store. Requires at least JDK 17;
+    * `appCategory` — category of the app for the Apple App Store. 
+      Default value is `utilities` when building for the App Store, `Unknown` otherwise. 
+      See [LSApplicationCategoryType](https://developer.apple.com/documentation/bundleresources/information_property_list/lsapplicationcategorytype) for a list of valid categories;
     * `dmgPackageVersion = "DMG_VERSION"` — a dmg-specific package version
       (see the section `Specifying package version` for details);
     * `pkgPackageVersion = "PKG_VERSION"` — a pkg-specific package version
