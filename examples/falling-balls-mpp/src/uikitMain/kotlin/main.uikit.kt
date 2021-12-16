@@ -36,14 +36,8 @@ class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
     override fun application(application: UIApplication, didFinishLaunchingWithOptions: Map<Any?, *>?): Boolean {
         window = UIWindow(frame = UIScreen.mainScreen.bounds)
         window!!.rootViewController = Application("Compose/Native sample") {
-            fallingBalls(
-                remember {
-                    utils().apply {
-                        width = 600
-                        height = 400
-                    }
-                }
-            )
+            val game = remember { Game(width = 600, height = 600) }
+            fallingBalls(game)
         }
         window!!.makeKeyAndVisible()
         return true
