@@ -270,19 +270,14 @@ internal class SkiaParagraph(
         val prevBox = getBoxBackwardByOffset(offset)
         val nextBox = getBoxForwardByOffset(offset)
         return when {
-            prevBox == null -> {
-                val line = lineMetricsForOffset(offset)!!
-                return when (getParagraphDirection(offset)) {
-                    ResolvedTextDirection.Ltr -> line.left.toFloat()
-                    ResolvedTextDirection.Rtl -> line.right.toFloat()
-                }
-            }
-
-            nextBox == null || usePrimaryDirection || nextBox.direction == prevBox.direction ->
-                prevBox.cursorHorizontalPosition()
-
-            else ->
-                nextBox.cursorHorizontalPosition(true)
+            prevBox == null && nextBox == null -> 0f
+            prevBox == null -> nextBox!!.cursorHorizontalPosition(true)
+            nextBox == null -> prevBox.cursorHorizontalPosition()
+            nextBox.direction == prevBox.direction -> nextBox.cursorHorizontalPosition(true)
+            // BiDi transition offset, we need to resolve ambiguity with usePrimaryDirection
+            // for details see comment for MultiParagraph.getHorizontalPosition
+            usePrimaryDirection -> prevBox.cursorHorizontalPosition()
+            else -> nextBox.cursorHorizontalPosition(true)
         }
     }
 
