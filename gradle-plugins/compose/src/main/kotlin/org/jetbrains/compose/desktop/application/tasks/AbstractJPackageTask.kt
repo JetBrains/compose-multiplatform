@@ -129,6 +129,10 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
+    val packageBuildVersion: Property<String?> = objects.nullableProperty()
+
+    @get:Input
+    @get:Optional
     val winConsole: Property<Boolean?> = objects.nullableProperty()
 
     @get:Input
@@ -477,7 +481,8 @@ abstract class AbstractJPackageTask @Inject constructor(
         val packageVersion = packageVersion.get()!!
         plist[PlistKeys.CFBundleShortVersionString] = packageVersion
         plist[PlistKeys.LSApplicationCategoryType] = "Unknown"
-        plist[PlistKeys.CFBundleVersion] = packageVersion
+        val packageBuildVersion = packageBuildVersion.get()!!
+        plist[PlistKeys.CFBundleVersion] = packageBuildVersion
         val year = Calendar.getInstance().get(Calendar.YEAR)
         plist[PlistKeys.NSHumanReadableCopyright] = packageCopyright.orNull
             ?: "Copyright (C) $year"

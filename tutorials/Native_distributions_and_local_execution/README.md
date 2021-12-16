@@ -152,6 +152,13 @@ compose.desktop {
               dmgVersion = "..." 
               // a version only for the pkg package
               pkgVersion = "..." 
+              
+              // a build version for all macOS distributables
+              packageBuildVersion = "..."
+              // a build version only for the dmg package
+              dmgBuildVersion = "..." 
+              // a build version only for the pkg package
+              pkgBuildVersion = "..." 
             }
             windows {
               // a version for all Windows distributables
