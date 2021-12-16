@@ -77,7 +77,7 @@ class ScaffoldTest {
     fun scaffold_onlyContent_stackSlot() {
         var child1: Offset = Offset.Zero
         var child2: Offset = Offset.Zero
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Scaffold {
                 Text(
                     "One",
@@ -98,7 +98,7 @@ class ScaffoldTest {
         var appbarPosition: Offset = Offset.Zero
         var appbarSize: IntSize = IntSize.Zero
         var contentPosition: Offset = Offset.Zero
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Scaffold(
                 topBar = {
                     Box(
@@ -132,7 +132,7 @@ class ScaffoldTest {
         var appbarSize: IntSize = IntSize.Zero
         var contentPosition: Offset = Offset.Zero
         var contentSize: IntSize = IntSize.Zero
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Scaffold(
                 bottomBar = {
                     Box(

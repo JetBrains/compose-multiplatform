@@ -89,7 +89,7 @@ class AppBarTest {
     @Test
     fun smallTopAppBar_withTitle() {
         val title = "Title"
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.testTag(TopAppBarTestTag)) {
                 SmallTopAppBar(title = { Text(title) })
             }
@@ -99,7 +99,7 @@ class AppBarTest {
 
     @Test
     fun smallTopAppBar_default_positioning() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.testTag(TopAppBarTestTag)) {
                 SmallTopAppBar(
                     navigationIcon = {
@@ -119,7 +119,7 @@ class AppBarTest {
 
     @Test
     fun smallTopAppBar_noNavigationIcon_positioning() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.testTag(TopAppBarTestTag)) {
                 SmallTopAppBar(
                     title = {
@@ -138,7 +138,7 @@ class AppBarTest {
     fun smallTopAppBar_titleDefaultStyle() {
         var textStyle: TextStyle? = null
         var expectedTextStyle: TextStyle? = null
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             SmallTopAppBar(title = {
                 Text("Title")
                 textStyle = LocalTextStyle.current
@@ -162,7 +162,7 @@ class AppBarTest {
         var expectedActionsColor: Color = Color.Unspecified
         var expectedContainerColor: Color = Color.Unspecified
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             SmallTopAppBar(
                 modifier = Modifier.testTag(TopAppBarTestTag),
                 navigationIcon = {
@@ -213,7 +213,7 @@ class AppBarTest {
         var expectedScrolledContainerColor: Color = Color.Unspecified
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             SmallTopAppBar(
                 modifier = Modifier.testTag(TopAppBarTestTag),
                 title = {
@@ -243,7 +243,7 @@ class AppBarTest {
         val scrollOffsetDp = 20.dp
         var scrollOffsetPx = 0f
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             scrollOffsetPx = with(LocalDensity.current) { scrollOffsetDp.toPx() }
             SmallTopAppBar(
                 modifier = Modifier.testTag(TopAppBarTestTag),
@@ -274,7 +274,7 @@ class AppBarTest {
     @Test
     fun centerAlignedTopAppBar_withTitle() {
         val title = "Title"
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.testTag(TopAppBarTestTag)) {
                 CenterAlignedTopAppBar(title = { Text(title) })
             }
@@ -284,7 +284,7 @@ class AppBarTest {
 
     @Test
     fun centerAlignedTopAppBar_default_positioning() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.testTag(TopAppBarTestTag)) {
                 CenterAlignedTopAppBar(
                     navigationIcon = {
@@ -304,7 +304,7 @@ class AppBarTest {
 
     @Test
     fun centerAlignedTopAppBar_noNavigationIcon_positioning() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.testTag(TopAppBarTestTag)) {
                 CenterAlignedTopAppBar(
                     title = {
@@ -323,7 +323,7 @@ class AppBarTest {
     fun centerAlignedTopAppBar_titleDefaultStyle() {
         var textStyle: TextStyle? = null
         var expectedTextStyle: TextStyle? = null
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             CenterAlignedTopAppBar(
                 title = {
                     Text("Title")
@@ -350,7 +350,7 @@ class AppBarTest {
         var expectedActionsColor: Color = Color.Unspecified
         var expectedContainerColor: Color = Color.Unspecified
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             CenterAlignedTopAppBar(
                 modifier = Modifier.testTag(TopAppBarTestTag),
                 navigationIcon = {
@@ -398,7 +398,7 @@ class AppBarTest {
         var expectedScrolledContainerColor: Color = Color.Unspecified
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             CenterAlignedTopAppBar(
                 modifier = Modifier.testTag(TopAppBarTestTag),
                 title = {
@@ -432,7 +432,7 @@ class AppBarTest {
 
     @Test
     fun mediumTopAppBar_expanded_positioning() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.testTag(TopAppBarTestTag)) {
                 MediumTopAppBar(
                     navigationIcon = {
@@ -511,7 +511,7 @@ class AppBarTest {
 
     @Test
     fun largeTopAppBar_expanded_positioning() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.testTag(TopAppBarTestTag)) {
                 LargeTopAppBar(
                     navigationIcon = {
@@ -582,7 +582,7 @@ class AppBarTest {
     @Test
     fun topAppBar_enterAlways_allowHorizontalScroll() {
         lateinit var state: LazyListState
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             state = rememberLazyListState()
             MultiPageContent(TopAppBarDefaults.enterAlwaysScrollBehavior(), state)
         }
@@ -602,7 +602,7 @@ class AppBarTest {
     @Test
     fun topAppBar_exitUntilCollapsed_allowHorizontalScroll() {
         lateinit var state: LazyListState
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             state = rememberLazyListState()
             MultiPageContent(
                 TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
@@ -626,7 +626,7 @@ class AppBarTest {
     @Test
     fun topAppBar_pinned_allowHorizontalScroll() {
         lateinit var state: LazyListState
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             state = rememberLazyListState()
             MultiPageContent(TopAppBarDefaults.pinnedScrollBehavior(), state)
         }
@@ -821,7 +821,7 @@ class AppBarTest {
         var partiallyCollapsedOffsetPx = 0f
         var fullyCollapsedOffsetPx = 0f
         var scrollBehavior: TopAppBarScrollBehavior? = null
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             scrollBehavior =
                 TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberSplineBasedDecay())
             with(LocalDensity.current) {
@@ -877,7 +877,7 @@ class AppBarTest {
         var oneThirdCollapsedContainerColor: Color = Color.Unspecified
         var titleContentColor: Color = Color.Unspecified
         var scrollBehavior: TopAppBarScrollBehavior? = null
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             scrollBehavior =
                 TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberSplineBasedDecay())
             // Using the mediumTopAppBarColors for both Medium and Large top app bars, as the

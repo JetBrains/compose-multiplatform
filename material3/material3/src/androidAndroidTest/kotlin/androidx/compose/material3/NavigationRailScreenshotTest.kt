@@ -64,7 +64,7 @@ class NavigationRailScreenshotTest {
 
         var scope: CoroutineScope? = null
 
-        composeTestRule.setMaterialContent {
+        composeTestRule.setMaterialContent(lightColorScheme()) {
             scope = rememberCoroutineScope()
             DefaultNavigationRail(interactionSource)
         }
@@ -83,7 +83,7 @@ class NavigationRailScreenshotTest {
 
         var scope: CoroutineScope? = null
 
-        composeTestRule.setMaterialContent {
+        composeTestRule.setMaterialContent(lightColorScheme()) {
             scope = rememberCoroutineScope()
             DefaultNavigationRail(interactionSource)
         }
@@ -102,7 +102,7 @@ class NavigationRailScreenshotTest {
 
         var scope: CoroutineScope? = null
 
-        composeTestRule.setMaterialContent(colorScheme = darkColorScheme()) {
+        composeTestRule.setMaterialContent(darkColorScheme()) {
             scope = rememberCoroutineScope()
             DefaultNavigationRail(interactionSource)
         }
@@ -121,7 +121,7 @@ class NavigationRailScreenshotTest {
 
         var scope: CoroutineScope? = null
 
-        composeTestRule.setMaterialContent(colorScheme = darkColorScheme()) {
+        composeTestRule.setMaterialContent(darkColorScheme()) {
             scope = rememberCoroutineScope()
             DefaultNavigationRail(interactionSource)
         }
@@ -140,7 +140,7 @@ class NavigationRailScreenshotTest {
 
         var scope: CoroutineScope? = null
 
-        composeTestRule.setMaterialContent {
+        composeTestRule.setMaterialContent(lightColorScheme()) {
             scope = rememberCoroutineScope()
             DefaultNavigationRail(interactionSource, withHeaderFab = true)
         }
@@ -159,7 +159,7 @@ class NavigationRailScreenshotTest {
 
         var scope: CoroutineScope? = null
 
-        composeTestRule.setMaterialContent {
+        composeTestRule.setMaterialContent(lightColorScheme()) {
             scope = rememberCoroutineScope()
             DefaultNavigationRail(interactionSource, withHeaderFab = true)
         }

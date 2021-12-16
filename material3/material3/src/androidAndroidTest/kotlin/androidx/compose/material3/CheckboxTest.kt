@@ -28,18 +28,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.state.ToggleableState.Indeterminate
 import androidx.compose.ui.state.ToggleableState.Off
 import androidx.compose.ui.state.ToggleableState.On
-import androidx.compose.ui.test.assertHasClickAction
-import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsOff
@@ -72,7 +72,7 @@ class CheckboxTest {
 
     @Test
     fun checkBoxTest_defaultSemantics() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Column {
                 Checkbox(false, {}, modifier = Modifier.testTag(tag = "checkboxUnchecked"))
                 Checkbox(true, {}, modifier = Modifier.testTag("checkboxChecked"))
@@ -92,7 +92,7 @@ class CheckboxTest {
 
     @Test
     fun checkBoxTest_toggle() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val (checked, onCheckedChange) = remember { mutableStateOf(false) }
             Checkbox(checked, onCheckedChange, modifier = Modifier.testTag(defaultTag))
         }
@@ -105,7 +105,7 @@ class CheckboxTest {
 
     @Test
     fun checkBoxTest_toggle_twice() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val (checked, onCheckedChange) = remember { mutableStateOf(false) }
             Checkbox(checked, onCheckedChange, modifier = Modifier.testTag(defaultTag))
         }
@@ -122,7 +122,7 @@ class CheckboxTest {
     fun checkBoxTest_untoggleable_whenEmptyLambda() {
         val parentTag = "parent"
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val (checked, _) = remember { mutableStateOf(false) }
             Box(Modifier.semantics(mergeDescendants = true) {}.testTag(parentTag)) {
                 Checkbox(
@@ -144,7 +144,7 @@ class CheckboxTest {
 
     @Test
     fun checkBoxTest_untoggleableAndMergeable_whenNullLambda() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val (checked, _) = remember { mutableStateOf(false) }
             Box(Modifier.semantics(mergeDescendants = true) {}.testTag(defaultTag)) {
                 Checkbox(
@@ -281,7 +281,9 @@ class CheckboxTest {
                 ) {
                     TriStateCheckbox(
                         state = checkboxValue,
-                        onClick = if (clickable) { {} } else null,
+                        onClick = if (clickable) {
+                            {}
+                        } else null,
                         enabled = false
                     )
                 }
@@ -299,7 +301,7 @@ class CheckboxTest {
     fun checkBoxTest_clickInMinimumTouchTarget(): Unit = with(rule.density) {
         val tag = "switch"
         var state by mutableStateOf(Off)
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             // Box is needed because otherwise the control will be expanded to fill its parent
             Box(Modifier.fillMaxSize()) {
                 TriStateCheckbox(

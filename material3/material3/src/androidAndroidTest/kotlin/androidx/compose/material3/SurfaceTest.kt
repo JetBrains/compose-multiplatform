@@ -79,7 +79,7 @@ class SurfaceTest {
     fun noTonalElevationColorIsSetOnNonElevatedSurfaceColor() {
         var absoluteTonalElevation: Dp = 0.dp
         var surfaceColor: Color = Color.Unspecified
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             surfaceColor = MaterialTheme.colorScheme.surface
             Box(
                 Modifier
@@ -114,7 +114,7 @@ class SurfaceTest {
         var absoluteTonalElevation: Dp = 0.dp
         var surfaceTonalColor: Color = Color.Unspecified
         var surfaceColor: Color
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             surfaceColor = MaterialTheme.colorScheme.surface
             Box(
                 Modifier
@@ -149,7 +149,7 @@ class SurfaceTest {
     @Test
     fun tonalElevationColorIsNotSetOnNonSurfaceColor() {
         var absoluteTonalElevation: Dp = 0.dp
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(
                 Modifier
                     .size(10.dp, 10.dp)
@@ -181,7 +181,7 @@ class SurfaceTest {
     fun absoluteElevationCompositionLocalIsSet() {
         var outerElevation: Dp? = null
         var innerElevation: Dp? = null
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Surface(tonalElevation = 2.dp) {
                 outerElevation = LocalAbsoluteTonalElevation.current
                 Surface(tonalElevation = 4.dp) {
@@ -199,7 +199,7 @@ class SurfaceTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun absoluteElevationIsNotUsedForShadows() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Column {
                 Box(
                     Modifier
@@ -257,7 +257,7 @@ class SurfaceTest {
     fun contentColorSetBeforeModifier() {
         var contentColor: Color = Color.Unspecified
         val expectedColor = Color.Blue
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             CompositionLocalProvider(LocalContentColor provides Color.Red) {
                 Surface(
                     Modifier.composed {
@@ -279,7 +279,7 @@ class SurfaceTest {
     @Test
     fun clickableOverload_semantics() {
         val count = mutableStateOf(0)
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Surface(
                 modifier = Modifier.testTag("surface"),
                 role = Role.Checkbox,
@@ -302,7 +302,7 @@ class SurfaceTest {
     @Test
     fun clickableOverload_clickAction() {
         val count = mutableStateOf(0f)
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Surface(
                 modifier = Modifier.testTag("surface"),
                 onClick = { count.value += 1 }
@@ -324,7 +324,7 @@ class SurfaceTest {
     fun clickableOverload_enabled_disabled() {
         val count = mutableStateOf(0f)
         val enabled = mutableStateOf(true)
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Surface(
                 modifier = Modifier.testTag("surface"),
                 enabled = enabled.value,
