@@ -63,6 +63,12 @@ sealed interface MultiModalInjectionScope : InjectionScope {
      */
     @ExperimentalTestApi
     fun mouse(block: MouseInjectionScope.() -> Unit)
+
+    /**
+     * Injects all rotary events sent by the given [block]
+     */
+    @ExperimentalTestApi
+    fun rotary(block: RotaryInjectionScope.() -> Unit)
 }
 
 internal class MultiModalInjectionScopeImpl(node: SemanticsNode, testContext: TestContext) :
@@ -140,6 +146,9 @@ internal class MultiModalInjectionScopeImpl(node: SemanticsNode, testContext: Te
     @ExperimentalTestApi
     private val mouseScope: MouseInjectionScope = MouseInjectionScopeImpl(this)
 
+    @ExperimentalTestApi
+    private val rotaryScope: RotaryInjectionScope = RotaryInjectionScopeImpl(this)
+
     override fun touch(block: TouchInjectionScope.() -> Unit) {
         block.invoke(touchScope)
     }
@@ -147,5 +156,10 @@ internal class MultiModalInjectionScopeImpl(node: SemanticsNode, testContext: Te
     @ExperimentalTestApi
     override fun mouse(block: MouseInjectionScope.() -> Unit) {
         block.invoke(mouseScope)
+    }
+
+    @ExperimentalTestApi
+    override fun rotary(block: RotaryInjectionScope.() -> Unit) {
+        block.invoke(rotaryScope)
     }
 }

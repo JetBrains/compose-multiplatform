@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.test
 
-import android.view.InputDevice
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_BUTTON_PRESS
 import android.view.MotionEvent.ACTION_BUTTON_RELEASE
@@ -31,9 +30,19 @@ import android.view.MotionEvent.ACTION_POINTER_INDEX_SHIFT
 import android.view.MotionEvent.ACTION_POINTER_UP
 import android.view.MotionEvent.ACTION_SCROLL
 import android.view.MotionEvent.ACTION_UP
+import android.view.MotionEvent.PointerCoords
+import android.view.MotionEvent.PointerProperties
+import android.view.MotionEvent.TOOL_TYPE_UNKNOWN
+import android.view.ViewConfiguration
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.ViewRootForTest
+import androidx.core.view.InputDeviceCompat.SOURCE_MOUSE
+import androidx.core.view.InputDeviceCompat.SOURCE_ROTARY_ENCODER
+import androidx.core.view.InputDeviceCompat.SOURCE_TOUCHSCREEN
+import androidx.core.view.MotionEventCompat.AXIS_SCROLL
+import androidx.core.view.ViewConfigurationCompat.getScaledHorizontalScrollFactor
+import androidx.core.view.ViewConfigurationCompat.getScaledVerticalScrollFactor
 
 private val MouseAsTouchEvents = listOf(ACTION_DOWN, ACTION_MOVE, ACTION_UP)
 
@@ -48,15 +57,11 @@ internal actual fun createInputDispatcher(
     val view = root.view
     return AndroidInputDispatcher(testContext, root) {
         when (it.source) {
-            InputDevice.SOURCE_TOUCHSCREEN -> {
-                view.dispatchTouchEvent(it)
-            }
-            InputDevice.SOURCE_MOUSE -> {
-                if (it.action in MouseAsTouchEvents) {
-                    view.dispatchTouchEvent(it)
-                } else {
-                    view.dispatchGenericMotionEvent(it)
-                }
+            SOURCE_TOUCHSCREEN -> view.dispatchTouchEvent(it)
+            SOURCE_ROTARY_ENCODER -> view.dispatchGenericMotionEvent(it)
+            SOURCE_MOUSE -> when (it.action) {
+                in MouseAsTouchEvents -> view.dispatchTouchEvent(it)
+                else -> view.dispatchGenericMotionEvent(it)
             }
             else -> throw IllegalArgumentException(
                 "Can't dispatch MotionEvents with source ${it.source}"
@@ -75,6 +80,19 @@ internal class AndroidInputDispatcher(
     private var batchedEvents = mutableListOf<MotionEvent>()
     private var disposed = false
     private var currentClockTime = currentTime
+
+    // TODO(b/214439478): Find out if we should add these values to Compose's ViewConfiguration.
+    // Scroll factors for Rotary Input.
+    private val verticalScrollFactor: Float by lazy {
+        val context = root.view.context
+        val config = ViewConfiguration.get(context)
+        getScaledVerticalScrollFactor(config, context)
+    }
+    private val horizontalScrollFactor: Float by lazy {
+        val context = root.view.context
+        val config = ViewConfiguration.get(context)
+        getScaledHorizontalScrollFactor(config, context)
+    }
 
     override fun PartialGesture.enqueueDown(pointerId: Int) {
         enqueueTouchEvent(
@@ -227,13 +245,13 @@ internal class AndroidInputDispatcher(
                 /* action = */ action + (actionIndex shl ACTION_POINTER_INDEX_SHIFT),
                 /* pointerCount = */ coordinates.size,
                 /* pointerProperties = */ Array(coordinates.size) { pointerIndex ->
-                    MotionEvent.PointerProperties().apply {
+                    PointerProperties().apply {
                         id = pointerIds[pointerIndex]
                         toolType = MotionEvent.TOOL_TYPE_FINGER
                     }
                 },
                 /* pointerCoords = */ Array(coordinates.size) { pointerIndex ->
-                    MotionEvent.PointerCoords().apply {
+                    PointerCoords().apply {
                         x = positionInScreen.x + coordinates[pointerIndex][0].x
                         y = positionInScreen.y + coordinates[pointerIndex][0].y
                     }
@@ -244,7 +262,7 @@ internal class AndroidInputDispatcher(
                 /* yPrecision = */ 1f,
                 /* deviceId = */ 0,
                 /* edgeFlags = */ 0,
-                /* source = */ InputDevice.SOURCE_TOUCHSCREEN,
+                /* source = */ SOURCE_TOUCHSCREEN,
                 /* flags = */ 0
             ).apply {
                 // The current time & coordinates are the last element in the lists, and need to
@@ -254,7 +272,7 @@ internal class AndroidInputDispatcher(
                     addBatch(
                         /* eventTime = */ eventTimes[timeIndex],
                         /* pointerCoords = */ Array(coordinates.size) { pointerIndex ->
-                            MotionEvent.PointerCoords().apply {
+                            PointerCoords().apply {
                                 x = positionInScreen.x + coordinates[pointerIndex][timeIndex].x
                                 y = positionInScreen.y + coordinates[pointerIndex][timeIndex].y
                             }
@@ -313,13 +331,13 @@ internal class AndroidInputDispatcher(
                     /* action = */ action,
                     /* pointerCount = */ 1,
                     /* pointerProperties = */ arrayOf(
-                        MotionEvent.PointerProperties().apply {
+                        PointerProperties().apply {
                             id = 0
                             toolType = MotionEvent.TOOL_TYPE_MOUSE
                         }
                     ),
                     /* pointerCoords = */ arrayOf(
-                        MotionEvent.PointerCoords().apply {
+                        PointerCoords().apply {
                             x = positionInScreen.x + coordinate.x
                             y = positionInScreen.y + coordinate.y
                             if (axis != -1) {
@@ -333,11 +351,65 @@ internal class AndroidInputDispatcher(
                     /* yPrecision = */ 1f,
                     /* deviceId = */ 0,
                     /* edgeFlags = */ 0,
-                    /* source = */ InputDevice.SOURCE_MOUSE,
+                    /* source = */ SOURCE_MOUSE,
                     /* flags = */ 0
                 ).apply {
                     offsetLocation(-positionInScreen.x, -positionInScreen.y)
                 }
+            )
+        }
+    }
+
+    override fun RotaryInputState.enqueueRotaryScrollHorizontally(horizontalScrollPixels: Float) {
+        enqueueRotaryScrollEvent(
+            eventTime = currentTime,
+            scrollPixels = -horizontalScrollPixels / horizontalScrollFactor
+        )
+    }
+
+    override fun RotaryInputState.enqueueRotaryScrollVertically(verticalScrollPixels: Float) {
+        enqueueRotaryScrollEvent(
+            eventTime = currentTime,
+            scrollPixels = -verticalScrollPixels / verticalScrollFactor
+        )
+    }
+
+    private fun enqueueRotaryScrollEvent(
+        eventTime: Long,
+        scrollPixels: Float
+    ) {
+        synchronized(batchLock) {
+            ensureNotDisposed {
+                "Can't enqueue rotary scroll event (" +
+                    "eventTime=$eventTime, " +
+                    "scrollDelta=$scrollPixels)"
+            }
+            batchedEvents.add(
+                MotionEvent.obtain(
+                    /* downTime = */ 0,
+                    /* eventTime = */ eventTime,
+                    /* action = */ ACTION_SCROLL,
+                    /* pointerCount = */ 1,
+                    /* pointerProperties = */ arrayOf(
+                        PointerProperties().apply {
+                            id = 0
+                            toolType = TOOL_TYPE_UNKNOWN
+                        }
+                    ),
+                    /* pointerCoords = */ arrayOf(
+                        PointerCoords().apply {
+                            setAxisValue(AXIS_SCROLL, scrollPixels)
+                        }
+                    ),
+                    /* metaState = */ 0,
+                    /* buttonState = */ 0,
+                    /* xPrecision = */ 1f,
+                    /* yPrecision = */ 1f,
+                    /* deviceId = */ 0,
+                    /* edgeFlags = */ 0,
+                    /* source = */ SOURCE_ROTARY_ENCODER,
+                    /* flags = */ 0
+                )
             )
         }
     }

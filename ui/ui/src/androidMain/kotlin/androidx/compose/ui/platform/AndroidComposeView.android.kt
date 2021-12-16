@@ -110,6 +110,8 @@ import androidx.compose.ui.input.pointer.PointerIconService
 import androidx.compose.ui.input.pointer.PointerInputEventProcessor
 import androidx.compose.ui.input.pointer.PositionCalculator
 import androidx.compose.ui.input.pointer.ProcessResult
+import androidx.compose.ui.input.rotary.RotaryScrollEvent
+import androidx.compose.ui.input.rotary.onRotaryScrollEvent
 import androidx.compose.ui.layout.RootMeasurePolicy
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
@@ -135,7 +137,11 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.trace
 import androidx.compose.ui.viewinterop.AndroidViewHolder
 import androidx.core.view.AccessibilityDelegateCompat
+import androidx.core.view.InputDeviceCompat.SOURCE_ROTARY_ENCODER
+import androidx.core.view.MotionEventCompat.AXIS_SCROLL
 import androidx.core.view.ViewCompat
+import androidx.core.view.ViewConfigurationCompat.getScaledHorizontalScrollFactor
+import androidx.core.view.ViewConfigurationCompat.getScaledVerticalScrollFactor
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.accessibility.AccessibilityNodeProviderCompat
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -205,12 +211,18 @@ internal class AndroidComposeView(context: Context) :
         onPreviewKeyEvent = null
     )
 
+    private val rotaryInputModifier = Modifier.onRotaryScrollEvent {
+        // TODO(b/210748692): call focusManager.moveFocus() in response to rotary events.
+        false
+    }
+
     private val canvasHolder = CanvasHolder()
 
     override val root = LayoutNode().also {
         it.measurePolicy = RootMeasurePolicy
         it.modifier = Modifier
             .then(semanticsModifier)
+            .then(rotaryInputModifier)
             .then(_focusManager.modifier)
             .then(keyInputModifier)
         it.density = density
@@ -1022,12 +1034,12 @@ internal class AndroidComposeView(context: Context) :
         if (autofillSupported()) _autofill?.performAutofill(values)
     }
 
-    override fun dispatchGenericMotionEvent(event: MotionEvent): Boolean {
-        return if (event.actionMasked == ACTION_SCROLL) {
-            handleMotionEvent(event).dispatchedToAPointerInputModifier
-        } else {
-            super.dispatchGenericMotionEvent(event)
-        }
+    override fun dispatchGenericMotionEvent(event: MotionEvent) = when (event.actionMasked) {
+            ACTION_SCROLL -> when {
+                event.isFromSource(SOURCE_ROTARY_ENCODER) -> handleRotaryEvent(event)
+                else -> handleMotionEvent(event).dispatchedToAPointerInputModifier
+            }
+            else -> super.dispatchGenericMotionEvent(event)
     }
 
     // TODO(shepshapard): Test this method.
@@ -1063,6 +1075,16 @@ internal class AndroidComposeView(context: Context) :
         }
 
         return processResult.dispatchedToAPointerInputModifier
+    }
+
+    private fun handleRotaryEvent(event: MotionEvent): Boolean {
+        val config = android.view.ViewConfiguration.get(context)
+        val axisValue = -event.getAxisValue(AXIS_SCROLL)
+        val rotaryEvent = RotaryScrollEvent(
+            verticalScrollPixels = axisValue * getScaledVerticalScrollFactor(config, context),
+            horizontalScrollPixels = axisValue * getScaledHorizontalScrollFactor(config, context)
+        )
+        return _focusManager.getActiveFocusModifier()?.propagateRotaryEvent(rotaryEvent) ?: false
     }
 
     private fun handleMotionEvent(motionEvent: MotionEvent): ProcessResult {

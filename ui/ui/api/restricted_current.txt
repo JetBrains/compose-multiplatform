@@ -1659,6 +1659,13 @@ package androidx.compose.ui.input.pointer.util {
 
 }
 
+package androidx.compose.ui.input.rotary {
+
+  public final class RotaryInputModifierKt {
+  }
+
+}
+
 package androidx.compose.ui.layout {
 
   @androidx.compose.runtime.Immutable public abstract sealed class AlignmentLine {
