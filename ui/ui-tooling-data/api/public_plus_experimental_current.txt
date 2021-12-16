@@ -2,7 +2,7 @@
 package androidx.compose.ui.tooling.data {
 
   @androidx.compose.ui.tooling.data.UiToolingDataApi public final class CallGroup extends androidx.compose.ui.tooling.data.Group {
-    ctor public CallGroup(Object? key, String? name, androidx.compose.ui.unit.IntRect box, androidx.compose.ui.tooling.data.SourceLocation? location, java.util.List<androidx.compose.ui.tooling.data.ParameterInformation> parameters, java.util.Collection<?> data, java.util.Collection<? extends androidx.compose.ui.tooling.data.Group> children);
+    ctor public CallGroup(Object? key, String? name, androidx.compose.ui.unit.IntRect box, androidx.compose.ui.tooling.data.SourceLocation? location, Object? identity, java.util.List<androidx.compose.ui.tooling.data.ParameterInformation> parameters, java.util.Collection<?> data, java.util.Collection<? extends androidx.compose.ui.tooling.data.Group> children);
     property public java.util.List<androidx.compose.ui.tooling.data.ParameterInformation> parameters;
   }
 
@@ -10,6 +10,7 @@ package androidx.compose.ui.tooling.data {
     method public final androidx.compose.ui.unit.IntRect getBox();
     method public final java.util.Collection<androidx.compose.ui.tooling.data.Group> getChildren();
     method public final java.util.Collection<java.lang.Object> getData();
+    method public final Object? getIdentity();
     method public final Object? getKey();
     method public final androidx.compose.ui.tooling.data.SourceLocation? getLocation();
     method public java.util.List<androidx.compose.ui.layout.ModifierInfo> getModifierInfo();
@@ -18,6 +19,7 @@ package androidx.compose.ui.tooling.data {
     property public final androidx.compose.ui.unit.IntRect box;
     property public final java.util.Collection<androidx.compose.ui.tooling.data.Group> children;
     property public final java.util.Collection<java.lang.Object> data;
+    property public final Object? identity;
     property public final Object? key;
     property public final androidx.compose.ui.tooling.data.SourceLocation? location;
     property public java.util.List<androidx.compose.ui.layout.ModifierInfo> modifierInfo;

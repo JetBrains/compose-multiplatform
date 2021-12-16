@@ -800,23 +800,34 @@ class LayoutInspectorTreeTest {
         val androidComposeView = findAndroidComposeView()
         androidComposeView.setTag(R.id.inspection_slot_table_set, slotTableRecord.store)
         val builder = LayoutInspectorTree()
-        builder.hideSystemNodes = false
-        val first = builder.convert(androidComposeView)
-            .flatMap { flatten(it) }
-            .first { it.name == "First" }
+        val tree1 = builder.convert(androidComposeView)
+        val first = tree1.flatMap { flatten(it) }.single { it.name == "First" }
         val hash = packageNameHash(this.javaClass.name.substringBeforeLast('.'))
         assertThat(first.fileName).isEqualTo("LayoutInspectorTreeTest.kt")
         assertThat(first.packageHash).isEqualTo(hash)
         assertThat(first.parameters.map { it.name }).contains("p1")
 
+        val cross1 = tree1.flatMap { flatten(it) }.single { it.name == "Crossfade" }
+        val button1 = tree1.flatMap { flatten(it) }.single { it.name == "Button" }
+        val column1 = tree1.flatMap { flatten(it) }.single { it.name == "Column" }
+        assertThat(cross1.id < RESERVED_FOR_GENERATED_IDS)
+        assertThat(button1.id < RESERVED_FOR_GENERATED_IDS)
+        assertThat(column1.id < RESERVED_FOR_GENERATED_IDS)
+
         composeTestRule.onNodeWithText("Button").performClick()
         composeTestRule.runOnIdle {
-            val second = builder.convert(androidComposeView)
-                .flatMap { flatten(it) }
-                .first { it.name == "Second" }
+            val tree2 = builder.convert(androidComposeView)
+            val second = tree2.flatMap { flatten(it) }.first { it.name == "Second" }
             assertThat(second.fileName).isEqualTo("LayoutInspectorTreeTest.kt")
             assertThat(second.packageHash).isEqualTo(hash)
             assertThat(second.parameters.map { it.name }).contains("p2")
+
+            val cross2 = tree2.flatMap { flatten(it) }.first { it.name == "Crossfade" }
+            val button2 = tree2.flatMap { flatten(it) }.single { it.name == "Button" }
+            val column2 = tree2.flatMap { flatten(it) }.single { it.name == "Column" }
+            assertThat(cross2.id).isEqualTo(cross1.id)
+            assertThat(button2.id).isEqualTo(button1.id)
+            assertThat(column2.id).isEqualTo(column1.id)
         }
     }
 
