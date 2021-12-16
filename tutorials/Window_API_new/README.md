@@ -607,7 +607,7 @@ private fun WindowScope.AppWindowTitleBar() = WindowDraggableArea {
 <img alt="Draggable area" src="draggable_area.gif" height="239" />
 
 ## Transparent windows (e.g. allows to make windows of a custom form)
-To create a transparent window it is enough to pass two parameners to the Window function: transparent=true and undecorate=true (it is not possible to decorate a transparent Window). Common scenario is to combine transparent window with a Surface of a custom form. Below is an example of a round-cornered Window. 
+To create a transparent window it is enough to pass two parameners to the Window function: `transparent=true` and `undecorate=true` (it is not possible to decorate a transparent Window). Common scenario is to combine transparent window with a Surface of a custom form. Below is an example of a round-cornered Window. 
 
 ```kotlin
 import androidx.compose.foundation.layout.fillMaxSize
@@ -646,5 +646,5 @@ fun main() = application {
 }
 ```
 
-_Important note: Window transparency is implemented based on JDK implementation, that contains known issue in case of moving a Window between two monitors with different density. So when you move an App, the Window stops being transparent. And it seems nothing can be done with this situation on Compose side.
+_**Important note:** Window transparency is implemented based on JDK implementation, that contains **known issue on Linux** in case of moving a Window between two monitors with different density. So when you move an App, the Window stops being transparent. And it seems nothing can be done with this situation on Compose side.
 [An issue about it](https://github.com/JetBrains/compose-jb/issues/1339)_
