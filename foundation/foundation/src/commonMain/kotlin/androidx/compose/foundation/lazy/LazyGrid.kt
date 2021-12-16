@@ -48,6 +48,8 @@ import kotlin.math.sqrt
  * @param contentPadding specify a padding around the whole content
  * @param verticalArrangement The vertical arrangement of the layout's children
  * @param horizontalArrangement The horizontal arrangement of the layout's children
+ * @param userScrollEnabled whether the scrolling via the user gestures or accessibility actions
+ * is allowed. You can still scroll programmatically using the state even when it is disabled.
  * @param content the [LazyListScope] which describes the content
  */
 @ExperimentalFoundationApi
@@ -59,6 +61,7 @@ fun LazyVerticalGrid(
     contentPadding: PaddingValues = PaddingValues(0.dp),
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+    userScrollEnabled: Boolean = true,
     content: LazyGridScope.() -> Unit
 ) {
     when (cells) {
@@ -70,6 +73,7 @@ fun LazyVerticalGrid(
                 horizontalArrangement = horizontalArrangement,
                 verticalArrangement = verticalArrangement,
                 contentPadding = contentPadding,
+                userScrollEnabled = userScrollEnabled,
                 content = content
             )
         is GridCells.Adaptive ->
@@ -83,6 +87,7 @@ fun LazyVerticalGrid(
                     horizontalArrangement = horizontalArrangement,
                     verticalArrangement = verticalArrangement,
                     contentPadding = contentPadding,
+                    userScrollEnabled = userScrollEnabled,
                     content = content
                 )
             }
@@ -243,13 +248,15 @@ private fun FixedLazyGrid(
     contentPadding: PaddingValues,
     verticalArrangement: Arrangement.Vertical,
     horizontalArrangement: Arrangement.Horizontal,
+    userScrollEnabled: Boolean,
     content: LazyGridScope.() -> Unit
 ) {
     LazyColumn(
         modifier = modifier,
         state = state,
         verticalArrangement = verticalArrangement,
-        contentPadding = contentPadding
+        contentPadding = contentPadding,
+        userScrollEnabled = userScrollEnabled
     ) {
         val scope = LazyGridScopeImpl(nColumns)
         scope.apply(content)

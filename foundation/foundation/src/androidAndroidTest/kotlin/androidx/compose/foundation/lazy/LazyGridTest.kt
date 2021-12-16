@@ -18,6 +18,7 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -36,6 +37,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.SemanticsMatcher.Companion.keyIsDefined
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -864,6 +870,98 @@ class LazyGridTest {
             .assertTopPositionInRootIsEqualTo(0.dp)
             .assertLeftPositionInRootIsEqualTo(columnWidth * 3)
             .assertWidthIsEqualTo(columnWidth)
+    }
+
+    @Test
+    fun pointerInputScrollingIsAllowedWhenUserScrollingIsEnabled() {
+        val itemSize = with(rule.density) { 30.toDp() }
+        rule.setContentWithTestViewConfiguration {
+            LazyVerticalGrid(
+                GridCells.Fixed(1),
+                Modifier.size(itemSize * 3).testTag(LazyGridTag),
+                userScrollEnabled = true,
+            ) {
+                items(5) {
+                    Spacer(Modifier.size(itemSize).testTag("$it"))
+                }
+            }
+        }
+
+        rule.onNodeWithTag(LazyGridTag).scrollBy(y = itemSize, density = rule.density)
+
+        rule.onNodeWithTag("1")
+            .assertTopPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun pointerInputScrollingIsDisallowedWhenUserScrollingIsDisabled() {
+        val itemSize = with(rule.density) { 30.toDp() }
+        rule.setContentWithTestViewConfiguration {
+            LazyVerticalGrid(
+                GridCells.Fixed(1),
+                Modifier.size(itemSize * 3).testTag(LazyGridTag),
+                userScrollEnabled = false,
+            ) {
+                items(5) {
+                    Spacer(Modifier.size(itemSize).testTag("$it"))
+                }
+            }
+        }
+
+        rule.onNodeWithTag(LazyGridTag).scrollBy(y = itemSize, density = rule.density)
+
+        rule.onNodeWithTag("1")
+            .assertTopPositionInRootIsEqualTo(itemSize)
+    }
+
+    @Test
+    fun programmaticScrollingIsAllowedWhenUserScrollingIsDisabled() {
+        val itemSizePx = 30f
+        val itemSize = with(rule.density) { itemSizePx.toDp() }
+        lateinit var state: LazyListState
+        rule.setContentWithTestViewConfiguration {
+            LazyVerticalGrid(
+                GridCells.Fixed(1),
+                Modifier.size(itemSize * 3),
+                state = rememberLazyListState().also { state = it },
+                userScrollEnabled = false,
+            ) {
+                items(5) {
+                    Spacer(Modifier.size(itemSize).testTag("$it"))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy(itemSizePx)
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertTopPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun semanticScrollingIsDisallowedWhenUserScrollingIsDisabled() {
+        val itemSize = with(rule.density) { 30.toDp() }
+        rule.setContentWithTestViewConfiguration {
+            LazyVerticalGrid(
+                GridCells.Fixed(1),
+                Modifier.size(itemSize * 3).testTag(LazyGridTag),
+                userScrollEnabled = false,
+            ) {
+                items(5) {
+                    Spacer(Modifier.size(itemSize).testTag("$it"))
+                }
+            }
+        }
+
+        rule.onNodeWithTag(LazyGridTag)
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.ScrollBy))
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.ScrollToIndex))
+            // but we still have a read only scroll range property
+            .assert(keyIsDefined(SemanticsProperties.VerticalScrollAxisRange))
     }
 
     // TODO: add tests for the cache logic

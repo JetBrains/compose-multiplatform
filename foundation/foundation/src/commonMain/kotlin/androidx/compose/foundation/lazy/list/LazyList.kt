@@ -64,6 +64,8 @@ internal fun LazyList(
     isVertical: Boolean,
     /** fling behavior to be used for flinging */
     flingBehavior: FlingBehavior,
+    /** Whether scrolling via the user gestures is allowed. */
+    userScrollEnabled: Boolean,
     /** The alignment to align items horizontally. Required when isVertical is true */
     horizontalAlignment: Alignment.Horizontal? = null,
     /** The vertical arrangement for items. Required when isVertical is true */
@@ -117,7 +119,8 @@ internal fun LazyList(
                 state = state,
                 coroutineScope = scope,
                 isVertical = isVertical,
-                reverseScrolling = reverseLayout
+                reverseScrolling = reverseLayout,
+                userScrollEnabled = userScrollEnabled
             )
             .clipScrollableContainer(isVertical)
             .scrollable(
@@ -136,7 +139,8 @@ internal fun LazyList(
                 interactionSource = state.internalInteractionSource,
                 flingBehavior = flingBehavior,
                 state = state,
-                overScrollController = overScrollController
+                overScrollController = overScrollController,
+                enabled = userScrollEnabled
             ),
         state = innerState,
         prefetchPolicy = state.prefetchPolicy,
