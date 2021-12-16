@@ -67,6 +67,17 @@ val systemPackages = setOf(
     packageNameHash("androidx.compose.ui.window"),
 )
 
+/**
+ * The [InspectorNode.id] will be populated with:
+ * - the layerId from a LayoutNode if this exists
+ * - an id generated from an Anchor instance from the SlotTree if this exists
+ * - a generated id if none of the above ids are available
+ *
+ * The interval -10000..-2 is reserved for the generated ids.
+ */
+@VisibleForTesting
+const val RESERVED_FOR_GENERATED_IDS = -10000L
+
 private val unwantedCalls = setOf(
     "CompositionLocalProvider",
     "Content",
@@ -387,7 +398,7 @@ class LayoutInspectorTree {
         input.forEach { node ->
             if (node.name.isEmpty() && !(buildFakeChildNodes && node.layoutNodes.isNotEmpty())) {
                 parentNode.children.addAll(node.children)
-                if (node.id != UNDEFINED_ID) {
+                if (node.id > UNDEFINED_ID) {
                     // If multiple siblings with a render ids are dropped:
                     // Ignore them all. And delegate the drawing to a parent in the inspector.
                     id = if (id == null) node.id else UNDEFINED_ID
@@ -414,13 +425,13 @@ class LayoutInspectorTree {
         }
         val nodeId = id
         parentNode.id =
-            if (parentNode.id == UNDEFINED_ID && nodeId != null) nodeId else parentNode.id
+            if (parentNode.id <= UNDEFINED_ID && nodeId != null) nodeId else parentNode.id
     }
 
     @OptIn(UiToolingDataApi::class)
     private fun parse(group: Group, overrideBox: IntRect? = null): MutableInspectorNode {
         val node = newNode()
-        node.id = getRenderNode(group)
+        node.id = parseId(group)
         node.name = group.name ?: ""
         parsePosition(group, node, overrideBox)
         parseLayoutInfo(group, node)
@@ -518,12 +529,19 @@ class LayoutInspectorTree {
     }
 
     @OptIn(UiToolingDataApi::class)
-    private fun getRenderNode(group: Group): Long =
+    private fun parseId(group: Group): Long =
         group.modifierInfo.asSequence()
             .map { it.extra }
             .filterIsInstance<GraphicLayerInfo>()
             .map { it.layerId }
-            .firstOrNull() ?: 0
+            .firstOrNull() ?: syntheticId(group)
+
+    @OptIn(UiToolingDataApi::class)
+    private fun syntheticId(group: Group): Long {
+        val id = group.identity?.hashCode() ?: return UNDEFINED_ID
+        // The hashCode is an Int
+        return id.toLong() - Int.MAX_VALUE.toLong() + RESERVED_FOR_GENERATED_IDS
+    }
 
     private fun belongsToView(layoutNodes: List<LayoutInfo>, view: View): Boolean =
         layoutNodes.asSequence().flatMap { node ->

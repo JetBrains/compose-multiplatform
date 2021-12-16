@@ -48,6 +48,11 @@ sealed class Group(
     val location: SourceLocation?,
 
     /**
+     * An optional value that identifies a Group independently of movement caused by recompositions.
+     */
+    val identity: Any?,
+
+    /**
      * The bounding layout box for the group.
      */
     val box: IntRect,
@@ -134,10 +139,11 @@ class CallGroup(
     name: String?,
     box: IntRect,
     location: SourceLocation?,
+    identity: Any?,
     override val parameters: List<ParameterInformation>,
     data: Collection<Any?>,
     children: Collection<Group>
-) : Group(key, name, location, box, data, children)
+) : Group(key, name, location, identity, box, data, children)
 
 /**
  * A group that represents an emitted node
@@ -154,13 +160,14 @@ class NodeGroup(
     data: Collection<Any?>,
     override val modifierInfo: List<ModifierInfo>,
     children: Collection<Group>
-) : Group(key, null, null, box, data, children)
+) : Group(key, null, null, null, box, data, children)
 
 @UiToolingDataApi
 private object EmptyGroup : Group(
     key = null,
     name = null,
     location = null,
+    identity = null,
     box = emptyBox,
     data = emptyList(),
     children = emptyList()
@@ -466,6 +473,8 @@ private fun CompositionGroup.getGroup(parentContext: SourceInformationContext?):
             if (children.isEmpty()) emptyBox else
                 children.map { g -> g.box }.reduce { acc, box -> box.union(acc) }
     }
+    val location =
+        if (context?.isCall == true) { parentContext?.nextSourceLocation() } else { null }
     return if (node != null) NodeGroup(
         key,
         node,
@@ -478,8 +487,11 @@ private fun CompositionGroup.getGroup(parentContext: SourceInformationContext?):
             key,
             context?.name,
             box,
-            if (context != null && context.isCall) {
-                parentContext?.nextSourceLocation()
+            location,
+            identity = if (!context?.name.isNullOrEmpty() &&
+                            location?.sourceFile != null &&
+                            (box.bottom - box.top > 0 || box.right - box.left > 0)) {
+                this.identity
             } else {
                 null
             },
