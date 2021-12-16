@@ -13,5 +13,5 @@ fun KotlinKarma.standardConf() {
     }
     useConfigDirectory("${kotlinKarmaConfig.rootDir}/test-utils/conf/karma.config.common.d")
     useChromeHeadless()
-    useFirefox()
+    useFirefoxHeadless()
 }
