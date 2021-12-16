@@ -296,6 +296,7 @@ internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
                     else
                         provider { mac.dockName }
                 )
+                macAppStore.set(mac.appStore)
                 packageBuildVersion.set(packageBuildVersionFor(project, app, targetFormat))
                 nonValidatedMacBundleID.set(provider { mac.bundleID })
                 macExtraPlistKeysRawXml.set(provider { mac.infoPlistSettings.extraKeysRawXml })

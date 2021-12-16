@@ -129,6 +129,10 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
+    val macAppStore: Property<Boolean?> = objects.nullableProperty()
+
+    @get:Input
+    @get:Optional
     val packageBuildVersion: Property<String?> = objects.nullableProperty()
 
     @get:Input
@@ -183,7 +187,7 @@ abstract class AbstractJPackageTask @Inject constructor(
         val nonValidatedSettings = nonValidatedMacSigningSettings
         if (currentOS == OS.MacOS && nonValidatedSettings?.sign?.get() == true) {
             val validatedSettings =
-                nonValidatedSettings.validate(nonValidatedMacBundleID, project)
+                nonValidatedSettings.validate(nonValidatedMacBundleID, project, macAppStore)
             MacSigner(validatedSettings, runExternalTool)
         } else null
     }
@@ -320,6 +324,7 @@ abstract class AbstractJPackageTask @Inject constructor(
             OS.MacOS -> {
                 cliArg("--mac-package-name", macPackageName)
                 cliArg("--mac-package-identifier", nonValidatedMacBundleID)
+                cliArg("--mac-app-store", macAppStore)
 
                 macSigner?.let { signer ->
                     cliArg("--mac-sign", true)

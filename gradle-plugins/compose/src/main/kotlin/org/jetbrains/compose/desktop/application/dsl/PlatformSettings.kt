@@ -20,6 +20,7 @@ open class MacOSPlatformSettings @Inject constructor(objects: ObjectFactory): Pl
     var packageName: String? = null
     var dockName: String? = null
     var setDockNameSameAsPackageName: Boolean = true
+    var appStore: Boolean = false
     var packageBuildVersion: String? = null
     var dmgPackageVersion: String? = null
     var dmgPackageBuildVersion: String? = null

@@ -439,6 +439,7 @@ The following platform-specific options are available
     * `signing` and `notarization` — see
       [the corresponding tutorial](/tutorials/Signing_and_notarization_on_macOS/README.md) 
       for details;
+    * `appStore = true` — build and sign for the Apple App Store. Requires at least JDK 17;
     * `dmgPackageVersion = "DMG_VERSION"` — a dmg-specific package version
       (see the section `Specifying package version` for details);
     * `pkgPackageVersion = "PKG_VERSION"` — a pkg-specific package version

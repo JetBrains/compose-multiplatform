@@ -18,6 +18,7 @@ internal data class ValidatedMacOSSigningSettings(
     val identity: String,
     val keychain: File?,
     val prefix: String,
+    private val appStore: Boolean
 ) {
     val fullDeveloperID: String
         get() {
@@ -26,14 +27,15 @@ internal data class ValidatedMacOSSigningSettings(
             return when {
                 identity.startsWith(developerIdPrefix) -> identity
                 identity.startsWith(thirdPartyMacDeveloperPrefix) -> identity
-                else -> developerIdPrefix + identity
+                else -> (if (!appStore) developerIdPrefix else thirdPartyMacDeveloperPrefix) + identity
             }
         }
 }
 
 internal fun MacOSSigningSettings.validate(
     bundleIDProvider: Provider<String?>,
-    project: Project
+    project: Project,
+    appStoreProvider: Provider<Boolean?>
 ): ValidatedMacOSSigningSettings {
     check(currentOS == OS.MacOS) { ERR_WRONG_OS }
 
@@ -52,12 +54,14 @@ internal fun MacOSSigningSettings.validate(
         }
         keychainFile
     } else null
+    val appStore = appStoreProvider.get()!!
 
     return ValidatedMacOSSigningSettings(
         bundleID = bundleID,
         identity = signIdentity,
         keychain = keychainFile,
-        prefix = signPrefix
+        prefix = signPrefix,
+        appStore = appStore
     )
 }
 
