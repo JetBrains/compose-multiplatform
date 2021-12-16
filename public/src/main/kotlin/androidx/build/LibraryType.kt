@@ -85,6 +85,12 @@ enum class LibraryType(
         checkApi = RunApiTasks.No("Lint Library"),
         compilationTarget = CompilationTarget.HOST
     ),
+    COMPILER_DAEMON(
+        Publish.SNAPSHOT_AND_RELEASE,
+        sourceJars = false,
+        RunApiTasks.No("Compiler Daemon (Host-only)"),
+        CompilationTarget.HOST
+    ),
     COMPILER_PLUGIN(
         Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = false,
