@@ -16,41 +16,46 @@
 
 package androidx.compose.foundation.text.selection
 
-import android.view.View
-import androidx.compose.ui.platform.ViewRootForTest
-import androidx.compose.ui.test.junit4.ComposeTestRule
-import androidx.compose.ui.window.isPopupLayout
-import androidx.test.espresso.Espresso
-import androidx.test.espresso.Root
-import androidx.test.espresso.assertion.ViewAssertions
-import org.hamcrest.CoreMatchers
-import org.hamcrest.Description
-import org.hamcrest.Matcher
-import org.hamcrest.TypeSafeMatcher
+import androidx.compose.foundation.text.Handle
+import androidx.compose.ui.semantics.getOrNull
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.SemanticsNodeInteraction
+import androidx.compose.ui.unit.Dp
+import com.google.common.truth.Truth.assertWithMessage
 
-internal fun ComposeTestRule.doubleSelectionHandleMatches(
-    index: Int,
-    viewMatcher: Matcher<in View>
-) {
-    // Make sure that current measurement/drawing is finished
-    runOnIdle { }
-    Espresso.onView(CoreMatchers.instanceOf(ViewRootForTest::class.java))
-        .inRoot(DoubleSelectionHandleMatcher(index))
-        .check(ViewAssertions.matches(viewMatcher))
-}
-
-internal class DoubleSelectionHandleMatcher(val index: Int) : TypeSafeMatcher<Root>() {
-    var popupsMatchedSoFar: Int = 0
-
-    override fun describeTo(description: Description?) {
-        description?.appendText("DoubleSelectionHandleMatcher")
+/**
+ * Matches selection handles by looking for the [SelectionHandleInfoKey] property that has a
+ * [SelectionHandleInfo] with the given [handle]. If [handle] is null (the default), then all
+ * handles are matched.
+ */
+internal fun isSelectionHandle(handle: Handle? = null) =
+    SemanticsMatcher("is ${handle ?: "any"} handle") { node ->
+        if (handle == null) {
+            SelectionHandleInfoKey in node.config
+        } else {
+            node.config.getOrNull(SelectionHandleInfoKey)?.handle == handle
+        }
     }
 
-    override fun matchesSafely(item: Root?): Boolean {
-        val matches = item != null && isPopupLayout(item.decorView)
-        if (matches) {
-            popupsMatchedSoFar++
-        }
-        return matches && popupsMatchedSoFar == index + 1
+/**
+ * Asserts about the [SelectionHandleInfo.position] for the matching node. This is the position of
+ * the handle's _anchor_, not the position of the popup itself. E.g. for a cursor handle this is the
+ * position of the bottom of the cursor, which will be in the center of the popup.
+ */
+internal fun SemanticsNodeInteraction.assertHandlePositionMatches(
+    expectedX: Dp,
+    expectedY: Dp
+) {
+    val node = fetchSemanticsNode()
+    with(node.layoutInfo.density) {
+        val positionFound = node.config[SelectionHandleInfoKey].position
+        val positionFoundX = positionFound.x.toDp()
+        val positionFoundY = positionFound.y.toDp()
+        val message = "Expected position ($expectedX, $expectedY), " +
+            "but found ($positionFoundX, $positionFoundY)"
+        assertWithMessage(message).that(positionFoundX.value)
+            .isWithin(5f).of(expectedX.value)
+        assertWithMessage(message).that(positionFoundY.value)
+            .isWithin(5f).of(expectedY.value)
     }
 }

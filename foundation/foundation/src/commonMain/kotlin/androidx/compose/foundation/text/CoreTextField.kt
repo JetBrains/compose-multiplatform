@@ -21,6 +21,8 @@ import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.SelectionHandleInfo
+import androidx.compose.foundation.text.selection.SelectionHandleInfoKey
 import androidx.compose.foundation.text.selection.SimpleLayout
 import androidx.compose.foundation.text.selection.TextFieldSelectionHandle
 import androidx.compose.foundation.text.selection.TextFieldSelectionManager
@@ -878,9 +880,16 @@ internal fun TextFieldCursorHandle(manager: TextFieldSelectionManager) {
         val position = manager.getCursorPosition(LocalDensity.current)
         CursorHandle(
             handlePosition = position,
-            modifier = Modifier.pointerInput(observer) {
-                detectDragGesturesWithObserver(observer)
-            },
+            modifier = Modifier
+                .pointerInput(observer) {
+                    detectDragGesturesWithObserver(observer)
+                }
+                .semantics {
+                    this[SelectionHandleInfoKey] = SelectionHandleInfo(
+                        handle = Handle.Cursor,
+                        position = position
+                    )
+                },
             content = null
         )
     }
