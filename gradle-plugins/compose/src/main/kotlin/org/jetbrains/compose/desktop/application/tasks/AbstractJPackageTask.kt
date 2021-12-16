@@ -284,7 +284,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
         if (targetFormat != TargetFormat.AppImage) {
             // Args, that can only be used, when creating an installer
-            cliArg("--app-image", appImage)
+            cliArg("--app-image", appImage.dir("${packageName.get()}.app"))
             cliArg("--install-dir", installationPath)
             cliArg("--license-file", licenseFile)
 
