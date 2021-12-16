@@ -111,7 +111,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             unzippedSamplesSources,
             samplesSourcesConfiguration
         )
-        val unzippedDocsSources = File(project.buildDir, "unzippedDocsSources")
+        val unzippedDocsSources = File(project.buildDir, "srcs")
         val unzipDocsTask = configureUnzipTask(
             project,
             "unzipDocsSources",
