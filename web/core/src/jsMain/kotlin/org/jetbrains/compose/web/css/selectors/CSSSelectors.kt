@@ -7,8 +7,8 @@ import org.jetbrains.compose.web.css.SelectorsScope
 internal const val webCssSelectorsDeprecationMessage = "Consider using a property from SelectorsScope"
 private val selectorScope = object : SelectorsScope {}
 
-sealed class Nth {
-    data class Functional(val a: Int? = null, val b: Int? = null) {
+sealed interface Nth {
+    data class Functional(val a: Int? = null, val b: Int? = null) : Nth {
         override fun toString(): String = when {
             a != null && b != null -> "${a}n+$b"
             a != null -> "${a}n"
@@ -16,10 +16,10 @@ sealed class Nth {
             else -> ""
         }
     }
-    object Odd : Nth() {
+    object Odd : Nth {
         override fun toString(): String = "odd"
     }
-    object Even : Nth() {
+    object Even : Nth {
         override fun toString(): String = "even"
     }
 }
