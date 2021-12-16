@@ -40,10 +40,11 @@ import androidx.compose.ui.unit.width
 
 fun ComposeContentTestRule.setMaterialContent(
     modifier: Modifier = Modifier,
+    colorScheme: ColorScheme = lightColorScheme(),
     composable: @Composable () -> Unit
 ) {
     setContent {
-        MaterialTheme {
+        MaterialTheme(colorScheme = colorScheme) {
             Surface(modifier = modifier, content = composable)
         }
     }

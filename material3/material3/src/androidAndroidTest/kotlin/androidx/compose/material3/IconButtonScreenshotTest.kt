@@ -73,16 +73,14 @@ class IconButtonScreenshotTest {
 
     @Test
     fun iconButton_darkTheme() {
-        rule.setContent {
-            MaterialTheme(darkColorScheme()) {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    Box(wrap.testTag(wrapperTestTag)) {
-                        IconButton(onClick = { /* doSomething() */ }) {
-                            Icon(
-                                Icons.Filled.Favorite,
-                                contentDescription = "Localized description"
-                            )
-                        }
+        rule.setMaterialContent(colorScheme = darkColorScheme()) {
+            Surface(modifier = Modifier.fillMaxSize()) {
+                Box(wrap.testTag(wrapperTestTag)) {
+                    IconButton(onClick = { /* doSomething() */ }) {
+                        Icon(
+                            Icons.Filled.Favorite,
+                            contentDescription = "Localized description"
+                        )
                     }
                 }
             }
@@ -92,7 +90,6 @@ class IconButtonScreenshotTest {
 
     @Test
     fun iconButton_lightTheme_disabled() {
-
         rule.setMaterialContent {
             Box(wrap.testTag(wrapperTestTag)) {
                 IconButton(onClick = { /* doSomething() */ }, enabled = false) {
