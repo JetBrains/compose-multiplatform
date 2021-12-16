@@ -183,6 +183,8 @@ inline fun <T> LazyListScope.itemsIndexed(
  * of them to fill the whole minimum size.
  * @param verticalAlignment the vertical alignment applied to the items
  * @param flingBehavior logic describing fling behavior.
+ * @param userScrollEnabled whether the scrolling via the user gestures or accessibility actions
+ * is allowed. You can still scroll programmatically using the state even when it is disabled.
  * @param content a block which describes the content. Inside this block you can use methods like
  * [LazyListScope.item] to add a single item or [LazyListScope.items] to add a list of items.
  */
@@ -196,6 +198,7 @@ fun LazyRow(
         if (!reverseLayout) Arrangement.Start else Arrangement.End,
     verticalAlignment: Alignment.Vertical = Alignment.Top,
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
+    userScrollEnabled: Boolean = true,
     content: LazyListScope.() -> Unit
 ) {
     LazyList(
@@ -207,6 +210,7 @@ fun LazyRow(
         isVertical = false,
         flingBehavior = flingBehavior,
         reverseLayout = reverseLayout,
+        userScrollEnabled = userScrollEnabled,
         content = content
     )
 }
@@ -233,6 +237,8 @@ fun LazyRow(
  * of them to fill the whole minimum size.
  * @param horizontalAlignment the horizontal alignment applied to the items.
  * @param flingBehavior logic describing fling behavior.
+ * @param userScrollEnabled whether the scrolling via the user gestures or accessibility actions
+ * is allowed. You can still scroll programmatically using the state even when it is disabled.
  * @param content a block which describes the content. Inside this block you can use methods like
  * [LazyListScope.item] to add a single item or [LazyListScope.items] to add a list of items.
  */
@@ -246,6 +252,7 @@ fun LazyColumn(
         if (!reverseLayout) Arrangement.Top else Arrangement.Bottom,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
+    userScrollEnabled: Boolean = true,
     content: LazyListScope.() -> Unit
 ) {
     LazyList(
@@ -257,6 +264,59 @@ fun LazyColumn(
         verticalArrangement = verticalArrangement,
         isVertical = true,
         reverseLayout = reverseLayout,
+        userScrollEnabled = userScrollEnabled,
+        content = content
+    )
+}
+
+@Deprecated("Use the non deprecated overload", level = DeprecationLevel.HIDDEN)
+@Composable
+fun LazyColumn(
+    modifier: Modifier = Modifier,
+    state: LazyListState = rememberLazyListState(),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    reverseLayout: Boolean = false,
+    verticalArrangement: Arrangement.Vertical =
+        if (!reverseLayout) Arrangement.Top else Arrangement.Bottom,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
+    content: LazyListScope.() -> Unit
+) {
+    LazyColumn(
+        modifier = modifier,
+        state = state,
+        contentPadding = contentPadding,
+        reverseLayout = reverseLayout,
+        verticalArrangement = verticalArrangement,
+        horizontalAlignment = horizontalAlignment,
+        flingBehavior = flingBehavior,
+        userScrollEnabled = true,
+        content = content
+    )
+}
+
+@Deprecated("Use the non deprecated overload", level = DeprecationLevel.HIDDEN)
+@Composable
+fun LazyRow(
+    modifier: Modifier = Modifier,
+    state: LazyListState = rememberLazyListState(),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    reverseLayout: Boolean = false,
+    horizontalArrangement: Arrangement.Horizontal =
+        if (!reverseLayout) Arrangement.Start else Arrangement.End,
+    verticalAlignment: Alignment.Vertical = Alignment.Top,
+    flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
+    content: LazyListScope.() -> Unit
+) {
+    LazyRow(
+        modifier = modifier,
+        state = state,
+        contentPadding = contentPadding,
+        reverseLayout = reverseLayout,
+        horizontalArrangement = horizontalArrangement,
+        verticalAlignment = verticalAlignment,
+        flingBehavior = flingBehavior,
+        userScrollEnabled = true,
         content = content
     )
 }

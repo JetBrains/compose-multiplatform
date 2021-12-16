@@ -38,7 +38,8 @@ internal fun Modifier.lazyListSemantics(
     state: LazyListState,
     coroutineScope: CoroutineScope,
     isVertical: Boolean,
-    reverseScrolling: Boolean
+    reverseScrolling: Boolean,
+    userScrollEnabled: Boolean
 ): Modifier {
     return semantics {
         indexForKey { needle ->
@@ -77,24 +78,30 @@ internal fun Modifier.lazyListSemantics(
             horizontalScrollAxisRange = accessibilityScrollState
         }
 
-        scrollBy { x, y ->
-            val delta = if (isVertical) { y } else { x }
-            coroutineScope.launch {
-                (state as ScrollableState).animateScrollBy(delta)
+        if (userScrollEnabled) {
+            scrollBy { x, y ->
+                val delta = if (isVertical) {
+                    y
+                } else {
+                    x
+                }
+                coroutineScope.launch {
+                    (state as ScrollableState).animateScrollBy(delta)
+                }
+                // TODO(aelias): is it important to return false if we know in advance we cannot scroll?
+                true
             }
-            // TODO(aelias): is it important to return false if we know in advance we cannot scroll?
-            true
-        }
 
-        scrollToIndex { index ->
-            require(index >= 0 && index < state.layoutInfo.totalItemsCount) {
-                "Can't scroll to index $index, it is out of " +
-                    "bounds [0, ${state.layoutInfo.totalItemsCount})"
+            scrollToIndex { index ->
+                require(index >= 0 && index < state.layoutInfo.totalItemsCount) {
+                    "Can't scroll to index $index, it is out of " +
+                        "bounds [0, ${state.layoutInfo.totalItemsCount})"
+                }
+                coroutineScope.launch {
+                    state.scrollToItem(index)
+                }
+                true
             }
-            coroutineScope.launch {
-                state.scrollToItem(index)
-            }
-            true
         }
 
         collectionInfo = CollectionInfo(
