@@ -49,7 +49,7 @@ class ButtonTest {
 
     @Test
     fun defaultSemantics() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 Button(modifier = Modifier.testTag("myButton"), onClick = {}) {
                     Text("myButton")
@@ -64,7 +64,7 @@ class ButtonTest {
 
     @Test
     fun disabledSemantics() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 Button(modifier = Modifier.testTag("myButton"), onClick = {}, enabled = false) {
                     Text("myButton")
@@ -83,7 +83,7 @@ class ButtonTest {
         val onClick: () -> Unit = { ++counter }
         val text = "myButton"
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 Button(onClick = onClick, modifier = Modifier.testTag("myButton")) {
                     Text(text)
@@ -107,7 +107,7 @@ class ButtonTest {
     fun canBeDisabled() {
         val tag = "myButton"
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             var enabled by remember { mutableStateOf(true) }
             val onClick = { enabled = false }
             Box {
@@ -138,7 +138,7 @@ class ButtonTest {
 
         val text = "myButton"
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Column {
                 Button(modifier = Modifier.testTag(button1Tag), onClick = button1OnClick) {
                     Text(text)

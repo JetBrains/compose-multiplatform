@@ -104,7 +104,7 @@ class BadgeTest {
     @Test
     fun badge_noContent_shape() {
         var errorColor = Color.Unspecified
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             errorColor = MaterialTheme.colorScheme.fromToken(NavigationBar.BadgeColor)
             Badge(modifier = Modifier.testTag(TestBadgeTag))
         }
@@ -123,7 +123,7 @@ class BadgeTest {
     @Test
     fun badgeBox_noContent_position() {
         rule
-            .setMaterialContent {
+            .setMaterialContent(lightColorScheme()) {
                 BadgedBox(badge = { Badge(Modifier.testTag(TestBadgeTag)) }) {
                     Icon(
                         icon,
@@ -137,8 +137,8 @@ class BadgeTest {
         val badgeBounds = badge.getUnclippedBoundsInRoot()
         badge.assertPositionInRootIsEqualTo(
             expectedLeft =
-                anchorBounds.right + BadgeOffset +
-                    max((NavigationBar.BadgeSize - badgeBounds.width) / 2, 0.dp),
+            anchorBounds.right + BadgeOffset +
+                max((NavigationBar.BadgeSize - badgeBounds.width) / 2, 0.dp),
             expectedTop = -badgeBounds.height / 2
         )
     }
@@ -146,7 +146,7 @@ class BadgeTest {
     @Test
     fun badgeBox_shortContent_position() {
         rule
-            .setMaterialContent {
+            .setMaterialContent(lightColorScheme()) {
                 BadgedBox(badge = { Badge { Text("8") } }) {
                     Icon(
                         icon,
@@ -160,7 +160,7 @@ class BadgeTest {
         val badgeBounds = badge.getUnclippedBoundsInRoot()
         badge.assertPositionInRootIsEqualTo(
             expectedLeft = anchorBounds.right + BadgeWithContentHorizontalOffset + max
-            (
+                (
                 (
                     NavigationBar.LargeBadgeSize - badgeBounds.width
                     ) / 2,
@@ -173,7 +173,7 @@ class BadgeTest {
     @Test
     fun badgeBox_longContent_position() {
         rule
-            .setMaterialContent {
+            .setMaterialContent(lightColorScheme()) {
                 BadgedBox(badge = { Badge { Text("999+") } }) {
                     Icon(
                         icon,
@@ -196,7 +196,7 @@ class BadgeTest {
 
     @Test
     fun badge_notMergingDescendants_withOwnContentDescription() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             BadgedBox(
                 badge = {
                     Badge { Text("99+") }

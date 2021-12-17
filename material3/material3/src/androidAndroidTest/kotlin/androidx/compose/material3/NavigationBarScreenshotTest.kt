@@ -62,7 +62,7 @@ class NavigationBarScreenshotTest {
 
         var scope: CoroutineScope? = null
 
-        composeTestRule.setMaterialContent {
+        composeTestRule.setMaterialContent(lightColorScheme()) {
             scope = rememberCoroutineScope()
             DefaultNavigationBar(interactionSource)
         }
@@ -81,7 +81,7 @@ class NavigationBarScreenshotTest {
 
         var scope: CoroutineScope? = null
 
-        composeTestRule.setMaterialContent {
+        composeTestRule.setMaterialContent(lightColorScheme()) {
             scope = rememberCoroutineScope()
             DefaultNavigationBar(interactionSource)
         }
@@ -100,7 +100,7 @@ class NavigationBarScreenshotTest {
 
         var scope: CoroutineScope? = null
 
-        composeTestRule.setMaterialContent(colorScheme = darkColorScheme()) {
+        composeTestRule.setMaterialContent(darkColorScheme()) {
             scope = rememberCoroutineScope()
             DefaultNavigationBar(interactionSource)
         }
@@ -119,7 +119,7 @@ class NavigationBarScreenshotTest {
 
         var scope: CoroutineScope? = null
 
-        composeTestRule.setMaterialContent(colorScheme = darkColorScheme()) {
+        composeTestRule.setMaterialContent(darkColorScheme()) {
             scope = rememberCoroutineScope()
             DefaultNavigationBar(interactionSource)
         }

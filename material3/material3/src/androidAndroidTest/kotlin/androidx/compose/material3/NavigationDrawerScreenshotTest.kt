@@ -51,7 +51,7 @@ class NavigationDrawerScreenshotTest {
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL3)
 
     private fun ComposeContentTestRule.setnavigationDrawer(drawerValue: DrawerValue) {
-        setMaterialContent {
+        setMaterialContent(lightColorScheme()) {
             Box(Modifier.requiredSize(400.dp, 32.dp).testTag(ContainerTestTag)) {
                 NavigationDrawer(
                     drawerState = rememberDrawerState(drawerValue),
@@ -67,7 +67,7 @@ class NavigationDrawerScreenshotTest {
     }
 
     private fun ComposeContentTestRule.setDarknavigationDrawer(drawerValue: DrawerValue) {
-        setMaterialContent(colorScheme = darkColorScheme()) {
+        setMaterialContent(darkColorScheme()) {
             Surface {
                 Box(Modifier.requiredSize(400.dp, 32.dp).testTag(ContainerTestTag)) {
                     NavigationDrawer(

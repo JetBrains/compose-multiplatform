@@ -46,7 +46,7 @@ class AlertDialogScreenshotTest {
 
     @Test
     fun alertDialog_lightTheme() {
-        composeTestRule.setMaterialContent {
+        composeTestRule.setMaterialContent(lightColorScheme()) {
             AlertDialog(
                 onDismissRequest = {},
                 title = {
@@ -76,7 +76,7 @@ class AlertDialogScreenshotTest {
 
     @Test
     fun alertDialog_darkTheme() {
-        composeTestRule.setMaterialContent(colorScheme = darkColorScheme()) {
+        composeTestRule.setMaterialContent(darkColorScheme()) {
             AlertDialog(
                 onDismissRequest = {},
                 title = {
@@ -106,7 +106,7 @@ class AlertDialogScreenshotTest {
 
     @Test
     fun alertDialog_withIcon_lightTheme() {
-        composeTestRule.setMaterialContent {
+        composeTestRule.setMaterialContent(lightColorScheme()) {
             AlertDialog(
                 onDismissRequest = {},
                 icon = { Icon(Icons.Filled.Favorite, contentDescription = null) },
@@ -137,7 +137,7 @@ class AlertDialogScreenshotTest {
 
     @Test
     fun alertDialog_withIcon_darkTheme() {
-        composeTestRule.setMaterialContent(colorScheme = darkColorScheme()) {
+        composeTestRule.setMaterialContent(darkColorScheme()) {
             AlertDialog(
                 onDismissRequest = {},
                 icon = { Icon(Icons.Filled.Favorite, contentDescription = null) },

@@ -53,7 +53,7 @@ class BadgeScreenshotTest {
 
     @Test
     fun lightTheme_noContent() {
-        composeTestRule.setMaterialContent {
+        composeTestRule.setMaterialContent(lightColorScheme()) {
             Box(
                 Modifier.size(56.dp).semantics(mergeDescendants = true) {}.testTag(TestTag),
                 contentAlignment = Alignment.Center
@@ -71,7 +71,7 @@ class BadgeScreenshotTest {
 
     @Test
     fun darkTheme_noContent() {
-        composeTestRule.setMaterialContent(colorScheme = darkColorScheme()) {
+        composeTestRule.setMaterialContent(darkColorScheme()) {
             Box(
                 Modifier.size(56.dp).semantics(mergeDescendants = true) {}.testTag(TestTag),
                 contentAlignment = Alignment.Center
@@ -89,7 +89,7 @@ class BadgeScreenshotTest {
 
     @Test
     fun lightTheme_withContent() {
-        composeTestRule.setMaterialContent {
+        composeTestRule.setMaterialContent(lightColorScheme()) {
             Box(
                 Modifier.size(56.dp).semantics(mergeDescendants = true) {}.testTag(TestTag),
                 contentAlignment = Alignment.Center
@@ -107,7 +107,7 @@ class BadgeScreenshotTest {
 
     @Test
     fun darkTheme_withContent() {
-        composeTestRule.setMaterialContent(colorScheme = darkColorScheme()) {
+        composeTestRule.setMaterialContent(darkColorScheme()) {
             Box(
                 Modifier.size(56.dp).semantics(mergeDescendants = true) {}.testTag(TestTag),
                 contentAlignment = Alignment.Center

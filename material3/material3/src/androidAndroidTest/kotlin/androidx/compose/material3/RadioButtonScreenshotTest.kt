@@ -60,7 +60,7 @@ class RadioButtonScreenshotTest {
 
     @Test
     fun radioButton_lightTheme_selected() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 RadioButton(selected = true, onClick = {})
             }
@@ -70,7 +70,7 @@ class RadioButtonScreenshotTest {
 
     @Test
     fun radioButton_darkTheme_selected() {
-        rule.setMaterialContent(colorScheme = darkColorScheme()) {
+        rule.setMaterialContent(darkColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 RadioButton(selected = true, onClick = {})
             }
@@ -80,7 +80,7 @@ class RadioButtonScreenshotTest {
 
     @Test
     fun radioButton_lightTheme_notSelected() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 RadioButton(selected = false, onClick = {})
             }
@@ -90,7 +90,7 @@ class RadioButtonScreenshotTest {
 
     @Test
     fun radioButton_darkTheme_notSelected() {
-        rule.setMaterialContent(colorScheme = darkColorScheme()) {
+        rule.setMaterialContent(darkColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 RadioButton(selected = false, onClick = {})
             }
@@ -100,7 +100,7 @@ class RadioButtonScreenshotTest {
 
     @Test
     fun radioButton_lightTheme_pressed() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 RadioButton(selected = false, onClick = {})
             }
@@ -123,7 +123,7 @@ class RadioButtonScreenshotTest {
 
     @Test
     fun radioButton_darkTheme_pressed() {
-        rule.setMaterialContent(colorScheme = darkColorScheme()) {
+        rule.setMaterialContent(darkColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 RadioButton(selected = false, onClick = {})
             }
@@ -146,7 +146,7 @@ class RadioButtonScreenshotTest {
 
     @Test
     fun radioButton_lightTheme_hovered() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 RadioButton(selected = false, onClick = {})
             }
@@ -160,7 +160,7 @@ class RadioButtonScreenshotTest {
 
     @Test
     fun radioButton_darkTheme_hovered() {
-        rule.setMaterialContent(colorScheme = darkColorScheme()) {
+        rule.setMaterialContent(darkColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 RadioButton(selected = false, onClick = {})
             }
@@ -176,7 +176,7 @@ class RadioButtonScreenshotTest {
     fun radioButton_lightTheme_focused() {
         val focusRequester = FocusRequester()
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 RadioButton(
                     selected = false,
@@ -201,7 +201,7 @@ class RadioButtonScreenshotTest {
     fun radioButton_darkTheme_focused() {
         val focusRequester = FocusRequester()
 
-        rule.setMaterialContent(colorScheme = darkColorScheme()) {
+        rule.setMaterialContent(darkColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 RadioButton(
                     selected = false,
@@ -224,7 +224,7 @@ class RadioButtonScreenshotTest {
 
     @Test
     fun radioButton_lightTheme_disabled_selected() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 RadioButton(selected = true, onClick = {}, enabled = false)
             }
@@ -234,7 +234,7 @@ class RadioButtonScreenshotTest {
 
     @Test
     fun radioButton_darkTheme_disabled_selected() {
-        rule.setMaterialContent(colorScheme = darkColorScheme()) {
+        rule.setMaterialContent(darkColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 RadioButton(selected = true, onClick = {}, enabled = false)
             }
@@ -244,7 +244,7 @@ class RadioButtonScreenshotTest {
 
     @Test
     fun radioButton_lightTheme_disabled_notSelected() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 RadioButton(selected = false, onClick = {}, enabled = false)
             }
@@ -254,7 +254,7 @@ class RadioButtonScreenshotTest {
 
     @Test
     fun radioButton_darkTheme_disabled_notSelected() {
-        rule.setMaterialContent(colorScheme = darkColorScheme()) {
+        rule.setMaterialContent(darkColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 RadioButton(selected = false, onClick = {}, enabled = false)
             }
@@ -264,7 +264,7 @@ class RadioButtonScreenshotTest {
 
     @Test
     fun radioButton_lightTheme_notSelected_animateToSelected() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val isSelected = remember { mutableStateOf(false) }
             Box(wrap.testTag(wrapperTestTag)) {
                 RadioButton(
@@ -294,7 +294,7 @@ class RadioButtonScreenshotTest {
 
     @Test
     fun radioButton_darkTheme_notSelected_animateToSelected() {
-        rule.setMaterialContent(colorScheme = darkColorScheme()) {
+        rule.setMaterialContent(darkColorScheme()) {
             val isSelected = remember { mutableStateOf(false) }
             Box(wrap.testTag(wrapperTestTag)) {
                 RadioButton(
@@ -324,7 +324,7 @@ class RadioButtonScreenshotTest {
 
     @Test
     fun radioButton_lightTheme_selected_animateToNotSelected() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val isSelected = remember { mutableStateOf(true) }
             Box(wrap.testTag(wrapperTestTag)) {
                 RadioButton(
@@ -354,7 +354,7 @@ class RadioButtonScreenshotTest {
 
     @Test
     fun radioButton_darkTheme_selected_animateToNotSelected() {
-        rule.setMaterialContent(colorScheme = darkColorScheme()) {
+        rule.setMaterialContent(darkColorScheme()) {
             val isSelected = remember { mutableStateOf(true) }
             Box(wrap.testTag(wrapperTestTag)) {
                 RadioButton(

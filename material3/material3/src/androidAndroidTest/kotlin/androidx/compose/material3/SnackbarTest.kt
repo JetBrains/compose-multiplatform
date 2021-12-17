@@ -60,7 +60,7 @@ class SnackbarTest {
     @Test
     fun defaultSnackbar_semantics() {
         var clicked = false
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 Snackbar(
                     content = { Text("Message") },
@@ -343,7 +343,7 @@ class SnackbarTest {
 
             override fun dismiss() {}
         }
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 Snackbar(snackbarData = snackbarData)
             }

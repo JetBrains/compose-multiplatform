@@ -61,7 +61,7 @@ class IconButtonScreenshotTest {
 
     @Test
     fun iconButton_lightTheme() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 IconButton(onClick = { /* doSomething() */ }) {
                     Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
@@ -73,7 +73,7 @@ class IconButtonScreenshotTest {
 
     @Test
     fun iconButton_darkTheme() {
-        rule.setMaterialContent(colorScheme = darkColorScheme()) {
+        rule.setMaterialContent(darkColorScheme()) {
             Surface(modifier = Modifier.fillMaxSize()) {
                 Box(wrap.testTag(wrapperTestTag)) {
                     IconButton(onClick = { /* doSomething() */ }) {
@@ -90,7 +90,7 @@ class IconButtonScreenshotTest {
 
     @Test
     fun iconButton_lightTheme_disabled() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 IconButton(onClick = { /* doSomething() */ }, enabled = false) {
                     Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
@@ -102,7 +102,7 @@ class IconButtonScreenshotTest {
 
     @Test
     fun iconButton_lightTheme_pressed() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 IconButton(onClick = { /* doSomething() */ }) {
                     Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
@@ -127,7 +127,7 @@ class IconButtonScreenshotTest {
 
     @Test
     fun iconButton_lightTheme_hovered() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 IconButton(onClick = { /* doSomething() */ }) {
                     Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
@@ -145,7 +145,7 @@ class IconButtonScreenshotTest {
     fun iconButton_lightTheme_focused() {
         val focusRequester = FocusRequester()
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 IconButton(onClick = { /* doSomething() */ },
                     modifier = Modifier

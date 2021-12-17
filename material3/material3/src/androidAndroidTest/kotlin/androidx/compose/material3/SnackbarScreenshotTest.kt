@@ -49,7 +49,7 @@ class SnackbarScreenshotTest {
 
     @Test
     fun snackbar_lightTheme() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TestSnackbar()
         }
         assertAgainstGolden("snackbar_lightTheme")
@@ -57,7 +57,7 @@ class SnackbarScreenshotTest {
 
     @Test
     fun snackbar_withAction_lightTheme() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TestSnackbar(showAction = true)
         }
         assertAgainstGolden("snackbar_withAction_lightTheme")
@@ -65,7 +65,7 @@ class SnackbarScreenshotTest {
 
     @Test
     fun snackbar_withDismiss_lightTheme() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TestSnackbar(showAction = true, duration = SnackbarDuration.Indefinite)
         }
         assertAgainstGolden("snackbar_withDismiss_lightTheme")
@@ -73,7 +73,7 @@ class SnackbarScreenshotTest {
 
     @Test
     fun snackbar_darkTheme() {
-        rule.setMaterialContent(colorScheme = darkColorScheme()) {
+        rule.setMaterialContent(darkColorScheme()) {
             TestSnackbar()
         }
         assertAgainstGolden("snackbar_darkTheme")
@@ -81,7 +81,7 @@ class SnackbarScreenshotTest {
 
     @Test
     fun snackbar_withAction_darkTheme() {
-        rule.setMaterialContent(colorScheme = darkColorScheme()) {
+        rule.setMaterialContent(darkColorScheme()) {
             TestSnackbar(showAction = true)
         }
         assertAgainstGolden("snackbar_withAction_darkTheme")
@@ -89,7 +89,7 @@ class SnackbarScreenshotTest {
 
     @Test
     fun snackbar_withDismiss_darkTheme() {
-        rule.setMaterialContent(colorScheme = darkColorScheme()) {
+        rule.setMaterialContent(darkColorScheme()) {
             TestSnackbar(showAction = true, duration = SnackbarDuration.Indefinite)
         }
         assertAgainstGolden("snackbar_withDismiss_darkTheme")

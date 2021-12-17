@@ -193,7 +193,7 @@ class AlertDialogTest {
 
     @Test
     fun alertDialog_withIcon_positioning() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             AlertDialog(
                 onDismissRequest = {},
                 icon = {
@@ -273,7 +273,7 @@ class AlertDialogTest {
 
     @Test
     fun alertDialog_positioning() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             AlertDialog(
                 onDismissRequest = {},
                 title = { Text(text = "Title", modifier = Modifier.testTag(TitleTestTag)) },
