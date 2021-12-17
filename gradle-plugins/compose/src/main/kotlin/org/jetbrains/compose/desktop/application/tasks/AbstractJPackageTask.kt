@@ -291,6 +291,7 @@ abstract class AbstractJPackageTask @Inject constructor(
             cliArg("--app-image", appImage.dir("${packageName.get()}.app"))
             cliArg("--install-dir", installationPath)
             cliArg("--license-file", licenseFile)
+            cliArg("--resource-dir", jpackageResources)
 
             when (currentOS) {
                 OS.Linux -> {
@@ -434,6 +435,17 @@ abstract class AbstractJPackageTask @Inject constructor(
             InfoPlistBuilder(macExtraPlistKeysRawXml.orNull)
                 .also { setInfoPlistValues(it) }
                 .writeToFile(jpackageResources.ioFile.resolve("Info.plist"))
+
+            if (macAppStore.get()!!) {
+                val productDefPlistXml = """
+                    <key>os</key>
+                    <array>
+                        <string>10.13</string>
+                    </array>
+                """.trimIndent()
+                InfoPlistBuilder(productDefPlistXml)
+                    .writeToFile(jpackageResources.ioFile.resolve("product-def.plist"))
+            }
         }
     }
 
