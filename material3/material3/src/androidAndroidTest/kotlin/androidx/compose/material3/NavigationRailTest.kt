@@ -74,7 +74,7 @@ class NavigationRailTest {
 
     @Test
     fun defaultSemantics() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             NavigationRail {
                 NavigationRailItem(
                     modifier = Modifier.testTag("item"),
@@ -103,7 +103,7 @@ class NavigationRailTest {
 
     @Test
     fun disabledSemantics() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             NavigationRail {
                 NavigationRailItem(
                     enabled = false,
@@ -149,7 +149,7 @@ class NavigationRailTest {
     @Test
     fun navigationRailItem_sizeAndPositions() {
         val itemCoords = mutableMapOf<Int, LayoutCoordinates>()
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 NavigationRail {
                     repeat(4) { index ->
@@ -194,7 +194,7 @@ class NavigationRailTest {
 
     @Test
     fun navigationRailItemContent_withLabel_sizeAndPosition() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 NavigationRail {
                     NavigationRailItem(
@@ -237,7 +237,7 @@ class NavigationRailTest {
 
     @Test
     fun navigationRailItemContent_withLabel_unselected_sizeAndPosition() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 NavigationRail {
                     NavigationRailItem(
@@ -274,7 +274,7 @@ class NavigationRailTest {
 
     @Test
     fun navigationRailItemContent_withoutLabel_sizeAndPosition() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 NavigationRail {
                     NavigationRailItem(
@@ -305,7 +305,7 @@ class NavigationRailTest {
 
     @Test
     fun navigationRail_selectNewItem() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             var selectedItem by remember { mutableStateOf(0) }
             val items = listOf("Home", "Search", "Settings")
             val icons = listOf(Icons.Filled.Home, Icons.Filled.Search, Icons.Filled.Settings)
@@ -344,7 +344,7 @@ class NavigationRailTest {
     @Test
     fun disabled_noClicks() {
         var clicks = 0
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             NavigationRail {
                 NavigationRailItem(
                     enabled = false,

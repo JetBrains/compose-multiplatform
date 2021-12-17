@@ -50,7 +50,7 @@ class AppBarScreenshotTest {
 
     @Test
     fun smallAppBar_lightTheme() {
-        composeTestRule.setMaterialContent {
+        composeTestRule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.testTag(TestTag)) {
                 SmallTopAppBar(
                     navigationIcon = {
@@ -81,7 +81,7 @@ class AppBarScreenshotTest {
 
     @Test
     fun smallAppBar_darkTheme() {
-        composeTestRule.setMaterialContent(colorScheme = darkColorScheme()) {
+        composeTestRule.setMaterialContent(darkColorScheme()) {
             Box(Modifier.testTag(TestTag)) {
                 SmallTopAppBar(
                     navigationIcon = {
@@ -112,7 +112,7 @@ class AppBarScreenshotTest {
 
     @Test
     fun centerAlignedAppBar_lightTheme() {
-        composeTestRule.setMaterialContent {
+        composeTestRule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.testTag(TestTag)) {
                 CenterAlignedTopAppBar(
                     navigationIcon = {
@@ -143,7 +143,7 @@ class AppBarScreenshotTest {
 
     @Test
     fun centerAlignedAppBar_darkTheme() {
-        composeTestRule.setMaterialContent(colorScheme = darkColorScheme()) {
+        composeTestRule.setMaterialContent(darkColorScheme()) {
             Box(Modifier.testTag(TestTag)) {
                 CenterAlignedTopAppBar(
                     navigationIcon = {
@@ -174,7 +174,7 @@ class AppBarScreenshotTest {
 
     @Test
     fun mediumAppBar_lightTheme() {
-        composeTestRule.setMaterialContent {
+        composeTestRule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.testTag(TestTag)) {
                 MediumTopAppBar(
                     navigationIcon = {
@@ -205,7 +205,7 @@ class AppBarScreenshotTest {
 
     @Test
     fun mediumAppBar_darkTheme() {
-        composeTestRule.setMaterialContent(colorScheme = darkColorScheme()) {
+        composeTestRule.setMaterialContent(darkColorScheme()) {
             Box(Modifier.testTag(TestTag)) {
                 MediumTopAppBar(
                     navigationIcon = {
@@ -236,7 +236,7 @@ class AppBarScreenshotTest {
 
     @Test
     fun largeAppBar_lightTheme() {
-        composeTestRule.setMaterialContent {
+        composeTestRule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.testTag(TestTag)) {
                 LargeTopAppBar(
                     navigationIcon = {
@@ -267,7 +267,7 @@ class AppBarScreenshotTest {
 
     @Test
     fun largeAppBar_darkTheme() {
-        composeTestRule.setMaterialContent(colorScheme = darkColorScheme()) {
+        composeTestRule.setMaterialContent(darkColorScheme()) {
             Box(Modifier.testTag(TestTag)) {
                 LargeTopAppBar(
                     navigationIcon = {

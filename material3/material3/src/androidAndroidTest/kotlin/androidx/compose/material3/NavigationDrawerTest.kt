@@ -71,7 +71,7 @@ class NavigationDrawerTest {
 
     @Test
     fun navigationDrawer_testOffset_whenOpen() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val drawerState = rememberDrawerState(DrawerValue.Open)
             NavigationDrawer(
                 drawerState = drawerState,
@@ -88,7 +88,7 @@ class NavigationDrawerTest {
 
     @Test
     fun navigationDrawer_testOffset_whenClosed() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val drawerState = rememberDrawerState(DrawerValue.Closed)
             NavigationDrawer(
                 drawerState = drawerState,
@@ -106,7 +106,7 @@ class NavigationDrawerTest {
 
     @Test
     fun navigationDrawer_testWidth_whenOpen() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val drawerState = rememberDrawerState(DrawerValue.Open)
             NavigationDrawer(
                 drawerState = drawerState,
@@ -125,7 +125,7 @@ class NavigationDrawerTest {
     @SmallTest
     fun navigationDrawer_hasPaneTitle() {
         lateinit var navigationMenu: String
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             NavigationDrawer(
                 drawerState = rememberDrawerState(DrawerValue.Open),
                 drawerContent = {
@@ -145,7 +145,7 @@ class NavigationDrawerTest {
     @LargeTest
     fun navigationDrawer_openAndClose(): Unit = runBlocking(AutoTestFrameClock()) {
         lateinit var drawerState: DrawerState
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             drawerState = rememberDrawerState(DrawerValue.Closed)
             NavigationDrawer(
                 drawerState = drawerState,
@@ -176,7 +176,7 @@ class NavigationDrawerTest {
     @LargeTest
     fun navigationDrawer_animateTo(): Unit = runBlocking(AutoTestFrameClock()) {
         lateinit var drawerState: DrawerState
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             drawerState = rememberDrawerState(DrawerValue.Closed)
             NavigationDrawer(
                 drawerState = drawerState,
@@ -207,7 +207,7 @@ class NavigationDrawerTest {
     @LargeTest
     fun navigationDrawer_snapTo(): Unit = runBlocking(AutoTestFrameClock()) {
         lateinit var drawerState: DrawerState
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             drawerState = rememberDrawerState(DrawerValue.Closed)
             NavigationDrawer(
                 drawerState = drawerState,
@@ -238,7 +238,7 @@ class NavigationDrawerTest {
     @LargeTest
     fun navigationDrawer_currentValue(): Unit = runBlocking(AutoTestFrameClock()) {
         lateinit var drawerState: DrawerState
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             drawerState = rememberDrawerState(DrawerValue.Closed)
             NavigationDrawer(
                 drawerState = drawerState,
@@ -269,7 +269,7 @@ class NavigationDrawerTest {
         var drawerClicks = 0
         var bodyClicks = 0
         lateinit var drawerState: DrawerState
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             drawerState = rememberDrawerState(DrawerValue.Closed)
             // emulate click on the screen
             NavigationDrawer(
@@ -310,7 +310,7 @@ class NavigationDrawerTest {
     ) {
         var bodyClicks = 0
         lateinit var drawerState: DrawerState
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             drawerState = rememberDrawerState(DrawerValue.Closed)
             NavigationDrawer(
                 drawerState = drawerState,
@@ -345,7 +345,7 @@ class NavigationDrawerTest {
     @LargeTest
     fun navigationDrawer_openBySwipe() {
         lateinit var drawerState: DrawerState
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             drawerState = rememberDrawerState(DrawerValue.Closed)
             Box(Modifier.testTag(DrawerTestTag)) {
                 NavigationDrawer(
@@ -379,7 +379,7 @@ class NavigationDrawerTest {
     @LargeTest
     fun navigationDrawer_confirmStateChangeRespect() {
         lateinit var drawerState: DrawerState
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             drawerState = rememberDrawerState(
                 DrawerValue.Open,
                 confirmStateChange = {
@@ -424,7 +424,7 @@ class NavigationDrawerTest {
     @LargeTest
     fun navigationDrawer_openBySwipe_rtl() {
         lateinit var drawerState: DrawerState
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             drawerState = rememberDrawerState(DrawerValue.Closed)
             // emulate click on the screen
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -463,7 +463,7 @@ class NavigationDrawerTest {
         AutoTestFrameClock()
     ) {
         lateinit var drawerState: DrawerState
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             drawerState = rememberDrawerState(DrawerValue.Closed)
             NavigationDrawer(
                 drawerState = drawerState,
@@ -500,7 +500,7 @@ class NavigationDrawerTest {
     fun navigationDrawer_scrimNode_reportToSemanticsWhenOpen_notReportToSemanticsWhenClosed() {
         val topTag = "navigationDrawer"
         lateinit var closeDrawer: String
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             NavigationDrawer(
                 modifier = Modifier.testTag(topTag),
                 drawerState = rememberDrawerState(DrawerValue.Open),

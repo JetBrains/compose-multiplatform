@@ -62,7 +62,7 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
 
     @Test
     fun checkBox_checked() {
-        rule.setMaterialContent(colorScheme = scheme.colorScheme) {
+        rule.setMaterialContent(scheme.colorScheme) {
             Box(wrap.testTag(wrapperTestTag)) {
                 Checkbox(checked = true, onCheckedChange = { })
             }
@@ -72,7 +72,7 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
 
     @Test
     fun checkBox_unchecked() {
-        rule.setMaterialContent(colorScheme = scheme.colorScheme) {
+        rule.setMaterialContent(scheme.colorScheme) {
             Box(wrap.testTag(wrapperTestTag)) {
                 Checkbox(modifier = wrap, checked = false, onCheckedChange = { })
             }
@@ -82,7 +82,7 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
 
     @Test
     fun checkBox_pressed() {
-        rule.setMaterialContent(colorScheme = scheme.colorScheme) {
+        rule.setMaterialContent(scheme.colorScheme) {
             Box(wrap.testTag(wrapperTestTag)) {
                 Checkbox(modifier = wrap, checked = false, onCheckedChange = { })
             }
@@ -105,7 +105,7 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
 
     @Test
     fun checkBox_indeterminate() {
-        rule.setMaterialContent(colorScheme = scheme.colorScheme) {
+        rule.setMaterialContent(scheme.colorScheme) {
             Box(wrap.testTag(wrapperTestTag)) {
                 TriStateCheckbox(
                     state = ToggleableState.Indeterminate,
@@ -119,7 +119,7 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
 
     @Test
     fun checkBox_disabled_checked() {
-        rule.setMaterialContent(colorScheme = scheme.colorScheme) {
+        rule.setMaterialContent(scheme.colorScheme) {
             Box(wrap.testTag(wrapperTestTag)) {
                 Checkbox(
                     modifier = wrap,
@@ -133,7 +133,7 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
 
     @Test
     fun checkBox_disabled_unchecked() {
-        rule.setMaterialContent(colorScheme = scheme.colorScheme) {
+        rule.setMaterialContent(scheme.colorScheme) {
             Box(wrap.testTag(wrapperTestTag)) {
                 Checkbox(
                     modifier = wrap,
@@ -147,7 +147,7 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
 
     @Test
     fun checkBox_disabled_indeterminate() {
-        rule.setMaterialContent(colorScheme = scheme.colorScheme) {
+        rule.setMaterialContent(scheme.colorScheme) {
             Box(wrap.testTag(wrapperTestTag)) {
                 TriStateCheckbox(
                     state = ToggleableState.Indeterminate,
@@ -163,7 +163,7 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
     @Test
     fun checkBox_unchecked_animateToChecked() {
         val isChecked = mutableStateOf(false)
-        rule.setMaterialContent(colorScheme = scheme.colorScheme) {
+        rule.setMaterialContent(scheme.colorScheme) {
             Box(wrap.testTag(wrapperTestTag)) {
                 Checkbox(
                     modifier = wrap,
@@ -192,7 +192,7 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
     @Test
     fun checkBox_checked_animateToUnchecked() {
         val isChecked = mutableStateOf(true)
-        rule.setMaterialContent(colorScheme = scheme.colorScheme) {
+        rule.setMaterialContent(scheme.colorScheme) {
             Box(wrap.testTag(wrapperTestTag)) {
                 Checkbox(
                     modifier = wrap,
@@ -220,7 +220,7 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
 
     @Test
     fun checkBox_hover() {
-        rule.setMaterialContent(colorScheme = scheme.colorScheme) {
+        rule.setMaterialContent(scheme.colorScheme) {
             Box(wrap.testTag(wrapperTestTag)) {
                 Checkbox(
                     modifier = wrap,
@@ -242,7 +242,7 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
     fun checkBox_focus() {
         val focusRequester = FocusRequester()
 
-        rule.setMaterialContent(colorScheme = scheme.colorScheme) {
+        rule.setMaterialContent(scheme.colorScheme) {
             Box(wrap.testTag(wrapperTestTag)) {
                 Checkbox(
                     modifier = wrap
