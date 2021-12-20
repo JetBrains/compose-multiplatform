@@ -95,6 +95,8 @@ class ElementsTests {
             Pair({ Td() }, "TD"),
             Pair({ Tbody() }, "TBODY"),
             Pair({ Tfoot() }, "TFOOT"),
+
+            Pair({ Canvas() }, "CANVAS"),
         )
 
         composition {

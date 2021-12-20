@@ -59,6 +59,7 @@ import org.w3c.dom.HTMLUListElement
 import org.w3c.dom.HTMLVideoElement
 import org.w3c.dom.Text
 import org.w3c.dom.css.CSSStyleSheet
+import org.w3c.dom.HTMLCanvasElement
 
 typealias AttrBuilderContext<T> = AttrsBuilder<T>.() -> Unit
 typealias ContentBuilder<T> = @Composable ElementScope<T>.() -> Unit
@@ -149,6 +150,8 @@ private val Td: ElementBuilder<HTMLTableCellElement> = ElementBuilderImplementat
 private val Tbody: ElementBuilder<HTMLTableSectionElement> = ElementBuilderImplementation("tbody")
 private val Tfoot: ElementBuilder<HTMLTableSectionElement> = ElementBuilderImplementation("tfoot")
 
+private val Canvas: ElementBuilder<HTMLCanvasElement> = ElementBuilderImplementation("canvas")
+
 val Style: ElementBuilder<HTMLStyleElement> = ElementBuilderImplementation("style")
 
 fun interface ElementBuilder<TElement : Element> {
@@ -160,6 +163,19 @@ fun interface ElementBuilder<TElement : Element> {
         }
     }
 }
+
+@Composable
+fun Canvas(
+    attrs: AttrBuilderContext<HTMLCanvasElement>? = null,
+    content: ContentBuilder<HTMLCanvasElement>? = null
+) {
+    TagElement(
+        elementBuilder = Canvas,
+        applyAttrs = attrs,
+        content = content
+    )
+}
+
 
 @Composable
 fun Address(
