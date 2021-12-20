@@ -18,7 +18,7 @@ package androidx.build.dependencyTracker
 
 import androidx.build.dependencyTracker.AffectedModuleDetector.Companion.ENABLE_ARG
 import androidx.build.getDistributionDirectory
-import androidx.build.gitclient.GitClientImpl
+import androidx.build.gitclient.GitRunnerGitClient
 import androidx.build.gradle.isRoot
 import java.io.File
 import org.gradle.api.Action
@@ -271,7 +271,7 @@ abstract class AffectedModuleDetectorLoader :
             if (baseCommitOverride != null) {
                 logger.info("using base commit override $baseCommitOverride")
             }
-            val gitClient = GitClientImpl(
+            val gitClient = GitRunnerGitClient(
                 workingDir = parameters.rootDir,
                 logger = logger
             )
