@@ -544,3 +544,9 @@ fun main() {
 ```
 3. Run `./gradlew runDistributable`.
 4. Links like `compose://foo/bar` are now redirected from a browser to your application.
+
+## Obfuscation
+    
+There's nothing special with obfuscation of CfD programs - it's done the same was as for any other JVM program. Compose plugin provides task
+packageUberJarForCurrentOS which produces self-contained JAR. It could be obfuscated using steps similar to what's described in
+https://stackoverflow.com/questions/64355998/proguard-example-for-gradle-java-application
