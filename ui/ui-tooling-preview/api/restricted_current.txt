@@ -24,6 +24,10 @@ package androidx.compose.ui.tooling.preview {
     field public static final String PIXEL_4_XL = "id:pixel_4_xl";
     field public static final String PIXEL_C = "id:pixel_c";
     field public static final String PIXEL_XL = "id:pixel_xl";
+    field public static final String WEAR_OS_LARGE_ROUND = "id:wearos_large_round";
+    field public static final String WEAR_OS_RECT = "id:wearos_rect";
+    field public static final String WEAR_OS_SMALL_ROUND = "id:wearos_small_round";
+    field public static final String WEAR_OS_SQUARE = "id:wearos_square";
   }
 
   @kotlin.annotation.MustBeDocumented @kotlin.annotation.Repeatable @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.SOURCE) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget.FUNCTION) public @interface Preview {
