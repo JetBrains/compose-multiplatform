@@ -33,7 +33,7 @@ import org.gradle.api.attributes.Usage
 
 
 open class AndroidXComposeMultiplatformExtensionImpl @Inject constructor(
-    project: Project
+    val project: Project
 ) : AndroidXComposeMultiplatformExtension() {
     private val multiplatformExtension =
         project.extensions.getByType(KotlinMultiplatformExtension::class.java)
@@ -115,6 +115,10 @@ open class AndroidXComposeMultiplatformExtensionImpl @Inject constructor(
         uikitArm64Test.dependsOn(uikitTest)
     }
 
+    override fun includeUtil(): Unit {
+        addUtilDirectory("commonMain", "jvmMain", "jsMain", "nativeMain")
+    }
+
     private fun getOrCreateJvmMain(): KotlinSourceSet =
         getOrCreateSourceSet("jvmMain", "commonMain")
 
@@ -130,12 +134,20 @@ open class AndroidXComposeMultiplatformExtensionImpl @Inject constructor(
                     dependsOn(sourceSets.getByName(dependsOnSourceSetName))
             }
     }
+
+    private fun addUtilDirectory(vararg sourceSetNames: String) = multiplatformExtension.run {
+        sourceSetNames.forEach { name ->
+            val sourceSet = sourceSets.findByName(name)
+            sourceSet?.let {
+                it.kotlin.srcDirs(project.rootProject.files("compose/util/util/src/$name/kotlin/"))
+            }
+        }
+    }
 }
 
 fun Project.experimentalOELPublication() : Boolean = findProperty("oel.publication") == "true"
 fun Project.oelAndroidxVersion() : String? = findProperty("oel.androidx.version") as String?
 fun Project.oelAndroidxMaterial3Version() : String? = findProperty("oel.androidx.material3.version") as String?
-
 
 fun enableOELPublishing(project: Project) {
     if (!project.experimentalOELPublication()) return
@@ -143,7 +155,6 @@ fun enableOELPublishing(project: Project) {
     if (project.experimentalOELPublication() && (project.oelAndroidxVersion() == null)) {
         error("androidx version should be specified for OEL publications")
     }
-
 
     val ext = project.multiplatformExtension ?: error("expected a multiplatform project")
 
