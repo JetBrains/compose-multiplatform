@@ -67,22 +67,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toOffset
 import androidx.compose.ui.zIndex
 import com.google.common.truth.Truth.assertThat
+import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.ExpectedException
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
 class LayoutNodeTest {
-    @get:Rule
-    val thrown = ExpectedException.none()!!
-
     // Ensure that attach and detach work properly
     @Test
     fun layoutNodeAttachDetach() {
@@ -532,9 +528,9 @@ class LayoutNodeTest {
         val node1 = LayoutNode()
         node1.attach(owner)
 
-        thrown.expect(IllegalArgumentException::class.java)
-
-        node1.coordinates.localPositionOf(node0.coordinates, Offset(5f, 15f))
+        Assert.assertThrows(IllegalArgumentException::class.java) {
+            node1.coordinates.localPositionOf(node0.coordinates, Offset(5f, 15f))
+        }
     }
 
     @Test
@@ -610,16 +606,18 @@ class LayoutNodeTest {
     @Test
     fun testAddBeyondCurrent() {
         val node = LayoutNode()
-        thrown.expect(IndexOutOfBoundsException::class.java)
-        node.insertAt(1, LayoutNode())
+        Assert.assertThrows(IndexOutOfBoundsException::class.java) {
+            node.insertAt(1, LayoutNode())
+        }
     }
 
     // LayoutNode shouldn't allow adding below 0
     @Test
     fun testAddBelowZero() {
         val node = LayoutNode()
-        thrown.expect(IndexOutOfBoundsException::class.java)
-        node.insertAt(-1, LayoutNode())
+        Assert.assertThrows(IndexOutOfBoundsException::class.java) {
+            node.insertAt(-1, LayoutNode())
+        }
     }
 
     // LayoutNode should error when removing at index < 0
@@ -627,8 +625,9 @@ class LayoutNodeTest {
     fun testRemoveNegativeIndex() {
         val node = LayoutNode()
         node.insertAt(0, LayoutNode())
-        thrown.expect(IndexOutOfBoundsException::class.java)
-        node.removeAt(-1, 1)
+        Assert.assertThrows(IndexOutOfBoundsException::class.java) {
+            node.removeAt(-1, 1)
+        }
     }
 
     // LayoutNode should error when removing at index > count
@@ -636,8 +635,9 @@ class LayoutNodeTest {
     fun testRemoveBeyondIndex() {
         val node = LayoutNode()
         node.insertAt(0, LayoutNode())
-        thrown.expect(IndexOutOfBoundsException::class.java)
-        node.removeAt(1, 1)
+        Assert.assertThrows(IndexOutOfBoundsException::class.java) {
+            node.removeAt(1, 1)
+        }
     }
 
     // LayoutNode should error when removing at count < 0
@@ -645,8 +645,9 @@ class LayoutNodeTest {
     fun testRemoveNegativeCount() {
         val node = LayoutNode()
         node.insertAt(0, LayoutNode())
-        thrown.expect(IllegalArgumentException::class.java)
-        node.removeAt(0, -1)
+        Assert.assertThrows(IllegalArgumentException::class.java) {
+            node.removeAt(0, -1)
+        }
     }
 
     // LayoutNode should error when removing at count > entry count
@@ -654,16 +655,18 @@ class LayoutNodeTest {
     fun testRemoveWithIndexBeyondSize() {
         val node = LayoutNode()
         node.insertAt(0, LayoutNode())
-        thrown.expect(IndexOutOfBoundsException::class.java)
-        node.removeAt(0, 2)
+        Assert.assertThrows(IndexOutOfBoundsException::class.java) {
+            node.removeAt(0, 2)
+        }
     }
 
     // LayoutNode should error when there aren't enough items
     @Test
     fun testRemoveWithIndexEqualToSize() {
         val node = LayoutNode()
-        thrown.expect(IndexOutOfBoundsException::class.java)
-        node.removeAt(0, 1)
+        Assert.assertThrows(IndexOutOfBoundsException::class.java) {
+            node.removeAt(0, 1)
+        }
     }
 
     // LayoutNode should allow removing two items
