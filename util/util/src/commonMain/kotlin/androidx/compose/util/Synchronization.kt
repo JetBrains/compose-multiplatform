@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,11 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.platform
+package androidx.compose.util
 
-internal actual typealias AtomicInt = java.util.concurrent.atomic.AtomicInteger
+internal expect class SynchronizedObject
 
-internal actual fun simpleIdentityToString(obj: Any, name: String?): String {
-    val className = name ?: if (obj::class.java.isAnonymousClass) {
-        obj::class.java.name
-    } else {
-        obj::class.java.simpleName
-    }
+internal expect fun createSynchronizedObject(): SynchronizedObject
 
-    return className + "@" + String.format("%07x", System.identityHashCode(obj))
-}
-
-internal actual fun Any.nativeClass(): Any = this.javaClass
-
+@PublishedApi
+internal expect inline fun <R> synchronized(lock: SynchronizedObject, block: () -> R): R

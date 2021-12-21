@@ -18,6 +18,7 @@ package androidx.compose.ui.platform
 
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.platform.GlobalSnapshotManager.ensureStarted
+import androidx.compose.util.createSynchronizedObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -38,6 +39,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * may establish different policies for these notifications.
  */
 internal actual object GlobalSnapshotManager {
+    internal val sync = createSynchronizedObject()
     private val started = AtomicBoolean(false)
 
     actual fun ensureStarted() {
@@ -47,7 +49,7 @@ internal actual object GlobalSnapshotManager {
             CoroutineScope(MainUIDispatcher).launch {
                 channel.consumeEach {
                     // TODO(https://github.com/JetBrains/compose-jb/issues/1854) get rid of synchronized
-                    synchronized(GlobalSnapshotManager) {
+                    synchronized(sync) {
                         Snapshot.sendApplyNotifications()
                     }
                 }

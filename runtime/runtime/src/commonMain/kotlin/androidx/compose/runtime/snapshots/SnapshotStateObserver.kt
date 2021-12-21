@@ -79,6 +79,8 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
         }
     }
 
+    private val applyMapsLock = createSynchronizedObject()
+
     /**
      * Method to call when unsubscribing from the apply observer.
      */

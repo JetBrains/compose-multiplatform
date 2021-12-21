@@ -124,9 +124,6 @@ private fun memoizeIdentityHashCode(instance: Any?): Int {
 
 actual annotation class TestOnly
 
-actual inline fun <R> synchronized(lock: Any, block: () -> R): R =
-    block()
-
 actual val DefaultMonotonicFrameClock: MonotonicFrameClock = MonotonicClockImpl()
 
 @OptIn(ExperimentalTime::class)

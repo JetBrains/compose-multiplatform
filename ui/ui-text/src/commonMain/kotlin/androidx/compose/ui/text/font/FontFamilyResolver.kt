@@ -19,8 +19,8 @@ package androidx.compose.ui.text.font
 import androidx.compose.runtime.State
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.caches.LruCache
-import androidx.compose.ui.text.platform.createSynchronizedObject
-import androidx.compose.ui.text.platform.synchronized
+import androidx.compose.util.createSynchronizedObject
+import androidx.compose.util.synchronized
 import androidx.compose.ui.util.fastMap
 
 @ExperimentalTextApi

@@ -18,6 +18,7 @@ package androidx.compose.ui.platform
 
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.platform.GlobalSnapshotManager.ensureStarted
+import androidx.compose.util.createSynchronizedObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
@@ -36,6 +37,7 @@ import org.jetbrains.skiko.SkikoDispatchers
  * may establish different policies for these notifications.
  */
 internal actual object GlobalSnapshotManager {
+    internal val sync = createSynchronizedObject()
     private val started = AtomicInt(0)
 
     actual fun ensureStarted() {

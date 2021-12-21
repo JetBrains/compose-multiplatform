@@ -122,6 +122,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         desktop()
         darwin()
         js()
+        includeUtil()
     }
 
     kotlin {
@@ -252,6 +253,13 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         // Can't declare this in kotlin { sourceSets { androidTest.dependencies { .. } } } as that
         // leaks into instrumented tests (b/214407011)
         testImplementation(libs.robolectric)
+    }
+} else {
+    android {
+        sourceSets.main.java {
+           srcDirs += "../../util/util/src/commonMain/kotlin"
+           srcDirs += "../../util/util/src/jvmMain/kotlin"
+        }
     }
 }
 

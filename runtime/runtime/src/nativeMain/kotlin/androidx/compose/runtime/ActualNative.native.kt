@@ -102,9 +102,6 @@ actual annotation class TestOnly
 
 actual typealias CompositionContextLocal = kotlin.native.concurrent.ThreadLocal
 
-actual inline fun <R> synchronized(lock: Any, block: () -> R): R =
-    block()
-
 actual val DefaultMonotonicFrameClock: MonotonicFrameClock = MonotonicClockImpl()
 
 @OptIn(ExperimentalTime::class)

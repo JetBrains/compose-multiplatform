@@ -27,6 +27,9 @@ import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentSetOf
 import androidx.compose.runtime.snapshots.fastAny
 import androidx.compose.runtime.snapshots.fastGroupBy
+import androidx.compose.util.SynchronizedObject
+import androidx.compose.util.createSynchronizedObject
+import androidx.compose.util.synchronized
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -247,7 +250,7 @@ class Recomposer(
         PendingWork
     }
 
-    private val stateLock = Any()
+    private val stateLock = createSynchronizedObject()
 
     // Begin properties guarded by stateLock
     private var runnerJob: Job? = null
@@ -1334,7 +1337,7 @@ private class ProduceFrameSignal {
      * [FramePending] state which must be acknowledged by a call to [takeFrameRequestLocked]
      * once all data that will be used to produce the frame has been claimed.
      */
-    suspend fun awaitFrameRequest(lock: Any) {
+    suspend fun awaitFrameRequest(lock: SynchronizedObject) {
         synchronized(lock) {
             if (pendingFrameContinuation === ProduceAnotherFrame) {
                 pendingFrameContinuation = FramePending

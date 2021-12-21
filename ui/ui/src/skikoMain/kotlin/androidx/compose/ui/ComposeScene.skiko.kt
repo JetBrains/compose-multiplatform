@@ -50,12 +50,12 @@ import androidx.compose.ui.platform.FlushCoroutineDispatcher
 import androidx.compose.ui.platform.GlobalSnapshotManager
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.node.RootForTest
-import androidx.compose.ui.platform.synchronized
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toIntRect
+import androidx.compose.util.synchronized
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -124,7 +124,7 @@ class ComposeScene internal constructor(
         val result = try {
             // We must see the actual state before we will do [block]
             // TODO(https://github.com/JetBrains/compose-jb/issues/1854) get rid of synchronized.
-            synchronized(GlobalSnapshotManager) {
+            synchronized(GlobalSnapshotManager.sync) {
                 Snapshot.sendApplyNotifications()
             }
             snapshotChanges.perform()

@@ -19,6 +19,8 @@ package androidx.compose.runtime
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
+import androidx.compose.util.createSynchronizedObject
+import androidx.compose.util.synchronized
 
 /**
  * A boolean open or closed latch for awaiting a single repeating event, like pending
@@ -31,7 +33,7 @@ import kotlin.coroutines.resume
  */
 internal class Latch {
 
-    private val lock = Any()
+    private val lock = createSynchronizedObject()
     private var awaiters = mutableListOf<Continuation<Unit>>()
     private var spareList = mutableListOf<Continuation<Unit>>()
 

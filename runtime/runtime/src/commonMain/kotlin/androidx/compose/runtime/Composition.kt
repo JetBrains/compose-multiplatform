@@ -25,6 +25,8 @@ import androidx.compose.runtime.snapshots.fastAny
 import androidx.compose.runtime.snapshots.fastForEach
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import androidx.compose.util.createSynchronizedObject
+import androidx.compose.util.synchronized
 
 /**
  * A composition object is usually constructed for you, and returned from an API that
@@ -359,7 +361,7 @@ internal class CompositionImpl(
     private val pendingModifications = AtomicReference<Any?>(null)
 
     // Held when making changes to self or composer
-    private val lock = Any()
+    private val lock = createSynchronizedObject()
 
     /**
      * A set of remember observers that were potentially abandoned between [composeContent] or

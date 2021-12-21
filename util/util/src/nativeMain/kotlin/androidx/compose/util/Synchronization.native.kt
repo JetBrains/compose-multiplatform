@@ -14,11 +14,17 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.text.platform
+package androidx.compose.util
 
-internal expect class SynchronizedObject
+internal actual class SynchronizedObject : kotlinx.atomicfu.locks.SynchronizedObject()
 
-internal expect fun createSynchronizedObject(): SynchronizedObject
+internal actual fun createSynchronizedObject() = SynchronizedObject()
+
+// When we decide to switch to Experimental Memoty Model,
+// we need to change the synchronized impementation:
+//
+// internal actual inline fun <R> synchronized(lock: SynchronizedObject, block: () -> R): R =
+//    kotlinx.atomicfu.locks.synchronized(lock, block)
 
 @PublishedApi
-internal expect inline fun <R> synchronized(lock: SynchronizedObject, block: () -> R): R
+internal actual inline fun <R> synchronized(lock: SynchronizedObject, block: () -> R): R = block()

@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.platform
 
+import androidx.compose.util.synchronized
+import androidx.compose.util.createSynchronizedObject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -36,17 +38,18 @@ internal class FlushCoroutineDispatcher(
     // TODO replace it by scope.coroutineContext[Dispatcher] when it will be no longer experimental
     private val scope = CoroutineScope(scope.coroutineContext.minusKey(Job))
     private val tasks = mutableSetOf<Runnable>()
+    private val tasksLock = createSynchronizedObject()
     private val tasksCopy = mutableSetOf<Runnable>()
     @Volatile
     private var isPerformingRun = false
-    private val runLock = Any()
+    private val runLock = createSynchronizedObject()
     override fun dispatch(context: CoroutineContext, block: Runnable) {
-        synchronized(tasks) {
+        synchronized(tasksLock) {
             tasks.add(block)
         }
         scope.launch {
             performRun {
-                val isTaskAlive = synchronized(tasks) {
+                val isTaskAlive = synchronized(tasksLock) {
                     tasks.remove(block)
                 }
                 if (isTaskAlive) {
@@ -58,7 +61,7 @@ internal class FlushCoroutineDispatcher(
     /**
      * Does the dispatcher have any tasks scheduled or currently in progress
      */
-    fun hasTasks() = synchronized(tasks) {
+    fun hasTasks() = synchronized(tasksLock) {
         tasks.isNotEmpty()
     } && !isPerformingRun
 
@@ -67,7 +70,7 @@ internal class FlushCoroutineDispatcher(
      * performing in the [scope]
      */
     fun flush() = performRun {
-        synchronized(tasks) {
+        synchronized(tasksLock) {
             tasksCopy.addAll(tasks)
             tasks.clear()
         }

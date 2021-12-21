@@ -87,6 +87,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         desktop()
         darwin()
         js()
+        includeUtil()
     }
 
     kotlin {

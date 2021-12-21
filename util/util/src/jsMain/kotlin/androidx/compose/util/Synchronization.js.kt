@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.text.platform
+package androidx.compose.util
 
 internal actual class SynchronizedObject
 
 internal actual fun createSynchronizedObject() = SynchronizedObject()
 
-internal actual inline fun <R> synchronized(lock: SynchronizedObject, block: () -> R): R {
-    return kotlin.synchronized(lock, block)
-}
+@PublishedApi
+internal actual inline fun <R> synchronized(lock: SynchronizedObject, block: () -> R): R = block()
