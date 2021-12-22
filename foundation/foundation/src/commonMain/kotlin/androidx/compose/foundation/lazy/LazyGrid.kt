@@ -471,7 +471,7 @@ private fun ItemRow(
         layout(constraints.maxWidth, placeables.fastMaxOfOrNull { it.height }!!) {
             var x = 0
             placeables.fastForEach { placeable ->
-                placeable.place(x, 0)
+                placeable.placeRelative(x, 0)
                 x += placeable.width + spacing
             }
         }
