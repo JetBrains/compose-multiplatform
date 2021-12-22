@@ -5,10 +5,12 @@ plugins {
     id("org.jetbrains.compose")
 }
 
+val SKIKO_VERSION: String by project
+
 val skikoWasm by configurations.creating
 
 dependencies {
-    skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:0.0.0-SNAPSHOT")
+    skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:${SKIKO_VERSION}")
 }
 
 val copySkikoResources = tasks.register("copySkikoResources", Copy::class) {
@@ -16,7 +18,7 @@ val copySkikoResources = tasks.register("copySkikoResources", Copy::class) {
         include("skiko.wasm")
         include("skiko.js")
     }
-    destinationDir = file("${project.buildDir}/skiko")
+    destinationDir = file("${rootProject.buildDir}/skiko")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTest>().configureEach {
@@ -42,7 +44,7 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(kotlin("stdlib-common"))
 
-                implementation("org.jetbrains.skiko:skiko:0.0.0-SNAPSHOT")
+                implementation("org.jetbrains.skiko:skiko:${SKIKO_VERSION}")
             }
         }
 
