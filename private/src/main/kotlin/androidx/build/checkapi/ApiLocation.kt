@@ -54,7 +54,9 @@ data class ApiLocation(
     // recorded
     val experimentalApiFile: File,
     // File where the library's public resources are recorded
-    val resourceFile: File
+    val resourceFile: File,
+    // Directory where native API files are stored
+    val nativeApiDirectory: File
 ) : Serializable {
 
     /**
@@ -93,7 +95,8 @@ data class ApiLocation(
                 removedApiFile = File(apiFileDir, "$PREFIX_REMOVED$baseName$EXTENSION"),
                 restrictedApiFile = File(apiFileDir, "$PREFIX_RESTRICTED$baseName$EXTENSION"),
                 experimentalApiFile = File(apiFileDir, "$PREFIX_EXPERIMENTAL$baseName$EXTENSION"),
-                resourceFile = File(apiFileDir, "$PREFIX_RESOURCE$baseName$EXTENSION")
+                resourceFile = File(apiFileDir, "$PREFIX_RESOURCE$baseName$EXTENSION"),
+                nativeApiDirectory = File(apiFileDir, NATIVE_API_DIRECTORY_NAME).resolve(baseName)
             )
         }
 
@@ -126,6 +129,11 @@ data class ApiLocation(
          * Prefix used for resource-type API files.
          */
         private const val PREFIX_RESOURCE = "res-"
+
+        /**
+         * Directory name for location of native API files
+         */
+        private const val NATIVE_API_DIRECTORY_NAME = "native"
     }
 }
 
