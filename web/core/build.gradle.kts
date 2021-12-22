@@ -12,7 +12,10 @@ dependencies {
 }
 
 tasks.register<Copy>("copySkiko") {
-    from(skiko)
+    val skikoJar = skiko.find { 
+        it.name == "skiko-jvm-0.0.0-SNAPSHOT.jar"
+    } 
+    from(zipTree(skikoJar))
     into("${project.buildDir}/skiko")
 }
 
