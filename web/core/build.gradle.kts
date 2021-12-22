@@ -5,18 +5,18 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-val skiko by configurations.creating
+val skikoWasm by configurations.creating
 
 dependencies {
-    skiko("org.jetbrains.skiko:skiko:0.0.0-SNAPSHOT")
+    skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:0.0.0-SNAPSHOT")
 }
 
-tasks.register<Copy>("copySkiko") {
-    val skikoJar = skiko.find { 
-        it.name == "skiko-jvm-0.0.0-SNAPSHOT.jar"
-    } 
-    from(zipTree(skikoJar))
-    into("${project.buildDir}/skiko")
+val copySkikoResources = tasks.register("copySkikoResources", Copy::class) {
+    from(skikoWasm.map { zipTree(it) }) {
+        include("skiko.wasm")
+        include("skiko.js")
+    }
+    destinationDir = file("${project.buildDir}/skiko")
 }
 
 kotlin {
