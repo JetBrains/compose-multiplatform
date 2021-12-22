@@ -19,6 +19,10 @@ val copySkikoResources = tasks.register("copySkikoResources", Copy::class) {
     destinationDir = file("${project.buildDir}/skiko")
 }
 
+tasks.withType<org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTest>().configureEach {
+    dependsOn(copySkikoResources)
+}
+
 kotlin {
     jvm()
     js(IR) {
