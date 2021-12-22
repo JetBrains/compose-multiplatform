@@ -32,10 +32,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.list.scrollBy
 import androidx.compose.foundation.lazy.list.setContentWithTestViewConfiguration
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -51,6 +53,7 @@ import androidx.compose.ui.test.assertWidthIsAtLeast
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -962,6 +965,25 @@ class LazyGridTest {
             .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.ScrollToIndex))
             // but we still have a read only scroll range property
             .assert(keyIsDefined(SemanticsProperties.VerticalScrollAxisRange))
+    }
+
+    @Test
+    fun rtl() {
+        val gridWidth = 30
+        val gridWidthDp = with(rule.density) { gridWidth.toDp() }
+        rule.setContent {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                LazyVerticalGrid(GridCells.Fixed(3), Modifier.width(gridWidthDp)) {
+                    items(3) {
+                        Box(Modifier.height(1.dp).testTag("$it"))
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0").assertLeftPositionInRootIsEqualTo(gridWidthDp * 2 / 3)
+        rule.onNodeWithTag("1").assertLeftPositionInRootIsEqualTo(gridWidthDp / 3)
+        rule.onNodeWithTag("2").assertLeftPositionInRootIsEqualTo(0.dp)
     }
 
     // TODO: add tests for the cache logic
