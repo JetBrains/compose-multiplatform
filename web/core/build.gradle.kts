@@ -24,6 +24,7 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
                 implementation(kotlin("stdlib-common"))
+                implementation("org.jetbrains.skiko:skiko:0.0.0-SNAPSHOT")
             }
         }
 

@@ -7,7 +7,10 @@ package org.jetbrains.compose.web.skiko
 
 import org.jetbrains.compose.web.dom.ElementScope
 import org.w3c.dom.HTMLCanvasElement
+import org.jetbrains.skiko.wasm.onWasmReady
 
 fun ElementScope<HTMLCanvasElement>.ping() {
-    println("PING!!!")
+    onWasmReady {
+        println("PONG!!!")
+    }
 }
