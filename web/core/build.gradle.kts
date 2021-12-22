@@ -5,6 +5,16 @@ plugins {
     id("org.jetbrains.compose")
 }
 
+val skiko by configurations.creating
+
+dependencies {
+    skiko("org.jetbrains.skiko:skiko:0.0.0-SNAPSHOT")
+}
+
+tasks.register<Copy>("copySkiko") {
+    from(skiko)
+    into("${project.buildDir}/skiko")
+}
 
 kotlin {
     jvm()
@@ -24,6 +34,7 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
                 implementation(kotlin("stdlib-common"))
+
                 implementation("org.jetbrains.skiko:skiko:0.0.0-SNAPSHOT")
             }
         }
