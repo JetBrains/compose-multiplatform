@@ -62,3 +62,15 @@ Run tests for Web:
 ```
 ./scripts/testWeb
 ```
+
+## Multiplatform build
+
+```console
+./scripts/downloadAndroidSdk
+export COMPOSE_CUSTOM_VERSION=1.1.0-beta04
+./scripts/publishToMavenLocal -Pcompose.platforms=all
+./scripts/publishGradlePluginToMavenLocal
+./scripts/publishWebComponentsToMavenLocal
+```
+`-Pcompose.platforms=all` could be replace with comma-separated list of platforms, such as `js,jvm,androidDebug,androidRelease,macosx64,uikitx64`.
+
