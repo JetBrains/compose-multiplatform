@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.keywords.auto
+import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 import kotlin.test.Test
@@ -12,6 +13,17 @@ import kotlin.test.assertEquals
 import org.jetbrains.compose.web.testutils.*
 
 class InlineStyleTests {
+
+    @Test
+    fun inlineProtocolTest() = runTest {
+        composition {
+            Div({
+                shtyle(js("{color: \"red\"}"))
+            }) { }
+        }
+
+        assertEquals("color: red;", nextChild().style.cssText)
+    }
 
     @Test
     fun conditionalStyleAppliedProperly() = runTest {

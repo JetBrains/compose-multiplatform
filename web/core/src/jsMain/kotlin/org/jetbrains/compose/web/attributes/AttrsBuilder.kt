@@ -17,6 +17,11 @@ import org.w3c.dom.HTMLElement
  * are extracted to a separate methods.
  *
  */
+
+private external object Object {
+    fun entries(obj: Any): Array<Array<String>>
+}
+
 open class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
     internal val attributesMap = mutableMapOf<String, String>()
     internal val styleBuilder = StyleBuilderImpl()
@@ -41,6 +46,14 @@ open class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
      */
     fun style(builder: StyleBuilder.() -> Unit) {
         styleBuilder.apply(builder)
+    }
+
+    fun shtyle(propertyHolder: Any) {
+        styleBuilder.apply {
+            Object.entries(propertyHolder).forEach { (k, v) ->
+                property(k, v)
+            }
+        }
     }
 
     /**
