@@ -48,7 +48,7 @@ open class AttrsBuilder<TElement : Element> : EventsListenerBuilder() {
         styleBuilder.apply(builder)
     }
 
-    fun shtyle(propertyHolder: Any) {
+    fun style(propertyHolder: Any) {
         styleBuilder.apply {
             Object.entries(propertyHolder).forEach { (k, v) ->
                 property(k, v)

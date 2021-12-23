@@ -19,7 +19,7 @@ class InlineStyleTests {
     fun inlineProtocolTest() = runTest {
         composition {
             Div({
-                shtyle(js("{color: \"red\"}"))
+                style(js("{color: \"red\"}"))
             }) { }
         }
 
@@ -33,7 +33,7 @@ class InlineStyleTests {
             obj.color = CssTypeColor("#F00FFA")
 
             Div({
-                shtyle(obj)
+                style(obj)
             }) { }
         }
 

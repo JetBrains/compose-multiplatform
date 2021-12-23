@@ -16,12 +16,16 @@ class CSSBackgroundTests {
     @Test
     fun backgroundColor() = runTest {
         composition {
-            Div({style {
-                backgroundColor(rgb(0, 128, 0))
-            }})
-            Div({style {
-                backgroundColor(rgba(0, 129, 0, 0.2))
-            }})
+            Div({
+                style {
+                    backgroundColor(rgb(0, 128, 0))
+                }
+            })
+            Div({
+                style {
+                    backgroundColor(rgba(0, 129, 0, 0.2))
+                }
+            })
         }
 
         assertEquals("rgb(0, 128, 0)", window.getComputedStyle(nextChild()).backgroundColor)
@@ -31,15 +35,21 @@ class CSSBackgroundTests {
     @Test
     fun backgroundAttachment() = runTest {
         composition {
-            Div({style {
-                backgroundAttachment("scroll")
-            }})
-            Div({style {
-                backgroundAttachment("fixed")
-            }})
-            Div({style {
-                backgroundAttachment("local")
-            }})
+            Div({
+                style {
+                    backgroundAttachment("scroll")
+                }
+            })
+            Div({
+                style {
+                    backgroundAttachment("fixed")
+                }
+            })
+            Div({
+                style {
+                    backgroundAttachment("local")
+                }
+            })
         }
 
         assertEquals("scroll", window.getComputedStyle(nextChild()).backgroundAttachment)
@@ -50,15 +60,21 @@ class CSSBackgroundTests {
     @Test
     fun backgroundImage() = runTest {
         composition {
-            Div({style {
-                backgroundImage("url(\"https://localhost:3333/media/examples/lizard.png\")")
-            }})
-            Div({style {
-                backgroundImage("url(\"https://localhost:3333/media/examples/lizard.png\"), url(\"https://localhost:3333/media/examples/star.png\")")
-            }})
-            Div({style {
-                backgroundImage("linear-gradient(rgba(0, 0, 255, 0.5), rgba(255, 255, 0, 0.5))")
-            }})
+            Div({
+                style {
+                    backgroundImage("url(\"https://localhost:3333/media/examples/lizard.png\")")
+                }
+            })
+            Div({
+                style {
+                    backgroundImage("url(\"https://localhost:3333/media/examples/lizard.png\"), url(\"https://localhost:3333/media/examples/star.png\")")
+                }
+            })
+            Div({
+                style {
+                    backgroundImage("linear-gradient(rgba(0, 0, 255, 0.5), rgba(255, 255, 0, 0.5))")
+                }
+            })
         }
 
         assertEquals("url(\"https://localhost:3333/media/examples/lizard.png\")", window.getComputedStyle(nextChild()).backgroundImage)
@@ -69,18 +85,26 @@ class CSSBackgroundTests {
     @Test
     fun backgroundPosition() = runTest {
         composition {
-            Div({style {
-                backgroundPosition("top")
-            }})
-            Div({style {
-                backgroundPosition("left")
-            }})
-            Div({style {
-                backgroundPosition("center")
-            }})
-            Div({style {
-                backgroundPosition("25% 75%")
-            }})
+            Div({
+                style {
+                    backgroundPosition("top")
+                }
+            })
+            Div({
+                style {
+                    backgroundPosition("left")
+                }
+            })
+            Div({
+                style {
+                    backgroundPosition("center")
+                }
+            })
+            Div({
+                style {
+                    backgroundPosition("25% 75%")
+                }
+            })
         }
 
         assertEquals("50% 0%", window.getComputedStyle(nextChild()).backgroundPosition)
@@ -92,9 +116,11 @@ class CSSBackgroundTests {
     @Test
     fun backgroundRepeat() = runTest {
         composition {
-            Div({style {
-                backgroundRepeat("space repeat")
-            }})
+            Div({
+                style {
+                    backgroundRepeat("space repeat")
+                }
+            })
         }
 
         assertEquals("space repeat", window.getComputedStyle(nextChild()).backgroundRepeat)
@@ -104,15 +130,21 @@ class CSSBackgroundTests {
     @Test
     fun backgroundClip() = runTest {
         composition {
-            Div({style {
-                backgroundClip("border-box")
-            }})
-            Div({style {
-                backgroundClip("padding-box")
-            }})
-            Div({style {
-                backgroundClip("content-box")
-            }})
+            Div({
+                style {
+                    backgroundClip("border-box")
+                }
+            })
+            Div({
+                style {
+                    backgroundClip("padding-box")
+                }
+            })
+            Div({
+                style {
+                    backgroundClip("content-box")
+                }
+            })
         }
 
 
@@ -124,15 +156,21 @@ class CSSBackgroundTests {
     @Test
     fun backgroundOrigin() = runTest {
         composition {
-            Div({style {
-                backgroundOrigin("border-box")
-            }})
-            Div({style {
-                backgroundOrigin("padding-box")
-            }})
-            Div({style {
-                backgroundOrigin("content-box")
-            }})
+            Div({
+                style {
+                    backgroundOrigin("border-box")
+                }
+            })
+            Div({
+                style {
+                    backgroundOrigin("padding-box")
+                }
+            })
+            Div({
+                style {
+                    backgroundOrigin("content-box")
+                }
+            })
         }
 
 
@@ -145,18 +183,26 @@ class CSSBackgroundTests {
     @Test
     fun backgroundSize() = runTest {
         composition {
-            Div({style {
-                backgroundSize("contain")
-            }})
-            Div({style {
-                backgroundSize("cover")
-            }})
-            Div({style {
-                backgroundSize("50%")
-            }})
-            Div({style {
-                backgroundSize("auto 50px")
-            }})
+            Div({
+                style {
+                    backgroundSize("contain")
+                }
+            })
+            Div({
+                style {
+                    backgroundSize("cover")
+                }
+            })
+            Div({
+                style {
+                    backgroundSize("50%")
+                }
+            })
+            Div({
+                style {
+                    backgroundSize("auto 50px")
+                }
+            })
         }
 
         assertEquals("contain", window.getComputedStyle(nextChild()).backgroundSize)
@@ -168,15 +214,21 @@ class CSSBackgroundTests {
     @Test
     fun background() = runTest {
         composition {
-            Div({style {
-                background("green")
-            }})
-            Div({style {
-                background("content-box radial-gradient(crimson, skyblue)")
-            }})
-            Div({style {
-                background("no-repeat url(\"../../media/examples/lizard.png\")")
-            }})
+            Div({
+                style {
+                    background("green")
+                }
+            })
+            Div({
+                style {
+                    background("content-box radial-gradient(crimson, skyblue)")
+                }
+            })
+            Div({
+                style {
+                    background("no-repeat url(\"../../media/examples/lizard.png\")")
+                }
+            })
         }
 
         assertEquals("rgb(0, 128, 0)", window.getComputedStyle(nextChild()).backgroundColor)
