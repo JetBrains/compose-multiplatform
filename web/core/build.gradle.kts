@@ -45,6 +45,9 @@ kotlin {
                 implementation(kotlin("stdlib-common"))
 
                 implementation("org.jetbrains.skiko:skiko:${SKIKO_VERSION}")
+                implementation(compose.ui)
+                implementation(compose.foundation)
+                implementation(compose.material)
             }
         }
 
