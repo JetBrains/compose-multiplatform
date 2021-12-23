@@ -124,6 +124,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             }
             nativeMain.dependsOn(commonMain)
             macosX64Main.dependsOn(commonMain)
+            macosArm64.dependsOn(commmonMain)
             jsMain.dependsOn(commonMain)
         }
     }

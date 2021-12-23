@@ -145,6 +145,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 kotlin.srcDir("src/nativeTest/kotlin")
             }
             macosX64Test.dependsOn(nativeTest)
+            macosArm64Test.dependsOn(nativeTest)
             uikitX64Test.dependsOn(nativeTest)
         }
     }
@@ -186,5 +187,13 @@ tasks.withType(KotlinCompile).configureEach {
         freeCompilerArgs += [
                 "-Xjvm-default=all"
         ]
+        incremental = false
     }
+}
+
+// Workaround for older Node JS not available for macOS M1 machines.
+afterEvaluate {
+    rootProject.plugins.withType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin) {
+        rootProject.extensions.getByType(org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension).nodeVersion = "16.0.0"
+   }
 }

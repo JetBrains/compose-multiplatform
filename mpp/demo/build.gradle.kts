@@ -67,6 +67,18 @@ kotlin {
             }
         }
     }
+    macosArm64() {
+        binaries {
+            executable() {
+                entryPoint = "androidx.compose.mpp.demo.main"
+                freeCompilerArgs += listOf(
+                    "-linker-option", "-framework", "-linker-option", "Metal"
+                )
+                // TODO: the current release binary surprises LLVM, so disable checks for now.
+                freeCompilerArgs += "-Xdisable-phases=VerifyBitcode"
+            }
+        }
+    }
     iosX64("uikitX64") {
         binaries {
             executable() {
@@ -113,7 +125,7 @@ kotlin {
         val darwinMain by creating { dependsOn(nativeMain) }
         val macosMain by creating { dependsOn(darwinMain) }
         val macosX64Main by getting { dependsOn(macosMain) }
-        val macosArm64Main by creating { dependsOn(macosMain) }
+        val macosArm64Main by getting { dependsOn(macosMain) }
         val uikitMain by creating { dependsOn(darwinMain) }
         val uikitX64Main by getting { dependsOn(uikitMain) }
         val uikitArm64Main by creating { dependsOn(uikitMain) }

@@ -34,6 +34,7 @@ kotlin {
         browser()
     }
     macosX64()
+    macosArm64()
     iosX64("uikitX64")
 
     sourceSets {
