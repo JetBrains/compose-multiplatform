@@ -84,5 +84,4 @@ class NthChildTests {
             styleSheet.serializeRules()
         )
     }
-
 }
