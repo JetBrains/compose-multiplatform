@@ -11,6 +11,7 @@ import org.jetbrains.compose.web.dom.Text
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import org.jetbrains.compose.web.testutils.*
+import csstype.Color as CssTypeColor
 
 class InlineStyleTests {
 
@@ -24,6 +25,21 @@ class InlineStyleTests {
 
         assertEquals("color: red;", nextChild().style.cssText)
     }
+
+    @Test
+    fun inlineProtocolWithCssTypeTest() = runTest {
+        composition {
+            val obj = js("{}")
+            obj.color = CssTypeColor("#F00FFA")
+
+            Div({
+                shtyle(obj)
+            }) { }
+        }
+
+        assertEquals("color: rgb(240, 15, 250);", nextChild().style.cssText)
+    }
+
 
     @Test
     fun conditionalStyleAppliedProperly() = runTest {
