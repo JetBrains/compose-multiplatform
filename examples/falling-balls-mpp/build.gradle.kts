@@ -14,7 +14,7 @@ buildscript {
 }
 
 plugins {
-    kotlin("multiplatform") version "1.6.0"
+    kotlin("multiplatform") version "1.6.10"
     id("org.jetbrains.compose") version "1.1.0-beta04"
 }
 
@@ -24,7 +24,7 @@ val resourcesDir = "$buildDir/resources"
 val skikoWasm by configurations.creating
 
 dependencies {
-    skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:0.6.7")
+    skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:0.6.9")
 }
 
 val unzipTask = tasks.register("unzipWasm", Copy::class) {
@@ -45,8 +45,18 @@ kotlin {
         browser()
         binaries.executable()
     }
-    macosX64() {
+    macosX64 {
         binaries { 
+            executable {
+                entryPoint = "main"
+                freeCompilerArgs += listOf(
+                    "-linker-option", "-framework", "-linker-option", "Metal"
+                )
+            }
+        }
+    }
+    macosArm64 {
+        binaries {
             executable {
                 entryPoint = "main"
                 freeCompilerArgs += listOf(
@@ -70,7 +80,18 @@ kotlin {
         }
     }
     iosArm64("uikitArm64") {
-        binaries.executable()
+         binaries {
+             executable() {
+                entryPoint = "main"
+                freeCompilerArgs += listOf(
+                    "-linker-option", "-framework", "-linker-option", "Metal",
+                    "-linker-option", "-framework", "-linker-option", "CoreText",
+                    "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+                )
+                // TODO: the current compose binary surprises LLVM, so disable checks for now.
+                freeCompilerArgs += "-Xdisable-phases=VerifyBitcode"
+            }
+        }
     }
 
     sourceSets {
@@ -103,11 +124,15 @@ kotlin {
         }
 
         val nativeMain by creating {
+            dependsOn(commonMain)
         }
         val macosMain by creating {
             dependsOn(nativeMain)
         }
         val macosX64Main by getting {
+            dependsOn(macosMain)
+        }
+        val macosArm64Main by getting {
             dependsOn(macosMain)
         }
         val uikitMain by creating {
@@ -157,6 +182,7 @@ afterEvaluate {
     rootProject.extensions.configure<NodeJsRootExtension> {
         versions.webpackDevServer.version = "4.0.0"
         versions.webpackCli.version = "4.9.0"
+        nodeVersion = "16.0.0"
     }
 }
 

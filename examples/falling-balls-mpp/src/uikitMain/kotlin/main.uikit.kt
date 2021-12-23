@@ -4,7 +4,12 @@
  */
 
 // Use `xcodegen` first, then `open ./SkikoSample.xcodeproj` and then Run button in XCode.
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Application
 import kotlinx.cinterop.*
 import platform.UIKit.*
@@ -37,7 +42,12 @@ class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
         window = UIWindow(frame = UIScreen.mainScreen.bounds)
         window!!.rootViewController = Application("Compose/Native sample") {
             val game = remember { Game(width = 600, height = 600) }
-            fallingBalls(game)
+            Column {
+                // To skip upper part of screen.
+                Box(modifier = Modifier
+                    .height(100.dp))
+                fallingBalls(game)
+            }
         }
         window!!.makeKeyAndVisible()
         return true
