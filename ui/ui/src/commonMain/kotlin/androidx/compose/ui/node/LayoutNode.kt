@@ -586,6 +586,11 @@ internal class LayoutNode(
     private var zIndex: Float = 0f
 
     /**
+     * The inner state associated with [androidx.compose.ui.layout.SubcomposeLayout].
+     */
+    internal var subcompositionsState: Any? = null
+
+    /**
      * The inner-most layer wrapper. Used for performance for LayoutNodeWrapper.findLayer().
      */
     private var _innerLayerWrapper: LayoutNodeWrapper? = null
