@@ -16,5 +16,5 @@
 
 package androidx.compose.foundation.text
 
-internal actual fun timeNowMillis(): Long = TODO("implement native timeNowMillis")
+internal actual fun timeNowMillis(): Long = kotlinx.browser.window.performance.now().toLong()
 

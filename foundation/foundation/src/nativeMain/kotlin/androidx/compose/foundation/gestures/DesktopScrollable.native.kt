@@ -18,13 +18,9 @@
 
 package androidx.compose.foundation.gestures
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
-// TODO(demin): implement smooth scroll animation on Windows
-// TODO(demin): implement touchpad bounce physics on MacOS
-// TODO(demin): maybe we need to differentiate different linux environments (Gnome/KDE)
-// TODO(demin): do we need support real line scrolling (i.e. scroll by 3 text lines)?
-internal actual fun Modifier.mouseScrollable(
-    orientation: Orientation,
-    onScroll: (Float) -> Unit
-): Modifier = TODO("implement native Modifier.mouseScrollable")
+@Composable
+internal actual fun platformScrollConfig(): ScrollConfig =
+    TODO("implement native platformScrollConfig")

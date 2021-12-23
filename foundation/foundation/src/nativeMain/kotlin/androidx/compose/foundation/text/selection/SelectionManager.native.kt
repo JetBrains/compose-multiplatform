@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.text.selection
 
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.KeyEvent
 
 // this doesn't sounds very sustainable
@@ -29,3 +30,9 @@ internal actual fun isCopyKeyEvent(keyEvent: KeyEvent): Boolean =
         else -> keyEvent.isCtrlPressed
     } || keyEvent.key == Key.Copy
 */
+
+/**
+ * Magnification is not supported on desktop.
+ */
+internal actual fun Modifier.selectionMagnifier(manager: SelectionManager): Modifier =
+    TODO("implement native selectionMagnifier")

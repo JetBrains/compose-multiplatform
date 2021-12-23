@@ -16,8 +16,27 @@
 
 package androidx.compose.foundation.text
 
+import androidx.compose.foundation.text.selection.SelectionManager
 import androidx.compose.foundation.text.selection.TextFieldSelectionManager
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import kotlinx.coroutines.flow.collect
 
-internal actual fun Modifier.textFieldMagnifier(manager: TextFieldSelectionManager): Modifier =
-    Modifier
+@Composable
+internal actual fun ContextMenuArea(
+    manager: TextFieldSelectionManager,
+    content: @Composable () -> Unit
+) {
+    TODO("implement native ContextMenuArea")
+}
+
+@Composable
+internal actual fun ContextMenuArea(
+    manager: SelectionManager,
+    content: @Composable () -> Unit
+) {
+    TODO("implement native ContextMenuArea")
+}
+

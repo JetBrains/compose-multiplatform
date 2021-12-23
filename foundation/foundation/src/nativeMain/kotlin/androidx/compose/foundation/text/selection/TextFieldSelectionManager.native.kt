@@ -16,8 +16,12 @@
 
 package androidx.compose.foundation.text.selection
 
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEvent
 
 internal actual val PointerEvent.isShiftPressed: Boolean
     get() = TODO("implement native PointerEvent.isShiftPressed")
     // get() = mouseEvent?.isShiftDown ?: false
+
+internal actual fun Modifier.textFieldMagnifier(manager: TextFieldSelectionManager): Modifier =
+    TODO("implement native textFieldMagnifier")
