@@ -8,7 +8,7 @@ internal const val webCssSelectorsDeprecationMessage = "Consider using a propert
 private val selectorScope = object : SelectorsScope {}
 
 sealed interface Nth {
-    data class Functional(val a: Int? = null, val b: Int? = null) : Nth {
+    private data class FunctionalImpl(val a: Int? = null, val b: Int? = null) : Nth {
         override fun toString(): String = when {
             a != null && b != null -> "${a}n+$b"
             a != null -> "${a}n"
@@ -16,11 +16,21 @@ sealed interface Nth {
             else -> ""
         }
     }
-    object Odd : Nth {
+    private object OddImpl : Nth {
         override fun toString(): String = "odd"
     }
-    object Even : Nth {
+    private object EvenImpl : Nth {
         override fun toString(): String = "even"
+    }
+
+    companion object {
+        val Odd: Nth = OddImpl
+        val Even: Nth = EvenImpl
+
+        @Suppress("FunctionName") // we want it to look like old Functional class constructor
+        fun Functional(a: Int? = null, b: Int? = null): Nth {
+            return FunctionalImpl(a = a, b = b)
+        }
     }
 }
 
