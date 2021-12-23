@@ -105,4 +105,3 @@ subprojects {
         google()
     }
 }
-
