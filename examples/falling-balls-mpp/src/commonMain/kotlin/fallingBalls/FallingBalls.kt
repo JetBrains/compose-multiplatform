@@ -38,11 +38,12 @@ fun FallingBalls(game: Game) {
                     .border(2.dp, Color(255, 215, 0))
                     .background(Color.Yellow),
                 onClick = {
-                game.started = !game.started
-                if (game.started) {
-                    game.start()
+                    game.started = !game.started
+                    if (game.started) {
+                        game.start()
+                    }
                 }
-            }) {
+            ) {
                 Text(if (game.started) "Stop" else "Start", fontSize = 2f.em)
             }
             if (game.started) {

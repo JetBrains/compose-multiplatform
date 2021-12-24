@@ -11,7 +11,7 @@ interface Time {
     fun now(): Long
 }
 
-class Game(val time: Time, width: Int = 0, height: Int = 0) {
+class Game(val time: Time) {
     private var previousTimeNanos: Long = Long.MAX_VALUE
     private val colors = arrayOf(
         Color.Red, Color.Blue, Color.Cyan,
