@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.lazy
+package androidx.compose.foundation.lazy.grid
 
 import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -30,8 +30,15 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.GridItemSpan
+import androidx.compose.foundation.lazy.LazyGridState
+import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.list.scrollBy
 import androidx.compose.foundation.lazy.list.setContentWithTestViewConfiguration
+import androidx.compose.foundation.lazy.rememberLazyGridState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -151,13 +158,13 @@ class LazyGridTest {
             .assertIsDisplayed()
 
         rule.onNodeWithTag("7")
-            .assertIsNotDisplayed()
+            .assertDoesNotExist()
 
         rule.onNodeWithTag("8")
-            .assertIsNotDisplayed()
+            .assertDoesNotExist()
 
         rule.onNodeWithTag("9")
-            .assertIsNotDisplayed()
+            .assertDoesNotExist()
     }
 
     @Test
@@ -179,7 +186,7 @@ class LazyGridTest {
             .scrollBy(y = 103.dp, density = rule.density)
 
         rule.onNodeWithTag("1")
-            .assertIsNotDisplayed()
+            .assertDoesNotExist()
 
         rule.onNodeWithTag("2")
             .assertIsNotDisplayed()
@@ -636,11 +643,11 @@ class LazyGridTest {
 
     @Test
     fun changeItemsCountAndScrollImmediately() {
-        lateinit var state: LazyListState
+        lateinit var state: LazyGridState
         var count by mutableStateOf(100)
         val composedIndexes = mutableListOf<Int>()
         rule.setContent {
-            state = rememberLazyListState()
+            state = rememberLazyGridState()
             LazyVerticalGrid(
                 GridCells.Fixed(1),
                 Modifier.fillMaxWidth().height(10.dp),
@@ -676,7 +683,7 @@ class LazyGridTest {
             LazyVerticalGrid(
                 cells = GridCells.Fixed(2),
                 modifier = Modifier.requiredSize(itemSize * 2).testTag(LazyGridTag),
-                state = LazyListState(firstVisibleItemIndex = Int.MAX_VALUE - 3)
+                state = LazyGridState(firstVisibleItemIndex = Int.MAX_VALUE - 3)
             ) {
                 items(Int.MAX_VALUE) {
                     Box(Modifier.size(itemSize).testTag("$it"))
@@ -921,12 +928,12 @@ class LazyGridTest {
     fun programmaticScrollingIsAllowedWhenUserScrollingIsDisabled() {
         val itemSizePx = 30f
         val itemSize = with(rule.density) { itemSizePx.toDp() }
-        lateinit var state: LazyListState
+        lateinit var state: LazyGridState
         rule.setContentWithTestViewConfiguration {
             LazyVerticalGrid(
                 GridCells.Fixed(1),
                 Modifier.size(itemSize * 3),
-                state = rememberLazyListState().also { state = it },
+                state = rememberLazyGridState().also { state = it },
                 userScrollEnabled = false,
             ) {
                 items(5) {

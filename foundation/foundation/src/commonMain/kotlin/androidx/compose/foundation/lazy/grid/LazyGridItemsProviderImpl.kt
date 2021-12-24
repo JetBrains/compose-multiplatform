@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.lazy.list
+package androidx.compose.foundation.lazy.grid
 
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.lazy.GridItemSpan
+import androidx.compose.foundation.lazy.LazyGridItemSpanScope
+import androidx.compose.foundation.lazy.LazyGridScope
+import androidx.compose.foundation.lazy.LazyGridState
 import androidx.compose.foundation.lazy.getDefaultLazyKeyFor
+import androidx.compose.foundation.lazy.layout.IntervalHolder
 import androidx.compose.foundation.lazy.layout.IntervalList
 import androidx.compose.foundation.lazy.layout.intervalForIndex
 import androidx.compose.foundation.lazy.layout.intervalIndexForItemIndex
@@ -30,19 +34,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.node.Ref
 import kotlinx.coroutines.flow.collect
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun rememberStateOfItemsProvider(
-    state: LazyListState,
-    content: LazyListScope.() -> Unit,
-    itemScope: Ref<LazyItemScopeImpl>
-): State<LazyListItemsProvider> {
+    state: LazyGridState,
+    content: LazyGridScope.() -> Unit
+): State<LazyGridItemsProvider> {
     val latestContent = rememberUpdatedState(content)
     val nearestItemsRangeState = remember(state) {
         mutableStateOf(
-            calculateNearestItemsRange(state.firstVisibleItemIndexNonObservable.value)
+            calculateNearestItemsRange(state.firstVisibleItemIndex)
         )
     }
     LaunchedEffect(nearestItemsRangeState) {
@@ -52,40 +55,59 @@ internal fun rememberStateOfItemsProvider(
             .collect { nearestItemsRangeState.value = it }
     }
     return remember(nearestItemsRangeState) {
-        derivedStateOf<LazyListItemsProvider> {
-            val listScope = LazyListScopeImpl().apply(latestContent.value)
-            LazyListItemsProviderImpl(
-                itemScope,
+        derivedStateOf<LazyGridItemsProvider> {
+            val listScope = LazyGridScopeImpl().apply(latestContent.value)
+            LazyGridItemsProviderImpl(
                 listScope.intervals,
-                listScope.headerIndexes,
+                listScope.hasCustomSpans,
                 nearestItemsRangeState.value
             )
         }
     }
 }
 
-internal class LazyListItemsProviderImpl(
-    private val itemScope: Ref<LazyItemScopeImpl>,
-    private val list: IntervalList<LazyListIntervalContent>,
-    override val headerIndexes: List<Int>,
+@OptIn(ExperimentalFoundationApi::class)
+internal class LazyGridItemsProviderImpl(
+    private val intervals: IntervalList<LazyGridIntervalContent>,
+    override val hasCustomSpans: Boolean,
     nearestItemsRange: IntRange
-) : LazyListItemsProvider {
-    override val itemsCount get() = list.totalSize
+) : LazyGridItemsProvider {
+    /**
+     * Caches the last interval we binary searched for. We might not need to recalculate
+     * for subsequent queries, as they tend to be localised.
+     */
+    private var lastInterval: IntervalHolder<LazyGridIntervalContent>? = null
+
+    override val itemsCount get() = intervals.totalSize
 
     override fun getKey(index: Int): Any {
-        val interval = list.intervalForIndex(index)
+        val interval = cachedIntervalForIndex(index)
         val localIntervalIndex = index - interval.startIndex
         val key = interval.content.key?.invoke(localIntervalIndex)
         return key ?: getDefaultLazyKeyFor(index)
     }
 
-    override fun getContent(index: Int): @Composable () -> Unit {
-        val interval = list.intervalForIndex(index)
+    override fun LazyGridItemSpanScope.getSpan(index: Int): GridItemSpan {
+        val interval = cachedIntervalForIndex(index)
         val localIntervalIndex = index - interval.startIndex
-        return interval.content.content.invoke(itemScope.value!!, localIntervalIndex)
+        return interval.content.span.invoke(this, localIntervalIndex)
     }
 
-    override val keyToIndexMap: Map<Any, Int> = generateKeyToIndexMap(nearestItemsRange, list)
+    override fun getContent(index: Int): @Composable () -> Unit {
+        val interval = cachedIntervalForIndex(index)
+        val localIntervalIndex = index - interval.startIndex
+        return interval.content.content.invoke(localIntervalIndex)
+    }
+
+    override val keyToIndexMap: Map<Any, Int> = generateKeyToIndexMap(nearestItemsRange, intervals)
+
+    private fun cachedIntervalForIndex(itemIndex: Int) = lastInterval.let {
+        if (it != null && itemIndex in it.startIndex until it.startIndex + it.size) {
+            it
+        } else {
+            intervals.intervalForIndex(itemIndex).also { lastInterval = it }
+        }
+    }
 }
 
 /**
@@ -95,7 +117,7 @@ internal class LazyListItemsProviderImpl(
  */
 internal fun generateKeyToIndexMap(
     range: IntRange,
-    list: IntervalList<LazyListIntervalContent>
+    list: IntervalList<LazyGridIntervalContent>
 ): Map<Any, Int> {
     val first = range.first
     check(first >= 0)
@@ -144,9 +166,9 @@ private fun calculateNearestItemsRange(firstVisibleItem: Int): IntRange {
  * We use the idea of sliding window as an optimization, so user can scroll up to this number of
  * items until we have to regenerate the key to index map.
  */
-private val VisibleItemsSlidingWindowSize = 30
+private val VisibleItemsSlidingWindowSize = 90
 
 /**
  * The minimum amount of items near the current first visible item we want to have mapping for.
  */
-private val ExtraItemsNearTheSlidingWindow = 100
+private val ExtraItemsNearTheSlidingWindow = 200
