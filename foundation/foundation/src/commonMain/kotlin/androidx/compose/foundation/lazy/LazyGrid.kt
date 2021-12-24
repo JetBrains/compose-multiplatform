@@ -17,25 +17,20 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.fastMapIndexedNotNull
-import androidx.compose.foundation.fastMaxOfOrNull
+import androidx.compose.foundation.gestures.FlingBehavior
+import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.lazy.list.IntervalHolder
-import androidx.compose.foundation.lazy.list.MutableIntervalList
-import androidx.compose.foundation.lazy.list.intervalForIndex
+import androidx.compose.foundation.lazy.grid.LazyGrid
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.fastForEach
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.sqrt
 
 /**
  * The DSL implementation of a lazy grid layout. It composes only visible rows of the grid.
@@ -48,6 +43,7 @@ import kotlin.math.sqrt
  * @param contentPadding specify a padding around the whole content
  * @param verticalArrangement The vertical arrangement of the layout's children
  * @param horizontalArrangement The horizontal arrangement of the layout's children
+ * @param flingBehavior logic describing fling behavior
  * @param userScrollEnabled whether the scrolling via the user gestures or accessibility actions
  * is allowed. You can still scroll programmatically using the state even when it is disabled.
  * @param content the [LazyListScope] which describes the content
@@ -57,47 +53,42 @@ import kotlin.math.sqrt
 fun LazyVerticalGrid(
     cells: GridCells,
     modifier: Modifier = Modifier,
-    state: LazyListState = rememberLazyListState(),
+    state: LazyGridState = rememberLazyGridState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+    flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     userScrollEnabled: Boolean = true,
     content: LazyGridScope.() -> Unit
 ) {
-    when (cells) {
-        is GridCells.Fixed ->
-            FixedLazyGrid(
-                nColumns = cells.count,
-                modifier = modifier,
-                state = state,
-                horizontalArrangement = horizontalArrangement,
-                verticalArrangement = verticalArrangement,
-                contentPadding = contentPadding,
-                userScrollEnabled = userScrollEnabled,
-                content = content
-            )
-        is GridCells.Adaptive ->
-            BoxWithConstraints(
-                modifier = modifier
-            ) {
-                val nColumns = maxOf((maxWidth / cells.minSize).toInt(), 1)
-                FixedLazyGrid(
-                    nColumns = nColumns,
-                    state = state,
-                    horizontalArrangement = horizontalArrangement,
-                    verticalArrangement = verticalArrangement,
-                    contentPadding = contentPadding,
-                    userScrollEnabled = userScrollEnabled,
-                    content = content
-                )
+    val slotsPerLine = remember<Density.(Constraints) -> Int>(cells) {
+        { constraints ->
+            if (cells is GridCells.Fixed) {
+                cells.count
+            } else {
+                require(cells is GridCells.Adaptive)
+                maxOf((constraints.maxWidth.toDp() / cells.minSize).toInt(), 1)
             }
+        }
     }
+    LazyGrid(
+        slotsPerLine = slotsPerLine,
+        modifier = modifier,
+        state = state,
+        contentPadding = contentPadding,
+        horizontalArrangement = horizontalArrangement,
+        verticalArrangement = verticalArrangement,
+        flingBehavior = flingBehavior,
+        userScrollEnabled = userScrollEnabled,
+        content = content
+    )
 }
 
 /**
  * This class describes how cells form columns in vertical grids or rows in horizontal grids.
  */
 @ExperimentalFoundationApi
+@Stable
 sealed class GridCells {
     /**
      * Combines cells with fixed number rows or columns.
@@ -106,6 +97,7 @@ sealed class GridCells {
      * of the parent wide.
      */
     @ExperimentalFoundationApi
+    @Stable
     class Fixed(val count: Int) : GridCells()
 
     /**
@@ -118,7 +110,19 @@ sealed class GridCells {
      * have equal width. If the screen is 88.dp wide then there will be 4 columns 22.dp each.
      */
     @ExperimentalFoundationApi
+    @Stable
     class Adaptive(val minSize: Dp) : GridCells()
+
+    override fun hashCode() = if (this is Fixed) {
+        31 + count
+    } else {
+        require(this is Adaptive)
+        62 + minSize.hashCode()
+    }
+
+    override fun equals(other: Any?) =
+        (this is Fixed && other is Fixed && this.count == other.count) ||
+            (this is Adaptive && other is Adaptive && this.minSize == other.minSize)
 }
 
 /**
@@ -129,20 +133,33 @@ interface LazyGridScope {
     /**
      * Adds a single item to the scope.
      *
+     * @param key a stable and unique key representing the item. Using the same key
+     * for multiple items in the grid is not allowed. Type of the key should be saveable
+     * via Bundle on Android. If null is passed the position in the grid will represent the key.
+     * When you specify the key the scroll position will be maintained based on the key, which
+     * means if you add/remove items before the current visible item the item with the given key
+     * will be kept as the first visible one.
      * @param span the span of the item. Default is 1x1. It is good practice to leave it `null`
      * when this matches the intended behavior, as providing a custom implementation impacts
      * performance
      * @param content the content of the item
      */
     fun item(
+        key: Any? = null,
         span: (LazyGridItemSpanScope.() -> GridItemSpan)? = null,
-        content: @Composable LazyItemScope.() -> Unit
+        content: @Composable () -> Unit
     )
 
     /**
      * Adds a [count] of items.
      *
      * @param count the items count
+     * @param key a factory of stable and unique keys representing the item. Using the same key
+     * for multiple items in the grid is not allowed. Type of the key should be saveable
+     * via Bundle on Android. If null is passed the position in the grid will represent the key.
+     * When you specify the key the scroll position will be maintained based on the key, which
+     * means if you add/remove items before the current visible item the item with the given key
+     * will be kept as the first visible one.
      * @param span define custom spans for the items. Default is 1x1. It is good practice to
      * leave it `null` when this matches the intended behavior, as providing a custom
      * implementation impacts performance
@@ -150,8 +167,9 @@ interface LazyGridScope {
      */
     fun items(
         count: Int,
+        key: ((index: Int) -> Any)? = null,
         span: (LazyGridItemSpanScope.(index: Int) -> GridItemSpan)? = null,
-        itemContent: @Composable LazyItemScope.(index: Int) -> Unit
+        itemContent: @Composable (index: Int) -> Unit
     )
 }
 
@@ -159,7 +177,13 @@ interface LazyGridScope {
  * Adds a list of items.
  *
  * @param items the data list
- * @param spans define custom spans for the items. Default is 1x1. It is good practice to
+ * @param key a factory of stable and unique keys representing the item. Using the same key
+ * for multiple items in the grid is not allowed. Type of the key should be saveable
+ * via Bundle on Android. If null is passed the position in the grid will represent the key.
+ * When you specify the key the scroll position will be maintained based on the key, which
+ * means if you add/remove items before the current visible item the item with the given key
+ * will be kept as the first visible one.
+ * @param span define custom spans for the items. Default is 1x1. It is good practice to
  * leave it `null` when this matches the intended behavior, as providing a custom implementation
  * impacts performance
  * @param itemContent the content displayed by a single item
@@ -167,11 +191,13 @@ interface LazyGridScope {
 @ExperimentalFoundationApi
 inline fun <T> LazyGridScope.items(
     items: List<T>,
-    noinline spans: (LazyGridItemSpanScope.(item: T) -> GridItemSpan)? = null,
-    crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit
+    noinline key: ((item: T) -> Any)? = null,
+    noinline span: (LazyGridItemSpanScope.(item: T) -> GridItemSpan)? = null,
+    crossinline itemContent: @Composable (item: T) -> Unit
 ) = items(
     items.size,
-    spans?.let { { spans(items[it]) } }
+    if (key != null) { index: Int -> key(items[index]) } else null,
+    if (span != null) { { span(items[it]) } } else null
 ) {
     itemContent(items[it])
 }
@@ -180,7 +206,13 @@ inline fun <T> LazyGridScope.items(
  * Adds a list of items where the content of an item is aware of its index.
  *
  * @param items the data list
- * @param spans define custom spans for the items. Default is 1x1. It is good practice to leave
+ * @param key a factory of stable and unique keys representing the item. Using the same key
+ * for multiple items in the grid is not allowed. Type of the key should be saveable
+ * via Bundle on Android. If null is passed the position in the grid will represent the key.
+ * When you specify the key the scroll position will be maintained based on the key, which
+ * means if you add/remove items before the current visible item the item with the given key
+ * will be kept as the first visible one.
+ * @param span define custom spans for the items. Default is 1x1. It is good practice to leave
  * it `null` when this matches the intended behavior, as providing a custom implementation
  * impacts performance
  * @param itemContent the content displayed by a single item
@@ -188,11 +220,13 @@ inline fun <T> LazyGridScope.items(
 @ExperimentalFoundationApi
 inline fun <T> LazyGridScope.itemsIndexed(
     items: List<T>,
-    noinline spans: (LazyGridItemSpanScope.(index: Int, item: T) -> GridItemSpan)? = null,
-    crossinline itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
+    noinline key: ((index: Int, item: T) -> Any)? = null,
+    noinline span: (LazyGridItemSpanScope.(index: Int, item: T) -> GridItemSpan)? = null,
+    crossinline itemContent: @Composable (index: Int, item: T) -> Unit
 ) = items(
     items.size,
-    spans?.let { { spans(it, items[it]) } }
+    if (key != null) { index: Int -> key(index, items[index]) } else null,
+    if (span != null) { { span(it, items[it]) } } else null
 ) {
     itemContent(it, items[it])
 }
@@ -201,7 +235,13 @@ inline fun <T> LazyGridScope.itemsIndexed(
  * Adds an array of items.
  *
  * @param items the data array
- * @param spans define custom spans for the items. Default is 1x1. It is good practice to leave
+ * @param key a factory of stable and unique keys representing the item. Using the same key
+ * for multiple items in the grid is not allowed. Type of the key should be saveable
+ * via Bundle on Android. If null is passed the position in the grid will represent the key.
+ * When you specify the key the scroll position will be maintained based on the key, which
+ * means if you add/remove items before the current visible item the item with the given key
+ * will be kept as the first visible one.
+ * @param span define custom spans for the items. Default is 1x1. It is good practice to leave
  * it `null` when this matches the intended behavior, as providing a custom implementation
  * impacts performance
  * @param itemContent the content displayed by a single item
@@ -209,11 +249,13 @@ inline fun <T> LazyGridScope.itemsIndexed(
 @ExperimentalFoundationApi
 inline fun <T> LazyGridScope.items(
     items: Array<T>,
-    noinline spans: (LazyGridItemSpanScope.(item: T) -> GridItemSpan)? = null,
-    crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit
+    noinline key: ((item: T) -> Any)? = null,
+    noinline span: (LazyGridItemSpanScope.(item: T) -> GridItemSpan)? = null,
+    crossinline itemContent: @Composable (item: T) -> Unit
 ) = items(
     items.size,
-    spans?.let { { spans(items[it]) } }
+    if (key != null) { index: Int -> key(items[index]) } else null,
+    if (span != null) { { span(items[it]) } } else null
 ) {
     itemContent(items[it])
 }
@@ -222,7 +264,13 @@ inline fun <T> LazyGridScope.items(
  * Adds an array of items where the content of an item is aware of its index.
  *
  * @param items the data array
- * @param spans define custom spans for the items. Default is 1x1. It is good practice to leave
+ * @param key a factory of stable and unique keys representing the item. Using the same key
+ * for multiple items in the grid is not allowed. Type of the key should be saveable
+ * via Bundle on Android. If null is passed the position in the grid will represent the key.
+ * When you specify the key the scroll position will be maintained based on the key, which
+ * means if you add/remove items before the current visible item the item with the given key
+ * will be kept as the first visible one.
+ * @param span define custom spans for the items. Default is 1x1. It is good practice to leave
  * it `null` when this matches the intended behavior, as providing a custom implementation
  * impacts performance
  * @param itemContent the content displayed by a single item
@@ -230,257 +278,13 @@ inline fun <T> LazyGridScope.items(
 @ExperimentalFoundationApi
 inline fun <T> LazyGridScope.itemsIndexed(
     items: Array<T>,
-    noinline spans: (LazyGridItemSpanScope.(index: Int, item: T) -> GridItemSpan)? = null,
-    crossinline itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
+    noinline key: ((index: Int, item: T) -> Any)? = null,
+    noinline span: (LazyGridItemSpanScope.(index: Int, item: T) -> GridItemSpan)? = null,
+    crossinline itemContent: @Composable (index: Int, item: T) -> Unit
 ) = items(
     items.size,
-    spans?.let { { spans(it, items[it]) } }
+    if (key != null) { index: Int -> key(index, items[index]) } else null,
+    if (span != null) { { span(it, items[it]) } } else null
 ) {
     itemContent(it, items[it])
-}
-
-@Composable
-@ExperimentalFoundationApi
-private fun FixedLazyGrid(
-    nColumns: Int,
-    modifier: Modifier = Modifier,
-    state: LazyListState,
-    contentPadding: PaddingValues,
-    verticalArrangement: Arrangement.Vertical,
-    horizontalArrangement: Arrangement.Horizontal,
-    userScrollEnabled: Boolean,
-    content: LazyGridScope.() -> Unit
-) {
-    LazyColumn(
-        modifier = modifier,
-        state = state,
-        verticalArrangement = verticalArrangement,
-        contentPadding = contentPadding,
-        userScrollEnabled = userScrollEnabled
-    ) {
-        val scope = LazyGridScopeImpl(nColumns)
-        scope.apply(content)
-
-        val rows = if (!scope.hasCustomSpans) {
-            // We know exactly how many rows we have as the grid layout is known.
-            if (scope.totalSize == 0) 0 else 1 + (scope.totalSize - 1) / nColumns
-        } else {
-            // Worst case. We could do smarter, but this should become a non-problem when
-            // we switch to a LazyLayout implementation. TODO
-            scope.totalSize
-        }
-        items(rows) { rowIndex ->
-            val rowContent = scope.contentFor(rowIndex, this)
-            if (rowContent.isNotEmpty()) {
-                ItemRow(nColumns, horizontalArrangement, rowContent)
-            }
-        }
-    }
-}
-
-@ExperimentalFoundationApi
-internal class LazyGridScopeImpl(private val nColumns: Int) : LazyGridScope {
-    private class IntervalData(
-        val content: LazyItemScope.(Int) -> (@Composable () -> Unit),
-        val span: LazyGridItemSpanScope.(Int) -> GridItemSpan
-    )
-
-    private val intervals = MutableIntervalList<IntervalData>()
-    internal var hasCustomSpans = false
-
-    /** Caches the index of the first item on lines 0, [bucketSize], 2 * [bucketSize], etc. */
-    private val bucketStartItemIndex = ArrayList<Int>().apply { add(0) }
-    /**
-     * The interval at each we will store the starting element of lines. These will be then
-     * used to calculate the layout of arbitrary lines, by starting from the closest
-     * known "bucket start". The smaller the bucketSize, the smaller cost for calculating layout
-     * of arbitrary lines but the higher memory usage for [bucketStartItemIndex].
-     */
-    private val bucketSize get() = sqrt(1.0 * totalSize / nColumns).toInt() + 1
-    /** Caches the last calculated line index, useful when scrolling in main axis direction. */
-    private var lastLineIndex = 0
-    /** Caches the starting item index on [lastLineIndex]. */
-    private var lastLineStartItemIndex = 0
-    /**
-     * Caches a calculated bucket, this is useful when scrolling in reverse main axis
-     * direction. We cannot only keep the last element, as we would not know previous max span.
-     */
-    private var cachedBucketIndex = -1
-    /**
-     * Caches layout of [cachedBucketIndex], this is useful when scrolling in reverse main axis
-     * direction. We cannot only keep the last element, as we would not know previous max span.
-     */
-    private val cachedBucket = mutableListOf<Int>()
-    /**
-     * Caches the last interval we binary searched for. We might not need to recalculate
-     * for subsequent queries, as they tend to be localised.
-     */
-    private var lastInterval: IntervalHolder<IntervalData>? = null
-
-    private val DefaultSpan: LazyGridItemSpanScope.(Int) -> GridItemSpan = { GridItemSpan(1) }
-
-    val totalSize get() = intervals.totalSize
-
-    fun contentFor(lineIndex: Int, scope: LazyItemScope): List<Pair<@Composable () -> Unit, Int>> {
-        if (!hasCustomSpans) {
-            // Quick return when all spans are 1x1 - in this case we can easily calculate positions.
-            return contentForLineStartingWith(lineIndex * nColumns, lineIndex, scope)
-        }
-
-        val bucket = lineIndex / bucketSize
-        // We can calculate the items on the line from the closest cached bucket start item.
-        var currentLine = min(bucket, bucketStartItemIndex.size - 1) * bucketSize
-        var currentItemIndex = bucketStartItemIndex[min(bucket, bucketStartItemIndex.size - 1)]
-        // ... but try using the more localised cached values.
-        if (lastLineIndex in currentLine..lineIndex) {
-            // The last calculated value is a better start point. Common when scrolling main axis.
-            currentLine = lastLineIndex
-            currentItemIndex = lastLineStartItemIndex
-        } else if (bucket == cachedBucketIndex && lineIndex - currentLine < cachedBucket.size) {
-            // It happens that the needed line start is fully cached. Common when scrolling in
-            // reverse main axis, as we decided to cacheThisBucket previously.
-            currentItemIndex = cachedBucket[lineIndex - currentLine]
-            currentLine = lineIndex
-        }
-
-        val cacheThisBucket = currentLine % bucketSize == 0 &&
-            lineIndex - currentLine in 2 until bucketSize
-        if (cacheThisBucket) {
-            cachedBucketIndex = bucket
-            cachedBucket.clear()
-        }
-
-        check(currentLine <= lineIndex)
-        while (currentLine < lineIndex && currentItemIndex < totalSize) {
-            if (cacheThisBucket) {
-                cachedBucket.add(currentItemIndex)
-            }
-
-            var spansUsed = 0
-            while (spansUsed < nColumns && currentItemIndex < totalSize) {
-                spansUsed +=
-                    spanOf(currentItemIndex++, currentLine, spansUsed, nColumns - spansUsed)
-            }
-            ++currentLine
-            if (currentLine % bucketSize == 0) {
-                val currentLineBucket = currentLine / bucketSize
-                // This should happen, as otherwise this should have been used as starting point.
-                check(bucketStartItemIndex.size == currentLineBucket)
-                bucketStartItemIndex.add(currentItemIndex)
-            }
-        }
-
-        lastLineIndex = lineIndex
-        lastLineStartItemIndex = currentItemIndex
-        return contentForLineStartingWith(currentItemIndex, lineIndex, scope)
-    }
-
-    private fun contentForLineStartingWith(
-        itemIndex: Int,
-        lineIndex: Int,
-        scope: LazyItemScope
-    ): List<Pair<@Composable () -> Unit, Int>> {
-        val lineContent = ArrayList<Pair<@Composable () -> Unit, Int>>(nColumns)
-
-        var currentItemIndex = itemIndex
-        var spansUsed = 0
-        while (spansUsed < nColumns && currentItemIndex < totalSize) {
-            val span = spanOf(currentItemIndex, lineIndex, spansUsed, nColumns - spansUsed)
-            lineContent.add(contentOf(currentItemIndex, scope) to span)
-            ++currentItemIndex
-            spansUsed += span
-        }
-
-        return lineContent
-    }
-
-    private fun contentOf(itemIndex: Int, scope: LazyItemScope): @Composable () -> Unit {
-        val interval = cachedIntervalForIndex(itemIndex)
-        return interval.content.content(scope, itemIndex - interval.startIndex)
-    }
-
-    private fun spanOf(itemIndex: Int, row: Int, column: Int, maxSpan: Int): Int {
-        val interval = cachedIntervalForIndex(itemIndex)
-        return with(LazyGridItemSpanScopeImpl) {
-            itemRow = row
-            itemColumn = column
-            maxCurrentLineSpan = maxSpan
-
-            interval.content.span(this, itemIndex - interval.startIndex)
-                .currentLineSpan
-                .coerceIn(1, maxSpan)
-        }
-    }
-
-    private object LazyGridItemSpanScopeImpl : LazyGridItemSpanScope {
-        override var itemRow = 0
-        override var itemColumn = 0
-        override var maxCurrentLineSpan = 0
-    }
-
-    private fun cachedIntervalForIndex(itemIndex: Int) = lastInterval.let {
-        if (it != null && itemIndex in it.startIndex until it.startIndex + it.size) {
-            it
-        } else {
-            intervals.intervalForIndex(itemIndex).also { lastInterval = it }
-        }
-    }
-
-    override fun item(
-        span: (LazyGridItemSpanScope.() -> GridItemSpan)?,
-        content: @Composable (LazyItemScope.() -> Unit)
-    ) {
-        intervals.add(1, IntervalData({ { content() } }, span?.let { { span() } } ?: DefaultSpan))
-        if (span != null) hasCustomSpans = true
-    }
-
-    override fun items(
-        count: Int,
-        span: (LazyGridItemSpanScope.(Int) -> GridItemSpan)?,
-        itemContent: @Composable (LazyItemScope.(index: Int) -> Unit)
-    ) {
-        intervals.add(count, IntervalData({ { itemContent(it) } }, span ?: DefaultSpan))
-        if (span != null) hasCustomSpans = true
-    }
-}
-
-@Composable
-private fun ItemRow(
-    nColumns: Int,
-    horizontalArrangement: Arrangement.Horizontal,
-    rowContent: List<Pair<@Composable () -> Unit, Int>>
-) {
-    Layout(content = {
-        rowContent.fastForEach {
-            it.first.invoke()
-        }
-    }) { measurables, constraints ->
-        check(measurables.size == rowContent.size)
-        if (measurables.isEmpty()) {
-            return@Layout layout(constraints.minWidth, constraints.minHeight) {}
-        }
-
-        val spacing = horizontalArrangement.spacing.roundToPx()
-        val columnSize = max(constraints.maxWidth - spacing * (nColumns - 1), 0) / nColumns
-        var remainder = max(
-            constraints.maxWidth - columnSize * nColumns - spacing * (nColumns - 1),
-            0
-        )
-
-        val placeables = measurables.fastMapIndexedNotNull { index, measurable ->
-            val span = rowContent[index].second
-            val remainderUsed = min(remainder, span)
-            remainder -= remainderUsed
-            val width = span * columnSize + remainderUsed + spacing * (span - 1)
-            measurable.measure(Constraints.fixedWidth(width))
-        }
-
-        layout(constraints.maxWidth, placeables.fastMaxOfOrNull { it.height }!!) {
-            var x = 0
-            placeables.fastForEach { placeable ->
-                placeable.placeRelative(x, 0)
-                x += placeable.width + spacing
-            }
-        }
-    }
 }

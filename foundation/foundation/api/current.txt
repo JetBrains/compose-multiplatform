@@ -389,6 +389,9 @@ package androidx.compose.foundation.lazy {
   public final class LazyGridSpanKt {
   }
 
+  public final class LazyGridStateKt {
+  }
+
   @androidx.compose.foundation.lazy.LazyScopeMarker @androidx.compose.runtime.Stable public interface LazyItemScope {
     method public androidx.compose.ui.Modifier fillParentMaxHeight(androidx.compose.ui.Modifier, optional float fraction);
     method public androidx.compose.ui.Modifier fillParentMaxSize(androidx.compose.ui.Modifier, optional float fraction);
@@ -458,7 +461,29 @@ package androidx.compose.foundation.lazy {
 
 }
 
+package androidx.compose.foundation.lazy.grid {
+
+  public final class LazyGridItemsProviderImplKt {
+  }
+
+  public final class LazyGridKt {
+  }
+
+  public final class LazyGridMeasureKt {
+  }
+
+  public final class LazyGridScrollingKt {
+  }
+
+  public final class LazySemanticsKt {
+  }
+
+}
+
 package androidx.compose.foundation.lazy.layout {
+
+  public final class IntervalListKt {
+  }
 
   public final class LazyLayoutItemContentFactoryKt {
   }
@@ -478,9 +503,6 @@ package androidx.compose.foundation.lazy.layout {
 }
 
 package androidx.compose.foundation.lazy.list {
-
-  public final class IntervalListKt {
-  }
 
   public final class LazyListHeadersKt {
   }

@@ -16,8 +16,8 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.foundation.lazy.list.MutableIntervalList
-import androidx.compose.foundation.lazy.list.intervalForIndex
+import androidx.compose.foundation.lazy.layout.MutableIntervalList
+import androidx.compose.foundation.lazy.layout.intervalForIndex
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
