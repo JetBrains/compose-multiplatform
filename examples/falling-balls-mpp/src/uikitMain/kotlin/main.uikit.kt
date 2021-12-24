@@ -15,6 +15,10 @@ import kotlinx.cinterop.*
 import platform.UIKit.*
 import platform.Foundation.*
 
+object UikitTime : Time {
+    override fun now(): Long = kotlin.system.getTimeNanos()
+}
+
 fun main() {
     val args = emptyArray<String>()
     memScoped {
@@ -40,13 +44,16 @@ class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
 
     override fun application(application: UIApplication, didFinishLaunchingWithOptions: Map<Any?, *>?): Boolean {
         window = UIWindow(frame = UIScreen.mainScreen.bounds)
-        window!!.rootViewController = Application("Compose/Native sample") {
-            val game = remember { Game(width = 600, height = 600) }
+        window!!.rootViewController = Application("Falling Balls") {
+            val game = remember { Game(UikitTime).apply {
+                width = 800.dp
+                height = 800.dp
+            } }
             Column {
                 // To skip upper part of screen.
                 Box(modifier = Modifier
                     .height(100.dp))
-                fallingBalls(game)
+                FallingBalls(game)
             }
         }
         window!!.makeKeyAndVisible()
