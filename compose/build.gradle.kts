@@ -45,10 +45,15 @@ val iconsComponents =
 fun ComposePublishingTask.mainPublications() {
     publish(":compose:compiler:compiler", publications = listOf("Maven"))
     publish(":compose:compiler:compiler-hosted", publications = listOf("Maven"))
-    publish(":compose:ui:ui-tooling-data", publications = listOf("Maven"))
+    publish(
+        ":compose:ui:ui-tooling-data",
+        onlyWithPlatforms = setOf(ComposePlatforms.AndroidRelease, ComposePlatforms.AndroidDebug),
+        publications = listOf("Maven")
+    )
 
     publish(
         ":compose:desktop:desktop",
+        onlyWithPlatforms = setOf(ComposePlatforms.Desktop),
         publications = listOf(
             "KotlinMultiplatform",
             "Jvm",

@@ -12,9 +12,9 @@ enum class ComposePlatforms(vararg val alternativeNames: String) {
     AndroidRelease("Android"),
     Js("Web"),
     MacosX64("Macos"),
-    MacosArm64(),
+    MacosArm64("Macos"),
     UikitX64("UiKit"),
-    UikitArm64();
+    UikitArm64("UiKit");
 
     fun matches(nameCandidate: String): Boolean =
         listOf(name, *alternativeNames).any { it.equals(nameCandidate, ignoreCase = true) }
