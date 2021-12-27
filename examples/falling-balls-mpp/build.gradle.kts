@@ -40,7 +40,7 @@ repositories {
 }
 
 kotlin {
-    jvm()
+    jvm("desktop")
     js(IR) {
         browser()
         binaries.executable()
@@ -112,7 +112,7 @@ kotlin {
             }
         }
 
-        val jvmMain by getting {
+        val desktopMain by getting {
              dependencies {
                 implementation(compose.desktop.currentOs)
              }
@@ -149,11 +149,11 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "Main_jvmKt"
+        mainClass = "Main_desktopKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "Falling Balls MPP"
+            packageName = "Falling Balls"
             packageVersion = "1.0.0"
 
             windows {

@@ -5,14 +5,23 @@
 
 import androidx.compose.ui.window.Window
 import androidx.compose.runtime.remember
+import androidx.compose.ui.unit.dp
 import platform.AppKit.NSApp
 import platform.AppKit.NSApplication
 
+object MacosTime : Time {
+    override fun now(): Long = kotlin.system.getTimeNanos()
+}
+
 fun main() {
     NSApplication.sharedApplication()
-    Window("Compose/Native sample") {
-        val game = remember { Game(width = 600, height = 600) }
-        fallingBalls(game)
+    Window("Falling Balls") {
+        val game = remember { Game(MacosTime).apply {
+            // TODO: rework, now we do not properly propagate geometry changes.
+            width = 800.dp
+            height = 600.dp
+        }  }
+        FallingBalls(game)
     }
     NSApp?.run()
 }
