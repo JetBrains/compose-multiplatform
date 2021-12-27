@@ -49,10 +49,12 @@ dependencies {
 }
 
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-    kotlin {
+    androidXComposeMultiplatform {
         android()
-        jvm("desktop")
+        desktop()
+    }
 
+    kotlin {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block above
@@ -67,20 +69,14 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.kotlinStdlib)
                 api(libs.kotlinCoroutinesCore)
             }
-            androidMain {
-                dependencies {
-                    api(libs.kotlinCoroutinesAndroid)
-                    api("androidx.annotation:annotation:1.1.0")
+            androidMain.dependencies {
+                api(libs.kotlinCoroutinesAndroid)
+                api("androidx.annotation:annotation:1.1.0")
 
-                    implementation("androidx.core:core-ktx:1.1.0")
-                }
-                dependsOn(jvmMain)
+                implementation("androidx.core:core-ktx:1.1.0")
             }
-            desktopMain {
-                dependencies {
-                    api(libs.kotlinCoroutinesSwing)
-                }
-                dependsOn(jvmMain)
+            desktopMain.dependencies {
+                api(libs.kotlinCoroutinesSwing)
             }
 
             commonTest.dependencies {

@@ -19,8 +19,6 @@
 
 import androidx.build.AndroidXComposePlugin
 
-AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
-
 dependencies {
     if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         /*
@@ -34,9 +32,12 @@ dependencies {
 }
 
 if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-    kotlin {
+    androidXComposeMultiplatform {
         android()
-        jvm("desktop")
+        desktop()
+    }
+
+    kotlin {
         /*
          * When updating dependencies, make sure to make an analogous update in the
          * corresponding block above

@@ -77,10 +77,12 @@ dependencies {
 
 
 if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-    kotlin {
+    androidXComposeMultiplatform {
         android()
-        jvm("desktop")
+        desktop()
+    }
 
+    kotlin {
         sourceSets {
             commonMain.dependencies {
                 api(project(":compose:ui:ui"))
@@ -129,10 +131,6 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.truth)
                 implementation(libs.skiko)
             }
-
-            androidMain.dependsOn(jvmMain)
-            desktopMain.dependsOn(jvmMain)
-            jvmMain.dependsOn(commonMain)
 
             androidCommonTest.dependsOn(commonTest)
             androidTest.dependsOn(androidCommonTest)
