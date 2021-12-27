@@ -547,6 +547,6 @@ fun main() {
 
 ## Obfuscation
     
-There's nothing special with obfuscation of CfD programs - it's done the same was as for any other JVM program. Compose plugin provides task
-packageUberJarForCurrentOS which produces self-contained JAR. It could be obfuscated using steps similar to what's described in
-https://stackoverflow.com/questions/64355998/proguard-example-for-gradle-java-application
+To obfuscate Compose Multiplatform JVM applications standard approach for JVM application works. Using task packageUberJarForCurrentOS one could generate JAR file which could be later obfuscated using ProGuard or R8, see for example https://stackoverflow.com/questions/64355998/proguard-example-for-gradle-java-application.
+
+Also example in the document using Kotlin DSL would be better, as above link uses Groovy.
