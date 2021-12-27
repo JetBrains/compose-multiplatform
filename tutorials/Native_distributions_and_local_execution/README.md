@@ -544,3 +544,9 @@ fun main() {
 ```
 3. Run `./gradlew runDistributable`.
 4. Links like `compose://foo/bar` are now redirected from a browser to your application.
+
+## Obfuscation
+    
+To obfuscate Compose Multiplatform JVM applications standard approach for JVM application works. Using task packageUberJarForCurrentOS one could generate JAR file which could be later obfuscated using ProGuard or R8, see for example https://stackoverflow.com/questions/64355998/proguard-example-for-gradle-java-application.
+
+Also example in the document using Kotlin DSL would be better, as above link uses Groovy.
