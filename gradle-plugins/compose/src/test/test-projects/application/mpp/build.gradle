@@ -5,14 +5,6 @@ plugins {
     id "org.jetbrains.compose"
 }
 
-repositories {
-    google()
-    mavenCentral()
-    maven {
-        url "https://maven.pkg.jetbrains.space/public/p/compose/dev"
-    }
-}
-
 kotlin {
     jvm {
     }
@@ -25,7 +17,6 @@ kotlin {
         }
     }
 }
-
 
 compose.desktop {
     application {
