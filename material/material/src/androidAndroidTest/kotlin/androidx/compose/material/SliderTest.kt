@@ -360,8 +360,13 @@ class SliderTest {
         }
     }
 
-    private fun calculateFraction(a: Float, b: Float, pos: Float) =
-        ((pos - a) / (b - a)).coerceIn(0f, 1f)
+    private fun calculateFraction(left: Float, right: Float, pos: Float) = with(rule.density) {
+        val offset = ThumbRadius.toPx()
+        val start = left + offset
+        val end = right - offset
+
+        ((pos - start) / (end - start)).coerceIn(0f, 1f)
+    }
 
     @Test
     fun slider_sizes() {
