@@ -19,13 +19,15 @@ class TestProject(
     private val name: String,
     private val testEnvironment: TestEnvironment
 ) {
+    private val testProjectsRootDir = File("src/test/test-projects")
     private val additionalArgs = listOf(
         "--stacktrace",
+        "--init-script", testProjectsRootDir.resolve("init.gradle").absolutePath,
         "-P${ComposeProperties.VERBOSE}=true"
     )
 
     init {
-        val originalTestRoot = File("src/test/test-projects").resolve(name).also {
+        val originalTestRoot = testProjectsRootDir.resolve(name).also {
             check(it.exists()) { "Test project is not found: ${it.absolutePath}" }
         }
         for (orig in originalTestRoot.walk()) {

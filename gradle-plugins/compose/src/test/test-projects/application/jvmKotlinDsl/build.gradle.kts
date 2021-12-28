@@ -7,8 +7,6 @@ plugins {
 }
 
 repositories {
-    google()
-    mavenCentral()
     jetbrainsCompose()
 }
 

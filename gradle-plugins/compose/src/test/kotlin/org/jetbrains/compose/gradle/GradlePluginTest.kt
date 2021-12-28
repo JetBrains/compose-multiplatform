@@ -24,12 +24,7 @@ import kotlin.concurrent.thread
 class GradlePluginTest : GradlePluginTestBase() {
     @Test
     fun jsMppIsNotBroken() =
-        with(
-            testProject(
-                TestProjects.jsMpp,
-                testEnvironment = defaultTestEnvironment.copy(kotlinVersion = TestKotlinVersion.V1_5_20)
-            )
-        ) {
+        with(testProject(TestProjects.jsMpp)) {
             gradle(":compileKotlinJs").build().checks { check ->
                 check.taskOutcome(":compileKotlinJs", TaskOutcome.SUCCESS)
             }
