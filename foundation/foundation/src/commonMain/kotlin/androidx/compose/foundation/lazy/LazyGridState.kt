@@ -23,6 +23,7 @@ import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.grid.ItemIndex
+import androidx.compose.foundation.lazy.grid.LazyGridItemsProvider
 import androidx.compose.foundation.lazy.grid.LazyGridMeasureResult
 import androidx.compose.foundation.lazy.grid.LazyGridScrollPosition
 import androidx.compose.foundation.lazy.grid.doSmoothScrollToItem
@@ -335,14 +336,14 @@ class LazyGridState constructor(
         numMeasurePasses++
     }
 
-    // /**
-    //  * When the user provided custom keys for the items we can try to detect when there were
-    //  * items added or removed before our current first visible item and keep this item
-    //  * as the first visible one even given that its index has been changed.
-    //  */
-    // internal fun updateScrollPositionIfTheFirstItemWasMoved(itemsProvider: LazyGridItemsProvider) {
-    //     scrollPosition.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
-    // }
+    /**
+     * When the user provided custom keys for the items we can try to detect when there were
+     * items added or removed before our current first visible item and keep this item
+     * as the first visible one even given that its index has been changed.
+     */
+    internal fun updateScrollPositionIfTheFirstItemWasMoved(itemsProvider: LazyGridItemsProvider) {
+        scrollPosition.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
+    }
 
     companion object {
         /**

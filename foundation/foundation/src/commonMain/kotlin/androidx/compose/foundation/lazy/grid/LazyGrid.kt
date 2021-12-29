@@ -108,10 +108,10 @@ internal fun LazyGrid(
     // state.prefetchPolicy = rememberLazyLayoutPrefetchPolicy()
     val innerState = rememberLazyLayoutState().also { state.innerState = it }
 
-    // TODO(b/211849521)
-    // if (itemsProvider.itemsCount > 0) {
-    //     state.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
-    // }
+    val itemsProvider = stateOfItemsProvider.value
+    if (itemsProvider.itemsCount > 0) {
+        state.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
+    }
 
     LazyLayout(
         modifier = modifier
@@ -191,7 +191,7 @@ private fun rememberLazyGridMeasurePolicy(
         constraints.assertNotNestingScrollableContainers(isVertical)
 
         val itemsProvider = stateOfItemsProvider.value
-        // state.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
+        state.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
 
         // Update the state's cached Density
         state.density = this
