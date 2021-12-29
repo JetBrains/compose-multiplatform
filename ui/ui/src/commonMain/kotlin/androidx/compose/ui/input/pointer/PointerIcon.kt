@@ -19,6 +19,7 @@ package androidx.compose.ui.input.pointer
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalPointerIconService
 import androidx.compose.ui.platform.debugInspectorInfo
 
@@ -74,10 +75,10 @@ fun Modifier.pointerHoverIcon(icon: PointerIcon, overrideDescendants: Boolean = 
                         else
                             PointerEventPass.Initial
                         val event = awaitPointerEvent(pass)
-                        when (event.type) {
-                            PointerEventType.Enter, PointerEventType.Move -> {
-                                pointerIconService.current = icon
-                            }
+                        val isOutsideRelease = event.type == PointerEventType.Release &&
+                            event.changes[0].isOutOfBounds(size, Size.Zero)
+                        if (event.type != PointerEventType.Exit && !isOutsideRelease) {
+                            pointerIconService.current = icon
                         }
                     }
                 }
