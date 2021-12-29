@@ -534,7 +534,7 @@ private class FilesMapping : Serializable {
 }
 
 private fun isSkikoForCurrentOS(lib: File): Boolean =
-    lib.name.startsWith("skiko-jvm-runtime-${currentOS.id}-${currentArch.id}")
+    lib.name.startsWith("skiko-awt-runtime-${currentOS.id}-${currentArch.id}")
             && lib.name.endsWith(".jar")
 
 private fun unpackSkikoForCurrentOS(sourceJar: File, skikoDir: File, fileOperations: FileOperations): List<File> {
