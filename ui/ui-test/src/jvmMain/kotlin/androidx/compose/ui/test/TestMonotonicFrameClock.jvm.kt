@@ -23,13 +23,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.test.DelayController
-import kotlin.coroutines.ContinuationInterceptor
+import kotlinx.coroutines.test.TestCoroutineScheduler
 
 private const val DefaultFrameDelay = 16_000_000L
 
 /**
- * Construct a [TestMonotonicFrameClock] for [coroutineScope], obtaining the [DelayController]
+ * Construct a [TestMonotonicFrameClock] for [coroutineScope], obtaining the [TestCoroutineScheduler]
  * from the scope's [context][CoroutineScope.coroutineContext]. This frame clock may be used to
  * consistently drive time under controlled tests.
  *
@@ -44,17 +43,15 @@ fun TestMonotonicFrameClock(
     frameDelayNanos: Long = DefaultFrameDelay
 ): TestMonotonicFrameClock = TestMonotonicFrameClock(
     coroutineScope = coroutineScope,
-    delayController = coroutineScope.coroutineContext[ContinuationInterceptor].let { interceptor ->
-        requireNotNull(interceptor as? DelayController) {
-            "ContinuationInterceptor $interceptor of supplied scope must implement DelayController"
-        }
+    delayController = requireNotNull(coroutineScope.coroutineContext[TestCoroutineScheduler]) {
+        "coroutuineScope should have TestCoroutineScheduler"
     },
     frameDelayNanos = frameDelayNanos
 )
 
 /**
  * A [MonotonicFrameClock] with a time source controlled by a `kotlinx-coroutines-test`
- * [DelayController]. This frame clock may be used to consistently drive time under controlled
+ * [TestCoroutineScheduler]. This frame clock may be used to consistently drive time under controlled
  * tests.
  *
  * Calls to [withFrameNanos] will schedule an upcoming frame [frameDelayNanos] nanoseconds in the
@@ -65,7 +62,7 @@ fun TestMonotonicFrameClock(
 @ExperimentalCoroutinesApi
 class TestMonotonicFrameClock(
     private val coroutineScope: CoroutineScope,
-    private val delayController: DelayController,
+    private val delayController: TestCoroutineScheduler,
     @get:Suppress("MethodNameUnits") // Nanos for high-precision animation clocks
     val frameDelayNanos: Long = DefaultFrameDelay
 ) : MonotonicFrameClock {

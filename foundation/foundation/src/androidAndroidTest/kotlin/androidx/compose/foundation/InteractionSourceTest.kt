@@ -33,9 +33,9 @@ import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -59,7 +59,7 @@ class InteractionSourceTest {
 
         val interactions = mutableListOf<Interaction>()
 
-        val scope = TestCoroutineScope()
+        val scope = TestScope(UnconfinedTestDispatcher())
 
         scope.launch {
             interactionSource.interactions.collect {

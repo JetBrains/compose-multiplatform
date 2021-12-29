@@ -20,7 +20,8 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -28,7 +29,7 @@ import kotlin.test.assertTrue
 @ExperimentalCoroutinesApi
 class BroadcastFrameClockTest {
     @Test
-    fun sendAndReceiveFrames() = runBlockingTest {
+    fun sendAndReceiveFrames() = runTest(UnconfinedTestDispatcher()) {
         val clock = androidx.compose.runtime.BroadcastFrameClock()
 
         val frameAwaiter = async { clock.withFrameNanos { it } }
@@ -48,7 +49,7 @@ class BroadcastFrameClockTest {
     }
 
     @Test
-    fun cancelClock() = runBlockingTest {
+    fun cancelClock() = runTest(UnconfinedTestDispatcher()) {
         val clock = androidx.compose.runtime.BroadcastFrameClock()
         val frameAwaiter = async { clock.withFrameNanos { it } }
 
@@ -63,7 +64,7 @@ class BroadcastFrameClockTest {
     }
 
     @Test
-    fun failClockWhenNewAwaitersNotified() = runBlockingTest {
+    fun failClockWhenNewAwaitersNotified() = runTest(UnconfinedTestDispatcher()) {
         val clock = androidx.compose.runtime.BroadcastFrameClock {
             throw CancellationException("failed frame clock")
         }

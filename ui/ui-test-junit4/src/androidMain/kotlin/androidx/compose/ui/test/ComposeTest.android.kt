@@ -54,7 +54,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 
 @OptIn(InternalTestApi::class, ExperimentalCoroutinesApi::class)
 internal class AndroidComposeTest<A : ComponentActivity>(
@@ -74,8 +76,8 @@ internal class AndroidComposeTest<A : ComponentActivity>(
     private var idlingStrategy: IdlingStrategy = EspressoLink(idlingResourceRegistry)
 
     private val recomposer: Recomposer
-    private val testCoroutineDispatcher = TestCoroutineDispatcher()
-    private val frameCoroutineScope = CoroutineScope(testCoroutineDispatcher)
+    private val testCoroutineDispatcher = UnconfinedTestDispatcher()
+    private val frameCoroutineScope = TestScope(testCoroutineDispatcher)
     private val recomposerApplyCoroutineScope: CoroutineScope
     private val coroutineExceptionHandler = UncaughtExceptionHandler()
 
@@ -275,9 +277,11 @@ internal class AndroidComposeTest<A : ComponentActivity>(
         try {
             return block()
         } finally {
+            // runTest {} as the last step -
+            // to replace deprecated TestCoroutineScope.cleanupTestCoroutines
+            frameCoroutineScope.runTest {}
             frameCoroutineScope.cancel()
             coroutineExceptionHandler.throwUncaught()
-            testCoroutineDispatcher.cleanupTestCoroutines()
         }
     }
 

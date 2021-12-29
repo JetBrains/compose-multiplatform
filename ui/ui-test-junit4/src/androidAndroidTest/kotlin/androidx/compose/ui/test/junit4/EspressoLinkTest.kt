@@ -21,13 +21,16 @@ import androidx.test.espresso.Espresso
 import androidx.test.espresso.IdlingRegistry
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.After
 import org.junit.Test
 
 class EspressoLinkTest {
     @OptIn(InternalTestApi::class, ExperimentalCoroutinesApi::class)
-    private val espressoLink = EspressoLink(IdlingResourceRegistry(TestCoroutineScope()))
+    private val espressoLink = EspressoLink(
+        IdlingResourceRegistry(TestScope(UnconfinedTestDispatcher()))
+    )
 
     @After
     fun tearDown() {
