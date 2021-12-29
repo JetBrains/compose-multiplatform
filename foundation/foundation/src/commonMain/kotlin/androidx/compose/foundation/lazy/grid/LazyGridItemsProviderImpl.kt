@@ -81,27 +81,27 @@ internal class LazyGridItemsProviderImpl(
     override val itemsCount get() = intervals.totalSize
 
     override fun getKey(index: Int): Any {
-        val interval = cachedIntervalForIndex(index)
+        val interval = getIntervalForIndex(index)
         val localIntervalIndex = index - interval.startIndex
         val key = interval.content.key?.invoke(localIntervalIndex)
         return key ?: getDefaultLazyKeyFor(index)
     }
 
     override fun LazyGridItemSpanScope.getSpan(index: Int): GridItemSpan {
-        val interval = cachedIntervalForIndex(index)
+        val interval = getIntervalForIndex(index)
         val localIntervalIndex = index - interval.startIndex
         return interval.content.span.invoke(this, localIntervalIndex)
     }
 
     override fun getContent(index: Int): @Composable () -> Unit {
-        val interval = cachedIntervalForIndex(index)
+        val interval = getIntervalForIndex(index)
         val localIntervalIndex = index - interval.startIndex
         return interval.content.content.invoke(localIntervalIndex)
     }
 
     override val keyToIndexMap: Map<Any, Int> = generateKeyToIndexMap(nearestItemsRange, intervals)
 
-    private fun cachedIntervalForIndex(itemIndex: Int) = lastInterval.let {
+    private fun getIntervalForIndex(itemIndex: Int) = lastInterval.let {
         if (it != null && itemIndex in it.startIndex until it.startIndex + it.size) {
             it
         } else {

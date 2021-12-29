@@ -19,6 +19,7 @@ package androidx.compose.foundation.lazy.list
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.getDefaultLazyKeyFor
+import androidx.compose.foundation.lazy.layout.IntervalHolder
 import androidx.compose.foundation.lazy.layout.IntervalList
 import androidx.compose.foundation.lazy.layout.intervalForIndex
 import androidx.compose.foundation.lazy.layout.intervalIndexForItemIndex
@@ -70,22 +71,36 @@ internal class LazyListItemsProviderImpl(
     override val headerIndexes: List<Int>,
     nearestItemsRange: IntRange
 ) : LazyListItemsProvider {
+    /**
+     * Caches the last interval we binary searched for. We might not need to recalculate
+     * for subsequent queries, as they tend to be localised.
+     */
+    private var lastInterval: IntervalHolder<LazyListIntervalContent>? = null
+
     override val itemsCount get() = list.totalSize
 
     override fun getKey(index: Int): Any {
-        val interval = list.intervalForIndex(index)
+        val interval = getIntervalForIndex(index)
         val localIntervalIndex = index - interval.startIndex
         val key = interval.content.key?.invoke(localIntervalIndex)
         return key ?: getDefaultLazyKeyFor(index)
     }
 
     override fun getContent(index: Int): @Composable () -> Unit {
-        val interval = list.intervalForIndex(index)
+        val interval = getIntervalForIndex(index)
         val localIntervalIndex = index - interval.startIndex
         return interval.content.content.invoke(itemScope.value!!, localIntervalIndex)
     }
 
     override val keyToIndexMap: Map<Any, Int> = generateKeyToIndexMap(nearestItemsRange, list)
+
+    private fun getIntervalForIndex(itemIndex: Int) = lastInterval.let {
+        if (it != null && itemIndex in it.startIndex until it.startIndex + it.size) {
+            it
+        } else {
+            list.intervalForIndex(itemIndex).also { lastInterval = it }
+        }
+    }
 }
 
 /**
