@@ -82,13 +82,13 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
             var skikoVersion: String? = null
             for (file in previewClasspath.files) {
                 if (file.name.endsWith(".jar")) {
-                    if (file.name.startsWith("skiko-jvm-runtime-")) {
+                    if (file.name.startsWith("skiko-awt-runtime-")) {
                         hasSkikoJvmRuntime = true
                         continue
-                    } else if (file.name.startsWith("skiko-jvm-")) {
+                    } else if (file.name.startsWith("skiko-awt-")) {
                         hasSkikoJvm = true
                         skikoVersion = file.name
-                            .removePrefix("skiko-jvm-")
+                            .removePrefix("skiko-awt-")
                             .removeSuffix(".jar")
                     }
                 }
@@ -97,7 +97,7 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
 
             if (hasSkikoJvm && skikoVersion != null && skikoVersion.isNotBlank()) {
                 val skikoRuntimeConfig = project.configurations.detachedConfiguration(
-                    project.dependencies.create("org.jetbrains.skiko:skiko-jvm-runtime-${currentTarget.id}:$skikoVersion")
+                    project.dependencies.create("org.jetbrains.skiko:skiko-awt-runtime-${currentTarget.id}:$skikoVersion")
                 ).apply { isTransitive = false }
                 return skikoRuntimeConfig.files
             }
