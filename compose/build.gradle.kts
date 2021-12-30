@@ -1,86 +1,106 @@
+import org.gradle.api.*
 import org.jetbrains.compose.internal.publishing.*
 
 plugins {
     signing
 }
 
-val composeBuild = gradle.includedBuild("support")
-fun Task.dependsOnComposeTask(name: String) = dependsOn(composeBuild.task(name))
+fun Task.dependsOnComposeTask(name: String) {
+   dependsOn(project.composeBuild?.task(name) ?: return)
+}
 
-val isOelPublication = project.findProperty("oel.publication") == "true"
-val isWebExist = composeBuild.projectDir.resolve(".jbWebExistsMarker").exists()
+open class ComposePublishingTask : AbstractComposePublishingTask() {
+    override fun dependsOnComposeTask(task: String) {
+        dependsOn(project.composeBuild?.task(task) ?: return)
+    }
+}
+
+val composeProperties = ComposeProperties(project)
+val isWebExist =
+    project.composeBuild?.run { projectDir.resolve(".jbWebExistsMarker").exists() } ?: false
+
+val mainComponents =
+    listOf(
+        ComposeComponent(":compose:animation:animation"),
+        ComposeComponent(":compose:animation:animation-core"),
+        ComposeComponent(":compose:animation:animation-graphics", supportedPlatforms = ComposePlatforms.JVM_BASED),
+        ComposeComponent(":compose:foundation:foundation"),
+        ComposeComponent(":compose:foundation:foundation-layout"),
+        ComposeComponent(":compose:material:material"),
+        ComposeComponent(":compose:material3:material3", supportedPlatforms = ComposePlatforms.JVM_BASED),
+        ComposeComponent(":compose:material:material-icons-core"),
+        ComposeComponent(":compose:material:material-ripple"),
+        ComposeComponent(":compose:runtime:runtime"),
+        ComposeComponent(":compose:runtime:runtime-saveable"),
+        ComposeComponent(":compose:ui:ui"),
+        ComposeComponent(":compose:ui:ui-geometry"),
+        ComposeComponent(":compose:ui:ui-graphics"),
+        ComposeComponent(":compose:ui:ui-test", supportedPlatforms = ComposePlatforms.JVM_BASED),
+        ComposeComponent(":compose:ui:ui-test-junit4", supportedPlatforms = ComposePlatforms.JVM_BASED),
+        ComposeComponent(":compose:ui:ui-text"),
+        ComposeComponent(":compose:ui:ui-tooling", supportedPlatforms = ComposePlatforms.JVM_BASED),
+        ComposeComponent(":compose:ui:ui-tooling-preview", supportedPlatforms = ComposePlatforms.JVM_BASED),
+        ComposeComponent(":compose:ui:ui-unit"),
+        ComposeComponent(":compose:ui:ui-util", supportedPlatforms = ComposePlatforms.ALL),
+    )
+
+val iconsComponents =
+    listOf(
+        ComposeComponent(":compose:material:material-icons-extended", supportedPlatforms = ComposePlatforms.JVM_BASED),
+    )
+
+fun ComposePublishingTask.mainPublications() {
+    publish(":compose:compiler:compiler", publications = listOf("Maven"))
+    publish(":compose:compiler:compiler-hosted", publications = listOf("Maven"))
+    publish(
+        ":compose:ui:ui-tooling-data",
+        onlyWithPlatforms = setOf(ComposePlatforms.AndroidRelease, ComposePlatforms.AndroidDebug),
+        publications = listOf("Maven")
+    )
+
+    publish(
+        ":compose:desktop:desktop",
+        onlyWithPlatforms = setOf(ComposePlatforms.Desktop),
+        publications = listOf(
+            "KotlinMultiplatform",
+            "Jvm",
+            "Jvmlinux-x64",
+            "Jvmlinux-arm64",
+            "Jvmmacos-x64",
+            "Jvmmacos-arm64",
+            "Jvmwindows-x64"
+        )
+    )
+
+    mainComponents.forEach { publishMultiplatform(it) }
+}
+
+fun ComposePublishingTask.iconsPublications() {
+    iconsComponents.forEach { publishMultiplatform(it) }
+}
 
 // To show all projects which use `xxx` task, run:
 // ./gradlew -p frameworks/support help --task xxx
+tasks.register("publishComposeJb", ComposePublishingTask::class) {
+    repository = "MavenRepository"
+    mainPublications()
+}
 
-tasks.register("publishComposeJb") {
-    dependsOnComposeTask(":compose:compiler:compiler:publishMavenPublicationToMavenRepository")
-    dependsOnComposeTask(":compose:compiler:compiler-hosted:publishMavenPublicationToMavenRepository")
-    dependsOnComposeTask(":compose:ui:ui-tooling-data:publishMavenPublicationToMavenRepository")
-
-    dependsOnComposeTask(":compose:desktop:desktop:publishKotlinMultiplatformPublicationToMavenRepository")
-    dependsOnComposeTask(":compose:desktop:desktop:publishJvmPublicationToMavenRepository")
-    dependsOnComposeTask(":compose:desktop:desktop:publishJvmlinux-x64PublicationToMavenRepository")
-    dependsOnComposeTask(":compose:desktop:desktop:publishJvmlinux-arm64PublicationToMavenRepository")
-    dependsOnComposeTask(":compose:desktop:desktop:publishJvmmacos-x64PublicationToMavenRepository")
-    dependsOnComposeTask(":compose:desktop:desktop:publishJvmmacos-arm64PublicationToMavenRepository")
-    dependsOnComposeTask(":compose:desktop:desktop:publishJvmwindows-x64PublicationToMavenRepository")
-
-    listOf(
-        ":compose:animation:animation",
-        ":compose:animation:animation-core",
-        ":compose:animation:animation-graphics",
-        ":compose:foundation:foundation",
-        ":compose:foundation:foundation-layout",
-        ":compose:material:material",
-        ":compose:material3:material3",
-        ":compose:material:material-icons-core",
-        ":compose:material:material-ripple",
-        ":compose:runtime:runtime",
-        ":compose:runtime:runtime-saveable",
-        ":compose:ui:ui",
-        ":compose:ui:ui-geometry",
-        ":compose:ui:ui-graphics",
-        ":compose:ui:ui-test",
-        ":compose:ui:ui-test-junit4",
-        ":compose:ui:ui-text",
-        ":compose:ui:ui-tooling",
-        ":compose:ui:ui-tooling-preview",
-        ":compose:ui:ui-unit",
-        ":compose:ui:ui-util",
-    ).forEach {
-        dependsOnComposeTask("$it:publishKotlinMultiplatformPublicationToMavenRepository")
-        dependsOnComposeTask("$it:publishDesktopPublicationToMavenRepository")
-
-        if (!isOelPublication) {
-            dependsOnComposeTask("$it:publishAndroidDebugPublicationToMavenRepository")
-            dependsOnComposeTask("$it:publishAndroidReleasePublicationToMavenRepository")
-        }
-    }
-
-    if (isWebExist) {
-        listOf(
-            ":compose:runtime:runtime",
-        ).forEach {
-            dependsOnComposeTask("$it:publishJsPublicationToMavenRepository")
-        }
-    }
+tasks.register("publishComposeJbToMavenLocal", ComposePublishingTask::class) {
+    repository = "MavenLocal"
+    mainPublications()
 }
 
 // separate task that cannot be built in parallel (because it requires too much RAM).
 // should be run with "--max-workers=1"
-tasks.register("publishComposeJbExtendedIcons") {
-    listOf(
-        ":compose:material:material-icons-extended",
-    ).forEach {
-        dependsOnComposeTask("$it:publishKotlinMultiplatformPublicationToMavenRepository")
-        dependsOnComposeTask("$it:publishDesktopPublicationToMavenRepository")
+tasks.register("publishComposeJbExtendedIcons", ComposePublishingTask::class) {
+    repository = "MavenRepository"
+    iconsPublications()
+}
 
-        if (!isOelPublication) {
-            dependsOnComposeTask("$it:publishAndroidDebugPublicationToMavenRepository")
-            dependsOnComposeTask("$it:publishAndroidReleasePublicationToMavenRepository")
-        }
-    }
+tasks.register("publishComposeJbExtendedIconsToMavenLocal", ComposePublishingTask::class) {
+    repository = "MavenLocal"
+    iconsPublications()
 }
 
 tasks.register("testComposeJbDesktop") {
