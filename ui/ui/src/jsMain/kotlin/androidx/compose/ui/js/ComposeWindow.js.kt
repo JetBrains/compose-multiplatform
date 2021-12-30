@@ -39,6 +39,12 @@ internal actual class ComposeWindow actual constructor(){
         layer.layer.attachTo(canvas)
         canvas.setAttribute("tabindex", "0")
         layer.layer.needRedraw()
+
+        val scale = layer.layer.contentScale
+        layer.setSize(
+            (canvas.width / scale).toInt(),
+            (canvas.height / scale).toInt()
+        )
     }
 
     /**

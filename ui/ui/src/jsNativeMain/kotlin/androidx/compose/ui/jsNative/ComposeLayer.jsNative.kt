@@ -36,6 +36,7 @@ import org.jetbrains.skiko.SkikoPointerEvent
 import org.jetbrains.skiko.SkikoGestureEvent
 import org.jetbrains.skiko.SkikoPointerEventKind
 import org.jetbrains.skiko.SkikoGestureEventKind
+import androidx.compose.ui.unit.Constraints
 
 internal class ComposeLayer {
     private var isDisposed = false
@@ -121,6 +122,10 @@ internal class ComposeLayer {
         scene.dispose()
         _initContent = null
         isDisposed = true
+    }
+
+    internal fun setSize(width: Int, height: Int) {
+        scene.constraints = Constraints(maxWidth = width, maxHeight = height)
     }
 
     fun setContent(

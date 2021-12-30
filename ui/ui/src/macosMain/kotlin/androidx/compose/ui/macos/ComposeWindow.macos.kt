@@ -23,6 +23,8 @@ import androidx.compose.ui.native.ComposeLayer
 import platform.AppKit.*
 import platform.Cocoa.*
 import platform.Foundation.*
+import platform.CoreGraphics.*
+import kotlinx.cinterop.*
 
 internal actual class ComposeWindow actual constructor(){
     val layer = ComposeLayer()
@@ -40,8 +42,10 @@ internal actual class ComposeWindow actual constructor(){
         NSWindowStyleMaskClosable or
         NSWindowStyleMaskResizable
 
+    private val contentRect = NSMakeRect(0.0, 0.0, 640.0, 480.0)
+
     private val nsWindow = NSWindow(
-        contentRect =  NSMakeRect(0.0, 0.0, 640.0, 480.0),
+        contentRect = contentRect,
         styleMask = windowStyle,
         backing =  NSBackingStoreBuffered,
         defer =  true
@@ -50,6 +54,9 @@ internal actual class ComposeWindow actual constructor(){
     init {
         layer.layer.attachTo(nsWindow)
         nsWindow.orderFrontRegardless()
+        contentRect.useContents {
+            layer.setSize(size.width.toInt(), size.height.toInt())
+        }
     }
 
     /**
