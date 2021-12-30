@@ -2,6 +2,10 @@ import org.gradle.api.tasks.testing.AbstractTestTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.compose.gradle.kotlinKarmaConfig
 
+plugins {
+    kotlin("multiplatform") apply false
+}
+
 val COMPOSE_WEB_VERSION: String by project
 val COMPOSE_REPO_USERNAME: String? by project
 val COMPOSE_REPO_KEY: String? by project
@@ -24,11 +28,15 @@ rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJ
     rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.13.1"
 }
 
-subprojects { 
+subprojects {
     apply(plugin = "maven-publish")
 
     group = "org.jetbrains.compose.web"
     version = COMPOSE_WEB_VERSION
+
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>() {
+        kotlinOptions.jvmTarget = "11"
+    }
 
     pluginManager.withPlugin("maven-publish") {
         configure<PublishingExtension> {
@@ -116,4 +124,3 @@ subprojects {
         }
     }
 }
-
