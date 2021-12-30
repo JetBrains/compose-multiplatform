@@ -443,6 +443,12 @@ The following platform-specific options are available
       (see the section `Specifying package version` for details);
     * `pkgPackageVersion = "PKG_VERSION"` — a pkg-specific package version
       (see the section `Specifying package version` for details);
+    * `packageBuildVersion = "DMG_VERSION"` — a package build version
+      (see the section `Specifying package version` for details);
+    * `dmgPackageBuildVersion = "DMG_VERSION"` — a dmg-specific package build version
+      (see the section `Specifying package version` for details);
+    * `pkgPackageBuildVersion = "PKG_VERSION"` — a pkg-specific package build version
+      (see the section `Specifying package version` for details);
     * `infoPlist` — see the section `Customizing Info.plist on macOS` for details;
 * Windows:
     * `console = true` adds a console launcher for the application;
