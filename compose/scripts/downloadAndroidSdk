@@ -22,6 +22,7 @@ downloadLinuxSDK() {
     clone ../prebuilts/fullsdk-linux/platform-tools https://android.googlesource.com/platform/prebuilts/fullsdk-linux/platform-tools master
     clone ../prebuilts/fullsdk-linux/tools https://android.googlesource.com/platform/prebuilts/fullsdk-linux/tools master
     clone ../prebuilts/fullsdk-linux/cmake https://android.googlesource.com/platform/prebuilts/cmake/linux-x86 master
+    clone ../prebuilts/fullsdk-linux/ninja https://android.googlesource.com/platform/prebuilts/ninja/linux-x86 master
 }
 
 downloadMacOsSDK() {
@@ -32,12 +33,13 @@ downloadMacOsSDK() {
     clone ../prebuilts/fullsdk-darwin/platform-tools https://android.googlesource.com/platform/prebuilts/fullsdk-darwin/platform-tools master
     clone ../prebuilts/fullsdk-darwin/tools https://android.googlesource.com/platform/prebuilts/fullsdk-darwin/tools master
     clone ../prebuilts/fullsdk-darwin/cmake https://android.googlesource.com/platform/prebuilts/cmake/darwin-x86 master
+    clone ../prebuilts/fullsdk-darwin/ninja https://android.googlesource.com/platform/prebuilts/ninja/darwin-x86 master
 }
 
 setupNativeBuildTools() {
     mkdir -p ../prebuilts/fullsdk-$1/native-build-tools/bin/
     pushd ../prebuilts/fullsdk-$1/native-build-tools/bin/
-    ln -s ../../ninja/bin/ninja .
+    ln -s ../../ninja/ninja .
     ln -s ../../cmake/bin/cmake .
     popd
 }
