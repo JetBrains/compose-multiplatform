@@ -481,7 +481,7 @@ abstract class AbstractJPackageTask @Inject constructor(
         val packageVersion = packageVersion.get()!!
         plist[PlistKeys.CFBundleShortVersionString] = packageVersion
         plist[PlistKeys.LSApplicationCategoryType] = "Unknown"
-        val packageBuildVersion = packageBuildVersion.get()!!
+        val packageBuildVersion = packageBuildVersion.orNull ?: packageVersion
         plist[PlistKeys.CFBundleVersion] = packageBuildVersion
         val year = Calendar.getInstance().get(Calendar.YEAR)
         plist[PlistKeys.NSHumanReadableCopyright] = packageCopyright.orNull
