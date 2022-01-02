@@ -547,6 +547,39 @@ fun main() {
 
 ## Obfuscation
     
-To obfuscate Compose Multiplatform JVM applications standard approach for JVM application works. Using task packageUberJarForCurrentOS one could generate JAR file which could be later obfuscated using ProGuard or R8, see for example https://stackoverflow.com/questions/64355998/proguard-example-for-gradle-java-application.
+To obfuscate Compose Multiplatform JVM applications the standard approach for JVM applications works.
+With the task `packageUberJarForCurrentOS` one could generate a JAR file which could be later obfuscated using ProGuard or R8.
 
-Also example in the document using Kotlin DSL would be better, as above link uses Groovy.
+### ProGuard example
+
+``` kotlin
+// build.gradle.kts
+
+// Add ProGuard to buildscript classpath
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.guardsquare:proguard-gradle:7.1.1") {
+            exclude("com.android.tools.build")
+        }
+    }
+}
+
+// ...
+
+// Define task to obfuscate the JAR and output to <name>.min.jar
+tasks.register<ProGuardTask>("obfuscate") {
+    val packageUberJarForCurrentOS by getting
+    dependsOn(packageUberJarForCurrentOS)
+    val files = packageUberJarForCurrentOS.outputs.files
+    injars(files)
+    outjars(files.map { file -> File(file.parentFile, "${file.nameWithoutExtension}.min.jar") })
+
+    val library = if (System.getProperty("java.version").startsWith("1.")) "lib/rt.jar" else "jmods"
+    libraryjars("${System.getProperty("java.home")}/$library")
+
+    configuration("proguard-rules.pro")
+}
+```
