@@ -26,13 +26,16 @@ class CanvasSkikoTests  {
     fun canvasNoSkikoTest() = runTest {
         composition {
             Canvas {
-                attr("height", "60")
-                attr("width", "60")
+//                attr("height", "60")
+//                attr("width", "60")
 
                 DomSideEffect { canvas ->
+                    canvas.width = 60
+                    canvas.height = 60
+
                     val ctx = canvas.getContext("2d") as CanvasRenderingContext2D
                     ctx.beginPath()
-                    ctx.rect(20.0, 20.0, 40.0, 40.0)
+                    ctx.rect(10.0, 10.0, 30.0, 30.0)
                     ctx.stroke()
                 }
             }
