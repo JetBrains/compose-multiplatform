@@ -23,17 +23,17 @@ import androidx.compose.runtime.setValue
 
 fun ElementScope<HTMLCanvasElement>.ping() {
     onWasmReady {
-        Window("whatevs") {
-            var switched by remember { mutableStateOf(false) }
-            Button(
-                modifier = Modifier.padding(16.dp),
-                onClick = {
-                    println("Button clicked!")
-                    switched = !switched
-                }
-            ) {
-                Text(if (switched) "🦑 press 🐙" else "Press me!")
-            }
-        }
+//        Window("whatevs") {
+//            var switched by remember { mutableStateOf(false) }
+//            Button(
+//                modifier = Modifier.padding(16.dp),
+//                onClick = {
+//                    println("Button clicked!")
+//                    switched = !switched
+//                }
+//            ) {
+//                Text(if (switched) "🦑 press 🐙" else "Press me!")
+//            }
+//        }
     }
 }
