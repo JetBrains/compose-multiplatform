@@ -24,6 +24,7 @@ import androidx.compose.material3.samples.AlertDialogWithIconSample
 import androidx.compose.material3.samples.ButtonSample
 import androidx.compose.material3.samples.ButtonWithIconSample
 import androidx.compose.material3.samples.CheckboxSample
+import androidx.compose.material3.samples.CircularProgressIndicatorSample
 import androidx.compose.material3.samples.ColorSchemeSample
 import androidx.compose.material3.samples.ElevatedButtonSample
 import androidx.compose.material3.samples.EnterAlwaysSmallTopAppBar
@@ -33,6 +34,7 @@ import androidx.compose.material3.samples.ExtendedFloatingActionButtonSample
 import androidx.compose.material3.samples.FilledTonalButtonSample
 import androidx.compose.material3.samples.FloatingActionButtonSample
 import androidx.compose.material3.samples.LargeFloatingActionButtonSample
+import androidx.compose.material3.samples.LinearProgressIndicatorSample
 import androidx.compose.material3.samples.NavigationBarSample
 import androidx.compose.material3.samples.NavigationBarWithOnlySelectedLabelsSample
 import androidx.compose.material3.samples.NavigationDrawerSample
@@ -258,6 +260,26 @@ val NavigationDrawerExamples = listOf(
         sourceUrl = NavigationDrawerExampleSourceUrl
     ) {
         NavigationDrawerSample()
+    }
+)
+
+private const val ProgressIndicatorsExampleDescription = "Progress indicators examples"
+private const val ProgressIndicatorsExampleSourceUrl = "$SampleSourceUrl/" +
+    "ProgressIndicatorSamples.kt"
+val ProgressIndicatorsExamples = listOf(
+    Example(
+        name = ::LinearProgressIndicatorSample.name,
+        description = ProgressIndicatorsExampleDescription,
+        sourceUrl = ProgressIndicatorsExampleSourceUrl
+    ) {
+        LinearProgressIndicatorSample()
+    },
+    Example(
+        name = ::CircularProgressIndicatorSample.name,
+        description = ProgressIndicatorsExampleDescription,
+        sourceUrl = ProgressIndicatorsExampleSourceUrl
+    ) {
+        CircularProgressIndicatorSample()
     }
 )
 
