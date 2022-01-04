@@ -93,6 +93,7 @@ internal object TextToolbarHelperMethods {
     }
 
     @RequiresApi(23)
+    @DoNotInline
     fun invalidateContentRect(actionMode: ActionMode) {
         actionMode.invalidateContentRect()
     }
