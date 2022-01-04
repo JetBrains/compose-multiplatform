@@ -20,12 +20,13 @@ dependencies {
     skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:${SKIKO_VERSION}")
 }
 
+val skikoResourcesDir = "${rootProject.buildDir}/skiko"
 val copySkikoResources by tasks.registering(Copy::class) {
     from(skikoWasm.map { zipTree(it) }) {
         include("skiko.wasm")
         include("skiko.js")
     }
-    destinationDir = file("${rootProject.buildDir}/skiko")
+    destinationDir = file(skikoResourcesDir)
 }
 
 
@@ -37,6 +38,8 @@ kotlin {
 
     sourceSets {
         val jsMain by getting {
+            resources.srcDirs(skikoResourcesDir)
+
             dependencies {
                 implementation(compose.web.core)
                 implementation(compose.runtime)
