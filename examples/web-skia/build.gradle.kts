@@ -12,6 +12,23 @@ repositories {
     google()
 }
 
+val SKIKO_VERSION: String by project
+
+val skikoWasm by configurations.creating
+
+dependencies {
+    skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:${SKIKO_VERSION}")
+}
+
+val copySkikoResources = tasks.register("copySkikoResources", Copy::class) {
+    from(skikoWasm.map { zipTree(it) }) {
+        include("skiko.wasm")
+        include("skiko.js")
+    }
+    destinationDir = file("${rootProject.buildDir}/skiko")
+}
+
+
 kotlin {
     js(IR) {
         browser()
