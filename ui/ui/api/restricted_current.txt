@@ -1930,6 +1930,12 @@ package androidx.compose.ui.layout {
     method public static androidx.compose.ui.Modifier layout(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.MeasureScope,? super androidx.compose.ui.layout.Measurable,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measure);
   }
 
+  public final class LookaheadLayoutCoordinatesKt {
+  }
+
+  public final class LookaheadLayoutKt {
+  }
+
   public interface Measurable extends androidx.compose.ui.layout.IntrinsicMeasurable {
     method public androidx.compose.ui.layout.Placeable measure(long constraints);
   }
@@ -2214,6 +2220,12 @@ package androidx.compose.ui.node {
   }
 
   public final class LayoutNodeKt {
+  }
+
+  public final class LayoutNodeLayoutDelegateKt {
+  }
+
+  public final class ModifiedLayoutNodeKt {
   }
 
   public final class Ref<T> {

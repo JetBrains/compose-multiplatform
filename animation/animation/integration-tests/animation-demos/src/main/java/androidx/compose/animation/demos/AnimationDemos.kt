@@ -54,6 +54,20 @@ val AnimationDemos = DemoCategory(
             )
         ),
         DemoCategory(
+            "\uD83E\uDD7C\uD83E\uDDD1\u200D\uD83D\uDD2C Layout Animation Demos",
+            listOf(
+                ComposableDemo("Crane Nested Shared Element") { CraneDemo() },
+                ComposableDemo("Screen Size Change Demo") { ScreenSizeChangeDemo() },
+                ComposableDemo("Lookahead With Movable Content") {
+                    LookaheadWithMovableContentDemo()
+                },
+                ComposableDemo("Lookahead With Alignment Lines") {
+                    LookaheadLayoutWithAlignmentLinesDemo()
+                },
+                ComposableDemo("Flow Row Lookahead") { LookaheadMeasurePlaceDemo() },
+            )
+        ),
+        DemoCategory(
             "Suspend Animation Demos",
             listOf(
                 ComposableDemo("Animated scrolling") { FancyScrollingDemo() },

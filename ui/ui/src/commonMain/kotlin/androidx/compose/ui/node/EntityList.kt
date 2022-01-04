@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.layout.OnPlacedModifier
 import androidx.compose.ui.layout.OnRemeasuredModifier
+import androidx.compose.ui.layout.LookaheadOnPlacedModifier
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.semantics.SemanticsEntity
 import androidx.compose.ui.semantics.SemanticsModifier
@@ -59,12 +60,16 @@ internal value class EntityList(
     /**
      * Add [LayoutNodeEntity] values that must be added after the LayoutModifier.
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     fun addAfterLayoutModifier(layoutNodeWrapper: LayoutNodeWrapper, modifier: Modifier) {
         if (modifier is OnPlacedModifier) {
             add(SimpleEntity(layoutNodeWrapper, modifier), OnPlacedEntityType.index)
         }
         if (modifier is OnRemeasuredModifier) {
             add(SimpleEntity(layoutNodeWrapper, modifier), RemeasureEntityType.index)
+        }
+        if (modifier is LookaheadOnPlacedModifier) {
+            add(SimpleEntity(layoutNodeWrapper, modifier), LookaheadOnPlacedEntityType.index)
         }
     }
 
@@ -144,12 +149,16 @@ internal value class EntityList(
         val SemanticsEntityType = EntityType<SemanticsEntity, SemanticsModifier>(2)
         val ParentDataEntityType =
             EntityType<SimpleEntity<ParentDataModifier>, ParentDataModifier>(3)
-        @OptIn(ExperimentalComposeUiApi::class)
         val OnPlacedEntityType =
             EntityType<SimpleEntity<OnPlacedModifier>, OnPlacedModifier>(4)
         val RemeasureEntityType =
             EntityType<SimpleEntity<OnRemeasuredModifier>, OnRemeasuredModifier>(5)
+        @OptIn(ExperimentalComposeUiApi::class)
+        val LookaheadOnPlacedEntityType =
+            EntityType<SimpleEntity<LookaheadOnPlacedModifier>, LookaheadOnPlacedModifier>(
+                6
+            )
 
-        private const val TypeCount = 6
+        private const val TypeCount = 7
     }
 }

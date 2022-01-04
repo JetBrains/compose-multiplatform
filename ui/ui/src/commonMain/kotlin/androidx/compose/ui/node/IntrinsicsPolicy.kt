@@ -16,8 +16,9 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.layout.MeasurePolicy
 
 /**
@@ -26,39 +27,46 @@ import androidx.compose.ui.layout.MeasurePolicy
  * result of these intrinsic measurements have their own layout recalculated.
  */
 internal class IntrinsicsPolicy(val layoutNode: LayoutNode) {
-    private var measurePolicyState: MutableState<MeasurePolicy>? = null
-
-    private var pendingMeasurePolicy: MeasurePolicy? = null
+    private var measurePolicyState: MeasurePolicy? by mutableStateOf(null)
 
     fun updateFrom(measurePolicy: MeasurePolicy) {
-        if (measurePolicyState != null) {
-            measurePolicyState!!.value = measurePolicy
-        } else {
-            pendingMeasurePolicy = measurePolicy
-        }
+        measurePolicyState = measurePolicy
     }
 
     fun minIntrinsicWidth(height: Int) = with(measurePolicyFromState()) {
-        layoutNode.measureScope.minIntrinsicWidth(layoutNode.children, height)
+        layoutNode.measureScope.minIntrinsicWidth(layoutNode.childMeasurables, height)
     }
 
     fun minIntrinsicHeight(width: Int) = with(measurePolicyFromState()) {
-        layoutNode.measureScope.minIntrinsicHeight(layoutNode.children, width)
+        layoutNode.measureScope.minIntrinsicHeight(layoutNode.childMeasurables, width)
     }
 
     fun maxIntrinsicWidth(height: Int) = with(measurePolicyFromState()) {
-        layoutNode.measureScope.maxIntrinsicWidth(layoutNode.children, height)
+        layoutNode.measureScope.maxIntrinsicWidth(layoutNode.childMeasurables, height)
     }
 
     fun maxIntrinsicHeight(width: Int) = with(measurePolicyFromState()) {
-        layoutNode.measureScope.maxIntrinsicHeight(layoutNode.children, width)
+        layoutNode.measureScope.maxIntrinsicHeight(layoutNode.childMeasurables, width)
+    }
+
+    fun minLookaheadIntrinsicWidth(height: Int) = with(measurePolicyFromState()) {
+        layoutNode.measureScope.minIntrinsicWidth(layoutNode.childLookaheadMeasurables, height)
+    }
+
+    fun minLookaheadIntrinsicHeight(width: Int) = with(measurePolicyFromState()) {
+        layoutNode.measureScope.minIntrinsicHeight(layoutNode.childLookaheadMeasurables, width)
+    }
+
+    fun maxLookaheadIntrinsicWidth(height: Int) = with(measurePolicyFromState()) {
+        layoutNode.measureScope.maxIntrinsicWidth(layoutNode.childLookaheadMeasurables, height)
+    }
+
+    fun maxLookaheadIntrinsicHeight(width: Int) = with(measurePolicyFromState()) {
+        layoutNode.measureScope.maxIntrinsicHeight(layoutNode.childLookaheadMeasurables, width)
     }
 
     private fun measurePolicyFromState(): MeasurePolicy {
-        val currentState = measurePolicyState
-            ?: mutableStateOf(pendingMeasurePolicy ?: error(NoPolicyError))
-        measurePolicyState = currentState
-        return currentState.value
+        return measurePolicyState ?: error(NoPolicyError)
     }
 
     private companion object {

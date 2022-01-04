@@ -647,7 +647,7 @@ class Transition<S> @PublishedApi internal constructor(
         val typeConverter: TwoWayConverter<T, V>,
         val label: String
     ) {
-        internal var data: DeferredAnimationData<T, V>? = null
+        internal var data: DeferredAnimationData<T, V>? by mutableStateOf(null)
 
         internal inner class DeferredAnimationData<T, V : AnimationVector>(
             val animation: Transition<S>.TransitionAnimationState<T, V>,

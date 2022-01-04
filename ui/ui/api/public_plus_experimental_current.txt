@@ -2069,6 +2069,22 @@ package androidx.compose.ui.layout {
     method public static androidx.compose.ui.Modifier layout(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.MeasureScope,? super androidx.compose.ui.layout.Measurable,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measure);
   }
 
+  @androidx.compose.ui.ExperimentalComposeUiApi public sealed interface LookaheadLayoutCoordinates extends androidx.compose.ui.layout.LayoutCoordinates {
+    method public long localLookaheadPositionOf(androidx.compose.ui.layout.LookaheadLayoutCoordinates sourceCoordinates, optional long relativeToSource);
+  }
+
+  public final class LookaheadLayoutCoordinatesKt {
+  }
+
+  public final class LookaheadLayoutKt {
+    method @androidx.compose.runtime.Composable @androidx.compose.ui.ExperimentalComposeUiApi @androidx.compose.ui.UiComposable public static void LookaheadLayout(kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.LookaheadLayoutScope,kotlin.Unit> content, optional androidx.compose.ui.Modifier modifier, androidx.compose.ui.layout.MeasurePolicy measurePolicy);
+  }
+
+  @androidx.compose.ui.ExperimentalComposeUiApi public interface LookaheadLayoutScope {
+    method public androidx.compose.ui.Modifier intermediateLayout(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function4<? super androidx.compose.ui.layout.MeasureScope,? super androidx.compose.ui.layout.Measurable,? super androidx.compose.ui.unit.Constraints,? super androidx.compose.ui.unit.IntSize,? extends androidx.compose.ui.layout.MeasureResult> measure);
+    method public androidx.compose.ui.Modifier onPlaced(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function2<? super androidx.compose.ui.layout.LookaheadLayoutCoordinates,? super androidx.compose.ui.layout.LookaheadLayoutCoordinates,kotlin.Unit> onPlaced);
+  }
+
   public interface Measurable extends androidx.compose.ui.layout.IntrinsicMeasurable {
     method public androidx.compose.ui.layout.Placeable measure(long constraints);
   }
@@ -2336,6 +2352,12 @@ package androidx.compose.ui.node {
   }
 
   public final class LayoutNodeKt {
+  }
+
+  public final class LayoutNodeLayoutDelegateKt {
+  }
+
+  public final class ModifiedLayoutNodeKt {
   }
 
   public final class Ref<T> {

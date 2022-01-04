@@ -54,8 +54,8 @@ import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.WindowInfo
 import androidx.compose.ui.semantics.SemanticsConfiguration
-import androidx.compose.ui.semantics.SemanticsModifier
 import androidx.compose.ui.semantics.SemanticsEntity
+import androidx.compose.ui.semantics.SemanticsModifier
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.TextInputService
@@ -731,6 +731,7 @@ class LayoutNodeTest {
                 constraints: Constraints
             ) = layout(0, 0) {}
         }
+
         val layoutNode = LayoutNode()
 
         layoutNode.modifier = TestModifier()
@@ -2192,6 +2193,7 @@ class LayoutNodeTest {
                     placeable.placeRelative(IntOffset.Zero)
                 }
             }
+
             override fun ContentDrawScope.draw() {
                 drawContent()
             }
@@ -2283,9 +2285,11 @@ private class MockOwner(
         get() = TODO("Not yet implemented")
     override val textToolbar: TextToolbar
         get() = TODO("Not yet implemented")
+
     @OptIn(ExperimentalComposeUiApi::class)
     override val autofillTree: AutofillTree
         get() = TODO("Not yet implemented")
+
     @OptIn(ExperimentalComposeUiApi::class)
     override val autofill: Autofill?
         get() = TODO("Not yet implemented")
@@ -2299,6 +2303,7 @@ private class MockOwner(
         get() = TODO("Not yet implemented")
     override val windowInfo: WindowInfo
         get() = TODO("Not yet implemented")
+
     @Deprecated(
         "fontLoader is deprecated, use fontFamilyResolver",
         replaceWith = ReplaceWith("fontFamilyResolver")
@@ -2313,12 +2318,26 @@ private class MockOwner(
     override var showLayoutBounds: Boolean = false
     override val snapshotObserver = OwnerSnapshotObserver { it.invoke() }
 
-    override fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean) {
+    override fun onRequestMeasure(
+        layoutNode: LayoutNode,
+        affectsLookahead: Boolean,
+        forceRequest: Boolean
+    ) {
         onRequestMeasureParams += layoutNode
+        if (affectsLookahead) {
+            layoutNode.markLookaheadMeasurePending()
+        }
         layoutNode.markMeasurePending()
     }
 
-    override fun onRequestRelayout(layoutNode: LayoutNode, forceRequest: Boolean) {
+    override fun onRequestRelayout(
+        layoutNode: LayoutNode,
+        affectsLookahead: Boolean,
+        forceRequest: Boolean
+    ) {
+        if (affectsLookahead) {
+            layoutNode.markLookaheadLayoutPending()
+        }
         layoutNode.markLayoutPending()
     }
 
