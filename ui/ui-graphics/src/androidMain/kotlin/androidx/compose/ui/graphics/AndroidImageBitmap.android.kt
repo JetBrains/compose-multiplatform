@@ -19,6 +19,7 @@ package androidx.compose.ui.graphics
 import android.graphics.Bitmap
 import android.os.Build
 import android.util.DisplayMetrics
+import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.colorspace.ColorSpace
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
@@ -182,94 +183,98 @@ internal fun Bitmap.Config.toImageConfig(): ImageBitmapConfig {
  * Separate class to contain all API calls that require API level 26 to assist in dead code
  * elimination during compilation time
  */
-private class Api26Bitmap {
+@RequiresApi(Build.VERSION_CODES.O)
+private object Api26Bitmap {
+    @DoNotInline
+    @JvmStatic
+    internal fun createBitmap(
+        width: Int,
+        height: Int,
+        bitmapConfig: ImageBitmapConfig,
+        hasAlpha: Boolean,
+        colorSpace: ColorSpace
+    ): Bitmap {
+        // Note intentionally ignoring density in all cases
+        return Bitmap.createBitmap(
+            null,
+            width,
+            height,
+            bitmapConfig.toBitmapConfig(),
+            hasAlpha,
+            colorSpace.toFrameworkColorSpace()
+        )
+    }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    companion object {
+    @DoNotInline
+    @JvmStatic
+    internal fun Bitmap.composeColorSpace() =
+        colorSpace?.composeColorSpace() ?: ColorSpaces.Srgb
 
-        internal fun createBitmap(
-            width: Int,
-            height: Int,
-            bitmapConfig: ImageBitmapConfig,
-            hasAlpha: Boolean,
-            colorSpace: ColorSpace
-        ): Bitmap {
-            // Note intentionally ignoring density in all cases
-            return Bitmap.createBitmap(
-                null,
-                width,
-                height,
-                bitmapConfig.toBitmapConfig(),
-                hasAlpha,
-                colorSpace.toFrameworkColorSpace()
-            )
+    @DoNotInline
+    @JvmStatic
+    internal fun ColorSpace.toFrameworkColorSpace(): android.graphics.ColorSpace {
+        val frameworkNamedSpace = when (this) {
+            ColorSpaces.Srgb -> android.graphics.ColorSpace.Named.SRGB
+            ColorSpaces.Aces -> android.graphics.ColorSpace.Named.ACES
+            ColorSpaces.Acescg -> android.graphics.ColorSpace.Named.ACESCG
+            ColorSpaces.AdobeRgb -> android.graphics.ColorSpace.Named.ADOBE_RGB
+            ColorSpaces.Bt2020 -> android.graphics.ColorSpace.Named.BT2020
+            ColorSpaces.Bt709 -> android.graphics.ColorSpace.Named.BT709
+            ColorSpaces.CieLab -> android.graphics.ColorSpace.Named.CIE_LAB
+            ColorSpaces.CieXyz -> android.graphics.ColorSpace.Named.CIE_XYZ
+            ColorSpaces.DciP3 -> android.graphics.ColorSpace.Named.DCI_P3
+            ColorSpaces.DisplayP3 -> android.graphics.ColorSpace.Named.DISPLAY_P3
+            ColorSpaces.ExtendedSrgb -> android.graphics.ColorSpace.Named.EXTENDED_SRGB
+            ColorSpaces.LinearExtendedSrgb ->
+                android.graphics.ColorSpace.Named.LINEAR_EXTENDED_SRGB
+            ColorSpaces.LinearSrgb -> android.graphics.ColorSpace.Named.LINEAR_SRGB
+            ColorSpaces.Ntsc1953 -> android.graphics.ColorSpace.Named.NTSC_1953
+            ColorSpaces.ProPhotoRgb -> android.graphics.ColorSpace.Named.PRO_PHOTO_RGB
+            ColorSpaces.SmpteC -> android.graphics.ColorSpace.Named.SMPTE_C
+            else -> android.graphics.ColorSpace.Named.SRGB
         }
+        return android.graphics.ColorSpace.get(frameworkNamedSpace)
+    }
 
-        internal fun Bitmap.composeColorSpace() =
-            colorSpace?.composeColorSpace() ?: ColorSpaces.Srgb
-
-        internal fun ColorSpace.toFrameworkColorSpace(): android.graphics.ColorSpace {
-            val frameworkNamedSpace = when (this) {
-                ColorSpaces.Srgb -> android.graphics.ColorSpace.Named.SRGB
-                ColorSpaces.Aces -> android.graphics.ColorSpace.Named.ACES
-                ColorSpaces.Acescg -> android.graphics.ColorSpace.Named.ACESCG
-                ColorSpaces.AdobeRgb -> android.graphics.ColorSpace.Named.ADOBE_RGB
-                ColorSpaces.Bt2020 -> android.graphics.ColorSpace.Named.BT2020
-                ColorSpaces.Bt709 -> android.graphics.ColorSpace.Named.BT709
-                ColorSpaces.CieLab -> android.graphics.ColorSpace.Named.CIE_LAB
-                ColorSpaces.CieXyz -> android.graphics.ColorSpace.Named.CIE_XYZ
-                ColorSpaces.DciP3 -> android.graphics.ColorSpace.Named.DCI_P3
-                ColorSpaces.DisplayP3 -> android.graphics.ColorSpace.Named.DISPLAY_P3
-                ColorSpaces.ExtendedSrgb -> android.graphics.ColorSpace.Named.EXTENDED_SRGB
-                ColorSpaces.LinearExtendedSrgb ->
-                    android.graphics.ColorSpace.Named.LINEAR_EXTENDED_SRGB
-                ColorSpaces.LinearSrgb -> android.graphics.ColorSpace.Named.LINEAR_SRGB
-                ColorSpaces.Ntsc1953 -> android.graphics.ColorSpace.Named.NTSC_1953
-                ColorSpaces.ProPhotoRgb -> android.graphics.ColorSpace.Named.PRO_PHOTO_RGB
-                ColorSpaces.SmpteC -> android.graphics.ColorSpace.Named.SMPTE_C
-                else -> android.graphics.ColorSpace.Named.SRGB
-            }
-            return android.graphics.ColorSpace.get(frameworkNamedSpace)
-        }
-
-        internal fun android.graphics.ColorSpace.composeColorSpace(): ColorSpace {
-            return when (this) {
-                android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.SRGB) ->
-                    ColorSpaces.Srgb
-                android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.ACES) ->
-                    ColorSpaces.Aces
-                android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.ACESCG) ->
-                    ColorSpaces.Acescg
-                android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.ADOBE_RGB) ->
-                    ColorSpaces.AdobeRgb
-                android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.BT2020) ->
-                    ColorSpaces.Bt2020
-                android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.BT709) ->
-                    ColorSpaces.Bt709
-                android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.CIE_LAB) ->
-                    ColorSpaces.CieLab
-                android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.CIE_XYZ) ->
-                    ColorSpaces.CieXyz
-                android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.DCI_P3) ->
-                    ColorSpaces.DciP3
-                android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.DISPLAY_P3) ->
-                    ColorSpaces.DisplayP3
-                android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.EXTENDED_SRGB) ->
-                    ColorSpaces.ExtendedSrgb
-                android.graphics.ColorSpace.get(
-                    android.graphics.ColorSpace.Named.LINEAR_EXTENDED_SRGB
-                ) ->
-                    ColorSpaces.LinearExtendedSrgb
-                android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.LINEAR_SRGB) ->
-                    ColorSpaces.LinearSrgb
-                android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.NTSC_1953) ->
-                    ColorSpaces.Ntsc1953
-                android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.PRO_PHOTO_RGB) ->
-                    ColorSpaces.ProPhotoRgb
-                android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.SMPTE_C) ->
-                    ColorSpaces.SmpteC
-                else -> ColorSpaces.Srgb
-            }
+    @DoNotInline
+    @JvmStatic
+    internal fun android.graphics.ColorSpace.composeColorSpace(): ColorSpace {
+        return when (this) {
+            android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.SRGB) ->
+                ColorSpaces.Srgb
+            android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.ACES) ->
+                ColorSpaces.Aces
+            android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.ACESCG) ->
+                ColorSpaces.Acescg
+            android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.ADOBE_RGB) ->
+                ColorSpaces.AdobeRgb
+            android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.BT2020) ->
+                ColorSpaces.Bt2020
+            android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.BT709) ->
+                ColorSpaces.Bt709
+            android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.CIE_LAB) ->
+                ColorSpaces.CieLab
+            android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.CIE_XYZ) ->
+                ColorSpaces.CieXyz
+            android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.DCI_P3) ->
+                ColorSpaces.DciP3
+            android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.DISPLAY_P3) ->
+                ColorSpaces.DisplayP3
+            android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.EXTENDED_SRGB) ->
+                ColorSpaces.ExtendedSrgb
+            android.graphics.ColorSpace.get(
+                android.graphics.ColorSpace.Named.LINEAR_EXTENDED_SRGB
+            ) ->
+                ColorSpaces.LinearExtendedSrgb
+            android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.LINEAR_SRGB) ->
+                ColorSpaces.LinearSrgb
+            android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.NTSC_1953) ->
+                ColorSpaces.Ntsc1953
+            android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.PRO_PHOTO_RGB) ->
+                ColorSpaces.ProPhotoRgb
+            android.graphics.ColorSpace.get(android.graphics.ColorSpace.Named.SMPTE_C) ->
+                ColorSpaces.SmpteC
+            else -> ColorSpaces.Srgb
         }
     }
 }
