@@ -20,7 +20,7 @@ dependencies {
     skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:${SKIKO_VERSION}")
 }
 
-val copySkikoResources = tasks.register("copySkikoResources", Copy::class) {
+val copySkikoResources by tasks.registering(Copy::class) {
     from(skikoWasm.map { zipTree(it) }) {
         include("skiko.wasm")
         include("skiko.js")
