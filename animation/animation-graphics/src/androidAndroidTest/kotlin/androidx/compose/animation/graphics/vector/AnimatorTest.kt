@@ -131,13 +131,41 @@ class AnimatorTest {
         )
     }
 
+    @Test
+    fun offsetAnimators() {
+        verifyAnimator(
+            AnimatorSet(
+                animators = listOf(
+                    objectAnimator(
+                        propertyName = "translateX",
+                        duration = 500,
+                        keyframes = listOf(
+                            Keyframe(0f, 0f, LinearEasing),
+                            Keyframe(1f, 500f, LinearEasing),
+                        )
+                    ),
+                    objectAnimator(
+                        propertyName = "translateX",
+                        duration = 500,
+                        startDelay = 500,
+                        keyframes = listOf(
+                            Keyframe(0f, 500f, LinearEasing),
+                            Keyframe(1f, 1000f, LinearEasing),
+                        )
+                    )
+                ),
+                ordering = Ordering.Together
+            )
+        )
+    }
+
     @OptIn(InternalAnimationApi::class, ExperimentalComposeUiApi::class)
     private fun verifyAnimator(a: Animator) {
         val isAtEnd = mutableStateOf(false)
         val config = StateVectorConfig()
         rule.setContent {
             val transition = updateTransition(isAtEnd.value, label = "translateX")
-            a.Configure(transition, config, 1000, 0)
+            a.Configure(transition, config, 1000)
             if (transition.isRunning) {
                 assertThat(config.getOrDefault(VectorProperty.TranslateX, -1f))
                     .isWithin(tolerance)
