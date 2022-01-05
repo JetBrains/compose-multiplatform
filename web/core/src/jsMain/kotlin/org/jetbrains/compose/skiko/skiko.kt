@@ -8,16 +8,12 @@ package org.jetbrains.compose.web.skiko
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.window.ComposeCanvas
 import org.jetbrains.compose.web.dom.ElementScope
-import org.jetbrains.skiko.wasm.onWasmReady
 import org.w3c.dom.HTMLCanvasElement
 
 @Composable
 fun ElementScope<HTMLCanvasElement>.skiko(block: @Composable () -> Unit) {
-//    onWasmReady {
-        DomSideEffect { canvas ->
-            ComposeCanvas(canvas).apply {
-                setContent(block)
-            }
-        }
-//    }
+    DomSideEffect { canvas ->
+        val skikoCanvas = ComposeCanvas(canvas)
+        skikoCanvas.setContent(block)
+    }
 }
