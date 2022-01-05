@@ -809,4 +809,112 @@ class MutableVectorTest {
         l.sortWith(Comparator { p0, p1 -> p0 - p1 })
         assertTrue(l.contentEquals(list))
     }
+
+    @Test(IndexOutOfBoundsException::class)
+    fun list_outOfBounds_Get_Below() {
+        val l = mutableVectorOf(1, 2, 3, 4).asMutableList()
+        l[-1]
+    }
+
+    @Test(IndexOutOfBoundsException::class)
+    fun sublist_outOfBounds_Get_Below() {
+        val l = mutableVectorOf(1, 2, 3, 4).asMutableList().subList(1, 2)
+        l[-1]
+    }
+
+    @Test(IndexOutOfBoundsException::class)
+    fun list_outOfBounds_Get_Above() {
+        val l = mutableVectorOf(1, 2, 3, 4).asMutableList()
+        l[4]
+    }
+
+    @Test(IndexOutOfBoundsException::class)
+    fun sublist_outOfBounds_Get_Above() {
+        val l = mutableVectorOf(1, 2, 3, 4).asMutableList().subList(1, 2)
+        l[1]
+    }
+
+    @Test(IndexOutOfBoundsException::class)
+    fun list_outOfBounds_RemoveAt_Below() {
+        val l = mutableVectorOf(0, 1, 2, 3).asMutableList()
+        l.removeAt(-1)
+    }
+
+    @Test(IndexOutOfBoundsException::class)
+    fun sublist_outOfBounds_RemoveAt_Below() {
+        val l = mutableVectorOf(0, 1, 2, 3).asMutableList().subList(1, 2)
+        l.removeAt(-1)
+    }
+
+    @Test(IndexOutOfBoundsException::class)
+    fun list_outOfBounds_RemoveAt_Above() {
+        val l = mutableVectorOf(0, 1, 2, 3).asMutableList()
+        l.removeAt(4)
+    }
+
+    @Test(IndexOutOfBoundsException::class)
+    fun sublist_outOfBounds_RemoveAt_Above() {
+        val l = mutableVectorOf(0, 1, 2, 3).asMutableList().subList(1, 2)
+        l.removeAt(1)
+    }
+
+    @Test(IndexOutOfBoundsException::class)
+    fun list_outOfBounds_Set_Below() {
+        val l = mutableVectorOf(0, 1, 2, 3).asMutableList()
+        l[-1] = 1
+    }
+
+    @Test(IndexOutOfBoundsException::class)
+    fun sublist_outOfBounds_Set_Below() {
+        val l = mutableVectorOf(0, 1, 2, 3).asMutableList().subList(1, 2)
+        l[-1] = 1
+    }
+
+    @Test(IndexOutOfBoundsException::class)
+    fun list_outOfBounds_Set_Above() {
+        val l = mutableVectorOf(0, 1, 2, 3).asMutableList()
+        l[4] = 1
+    }
+
+    @Test(IndexOutOfBoundsException::class)
+    fun sublist_outOfBounds_Set_Above() {
+        val l = mutableVectorOf(0, 1, 2, 3).asMutableList().subList(1, 2)
+        l[1] = 1
+    }
+
+    @Test(IndexOutOfBoundsException::class)
+    fun list_outOfBounds_SubList_Below() {
+        val l = mutableVectorOf(0, 1, 2, 3).asMutableList()
+        l.subList(-1, 1)
+    }
+
+    @Test(IndexOutOfBoundsException::class)
+    fun sublist_outOfBounds_SubList_Below() {
+        val l = mutableVectorOf(0, 1, 2, 3).asMutableList().subList(1, 2)
+        l.subList(-1, 1)
+    }
+
+    @Test(IndexOutOfBoundsException::class)
+    fun list_outOfBounds_SubList_Above() {
+        val l = mutableVectorOf(0, 1, 2, 3).asMutableList()
+        l.subList(5, 5)
+    }
+
+    @Test(IndexOutOfBoundsException::class)
+    fun sublist_outOfBounds_SubList_Above() {
+        val l = mutableVectorOf(0, 1, 2, 3).asMutableList().subList(1, 2)
+        l.subList(1, 2)
+    }
+
+    @Test(IllegalArgumentException::class)
+    fun list_outOfBounds_SubList_Order() {
+        val l = mutableVectorOf(0, 1, 2, 3).asMutableList()
+        l.subList(3, 2)
+    }
+
+    @Test(IllegalArgumentException::class)
+    fun sublist_outOfBounds_SubList_Order() {
+        val l = mutableVectorOf(0, 1, 2, 3).asMutableList().subList(1, 2)
+        l.subList(1, 0)
+    }
 }
