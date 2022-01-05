@@ -536,8 +536,8 @@ package androidx.compose.ui.text.font {
   }
 
   @androidx.compose.runtime.Immutable public abstract sealed class FontFamily {
-    method public final boolean getCanLoadSynchronously();
-    property public final boolean canLoadSynchronously;
+    method @Deprecated public final boolean getCanLoadSynchronously();
+    property @Deprecated public final boolean canLoadSynchronously;
     field public static final androidx.compose.ui.text.font.FontFamily.Companion Companion;
   }
 
