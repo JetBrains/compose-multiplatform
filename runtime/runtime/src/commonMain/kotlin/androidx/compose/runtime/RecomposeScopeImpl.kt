@@ -33,6 +33,17 @@ interface RecomposeScope {
     fun invalidate()
 }
 
+/**
+ * Used by internal tooling to identify a composable in a scope.
+ */
+@InternalComposeApi
+interface InternalRecomposeScope {
+    /**
+     * A value that identifies a Group independently of movement caused by recompositions.
+     */
+    val identity: Any?
+}
+
 private const val UsedFlag = 0x01
 private const val DefaultsInScopeFlag = 0x02
 private const val DefaultsInvalidFlag = 0x04
@@ -46,9 +57,10 @@ private const val RereadingFlag = 0x20
  * stored in [anchor] and call [block] when recomposition is requested. It is created by
  * [Composer.startRestartGroup] and is used to track how to restart the group.
  */
+@OptIn(InternalComposeApi::class)
 internal class RecomposeScopeImpl(
     var composition: CompositionImpl?
-) : ScopeUpdateScope, RecomposeScope {
+) : ScopeUpdateScope, RecomposeScope, InternalRecomposeScope {
 
     private var flags: Int = 0
 
@@ -57,6 +69,9 @@ internal class RecomposeScopeImpl(
      * recompose scope.
      */
     var anchor: Anchor? = null
+
+    override val identity: Any?
+        get() = anchor
 
     /**
      * Return whether the scope is valid. A scope becomes invalid when the slots it updates are
