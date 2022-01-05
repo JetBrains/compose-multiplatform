@@ -29,6 +29,9 @@ val copySkikoResources by tasks.registering(Copy::class) {
     destinationDir = file(skikoResourcesDir)
 }
 
+tasks.withType<ProcessResources> {
+    dependsOn(copySkikoResources)
+}
 
 kotlin {
     js(IR) {
