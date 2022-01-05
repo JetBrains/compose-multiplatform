@@ -27,8 +27,7 @@ import androidx.compose.ui.text.fastDistinctBy
  * @see GenericFontFamily
  */
 @Immutable
-// TODO Unused parameter canLoadSynchronously
-sealed class FontFamily(val canLoadSynchronously: Boolean) {
+sealed class FontFamily(canLoadSynchronously: Boolean) {
     companion object {
         /**
          * The platform default font.
@@ -74,6 +73,13 @@ sealed class FontFamily(val canLoadSynchronously: Boolean) {
          */
         val Cursive = GenericFontFamily("cursive")
     }
+
+    @Suppress("CanBePrimaryConstructorProperty") // for deprecation
+    @get:Deprecated(
+        message = "Unused property that has no meaning. Do not use.",
+        level = DeprecationLevel.ERROR
+    )
+    val canLoadSynchronously = canLoadSynchronously
 }
 
 /**
