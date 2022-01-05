@@ -941,6 +941,15 @@ interface Composer {
         val Empty = object {
             override fun toString() = "Empty"
         }
+
+        /**
+         * Experimental API for specifying a tracer used for instrumenting frequent
+         * operations, e.g. recompositions.
+         */
+        @ExperimentalComposeApi
+        fun setTracer(tracer: CompositionTracer) {
+            compositionTracer = tracer
+        }
     }
 }
 
@@ -991,6 +1000,28 @@ fun sourceInformation(composer: Composer, sourceInformation: String) {
 fun sourceInformationMarkerStart(composer: Composer, key: Int, sourceInformation: String) {
     composer.sourceInformationMarkerStart(key, sourceInformation)
 }
+
+@ExperimentalComposeApi
+interface CompositionTracer {
+    fun traceEventStart(key: Int, info: String): Unit
+    fun traceEventEnd(): Unit
+}
+
+@OptIn(ExperimentalComposeApi::class)
+private var compositionTracer: CompositionTracer? = null
+
+@OptIn(ExperimentalComposeApi::class)
+@ComposeCompilerApi
+fun isTraceInProgress(): Boolean = compositionTracer != null
+
+@OptIn(ExperimentalComposeApi::class)
+@ComposeCompilerApi
+fun traceEventStart(key: Int, info: String): Unit =
+    compositionTracer?.traceEventStart(key, info) ?: Unit
+
+@OptIn(ExperimentalComposeApi::class)
+@ComposeCompilerApi
+fun traceEventEnd(): Unit = compositionTracer?.traceEventEnd() ?: Unit
 
 /**
  * A Compose internal function. DO NOT call directly.

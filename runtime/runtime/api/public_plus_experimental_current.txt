@@ -147,14 +147,18 @@ package androidx.compose.runtime {
 
   public static final class Composer.Companion {
     method public Object getEmpty();
+    method @androidx.compose.runtime.ExperimentalComposeApi public void setTracer(androidx.compose.runtime.CompositionTracer tracer);
     property public final Object Empty;
   }
 
   public final class ComposerKt {
     method @androidx.compose.runtime.ComposeCompilerApi public static inline <T> T! cache(androidx.compose.runtime.Composer, boolean invalid, kotlin.jvm.functions.Function0<? extends T> block);
+    method @androidx.compose.runtime.ComposeCompilerApi public static boolean isTraceInProgress();
     method @androidx.compose.runtime.ComposeCompilerApi public static void sourceInformation(androidx.compose.runtime.Composer composer, String sourceInformation);
     method @androidx.compose.runtime.ComposeCompilerApi public static void sourceInformationMarkerEnd(androidx.compose.runtime.Composer composer);
     method @androidx.compose.runtime.ComposeCompilerApi public static void sourceInformationMarkerStart(androidx.compose.runtime.Composer composer, int key, String sourceInformation);
+    method @androidx.compose.runtime.ComposeCompilerApi public static void traceEventEnd();
+    method @androidx.compose.runtime.ComposeCompilerApi public static void traceEventStart(int key, String info);
   }
 
   public interface Composition {
@@ -193,6 +197,11 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.Composable public static void CompositionLocalProvider(androidx.compose.runtime.CompositionLocalContext context, kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method public static <T> androidx.compose.runtime.ProvidableCompositionLocal<T> compositionLocalOf(optional androidx.compose.runtime.SnapshotMutationPolicy<T> policy, kotlin.jvm.functions.Function0<? extends T> defaultFactory);
     method public static <T> androidx.compose.runtime.ProvidableCompositionLocal<T> staticCompositionLocalOf(kotlin.jvm.functions.Function0<? extends T> defaultFactory);
+  }
+
+  @androidx.compose.runtime.ExperimentalComposeApi public interface CompositionTracer {
+    method public void traceEventEnd();
+    method public void traceEventStart(int key, String info);
   }
 
   public interface ControlledComposition extends androidx.compose.runtime.Composition {
