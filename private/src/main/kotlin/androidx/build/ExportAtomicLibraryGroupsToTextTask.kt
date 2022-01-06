@@ -32,45 +32,33 @@ import kotlin.text.Charsets.UTF_8
 
 /**
  * Task that parses the contents of a given library group file (usually [LibraryGroups]) and writes
- * them to an XML file. The XML file is then used by Lint.
+ * the groups that are atomic to a text file. The file is then used by Lint.
  */
 @CacheableTask
-abstract class ExportLibraryGroupsToXmlTask : DefaultTask() {
+abstract class ExportAtomicLibraryGroupsToTextTask : DefaultTask() {
 
     @get:[InputFile PathSensitive(PathSensitivity.NONE)]
     lateinit var libraryGroupFile: File
 
     @get:OutputFile
-    lateinit var xmlOutputFile: File
+    lateinit var textOutputFile: File
 
     @TaskAction
     fun exec() {
-        val writer: Writer = BufferedWriter(Files.newWriter(xmlOutputFile, UTF_8))
-
-        // Write XML header and outermost opening tag
-        writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-        writer.write("<libraryGroups>\n")
+        val writer: Writer = BufferedWriter(Files.newWriter(textOutputFile, UTF_8))
 
         LibraryGroups::class.memberProperties.forEach { member ->
             try {
                 val libraryGroup = member.get(LibraryGroups) as LibraryGroup
                 val groupName = libraryGroup.group
-                val isAtomic = (libraryGroup.forcedVersion != null)
 
-                // Write data for this LibraryGroup
-                writer.run {
-                    write("    <libraryGroup>\n")
-                    write("        <group>$groupName</group>\n")
-                    write("        <isAtomic>$isAtomic</isAtomic>\n")
-                    write("    </libraryGroup>\n")
+                if (libraryGroup.requireSameVersion) {
+                    writer.write("$groupName\n")
                 }
             } catch (ignore: ClassCastException) {
                 // Object isn't a LibraryGroup, skip it
             }
         }
-
-        // Write outermost closing tag and close writer
-        writer.write("<libraryGroups>\n")
         writer.close()
     }
 }

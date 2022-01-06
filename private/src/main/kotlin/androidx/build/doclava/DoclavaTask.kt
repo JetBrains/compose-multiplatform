@@ -153,10 +153,15 @@ abstract class DoclavaTask @Inject constructor(
         val args = DoclavaArgumentBuilder()
 
         // classpath
-        val classpathString = classpath!!.files.map({ f -> f.toString() }).joinToString(":")
-        args.addStringOption("cp", classpathString)
+        val classpathFile = File.createTempFile("doclavaClasspath", ".txt")
+        classpathFile.deleteOnExit()
+        classpathFile.bufferedWriter().use { writer ->
+            val classpathString = classpath!!.files.map({ f -> f.toString() }).joinToString(":")
+            writer.write(classpathString)
+        }
+        args.addStringOption("cp", "@$classpathFile")
         args.addStringOption("doclet", "com.google.doclava.Doclava")
-        args.addStringOption("docletpath", classpathString)
+        args.addStringOption("docletpath", "@$classpathFile")
 
         args.addOption("quiet")
         args.addStringOption("encoding", "UTF-8")
@@ -197,15 +202,21 @@ abstract class DoclavaTask @Inject constructor(
         args.addFileOption("d", destinationDir!!)
 
         // source files
-        for (source in sources) {
-            for (file in source) {
-                val arg = file.toString()
-                // Doclava does not know how to parse Kotlin files
-                if (!arg.endsWith(".kt")) {
-                    args.add(arg)
+        val tmpArgs = File.createTempFile("doclavaSourceArgs", ".txt")
+        tmpArgs.deleteOnExit()
+        tmpArgs.bufferedWriter().use { writer ->
+            for (source in sources) {
+                for (file in source) {
+                    val arg = file.toString()
+                    // Doclava does not know how to parse Kotlin files
+                    if (!arg.endsWith(".kt")) {
+                        writer.write(arg)
+                        writer.newLine()
+                    }
                 }
             }
         }
+        args.add("@$tmpArgs")
 
         return args.build() + extraArgumentsBuilder.build()
     }

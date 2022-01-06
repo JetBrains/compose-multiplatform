@@ -23,11 +23,12 @@ import androidx.build.dependencies.KSP_VERSION
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
@@ -79,11 +80,12 @@ abstract class SdkResourceGenerator : DefaultTask() {
     @get:InputFile
     abstract val gradleWrapperProperties: RegularFileProperty
 
-    @get:OutputFile
-    abstract val outputFile: RegularFileProperty
+    @get:OutputDirectory
+    abstract val outputDir: DirectoryProperty
 
     @TaskAction
     fun generateFile() {
+        val outputFile = outputDir.file("sdk.prop")
         outputFile.get().asFile.writer().use { writer ->
             writer.write("prebuiltsRoot=$prebuiltsRoot\n")
             writer.write("localSupportRepo=$localSupportRepo\n")
@@ -123,7 +125,7 @@ abstract class SdkResourceGenerator : DefaultTask() {
                 it.gradleWrapperProperties.set(
                     File(project.rootDir, "gradle/wrapper/gradle-wrapper.properties")
                 )
-                it.outputFile.set(File(generatedDirectory, "sdk.prop"))
+                it.outputDir.set(generatedDirectory)
                 // Copy repositories used for the library project so that it can replicate the same
                 // maven structure in test.
                 it.repositoryUrls = project.repositories.filterIsInstance<MavenArtifactRepository>()
@@ -131,12 +133,10 @@ abstract class SdkResourceGenerator : DefaultTask() {
                         it.url.toString()
                     }
             }
-            project.tasks.named("compileTestJava").configure { it.dependsOn(provider) }
-            project.tasks.named("processTestResources").configure { it.dependsOn(provider) }
 
             val extension = project.extensions.getByType<JavaPluginExtension>()
-            val resources = extension.sourceSets.getByName("test").resources
-            resources.srcDirs(setOf(resources.srcDirs, generatedDirectory))
+            val testSources = extension.sourceSets.getByName("test")
+            testSources.getOutput().dir(provider.flatMap { it.outputDir })
         }
     }
 }

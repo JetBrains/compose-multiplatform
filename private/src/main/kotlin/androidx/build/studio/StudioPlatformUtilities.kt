@@ -171,11 +171,6 @@ private class LinuxUtilities(projectRoot: File, studioInstallationDir: File) :
     }
 
     override fun StudioTask.updateJvmHeapSize() {
-        val vmoptions =
-            File(binaryDirectory, "bin/studio.vmoptions")
-        val newText = vmoptions.readText().replace(jvmHeapRegex, "-Xmx4g")
-        vmoptions.writeText(newText)
-
         val vmoptions64 =
             File(binaryDirectory, "bin/studio64.vmoptions")
         val newText64 = vmoptions64.readText().replace(jvmHeapRegex, "-Xmx8g")

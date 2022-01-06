@@ -72,6 +72,7 @@ fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
     // Create fake variant tasks since that is what is invoked by developers.
     val lintTask = tasks.named("lint")
     lintTask.configure { task ->
+        task.dependsOn(tasks.named("exportAtomicLibraryGroupsToText"))
         AffectedModuleDetector.configureTaskGuard(task)
     }
     afterEvaluate {
@@ -122,6 +123,7 @@ fun Project.configureAndroidProjectForLint(lint: Lint, extension: AndroidXExtens
                 }}"
             ).configure { task ->
                 AffectedModuleDetector.configureTaskGuard(task)
+                task.dependsOn(tasks.named("exportAtomicLibraryGroupsToText"))
             }
             tasks.named(
                 "lintAnalyze${variant.name.replaceFirstChar {
@@ -129,6 +131,7 @@ fun Project.configureAndroidProjectForLint(lint: Lint, extension: AndroidXExtens
                 }}"
             ).configure { task ->
                 AffectedModuleDetector.configureTaskGuard(task)
+                task.dependsOn(tasks.named("exportAtomicLibraryGroupsToText"))
             }
             /* TODO: uncomment when we upgrade to AGP 7.1.0-alpha04
             tasks.named("lintReport${variant.name.capitalize(Locale.US)}").configure { task ->
@@ -233,7 +236,15 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension) {
         // We run lint on each library, so we don't want transitive checking of each dependency
         checkDependencies = false
 
-        fatal.add("VisibleForTests")
+        if (
+            extension.type == LibraryType.PUBLISHED_TEST_LIBRARY ||
+            extension.type == LibraryType.INTERNAL_TEST_LIBRARY
+        ) {
+            // Test libraries are allowed to call @VisibleForTests code
+            disable.add("VisibleForTests")
+        } else {
+            fatal.add("VisibleForTests")
+        }
 
         // Disable dependency checks that suggest to change them. We want libraries to be
         // intentional with their dependency version bumps.
