@@ -116,6 +116,7 @@ private fun SpannableString.setSpanStyle(
             )
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                // TODO(seanmcq): Check for async here and uncache
                 val typeface = FontFamilyResolver.resolve(
                     resourceLoader = resourceLoader,
                     fontFamily = spanStyle.fontFamily,

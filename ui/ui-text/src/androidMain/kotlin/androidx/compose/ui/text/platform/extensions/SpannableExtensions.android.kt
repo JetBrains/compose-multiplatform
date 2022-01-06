@@ -258,6 +258,7 @@ private fun Spannable.setFontAttributes(
         fontRelatedSpanStyles
     ) { spanStyle, start, end ->
         setSpan(
+            // TODO(seanmcq): Check if it's async here and uncache
             TypefaceSpan(
                 FontFamilyResolver.resolve(
                     resourceLoader = resourceLoader,

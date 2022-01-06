@@ -52,6 +52,7 @@ internal fun AndroidTextPaint.applySpanStyle(
     }
 
     if (style.hasFontAttributes()) {
+        // TODO (seanmcq): Check if it's async here and uncache
         typeface = FontFamilyResolver.resolve(
             resourceLoader = resourceLoader,
             fontFamily = style.fontFamily,
