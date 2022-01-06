@@ -43,7 +43,7 @@ internal class LazyMeasuredLineProvider(
     private val slotsWithRemainder = availableCrossAxis % slotsPerLine
 
     // the constraints we will measure child with. the main axis is not restricted
-    private val childConstraints: (startSlot: Int, span: Int) -> Constraints = { startSlot, span ->
+    internal val childConstraints: (startSlot: Int, span: Int) -> Constraints = { startSlot, span ->
         val crossAxisSize = slotSize * span + crossAxisSpacing * (span - 1) +
             (slotsWithRemainder - startSlot).coerceIn(0, span)
         if (isVertical) {

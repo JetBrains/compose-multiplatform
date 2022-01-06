@@ -34,6 +34,7 @@ import androidx.compose.foundation.lazy.LazyGridScope
 import androidx.compose.foundation.lazy.LazyGridState
 import androidx.compose.foundation.lazy.layout.LazyLayout
 import androidx.compose.foundation.lazy.layout.LazyMeasurePolicy
+import androidx.compose.foundation.lazy.layout.rememberLazyLayoutPrefetchPolicy
 import androidx.compose.foundation.lazy.layout.rememberLazyLayoutState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -48,6 +49,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastForEach
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -104,8 +106,7 @@ internal fun LazyGrid(
         // placementAnimator
     )
 
-    // TODO(b/211849056): enable prefetching
-    // state.prefetchPolicy = rememberLazyLayoutPrefetchPolicy()
+    state.prefetchPolicy = rememberLazyLayoutPrefetchPolicy()
     val innerState = rememberLazyLayoutState().also { state.innerState = it }
 
     val itemsProvider = stateOfItemsProvider.value
@@ -260,7 +261,19 @@ private fun rememberLazyGridMeasurePolicy(
                 // placementAnimator = placementAnimator
             )
         }
-        // state.prefetchPolicy?.constraints = itemProvider.childConstraints
+        state.prefetchInfoRetriever = { line ->
+            val lineConfiguration = spanLayoutProvider.getLineConfiguration(line.value)
+            var index = ItemIndex(lineConfiguration.firstItemIndex)
+            var slot = 0
+            val result = ArrayList<Pair<Int, Constraints>>(lineConfiguration.spans.size)
+            lineConfiguration.spans.fastForEach {
+                val span = it.currentLineSpan
+                result.add(index.value to lineProvider.childConstraints(slot, span))
+                ++index
+                slot += span
+            }
+            result
+        }
 
         val firstVisibleLineIndex: LineIndex
         val firstVisibleLineScrollOffset: Int
