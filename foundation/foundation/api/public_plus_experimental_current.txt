@@ -50,6 +50,11 @@ package androidx.compose.foundation {
   public final class DarkTheme_androidKt {
   }
 
+  public final class ExcludeFromSystemGesture_androidKt {
+    method public static androidx.compose.ui.Modifier excludeFromSystemGesture(androidx.compose.ui.Modifier);
+    method public static androidx.compose.ui.Modifier excludeFromSystemGesture(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.LayoutCoordinates,androidx.compose.ui.geometry.Rect> exclusion);
+  }
+
   @kotlin.RequiresOptIn(message="This foundation API is experimental and is likely to change or be removed in the " + "future.") public @interface ExperimentalFoundationApi {
   }
 

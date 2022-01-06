@@ -47,6 +47,11 @@ package androidx.compose.foundation {
   public final class DarkTheme_androidKt {
   }
 
+  public final class ExcludeFromSystemGesture_androidKt {
+    method public static androidx.compose.ui.Modifier excludeFromSystemGesture(androidx.compose.ui.Modifier);
+    method public static androidx.compose.ui.Modifier excludeFromSystemGesture(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.LayoutCoordinates,androidx.compose.ui.geometry.Rect> exclusion);
+  }
+
   public final class FocusableKt {
     method public static androidx.compose.ui.Modifier focusable(androidx.compose.ui.Modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource? interactionSource);
   }
