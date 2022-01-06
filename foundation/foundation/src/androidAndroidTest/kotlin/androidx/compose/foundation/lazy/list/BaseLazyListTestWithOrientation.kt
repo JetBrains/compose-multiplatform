@@ -173,6 +173,12 @@ open class BaseLazyListTestWithOrientation(private val orientation: Orientation)
         }
     }
 
+    fun SemanticsNodeInteraction.scrollBy(offset: Dp) = scrollBy(
+        x = if (vertical) 0.dp else offset,
+        y = if (!vertical) 0.dp else offset,
+        density = rule.density
+    )
+
     @Composable
     fun LazyColumnOrRow(
         modifier: Modifier = Modifier,
@@ -180,6 +186,7 @@ open class BaseLazyListTestWithOrientation(private val orientation: Orientation)
         contentPadding: PaddingValues = PaddingValues(0.dp),
         reverseLayout: Boolean = false,
         flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
+        userScrollEnabled: Boolean = true,
         content: LazyListScope.() -> Unit
     ) {
         if (vertical) {
@@ -189,6 +196,7 @@ open class BaseLazyListTestWithOrientation(private val orientation: Orientation)
                 contentPadding = contentPadding,
                 reverseLayout = reverseLayout,
                 flingBehavior = flingBehavior,
+                userScrollEnabled = userScrollEnabled,
                 content = content
             )
         } else {
@@ -198,6 +206,7 @@ open class BaseLazyListTestWithOrientation(private val orientation: Orientation)
                 contentPadding = contentPadding,
                 reverseLayout = reverseLayout,
                 flingBehavior = flingBehavior,
+                userScrollEnabled = userScrollEnabled,
                 content = content
             )
         }

@@ -433,6 +433,10 @@ internal class CompositionImpl(
         parent.composeInitial(this, composable)
     }
 
+    fun invalidateGroupsWithKey(key: Int): Boolean {
+        return slotTable.invalidateGroupsWithKey(key)
+    }
+
     @Suppress("UNCHECKED_CAST")
     private fun drainPendingModificationsForCompositionLocked() {
         // Recording modifications may race for lock. If there are pending modifications
@@ -681,20 +685,23 @@ internal class CompositionImpl(
         val anchor = scope.anchor
         if (anchor == null || !slotTable.ownsAnchor(anchor) || !anchor.valid)
             return InvalidationResult.IGNORED // The scope has not yet entered the composition
-        val location = anchor.toIndexFor(slotTable)
-        if (location < 0)
+        if (!anchor.valid)
             return InvalidationResult.IGNORED // The scope was removed from the composition
-        if (isComposing && composer.tryImminentInvalidation(scope, instance)) {
-            // The invalidation was redirected to the composer.
-            return InvalidationResult.IMMINENT
-        }
+        if (!scope.canRecompose)
+            return InvalidationResult.IGNORED // The scope isn't able to be recomposed/invalidated
+        synchronized(lock) {
+            if (isComposing && composer.tryImminentInvalidation(scope, instance)) {
+                // The invalidation was redirected to the composer.
+                return InvalidationResult.IMMINENT
+            }
 
-        // invalidations[scope] containing an explicit null means it was invalidated
-        // unconditionally.
-        if (instance == null) {
-            invalidations[scope] = null
-        } else {
-            invalidations.addValue(scope, instance)
+            // invalidations[scope] containing an explicit null means it was invalidated
+            // unconditionally.
+            if (instance == null) {
+                invalidations[scope] = null
+            } else {
+                invalidations.addValue(scope, instance)
+            }
         }
 
         parent.invalidate(this)
@@ -852,6 +859,11 @@ private class HotReloader {
         internal fun simulateHotReload(context: Any) {
             loadStateAndCompose(saveStateAndDispose(context))
         }
+
+        @TestOnly
+        internal fun invalidateGroupsWithKey(key: Int): Boolean {
+            return Recomposer.invalidateGroupsWithKey(key)
+        }
     }
 }
 
@@ -860,6 +872,12 @@ private class HotReloader {
  */
 @TestOnly
 fun simulateHotReload(context: Any) = HotReloader.simulateHotReload(context)
+
+/**
+ * @suppress
+ */
+@TestOnly
+fun invalidateGroupsWithKey(key: Int) = HotReloader.invalidateGroupsWithKey(key)
 
 private fun <K : Any, V : Any> IdentityArrayMap<K, IdentityArraySet<V>?>.addValue(
     key: K,

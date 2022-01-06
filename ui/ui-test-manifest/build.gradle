@@ -29,7 +29,7 @@ dependencies {
 
 androidx {
     name = "Compose Testing manifest dependency"
-    type = LibraryType.PUBLISHED_LIBRARY
+    type = LibraryType.PUBLISHED_TEST_LIBRARY
     mavenGroup = LibraryGroups.Compose.UI
     inceptionYear = "2021"
     description = "Compose testing library that should be added as a debugImplementation dependency to add properties to the debug manifest necessary for testing an application"

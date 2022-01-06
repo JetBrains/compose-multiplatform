@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.layout
 
+import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.LayoutState
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.unit.Constraints
@@ -1229,5 +1230,56 @@ class MeasureAndLayoutDelegateTest {
         assertThat(root.first.isPlaced).isFalse()
         assertThat(root.first.first.isPlaced).isFalse()
         assertThat(root.first.first.isPlaced).isFalse()
+    }
+
+    @Test
+    fun remeasuringNodeSecondTimeWithinTheSameIteration() {
+        lateinit var node1: LayoutNode
+        lateinit var node2: LayoutNode
+        lateinit var node3: LayoutNode
+        lateinit var node4: LayoutNode
+        lateinit var node5: LayoutNode
+        val root = root {
+            size = 100
+            add(node {
+                node1 = this
+                size = 50
+                add(node {
+                    node2 = this
+                    add(node { node3 = this })
+                })
+                add(node { node4 = this })
+            })
+            add(node { node5 = this })
+        }
+
+        val delegate = createDelegate(root)
+
+        delegate.requestRemeasure(root)
+        // we change the root size so now node1 and node5 will be remeasured for the new size
+        root.size = 50
+        // we also want to remeasure node3. as node2 is not scheduled for remeasure node3 will
+        // be remeasured via owner.forceMeasureTheSubtree() logic.
+        delegate.requestRemeasure(node3)
+        // we also want node5 to synchronously request remeasure for already measured node1
+        node5.runDuringMeasure {
+            delegate.requestRemeasure(node1)
+        }
+        node2.toString()
+        node4.toString()
+        // this was crashing and reported as b/208675143
+        assertRemeasured(root) {
+            assertRemeasured(node1, times = 2) {
+                assertNotRemeasured(node2) {
+                    assertRemeasured(node3) {
+                        assertNotRemeasured(node4) {
+                            assertRemeasured(node5) {
+                                delegate.measureAndLayout()
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

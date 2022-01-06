@@ -38,12 +38,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.width
 
+/**
+ * Wraps Compose content in a [MaterialTheme] and a [Surface].
+ *
+ * @param colorScheme a [ColorScheme] to provide to the theme. Usually a [lightColorScheme],
+ * [darkColorScheme], or a dynamic one
+ * @param modifier a [Modifier] to be applied at the [Surface] wrapper
+ */
 fun ComposeContentTestRule.setMaterialContent(
+    colorScheme: ColorScheme,
     modifier: Modifier = Modifier,
     composable: @Composable () -> Unit
 ) {
     setContent {
-        MaterialTheme {
+        MaterialTheme(colorScheme = colorScheme) {
             Surface(modifier = modifier, content = composable)
         }
     }

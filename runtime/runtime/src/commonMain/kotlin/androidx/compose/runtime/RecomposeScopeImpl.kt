@@ -65,6 +65,8 @@ internal class RecomposeScopeImpl(
      */
     val valid: Boolean get() = composition != null && anchor?.valid ?: false
 
+    val canRecompose: Boolean get() = block != null
+
     /**
      * Used is set when the [RecomposeScopeImpl] is used by, for example, [currentRecomposeScope].
      * This is used as the result of [Composer.endRestartGroup] and indicates whether the lambda

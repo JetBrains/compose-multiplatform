@@ -65,6 +65,7 @@ import org.jetbrains.kotlin.ir.declarations.IrLocalDelegatedProperty
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.IrPackageFragment
 import org.jetbrains.kotlin.ir.declarations.IrProperty
+import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.IrTypeAlias
 import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
 import org.jetbrains.kotlin.ir.declarations.IrValueDeclaration
@@ -363,7 +364,7 @@ interface IrChangedBitMaskVariable : IrChangedBitMaskValue {
  *       if ($changed and 0b0110 === 0) {
  *         $dirty = $dirty or if ($composer.changed(x)) 0b0010 else 0b0100
  *       }
- *      if (%dirty and 0b1011 xor 0b1010 !== 0 || !$composer.skipping) {
+ *      if (%dirty and 0b1011 !== 0b1010 || !$composer.skipping) {
  *        f(x)
  *      } else {
  *        $composer.skipToGroupEnd()
@@ -829,14 +830,14 @@ class ComposableFunctionBodyTransformer(
                         irStartReplaceableGroup(
                             body,
                             scope,
-                            declaration.irSourceKey()
+                            irFunctionSourceKey()
                         )
                     collectSourceInformation &&
                         !declaration.descriptor.hasExplicitGroupsAnnotation() ->
                         irSourceInformationMarkerStart(
                             body,
                             scope,
-                            declaration.irSourceKey()
+                            irFunctionSourceKey()
                         )
                     else -> null
                 },
@@ -972,7 +973,7 @@ class ComposableFunctionBodyTransformer(
                 body.endOffset,
                 listOfNotNull(
                     if (collectSourceInformation && scope.isInlinedLambda)
-                        irStartReplaceableGroup(body, scope)
+                        irStartReplaceableGroup(body, scope, irFunctionSourceKey())
                     else null,
                     *sourceInformationPreamble.statements.toTypedArray(),
                     *skipPreamble.statements.toTypedArray(),
@@ -984,9 +985,6 @@ class ComposableFunctionBodyTransformer(
                     returnVar?.let { irReturn(declaration.symbol, irGet(it)) }
                 )
             )
-            if (collectSourceInformation && scope.isInlinedLambda) {
-                scope.realizeEndCalls { irEndReplaceableGroup() }
-            }
         } else {
             declaration.body = IrBlockBodyImpl(
                 body.startOffset,
@@ -1147,7 +1145,7 @@ class ComposableFunctionBodyTransformer(
                 irStartRestartGroup(
                     body,
                     scope,
-                    declaration.irSourceKey()
+                    irFunctionSourceKey()
                 ),
                 *skipPreamble.statements.toTypedArray(),
                 transformedBody,
@@ -1818,6 +1816,16 @@ class ComposableFunctionBodyTransformer(
         return hash
     }
 
+    @OptIn(ObsoleteDescriptorBasedAPI::class)
+    private fun functionSourceKey(): Int {
+        val fn = currentFunctionScope.function
+        if (fn is IrSimpleFunction) {
+            return fn.sourceKey()
+        } else {
+            error("expected simple function: ${fn::class}")
+        }
+    }
+
     private fun IrElement.irSourceKey(): IrConst<Int> {
         return IrConstImpl(
             UNDEFINED_OFFSET,
@@ -1825,6 +1833,16 @@ class ComposableFunctionBodyTransformer(
             context.irBuiltIns.intType,
             IrConstKind.Int,
             sourceKey()
+        )
+    }
+
+    private fun irFunctionSourceKey(): IrConst<Int> {
+        return IrConstImpl(
+            UNDEFINED_OFFSET,
+            UNDEFINED_OFFSET,
+            context.irBuiltIns.intType,
+            IrConstKind.Int,
+            functionSourceKey()
         )
     }
 
@@ -2752,7 +2770,7 @@ class ComposableFunctionBodyTransformer(
     private fun visitRememberCall(expression: IrCall): IrExpression {
         val inputArgs = mutableListOf<IrExpression>()
         var hasSpreadArgs = false
-        var calculationArg: IrFunctionExpression? = null
+        var calculationArg: IrExpression? = null
         for (i in 0 until expression.valueArgumentsCount) {
             val param = expression.symbol.owner.valueParameters[i]
             val arg = expression.getValueArgument(i)
@@ -2763,7 +2781,7 @@ class ComposableFunctionBodyTransformer(
                 break
 
             when {
-                param.name.identifier == "calculation" && arg is IrFunctionExpression -> {
+                param.name.identifier == "calculation" -> {
                     calculationArg = arg
                 }
                 arg is IrVararg -> {
@@ -2802,12 +2820,10 @@ class ComposableFunctionBodyTransformer(
 
         encounteredComposableCall(withGroups = false)
 
-        val invalidExpr = if (inputArgs.isEmpty())
-            irConst(false)
-        else
-            inputArgs
-                .map { irChangedOrInferredChanged(it) }
-                .reduce { acc, changed -> irBooleanOr(acc, changed) }
+        val invalidExpr = inputArgs
+            .mapNotNull(::irChangedOrInferredChanged)
+            .reduceOrNull { acc, changed -> irBooleanOr(acc, changed) }
+            ?: irConst(false)
 
         return irCache(
             expression.startOffset,
@@ -2818,12 +2834,12 @@ class ComposableFunctionBodyTransformer(
         )
     }
 
-    private fun irChangedOrInferredChanged(arg: IrExpression): IrExpression {
+    private fun irChangedOrInferredChanged(arg: IrExpression): IrExpression? {
         val meta = paramMetaOf(arg, isProvided = true)
         val param = meta.maskParam
 
         return when {
-            meta.isStatic -> irConst(false)
+            meta.isStatic -> null
             meta.isCertain &&
                 meta.stability.knownStable() &&
                 param is IrChangedBitMaskVariable -> {
@@ -3037,7 +3053,7 @@ class ComposableFunctionBodyTransformer(
         // (the shift amount represented here by `x`, `y`, and `z`).
 
         // TODO: we could make some small optimization here if we have multiple values passed
-        //  from one function into another in the same order. This may not happen commonly eugh
+        //  from one function into another in the same order. This may not happen commonly enough
         //  to be worth the complication though.
 
         // NOTE: we start with 0b0 because it is important that the low bit is always 0
@@ -3374,12 +3390,13 @@ class ComposableFunctionBodyTransformer(
             }
         }
 
-        return if (resultsWithCalls == 1) {
-            transformed.asCoalescableGroup(resultScopes.single { it.hasComposableCalls })
-        } else if (needsWrappingGroup) {
-            transformed.asCoalescableGroup(whenScope)
-        } else {
-            transformed
+        return when {
+            resultsWithCalls == 1 ->
+                transformed.asCoalescableGroup(resultScopes.single { it.hasComposableCalls })
+            needsWrappingGroup ->
+                transformed.asCoalescableGroup(whenScope)
+            else ->
+                transformed
         }
     }
 
@@ -3898,13 +3915,13 @@ class ComposableFunctionBodyTransformer(
                 val end = min(start + BITS_PER_INT, count)
                 val unstableMask = bitMask(*unstable.sliceArray(start until end))
                 irNotEqual(
-                    // ~$default and unstableMask will be non-zero if any parameters were
-                    // *provided* AND *unstable*
+                    // $default and unstableMask will be different from unstableMask
+                    // iff any parameters were *provided* AND *unstable*
                     irAnd(
-                        irInv(irGet(param)),
+                        irGet(param),
                         irConst(unstableMask)
                     ),
-                    irConst(0)
+                    irConst(unstableMask)
                 )
             }
             return if (expressions.size == 1)
@@ -4024,16 +4041,13 @@ class ComposableFunctionBodyTransformer(
                         irConst(0)
                     )
                 } else {
-                    // $dirty and (0b 101 ... 101 1) xor (0b 001 ... 001 0)
+                    // $dirty and (0b 101 ... 101 1) != (0b 001 ... 001 0)
                     irNotEqual(
-                        irXor(
-                            irAnd(
-                                irGet(param),
-                                irConst(lhs or 0b1)
-                            ),
-                            irConst(rhs or 0b0)
+                        irAnd(
+                            irGet(param),
+                            irConst(lhs or 0b1)
                         ),
-                        irConst(0) // anything non-zero means we have differences
+                        irConst(rhs or 0b0)
                     )
                 }
             }

@@ -1644,6 +1644,74 @@ class ScrollableTest {
     }
 
     @Test
+    fun scrollable_multiDirectionsShouldPropagateOrthogonalAxisToNextParentWithSameDirection() {
+        var innerDelta = 0f
+        var middleDelta = 0f
+        var outerDelta = 0f
+
+        val outerStateController = ScrollableState {
+            outerDelta += it
+            it
+        }
+
+        val middleController = ScrollableState {
+            middleDelta += it
+            it / 2
+        }
+
+        val innerController = ScrollableState {
+            innerDelta += it
+            it / 2
+        }
+
+        rule.setContentAndGetScope {
+            Box(
+                modifier = Modifier
+                    .testTag("outerScrollable")
+                    .size(300.dp)
+                    .scrollable(
+                        outerStateController,
+                        orientation = Orientation.Horizontal
+                    )
+
+            ) {
+                Box(
+                    modifier = Modifier
+                        .testTag("middleScrollable")
+                        .size(300.dp)
+                        .scrollable(
+                            middleController,
+                            orientation = Orientation.Vertical
+                        )
+
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .testTag("innerScrollable")
+                            .size(300.dp)
+                            .scrollable(
+                                innerController,
+                                orientation = Orientation.Horizontal
+                            )
+                    )
+                }
+            }
+        }
+
+        rule.onNodeWithTag("innerScrollable").performTouchInput {
+            down(center)
+            moveBy(Offset(this.center.x + 100f, this.center.y))
+            up()
+        }
+
+        rule.runOnIdle {
+            assertThat(innerDelta).isGreaterThan(0)
+            assertThat(middleDelta).isEqualTo(0)
+            assertThat(outerDelta).isEqualTo(innerDelta / 2f)
+        }
+    }
+
+    @Test
     fun testInspectorValue() {
         val controller = ScrollableState(
             consumeScrollDelta = { it }

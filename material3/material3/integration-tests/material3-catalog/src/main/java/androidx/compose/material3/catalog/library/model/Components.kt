@@ -169,6 +169,19 @@ private val RadioButtons = Component(
     examples = RadioButtonsExamples
 )
 
+private val Snackbars = Component(
+    id = nextId(),
+    name = "Snackbars",
+    description = "Snackbars provide brief messages about app processes at the bottom of the " +
+        "screen.",
+    // No snackbar icon
+    tintIcon = true,
+    guidelinesUrl = "$ComponentGuidelinesUrl/snackbars",
+    docsUrl = "$DocsUrl#snackbar",
+    sourceUrl = "$Material3SourceUrl/Snackbar.kt",
+    examples = SnackbarsExamples
+)
+
 private val TopAppBar = Component(
     id = nextId(),
     name = "Top app bar",
@@ -193,5 +206,6 @@ val Components = listOf(
     NavigationDrawer,
     NavigationRail,
     RadioButtons,
+    Snackbars,
     TopAppBar
 )

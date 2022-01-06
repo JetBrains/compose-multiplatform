@@ -19,6 +19,8 @@ package androidx.compose.foundation.lazy.list
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.layout.IntervalList
+import androidx.compose.foundation.lazy.layout.MutableIntervalList
 import androidx.compose.runtime.Composable
 
 internal class LazyListScopeImpl : LazyListScope {

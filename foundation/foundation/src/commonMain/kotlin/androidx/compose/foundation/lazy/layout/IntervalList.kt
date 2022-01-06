@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.lazy.list
+package androidx.compose.foundation.lazy.layout
 
 internal class IntervalHolder<T>(
     val startIndex: Int,

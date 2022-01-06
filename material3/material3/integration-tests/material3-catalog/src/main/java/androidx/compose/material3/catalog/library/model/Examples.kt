@@ -25,8 +25,8 @@ import androidx.compose.material3.samples.ButtonSample
 import androidx.compose.material3.samples.ButtonWithIconSample
 import androidx.compose.material3.samples.CheckboxSample
 import androidx.compose.material3.samples.ColorSchemeSample
-import androidx.compose.material3.samples.EnterAlwaysSmallTopAppBar
 import androidx.compose.material3.samples.ElevatedButtonSample
+import androidx.compose.material3.samples.EnterAlwaysSmallTopAppBar
 import androidx.compose.material3.samples.ExitUntilCollapsedLargeTopAppBar
 import androidx.compose.material3.samples.ExitUntilCollapsedMediumTopAppBar
 import androidx.compose.material3.samples.ExtendedFloatingActionButtonSample
@@ -35,14 +35,18 @@ import androidx.compose.material3.samples.FloatingActionButtonSample
 import androidx.compose.material3.samples.LargeFloatingActionButtonSample
 import androidx.compose.material3.samples.NavigationBarSample
 import androidx.compose.material3.samples.NavigationBarWithOnlySelectedLabelsSample
+import androidx.compose.material3.samples.NavigationDrawerSample
 import androidx.compose.material3.samples.NavigationRailBottomAlignSample
 import androidx.compose.material3.samples.NavigationRailSample
 import androidx.compose.material3.samples.NavigationRailWithOnlySelectedLabelsSample
 import androidx.compose.material3.samples.OutlinedButtonSample
-import androidx.compose.material3.samples.NavigationDrawerSample
 import androidx.compose.material3.samples.PinnedSmallTopAppBar
 import androidx.compose.material3.samples.RadioButtonSample
 import androidx.compose.material3.samples.RadioGroupSample
+import androidx.compose.material3.samples.ScaffoldWithCoroutinesSnackbar
+import androidx.compose.material3.samples.ScaffoldWithCustomSnackbar
+import androidx.compose.material3.samples.ScaffoldWithIndefiniteSnackbar
+import androidx.compose.material3.samples.ScaffoldWithSimpleSnackbar
 import androidx.compose.material3.samples.SimpleCenterAlignedTopAppBar
 import androidx.compose.material3.samples.SimpleSmallTopAppBar
 import androidx.compose.material3.samples.SmallFloatingActionButtonSample
@@ -274,4 +278,37 @@ val RadioButtonsExamples = listOf(
     ) {
         RadioGroupSample()
     },
+)
+
+private const val SnackbarsExampleDescription = "Snackbars examples"
+private const val SnackbarsExampleSourceUrl = "$SampleSourceUrl/ScaffoldSamples.kt"
+val SnackbarsExamples = listOf(
+    Example(
+        name = ::ScaffoldWithSimpleSnackbar.name,
+        description = SnackbarsExampleDescription,
+        sourceUrl = SnackbarsExampleSourceUrl
+    ) {
+        ScaffoldWithSimpleSnackbar()
+    },
+    Example(
+        name = ::ScaffoldWithIndefiniteSnackbar.name,
+        description = SnackbarsExampleDescription,
+        sourceUrl = SnackbarsExampleSourceUrl
+    ) {
+        ScaffoldWithIndefiniteSnackbar()
+    },
+    Example(
+        name = ::ScaffoldWithCustomSnackbar.name,
+        description = SnackbarsExampleDescription,
+        sourceUrl = SnackbarsExampleSourceUrl
+    ) {
+        ScaffoldWithCustomSnackbar()
+    },
+    Example(
+        name = ::ScaffoldWithCoroutinesSnackbar.name,
+        description = SnackbarsExampleDescription,
+        sourceUrl = SnackbarsExampleSourceUrl
+    ) {
+        ScaffoldWithCoroutinesSnackbar()
+    }
 )

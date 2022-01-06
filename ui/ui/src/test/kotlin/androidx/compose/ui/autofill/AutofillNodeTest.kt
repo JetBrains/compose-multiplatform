@@ -23,10 +23,9 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.toComposeRect
 import com.google.common.truth.Truth.assertThat
+import org.junit.Assert
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.ExpectedException
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
@@ -42,9 +41,6 @@ import org.robolectric.shadow.api.Shadow
     minSdk = 26
 )
 class AutofillNodeTest {
-    @get:Rule
-    val expectedException = ExpectedException.none()!!
-
     private lateinit var androidAutofill: AndroidAutofill
     private lateinit var autofillManager: ShadowAutofillManager
     private lateinit var view: View
@@ -94,11 +90,15 @@ class AutofillNodeTest {
         // Arrange - Before the composable is positioned, the boundingBox is null.
         val autofillNode = AutofillNode(onFill = {})
 
-        // Assert.
-        expectedException.expectMessage("requestAutofill called before onChildPositioned()")
+        // Act and assert.
+        val exception = Assert.assertThrows(IllegalStateException::class.java) {
+            androidAutofill.requestAutofillForNode(autofillNode)
+        }
 
-        // Act.
-        androidAutofill.requestAutofillForNode(autofillNode)
+        // Assert some more.
+        assertThat(exception).hasMessageThat().isEqualTo(
+            "requestAutofill called before onChildPositioned()"
+        )
     }
 
     @Test

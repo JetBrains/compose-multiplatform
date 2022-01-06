@@ -95,7 +95,7 @@ class IconButtonTest {
 
     @Test
     fun iconButton_defaultSemantics() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             IconButtonContent()
         }
         rule.onNode(hasClickAction()).apply {
@@ -105,7 +105,7 @@ class IconButtonTest {
 
     @Test
     fun iconButton_disabledSemantics() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             IconButton(onClick = {}, enabled = false) {}
         }
         rule.onNode(hasClickAction()).apply {
@@ -116,7 +116,7 @@ class IconButtonTest {
     @Test
     fun iconButton_materialIconSize_iconPositioning() {
         val diameter = 24.dp
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 IconButton(onClick = {}) {
                     Box(Modifier.size(diameter).testTag("icon"))
@@ -134,7 +134,7 @@ class IconButtonTest {
     fun iconButton_customIconSize_iconPositioning() {
         val width = 36.dp
         val height = 14.dp
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 IconButton(onClick = {}) {
                     Box(Modifier.size(width, height).testTag("icon"))
@@ -177,7 +177,7 @@ class IconButtonTest {
 
     @Test
     fun iconToggleButton_defaultSemantics() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             IconToggleButtonContent()
         }
         rule.onNode(isToggleable()).apply {
@@ -190,7 +190,7 @@ class IconButtonTest {
 
     @Test
     fun iconToggleButton_disabledSemantics() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             IconToggleButton(checked = false, onCheckedChange = {}, enabled = false) {}
         }
         rule.onNode(isToggleable()).apply {
@@ -202,7 +202,7 @@ class IconButtonTest {
     @Test
     fun iconToggleButton_materialIconSize_iconPositioning() {
         val diameter = 24.dp
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 IconToggleButton(checked = false, onCheckedChange = {}) {
                     Box(Modifier.size(diameter).testTag("icon"))
@@ -220,7 +220,7 @@ class IconButtonTest {
     fun iconToggleButton_customIconSize_iconPositioning() {
         val width = 36.dp
         val height = 14.dp
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 IconToggleButton(checked = false, onCheckedChange = {}) {
                     Box(Modifier.size(width, height).testTag("icon"))
@@ -238,7 +238,7 @@ class IconButtonTest {
     fun iconToggleButton_clickInMinimumTouchTarget(): Unit = with(rule.density) {
         val tag = "iconToggleButton"
         var checked by mutableStateOf(false)
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             // Box is needed because otherwise the control will be expanded to fill its parent
             Box(Modifier.fillMaxSize()) {
                 IconToggleButton(

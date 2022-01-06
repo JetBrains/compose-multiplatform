@@ -13,11 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import androidx.build.Publish
 
-package androidx.compose.foundation.text
+plugins {
+    id("AndroidXPlugin")
+    id("kotlin")
+}
 
-import androidx.compose.foundation.text.selection.TextFieldSelectionManager
-import androidx.compose.ui.Modifier
+dependencies {
+    testImplementation(libs.junit)
 
-internal actual fun Modifier.textFieldMagnifier(manager: TextFieldSelectionManager): Modifier =
-    Modifier
+    testImplementation(libs.kotlinCompiler)
+    testImplementation(libs.kotlinStdlib)
+    testImplementation(project(":compose:compiler:compiler-daemon"))
+}
+
+androidx {
+    name = "AndroidX Compiler Daemon CLI Tests"
+    publish = Publish.NONE
+    inceptionYear = "2021"
+    description = "Contains test for the compose compiler daemon"
+}

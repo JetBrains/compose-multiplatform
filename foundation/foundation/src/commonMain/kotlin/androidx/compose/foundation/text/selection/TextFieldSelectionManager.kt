@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.text.selection
 
+import androidx.compose.foundation.text.DefaultCursorThickness
 import androidx.compose.foundation.text.Handle
 import androidx.compose.foundation.text.HandleState
 import androidx.compose.foundation.text.InternalFoundationTextApi
@@ -49,6 +50,7 @@ import androidx.compose.ui.text.input.getSelectedText
 import androidx.compose.ui.text.input.getTextAfterSelection
 import androidx.compose.ui.text.input.getTextBeforeSelection
 import androidx.compose.ui.text.style.ResolvedTextDirection
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import kotlin.math.max
 import kotlin.math.min
@@ -557,6 +559,18 @@ internal class TextFieldSelectionManager(
         )
     }
 
+    internal fun getCursorPosition(density: Density): Offset {
+        val offset = offsetMapping.originalToTransformed(value.selection.start)
+        val layoutResult = state?.layoutResult!!.value
+        val cursorRect = layoutResult.getCursorRect(
+            offset.coerceIn(0, layoutResult.layoutInput.text.length)
+        )
+        val x = with(density) {
+            cursorRect.left + DefaultCursorThickness.toPx() / 2
+        }
+        return Offset(x, cursorRect.bottom)
+    }
+
     /**
      * This function get the selected region as a Rectangle region, and pass it to [TextToolbar]
      * to make the FloatingToolbar show up in the proper place. In addition, this function passes
@@ -605,6 +619,21 @@ internal class TextFieldSelectionManager(
     internal fun hideSelectionToolbar() {
         if (textToolbar?.status == TextToolbarStatus.Shown) {
             textToolbar?.hide()
+        }
+    }
+
+    fun contextMenuOpenAdjustment(position: Offset) {
+        state?.layoutResult?.let { layoutResult ->
+            val offset = layoutResult.getOffsetForPosition(position)
+            if (!value.selection.contains(offset)) {
+                updateSelection(
+                    value = value,
+                    transformedStartOffset = offset,
+                    transformedEndOffset = offset,
+                    isStartHandle = false,
+                    adjustment = SelectionAdjustment.Word
+                )
+            }
         }
     }
 
@@ -757,3 +786,48 @@ internal fun TextFieldSelectionManager.isSelectionHandleInVisibleBound(
 
 // TODO(b/180075467) it should be part of PointerEvent API in one way or another
 internal expect val PointerEvent.isShiftPressed: Boolean
+
+/**
+ * Optionally shows a magnifier widget, if the current platform supports it, for the current state
+ * of a [TextFieldSelectionManager]. Should check [TextFieldState.draggingHandle] to see which
+ * handle is being dragged and then calculate the magnifier position for that handle.
+ *
+ * Actual implementations should as much as possible actually live in this common source set, _not_
+ * the platform-specific source sets. The actual implementations of this function should then just
+ * delegate to those functions.
+ */
+internal expect fun Modifier.textFieldMagnifier(manager: TextFieldSelectionManager): Modifier
+
+internal fun calculateSelectionMagnifierCenterAndroid(manager: TextFieldSelectionManager): Offset {
+    // manager.state is not a snapshot state value, it's just a regular lazily-initialized property
+    // that doesn't change after being initialized, so it doesn't need to be read inside a
+    // restartable function.
+    val state = manager.state ?: return Offset.Unspecified
+
+    return calculateSelectionMagnifierCenterAndroid(
+        draggingHandle = state.draggingHandle,
+        fieldValue = manager.value,
+        transformTextOffset = { manager.offsetMapping.originalToTransformed(it) },
+        getCursorRect = { state.layoutResult?.value?.getCursorRect(it) },
+    )
+}
+
+/*@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)*/
+internal fun calculateSelectionMagnifierCenterAndroid(
+    draggingHandle: Handle?,
+    fieldValue: TextFieldValue,
+    transformTextOffset: (Int) -> Int,
+    getCursorRect: (offset: Int) -> Rect?,
+): Offset {
+    val rawTextOffset = when (draggingHandle) {
+        null -> return Offset.Unspecified
+        Handle.Cursor,
+        Handle.SelectionStart -> fieldValue.selection.start
+        Handle.SelectionEnd -> fieldValue.selection.end
+    }
+    val textOffset = transformTextOffset(rawTextOffset)
+
+    // Center vertically on the current line.
+    // If the text hasn't been laid out yet, don't show the modifier.
+    return getCursorRect(textOffset)?.center ?: Offset.Unspecified
+}

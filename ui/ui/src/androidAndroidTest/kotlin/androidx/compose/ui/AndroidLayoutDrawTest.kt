@@ -23,6 +23,7 @@ import android.graphics.Bitmap
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.transition.TransitionManager
 import android.view.PixelCopy
 import android.view.View
 import android.view.ViewGroup
@@ -116,7 +117,6 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
-import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -503,21 +503,6 @@ class AndroidLayoutDrawTest {
             }
         }
         validateSquareColors(outerColor = green, innerColor = white, size = 20)
-    }
-
-    // Tests that calling measure multiple times on the same Measurable causes an exception
-    @Test
-    fun multipleMeasureCall() {
-        val latch = CountDownLatch(1)
-        activityTestRule.runOnUiThreadIR {
-            activity.setContent {
-                TwoMeasureLayout(50, latch) {
-                    AtLeastSize(50) {
-                    }
-                }
-            }
-        }
-        assertTrue(latch.await(1, TimeUnit.SECONDS))
     }
 
     @Test
@@ -3647,6 +3632,37 @@ class AndroidLayoutDrawTest {
         assertEquals(1, innerDrawLatch.count)
     }
 
+    /**
+     * Android Transitions should be possible with Compose Views. View layers can
+     * confuse the Android Transition system.
+     */
+    @Test
+    fun worksWithTransitions() {
+        val frameLayout = FrameLayout(activity)
+        activityTestRule.runOnUiThread {
+            activity.setContentView(frameLayout)
+            val composeView = ComposeView(activity).apply {
+                setContent {
+                    Box {}
+                }
+            }
+            frameLayout.addView(composeView)
+        }
+
+        activityTestRule.runOnUiThread {
+            TransitionManager.beginDelayedTransition(frameLayout)
+            frameLayout.removeAllViews()
+            val composeView = ComposeView(activity).apply {
+                setContent {
+                    Box(Modifier.drawLatchModifier()) {}
+                }
+            }
+            frameLayout.addView(composeView)
+        }
+
+        assertTrue(drawLatch.await(1, TimeUnit.SECONDS))
+    }
+
     private fun Modifier.layout(onLayout: () -> Unit) = layout { measurable, constraints ->
         val placeable = measurable.measure(constraints)
         layout(placeable.width, placeable.height) {
@@ -4016,33 +4032,6 @@ internal fun Padding(
         },
         content = content
     )
-}
-
-@Composable
-fun TwoMeasureLayout(
-    size: Int,
-    latch: CountDownLatch,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Layout(modifier = modifier, content = content) { measurables, _ ->
-        val testConstraints = Constraints()
-        measurables.forEach { it.measure(testConstraints) }
-        val childConstraints = Constraints.fixed(size, size)
-        try {
-            val placeables2 = measurables.map { it.measure(childConstraints) }
-            fail("Measuring twice on the same Measurable should throw an exception")
-            layout(size, size) {
-                placeables2.forEach { child ->
-                    child.placeRelative(0, 0)
-                }
-            }
-        } catch (_: IllegalStateException) {
-            // expected
-            latch.countDown()
-        }
-        layout(0, 0) { }
-    }
 }
 
 @Composable

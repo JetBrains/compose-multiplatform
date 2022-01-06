@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.lazy
+package androidx.compose.foundation.lazy.grid
 
 import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,13 +30,27 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.GridItemSpan
+import androidx.compose.foundation.lazy.LazyGridState
+import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.list.scrollBy
 import androidx.compose.foundation.lazy.list.setContentWithTestViewConfiguration
+import androidx.compose.foundation.lazy.rememberLazyGridState
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.SemanticsMatcher.Companion.keyIsDefined
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -45,6 +60,7 @@ import androidx.compose.ui.test.assertWidthIsAtLeast
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -142,13 +158,13 @@ class LazyGridTest {
             .assertIsDisplayed()
 
         rule.onNodeWithTag("7")
-            .assertIsNotDisplayed()
+            .assertDoesNotExist()
 
         rule.onNodeWithTag("8")
-            .assertIsNotDisplayed()
+            .assertDoesNotExist()
 
         rule.onNodeWithTag("9")
-            .assertIsNotDisplayed()
+            .assertDoesNotExist()
     }
 
     @Test
@@ -170,7 +186,7 @@ class LazyGridTest {
             .scrollBy(y = 103.dp, density = rule.density)
 
         rule.onNodeWithTag("1")
-            .assertIsNotDisplayed()
+            .assertDoesNotExist()
 
         rule.onNodeWithTag("2")
             .assertIsNotDisplayed()
@@ -627,11 +643,11 @@ class LazyGridTest {
 
     @Test
     fun changeItemsCountAndScrollImmediately() {
-        lateinit var state: LazyListState
+        lateinit var state: LazyGridState
         var count by mutableStateOf(100)
         val composedIndexes = mutableListOf<Int>()
         rule.setContent {
-            state = rememberLazyListState()
+            state = rememberLazyGridState()
             LazyVerticalGrid(
                 GridCells.Fixed(1),
                 Modifier.fillMaxWidth().height(10.dp),
@@ -667,7 +683,7 @@ class LazyGridTest {
             LazyVerticalGrid(
                 cells = GridCells.Fixed(2),
                 modifier = Modifier.requiredSize(itemSize * 2).testTag(LazyGridTag),
-                state = LazyListState(firstVisibleItemIndex = Int.MAX_VALUE - 3)
+                state = LazyGridState(firstVisibleItemIndex = Int.MAX_VALUE - 3)
             ) {
                 items(Int.MAX_VALUE) {
                     Box(Modifier.size(itemSize).testTag("$it"))
@@ -864,6 +880,117 @@ class LazyGridTest {
             .assertTopPositionInRootIsEqualTo(0.dp)
             .assertLeftPositionInRootIsEqualTo(columnWidth * 3)
             .assertWidthIsEqualTo(columnWidth)
+    }
+
+    @Test
+    fun pointerInputScrollingIsAllowedWhenUserScrollingIsEnabled() {
+        val itemSize = with(rule.density) { 30.toDp() }
+        rule.setContentWithTestViewConfiguration {
+            LazyVerticalGrid(
+                GridCells.Fixed(1),
+                Modifier.size(itemSize * 3).testTag(LazyGridTag),
+                userScrollEnabled = true,
+            ) {
+                items(5) {
+                    Spacer(Modifier.size(itemSize).testTag("$it"))
+                }
+            }
+        }
+
+        rule.onNodeWithTag(LazyGridTag).scrollBy(y = itemSize, density = rule.density)
+
+        rule.onNodeWithTag("1")
+            .assertTopPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun pointerInputScrollingIsDisallowedWhenUserScrollingIsDisabled() {
+        val itemSize = with(rule.density) { 30.toDp() }
+        rule.setContentWithTestViewConfiguration {
+            LazyVerticalGrid(
+                GridCells.Fixed(1),
+                Modifier.size(itemSize * 3).testTag(LazyGridTag),
+                userScrollEnabled = false,
+            ) {
+                items(5) {
+                    Spacer(Modifier.size(itemSize).testTag("$it"))
+                }
+            }
+        }
+
+        rule.onNodeWithTag(LazyGridTag).scrollBy(y = itemSize, density = rule.density)
+
+        rule.onNodeWithTag("1")
+            .assertTopPositionInRootIsEqualTo(itemSize)
+    }
+
+    @Test
+    fun programmaticScrollingIsAllowedWhenUserScrollingIsDisabled() {
+        val itemSizePx = 30f
+        val itemSize = with(rule.density) { itemSizePx.toDp() }
+        lateinit var state: LazyGridState
+        rule.setContentWithTestViewConfiguration {
+            LazyVerticalGrid(
+                GridCells.Fixed(1),
+                Modifier.size(itemSize * 3),
+                state = rememberLazyGridState().also { state = it },
+                userScrollEnabled = false,
+            ) {
+                items(5) {
+                    Spacer(Modifier.size(itemSize).testTag("$it"))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy(itemSizePx)
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertTopPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun semanticScrollingIsDisallowedWhenUserScrollingIsDisabled() {
+        val itemSize = with(rule.density) { 30.toDp() }
+        rule.setContentWithTestViewConfiguration {
+            LazyVerticalGrid(
+                GridCells.Fixed(1),
+                Modifier.size(itemSize * 3).testTag(LazyGridTag),
+                userScrollEnabled = false,
+            ) {
+                items(5) {
+                    Spacer(Modifier.size(itemSize).testTag("$it"))
+                }
+            }
+        }
+
+        rule.onNodeWithTag(LazyGridTag)
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.ScrollBy))
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.ScrollToIndex))
+            // but we still have a read only scroll range property
+            .assert(keyIsDefined(SemanticsProperties.VerticalScrollAxisRange))
+    }
+
+    @Test
+    fun rtl() {
+        val gridWidth = 30
+        val gridWidthDp = with(rule.density) { gridWidth.toDp() }
+        rule.setContent {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                LazyVerticalGrid(GridCells.Fixed(3), Modifier.width(gridWidthDp)) {
+                    items(3) {
+                        Box(Modifier.height(1.dp).testTag("$it"))
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0").assertLeftPositionInRootIsEqualTo(gridWidthDp * 2 / 3)
+        rule.onNodeWithTag("1").assertLeftPositionInRootIsEqualTo(gridWidthDp / 3)
+        rule.onNodeWithTag("2").assertLeftPositionInRootIsEqualTo(0.dp)
     }
 
     // TODO: add tests for the cache logic

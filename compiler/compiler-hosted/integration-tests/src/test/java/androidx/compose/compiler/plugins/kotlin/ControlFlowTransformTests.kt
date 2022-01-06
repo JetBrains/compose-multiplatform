@@ -184,55 +184,6 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
     )
 
     @Test
-    fun testInlineReturnLabel(): Unit = controlFlow(
-        """
-            @Composable
-            @NonRestartableComposable
-            fun CustomTextBroken(condition: Boolean) {
-                FakeBox {
-                    if (condition) {
-                        return@FakeBox
-                    }
-                    A()
-                }
-            }
-            @Composable
-            inline fun FakeBox(content: @Composable () -> Unit) {
-                content()
-            }
-        """,
-        """
-            @Composable
-            @NonRestartableComposable
-            fun CustomTextBroken(condition: Boolean, %composer: Composer?, %changed: Int) {
-              %composer.startReplaceableGroup(<>)
-              sourceInformation(%composer, "C(CustomTextBroken)<FakeBo...>:Test.kt")
-              FakeBox({ %composer: Composer?, %changed: Int ->
-                %composer.startReplaceableGroup(<>)
-                sourceInformation(%composer, "C<A()>:Test.kt")
-                if (%changed and 0b1011 xor 0b0010 !== 0 || !%composer.skipping) {
-                  if (condition) {
-                    %composer.endReplaceableGroup()
-                  }
-                  A(%composer, 0)
-                } else {
-                  %composer.skipToGroupEnd()
-                }
-                %composer.endReplaceableGroup()
-              }, %composer, 0)
-              %composer.endReplaceableGroup()
-            }
-            @Composable
-            fun FakeBox(content: Function2<Composer, Int, Unit>, %composer: Composer?, %changed: Int) {
-              %composer.startReplaceableGroup(<>)
-              sourceInformation(%composer, "C(FakeBox)<conten...>:Test.kt")
-              content(%composer, 0b1110 and %changed)
-              %composer.endReplaceableGroup()
-            }
-        """
-    )
-
-    @Test
     fun testIfElseWithCallsInConditions(): Unit = controlFlow(
         """
             @NonRestartableComposable @Composable
@@ -2309,7 +2260,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b1110 === 0) {
                 %dirty = %dirty or if (%composer.changed(x)) 0b0100 else 0b0010
               }
-              if (%dirty and 0b1011 xor 0b0010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b1011 !== 0b0010 || !%composer.skipping) {
                 val tmp0_safe_receiver = x
                 %composer.startReplaceableGroup(<>)
                 sourceInformation(%composer, "*<A(b)>")
@@ -2364,7 +2315,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b1110 === 0) {
                 %dirty = %dirty or if (%composer.changed(x)) 0b0100 else 0b0010
               }
-              if (%dirty and 0b1011 xor 0b0010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b1011 !== 0b0010 || !%composer.skipping) {
                 x?.let { it: Int ->
                   if (it > 0) {
                     NA()
@@ -2473,7 +2424,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
             internal object ComposableSingletons%TestKt {
               val lambda-1: Function2<Composer, Int, Unit> = composableLambdaInstance(<>, false) { %composer: Composer?, %changed: Int ->
                 sourceInformation(%composer, "C<A()>:Test.kt")
-                if (%changed and 0b1011 xor 0b0010 !== 0 || !%composer.skipping) {
+                if (%changed and 0b1011 !== 0b0010 || !%composer.skipping) {
                   A(%composer, 0)
                 } else {
                   %composer.skipToGroupEnd()
@@ -2502,7 +2453,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
                 IW({ %composer: Composer?, %changed: Int ->
                   %composer.startReplaceableGroup(<>)
                   sourceInformation(%composer, "C<A()>:Test.kt")
-                  if (%changed and 0b1011 xor 0b0010 !== 0 || !%composer.skipping) {
+                  if (%changed and 0b1011 !== 0b0010 || !%composer.skipping) {
                     A(%composer, 0)
                   } else {
                     %composer.skipToGroupEnd()
@@ -2551,7 +2502,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
             internal object ComposableSingletons%TestKt {
               val lambda-1: Function2<Composer, Int, Unit> = composableLambdaInstance(<>, false) { %composer: Composer?, %changed: Int ->
                 sourceInformation(%composer, "C<effect>:Test.kt")
-                if (%changed and 0b1011 xor 0b0010 !== 0 || !%composer.skipping) {
+                if (%changed and 0b1011 !== 0b0010 || !%composer.skipping) {
                   %composer.startReplaceableGroup(<>)
                   sourceInformation(%composer, "*<effect>")
                   repeat(number) { it: Int ->
@@ -2600,7 +2551,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b1110 === 0) {
                 %dirty = %dirty or if (%composer.changed(<unsafe-coerce>(value))) 0b0100 else 0b0010
               }
-              if (%dirty and 0b1011 xor 0b0010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b1011 !== 0b0010 || !%composer.skipping) {
                 used(value)
                 A(%composer, 0)
               } else {
@@ -2779,7 +2730,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p3)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -2808,7 +2759,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p2)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -2837,7 +2788,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p3)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -2866,7 +2817,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p1)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -2895,7 +2846,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p2)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -2924,7 +2875,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p1)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -2953,7 +2904,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p3)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -2982,7 +2933,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p2)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -3011,7 +2962,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p3)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -3040,7 +2991,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p0)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -3069,7 +3020,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p2)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -3098,7 +3049,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p0)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -3127,7 +3078,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p3)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -3156,7 +3107,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p1)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -3185,7 +3136,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p3)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -3214,7 +3165,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p0)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -3243,7 +3194,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p1)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -3272,7 +3223,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p0)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -3301,7 +3252,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p2)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -3330,7 +3281,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p1)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -3359,7 +3310,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p2)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -3388,7 +3339,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p0)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -3417,7 +3368,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p1)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -3446,7 +3397,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b0001110000000000 === 0) {
                 %dirty = %dirty or if (%composer.changed(p0)) 0b100000000000 else 0b010000000000
               }
-              if (%dirty and 0b0001011011011011 xor 0b010010010010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b0001011011011011 !== 0b010010010010 || !%composer.skipping) {
                 used(p0)
                 used(p1)
                 used(p2)
@@ -3488,7 +3439,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               if (%changed and 0b1110 === 0) {
                 %dirty = %dirty or if (%composer.changed(<unsafe-coerce>(value))) 0b0100 else 0b0010
               }
-              if (%dirty and 0b1011 xor 0b0010 !== 0 || !%composer.skipping) {
+              if (%dirty and 0b1011 !== 0b0010 || !%composer.skipping) {
                 used(value)
               } else {
                 %composer.skipToGroupEnd()
@@ -3574,7 +3525,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               fun onCreate() {
                 setContent(composableLambdaInstance(<>, true) { %composer: Composer?, %changed: Int ->
                   sourceInformation(%composer, "C<B(a)>,<B(a)>:Test.kt")
-                  if (%changed and 0b1011 xor 0b0010 !== 0 || !%composer.skipping) {
+                  if (%changed and 0b1011 !== 0b0010 || !%composer.skipping) {
                     B(a, %composer, 0)
                     B(a, %composer, 0)
                   } else {
@@ -3589,7 +3540,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
               var a = "Test"
               setContent(composableLambdaInstance(<>, true) { %composer: Composer?, %changed: Int ->
                 sourceInformation(%composer, "C<B(a)>,<B(a)>:Test.kt")
-                if (%changed and 0b1011 xor 0b0010 !== 0 || !%composer.skipping) {
+                if (%changed and 0b1011 !== 0b0010 || !%composer.skipping) {
                   B(a, %composer, 0)
                   B(a, %composer, 0)
                 } else {
@@ -3643,11 +3594,11 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
             internal object ComposableSingletons%TestKt {
               val lambda-1: Function2<Composer, Int, Unit> = composableLambdaInstance(<>, false) { %composer: Composer?, %changed: Int ->
                 sourceInformation(%composer, "C<IW>:Test.kt")
-                if (%changed and 0b1011 xor 0b0010 !== 0 || !%composer.skipping) {
+                if (%changed and 0b1011 !== 0b0010 || !%composer.skipping) {
                   IW({ %composer: Composer?, %changed: Int ->
                     %composer.startReplaceableGroup(<>)
                     sourceInformation(%composer, "C<T(2)>,<T(4)>:Test.kt")
-                    if (%changed and 0b1011 xor 0b0010 !== 0 || !%composer.skipping) {
+                    if (%changed and 0b1011 !== 0b0010 || !%composer.skipping) {
                       T(2, %composer, 0b0110)
                       %composer.startReplaceableGroup(<>)
                       sourceInformation(%composer, "*<T(3)>")
@@ -3722,7 +3673,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
                 Layout({ %composer: Composer?, %changed: Int ->
                   %composer.startReplaceableGroup(<>)
                   sourceInformation(%composer, "C<Text("...>:Test.kt")
-                  if (%changed and 0b1011 xor 0b0010 !== 0 || !%composer.skipping) {
+                  if (%changed and 0b1011 !== 0b0010 || !%composer.skipping) {
                     Text("%c %cl", %composer, 0)
                   } else {
                     %composer.skipToGroupEnd()
@@ -3831,7 +3782,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
                 Layout({ %composer: Composer?, %changed: Int ->
                   %composer.startReplaceableGroup(<>)
                   sourceInformation(%composer, "C<Text("...>:Test.kt")
-                  if (%changed and 0b1011 xor 0b0010 !== 0 || !%composer.skipping) {
+                  if (%changed and 0b1011 !== 0b0010 || !%composer.skipping) {
                     Text("%c %cl", %composer, 0)
                   } else {
                     %composer.skipToGroupEnd()
@@ -3912,7 +3863,7 @@ class ControlFlowTransformTests : AbstractControlFlowTransformTests() {
                 Wrapper({ %composer: Composer?, %changed: Int ->
                   %composer.startReplaceableGroup(<>)
                   sourceInformation(%composer, "C*<Leaf(0...>:Test.kt")
-                  if (%changed and 0b1011 xor 0b0010 !== 0 || !%composer.skipping) {
+                  if (%changed and 0b1011 !== 0b0010 || !%composer.skipping) {
                     repeat(1) { it: Int ->
                       %composer.startReplaceableGroup(<>)
                       sourceInformation(%composer, "*<Leaf(0...>")

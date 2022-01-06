@@ -60,9 +60,10 @@ HSPLandroidx/compose/ui/platform/InspectableValueKt;->getNoInspectorInfo()Lkotli
 HSPLandroidx/compose/ui/platform/InspectableValueKt;->isDebugInspectorInfoEnabled()Z
 HSPLandroidx/compose/ui/platform/InspectorValueInfo;-><init>(Lkotlin/jvm/functions/Function1;)V
 HSPLandroidx/compose/ui/platform/RenderNodeLayer;->**(**)**
-HSPLandroidx/compose/ui/platform/RenderNodeApi29;->**(**)**
+HSPLandroidx/compose/ui/platform/RenderNodeApi**;->**(**)**
 HSPLandroidx/compose/ui/platform/OutlineResolver;->**(**)**
 HSPLandroidx/compose/ui/platform/RenderNodeMatrixCache;->**(**)**
+HSPLandroidx/compose/ui/platform/ViewLayer;->**(**)**
 HSPLandroidx/compose/ui/platform/WindowRecomposerPolicy**->**(**)**
 HSPLandroidx/compose/ui/platform/WindowRecomposer_androidKt**->**(**)**
 HSPLandroidx/compose/ui/platform/WrappedComposition**->**(**)**

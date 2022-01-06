@@ -67,15 +67,18 @@ import java.io.File
 abstract class ComposeIrTransformTest : AbstractIrTransformTest() {
     open val liveLiteralsEnabled get() = false
     open val liveLiteralsV2Enabled get() = false
+    open val generateFunctionKeyMetaClasses get() = false
     open val sourceInformationEnabled get() = true
+    open val intrinsicRememberEnabled get() = false
     open val decoysEnabled get() = false
     open val metricsDestination: String? get() = null
 
     protected val extension = ComposeIrGenerationExtension(
         liveLiteralsEnabled,
         liveLiteralsV2Enabled,
+        generateFunctionKeyMetaClasses,
         sourceInformationEnabled,
-        intrinsicRememberEnabled = true,
+        intrinsicRememberEnabled,
         decoysEnabled,
         metricsDestination
     )

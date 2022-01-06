@@ -146,8 +146,7 @@ internal suspend fun PointerInputScope.detectTapWithContext(
     }
 }
 
-@ExperimentalFoundationApi
-suspend fun AwaitPointerEventScope.awaitEventFirstDown(): PointerEvent {
+private suspend fun AwaitPointerEventScope.awaitEventFirstDown(): PointerEvent {
     var event: PointerEvent
     do {
         event = awaitPointerEvent()

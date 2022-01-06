@@ -25,6 +25,7 @@ import androidx.compose.foundation.text.selection.SimpleLayout
 import androidx.compose.foundation.text.selection.TextFieldSelectionHandle
 import androidx.compose.foundation.text.selection.TextFieldSelectionManager
 import androidx.compose.foundation.text.selection.isSelectionHandleInVisibleBound
+import androidx.compose.foundation.text.selection.textFieldMagnifier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.currentRecomposeScope
@@ -343,8 +344,13 @@ internal fun CoreTextField(
                 } else {
                     manager.hideSelectionToolbar()
                 }
-                state.showSelectionHandleStart = manager.isSelectionHandleInVisibleBound(true)
-                state.showSelectionHandleEnd = manager.isSelectionHandleInVisibleBound(false)
+                state.showSelectionHandleStart =
+                    manager.isSelectionHandleInVisibleBound(isStartHandle = true)
+                state.showSelectionHandleEnd =
+                    manager.isSelectionHandleInVisibleBound(isStartHandle = false)
+            } else if (state.handleState == HandleState.Cursor) {
+                state.showCursorHandle =
+                    manager.isSelectionHandleInVisibleBound(isStartHandle = true)
             }
             state.layoutResult?.let { layoutResult ->
                 state.inputSession?.let { inputSession ->
@@ -506,7 +512,7 @@ internal fun CoreTextField(
         Modifier
     }
 
-    Box(modifier = decorationBoxModifier, propagateMinConstraints = true) {
+    CoreTextFieldRootBox(decorationBoxModifier, manager) {
         decorationBox {
             // Modifiers applied directly to the internal input field implementation. In general,
             // these will most likely include draw, layout and IME related modifiers.
@@ -578,6 +584,17 @@ internal fun CoreTextField(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun CoreTextFieldRootBox(
+    modifier: Modifier,
+    manager: TextFieldSelectionManager,
+    content: @Composable () -> Unit
+) {
+    Box(modifier, propagateMinConstraints = true) {
+        ContextMenuArea(manager, content)
     }
 }
 
@@ -702,14 +719,22 @@ internal class TextFieldState(
     var showFloatingToolbar = false
 
     /**
-     * A flag to check if the start selection handle should show.
+     * True if the position of the selection start handle is within a visible part of the window
+     * (i.e. not scrolled out of view) and the handle should be drawn.
      */
     var showSelectionHandleStart by mutableStateOf(false)
 
     /**
-     * A flag to check if the end selection handle should show.
+     * True if the position of the selection end handle is within a visible part of the window
+     * (i.e. not scrolled out of view) and the handle should be drawn.
      */
     var showSelectionHandleEnd by mutableStateOf(false)
+
+    /**
+     * True if the position of the cursor is within a visible part of the window (i.e. not scrolled
+     * out of view) and the handle should be drawn.
+     */
+    var showCursorHandle by mutableStateOf(false)
 
     val keyboardActionRunner: KeyboardActionRunner = KeyboardActionRunner()
 
@@ -848,17 +873,11 @@ private fun SelectionToolbarAndHandles(manager: TextFieldSelectionManager, show:
 
 @Composable
 internal fun TextFieldCursorHandle(manager: TextFieldSelectionManager) {
-    val offset = manager.offsetMapping.originalToTransformed(manager.value.selection.start)
-    val observer = remember(manager) { manager.cursorDragObserver() }
-    manager.state?.layoutResult?.value?.let {
-        val cursorRect = it.getCursorRect(
-            offset.coerceIn(0, it.layoutInput.text.length)
-        )
-        val x = with(LocalDensity.current) {
-            cursorRect.left + DefaultCursorThickness.toPx() / 2
-        }
+    if (manager.state?.showCursorHandle == true) {
+        val observer = remember(manager) { manager.cursorDragObserver() }
+        val position = manager.getCursorPosition(LocalDensity.current)
         CursorHandle(
-            handlePosition = Offset(x, cursorRect.bottom),
+            handlePosition = position,
             modifier = Modifier.pointerInput(observer) {
                 detectDragGesturesWithObserver(observer)
             },

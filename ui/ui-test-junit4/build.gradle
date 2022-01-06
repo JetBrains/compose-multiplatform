@@ -43,7 +43,7 @@ dependencies {
         api(libs.kotlinStdlib)
         api(libs.kotlinStdlibCommon)
 
-        implementation(project(":compose:runtime:runtime-saveable"))
+        implementation("androidx.compose.runtime:runtime-saveable:1.1.0-rc01")
         implementation("androidx.activity:activity-compose:1.3.0")
         implementation("androidx.annotation:annotation:1.1.0")
         implementation("androidx.lifecycle:lifecycle-common:2.3.0")
@@ -141,7 +141,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
 androidx {
     name = "Compose Testing for JUnit4"
-    type = LibraryType.PUBLISHED_LIBRARY
+    type = LibraryType.PUBLISHED_TEST_LIBRARY
     mavenGroup = LibraryGroups.Compose.UI
     inceptionYear = "2020"
     description = "Compose testing integration with JUnit4"

@@ -2409,34 +2409,34 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
     }
 
-    private class Api24Impl {
-        @RequiresApi(Build.VERSION_CODES.N)
-        companion object {
-            fun addSetProgressAction(
-                info: AccessibilityNodeInfoCompat,
-                semanticsNode: SemanticsNode
-            ) {
-                if (semanticsNode.enabled()) {
-                    semanticsNode.unmergedConfig.getOrNull(SemanticsActions.SetProgress)?.let {
-                        info.addAction(
-                            AccessibilityActionCompat(
-                                android.R.id.accessibilityActionSetProgress,
-                                it.label
-                            )
+    @RequiresApi(Build.VERSION_CODES.N)
+    private object Api24Impl {
+        @DoNotInline
+        @JvmStatic
+        fun addSetProgressAction(
+            info: AccessibilityNodeInfoCompat,
+            semanticsNode: SemanticsNode
+        ) {
+            if (semanticsNode.enabled()) {
+                semanticsNode.unmergedConfig.getOrNull(SemanticsActions.SetProgress)?.let {
+                    info.addAction(
+                        AccessibilityActionCompat(
+                            android.R.id.accessibilityActionSetProgress,
+                            it.label
                         )
-                    }
+                    )
                 }
             }
         }
     }
 
-    private class Api28Impl {
-        @RequiresApi(Build.VERSION_CODES.P)
-        companion object {
-            fun setScrollEventDelta(event: AccessibilityEvent, deltaX: Int, deltaY: Int) {
-                event.scrollDeltaX = deltaX
-                event.scrollDeltaY = deltaY
-            }
+    @RequiresApi(Build.VERSION_CODES.P)
+    private object Api28Impl {
+        @JvmStatic
+        @DoNotInline
+        fun setScrollEventDelta(event: AccessibilityEvent, deltaX: Int, deltaY: Int) {
+            event.scrollDeltaX = deltaX
+            event.scrollDeltaY = deltaY
         }
     }
 }
@@ -2504,14 +2504,16 @@ internal fun SemanticsOwner
 .getAllUncoveredSemanticsNodesToMap(): Map<Int, SemanticsNodeWithAdjustedBounds> {
     val root = unmergedRootSemanticsNode
     val nodes = mutableMapOf<Int, SemanticsNodeWithAdjustedBounds>()
-    if (!root.layoutNode.isPlaced) {
+    if (!root.layoutNode.isPlaced || !root.layoutNode.isAttached) {
         return nodes
     }
     val unaccountedSpace = Region().also { it.set(root.boundsInRoot.toAndroidRect()) }
 
     fun findAllSemanticNodesRecursive(currentNode: SemanticsNode) {
+        val notAttachedOrPlaced =
+            !currentNode.layoutNode.isPlaced || !currentNode.layoutNode.isAttached
         if ((unaccountedSpace.isEmpty && currentNode.id != root.id) ||
-            (!currentNode.layoutNode.isPlaced && !currentNode.isFake)
+            (notAttachedOrPlaced && !currentNode.isFake)
         ) {
             return
         }

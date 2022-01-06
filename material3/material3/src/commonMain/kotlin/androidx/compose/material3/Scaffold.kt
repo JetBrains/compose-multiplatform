@@ -40,9 +40,15 @@ import androidx.compose.ui.unit.dp
  *
  * @sample androidx.compose.material3.samples.SimpleScaffoldWithTopBar
  *
- * @param modifier optional Modifier for the root of the [Scaffold]
+ * To show a [Snackbar], use [SnackbarHostState.showSnackbar].
+ *
+ * @sample androidx.compose.material3.samples.ScaffoldWithSimpleSnackbar
+ *
+ * @param modifier optional Modifier for the root of the [Scaffold].
  * @param topBar top app bar of the screen. Consider using [SmallTopAppBar].
  * @param bottomBar bottom bar of the screen. Consider using [NavigationBar].
+ * @param snackbarHost component to host [Snackbar]s that are pushed to be shown via
+ * [SnackbarHostState.showSnackbar]. Usually it's a [SnackbarHost].
  * @param floatingActionButton Main action button of your screen. Consider using
  * [FloatingActionButton] for this slot.
  * @param floatingActionButtonPosition position of the FAB on the screen. See [FabPosition] for
@@ -62,19 +68,20 @@ fun Scaffold(
     modifier: Modifier = Modifier,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
+    snackbarHost: @Composable () -> Unit = {},
     floatingActionButton: @Composable () -> Unit = {},
     floatingActionButtonPosition: FabPosition = FabPosition.End,
     containerColor: Color = MaterialTheme.colorScheme.background,
     contentColor: Color = contentColorFor(containerColor),
     content: @Composable (PaddingValues) -> Unit
 ) {
-
     Surface(modifier = modifier, color = containerColor, contentColor = contentColor) {
         ScaffoldLayout(
             fabPosition = floatingActionButtonPosition,
             topBar = topBar,
             bottomBar = bottomBar,
             content = content,
+            snackbar = snackbarHost,
             fab = floatingActionButton
         )
     }
@@ -86,7 +93,9 @@ fun Scaffold(
  * @param fabPosition [FabPosition] for the FAB (if present)
  * @param topBar the content to place at the top of the [Scaffold], typically a [SmallTopAppBar]
  * @param content the main 'body' of the [Scaffold]
- * @param fab the [FloatingActionButton] displayed on top of the [content]
+ * @param snackbar the [Snackbar] displayed on top of the [content]
+ * @param fab the [FloatingActionButton] displayed on top of the [content], below the [snackbar]
+ * and above the [bottomBar]
  * @param bottomBar the content to place at the bottom of the [Scaffold], on top of the
  * [content], typically a [NavigationBar].
  */
@@ -96,6 +105,7 @@ private fun ScaffoldLayout(
     fabPosition: FabPosition,
     topBar: @Composable () -> Unit,
     content: @Composable (PaddingValues) -> Unit,
+    snackbar: @Composable () -> Unit,
     fab: @Composable () -> Unit,
     bottomBar: @Composable () -> Unit
 
@@ -112,6 +122,13 @@ private fun ScaffoldLayout(
             }
 
             val topBarHeight = topBarPlaceables.maxByOrNull { it.height }?.height ?: 0
+
+            val snackbarPlaceables = subcompose(ScaffoldLayoutContent.Snackbar, snackbar).map {
+                it.measure(looseConstraints)
+            }
+
+            val snackbarHeight = snackbarPlaceables.maxByOrNull { it.height }?.height ?: 0
+            val snackbarWidth = snackbarPlaceables.maxByOrNull { it.width }?.width ?: 0
 
             val fabPlaceables =
                 subcompose(ScaffoldLayoutContent.Fab, fab).mapNotNull { measurable ->
@@ -159,6 +176,12 @@ private fun ScaffoldLayout(
                 }
             }
 
+            val snackbarOffsetFromBottom = if (snackbarHeight != 0) {
+                snackbarHeight + (fabOffsetFromBottom ?: bottomBarHeight)
+            } else {
+                0
+            }
+
             val bodyContentHeight = layoutHeight - topBarHeight
 
             val bodyContentPlaceables = subcompose(ScaffoldLayoutContent.MainContent) {
@@ -173,6 +196,12 @@ private fun ScaffoldLayout(
             }
             topBarPlaceables.forEach {
                 it.place(0, 0)
+            }
+            snackbarPlaceables.forEach {
+                it.place(
+                    (layoutWidth - snackbarWidth) / 2,
+                    layoutHeight - snackbarOffsetFromBottom
+                )
             }
             // The bottom bar is always at the bottom of the layout
             bottomBarPlaceables.forEach {
@@ -240,4 +269,4 @@ internal val LocalFabPlacement = staticCompositionLocalOf<FabPlacement?> { null 
 // FAB spacing above the bottom bar / bottom of the Scaffold
 private val FabSpacing = 16.dp
 
-private enum class ScaffoldLayoutContent { TopBar, MainContent, Fab, BottomBar }
+private enum class ScaffoldLayoutContent { TopBar, MainContent, Snackbar, Fab, BottomBar }

@@ -391,6 +391,7 @@ class ComposerParamTransformer(
             containerSource
         ).also { fn ->
             if (this is IrSimpleFunction) {
+                fn.copyAttributes(this)
                 val propertySymbol = correspondingPropertySymbol
                 if (propertySymbol != null) {
                     fn.correspondingPropertySymbol = propertySymbol
@@ -428,7 +429,10 @@ class ComposerParamTransformer(
                     fn,
                     name = newName,
                     type = newType,
-                    isAssignable = param.defaultValue != null
+                    isAssignable = param.defaultValue != null,
+                    defaultValue = param.defaultValue?.copyWithNewTypeParams(
+                        source = this, target = fn
+                    )
                 )
             }
             fn.annotations = annotations.toList()

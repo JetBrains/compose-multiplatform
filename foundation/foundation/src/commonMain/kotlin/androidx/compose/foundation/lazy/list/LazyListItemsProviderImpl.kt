@@ -19,6 +19,9 @@ package androidx.compose.foundation.lazy.list
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.getDefaultLazyKeyFor
+import androidx.compose.foundation.lazy.layout.IntervalList
+import androidx.compose.foundation.lazy.layout.intervalForIndex
+import androidx.compose.foundation.lazy.layout.intervalIndexForItemIndex
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State

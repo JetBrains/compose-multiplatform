@@ -28,6 +28,8 @@ import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.referentialEqualityPolicy
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot.Companion.openSnapshotCount
+import androidx.compose.runtime.snapshots.Snapshot.Companion.takeMutableSnapshot
+import androidx.compose.runtime.snapshots.Snapshot.Companion.takeSnapshot
 import androidx.compose.runtime.structuralEqualityPolicy
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -796,6 +798,21 @@ class SnapshotTests {
             snapshot1.dispose()
             snapshot2.dispose()
         }
+    }
+
+    @Test
+    fun testRecordsAreReusedCorrectly() {
+        val value = mutableStateOf(0)
+        Snapshot.withMutableSnapshot { value.value++ }
+        val mutable1 = takeMutableSnapshot()
+        val readable1 = takeSnapshot()
+        mutable1.enter { value.value++ }
+        mutable1.apply().check()
+        Snapshot.withMutableSnapshot { value.value++ }
+        val v = readable1.enter { value.value }
+        assertEquals(v, 1)
+        readable1.dispose()
+        mutable1.dispose()
     }
 
     private var count = 0

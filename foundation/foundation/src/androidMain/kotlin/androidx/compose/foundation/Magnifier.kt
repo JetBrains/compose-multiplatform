@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.toSize
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
@@ -206,13 +207,17 @@ class MagnifierStyle internal constructor(
  * offset is specified by the system.
  * @param zoom See [Magnifier.setZoom]. Not supported on SDK levels < Q.
  * @param style The [MagnifierStyle] to use to configure the magnifier widget.
+ * @param onSizeChanged An optional callback that will be invoked when the magnifier widget is
+ * initialized to report on its actual size. This can be useful if one of the default
+ * [MagnifierStyle]s is used to find out what size the system decided to use for the widget.
  */
 @ExperimentalFoundationApi
 fun Modifier.magnifier(
     sourceCenter: Density.() -> Offset,
     magnifierCenter: Density.() -> Offset = { Offset.Unspecified },
     zoom: Float = Float.NaN,
-    style: MagnifierStyle = MagnifierStyle.Default
+    style: MagnifierStyle = MagnifierStyle.Default,
+    onSizeChanged: ((DpSize) -> Unit)? = null
 ): Modifier = inspectable(
     // Publish inspector info even if magnification isn't supported.
     inspectorInfo = debugInspectorInfo {
@@ -229,6 +234,7 @@ fun Modifier.magnifier(
             magnifierCenter = magnifierCenter,
             zoom = zoom,
             style = style,
+            onSizeChanged = onSizeChanged,
             platformMagnifierFactory = PlatformMagnifierFactory.getForCurrentPlatform()
         )
     } else {
@@ -252,6 +258,7 @@ internal fun Modifier.magnifier(
     magnifierCenter: Density.() -> Offset,
     zoom: Float,
     style: MagnifierStyle,
+    onSizeChanged: ((DpSize) -> Unit)?,
     platformMagnifierFactory: PlatformMagnifierFactory
 ): Modifier = composed {
     val view = LocalView.current
@@ -260,6 +267,7 @@ internal fun Modifier.magnifier(
     val updatedSourceCenter by rememberUpdatedState(sourceCenter)
     val updatedMagnifierCenter by rememberUpdatedState(magnifierCenter)
     val updatedZoom by rememberUpdatedState(zoom)
+    val updatedOnSizeChanged by rememberUpdatedState(onSizeChanged)
 
     /**
      * Used to request that the magnifier updates its buffer when the layer is redrawn.
@@ -287,6 +295,13 @@ internal fun Modifier.magnifier(
         style == MagnifierStyle.TextDefault
     ) {
         val magnifier = platformMagnifierFactory.create(style, view, density, zoom)
+        var previousSize = magnifier.size.also { newSize ->
+            updatedOnSizeChanged?.invoke(
+                with(density) {
+                    newSize.toSize().toDpSize()
+                }
+            )
+        }
 
         // Ask the magnifier to do another pixel copy whenever the nearest layer is redrawn.
         onNeedsUpdate
@@ -313,6 +328,17 @@ internal fun Modifier.magnifier(
                         },
                         zoom = updatedZoom
                     )
+
+                    magnifier.size.let { size ->
+                        if (size != previousSize) {
+                            previousSize = size
+                            updatedOnSizeChanged?.invoke(
+                                with(density) {
+                                    size.toSize().toDpSize()
+                                }
+                            )
+                        }
+                    }
                 } else {
                     // Can't place the magnifier at an unspecified location, so just hide it.
                     magnifier.dismiss()

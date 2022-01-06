@@ -662,6 +662,20 @@ package androidx.compose.runtime.internal {
     method @androidx.compose.runtime.ComposeCompilerApi public static Void illegalDecoyCallException(String fName);
   }
 
+  @androidx.compose.runtime.ComposeCompilerApi @kotlin.annotation.Repeatable @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.RUNTIME) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget.CLASS) public @interface FunctionKeyMeta {
+    method public abstract int endOffset();
+    method public abstract int key();
+    method public abstract int startOffset();
+    property public abstract int endOffset;
+    property public abstract int key;
+    property public abstract int startOffset;
+  }
+
+  @androidx.compose.runtime.ComposeCompilerApi @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.RUNTIME) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget.CLASS) public @interface FunctionKeyMetaClass {
+    method public abstract String file();
+    property public abstract String file;
+  }
+
   @androidx.compose.runtime.ComposeCompilerApi @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.RUNTIME) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget.CLASS) public @interface LiveLiteralFileInfo {
     method public abstract String file();
     property public abstract String file;
@@ -767,6 +781,9 @@ package androidx.compose.runtime.snapshots {
     method public boolean getSucceeded();
     property public boolean succeeded;
     field public static final androidx.compose.runtime.snapshots.SnapshotApplyResult.Success INSTANCE;
+  }
+
+  public final class SnapshotDoubleIndexHeapKt {
   }
 
   public final class SnapshotIdSetKt {
@@ -882,10 +899,12 @@ package androidx.compose.runtime.tooling {
 
   public interface CompositionGroup extends androidx.compose.runtime.tooling.CompositionData {
     method public Iterable<java.lang.Object> getData();
+    method public default Object? getIdentity();
     method public Object getKey();
     method public Object? getNode();
     method public String? getSourceInfo();
     property public abstract Iterable<java.lang.Object> data;
+    property public default Object? identity;
     property public abstract Object key;
     property public abstract Object? node;
     property public abstract String? sourceInfo;

@@ -45,6 +45,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateObserver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineDispatcher
@@ -3170,7 +3171,7 @@ class CompositionTests {
             }
         }
 
-        for (i in 1..5000) {
+        for (i in 1..1000) {
             runBlocking(TestCoroutineDispatcher()) {
                 localRecomposerTest {
                     @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
@@ -3191,6 +3192,98 @@ class CompositionTests {
         }
 
         thread.interrupt()
+    }
+
+    @Test
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun avoidRaceConditionWhenInvalidating() = compositionTest {
+        var scope: RecomposeScope? = null
+        var count = 0
+        var threadException: Exception? = null
+        val thread = thread {
+            try {
+                while (!Thread.interrupted()) {
+                    scope?.invalidate()
+                    count++
+                }
+            } catch (e: Exception) {
+                threadException = e
+            }
+        }
+
+        compose {
+            scope = currentRecomposeScope
+            Text("Some text")
+            Text("Count $count")
+        }
+
+        repeat(20) {
+            advance(ignorePendingWork = true)
+            delay(1)
+        }
+
+        thread.interrupt()
+        @Suppress("BlockingMethodInNonBlockingContext")
+        thread.join()
+        delay(10)
+        threadException?.let { throw it }
+    }
+
+    @Test
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun avoidRaceConditionWhenApplyingSnapshotsInAThread() = compositionTest {
+        val count = mutableStateOf(0)
+        var threadException: Exception? = null
+
+        compose {
+            Text("Some text")
+            Text("Count ${count.value}")
+        }
+
+        val thread = thread {
+            try {
+                while (!Thread.interrupted()) {
+                    Snapshot.withMutableSnapshot {
+                        count.value++
+                    }
+                }
+            } catch (e: Exception) {
+                threadException = e
+            }
+        }
+
+        repeat(200) {
+            advance(ignorePendingWork = true)
+            delay(1)
+        }
+
+        thread.interrupt()
+        @Suppress("BlockingMethodInNonBlockingContext")
+        thread.join()
+        delay(10)
+        threadException?.let { throw it }
+    }
+
+    @Test // b/197064250 and others
+    fun canInvalidateDuringApplyChanges() = compositionTest {
+        var value by mutableStateOf(0)
+        compose {
+            Wrap {
+                val scope = currentRecomposeScope
+                ComposeNode<View, ViewApplier>(
+                    factory = { View().also { it.name = "linear" } },
+                    update = {
+                        set(value) {
+                            scope.invalidate()
+                            this.attributes["value"] = value.toString()
+                        }
+                    }
+                )
+            }
+        }
+
+        value = 2
+        expectChanges()
     }
 }
 

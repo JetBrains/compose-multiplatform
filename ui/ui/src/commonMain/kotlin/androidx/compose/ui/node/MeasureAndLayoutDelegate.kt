@@ -124,15 +124,11 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
             false
         }
         NeedsRelayout, Ready -> {
-            if (duringMeasureLayout && layoutNode.wasMeasuredDuringThisIteration) {
-                postponedMeasureRequests.add(layoutNode)
-            } else {
-                layoutNode.layoutState = NeedsRemeasure
-                if (layoutNode.isPlaced || layoutNode.canAffectParent) {
-                    val parentLayoutState = layoutNode.parent?.layoutState
-                    if (parentLayoutState != NeedsRemeasure) {
-                        relayoutNodes.add(layoutNode)
-                    }
+            layoutNode.layoutState = NeedsRemeasure
+            if (layoutNode.isPlaced || layoutNode.canAffectParent) {
+                val parentLayoutState = layoutNode.parent?.layoutState
+                if (parentLayoutState != NeedsRemeasure) {
+                    relayoutNodes.add(layoutNode)
                 }
             }
             !duringMeasureLayout
@@ -240,7 +236,6 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
                 onPositionedDispatcher.onNodePositioned(layoutNode)
                 consistencyChecker?.assertConsistent()
             }
-            measureIteration++
             // execute postponed `onRequestMeasure`
             if (postponedMeasureRequests.isNotEmpty()) {
                 postponedMeasureRequests.fastForEach {
