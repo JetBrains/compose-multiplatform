@@ -336,6 +336,75 @@ class OneDimensionalFocusSearchPreviousTest {
     }
 
     @Test
+    fun focusMovesToChildOfDeactivatedItem() {
+        // Arrange.
+        val (item1, item2, item3, child) = List(4) { mutableStateOf(false) }
+        rule.setContentForTest {
+            FocusableBox(item1, 0, 0, 10, 10)
+            FocusableBox(item2, 10, 0, 10, 10, deactivated = true) {
+                FocusableBox(child, 10, 0, 10, 10)
+            }
+            FocusableBox(item3, 10, 0, 10, 10, initialFocus)
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Previous) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
+            assertThat(child.value).isTrue()
+        }
+    }
+
+    @Test
+    fun focusMovesToGrandChildOfDeactivatedItem() {
+        // Arrange.
+        val (item1, item2, item3, child, grandchild) = List(5) { mutableStateOf(false) }
+        rule.setContentForTest {
+            FocusableBox(item1, 0, 0, 10, 10)
+            FocusableBox(item2, 10, 0, 10, 10, deactivated = true) {
+                FocusableBox(child, 10, 0, 10, 10, deactivated = true) {
+                    FocusableBox(grandchild, 10, 0, 10, 10)
+                }
+            }
+            FocusableBox(item3, 10, 0, 10, 10, initialFocus)
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Previous) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
+            assertThat(grandchild.value).isTrue()
+        }
+    }
+
+    @Test
+    fun focusMovesToNextSiblingOfDeactivatedItem_evenThoughThereIsACloserNonSibling() {
+        // Arrange.
+        val (item1, item2, item3, child1, child2) = List(5) { mutableStateOf(false) }
+        rule.setContentForTest {
+            FocusableBox(item1, 10, 0, 10, 10)
+            FocusableBox(item2, 0, 0, 10, 10, deactivated = true) {
+                FocusableBox(child1, 0, 0, 10, 10)
+                FocusableBox(child2, 10, 0, 10, 10, initialFocus)
+            }
+            FocusableBox(item3, 10, 0, 10, 10)
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Previous) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
+            assertThat(child1.value).isTrue()
+        }
+    }
+
+    @Test
     fun focusPreviousOrdering() {
         // Arrange.
         val (parent1, child1, child2, child3) = List(4) { mutableStateOf(false) }

@@ -55,7 +55,7 @@ class FocusEventCountTest {
 
         // Assert.
         rule.runOnIdle {
-            assertThat(focusStates).containsExactly(
+            assertThat(focusStates).isExactly(
                 Inactive, // triggered by onFocusEvent node's onModifierChanged().
             )
         }
@@ -70,7 +70,7 @@ class FocusEventCountTest {
         }
 
         // Assert.
-        rule.runOnIdle { assertThat(focusStates).containsExactly(Inactive) }
+        rule.runOnIdle { assertThat(focusStates).isExactly(Inactive) }
     }
 
     @Test
@@ -92,7 +92,7 @@ class FocusEventCountTest {
         rule.runOnIdle { focusRequester.requestFocus() }
 
         // Assert.
-        rule.runOnIdle { assertThat(focusStates).containsExactly(Active) }
+        rule.runOnIdle { assertThat(focusStates).isExactly(Active) }
     }
 
     @Test
@@ -117,7 +117,7 @@ class FocusEventCountTest {
         rule.runOnIdle { focusRequester.requestFocus() }
 
         // Assert.
-        rule.runOnIdle { assertThat(focusStates).containsExactly(Active) }
+        rule.runOnIdle { assertThat(focusStates).isExactly(Active) }
     }
 
     @Test
@@ -144,7 +144,7 @@ class FocusEventCountTest {
         rule.runOnIdle { focusManager.clearFocus() }
 
         // Assert.
-        rule.runOnIdle { assertThat(focusStates).containsExactly(Inactive) }
+        rule.runOnIdle { assertThat(focusStates).isExactly(Inactive) }
     }
 
     @Test
@@ -171,7 +171,7 @@ class FocusEventCountTest {
 
         // Assert.
         rule.runOnIdle {
-            assertThat(focusStates).containsExactly(
+            assertThat(focusStates).isExactly(
                 Inactive, // triggered by focus node's state change.
                 Inactive, // triggered by onFocusEvent node's onModifierChanged().
             )
@@ -196,7 +196,7 @@ class FocusEventCountTest {
         rule.runOnIdle { addFocusTarget = false }
 
         // Assert.
-        rule.runOnIdle { assertThat(focusStates).containsExactly(Inactive) }
+        rule.runOnIdle { assertThat(focusStates).isExactly(Inactive) }
     }
 
     @Test
@@ -218,7 +218,7 @@ class FocusEventCountTest {
 
         // Assert.
         rule.runOnIdle {
-            assertThat(focusStates).containsExactly(
+            assertThat(focusStates).isExactly(
                 Inactive, // triggered by onFocusEvent node's onModifierChanged().
                 Inactive, // triggered by focus node's onModifierChanged().
             )
@@ -245,7 +245,7 @@ class FocusEventCountTest {
 
         // Assert.
         rule.runOnIdle {
-            assertThat(focusStates).containsExactly(
+            assertThat(focusStates).isExactly(
                 Inactive, // triggered by onFocusEvent node's onModifierChanged().
                 Inactive, // triggered by focus node's onModifierChanged().
             )
@@ -271,7 +271,7 @@ class FocusEventCountTest {
         rule.runOnIdle { deactiated = true }
 
         // Assert.
-        rule.runOnIdle { assertThat(focusStates).containsExactly(Deactivated) }
+        rule.runOnIdle { assertThat(focusStates).isExactly(Deactivated) }
     }
 
     @Test
@@ -293,6 +293,6 @@ class FocusEventCountTest {
         rule.runOnIdle { deactiated = false }
 
         // Assert.
-        rule.runOnIdle { assertThat(focusStates).containsExactly(Inactive) }
+        rule.runOnIdle { assertThat(focusStates).isExactly(Inactive) }
     }
 }

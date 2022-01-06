@@ -232,7 +232,10 @@ class TwoDimensionalFocusTraversalInTest {
         rule.runOnIdle {
             assertThat(movedFocusSuccessfully).isTrue()
             assertThat(focusedItem.value).isFalse()
-            assertThat(children.values).containsExactly(true, false, false, false, false, false)
+            assertThat(children.values).isExactly(
+                true, false, false,
+                false, false, false
+            )
         }
     }
 
@@ -269,7 +272,10 @@ class TwoDimensionalFocusTraversalInTest {
         rule.runOnIdle {
             assertThat(movedFocusSuccessfully).isTrue()
             assertThat(focusedItem.value).isFalse()
-            assertThat(children.values).containsExactly(false, true, false, false, false, false)
+            assertThat(children.values).isExactly(
+                false, false, false,
+                true, false, false
+            )
         }
     }
 

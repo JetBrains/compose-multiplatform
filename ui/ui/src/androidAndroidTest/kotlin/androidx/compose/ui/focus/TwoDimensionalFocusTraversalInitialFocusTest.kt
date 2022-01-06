@@ -23,13 +23,13 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.FocusDirection.Companion.Down
 import androidx.compose.ui.focus.FocusDirection.Companion.Left
 import androidx.compose.ui.focus.FocusDirection.Companion.Right
 import androidx.compose.ui.focus.FocusDirection.Companion.Up
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -53,6 +53,8 @@ class TwoDimensionalFocusTraversalInitialFocusTest(param: Param) {
     }
 
     private val focusDirection = param.focusDirection
+    lateinit var view: View
+    private lateinit var focusManager: FocusManager
 
     companion object {
         @JvmStatic
@@ -63,12 +65,8 @@ class TwoDimensionalFocusTraversalInitialFocusTest(param: Param) {
     @Test
     fun initialFocus() {
         // Arrange.
-        lateinit var view: View
-        lateinit var focusManager: FocusManager
         val isFocused = MutableList(4) { mutableStateOf(false) }
-        rule.setContent {
-            view = LocalView.current
-            focusManager = LocalFocusManager.current
+        rule.setContentForTest {
             Column {
                 Row {
                     FocusableBox(isFocused[0])
@@ -80,18 +78,20 @@ class TwoDimensionalFocusTraversalInitialFocusTest(param: Param) {
                 }
             }
         }
-        rule.runOnIdle { view.requestFocus() }
 
         // Act.
-        rule.runOnIdle { focusManager.moveFocus(focusDirection) }
+        val movedFocusSuccessfully = rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
             when (focusDirection) {
-                Up -> assertThat(isFocused.values).containsExactly(false, false, true, false)
-                Down -> assertThat(isFocused.values).containsExactly(true, false, false, false)
-                Left -> assertThat(isFocused.values).containsExactly(false, false, false, true)
-                Right -> assertThat(isFocused.values).containsExactly(true, false, false, false)
+                Up -> assertThat(isFocused.values).isExactly(false, false, false, true)
+                Down -> assertThat(isFocused.values).isExactly(true, false, false, false)
+                Left -> assertThat(isFocused.values).isExactly(false, false, false, true)
+                Right -> assertThat(isFocused.values).isExactly(true, false, false, false)
                 else -> error(invalid)
             }
         }
@@ -100,12 +100,8 @@ class TwoDimensionalFocusTraversalInitialFocusTest(param: Param) {
     @Test
     fun initialFocus_DeactivatedItemIsSkipped() {
         // Arrange.
-        lateinit var view: View
-        lateinit var focusManager: FocusManager
         val isFocused = MutableList(9) { mutableStateOf(false) }
-        rule.setContent {
-            view = LocalView.current
-            focusManager = LocalFocusManager.current
+        rule.setContentForTest {
             Column {
                 Row {
                     FocusableBox(isFocused[0], deactivated = true)
@@ -124,32 +120,34 @@ class TwoDimensionalFocusTraversalInitialFocusTest(param: Param) {
                 }
             }
         }
-        rule.runOnIdle { view.requestFocus() }
 
         // Act.
-        rule.runOnIdle { focusManager.moveFocus(focusDirection) }
+        val movedFocusSuccessfully = rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
             when (focusDirection) {
-                Up -> assertThat(isFocused.values).containsExactly(
+                Up -> assertThat(isFocused.values).isExactly(
                     false, false, false,
                     false, false, false,
-                    false, true, false
+                    false, false, true
                 )
-                Down -> assertThat(isFocused.values).containsExactly(
+                Down -> assertThat(isFocused.values).isExactly(
                     false, true, false,
                     false, false, false,
                     false, false, false
                 )
-                Left -> assertThat(isFocused.values).containsExactly(
-                    false, true, false,
+                Left -> assertThat(isFocused.values).isExactly(
                     false, false, false,
-                    false, false, false
+                    false, false, false,
+                    false, false, true
                 )
-                Right -> assertThat(isFocused.values).containsExactly(
-                    false, true, false,
+                Right -> assertThat(isFocused.values).isExactly(
                     false, false, false,
+                    true, false, false,
                     false, false, false
                 )
                 else -> error(invalid)
@@ -161,155 +159,65 @@ class TwoDimensionalFocusTraversalInitialFocusTest(param: Param) {
     fun initialFocus_whenThereIsOnlyOneFocusable() {
         // Arrange.
         val isFocused = mutableStateOf(false)
-        lateinit var view: View
-        lateinit var focusManager: FocusManager
-        rule.setContent {
-            view = LocalView.current
-            focusManager = LocalFocusManager.current
+        rule.setContentForTest {
             FocusableBox(isFocused)
         }
-        rule.runOnIdle { view.requestFocus() }
 
         // Act.
-        rule.runOnIdle { focusManager.moveFocus(focusDirection) }
+        val movedFocusSuccessfully = rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
-        rule.runOnIdle { assertThat(isFocused.value).isTrue() }
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
+            assertThat(isFocused.value).isTrue()
+        }
     }
 
     @Test
     fun doesNotCrash_whenThereIsNoFocusable() {
         // Arrange.
-        lateinit var view: View
-        lateinit var focusManager: FocusManager
-        rule.setContent {
-            view = LocalView.current
-            focusManager = LocalFocusManager.current
+        rule.setContentForTest {
             BasicText("Hello")
         }
-        rule.runOnIdle { view.requestFocus() }
 
         // Act.
-        rule.runOnIdle { focusManager.moveFocus(focusDirection) }
+        val movedFocusSuccessfully = rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isFalse()
+        }
     }
 
     @Test
     fun doesNotCrash_whenThereIsOneDeactivatedItem() {
         // Arrange.
-        lateinit var view: View
-        lateinit var focusManager: FocusManager
-        rule.setContent {
-            view = LocalView.current
-            focusManager = LocalFocusManager.current
+        rule.setContentForTest {
             FocusableBox(deactivated = true)
         }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isFalse()
+        }
+    }
+
+    private fun ComposeContentTestRule.setContentForTest(composable: @Composable () -> Unit) {
+        setContent {
+            view = LocalView.current
+            focusManager = LocalFocusManager.current
+            composable()
+        }
         rule.runOnIdle { view.requestFocus() }
-
-        // Act.
-        rule.runOnIdle { focusManager.moveFocus(focusDirection) }
-    }
-
-    @OptIn(ExperimentalComposeUiApi::class)
-    @Test
-    fun movesFocusAmongSiblingsDeepInTheFocusHierarchy() {
-        // Arrange.
-        lateinit var focusManager: FocusManager
-        val isFocused = MutableList(2) { mutableStateOf(false) }
-        val (item1, item2) = FocusRequester.createRefs()
-        val siblings = @Composable {
-            FocusableBox(isFocused[0], item1)
-            FocusableBox(isFocused[1], item2)
-        }
-        val initialFocusedItem = when (focusDirection) {
-            Up, Left -> item2
-            Down, Right -> item1
-            else -> error(invalid)
-        }
-        rule.setContent {
-            focusManager = LocalFocusManager.current
-            FocusableBox {
-                FocusableBox {
-                    FocusableBox {
-                        FocusableBox {
-                            FocusableBox {
-                                FocusableBox {
-                                    when (focusDirection) {
-                                        Up, Down -> Column { siblings() }
-                                        Left, Right -> Row { siblings() }
-                                        else -> error(invalid)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        rule.runOnIdle { initialFocusedItem.requestFocus() }
-
-        // Act.
-        rule.runOnIdle { focusManager.moveFocus(focusDirection) }
-
-        // Assert.
-        rule.runOnIdle {
-            when (focusDirection) {
-                Up, Left -> assertThat(isFocused.values).containsExactly(true, false)
-                Down, Right -> assertThat(isFocused.values).containsExactly(false, true)
-                else -> error(invalid)
-            }
-        }
-    }
-
-    @OptIn(ExperimentalComposeUiApi::class)
-    @Test
-    fun movesFocusAmongSiblingsDeepInTheFocusHierarchy_skipsDeactivatedSibling() {
-        // Arrange.
-        lateinit var focusManager: FocusManager
-        val isFocused = MutableList(3) { mutableStateOf(false) }
-        val (item1, item3) = FocusRequester.createRefs()
-        val siblings = @Composable {
-            FocusableBox(isFocused[0], item1)
-            FocusableBox(isFocused[1])
-            FocusableBox(isFocused[2], item3)
-        }
-        val initialFocusedItem = when (focusDirection) {
-            Up, Left -> item3
-            Down, Right -> item1
-            else -> error(invalid)
-        }
-        rule.setContent {
-            focusManager = LocalFocusManager.current
-            FocusableBox {
-                FocusableBox {
-                    FocusableBox {
-                        FocusableBox {
-                            FocusableBox {
-                                FocusableBox {
-                                    when (focusDirection) {
-                                        Up, Down -> Column { siblings() }
-                                        Left, Right -> Row { siblings() }
-                                        else -> error(invalid)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        rule.runOnIdle { initialFocusedItem.requestFocus() }
-
-        // Act.
-        rule.runOnIdle { focusManager.moveFocus(focusDirection) }
-
-        // Assert.
-        rule.runOnIdle {
-            when (focusDirection) {
-                Up, Left -> assertThat(isFocused.values).containsExactly(true, false, false)
-                Down, Right -> assertThat(isFocused.values).containsExactly(false, false, true)
-                else -> error(invalid)
-            }
-        }
     }
 }
 
