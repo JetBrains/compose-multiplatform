@@ -24,37 +24,47 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
 import androidx.compose.ui.graphics.Color
 import androidx.core.view.get
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNotSame
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
 import org.junit.Assert.fail
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.lang.ref.WeakReference
+import kotlin.coroutines.CoroutineContext
 
 @RunWith(AndroidJUnit4::class)
 class WindowRecomposerTest {
@@ -142,6 +152,7 @@ class WindowRecomposerTest {
     }
 
     @Test
+    @MediumTest
     fun setContentViewCalledMultipleTimes(): Unit = runBlocking {
         var output by mutableStateOf("initial")
         val input = MutableStateFlow(0)
@@ -182,4 +193,102 @@ class WindowRecomposerTest {
             assertOutput("one 2")
         }
     }
+
+    @ExperimentalComposeUiApi
+    @Test
+    @MediumTest
+    fun lifecycleAwareWindowRecomposerAcceptsContextElements(): Unit = runBlocking {
+        ActivityScenario.launch(ComponentActivity::class.java).use { scenario ->
+            val expectedElement = SampleCoroutineContextElement()
+            val effectContext = CompletableDeferred<CoroutineContext>()
+            scenario.onActivity { activity ->
+                val view = ComposeView(activity)
+                val recomposer = view.createLifecycleAwareWindowRecomposer(
+                    expectedElement,
+                    activity.lifecycle
+                )
+                view.setParentCompositionContext(recomposer)
+                view.setContent {
+                    LaunchedEffect(Unit) {
+                        effectContext.complete(coroutineContext)
+                    }
+                }
+
+                activity.setContentView(view)
+            }
+            assertSame(expectedElement, effectContext.await()[SampleCoroutineContextElement])
+        }
+    }
+
+    @ExperimentalComposeUiApi
+    @Test
+    @MediumTest
+    fun lifecycleAwareWindowRecomposerJoinsAfterDetach(): Unit = runBlocking {
+        ActivityScenario.launch(ComponentActivity::class.java).use { scenario ->
+            lateinit var recomposer: Recomposer
+            val lifecycleOwner = object : LifecycleOwner {
+                val lifecycle = LifecycleRegistry(this)
+                override fun getLifecycle(): Lifecycle = lifecycle
+            }
+            scenario.onActivity { activity ->
+                val view = View(activity)
+                lifecycleOwner.lifecycle.currentState = Lifecycle.State.RESUMED
+                recomposer = view.createLifecycleAwareWindowRecomposer(
+                    lifecycle = lifecycleOwner.lifecycle
+                )
+                activity.setContentView(view)
+                (view.parent as ViewGroup).removeView(view)
+            }
+            assertNotNull(
+                "recomposer did not join",
+                withTimeoutOrNull(3_000) {
+                    recomposer.join()
+                }
+            )
+
+            // LifecycleRegistry enforces main thread checks for observerCount
+            withContext(Dispatchers.Main) {
+                assertEquals(
+                    "did not unregister LifecycleObserver after detach; lifecycle observer count",
+                    0,
+                    lifecycleOwner.lifecycle.observerCount
+                )
+            }
+        }
+    }
+
+    @ExperimentalComposeUiApi
+    @Test
+    @MediumTest
+    fun lifecycleAwareWindowRecomposerJoinsAfterLifecycleDestroy(): Unit = runBlocking {
+        ActivityScenario.launch(ComponentActivity::class.java).use { scenario ->
+            lateinit var recomposer: Recomposer
+            scenario.onActivity { activity ->
+                val view = View(activity)
+                val lifecycleOwner = object : LifecycleOwner {
+                    val lifecycle = LifecycleRegistry(this)
+                    override fun getLifecycle(): Lifecycle = lifecycle
+                }
+                lifecycleOwner.lifecycle.currentState = Lifecycle.State.RESUMED
+                recomposer = view.createLifecycleAwareWindowRecomposer(
+                    lifecycle = lifecycleOwner.lifecycle
+                )
+                activity.setContentView(view)
+                lifecycleOwner.lifecycle.currentState = Lifecycle.State.DESTROYED
+            }
+            assertNotNull(
+                "recomposer did not join",
+                withTimeoutOrNull(3_000) {
+                    recomposer.join()
+                }
+            )
+        }
+    }
+}
+
+private class SampleCoroutineContextElement : CoroutineContext.Element {
+    override val key: CoroutineContext.Key<SampleCoroutineContextElement>
+        get() = SampleCoroutineContextElement
+
+    companion object : CoroutineContext.Key<SampleCoroutineContextElement>
 }
