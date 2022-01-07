@@ -12,16 +12,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.BlendMode.Companion.Color
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.web.dom.Canvas
-import org.jetbrains.compose.web.dom.Table
-import org.jetbrains.compose.web.dom.Td
-import org.jetbrains.compose.web.dom.Tr
+import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.renderComposable
 import org.jetbrains.compose.web.skiko.skiko
 import org.jetbrains.skiko.wasm.onWasmReady
@@ -41,7 +36,10 @@ fun SomeCanvas() {
             LaunchedEffect(radius) {
                 radius.animateTo(
                     targetValue = 100f,
-                    animationSpec = infiniteRepeatable(tween(durationMillis = 1000, easing = LinearEasing), repeatMode = RepeatMode.Reverse)
+                    animationSpec = infiniteRepeatable(
+                        tween(durationMillis = 1000, easing = LinearEasing),
+                        repeatMode = RepeatMode.Reverse
+                    )
                 )
             }
 
@@ -53,7 +51,7 @@ fun SomeCanvas() {
                 drawCircle(color = Color(255, 160, 122), radius = radius.value)
                 drawCircle(color = Color(230, 230, 250), radius = 0.8f * radius.value)
                 drawCircle(color = Color(127, 255, 212), radius = 0.6f * radius.value)
-                drawCircle(color = Color(255, 215,   0), radius = 0.4f * radius.value)
+                drawCircle(color = Color(255, 215, 0), radius = 0.4f * radius.value)
                 drawCircle(color = androidx.compose.ui.graphics.Color(64, 224, 208), radius = 0.2f * radius.value)
             }
         }
@@ -62,17 +60,15 @@ fun SomeCanvas() {
 
 @Composable
 fun App() {
-    Table {
-        Tr {
-            Td {
-                SomeCanvas()
-            }
-            Td {
-                SomeCanvas()
-            }
-            Td {
-                SomeCanvas()
-            }
+    Div {
+        Span {
+            SomeCanvas()
+        }
+        Span {
+            SomeCanvas()
+        }
+        Span {
+            SomeCanvas()
         }
     }
 }
