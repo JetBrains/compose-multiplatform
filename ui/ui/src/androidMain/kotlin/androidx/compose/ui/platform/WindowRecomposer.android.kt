@@ -22,6 +22,7 @@ import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.PausableMonotonicFrameClock
 import androidx.compose.runtime.Recomposer
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.R
 import androidx.lifecycle.Lifecycle
@@ -35,6 +36,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.android.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.coroutines.ContinuationInterceptor
+import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
 /**
@@ -95,8 +98,9 @@ fun interface WindowRecomposerFactory {
          * [Lifecycle.State.STARTED], causing animations and other uses of [MonotonicFrameClock]
          * APIs to suspend until a **visible** frame will be produced.
          */
+        @OptIn(ExperimentalComposeUiApi::class)
         val LifecycleAware: WindowRecomposerFactory = WindowRecomposerFactory { rootView ->
-            rootView.createLifecycleAwareViewTreeRecomposer()
+            rootView.createLifecycleAwareWindowRecomposer()
         }
     }
 }
@@ -233,15 +237,42 @@ internal val View.windowRecomposer: Recomposer
         }
     }
 
-private fun View.createLifecycleAwareViewTreeRecomposer(): Recomposer {
-    val currentThreadContext = AndroidUiDispatcher.CurrentThread
-    val pausableClock = currentThreadContext[MonotonicFrameClock]?.let {
+/**
+ * Create a [Lifecycle] and [window attachment][View.isAttachedToWindow]-aware [Recomposer] for
+ * this [View] with the same behavior as [WindowRecomposerFactory.LifecycleAware].
+ *
+ * [coroutineContext] will override any [CoroutineContext] elements from the default configuration
+ * normally used for this content view. The default [CoroutineContext] contains
+ * [AndroidUiDispatcher.CurrentThread]; this function should only be called from the UI thread
+ * of this [View] or its intended UI thread if it is currently detached.
+ *
+ * If [lifecycle] is `null` or not supplied the [ViewTreeLifecycleOwner] will be used;
+ * if a non-null [lifecycle] is not provided and a [ViewTreeLifecycleOwner] is not present
+ * an [IllegalStateException] will be thrown.
+ *
+ * The returned [Recomposer] will be [cancelled][Recomposer.cancel] when this [View] is detached
+ * from a window or if its determined [Lifecycle] is [destroyed][Lifecycle.Event.ON_DESTROY].
+ * Recomposition and associated [frame-based][MonotonicFrameClock] effects may be throttled
+ * or paused while the [Lifecycle] is not at least [Lifecycle.State.STARTED].
+ */
+@ExperimentalComposeUiApi
+fun View.createLifecycleAwareWindowRecomposer(
+    coroutineContext: CoroutineContext = EmptyCoroutineContext,
+    lifecycle: Lifecycle? = null
+): Recomposer {
+    // Only access AndroidUiDispatcher.CurrentThread if we would use an element from it,
+    // otherwise prevent lazy initialization.
+    val baseContext = if (coroutineContext[ContinuationInterceptor] == null ||
+        coroutineContext[MonotonicFrameClock] == null) {
+            AndroidUiDispatcher.CurrentThread + coroutineContext
+    } else coroutineContext
+    val pausableClock = baseContext[MonotonicFrameClock]?.let {
         PausableMonotonicFrameClock(it).apply { pause() }
     }
-    val contextWithClock = currentThreadContext + (pausableClock ?: EmptyCoroutineContext)
+    val contextWithClock = baseContext + (pausableClock ?: EmptyCoroutineContext)
     val recomposer = Recomposer(contextWithClock)
     val runRecomposeScope = CoroutineScope(contextWithClock)
-    val viewTreeLifecycleOwner = checkNotNull(ViewTreeLifecycleOwner.get(this)) {
+    val viewTreeLifecycle = checkNotNull(lifecycle ?: ViewTreeLifecycleOwner.get(this)?.lifecycle) {
         "ViewTreeLifecycleOwner not found from $this"
     }
     // Removing the view holding the ViewTreeRecomposer means we may never be reattached again.
@@ -257,7 +288,7 @@ private fun View.createLifecycleAwareViewTreeRecomposer(): Recomposer {
             }
         }
     )
-    viewTreeLifecycleOwner.lifecycle.addObserver(
+    viewTreeLifecycle.addObserver(
         object : LifecycleEventObserver {
             override fun onStateChanged(lifecycleOwner: LifecycleOwner, event: Lifecycle.Event) {
                 val self = this

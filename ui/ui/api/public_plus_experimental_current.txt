@@ -2573,6 +2573,7 @@ package androidx.compose.ui.platform {
   }
 
   public final class WindowRecomposer_androidKt {
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.runtime.Recomposer createLifecycleAwareWindowRecomposer(android.view.View, optional kotlin.coroutines.CoroutineContext coroutineContext, optional androidx.lifecycle.Lifecycle? lifecycle);
     method public static androidx.compose.runtime.CompositionContext? findViewTreeCompositionContext(android.view.View);
     method public static androidx.compose.runtime.CompositionContext? getCompositionContext(android.view.View);
     method public static void setCompositionContext(android.view.View, androidx.compose.runtime.CompositionContext? value);
