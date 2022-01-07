@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode.Companion.Color
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.web.dom.Canvas
@@ -49,10 +50,11 @@ fun SomeCanvas() {
                     .size(300.dp)
                     .fillMaxSize()
             ) {
-                drawCircle(color = androidx.compose.ui.graphics.Color.Red, radius = radius.value)
-                drawCircle(color = androidx.compose.ui.graphics.Color.LightGray, radius = 0.8f * radius.value)
-                drawCircle(color = androidx.compose.ui.graphics.Color.Green, radius = 0.6f * radius.value)
-                drawCircle(color = androidx.compose.ui.graphics.Color.Yellow, radius = 0.4f * radius.value)
+                drawCircle(color = Color(255, 160, 122), radius = radius.value)
+                drawCircle(color = Color(230, 230, 250), radius = 0.8f * radius.value)
+                drawCircle(color = Color(127, 255, 212), radius = 0.6f * radius.value)
+                drawCircle(color = Color(255, 215,   0), radius = 0.4f * radius.value)
+                drawCircle(color = androidx.compose.ui.graphics.Color(64, 224, 208), radius = 0.2f * radius.value)
             }
         }
     }
