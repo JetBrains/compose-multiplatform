@@ -203,7 +203,7 @@ internal fun MotionEvent(
         0f,
         0,
         0,
-        0,
+        InputDevice.SOURCE_TOUCHSCREEN,
         0
     ).apply {
         offsetLocation(-locationOnScreen[0].toFloat(), -locationOnScreen[1].toFloat())

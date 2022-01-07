@@ -17,6 +17,7 @@
 package androidx.compose.ui.input.pointer
 
 import android.util.SparseLongArray
+import android.view.InputDevice
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_CANCEL
 import android.view.MotionEvent.ACTION_DOWN
@@ -1688,7 +1689,7 @@ private fun MotionEvent(
     0f,
     0,
     0,
-    0,
+    InputDevice.SOURCE_TOUCHSCREEN,
     0
 )
 
