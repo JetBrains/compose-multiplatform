@@ -24,8 +24,6 @@ internal object TextButton {
     val ContainerElevation = Elevation.Level0
     val ContainerHeight = 40.0.dp
     val ContainerShape = RoundedCornerShape(20.0.dp)
-    val DisabledContainerColor = ColorSchemeKey.OnSurface
-    const val DisabledContainerOpacity = 0.12f
     val DisabledLabelTextColor = ColorSchemeKey.OnSurface
     const val DisabledLabelTextOpacity = 0.38f
     val FocusLabelTextColor = ColorSchemeKey.Primary

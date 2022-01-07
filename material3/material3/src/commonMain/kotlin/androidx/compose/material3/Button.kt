@@ -624,10 +624,7 @@ object ButtonDefaults {
     fun textButtonColors(
         containerColor: Color = Color.Transparent,
         contentColor: Color = MaterialTheme.colorScheme.fromToken(TextButton.LabelTextColor),
-        disabledContainerColor: Color =
-            MaterialTheme.colorScheme
-                .fromToken(TextButton.DisabledContainerColor)
-                .copy(alpha = TextButton.DisabledContainerOpacity),
+        disabledContainerColor: Color = Color.Transparent,
         disabledContentColor: Color =
             MaterialTheme.colorScheme
                 .fromToken(TextButton.DisabledLabelTextColor)
