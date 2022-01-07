@@ -22,14 +22,13 @@ import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.platform.AndroidResourceLoader
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.sp
 import androidx.test.filters.LargeTest
@@ -119,7 +118,7 @@ class ParagraphBenchmark(
             text = text,
             density = Density(density = instrumentationContext.resources.displayMetrics.density),
             style = TextStyle(fontSize = fontSize),
-            resourceLoader = Font.AndroidResourceLoader(instrumentationContext),
+            fontFamilyResolver = createFontFamilyResolver(instrumentationContext),
             spanStyles = spanStyles
         )
     }

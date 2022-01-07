@@ -23,10 +23,12 @@ import androidx.compose.ui.text.platform.AndroidTypeface
 
 @ExperimentalTextApi
 internal actual class PlatformFontFamilyTypefaceAdapter : FontFamilyTypefaceAdapter {
+
     override fun resolve(
         typefaceRequest: TypefaceRequest,
-        resourceLoader: Font.ResourceLoader,
-        onAsyncCompletion: (TypefaceResult.Immutable) -> Unit
+        fontLoader: FontLoader,
+        onAsyncCompletion: (TypefaceResult.Immutable) -> Unit,
+        createDefaultTypeface: (TypefaceRequest) -> Any
     ): TypefaceResult? {
         val result: Typeface = when (typefaceRequest.fontFamily) {
             null, is DefaultFontFamily -> create(

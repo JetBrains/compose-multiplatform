@@ -38,7 +38,7 @@ internal interface FontFamilyTypefaceAdapter {
      * result is available to allow caches to update.
      *
      * @param typefaceRequest unique description of this typeface request
-     * @param resourceLoader font loader used for loading typefaces from [Font] descriptors
+     * @param fontLoader font loader used for loading typefaces from [Font] descriptors
      * @param onAsyncCompletion will be called (on an arbitrary thread) when
      * [FontLoadingStrategy.Async] fonts reach their final resolved state, may be called prior to
      * resolve returning
@@ -46,7 +46,8 @@ internal interface FontFamilyTypefaceAdapter {
      */
     fun resolve(
         typefaceRequest: TypefaceRequest,
-        resourceLoader: Font.ResourceLoader,
-        onAsyncCompletion: ((TypefaceResult.Immutable) -> Unit)
+        fontLoader: FontLoader,
+        onAsyncCompletion: ((TypefaceResult.Immutable) -> Unit),
+        createDefaultTypeface: (TypefaceRequest) -> Any
     ): TypefaceResult?
 }

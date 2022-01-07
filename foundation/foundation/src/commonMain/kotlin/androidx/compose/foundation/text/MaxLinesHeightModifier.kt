@@ -21,7 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalFontLoader
+import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.text.TextStyle
@@ -48,26 +48,28 @@ internal fun Modifier.maxLinesHeight(
     if (maxLines == Int.MAX_VALUE) return@composed Modifier
 
     val density = LocalDensity.current
-    val resourceLoader = LocalFontLoader.current
+    val fontFamilyResolver = LocalFontFamilyResolver.current
     val layoutDirection = LocalLayoutDirection.current
 
     // Difference between the height of two lines paragraph and one line paragraph gives us
     // an approximation of height of one line
-    val firstLineHeight = remember(density, resourceLoader, textStyle, layoutDirection) {
+    // TODO(seanmcq): Uncache this
+    val firstLineHeight = remember(density, fontFamilyResolver, textStyle, layoutDirection) {
         computeSizeForDefaultText(
             style = resolveDefaults(textStyle, layoutDirection),
             density = density,
-            resourceLoader = resourceLoader,
+            fontFamilyResolver = fontFamilyResolver,
             text = EmptyTextReplacement,
             maxLines = 1
         ).height
     }
-    val firstTwoLinesHeight = remember(density, resourceLoader, textStyle, layoutDirection) {
+    // TODO(seanmcq): Uncache this
+    val firstTwoLinesHeight = remember(density, fontFamilyResolver, textStyle, layoutDirection) {
         val twoLines = EmptyTextReplacement + "\n" + EmptyTextReplacement
         computeSizeForDefaultText(
             style = resolveDefaults(textStyle, layoutDirection),
             density = density,
-            resourceLoader = resourceLoader,
+            fontFamilyResolver = fontFamilyResolver,
             text = twoLines,
             maxLines = 2
         ).height

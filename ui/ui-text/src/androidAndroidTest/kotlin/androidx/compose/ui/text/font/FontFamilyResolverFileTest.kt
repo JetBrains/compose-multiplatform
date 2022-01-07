@@ -19,8 +19,8 @@ package androidx.compose.ui.text.font
 import android.content.Context
 import android.graphics.Typeface
 import android.os.ParcelFileDescriptor
-import androidx.compose.ui.platform.AndroidResourceLoader
 import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.UncachedFontFamilyResolver
 import androidx.compose.ui.text.matchers.assertThat
 import androidx.compose.ui.text.platform.bitmap
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -40,7 +40,7 @@ class FontFamilyResolverFileTest {
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val assetFontPath = "subdirectory/asset_font.ttf"
     private val tmpFontPath = "tmp_file_font.ttf"
-    private val resourceLoader = Font.AndroidResourceLoader(context)
+    private val fontFamilyResolver = UncachedFontFamilyResolver(context)
 
     @Before
     fun setup() {
@@ -59,8 +59,7 @@ class FontFamilyResolverFileTest {
         fontStyle: FontStyle = FontStyle.Normal,
         fontSynthesis: FontSynthesis = FontSynthesis.All
     ): Typeface {
-        return FontFamilyResolver.resolve(
-            resourceLoader,
+        return fontFamilyResolver.resolve(
             fontFamily,
             fontWeight,
             fontStyle,

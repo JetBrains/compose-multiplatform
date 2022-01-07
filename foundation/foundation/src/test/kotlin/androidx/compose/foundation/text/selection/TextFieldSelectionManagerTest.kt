@@ -105,7 +105,7 @@ class TextFieldSelectionManagerTest {
                 overflow = TextOverflow.Ellipsis,
                 density = density,
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = mock(),
+                fontFamilyResolver = mock(),
                 constraints = Constraints()
             )
         )

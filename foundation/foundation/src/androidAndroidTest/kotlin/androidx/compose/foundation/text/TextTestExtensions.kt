@@ -15,9 +15,6 @@
  */
 package androidx.compose.foundation.text
 
-import android.content.Context
-import androidx.compose.ui.platform.AndroidResourceLoader
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -27,9 +24,6 @@ import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 fun Float.toIntPx(): Int = ceil(this).roundToInt()
-
-@OptIn(ExperimentalTextApi::class)
-fun TestFontResourceLoader(context: Context) = Font.AndroidResourceLoader(context)
 
 val TEST_FONT = Font(
     resId = R.font.sample_font,

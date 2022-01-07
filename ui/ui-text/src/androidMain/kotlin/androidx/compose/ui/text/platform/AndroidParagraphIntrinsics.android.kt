@@ -25,7 +25,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.android.InternalPlatformTextApi
 import androidx.compose.ui.text.android.LayoutCompat
 import androidx.compose.ui.text.android.LayoutIntrinsics
-import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.intl.AndroidLocale
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.platform.extensions.applySpanStyle
@@ -36,12 +36,12 @@ import androidx.core.view.ViewCompat
 import java.util.Locale
 
 @OptIn(InternalPlatformTextApi::class)
-internal class AndroidParagraphIntrinsics(
+internal class AndroidParagraphIntrinsics constructor(
     val text: String,
     val style: TextStyle,
     val spanStyles: List<AnnotatedString.Range<SpanStyle>>,
     val placeholders: List<AnnotatedString.Range<Placeholder>>,
-    val resourceLoader: Font.ResourceLoader,
+    val fontFamilyResolver: FontFamily.Resolver,
     val density: Density
 ) : ParagraphIntrinsics {
 
@@ -65,7 +65,7 @@ internal class AndroidParagraphIntrinsics(
     init {
         val notAppliedStyle = textPaint.applySpanStyle(
             style = style.toSpanStyle(),
-            resourceLoader = resourceLoader,
+            fontFamilyResolver = fontFamilyResolver,
             density = density
         )
 
@@ -84,7 +84,7 @@ internal class AndroidParagraphIntrinsics(
             ) + spanStyles,
             placeholders = placeholders,
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         )
 
         layoutIntrinsics = LayoutIntrinsics(charSequence, textPaint, textDirectionHeuristic)
@@ -126,12 +126,12 @@ internal actual fun ActualParagraphIntrinsics(
     spanStyles: List<AnnotatedString.Range<SpanStyle>>,
     placeholders: List<AnnotatedString.Range<Placeholder>>,
     density: Density,
-    resourceLoader: Font.ResourceLoader
+    fontFamilyResolver: FontFamily.Resolver
 ): ParagraphIntrinsics = AndroidParagraphIntrinsics(
     text = text,
     style = style,
     placeholders = placeholders,
-    resourceLoader = resourceLoader,
+    fontFamilyResolver = fontFamilyResolver,
     spanStyles = spanStyles,
     density = density
 )

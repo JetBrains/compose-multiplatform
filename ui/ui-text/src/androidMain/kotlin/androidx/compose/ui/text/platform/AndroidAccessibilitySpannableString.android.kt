@@ -33,11 +33,12 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.GenericFontFamily
-import androidx.compose.ui.text.font.FontFamilyResolver
+import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.font.getAndroidTypefaceStyle
 import androidx.compose.ui.text.platform.extensions.setBackground
 import androidx.compose.ui.text.platform.extensions.setColor
@@ -57,11 +58,21 @@ import androidx.compose.ui.util.fastForEach
 @InternalTextApi // used in ui:ui
 fun AnnotatedString.toAccessibilitySpannableString(
     density: Density,
-    resourceLoader: Font.ResourceLoader
+    @Suppress("DEPRECATION") resourceLoader: Font.ResourceLoader
+): SpannableString {
+    @Suppress("DEPRECATION")
+    return toAccessibilitySpannableString(density, createFontFamilyResolver(resourceLoader))
+}
+
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+@InternalTextApi // used in ui:ui
+fun AnnotatedString.toAccessibilitySpannableString(
+    density: Density,
+    fontFamilyResolver: FontFamily.Resolver
 ): SpannableString {
     val spannableString = SpannableString(text)
     spanStyles.fastForEach { (style, start, end) ->
-        spannableString.setSpanStyle(style, start, end, density, resourceLoader)
+        spannableString.setSpanStyle(style, start, end, density, fontFamilyResolver)
     }
 
     getTtsAnnotations(0, length).fastForEach { (ttsAnnotation, start, end) ->
@@ -83,7 +94,7 @@ private fun SpannableString.setSpanStyle(
     start: Int,
     end: Int,
     density: Density,
-    resourceLoader: Font.ResourceLoader
+    fontFamilyResolver: FontFamily.Resolver
 ) {
     setColor(spanStyle.color, start, end)
 
@@ -117,8 +128,7 @@ private fun SpannableString.setSpanStyle(
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 // TODO(seanmcq): Check for async here and uncache
-                val typeface = FontFamilyResolver.resolve(
-                    resourceLoader = resourceLoader,
+                val typeface = fontFamilyResolver.resolve(
                     fontFamily = spanStyle.fontFamily,
                     fontSynthesis = spanStyle.fontSynthesis ?: FontSynthesis.All
                 ).value as Typeface

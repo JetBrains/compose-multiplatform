@@ -31,7 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalFontLoader
+import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -126,7 +126,7 @@ internal class TextFieldMagnifierTest : AbstractSelectionMagnifierTests() {
     private fun setupSelectionManagedMagnifier(): TextFieldSelectionManager {
         val selectionManager = TextFieldSelectionManager()
         rule.setContent {
-            val resourceLoader = LocalFontLoader.current
+            val fontFamilyResolver = LocalFontFamilyResolver.current
             val density = LocalDensity.current
             selectionManager.value = TextFieldValue(Text)
             val scope = currentRecomposeScope
@@ -137,7 +137,7 @@ internal class TextFieldMagnifierTest : AbstractSelectionMagnifierTests() {
                         text = AnnotatedString(Text),
                         style = TextStyle.Default,
                         density = density,
-                        resourceLoader = resourceLoader
+                        fontFamilyResolver = fontFamilyResolver
                     ),
                     scope
                 )

@@ -47,6 +47,8 @@ import androidx.compose.ui.text.android.TextLayout
 import androidx.compose.ui.text.android.selection.WordBoundary
 import androidx.compose.ui.text.android.style.PlaceholderSpan
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -76,7 +78,7 @@ internal class AndroidParagraph constructor(
         maxLines: Int,
         ellipsis: Boolean,
         width: Float,
-        resourceLoader: Font.ResourceLoader,
+        fontFamilyResolver: FontFamily.Resolver,
         density: Density
     ) : this(
         paragraphIntrinsics = AndroidParagraphIntrinsics(
@@ -84,7 +86,7 @@ internal class AndroidParagraph constructor(
             style = style,
             placeholders = placeholders,
             spanStyles = spanStyles,
-            resourceLoader = resourceLoader,
+            fontFamilyResolver = fontFamilyResolver,
             density = density
         ),
         maxLines = maxLines,
@@ -366,6 +368,12 @@ private fun toLayoutAlign(align: TextAlign?): Int = when (align) {
     else -> DEFAULT_ALIGNMENT
 }
 
+@Suppress("DEPRECATION")
+@Deprecated(
+    "Font.ResourceLoader is deprecated, instead pass FontFamily.Resolver",
+    replaceWith = ReplaceWith("ActualParagraph(text, style, spanStyles, placeholders, " +
+        "maxLines, ellipsis, width, density, fontFamilyResolver)"),
+)
 internal actual fun ActualParagraph(
     text: String,
     style: TextStyle,
@@ -375,14 +383,38 @@ internal actual fun ActualParagraph(
     ellipsis: Boolean,
     width: Float,
     density: Density,
-    resourceLoader: Font.ResourceLoader
+    @Suppress("DEPRECATION") resourceLoader: Font.ResourceLoader
 ): Paragraph = AndroidParagraph(
     AndroidParagraphIntrinsics(
         text = text,
         style = style,
         placeholders = placeholders,
         spanStyles = spanStyles,
-        resourceLoader = resourceLoader,
+        fontFamilyResolver = createFontFamilyResolver(resourceLoader),
+        density = density
+    ),
+    maxLines,
+    ellipsis,
+    width
+)
+
+internal actual fun ActualParagraph(
+    text: String,
+    style: TextStyle,
+    spanStyles: List<AnnotatedString.Range<SpanStyle>>,
+    placeholders: List<AnnotatedString.Range<Placeholder>>,
+    maxLines: Int,
+    ellipsis: Boolean,
+    width: Float,
+    density: Density,
+    fontFamilyResolver: FontFamily.Resolver
+): Paragraph = AndroidParagraph(
+    AndroidParagraphIntrinsics(
+        text = text,
+        style = style,
+        placeholders = placeholders,
+        spanStyles = spanStyles,
+        fontFamilyResolver = fontFamilyResolver,
         density = density
     ),
     maxLines,

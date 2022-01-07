@@ -18,9 +18,9 @@ package androidx.compose.ui.text.font
 
 import android.graphics.Typeface
 import android.os.Build
-import androidx.compose.ui.platform.AndroidResourceLoader
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.FontTestData
+import androidx.compose.ui.text.UncachedFontFamilyResolver
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -34,10 +34,10 @@ import org.junit.runner.RunWith
 class FontSynthesisTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().context
+    private val resolver = UncachedFontFamilyResolver(context)
 
     private fun loadFont(font: Font): Pair<Font, Typeface> {
-        return font to FontFamilyResolver.resolve(
-            Font.AndroidResourceLoader(context),
+        return font to resolver.resolve(
             font.toFontFamily(),
             font.weight,
             font.style,

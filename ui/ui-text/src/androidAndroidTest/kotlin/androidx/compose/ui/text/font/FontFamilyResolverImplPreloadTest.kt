@@ -17,7 +17,6 @@
 package androidx.compose.ui.text.font
 
 import android.graphics.Typeface
-import androidx.compose.ui.platform.AndroidResourceLoader
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.FontTestData
 import androidx.compose.ui.text.font.testutils.AsyncFauxFont
@@ -51,7 +50,7 @@ class FontFamilyResolverImplPreloadTest {
     private lateinit var typefaceCache: TypefaceRequestCache
     private val context = InstrumentationRegistry.getInstrumentation().context
 
-    private val resourceLoader = Font.AndroidResourceLoader(context)
+    private val fontLoader = AndroidFontLoader(context)
     private lateinit var subject: FontFamilyResolverImpl
 
     @Before
@@ -62,6 +61,7 @@ class FontFamilyResolverImplPreloadTest {
         scope = TestCoroutineScope(dispatcher)
         val injectedContext = scope.coroutineContext.minusKey(CoroutineExceptionHandler)
         subject = FontFamilyResolverImpl(
+            fontLoader,
             typefaceRequestCache = typefaceCache,
             fontListFontFamilyTypefaceAdapter = FontListFontFamilyTypefaceAdapter(
                 asyncTypefaceCache,
@@ -75,13 +75,13 @@ class FontFamilyResolverImplPreloadTest {
     fun preload_insertsTypefaceIntoCache() {
         val fontFamily = FontTestData.FONT_100_REGULAR.toFontFamily()
         scope.runBlockingTest {
-            subject.preload(fontFamily, resourceLoader)
+            subject.preload(fontFamily)
         }
         assertThat(typefaceCache.size).isEqualTo(1)
         val cacheResult = typefaceCache.getImmutableResultFor(
             fontFamily,
             FontWeight.W100,
-            resourceLoader = resourceLoader
+            fontLoader = fontLoader
         )
         assertThat(cacheResult).isNotNull()
     }
@@ -90,13 +90,13 @@ class FontFamilyResolverImplPreloadTest {
     fun preload_insertsTypefaceIntoCache_onlyForFontWeightAndStyle() {
         val fontFamily = FontTestData.FONT_100_REGULAR.toFontFamily()
         scope.runBlockingTest {
-            subject.preload(fontFamily, resourceLoader)
+            subject.preload(fontFamily)
         }
         assertThat(typefaceCache.size).isEqualTo(1)
         val cacheResult = typefaceCache.getImmutableResultFor(
             fontFamily,
             FontWeight.W200,
-            resourceLoader = resourceLoader
+            fontLoader = fontLoader
         )
         assertThat(cacheResult).isNull()
     }
@@ -111,14 +111,14 @@ class FontFamilyResolverImplPreloadTest {
             FontTestData.FONT_500_REGULAR
         )
         scope.runBlockingTest {
-            subject.preload(fontFamily, resourceLoader)
+            subject.preload(fontFamily)
         }
         assertThat(typefaceCache.size).isEqualTo(5)
         for (weight in 100..500 step 100) {
             val cacheResult = typefaceCache.getImmutableResultFor(
                 fontFamily,
                 FontWeight(weight),
-                resourceLoader = resourceLoader
+                fontLoader = fontLoader
             )
             assertThat(cacheResult).isNotNull()
         }
@@ -131,7 +131,7 @@ class FontFamilyResolverImplPreloadTest {
 
         val fontFamily = font.toFontFamily()
         val preloadResult = scope.async {
-            subject.preload(fontFamily, resourceLoader)
+            subject.preload(fontFamily)
         }
 
         assertThat(typefaceLoader.pendingRequestsFor(font)).hasSize(1)
@@ -152,7 +152,7 @@ class FontFamilyResolverImplPreloadTest {
 
         val typefaceResult = typefaceCache.getImmutableResultFor(
             fontFamily,
-            resourceLoader = resourceLoader
+            fontLoader = fontLoader
         )
         assertThat(typefaceResult).isNotNull()
     }
@@ -168,7 +168,7 @@ class FontFamilyResolverImplPreloadTest {
             fallbackFont
         )
         val preloadResult = scope.async {
-            subject.preload(fontFamily, resourceLoader)
+            subject.preload(fontFamily)
         }
 
         typefaceLoader.completeOne(font, Typeface.MONOSPACE)
@@ -192,7 +192,7 @@ class FontFamilyResolverImplPreloadTest {
             font,
             fallbackFont
         )
-        val deferred = testScope.async { subject.preload(fontFamily, resourceLoader) }
+        val deferred = testScope.async { subject.preload(fontFamily) }
         testScope.advanceTimeBy(Font.MaximumAsyncTimeout)
         assertThat(deferred.isCompleted).isTrue()
         testScope.runBlockingTest {
@@ -218,7 +218,7 @@ class FontFamilyResolverImplPreloadTest {
             fallbackFont
         )
         val preloadResult = testScope.async {
-            subject.preload(fontFamily, resourceLoader)
+            subject.preload(fontFamily)
         }
 
         scope.runBlockingTest {
@@ -228,7 +228,7 @@ class FontFamilyResolverImplPreloadTest {
         assertThat(typefaceLoader.pendingRequestsFor(fallbackFont)).hasSize(0)
         val typefaceResult = typefaceCache.getImmutableResultFor(
             fontFamily,
-            resourceLoader = resourceLoader
+            fontLoader = fontLoader
         )
         assertThat(typefaceResult).isSameInstanceAs(Typeface.DEFAULT)
     }
@@ -250,7 +250,7 @@ class FontFamilyResolverImplPreloadTest {
             fallbackFont
         )
         val preloadResult = testScope.async {
-            subject.preload(fontFamily, resourceLoader)
+            subject.preload(fontFamily)
         }
         testScope.runCurrent() // past yield on optionalFont
         typefaceLoader.completeOne(fallbackFont, Typeface.MONOSPACE)
@@ -262,7 +262,7 @@ class FontFamilyResolverImplPreloadTest {
         assertThat(typefaceLoader.pendingRequestsFor(fallbackFont)).hasSize(0)
         val typefaceResult = typefaceCache.getImmutableResultFor(
             fontFamily,
-            resourceLoader = resourceLoader
+            fontLoader = fontLoader
         )
         assertThat(typefaceResult).isSameInstanceAs(Typeface.MONOSPACE)
     }
@@ -285,7 +285,7 @@ class FontFamilyResolverImplPreloadTest {
             fallbackFont
         )
         val preloadResult = testScope.async {
-            subject.preload(fontFamily, resourceLoader)
+            subject.preload(fontFamily)
         }
 
         scope.runBlockingTest {
@@ -296,7 +296,7 @@ class FontFamilyResolverImplPreloadTest {
         val typefaceResult = typefaceCache.getImmutableResultFor(
             fontFamily,
             fontWeight = FontWeight.Bold,
-            resourceLoader = resourceLoader
+            fontLoader = fontLoader
         )
         assertThat(typefaceResult).isSameInstanceAs(Typeface.DEFAULT_BOLD)
     }

@@ -119,14 +119,14 @@ class AsyncFontListLoaderTest {
 
     // timeout is tested at integration level, avoiding dupe here for now to keep dependencies light
 
-    private fun makeSubject(resourceLoader: Font.ResourceLoader): AsyncFontListLoader {
+    private fun makeSubject(fontLoader: FontLoader): AsyncFontListLoader {
         return AsyncFontListLoader(
             emptyList(),
             0,
             mock(TypefaceRequest::class.java),
             AsyncTypefaceCache(),
-            onCompletion = null,
-            resourceLoader
+            onCompletion = { },
+            fontLoader
         )
     }
 
@@ -139,15 +139,10 @@ class AsyncFontListLoaderTest {
         }
     }
 
-    fun makeResourceLoader(asyncLoad: suspend (Font) -> Any?): Font.ResourceLoader {
-        return object : Font.ResourceLoader {
-            @ExperimentalTextApi
-            override fun loadBlocking(font: Font): Any? = TODO("Not called")
-
-            @ExperimentalTextApi
+    private fun makeResourceLoader(asyncLoad: suspend (Font) -> Any?): FontLoader {
+        return object : FontLoader {
+            override fun loadBlocking(font: Font): Any = TODO("Not called")
             override suspend fun awaitLoad(font: Font): Any? = asyncLoad(font)
-
-            @ExperimentalTextApi
             override val cacheKey: String = "androidx.compose.ui.text.font.makeResourceLoader"
         }
     }

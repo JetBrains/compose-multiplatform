@@ -29,7 +29,7 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextPainter
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.EditProcessor
 import androidx.compose.ui.text.input.ImeAction
@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import kotlin.jvm.JvmStatic
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
@@ -66,7 +65,7 @@ internal val EmptyTextReplacement = "H".repeat(DefaultWidthCharCount) // just a 
 internal fun computeSizeForDefaultText(
     style: TextStyle,
     density: Density,
-    resourceLoader: Font.ResourceLoader,
+    fontFamilyResolver: FontFamily.Resolver,
     text: String = EmptyTextReplacement,
     maxLines: Int = 1
 ): IntSize {
@@ -77,7 +76,7 @@ internal fun computeSizeForDefaultText(
         maxLines = maxLines,
         ellipsis = false,
         density = density,
-        resourceLoader = resourceLoader,
+        fontFamilyResolver = fontFamilyResolver,
         width = Float.POSITIVE_INFINITY
     )
     return IntSize(paragraph.minIntrinsicWidth.toIntPx(), paragraph.height.toIntPx())
@@ -170,7 +169,7 @@ internal class TextFieldDelegate {
                     val defaultSize = computeSizeForDefaultText(
                         textDelegate.style,
                         textDelegate.density,
-                        textDelegate.resourceLoader
+                        textDelegate.fontFamilyResolver
                     )
                     Rect(0f, 0f, 1.0f, defaultSize.height.toFloat())
                 }

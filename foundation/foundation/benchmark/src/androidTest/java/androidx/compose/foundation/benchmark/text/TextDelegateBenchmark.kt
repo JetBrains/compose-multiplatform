@@ -22,21 +22,20 @@ import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.foundation.text.InternalFoundationTextApi
 import androidx.compose.foundation.text.TextDelegate
-import androidx.test.filters.LargeTest
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.platform.AndroidResourceLoader
 import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.benchmark.RandomTextGenerator
 import androidx.compose.ui.text.benchmark.TextBenchmarkTestRule
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.benchmark.cartesian
-import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.createFontFamilyResolver
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.sp
+import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -98,7 +97,7 @@ class TextDelegateBenchmark(
             text = text,
             density = Density(density = instrumentationContext.resources.displayMetrics.density),
             style = TextStyle(fontSize = fontSize),
-            resourceLoader = Font.AndroidResourceLoader(instrumentationContext)
+            fontFamilyResolver = createFontFamilyResolver(instrumentationContext)
         )
     }
 
@@ -119,7 +118,7 @@ class TextDelegateBenchmark(
                     text = text,
                     density = Density(density = 1f),
                     style = TextStyle(fontSize = fontSize),
-                    resourceLoader = Font.AndroidResourceLoader(instrumentationContext)
+                    fontFamilyResolver = createFontFamilyResolver(instrumentationContext)
                 )
             }
         }

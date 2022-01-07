@@ -8,9 +8,6 @@ package androidx.compose.ui.tooling {
     method @Deprecated @androidx.compose.runtime.Composable public static void InInspectionModeOnly(kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
-  public final class LayoutlibFontResourceLoaderKt {
-  }
-
   public final class PreviewUtilsKt {
   }
 

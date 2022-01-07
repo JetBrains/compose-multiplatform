@@ -203,7 +203,7 @@ class TextFieldDelegateTest {
             overflow = TextOverflow.Clip,
             density = Density(1.0f),
             layoutDirection = LayoutDirection.Ltr,
-            resourceLoader = mock(),
+            fontFamilyResolver = mock(),
             constraints = mock()
         )
         whenever(textLayoutResult.layoutInput).thenReturn(input)
@@ -255,7 +255,7 @@ class TextFieldDelegateTest {
             overflow = TextOverflow.Clip,
             density = Density(1.0f),
             layoutDirection = LayoutDirection.Ltr,
-            resourceLoader = mock(),
+            fontFamilyResolver = mock(),
             constraints = mock()
         )
         whenever(textLayoutResult.layoutInput).thenReturn(input)
@@ -288,7 +288,7 @@ class TextFieldDelegateTest {
             overflow = TextOverflow.Clip,
             density = Density(1.0f),
             layoutDirection = LayoutDirection.Ltr,
-            resourceLoader = mock(),
+            fontFamilyResolver = mock(),
             constraints = mock()
         )
         whenever(textLayoutResult.layoutInput).thenReturn(input)
@@ -426,7 +426,7 @@ class TextFieldDelegateTest {
             overflow = TextOverflow.Clip,
             density = Density(1.0f),
             layoutDirection = LayoutDirection.Ltr,
-            resourceLoader = mock(),
+            fontFamilyResolver = mock(),
             constraints = mock()
         )
         whenever(textLayoutResult.layoutInput).thenReturn(input)

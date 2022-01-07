@@ -22,38 +22,27 @@ import androidx.compose.ui.text.caches.LruCache
 import androidx.compose.ui.text.platform.createSynchronizedObject
 import androidx.compose.ui.text.platform.synchronized
 import androidx.compose.ui.util.fastMap
-import kotlin.coroutines.CoroutineContext
-
-/**
- * Global font resolver for displaying text in a style.
- *
- * This may be used to load platform-specific typefaces that can be used to draw styled
- * text.
- *
- * @see FontFamily.Resolver
- */
-@ExperimentalTextApi
-object FontFamilyResolver : FontFamily.Resolver by fontFamilyResolverInstance
-
-@ExperimentalTextApi
-private val fontFamilyResolverInstance: FontFamily.Resolver = FontFamilyResolverImpl()
 
 @ExperimentalTextApi
 internal class FontFamilyResolverImpl(
-    private val typefaceRequestCache: TypefaceRequestCache = TypefaceRequestCache(),
+    private val fontLoader: FontLoader,
+    private val typefaceRequestCache: TypefaceRequestCache = GlobalTypefaceRequestCache,
     private val fontListFontFamilyTypefaceAdapter: FontListFontFamilyTypefaceAdapter =
-        FontListFontFamilyTypefaceAdapter(),
+        FontListFontFamilyTypefaceAdapter(GlobalAsyncTypefaceCache),
     private val platformFamilyTypefaceAdapter: PlatformFontFamilyTypefaceAdapter =
         PlatformFontFamilyTypefaceAdapter()
 ) : FontFamily.Resolver {
+    private val createDefaultTypeface: (TypefaceRequest) -> Any = {
+        resolve(null, it.fontWeight, it.fontStyle, it.fontSynthesis).value
+    }
+
     override suspend fun preload(
-        fontFamily: FontFamily,
-        resourceLoader: Font.ResourceLoader
+        fontFamily: FontFamily
     ) {
         // all other types of FontFamily are already preloaded.
         if (fontFamily !is FontListFontFamily) return
 
-        fontListFontFamilyTypefaceAdapter.preload(fontFamily, resourceLoader)
+        fontListFontFamilyTypefaceAdapter.preload(fontFamily, fontLoader)
 
         val typeRequests = fontFamily.fonts.fastMap {
             TypefaceRequest(
@@ -61,7 +50,7 @@ internal class FontFamilyResolverImpl(
                 it.weight,
                 it.style,
                 FontSynthesis.All,
-                resourceLoader.cacheKey
+                fontLoader.cacheKey
             )
         }
 
@@ -69,18 +58,19 @@ internal class FontFamilyResolverImpl(
             @Suppress("MoveLambdaOutsideParentheses")
             fontListFontFamilyTypefaceAdapter.resolve(
                 typefaceRequest = typeRequest,
-                resourceLoader = resourceLoader,
-                onAsyncCompletion = { /* nothing */ }
+                fontLoader = fontLoader,
+                onAsyncCompletion = { /* nothing */ },
+                createDefaultTypeface = createDefaultTypeface
             ) ?: platformFamilyTypefaceAdapter.resolve(
                 typefaceRequest = typeRequest,
-                resourceLoader = resourceLoader,
-                onAsyncCompletion = { /* nothing */ }
+                fontLoader = fontLoader,
+                onAsyncCompletion = { /* nothing */ },
+                createDefaultTypeface = createDefaultTypeface
             ) ?: throw IllegalStateException("Could not load font")
         }
     }
 
     override fun resolve(
-        resourceLoader: Font.ResourceLoader,
         fontFamily: FontFamily?,
         fontWeight: FontWeight,
         fontStyle: FontStyle,
@@ -91,26 +81,28 @@ internal class FontFamilyResolverImpl(
             fontWeight,
             fontStyle,
             fontSynthesis,
-            resourceLoader.cacheKey
+            fontLoader.cacheKey
         )
         val result = typefaceRequestCache.runCached(typeRequest) { onAsyncCompletion ->
             fontListFontFamilyTypefaceAdapter.resolve(
                 typeRequest,
-                resourceLoader,
-                onAsyncCompletion
+                fontLoader,
+                onAsyncCompletion,
+                createDefaultTypeface
             ) ?: platformFamilyTypefaceAdapter.resolve(
                 typeRequest,
-                resourceLoader,
-                onAsyncCompletion
+                fontLoader,
+                onAsyncCompletion,
+                createDefaultTypeface
             ) ?: throw IllegalStateException("Could not load font")
         }
         return result
     }
-
-    override fun setAsyncLoadContext(context: CoroutineContext) {
-        fontListFontFamilyTypefaceAdapter.setAsyncLoadContext(context)
-    }
 }
+
+internal val GlobalTypefaceRequestCache = TypefaceRequestCache()
+@OptIn(ExperimentalTextApi::class)
+internal val GlobalAsyncTypefaceCache = AsyncTypefaceCache()
 
 @ExperimentalTextApi
 internal expect class PlatformFontFamilyTypefaceAdapter() : FontFamilyTypefaceAdapter
@@ -120,13 +112,21 @@ internal data class TypefaceRequest(
     val fontWeight: FontWeight,
     val fontStyle: FontStyle,
     val fontSynthesis: FontSynthesis,
-    val resourceLoaderCacheKey: String?
+    val resourceLoaderCacheKey: Any?
 )
 
 internal sealed interface TypefaceResult : State<Any> {
+    val cacheable: Boolean
     // Immutable results present as State, but don't trigger a read observer
-    class Immutable(override val value: Any) : TypefaceResult
-    class Async(internal val current: State<Any>) : TypefaceResult, State<Any> by current
+    class Immutable(
+        override val value: Any,
+        override val cacheable: Boolean = true
+    ) : TypefaceResult
+
+    class Async(internal val current: AsyncFontListLoader) : TypefaceResult, State<Any> by current {
+        override val cacheable: Boolean
+            get() = current.cacheable
+    }
 }
 
 internal class TypefaceRequestCache {
@@ -140,7 +140,11 @@ internal class TypefaceRequestCache {
     ): State<Any> {
         synchronized(lock) {
             resultCache.get(typefaceRequest)?.let {
-                return it
+                if (it.cacheable) {
+                    return it
+                } else {
+                    resultCache.remove(typefaceRequest)
+                }
             }
         }
         // this is not run synchronized2 as it incurs expected file system reads.
@@ -161,7 +165,11 @@ internal class TypefaceRequestCache {
                 // this converts an async (state) result to an immutable (val) result to optimize
                 // future lookups
                 synchronized(lock) {
-                    resultCache.put(typefaceRequest, finalResult)
+                    if (finalResult.cacheable) {
+                        resultCache.put(typefaceRequest, finalResult)
+                    } else {
+                        resultCache.remove(typefaceRequest)
+                    }
                 }
             }
         } catch (cause: Exception) {
@@ -170,7 +178,7 @@ internal class TypefaceRequestCache {
         synchronized(lock) {
             // async result may have completed prior to this block entering, do not overwrite
             // final results
-            if (resultCache.get(typefaceRequest) == null) {
+            if (resultCache.get(typefaceRequest) == null && currentTypefaceResult.cacheable) {
                 resultCache.put(typefaceRequest, currentTypefaceResult)
             }
         }

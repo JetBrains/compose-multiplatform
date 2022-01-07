@@ -47,7 +47,7 @@ import androidx.compose.ui.text.android.style.TextDecorationSpan
 import androidx.compose.ui.text.android.style.TypefaceSpan
 import androidx.compose.ui.text.fastFilter
 import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamilyResolver
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
@@ -141,10 +141,10 @@ internal fun Spannable.setSpanStyles(
     contextTextStyle: TextStyle,
     spanStyles: List<AnnotatedString.Range<SpanStyle>>,
     density: Density,
-    resourceLoader: Font.ResourceLoader
+    fontFamilyResolver: FontFamily.Resolver
 ) {
 
-    setFontAttributes(contextTextStyle, spanStyles, resourceLoader)
+    setFontAttributes(contextTextStyle, spanStyles, fontFamilyResolver)
 
     // LetterSpacingSpanPx/LetterSpacingSpanSP has lower priority than normal spans. Because
     // letterSpacing relies on the fontSize on [Paint] to compute Px/Sp from Em. So it must be
@@ -228,13 +228,13 @@ private fun Spannable.setSpanStyle(
  * @param contextTextStyle the global [TextStyle] for the entire string.
  * @param spanStyles the [spanStyles] to be applied, this function will first filter out the font
  * related [SpanStyle]s and then apply them to this [Spannable].
- * @param resourceLoader the [Font.ResourceLoader] used to resolve font.
+ * @param fontFamilyResolver the [Font.ResourceLoader] used to resolve font.
  */
-@OptIn(InternalPlatformTextApi::class, androidx.compose.ui.text.ExperimentalTextApi::class)
+@OptIn(InternalPlatformTextApi::class)
 private fun Spannable.setFontAttributes(
     contextTextStyle: TextStyle,
     spanStyles: List<AnnotatedString.Range<SpanStyle>>,
-    resourceLoader: Font.ResourceLoader
+    fontFamilyResolver: FontFamily.Resolver
 ) {
     val fontRelatedSpanStyles = spanStyles.fastFilter {
         it.item.hasFontAttributes() || it.item.fontSynthesis != null
@@ -260,8 +260,7 @@ private fun Spannable.setFontAttributes(
         setSpan(
             // TODO(seanmcq): Check if it's async here and uncache
             TypefaceSpan(
-                FontFamilyResolver.resolve(
-                    resourceLoader = resourceLoader,
+                fontFamilyResolver.resolve(
                     fontFamily = spanStyle.fontFamily,
                     fontWeight = spanStyle.fontWeight ?: FontWeight.Normal,
                     fontStyle = spanStyle.fontStyle ?: FontStyle.Normal,

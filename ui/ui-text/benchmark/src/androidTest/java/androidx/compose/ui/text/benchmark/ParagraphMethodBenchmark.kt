@@ -20,12 +20,11 @@ import android.content.Context
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.platform.AndroidResourceLoader
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.sp
 import androidx.test.filters.LargeTest
@@ -60,7 +59,7 @@ class ParagraphMethodBenchmark(private val textType: TextType, private val textL
 
     // A fake resource loader required to construct Paragraph
     @OptIn(ExperimentalTextApi::class)
-    private val resourceLoader = Font.AndroidResourceLoader(context)
+    private val fontFamilyResolver = createFontFamilyResolver(context)
 
     private fun paragraphIntrinsics(
         textGenerator: RandomTextGenerator,
@@ -76,7 +75,7 @@ class ParagraphMethodBenchmark(private val textType: TextType, private val textL
             text = text,
             density = Density(density = 1f),
             style = TextStyle(fontSize = 12.sp),
-            resourceLoader = resourceLoader,
+            fontFamilyResolver = fontFamilyResolver,
             spanStyles = spanStyles
         )
     }

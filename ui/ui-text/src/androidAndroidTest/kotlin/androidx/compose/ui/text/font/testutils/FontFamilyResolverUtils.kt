@@ -17,7 +17,7 @@
 package androidx.compose.ui.text.font.testutils
 
 import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.AndroidFontLoader
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
@@ -41,7 +41,7 @@ internal fun TypefaceRequestCache.getImmutableResultFor(
     fontWeight: FontWeight = FontWeight.Normal,
     fontStyle: FontStyle = FontStyle.Normal,
     fontSynthesis: FontSynthesis = FontSynthesis.All,
-    resourceLoader: Font.ResourceLoader
+    fontLoader: AndroidFontLoader
 ): Any? {
     val result = get(
         TypefaceRequest(
@@ -49,7 +49,7 @@ internal fun TypefaceRequestCache.getImmutableResultFor(
             fontWeight = fontWeight,
             fontStyle = fontStyle,
             fontSynthesis = fontSynthesis,
-            resourceLoaderCacheKey = resourceLoader.cacheKey
+            resourceLoaderCacheKey = fontLoader.cacheKey
         )
     )
     if (result == null) {

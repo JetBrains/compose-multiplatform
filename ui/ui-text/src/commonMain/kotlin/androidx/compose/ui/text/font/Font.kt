@@ -40,16 +40,12 @@ interface Font {
     val style: FontStyle
 
     /**
-     * Loading strategy for this font.
-     */
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
-    @get:ExperimentalTextApi
-    @ExperimentalTextApi
-    val loadingStrategy: FontLoadingStrategy
-
-    /**
      * Interface used to load a font resource.
      */
+    @Deprecated(
+        "Replaced with FontFamily.Resolver during the introduction of async fonts, " +
+            "all usages should be replaced"
+    )
     interface ResourceLoader {
         /**
          * Loads resource represented by the [Font] object.
@@ -59,68 +55,101 @@ interface Font {
          * @param font [Font] to be loaded
          * @return platform specific typeface
          */
-        @OptIn(ExperimentalTextApi::class)
         @Deprecated(
-            "Deprecated with the introduction of optional fonts",
-            replaceWith = ReplaceWith("loadOrNull(font)")
+            "Replaced by FontFamily.Resolver, this method should not be called",
+            ReplaceWith("FontFamily.Resolver.resolve(font, )"),
         )
-        fun load(font: Font): Any = loadBlocking(font)
-            ?: throw IllegalStateException("Unable to load $font")
-
-        /**
-         * Loads the resource represented by the [Font] in a blocking manner for use in the current
-         * frame.
-         *
-         * This method may safely throw if a font fails to load, or return null.
-         *
-         * This method will be called on a UI-critical thread, however the font has been determined
-         * to be critical to the current frame display and blocking for file system reads is
-         * permitted.
-         *
-         * @throws Exception subclass may optionally be thrown if font cannot be loaded
-         * @param font [Font] to be loaded
-         * @return platform specific typeface, or null if not available
-         */
-        @ExperimentalTextApi
-        fun loadBlocking(font: Font): Any?
-
-        /**
-         * Loads resource represented by the [Font] object in a non-blocking manner which causes
-         * text reflow when the font resolves.
-         *
-         * This method may safely throw if the font cannot be loaded, or return null.
-         *
-         * This method will be called on a UI-critical thread and should not block the thread beyond
-         * loading local fonts from disk. Loading fonts from sources slower than the local file
-         * system such as a network access should not block the calling thread.
-         *
-         * @throws Exception subclass may optionally be thrown if font cannot be loaded
-         * @param font [Font] to be loaded
-         * @return platform specific typeface, or null if not available
-         */
-        @ExperimentalTextApi
-        suspend fun awaitLoad(font: Font): Any?
-
-        /**
-         * If this loader returns different results for the same [Font] than the platform default
-         * loader return the fully qualified class name of this loader.
-         *
-         * Loaders that return the same results for all fonts as the platform default may return
-         * null.
-         *
-         * This cache key ensures that [FontFamily.Companion.Resolver] can lookup cache
-         * results per-loader.
-         */
-        @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
-        @get:ExperimentalTextApi
-        @ExperimentalTextApi
-        val cacheKey: String?
+        fun load(font: Font): Any
     }
 
+    /**
+     * Loading strategy for this font.
+     */
+    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @get:ExperimentalTextApi
+    @ExperimentalTextApi
+    val loadingStrategy: FontLoadingStrategy
+
     companion object {
+        /**
+         * This is the global timeout for fetching an [FontLoadingStrategy.Async] font.
+         *
+         * This defines the "loading" window for a font. After this timeout, a font load may no
+         * longer trigger text reflow and is considered "resolved."
+         *
+         * Each async font is given separate loading window and goes through these states:
+         *
+         * ```
+         * (initial) -> (loading with timeout) -> (resolved)
+         * ```
+         *
+         * - In the initial state, a fallback typeface is used to display text, which will reflow if
+         * the font successfully loads.
+         * - In the loading state, the font continues to use the fallback typeface and may cause one
+         * text reflow by finishing load. After a successful load it is considered resolved and will
+         * not cause another text reflow.
+         * - If the font fails to load by the timeout, the failure is permanent, and the font will
+         * never attempt to load again. Failure never causes text reflow.
+         *
+         * After a font is in resolved, it will never cause text reflow unless it is evicted from
+         * the font cache and re-enters initial.
+         *
+         * This timeout is not configurable, and timers are maintained globally.
+         */
         @ExperimentalTextApi
         internal const val MaximumAsyncTimeout = 15_000L
     }
+}
+
+/**
+ * Interface used to load a font resource into a platform-specific typeface.
+ */
+internal interface FontLoader {
+    /**
+     * Loads the resource represented by the [Font] in a blocking manner for use in the current
+     * frame.
+     *
+     * This method may safely throw if a font fails to load, or return null.
+     *
+     * This method will be called on a UI-critical thread, however the font has been determined
+     * to be critical to the current frame display and blocking for file system reads is
+     * permitted.
+     *
+     * @throws Exception subclass may optionally be thrown if font cannot be loaded
+     * @param font [Font] to be loaded
+     * @return platform specific typeface, or null if not available
+     */
+    fun loadBlocking(font: Font): Any?
+
+    /**
+     * Loads resource represented by the [Font] object in a non-blocking manner which causes
+     * text reflow when the font resolves.
+     *
+     * This method may safely throw if the font cannot be loaded, or return null.
+     *
+     * This method will be called on a UI-critical thread and should not block the thread beyond
+     * loading local fonts from disk. Loading fonts from sources slower than the local file
+     * system such as a network access should not block the calling thread.
+     *
+     * @throws Exception subclass may optionally be thrown if font cannot be loaded
+     * @param font [Font] to be loaded
+     * @return platform specific typeface, or null if not available
+     */
+    suspend fun awaitLoad(font: Font): Any?
+
+    /**
+     * If this loader returns different results for the same [Font] than the platform default
+     * loader return a non-null object that uniquely identifies this loader for caching. This
+     * cache key will be retained in global maps, and should ensure that it does not create a
+     * memory leak.
+     *
+     * Loaders that return the same results for all fonts as the platform default may return
+     * null.
+     *
+     * This cache key ensures that [FontFamily.Resolver] can lookup cache
+     * results per-loader.
+     */
+    val cacheKey: Any?
 }
 
 /**

@@ -17,7 +17,6 @@
 package androidx.compose.ui.text.font
 
 import android.graphics.Typeface
-import androidx.compose.ui.platform.AndroidResourceLoader
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.testutils.AsyncFauxFont
 import androidx.compose.ui.text.font.testutils.AsyncTestTypefaceLoader
@@ -47,7 +46,7 @@ class FontFamilyResolverImplCancellationTest {
     private lateinit var asyncTypefaceCache: AsyncTypefaceCache
 
     private val context = InstrumentationRegistry.getInstrumentation().context
-    private val resourceLoader = Font.AndroidResourceLoader(context)
+    private val fontLoader = AndroidFontLoader(context)
 
     @Before
     fun setup() {
@@ -59,6 +58,7 @@ class FontFamilyResolverImplCancellationTest {
         }
         val injectedContext = scope.coroutineContext.minusKey(CoroutineExceptionHandler)
         subject = FontFamilyResolverImpl(
+            fontLoader,
             typefaceRequestCache,
             FontListFontFamilyTypefaceAdapter(asyncTypefaceCache, injectedContext))
         typefaceLoader = AsyncTestTypefaceLoader()
@@ -73,7 +73,7 @@ class FontFamilyResolverImplCancellationTest {
     fun onAsyncLoadCancellation_consideredLoadFailure() {
         val asyncFont = AsyncFauxFont(typefaceLoader)
         val fontFamily = asyncFont.toFontFamily()
-        subject.resolve(resourceLoader, fontFamily)
+        subject.resolve(fontFamily)
 
         fun currentCacheItem(): TypefaceResult = typefaceRequestCache.get(
             TypefaceRequest(
@@ -81,7 +81,7 @@ class FontFamilyResolverImplCancellationTest {
                 FontWeight.Normal,
                 FontStyle.Normal,
                 FontSynthesis.All,
-                resourceLoader.cacheKey
+                fontLoader.cacheKey
             )
         )!!
 

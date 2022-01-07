@@ -21,8 +21,7 @@ import android.os.Build
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamilyResolver
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
@@ -38,7 +37,7 @@ import androidx.compose.ui.unit.TextUnitType
 @OptIn(ExperimentalTextApi::class)
 internal fun AndroidTextPaint.applySpanStyle(
     style: SpanStyle,
-    resourceLoader: Font.ResourceLoader,
+    fontFamilyResolver: FontFamily.Resolver,
     density: Density
 ): SpanStyle {
     when (style.fontSize.type) {
@@ -53,8 +52,7 @@ internal fun AndroidTextPaint.applySpanStyle(
 
     if (style.hasFontAttributes()) {
         // TODO (seanmcq): Check if it's async here and uncache
-        typeface = FontFamilyResolver.resolve(
-            resourceLoader = resourceLoader,
+        typeface = fontFamilyResolver.resolve(
             fontFamily = style.fontFamily,
             fontWeight = style.fontWeight ?: FontWeight.Normal,
             fontStyle = style.fontStyle ?: FontStyle.Normal,

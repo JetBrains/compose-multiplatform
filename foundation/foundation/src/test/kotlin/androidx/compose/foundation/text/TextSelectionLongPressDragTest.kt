@@ -89,7 +89,7 @@ class TextSelectionLongPressDragTest {
                 overflow = TextOverflow.Ellipsis,
                 density = Density(1.0f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = mock(),
+                fontFamilyResolver = mock(),
                 constraints = Constraints.fixedWidth(100)
             ),
             multiParagraph = mock(),

@@ -19,9 +19,6 @@ package androidx.compose.ui.text.font
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
-import androidx.compose.ui.text.ExperimentalTextApi
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * The primary typography interface for Compose applications.
@@ -44,34 +41,33 @@ sealed class FontFamily(canLoadSynchronously: Boolean) {
      * Fonts may be preloaded by calling [Resolver.preload] to avoid text reflow when async fonts
      * load.
      */
-    @ExperimentalTextApi
     sealed interface Resolver {
+
         /**
          * Preloading resolves and caches all fonts reachable in a [FontFamily].
          *
-         * Fonts are consider reachable if they are included in the fallback chain for any call to
-         * [resolve].
+         * Fonts are consider reachable if they are the first entry in the fallback chain for any
+         * call to [resolve].
          *
          * This method will suspend until:
          *
-         * 1. All [FontLoad.Async] fonts that are reachable have completed loading, or failed to
-         * load
+         * 1. All [FontLoadingStrategy.Async] fonts that are reachable have completed loading, or
+         * failed to load
          * 2. All reachable fonts in the fallback chain have been loaded and inserted into the
          * cache
          *
-         * After returning, all fonts with [FontLoad.Async] and [FontLoad.OptionalLocal] will be
-         * permanently cached. In contrast to [resolve] this method will throw when a reachable
-         * [FontLoad.Async] font fails to resolve.
+         * After returning, all fonts with [FontLoadingStrategy.Async] and
+         * [FontLoadingStrategy.OptionalLocal] will be permanently cached. In contrast to [resolve]
+         * this method will throw when a reachable [FontLoadingStrategy.Async] font fails to
+         * resolve.
          *
-         * All fonts with [FontLoad.Blocking] will be cached with normal eviction rules.
+         * All fonts with [FontLoadingStrategy.Blocking] will be cached with normal eviction rules.
          *
          * @throws IllegalStateException if any reachable font fails to load
          * @param fontFamily the family to resolve all fonts from
-         * @param resourceLoader to load resolved fonts, typically pass LocalFontLoader.current
          */
         suspend fun preload(
-            fontFamily: FontFamily,
-            resourceLoader: Font.ResourceLoader
+            fontFamily: FontFamily
         )
 
         /**
@@ -83,7 +79,6 @@ sealed class FontFamily(canLoadSynchronously: Boolean) {
          * Platform specific [FontFamily] will resolve according to platform behavior, as documented
          * for each [FontFamily].
          *
-         * @param resourceLoader to load resolved fonts into typefaces
          * @param fontFamily family to resolve
          * @param fontWeight desired font weight
          * @param fontStyle desired font style
@@ -92,30 +87,11 @@ sealed class FontFamily(canLoadSynchronously: Boolean) {
          * @return platform-specific Typeface such as [android.graphics.Typeface]
          */
         fun resolve(
-            resourceLoader: Font.ResourceLoader,
             fontFamily: FontFamily? = null,
             fontWeight: FontWeight = FontWeight.Normal,
             fontStyle: FontStyle = FontStyle.Normal,
             fontSynthesis: FontSynthesis = FontSynthesis.All
         ): State<Any>
-
-        /**
-         * Set the coroutine context used for loading async fonts.
-         *
-         * Any current fonts loading will continue in the prior context. New requests will run in
-         * the new context.
-         *
-         * Any [kotlinx.coroutines.CoroutineExceptionHandler] provided will be called with
-         * exceptions related to fallback font loading. These exceptions are not fatal, and indicate
-         * that font fallback continued to the next font load.
-         *
-         * 1. Any [kotlinx.coroutines.Job] will be removed
-         * 2. If no [kotlinx.coroutines.CoroutineExceptionHandler] is provided, a default
-         * implementation will be added that ignores all exceptions.
-         *
-         * @param context to run load requests on
-         */
-        fun setAsyncLoadContext(context: CoroutineContext = EmptyCoroutineContext)
     }
     companion object {
         /**

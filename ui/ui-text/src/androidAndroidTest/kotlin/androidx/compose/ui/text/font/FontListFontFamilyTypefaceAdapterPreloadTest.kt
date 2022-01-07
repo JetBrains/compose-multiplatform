@@ -17,7 +17,6 @@
 package androidx.compose.ui.text.font
 
 import android.graphics.Typeface
-import androidx.compose.ui.platform.AndroidResourceLoader
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.testutils.AsyncFauxFont
 import androidx.compose.ui.text.font.testutils.AsyncTestTypefaceLoader
@@ -51,7 +50,7 @@ class FontListFontFamilyTypefaceAdapterPreloadTest {
     private lateinit var cache: AsyncTypefaceCache
 
     private val context = InstrumentationRegistry.getInstrumentation().context
-    private val resourceLoader = Font.AndroidResourceLoader(context)
+    private val fontLoader = AndroidFontLoader(context)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
@@ -76,7 +75,7 @@ class FontListFontFamilyTypefaceAdapterPreloadTest {
         val font = BlockingFauxFont(typefaceLoader, Typeface.MONOSPACE)
         val fontFamily = font.toFontFamily()
         scope.runBlockingTest {
-            subject.preload(fontFamily, resourceLoader)
+            subject.preload(fontFamily, fontLoader)
             // no styles matched, so no interactions
             assertThat(typefaceLoader.completedRequests()).isEmpty()
         }
@@ -89,7 +88,7 @@ class FontListFontFamilyTypefaceAdapterPreloadTest {
         val asyncFont = AsyncFauxFont(typefaceLoader)
         val fontFamily = FontFamily(blockingFont, asyncFont)
         scope.runBlockingTest {
-            subject.preload(fontFamily, resourceLoader)
+            subject.preload(fontFamily, fontLoader)
             // style matched, but blocking font is higher priority than async font
             assertThat(typefaceLoader.completedRequests()).containsExactly(blockingFont)
         }
@@ -102,7 +101,7 @@ class FontListFontFamilyTypefaceAdapterPreloadTest {
         val blockingFont = BlockingFauxFont(typefaceLoader, Typeface.MONOSPACE)
         val fontFamily = FontFamily(asyncFont, blockingFont)
         val preloadJob = scope.launch {
-            subject.preload(fontFamily, resourceLoader)
+            subject.preload(fontFamily, fontLoader)
         }
 
         assertThat(typefaceLoader.pendingRequests()).containsExactly(asyncFont)
@@ -119,7 +118,7 @@ class FontListFontFamilyTypefaceAdapterPreloadTest {
         val blockingFont2 = BlockingFauxFont(typefaceLoader, Typeface.MONOSPACE)
         val fontFamily = FontFamily(asyncFont, blockingFont, blockingFont2)
         val preloadJob = scope.launch {
-            subject.preload(fontFamily, resourceLoader)
+            subject.preload(fontFamily, fontLoader)
         }
 
         assertThat(typefaceLoader.pendingRequests()).containsExactly(asyncFont)
@@ -139,7 +138,7 @@ class FontListFontFamilyTypefaceAdapterPreloadTest {
         val asyncFont = AsyncFauxFont(typefaceLoader)
         val fontFamily = FontFamily(asyncFont, blockingFont)
         val preloadJob = scope.launch {
-            subject.preload(fontFamily, resourceLoader)
+            subject.preload(fontFamily, fontLoader)
         }
 
         assertThat(typefaceLoader.pendingRequests()).containsExactly(asyncFont)
@@ -154,7 +153,7 @@ class FontListFontFamilyTypefaceAdapterPreloadTest {
         val asyncFont400 = AsyncFauxFont(typefaceLoader)
         val fontFamily = FontFamily(asyncFont400, asyncFont100)
         val preloadJob = scope.launch {
-            subject.preload(fontFamily, resourceLoader)
+            subject.preload(fontFamily, fontLoader)
         }
 
         assertThat(typefaceLoader.pendingRequests()).containsExactly(asyncFont400, asyncFont100)
@@ -170,7 +169,7 @@ class FontListFontFamilyTypefaceAdapterPreloadTest {
         val asyncFontFallback = AsyncFauxFont(typefaceLoader, name = "AsyncFallbackFont")
         val fontFamily = FontFamily(asyncFont, asyncFontFallback)
         val job = scope.launch {
-            subject.preload(fontFamily, resourceLoader)
+            subject.preload(fontFamily, fontLoader)
         }
 
         assertThat(typefaceLoader.pendingRequests()).containsExactly(asyncFont)
@@ -187,7 +186,7 @@ class FontListFontFamilyTypefaceAdapterPreloadTest {
         val asyncFontFallback = AsyncFauxFont(typefaceLoader, name = "AsyncFallbackFont")
         val fontFamily = FontFamily(asyncFont, asyncFontFallback)
         val preloadJob = scope.async {
-            subject.preload(fontFamily, resourceLoader)
+            subject.preload(fontFamily, fontLoader)
         }
         assertThat(typefaceLoader.pendingRequests()).containsExactly(asyncFont)
         scope.advanceTimeBy(Font.MaximumAsyncTimeout)
@@ -203,7 +202,7 @@ class FontListFontFamilyTypefaceAdapterPreloadTest {
         val asyncFontFallback = AsyncFauxFont(typefaceLoader, name = "AsyncFallbackFont")
         val fontFamily = FontFamily(asyncFont, asyncFontFallback)
         val deferred = scope.async {
-            subject.preload(fontFamily, resourceLoader)
+            subject.preload(fontFamily, fontLoader)
         }
         assertThat(typefaceLoader.pendingRequests()).containsExactly(asyncFont)
         typefaceLoader.errorOne(asyncFont, RuntimeException("Failed to load"))
@@ -221,7 +220,7 @@ class FontListFontFamilyTypefaceAdapterPreloadTest {
         val asyncFontFallback = AsyncFauxFont(typefaceLoader, name = "AsyncFallbackFont")
         val fontFamily = FontFamily(asyncFont, asyncFontFallback)
         val deferred = scope.async {
-            subject.preload(fontFamily, resourceLoader)
+            subject.preload(fontFamily, fontLoader)
         }
         typefaceLoader.errorOne(asyncFont, MyFontException())
         scope.runBlockingTest {
@@ -236,7 +235,7 @@ class FontListFontFamilyTypefaceAdapterPreloadTest {
         val asyncFont = AsyncFauxFont(typefaceLoader)
         val fontFamily = FontFamily(optionalFont, asyncFont)
         scope.runBlockingTest {
-            subject.preload(fontFamily, resourceLoader)
+            subject.preload(fontFamily, fontLoader)
             assertThat(typefaceLoader.completedRequests()).containsExactly(optionalFont)
         }
     }
@@ -248,7 +247,7 @@ class FontListFontFamilyTypefaceAdapterPreloadTest {
         val optionalFont = OptionalFauxFont(typefaceLoader, null)
         val fontFamily = FontFamily(optionalFont, asyncFont)
         val preloadJob = scope.launch {
-            subject.preload(fontFamily, resourceLoader)
+            subject.preload(fontFamily, fontLoader)
         }
 
         assertThat(typefaceLoader.completedRequests()).containsExactly(optionalFont)
@@ -269,7 +268,7 @@ class FontListFontFamilyTypefaceAdapterPreloadTest {
         val blockingFont = BlockingFauxFont(typefaceLoader, Typeface.MONOSPACE)
         val fontFamily = FontFamily(optionalFont, asyncFont, blockingFont)
         val preloadJob = scope.launch {
-            subject.preload(fontFamily, resourceLoader)
+            subject.preload(fontFamily, fontLoader)
         }
         assertThat(typefaceLoader.pendingRequests()).containsExactly(asyncFont)
         typefaceLoader.completeOne(asyncFont, Typeface.SERIF)
@@ -290,7 +289,7 @@ class FontListFontFamilyTypefaceAdapterPreloadTest {
         // this is a weird order, but lets make sure it doesn't break :)
         val fontFamily = FontFamily(asyncFont, optionalFont, blockingFont)
         val preloadJob = scope.launch {
-            subject.preload(fontFamily, resourceLoader)
+            subject.preload(fontFamily, fontLoader)
         }
 
         assertThat(typefaceLoader.pendingRequests()).containsExactly(asyncFont)
@@ -308,7 +307,7 @@ class FontListFontFamilyTypefaceAdapterPreloadTest {
         // this is expected order
         val fontFamily = FontFamily(optionalFont, asyncFont, blockingFont)
         val preloadJob = scope.launch {
-            subject.preload(fontFamily, resourceLoader)
+            subject.preload(fontFamily, fontLoader)
         }
 
         assertThat(typefaceLoader.pendingRequests()).isEmpty()

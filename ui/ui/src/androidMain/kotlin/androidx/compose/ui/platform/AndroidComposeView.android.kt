@@ -32,10 +32,10 @@ import android.view.MotionEvent.ACTION_DOWN
 import android.view.MotionEvent.ACTION_HOVER_ENTER
 import android.view.MotionEvent.ACTION_HOVER_EXIT
 import android.view.MotionEvent.ACTION_HOVER_MOVE
-import android.view.MotionEvent.ACTION_SCROLL
 import android.view.MotionEvent.ACTION_MOVE
 import android.view.MotionEvent.ACTION_POINTER_DOWN
 import android.view.MotionEvent.ACTION_POINTER_UP
+import android.view.MotionEvent.ACTION_SCROLL
 import android.view.MotionEvent.ACTION_UP
 import android.view.MotionEvent.TOOL_TYPE_MOUSE
 import android.view.View
@@ -127,6 +127,8 @@ import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.input.TextInputServiceAndroid
@@ -372,7 +374,10 @@ internal class AndroidComposeView(context: Context) :
     @OptIn(InternalComposeUiApi::class)
     override val textInputService = textInputServiceFactory(textInputServiceAndroid)
 
+    @Suppress("DEPRECATION", "OverridingDeprecatedMember")
     override val fontLoader: Font.ResourceLoader = AndroidFontResourceLoader(context)
+
+    override val fontFamilyResolver: FontFamily.Resolver = createFontFamilyResolver(context)
 
     // Backed by mutableStateOf so that the ambient provider recomposes when it changes
     override var layoutDirection by mutableStateOf(

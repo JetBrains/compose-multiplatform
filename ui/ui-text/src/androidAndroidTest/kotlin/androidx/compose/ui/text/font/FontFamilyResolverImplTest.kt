@@ -19,9 +19,9 @@ package androidx.compose.ui.text.font
 import android.content.Context
 import android.graphics.Typeface
 import android.os.Build
-import androidx.compose.ui.platform.AndroidResourceLoader
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.FontTestData
+import androidx.compose.ui.text.UncachedFontFamilyResolver
 import androidx.compose.ui.text.font.testutils.AsyncTestTypefaceLoader
 import androidx.compose.ui.text.font.testutils.BlockingFauxFont
 import androidx.compose.ui.text.matchers.assertThat
@@ -52,7 +52,7 @@ class FontFamilyResolverImplTest {
     private lateinit var typefaceCache: TypefaceRequestCache
     private val context = InstrumentationRegistry.getInstrumentation().context
 
-    private val resourceLoader = Font.AndroidResourceLoader(context)
+    private val fontLoader = AndroidFontLoader(context)
     private lateinit var subject: FontFamilyResolverImpl
 
     @Before
@@ -63,6 +63,7 @@ class FontFamilyResolverImplTest {
         scope = TestCoroutineScope(dispatcher)
         val injectedContext = scope.coroutineContext.minusKey(CoroutineExceptionHandler)
         subject = FontFamilyResolverImpl(
+            fontLoader,
             typefaceRequestCache = typefaceCache,
             fontListFontFamilyTypefaceAdapter = FontListFontFamilyTypefaceAdapter(
                 asyncTypefaceCache,
@@ -77,11 +78,8 @@ class FontFamilyResolverImplTest {
         fontWeight: FontWeight = FontWeight.Normal,
         fontStyle: FontStyle = FontStyle.Normal,
         fontSynthesis: FontSynthesis = FontSynthesis.All,
-        resourceLoader: Font.ResourceLoader? = null
     ): Typeface {
-        val finalResourceLoader = resourceLoader ?: this.resourceLoader
         return subject.resolve(
-            finalResourceLoader,
             fontFamily,
             fontWeight,
             fontStyle,
@@ -375,11 +373,11 @@ class FontFamilyResolverImplTest {
             font800
         )
 
-        subject.resolve(resourceLoader, fontFamily, FontWeight.W100)
+        subject.resolve(fontFamily, FontWeight.W100)
 
         for (weight in 801..816) {
             // don't use test resolver for cache busting
-            subject.resolve(resourceLoader, fontFamily, FontWeight(weight))
+            subject.resolve(fontFamily, FontWeight(weight))
         }
         assertThat(typefaceCache.get(
             TypefaceRequest(
@@ -387,7 +385,7 @@ class FontFamilyResolverImplTest {
                 FontWeight.W100,
                 FontStyle.Normal,
                 FontSynthesis.All,
-                resourceLoader.cacheKey
+                fontLoader.cacheKey
             ))).isNull()
     }
 
@@ -404,11 +402,10 @@ class FontFamilyResolverImplTest {
             font800
         )
 
-        subject.resolve(resourceLoader, fontFamily, FontWeight.W100)
+        subject.resolve(fontFamily, FontWeight.W100)
         for (weight in 801..816) {
-            // don't use test resolver for cache busting
-            subject.resolve(resourceLoader, fontFamily, FontWeight.W100)
-            subject.resolve(resourceLoader, fontFamily, FontWeight(weight))
+            subject.resolve(fontFamily, FontWeight.W100)
+            subject.resolve(fontFamily, FontWeight(weight))
         }
         assertThat(typefaceCache.get(
             TypefaceRequest(
@@ -416,7 +413,7 @@ class FontFamilyResolverImplTest {
                 FontWeight.W100,
                 FontStyle.Normal,
                 FontSynthesis.All,
-                resourceLoader.cacheKey
+                fontLoader.cacheKey
             ))).isNotNull()
     }
 
@@ -425,18 +422,13 @@ class FontFamilyResolverImplTest {
         val fontFamily = FontTestData.FONT_100_REGULAR.toFontFamily()
         val typeface = resolveAsTypeface(fontFamily)
         /* definitely not same instance :) */
-        val defaultResourceLoader = object : Font.ResourceLoader {
-            @ExperimentalTextApi
+        val newFontLoader = object : FontLoader {
             override fun loadBlocking(font: Font): Any = Typeface.DEFAULT
-
-            @ExperimentalTextApi
             override suspend fun awaitLoad(font: Font): Any = Typeface.DEFAULT
             override val cacheKey: String = "Not the default resource loader"
         }
-        val otherTypeface = resolveAsTypeface(
-            fontFamily,
-            resourceLoader = defaultResourceLoader
-        )
+        val otherTypeface = UncachedFontFamilyResolver(newFontLoader)
+            .resolve(fontFamily).value as Typeface
 
         assertThat(typeface).isNotSameInstanceAs(otherTypeface)
     }
@@ -465,16 +457,18 @@ class FontFamilyResolverImplTest {
                 override val style: FontStyle = FontStyle.Normal
             }
         )
-        val firstAndroidResourceLoader = Font.AndroidResourceLoader(context)
-        val typeface = resolveAsTypeface(
-            fontFamily,
-            resourceLoader = firstAndroidResourceLoader
-        )
-        val secondAndroidResourceLoader = Font.AndroidResourceLoader(context)
-        val otherTypeface = resolveAsTypeface(
-            fontFamily,
-            resourceLoader = secondAndroidResourceLoader
-        )
+        val firstAndroidResourceLoader = AndroidFontLoader(context)
+        val typeface = FontFamilyResolverImpl(
+            fontLoader,
+            typefaceCache,
+            FontListFontFamilyTypefaceAdapter(asyncTypefaceCache)
+        ).resolve(fontFamily).value as Typeface
+        val secondAndroidResourceLoader = AndroidFontLoader(context)
+        val otherTypeface = FontFamilyResolverImpl(
+            fontLoader,
+            typefaceCache,
+            FontListFontFamilyTypefaceAdapter(asyncTypefaceCache)
+        ).resolve(fontFamily).value as Typeface
 
         assertThat(firstAndroidResourceLoader).isNotSameInstanceAs(secondAndroidResourceLoader)
         assertThat(typeface).isSameInstanceAs(otherTypeface)

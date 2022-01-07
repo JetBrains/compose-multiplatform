@@ -18,8 +18,14 @@ package androidx.compose.ui.text
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import androidx.compose.ui.platform.AndroidResourceLoader
-import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.AndroidFontLoader
+import androidx.compose.ui.text.font.AsyncTypefaceCache
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontFamilyResolverImpl
+import androidx.compose.ui.text.font.FontListFontFamilyTypefaceAdapter
+import androidx.compose.ui.text.font.FontLoader
+import androidx.compose.ui.text.font.PlatformFontFamilyTypefaceAdapter
+import androidx.compose.ui.text.font.TypefaceRequestCache
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
@@ -34,6 +40,18 @@ fun Paragraph.bitmap(): Bitmap {
 }
 
 @OptIn(ExperimentalTextApi::class)
-fun TestFontResourceLoader(context: Context) = Font.AndroidResourceLoader(context)
+internal fun UncachedFontFamilyResolver(
+    context: Context
+): FontFamily.Resolver = UncachedFontFamilyResolver(AndroidFontLoader(context))
+
+@OptIn(ExperimentalTextApi::class)
+internal fun UncachedFontFamilyResolver(
+    fontLoader: FontLoader
+): FontFamily.Resolver = FontFamilyResolverImpl(
+    fontLoader,
+    TypefaceRequestCache(),
+    FontListFontFamilyTypefaceAdapter(AsyncTypefaceCache()),
+    PlatformFontFamilyTypefaceAdapter()
+)
 
 fun Float.toIntPx(): Int = ceil(this).roundToInt()

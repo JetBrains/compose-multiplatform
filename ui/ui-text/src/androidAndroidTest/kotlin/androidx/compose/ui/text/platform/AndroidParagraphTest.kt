@@ -19,8 +19,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TestFontResourceLoader
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.UncachedFontFamilyResolver
 import androidx.compose.ui.text.android.InternalPlatformTextApi
 import androidx.compose.ui.text.android.TextLayout
 import androidx.compose.ui.text.android.style.BaselineShiftSpan
@@ -30,7 +30,6 @@ import androidx.compose.ui.text.android.style.LetterSpacingSpanPx
 import androidx.compose.ui.text.android.style.ShadowSpan
 import androidx.compose.ui.text.android.style.SkewXSpan
 import androidx.compose.ui.text.android.style.TextDecorationSpan
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -89,8 +88,8 @@ AndroidParagraphTest {
 
                 val textPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
                 textPaint.textSize = fontSize.toPx()
-                textPaint.typeface = TestFontResourceLoader(context)
-                    .loadBlocking(BASIC_MEASURE_FONT) as Typeface
+                textPaint.typeface = UncachedFontFamilyResolver(context)
+                    .resolve(BASIC_MEASURE_FONT.toFontFamily()).value as Typeface
 
                 val layout = TextLayout(
                     charSequence = text,
@@ -817,8 +816,8 @@ AndroidParagraphTest {
     @MediumTest
     fun testFontFamily_withCustomFont() {
         val typefaceLoader = AsyncTestTypefaceLoader()
-        val expectedTypeface: Typeface =
-            TestFontResourceLoader(context).loadBlocking(BASIC_MEASURE_FONT) as Typeface
+        val expectedTypeface: Typeface = UncachedFontFamilyResolver(context)
+            .resolve(BASIC_MEASURE_FONT.toFontFamily()).value as Typeface
         val font = BlockingFauxFont(typefaceLoader, expectedTypeface)
         val paragraph = simpleParagraph(
             text = "abc",
@@ -1328,7 +1327,7 @@ AndroidParagraphTest {
         maxLines: Int = Int.MAX_VALUE,
         width: Float,
         style: TextStyle? = null,
-        resourceLoader: Font.ResourceLoader = TestFontResourceLoader(context)
+        fontFamilyResolver: FontFamily.Resolver = UncachedFontFamilyResolver(context)
     ): AndroidParagraph {
         return AndroidParagraph(
             text = text,
@@ -1342,7 +1341,7 @@ AndroidParagraphTest {
             ellipsis = ellipsis,
             width = width,
             density = Density(density = 1f),
-            resourceLoader = resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         )
     }
 }
