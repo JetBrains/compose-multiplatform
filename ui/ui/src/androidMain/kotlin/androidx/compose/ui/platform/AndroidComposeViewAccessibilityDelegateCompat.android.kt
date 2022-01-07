@@ -184,10 +184,21 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     private val accessibilityManager: AccessibilityManager =
         view.context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
     internal var accessibilityForceEnabledForTesting = false
-    private val isAccessibilityEnabled
+    /** Indicates if accessibility in the system enabled */
+    private val accessibilityEnabled
+        get() = accessibilityForceEnabledForTesting || accessibilityManager.isEnabled
+
+    /** Indicates if touch exploration in the system enabled.
+     * For example screen readers are the services with touch exploration.
+     *
+     * Will return false if no accessibility services are enabled,
+     * or if no enabled service has a touch exploration mode
+     */
+    private val touchExplorationEnabled
         get() = accessibilityForceEnabledForTesting ||
             accessibilityManager.isEnabled &&
             accessibilityManager.isTouchExplorationEnabled
+
     private val handler = Handler(Looper.getMainLooper())
     private var nodeProvider: AccessibilityNodeProviderCompat =
         AccessibilityNodeProviderCompat(MyNodeProvider())
@@ -930,7 +941,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
      * @return Whether this virtual view actually took accessibility focus.
      */
     private fun requestAccessibilityFocus(virtualViewId: Int): Boolean {
-        if (!isAccessibilityEnabled) {
+        if (!touchExplorationEnabled) {
             return false
         }
         // TODO: Check virtual view visibility.
@@ -981,7 +992,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         contentChangeType: Int? = null,
         contentDescription: List<String>? = null
     ): Boolean {
-        if (virtualViewId == InvalidId || !isAccessibilityEnabled) {
+        if (virtualViewId == InvalidId || !accessibilityEnabled) {
             return false
         }
 
@@ -1003,7 +1014,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
      * @return true if the event was sent successfully.
      */
     private fun sendEvent(event: AccessibilityEvent): Boolean {
-        if (!isAccessibilityEnabled) {
+        if (!accessibilityEnabled) {
             return false
         }
 
@@ -1455,7 +1466,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
      * @return Whether the hover event was handled.
      */
     fun dispatchHoverEvent(event: MotionEvent): Boolean {
-        if (!isAccessibilityEnabled) {
+        if (!touchExplorationEnabled) {
             return false
         }
 
@@ -1587,7 +1598,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         // later, we can refresh currentSemanticsNodes if currentSemanticsNodes is stale.
         currentSemanticsNodesInvalidated = true
 
-        if (isAccessibilityEnabled && !checkingForSemanticsChanges) {
+        if (accessibilityEnabled && !checkingForSemanticsChanges) {
             checkingForSemanticsChanges = true
             handler.post(semanticsChangeChecker)
         }
@@ -1602,7 +1613,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         try {
             val subtreeChangedSemanticsNodesIds = ArraySet<Int>()
             for (notification in boundsUpdateChannel) {
-                if (isAccessibilityEnabled) {
+                if (accessibilityEnabled) {
                     for (i in subtreeChangedLayoutNodes.indices) {
                         sendSubtreeChangeAccessibilityEvents(
                             subtreeChangedLayoutNodes.valueAt(i)!!,
@@ -1642,7 +1653,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         // currentSemanticsNodesInvalidated up to date so that when accessibility is turned on
         // later, we can refresh currentSemanticsNodes if currentSemanticsNodes is stale.
         currentSemanticsNodesInvalidated = true
-        if (!isAccessibilityEnabled) {
+        if (!accessibilityEnabled) {
             return
         }
         // The layout change of a LayoutNode will also affect its children, so even if it doesn't
