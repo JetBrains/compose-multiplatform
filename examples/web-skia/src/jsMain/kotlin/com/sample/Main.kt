@@ -1,7 +1,7 @@
 package org.jetbrains.compose.sample
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
@@ -14,6 +14,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.web.css.JustifyContent
+import org.jetbrains.compose.web.css.justifyContent
 import org.jetbrains.compose.web.dom.Canvas
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Span
@@ -21,23 +23,27 @@ import org.jetbrains.compose.web.renderComposable
 import org.jetbrains.compose.web.skiko.skiko
 import org.jetbrains.skiko.wasm.onWasmReady
 
+fun Color.Companion.random(): Color {
+    return Color((0..255).random(), (0..255).random(), (0..255).random())
+}
+
 @Composable
 fun SomeCanvas() {
     Canvas({
-        attr("width", "300")
-        attr("height", "300")
+        attr("width", "360")
+        attr("height", "360")
         style {
-            property("outline", "1px solid black")
-            property("margin", "0 auto")
+//            property("outline", "1px solid black")
+//            property("margin", "0 auto")
         }
     }) {
         skiko {
-            val radius = remember { Animatable(70f) }
+            val radius = remember { Animatable(20f) }
             LaunchedEffect(radius) {
                 radius.animateTo(
-                    targetValue = 100f,
+                    targetValue = 180f,
                     animationSpec = infiniteRepeatable(
-                        tween(durationMillis = 1000, easing = LinearEasing),
+                        tween(durationMillis = 1000, easing = FastOutSlowInEasing),
                         repeatMode = RepeatMode.Reverse
                     )
                 )
@@ -45,14 +51,28 @@ fun SomeCanvas() {
 
             Canvas(
                 modifier = Modifier
-                    .size(300.dp)
+                    .size(360.dp)
                     .fillMaxSize()
             ) {
-                drawCircle(color = Color(255, 160, 122), radius = radius.value)
-                drawCircle(color = Color(230, 230, 250), radius = 0.8f * radius.value)
-                drawCircle(color = Color(127, 255, 212), radius = 0.6f * radius.value)
-                drawCircle(color = Color(255, 215, 0), radius = 0.4f * radius.value)
-                drawCircle(color = androidx.compose.ui.graphics.Color(64, 224, 208), radius = 0.2f * radius.value)
+                drawCircle(color = Color.random(), radius = radius.value)
+                drawCircle(color = Color.random(), radius = 0.95f * radius.value)
+                drawCircle(color = Color.random(), radius = 0.9f * radius.value)
+                drawCircle(color = Color.random(), radius = 0.85f * radius.value)
+                drawCircle(color = Color.random(), radius = 0.8f * radius.value)
+                drawCircle(color = Color.random(), radius = 0.75f * radius.value)
+                drawCircle(color = Color.random(), radius = 0.7f * radius.value)
+                drawCircle(color = Color.random(), radius = 0.65f * radius.value)
+                drawCircle(color = Color.random(), radius = 0.6f * radius.value)
+                drawCircle(color = Color.random(), radius = 0.55f * radius.value)
+                drawCircle(color = Color.random(), radius = 0.5f * radius.value)
+                drawCircle(color = Color.random(), radius = 0.45f * radius.value)
+                drawCircle(color = Color.random(), radius = 0.4f * radius.value)
+                drawCircle(color = Color.random(), radius = 0.35f * radius.value)
+                drawCircle(color = Color.random(), radius = 0.3f * radius.value)
+                drawCircle(color = Color.random(), radius = 0.25f * radius.value)
+                drawCircle(color = Color.random(), radius = 0.2f * radius.value)
+                drawCircle(color = Color.random(), radius = 0.15f * radius.value)
+                drawCircle(color = Color.random(), radius = 0.1f * radius.value)
             }
         }
     }
@@ -60,7 +80,13 @@ fun SomeCanvas() {
 
 @Composable
 fun App() {
-    Div {
+    Div({
+        style {
+            property("width", "100%")
+            property("display", "flex")
+            justifyContent(JustifyContent.SpaceEvenly)
+        }
+    }) {
         Span {
             SomeCanvas()
         }
