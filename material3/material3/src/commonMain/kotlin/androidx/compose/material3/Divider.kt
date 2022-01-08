@@ -28,12 +28,12 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+// TODO: Provide M3 divider image when asset is available.
+// TODO(b/210996136): Update to use standalone divider token.
 /**
  * <a href="https://material.io/components/dividers" class="external" target="_blank">Material Design divider</a>.
  *
  * A divider is a thin line that groups content in lists and layouts.
- *
- * ![Dividers image](https://developer.android.com/images/reference/androidx/compose/material/dividers.png)
  *
  * @param color color of the divider line
  * @param thickness thickness of the divider line, 1 dp is used by default. Using [Dp.Hairline]
@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun Divider(
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colors.onSurface.copy(alpha = DividerAlpha),
+    color: Color = MaterialTheme.colorScheme.surfaceVariant,
     thickness: Dp = 1.dp,
     startIndent: Dp = 0.dp
 ) {
@@ -64,5 +64,3 @@ fun Divider(
             .background(color = color)
     )
 }
-
-private const val DividerAlpha = 0.12f

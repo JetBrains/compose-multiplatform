@@ -91,19 +91,21 @@ class DividerUiTest {
         val size = 5.dp
         val testTag = "testTag"
         var sizePx = 0
+        var dividerColor = Color.Transparent
         rule.setContent {
             sizePx = with(LocalDensity.current) { size.toPx().roundToInt() }
+            dividerColor =
+                MaterialTheme.colorScheme.surfaceVariant
             Box(modifier = Modifier.size(size).background(Color.Black)) {
                 Divider(
                     modifier = Modifier.testTag(testTag).fillMaxWidth(),
-                    color = Color.Blue,
                     thickness = Dp.Hairline
                 )
             }
         }
 
         rule.onNodeWithTag(testTag).captureToImage().assertPixels(IntSize(sizePx, 1)) {
-            Color.Blue
+            dividerColor
         }
     }
 }
