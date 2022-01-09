@@ -5,6 +5,18 @@ plugins {
     id("org.jetbrains.compose")
 }
 
+val resourcesDir = "$buildDir/resources"
+val skikoWasm by configurations.creating
+
+dependencies {
+    skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:0.7.0")
+}
+
+val unzipTask = tasks.register("unzipWasm", Copy::class) {
+    destinationDir = file(resourcesDir)
+    from(skikoWasm.map { zipTree(it) })
+}
+
 kotlin {
     jvm {
         tasks.named<Test>("jvmTest") {
@@ -39,9 +51,17 @@ kotlin {
         }
 
         val jsMain by getting {
+            resources.setSrcDirs(resources.srcDirs)
+            resources.srcDirs(unzipTask.map { it.destinationDir })
+
             dependencies {
                 implementation(kotlin("stdlib-js"))
                 implementation(npm("highlight.js", "10.7.2"))
+
+                implementation(compose.ui)
+                implementation(compose.foundation)
+                implementation(compose.material)
+                implementation("org.jetbrains.skiko:skiko:0.7.0")
             }
         }
 

@@ -1,14 +1,14 @@
 package org.jetbrains.compose.web.sample
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import org.jetbrains.compose.web.renderComposableInBody
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Window
+import kotlinx.browser.document
 import org.jetbrains.compose.web.sample.tests.launchTestCase
 import kotlinx.browser.window
 import kotlinx.coroutines.MainScope
@@ -18,6 +18,8 @@ import org.jetbrains.compose.web.ExperimentalComposeWebStyleApi
 import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.*
+import org.jetbrains.compose.web.renderComposableInBody
+import org.jetbrains.skiko.wasm.onWasmReady
 import org.w3c.dom.url.URLSearchParams
 
 class State {
@@ -120,6 +122,34 @@ fun Counter(value: Int) {
     }
 }
 
+@Composable
+fun CanvasForWidgets(content: @Composable () -> Unit) {
+    TagElement(
+        elementBuilder = {
+            document.createElement("canvas")
+        },
+        applyAttrs = {
+
+            // TODO: 'ComposeTarget' id was hardcoded in Window(), so we hardcode it here as well for nwo
+            id("ComposeTarget")
+            attr("width", "400")
+            attr("height", "100")
+        },
+        content = {}
+    )
+
+    DisposableEffect(Unit) {
+        onWasmReady {
+            Window("Canvas for Androidx Compose widgets") {
+                content()
+            }
+        }
+        onDispose {
+            // TODO: add necessary APIs to dispose the composition built using Window
+        }
+    }
+}
+
 @OptIn(ExperimentalComposeWebStyleApi::class)
 fun main() {
     val urlParams = URLSearchParams(window.location.search)
@@ -169,6 +199,34 @@ fun main() {
         MonthInput(value = "2021-10") {
             onInput {
                 println("Month = ${it.value}")
+            }
+        }
+
+        Div {
+            CanvasForWidgets {
+                Box(
+                    modifier = Modifier
+                        .size(400.dp)
+                        .background(color = androidx.compose.ui.graphics.Color.Red)
+                ) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                        androidx.compose.material.Button(onClick = {
+                            counter.value++
+                        }) {
+                            androidx.compose.material.Text("+")
+                        }
+                        androidx.compose.material.Text(
+                            text = "${counter.value}",
+                            color = androidx.compose.ui.graphics.Color.Blue,
+                            fontSize = 40.sp
+                        )
+                        androidx.compose.material.Button(onClick = {
+                            counter.value--
+                        }) {
+                            androidx.compose.material.Text("-")
+                        }
+                    }
+                }
             }
         }
 
