@@ -394,7 +394,9 @@ class AccessibilityAction<T : Function<Boolean>>(val label: String?, val action:
     }
 }
 
-internal fun <T : Function<Boolean>> ActionPropertyKey(
+@Suppress("NOTHING_TO_INLINE")
+// inline to break static initialization cycle issue
+private inline fun <T : Function<Boolean>> ActionPropertyKey(
     name: String
 ): SemanticsPropertyKey<AccessibilityAction<T>> {
     return SemanticsPropertyKey(
