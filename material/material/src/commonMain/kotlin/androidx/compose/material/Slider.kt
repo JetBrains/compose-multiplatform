@@ -286,7 +286,8 @@ fun RangeSlider(
     }
 
     BoxWithConstraints(
-        modifier = Modifier
+        modifier = modifier
+            .minimumTouchTargetSize()
             .requiredSizeIn(minWidth = ThumbRadius * 4, minHeight = ThumbRadius * 2)
     ) {
         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
@@ -348,7 +349,7 @@ fun RangeSlider(
             }
         }
 
-        val pressDrag = modifier.rangeSliderPressDragModifier(
+        val pressDrag = Modifier.rangeSliderPressDragModifier(
             startInteractionSource,
             endInteractionSource,
             rawOffsetStart,
@@ -389,7 +390,7 @@ fun RangeSlider(
             maxPx - minPx,
             startInteractionSource,
             endInteractionSource,
-            modifier = pressDrag.then(modifier),
+            modifier = pressDrag,
         )
     }
 }
