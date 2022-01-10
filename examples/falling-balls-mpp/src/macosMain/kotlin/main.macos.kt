@@ -16,11 +16,7 @@ object MacosTime : Time {
 fun main() {
     NSApplication.sharedApplication()
     Window("Falling Balls") {
-        val game = remember { Game(MacosTime).apply {
-            // TODO: rework, now we do not properly propagate geometry changes.
-            width = 800.dp
-            height = 600.dp
-        }  }
+        val game = remember { Game(MacosTime) }
         FallingBalls(game)
     }
     NSApp?.run()

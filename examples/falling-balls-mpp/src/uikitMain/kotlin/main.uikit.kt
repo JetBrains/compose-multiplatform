@@ -45,10 +45,7 @@ class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
     override fun application(application: UIApplication, didFinishLaunchingWithOptions: Map<Any?, *>?): Boolean {
         window = UIWindow(frame = UIScreen.mainScreen.bounds)
         window!!.rootViewController = Application("Falling Balls") {
-            val game = remember { Game(UikitTime).apply {
-                width = 800.dp
-                height = 800.dp
-            } }
+            val game = remember { Game(UikitTime) }
             Column {
                 // To skip upper part of screen.
                 Box(modifier = Modifier

@@ -66,12 +66,8 @@ fun FallingBalls(game: Game) {
                 .fillMaxHeight(1f)
                 .onSizeChanged {
                     with(density) {
-                        if (org.jetbrains.skiko.kotlinBackend == KotlinBackend.JVM) {
-                            // Really ugly hack, until we properly pass geometry.
-                            // TODO: fix me in Compose.
-                            game.width = it.width.toDp()
-                            game.height = it.height.toDp()
-                        }
+                        game.width = it.width.toDp()
+                        game.height = it.height.toDp()
                     }
                 }
             ) {
