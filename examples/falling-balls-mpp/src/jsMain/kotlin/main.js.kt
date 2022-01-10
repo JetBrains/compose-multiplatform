@@ -15,11 +15,7 @@ object JsTime : Time {
 fun main() {
     onWasmReady {
         Window("Falling Balls") {
-            val game = remember { Game(JsTime).apply {
-                // Ugly hack, properly pass geometry.
-                width = 800.dp
-                height = 800.dp
-            }}
+            val game = remember { Game(JsTime) }
             FallingBalls(game)
         }
     }
