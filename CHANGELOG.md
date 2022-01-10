@@ -1,3 +1,6 @@
+# 1.0.1 (Dec 2021)
+This is basically 1.0.0 that works with Kotlin 1.6.10
+
 # 1.0.0 (Dec 2021)
 ## Desktop
 ### Features
