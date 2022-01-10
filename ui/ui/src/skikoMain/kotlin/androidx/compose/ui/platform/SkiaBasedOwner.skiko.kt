@@ -387,7 +387,9 @@ internal class SkiaBasedOwner(
                     it.position.y in 0f..root.height.toFloat()
             }
         ).also {
-            setPointerIcon(containerCursor, desiredPointerIcon)
+            if (it.dispatchedToAPointerInputModifier) {
+                setPointerIcon(containerCursor, desiredPointerIcon)
+            }
         }
     }
 

@@ -78,13 +78,18 @@ class TestComposeWindow(
         scene.render(canvas, nanoTime())
     }
 
+    internal val component = DummyPlatformComponent
     private val scene = ComposeScene(
         coroutineScope.coroutineContext,
+        component,
         density,
         invalidate = frameDispatcher::scheduleFrame
     ).apply {
         constraints = Constraints(maxWidth = width, maxHeight = height)
     }
+
+    val currentCursor
+        get() = component.componentCursor
 
     /**
      * All currently registered [RootForTest]s
