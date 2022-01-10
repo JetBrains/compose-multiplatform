@@ -55,6 +55,7 @@ internal actual class ComposeWindow : UIViewController {
         }
         layer = ComposeLayer()
         layer.setContent(content = content)
+        layer.setSize(width.toInt(), height.toInt())
 
         view.contentScaleFactor = UIScreen.mainScreen.scale
         view.setFrame(CGRectMake(0.0, 0.0, width, height))
