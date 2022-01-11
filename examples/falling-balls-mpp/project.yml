@@ -14,7 +14,7 @@ targets:
     platform: iOS
     deploymentTarget: "12.0"
     prebuildScripts:
-      - script: cd "$SRCROOT" && ./gradlew -i -p . packForXCode
+      - script: cd "$SRCROOT" && ./gradlew -i -p . packComposeUikitApplicationForXCode
         name: GradleCompile
     info:
       path: plists/Ios/Info.plist

@@ -59,6 +59,7 @@ dependencies {
     compileOnly(localGroovy())
     compileOnly(kotlin("gradle-plugin-api"))
     compileOnly(kotlin("gradle-plugin"))
+    compileOnly(kotlin("native-utils"))
 
     testImplementation(gradleTestKit())
     testImplementation(platform("org.junit:junit-bom:5.7.0"))
