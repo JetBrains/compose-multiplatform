@@ -119,9 +119,31 @@ class DomSideEffectTests {
             Div {
                 DomSideEffect(key) {
                     effectsList.add("DomSideEffect")
+
+                    onDispose {
+                        effectsList.add("DomSideEffectIgnored")
+                    }
+
+                    onDispose {
+                        throw Exception("this should be ignored")
+                    }
+
+                    onDispose {
+                        effectsList.add("DomSideEffectDisposed")
+                    }
+
                 }
                 DisposableRefEffect(key) {
                     effectsList.add("DisposableRefEffect")
+
+                    onDispose {
+                        effectsList.add("DisposableRefEffectIgnored")
+                    }
+
+                    onDispose {
+                        throw Exception("this should be ignored")
+                    }
+
                     onDispose {
                         effectsList.add("DisposableRefEffectDisposed")
                     }
@@ -140,7 +162,14 @@ class DomSideEffectTests {
         waitForRecompositionComplete()
 
         assertContentEquals(
-            listOf("DisposableRefEffect", "DomSideEffect", "DisposableRefEffectDisposed", "DisposableRefEffect", "DomSideEffect"),
+            listOf(
+                "DisposableRefEffect",
+                "DomSideEffect",
+                "DisposableRefEffectDisposed",
+                "DomSideEffectDisposed",
+                "DisposableRefEffect",
+                "DomSideEffect"
+            ),
             effectsList
         )
     }
