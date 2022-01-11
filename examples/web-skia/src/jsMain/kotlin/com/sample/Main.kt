@@ -8,6 +8,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -362,6 +363,8 @@ fun SomeCanvas() {
 //            property("margin", "0 auto")
         }
     }) {
+        Text("xxxx")
+
         skiko {
             val radius = remember { Animatable(10f) }
             LaunchedEffect(radius) {
@@ -373,6 +376,8 @@ fun SomeCanvas() {
                     )
                 )
             }
+
+            Text(text = "Xxx")
 
             Canvas(
                 modifier = Modifier
@@ -460,9 +465,7 @@ fun App() {
 }
 
 fun main() {
-    onWasmReady {
-        renderComposable(rootElementId = "root") {
-            App()
-        }
+    renderComposable(rootElementId = "root") {
+        App()
     }
 }
