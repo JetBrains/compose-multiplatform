@@ -44,7 +44,7 @@
 
   <hhea>
     <tableVersion value="0x00010000"/>
-    <ascent value="1000"/>
+    <ascent value="800"/>
     <descent value="-200"/>
     <lineGap value="0"/>
     <advanceWidthMax value="1000"/>
