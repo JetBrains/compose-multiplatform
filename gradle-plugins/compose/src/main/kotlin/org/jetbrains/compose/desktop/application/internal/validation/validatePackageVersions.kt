@@ -10,18 +10,13 @@ import org.gradle.api.Project
 import org.jetbrains.compose.desktop.application.dsl.Application
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.OS
+import org.jetbrains.compose.desktop.application.internal.packageBuildVersionFor
 import org.jetbrains.compose.desktop.application.internal.packageVersionFor
 
 internal fun Project.validatePackageVersions(app: Application) {
     val errors = ErrorsCollector()
 
     for (targetFormat in app.nativeDistributions.targetFormats) {
-        val packageVersion = packageVersionFor(project, app, targetFormat).orNull
-        if (packageVersion == null) {
-            errors.addError(targetFormat, "no version was specified")
-            continue
-        }
-
         val versionChecker: VersionChecker? = when (targetFormat) {
             TargetFormat.AppImage -> null
             TargetFormat.Deb -> DebVersionChecker
@@ -30,13 +25,35 @@ internal fun Project.validatePackageVersions(app: Application) {
             TargetFormat.Dmg, TargetFormat.Pkg -> MacVersionChecker
         }
 
-        versionChecker?.apply {
-            if (!isValid(packageVersion)) {
-                errors.addError(
-                    targetFormat,
-                    "'$packageVersion' is not a valid version",
-                    correctFormat = correctFormat
-                )
+        val packageVersion = packageVersionFor(project, app, targetFormat).orNull
+        if (packageVersion == null) {
+            errors.addError(targetFormat, "no version was specified")
+        } else {
+            versionChecker?.apply {
+                if (!isValid(packageVersion)) {
+                    errors.addError(
+                        targetFormat,
+                        "'$packageVersion' is not a valid version",
+                        correctFormat = correctFormat
+                    )
+                }
+            }
+        }
+
+        if (targetFormat.targetOS == OS.MacOS) {
+            val packageBuildVersion = packageBuildVersionFor(project, app, targetFormat).orNull
+            if (packageBuildVersion == null) {
+                errors.addError(targetFormat, "no build version was specified")
+            } else {
+                versionChecker?.apply {
+                    if (!isValid(packageBuildVersion)) {
+                        errors.addError(
+                            targetFormat,
+                            "'$packageBuildVersion' is not a valid build version",
+                            correctFormat = correctFormat
+                        )
+                    }
+                }
             }
         }
     }

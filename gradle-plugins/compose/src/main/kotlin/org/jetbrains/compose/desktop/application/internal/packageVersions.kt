@@ -43,3 +43,31 @@ private fun NativeDistributions.packageVersionFor(
         ?: osSpecificVersion
         ?: packageVersion
 }
+
+internal fun packageBuildVersionFor(
+    project: Project,
+    app: Application,
+    targetFormat: TargetFormat
+): Provider<String?> =
+    project.provider {
+        app.nativeDistributions.packageBuildVersionFor(targetFormat)
+            // fallback to normal version
+            ?: app.nativeDistributions.packageVersionFor(targetFormat)
+            ?: project.version.toString().takeIf { it != "unspecified" }
+            ?: "1.0.0"
+    }
+
+private fun NativeDistributions.packageBuildVersionFor(
+    targetFormat: TargetFormat
+): String? {
+    check(targetFormat.targetOS == OS.MacOS)
+    val formatSpecificVersion: String? = when (targetFormat) {
+        TargetFormat.AppImage -> null
+        TargetFormat.Dmg -> macOS.dmgPackageBuildVersion
+        TargetFormat.Pkg -> macOS.pkgPackageBuildVersion
+        else -> error("invalid target format: $targetFormat")
+    }
+    val osSpecificVersion: String? = macOS.packageBuildVersion
+    return formatSpecificVersion
+        ?: osSpecificVersion
+}

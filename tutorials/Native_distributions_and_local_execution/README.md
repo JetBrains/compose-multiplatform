@@ -130,6 +130,15 @@ You can use the following DSL properties (in order of descending priority):
 * `nativeDistributions.<os>.packageVersion` specifies a version for a single target OS;
 * `nativeDistributions.packageVersion` specifies a version for all packages;
 
+For macOS you can also specify the build version using the following DSL properties (in order of descending priority):
+* `nativeDistributions.macOS.<packageFormat>PackageBuildVersion` specifies a build version for a single package format;
+* `nativeDistributions.macOS.packageBuildVersion` specifies a build version for all macOS packages;
+
+If the build version is not specified, the package version is used.
+See [CFBundleShortVersionString](https://developer.apple.com/documentation/bundleresources/information_property_list/cfbundleshortversionstring) (package version)
+and [CFBundleVersion](https://developer.apple.com/documentation/bundleresources/information_property_list/cfbundleversion) (build version)
+for more information about versions on macOS.
+
 ``` kotlin
 compose.desktop {
     application {
@@ -141,25 +150,32 @@ compose.desktop {
               // a version for all Linux distributables
               packageVersion = "..." 
               // a version only for the deb package
-              debVersion = "..." 
+              debPackageVersion = "..." 
               // a version only for the rpm package
-              rpmVersion = "..." 
+              rpmPackageVersion = "..." 
             }
             macOS {
               // a version for all macOS distributables
               packageVersion = "..."
               // a version only for the dmg package
-              dmgVersion = "..." 
+              dmgPackageVersion = "..." 
               // a version only for the pkg package
-              pkgVersion = "..." 
+              pkgPackageVersion = "..." 
+              
+              // a build version for all macOS distributables
+              packageBuildVersion = "..."
+              // a build version only for the dmg package
+              dmgPackageBuildVersion = "..." 
+              // a build version only for the pkg package
+              pkgPackageBuildVersion = "..." 
             }
             windows {
               // a version for all Windows distributables
               packageVersion = "..."  
               // a version only for the msi package
-              msiVersion = "..."
+              msiPackageVersion = "..."
               // a version only for the exe package
-              exeVersion = "..." 
+              exePackageVersion = "..." 
             }
         }
     }
@@ -426,6 +442,12 @@ The following platform-specific options are available
     * `dmgPackageVersion = "DMG_VERSION"` — a dmg-specific package version
       (see the section `Specifying package version` for details);
     * `pkgPackageVersion = "PKG_VERSION"` — a pkg-specific package version
+      (see the section `Specifying package version` for details);
+    * `packageBuildVersion = "DMG_VERSION"` — a package build version
+      (see the section `Specifying package version` for details);
+    * `dmgPackageBuildVersion = "DMG_VERSION"` — a dmg-specific package build version
+      (see the section `Specifying package version` for details);
+    * `pkgPackageBuildVersion = "PKG_VERSION"` — a pkg-specific package build version
       (see the section `Specifying package version` for details);
     * `infoPlist` — see the section `Customizing Info.plist on macOS` for details;
 * Windows:
