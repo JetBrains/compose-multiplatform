@@ -7,6 +7,7 @@ import kotlinx.browser.document
 import kotlinx.dom.clear
 import org.jetbrains.compose.web.testutils.*
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
 class DomSideEffectTests {
@@ -107,7 +108,7 @@ class DomSideEffectTests {
 
     @Test
     fun sideEffectsOrder() = runTest {
-        var effectsList = mutableListOf<String>()
+        val effectsList = mutableListOf<String>()
 
         var key = 1
         var recomposeScope: RecomposeScope? = null
@@ -126,19 +127,19 @@ class DomSideEffectTests {
             }
         }
 
-        assertEquals(2, effectsList.size)
-        assertEquals("DisposableRefEffect", effectsList[0])
-        assertEquals("DomSideEffect", effectsList[1])
+        assertContentEquals(
+            listOf("DisposableRefEffect", "DomSideEffect"),
+            effectsList
+        )
 
         key = 2
         recomposeScope?.invalidate()
 
         waitForRecompositionComplete()
 
-        assertEquals(4, effectsList.size)
-        assertEquals("DisposableRefEffect", effectsList[0])
-        assertEquals("DomSideEffect", effectsList[1])
-        assertEquals("DisposableRefEffect", effectsList[2])
-        assertEquals("DomSideEffect", effectsList[3])
+        assertContentEquals(
+            listOf("DisposableRefEffect", "DomSideEffect", "DisposableRefEffect", "DomSideEffect"),
+            effectsList
+        )
     }
 }
