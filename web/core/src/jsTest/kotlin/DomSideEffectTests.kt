@@ -122,7 +122,9 @@ class DomSideEffectTests {
                 }
                 DisposableRefEffect(key) {
                     effectsList.add("DisposableRefEffect")
-                    onDispose { }
+                    onDispose {
+                        effectsList.add("DisposableRefEffectDisposed")
+                    }
                 }
             }
         }
@@ -138,7 +140,7 @@ class DomSideEffectTests {
         waitForRecompositionComplete()
 
         assertContentEquals(
-            listOf("DisposableRefEffect", "DomSideEffect", "DisposableRefEffect", "DomSideEffect"),
+            listOf("DisposableRefEffect", "DomSideEffect", "DisposableRefEffectDisposed", "DisposableRefEffect", "DomSideEffect"),
             effectsList
         )
     }
