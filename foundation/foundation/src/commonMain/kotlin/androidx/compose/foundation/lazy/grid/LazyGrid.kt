@@ -240,7 +240,7 @@ private fun rememberLazyGridMeasurePolicy(
             itemsProvider,
             spanLayoutProvider,
             placeablesProvider
-        ) { index, firstItemIndex, spans, keys, placeables ->
+        ) { index, firstItemIndex, spans, keys, crossAxisSizes, placeables ->
             // we add space between lines as an extra spacing for all lines apart from the last one
             // so the lazy grid measuring logic will take it into account.
             val spacing =
@@ -248,6 +248,7 @@ private fun rememberLazyGridMeasurePolicy(
             LazyMeasuredLine(
                 index = index,
                 firstItemIndex = firstItemIndex,
+                crossAxisSizes = crossAxisSizes,
                 placeables = placeables,
                 spans = spans,
                 keys = keys,
