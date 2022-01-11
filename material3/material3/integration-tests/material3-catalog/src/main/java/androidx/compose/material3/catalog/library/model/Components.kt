@@ -157,6 +157,19 @@ private val NavigationRail = Component(
     examples = NavigationRailExamples
 )
 
+private val ProgressIndicators = Component(
+    id = nextId(),
+    name = "Progress indicators",
+    description = "Progress indicators express an unspecified wait time or display the length of " +
+        "a process.",
+    // No progress indicator icon
+    tintIcon = true,
+    guidelinesUrl = "$ComponentGuidelinesUrl/progress-indicators",
+    docsUrl = "$DocsUrl#circularprogressindicator",
+    sourceUrl = "$Material3SourceUrl/ProgressIndicator.kt",
+    examples = ProgressIndicatorsExamples
+)
+
 private val RadioButtons = Component(
     id = nextId(),
     name = "Radio buttons",
@@ -205,6 +218,7 @@ val Components = listOf(
     NavigationBar,
     NavigationDrawer,
     NavigationRail,
+    ProgressIndicators,
     RadioButtons,
     Snackbars,
     TopAppBar
