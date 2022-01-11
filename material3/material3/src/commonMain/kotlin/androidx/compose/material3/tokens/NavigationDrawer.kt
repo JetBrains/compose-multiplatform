@@ -55,8 +55,6 @@ internal object NavigationDrawer {
     val InactivePressedLabelTextColor = ColorSchemeKey.OnSurface
     val InactivePressedStateLayerColor = ColorSchemeKey.OnSecondaryContainer
     val LabelTextFont = TypographyKey.LabelLarge
-    val LargeBadgeLabelColor = ColorSchemeKey.OnSurfaceVariant
-    val LargeBadgeLabelFont = TypographyKey.LabelLarge
     val ModalContainerElevation = Elevation.Level1
     const val ScrimOpacity = 0.4f
     val StandardContainerElevation = Elevation.Level0

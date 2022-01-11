@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.tokens.NavigationBar
+import androidx.compose.material3.tokens.BadgeTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -101,7 +101,7 @@ fun BadgedBox(
         ) {
             // Use the width of the badge to infer whether it has any content (based on radius used
             // in [Badge]) and determine its horizontal offset.
-            val hasContent = badgePlaceable.width > (NavigationBar.BadgeSize.roundToPx())
+            val hasContent = badgePlaceable.width > (BadgeTokens.Size.roundToPx())
             val badgeHorizontalOffset =
                 if (hasContent) BadgeWithContentHorizontalOffset else BadgeOffset
             val badgeVerticalOffset =
@@ -130,12 +130,12 @@ fun BadgedBox(
 @Composable
 fun Badge(
     modifier: Modifier = Modifier,
-    containerColor: Color = MaterialTheme.colorScheme.fromToken(NavigationBar.BadgeColor),
+    containerColor: Color = MaterialTheme.colorScheme.fromToken(BadgeTokens.Color),
     contentColor: Color = contentColorFor(containerColor),
     content: @Composable (RowScope.() -> Unit)? = null,
 ) {
-    val size = if (content != null) NavigationBar.LargeBadgeSize else NavigationBar.BadgeSize
-    val shape = if (content != null) NavigationBar.LargeBadgeShape else NavigationBar.BadgeShape
+    val size = if (content != null) BadgeTokens.LargeSize else BadgeTokens.Size
+    val shape = if (content != null) BadgeTokens.LargeShape else BadgeTokens.Shape
 
     // Draw badge container.
     Row(
@@ -158,7 +158,7 @@ fun Badge(
                 LocalContentColor provides contentColor
             ) {
                 val style =
-                    MaterialTheme.typography.fromToken(NavigationBar.LargeBadgeLabelFontFamily)
+                    MaterialTheme.typography.fromToken(BadgeTokens.LargeLabelTextFont)
                 ProvideTextStyle(
                     value = style,
                     content = { content() }

@@ -36,9 +36,6 @@ internal object NavigationBar {
     val ActivePressedIconColor = ColorSchemeKey.OnSecondary
     val ActivePressedLabelTextColor = ColorSchemeKey.OnSurface
     val ActivePressedStateLayerColor = ColorSchemeKey.OnSurface
-    val BadgeColor = ColorSchemeKey.Error
-    val BadgeShape = RoundedCornerShape(3.0.dp)
-    val BadgeSize = 6.0.dp
     val ContainerColor = ColorSchemeKey.Surface
     val ContainerElevation = Elevation.Level2
     val ContainerHeight = 80.0.dp
@@ -55,9 +52,4 @@ internal object NavigationBar {
     val InactivePressedLabelTextColor = ColorSchemeKey.OnSurface
     val InactivePressedStateLayerColor = ColorSchemeKey.OnSurface
     val LabelTextFont = TypographyKey.LabelMedium
-    val LargeBadgeColor = ColorSchemeKey.Error
-    val LargeBadgeLabelColor = ColorSchemeKey.OnError
-    val LargeBadgeLabelFontFamily = TypographyKey.LabelSmall
-    val LargeBadgeShape = RoundedCornerShape(8.0.dp)
-    val LargeBadgeSize = 16.0.dp
 }
