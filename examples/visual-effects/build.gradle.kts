@@ -55,7 +55,7 @@ afterEvaluate {
         dependsOn(runTask)
     }
 
-    tasks.register("runNY") {
+    tasks.register("runNewYear") {
         additionalArguments.add("NY")
         group = "compose desktop"
         dependsOn(runTask)
