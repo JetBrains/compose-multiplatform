@@ -14,9 +14,15 @@ import org.w3c.dom.HTMLCanvasElement
 @Composable
 fun ElementScope<HTMLCanvasElement>.skiko(block: @Composable () -> Unit) {
     DomSideEffect { canvas ->
+        var skikoCanvas: ComposeCanvas? = null
+
         onWasmReady {
-            val skikoCanvas = ComposeCanvas(canvas)
-            skikoCanvas.setContent(block)
+            skikoCanvas = ComposeCanvas(canvas)
+            skikoCanvas?.setContent(block)
+        }
+
+        onDispose {
+            skikoCanvas?.dispose()
         }
     }
 }

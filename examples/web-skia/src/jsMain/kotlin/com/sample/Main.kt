@@ -377,8 +377,6 @@ fun SomeCanvas() {
                 )
             }
 
-            Text(text = "Xxx")
-
             Canvas(
                 modifier = Modifier
                     .size(400.dp)
