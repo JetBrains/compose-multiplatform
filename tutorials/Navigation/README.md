@@ -159,7 +159,7 @@ The second point may be especially useful in Desktop. When a child is pushed to 
 
 The third point is about instances retaining, like AndroidX `ViewModels`, and is mostly used in Android. It allows to retain (keep in memory) some data when Android configuration change occurs and the whole navigation stack is recreated. The most important advantage of instance retaining in this pattern is that it is encapsulated in children as implementation details.
 
-The forth point is not that obvious but might be very important. Separating navigation and business logic from the user interface may improve testability. E.g. it becomes possible to test non-UI code in integration with just plain JUnit tests. And the UI can be tested in isolation as well using another testing frameworks.
+The fourth point is not that obvious but might be very important. Separating navigation and business logic from the user interface may improve testability. E.g. it becomes possible to test non-UI code in integration with just plain JUnit tests. And the UI can be tested in isolation as well using another testing frameworks.
 
 You can find some integration tests in the TodoApp example:
 
