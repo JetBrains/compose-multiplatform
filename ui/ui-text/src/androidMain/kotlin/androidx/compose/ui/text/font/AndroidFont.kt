@@ -28,6 +28,7 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.android.InternalPlatformTextApi
 import androidx.compose.ui.text.font.FontLoadingStrategy.Companion.Blocking
 import java.io.File
+import java.lang.UnsupportedOperationException
 
 /**
  * Create a Font declaration from a file in the assets directory. The content of the [File] is
@@ -206,13 +207,14 @@ private object AndroidPreloadedFontTypefaceLoader : AndroidFont.TypefaceLoader {
     override fun loadBlocking(context: Context, font: AndroidFont): Typeface? =
         (font as? AndroidPreloadedFont)?.typefaceInternal
 
-    override suspend fun awaitLoad(context: Context, font: AndroidFont): Typeface? =
-        loadBlocking(context, font)
+    override suspend fun awaitLoad(context: Context, font: AndroidFont): Nothing {
+        throw UnsupportedOperationException("All preloaded fonts are blocking.")
+    }
 }
 
 @OptIn(ExperimentalTextApi::class)
 private class AndroidAssetFont constructor(
-    val assetManager: AssetManager,
+    @Suppress("CanBeParameter") val assetManager: AssetManager,
     val path: String,
     override val weight: FontWeight = FontWeight.Normal,
     override val style: FontStyle = FontStyle.Normal

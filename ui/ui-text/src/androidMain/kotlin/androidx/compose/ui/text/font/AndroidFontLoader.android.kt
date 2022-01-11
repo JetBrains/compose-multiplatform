@@ -18,9 +18,14 @@ package androidx.compose.ui.text.font
 
 import android.content.Context
 import android.graphics.Typeface
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.font.FontLoadingStrategy.Companion.Async
+import androidx.compose.ui.text.font.FontLoadingStrategy.Companion.Blocking
+import androidx.compose.ui.text.font.FontLoadingStrategy.Companion.OptionalLocal
 import androidx.core.content.res.ResourcesCompat
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
+import kotlin.runCatching
 
 /**
  * Android implementation for [Font.ResourceLoader]. It is designed to load only [ResourceFont].
@@ -30,10 +35,18 @@ internal class AndroidFontLoader(
 ) : FontLoader {
     private val context = context.applicationContext
 
+    @OptIn(ExperimentalTextApi::class)
     override fun loadBlocking(font: Font): Typeface? {
         return when (font) {
             is AndroidFont -> font.typefaceLoader.loadBlocking(context, font)
-            is ResourceFont -> runCatching { font.load(context) }.getOrNull()
+            is ResourceFont -> when (font.loadingStrategy) {
+                Blocking -> font.load(context)
+                OptionalLocal -> runCatching { font.load(context) }.getOrNull()
+                Async -> throw UnsupportedOperationException("Unsupported Async font load path")
+                else -> throw IllegalArgumentException(
+                    "Unknown loading type ${font.loadingStrategy}"
+                )
+            }
             else -> null
         }
     }

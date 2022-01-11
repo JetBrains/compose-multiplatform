@@ -654,11 +654,9 @@ package androidx.compose.ui.text.font {
     method public int getAsync();
     method public int getBlocking();
     method public int getOptionalLocal();
-    method public java.util.List<androidx.compose.ui.text.font.FontLoadingStrategy> getValues();
     property public final int Async;
     property public final int Blocking;
     property public final int OptionalLocal;
-    property public final java.util.List<androidx.compose.ui.text.font.FontLoadingStrategy> values;
   }
 
   public final inline class FontStyle {

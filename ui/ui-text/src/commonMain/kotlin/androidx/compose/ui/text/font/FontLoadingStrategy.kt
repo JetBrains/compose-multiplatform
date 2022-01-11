@@ -96,8 +96,5 @@ value class FontLoadingStrategy private constructor(val value: Int) {
          * http.
          */
         val Async = FontLoadingStrategy(2)
-
-        /** Returns a list of possible values of [FontStyle]. */
-        val values: List<FontLoadingStrategy> = listOf(Blocking, OptionalLocal, Async)
     }
 }
