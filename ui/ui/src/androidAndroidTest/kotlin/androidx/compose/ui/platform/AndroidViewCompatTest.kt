@@ -524,14 +524,18 @@ class AndroidViewCompatTest {
             Box(Modifier.onGloballyPositioned { outer = it.positionInWindow() }) {
                 val paddingDp = with(LocalDensity.current) { padding.toDp() }
                 Box(Modifier.padding(paddingDp)) {
-                    AndroidView(::ComposeView) {
-                        it.setContent {
-                            Box(
-                                Modifier.padding(paddingDp)
-                                    .onGloballyPositioned { inner = it.positionInWindow() }
-                            )
+                    AndroidView(
+                        {
+                            ComposeView(it).apply {
+                                setContent {
+                                    Box(
+                                        Modifier.padding(paddingDp)
+                                            .onGloballyPositioned { inner = it.positionInWindow() }
+                                    )
+                                }
+                            }
                         }
-                    }
+                    )
                 }
             }
         }
@@ -564,14 +568,18 @@ class AndroidViewCompatTest {
                 Box {
                     val paddingDp = with(LocalDensity.current) { padding.toDp() }
                     Box(Modifier.padding(paddingDp)) {
-                        AndroidView(::ComposeView) {
-                            it.setContent {
-                                Box(
-                                    Modifier.padding(paddingDp)
-                                        .onGloballyPositioned { coordinates = it }
-                                )
+                        AndroidView(
+                            {
+                                ComposeView(it).apply {
+                                    setContent {
+                                        Box(
+                                            Modifier.padding(paddingDp)
+                                                .onGloballyPositioned { coordinates = it }
+                                        )
+                                    }
+                                }
                             }
-                        }
+                        )
                     }
                 }
             }
