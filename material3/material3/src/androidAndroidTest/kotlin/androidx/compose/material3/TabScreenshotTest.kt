@@ -23,6 +23,7 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.testutils.assertAgainstGolden
@@ -55,17 +56,17 @@ class TabScreenshotTest {
     val composeTestRule = createComposeRule()
 
     @get:Rule
-    val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
+    val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL3)
 
     @Test
-    fun lightTheme_defaultColors() {
+    fun lightTheme() {
         val interactionSource = MutableInteractionSource()
 
         var scope: CoroutineScope? = null
 
         composeTestRule.setContent {
             scope = rememberCoroutineScope()
-            MaterialTheme(lightColors()) {
+            MaterialTheme(lightColorScheme()) {
                 DefaultTabs(interactionSource)
             }
         }
@@ -74,19 +75,19 @@ class TabScreenshotTest {
             scope = scope!!,
             interactionSource = interactionSource,
             interaction = null,
-            goldenIdentifier = "tabs_lightTheme_defaultColors"
+            goldenIdentifier = "tabs_lightTheme"
         )
     }
 
     @Test
-    fun lightTheme_defaultColors_pressed() {
+    fun lightTheme_pressed() {
         val interactionSource = MutableInteractionSource()
 
         var scope: CoroutineScope? = null
 
         composeTestRule.setContent {
             scope = rememberCoroutineScope()
-            MaterialTheme(lightColors()) {
+            MaterialTheme(lightColorScheme()) {
                 DefaultTabs(interactionSource)
             }
         }
@@ -95,71 +96,19 @@ class TabScreenshotTest {
             scope = scope!!,
             interactionSource = interactionSource,
             interaction = PressInteraction.Press(Offset(10f, 10f)),
-            goldenIdentifier = "tabs_lightTheme_defaultColors_pressed"
+            goldenIdentifier = "tabs_lightTheme_pressed"
         )
     }
 
     @Test
-    fun lightTheme_surfaceColors() {
-        val interactionSource = MutableInteractionSource()
-
-        var scope: CoroutineScope? = null
-
-        composeTestRule.setContent {
-            MaterialTheme(lightColors()) {
-                scope = rememberCoroutineScope()
-                CustomTabs(
-                    interactionSource,
-                    backgroundColor = MaterialTheme.colors.surface,
-                    selectedContentColor = MaterialTheme.colors.primary,
-                    unselectedContentColor = MaterialTheme.colors.onSurface
-                )
-            }
-        }
-
-        assertTabsMatch(
-            scope = scope!!,
-            interactionSource = interactionSource,
-            interaction = null,
-            goldenIdentifier = "tabs_lightTheme_surfaceColors"
-        )
-    }
-
-    @Test
-    fun lightTheme_surfaceColors_pressed() {
-        val interactionSource = MutableInteractionSource()
-
-        var scope: CoroutineScope? = null
-
-        composeTestRule.setContent {
-            MaterialTheme(lightColors()) {
-                scope = rememberCoroutineScope()
-                CustomTabs(
-                    interactionSource,
-                    backgroundColor = MaterialTheme.colors.surface,
-                    selectedContentColor = MaterialTheme.colors.primary,
-                    unselectedContentColor = MaterialTheme.colors.onSurface
-                )
-            }
-        }
-
-        assertTabsMatch(
-            scope = scope!!,
-            interactionSource = interactionSource,
-            interaction = PressInteraction.Press(Offset(10f, 10f)),
-            goldenIdentifier = "tabs_lightTheme_surfaceColors_pressed"
-        )
-    }
-
-    @Test
-    fun darkTheme_defaultColors() {
+    fun darkTheme() {
         val interactionSource = MutableInteractionSource()
 
         var scope: CoroutineScope? = null
 
         composeTestRule.setContent {
             scope = rememberCoroutineScope()
-            MaterialTheme(darkColors()) {
+            MaterialTheme(darkColorScheme()) {
                 DefaultTabs(interactionSource)
             }
         }
@@ -168,19 +117,19 @@ class TabScreenshotTest {
             scope = scope!!,
             interactionSource = interactionSource,
             interaction = null,
-            goldenIdentifier = "tabs_darkTheme_defaultColors"
+            goldenIdentifier = "tabs_darkTheme"
         )
     }
 
     @Test
-    fun darkTheme_defaultColors_pressed() {
+    fun darkTheme_pressed() {
         val interactionSource = MutableInteractionSource()
 
         var scope: CoroutineScope? = null
 
         composeTestRule.setContent {
             scope = rememberCoroutineScope()
-            MaterialTheme(darkColors()) {
+            MaterialTheme(darkColorScheme()) {
                 DefaultTabs(interactionSource)
             }
         }
@@ -189,126 +138,19 @@ class TabScreenshotTest {
             scope = scope!!,
             interactionSource = interactionSource,
             interaction = PressInteraction.Press(Offset(10f, 10f)),
-            goldenIdentifier = "tabs_darkTheme_defaultColors_pressed"
-        )
-    }
-
-    // Dark theme by default uses `surface` as the background color, but the selectedContentColor
-    // defaults to `onSurface`, whereas a typical use case is for it to be `primary`. This test
-    // matches that use case.
-    @Test
-    fun darkTheme_surfaceColors() {
-        val interactionSource = MutableInteractionSource()
-
-        var scope: CoroutineScope? = null
-
-        composeTestRule.setContent {
-            MaterialTheme(darkColors()) {
-                scope = rememberCoroutineScope()
-                CustomTabs(
-                    interactionSource,
-                    backgroundColor = MaterialTheme.colors.surface,
-                    selectedContentColor = MaterialTheme.colors.primary,
-                    unselectedContentColor = MaterialTheme.colors.onSurface
-                )
-            }
-        }
-
-        assertTabsMatch(
-            scope = scope!!,
-            interactionSource = interactionSource,
-            interaction = null,
-            goldenIdentifier = "tabs_darkTheme_surfaceColors"
+            goldenIdentifier = "tabs_darkTheme_pressed"
         )
     }
 
     @Test
-    fun darkTheme_surfaceColors_pressed() {
-        val interactionSource = MutableInteractionSource()
-
-        var scope: CoroutineScope? = null
-
-        composeTestRule.setContent {
-            MaterialTheme(darkColors()) {
-                scope = rememberCoroutineScope()
-                CustomTabs(
-                    interactionSource,
-                    backgroundColor = MaterialTheme.colors.surface,
-                    selectedContentColor = MaterialTheme.colors.primary,
-                    unselectedContentColor = MaterialTheme.colors.onSurface
-                )
-            }
-        }
-
-        assertTabsMatch(
-            scope = scope!!,
-            interactionSource = interactionSource,
-            interaction = PressInteraction.Press(Offset(10f, 10f)),
-            goldenIdentifier = "tabs_darkTheme_surfaceColors_pressed"
-        )
-    }
-
-    @Test
-    fun darkTheme_primaryColors() {
-        val interactionSource = MutableInteractionSource()
-
-        var scope: CoroutineScope? = null
-
-        composeTestRule.setContent {
-            MaterialTheme(darkColors()) {
-                scope = rememberCoroutineScope()
-                CustomTabs(
-                    interactionSource,
-                    backgroundColor = MaterialTheme.colors.primary,
-                    selectedContentColor = MaterialTheme.colors.onPrimary,
-                    unselectedContentColor = MaterialTheme.colors.onPrimary
-                )
-            }
-        }
-
-        assertTabsMatch(
-            scope = scope!!,
-            interactionSource = interactionSource,
-            interaction = null,
-            goldenIdentifier = "tabs_darkTheme_primaryColors"
-        )
-    }
-
-    @Test
-    fun darkTheme_primaryColors_pressed() {
-        val interactionSource = MutableInteractionSource()
-
-        var scope: CoroutineScope? = null
-
-        composeTestRule.setContent {
-            MaterialTheme(darkColors()) {
-                scope = rememberCoroutineScope()
-                CustomTabs(
-                    interactionSource,
-                    backgroundColor = MaterialTheme.colors.primary,
-                    selectedContentColor = MaterialTheme.colors.onPrimary,
-                    unselectedContentColor = MaterialTheme.colors.onPrimary
-                )
-            }
-        }
-
-        assertTabsMatch(
-            scope = scope!!,
-            interactionSource = interactionSource,
-            interaction = PressInteraction.Press(Offset(10f, 10f)),
-            goldenIdentifier = "tabs_darkTheme_primaryColors_pressed"
-        )
-    }
-
-    @Test
-    fun leadingIconTabs_lightTheme_defaultColors() {
+    fun leadingIconTabs_lightTheme() {
         val interactionSource = MutableInteractionSource()
 
         var scope: CoroutineScope? = null
 
         composeTestRule.setContent {
             scope = rememberCoroutineScope()
-            MaterialTheme(lightColors()) {
+            MaterialTheme(lightColorScheme()) {
                 DefaultLeadingIconTabs(interactionSource)
             }
         }
@@ -317,19 +159,19 @@ class TabScreenshotTest {
             scope = scope!!,
             interactionSource = interactionSource,
             interaction = null,
-            goldenIdentifier = "leadingIconTabs_lightTheme_defaultColors"
+            goldenIdentifier = "leadingIconTabs_lightTheme"
         )
     }
 
     @Test
-    fun leadingIconTabs_darkTheme_defaultColors() {
+    fun leadingIconTabs_darkTheme() {
         val interactionSource = MutableInteractionSource()
 
         var scope: CoroutineScope? = null
 
         composeTestRule.setContent {
             scope = rememberCoroutineScope()
-            MaterialTheme(darkColors()) {
+            MaterialTheme(darkColorScheme()) {
                 DefaultLeadingIconTabs(interactionSource)
             }
         }
@@ -338,7 +180,7 @@ class TabScreenshotTest {
             scope = scope!!,
             interactionSource = interactionSource,
             interaction = null,
-            goldenIdentifier = "leadingIconTabs_darkTheme_defaultColors"
+            goldenIdentifier = "leadingIconTabs_darkTheme"
         )
     }
 
@@ -414,22 +256,26 @@ private fun DefaultTabs(
  *
  * @param interactionSource the [MutableInteractionSource] for the first [Tab], to control its
  * visual state.
- * @param backgroundColor the backgroundColor of the [TabRow]
+ * @param containerColor the containerColor of the [TabRow]
  * @param selectedContentColor the content color for a selected [Tab] (first tab)
  * @param unselectedContentColor the content color for an unselected [Tab] (second and third tabs)
  */
 @Composable
 private fun CustomTabs(
     interactionSource: MutableInteractionSource,
-    backgroundColor: Color,
+    containerColor: Color,
     selectedContentColor: Color,
     unselectedContentColor: Color
 ) {
-    // Apply default emphasis
-    @Suppress("NAME_SHADOWING")
-    val unselectedContentColor = unselectedContentColor.copy(alpha = ContentAlpha.medium)
     Box(Modifier.semantics(mergeDescendants = true) {}.testTag(Tag)) {
-        TabRow(selectedTabIndex = 0, backgroundColor = backgroundColor) {
+        TabRow(selectedTabIndex = 0,
+            containerColor = containerColor,
+            indicator = @Composable { tabPositions ->
+                TabRowDefaults.Indicator(
+                    modifier = Modifier.tabIndicatorOffset(tabPositions[0]),
+                    color = selectedContentColor
+                )
+            }) {
             Tab(
                 text = { Text("TAB") },
                 selected = true,

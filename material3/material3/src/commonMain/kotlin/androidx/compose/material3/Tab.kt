@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.tokens.PrimaryNavigationTabTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -51,14 +52,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
 import kotlin.math.max
 
+// TODO: Provide M3 tab image when asset is available.
 /**
  * <a href="https://material.io/components/tabs" class="external" target="_blank">Material Design tab</a>.
  *
- * Tabs organize content across different screens, data sets, and other interactions.
- *
- * ![Tab image](https://developer.android.com/images/reference/androidx/compose/material/tab.png)
+ * A default Tab, also known as a Primary Navigation Tab. Tabs organize content across different
+ * screens, data sets, and other interactions.
  *
  * A Tab represents a single page of content using a text label and/or icon. It represents its
  * selected state by tinting the text label and/or image with [selectedContentColor].
@@ -96,11 +98,13 @@ fun Tab(
     icon: @Composable (() -> Unit)? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     selectedContentColor: Color = LocalContentColor.current,
-    unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium)
+    unselectedContentColor: Color = selectedContentColor
 ) {
     val styledText: @Composable (() -> Unit)? = text?.let {
         @Composable {
-            val style = MaterialTheme.typography.button.copy(textAlign = TextAlign.Center)
+            val style =
+                MaterialTheme.typography.fromToken(PrimaryNavigationTabTokens.LabelTextFont)
+                .copy(textAlign = TextAlign.Center)
             ProvideTextStyle(style, content = text)
         }
     }
@@ -117,12 +121,11 @@ fun Tab(
     }
 }
 
+// TODO: Provide M3 tab image when asset is available.
 /**
  * <a href="https://material.io/components/tabs" class="external" target="_blank">Material Design tab</a>.
  *
  * Tabs organize content across different screens, data sets, and other interactions.
- *
- * ![Tab image](https://developer.android.com/images/reference/androidx/compose/material/tab.png)
  *
  * A LeadingIconTab represents a single page of content using a text label and an icon in
  * front of the label.
@@ -158,7 +161,7 @@ fun LeadingIconTab(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     selectedContentColor: Color = LocalContentColor.current,
-    unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium)
+    unselectedContentColor: Color = selectedContentColor
 ) {
     // The color of the Ripple should always the be selected color, as we want to show the color
     // before the item is considered selected, and hence before the new contentColor is
@@ -184,18 +187,18 @@ fun LeadingIconTab(
         ) {
             icon()
             Spacer(Modifier.requiredWidth(TextDistanceFromLeadingIcon))
-            val style = MaterialTheme.typography.button.copy(textAlign = TextAlign.Center)
+            val style = MaterialTheme.typography.fromToken(PrimaryNavigationTabTokens.LabelTextFont)
+                .copy(textAlign = TextAlign.Center)
             ProvideTextStyle(style, content = text)
         }
     }
 }
 
+// TODO: Provide M3 tab image when asset is available.
 /**
  * <a href="https://material.io/components/tabs" class="external" target="_blank">Material Design tab</a>.
  *
  * Tabs organize content across different screens, data sets, and other interactions.
- *
- * ![Tab image](https://developer.android.com/images/reference/androidx/compose/material/tab.png)
  *
  * Generic [Tab] overload that is not opinionated about content / color. See the other overload
  * for a Tab that has specific slots for text and / or an icon, as well as providing the correct
@@ -203,7 +206,7 @@ fun LeadingIconTab(
  *
  * A custom tab using this API may look like:
  *
- * @sample androidx.compose.material.samples.FancyTab
+ * @sample androidx.compose.material3.samples.FancyTab
  *
  * @param selected whether this tab is selected or not
  * @param onClick the callback to be invoked when this tab is selected
@@ -227,7 +230,7 @@ fun Tab(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     selectedContentColor: Color = LocalContentColor.current,
-    unselectedContentColor: Color = selectedContentColor.copy(alpha = ContentAlpha.medium),
+    unselectedContentColor: Color = selectedContentColor,
     content: @Composable ColumnScope.() -> Unit
 ) {
     // The color of the Ripple should always the selected color, as we want to show the color
@@ -286,8 +289,7 @@ private fun TabTransition(
         if (it) activeColor else inactiveColor
     }
     CompositionLocalProvider(
-        LocalContentColor provides color.copy(alpha = 1f),
-        LocalContentAlpha provides color.alpha,
+        LocalContentColor provides color,
         content = content
     )
 }
@@ -391,7 +393,7 @@ private fun Placeable.PlacementScope.placeTextAndIcon(
 
     // Total offset between the last text baseline and the bottom of the Tab layout
     val textOffset = with(density) {
-        baselineOffset.roundToPx() + TabRowDefaults.IndicatorHeight.roundToPx()
+        baselineOffset.roundToPx() + PrimaryNavigationTabTokens.ActiveIndicatorHeight.roundToPx()
     }
 
     // How much space there is between the top of the icon (essentially the top of this layout)
@@ -410,7 +412,7 @@ private fun Placeable.PlacementScope.placeTextAndIcon(
 }
 
 // Tab specifications
-private val SmallTabHeight = 48.dp
+private val SmallTabHeight = PrimaryNavigationTabTokens.ContainerHeight
 private val LargeTabHeight = 72.dp
 
 // Tab transition specifications

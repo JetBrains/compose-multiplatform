@@ -19,12 +19,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.samples.LeadingIconTabs
-import androidx.compose.material.samples.ScrollingTextTabs
-import androidx.compose.material.samples.TextTabs
+import androidx.compose.material3.samples.LeadingIconTabs
+import androidx.compose.material3.samples.ScrollingTextTabs
+import androidx.compose.material3.samples.TextTabs
+import androidx.compose.material3.tokens.PrimaryNavigationTabTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -92,7 +93,7 @@ class TabTest {
 
     @Test
     fun defaultSemantics() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TabRow(0) {
                 Tab(
                     text = { Text("Text") },
@@ -116,7 +117,7 @@ class TabTest {
 
     @Test
     fun disabledSemantics() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 Tab(
                     enabled = false,
@@ -137,7 +138,7 @@ class TabTest {
 
     @Test
     fun leadingIconTab_defaultSemantics() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             TabRow(0) {
                 LeadingIconTab(
                     text = { Text("Text") },
@@ -162,7 +163,7 @@ class TabTest {
 
     @Test
     fun leadingIconTab_disabledSemantics() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 LeadingIconTab(
                     enabled = false,
@@ -236,7 +237,7 @@ class TabTest {
     fun fixedTabRow_indicatorPosition() {
         val indicatorHeight = 1.dp
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             var state by remember { mutableStateOf(0) }
             val titles = listOf("TAB 1", "TAB 2")
 
@@ -289,7 +290,7 @@ class TabTest {
 
     @Test
     fun fixedTabRow_dividerHeight() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val titles = listOf("TAB 1", "TAB 2")
             val tabRowHeight = 100.dp
 
@@ -318,14 +319,14 @@ class TabTest {
         rule.onNodeWithTag("divider", true)
             .assertPositionInRootIsEqualTo(
                 expectedLeft = 0.dp,
-                expectedTop = tabRowBounds.height - TabRowDefaults.DividerThickness
+                expectedTop = tabRowBounds.height - PrimaryNavigationTabTokens.DividerHeight
             )
-            .assertHeightIsEqualTo(TabRowDefaults.DividerThickness)
+            .assertHeightIsEqualTo(PrimaryNavigationTabTokens.DividerHeight)
     }
 
     @Test
     fun singleLineTab_textPosition() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             var state by remember { mutableStateOf(0) }
             val titles = listOf("TAB")
 
@@ -356,7 +357,7 @@ class TabTest {
 
     @Test
     fun singleLineTab_withIcon_textBaseline() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             var state by remember { mutableStateOf(0) }
             val titles = listOf("TAB")
 
@@ -380,7 +381,7 @@ class TabTest {
         }
 
         val expectedBaseline = 14.dp
-        val indicatorHeight = 2.dp
+        val indicatorHeight = 3.dp
         val expectedBaselineDistance = expectedBaseline + indicatorHeight
 
         val tabRowBounds = rule.onNodeWithTag("tabRow").getUnclippedBoundsInRoot()
@@ -396,7 +397,7 @@ class TabTest {
 
     @Test
     fun twoLineTab_textPosition() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             var state by remember { mutableStateOf(0) }
             val titles = listOf("Two line \n text")
 
@@ -428,7 +429,7 @@ class TabTest {
 
     @Test
     fun LeadingIconTab_textAndIconPosition() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 TabRow(
                     modifier = Modifier.testTag("tabRow"),
@@ -471,7 +472,7 @@ class TabTest {
         val indicatorHeight = 1.dp
         val minimumTabWidth = 90.dp
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             var state by remember { mutableStateOf(0) }
             val titles = listOf("TAB 1", "TAB 2")
 
@@ -504,12 +505,12 @@ class TabTest {
         }
 
         val tabRowBounds = rule.onNodeWithTag("tabRow").getUnclippedBoundsInRoot()
-
+        val tabRowPadding = 52.dp
         // Indicator should be placed in the bottom left of the first tab
         rule.onNodeWithTag("indicator", true)
             .assertPositionInRootIsEqualTo(
                 // Tabs in a scrollable tab row are offset 52.dp from each end
-                expectedLeft = TabRowDefaults.ScrollableTabRowPadding,
+                expectedLeft = tabRowPadding,
                 expectedTop = tabRowBounds.height - indicatorHeight
             )
 
@@ -520,14 +521,14 @@ class TabTest {
         // should be in the middle of the TabRow
         rule.onNodeWithTag("indicator", true)
             .assertPositionInRootIsEqualTo(
-                expectedLeft = TabRowDefaults.ScrollableTabRowPadding + minimumTabWidth,
+                expectedLeft = tabRowPadding + minimumTabWidth,
                 expectedTop = tabRowBounds.height - indicatorHeight
             )
     }
 
     @Test
     fun scrollableTabRow_dividerHeight() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             val titles = listOf("TAB 1", "TAB 2")
             val tabRowHeight = 100.dp
 
@@ -556,15 +557,15 @@ class TabTest {
         rule.onNodeWithTag("divider", true)
             .assertPositionInRootIsEqualTo(
                 expectedLeft = 0.dp,
-                expectedTop = tabRowBounds.height - TabRowDefaults.DividerThickness,
+                expectedTop = tabRowBounds.height - PrimaryNavigationTabTokens.DividerHeight,
             )
-            .assertHeightIsEqualTo(TabRowDefaults.DividerThickness)
+            .assertHeightIsEqualTo(PrimaryNavigationTabTokens.DividerHeight)
     }
 
     @Test
     fun fixedTabRow_initialTabSelected() {
         rule
-            .setMaterialContent {
+            .setMaterialContent(lightColorScheme()) {
                 TextTabs()
             }
 
@@ -581,7 +582,7 @@ class TabTest {
     @Test
     fun fixedTabRow_selectNewTab() {
         rule
-            .setMaterialContent {
+            .setMaterialContent(lightColorScheme()) {
                 TextTabs()
             }
 
@@ -610,7 +611,7 @@ class TabTest {
     @Test
     fun fixedLeadingIconTabRow_initialTabSelected() {
         rule
-            .setMaterialContent {
+            .setMaterialContent(lightColorScheme()) {
                 LeadingIconTabs()
             }
 
@@ -627,7 +628,7 @@ class TabTest {
     @Test
     fun LeadingIconTabRow_selectNewTab() {
         rule
-            .setMaterialContent {
+            .setMaterialContent(lightColorScheme()) {
                 LeadingIconTabs()
             }
 
@@ -656,7 +657,7 @@ class TabTest {
     @Test
     fun scrollableTabRow_initialTabSelected() {
         rule
-            .setMaterialContent {
+            .setMaterialContent(lightColorScheme()) {
                 ScrollingTextTabs()
             }
 
@@ -674,7 +675,7 @@ class TabTest {
     @Test
     fun scrollableTabRow_offScreenTabInitiallySelected() {
         rule
-            .setMaterialContent {
+            .setMaterialContent(lightColorScheme()) {
                 var state by remember { mutableStateOf(9) }
                 val titles = List(10) { "Tab ${it + 1}" }
                 ScrollableTabRow(selectedTabIndex = state) {
@@ -701,7 +702,7 @@ class TabTest {
     @Test
     fun scrollableTabRow_selectNewTab() {
         rule
-            .setMaterialContent {
+            .setMaterialContent(lightColorScheme()) {
                 ScrollingTextTabs()
             }
 
@@ -734,7 +735,7 @@ class TabTest {
     fun tabRowIndicator_animatesWidthChange() {
         rule.mainClock.autoAdvance = false
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             var state by remember { mutableStateOf(0) }
             val titles = listOf("TAB 1", "TAB 2", "TAB 3 WITH LOTS OF TEXT")
 
@@ -794,7 +795,7 @@ class TabTest {
     @Test
     fun disabled_noClicks() {
         var clicks = 0
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 Tab(
                     enabled = false,
@@ -817,7 +818,7 @@ class TabTest {
     @Test
     fun leadingIconTab_disabled_noClicks() {
         var clicks = 0
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box {
                 LeadingIconTab(
                     enabled = false,
