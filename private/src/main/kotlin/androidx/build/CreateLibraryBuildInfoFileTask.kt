@@ -17,7 +17,7 @@
 package androidx.build
 
 import androidx.build.gitclient.Commit
-import androidx.build.gitclient.GitClientImpl
+import androidx.build.gitclient.GitClient
 import androidx.build.gitclient.GitCommitRange
 import androidx.build.jetpad.LibraryBuildInfoFile
 import com.google.gson.GsonBuilder
@@ -233,7 +233,13 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
          * of the build that is released.  Thus, we use frameworks/support to get the sha
          */
         private fun Project.getFrameworksSupportCommitShaAtHead(): String {
-            val commitList: List<Commit> = GitClientImpl(project.getSupportRootFolder(), logger)
+            val gitClient = GitClient.create(
+                project.getSupportRootFolder(),
+                logger,
+                GitClient.getChangeInfoPath(project).get()
+            )
+            val commitList: List<Commit> =
+                gitClient
                 .getGitLog(
                     GitCommitRange(
                         fromExclusive = "",
