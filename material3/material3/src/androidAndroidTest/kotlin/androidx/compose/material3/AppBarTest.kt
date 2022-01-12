@@ -24,10 +24,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.tokens.TopAppBarLarge
-import androidx.compose.material3.tokens.TopAppBarMedium
-import androidx.compose.material3.tokens.TopAppBarSmall
-import androidx.compose.material3.tokens.TopAppBarSmallCentered
+import androidx.compose.material3.tokens.TopAppBarLargeTokens
+import androidx.compose.material3.tokens.TopAppBarMediumTokens
+import androidx.compose.material3.tokens.TopAppBarSmallTokens
+import androidx.compose.material3.tokens.TopAppBarSmallCenteredTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.testutils.assertContainsColor
 import androidx.compose.ui.Modifier
@@ -82,7 +82,7 @@ class AppBarTest {
             .setMaterialContentForSizeAssertions {
                 SmallTopAppBar(title = { Text("Title") })
             }
-            .assertHeightIsEqualTo(TopAppBarSmall.SmallContainerHeight)
+            .assertHeightIsEqualTo(TopAppBarSmallTokens.ContainerHeight)
             .assertWidthIsEqualTo(rule.rootWidth())
     }
 
@@ -143,7 +143,7 @@ class AppBarTest {
                 Text("Title")
                 textStyle = LocalTextStyle.current
                 expectedTextStyle =
-                    MaterialTheme.typography.fromToken(TopAppBarSmall.SmallHeadlineFont)
+                    MaterialTheme.typography.fromToken(TopAppBarSmallTokens.HeadlineFont)
             }
             )
         }
@@ -259,7 +259,7 @@ class AppBarTest {
         }
         rule.waitForIdle()
         rule.onNodeWithTag(TopAppBarTestTag)
-            .assertHeightIsEqualTo(TopAppBarSmall.SmallContainerHeight - scrollOffsetDp)
+            .assertHeightIsEqualTo(TopAppBarSmallTokens.ContainerHeight - scrollOffsetDp)
     }
 
     @Test
@@ -267,7 +267,7 @@ class AppBarTest {
         rule.setMaterialContentForSizeAssertions {
             CenterAlignedTopAppBar(title = { Text("Title") })
         }
-            .assertHeightIsEqualTo(TopAppBarSmallCentered.SmallCenteredContainerHeight)
+            .assertHeightIsEqualTo(TopAppBarSmallCenteredTokens.ContainerHeight)
             .assertWidthIsEqualTo(rule.rootWidth())
     }
 
@@ -330,7 +330,7 @@ class AppBarTest {
                     textStyle = LocalTextStyle.current
                     expectedTextStyle =
                         MaterialTheme.typography.fromToken(
-                            TopAppBarSmallCentered.SmallCenteredHeadlineFont
+                            TopAppBarSmallCenteredTokens.HeadlineFont
                         )
                 }
             )
@@ -426,7 +426,7 @@ class AppBarTest {
         rule.setMaterialContentForSizeAssertions {
             MediumTopAppBar(title = { Text("Medium Title") })
         }
-            .assertHeightIsEqualTo(TopAppBarMedium.MediumContainerHeight)
+            .assertHeightIsEqualTo(TopAppBarMediumTokens.ContainerHeight)
             .assertWidthIsEqualTo(rule.rootWidth())
     }
 
@@ -450,7 +450,7 @@ class AppBarTest {
 
         // The bottom text baseline should be 24.dp from the bottom of the app bar.
         assertMediumOrLargeDefaultPositioning(
-            expectedAppBarHeight = TopAppBarMedium.MediumContainerHeight,
+            expectedAppBarHeight = TopAppBarMediumTokens.ContainerHeight,
             bottomTextPadding = 24.dp
         )
     }
@@ -474,8 +474,8 @@ class AppBarTest {
             }
         }
         assertMediumOrLargeScrolledHeight(
-            TopAppBarMedium.MediumContainerHeight,
-            TopAppBarSmall.SmallContainerHeight,
+            TopAppBarMediumTokens.ContainerHeight,
+            TopAppBarSmallTokens.ContainerHeight,
             content
         )
     }
@@ -494,8 +494,8 @@ class AppBarTest {
         }
 
         assertMediumOrLargeScrolledColors(
-            TopAppBarMedium.MediumContainerHeight,
-            TopAppBarSmall.SmallContainerHeight,
+            TopAppBarMediumTokens.ContainerHeight,
+            TopAppBarSmallTokens.ContainerHeight,
             content
         )
     }
@@ -505,7 +505,7 @@ class AppBarTest {
         rule.setMaterialContentForSizeAssertions {
             LargeTopAppBar(title = { Text("Large Title") })
         }
-            .assertHeightIsEqualTo(TopAppBarLarge.LargeContainerHeight)
+            .assertHeightIsEqualTo(TopAppBarLargeTokens.ContainerHeight)
             .assertWidthIsEqualTo(rule.rootWidth())
     }
 
@@ -529,7 +529,7 @@ class AppBarTest {
 
         // The bottom text baseline should be 28.dp from the bottom of the app bar.
         assertMediumOrLargeDefaultPositioning(
-            expectedAppBarHeight = TopAppBarLarge.LargeContainerHeight,
+            expectedAppBarHeight = TopAppBarLargeTokens.ContainerHeight,
             bottomTextPadding = 28.dp
         )
     }
@@ -553,8 +553,8 @@ class AppBarTest {
             }
         }
         assertMediumOrLargeScrolledHeight(
-            TopAppBarLarge.LargeContainerHeight,
-            TopAppBarSmall.SmallContainerHeight,
+            TopAppBarLargeTokens.ContainerHeight,
+            TopAppBarSmallTokens.ContainerHeight,
             content
         )
     }
@@ -572,8 +572,8 @@ class AppBarTest {
             )
         }
         assertMediumOrLargeScrolledColors(
-            TopAppBarLarge.LargeContainerHeight,
-            TopAppBarSmall.SmallContainerHeight,
+            TopAppBarLargeTokens.ContainerHeight,
+            TopAppBarSmallTokens.ContainerHeight,
             content
         )
     }
@@ -760,7 +760,7 @@ class AppBarTest {
 
         val topTitleBounds = topTitleNode.getUnclippedBoundsInRoot()
         val bottomTitleBounds = bottomTitleNode.getUnclippedBoundsInRoot()
-        val topAppBarBottomEdgeY = appBarBounds.top + TopAppBarSmall.SmallContainerHeight
+        val topAppBarBottomEdgeY = appBarBounds.top + TopAppBarSmallTokens.ContainerHeight
         val bottomAppBarBottomEdgeY = appBarBounds.top + appBarBounds.height
 
         rule.onNodeWithTag(NavigationIconTestTag)
@@ -963,7 +963,8 @@ class AppBarTest {
 
     private val FakeIconSize = 48.dp
     private val AppBarStartAndEndPadding = 4.dp
-    private val AppBarTopAndBottomPadding = (TopAppBarSmall.SmallContainerHeight - FakeIconSize) / 2
+    private val AppBarTopAndBottomPadding =
+        (TopAppBarSmallTokens.ContainerHeight - FakeIconSize) / 2
 
     private val LazyListTag = "lazyList"
     private val TopAppBarTestTag = "bar"

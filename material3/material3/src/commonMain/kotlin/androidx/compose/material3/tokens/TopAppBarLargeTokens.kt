@@ -17,20 +17,16 @@
 
 package androidx.compose.material3.tokens
 
-internal enum class TypographyKey {
-    BodyLarge,
-    BodyMedium,
-    BodySmall,
-    DisplayLarge,
-    DisplayMedium,
-    DisplaySmall,
-    HeadlineLarge,
-    HeadlineMedium,
-    HeadlineSmall,
-    LabelLarge,
-    LabelMedium,
-    LabelSmall,
-    TitleLarge,
-    TitleMedium,
-    TitleSmall,
+import androidx.compose.ui.unit.dp
+
+internal object TopAppBarLargeTokens {
+    val ContainerColor = ColorSchemeKeyTokens.Surface
+    val ContainerElevation = ElevationTokens.Level0
+    val ContainerHeight = 152.0.dp
+    val HeadlineColor = ColorSchemeKeyTokens.OnSurface
+    val HeadlineFont = TypographyKeyTokens.HeadlineMedium
+    val LeadingIconColor = ColorSchemeKeyTokens.OnSurface
+    val LeadingIconSize = 24.0.dp
+    val TrailingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val TrailingIconSize = 24.0.dp
 }

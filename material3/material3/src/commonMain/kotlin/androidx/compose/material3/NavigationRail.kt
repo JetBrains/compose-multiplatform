@@ -35,7 +35,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.tokens.NavigationRail
+import androidx.compose.material3.tokens.NavigationRailTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
@@ -88,7 +88,8 @@ import kotlin.math.roundToInt
 @Composable
 fun NavigationRail(
     modifier: Modifier = Modifier,
-    containerColor: Color = MaterialTheme.colorScheme.fromToken(NavigationRail.ContainerColor),
+    containerColor: Color =
+        MaterialTheme.colorScheme.fromToken(NavigationRailTokens.ContainerColor),
     contentColor: Color = contentColorFor(containerColor),
     header: @Composable (ColumnScope.() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
@@ -100,7 +101,7 @@ fun NavigationRail(
     ) {
         Column(
             Modifier.fillMaxHeight()
-                .width(NavigationRail.ContainerWidth)
+                .width(NavigationRailTokens.ContainerWidth)
                 .padding(vertical = NavigationRailVerticalPadding)
                 .selectableGroup(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -157,7 +158,7 @@ fun NavigationRailItem(
 
     val styledLabel: @Composable (() -> Unit)? = label?.let {
         @Composable {
-            val style = MaterialTheme.typography.fromToken(NavigationRail.LabelTextFont)
+            val style = MaterialTheme.typography.fromToken(NavigationRailTokens.LabelTextFont)
             val textColor by colors.textColor(selected = selected)
             CompositionLocalProvider(LocalContentColor provides textColor) {
                 ProvideTextStyle(style, content = label)
@@ -189,9 +190,9 @@ fun NavigationRailItem(
                     .background(
                         color = colors.indicatorColor.copy(alpha = animationProgress),
                         shape = if (label != null) {
-                            NavigationRail.ActiveIndicatorShape
+                            NavigationRailTokens.ActiveIndicatorShape
                         } else {
-                            NavigationRail.NoLabelActiveIndicatorShape
+                            NavigationRailTokens.NoLabelActiveIndicatorShape
                         }
                     )
             )
@@ -223,15 +224,15 @@ object NavigationRailItemDefaults {
     @Composable
     fun colors(
         selectedIconColor: Color =
-            MaterialTheme.colorScheme.fromToken(NavigationRail.ActiveIconColor),
+            MaterialTheme.colorScheme.fromToken(NavigationRailTokens.ActiveIconColor),
         unselectedIconColor: Color =
-            MaterialTheme.colorScheme.fromToken(NavigationRail.InactiveIconColor),
+            MaterialTheme.colorScheme.fromToken(NavigationRailTokens.InactiveIconColor),
         selectedTextColor: Color =
-            MaterialTheme.colorScheme.fromToken(NavigationRail.ActiveLabelTextColor),
+            MaterialTheme.colorScheme.fromToken(NavigationRailTokens.ActiveLabelTextColor),
         unselectedTextColor: Color =
-            MaterialTheme.colorScheme.fromToken(NavigationRail.InactiveLabelTextColor),
+            MaterialTheme.colorScheme.fromToken(NavigationRailTokens.InactiveLabelTextColor),
         indicatorColor: Color =
-            MaterialTheme.colorScheme.fromToken(NavigationRail.ActiveIndicatorColor),
+            MaterialTheme.colorScheme.fromToken(NavigationRailTokens.ActiveIndicatorColor),
     ): NavigationRailItemColors = remember(
         selectedIconColor,
         unselectedIconColor,
@@ -504,21 +505,21 @@ private const val ItemAnimationDurationMillis: Int = 150
 
 /*@VisibleForTesting*/
 /** Width of an individual [NavigationRailItem]. */
-internal val NavigationRailItemWidth: Dp = NavigationRail.ContainerWidth
+internal val NavigationRailItemWidth: Dp = NavigationRailTokens.ContainerWidth
 
 /*@VisibleForTesting*/
 /** Height of an individual [NavigationRailItem]. */
-internal val NavigationRailItemHeight: Dp = NavigationRail.NoLabelActiveIndicatorHeight
+internal val NavigationRailItemHeight: Dp = NavigationRailTokens.NoLabelActiveIndicatorHeight
 
 /*@VisibleForTesting*/
 /** Vertical padding between the contents of a [NavigationRailItem] and its top/bottom. */
 internal val NavigationRailItemVerticalPadding: Dp = 4.dp
 
 private val IndicatorHorizontalPadding: Dp =
-    (NavigationRail.ActiveIndicatorWidth - NavigationRail.IconSize) / 2
+    (NavigationRailTokens.ActiveIndicatorWidth - NavigationRailTokens.IconSize) / 2
 
 private val IndicatorVerticalPaddingWithLabel: Dp =
-    (NavigationRail.ActiveIndicatorHeight - NavigationRail.IconSize) / 2
+    (NavigationRailTokens.ActiveIndicatorHeight - NavigationRailTokens.IconSize) / 2
 
 private val IndicatorVerticalPaddingNoLabel: Dp =
-    (NavigationRail.NoLabelActiveIndicatorHeight - NavigationRail.IconSize) / 2
+    (NavigationRailTokens.NoLabelActiveIndicatorHeight - NavigationRailTokens.IconSize) / 2

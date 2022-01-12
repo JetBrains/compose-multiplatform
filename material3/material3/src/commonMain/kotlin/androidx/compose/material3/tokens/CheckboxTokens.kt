@@ -20,24 +20,24 @@ package androidx.compose.material3.tokens
 import androidx.compose.ui.unit.dp
 
 internal object CheckboxTokens {
-    val DisabledSelectedIconColor = ColorSchemeKey.Primary
+    val DisabledSelectedIconColor = ColorSchemeKeyTokens.Primary
     const val DisabledSelectedIconOpacity = 0.38f
-    val DisabledUnselectedIconColor = ColorSchemeKey.Primary
+    val DisabledUnselectedIconColor = ColorSchemeKeyTokens.Primary
     const val DisabledUnselectedIconOpacity = 0.38f
     val IconSize = 24.0.dp
-    val SelectedFocusIconColor = ColorSchemeKey.Primary
-    val SelectedFocusStateLayerColor = ColorSchemeKey.Primary
-    val SelectedHoverIconColor = ColorSchemeKey.Primary
-    val SelectedHoverStateLayerColor = ColorSchemeKey.Primary
-    val SelectedIconColor = ColorSchemeKey.Primary
-    val SelectedPressedIconColor = ColorSchemeKey.Primary
-    val SelectedPressedStateLayerColor = ColorSchemeKey.OnSurface
+    val SelectedFocusIconColor = ColorSchemeKeyTokens.Primary
+    val SelectedFocusStateLayerColor = ColorSchemeKeyTokens.Primary
+    val SelectedHoverIconColor = ColorSchemeKeyTokens.Primary
+    val SelectedHoverStateLayerColor = ColorSchemeKeyTokens.Primary
+    val SelectedIconColor = ColorSchemeKeyTokens.Primary
+    val SelectedPressedIconColor = ColorSchemeKeyTokens.Primary
+    val SelectedPressedStateLayerColor = ColorSchemeKeyTokens.OnSurface
     val StateLayerSize = 48.0.dp
-    val UnselectedFocusIconColor = ColorSchemeKey.OnSurface
-    val UnselectedFocusStateLayerColor = ColorSchemeKey.OnSurface
-    val UnselectedHoverIconColor = ColorSchemeKey.OnSurface
-    val UnselectedHoverStateLayerColor = ColorSchemeKey.OnSurface
-    val UnselectedIconColor = ColorSchemeKey.OnSurface
-    val UnselectedPressedIconColor = ColorSchemeKey.OnSurface
-    val UnselectedPressedStateLayerColor = ColorSchemeKey.Primary
+    val UnselectedFocusIconColor = ColorSchemeKeyTokens.OnSurface
+    val UnselectedFocusStateLayerColor = ColorSchemeKeyTokens.OnSurface
+    val UnselectedHoverIconColor = ColorSchemeKeyTokens.OnSurface
+    val UnselectedHoverStateLayerColor = ColorSchemeKeyTokens.OnSurface
+    val UnselectedIconColor = ColorSchemeKeyTokens.OnSurface
+    val UnselectedPressedIconColor = ColorSchemeKeyTokens.OnSurface
+    val UnselectedPressedStateLayerColor = ColorSchemeKeyTokens.Primary
 }

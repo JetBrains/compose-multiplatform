@@ -90,7 +90,7 @@ class AlertDialogTest {
                         buttonContentColor = LocalContentColor.current
                         expectedButtonContentColor =
                             MaterialTheme.colorScheme.fromToken(
-                                androidx.compose.material3.tokens.Dialog.ActionLabelTextColor
+                                androidx.compose.material3.tokens.DialogTokens.ActionLabelTextColor
                             )
                     }
                 },

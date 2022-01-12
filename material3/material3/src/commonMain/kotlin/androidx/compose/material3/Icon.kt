@@ -17,7 +17,7 @@ package androidx.compose.material3
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.tokens.IconButton
+import androidx.compose.material3.tokens.IconButtonTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -145,4 +145,4 @@ private fun Modifier.defaultSizeFor(painter: Painter) =
 private fun Size.isInfinite() = width.isInfinite() && height.isInfinite()
 
 // Default icon size, for icons with no intrinsic size information
-private val DefaultIconSizeModifier = Modifier.size(IconButton.IconSize)
+private val DefaultIconSizeModifier = Modifier.size(IconButtonTokens.IconSize)
