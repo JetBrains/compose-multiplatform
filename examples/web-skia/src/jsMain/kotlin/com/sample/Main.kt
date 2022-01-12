@@ -41,18 +41,7 @@ private fun Color.Companion.random(): Color {
 private fun rgbColor(): String = "rgb(${(0..255).random()}, ${(0..255).random()}, ${(0..255).random()})"
 
 @Composable
-fun SomeHtml() {
-    val radius = remember { Animatable(20f) }
-    LaunchedEffect(radius) {
-        radius.animateTo(
-            targetValue = 400f,
-            animationSpec = infiniteRepeatable(
-                tween(durationMillis = 1000, easing = FastOutSlowInEasing),
-                repeatMode = RepeatMode.Reverse
-            )
-        )
-    }
-
+fun SomeHtml(radius: Animatable<Float, AnimationVector1D>) {
     Div({
         style {
             property("width", "400px")
@@ -64,7 +53,7 @@ fun SomeHtml() {
         }
     }) {
         Div({
-            val r = radius.value
+            val r = 2 * radius.value
 
             style {
                 property("border-radius", "50%")
@@ -77,7 +66,7 @@ fun SomeHtml() {
             }
         })
         Div({
-            val r = 0.95 * radius.value
+            val r = 0.95 * 2 * radius.value
 
             style {
                 property("border-radius", "50%")
@@ -90,7 +79,7 @@ fun SomeHtml() {
             }
         })
         Div({
-            val r = 0.9 * radius.value
+            val r = 0.9 * 2 * radius.value
 
             style {
                 property("border-radius", "50%")
@@ -103,7 +92,7 @@ fun SomeHtml() {
             }
         })
         Div({
-            val r = 0.85 * radius.value
+            val r = 0.85 * 2 * radius.value
 
             style {
                 property("border-radius", "50%")
@@ -116,7 +105,7 @@ fun SomeHtml() {
             }
         })
         Div({
-            val r = 0.8 * radius.value
+            val r = 0.8 * 2 * radius.value
 
             style {
                 property("border-radius", "50%")
@@ -129,7 +118,7 @@ fun SomeHtml() {
             }
         })
         Div({
-            val r = 0.75 * radius.value
+            val r = 0.75 * 2 * radius.value
 
             style {
                 property("border-radius", "50%")
@@ -142,7 +131,7 @@ fun SomeHtml() {
             }
         })
         Div({
-            val r = 0.7 * radius.value
+            val r = 0.7 * 2 * radius.value
 
             style {
                 property("border-radius", "50%")
@@ -155,7 +144,7 @@ fun SomeHtml() {
             }
         })
         Div({
-            val r = 0.65 * radius.value
+            val r = 0.65 * 2 * radius.value
 
             style {
                 property("border-radius", "50%")
@@ -168,7 +157,7 @@ fun SomeHtml() {
             }
         })
         Div({
-            val r = 0.6 * radius.value
+            val r = 0.6 * 2 * radius.value
 
             style {
                 property("border-radius", "50%")
@@ -181,7 +170,7 @@ fun SomeHtml() {
             }
         })
         Div({
-            val r = 0.55 * radius.value
+            val r = 0.55 * 2 * radius.value
 
             style {
                 property("border-radius", "50%")
@@ -194,7 +183,7 @@ fun SomeHtml() {
             }
         })
         Div({
-            val r = 0.5 * radius.value
+            val r = 0.5 * 2 * radius.value
 
             style {
                 property("border-radius", "50%")
@@ -207,7 +196,7 @@ fun SomeHtml() {
             }
         })
         Div({
-            val r = 0.45 * radius.value
+            val r = 0.45 * 2 * radius.value
 
             style {
                 property("border-radius", "50%")
@@ -220,7 +209,7 @@ fun SomeHtml() {
             }
         })
         Div({
-            val r = 0.4 * radius.value
+            val r = 0.4 * 2 * radius.value
 
             style {
                 property("border-radius", "50%")
@@ -233,7 +222,7 @@ fun SomeHtml() {
             }
         })
         Div({
-            val r = 0.35 * radius.value
+            val r = 0.35 * 2 * radius.value
 
             style {
                 property("border-radius", "50%")
@@ -246,7 +235,7 @@ fun SomeHtml() {
             }
         })
         Div({
-            val r = 0.3 * radius.value
+            val r = 0.3 * 2 * radius.value
 
             style {
                 property("border-radius", "50%")
@@ -259,7 +248,7 @@ fun SomeHtml() {
             }
         })
         Div({
-            val r = 0.25 * radius.value
+            val r = 0.25 * 2 * radius.value
 
             style {
                 property("border-radius", "50%")
@@ -272,7 +261,7 @@ fun SomeHtml() {
             }
         })
         Div({
-            val r = 0.2 * radius.value
+            val r = 0.2 * 2 * radius.value
 
             style {
                 property("border-radius", "50%")
@@ -285,7 +274,7 @@ fun SomeHtml() {
             }
         })
         Div({
-            val r = 0.15 * radius.value
+            val r = 0.15 * 2 * radius.value
 
             style {
                 property("border-radius", "50%")
@@ -298,7 +287,7 @@ fun SomeHtml() {
             }
         })
         Div({
-            val r = 0.1 * radius.value
+            val r = 0.1 * 2 * radius.value
 
             style {
                 property("border-radius", "50%")
@@ -452,13 +441,13 @@ fun App() {
         }
     }) {
         Div {
-            SomeHtml()
+            SomeHtml(radius)
         }
         Div {
-            SomeHtml()
+            SomeHtml(radius)
         }
         Div {
-            SomeHtml()
+            SomeHtml(radius)
         }
     }
 
