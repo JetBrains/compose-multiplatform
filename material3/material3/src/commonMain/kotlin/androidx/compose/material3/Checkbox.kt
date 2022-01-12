@@ -81,6 +81,7 @@ import kotlin.math.max
  * @param colors [CheckboxColors] that will be used to resolve the color used for this [Checkbox] in
  * different states. See [CheckboxDefaults.colors]
  */
+@ExperimentalMaterial3Api
 @Composable
 fun Checkbox(
     checked: Boolean,
