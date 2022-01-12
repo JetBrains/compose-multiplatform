@@ -28,6 +28,7 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.key.utf16CodePoint
 import androidx.compose.ui.text.input.CommitTextCommand
+import androidx.compose.ui.text.input.DeleteSurroundingTextCommand
 import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.FinishComposingTextCommand
 import androidx.compose.ui.text.input.OffsetMapping
@@ -56,14 +57,22 @@ internal class TextFieldKeyInput(
     val undoManager: UndoManager? = null,
     private val keyMapping: KeyMapping = platformDefaultKeyMapping,
 ) {
-    private fun EditCommand.apply() {
-        val newTextFieldValue = state.processor.apply(listOf(FinishComposingTextCommand(), this))
+    private fun List<EditCommand>.apply() {
+        val newTextFieldValue = state.processor.apply(
+            this.toMutableList().apply {
+                add(0, FinishComposingTextCommand())
+            }
+        )
         @OptIn(InternalFoundationTextApi::class)
         if (newTextFieldValue.annotatedString.text != state.textDelegate.text.text) {
             // Text has been changed, enter the HandleState.None and hide the cursor handle.
             state.handleState = HandleState.None
         }
         state.onValueChange(newTextFieldValue)
+    }
+
+    private fun EditCommand.apply() {
+        listOf(this).apply()
     }
 
     private fun typedCommand(event: KeyEvent): CommitTextCommand? =
@@ -96,6 +105,7 @@ internal class TextFieldKeyInput(
         commandExecutionContext {
             when (command) {
                 KeyCommand.COPY -> selectionManager.copy(false)
+                // TODO(siyamed): cut & paste will cause a reset input
                 KeyCommand.PASTE -> selectionManager.paste()
                 KeyCommand.CUT -> selectionManager.cut()
                 KeyCommand.LEFT_CHAR -> collapseLeftOr { moveCursorLeft() }
@@ -116,29 +126,37 @@ internal class TextFieldKeyInput(
                 KeyCommand.END -> moveCursorToEnd()
                 KeyCommand.DELETE_PREV_CHAR ->
                     deleteIfSelectedOr {
-                        moveCursorPrev().selectMovement().deleteSelected()
-                    }
+                        DeleteSurroundingTextCommand(selection.end - getPrecedingOffset(), 0)
+                    }?.apply()
                 KeyCommand.DELETE_NEXT_CHAR -> {
                     deleteIfSelectedOr {
-                        moveCursorNext().selectMovement().deleteSelected()
-                    }
+                        DeleteSurroundingTextCommand(0, getFollowingOffset() - selection.end)
+                    }?.apply()
                 }
                 KeyCommand.DELETE_PREV_WORD ->
                     deleteIfSelectedOr {
-                        moveCursorPrevByWord().selectMovement().deleteSelected()
-                    }
+                        getPreviousWordOffset()?.let {
+                            DeleteSurroundingTextCommand(selection.end - it, 0)
+                        }
+                    }?.apply()
                 KeyCommand.DELETE_NEXT_WORD ->
                     deleteIfSelectedOr {
-                        moveCursorNextByWord().selectMovement().deleteSelected()
-                    }
+                        getNextWordOffset()?.let {
+                            DeleteSurroundingTextCommand(0, it - selection.end)
+                        }
+                    }?.apply()
                 KeyCommand.DELETE_FROM_LINE_START ->
                     deleteIfSelectedOr {
-                        moveCursorToLineStart().selectMovement().deleteSelected()
-                    }
+                        getLineStartByOffset()?.let {
+                            DeleteSurroundingTextCommand(selection.end - it, 0)
+                        }
+                    }?.apply()
                 KeyCommand.DELETE_TO_LINE_END ->
                     deleteIfSelectedOr {
-                        moveCursorToLineEnd().selectMovement().deleteSelected()
-                    }
+                        getLineEndByOffset()?.let {
+                            DeleteSurroundingTextCommand(0, it - selection.end)
+                        }
+                    }?.apply()
                 KeyCommand.NEW_LINE ->
                     if (!singleLine) {
                         CommitTextCommand("\n", 1).apply()
