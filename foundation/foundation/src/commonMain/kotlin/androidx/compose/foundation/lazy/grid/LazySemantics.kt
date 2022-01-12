@@ -20,7 +20,9 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.lazy.LazyGridState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.CollectionInfo
 import androidx.compose.ui.semantics.ScrollAxisRange
@@ -35,6 +37,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
+@Suppress("ComposableModifierFactory", "ModifierInspectorInfo")
+@Composable
 internal fun Modifier.lazyGridSemantics(
     stateOfItemsProvider: State<LazyGridItemsProvider>,
     state: LazyGridState,
@@ -42,16 +46,24 @@ internal fun Modifier.lazyGridSemantics(
     isVertical: Boolean,
     reverseScrolling: Boolean,
     userScrollEnabled: Boolean
-): Modifier {
-    return semantics {
-        indexForKey { needle ->
+) = this.then(
+    remember(
+        stateOfItemsProvider,
+        state,
+        isVertical,
+        reverseScrolling,
+        userScrollEnabled
+    ) {
+        val indexForKeyMapping: (Any) -> Int = { needle ->
             val key = stateOfItemsProvider.value::getKey
+            var result = -1
             for (index in 0 until stateOfItemsProvider.value.itemsCount) {
                 if (key(index) == needle) {
-                    return@indexForKey index
+                    result = index
+                    break
                 }
             }
-            -1
+            result
         }
 
         val accessibilityScrollState = ScrollAxisRange(
@@ -74,23 +86,26 @@ internal fun Modifier.lazyGridSemantics(
             },
             reverseScrolling = reverseScrolling
         )
-        if (isVertical) {
-            verticalScrollAxisRange = accessibilityScrollState
-        } else {
-            horizontalScrollAxisRange = accessibilityScrollState
-        }
 
-        if (userScrollEnabled) {
-            scrollBy { x, y ->
-                val delta = if (isVertical) { y } else { x }
+        val scrollByAction: ((x: Float, y: Float) -> Boolean)? = if (userScrollEnabled) {
+            { x, y ->
+                val delta = if (isVertical) {
+                    y
+                } else {
+                    x
+                }
                 coroutineScope.launch {
                     (state as ScrollableState).animateScrollBy(delta)
                 }
                 // TODO(aelias): is it important to return false if we know in advance we cannot scroll?
                 true
             }
+        } else {
+            null
+        }
 
-            scrollToIndex { index ->
+        val scrollToIndexAction: ((Int) -> Boolean)? = if (userScrollEnabled) {
+            { index ->
                 require(index >= 0 && index < state.layoutInfo.totalItemsCount) {
                     "Can't scroll to index $index, it is out of " +
                         "bounds [0, ${state.layoutInfo.totalItemsCount})"
@@ -100,9 +115,31 @@ internal fun Modifier.lazyGridSemantics(
                 }
                 true
             }
+        } else {
+            null
         }
 
         // TODO(popam): check if this is correct - it would be nice to provide correct columns here
-        collectionInfo = CollectionInfo(rowCount = -1, columnCount = -1)
+        val collectionInfo = CollectionInfo(rowCount = -1, columnCount = -1)
+
+        Modifier.semantics {
+            indexForKey(indexForKeyMapping)
+
+            if (isVertical) {
+                verticalScrollAxisRange = accessibilityScrollState
+            } else {
+                horizontalScrollAxisRange = accessibilityScrollState
+            }
+
+            if (scrollByAction != null) {
+                scrollBy(action = scrollByAction)
+            }
+
+            if (scrollToIndexAction != null) {
+                scrollToIndex(action = scrollToIndexAction)
+            }
+
+            this.collectionInfo = collectionInfo
+        }
     }
-}
+)

@@ -44,6 +44,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
@@ -1029,6 +1031,42 @@ class LazyGridTest {
         rule.onNodeWithTag("5").assertIsDisplayed()
         rule.onNodeWithTag("6").assertDoesNotExist()
         rule.onNodeWithTag("7").assertDoesNotExist()
+    }
+
+    @Test
+    fun recomposingWithNewComposedModifierObjectIsNotCausingRemeasure() {
+        var remeasureCount = 0
+        val layoutModifier = Modifier.layout { measurable, constraints ->
+            remeasureCount++
+            val placeable = measurable.measure(constraints)
+            layout(placeable.width, placeable.height) {
+                placeable.place(0, 0)
+            }
+        }
+        val counter = mutableStateOf(0)
+
+        rule.setContentWithTestViewConfiguration {
+            counter.value // just to trigger recomposition
+            LazyVerticalGrid(
+                GridCells.Fixed(1),
+                // this will return a new object everytime causing LazyVerticalGrid recomposition
+                // without causing remeasure
+                Modifier.composed { layoutModifier }
+            ) {
+                items(1) {
+                    Spacer(Modifier.size(10.dp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            Truth.assertThat(remeasureCount).isEqualTo(1)
+            counter.value++
+        }
+
+        rule.runOnIdle {
+            Truth.assertThat(remeasureCount).isEqualTo(1)
+        }
     }
 
     // TODO: add tests for the cache logic
