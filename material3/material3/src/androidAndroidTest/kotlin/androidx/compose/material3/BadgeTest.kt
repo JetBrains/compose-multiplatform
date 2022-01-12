@@ -19,7 +19,7 @@ import android.os.Build
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material3.tokens.NavigationBar
+import androidx.compose.material3.tokens.BadgeTokens
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -62,8 +62,8 @@ class BadgeTest {
             .setMaterialContentForSizeAssertions {
                 Badge()
             }
-            .assertHeightIsEqualTo(NavigationBar.BadgeSize)
-            .assertWidthIsEqualTo(NavigationBar.BadgeSize)
+            .assertHeightIsEqualTo(BadgeTokens.Size)
+            .assertWidthIsEqualTo(BadgeTokens.Size)
     }
 
     @Test
@@ -72,8 +72,8 @@ class BadgeTest {
             .setMaterialContentForSizeAssertions {
                 Badge { Text("1") }
             }
-            .assertHeightIsEqualTo(NavigationBar.LargeBadgeSize)
-            .assertWidthIsEqualTo(NavigationBar.LargeBadgeSize)
+            .assertHeightIsEqualTo(BadgeTokens.LargeSize)
+            .assertWidthIsEqualTo(BadgeTokens.LargeSize)
     }
 
     @Test
@@ -82,8 +82,8 @@ class BadgeTest {
             .setMaterialContentForSizeAssertions {
                 Badge { Text("999+") }
             }
-            .assertHeightIsEqualTo(NavigationBar.LargeBadgeSize)
-            .assertWidthIsAtLeast(NavigationBar.LargeBadgeSize)
+            .assertHeightIsEqualTo(BadgeTokens.LargeSize)
+            .assertWidthIsAtLeast(BadgeTokens.LargeSize)
     }
 
     @Test
@@ -105,7 +105,7 @@ class BadgeTest {
     fun badge_noContent_shape() {
         var errorColor = Color.Unspecified
         rule.setMaterialContent(lightColorScheme()) {
-            errorColor = MaterialTheme.colorScheme.fromToken(NavigationBar.BadgeColor)
+            errorColor = MaterialTheme.colorScheme.fromToken(BadgeTokens.Color)
             Badge(modifier = Modifier.testTag(TestBadgeTag))
         }
 
@@ -113,7 +113,7 @@ class BadgeTest {
             .captureToImage()
             .assertShape(
                 density = rule.density,
-                shape = NavigationBar.BadgeShape,
+                shape = BadgeTokens.Shape,
                 shapeColor = errorColor,
                 backgroundColor = Color.White,
                 shapeOverlapPixelCount = with(rule.density) { 1.dp.toPx() }
@@ -138,7 +138,7 @@ class BadgeTest {
         badge.assertPositionInRootIsEqualTo(
             expectedLeft =
             anchorBounds.right + BadgeOffset +
-                max((NavigationBar.BadgeSize - badgeBounds.width) / 2, 0.dp),
+                max((BadgeTokens.Size - badgeBounds.width) / 2, 0.dp),
             expectedTop = -badgeBounds.height / 2
         )
     }
@@ -162,7 +162,7 @@ class BadgeTest {
             expectedLeft = anchorBounds.right + BadgeWithContentHorizontalOffset + max
                 (
                 (
-                    NavigationBar.LargeBadgeSize - badgeBounds.width
+                    BadgeTokens.LargeSize - badgeBounds.width
                     ) / 2,
                 0.dp
             ),
