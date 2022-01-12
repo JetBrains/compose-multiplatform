@@ -38,6 +38,10 @@ internal class AndroidFontResourceLoader(
     private val context: Context
 ) : Font.ResourceLoader {
 
+    @Deprecated(
+        "Replaced by FontFamily.Resolver, this method should not be called",
+        replaceWith = ReplaceWith("FontFamily.Resolver.resolve(font, )")
+    )
     override fun load(font: Font): Typeface {
         return when (font) {
             is ResourceFont ->

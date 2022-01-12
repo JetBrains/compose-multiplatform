@@ -96,7 +96,7 @@ android {
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         freeCompilerArgs += [
-                "-Xopt-in=kotlin.RequiresOptIn",
+                "-opt-in=kotlin.RequiresOptIn",
                 "-P", "plugin:androidx.compose.compiler.plugins.kotlin:sourceInformation=true"
         ]
     }

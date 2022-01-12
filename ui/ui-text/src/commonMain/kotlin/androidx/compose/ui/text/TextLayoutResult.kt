@@ -261,7 +261,10 @@ class TextLayoutInput private constructor(
 private class DeprecatedBridgeFontResourceLoader private constructor(
     private val fontFamilyResolver: FontFamily.Resolver
 ) : Font.ResourceLoader {
-    @Suppress("OverridingDeprecatedMember")
+    @Deprecated(
+        "Replaced by FontFamily.Resolver, this method should not be called",
+        ReplaceWith("FontFamily.Resolver.resolve(font, )"),
+    )
     override fun load(font: Font): Any {
         return fontFamilyResolver.resolve(
             font.toFontFamily(),

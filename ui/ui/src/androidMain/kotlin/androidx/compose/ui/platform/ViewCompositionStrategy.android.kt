@@ -121,7 +121,7 @@ interface ViewCompositionStrategy {
             val listener = object : View.OnAttachStateChangeListener {
                 override fun onViewAttachedToWindow(v: View) {}
 
-                override fun onViewDetachedFromWindow(v: View?) {
+                override fun onViewDetachedFromWindow(v: View) {
                     view.disposeComposition()
                 }
             }
@@ -161,7 +161,7 @@ interface ViewCompositionStrategy {
                 // We change this reference after we successfully attach
                 var disposer: () -> Unit
                 val listener = object : View.OnAttachStateChangeListener {
-                    override fun onViewAttachedToWindow(v: View?) {
+                    override fun onViewAttachedToWindow(v: View) {
                         val lco = checkNotNull(ViewTreeLifecycleOwner.get(view)) {
                             "View tree for $view has no ViewTreeLifecycleOwner"
                         }
@@ -171,7 +171,7 @@ interface ViewCompositionStrategy {
                         view.removeOnAttachStateChangeListener(this)
                     }
 
-                    override fun onViewDetachedFromWindow(v: View?) {}
+                    override fun onViewDetachedFromWindow(v: View) {}
                 }
                 view.addOnAttachStateChangeListener(listener)
                 disposer = { view.removeOnAttachStateChangeListener(listener) }

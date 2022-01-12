@@ -56,7 +56,7 @@ class ParagraphStyle @ExperimentalTextApi constructor(
     val textDirection: TextDirection? = null,
     val lineHeight: TextUnit = TextUnit.Unspecified,
     val textIndent: TextIndent? = null,
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalTextApi val platformStyle: PlatformParagraphStyle? = null
 ) {
 

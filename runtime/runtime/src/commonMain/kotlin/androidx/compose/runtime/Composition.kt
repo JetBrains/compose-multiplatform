@@ -235,7 +235,7 @@ sealed interface ControlledComposition : Composition {
 // ControlledComposition with a default implementation.
 @ExperimentalComposeApi
 val ControlledComposition.recomposeCoroutineContext: CoroutineContext
-    @Suppress("EXPERIMENTAL_ANNOTATION_ON_WRONG_TARGET")
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @ExperimentalComposeApi
     get() = (this as? CompositionImpl)?.recomposeContext ?: EmptyCoroutineContext
 
