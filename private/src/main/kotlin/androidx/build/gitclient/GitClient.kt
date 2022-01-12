@@ -19,9 +19,6 @@ package androidx.build.gitclient
 import androidx.build.releasenotes.getBuganizerLink
 import androidx.build.releasenotes.getChangeIdAOSPLink
 import java.io.File
-import org.gradle.api.Project
-import org.gradle.api.provider.Provider
-import org.gradle.api.logging.Logger
 
 interface GitClient {
     fun findChangedFilesSince(
@@ -49,24 +46,6 @@ interface GitClient {
          * Executes the given shell command and returns the stdout by lines.
          */
         fun executeAndParse(command: String): List<String>
-    }
-
-    companion object {
-        fun getChangeInfoPath(project: Project): Provider<String> {
-            return project.providers.environmentVariable("CHANGE_INFO")
-        }
-        fun create(rootProjectDir: File, logger: Logger, changeInfoPath: String): GitClient {
-            if (changeInfoPath != "") {
-                val changeInfoFile = File(changeInfoPath)
-                if (changeInfoFile.exists()) {
-                    val text = changeInfoFile.readText()
-                    logger.info("Using ChangeInfoGitClient, config = " + changeInfoPath)
-                    return ChangeInfoGitClient(text)
-                }
-            }
-            logger.info("UsingGitRunnerGitClient")
-            return GitRunnerGitClient(rootProjectDir, logger)
-        }
     }
 }
 
