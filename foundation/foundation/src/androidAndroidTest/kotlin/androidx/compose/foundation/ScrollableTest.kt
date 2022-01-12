@@ -21,6 +21,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.ModifierLocalScrollableContainer
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.OverScrollController
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.animateScrollBy
@@ -32,6 +33,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -39,10 +41,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.materialize
 import androidx.compose.ui.modifier.ModifierLocalConsumer
 import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.platform.InspectableValue
@@ -1732,6 +1737,36 @@ class ScrollableTest {
         }
     }
 
+    @Test
+    fun producingEqualMaterializedModifierAfterRecomposition() {
+        val state = ScrollableState { it }
+        val counter = mutableStateOf(0)
+        var materialized: Modifier? = null
+
+        rule.setContent {
+            counter.value // just to trigger recomposition
+            materialized = currentComposer.materialize(
+                Modifier.scrollable(
+                    state,
+                    Orientation.Vertical,
+                    NoOpOverscrollController
+                )
+            )
+        }
+
+        lateinit var first: Modifier
+        rule.runOnIdle {
+            first = requireNotNull(materialized)
+            materialized = null
+            counter.value++
+        }
+
+        rule.runOnIdle {
+            val second = requireNotNull(materialized)
+            assertThat(first).isEqualTo(second)
+        }
+    }
+
     private fun setScrollableContent(scrollableModifierFactory: @Composable () -> Modifier) {
         rule.setContentAndGetScope {
             Box {
@@ -1744,4 +1779,32 @@ class ScrollableTest {
             }
         }
     }
+}
+
+private val NoOpOverscrollController = object : OverScrollController {
+    override fun release() {}
+
+    override fun consumePreScroll(
+        scrollDelta: Offset,
+        pointerPosition: Offset?,
+        source: NestedScrollSource
+    ): Offset = Offset.Zero
+
+    override fun consumePostScroll(
+        initialDragDelta: Offset,
+        overScrollDelta: Offset,
+        pointerPosition: Offset?,
+        source: NestedScrollSource
+    ) {
+    }
+
+    override fun consumePreFling(velocity: Velocity): Velocity = Velocity.Zero
+
+    override fun consumePostFling(velocity: Velocity) {}
+
+    override fun refreshContainerInfo(size: Size, isContentScrolls: Boolean) {}
+
+    override fun stopOverscrollAnimation(): Boolean = false
+
+    override fun DrawScope.drawOverScroll() {}
 }
