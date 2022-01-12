@@ -26,7 +26,10 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.CommitTextCommand
+import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.SetSelectionCommand
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import kotlin.math.max
@@ -143,13 +146,17 @@ internal abstract class BaseTextPreparedSelection<T : BaseTextPreparedSelection<
         }
     }
 
-    fun moveCursorPrev() = apply {
-        val prev = annotatedString.text.findPrecedingBreak(selection.end)
+    fun getPrecedingOffset() = annotatedString.text.findPrecedingBreak(selection.end)
+
+    fun getFollowingOffset() = annotatedString.text.findFollowingBreak(selection.end)
+
+    private fun moveCursorPrev() = apply {
+        val prev = getPrecedingOffset()
         if (prev != -1) setCursor(prev)
     }
 
-    fun moveCursorNext() = apply {
-        val next = annotatedString.text.findFollowingBreak(selection.end)
+    private fun moveCursorNext() = apply {
+        val next = getFollowingOffset()
         if (next != -1) setCursor(next)
     }
 
@@ -177,12 +184,16 @@ internal abstract class BaseTextPreparedSelection<T : BaseTextPreparedSelection<
         }
     }
 
-    fun moveCursorNextByWord() = apply {
-        layoutResult?.getNextWordOffset()?.let { setCursor(it) }
+    fun getNextWordOffset(): Int? = layoutResult?.getNextWordOffset()
+
+    private fun moveCursorNextByWord() = apply {
+        getNextWordOffset()?.let { setCursor(it) }
     }
 
-    fun moveCursorPrevByWord() = apply {
-        layoutResult?.getPrevWordOffset()?.let { setCursor(it) }
+    fun getPreviousWordOffset(): Int? = layoutResult?.getPrevWordOffset()
+
+    private fun moveCursorPrevByWord() = apply {
+        getPreviousWordOffset()?.let { setCursor(it) }
     }
 
     fun moveCursorPrevByParagraph() = apply {
@@ -201,12 +212,16 @@ internal abstract class BaseTextPreparedSelection<T : BaseTextPreparedSelection<
         layoutResult?.jumpByLinesOffset(1)?.let { setCursor(it) }
     }
 
+    fun getLineStartByOffset(): Int? = layoutResult?.getLineStartByOffset()
+
     fun moveCursorToLineStart() = apply {
-        layoutResult?.getLineStartByOffset()?.let { setCursor(it) }
+        getLineStartByOffset()?.let { setCursor(it) }
     }
 
+    fun getLineEndByOffset(): Int? = layoutResult?.getLineEndByOffset()
+
     fun moveCursorToLineEnd() = apply {
-        layoutResult?.getLineEndByOffset()?.let { setCursor(it) }
+        getLineEndByOffset()?.let { setCursor(it) }
     }
 
     fun moveCursorToLineLeftSide() = apply {
@@ -228,22 +243,6 @@ internal abstract class BaseTextPreparedSelection<T : BaseTextPreparedSelection<
     // it selects a text from the original selection start to a current selection end
     fun selectMovement() = apply(false) {
         selection = TextRange(originalSelection.start, selection.end)
-    }
-
-    /**
-     * delete currently selected text and update [selection] and [annotatedString]
-     *
-     * it supposed to be the last operation, it doesn't relayout text by itself, so any
-     * subsequent calls could give wrong results
-     */
-    fun deleteSelected() = apply {
-        val maxChars = text.length
-        val beforeSelection =
-            annotatedString.subSequence(max(0, selection.min - maxChars), selection.min)
-        val afterSelection =
-            annotatedString.subSequence(selection.max, min(selection.max + maxChars, text.length))
-        annotatedString = beforeSelection + afterSelection
-        setCursor(selection.min)
     }
 
     private fun isLtr(): Boolean {
@@ -378,11 +377,16 @@ internal class TextFieldPreparedSelection(
             selection = selection
         )
 
-    fun deleteIfSelectedOr(or: TextFieldPreparedSelection.() -> Unit) = apply {
-        if (selection.collapsed) {
-            or(this)
+    fun deleteIfSelectedOr(or: TextFieldPreparedSelection.() -> EditCommand?): List<EditCommand>? {
+        return if (selection.collapsed) {
+            or(this)?.let {
+                listOf(it)
+            }
         } else {
-            deleteSelected()
+            listOf(
+                CommitTextCommand("", 0),
+                SetSelectionCommand(selection.min, selection.min)
+            )
         }
     }
 
