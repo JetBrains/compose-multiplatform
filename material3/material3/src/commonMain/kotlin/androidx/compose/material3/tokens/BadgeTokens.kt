@@ -23,10 +23,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 
 internal object BadgeTokens {
-    val Color = ColorSchemeKey.Error
-    val LargeColor = ColorSchemeKey.Error
-    val LargeLabelTextColor = ColorSchemeKey.OnError
-    val LargeLabelTextFont = TypographyKey.LabelSmall
+    val Color = ColorSchemeKeyTokens.Error
+    val LargeColor = ColorSchemeKeyTokens.Error
+    val LargeLabelTextColor = ColorSchemeKeyTokens.OnError
+    val LargeLabelTextFont = TypographyKeyTokens.LabelSmall
     val LargeShape = RoundedCornerShape(8.0.dp)
     val LargeSize = 16.0.dp
     val Shape = RoundedCornerShape(3.0.dp)

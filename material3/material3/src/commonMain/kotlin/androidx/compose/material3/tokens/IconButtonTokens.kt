@@ -17,9 +17,18 @@
 
 package androidx.compose.material3.tokens
 
-internal object State {
-    const val DraggedStateLayerOpacity = 0.16f
-    const val FocusStateLayerOpacity = 0.12f
-    const val HoverStateLayerOpacity = 0.08f
-    const val PressedStateLayerOpacity = 0.12f
+import androidx.compose.ui.unit.dp
+
+internal object IconButtonTokens {
+    val DisabledIconColor = ColorSchemeKeyTokens.OnSurface
+    const val DisabledIconOpacity = 0.38f
+    val FocusIconColor = ColorSchemeKeyTokens.Primary
+    val FocusStateLayerColor = ColorSchemeKeyTokens.Primary
+    val HoverIconColor = ColorSchemeKeyTokens.Primary
+    val HoverStateLayerColor = ColorSchemeKeyTokens.Primary
+    val IconColor = ColorSchemeKeyTokens.Primary
+    val IconSize = 24.0.dp
+    val PressedIconColor = ColorSchemeKeyTokens.Primary
+    val PressedStateLayerColor = ColorSchemeKeyTokens.Primary
+    val StateLayerSize = 40.0.dp
 }

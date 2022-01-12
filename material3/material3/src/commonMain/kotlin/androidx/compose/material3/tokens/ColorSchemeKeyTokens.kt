@@ -17,17 +17,31 @@
 
 package androidx.compose.material3.tokens
 
-import androidx.compose.ui.unit.dp
-
-internal object TopAppBarSmall {
-    val SmallContainerColor = ColorSchemeKey.Surface
-    val SmallContainerElevation = Elevation.Level0
-    val SmallContainerHeight = 64.0.dp
-    val SmallHeadlineColor = ColorSchemeKey.OnSurface
-    val SmallHeadlineFont = TypographyKey.TitleLarge
-    val SmallLeadingIconColor = ColorSchemeKey.OnSurface
-    val SmallLeadingIconSize = 24.0.dp
-    val SmallOnScrollContainerElevation = Elevation.Level2
-    val SmallTrailingIconColor = ColorSchemeKey.OnSurfaceVariant
-    val SmallTrailingIconSize = 24.0.dp
+internal enum class ColorSchemeKeyTokens {
+    Background,
+    Error,
+    ErrorContainer,
+    InverseOnSurface,
+    InversePrimary,
+    InverseSurface,
+    OnBackground,
+    OnError,
+    OnErrorContainer,
+    OnPrimary,
+    OnPrimaryContainer,
+    OnSecondary,
+    OnSecondaryContainer,
+    OnSurface,
+    OnSurfaceVariant,
+    OnTertiary,
+    OnTertiaryContainer,
+    Outline,
+    Primary,
+    PrimaryContainer,
+    Secondary,
+    SecondaryContainer,
+    Surface,
+    SurfaceVariant,
+    Tertiary,
+    TertiaryContainer,
 }

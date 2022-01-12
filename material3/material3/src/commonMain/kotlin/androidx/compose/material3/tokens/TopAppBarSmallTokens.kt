@@ -19,14 +19,15 @@ package androidx.compose.material3.tokens
 
 import androidx.compose.ui.unit.dp
 
-internal object TopAppBarMedium {
-    val MediumContainerColor = ColorSchemeKey.Surface
-    val MediumContainerElevation = Elevation.Level0
-    val MediumContainerHeight = 112.0.dp
-    val MediumHeadlineColor = ColorSchemeKey.OnSurface
-    val MediumHeadlineFont = TypographyKey.HeadlineSmall
-    val MediumLeadingIconColor = ColorSchemeKey.OnSurface
-    val MediumLeadingIconSize = 24.0.dp
-    val MediumTrailingIconColor = ColorSchemeKey.OnSurfaceVariant
-    val MediumTrailingIconSize = 24.0.dp
+internal object TopAppBarSmallTokens {
+    val ContainerColor = ColorSchemeKeyTokens.Surface
+    val ContainerElevation = ElevationTokens.Level0
+    val ContainerHeight = 64.0.dp
+    val HeadlineColor = ColorSchemeKeyTokens.OnSurface
+    val HeadlineFont = TypographyKeyTokens.TitleLarge
+    val LeadingIconColor = ColorSchemeKeyTokens.OnSurface
+    val LeadingIconSize = 24.0.dp
+    val OnScrollContainerElevation = ElevationTokens.Level2
+    val TrailingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val TrailingIconSize = 24.0.dp
 }

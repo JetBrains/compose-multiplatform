@@ -30,10 +30,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.tokens.TopAppBarLarge
-import androidx.compose.material3.tokens.TopAppBarMedium
-import androidx.compose.material3.tokens.TopAppBarSmall
-import androidx.compose.material3.tokens.TopAppBarSmallCentered
+import androidx.compose.material3.tokens.TopAppBarLargeTokens
+import androidx.compose.material3.tokens.TopAppBarMediumTokens
+import androidx.compose.material3.tokens.TopAppBarSmallTokens
+import androidx.compose.material3.tokens.TopAppBarSmallCenteredTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
@@ -106,7 +106,7 @@ fun SmallTopAppBar(
     SingleRowTopAppBar(
         modifier = modifier,
         title = title,
-        titleTextStyle = MaterialTheme.typography.fromToken(TopAppBarSmall.SmallHeadlineFont),
+        titleTextStyle = MaterialTheme.typography.fromToken(TopAppBarSmallTokens.HeadlineFont),
         centeredTitle = false,
         navigationIcon = navigationIcon,
         actions = actions,
@@ -154,7 +154,7 @@ fun CenterAlignedTopAppBar(
         modifier = modifier,
         title = title,
         titleTextStyle =
-        MaterialTheme.typography.fromToken(TopAppBarSmall.SmallHeadlineFont),
+        MaterialTheme.typography.fromToken(TopAppBarSmallTokens.HeadlineFont),
         centeredTitle = true,
         navigationIcon = navigationIcon,
         actions = actions,
@@ -204,15 +204,15 @@ fun MediumTopAppBar(
     TwoRowsTopAppBar(
         modifier = modifier,
         title = title,
-        titleTextStyle = MaterialTheme.typography.fromToken(TopAppBarMedium.MediumHeadlineFont),
-        smallTitleTextStyle = MaterialTheme.typography.fromToken(TopAppBarSmall.SmallHeadlineFont),
+        titleTextStyle = MaterialTheme.typography.fromToken(TopAppBarMediumTokens.HeadlineFont),
+        smallTitleTextStyle = MaterialTheme.typography.fromToken(TopAppBarSmallTokens.HeadlineFont),
         titleBottomPadding = MediumTitleBottomPadding,
         smallTitle = title,
         navigationIcon = navigationIcon,
         actions = actions,
         colors = colors,
-        maxHeight = TopAppBarMedium.MediumContainerHeight,
-        pinnedHeight = TopAppBarSmall.SmallContainerHeight,
+        maxHeight = TopAppBarMediumTokens.ContainerHeight,
+        pinnedHeight = TopAppBarSmallTokens.ContainerHeight,
         scrollBehavior = scrollBehavior
     )
 }
@@ -257,16 +257,16 @@ fun LargeTopAppBar(
 ) {
     TwoRowsTopAppBar(
         title = title,
-        titleTextStyle = MaterialTheme.typography.fromToken(TopAppBarLarge.LargeHeadlineFont),
-        smallTitleTextStyle = MaterialTheme.typography.fromToken(TopAppBarSmall.SmallHeadlineFont),
+        titleTextStyle = MaterialTheme.typography.fromToken(TopAppBarLargeTokens.HeadlineFont),
+        smallTitleTextStyle = MaterialTheme.typography.fromToken(TopAppBarSmallTokens.HeadlineFont),
         titleBottomPadding = LargeTitleBottomPadding,
         smallTitle = title,
         modifier = modifier,
         navigationIcon = navigationIcon,
         actions = actions,
         colors = colors,
-        maxHeight = TopAppBarLarge.LargeContainerHeight,
-        pinnedHeight = TopAppBarSmall.SmallContainerHeight,
+        maxHeight = TopAppBarLargeTokens.ContainerHeight,
+        pinnedHeight = TopAppBarSmallTokens.ContainerHeight,
         scrollBehavior = scrollBehavior
     )
 }
@@ -394,17 +394,17 @@ object TopAppBarDefaults {
     @Composable
     fun smallTopAppBarColors(
         containerColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarSmall.SmallContainerColor),
+            MaterialTheme.colorScheme.fromToken(TopAppBarSmallTokens.ContainerColor),
         scrolledContainerColor: Color = MaterialTheme.colorScheme.applyTonalElevation(
             backgroundColor = containerColor,
-            elevation = TopAppBarSmall.SmallOnScrollContainerElevation
+            elevation = TopAppBarSmallTokens.OnScrollContainerElevation
         ),
         navigationIconContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarSmall.SmallLeadingIconColor),
+            MaterialTheme.colorScheme.fromToken(TopAppBarSmallTokens.LeadingIconColor),
         titleContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarSmall.SmallHeadlineColor),
+            MaterialTheme.colorScheme.fromToken(TopAppBarSmallTokens.HeadlineColor),
         actionIconContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarSmall.SmallTrailingIconColor)
+            MaterialTheme.colorScheme.fromToken(TopAppBarSmallTokens.TrailingIconColor)
     ): TopAppBarColors {
         return remember(
             containerColor,
@@ -437,23 +437,17 @@ object TopAppBarDefaults {
     @Composable
     fun centerAlignedTopAppBarColors(
         containerColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarSmallCentered.SmallCenteredContainerColor),
+            MaterialTheme.colorScheme.fromToken(TopAppBarSmallCenteredTokens.ContainerColor),
         scrolledContainerColor: Color = MaterialTheme.colorScheme.applyTonalElevation(
             backgroundColor = containerColor,
-            elevation = TopAppBarSmall.SmallOnScrollContainerElevation
+            elevation = TopAppBarSmallTokens.OnScrollContainerElevation
         ),
         navigationIconContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(
-                TopAppBarSmallCentered.SmallCenteredLeadingIconColor
-            ),
+            MaterialTheme.colorScheme.fromToken(TopAppBarSmallCenteredTokens.LeadingIconColor),
         titleContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(
-                TopAppBarSmallCentered.SmallCenteredHeadlineColor
-            ),
+            MaterialTheme.colorScheme.fromToken(TopAppBarSmallCenteredTokens.HeadlineColor),
         actionIconContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(
-                TopAppBarSmallCentered.SmallCenteredTrailingIconColor
-            )
+            MaterialTheme.colorScheme.fromToken(TopAppBarSmallCenteredTokens.TrailingIconColor)
     ): TopAppBarColors {
         return remember(
             containerColor,
@@ -487,17 +481,17 @@ object TopAppBarDefaults {
     @Composable
     fun mediumTopAppBarColors(
         containerColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarMedium.MediumContainerColor),
+            MaterialTheme.colorScheme.fromToken(TopAppBarMediumTokens.ContainerColor),
         scrolledContainerColor: Color = MaterialTheme.colorScheme.applyTonalElevation(
             backgroundColor = containerColor,
-            elevation = TopAppBarSmall.SmallOnScrollContainerElevation
+            elevation = TopAppBarSmallTokens.OnScrollContainerElevation
         ),
         navigationIconContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarMedium.MediumLeadingIconColor),
+            MaterialTheme.colorScheme.fromToken(TopAppBarMediumTokens.LeadingIconColor),
         titleContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarMedium.MediumHeadlineColor),
+            MaterialTheme.colorScheme.fromToken(TopAppBarMediumTokens.HeadlineColor),
         actionIconContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarMedium.MediumTrailingIconColor)
+            MaterialTheme.colorScheme.fromToken(TopAppBarMediumTokens.TrailingIconColor)
     ): TopAppBarColors {
         return remember(
             containerColor,
@@ -531,17 +525,17 @@ object TopAppBarDefaults {
     @Composable
     fun largeTopAppBarColors(
         containerColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarLarge.LargeContainerColor),
+            MaterialTheme.colorScheme.fromToken(TopAppBarLargeTokens.ContainerColor),
         scrolledContainerColor: Color = MaterialTheme.colorScheme.applyTonalElevation(
             backgroundColor = containerColor,
-            elevation = TopAppBarSmall.SmallOnScrollContainerElevation
+            elevation = TopAppBarSmallTokens.OnScrollContainerElevation
         ),
         navigationIconContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarLarge.LargeLeadingIconColor),
+            MaterialTheme.colorScheme.fromToken(TopAppBarLargeTokens.LeadingIconColor),
         titleContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarLarge.LargeHeadlineColor),
+            MaterialTheme.colorScheme.fromToken(TopAppBarLargeTokens.HeadlineColor),
         actionIconContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarLarge.LargeTrailingIconColor)
+            MaterialTheme.colorScheme.fromToken(TopAppBarLargeTokens.TrailingIconColor)
     ): TopAppBarColors {
         return remember(
             containerColor,
@@ -627,7 +621,7 @@ private fun SingleRowTopAppBar(
 ) {
     // TODO(b/182393826): Check if there is a better place to set the offsetLimit.
     // Set a scroll offset limit to hide the entire app bar area when scrolling.
-    val offsetLimit = with(LocalDensity.current) { -TopAppBarSmall.SmallContainerHeight.toPx() }
+    val offsetLimit = with(LocalDensity.current) { -TopAppBarSmallTokens.ContainerHeight.toPx() }
     SideEffect {
         if (scrollBehavior?.offsetLimit != offsetLimit) {
             scrollBehavior?.offsetLimit = offsetLimit
@@ -653,7 +647,7 @@ private fun SingleRowTopAppBar(
     // scroll-state offset.
     Surface(modifier = modifier, color = appBarContainerColor) {
         val height = LocalDensity.current.run {
-            TopAppBarSmall.SmallContainerHeight.toPx() + (scrollBehavior?.offset ?: 0f)
+            TopAppBarSmallTokens.ContainerHeight.toPx() + (scrollBehavior?.offset ?: 0f)
         }
         TopAppBarLayout(
             heightPx = height,

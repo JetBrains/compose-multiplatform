@@ -20,7 +20,7 @@ package androidx.compose.material3.tokens
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 
-internal object Typeface {
+internal object TypefaceTokens {
     val BrandMedium = FontFamily.SansSerif
     val BrandRegular = FontFamily.SansSerif
     val PlainMedium = FontFamily.SansSerif
