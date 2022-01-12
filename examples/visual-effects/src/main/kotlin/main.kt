@@ -16,12 +16,17 @@ fun mainWave(controls: Boolean) = application {
     WaveEffect(::exitApplication, controls)
 }
 
+fun mainNY() = application {
+    NYWindow(::exitApplication)
+}
+
 fun main(args: Array<String>) {
     if (args.isEmpty()) return mainWords()
     when (val effect = args[0]) {
         "words" -> mainWords()
         "wave" -> mainWave(false)
         "wave-controls" -> mainWave(true)
+        "NY" -> mainNY()
         else -> throw Error("Unknown effect: $effect")
     }
 }

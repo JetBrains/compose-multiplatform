@@ -45,11 +45,19 @@ afterEvaluate {
 
     tasks.register("runWords") {
         additionalArguments.add("words")
+        group = "compose desktop"
         dependsOn(runTask)
     }
 
     tasks.register("runWave") {
         additionalArguments.add("wave")
+        group = "compose desktop"
+        dependsOn(runTask)
+    }
+
+    tasks.register("runNewYear") {
+        additionalArguments.add("NY")
+        group = "compose desktop"
         dependsOn(runTask)
     }
 }
