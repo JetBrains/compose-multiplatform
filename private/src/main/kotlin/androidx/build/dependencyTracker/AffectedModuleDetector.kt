@@ -18,7 +18,7 @@ package androidx.build.dependencyTracker
 
 import androidx.build.dependencyTracker.AffectedModuleDetector.Companion.ENABLE_ARG
 import androidx.build.getDistributionDirectory
-import androidx.build.gitclient.GitClient
+import androidx.build.gitclient.GitRunnerGitClient
 import androidx.build.gradle.isRoot
 import java.io.File
 import org.gradle.api.Action
@@ -146,8 +146,6 @@ abstract class AffectedModuleDetector(
             if (baseCommitOverride != null) {
                 logger.info("using base commit override $baseCommitOverride")
             }
-            val changeInfoPath = GitClient.getChangeInfoPath(rootProject)
-                .forUseAtConfigurationTime()
             gradle.taskGraph.whenReady {
                 logger.lifecycle("projects evaluated")
                 val projectGraph = ProjectGraph(rootProject)
@@ -161,7 +159,6 @@ abstract class AffectedModuleDetector(
                         params.dependencyTracker = dependencyTracker
                         params.log = outputFile
                         params.baseCommitOverride = baseCommitOverride
-                        params.changeInfoPath = changeInfoPath
                     }
                 )
                 logger.info("using real detector")
@@ -263,7 +260,6 @@ abstract class AffectedModuleDetectorLoader :
         var alwaysBuildIfExists: Set<String>?
         var ignoredPaths: Set<String>?
         var baseCommitOverride: String?
-        var changeInfoPath: Provider<String>
     }
 
     val detector: AffectedModuleDetector by lazy {
@@ -275,10 +271,9 @@ abstract class AffectedModuleDetectorLoader :
             if (baseCommitOverride != null) {
                 logger.info("using base commit override $baseCommitOverride")
             }
-            val gitClient = GitClient.create(
-                rootProjectDir = parameters.rootDir,
-                logger = logger,
-                changeInfoPath = parameters.changeInfoPath.get()
+            val gitClient = GitRunnerGitClient(
+                workingDir = parameters.rootDir,
+                logger = logger
             )
             val changedFilesProvider: ChangedFilesProvider = {
                 val baseSha = baseCommitOverride ?: gitClient.findPreviousSubmittedChange()
