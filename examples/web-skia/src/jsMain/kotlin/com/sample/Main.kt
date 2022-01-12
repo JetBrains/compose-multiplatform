@@ -1,6 +1,7 @@
 package org.jetbrains.compose.sample
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.infiniteRepeatable
@@ -13,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -314,22 +316,11 @@ fun SomeHtml() {
 
 @OptIn(ExperimentalComposeWebSvgApi::class)
 @Composable
-fun SomeSvg() {
+fun SomeSvg(radius: Animatable<Float, AnimationVector1D>) {
     Svg(viewBox = "0 0 400 400", attrs = {
         attr("width", "400")
         attr("height", "400")
     }) {
-        val radius = remember { Animatable(10f) }
-        LaunchedEffect(radius) {
-            radius.animateTo(
-                targetValue = 200f,
-                animationSpec = infiniteRepeatable(
-                    tween(durationMillis = 1000, easing = FastOutSlowInEasing),
-                    repeatMode = RepeatMode.Reverse
-                )
-            )
-        }
-
         Circle(200f, 200f, radius.value, attrs = { attr("fill", rgbColor()) })
         Circle(200f, 200f, 0.95f * radius.value, attrs = { attr("fill", rgbColor()) })
         Circle(200f, 200f, 0.9f * radius.value, attrs = { attr("fill", rgbColor()) })
@@ -408,6 +399,17 @@ fun SomeCanvas() {
 
 @Composable
 fun App() {
+    val radius = remember { Animatable(10f) }
+    LaunchedEffect(radius) {
+        radius.animateTo(
+            targetValue = 200f,
+            animationSpec = infiniteRepeatable(
+                tween(durationMillis = 1000, easing = FastOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse
+            )
+        )
+    }
+
     Div({
         style {
             property("width", "100%")
@@ -433,13 +435,13 @@ fun App() {
         }
     }) {
         Span {
-            SomeSvg()
+            SomeSvg(radius)
         }
         Span {
-            SomeSvg()
+            SomeSvg(radius)
         }
         Span {
-            SomeSvg()
+            SomeSvg(radius)
         }
     }
     Div({
