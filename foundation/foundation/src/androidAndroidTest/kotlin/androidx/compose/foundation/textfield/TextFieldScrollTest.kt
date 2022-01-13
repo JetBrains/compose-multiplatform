@@ -30,9 +30,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.Handle
 import androidx.compose.foundation.text.TextFieldScrollerPosition
 import androidx.compose.foundation.text.TextLayoutResultProxy
 import androidx.compose.foundation.text.maxLinesHeight
+import androidx.compose.foundation.text.selection.isSelectionHandle
 import androidx.compose.foundation.text.textFieldScroll
 import androidx.compose.foundation.text.textFieldScrollable
 import androidx.compose.foundation.verticalScroll
@@ -576,10 +578,7 @@ class TextFieldScrollTest {
         rule.onNodeWithTag(tag)
             .performClick()
 
-        // Check that handle is displayed (if it's not, we can't check if it gets hidden).
-        rule.onNode(isPopup())
-            .assertIsDisplayed()
-        // TODO(b/139861182) Assert handle position is within field bounds?
+        rule.onNode(isSelectionHandle(Handle.Cursor)).assertIsDisplayed()
 
         // Scroll up by twice the height to move the cursor out of the visible area.
         rule.onNodeWithTag(tag)
@@ -589,7 +588,7 @@ class TextFieldScrollTest {
             }
 
         // Check that cursor is hidden.
-        rule.onNode(isPopup()).assertDoesNotExist()
+        rule.onAllNodes(isSelectionHandle()).assertCountEquals(0)
 
         // Scroll back and make sure the handles are shown again.
         rule.onNodeWithTag(tag)
@@ -597,7 +596,7 @@ class TextFieldScrollTest {
                 moveBy(Offset(x = 0f, y = size * 2f))
             }
 
-        rule.onNode(isPopup()).assertIsDisplayed()
+        rule.onNode(isSelectionHandle(Handle.Cursor)).assertIsDisplayed()
     }
 
     @OptIn(ExperimentalTestApi::class)
@@ -605,19 +604,6 @@ class TextFieldScrollTest {
     fun textField_selectionHandles_hidden_whenScrolledOutOfView() {
         val size = 200
         val tag = "Text"
-
-        fun assertHandlesDisplayed() {
-            rule.onAllNodes(isPopup())
-                .assertCountEquals(2)
-                .apply {
-                    (0 until 2)
-                        .map(::get)
-                        .forEach {
-                            it.assertIsDisplayed()
-                            // TODO(b/139861182) Assert handle position is within field bounds?
-                        }
-                }
-        }
 
         with(rule.density) {
             rule.setContent {
@@ -644,7 +630,8 @@ class TextFieldScrollTest {
             }
 
         // Check that both handles are displayed (if not, we can't check that they get hidden).
-        assertHandlesDisplayed()
+        rule.onNode(isSelectionHandle(Handle.SelectionStart)).assertIsDisplayed()
+        rule.onNode(isSelectionHandle(Handle.SelectionEnd)).assertIsDisplayed()
 
         // Scroll up by twice the height to move the cursor out of the visible area.
         rule.onNodeWithTag(tag)
@@ -663,7 +650,8 @@ class TextFieldScrollTest {
                 moveBy(Offset(x = 0f, y = size * 2f))
             }
 
-        assertHandlesDisplayed()
+        rule.onNode(isSelectionHandle(Handle.SelectionStart)).assertIsDisplayed()
+        rule.onNode(isSelectionHandle(Handle.SelectionEnd)).assertIsDisplayed()
     }
 
     private fun ComposeContentTestRule.setupHorizontallyScrollableContent(

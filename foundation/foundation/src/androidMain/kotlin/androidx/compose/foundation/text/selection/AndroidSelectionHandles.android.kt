@@ -18,6 +18,10 @@ package androidx.compose.foundation.text.selection
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.Handle
+import androidx.compose.foundation.text.selection.HandleReferencePoint.TopLeft
+import androidx.compose.foundation.text.selection.HandleReferencePoint.TopMiddle
+import androidx.compose.foundation.text.selection.HandleReferencePoint.TopRight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -34,6 +38,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.ImageBitmapConfig
 import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
@@ -61,10 +66,21 @@ internal actual fun SelectionHandle(
     } else {
         HandleReferencePoint.TopLeft
     }
+
     HandlePopup(position = position, handleReferencePoint = handleReferencePoint) {
         if (content == null) {
             DefaultSelectionHandle(
-                modifier = modifier,
+                modifier = modifier
+                    .semantics {
+                        this[SelectionHandleInfoKey] = SelectionHandleInfo(
+                            handle = if (isStartHandle) {
+                                Handle.SelectionStart
+                            } else {
+                                Handle.SelectionEnd
+                            },
+                            position = position
+                        )
+                    },
                 isStartHandle = isStartHandle,
                 direction = direction,
                 handlesCrossed = handlesCrossed
