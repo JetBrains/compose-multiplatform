@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -44,6 +45,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.layout.RootMeasurePolicy.measure
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
@@ -1223,6 +1225,177 @@ class SubcomposeLayoutTest {
 
         rule.runOnIdle {
             assertThat(subcomposionValue).isFalse()
+        }
+    }
+
+    @Test
+    fun updatingStateWorks() {
+        val tagState = mutableStateOf("box1")
+
+        rule.setContent {
+            val tag = tagState.value
+            val state = remember(tag) { SubcomposeLayoutState() }
+
+            SubcomposeLayout(state = state) {
+                val placeable = subcompose(Unit) {
+                    Box(Modifier.size(10.dp).testTag(tag))
+                }.first().measure(Constraints())
+                layout(placeable.width, placeable.height) {
+                    placeable.place(0, 0)
+                }
+            }
+        }
+
+        rule.onNodeWithTag("box1").assertIsDisplayed()
+
+        rule.runOnIdle { tagState.value = "box2" }
+
+        rule.onNodeWithTag("box2").assertIsDisplayed()
+    }
+
+    @Test
+    fun nodesKeptAsReusableAreReusedWhenTheStateObjectChanges() {
+        val slotState = mutableStateOf(0)
+        var remeasuresCount = 0
+        val measureModifier = Modifier.layout { _, _ ->
+            remeasuresCount++
+            layout(10, 10) {}
+        }
+        val layoutState = mutableStateOf(SubcomposeLayoutState(1))
+
+        rule.setContent {
+            val slot = slotState.value
+            SubcomposeLayout(layoutState.value) {
+                val placeable = subcompose(slot) {
+                    ReusableContent(slot) {
+                        Box(measureModifier)
+                    }
+                }.first().measure(Constraints())
+                layout(placeable.width, placeable.height) {
+                    placeable.place(0, 0)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            slotState.value = 1
+            // slot 0 is kept for reuse
+        }
+
+        rule.runOnIdle {
+            assertThat(remeasuresCount).isEqualTo(2)
+            remeasuresCount = 0
+            slotState.value = 2 // slot 0 should be reused
+            layoutState.value = SubcomposeLayoutState(1)
+        }
+
+        rule.runOnIdle {
+            // there is no remeasure as the node was reused and the modifier didn't change
+            assertThat(remeasuresCount).isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun previouslyActiveNodesAreReusedWhenTheStateObjectChanges() {
+        val slotState = mutableStateOf(0)
+        var remeasuresCount = 0
+        val measureModifier = Modifier.layout { _, _ ->
+            remeasuresCount++
+            layout(10, 10) {}
+        }
+        val layoutState = mutableStateOf(SubcomposeLayoutState(1))
+
+        rule.setContent {
+            val slot = slotState.value
+            SubcomposeLayout(layoutState.value) { _ ->
+                val placeable = subcompose(slot) {
+                    ReusableContent(slot) {
+                        Box(measureModifier)
+                    }
+                }.first().measure(Constraints())
+                layout(placeable.width, placeable.height) {
+                    placeable.place(0, 0)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(remeasuresCount).isEqualTo(1)
+            remeasuresCount = 0
+            slotState.value = 1 // slot 0 should be reused
+            layoutState.value = SubcomposeLayoutState(1)
+        }
+
+        rule.runOnIdle {
+            // there is no remeasure as the node was reused and the modifier didn't change
+            assertThat(remeasuresCount).isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun reusableNodeIsKeptAsReusableAfterStateUpdate() {
+        val layoutState = mutableStateOf(SubcomposeLayoutState(1))
+        val needChild = mutableStateOf(true)
+        var disposed = false
+
+        rule.setContent {
+            SubcomposeLayout(state = layoutState.value) {
+                if (needChild.value) {
+                    subcompose(Unit) {
+                        DisposableEffect(Unit) {
+                            onDispose {
+                                disposed = true
+                            }
+                        }
+                    }
+                }
+                layout(0, 0) {}
+            }
+        }
+
+        rule.runOnIdle { needChild.value = false }
+
+        rule.runOnIdle {
+            // the composition is still active in the reusable pool
+            assertThat(disposed).isFalse()
+            layoutState.value = SubcomposeLayoutState(1)
+        }
+
+        rule.runOnIdle { needChild.value = false }
+    }
+
+    @Test
+    fun passingSmallerMaxSlotsToRetainForReuse() {
+        val layoutState = mutableStateOf(SubcomposeLayoutState(1))
+        val needChild = mutableStateOf(true)
+        var disposed = false
+
+        rule.setContent {
+            SubcomposeLayout(state = layoutState.value) {
+                if (needChild.value) {
+                    subcompose(Unit) {
+                        DisposableEffect(Unit) {
+                            onDispose {
+                                disposed = true
+                            }
+                        }
+                    }
+                }
+                layout(0, 0) {}
+            }
+        }
+
+        rule.runOnIdle { needChild.value = false }
+
+        rule.runOnIdle {
+            // the composition is still active in the reusable pool
+            assertThat(disposed).isFalse()
+            layoutState.value = SubcomposeLayoutState(0)
+        }
+
+        rule.runOnIdle {
+            // disposed as the new state has 0 as maxSlotsToRetainForReuse
+            needChild.value = true
         }
     }
 
