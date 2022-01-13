@@ -28,6 +28,7 @@ import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.google.common.truth.IterableSubject
 
 /**
  * This function adds a parent composable which has size. [View.requestFocus()][android.view.View
@@ -73,4 +74,16 @@ internal fun FocusableBox(
             }
         }
     )
+}
+
+/**
+ * Asserts that the elements appear in the specified order.
+ *
+ * Consider using this helper function instead of
+ * [containsExactlyElementsIn][com.google.common.truth.IterableSubject.containsExactlyElementsIn]
+ * or [containsExactly][com.google.common.truth.IterableSubject.containsExactly] as it also asserts
+ * that the elements are in the specified order.
+ */
+fun IterableSubject.isExactly(vararg expected: Any?) {
+    return containsExactlyElementsIn(expected).inOrder()
 }

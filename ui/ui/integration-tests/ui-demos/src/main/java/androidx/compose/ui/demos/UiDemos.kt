@@ -20,6 +20,7 @@ import androidx.compose.foundation.demos.text.SoftwareKeyboardControllerDemo
 import androidx.compose.integration.demos.common.ComposableDemo
 import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.ui.demos.autofill.ExplicitAutofillTypesDemo
+import androidx.compose.ui.demos.focus.AdjacentScrollablesFocusDemo
 import androidx.compose.ui.demos.focus.CaptureFocusDemo
 import androidx.compose.ui.demos.focus.ClickableInLazyColumnDemo
 import androidx.compose.ui.demos.focus.CustomFocusOrderDemo
@@ -132,6 +133,7 @@ private val FocusDemos = DemoCategory(
         ComposableDemo("FocusManager.moveFocus()") { FocusManagerMoveFocusDemo() },
         ComposableDemo("Capture/Free Focus") { CaptureFocusDemo() },
         ComposableDemo("Focus In Scrollable Row") { ScrollableRowFocusDemo() },
+        ComposableDemo("Focus In Adjacent Scrollable Rows") { AdjacentScrollablesFocusDemo() },
         ComposableDemo("Clickable in LazyColumn") { ClickableInLazyColumnDemo() },
         ComposableDemo("Conditional Focusability") { ConditionalFocusabilityDemo() }
     )

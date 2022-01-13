@@ -68,9 +68,9 @@ class FindFocusableChildrenTest(private val excludeDeactivated: Boolean) {
         // Assert.
         rule.runOnIdle {
             if (excludeDeactivated) {
-                assertThat(focusableChildren).containsExactly(focusModifier3.focusNode)
+                assertThat(focusableChildren).isExactly(focusModifier3.focusNode)
             } else {
-                assertThat(focusableChildren).containsExactly(focusModifier2.focusNode)
+                assertThat(focusableChildren).isExactly(focusModifier2.focusNode)
             }
         }
     }
@@ -101,9 +101,9 @@ class FindFocusableChildrenTest(private val excludeDeactivated: Boolean) {
         // Assert.
         rule.runOnIdle {
             if (excludeDeactivated) {
-                assertThat(focusableChildren).containsExactly(focusModifier3.focusNode)
+                assertThat(focusableChildren).isExactly(focusModifier3.focusNode)
             } else {
-                assertThat(focusableChildren).containsExactly(focusModifier2.focusNode)
+                assertThat(focusableChildren).isExactly(focusModifier2.focusNode)
             }
         }
     }
@@ -145,11 +145,11 @@ class FindFocusableChildrenTest(private val excludeDeactivated: Boolean) {
         // Assert.
         rule.runOnIdle {
             if (excludeDeactivated) {
-                assertThat(focusableChildren).containsExactly(
+                assertThat(focusableChildren).isExactly(
                     focusModifier2.focusNode, focusModifier3.focusNode
                 )
             } else {
-                assertThat(focusableChildren).containsExactly(
+                assertThat(focusableChildren).isExactly(
                     focusModifier1.focusNode, focusModifier3.focusNode
                 )
             }
