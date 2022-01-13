@@ -54,7 +54,7 @@ internal fun MacOSSigningSettings.validate(
         }
         keychainFile
     } else null
-    val appStore = appStoreProvider.get()!!
+    val appStore = appStoreProvider.orNull == true
 
     return ValidatedMacOSSigningSettings(
         bundleID = bundleID,

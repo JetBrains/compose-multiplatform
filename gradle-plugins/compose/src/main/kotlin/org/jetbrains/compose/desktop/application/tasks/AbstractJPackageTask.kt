@@ -441,7 +441,7 @@ abstract class AbstractJPackageTask @Inject constructor(
                 .also { setInfoPlistValues(it) }
                 .writeToFile(jpackageResources.ioFile.resolve("Info.plist"))
 
-            if (macAppStore.get()!!) {
+            if (macAppStore.orNull == true) {
                 val productDefPlistXml = """
                     <key>os</key>
                     <array>
