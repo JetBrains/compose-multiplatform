@@ -5,9 +5,9 @@ import androidx.compose.web.events.SyntheticDragEvent
 import androidx.compose.web.events.SyntheticEvent
 import androidx.compose.web.events.SyntheticMouseEvent
 import androidx.compose.web.events.SyntheticWheelEvent
-import org.jetbrains.compose.web.attributes.EventsListenerBuilder.Companion.CHANGE
-import org.jetbrains.compose.web.attributes.EventsListenerBuilder.Companion.INPUT
-import org.jetbrains.compose.web.attributes.EventsListenerBuilder.Companion.SELECT
+import org.jetbrains.compose.web.attributes.EventsListenerScope.Companion.CHANGE
+import org.jetbrains.compose.web.attributes.EventsListenerScope.Companion.INPUT
+import org.jetbrains.compose.web.attributes.EventsListenerScope.Companion.SELECT
 import org.jetbrains.compose.web.events.*
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.jetbrains.compose.web.internal.runtime.NamedEventListener

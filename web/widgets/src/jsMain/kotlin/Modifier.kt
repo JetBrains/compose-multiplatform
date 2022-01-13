@@ -8,7 +8,7 @@ import org.jetbrains.compose.web.css.margin
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.Color.RGB
 import org.jetbrains.compose.common.internal.castOrCreate
-import org.jetbrains.compose.web.attributes.AttrsBuilder
+import org.jetbrains.compose.web.attributes.AttrsScope
 
 @ExperimentalComposeWebWidgetsApi
 @Deprecated(message = webWidgetsDeprecationMessage)
@@ -21,10 +21,10 @@ actual fun Modifier.background(color: Color): Modifier = castOrCreate().apply {
 @ExperimentalComposeWebWidgetsApi
 @Deprecated(message = webWidgetsDeprecationMessage)
 fun Modifier.asAttributeBuilderApplier(
-    passThroughHandler: (AttrsBuilder<*>.() -> Unit)? = null
-): AttrsBuilder<*>.() -> Unit =
+    passThroughHandler: (AttrsScope<*>.() -> Unit)? = null
+): AttrsScope<*>.() -> Unit =
     castOrCreate().let { modifier ->
-        val st: AttrsBuilder<*>.() -> Unit = {
+        val st: AttrsScope<*>.() -> Unit = {
             modifier.attrHandlers.forEach { it.invoke(this) }
 
             style {

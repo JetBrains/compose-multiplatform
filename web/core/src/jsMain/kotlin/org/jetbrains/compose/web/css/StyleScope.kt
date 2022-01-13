@@ -11,7 +11,7 @@ import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import kotlin.properties.ReadOnlyProperty
 
 /**
- * StyleBuilder serves for two main purposes. Passed as a builder context (in [AttrsBuilder]), it
+ * StyleBuilder serves for two main purposes. Passed as a builder context (in [AttrsScope]), it
  * makes it possible to:
  * 1. Add inlined css properties to the element (@see [property])
  * 2. Set values to CSS variables (@see [variable])
@@ -129,9 +129,20 @@ interface StyleHolder {
     val variables: StylePropertyList
 }
 
+interface StyleScope : StyleBuilder, StyleHolder {
+    fun copyFrom(sb: StyleScope)
+}
+
+@Deprecated(
+    message = "Renamed to StyleScopeBuilder",
+    replaceWith = ReplaceWith("StyleScopeBuilder", "org.jetbrains.compose.web.css.StyleScopeBuilder")
+)
+typealias StyleBuilderImpl = StyleScopeBuilder
+
+
 @OptIn(ComposeWebInternalApi::class)
 @Suppress("EqualsOrHashCode")
-open class StyleBuilderImpl : StyleBuilder, StyleHolder {
+open class StyleScopeBuilder : StyleScope {
     override val properties: MutableStylePropertyList = mutableListOf()
     override val variables: MutableStylePropertyList = mutableListOf()
 
@@ -151,7 +162,7 @@ open class StyleBuilderImpl : StyleBuilder, StyleHolder {
         } else false
     }
 
-    internal fun copyFrom(sb: StyleBuilderImpl) {
+    override fun copyFrom(sb: StyleScope) {
         properties.addAll(sb.properties)
         variables.addAll(sb.variables)
     }

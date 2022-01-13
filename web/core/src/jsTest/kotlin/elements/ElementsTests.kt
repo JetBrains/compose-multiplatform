@@ -6,10 +6,9 @@
 package org.jetbrains.compose.web.core.tests.elements
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import kotlinx.browser.document
 import org.jetbrains.compose.web.ExperimentalComposeWebApi
-import org.jetbrains.compose.web.attributes.AttrsBuilder
+import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.testutils.*
 import org.jetbrains.compose.web.dom.*
 import org.w3c.dom.HTMLElement
@@ -113,8 +112,8 @@ class ElementsTests {
     fun rawCreation() = runTest {
         @Composable
         fun CustomElement(
-            attrs: AttrsBuilder<HTMLElement>.() -> Unit,
-            content: ContentBuilder<HTMLElement>? = null
+          attrs: AttrsScope<HTMLElement>.() -> Unit,
+          content: ContentBuilder<HTMLElement>? = null
         ) {
             TagElement(
                 tagName = "custom",
