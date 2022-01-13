@@ -488,6 +488,7 @@ internal fun CoreTextField(
             state = state,
             manager = manager,
             value = value,
+            onValueChange = onValueChangeWrapper,
             editable = !readOnly,
             singleLine = maxLines == 1,
             offsetMapping = offsetMapping,
