@@ -1069,5 +1069,39 @@ class LazyGridTest {
         }
     }
 
+    @Test
+    fun scrollingALotDoesntCauseLazyLayoutRecomposition() {
+        var recomposeCount = 0
+        lateinit var state: LazyGridState
+
+        rule.setContentWithTestViewConfiguration {
+            state = rememberLazyGridState()
+            LazyVerticalGrid(
+                GridCells.Fixed(1),
+                Modifier.composed {
+                    recomposeCount++
+                    Modifier
+                }.size(100.dp),
+                state
+            ) {
+                items(1000) {
+                    Spacer(Modifier.size(100.dp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            Truth.assertThat(recomposeCount).isEqualTo(1)
+
+            runBlocking {
+                state.scrollToItem(100)
+            }
+        }
+
+        rule.runOnIdle {
+            Truth.assertThat(recomposeCount).isEqualTo(1)
+        }
+    }
+
     // TODO: add tests for the cache logic
 }

@@ -45,7 +45,7 @@ internal fun rememberStateOfItemsProvider(
     val latestContent = rememberUpdatedState(content)
     val nearestItemsRangeState = remember(state) {
         mutableStateOf(
-            calculateNearestItemsRange(state.firstVisibleItemIndex)
+            calculateNearestItemsRange(state.firstVisibleItemIndexNonObservable.value)
         )
     }
     LaunchedEffect(nearestItemsRangeState) {

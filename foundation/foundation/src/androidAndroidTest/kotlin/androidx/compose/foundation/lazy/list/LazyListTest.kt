@@ -1683,6 +1683,39 @@ class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(o
         }
     }
 
+    @Test
+    fun scrollingALotDoesntCauseLazyLayoutRecomposition() {
+        var recomposeCount = 0
+        lateinit var state: LazyListState
+
+        rule.setContentWithTestViewConfiguration {
+            state = rememberLazyListState()
+            LazyColumnOrRow(
+                Modifier.composed {
+                    recomposeCount++
+                    Modifier
+                },
+                state
+            ) {
+                items(1000) {
+                    Spacer(Modifier.size(10.dp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(recomposeCount).isEqualTo(1)
+
+            runBlocking {
+                state.scrollToItem(100)
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(recomposeCount).isEqualTo(1)
+        }
+    }
+
     // ********************* END OF TESTS *********************
     // Helper functions, etc. live below here
 
