@@ -4,19 +4,19 @@ import org.jetbrains.compose.annotations.webWidgetsDeprecationMessage
 import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 import org.jetbrains.compose.common.ui.Modifier
 import org.jetbrains.compose.web.css.StyleBuilder
-import org.jetbrains.compose.web.attributes.AttrsBuilder
+import org.jetbrains.compose.web.attributes.AttrsScope
 
 @ExperimentalComposeWebWidgetsApi
 @Deprecated(message = webWidgetsDeprecationMessage)
 class ActualModifier : Modifier {
     val styleHandlers = mutableListOf<StyleBuilder.() -> Unit>()
-    val attrHandlers = mutableListOf<AttrsBuilder<*>.() -> Unit>()
+    val attrHandlers = mutableListOf<AttrsScope<*>.() -> Unit>()
 
     fun add(builder: StyleBuilder.() -> Unit) {
         styleHandlers.add(builder)
     }
 
-    fun addAttributeBuilder(builder: AttrsBuilder<*>.() -> Unit) {
+    fun addAttributeBuilder(builder: AttrsScope<*>.() -> Unit) {
         attrHandlers.add(builder)
     }
 }

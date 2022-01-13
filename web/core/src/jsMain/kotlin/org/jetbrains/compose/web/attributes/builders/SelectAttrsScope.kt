@@ -5,27 +5,27 @@
 
 package androidx.compose.web.attributes
 
-import org.jetbrains.compose.web.attributes.AttrsBuilder
-import org.jetbrains.compose.web.attributes.EventsListenerBuilder.Companion.CHANGE
-import org.jetbrains.compose.web.attributes.EventsListenerBuilder.Companion.INPUT
+import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
+import org.jetbrains.compose.web.attributes.EventsListenerScope.Companion.CHANGE
+import org.jetbrains.compose.web.attributes.EventsListenerScope.Companion.INPUT
 import org.jetbrains.compose.web.attributes.SyntheticEventListener
 import org.jetbrains.compose.web.events.SyntheticChangeEvent
 import org.jetbrains.compose.web.events.SyntheticInputEvent
 import org.w3c.dom.HTMLSelectElement
 import org.w3c.dom.events.Event
 
-class SelectAttrsBuilder : AttrsBuilder<HTMLSelectElement>() {
+class SelectAttrsScope : AttrsScopeBuilder<HTMLSelectElement>() {
 
     fun onInput(
         listener: (SyntheticInputEvent<String?, HTMLSelectElement>) -> Unit
     ) {
-        listeners.add(SelectInputEventListener(INPUT, listener))
+        registerEventListener(SelectInputEventListener(INPUT, listener))
     }
 
     fun onChange(
         listener: (SyntheticChangeEvent<String?, HTMLSelectElement>) -> Unit
     ) {
-        listeners.add(SelectChangeEventListener(listener))
+        registerEventListener(SelectChangeEventListener(listener))
     }
 }
 

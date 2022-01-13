@@ -1,8 +1,9 @@
 package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.*
-import org.jetbrains.compose.web.attributes.AttrsBuilder
+import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.ExperimentalComposeWebApi
+import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
 import org.jetbrains.compose.web.css.StyleHolder
 import org.jetbrains.compose.web.internal.runtime.DomElementWrapper
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
@@ -81,7 +82,7 @@ fun DomElementWrapper.updateAttrs(attrs: Map<String, String>) {
 @Composable
 fun <TElement : Element> TagElement(
     elementBuilder: ElementBuilder<TElement>,
-    applyAttrs: (AttrsBuilder<TElement>.() -> Unit)?,
+    applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
     content: (@Composable ElementScope<TElement>.() -> Unit)?
 ) {
     val scope = remember {  ElementScopeImpl<TElement>() }
@@ -94,16 +95,16 @@ fun <TElement : Element> TagElement(
             DomElementWrapper(node)
         },
         attrsSkippableUpdate = {
-            val attrsBuilder = AttrsBuilder<TElement>()
-            applyAttrs?.invoke(attrsBuilder)
+            val attrsScope = AttrsScopeBuilder<TElement>()
+            applyAttrs?.invoke(attrsScope)
 
-            refEffect = attrsBuilder.refEffect
+            refEffect = attrsScope.refEffect
 
             update {
-                set(attrsBuilder.collect(), DomElementWrapper::updateAttrs)
-                set(attrsBuilder.collectListeners(), DomElementWrapper::updateEventListeners)
-                set(attrsBuilder.propertyUpdates, DomElementWrapper::updateProperties)
-                set(attrsBuilder.styleBuilder, DomElementWrapper::updateStyleDeclarations)
+                set(attrsScope.collect(), DomElementWrapper::updateAttrs)
+                set(attrsScope.collectListeners(), DomElementWrapper::updateEventListeners)
+                set(attrsScope.propertyUpdates, DomElementWrapper::updateProperties)
+                set(attrsScope.styleScope, DomElementWrapper::updateStyleDeclarations)
             }
         },
         elementScope = scope,
@@ -121,7 +122,7 @@ fun <TElement : Element> TagElement(
 @ExperimentalComposeWebApi
 fun <TElement : Element> TagElement(
     tagName: String,
-    applyAttrs: AttrsBuilder<TElement>.() -> Unit,
+    applyAttrs: AttrsScope<TElement>.() -> Unit,
     content: (@Composable ElementScope<TElement>.() -> Unit)?
 ) = TagElement(
     elementBuilder = ElementBuilder.createBuilder(tagName),

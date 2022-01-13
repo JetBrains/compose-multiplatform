@@ -21,7 +21,7 @@ class AttributesTests {
 
     @Test
     fun copyFromStyleBuilderCopiesCorrectly() {
-        val copyFromStyleBuilder = StyleBuilderImpl().apply {
+        val copyFromStyleBuilder = StyleScopeBuilder().apply {
             property("color", "red")
             property("height", 100.px)
 
@@ -29,7 +29,7 @@ class AttributesTests {
             variable("var2", 100.px)
         }
 
-        val copyToStyleBuilder = StyleBuilderImpl().apply {
+        val copyToStyleBuilder = StyleScopeBuilder().apply {
             copyFrom(copyFromStyleBuilder)
         }
 
@@ -38,7 +38,7 @@ class AttributesTests {
 
     @Test
     fun copyFromAttrsBuilderCopiesCorrectly() {
-        val attrsBuilderCopyFrom = AttrsBuilder<HTMLElement>().apply {
+        val attrsScopeCopyFrom = AttrsScopeBuilder<HTMLElement>().apply {
             id("id1")
             classes("a b c")
             attr("title", "customTitle")
@@ -56,54 +56,54 @@ class AttributesTests {
             onMouseEnter {  }
         }
 
-        val copyToAttrsBuilder = AttrsBuilder<HTMLElement>().apply {
-            copyFrom(attrsBuilderCopyFrom)
+        val copyToAttrsScope = AttrsScopeBuilder<HTMLElement>().apply {
+            copyFrom(attrsScopeCopyFrom)
         }
 
-        assertEquals(attrsBuilderCopyFrom.attributesMap, copyToAttrsBuilder.attributesMap)
-        assertEquals(attrsBuilderCopyFrom.styleBuilder, copyToAttrsBuilder.styleBuilder)
-        assertEquals(attrsBuilderCopyFrom.refEffect, copyToAttrsBuilder.refEffect)
-        assertEquals(attrsBuilderCopyFrom.propertyUpdates, copyToAttrsBuilder.propertyUpdates)
-        assertEquals(attrsBuilderCopyFrom.collectListeners(), copyToAttrsBuilder.collectListeners())
+        assertEquals(attrsScopeCopyFrom.attributesMap, copyToAttrsScope.attributesMap)
+        assertEquals(attrsScopeCopyFrom.styleScope, copyToAttrsScope.styleScope)
+        assertEquals(attrsScopeCopyFrom.refEffect, copyToAttrsScope.refEffect)
+        assertEquals(attrsScopeCopyFrom.propertyUpdates, copyToAttrsScope.propertyUpdates)
+        assertEquals(attrsScopeCopyFrom.collectListeners(), copyToAttrsScope.collectListeners())
     }
 
     @Test
     fun attrsBuilderCopyFromPreservesExistingAttrs() {
-        val attrsBuilderCopyFrom = AttrsBuilder<HTMLElement>().apply {
+        val attrsScopeCopyFrom = AttrsScopeBuilder<HTMLElement>().apply {
             attr("title", "customTitle")
         }
 
-        val copyToAttrsBuilder = AttrsBuilder<HTMLElement>().apply {
+        val copyToAttrsScope = AttrsScopeBuilder<HTMLElement>().apply {
             id("id1")
             onClick {  }
             style {
                 width(100.px)
             }
 
-            copyFrom(attrsBuilderCopyFrom)
+            copyFrom(attrsScopeCopyFrom)
         }
 
-        assertEquals("id1", copyToAttrsBuilder.attributesMap["id"])
-        assertEquals(StyleBuilderImpl().apply { width(100.px) }, copyToAttrsBuilder.styleBuilder)
+        assertEquals("id1", copyToAttrsScope.attributesMap["id"])
+        assertEquals(StyleScopeBuilder().apply { width(100.px) }, copyToAttrsScope.styleScope)
 
-        val listeners = copyToAttrsBuilder.collectListeners()
+        val listeners = copyToAttrsScope.collectListeners()
         assertEquals(1, listeners.size)
         assertEquals("click", listeners[0].event)
     }
 
     @Test
     fun attrsBuilderCopyFromOverridesSameAttrs() {
-        val attrsBuilderCopyFrom = AttrsBuilder<HTMLElement>().apply {
+        val attrsScopeCopyFrom = AttrsScopeBuilder<HTMLElement>().apply {
             attr("title", "customTitleNew")
         }
 
-        val copyToAttrsBuilder = AttrsBuilder<HTMLElement>().apply {
+        val copyToAttrsScope = AttrsScopeBuilder<HTMLElement>().apply {
             attr("title", "customTitleOld")
         }
-        assertEquals("customTitleOld", copyToAttrsBuilder.attributesMap["title"])
+        assertEquals("customTitleOld", copyToAttrsScope.attributesMap["title"])
 
-        copyToAttrsBuilder.copyFrom(attrsBuilderCopyFrom)
-        assertEquals("customTitleNew", copyToAttrsBuilder.attributesMap["title"])
+        copyToAttrsScope.copyFrom(attrsScopeCopyFrom)
+        assertEquals("customTitleNew", copyToAttrsScope.attributesMap["title"])
     }
 
     @Test

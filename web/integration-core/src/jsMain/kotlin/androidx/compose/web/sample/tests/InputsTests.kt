@@ -343,7 +343,7 @@ class InputsTests {
             })
 
             Div(attrs = {
-                addEventListener(EventsListenerBuilder.INPUT) {
+                addEventListener(EventsListenerScope.INPUT) {
                     state2 = "div caught an input"
                 }
             }) {
