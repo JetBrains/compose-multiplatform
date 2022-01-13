@@ -993,5 +993,43 @@ class LazyGridTest {
         rule.onNodeWithTag("2").assertLeftPositionInRootIsEqualTo(0.dp)
     }
 
+    @Test
+    fun withMissingItems() {
+        val itemHeight = with(rule.density) { 30.toDp() }
+        lateinit var state: LazyGridState
+        rule.setContent {
+            state = rememberLazyGridState()
+            LazyVerticalGrid(
+                cells = GridCells.Fixed(2),
+                modifier = Modifier.height(itemHeight + 1.dp),
+                state = state
+            ) {
+                items((0..8).map { it.toString() }) {
+                    if (it != "3") {
+                        Box(Modifier.size(itemHeight).testTag(it))
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0").assertIsDisplayed()
+        rule.onNodeWithTag("1").assertIsDisplayed()
+        rule.onNodeWithTag("2").assertIsDisplayed()
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollToItem(3)
+            }
+        }
+
+        rule.onNodeWithTag("0").assertIsNotDisplayed()
+        rule.onNodeWithTag("1").assertIsNotDisplayed()
+        rule.onNodeWithTag("2").assertIsDisplayed()
+        rule.onNodeWithTag("4").assertIsDisplayed()
+        rule.onNodeWithTag("5").assertIsDisplayed()
+        rule.onNodeWithTag("6").assertDoesNotExist()
+        rule.onNodeWithTag("7").assertDoesNotExist()
+    }
+
     // TODO: add tests for the cache logic
 }

@@ -29,7 +29,7 @@ import kotlin.math.max
 @OptIn(ExperimentalFoundationApi::class)
 internal class LazyMeasuredLineProvider(
     constraints: Constraints,
-    isVertical: Boolean,
+    private val isVertical: Boolean,
     slotsPerLine: Int,
     crossAxisSpacing: Int,
     private val itemsProvider: LazyGridItemsProvider,
@@ -60,25 +60,28 @@ internal class LazyMeasuredLineProvider(
     fun getAndMeasure(lineIndex: LineIndex): LazyMeasuredLine {
         val lineConfiguration = spanLayoutProvider.getLineConfiguration(lineIndex.value)
         val lineItemsCount = lineConfiguration.spans.size
-
         val keys = Array(lineItemsCount) {
             itemsProvider.getKey(lineConfiguration.firstItemIndex + it)
         }
         var startSlot = 0
-        val placeables = Array(lineItemsCount) {
-            val span = lineConfiguration.spans[it].currentLineSpan
-            val placeables = placeablesProvider.getAndMeasure(
-                lineConfiguration.firstItemIndex + it,
-                childConstraints(startSlot, span)
+        val crossAxisSizes = Array(lineItemsCount) { 0 }
+        val placeables = Array<Array<LazyLayoutPlaceable>>(lineItemsCount) { emptyArray() }
+        for (i in 0 until lineItemsCount) {
+            val span = lineConfiguration.spans[i].currentLineSpan
+            val constraints = childConstraints(startSlot, span)
+            crossAxisSizes[i] = if (isVertical) constraints.minWidth else constraints.minHeight
+            placeables[i] = placeablesProvider.getAndMeasure(
+                lineConfiguration.firstItemIndex + i,
+                constraints
             )
             startSlot += span
-            placeables
         }
         return measuredLineFactory.createLine(
             lineIndex,
             ItemIndex(lineConfiguration.firstItemIndex),
             lineConfiguration.spans,
             keys,
+            crossAxisSizes,
             placeables
         )
     }
@@ -98,6 +101,7 @@ internal fun interface MeasuredLineFactory {
         firstItemIndex: ItemIndex,
         spans: List<GridItemSpan>,
         keys: Array<Any>,
+        crossAxisSizes: Array<Int>,
         placeables: Array<Array<LazyLayoutPlaceable>>
     ): LazyMeasuredLine
 }
