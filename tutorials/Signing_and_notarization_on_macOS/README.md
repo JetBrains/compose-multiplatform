@@ -175,7 +175,7 @@ uniquely identifies an application in Apple's ecosystem.
 macOS {
     signing { 
          sign.set(true)
-         identity.set("John Doe (123)")
+         identity.set("John Doe")
          // keychain.set("/path/to/keychain") 
     }
 }
@@ -183,7 +183,7 @@ macOS {
 
 * Set the `sign` DSL property or  to `true`.
     * Alternatively, the `compose.desktop.mac.sign` Gradle property can be used.
-* Set the `identity` DSL property to the certificate's name, e.g. `"John Doe (123)"`.
+* Set the `identity` DSL property to the certificate's name, e.g. `"John Doe"`.
     *  Alternatively,  the `compose.desktop.mac.signing.identity` Gradle property can be  used.
 * Optionally, set the `keychain` DSL property to the path to the specific keychain, containing your certificate.
     * Alternatively, the `compose.desktop.mac.signing.keychain` Gradle property can be used.
