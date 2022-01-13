@@ -32,8 +32,6 @@ import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.SetSelectionCommand
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.ResolvedTextDirection
-import kotlin.math.max
-import kotlin.math.min
 
 internal class TextPreparedSelectionState {
     // it's set at the start of vertical navigation and used as the preferred value to set a new
@@ -146,17 +144,17 @@ internal abstract class BaseTextPreparedSelection<T : BaseTextPreparedSelection<
         }
     }
 
-    fun getPrecedingOffset() = annotatedString.text.findPrecedingBreak(selection.end)
+    fun getPrecedingCharacterIndex() = annotatedString.text.findPrecedingBreak(selection.end)
 
-    fun getFollowingOffset() = annotatedString.text.findFollowingBreak(selection.end)
+    fun getNextCharacterIndex() = annotatedString.text.findFollowingBreak(selection.end)
 
     private fun moveCursorPrev() = apply {
-        val prev = getPrecedingOffset()
+        val prev = getPrecedingCharacterIndex()
         if (prev != -1) setCursor(prev)
     }
 
     private fun moveCursorNext() = apply {
-        val next = getFollowingOffset()
+        val next = getNextCharacterIndex()
         if (next != -1) setCursor(next)
     }
 
