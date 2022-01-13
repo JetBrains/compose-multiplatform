@@ -97,18 +97,13 @@ class ChangeInfoGitClient(
     }
 
     /**
-     * finds the most recently submitted change before any pending changes being tested
+     * Unused
+     * If this were supported, it would:
+     * Finds the most recently submitted change before any pending changes being tested
      */
     override fun findPreviousSubmittedChange(): String? {
-        for (change in changesInThisRepo) {
-            val revisions: JSONArray = change.get("revisions") as JSONArray
-            for (revision in revisions) {
-                val commit = (revision as JSONObject).get("commit") as JSONObject
-                val parents = commit.get("parents") as JSONArray
-                val firstParent = parents.get(0) as JSONObject
-                return firstParent.get("commitId").toString()
-            }
-        }
+        // findChangedFilesSince doesn't need this information, so
+        // this is unsupported at the moment.
         return null
     }
 
