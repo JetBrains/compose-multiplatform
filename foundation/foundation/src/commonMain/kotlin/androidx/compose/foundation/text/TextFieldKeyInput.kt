@@ -126,11 +126,14 @@ internal class TextFieldKeyInput(
                 KeyCommand.END -> moveCursorToEnd()
                 KeyCommand.DELETE_PREV_CHAR ->
                     deleteIfSelectedOr {
-                        DeleteSurroundingTextCommand(selection.end - getPrecedingOffset(), 0)
+                        DeleteSurroundingTextCommand(
+                            selection.end - getPrecedingCharacterIndex(),
+                            0
+                        )
                     }?.apply()
                 KeyCommand.DELETE_NEXT_CHAR -> {
                     deleteIfSelectedOr {
-                        DeleteSurroundingTextCommand(0, getFollowingOffset() - selection.end)
+                        DeleteSurroundingTextCommand(0, getNextCharacterIndex() - selection.end)
                     }?.apply()
                 }
                 KeyCommand.DELETE_PREV_WORD ->
