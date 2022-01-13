@@ -43,23 +43,28 @@ internal fun LazyLayout(
 
     SubcomposeLayout(
         subcomposeLayoutState,
-        modifier.then(state.remeasurementModifier)
-    ) { constraints ->
-        itemContentFactory.onBeforeMeasure(this, constraints)
+        modifier.then(state.remeasurementModifier),
+        remember(itemContentFactory, state, measurePolicy) {
+            { constraints ->
+                itemContentFactory.onBeforeMeasure(this, constraints)
 
-        val placeablesProvider = LazyLayoutPlaceablesProvider(
-            state.itemsProvider(),
-            itemContentFactory,
-            this
-        )
-        val measureResult = with(measurePolicy) { measure(placeablesProvider, constraints) }
+                val placeablesProvider = LazyLayoutPlaceablesProvider(
+                    state.itemsProvider(),
+                    itemContentFactory,
+                    this
+                )
+                val measureResult = with(measurePolicy) { measure(placeablesProvider, constraints) }
 
-        state.onPostMeasureListener?.apply { onPostMeasure(measureResult, placeablesProvider) }
-        state.layoutInfoState.value = measureResult
-        state.layoutInfoNonObservable = measureResult
+                state.onPostMeasureListener?.apply {
+                    onPostMeasure(measureResult, placeablesProvider)
+                }
+                state.layoutInfoState.value = measureResult
+                state.layoutInfoNonObservable = measureResult
 
-        measureResult
-    }
+                measureResult
+            }
+        }
+    )
 }
 
 private const val MaxItemsToRetainForReuse = 2
