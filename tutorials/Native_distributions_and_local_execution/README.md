@@ -443,6 +443,9 @@ The following platform-specific options are available
     * `appCategory` — category of the app for the Apple App Store. 
       Default value is `utilities` when building for the App Store, `Unknown` otherwise. 
       See [LSApplicationCategoryType](https://developer.apple.com/documentation/bundleresources/information_property_list/lsapplicationcategorytype) for a list of valid categories;
+    * `entitlementsFile.set(File("PATH_TO_ENTITLEMENTS"))` — a path to file containing entitlements to use when signing.
+      When a custom file is provided, make sure to add the entitlements that are required for Java apps.
+      See [sandbox.plist](https://github.com/openjdk/jdk/blob/master/src/jdk.jpackage/macosx/classes/jdk/jpackage/internal/resources/sandbox.plist) for the default file that is used when building for the App Store. It can be different depending on your JDK version.
     * `dmgPackageVersion = "DMG_VERSION"` — a dmg-specific package version
       (see the section `Specifying package version` for details);
     * `pkgPackageVersion = "PKG_VERSION"` — a pkg-specific package version

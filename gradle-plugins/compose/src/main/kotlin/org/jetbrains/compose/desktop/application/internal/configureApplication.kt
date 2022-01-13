@@ -298,6 +298,7 @@ internal fun AbstractJPackageTask.configurePlatformSettings(app: Application) {
                 )
                 macAppStore.set(mac.appStore)
                 macAppCategory.set(mac.appCategory)
+                macEntitlementsFile.set(mac.entitlementsFile)
                 packageBuildVersion.set(packageBuildVersionFor(project, app, targetFormat))
                 nonValidatedMacBundleID.set(provider { mac.bundleID })
                 macProvisioningProfile.set(mac.provisioningProfile)

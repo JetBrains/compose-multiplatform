@@ -22,6 +22,7 @@ open class MacOSPlatformSettings @Inject constructor(objects: ObjectFactory): Pl
     var setDockNameSameAsPackageName: Boolean = true
     var appStore: Boolean = false
     var appCategory: String? = null
+    var entitlementsFile: RegularFileProperty = objects.fileProperty()
     var packageBuildVersion: String? = null
     var dmgPackageVersion: String? = null
     var dmgPackageBuildVersion: String? = null

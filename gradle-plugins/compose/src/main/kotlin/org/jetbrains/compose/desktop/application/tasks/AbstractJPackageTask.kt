@@ -135,6 +135,11 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Optional
     val macAppCategory: Property<String?> = objects.nullableProperty()
 
+    @get:InputFile
+    @get:Optional
+    @get:PathSensitive(PathSensitivity.ABSOLUTE)
+    val macEntitlementsFile: RegularFileProperty = objects.fileProperty()
+
     @get:Input
     @get:Optional
     val packageBuildVersion: Property<String?> = objects.nullableProperty()
@@ -344,6 +349,7 @@ abstract class AbstractJPackageTask @Inject constructor(
                 cliArg("--mac-package-identifier", nonValidatedMacBundleID)
                 cliArg("--mac-app-store", macAppStore)
                 cliArg("--mac-app-category", macAppCategory)
+                cliArg("--mac-entitlements", macEntitlementsFile)
 
                 macSigner?.let { signer ->
                     cliArg("--mac-sign", true)
