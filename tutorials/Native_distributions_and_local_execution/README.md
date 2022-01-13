@@ -256,7 +256,7 @@ The following properties are available in the `nativeDistributions` DSL block:
 * `version` — application's version (default value: Gradle project's [version](https://docs.gradle.org/current/javadoc/org/gradle/api/Project.html#getVersion--));
 * `description` — application's description (default value: none);
 * `copyright` — application's copyright (default value: none);
-* `vendor` — application's vendor (default value: none).
+* `vendor` — application's vendor (default value: none);
 * `licenseFile` — application's license (default value: none).
 
 ``` kotlin
@@ -436,7 +436,7 @@ The following platform-specific options are available
     * `packageName` — a name of the application;
     * `dockName` — a name of the application displayed in the menu bar, the "About <App>" menu item, in the dock, etc. 
       Equals to `packageName` by default.
-    * `signing` and `notarization` — see
+    * `signing`, `notarization`, and `provisioningProfile` — see
       [the corresponding tutorial](/tutorials/Signing_and_notarization_on_macOS/README.md) 
       for details;
     * `appStore = true` — build and sign for the Apple App Store. Requires at least JDK 17;

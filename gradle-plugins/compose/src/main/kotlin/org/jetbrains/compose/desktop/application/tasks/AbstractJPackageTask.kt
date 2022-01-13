@@ -139,6 +139,11 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Optional
     val packageBuildVersion: Property<String?> = objects.nullableProperty()
 
+    @get:InputFile
+    @get:Optional
+    @get:PathSensitive(PathSensitivity.ABSOLUTE)
+    val macProvisioningProfile: RegularFileProperty = objects.fileProperty()
+
     @get:Input
     @get:Optional
     val winConsole: Property<Boolean?> = objects.nullableProperty()
@@ -282,6 +287,9 @@ abstract class AbstractJPackageTask @Inject constructor(
             if (currentOS == OS.MacOS) {
                 macDockName.orNull?.let { dockName ->
                     javaOption("-Xdock:name=$dockName")
+                }
+                macProvisioningProfile.orNull?.let { provisioningProfile ->
+                    cliArg("--app-content", provisioningProfile)
                 }
             }
         }

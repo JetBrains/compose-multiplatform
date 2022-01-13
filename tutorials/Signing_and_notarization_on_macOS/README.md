@@ -76,6 +76,24 @@ Open [the page](https://developer.apple.com/account/resources/identifiers/list) 
       uniquely identifies an application in Apple's ecosystem.
     * You can use an explicit bundle ID a wildcard, matching multiple bundle IDs.
     * It is recommended to use the reverse DNS notation (e.g.`com.yoursitename.yourappname`).
+
+## Preparing a Provisioning Profile
+For testing on TestFlight (when publishing to the App Store), you need to add a provisioning
+profile. You can skip this step otherwise.
+
+#### Checking existing provisioning profiles
+
+Open https://developer.apple.com/account/resources/profiles/list
+
+#### Creating a new provisioning profile
+
+1. Open [the page](https://developer.apple.com/account/resources/profiles/add) on Apple's developer portal.
+2. Choose `Mac App Store` option under `Distribution`.
+3. Select Profile Type `Mac`.
+4. Select the App ID which you created earlier.
+5. Select the Mac App Distribution certificate you created earlier.
+6. Enter a name.
+7. Click generate and download the provisioning profile.
    
 ## Creating an app-specific password
 
@@ -226,6 +244,21 @@ macOS {
 ```
 xcrun altool --list-providers -u <Apple ID> -p <Notarization password>"
 ```
+
+### Configuring provisioning profile
+
+For testing on TestFlight (when publishing to the App Store), you need to add a provisioning
+profile. You can skip this step otherwise.
+
+Note that this option requires JDK 18 due to [this issue](https://bugs.openjdk.java.net/browse/JDK-8274346).
+
+``` kotlin
+macOS {
+    provisioningProfile.set(project.file("embedded.provisionprofile"))
+}
+```
+
+Make sure to rename your provisioning profile you created earlier to `embedded.provisionprofile`.
 
 ## Using Gradle
 
