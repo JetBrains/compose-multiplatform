@@ -281,6 +281,25 @@ class LazyListLayoutInfoTest(
         }
     }
 
+    @Test
+    fun emptyItemsInVisibleItemsInfo() {
+        lateinit var state: LazyListState
+        rule.setContent {
+            LazyColumn(
+                state = rememberLazyListState().also { state = it }
+            ) {
+                item { Box(Modifier) }
+                item { }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(state.layoutInfo.visibleItemsInfo.size).isEqualTo(2)
+            assertThat(state.layoutInfo.visibleItemsInfo.first().index).isEqualTo(0)
+            assertThat(state.layoutInfo.visibleItemsInfo.last().index).isEqualTo(1)
+        }
+    }
+
     fun LazyListLayoutInfo.assertVisibleItems(
         count: Int,
         startIndex: Int = 0,

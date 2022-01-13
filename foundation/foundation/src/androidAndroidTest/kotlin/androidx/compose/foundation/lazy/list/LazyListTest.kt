@@ -1614,6 +1614,38 @@ class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(o
             )
     }
 
+    @Test
+    fun withMissingItems() {
+        val itemSize = with(rule.density) { 30.toDp() }
+        lateinit var state: LazyListState
+        rule.setContent {
+            state = rememberLazyListState()
+            LazyColumnOrRow(
+                modifier = Modifier.mainAxisSize(itemSize + 1.dp),
+                state = state
+            ) {
+                items(4) {
+                    if (it != 1) {
+                        Box(Modifier.size(itemSize).testTag(it.toString()))
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0").assertIsDisplayed()
+        rule.onNodeWithTag("2").assertIsDisplayed()
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollToItem(1)
+            }
+        }
+
+        rule.onNodeWithTag("0").assertIsNotDisplayed()
+        rule.onNodeWithTag("2").assertIsDisplayed()
+        rule.onNodeWithTag("3").assertIsDisplayed()
+    }
+
     // ********************* END OF TESTS *********************
     // Helper functions, etc. live below here
 

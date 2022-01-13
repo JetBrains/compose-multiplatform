@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.LayoutDirection
 internal class LazyMeasuredLine constructor(
     val index: LineIndex,
     val firstItemIndex: ItemIndex,
+    private val crossAxisSizes: Array<Int>,
     private val placeables: Array<Array<LazyLayoutPlaceable>>,
     private val spans: List<GridItemSpan>,
     val keys: Array<Any>,
@@ -107,7 +108,7 @@ internal class LazyMeasuredLine constructor(
             } else {
                 IntOffset(mainAxisOffset, crossAxisOffset)
             }
-            usedCrossAxis += placeables.first().placeable.width + crossAxisSpacing
+            usedCrossAxis += crossAxisSizes[placeablesIndex] + crossAxisSpacing
             val column = usedSpan
             usedSpan += spans[placeablesIndex].currentLineSpan
 
@@ -129,9 +130,9 @@ internal class LazyMeasuredLine constructor(
                 row = this@LazyMeasuredLine.index.value,
                 column = column,
                 size = if (isVertical) {
-                    IntSize(placeables.first().placeable.width, mainAxisSize)
+                    IntSize(crossAxisSizes[placeablesIndex], mainAxisSize)
                 } else {
-                    IntSize(mainAxisSize, placeables.first().placeable.height)
+                    IntSize(mainAxisSize, crossAxisSizes[placeablesIndex])
                 },
                 // sizeWithSpacings = sizeWithSpacings,
                 minMainAxisOffset = -if (!reverseLayout) {

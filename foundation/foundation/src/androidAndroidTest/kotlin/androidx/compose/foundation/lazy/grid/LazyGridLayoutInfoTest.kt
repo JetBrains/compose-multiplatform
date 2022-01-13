@@ -307,6 +307,26 @@ class LazyGridLayoutInfoTest(
         }
     }
 
+    @Test
+    fun emptyItemsInVisibleItemsInfo() {
+        lateinit var state: LazyGridState
+        rule.setContent {
+            LazyVerticalGrid(
+                cells = GridCells.Fixed(2),
+                state = rememberLazyGridState().also { state = it }
+            ) {
+                item { Box(Modifier) }
+                item { }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(state.layoutInfo.visibleItemsInfo.size).isEqualTo(2)
+            assertThat(state.layoutInfo.visibleItemsInfo.first().index).isEqualTo(0)
+            assertThat(state.layoutInfo.visibleItemsInfo.last().index).isEqualTo(1)
+        }
+    }
+
     fun LazyGridLayoutInfo.assertVisibleItems(
         count: Int,
         itemsPerRow: Int,
