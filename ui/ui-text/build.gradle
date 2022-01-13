@@ -126,6 +126,10 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
             androidMain.kotlin.srcDirs("../../../text/text/src/main/java")
 
+            // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
+            //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
+            //  level dependencies block instead:
+            //  `dependencies { testImplementation(libs.robolectric) }`
             androidTest.dependencies {
                 implementation(project(":compose:ui:ui-test-font"))
                 implementation(libs.testRules)

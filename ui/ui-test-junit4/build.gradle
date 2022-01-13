@@ -110,12 +110,15 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.espressoIdlingResource)
             }
 
+            // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
+            //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
+            //  level dependencies block instead:
+            //  `dependencies { testImplementation(libs.robolectric) }`
             androidTest.dependencies {
                 implementation(project(":compose:animation:animation-core"))
                 implementation(project(":compose:material:material"))
                 implementation(project(":compose:test-utils"))
                 implementation(libs.truth)
-                implementation(libs.robolectric)
             }
 
             androidAndroidTest.dependencies {
@@ -134,6 +137,12 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.skiko)
             }
         }
+    }
+
+    dependencies {
+        // Can't declare this in kotlin { sourceSets { androidTest.dependencies { .. } } } as that
+        // leaks into instrumented tests (b/214407011)
+        testImplementation(libs.robolectric)
     }
 }
 
