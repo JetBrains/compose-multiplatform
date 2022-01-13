@@ -56,6 +56,7 @@ internal class TextFieldKeyInput(
     val offsetMapping: OffsetMapping = OffsetMapping.Identity,
     val undoManager: UndoManager? = null,
     private val keyMapping: KeyMapping = platformDefaultKeyMapping,
+    private val onValueChange: (TextFieldValue) -> Unit = {}
 ) {
     private fun List<EditCommand>.apply() {
         val newTextFieldValue = state.processor.apply(
@@ -63,12 +64,8 @@ internal class TextFieldKeyInput(
                 add(0, FinishComposingTextCommand())
             }
         )
-        @OptIn(InternalFoundationTextApi::class)
-        if (newTextFieldValue.annotatedString.text != state.textDelegate.text.text) {
-            // Text has been changed, enter the HandleState.None and hide the cursor handle.
-            state.handleState = HandleState.None
-        }
-        state.onValueChange(newTextFieldValue)
+
+        onValueChange(newTextFieldValue)
     }
 
     private fun EditCommand.apply() {
@@ -192,10 +189,10 @@ internal class TextFieldKeyInput(
                 KeyCommand.DESELECT -> deselect()
                 KeyCommand.UNDO -> {
                     undoManager?.makeSnapshot(value)
-                    undoManager?.undo()?.let { this@TextFieldKeyInput.state.onValueChange(it) }
+                    undoManager?.undo()?.let { this@TextFieldKeyInput.onValueChange(it) }
                 }
                 KeyCommand.REDO -> {
-                    undoManager?.redo()?.let { this@TextFieldKeyInput.state.onValueChange(it) }
+                    undoManager?.redo()?.let { this@TextFieldKeyInput.onValueChange(it) }
                 }
                 KeyCommand.CHARACTER_PALETTE -> { showCharacterPalette() }
             }
@@ -215,7 +212,7 @@ internal class TextFieldKeyInput(
         if (preparedSelection.selection != value.selection ||
             preparedSelection.annotatedString != value.annotatedString
         ) {
-            state.onValueChange(preparedSelection.value)
+            onValueChange(preparedSelection.value)
         }
     }
 }
@@ -225,6 +222,7 @@ internal fun Modifier.textFieldKeyInput(
     state: TextFieldState,
     manager: TextFieldSelectionManager,
     value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit = {},
     editable: Boolean,
     singleLine: Boolean,
     offsetMapping: OffsetMapping,
@@ -239,7 +237,8 @@ internal fun Modifier.textFieldKeyInput(
         singleLine = singleLine,
         offsetMapping = offsetMapping,
         preparedSelectionState = preparedSelectionState,
-        undoManager = undoManager
+        undoManager = undoManager,
+        onValueChange = onValueChange
     )
     Modifier.onKeyEvent(processor::process)
 }
