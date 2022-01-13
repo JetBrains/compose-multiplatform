@@ -121,50 +121,28 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
             jsMain {
                 dependencies {
-                    implementation(kotlin("stdlib-js"))
+                    implementation(libs.kotlinStdlibJs)
                 }
             }
             jvmTest.dependencies {
-                implementation kotlin("test-junit")
+                implementation(libs.kotlinTestJunit)
                 // kotlinCoroutinesTest is copy-pasted in source code to support multiplarform tests
                 // implementation(libs.kotlinCoroutinesTest)
             }
-            desktopTest {
-                dependsOn jvmTest
-            }
-            androidTest {
-                dependsOn jvmTest
-            }
             jsTest {
                 dependencies {
-                    implementation kotlin("test-js")
+                    implementation(libs.kotlinTestJs)
                 }
             }
             nativeTest {
-                dependsOn(commonTest)
                 kotlin.srcDir("src/nativeTest/kotlin")
             }
-            macosX64Test.dependsOn(nativeTest)
-            macosArm64Test.dependsOn(nativeTest)
-            uikitX64Test.dependsOn(nativeTest)
         }
     }
     dependencies {
         samples(projectOrArtifact(":compose:runtime:runtime:runtime-samples"))
     }
 }
-
-//publishing {
-//     repositories {
-//        maven {
-//            url "https://maven.pkg.jetbrains.space/public/p/compose/dev"
-//            credentials {
-//                username = project.hasProperty("COMPOSE_REPO_USERNAME") ? "$COMPOSE_REPO_USERNAME" : ""
-//                password = project.hasProperty("COMPOSE_REPO_KEY") ? "$COMPOSE_REPO_KEY" : ""
-//            }
-//        }
-//    }
-//}
 
 android {
     defaultConfig {
