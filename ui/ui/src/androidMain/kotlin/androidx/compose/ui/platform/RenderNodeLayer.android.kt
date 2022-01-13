@@ -289,7 +289,9 @@ internal class RenderNodeLayer(
             } else {
                 null
             }
-            renderNode.record(canvasHolder, clipPath, drawBlock!!)
+            drawBlock?.let {
+                renderNode.record(canvasHolder, clipPath, it)
+            }
         }
     }
 
