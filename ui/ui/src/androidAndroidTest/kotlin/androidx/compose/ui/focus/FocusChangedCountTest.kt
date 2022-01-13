@@ -53,7 +53,7 @@ class FocusChangedCountTest {
         }
 
         // Assert.
-        rule.runOnIdle { assertThat(focusStates).containsExactly(Inactive) }
+        rule.runOnIdle { assertThat(focusStates).isExactly(Inactive) }
     }
 
     @Test
@@ -65,7 +65,7 @@ class FocusChangedCountTest {
         }
 
         // Assert.
-        rule.runOnIdle { assertThat(focusStates).containsExactly(Inactive) }
+        rule.runOnIdle { assertThat(focusStates).isExactly(Inactive) }
     }
 
     @Test
@@ -87,7 +87,7 @@ class FocusChangedCountTest {
         rule.runOnIdle { focusRequester.requestFocus() }
 
         // Assert.
-        rule.runOnIdle { assertThat(focusStates).containsExactly(Active) }
+        rule.runOnIdle { assertThat(focusStates).isExactly(Active) }
     }
 
     @Test
@@ -139,7 +139,7 @@ class FocusChangedCountTest {
         rule.runOnIdle { focusManager.clearFocus() }
 
         // Assert.
-        rule.runOnIdle { assertThat(focusStates).containsExactly(Inactive) }
+        rule.runOnIdle { assertThat(focusStates).isExactly(Inactive) }
     }
 
     @Test
@@ -166,7 +166,7 @@ class FocusChangedCountTest {
         rule.runOnIdle { addFocusTarget.value = false }
 
         // Assert.
-        rule.runOnIdle { assertThat(focusStates).containsExactly(Inactive) }
+        rule.runOnIdle { assertThat(focusStates).isExactly(Inactive) }
     }
 
     @Test
