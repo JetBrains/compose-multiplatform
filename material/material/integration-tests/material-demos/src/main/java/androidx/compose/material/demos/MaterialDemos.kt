@@ -54,6 +54,7 @@ val MaterialDemos = DemoCategory(
             )
         ),
         ComposableDemo("Buttons & FABs") { ButtonDemo() },
+        ComposableDemo("Chips") { ChipDemo() },
         DemoCategory(
             "Navigation drawer",
             listOf(
