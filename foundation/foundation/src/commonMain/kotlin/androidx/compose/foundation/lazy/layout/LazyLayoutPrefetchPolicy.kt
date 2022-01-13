@@ -29,23 +29,20 @@ internal fun rememberLazyLayoutPrefetchPolicy(): LazyLayoutPrefetchPolicy = reme
 
 /**
  * Controller for lazy items prefetching, used by lazy layouts to instruct the prefetcher.
- * TODO: This is currently supporting just one item, but it should rather be a queue.
  */
 @Stable
 internal class LazyLayoutPrefetchPolicy {
     internal var prefetcher: Subscriber? = null
 
-    /** Schedules a new item to prefetch, specified by [index]. */
-    fun scheduleForPrefetch(index: Int) = prefetcher?.scheduleForPrefetch(index)
+    /** Schedules new items to prefetch, specified by [indices]. */
+    fun scheduleForPrefetch(indices: List<Pair<Int, Constraints>>) =
+        prefetcher?.scheduleForPrefetch(indices)
 
-    /** Notifies the prefetcher that item with [index] is no longer likely to be needed. */
-    fun removeFromPrefetch(index: Int) = prefetcher?.removeFromPrefetch(index)
-
-    /** The constraints to be used for premeasuring the precomposed items. */
-    var constraints = Constraints()
+    /** Notifies the prefetcher that previously scheduled items are no longer likely to be needed. */
+    fun cancelScheduledPrefetch() = prefetcher?.cancelScheduledPrefetch()
 
     interface Subscriber {
-        fun scheduleForPrefetch(index: Int)
-        fun removeFromPrefetch(index: Int)
+        fun scheduleForPrefetch(indices: List<Pair<Int, Constraints>>)
+        fun cancelScheduledPrefetch()
     }
 }

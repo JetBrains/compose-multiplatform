@@ -84,15 +84,15 @@ internal class LazyGridScrollPosition(
         lastKnownFirstItemKey = null
     }
 
-    // /**
-    //  * In addition to keeping the first visible item index we also store the key of this item.
-    //  * When the user provided custom keys for the items this mechanism allows us to detect when
-    //  * there were items added or removed before our current first visible item and keep this item
-    //  * as the first visible one even given that its index has been changed.
-    //  */
-    // fun updateScrollPositionIfTheFirstItemWasMoved(itemsProvider: LazyGridItemsProvider) {
-    //     update(findLazyGridIndexByKey(lastKnownFirstItemKey, index, itemsProvider), scrollOffset)
-    // }
+    /**
+     * In addition to keeping the first visible item index we also store the key of this item.
+     * When the user provided custom keys for the items this mechanism allows us to detect when
+     * there were items added or removed before our current first visible item and keep this item
+     * as the first visible one even given that its index has been changed.
+     */
+    fun updateScrollPositionIfTheFirstItemWasMoved(itemsProvider: LazyGridItemsProvider) {
+        update(findLazyGridIndexByKey(lastKnownFirstItemKey, index, itemsProvider), scrollOffset)
+    }
 
     private fun update(index: ItemIndex, scrollOffset: Int) {
         require(index.value >= 0f) { "Index should be non-negative (${index.value})" }
@@ -107,32 +107,32 @@ internal class LazyGridScrollPosition(
         }
     }
 
-    // private companion object {
-    //     /**
-    //      * Finds a position of the item with the given key in the lists. This logic allows us to
-    //      * detect when there were items added or removed before our current first item.
-    //      */
-    //     private fun findLazyGridIndexByKey(
-    //         key: Any?,
-    //         lastKnownIndex: ItemIndex,
-    //         itemsProvider: LazyGridItemsProvider
-    //     ): ItemIndex {
-    //         if (key == null) {
-    //             // there were no real item during the previous measure
-    //             return lastKnownIndex
-    //         }
-    //         if (lastKnownIndex.value < itemsProvider.itemsCount &&
-    //             key == itemsProvider.getKey(lastKnownIndex.value)
-    //         ) {
-    //             // this item is still at the same index
-    //             return lastKnownIndex
-    //         }
-    //         val newIndex = itemsProvider.keyToIndexMap[key]
-    //         if (newIndex != null) {
-    //             return ItemIndex(newIndex)
-    //         }
-    //         // fallback to the previous index if we don't know the new index of the item
-    //         return lastKnownIndex
-    //     }
-    // }
+    private companion object {
+        /**
+         * Finds a position of the item with the given key in the grid. This logic allows us to
+         * detect when there were items added or removed before our current first item.
+         */
+        private fun findLazyGridIndexByKey(
+            key: Any?,
+            lastKnownIndex: ItemIndex,
+            itemsProvider: LazyGridItemsProvider
+        ): ItemIndex {
+            if (key == null) {
+                // there were no real item during the previous measure
+                return lastKnownIndex
+            }
+            if (lastKnownIndex.value < itemsProvider.itemsCount &&
+                key == itemsProvider.getKey(lastKnownIndex.value)
+            ) {
+                // this item is still at the same index
+                return lastKnownIndex
+            }
+            val newIndex = itemsProvider.keyToIndexMap[key]
+            if (newIndex != null) {
+                return ItemIndex(newIndex)
+            }
+            // fallback to the previous index if we don't know the new index of the item
+            return lastKnownIndex
+        }
+    }
 }

@@ -34,6 +34,7 @@ import androidx.compose.foundation.lazy.LazyGridScope
 import androidx.compose.foundation.lazy.LazyGridState
 import androidx.compose.foundation.lazy.layout.LazyLayout
 import androidx.compose.foundation.lazy.layout.LazyMeasurePolicy
+import androidx.compose.foundation.lazy.layout.rememberLazyLayoutPrefetchPolicy
 import androidx.compose.foundation.lazy.layout.rememberLazyLayoutState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -48,6 +49,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastForEach
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -104,14 +106,13 @@ internal fun LazyGrid(
         // placementAnimator
     )
 
-    // TODO(b/211849056): enable prefetching
-    // state.prefetchPolicy = rememberLazyLayoutPrefetchPolicy()
+    state.prefetchPolicy = rememberLazyLayoutPrefetchPolicy()
     val innerState = rememberLazyLayoutState().also { state.innerState = it }
 
-    // TODO(b/211849521)
-    // if (itemsProvider.itemsCount > 0) {
-    //     state.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
-    // }
+    val itemsProvider = stateOfItemsProvider.value
+    if (itemsProvider.itemsCount > 0) {
+        state.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
+    }
 
     LazyLayout(
         modifier = modifier
@@ -191,7 +192,7 @@ private fun rememberLazyGridMeasurePolicy(
         constraints.assertNotNestingScrollableContainers(isVertical)
 
         val itemsProvider = stateOfItemsProvider.value
-        // state.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
+        state.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
 
         // Update the state's cached Density
         state.density = this
@@ -260,7 +261,19 @@ private fun rememberLazyGridMeasurePolicy(
                 // placementAnimator = placementAnimator
             )
         }
-        // state.prefetchPolicy?.constraints = itemProvider.childConstraints
+        state.prefetchInfoRetriever = { line ->
+            val lineConfiguration = spanLayoutProvider.getLineConfiguration(line.value)
+            var index = ItemIndex(lineConfiguration.firstItemIndex)
+            var slot = 0
+            val result = ArrayList<Pair<Int, Constraints>>(lineConfiguration.spans.size)
+            lineConfiguration.spans.fastForEach {
+                val span = it.currentLineSpan
+                result.add(index.value to lineProvider.childConstraints(slot, span))
+                ++index
+                slot += span
+            }
+            result
+        }
 
         val firstVisibleLineIndex: LineIndex
         val firstVisibleLineScrollOffset: Int
