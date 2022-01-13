@@ -752,8 +752,8 @@ class AndroidPointerInputTest {
         val change = event.changes[0]
         assertThat(change.pressed).isFalse()
         assertThat(event.type).isEqualTo(PointerEventType.Scroll)
-        // we agreed to reverse the delta in android to be in line with other platforms
-        assertThat(change.scrollDelta).isEqualTo(-scrollExpected)
+        // we agreed to reverse Y in android to be in line with other platforms
+        assertThat(change.scrollDelta).isEqualTo(scrollExpected.copy(y = scrollExpected.y * -1))
     }
 
     private fun dispatchMouseEvent(
