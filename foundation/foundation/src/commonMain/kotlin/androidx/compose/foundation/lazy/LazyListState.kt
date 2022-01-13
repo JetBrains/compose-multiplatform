@@ -37,6 +37,7 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import kotlin.math.abs
 
@@ -177,6 +178,11 @@ class LazyListState constructor(
     internal var placementAnimator by mutableStateOf<LazyListItemPlacementAnimator?>(null)
 
     /**
+     * Constraints passed to the prefetcher for premeasuring the prefetched items.
+     */
+    internal var premeasureConstraints = Constraints()
+
+    /**
      * Instantly brings the item at [index] to the top of the viewport, offset by [scrollOffset]
      * pixels.
      *
@@ -283,11 +289,13 @@ class LazyListState constructor(
                     // is not going to be reached anytime soon so it is safer to dispose it.
                     // if this item is already visible it is safe to call the method anyway
                     // as it will be no-op
-                    prefetchPolicy?.removeFromPrefetch(this.indexToPrefetch)
+                    prefetchPolicy?.cancelScheduledPrefetch()
                 }
                 this.wasScrollingForward = scrollingForward
                 this.indexToPrefetch = indexToPrefetch
-                prefetchPolicy?.scheduleForPrefetch(indexToPrefetch)
+                prefetchPolicy?.scheduleForPrefetch(
+                    listOf(indexToPrefetch to premeasureConstraints)
+                )
             }
         }
     }

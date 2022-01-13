@@ -251,7 +251,7 @@ private fun rememberLazyListMeasurePolicy(
                 placementAnimator = placementAnimator
             )
         }
-        state.prefetchPolicy?.constraints = itemProvider.childConstraints
+        state.premeasureConstraints = itemProvider.childConstraints
 
         // can be negative if the content padding is larger than the max size from constraints
         val mainAxisAvailableSize = if (isVertical) {

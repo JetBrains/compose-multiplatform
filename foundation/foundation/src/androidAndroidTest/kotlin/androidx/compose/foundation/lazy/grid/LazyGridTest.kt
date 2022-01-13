@@ -158,13 +158,13 @@ class LazyGridTest {
             .assertIsDisplayed()
 
         rule.onNodeWithTag("7")
-            .assertDoesNotExist()
+            .assertIsNotDisplayed()
 
         rule.onNodeWithTag("8")
-            .assertDoesNotExist()
+            .assertIsNotDisplayed()
 
         rule.onNodeWithTag("9")
-            .assertDoesNotExist()
+            .assertIsNotDisplayed()
     }
 
     @Test

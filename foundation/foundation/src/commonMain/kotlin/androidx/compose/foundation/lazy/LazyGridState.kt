@@ -23,8 +23,10 @@ import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.grid.ItemIndex
+import androidx.compose.foundation.lazy.grid.LazyGridItemsProvider
 import androidx.compose.foundation.lazy.grid.LazyGridMeasureResult
 import androidx.compose.foundation.lazy.grid.LazyGridScrollPosition
+import androidx.compose.foundation.lazy.grid.LineIndex
 import androidx.compose.foundation.lazy.grid.doSmoothScrollToItem
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchPolicy
 import androidx.compose.foundation.lazy.layout.LazyLayoutState
@@ -34,6 +36,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import kotlin.math.abs
 
@@ -160,7 +163,7 @@ class LazyGridState constructor(
     /**
      * The index scheduled to be prefetched (or the last prefetched index if the prefetch is done).
      */
-    private var indexToPrefetch = -1
+    private var lineToPrefetch = -1
 
     /**
      * Keeps the scrolling direction during the previous calculation in order to be able to
@@ -172,6 +175,12 @@ class LazyGridState constructor(
      * The state of the inner LazyLayout.
      */
     internal var innerState: LazyLayoutState? = null
+
+    /**
+     * Finds items on a line and their measurement constraints. Used for prefetching.
+     */
+    internal var prefetchInfoRetriever: (line: LineIndex) -> List<Pair<Int, Constraints>> =
+        { emptyList() }
 
     // internal var placementAnimator by mutableStateOf<LazyListItemPlacementAnimator?>(null)
 
@@ -270,6 +279,7 @@ class LazyGridState constructor(
     }
 
     private fun notifyPrefetch(delta: Float) {
+        val prefetchPolicy = prefetchPolicy
         if (!prefetchingEnabled || prefetchPolicy == null) {
             return
         }
@@ -277,24 +287,28 @@ class LazyGridState constructor(
         if (info.visibleItemsInfo.isNotEmpty()) {
             // check(isActive)
             val scrollingForward = delta < 0
-            val indexToPrefetch = if (scrollingForward) {
-                info.visibleItemsInfo.last().index + 1
+            val lineToPrefetch: Int
+            val closestNextItemToPrefetch: Int
+            if (scrollingForward) {
+                lineToPrefetch = info.visibleItemsInfo.last().row + 1
+                closestNextItemToPrefetch = info.visibleItemsInfo.last().index + 1
             } else {
-                info.visibleItemsInfo.first().index - 1
+                lineToPrefetch = info.visibleItemsInfo.first().row - 1
+                closestNextItemToPrefetch = info.visibleItemsInfo.first().index - 1
             }
-            if (indexToPrefetch != this.indexToPrefetch &&
-                indexToPrefetch in 0 until info.totalItemsCount
+            if (lineToPrefetch != this.lineToPrefetch &&
+                closestNextItemToPrefetch in 0 until info.totalItemsCount
             ) {
                 if (wasScrollingForward != scrollingForward) {
                     // the scrolling direction has been changed which means the last prefetched
                     // is not going to be reached anytime soon so it is safer to dispose it.
-                    // if this item is already visible it is safe to call the method anyway
+                    // if this line is already visible it is safe to call the method anyway
                     // as it will be no-op
-                    prefetchPolicy?.removeFromPrefetch(this.indexToPrefetch)
+                    prefetchPolicy.cancelScheduledPrefetch()
                 }
                 this.wasScrollingForward = scrollingForward
-                this.indexToPrefetch = indexToPrefetch
-                prefetchPolicy?.scheduleForPrefetch(indexToPrefetch)
+                this.lineToPrefetch = lineToPrefetch
+                prefetchPolicy.scheduleForPrefetch(prefetchInfoRetriever(LineIndex(lineToPrefetch)))
             }
         }
     }
@@ -335,14 +349,14 @@ class LazyGridState constructor(
         numMeasurePasses++
     }
 
-    // /**
-    //  * When the user provided custom keys for the items we can try to detect when there were
-    //  * items added or removed before our current first visible item and keep this item
-    //  * as the first visible one even given that its index has been changed.
-    //  */
-    // internal fun updateScrollPositionIfTheFirstItemWasMoved(itemsProvider: LazyGridItemsProvider) {
-    //     scrollPosition.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
-    // }
+    /**
+     * When the user provided custom keys for the items we can try to detect when there were
+     * items added or removed before our current first visible item and keep this item
+     * as the first visible one even given that its index has been changed.
+     */
+    internal fun updateScrollPositionIfTheFirstItemWasMoved(itemsProvider: LazyGridItemsProvider) {
+        scrollPosition.updateScrollPositionIfTheFirstItemWasMoved(itemsProvider)
+    }
 
     companion object {
         /**
