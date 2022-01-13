@@ -53,9 +53,12 @@ import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.ScrollWheel
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performMouseInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipe
 import androidx.compose.ui.test.swipeWithVelocity
@@ -155,6 +158,46 @@ class ScrollableTest {
         }
     }
 
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun scrollable_horizontalScroll_mouseWheel() {
+        var total = 0f
+        val controller = ScrollableState(
+            consumeScrollDelta = {
+                total += it
+                it
+            }
+        )
+        setScrollableContent {
+            Modifier.scrollable(
+                state = controller,
+                orientation = Orientation.Horizontal
+            )
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performMouseInput {
+            this.scroll(-100f, ScrollWheel.Horizontal)
+        }
+
+        val lastTotal = rule.runOnIdle {
+            assertThat(total).isGreaterThan(0)
+            total
+        }
+
+        rule.onNodeWithTag(scrollableBoxTag).performMouseInput {
+            this.scroll(-100f, ScrollWheel.Vertical)
+        }
+
+        rule.runOnIdle {
+            assertThat(total).isEqualTo(lastTotal)
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performMouseInput {
+            this.scroll(100f, ScrollWheel.Horizontal)
+        }
+        rule.runOnIdle {
+            assertThat(total).isLessThan(0.01f)
+        }
+    }
+
     @Test
     fun scrollable_horizontalScroll_reverse() {
         var total = 0f
@@ -200,6 +243,46 @@ class ScrollableTest {
                 end = Offset(this.center.x - 100f, this.center.y),
                 durationMillis = 100
             )
+        }
+        rule.runOnIdle {
+            assertThat(total).isLessThan(0.01f)
+        }
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun scrollable_horizontalScroll_reverse_mouseWheel() {
+        var total = 0f
+        val controller = ScrollableState(
+            consumeScrollDelta = {
+                total += it
+                it
+            }
+        )
+        setScrollableContent {
+            Modifier.scrollable(
+                reverseDirection = true,
+                state = controller,
+                orientation = Orientation.Horizontal
+            )
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performMouseInput {
+            this.scroll(-100f, ScrollWheel.Horizontal)
+        }
+
+        val lastTotal = rule.runOnIdle {
+            assertThat(total).isLessThan(0)
+            total
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performMouseInput {
+            this.scroll(-100f, ScrollWheel.Vertical)
+        }
+
+        rule.runOnIdle {
+            assertThat(total).isEqualTo(lastTotal)
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performMouseInput {
+            this.scroll(100f, ScrollWheel.Horizontal)
         }
         rule.runOnIdle {
             assertThat(total).isLessThan(0.01f)
@@ -256,6 +339,45 @@ class ScrollableTest {
         }
     }
 
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun scrollable_verticalScroll_mouseWheel() {
+        var total = 0f
+        val controller = ScrollableState(
+            consumeScrollDelta = {
+                total += it
+                it
+            }
+        )
+        setScrollableContent {
+            Modifier.scrollable(
+                state = controller,
+                orientation = Orientation.Vertical
+            )
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performMouseInput {
+            this.scroll(100f, ScrollWheel.Vertical)
+        }
+
+        val lastTotal = rule.runOnIdle {
+            assertThat(total).isGreaterThan(0)
+            total
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performMouseInput {
+            this.scroll(100f, ScrollWheel.Horizontal)
+        }
+
+        rule.runOnIdle {
+            assertThat(total).isEqualTo(lastTotal)
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performMouseInput {
+            this.scroll(-100f, ScrollWheel.Vertical)
+        }
+        rule.runOnIdle {
+            assertThat(total).isLessThan(0.01f)
+        }
+    }
+
     @Test
     fun scrollable_verticalScroll_reversed() {
         var total = 0f
@@ -301,6 +423,47 @@ class ScrollableTest {
                 end = Offset(this.center.x, this.center.y - 100f),
                 durationMillis = 100
             )
+        }
+        rule.runOnIdle {
+            assertThat(total).isLessThan(0.01f)
+        }
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun scrollable_verticalScroll_reversed_mouseWheel() {
+        var total = 0f
+        val controller = ScrollableState(
+            consumeScrollDelta = {
+                total += it
+                it
+            }
+        )
+        setScrollableContent {
+            Modifier.scrollable(
+                reverseDirection = true,
+                state = controller,
+                orientation = Orientation.Vertical
+            )
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performMouseInput {
+            this.scroll(100f, ScrollWheel.Vertical)
+        }
+
+        val lastTotal = rule.runOnIdle {
+            assertThat(total).isLessThan(0)
+            total
+        }
+
+        rule.onNodeWithTag(scrollableBoxTag).performMouseInput {
+            this.scroll(100f, ScrollWheel.Horizontal)
+        }
+
+        rule.runOnIdle {
+            assertThat(total).isEqualTo(lastTotal)
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performMouseInput {
+            this.scroll(-100f, ScrollWheel.Vertical)
         }
         rule.runOnIdle {
             assertThat(total).isLessThan(0.01f)
@@ -589,6 +752,56 @@ class ScrollableTest {
             // values should be the same since no fling
             assertThat(innerDrag).isEqualTo(lastEqualDrag)
             assertThat(outerDrag).isEqualTo(lastEqualDrag)
+        }
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun scrollable_nestedScroll_disabledForMouseWheel() {
+        var innerDrag = 0f
+        var outerDrag = 0f
+        val outerState = ScrollableState(
+            consumeScrollDelta = {
+                outerDrag += it
+                it
+            }
+        )
+        val innerState = ScrollableState(
+            consumeScrollDelta = {
+                innerDrag += it / 2
+                it / 2
+            }
+        )
+
+        rule.setContentAndGetScope {
+            Box {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(300.dp)
+                        .scrollable(
+                            state = outerState,
+                            orientation = Orientation.Horizontal
+                        )
+                ) {
+                    Box(
+                        modifier = Modifier.testTag(scrollableBoxTag)
+                            .size(300.dp)
+                            .scrollable(
+                                state = innerState,
+                                orientation = Orientation.Horizontal
+                            )
+                    )
+                }
+            }
+        }
+        rule.onNodeWithTag(scrollableBoxTag).performMouseInput {
+            this.scroll(-200f, ScrollWheel.Horizontal)
+        }
+        rule.runOnIdle {
+            assertThat(innerDrag).isGreaterThan(0f)
+            assertThat(outerDrag).isZero()
+            innerDrag
         }
     }
 

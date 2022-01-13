@@ -32,6 +32,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
@@ -42,7 +43,11 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource.Companion.Drag
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource.Companion.Fling
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.AwaitPointerEventScope
+import androidx.compose.ui.input.pointer.PointerEvent
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.OnGloballyPositionedModifier
 import androidx.compose.ui.modifier.ModifierLocalConsumer
@@ -50,8 +55,12 @@ import androidx.compose.ui.modifier.ModifierLocalProvider
 import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.util.fastAll
+import androidx.compose.ui.util.fastForEach
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -121,8 +130,6 @@ internal fun Modifier.scrollable(
             BringIntoViewResponder(orientation, state, reverseDirection)
         }
 
-        fun Float.reverseIfNeeded(): Float = if (reverseDirection) this * -1 else this
-
         val scrollableContainerProvider = if (enabled) {
             ModifierLocalScrollableContainerProvider
         } else {
@@ -132,7 +139,7 @@ internal fun Modifier.scrollable(
         Modifier
             .then(bringIntoViewModifier)
             .then(overscrollModifier)
-            .touchScrollable(
+            .pointerScrollable(
                 interactionSource,
                 orientation,
                 reverseDirection,
@@ -141,9 +148,6 @@ internal fun Modifier.scrollable(
                 overScrollController,
                 enabled
             )
-            .mouseScrollable(orientation) {
-                state.dispatchRawDelta(it.reverseIfNeeded())
-            }
             .then(scrollableContainerProvider)
     }
 )
@@ -165,18 +169,16 @@ object ScrollableDefaults {
     }
 }
 
-// TODO(demin): think how we can move touchScrollable/mouseScrollable into commonMain,
-//  so Android can support mouse wheel scrolling, and desktop can support touch scrolling.
-//  For this we need first to implement different types of PointerInputEvent
-//  (to differentiate mouse and touch)
-internal expect fun Modifier.mouseScrollable(
-    orientation: Orientation,
-    onScroll: (Float) -> Unit
-): Modifier
+internal interface ScrollConfig {
+    fun Density.calculateMouseWheelScroll(event: PointerEvent, bounds: IntSize): Offset
+}
+
+@Composable
+internal expect fun platformScrollConfig(): ScrollConfig
 
 @Suppress("ComposableModifierFactory")
 @Composable
-private fun Modifier.touchScrollable(
+private fun Modifier.pointerScrollable(
     interactionSource: MutableInteractionSource?,
     orientation: Orientation,
     reverseDirection: Boolean,
@@ -201,6 +203,7 @@ private fun Modifier.touchScrollable(
         scrollableNestedScrollConnection(scrollLogic, enabled)
     }
     val draggableState = remember { ScrollDraggableState(scrollLogic) }
+    val scrollConfig = platformScrollConfig()
 
     return draggable(
         { draggableState },
@@ -215,7 +218,44 @@ private fun Modifier.touchScrollable(
             }
         },
         canDrag = { down -> down.type != PointerType.Mouse }
-    ).nestedScroll(nestedScrollConnection, nestedScrollDispatcher.value)
+    )
+        .mouseWheelScroll(scrollLogic, scrollConfig)
+        .nestedScroll(nestedScrollConnection, nestedScrollDispatcher.value)
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+private fun Modifier.mouseWheelScroll(
+    scrollingLogicState: State<ScrollingLogic>,
+    mouseWheelScrollConfig: ScrollConfig,
+) = pointerInput(scrollingLogicState, mouseWheelScrollConfig) {
+    while (true) {
+        awaitPointerEventScope {
+            val event = awaitScrollEvent()
+            if (event.changes.fastAll { !it.isConsumed }) {
+                with(mouseWheelScrollConfig) {
+                    val scrollAmount = calculateMouseWheelScroll(event, size)
+                    with(scrollingLogicState.value) {
+                        val delta = scrollAmount.toFloat().reverseIfNeeded()
+                        val consumedDelta = scrollableState.dispatchRawDelta(delta)
+                        if (consumedDelta != 0f) {
+                            event.changes.fastForEach { it.consume() }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+private suspend fun AwaitPointerEventScope.awaitScrollEvent(): PointerEvent {
+    var event: PointerEvent
+    do {
+        event = awaitPointerEvent()
+    } while (
+        event.type != PointerEventType.Scroll
+    )
+    return event
 }
 
 private class ScrollingLogic(
