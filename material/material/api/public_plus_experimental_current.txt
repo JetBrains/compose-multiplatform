@@ -217,6 +217,31 @@ package androidx.compose.material {
     method @androidx.compose.runtime.Composable public static void TriStateCheckbox(androidx.compose.ui.state.ToggleableState state, kotlin.jvm.functions.Function0<kotlin.Unit>? onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.material.CheckboxColors colors);
   }
 
+  @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface ChipColors {
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> backgroundColor(boolean enabled);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> contentColor(boolean enabled);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> leadingIconContentColor(boolean enabled);
+  }
+
+  @androidx.compose.material.ExperimentalMaterialApi public final class ChipDefaults {
+    method @androidx.compose.runtime.Composable public androidx.compose.material.ChipColors chipColors(optional long backgroundColor, optional long contentColor, optional long leadingIconContentColor, optional long disabledBackgroundColor, optional long disabledContentColor, optional long disabledLeadingIconContentColor);
+    method public float getMinHeight();
+    method @androidx.compose.runtime.Composable public androidx.compose.foundation.BorderStroke getOutlinedBorder();
+    method public float getOutlinedBorderSize();
+    method @androidx.compose.runtime.Composable public androidx.compose.material.ChipColors outlinedChipColors(optional long backgroundColor, optional long contentColor, optional long leadingIconContentColor, optional long disabledBackgroundColor, optional long disabledContentColor, optional long disabledLeadingIconContentColor);
+    property public final float MinHeight;
+    property public final float OutlinedBorderSize;
+    property @androidx.compose.runtime.Composable public final androidx.compose.foundation.BorderStroke outlinedBorder;
+    field public static final float ContentOpacity = 0.87f;
+    field public static final androidx.compose.material.ChipDefaults INSTANCE;
+    field public static final float LeadingIconOpacity = 0.54f;
+    field public static final float OutlinedBorderOpacity = 0.12f;
+  }
+
+  public final class ChipKt {
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void Chip(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.foundation.BorderStroke? border, optional androidx.compose.material.ChipColors colors, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
+  }
+
   @androidx.compose.runtime.Stable public final class Colors {
     ctor public Colors(long primary, long primaryVariant, long secondary, long secondaryVariant, long background, long surface, long error, long onPrimary, long onSecondary, long onBackground, long onSurface, long onError, boolean isLight);
     method public androidx.compose.material.Colors copy(optional long primary, optional long primaryVariant, optional long secondary, optional long secondaryVariant, optional long background, optional long surface, optional long error, optional long onPrimary, optional long onSecondary, optional long onBackground, optional long onSurface, optional long onError, optional boolean isLight);
