@@ -32,7 +32,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.layout.LazyLayout
 import androidx.compose.foundation.lazy.layout.LazyMeasurePolicy
 import androidx.compose.foundation.lazy.layout.rememberLazyLayoutPrefetchPolicy
-import androidx.compose.foundation.lazy.layout.rememberLazyLayoutState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
@@ -105,12 +104,12 @@ internal fun LazyList(
     )
 
     state.prefetchPolicy = rememberLazyLayoutPrefetchPolicy()
-    val innerState = rememberLazyLayoutState().also { state.innerState = it }
 
     ScrollPositionUpdater(stateOfItemsProvider, state)
 
     LazyLayout(
         modifier = modifier
+            .then(state.remeasurementModifier)
             .lazyListSemantics(
                 stateOfItemsProvider = stateOfItemsProvider,
                 state = state,
@@ -139,7 +138,6 @@ internal fun LazyList(
                 overScrollController = overScrollController,
                 enabled = userScrollEnabled
             ),
-        state = innerState,
         prefetchPolicy = state.prefetchPolicy,
         measurePolicy = measurePolicy,
         itemsProvider = { stateOfItemsProvider.value }

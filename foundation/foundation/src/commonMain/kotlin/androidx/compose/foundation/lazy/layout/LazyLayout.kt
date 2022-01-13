@@ -30,10 +30,10 @@ import androidx.compose.ui.layout.SubcomposeLayoutState
 internal fun LazyLayout(
     itemsProvider: () -> LazyLayoutItemsProvider,
     modifier: Modifier = Modifier,
-    state: LazyLayoutState = rememberLazyLayoutState(),
     prefetchPolicy: LazyLayoutPrefetchPolicy? = null,
     measurePolicy: LazyMeasurePolicy
 ) {
+    val state = remember { LazyLayoutState() }
     state.itemsProvider = itemsProvider
     val itemContentFactory = rememberItemContentFactory(state)
     val subcomposeLayoutState = remember { SubcomposeLayoutState(MaxItemsToRetainForReuse) }
@@ -58,8 +58,6 @@ internal fun LazyLayout(
                 state.onPostMeasureListener?.apply {
                     onPostMeasure(measureResult, placeablesProvider)
                 }
-                state.layoutInfoState.value = measureResult
-                state.layoutInfoNonObservable = measureResult
 
                 measureResult
             }
