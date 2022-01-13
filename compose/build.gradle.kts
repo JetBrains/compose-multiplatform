@@ -160,6 +160,10 @@ tasks.register("run") {
     dependsOnComposeTask(":compose:desktop:desktop:desktop-samples:run")
 }
 
+tasks.register("reproduceDemoJsProdRun") {
+    dependsOnComposeTask(":compose:mpp:demo:jsBrowserProductionRun")
+}
+
 val mavenCentral = MavenCentralProperties(project)
 if (mavenCentral.signArtifacts) {
     signing.useInMemoryPgpKeys(
