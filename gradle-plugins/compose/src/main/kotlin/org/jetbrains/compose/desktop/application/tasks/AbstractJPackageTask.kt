@@ -288,7 +288,12 @@ abstract class AbstractJPackageTask @Inject constructor(
 
         if (targetFormat != TargetFormat.AppImage) {
             // Args, that can only be used, when creating an installer
-            cliArg("--app-image", appImage.dir("${packageName.get()}.app"))
+            if (currentOS == OS.MacOS && macAppStore.orNull == true) {
+                // This is needed to prevent a directory does not exist error.
+                cliArg("--app-image", appImage.dir("${packageName.get()}.app"))
+            } else {
+                cliArg("--app-image", appImage)
+            }
             cliArg("--install-dir", installationPath)
             cliArg("--license-file", licenseFile)
             cliArg("--resource-dir", jpackageResources)
