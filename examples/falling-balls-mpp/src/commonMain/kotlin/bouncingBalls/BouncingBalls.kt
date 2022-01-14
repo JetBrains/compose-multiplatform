@@ -8,13 +8,16 @@ package bouncingBalls
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
 import kotlin.math.PI
@@ -23,11 +26,16 @@ import kotlin.math.max
 import kotlin.math.sin
 import kotlin.random.Random
 
-private inline fun Modifier.noRippleClickable(crossinline onClick: () -> Unit): Modifier =
+private inline fun Modifier.noRippleClickable(crossinline onClick: (Offset) -> Unit): Modifier =
     composed {
-        clickable(indication = null,
+        clickable(
+            indication = null,
             interactionSource = remember { MutableInteractionSource() }) {
-            onClick()
+        }.pointerInput(Unit) {
+            detectTapGestures(onTap = {
+                println("tap offset = $it")
+                onClick(it)
+            })
         }
     }
 
@@ -49,7 +57,7 @@ fun BouncingBallsApp(initialBallsCount: Int = 5) {
             .fillMaxHeight()
             .border(width = 1.dp, color = Color.Black)
             .noRippleClickable {
-                items += BouncingBall.nextRandomBall()
+                items += BouncingBall.nextRandomBall(it)
             }.onSizeChanged {
                 areaWidth = it.width
                 areaHeight = it.height
@@ -164,13 +172,12 @@ private class BouncingBall(
         private val angles = listOf(PI / 4, -PI / 3, 3 * PI / 4, -PI / 6, -1.1 * PI)
         private val colors = listOf(Color.Red, Color.Black, Color.Green, Color.Magenta)
 
-        fun nextRandomBall(): BouncingBall {
+        fun nextRandomBall(offset: Offset? = null): BouncingBall {
+            val x = offset?.x ?: random.nextInt(100, 700).toFloat()
+            val y = offset?.y ?: random.nextInt(100, 500).toFloat()
+
             return BouncingBall(
-                Circle(
-                    x = random.nextInt(100, 700).toFloat(),
-                    y = random.nextInt(100, 500).toFloat(),
-                    r = random.nextInt(10, 50).toFloat()
-                ),
+                circle = Circle(x = x, y = y, r = random.nextInt(10, 50).toFloat()),
                 velocity = random.nextInt(100, 200).toFloat(),
                 angle = angles.random(),
                 color = colors.random().copy(alpha = max(0.3f, random.nextFloat()))
