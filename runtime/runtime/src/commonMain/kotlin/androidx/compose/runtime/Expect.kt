@@ -84,3 +84,10 @@ expect annotation class CheckResult(
         "Use an appropriate local clock."
 )
 expect val DefaultMonotonicFrameClock: MonotonicFrameClock
+
+internal expect fun invokeComposable(composer: Composer, composable: @Composable () -> Unit)
+
+internal expect fun <T> invokeComposableForResult(
+    composer: Composer,
+    composable: @Composable () -> T
+): T
