@@ -334,10 +334,10 @@ fun SomeSvg(radius: Animatable<Float, AnimationVector1D>) {
 }
 
 @Composable
-fun SomeCanvas() {
+fun SomeCanvas(radius: Animatable<Float, AnimationVector1D>) {
     Canvas({
-        attr("width", "400")
-        attr("height", "400")
+        attr("width", "200")
+        attr("height", "200")
         style {
 //            property("outline", "1px solid black")
 //            property("margin", "0 auto")
@@ -346,17 +346,6 @@ fun SomeCanvas() {
         Text("xxxx")
 
         skiko {
-            val radius = remember { Animatable(10f) }
-            LaunchedEffect(radius) {
-                radius.animateTo(
-                    targetValue = 200f,
-                    animationSpec = infiniteRepeatable(
-                        tween(durationMillis = 1000, easing = FastOutSlowInEasing),
-                        repeatMode = RepeatMode.Reverse
-                    )
-                )
-            }
-
             Canvas(
                 modifier = Modifier
                     .size(400.dp)
@@ -407,13 +396,13 @@ fun App() {
         }
     }) {
         Span {
-            SomeCanvas()
+            SomeCanvas(radius)
         }
         Span {
-            SomeCanvas()
+            SomeCanvas(radius)
         }
         Span {
-            SomeCanvas()
+            SomeCanvas(radius)
         }
     }
     Div({
