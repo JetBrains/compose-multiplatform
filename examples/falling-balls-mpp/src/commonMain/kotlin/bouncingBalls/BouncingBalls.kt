@@ -47,7 +47,7 @@ fun BouncingBallsApp(initialBallsCount: Int = 5) {
     val items = remember {
         val list = mutableStateListOf<BouncingBall>()
         list.addAll(generateSequence {
-            BouncingBall.nextRandomBall()
+            BouncingBall.createBouncingBall()
         }.take(initialBallsCount))
         list
     }
@@ -57,7 +57,7 @@ fun BouncingBallsApp(initialBallsCount: Int = 5) {
             .fillMaxHeight()
             .border(width = 1.dp, color = Color.Black)
             .noRippleClickable {
-                items += BouncingBall.nextRandomBall(it)
+                items += BouncingBall.createBouncingBall(offset = it)
             }.onSizeChanged {
                 areaWidth = it.width
                 areaHeight = it.height
@@ -172,12 +172,16 @@ private class BouncingBall(
         private val angles = listOf(PI / 4, -PI / 3, 3 * PI / 4, -PI / 6, -1.1 * PI)
         private val colors = listOf(Color.Red, Color.Black, Color.Green, Color.Magenta)
 
-        fun nextRandomBall(offset: Offset? = null): BouncingBall {
-            val x = offset?.x ?: random.nextInt(100, 700).toFloat()
-            val y = offset?.y ?: random.nextInt(100, 500).toFloat()
+        private fun randomOffset(): Offset {
+            return Offset(
+                x = random.nextInt(100, 700).toFloat(),
+                y = random.nextInt(100, 500).toFloat()
+            )
+        }
 
+        fun createBouncingBall(offset: Offset = randomOffset()): BouncingBall {
             return BouncingBall(
-                circle = Circle(x = x, y = y, r = random.nextInt(10, 50).toFloat()),
+                circle = Circle(x = offset.x, y = offset.y, r = random.nextInt(10, 50).toFloat()),
                 velocity = random.nextInt(100, 200).toFloat(),
                 angle = angles.random(),
                 color = colors.random().copy(alpha = max(0.3f, random.nextFloat()))
