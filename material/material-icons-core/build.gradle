@@ -65,13 +65,6 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.kotlinStdlib)
             }
 
-            jsMain.dependsOn(commonMain)
-
-            nativeMain.dependsOn(commonMain)
-
-            macosX64Main {
-                dependsOn(nativeMain)
-            }
         }
     }
     dependencies {
