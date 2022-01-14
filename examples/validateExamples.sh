@@ -18,7 +18,7 @@ runGradle() {
 }
 
 runGradle codeviewer package
-runGradle falling-balls-web build
+runGradle falling-balls-mpp build
 runGradle imageviewer package
 runGradle issues package
 runGradle notepad package
