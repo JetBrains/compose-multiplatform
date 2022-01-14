@@ -19,6 +19,7 @@ import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.plugins.ExtensionAware
 import org.jetbrains.compose.android.AndroidExtension
 import org.jetbrains.compose.desktop.DesktopExtension
+import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.desktop.application.internal.configureApplicationImpl
 import org.jetbrains.compose.desktop.application.internal.currentTarget
 import org.jetbrains.compose.desktop.preview.internal.initializePreview
@@ -58,7 +59,7 @@ class ComposePlugin : Plugin<Project> {
             project.configureExperimental(composeExtension, experimentalExtension)
 
             if (androidExtension.useAndroidX) {
-                println("useAndroidX is an experimental feature at the moment!")
+                project.logger.warn("useAndroidX is an experimental feature at the moment!")
                 RedirectAndroidVariants.androidxVersion = androidExtension.androidxVersion
                 listOf(
                     RedirectAndroidVariants::class.java,
@@ -125,12 +126,14 @@ class ComposePlugin : Plugin<Project> {
                 }
             }
 
-        }
-
-        project.tasks.withType(KotlinCompile::class.java) {
-            it.kotlinOptions.apply {
-                jvmTarget = "1.8".takeIf { jvmTarget.toDouble() < 1.8 } ?: jvmTarget
-                useIR = true
+            val overrideDefaultJvmTarget = ComposeProperties.overrideKotlinJvmTarget(project.providers).get()
+            project.tasks.withType(KotlinCompile::class.java) {
+                it.kotlinOptions.apply {
+                    if (overrideDefaultJvmTarget) {
+                        jvmTarget = "11".takeIf { jvmTarget.toDouble() < 11 } ?: jvmTarget
+                    }
+                    useIR = true
+                }
             }
         }
     }
