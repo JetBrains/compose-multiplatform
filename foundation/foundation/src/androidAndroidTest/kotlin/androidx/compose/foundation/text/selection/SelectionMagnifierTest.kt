@@ -24,6 +24,7 @@ import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.style.ResolvedTextDirection.Ltr
 import androidx.compose.ui.unit.IntSize
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -186,6 +187,7 @@ class SelectionMagnifierTest {
             throw UnsupportedOperationException()
 
         override fun getBoundingBox(offset: Int): Rect = boundingBox(offset)
+        override fun getRangeOfLineContaining(offset: Int): TextRange = TextRange.Zero
     }
 
     private class FakeLayoutCoordinates(

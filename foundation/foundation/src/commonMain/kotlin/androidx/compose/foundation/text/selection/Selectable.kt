@@ -20,6 +20,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextRange
 
 /**
  * Provides [Selection] information for a composable to SelectionContainer. Composables who can
@@ -107,7 +108,16 @@ internal interface Selectable {
      * bounding box of the image.
      *
      * @param offset a character offset
-     * @return the bounding box for the character in [Rect].
+     * @return the bounding box for the character in [Rect], or [Rect.Zero] if the selectable is
+     * empty.
      */
     fun getBoundingBox(offset: Int): Rect
+
+    /**
+     * Return the offsets of the start and end of the line containing [offset], or [TextRange.Zero]
+     * if the selectable is empty. These offsets are in the same "coordinate space" as
+     * [getBoundingBox], and despite being returned in a [TextRange], may not refer to offsets in
+     * actual text if the selectable contains other types of content.
+     */
+    fun getRangeOfLineContaining(offset: Int): TextRange
 }

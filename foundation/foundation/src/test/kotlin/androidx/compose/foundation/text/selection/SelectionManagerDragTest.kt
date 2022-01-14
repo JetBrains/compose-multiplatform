@@ -20,6 +20,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.unit.IntSize
 import com.google.common.truth.Truth.assertThat
@@ -280,6 +281,10 @@ internal class FakeSelectable : Selectable {
 
     override fun getBoundingBox(offset: Int): Rect {
         return boundingBox
+    }
+
+    override fun getRangeOfLineContaining(offset: Int): TextRange {
+        return TextRange.Zero
     }
 
     fun clear() {
