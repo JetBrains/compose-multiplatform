@@ -29,23 +29,8 @@ dependencies {
     kotlinNativeCompilerPluginClasspath(project(":compose:compiler:compiler-hosted"))
 }
 
-kotlin {
-    js(IR) {
-        browser()
-    }
-    macosX64()
-    macosArm64()
-    iosX64("uikitX64")
-
-    sourceSets {
-        commonMain 
-        skikoMain.dependsOn(commonMain)
-        jsMain.dependsOn(skikoMain)
-        nativeMain.dependsOn(skikoMain)
-        darwinMain.dependsOn(nativeMain)
-        macosX64Main.dependsOn(darwinMain)
-        macosArm64Main.dependsOn(darwinMain)
-        uikitX64Main.dependsOn(darwinMain)
-        uikitArm64Main.dependsOn(darwinMain)
-    }
+androidXComposeMultiplatform {
+    desktop()
+    js()
+    darwin()
 }
