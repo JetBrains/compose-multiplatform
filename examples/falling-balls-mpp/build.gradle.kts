@@ -34,7 +34,7 @@ kotlin {
         binaries.executable()
     }
     macosX64 {
-        binaries { 
+        binaries {
             executable {
                 entryPoint = "main"
                 freeCompilerArgs += listOf(
@@ -173,4 +173,12 @@ afterEvaluate {
         versions.webpackCli.version = "4.9.0"
         nodeVersion = "16.0.0"
     }
+}
+
+
+// TODO: remove when https://youtrack.jetbrains.com/issue/KT-50778 fixed
+project.tasks.withType(org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile::class.java).configureEach {
+    kotlinOptions.freeCompilerArgs += listOf(
+        "-Xir-dce-runtime-diagnostic=log"
+    )
 }
