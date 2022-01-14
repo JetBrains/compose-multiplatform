@@ -42,9 +42,7 @@ class ComposePlugin : Plugin<Project> {
         }
 
         project.initializePreview()
-        if (ComposeBuildConfig.isComposeWithWeb) {
-            composeExtension.extensions.create("web", WebExtension::class.java)
-        }
+        composeExtension.extensions.create("web", WebExtension::class.java)
 
         project.plugins.apply(ComposeCompilerKotlinSupportPlugin::class.java)
 
@@ -176,9 +174,7 @@ class ComposePlugin : Plugin<Project> {
         val uiTooling get() = composeDependency("org.jetbrains.compose.ui:ui-tooling")
         val preview get() = composeDependency("org.jetbrains.compose.ui:ui-tooling-preview")
         val materialIconsExtended get() = composeDependency("org.jetbrains.compose.material:material-icons-extended")
-        val web: WebDependencies get() =
-            if (ComposeBuildConfig.isComposeWithWeb) WebDependencies
-            else error("This version of Compose plugin does not support 'compose.web.*' dependencies")
+        val web: WebDependencies get() = WebDependencies
     }
 
     object DesktopDependencies {
