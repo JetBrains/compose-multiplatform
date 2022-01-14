@@ -883,7 +883,7 @@ internal fun TextFieldCursorHandle(manager: TextFieldSelectionManager) {
             handlePosition = position,
             modifier = Modifier
                 .pointerInput(observer) {
-                    detectDragGesturesWithObserver(observer)
+                    detectDownAndDragGesturesWithObserver(observer)
                 }
                 .semantics {
                     this[SelectionHandleInfoKey] = SelectionHandleInfo(
