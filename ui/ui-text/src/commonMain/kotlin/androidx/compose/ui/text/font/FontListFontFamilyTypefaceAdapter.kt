@@ -60,7 +60,7 @@ internal class FontListFontFamilyTypefaceAdapter(
 
     suspend fun preload(
         family: FontFamily,
-        resourceLoader: FontLoader
+        resourceLoader: PlatformFontLoader
     ) {
         if (family !is FontListFontFamily) return
 
@@ -118,7 +118,7 @@ internal class FontListFontFamilyTypefaceAdapter(
 
     override fun resolve(
         typefaceRequest: TypefaceRequest,
-        fontLoader: FontLoader,
+        platformFontLoader: PlatformFontLoader,
         onAsyncCompletion: ((TypefaceResult.Immutable) -> Unit),
         createDefaultTypeface: (TypefaceRequest) -> Any
     ): TypefaceResult? {
@@ -131,7 +131,7 @@ internal class FontListFontFamilyTypefaceAdapter(
         val (asyncFontsToLoad, synthesizedTypeface) = matched.firstImmediatelyAvailable(
             typefaceRequest,
             asyncTypefaceCache,
-            fontLoader,
+            platformFontLoader,
             createDefaultTypeface
         )
         if (asyncFontsToLoad == null) return TypefaceResult.Immutable(synthesizedTypeface)
@@ -141,7 +141,7 @@ internal class FontListFontFamilyTypefaceAdapter(
             typefaceRequest = typefaceRequest,
             asyncTypefaceCache = asyncTypefaceCache,
             onCompletion = onAsyncCompletion,
-            fontLoader = fontLoader
+            platformFontLoader = platformFontLoader
         )
 
         // Always launch on whatever scope was set prior to this call, and continue until the load
@@ -170,14 +170,14 @@ internal class FontListFontFamilyTypefaceAdapter(
  *
  * @param typefaceRequest type to load
  * @param asyncTypefaceCache cache for finding pre-loaded async fonts
- * @param fontLoader loader for resolving types from fonts
+ * @param platformFontLoader loader for resolving types from fonts
  * @return (async fonts to resolve for fallback) to (a typeface that can display this frame)
  */
 @ExperimentalTextApi
 private fun List<Font>.firstImmediatelyAvailable(
     typefaceRequest: TypefaceRequest,
     asyncTypefaceCache: AsyncTypefaceCache,
-    fontLoader: FontLoader,
+    platformFontLoader: PlatformFontLoader,
     createDefaultTypeface: (TypefaceRequest) -> Any
 ): Pair<List<Font>?, Any> {
     var asyncFontsToLoad: MutableList<Font>? = null
@@ -185,9 +185,9 @@ private fun List<Font>.firstImmediatelyAvailable(
         val font = get(idx)
         when (font.loadingStrategy) {
             FontLoadingStrategy.Blocking -> {
-                val result: Any = asyncTypefaceCache.runCachedBlocking(font, fontLoader) {
+                val result: Any = asyncTypefaceCache.runCachedBlocking(font, platformFontLoader) {
                     try {
-                        fontLoader.loadBlocking(font)
+                        platformFontLoader.loadBlocking(font)
                     } catch (cause: Exception) {
                         throw IllegalStateException("Unable to load font $font", cause)
                     }
@@ -201,9 +201,9 @@ private fun List<Font>.firstImmediatelyAvailable(
                     )
             }
             FontLoadingStrategy.OptionalLocal -> {
-                val result = asyncTypefaceCache.runCachedBlocking(font, fontLoader) {
+                val result = asyncTypefaceCache.runCachedBlocking(font, platformFontLoader) {
                     // optional fonts should not throw, but consider it a failed load if they do
-                    kotlin.runCatching { fontLoader.loadBlocking(font) }.getOrNull()
+                    kotlin.runCatching { platformFontLoader.loadBlocking(font) }.getOrNull()
                 }
                 if (result != null) {
                     return asyncFontsToLoad to
@@ -216,7 +216,7 @@ private fun List<Font>.firstImmediatelyAvailable(
                 }
             }
             FontLoadingStrategy.Async -> {
-                val cacheResult = asyncTypefaceCache.get(font, fontLoader)
+                val cacheResult = asyncTypefaceCache.get(font, platformFontLoader)
                 if (cacheResult == null) {
                     if (asyncFontsToLoad == null) {
                         asyncFontsToLoad = mutableListOf(font)
@@ -251,7 +251,7 @@ internal class AsyncFontListLoader constructor(
     private val typefaceRequest: TypefaceRequest,
     private val asyncTypefaceCache: AsyncTypefaceCache,
     private val onCompletion: (TypefaceResult.Immutable) -> Unit,
-    private val fontLoader: FontLoader
+    private val platformFontLoader: PlatformFontLoader
 ) : State<Any> {
     override var value by mutableStateOf(initialType)
         private set
@@ -269,7 +269,7 @@ internal class AsyncFontListLoader constructor(
                 // therefore, it is not possible for an async load failure early in the chain to
                 //     require a new blocking or optional load to resolve
                 if (font.loadingStrategy == FontLoadingStrategy.Async) {
-                    val typeface = asyncTypefaceCache.runCached(font, fontLoader, false) {
+                    val typeface = asyncTypefaceCache.runCached(font, platformFontLoader, false) {
                         font.loadWithTimeoutOrNull()
                     }
                     if (typeface != null) {
@@ -302,7 +302,7 @@ internal class AsyncFontListLoader constructor(
             // case 0: load completes - success (non-null)
             // case 1: we timeout - permanent failure (null)
             withTimeoutOrNull(Font.MaximumAsyncTimeout) {
-                fontLoader.awaitLoad(this@loadWithTimeoutOrNull)
+                platformFontLoader.awaitLoad(this@loadWithTimeoutOrNull)
             }
         } catch (cancel: CancellationException) {
             // case 2: callee cancels - permanent failure (null)
@@ -362,11 +362,11 @@ internal class AsyncTypefaceCache {
 
     fun put(
         font: Font,
-        fontLoader: FontLoader,
+        platformFontLoader: PlatformFontLoader,
         result: Any?,
         forever: Boolean = false
     ) {
-        val key = Key(font, fontLoader.cacheKey)
+        val key = Key(font, platformFontLoader.cacheKey)
         synchronized(cacheLock) {
             when {
                 result == null -> { permanentCache.put(key, PermanentFailure) }
@@ -376,8 +376,8 @@ internal class AsyncTypefaceCache {
         }
     }
 
-    fun get(font: Font, fontLoader: FontLoader): AsyncTypefaceResult? {
-        val key = Key(font, fontLoader.cacheKey)
+    fun get(font: Font, platformFontLoader: PlatformFontLoader): AsyncTypefaceResult? {
+        val key = Key(font, platformFontLoader.cacheKey)
         return synchronized(cacheLock) {
             resultCache.get(key) ?: permanentCache[key]
         }
@@ -385,11 +385,11 @@ internal class AsyncTypefaceCache {
 
     suspend fun runCached(
         font: Font,
-        fontLoader: FontLoader,
+        platformFontLoader: PlatformFontLoader,
         forever: Boolean,
         block: suspend () -> Any?
     ): Any? {
-        val key = Key(font, fontLoader.cacheKey)
+        val key = Key(font, platformFontLoader.cacheKey)
         synchronized(cacheLock) {
             val priorResult = resultCache.get(key) ?: permanentCache[key]
             if (priorResult != null) {
@@ -415,18 +415,18 @@ internal class AsyncTypefaceCache {
 
     inline fun runCachedBlocking(
         font: Font,
-        fontLoader: FontLoader,
+        platformFontLoader: PlatformFontLoader,
         block: () -> Any?
     ): Any? {
         synchronized(cacheLock) {
-            val key = Key(font, fontLoader.cacheKey)
+            val key = Key(font, platformFontLoader.cacheKey)
             val priorResult = resultCache.get(key) ?: permanentCache[key]
             if (priorResult != null) {
                 return priorResult.result
             }
         }
         return block().also {
-            put(font, fontLoader, it)
+            put(font, platformFontLoader, it)
         }
     }
 }

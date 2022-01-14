@@ -35,12 +35,15 @@ import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.DelegatingFontLoaderForDeprecatedUsage
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontFamilyResolver
+import androidx.compose.ui.text.font.FontFamilyResolverImpl
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.SkiaFontLoader
+import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.ResolvedTextDirection
@@ -53,7 +56,6 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.sp
 import org.jetbrains.skia.Paint
-import org.jetbrains.skia.Typeface
 import org.jetbrains.skia.paragraph.Alignment as SkAlignment
 import org.jetbrains.skia.paragraph.BaselineMode
 import org.jetbrains.skia.paragraph.Direction as SkDirection
@@ -78,6 +80,12 @@ import org.jetbrains.skia.paragraph.Shadow as SkShadow
 
 private val DefaultFontSize = 16.sp
 
+@Suppress("DEPRECATION")
+@Deprecated(
+    "Font.ResourceLoader is deprecated, instead pass FontFamily.Resolver",
+    replaceWith = ReplaceWith("ActualParagraph(text, style, spanStyles, placeholders, " +
+        "maxLines, ellipsis, width, density, fontFamilyResolver)"),
+)
 internal actual fun ActualParagraph(
     text: String,
     style: TextStyle,
@@ -87,7 +95,7 @@ internal actual fun ActualParagraph(
     ellipsis: Boolean,
     width: Float,
     density: Density,
-    resourceLoader: Font.ResourceLoader
+    @Suppress("DEPRECATION") resourceLoader: Font.ResourceLoader
 ): Paragraph = SkiaParagraph(
     SkiaParagraphIntrinsics(
         text,
@@ -95,7 +103,31 @@ internal actual fun ActualParagraph(
         spanStyles,
         placeholders,
         density,
-        resourceLoader
+        createFontFamilyResolver(resourceLoader)
+    ),
+    maxLines,
+    ellipsis,
+    width
+)
+
+internal actual fun ActualParagraph(
+    text: String,
+    style: TextStyle,
+    spanStyles: List<Range<SpanStyle>>,
+    placeholders: List<Range<Placeholder>>,
+    maxLines: Int,
+    ellipsis: Boolean,
+    width: Float,
+    density: Density,
+    fontFamilyResolver: FontFamily.Resolver
+): Paragraph = SkiaParagraph(
+    SkiaParagraphIntrinsics(
+        text,
+        style,
+        spanStyles,
+        placeholders,
+        density,
+        fontFamilyResolver
     ),
     maxLines,
     ellipsis,
@@ -436,7 +468,7 @@ internal data class ComputedStyle(
     )
 
     @OptIn(ExperimentalTextApi::class)
-    fun toSkTextStyle(fontLoader: FontLoader): SkTextStyle {
+    fun toSkTextStyle(fontFamilyResolver: FontFamily.Resolver): SkTextStyle {
         val res = SkTextStyle()
         if (color != Color.Unspecified) {
             res.color = color.toArgb()
@@ -466,15 +498,13 @@ internal data class ComputedStyle(
         res.fontSize = fontSize
         fontFamily?.let {
             @Suppress("UNCHECKED_CAST")
-            val resolved = FontFamilyResolver.resolve(
-                fontLoader,
+            val resolved = fontFamilyResolver.resolve(
                 it,
                 fontWeight ?: FontWeight.Normal,
                 fontStyle ?: FontStyle.Normal,
                 fontSynthesis ?: FontSynthesis.None
-            ).value as Pair<List<String>, Typeface>
-            val (fontFamilies, _) = resolved
-            res.fontFamilies = fontFamilies.toTypedArray()
+            ).value as FontLoadResult
+            res.fontFamilies = resolved.aliases.toTypedArray()
         }
         return res
     }
@@ -520,7 +550,7 @@ internal expect class WeakHashMap<K, V> : MutableMap<K, V>
 private val skTextStylesCache = WeakHashMap<ComputedStyle, SkTextStyle>()
 
 internal class ParagraphBuilder(
-    val fontLoader: FontLoader,
+    val fontFamilyResolver: FontFamily.Resolver,
     val text: String,
     var textStyle: TextStyle,
     var ellipsis: String = "",
@@ -561,7 +591,19 @@ internal class ParagraphBuilder(
             ps.ellipsis = ellipsis
         }
 
-        val pb = ParagraphBuilder(ps, fontLoader.fonts)
+        // this downcast is always safe because of sealed types and we control construction
+        @OptIn(ExperimentalTextApi::class)
+        val platformFontLoader = (fontFamilyResolver as FontFamilyResolverImpl).platformFontLoader
+        val fontCollection = when (platformFontLoader) {
+            is SkiaFontLoader -> platformFontLoader.fontCollection
+            is DelegatingFontLoaderForDeprecatedUsage -> {
+                @Suppress("DEPRECATION")
+                (platformFontLoader.loader as FontLoader).fontCache.fonts
+            }
+            else -> throw IllegalStateException("Unsupported font loader $platformFontLoader")
+        }
+
+        val pb = ParagraphBuilder(ps, fontCollection)
 
         var addText = true
 
@@ -573,8 +615,7 @@ internal class ParagraphBuilder(
             when (op) {
                 is Op.StyleAdd -> {
                     // FontLoader may have changed, so ensure that Font resolution is still valid
-                    FontFamilyResolver.resolve(
-                        fontLoader,
+                    fontFamilyResolver.resolve(
                         op.style.fontFamily,
                         op.style.fontWeight ?: FontWeight.Normal,
                         op.style.fontStyle ?: FontStyle.Normal,
@@ -764,7 +805,7 @@ internal class ParagraphBuilder(
 
     private fun makeSkTextStyle(style: ComputedStyle): SkTextStyle {
         return skTextStylesCache.getOrPut(style) {
-            style.toSkTextStyle(fontLoader)
+            style.toSkTextStyle(fontFamilyResolver)
         }
     }
 
@@ -772,16 +813,14 @@ internal class ParagraphBuilder(
     internal val defaultFont by lazy {
         val loadResult = textStyle.fontFamily?.let {
             @Suppress("UNCHECKED_CAST")
-            FontFamilyResolver.resolve(
-                fontLoader,
+            fontFamilyResolver.resolve(
                 it,
                 textStyle.fontWeight ?: FontWeight.Normal,
                 textStyle.fontStyle ?: FontStyle.Normal,
                 textStyle.fontSynthesis ?: FontSynthesis.All
-            ).value as Pair<*, Typeface>
+            ).value as FontLoadResult
         }
-        val typeface = loadResult?.second
-        SkFont(typeface, defaultStyle.fontSize)
+        SkFont(loadResult?.typeface, defaultStyle.fontSize)
     }
 
     internal val defaultHeight by lazy {

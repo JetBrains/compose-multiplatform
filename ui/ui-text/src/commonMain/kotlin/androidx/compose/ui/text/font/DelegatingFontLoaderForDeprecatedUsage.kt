@@ -17,25 +17,23 @@
 package androidx.compose.ui.text.font
 
 import androidx.compose.ui.text.ExperimentalTextApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 /**
  * Allow converting between a Font.ResourceLoader and a FontLoader for deprecated APIs
  */
 @Suppress("DEPRECATION")
-private class DelegatingFontLoaderForDeprecatedUsage(
-    val loader: Font.ResourceLoader
-) : FontLoader {
+internal class DelegatingFontLoaderForDeprecatedUsage(
+    internal val loader: Font.ResourceLoader
+) : PlatformFontLoader {
 
     // never consider these reusable for caching
     override val cacheKey: Any = Any()
 
     override fun loadBlocking(font: Font): Any = loader.load(font)
 
-    override suspend fun awaitLoad(font: Font): Any = withContext(Dispatchers.IO) {
-        loader.load(font)
-    }
+    // there is no multiplat way to switch threads yet, so stay no the main thread for this
+    // deprecated path
+    override suspend fun awaitLoad(font: Font): Any = loader.load(font)
 }
 
 @Suppress("DEPRECATION")

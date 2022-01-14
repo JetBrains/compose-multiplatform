@@ -67,6 +67,7 @@ import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.text.input.TextInputService
+import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.platform.FontLoader
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -198,6 +199,8 @@ internal class SkiaBasedOwner(
     override val textInputService = TextInputService(platformInputService)
 
     override val fontLoader = FontLoader()
+
+    override val fontFamilyResolver = createFontFamilyResolver()
 
     override val hapticFeedBack = DefaultHapticFeedback()
 

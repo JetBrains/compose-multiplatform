@@ -25,7 +25,7 @@ import androidx.compose.ui.util.fastMap
 
 @ExperimentalTextApi
 internal class FontFamilyResolverImpl(
-    private val fontLoader: FontLoader,
+    internal val platformFontLoader: PlatformFontLoader /* exposed for desktop ParagraphBuilder */,
     private val typefaceRequestCache: TypefaceRequestCache = GlobalTypefaceRequestCache,
     private val fontListFontFamilyTypefaceAdapter: FontListFontFamilyTypefaceAdapter =
         FontListFontFamilyTypefaceAdapter(GlobalAsyncTypefaceCache),
@@ -42,7 +42,7 @@ internal class FontFamilyResolverImpl(
         // all other types of FontFamily are already preloaded.
         if (fontFamily !is FontListFontFamily) return
 
-        fontListFontFamilyTypefaceAdapter.preload(fontFamily, fontLoader)
+        fontListFontFamilyTypefaceAdapter.preload(fontFamily, platformFontLoader)
 
         val typeRequests = fontFamily.fonts.fastMap {
             TypefaceRequest(
@@ -50,7 +50,7 @@ internal class FontFamilyResolverImpl(
                 it.weight,
                 it.style,
                 FontSynthesis.All,
-                fontLoader.cacheKey
+                platformFontLoader.cacheKey
             )
         }
 
@@ -58,12 +58,12 @@ internal class FontFamilyResolverImpl(
             @Suppress("MoveLambdaOutsideParentheses")
             fontListFontFamilyTypefaceAdapter.resolve(
                 typefaceRequest = typeRequest,
-                fontLoader = fontLoader,
+                platformFontLoader = platformFontLoader,
                 onAsyncCompletion = { /* nothing */ },
                 createDefaultTypeface = createDefaultTypeface
             ) ?: platformFamilyTypefaceAdapter.resolve(
                 typefaceRequest = typeRequest,
-                fontLoader = fontLoader,
+                platformFontLoader = platformFontLoader,
                 onAsyncCompletion = { /* nothing */ },
                 createDefaultTypeface = createDefaultTypeface
             ) ?: throw IllegalStateException("Could not load font")
@@ -81,17 +81,17 @@ internal class FontFamilyResolverImpl(
             fontWeight,
             fontStyle,
             fontSynthesis,
-            fontLoader.cacheKey
+            platformFontLoader.cacheKey
         )
         val result = typefaceRequestCache.runCached(typeRequest) { onAsyncCompletion ->
             fontListFontFamilyTypefaceAdapter.resolve(
                 typeRequest,
-                fontLoader,
+                platformFontLoader,
                 onAsyncCompletion,
                 createDefaultTypeface
             ) ?: platformFamilyTypefaceAdapter.resolve(
                 typeRequest,
-                fontLoader,
+                platformFontLoader,
                 onAsyncCompletion,
                 createDefaultTypeface
             ) ?: throw IllegalStateException("Could not load font")

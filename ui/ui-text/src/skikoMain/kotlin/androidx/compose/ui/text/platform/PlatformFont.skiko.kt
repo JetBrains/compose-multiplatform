@@ -121,8 +121,33 @@ fun Typeface(typeface: SkTypeface, alias: String? = null): Typeface {
 // TODO: may be have an expect for MessageDigest?
 // It has the static .getInstance() method, how would that work?
 internal expect fun FontListFontFamily.makeAlias(): String
-internal expect fun nextFontLoaderCacheKey(): String?
+
+@Suppress("DEPRECATION", "OverridingDeprecatedMember")
+@Deprecated(
+    "Replaced with PlatformFontLoader during the introduction of async fonts, all usages" +
+        " should be replaced",
+    ReplaceWith("PlatformFontLoader"),
+)
 class FontLoader : Font.ResourceLoader {
+
+    internal val fontCache = FontCache()
+
+    // TODO: we need to support:
+    //  1. font collection (.ttc). Looks like skia currently doesn't have
+    //  proper interfaces or they are broken (.makeFromFile(*, 1) always fails)
+    //  2. variable fonts. for them we also need to extend definition interfaces to support
+    //  custom variation settings
+    override fun load(font: Font): FontLoadResult {
+        if (font !is PlatformFont) {
+            throw IllegalArgumentException("Unsupported font type: $font")
+        }
+        return fontCache.load(font)
+    }
+}
+
+class FontLoadResult(val typeface: SkTypeface?, val aliases: List<String>)
+
+internal class FontCache {
     internal val fonts = FontCollection()
     private val fontProvider = TypefaceFontProvider()
 
@@ -137,6 +162,29 @@ class FontLoader : Font.ResourceLoader {
     }
 
     private val registered = HashSet<String>()
+
+    internal fun load(font: PlatformFont): FontLoadResult {
+        val typeface = loadFromTypefacesCache(font)
+        ensureRegistered(typeface, font.cacheKey)
+        return FontLoadResult(typeface, listOf(font.cacheKey))
+    }
+
+    internal fun loadPlatformTypes(
+        fontFamily: FontFamily,
+        fontWeight: FontWeight = FontWeight.Normal,
+        fontStyle: FontStyle = FontStyle.Normal
+    ): FontLoadResult {
+        val aliases = ensureRegistered(fontFamily)
+        val style = fontStyle.toSkFontStyle().withWeight(fontWeight.weight)
+        return FontLoadResult(fonts.findTypefaces(aliases.toTypedArray(), style).first(), aliases)
+    }
+
+    private fun ensureRegistered(typeface: SkTypeface, key: String) {
+        if (!registered.contains(key)) {
+            fontProvider.registerTypeface(typeface, key)
+            registered.add(key)
+        }
+    }
 
     private fun ensureRegistered(fontFamily: FontFamily): List<String> =
         when (fontFamily) {
@@ -159,47 +207,6 @@ class FontLoader : Font.ResourceLoader {
             FontFamily.Default -> mapGenericFontFamily(FontFamily.SansSerif)
             else -> throw IllegalArgumentException("Unknown font family type: $fontFamily")
         }
-
-    // TODO: we need to support:
-    //  1. font collection (.ttc). Looks like skia currently doesn't have
-    //  proper interfaces or they are broken (.makeFromFile(*, 1) always fails)
-    //  2. variable fonts. for them we also need to extend definition interfaces to support
-    //  custom variation settings
-    // 3. Support optional fonts for system-installed fonts
-    @ExperimentalTextApi
-    override fun loadBlocking(font: Font): Pair<List<String>, SkTypeface>? {
-        if (font !is PlatformFont) {
-            throw IllegalArgumentException("Unsupported font type: $font")
-        }
-        val typeface = loadFromTypefacesCache(font)
-        if (!registered.contains(font.cacheKey)) {
-            fontProvider.registerTypeface(typeface, font.cacheKey)
-        }
-        return listOf(font.cacheKey) to typeface
-    }
-
-    // TODO: Support for
-    // 4. async fonts. fonts that load with fallback using FontFamily.Resolver for downloading fonts
-    @ExperimentalTextApi
-    override suspend fun awaitLoad(font: Font): Pair<List<String>, SkTypeface>? =
-        // For now, since only blocking fonts are available on desktop use the sync loading
-        // mechanism. On the introduction of an async font types, support loading here and integrate
-        // font resolution into caching behaviors
-        loadBlocking(font)
-
-    // since we maintain internal caching, results are only valid per-instance.
-    @ExperimentalTextApi
-    override val cacheKey: String? = nextFontLoaderCacheKey()
-
-    internal fun loadPlatformTypes(
-        fontFamily: FontFamily,
-        fontWeight: FontWeight = FontWeight.Normal,
-        fontStyle: FontStyle = FontStyle.Normal
-    ): Pair<List<String>, SkTypeface?> {
-        val aliases = ensureRegistered(fontFamily)
-        val style = fontStyle.toSkFontStyle().withWeight(fontWeight.weight)
-        return aliases to fonts.findTypefaces(aliases.toTypedArray(), style).first()
-    }
 }
 
 internal expect val typefacesCache: Cache<String, SkTypeface>

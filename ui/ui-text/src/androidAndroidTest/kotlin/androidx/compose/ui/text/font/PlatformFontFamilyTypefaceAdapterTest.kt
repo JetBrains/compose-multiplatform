@@ -96,7 +96,7 @@ class PlatformFontFamilyTypefaceAdapterTest {
             val trackingFun = TrackingFun()
             val result = subject.resolve(
                 typefaceRequest = typeRequest,
-                fontLoader = fontLoader,
+                platformFontLoader = fontLoader,
                 onAsyncCompletion = trackingFun,
                 createDefaultTypeface = { android.graphics.Typeface.DEFAULT }
             )
@@ -126,7 +126,7 @@ class PlatformFontFamilyTypefaceAdapterTest {
             val trackingFun = TrackingFun()
             val result = subject.resolve(
                 typefaceRequest = typeRequest,
-                fontLoader = fontLoader,
+                platformFontLoader = fontLoader,
                 onAsyncCompletion = trackingFun,
                 createDefaultTypeface = { android.graphics.Typeface.DEFAULT }
             )
@@ -156,7 +156,7 @@ class PlatformFontFamilyTypefaceAdapterTest {
             val trackingFun = TrackingFun()
             val result = subject.resolve(
                 typefaceRequest = typeRequest,
-                fontLoader = fontLoader,
+                platformFontLoader = fontLoader,
                 onAsyncCompletion = trackingFun,
                 createDefaultTypeface = { android.graphics.Typeface.DEFAULT }
             )
@@ -191,7 +191,7 @@ class PlatformFontFamilyTypefaceAdapterTest {
             val trackingFun = TrackingFun()
             val result = subject.resolve(
                 typefaceRequest = typeRequest,
-                fontLoader = fontLoader,
+                platformFontLoader = fontLoader,
                 onAsyncCompletion = trackingFun,
                 createDefaultTypeface = { android.graphics.Typeface.DEFAULT }
             )
@@ -220,7 +220,7 @@ class PlatformFontFamilyTypefaceAdapterTest {
         val trackingFun = TrackingFun()
         val result = subject.resolve(
             typefaceRequest = typeRequest,
-            fontLoader = fontLoader,
+            platformFontLoader = fontLoader,
             onAsyncCompletion = trackingFun,
             createDefaultTypeface = { android.graphics.Typeface.DEFAULT }
         )
@@ -242,7 +242,7 @@ class PlatformFontFamilyTypefaceAdapterTest {
             val trackingFun = TrackingFun()
             val result = subject.resolve(
                 typefaceRequest = typeRequest,
-                fontLoader = fontLoader,
+                platformFontLoader = fontLoader,
                 onAsyncCompletion = trackingFun,
                 createDefaultTypeface = { android.graphics.Typeface.DEFAULT }
             )

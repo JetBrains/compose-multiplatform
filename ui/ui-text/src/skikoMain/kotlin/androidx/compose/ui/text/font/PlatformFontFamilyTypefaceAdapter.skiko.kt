@@ -17,21 +17,20 @@
 package androidx.compose.ui.text.font
 
 import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.platform.FontLoader
 
 @ExperimentalTextApi
-internal actual class PlatformFontFamilyTypefaceAdapter : FontFamilyTypefaceAdapter {
+internal actual class PlatformFontFamilyTypefaceAdapter actual constructor() :
+    FontFamilyTypefaceAdapter {
+
     override fun resolve(
         typefaceRequest: TypefaceRequest,
-        resourceLoader: Font.ResourceLoader,
-        onAsyncCompletion: (TypefaceResult.Immutable) -> Unit
+        platformFontLoader: PlatformFontLoader,
+        onAsyncCompletion: (TypefaceResult.Immutable) -> Unit,
+        createDefaultTypeface: (TypefaceRequest) -> Any
     ): TypefaceResult? {
         if (typefaceRequest.fontFamily is FontListFontFamily) return null
-        // this check matches the behavior of ParagraphLayouter
-        require(resourceLoader is FontLoader) {
-            "This platform does not support replacing the Font.ResourceLoader"
-        }
-        val result = resourceLoader.loadPlatformTypes(
+        val skiaFontLoader = (platformFontLoader as SkiaFontLoader)
+        val result = skiaFontLoader.loadPlatformTypes(
             typefaceRequest.fontFamily ?: FontFamily.Default,
             typefaceRequest.fontWeight,
             typefaceRequest.fontStyle

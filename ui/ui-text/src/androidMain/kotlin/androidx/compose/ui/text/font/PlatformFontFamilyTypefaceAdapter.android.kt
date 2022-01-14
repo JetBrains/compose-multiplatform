@@ -26,7 +26,7 @@ internal actual class PlatformFontFamilyTypefaceAdapter : FontFamilyTypefaceAdap
 
     override fun resolve(
         typefaceRequest: TypefaceRequest,
-        fontLoader: FontLoader,
+        platformFontLoader: PlatformFontLoader,
         onAsyncCompletion: (TypefaceResult.Immutable) -> Unit,
         createDefaultTypeface: (TypefaceRequest) -> Any
     ): TypefaceResult? {

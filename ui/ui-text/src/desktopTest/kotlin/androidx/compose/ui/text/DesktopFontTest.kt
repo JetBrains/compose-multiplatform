@@ -19,8 +19,8 @@ package androidx.compose.ui.text
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.SkiaFontLoader
 import androidx.compose.ui.text.platform.Font
-import androidx.compose.ui.text.platform.FontLoader
 import androidx.compose.ui.text.platform.GenericFontFamiliesMapping
 import androidx.compose.ui.text.platform.Typeface
 import com.google.common.truth.Truth
@@ -36,7 +36,7 @@ class DesktopFontTest {
     @get:Rule
     val rule = createComposeRule()
 
-    private val fontLoader = FontLoader()
+    private val fontLoader = SkiaFontLoader()
 
     private val fontListFontFamily by lazy {
         FontFamily(
@@ -65,13 +65,13 @@ class DesktopFontTest {
 
     @Test
     fun ensureRegistered() {
-        Truth.assertThat(fontLoader.loadPlatformTypes(FontFamily.Cursive).first)
+        Truth.assertThat(fontLoader.loadPlatformTypes(FontFamily.Cursive).aliases)
             .isEqualTo(GenericFontFamiliesMapping[FontFamily.Cursive.name])
 
-        Truth.assertThat(fontLoader.loadPlatformTypes(FontFamily.Default).first)
+        Truth.assertThat(fontLoader.loadPlatformTypes(FontFamily.Default).aliases)
             .isEqualTo(GenericFontFamiliesMapping[FontFamily.SansSerif.name])
 
-        Truth.assertThat(fontLoader.loadPlatformTypes(loadedFontFamily).first)
+        Truth.assertThat(fontLoader.loadPlatformTypes(loadedFontFamily).aliases)
             .isEqualTo(listOf("Sample Font"))
     }
 }

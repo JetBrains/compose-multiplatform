@@ -104,7 +104,7 @@ interface Font {
 /**
  * Interface used to load a font resource into a platform-specific typeface.
  */
-internal interface FontLoader {
+internal interface PlatformFontLoader {
     /**
      * Loads the resource represented by the [Font] in a blocking manner for use in the current
      * frame.

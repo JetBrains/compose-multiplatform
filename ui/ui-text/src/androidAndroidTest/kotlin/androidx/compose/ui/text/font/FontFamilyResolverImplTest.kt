@@ -422,7 +422,7 @@ class FontFamilyResolverImplTest {
         val fontFamily = FontTestData.FONT_100_REGULAR.toFontFamily()
         val typeface = resolveAsTypeface(fontFamily)
         /* definitely not same instance :) */
-        val newFontLoader = object : FontLoader {
+        val newFontLoader = object : PlatformFontLoader {
             override fun loadBlocking(font: Font): Any = Typeface.DEFAULT
             override suspend fun awaitLoad(font: Font): Any = Typeface.DEFAULT
             override val cacheKey: String = "Not the default resource loader"

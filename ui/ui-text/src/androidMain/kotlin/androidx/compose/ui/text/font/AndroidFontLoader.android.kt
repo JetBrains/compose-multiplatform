@@ -32,7 +32,7 @@ import kotlin.runCatching
  */
 internal class AndroidFontLoader(
     context: Context
-) : FontLoader {
+) : PlatformFontLoader {
     private val context = context.applicationContext
 
     @OptIn(ExperimentalTextApi::class)
@@ -59,7 +59,7 @@ internal class AndroidFontLoader(
         }
     }
 
-    override val cacheKey: String? = null
+    override val cacheKey: Any? = null
 }
 
 private fun ResourceFont.load(context: Context): Typeface =

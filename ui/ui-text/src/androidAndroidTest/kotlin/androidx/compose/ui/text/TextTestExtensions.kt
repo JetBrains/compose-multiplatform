@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.AsyncTypefaceCache
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontFamilyResolverImpl
 import androidx.compose.ui.text.font.FontListFontFamilyTypefaceAdapter
-import androidx.compose.ui.text.font.FontLoader
+import androidx.compose.ui.text.font.PlatformFontLoader
 import androidx.compose.ui.text.font.PlatformFontFamilyTypefaceAdapter
 import androidx.compose.ui.text.font.TypefaceRequestCache
 import kotlin.math.ceil
@@ -46,9 +46,9 @@ internal fun UncachedFontFamilyResolver(
 
 @OptIn(ExperimentalTextApi::class)
 internal fun UncachedFontFamilyResolver(
-    fontLoader: FontLoader
+    platformFontLoader: PlatformFontLoader
 ): FontFamily.Resolver = FontFamilyResolverImpl(
-    fontLoader,
+    platformFontLoader,
     TypefaceRequestCache(),
     FontListFontFamilyTypefaceAdapter(AsyncTypefaceCache()),
     PlatformFontFamilyTypefaceAdapter()
