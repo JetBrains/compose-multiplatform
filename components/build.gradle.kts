@@ -1,3 +1,7 @@
+plugins {
+    kotlin("multiplatform") apply false
+}
+
 subprojects {
     version = findProperty("deploy.version") ?: property("compose.version")!!
 
