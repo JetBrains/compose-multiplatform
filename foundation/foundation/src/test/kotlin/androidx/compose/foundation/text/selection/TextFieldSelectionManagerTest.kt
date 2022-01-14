@@ -222,7 +222,7 @@ class TextFieldSelectionManagerTest {
     fun TextFieldSelectionManager_handleDragObserver_onStart_startHandle() {
         manager.handleDragObserver(isStartHandle = true).onStart(Offset.Zero)
 
-        assertThat(state.draggingHandle).isNotNull()
+        assertThat(manager.draggingHandle).isNotNull()
         assertThat(state.showFloatingToolbar).isFalse()
         verify(spyLambda, times(0)).invoke(any())
         verify(
@@ -235,7 +235,7 @@ class TextFieldSelectionManagerTest {
     fun TextFieldSelectionManager_handleDragObserver_onStart_endHandle() {
         manager.handleDragObserver(isStartHandle = false).onStart(Offset.Zero)
 
-        assertThat(state.draggingHandle).isNotNull()
+        assertThat(manager.draggingHandle).isNotNull()
         assertThat(state.showFloatingToolbar).isFalse()
         verify(spyLambda, times(0)).invoke(any())
         verify(
@@ -279,7 +279,7 @@ class TextFieldSelectionManagerTest {
 
         manager.handleDragObserver(false).onStop()
 
-        assertThat(state.draggingHandle).isNull()
+        assertThat(manager.draggingHandle).isNull()
         assertThat(state.showFloatingToolbar).isTrue()
         verify(
             hapticFeedback,
@@ -291,7 +291,7 @@ class TextFieldSelectionManagerTest {
     fun TextFieldSelectionManager_cursorDragObserver_onStart() {
         manager.cursorDragObserver().onStart(Offset.Zero)
 
-        assertThat(state.draggingHandle).isNotNull()
+        assertThat(manager.draggingHandle).isNotNull()
         assertThat(state.showFloatingToolbar).isFalse()
         verify(spyLambda, times(0)).invoke(any())
         verify(
@@ -321,7 +321,7 @@ class TextFieldSelectionManagerTest {
 
         manager.cursorDragObserver().onStop()
 
-        assertThat(state.draggingHandle).isNull()
+        assertThat(manager.draggingHandle).isNull()
         assertThat(state.showFloatingToolbar).isFalse()
         verify(
             hapticFeedback,

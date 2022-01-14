@@ -186,9 +186,17 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         private set
 
     /**
-     * The handle that is currently being dragged, or null when no handle is being dragged.
+     * The handle that is currently being dragged, or null when no handle is being dragged. To get
+     * the position of the last drag event, use [currentDragPosition].
      */
     var draggingHandle: Handle? by mutableStateOf(null)
+        private set
+
+    /**
+     * When a handle is being dragged (i.e. [draggingHandle] is non-null), this is the last position
+     * of the actual drag event. It is not clamped to handle positions. Null when not being dragged.
+     */
+    var currentDragPosition: Offset? by mutableStateOf(null)
         private set
 
     private val shouldShowMagnifier get() = draggingHandle != null
@@ -258,6 +266,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
             // This property is set by updateSelection while dragging, so we need to clear it after
             // the original selection drag.
             draggingHandle = null
+            currentDragPosition = null
         }
 
         selectionRegistrar.onSelectableChangeCallback = { selectableKey ->
@@ -501,11 +510,34 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
 
     fun handleDragObserver(isStartHandle: Boolean): TextDragObserver = object : TextDragObserver {
         override fun onDown(point: Offset) {
-            // TODO(b/206833278) Show magnifier on down.
+            val selection = selection ?: return
+            val anchor = if (isStartHandle) selection.start else selection.end
+            val selectable = getAnchorSelectable(anchor) ?: return
+            // The LayoutCoordinates of the composable where the drag gesture should begin. This
+            // is used to convert the position of the beginning of the drag gesture from the
+            // composable coordinates to selection container coordinates.
+            val beginLayoutCoordinates = selectable.getLayoutCoordinates() ?: return
+
+            // The position of the character where the drag gesture should begin. This is in
+            // the composable coordinates.
+            val beginCoordinates = getAdjustedCoordinates(
+                selectable.getHandlePosition(
+                    selection = selection, isStartHandle = isStartHandle
+                )
+            )
+
+            // Convert the position where drag gesture begins from composable coordinates to
+            // selection container coordinates.
+            currentDragPosition = requireContainerCoordinates().localPositionOf(
+                beginLayoutCoordinates,
+                beginCoordinates
+            )
+            draggingHandle = if (isStartHandle) Handle.SelectionStart else Handle.SelectionEnd
         }
 
         override fun onUp() {
-            // TODO(b/206833278) Show magnifier on down.
+            draggingHandle = null
+            currentDragPosition = null
         }
 
         override fun onStart(startPoint: Offset) {
@@ -567,11 +599,13 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         override fun onStop() {
             showSelectionToolbar()
             draggingHandle = null
+            currentDragPosition = null
         }
 
         override fun onCancel() {
             showSelectionToolbar()
             draggingHandle = null
+            currentDragPosition = null
         }
     }
 
@@ -704,8 +738,8 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         isStartHandle: Boolean,
         adjustment: SelectionAdjustment,
     ): Boolean {
-        // TODO(b/206833278) This should be set as soon as down event happens, not wait for drag.
         draggingHandle = if (isStartHandle) Handle.SelectionStart else Handle.SelectionEnd
+        currentDragPosition = if (isStartHandle) startHandlePosition else endHandlePosition
         val newSubselections = mutableMapOf<Long, Selection>()
         var moveConsumed = false
         val newSelection = selectionRegistrar.sort(requireContainerCoordinates())

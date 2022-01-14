@@ -708,15 +708,6 @@ internal class TextFieldState(
     var handleState by mutableStateOf(HandleState.None)
 
     /**
-     * A flag to check if a selection or cursor handle is being dragged, and which handle is being
-     * dragged.
-     * If this value is non-null, then onPress will not select any text.
-     * This value will be set to non-null when either handle is being dragged, and be reset to null
-     * when the dragging is stopped.
-     */
-    var draggingHandle: Handle? by mutableStateOf(null)
-
-    /**
      * A flag to check if the floating toolbar should show.
      */
     var showFloatingToolbar = false
