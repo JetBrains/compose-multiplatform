@@ -44,10 +44,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.testutils.WithTouchSlop
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -1644,6 +1646,74 @@ class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(o
         rule.onNodeWithTag("0").assertIsNotDisplayed()
         rule.onNodeWithTag("2").assertIsDisplayed()
         rule.onNodeWithTag("3").assertIsDisplayed()
+    }
+
+    @Test
+    fun recomposingWithNewComposedModifierObjectIsNotCausingRemeasure() {
+        var remeasureCount = 0
+        val layoutModifier = Modifier.layout { measurable, constraints ->
+            remeasureCount++
+            val placeable = measurable.measure(constraints)
+            layout(placeable.width, placeable.height) {
+                placeable.place(0, 0)
+            }
+        }
+        val counter = mutableStateOf(0)
+
+        rule.setContentWithTestViewConfiguration {
+            counter.value // just to trigger recomposition
+            LazyColumnOrRow(
+                // this will return a new object everytime causing Lazy list recomposition
+                // without causing remeasure
+                Modifier.composed { layoutModifier }
+            ) {
+                items(1) {
+                    Spacer(Modifier.size(10.dp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(remeasureCount).isEqualTo(1)
+            counter.value++
+        }
+
+        rule.runOnIdle {
+            assertThat(remeasureCount).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun scrollingALotDoesntCauseLazyLayoutRecomposition() {
+        var recomposeCount = 0
+        lateinit var state: LazyListState
+
+        rule.setContentWithTestViewConfiguration {
+            state = rememberLazyListState()
+            LazyColumnOrRow(
+                Modifier.composed {
+                    recomposeCount++
+                    Modifier
+                },
+                state
+            ) {
+                items(1000) {
+                    Spacer(Modifier.size(10.dp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(recomposeCount).isEqualTo(1)
+
+            runBlocking {
+                state.scrollToItem(100)
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(recomposeCount).isEqualTo(1)
+        }
     }
 
     // ********************* END OF TESTS *********************
