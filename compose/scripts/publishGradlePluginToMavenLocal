@@ -8,5 +8,5 @@ if [[ -z "$COMPOSE_CUSTOM_VERSION" ]]; then
 fi
 
 pushd ../../gradle-plugins
-./gradlew publishToMavenLocal -Pcompose.version="$COMPOSE_CUSTOM_VERSION" -Pdeploy.version="$COMPOSE_CUSTOM_VERSION" -Pcompose.with.web=true || exit 1
+./gradlew publishToMavenLocal -Pcompose.version="$COMPOSE_CUSTOM_VERSION" -Pdeploy.version="$COMPOSE_CUSTOM_VERSION" || exit 1
 popd
