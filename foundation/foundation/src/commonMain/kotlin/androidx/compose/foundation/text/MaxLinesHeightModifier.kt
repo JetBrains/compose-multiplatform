@@ -53,7 +53,7 @@ internal fun Modifier.maxLinesHeight(
 
     // Difference between the height of two lines paragraph and one line paragraph gives us
     // an approximation of height of one line
-    // TODO(seanmcq): Uncache this
+    // TODO(b/214587005): Uncache this
     val firstLineHeight = remember(density, fontFamilyResolver, textStyle, layoutDirection) {
         computeSizeForDefaultText(
             style = resolveDefaults(textStyle, layoutDirection),
@@ -63,7 +63,7 @@ internal fun Modifier.maxLinesHeight(
             maxLines = 1
         ).height
     }
-    // TODO(seanmcq): Uncache this
+    // TODO(b/214587005): Uncache this
     val firstTwoLinesHeight = remember(density, fontFamilyResolver, textStyle, layoutDirection) {
         val twoLines = EmptyTextReplacement + "\n" + EmptyTextReplacement
         computeSizeForDefaultText(

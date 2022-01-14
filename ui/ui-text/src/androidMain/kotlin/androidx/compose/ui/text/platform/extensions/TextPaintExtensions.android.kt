@@ -51,7 +51,7 @@ internal fun AndroidTextPaint.applySpanStyle(
     }
 
     if (style.hasFontAttributes()) {
-        // TODO (seanmcq): Check if it's async here and uncache
+        // TODO (b/214587005): Check if it's async here and uncache
         typeface = fontFamilyResolver.resolve(
             fontFamily = style.fontFamily,
             fontWeight = style.fontWeight ?: FontWeight.Normal,

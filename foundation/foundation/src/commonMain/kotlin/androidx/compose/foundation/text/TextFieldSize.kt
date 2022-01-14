@@ -37,7 +37,7 @@ internal fun Modifier.textFieldMinSize(style: TextStyle) = composed {
     val fontFamilyResolver = LocalFontFamilyResolver.current
     val layoutDirection = LocalLayoutDirection.current
 
-    // TODO(seanmcq): Uncache this
+    // TODO(b/214587005): Uncache this
     val minSizeState = remember {
         TextFieldSize(layoutDirection, density, fontFamilyResolver, style)
     }
@@ -73,7 +73,7 @@ private class TextFieldSize(
         fontFamilyResolver: FontFamily.Resolver,
         style: TextStyle
     ) {
-        // TODO(seanmcq): Uncache this
+        // TODO(b/214587005): Uncache this
         if (layoutDirection != this.layoutDirection ||
             density != this.density ||
             fontFamilyResolver != this.fontFamilyResolver ||

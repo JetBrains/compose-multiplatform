@@ -23,11 +23,12 @@ import androidx.compose.runtime.State
 /**
  * The primary typography interface for Compose applications.
  *
- * // TODO(seanmcq): Comment here about how it all works
  * @see FontListFontFamily
  * @see GenericFontFamily
  * @see FontFamily.Resolver
  */
+// TODO(b/214587299): Add large ktdoc comment here about how it all works, including fallback and
+//  optional
 @Immutable
 sealed class FontFamily(canLoadSynchronously: Boolean) {
 
