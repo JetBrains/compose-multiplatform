@@ -19,6 +19,10 @@ package androidx.build.gitclient
 import androidx.build.releasenotes.getBuganizerLink
 import androidx.build.releasenotes.getChangeIdAOSPLink
 import java.io.File
+import org.gradle.api.GradleException
+import org.gradle.api.Project
+import org.gradle.api.provider.Provider
+import org.gradle.api.logging.Logger
 
 interface GitClient {
     fun findChangedFilesSince(
@@ -46,6 +50,42 @@ interface GitClient {
          * Executes the given shell command and returns the stdout by lines.
          */
         fun executeAndParse(command: String): List<String>
+    }
+
+    companion object {
+        fun getChangeInfoPath(project: Project): Provider<String> {
+            return project.providers.environmentVariable("CHANGE_INFO").orElse("")
+        }
+        fun getManifestPath(project: Project): Provider<String> {
+            return project.providers.environmentVariable("MANIFEST").orElse("")
+        }
+        fun create(
+            rootProjectDir: File,
+            logger: Logger,
+            changeInfoPath: String,
+            manifestPath: String
+        ): GitClient {
+            if (changeInfoPath != "") {
+                if (manifestPath == "") {
+                    throw GradleException("Setting CHANGE_INFO requires also setting MANIFEST")
+                }
+                val changeInfoFile = File(changeInfoPath)
+                val manifestFile = File(manifestPath)
+                if (!changeInfoFile.exists()) {
+                    throw GradleException("changeinfo file $changeInfoFile does not exist")
+                }
+                if (!manifestFile.exists()) {
+                    throw GradleException("manifest $manifestFile does not exist")
+                }
+                val changeInfoText = changeInfoFile.readText()
+                val manifestText = manifestFile.readText()
+                logger.info("Using ChangeInfoGitClient with change info path $changeInfoPath, " +
+                    "manifest $manifestPath")
+                return ChangeInfoGitClient(changeInfoText, manifestText)
+            }
+            logger.info("UsingGitRunnerGitClient")
+            return GitRunnerGitClient(rootProjectDir, logger)
+        }
     }
 }
 
