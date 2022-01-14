@@ -296,8 +296,15 @@ fun getGenerateApiArgs(
             args += listOf("--show-unannotated")
         }
         is GenerateApiMode.AllRestrictedApis, GenerateApiMode.RestrictToLibraryGroupPrefixApis -> {
-            // Show restricted APIs despite @hide.
+            // Despite being hidden we still track the following:
+            // * @RestrictTo(Scope.LIBRARY_GROUP_PREFIX): inter-library APIs
+            // * @PublishedApi: needs binary stability for inline methods
+            // * @RestrictTo(Scope.LIBRARY_GROUP): APIs between libraries in non-atomic groups
             args += listOf(
+                // hide RestrictTo(LIBRARY), use --show-annotation for RestrictTo with
+                // specific arguments
+                "--hide-annotation",
+                "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY)",
                 "--show-annotation",
                 "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope." +
                     "LIBRARY_GROUP_PREFIX)",
