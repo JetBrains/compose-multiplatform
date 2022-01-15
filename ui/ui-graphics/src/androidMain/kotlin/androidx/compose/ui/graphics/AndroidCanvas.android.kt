@@ -67,13 +67,9 @@ private val EmptyCanvas = android.graphics.Canvas()
     // instance on each draw call
     @PublishedApi internal var internalCanvas: NativeCanvas = EmptyCanvas
 
-    private val srcRect: android.graphics.Rect by lazy(LazyThreadSafetyMode.NONE) {
-        android.graphics.Rect()
-    }
+    private val srcRect = android.graphics.Rect()
 
-    private val dstRect: android.graphics.Rect by lazy(LazyThreadSafetyMode.NONE) {
-        android.graphics.Rect()
-    }
+    private val dstRect = android.graphics.Rect()
 
     /**
      * @see Canvas.save
