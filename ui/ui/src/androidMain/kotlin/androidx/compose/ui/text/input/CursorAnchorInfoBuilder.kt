@@ -16,22 +16,34 @@
 
 package androidx.compose.ui.text.input
 
+import android.graphics.Matrix
 import android.view.inputmethod.CursorAnchorInfo
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.style.ResolvedTextDirection
 
 /**
  * Helper function to build [CursorAnchorInfo](https://developer.android.com/reference/android/view/inputmethod/CursorAnchorInfo).
  *
  * @param textFieldValue required to set text, composition and selection information into the
  * CursorAnchorInfo.
+ * @param textLayoutResult TextLayoutResult for the [textFieldValue] used to enter cursor and
+ * character information
+ * @param matrix Matrix used to convert local coordinates to global coordinates.
  */
 internal fun CursorAnchorInfo.Builder.build(
-    textFieldValue: TextFieldValue
+    textFieldValue: TextFieldValue,
+    textLayoutResult: TextLayoutResult,
+    matrix: Matrix
 ): CursorAnchorInfo {
     reset()
+
+    setMatrix(matrix)
 
     val selectionStart = textFieldValue.selection.min
     val selectionEnd = textFieldValue.selection.max
     setSelectionRange(selectionStart, selectionEnd)
+
+    setInsertionMarker(selectionStart, textLayoutResult)
 
     // set composition
     val compositionStart = textFieldValue.composition?.min ?: -1
@@ -45,4 +57,29 @@ internal fun CursorAnchorInfo.Builder.build(
     }
 
     return build()
+}
+
+private fun CursorAnchorInfo.Builder.setInsertionMarker(
+    selectionStart: Int,
+    textLayoutResult: TextLayoutResult
+): CursorAnchorInfo.Builder {
+    if (selectionStart < 0) return this
+
+    val cursorRect = textLayoutResult.getCursorRect(selectionStart)
+    val isRtl = textLayoutResult.getBidiRunDirection(selectionStart) == ResolvedTextDirection.Rtl
+
+    var flags = 0
+    if (isRtl) flags = flags or CursorAnchorInfo.FLAG_IS_RTL
+
+    // Sets the location of the text insertion point (zero width cursor) as a rectangle in local
+    // coordinates.
+    setInsertionMarkerLocation(
+        cursorRect.left,
+        cursorRect.top,
+        cursorRect.bottom,
+        cursorRect.bottom,
+        flags
+    )
+
+    return this
 }
