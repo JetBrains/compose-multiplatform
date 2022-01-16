@@ -81,12 +81,10 @@ inline fun Box(
 internal fun rememberBoxMeasurePolicy(
     alignment: Alignment,
     propagateMinConstraints: Boolean
-) = remember(alignment) {
-    if (alignment == Alignment.TopStart && !propagateMinConstraints) {
-        DefaultBoxMeasurePolicy
-    } else {
-        boxMeasurePolicy(alignment, propagateMinConstraints)
-    }
+) = if (alignment == Alignment.TopStart && !propagateMinConstraints) {
+    DefaultBoxMeasurePolicy
+} else {
+    remember(alignment) { boxMeasurePolicy(alignment, propagateMinConstraints) }
 }
 
 internal val DefaultBoxMeasurePolicy: MeasurePolicy = boxMeasurePolicy(Alignment.TopStart, false)
