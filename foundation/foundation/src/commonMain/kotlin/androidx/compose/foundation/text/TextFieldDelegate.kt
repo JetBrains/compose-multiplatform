@@ -267,7 +267,8 @@ internal class TextFieldDelegate {
             onValueChange: (TextFieldValue) -> Unit,
             onImeActionPerformed: (ImeAction) -> Unit
         ): TextInputSession {
-            val textInputSession = restartInput(
+            // The keyboard will automatically be shown when the new IME connection is started.
+            return restartInput(
                 textInputService = textInputService,
                 value = value,
                 editProcessor = editProcessor,
@@ -275,10 +276,6 @@ internal class TextFieldDelegate {
                 onValueChange = onValueChange,
                 onImeActionPerformed = onImeActionPerformed
             )
-
-            textInputSession.showSoftwareKeyboard()
-
-            return textInputSession
         }
 
         /**
@@ -295,7 +292,8 @@ internal class TextFieldDelegate {
             onValueChange: (TextFieldValue) -> Unit
         ) {
             onValueChange(editProcessor.toTextFieldValue().copy(composition = null))
-            textInputSession.hideSoftwareKeyboard()
+            // Don't hide the keyboard when losing focus. If the target system needs that behavior,
+            // it can be implemented in the PlatformTextInputService.
             textInputSession.dispose()
         }
 

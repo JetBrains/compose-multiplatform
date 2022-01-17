@@ -159,7 +159,6 @@ class TextFieldDelegateTest {
             eq(onEditorActionPerformed)
         )
 
-        verify(actual).showSoftwareKeyboard()
         assertThat(actual).isEqualTo(textInputSession)
     }
 
@@ -177,7 +176,6 @@ class TextFieldDelegateTest {
         TextFieldDelegate.onBlur(textInputSession, processor, onValueChange)
 
         inOrder(textInputSession) {
-            verify(textInputSession).hideSoftwareKeyboard()
             verify(textInputSession).dispose()
         }
         verify(onValueChange, times(1)).invoke(

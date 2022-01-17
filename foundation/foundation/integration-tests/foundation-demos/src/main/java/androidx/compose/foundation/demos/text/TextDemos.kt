@@ -37,6 +37,9 @@ val TextDemos = DemoCategory(
                 ComposableDemo("Various input fields") { VariousInputFieldDemo() },
                 ComposableDemo("Tricky input field") { InputFieldTrickyUseCase() },
                 ComposableDemo("Focus transition") { TextFieldFocusTransition() },
+                ComposableDemo("Focus keyboard interaction") {
+                    TextFieldFocusKeyboardInteraction()
+                },
                 ComposableDemo("Tail Following Text Field") { TailFollowingTextFieldDemo() },
                 ComposableDemo("Scrollable text fields") { ScrollableTextFieldDemo() },
                 ComposableDemo("Min/Max Lines") { BasicTextFieldMinMaxDemo() },
