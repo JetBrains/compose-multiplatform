@@ -53,6 +53,8 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.TouchInjectionScope
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
@@ -104,7 +106,6 @@ class ScrollTest {
     private val defaultCrossAxisSize = 45
     private val defaultMainAxisSize = 40
     private val defaultCellSize = 5
-
     private val colors = listOf(
         Color(red = 0xFF, green = 0, blue = 0, alpha = 0xFF),
         Color(red = 0xFF, green = 0xA5, blue = 0, alpha = 0xFF),
@@ -714,6 +715,40 @@ class ScrollTest {
         assertThat(scrollState.value).isEqualTo(100)
     }
 
+    @Test
+    fun scroller_touchInputEnabled_shouldHaveSemanticsInfo() {
+        val scrollState = ScrollState(initial = 0)
+        val scrollNode = rule.onNodeWithTag(scrollerTag)
+        createScrollableContent(isVertical = true, scrollState = scrollState)
+        val yScrollState = scrollNode
+            .fetchSemanticsNode()
+            .config
+            .getOrNull(SemanticsProperties.VerticalScrollAxisRange)
+
+        scrollNode.performTouchInput { swipeUp() }
+
+        assertThat(yScrollState?.value?.invoke()).isEqualTo(scrollState.value)
+    }
+
+    @Test
+    fun scroller_touchInputDisabled_shouldHaveSemanticsInfo() {
+        val scrollState = ScrollState(initial = 0)
+        val scrollNode = rule.onNodeWithTag(scrollerTag)
+        createScrollableContent(
+            isVertical = true,
+            scrollState = scrollState,
+            touchInputEnabled = false
+        )
+        val yScrollState = scrollNode
+            .fetchSemanticsNode()
+            .config
+            .getOrNull(SemanticsProperties.VerticalScrollAxisRange)
+
+        scrollNode.performTouchInput { swipeUp() }
+
+        assertThat(yScrollState?.value?.invoke()).isEqualTo(scrollState.value)
+    }
+
     private fun composeVerticalScroller(
         scrollState: ScrollState? = null,
         isReversed: Boolean = false,
@@ -826,7 +861,8 @@ class ScrollTest {
         height: Dp = 100.dp,
         isReversed: Boolean = false,
         scrollState: ScrollState? = null,
-        isRtl: Boolean = false
+        isRtl: Boolean = false,
+        touchInputEnabled: Boolean = true
     ) {
         val resolvedState = scrollState ?: ScrollState(initial = 0)
         rule.setContent {
@@ -846,6 +882,7 @@ class ScrollTest {
                                 .testTag(scrollerTag)
                                 .verticalScroll(
                                     resolvedState,
+                                    enabled = touchInputEnabled,
                                     reverseScrolling = isReversed
                                 )
                         ) {
@@ -858,6 +895,7 @@ class ScrollTest {
                                 Modifier.testTag(scrollerTag)
                                     .horizontalScroll(
                                         resolvedState,
+                                        enabled = touchInputEnabled,
                                         reverseScrolling = isReversed
                                     )
                             ) {
