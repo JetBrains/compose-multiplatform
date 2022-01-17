@@ -112,7 +112,8 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
             configurePackagingTask(
                 app,
                 createRuntimeImage = createRuntimeImage,
-                prepareAppResources = prepareAppResources
+                prepareAppResources = prepareAppResources,
+                checkRuntime = checkRuntime
             )
         }
 
@@ -131,7 +132,8 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
                     configurePackagingTask(
                         app,
                         createRuntimeImage = createRuntimeImage,
-                        prepareAppResources = prepareAppResources
+                        prepareAppResources = prepareAppResources,
+                        checkRuntime = checkRuntime
                     )
                 } else {
                     configurePackagingTask(app, createAppImage = createDistributable)
@@ -184,7 +186,8 @@ internal fun AbstractJPackageTask.configurePackagingTask(
     app: Application,
     createAppImage: TaskProvider<AbstractJPackageTask>? = null,
     createRuntimeImage: TaskProvider<AbstractJLinkTask>? = null,
-    prepareAppResources: TaskProvider<Sync>? = null
+    prepareAppResources: TaskProvider<Sync>? = null,
+    checkRuntime: TaskProvider<AbstractCheckNativeDistributionRuntime>? = null
 ) {
     enabled = targetFormat.isCompatibleWithCurrentOS
 
@@ -202,6 +205,11 @@ internal fun AbstractJPackageTask.configurePackagingTask(
         dependsOn(prepareResources)
         val resourcesDir = project.layout.dir(prepareResources.map { it.destinationDir })
         appResourcesDir.set(resourcesDir)
+    }
+
+    checkRuntime?.let { checkRuntime ->
+        dependsOn(checkRuntime)
+        javaRuntimePropertiesFile.set(checkRuntime.flatMap { it.javaRuntimePropertiesFile })
     }
 
     configurePlatformSettings(app)
