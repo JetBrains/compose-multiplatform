@@ -94,7 +94,7 @@ val LocalFocusManager = staticCompositionLocalOf<FocusManager> {
  * @suppress
  */
 @Suppress("DEPRECATION")
-@Deprecated("Font.ResourceLoader is replaced with FontFamily.Resolver",
+@Deprecated("LocalFontLoader is replaced with LocalFontFamilyResolver",
     replaceWith = ReplaceWith("LocalFontFamilyResolver")
 )
 val LocalFontLoader = staticCompositionLocalOf<Font.ResourceLoader> {

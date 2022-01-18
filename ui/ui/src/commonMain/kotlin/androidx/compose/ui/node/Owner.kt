@@ -119,7 +119,7 @@ internal interface Owner {
     val windowInfo: WindowInfo
 
     @Deprecated(
-        "Font.ResourceLoader is deprecated, use fontFamilyResolver",
+        "fontLoader is deprecated, use fontFamilyResolver",
         replaceWith = ReplaceWith("fontFamilyResolver")
     )
     @Suppress("DEPRECATION")

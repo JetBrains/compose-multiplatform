@@ -30,9 +30,9 @@ import androidx.core.content.res.ResourcesCompat
  */
 @Suppress("DEPRECATION", "OverridingDeprecatedMember")
 @Deprecated(
-    "Replaced with Font.Loader during the introduction of async fonts, all usages" +
-        " should be replaced",
-    ReplaceWith("Font.Loader"),
+    "Replaced with PlatformFontLoader during the introduction of async fonts, all" +
+        " usages should be replaced",
+    ReplaceWith("PlatformFontLoader"),
 )
 internal class AndroidFontResourceLoader(
     private val context: Context
