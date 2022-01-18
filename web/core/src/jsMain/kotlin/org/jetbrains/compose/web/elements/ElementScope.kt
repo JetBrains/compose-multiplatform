@@ -11,9 +11,10 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
 import org.w3c.dom.Element
-import org.w3c.dom.HTMLElement
 
-interface DOMScope<out TElement : Element>
+interface DOMScope<out TElement : Element> {
+    val element: TElement
+}
 
 /**
  * ElementScope allows adding effects to the Composable representing html element.
@@ -77,8 +78,6 @@ interface ElementScope<out TElement : Element> : DOMScope<TElement> {
 }
 
 abstract class ElementScopeBase<out TElement : Element> : ElementScope<TElement> {
-    abstract val element: TElement
-
     private var nextDisposableDomEffectKey = 0
 
     @Composable

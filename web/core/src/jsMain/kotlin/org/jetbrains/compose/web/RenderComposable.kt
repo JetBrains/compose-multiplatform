@@ -37,7 +37,9 @@ fun <TElement : Element> renderComposable(
         applier = DomApplier(DomNodeWrapper(root)),
         parent = recomposer
     )
-    val scope = object : DOMScope<TElement> {}
+    val scope = object : DOMScope<TElement> {
+        override val element = root
+    }
     composition.setContent @Composable {
         content(scope)
     }
