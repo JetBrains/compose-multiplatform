@@ -24,6 +24,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.InternalComposeUiApi
+import androidx.compose.ui.PointerPositionUpdater
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.focus.FocusDirection
@@ -90,6 +91,7 @@ private typealias Command = () -> Unit
 internal class SkiaBasedOwner(
     private val platformInputService: PlatformInput,
     private val component: PlatformComponent,
+    private val pointerPositionUpdater: PointerPositionUpdater,
     density: Density = Density(1f, 1f),
     val isPopup: Boolean = false,
     val isFocusable: Boolean = true,
@@ -253,8 +255,6 @@ internal class SkiaBasedOwner(
 
     override val measureIteration: Long get() = measureAndLayoutDelegate.measureIteration
 
-    val needRender get() = needSendSyntheticEvents
-    var onNeedRender: (() -> Unit)? = null
     var requestLayout: (() -> Unit)? = null
     var requestDraw: (() -> Unit)? = null
     var dispatchSnapshotChanges: ((Command) -> Unit)? = null
@@ -274,9 +274,11 @@ internal class SkiaBasedOwner(
     override fun measureAndLayout(sendPointerUpdate: Boolean) {
         measureAndLayoutDelegate.updateRootConstraints(constraints)
         if (
-            measureAndLayoutDelegate.measureAndLayout(
-                scheduleSyntheticEvents.takeIf { sendPointerUpdate }
-            )
+            measureAndLayoutDelegate.measureAndLayout {
+                if (sendPointerUpdate) {
+                    pointerPositionUpdater.onLayout()
+                }
+            }
         ) {
             requestDraw?.invoke()
         }
@@ -375,50 +377,8 @@ internal class SkiaBasedOwner(
 
     private var desiredPointerIcon: PointerIcon? = null
 
-    private var needSendSyntheticEvents = false
-    private var lastPointerEvent: PointerInputEvent? = null
-
-    private val scheduleSyntheticEvents: () -> Unit = {
-        // we can't send event synchronously, as we can have call of `measureAndLayout`
-        // inside the event handler. So we can have a situation when we call event handler inside
-        // event handler. And that can lead to unpredictable behaviour.
-        // Nature of synthetic events doesn't require that they should be fired
-        // synchronously on layout change.
-        needSendSyntheticEvents = true
-        onNeedRender?.invoke()
-    }
-
-    // TODO(demin) should we repeat all events, or only which are make sense?
-    //  For example, touch Move after touch Release doesn't make sense,
-    //  and an application can handle it in a wrong way
-    //  Desktop doesn't support touch at the moment, but when it will, we should resolve this.
-    fun sendSyntheticEvents() {
-        if (needSendSyntheticEvents) {
-            needSendSyntheticEvents = false
-            val lastPointerEvent = lastPointerEvent
-            if (lastPointerEvent != null) {
-                doProcessPointerInput(
-                    PointerInputEvent(
-                        PointerEventType.Move,
-                        lastPointerEvent.uptime,
-                        lastPointerEvent.pointers,
-                        lastPointerEvent.buttons,
-                        lastPointerEvent.keyboardModifiers,
-                        lastPointerEvent.nativeEvent
-                    )
-                )
-            }
-        }
-    }
-
     internal fun processPointerInput(event: PointerInputEvent): ProcessResult {
-        sendSyntheticEvents()
         desiredPointerIcon = null
-        lastPointerEvent = event
-        return doProcessPointerInput(event)
-    }
-
-    private fun doProcessPointerInput(event: PointerInputEvent): ProcessResult {
         return pointerInputEventProcessor.process(
             event,
             this,

@@ -83,7 +83,10 @@ class ComposeScene internal constructor(
     coroutineContext: CoroutineContext = Dispatchers.Unconfined,
     internal val component: PlatformComponent,
     density: Density = Density(1f),
-    private val invalidate: () -> Unit = {}
+    private val invalidate: () -> Unit = {},
+    @Deprecated("Will be removed in Compose 1.3")
+    internal val createSyntheticNativeMoveEvent:
+        (sourceEvent: Any?, positionSourceEvent: Any?) -> Any? = { _, _ -> null },
 ) {
     /**
      * Constructs [ComposeScene]
@@ -130,7 +133,7 @@ class ComposeScene internal constructor(
 
     private fun invalidateIfNeeded() {
         hasPendingDraws = frameClock.hasAwaiters || needLayout || needDraw ||
-            list.any(SkiaBasedOwner::needRender) || snapshotChanges.hasCommands
+           snapshotChanges.hasCommands || pointerPositionUpdater.needUpdate
         if (hasPendingDraws && !isInvalidationDisabled && !isClosed) {
             invalidate()
         }
@@ -177,6 +180,7 @@ class ComposeScene internal constructor(
 
     private val recomposer = Recomposer(coroutineContext + job + effectDispatcher)
 
+    internal val pointerPositionUpdater = PointerPositionUpdater(::invalidateIfNeeded, ::sendAsMove)
     internal val platformInputService: PlatformInput = PlatformInput(component)
 
     internal var mainOwner: SkiaBasedOwner? = null
@@ -235,7 +239,6 @@ class ComposeScene internal constructor(
     internal fun attach(owner: SkiaBasedOwner) {
         check(!isClosed) { "ComposeScene is closed" }
         list.add(owner)
-        owner.onNeedRender = ::invalidateIfNeeded
         owner.requestLayout = ::requestLayout
         owner.requestDraw = ::requestDraw
         owner.dispatchSnapshotChanges = snapshotChanges::add
@@ -256,7 +259,6 @@ class ComposeScene internal constructor(
         owner.dispatchSnapshotChanges = null
         owner.requestDraw = null
         owner.requestLayout = null
-        owner.onNeedRender = null
         invalidateIfNeeded()
         if (owner == focusedOwner) {
             focusedOwner = list.lastOrNull { it.isFocusable }
@@ -299,11 +301,13 @@ class ComposeScene internal constructor(
         content: @Composable () -> Unit
     ) {
         check(!isClosed) { "ComposeScene is closed" }
+        pointerPositionUpdater.reset()
         composition?.dispose()
         mainOwner?.dispose()
         val mainOwner = SkiaBasedOwner(
             platformInputService,
             component,
+            pointerPositionUpdater,
             density,
             onPreviewKeyEvent = onPreviewKeyEvent,
             onKeyEvent = onKeyEvent
@@ -351,10 +355,8 @@ class ComposeScene internal constructor(
         recomposeDispatcher.flush()
         frameClock.sendFrame(nanoTime)
         needLayout = false
-        forEachOwner {
-            it.measureAndLayout()
-            it.sendSyntheticEvents()
-        }
+        forEachOwner { it.measureAndLayout() }
+        pointerPositionUpdater.update()
         needDraw = false
         forEachOwner { it.draw(canvas) }
         forEachOwner { it.clearInvalidObservations() }
@@ -413,7 +415,17 @@ class ComposeScene internal constructor(
         )
         needLayout = false
         forEachOwner { it.measureAndLayout() }
+        pointerPositionUpdater.beforeEvent(event)
         processPointerInput(event)
+    }
+
+    @Suppress("DEPRECATION")
+    private fun sendAsMove(sourceEvent: PointerInputEvent, positionSourceEvent: PointerInputEvent) {
+        val nativeEvent = createSyntheticNativeMoveEvent(
+            sourceEvent.nativeEvent,
+            positionSourceEvent.nativeEvent
+        )
+        processPointerInput(createMoveEvent(nativeEvent, sourceEvent, positionSourceEvent))
     }
 
     @OptIn(ExperimentalComposeUiApi::class)
@@ -512,6 +524,21 @@ private fun pointerInputEvent(
         nativeEvent
     )
 }
+
+private fun createMoveEvent(
+    nativeEvent: Any?,
+    sourceEvent: PointerInputEvent,
+    positionSourceEvent: PointerInputEvent
+) = pointerInputEvent(
+    eventType = PointerEventType.Move,
+    position = positionSourceEvent.pointers.first().position,
+    timeMillis = sourceEvent.uptime,
+    nativeEvent = nativeEvent,
+    type = sourceEvent.pointers.first().type,
+    scrollDelta = Offset(0f, 0f),
+    buttons = sourceEvent.buttons,
+    keyboardModifiers = sourceEvent.keyboardModifiers
+)
 
 internal expect fun makeAccessibilityController(
     skiaBasedOwner: SkiaBasedOwner,

@@ -44,6 +44,7 @@ val KeyEvent.awtEvent: java.awt.event.KeyEvent get() {
  */
 @Suppress("DEPRECATION")
 val PointerEvent.awtEventOrNull: java.awt.event.MouseEvent? get() {
+    if (nativeEvent is SyntheticMouseEvent) return null
     return nativeEvent as? java.awt.event.MouseEvent
 }
 
