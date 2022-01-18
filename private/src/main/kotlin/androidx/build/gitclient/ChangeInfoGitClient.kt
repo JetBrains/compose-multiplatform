@@ -16,15 +16,16 @@
 
 package androidx.build.gitclient
 
+import org.gradle.api.GradleException
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import java.io.File
 
 /**
- * A git client based on changeinfo files created by the build server.
+ * A git client based on changeinfo files and manifest files created by the build server.
  *
- * For sample config files, see:
+ * For sample changeinfo config files, see:
  * ChangeInfoGitClientTest.kt
  * https://android-build.googleplex.com/builds/pending/P28356101/androidx_incremental/latest/incremental/P28356101-changeInfo
  *
@@ -34,16 +35,33 @@ private const val mainProject: String = "platform/frameworks/support"
 
 class ChangeInfoGitClient(
     /**
-     * The file containing the change information
+     * The file containing the information about which changes are new in this build
      */
-    private val config: String
+    private val changeInfo: String,
+    /**
+     * The file containing version information
+     */
+    private val versionInfo: String
 ) : GitClient {
 
     private val changeInfoParsed: JSONObject
 
     init {
-       val parser = JSONParser()
-       changeInfoParsed = parser.parse(config) as JSONObject
+       val changeInfoParser = JSONParser()
+       changeInfoParsed = changeInfoParser.parse(changeInfo) as JSONObject
+    }
+
+    private fun parseSupportVersion(config: String): String? {
+        val revisionRegex = Regex("revision=\"([^\"]*)\"")
+        for (line in config.split("\n")) {
+            if (line.contains("path=\"frameworks/support\"")) {
+                val result = revisionRegex.find(line)?.groupValues?.get(1)
+                if (result != null) {
+                    return result
+                }
+            }
+        }
+        throw GradleException("Could not identify frameworks/support version from text '$config'")
     }
 
     private val changesInThisRepo: List<JSONObject>
@@ -126,13 +144,7 @@ class ChangeInfoGitClient(
                 "not ${gitCommitRange.untilInclusive}"
             )
         }
-        var latestCommit: String? = null
-        for (change in changesInThisRepo) {
-            val revisions: JSONArray = change.get("revisions") as JSONArray
-            for (revision in revisions) {
-                latestCommit = (revision as JSONObject).get("gitRevision").toString()
-            }
-        }
+        var latestCommit: String? = parseSupportVersion(versionInfo)
         if (latestCommit != null) {
             return listOf(Commit(latestCommit, fullProjectDir.toString()))
         }
