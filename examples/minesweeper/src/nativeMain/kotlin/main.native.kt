@@ -1,7 +1,4 @@
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,28 +7,15 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.isPrimaryPressed
+import androidx.compose.ui.input.pointer.isSecondaryPressed
+import androidx.compose.ui.input.pointer.isShiftPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Window
-import kotlinx.browser.document
-import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.dom.Button
-import org.jetbrains.compose.web.dom.Div
-import org.jetbrains.compose.web.dom.Img
-import org.jetbrains.compose.web.renderComposable
-import org.jetbrains.compose.web.ui.Styles
-import org.jetbrains.skiko.wasm.onWasmReady
-
-fun main() {
-    onWasmReady {
-        Window("Falling Balls") {
-            Game()
-        }
-    }
-}
 
 @Composable
 actual fun CellWithIcon(src: String, alt: String) {
@@ -61,7 +45,7 @@ actual fun NewGameButton(text: String, onClick: () -> Unit) {
             .border(width = 1.dp,  color = Color.White)
             .clickable { onClick() }
     ) {
-        androidx.compose.material.Text(text,
+        Text(text,
             fontSize = 18.sp,
             color = Color.White,
             modifier = Modifier.padding(4.dp)

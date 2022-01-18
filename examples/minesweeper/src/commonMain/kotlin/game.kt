@@ -113,7 +113,13 @@ fun IndicatorWithIcon(iconPath: String, alt: String, value: Int) {
 expect fun NewGameButton(text: String, onClick: () -> Unit)
 
 @Composable
-fun Game(requestWindowSize: ((width: Dp, height: Dp) -> Unit)? = null) = Column {
+private fun NoInlineColumn(content: @Composable ColumnScope.() -> Unit) {
+    // Temporary wrap call to inline fun Column into no-inline function to workaround K/JS compilation error
+    Column { this.content() }
+}
+
+@Composable
+fun Game(requestWindowSize: ((width: Dp, height: Dp) -> Unit)? = null) = NoInlineColumn {
     val windowPadding = 16.dp
     val boardBorderWidth = 1.dp
     val boardPadding = 4.dp
