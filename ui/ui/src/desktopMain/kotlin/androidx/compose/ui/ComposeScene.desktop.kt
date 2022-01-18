@@ -16,10 +16,12 @@
 package androidx.compose.ui
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerButtons
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventData
+import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
 import androidx.compose.ui.input.pointer.PointerType
 import java.awt.event.InputMethodEvent
 import java.awt.event.MouseEvent
@@ -48,7 +50,9 @@ internal actual fun pointerInputEvent(
     type: PointerType,
     isMousePressed: Boolean,
     pointerId: Long,
-    scrollDelta: Offset
+    scrollDelta: Offset,
+    buttons: PointerButtons,
+    keyboardModifiers: PointerKeyboardModifiers,
 ): PointerInputEvent {
     return PointerInputEvent(
         eventType,
@@ -64,6 +68,19 @@ internal actual fun pointerInputEvent(
                 scrollDelta = scrollDelta
             )
         ),
+        buttons,
+        keyboardModifiers,
         nativeEvent as MouseEvent?
     )
 }
+
+@OptIn(ExperimentalComposeUiApi::class)
+internal actual val DefaultPointerButtons: PointerButtons = PointerButtons()
+
+@OptIn(ExperimentalComposeUiApi::class)
+internal actual val DefaultPointerKeyboardModifiers: PointerKeyboardModifiers =
+    PointerKeyboardModifiers()
+
+@OptIn(ExperimentalComposeUiApi::class)
+internal actual val PrimaryPressedPointerButtons: PointerButtons =
+    PointerButtons(isPrimaryPressed = true)

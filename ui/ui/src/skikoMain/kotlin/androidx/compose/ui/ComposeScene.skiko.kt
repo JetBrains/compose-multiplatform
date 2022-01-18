@@ -27,9 +27,11 @@ import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerButtons
 import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerInputEvent
+import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.PlatformComponent
@@ -132,6 +134,8 @@ class ComposeScene internal constructor(
      * another [RootForTest]
      */
     val roots: Set<RootForTest> get() = list
+
+    private val defaultPointerStateTracker = DefaultPointerStateTracker()
 
     private var pointerId = 0L
     private var isMousePressed = false
@@ -347,6 +351,9 @@ class ComposeScene internal constructor(
      * is platform-dependent.
      * @param type The device type that produced the event, such as [mouse][PointerType.Mouse],
      * or [touch][PointerType.Touch].
+     * @param buttons Contains the state of pointer buttons (e.g. mouse and stylus buttons).
+     * @param keyboardModifiers Contains the state of modifier keys, such as Shift, Control,
+     * and Alt, as well as the state of the lock keys, such as Caps Lock and Num Lock.
      * @param nativeEvent The original native event.
      */
     @OptIn(ExperimentalComposeUiApi::class)
@@ -356,12 +363,17 @@ class ComposeScene internal constructor(
         scrollDelta: Offset = Offset(0f, 0f),
         timeMillis: Long = System.nanoTime() / 1_000_000L,
         type: PointerType = PointerType.Mouse,
+        buttons: PointerButtons? = null,
+        keyboardModifiers: PointerKeyboardModifiers? = null,
         nativeEvent: Any? = null,
-        // TODO(demin): support PointerButtons, PointerKeyboardModifiers
-//        buttons: PointerButtons? = null,
-//        keyboardModifiers: PointerKeyboardModifiers? = null,
     ): Unit = postponeInvalidation {
         check(!isClosed) { "ComposeScene is closed" }
+        defaultPointerStateTracker.onPointerEvent(eventType)
+
+        val actualButtons = buttons ?: defaultPointerStateTracker.buttons
+        val actualKeyboardModifiers =
+            keyboardModifiers ?: defaultPointerStateTracker.keyboardModifiers
+
         when (eventType) {
             PointerEventType.Press -> isMousePressed = true
             PointerEventType.Release -> isMousePressed = false
@@ -374,7 +386,9 @@ class ComposeScene internal constructor(
             type,
             isMousePressed,
             pointerId,
-            scrollDelta
+            scrollDelta,
+            actualButtons,
+            actualKeyboardModifiers
         )
         when (eventType) {
             PointerEventType.Press -> onMousePressed(event)
@@ -421,6 +435,21 @@ class ComposeScene internal constructor(
     internal fun onInputMethodEvent(event: Any) = this.onPlatformInputMethodEvent(event)
 }
 
+private class DefaultPointerStateTracker {
+    fun onPointerEvent(eventType: PointerEventType) {
+        when (eventType) {
+            PointerEventType.Press -> buttons = PrimaryPressedPointerButtons
+            PointerEventType.Release -> buttons = DefaultPointerButtons
+        }
+    }
+
+    var buttons = DefaultPointerButtons
+        private set
+
+    var keyboardModifiers = DefaultPointerKeyboardModifiers
+        private set
+}
+
 internal expect fun ComposeScene.onPlatformInputMethodEvent(event: Any)
 
 internal expect fun pointerInputEvent(
@@ -431,5 +460,11 @@ internal expect fun pointerInputEvent(
     type: PointerType,
     isMousePressed: Boolean,
     pointerId: Long,
-    scrollDelta: Offset
+    scrollDelta: Offset,
+    buttons: PointerButtons,
+    keyboardModifiers: PointerKeyboardModifiers,
 ): PointerInputEvent
+
+internal expect val DefaultPointerButtons: PointerButtons
+internal expect val DefaultPointerKeyboardModifiers: PointerKeyboardModifiers
+internal expect val PrimaryPressedPointerButtons: PointerButtons

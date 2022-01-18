@@ -21,8 +21,10 @@ package androidx.compose.ui.platform
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.DefaultPointerButtons
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.InternalComposeUiApi
+import androidx.compose.ui.PrimaryPressedPointerButtons
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.focus.FocusDirection
@@ -363,6 +365,8 @@ internal class SkiaBasedOwner(
                         PointerEventType.Move,
                         lastPointerEvent.uptime,
                         lastPointerEvent.pointers,
+                        lastPointerEvent.buttons,
+                        lastPointerEvent.keyboardModifiers,
                         lastPointerEvent.mouseEvent
                     )
                 )
@@ -394,11 +398,13 @@ internal class SkiaBasedOwner(
     }
 
     override fun processPointerInput(timeMillis: Long, pointers: List<TestPointerInputEventData>) {
+        val isPressed = pointers.any { it.down }
         processPointerInput(
             PointerInputEvent(
                 PointerEventType.Unknown,
                 timeMillis,
-                pointers.map { it.toPointerInputEventData() }
+                pointers.map { it.toPointerInputEventData() },
+                if (isPressed) PrimaryPressedPointerButtons else DefaultPointerButtons
             )
         )
     }

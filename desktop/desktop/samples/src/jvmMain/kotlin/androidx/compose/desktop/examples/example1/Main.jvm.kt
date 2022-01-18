@@ -94,6 +94,8 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerIconDefaults
+import androidx.compose.ui.input.pointer.isBackPressed
+import androidx.compose.ui.input.pointer.isForwardPressed
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalUriHandler
@@ -389,6 +391,9 @@ private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
                             append("primary: ${buttons.isPrimaryPressed}\t")
                             append("secondary: ${buttons.isSecondaryPressed}\t")
                             append("tertiary: ${buttons.isTertiaryPressed}\t")
+                            append("primary: ${buttons.isPrimaryPressed}\t")
+                            append("back: ${buttons.isBackPressed}\t")
+                            append("forward: ${buttons.isForwardPressed}\t")
 
                             append("\n\nKeyboard modifiers pressed:\n")
 
