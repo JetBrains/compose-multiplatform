@@ -1,11 +1,16 @@
 package org.jetbrains.compose.web.core.tests
 
-import androidx.compose.runtime.*
-import org.jetbrains.compose.web.dom.Div
-import org.jetbrains.compose.web.renderComposable
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.RecomposeScope
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.currentRecomposeScope
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import kotlinx.browser.document
 import kotlinx.dom.clear
-import org.jetbrains.compose.web.testutils.*
+import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.testutils.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -30,6 +35,27 @@ class DomSideEffectTests {
             actual = root.outerHTML
         )
     }
+
+    @Test
+    fun canCreateElementsInSideEffect() = runTest {
+        composition {
+            Div {
+                SideEffect {
+                    element.appendChild(
+                        document.createElement("p").also {
+                            it.appendChild(document.createTextNode("Hello World!"))
+                        }
+                    )
+                }
+            }
+        }
+
+        assertEquals(
+            expected = "<div><div><p>Hello World!</p></div></div>",
+            actual = root.outerHTML
+        )
+    }
+
 
     @Test
     fun canUpdateElementsCreatedInDomSideEffect() = runTest {
