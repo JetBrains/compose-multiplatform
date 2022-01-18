@@ -25,6 +25,7 @@ import androidx.compose.foundation.text.TextFieldDelegate
 import androidx.compose.foundation.text.TextFieldState
 import androidx.compose.foundation.text.TextLayoutResultProxy
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -207,6 +208,7 @@ class TextFieldMagnifierTest {
             val resourceLoader = LocalFontLoader.current
             val density = LocalDensity.current
             selectionManager.value = TextFieldValue(Text)
+            val scope = currentRecomposeScope
             // The value won't ever change so we don't need to worry about ever updating the state.
             selectionManager.state = remember {
                 TextFieldState(
@@ -215,7 +217,8 @@ class TextFieldMagnifierTest {
                         style = TextStyle.Default,
                         density = density,
                         resourceLoader = resourceLoader
-                    )
+                    ),
+                    scope
                 )
             }
             // Required for the drag observers to actually update the selection.
