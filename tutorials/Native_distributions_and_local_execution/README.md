@@ -256,7 +256,7 @@ The following properties are available in the `nativeDistributions` DSL block:
 * `version` — application's version (default value: Gradle project's [version](https://docs.gradle.org/current/javadoc/org/gradle/api/Project.html#getVersion--));
 * `description` — application's description (default value: none);
 * `copyright` — application's copyright (default value: none);
-* `vendor` — application's vendor (default value: none).
+* `vendor` — application's vendor (default value: none);
 * `licenseFile` — application's license (default value: none).
 
 ``` kotlin
@@ -436,9 +436,16 @@ The following platform-specific options are available
     * `packageName` — a name of the application;
     * `dockName` — a name of the application displayed in the menu bar, the "About <App>" menu item, in the dock, etc. 
       Equals to `packageName` by default.
-    * `signing` and `notarization` — see
+    * `signing`, `notarization`, and `provisioningProfile` — see
       [the corresponding tutorial](/tutorials/Signing_and_notarization_on_macOS/README.md) 
       for details;
+    * `appStore = true` — build and sign for the Apple App Store. Requires at least JDK 17;
+    * `appCategory` — category of the app for the Apple App Store. 
+      Default value is `utilities` when building for the App Store, `Unknown` otherwise. 
+      See [LSApplicationCategoryType](https://developer.apple.com/documentation/bundleresources/information_property_list/lsapplicationcategorytype) for a list of valid categories;
+    * `entitlementsFile.set(File("PATH_TO_ENTITLEMENTS"))` — a path to file containing entitlements to use when signing.
+      When a custom file is provided, make sure to add the entitlements that are required for Java apps.
+      See [sandbox.plist](https://github.com/openjdk/jdk/blob/master/src/jdk.jpackage/macosx/classes/jdk/jpackage/internal/resources/sandbox.plist) for the default file that is used when building for the App Store. It can be different depending on your JDK version.
     * `dmgPackageVersion = "DMG_VERSION"` — a dmg-specific package version
       (see the section `Specifying package version` for details);
     * `pkgPackageVersion = "PKG_VERSION"` — a pkg-specific package version
