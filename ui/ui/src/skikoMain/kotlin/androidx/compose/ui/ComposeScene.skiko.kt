@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toIntRect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -263,6 +264,12 @@ class ComposeScene internal constructor(
         if (owner == focusedOwner) {
             focusedOwner = list.lastOrNull { it.isFocusable }
         }
+        if (owner == lastMoveOwner) {
+            lastMoveOwner = null
+        }
+        if (owner == pressOwner) {
+            pressOwner = null
+        }
     }
 
     /**
@@ -309,6 +316,7 @@ class ComposeScene internal constructor(
             component,
             pointerPositionUpdater,
             density,
+            IntSize(constraints.maxWidth, constraints.maxHeight).toIntRect(),
             onPreviewKeyEvent = onPreviewKeyEvent,
             onKeyEvent = onKeyEvent
         )
@@ -326,7 +334,7 @@ class ComposeScene internal constructor(
     }
 
     /**
-     * Set constraints, which will be used to measure and layout content.
+     * Constraints used to measure and layout content.
      */
     var constraints: Constraints = Constraints()
         set(value) {
@@ -334,6 +342,7 @@ class ComposeScene internal constructor(
             forEachOwner {
                 it.constraints = constraints
             }
+            mainOwner?.bounds = IntSize(constraints.maxWidth, constraints.maxHeight).toIntRect()
         }
 
     /**
@@ -363,12 +372,14 @@ class ComposeScene internal constructor(
     }
 
     private var focusedOwner: SkiaBasedOwner? = null
-    private val hoveredOwner: SkiaBasedOwner?
-        get() = list.lastOrNull { it.isHovered(pointLocation) } ?: list.lastOrNull()
+    private var pressOwner: SkiaBasedOwner? = null
+    private var lastMoveOwner: SkiaBasedOwner? = null
+    private fun hoveredOwner(event: PointerInputEvent): SkiaBasedOwner? =
+        list.lastOrNull { it.isHovered(event.pointers.first().position) }
 
     private fun SkiaBasedOwner?.isAbove(
         targetOwner: SkiaBasedOwner?
-    ) = list.indexOf(this) > list.indexOf(targetOwner)
+    ) = this != null && targetOwner != null && list.indexOf(this) > list.indexOf(targetOwner)
 
     // TODO(demin): return Boolean (when it is consumed)
     /**
@@ -431,37 +442,70 @@ class ComposeScene internal constructor(
     @OptIn(ExperimentalComposeUiApi::class)
     private fun processPointerInput(event: PointerInputEvent) {
         when (event.eventType) {
-            PointerEventType.Press -> onMousePressed(event)
-            PointerEventType.Release -> onMouseReleased(event)
-            PointerEventType.Move -> {
-                pointLocation = event.pointers.first().position
-                hoveredOwner?.processPointerInput(event)
-            }
-            PointerEventType.Enter -> hoveredOwner?.processPointerInput(event)
-            PointerEventType.Exit -> hoveredOwner?.processPointerInput(event)
-            PointerEventType.Scroll -> hoveredOwner?.processPointerInput(event)
+            PointerEventType.Press -> processPress(event)
+            PointerEventType.Release -> processRelease(event)
+            PointerEventType.Move -> processMove(event)
+            PointerEventType.Enter -> processMove(event)
+            PointerEventType.Exit -> processMove(event)
+            PointerEventType.Scroll -> processScroll(event)
+        }
+
+        if (!event.buttons.areAnyPressed) {
+            pressOwner = null
         }
     }
 
-    private fun onMousePressed(event: PointerInputEvent) {
-        val currentOwner = hoveredOwner
-        if (currentOwner != null) {
-            if (focusedOwner.isAbove(currentOwner)) {
-                focusedOwner?.onDismissRequest?.invoke()
-            } else {
-                currentOwner.processPointerInput(event)
-            }
+    private fun processPress(event: PointerInputEvent) {
+        val owner = hoveredOwner(event)
+        if (focusedOwner.isAbove(owner)) {
+            focusedOwner?.onDismissRequest?.invoke()
         } else {
-            focusedOwner?.processPointerInput(event)
+            owner?.processPointerInput(event)
+            pressOwner = owner
         }
     }
 
-    private fun onMouseReleased(event: PointerInputEvent) {
-        val owner = hoveredOwner ?: focusedOwner
+    private fun processRelease(event: PointerInputEvent) {
+        val owner = pressOwner ?: hoveredOwner(event)
         owner?.processPointerInput(event)
     }
 
-    private var pointLocation = Offset.Zero
+    private fun processMove(event: PointerInputEvent) {
+        val owner = when {
+            event.buttons.areAnyPressed -> pressOwner
+            event.eventType == PointerEventType.Exit -> null
+            else -> hoveredOwner(event)
+        }
+
+        // Cases:
+        // - move from outside to the window (owner != null, lastMoveOwner == null): Enter
+        // - move from the window to outside (owner == null, lastMoveOwner != null): Exit
+        // - move from one point of the window to another (owner == lastMoveOwner): Move
+        // - move from one popup to another (owner != lastMoveOwner): [Popup 1] Exit, [Popup 2] Enter
+
+        if (owner != lastMoveOwner) {
+            lastMoveOwner?.processPointerInput(
+                event.copy(eventType = PointerEventType.Exit),
+                isInBounds = false
+            )
+            owner?.processPointerInput(
+                event.copy(eventType = PointerEventType.Enter)
+            )
+        } else {
+            owner?.processPointerInput(
+                event.copy(eventType = PointerEventType.Move)
+            )
+        }
+
+        lastMoveOwner = owner
+    }
+
+    private fun processScroll(event: PointerInputEvent) {
+        val owner = hoveredOwner(event)
+        if (!focusedOwner.isAbove(owner)) {
+            owner?.processPointerInput(event)
+        }
+    }
 
     /**
      * Send [KeyEvent] to the content.

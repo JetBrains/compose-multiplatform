@@ -79,6 +79,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.round
 import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
 
 private typealias Command = () -> Unit
@@ -93,7 +94,7 @@ internal class SkiaBasedOwner(
     private val component: PlatformComponent,
     private val pointerPositionUpdater: PointerPositionUpdater,
     density: Density = Density(1f, 1f),
-    val isPopup: Boolean = false,
+    bounds: IntRect = IntRect.Zero,
     val isFocusable: Boolean = true,
     val onDismissRequest: (() -> Unit)? = null,
     private val onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
@@ -107,7 +108,7 @@ internal class SkiaBasedOwner(
 
     internal var accessibilityController: AccessibilityController? = null
 
-    internal var bounds by mutableStateOf(IntRect.Zero)
+    var bounds by mutableStateOf(bounds)
 
     override var density by mutableStateOf(density)
 
@@ -167,16 +168,6 @@ internal class SkiaBasedOwner(
     }
 
     var constraints: Constraints = Constraints()
-        set(value) {
-            field = value
-
-            if (!isPopup) {
-                this.bounds = IntRect(
-                    IntOffset(bounds.left, bounds.top),
-                    IntSize(constraints.maxWidth, constraints.maxHeight)
-                )
-            }
-        }
 
     override val root = LayoutNode().also {
         it.measurePolicy = RootMeasurePolicy
@@ -377,14 +368,16 @@ internal class SkiaBasedOwner(
 
     private var desiredPointerIcon: PointerIcon? = null
 
-    internal fun processPointerInput(event: PointerInputEvent): ProcessResult {
+    internal fun processPointerInput(
+        event: PointerInputEvent,
+        isInBounds: Boolean = true
+    ): ProcessResult {
         desiredPointerIcon = null
         return pointerInputEventProcessor.process(
             event,
             this,
-            isInBounds = event.pointers.all {
-                it.position.x in 0f..root.width.toFloat() &&
-                    it.position.y in 0f..root.height.toFloat()
+            isInBounds = isInBounds && event.pointers.all {
+                bounds.contains(it.position.round())
             }
         ).also {
             if (it.dispatchedToAPointerInputModifier) {

@@ -149,7 +149,6 @@ private fun PopupLayout(
     val density = LocalDensity.current
 
     var parentBounds by remember { mutableStateOf(IntRect.Zero) }
-    var popupBounds by remember { mutableStateOf(IntRect.Zero) }
 
     // getting parent bounds
     Layout(
@@ -173,7 +172,6 @@ private fun PopupLayout(
             component = scene.component,
             pointerPositionUpdater = scene.pointerPositionUpdater,
             density = density,
-            isPopup = true,
             isFocusable = focusable,
             onDismissRequest = onDismissRequest,
             onPreviewKeyEvent = onPreviewKeyEvent,
@@ -196,12 +194,10 @@ private fun PopupLayout(
                                 layoutDirection = layoutDirection,
                                 popupContentSize = IntSize(placeable.width, placeable.height)
                             )
-
-                            popupBounds = IntRect(
+                            owner.bounds = IntRect(
                                 position,
                                 IntSize(placeable.width, placeable.height)
                             )
-                            owner.bounds = popupBounds
                             placeable.place(position.x, position.y)
                         }
                     }
