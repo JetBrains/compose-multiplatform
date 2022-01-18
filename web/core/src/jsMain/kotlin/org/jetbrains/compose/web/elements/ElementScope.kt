@@ -39,6 +39,7 @@ interface ElementScope<out TElement : Element> : DOMScope<TElement> {
      */
     @Composable
     @NonRestartableComposable
+    @Deprecated("DisposableRefEffect is deprecated, use regular DisposableEffect instead and access element via scope if needed")
     fun DisposableRefEffect(
         key: Any?,
         effect: DisposableEffectScope.(TElement) -> DisposableEffectResult
@@ -52,6 +53,7 @@ interface ElementScope<out TElement : Element> : DOMScope<TElement> {
      */
     @Composable
     @NonRestartableComposable
+    @Deprecated("DisposableRefEffect is deprecated, use regular DisposableEffect instead and access element via scope if needed")
     fun DisposableRefEffect(
         effect: DisposableEffectScope.(TElement) -> DisposableEffectResult
     ) {
@@ -65,6 +67,7 @@ interface ElementScope<out TElement : Element> : DOMScope<TElement> {
      */
     @Composable
     @NonRestartableComposable
+    @Deprecated("DomSideEffect is deprecated, use regular DisposableEffect instead and access element via scope if needed")
     fun DomSideEffect(key: Any?, effect: DomEffectScope.(TElement) -> Unit)
 
     /**
@@ -74,6 +77,7 @@ interface ElementScope<out TElement : Element> : DOMScope<TElement> {
      */
     @Composable
     @NonRestartableComposable
+    @Deprecated("DomSideEffect is deprecated, use regular DisposableEffect instead and access element via scope if needed")
     fun DomSideEffect(effect: DomEffectScope.(TElement) -> Unit)
 }
 
