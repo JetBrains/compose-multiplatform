@@ -195,6 +195,7 @@ class AndroidXImplPlugin : Plugin<Project> {
                     it.archiveFileName.set(archiveName)
                     it.from(project.file(xmlReport.outputLocation))
                 }
+                @Suppress("DEPRECATION") // TODO: remove when studio upgrades to Gradle 7.4-rc-1
                 val ignoreFailuresProperty = project.providers.gradleProperty(
                     TEST_FAILURES_DO_NOT_FAIL_TEST_TASK
                 ).forUseAtConfigurationTime()

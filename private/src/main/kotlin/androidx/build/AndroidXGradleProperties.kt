@@ -215,6 +215,7 @@ fun Project.validateAllAndroidxArgumentsAreRecognized() {
  * results aren't considered build failures, and instead pass their test failures on via build
  * artifacts to be tracked and displayed on test dashboards in a different format
  */
+@Suppress("DEPRECATION") // TODO: remove when studio upgrades to Gradle 7.4-rc-1
 fun Project.isDisplayTestOutput(): Boolean =
     (providers.gradleProperty(DISPLAY_TEST_OUTPUT).forUseAtConfigurationTime().orNull)?.toBoolean()
         ?: true
