@@ -38,7 +38,6 @@ import androidx.compose.ui.platform.PlatformComponent
 import androidx.compose.ui.platform.SkiaBasedOwner
 import androidx.compose.ui.platform.PlatformInput
 import androidx.compose.ui.platform.DummyPlatformComponent
-import androidx.compose.ui.platform.EmptyDispatcher
 import androidx.compose.ui.platform.FlushCoroutineDispatcher
 import androidx.compose.ui.platform.GlobalSnapshotManager
 import androidx.compose.ui.platform.setContent
@@ -49,6 +48,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.Canvas
@@ -71,10 +71,10 @@ internal val LocalComposeScene = staticCompositionLocalOf<ComposeScene> {
  * and subscriptions will be properly closed. Otherwise there can be a memory leak.
  */
 class ComposeScene internal constructor(
-    coroutineContext: CoroutineContext,
+    coroutineContext: CoroutineContext = Dispatchers.Unconfined,
     internal val component: PlatformComponent,
-    density: Density,
-    private val invalidate: () -> Unit
+    density: Density = Density(1f),
+    private val invalidate: () -> Unit = {}
 ) {
     /**
      * Constructs [ComposeScene]
@@ -87,7 +87,7 @@ class ComposeScene internal constructor(
      * schedule the next [render] in your rendering loop.
      */
     constructor(
-        coroutineContext: CoroutineContext = EmptyDispatcher,
+        coroutineContext: CoroutineContext = Dispatchers.Unconfined,
         density: Density = Density(1f),
         invalidate: () -> Unit = {}
     ) : this(
@@ -141,11 +141,15 @@ class ComposeScene internal constructor(
     private var isMousePressed = false
 
     private val job = Job()
-    private val dispatcher = FlushCoroutineDispatcher(CoroutineScope(coroutineContext + job))
+    private val coroutineScope = CoroutineScope(coroutineContext + job)
+    // We use FlushCoroutineDispatcher for effectDispatcher not because we need `flush` for
+    // LaunchEffect tasks, but because we need to know if it is idle (hasn't scheduled tasks)
+    private val effectDispatcher = FlushCoroutineDispatcher(coroutineScope)
+    private val recomposeDispatcher = FlushCoroutineDispatcher(coroutineScope)
     private val frameClock = BroadcastFrameClock(onNewAwaiters = ::invalidateIfNeeded)
-    private val coroutineScope = CoroutineScope(coroutineContext + job + dispatcher + frameClock)
 
-    private val recomposer = Recomposer(coroutineScope.coroutineContext)
+    private val recomposer = Recomposer(coroutineContext + job + effectDispatcher)
+
     internal val platformInputService: PlatformInput = PlatformInput(component)
 
     private var mainOwner: SkiaBasedOwner? = null
@@ -165,7 +169,10 @@ class ComposeScene internal constructor(
 
     init {
         GlobalSnapshotManager.ensureStarted()
-        coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
+        coroutineScope.launch(
+            recomposeDispatcher + frameClock,
+            start = CoroutineStart.UNDISPATCHED
+        ) {
             recomposer.runRecomposeAndApplyChanges()
         }
     }
@@ -199,7 +206,8 @@ class ComposeScene internal constructor(
      */
     fun hasInvalidations() = hasPendingDraws ||
         recomposer.hasPendingWork ||
-        dispatcher.hasTasks()
+        effectDispatcher.hasTasks() ||
+        recomposeDispatcher.hasTasks()
 
     internal fun attach(owner: SkiaBasedOwner) {
         check(!isClosed) { "ComposeScene is closed" }
@@ -279,7 +287,7 @@ class ComposeScene internal constructor(
         this.mainOwner = mainOwner
 
         // to perform all pending work synchronously. to start LaunchedEffect for example
-        dispatcher.flush()
+        recomposeDispatcher.flush()
     }
 
     /**
@@ -311,24 +319,20 @@ class ComposeScene internal constructor(
     fun render(canvas: Canvas, nanoTime: Long) {
         check(!isClosed) { "ComposeScene is closed" }
         postponeInvalidation {
-            // TODO(https://github.com/JetBrains/compose-jb/issues/1135):
-            //  Temporarily workaround for flaky tests in WithComposeUiTest.
-            //  It fails when we remove synchronized and run:
-            //  ./gradlew desktopTest -Pandroidx.compose.multiplatformEnabled=true
-            //  We should make a minimal reproducer, and fix race condition somewhere
-            //  else, not here.
-            //  See also GlobalSnapshotManager.
-            synchronized(Snapshot.current) {
-                // We must see the actual state before we will render the frame
-                Snapshot.sendApplyNotifications()
-                dispatcher.flush()
-                frameClock.sendFrame(nanoTime)
-            }
+            // We must see the actual state before we will render the frame
+            Snapshot.sendApplyNotifications()
+            recomposeDispatcher.flush()
+            frameClock.sendFrame(nanoTime)
 
             forEachOwner {
                 it.render(canvas)
             }
         }
+    }
+
+    // for TestComposeWindow backward compatibility
+    internal fun flushEffects() {
+        effectDispatcher.flush()
     }
 
     private var focusedOwner: SkiaBasedOwner? = null
