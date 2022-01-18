@@ -5,7 +5,6 @@
 
 package org.jetbrains.compose.web.css
 
-import org.jetbrains.compose.web.ExperimentalComposeWebApi
 import org.w3c.dom.css.CSS
 
 fun interface FilterFunction {
@@ -98,7 +97,6 @@ private class FilterBuilderImplementation : FilterBuilder {
     }
 }
 
-@ExperimentalComposeWebApi
 fun StyleBuilder.filter(filterContext: FilterBuilder.() -> Unit) {
     val builder = FilterBuilderImplementation()
     property("filter", builder.apply(filterContext).toString())

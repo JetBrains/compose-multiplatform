@@ -5,8 +5,6 @@
 
 package org.jetbrains.compose.web.css
 
-import org.jetbrains.compose.web.ExperimentalComposeWebApi
-
 fun interface TransformFunction {
     fun apply(): String
 }
@@ -197,7 +195,6 @@ private class TransformBuilderImplementation : TransformBuilder {
     }
 }
 
-@ExperimentalComposeWebApi
 fun StyleBuilder.transform(transformContext: TransformBuilder.() -> Unit) {
     val transformBuilder = TransformBuilderImplementation()
     property("transform", transformBuilder.apply(transformContext).toString())
