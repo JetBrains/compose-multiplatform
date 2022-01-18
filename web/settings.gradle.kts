@@ -62,6 +62,7 @@ fun module(name: String, path: String) {
 
 module(":web-core", "core")
 module(":web-svg", "svg")
+module(":web-css", "css")
 module(":web-widgets", "widgets")
 module(":web-integration-core", "integration-core")
 module(":web-integration-widgets", "integration-widgets")

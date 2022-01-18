@@ -24,6 +24,7 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
                 implementation(kotlin("stdlib-common"))
+                implementation(project(":web-css"))
             }
         }
 
