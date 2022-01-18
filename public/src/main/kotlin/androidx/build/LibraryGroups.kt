@@ -94,6 +94,7 @@ object LibraryGroups {
     val SQLITE = LibraryGroup("androidx.sqlite", LibraryVersions.SQLITE)
     val SWIPEREFRESHLAYOUT = LibraryGroup("androidx.swiperefreshlayout", LibraryVersions.SWIPEREFRESHLAYOUT)
     val TESTSCREENSHOT = LibraryGroup("androidx.test.screenshot", LibraryVersions.TESTSCREENSHOT)
+    val TESTJUNIT = LibraryGroup("androidx.test.junit", LibraryVersions.TESTJUNIT)
     val TEXT = LibraryGroup("androidx.text", LibraryVersions.TEXT)
     val TEXTCLASSIFIER = LibraryGroup("androidx.textclassifier", LibraryVersions.TEXTCLASSIFIER)
     val TRACING = LibraryGroup("androidx.tracing", LibraryVersions.TRACING)
