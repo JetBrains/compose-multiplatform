@@ -1974,11 +1974,13 @@ package androidx.compose.ui.layout {
   public final class SubcomposeLayoutKt {
     method @androidx.compose.runtime.Composable public static void SubcomposeLayout(optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function2<? super androidx.compose.ui.layout.SubcomposeMeasureScope,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measurePolicy);
     method @androidx.compose.runtime.Composable public static void SubcomposeLayout(androidx.compose.ui.layout.SubcomposeLayoutState state, optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function2<? super androidx.compose.ui.layout.SubcomposeMeasureScope,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measurePolicy);
+    method public static androidx.compose.ui.layout.SubcomposeSlotReusePolicy SubcomposeSlotReusePolicy(int maxSlotsToRetainForReuse);
   }
 
   public final class SubcomposeLayoutState {
-    ctor public SubcomposeLayoutState(int maxSlotsToRetainForReuse);
+    ctor public SubcomposeLayoutState(androidx.compose.ui.layout.SubcomposeSlotReusePolicy slotReusePolicy);
     ctor public SubcomposeLayoutState();
+    ctor @Deprecated public SubcomposeLayoutState(int maxSlotsToRetainForReuse);
     method public androidx.compose.ui.layout.SubcomposeLayoutState.PrecomposedSlotHandle precompose(Object? slotId, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
@@ -1988,6 +1990,11 @@ package androidx.compose.ui.layout {
 
   public interface SubcomposeMeasureScope extends androidx.compose.ui.layout.MeasureScope {
     method public java.util.List<androidx.compose.ui.layout.Measurable> subcompose(Object? slotId, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+  }
+
+  public interface SubcomposeSlotReusePolicy {
+    method public boolean areCompatible(Object? slotId, Object? reusableSlotId);
+    method public void getSlotsToRetain(java.util.Set<java.lang.Object> slotIds);
   }
 
   public final class TestModifierUpdaterKt {

@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.SubcomposeLayoutState
+import androidx.compose.ui.layout.SubcomposeSlotReusePolicy
 
 /**
  * A layout that only composes and lays out currently visible items. Can be used to build
@@ -36,7 +37,9 @@ internal fun LazyLayout(
     val state = remember { LazyLayoutState() }
     state.itemsProvider = itemsProvider
     val itemContentFactory = rememberItemContentFactory(state)
-    val subcomposeLayoutState = remember { SubcomposeLayoutState(MaxItemsToRetainForReuse) }
+    val subcomposeLayoutState = remember {
+        SubcomposeLayoutState(SubcomposeSlotReusePolicy(MaxItemsToRetainForReuse))
+    }
     prefetchPolicy?.let {
         LazyLayoutPrefetcher(prefetchPolicy, state, itemContentFactory, subcomposeLayoutState)
     }

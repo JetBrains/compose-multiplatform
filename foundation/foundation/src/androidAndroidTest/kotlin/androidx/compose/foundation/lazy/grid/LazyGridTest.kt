@@ -188,13 +188,13 @@ class LazyGridTest {
             .scrollBy(y = 103.dp, density = rule.density)
 
         rule.onNodeWithTag("1")
-            .assertDoesNotExist()
+            .assertIsNotDisplayed()
 
         rule.onNodeWithTag("2")
             .assertIsNotDisplayed()
 
         rule.onNodeWithTag("3")
-            .assertIsNotDisplayed()
+            .assertDoesNotExist()
 
         rule.onNodeWithTag("4")
             .assertIsDisplayed()
