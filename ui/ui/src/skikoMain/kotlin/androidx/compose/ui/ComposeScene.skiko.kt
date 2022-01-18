@@ -35,6 +35,7 @@ import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventData
 import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
 import androidx.compose.ui.input.pointer.PointerType
+import androidx.compose.ui.input.pointer.areAnyPressed
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.AccessibilityController
 import androidx.compose.ui.platform.PlatformComponent
@@ -165,9 +166,6 @@ class ComposeScene internal constructor(
     val roots: Set<RootForTest> get() = list
 
     private val defaultPointerStateTracker = DefaultPointerStateTracker()
-
-    private var pointerId = 0L
-    private var isMousePressed = false
 
     private val job = Job()
     private val coroutineScope = CoroutineScope(coroutineContext + job)
@@ -403,18 +401,12 @@ class ComposeScene internal constructor(
         val actualKeyboardModifiers =
             keyboardModifiers ?: defaultPointerStateTracker.keyboardModifiers
 
-        when (eventType) {
-            PointerEventType.Press -> isMousePressed = true
-            PointerEventType.Release -> isMousePressed = false
-        }
         val event = pointerInputEvent(
             eventType,
             position,
             timeMillis,
             nativeEvent,
             type,
-            isMousePressed,
-            pointerId,
             scrollDelta,
             actualButtons,
             actualKeyboardModifiers
@@ -455,7 +447,6 @@ class ComposeScene internal constructor(
     private fun onMouseReleased(event: PointerInputEvent) {
         val owner = hoveredOwner ?: focusedOwner
         owner?.processPointerInput(event)
-        pointerId += 1
     }
 
     private var pointLocation = Offset.Zero
@@ -498,8 +489,6 @@ private fun pointerInputEvent(
     timeMillis: Long,
     nativeEvent: Any?,
     type: PointerType,
-    isMousePressed: Boolean,
-    pointerId: Long,
     scrollDelta: Offset,
     buttons: PointerButtons,
     keyboardModifiers: PointerKeyboardModifiers
@@ -509,11 +498,11 @@ private fun pointerInputEvent(
         timeMillis,
         listOf(
             PointerInputEventData(
-                PointerId(pointerId),
+                PointerId(0),
                 timeMillis,
                 position,
                 position,
-                isMousePressed,
+                buttons.areAnyPressed,
                 type,
                 scrollDelta = scrollDelta
             )

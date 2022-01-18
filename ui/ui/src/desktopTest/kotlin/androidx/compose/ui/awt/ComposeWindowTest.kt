@@ -43,31 +43,6 @@ import org.junit.Assume
 import org.junit.Test
 
 class ComposeWindowTest {
-    // bug https://github.com/JetBrains/compose-jb/issues/1448
-    @Test
-    fun `dispose window inside event handler`() = runApplicationTest {
-        var isClickHappened = false
-
-        val window = ComposeWindow()
-        window.isUndecorated = true
-        window.size = Dimension(200, 200)
-        window.setContent {
-            Box(modifier = Modifier.fillMaxSize().background(Color.Blue).clickable {
-                isClickHappened = true
-                window.dispose()
-            })
-        }
-
-        window.isVisible = true
-        awaitIdle()
-
-        window.sendMouseEvent(MOUSE_PRESSED, x = 100, y = 50)
-        window.sendMouseEvent(MOUSE_RELEASED, x = 100, y = 50)
-        awaitIdle()
-
-        assertThat(isClickHappened).isTrue()
-    }
-
     @Test
     fun `don't override user preferred size`() {
         Assume.assumeFalse(GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance)
@@ -145,25 +120,29 @@ class ComposeWindowTest {
         }
     }
 
+    // bug https://github.com/JetBrains/compose-jb/issues/1448
     @Test
     fun `dispose window in event handler`() = runApplicationTest {
         val window = ComposeWindow()
         try {
+            var isClickHappened = false
             window.size = Dimension(300, 400)
             window.setContent {
                 Box(modifier = Modifier.fillMaxSize().background(Color.Blue).clickable {
+                    isClickHappened = true
                     window.dispose()
                 })
             }
             window.isVisible = true
-            window.sendMouseEvent(MOUSE_ENTERED, x = 100, y = 50)
+            window.sendMouseEvent(MOUSE_ENTERED, 100, 50)
             awaitIdle()
-            window.sendMouseEvent(MOUSE_MOVED, x = 100, y = 50)
+            window.sendMouseEvent(MOUSE_MOVED, 100, 50)
             awaitIdle()
-            window.sendMouseEvent(MOUSE_PRESSED, x = 100, y = 50, modifiers = BUTTON1_DOWN_MASK)
+            window.sendMouseEvent(MOUSE_PRESSED, 100, 50, modifiers = BUTTON1_DOWN_MASK)
             awaitIdle()
-            window.sendMouseEvent(MOUSE_RELEASED, x = 100, y = 50)
+            window.sendMouseEvent(MOUSE_RELEASED, 100, 50)
             awaitIdle()
+            assertThat(isClickHappened).isTrue()
         } finally {
             window.dispose()
         }

@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-@file:Suppress("DEPRECATION") // https://github.com/JetBrains/compose-jb/issues/1514
-
 package androidx.compose.ui.window.window
 
 import androidx.compose.foundation.layout.Box
@@ -49,11 +47,19 @@ import androidx.compose.ui.window.launchApplication
 import androidx.compose.ui.window.rememberWindowState
 import androidx.compose.ui.window.runApplicationTest
 import com.google.common.truth.Truth.assertThat
-import org.junit.Test
 import java.awt.Toolkit
 import java.awt.event.KeyEvent
 import java.awt.event.MouseEvent
-import java.awt.event.MouseWheelEvent
+import java.awt.event.MouseEvent.BUTTON1_DOWN_MASK
+import java.awt.event.MouseEvent.BUTTON3_DOWN_MASK
+import java.awt.event.MouseEvent.CTRL_DOWN_MASK
+import java.awt.event.MouseEvent.MOUSE_DRAGGED
+import java.awt.event.MouseEvent.MOUSE_PRESSED
+import java.awt.event.MouseEvent.MOUSE_RELEASED
+import java.awt.event.MouseEvent.MOUSE_WHEEL
+import java.awt.event.MouseEvent.SHIFT_DOWN_MASK
+import java.awt.event.MouseWheelEvent.WHEEL_UNIT_SCROLL
+import org.junit.Test
 
 @OptIn(ExperimentalComposeUiApi::class)
 class WindowInputEventTest {
@@ -215,8 +221,8 @@ class WindowInputEventTest {
 
                 Box(
                     Modifier.fillMaxSize().pointerInput(events) {
-                        while (true) {
-                            awaitPointerEventScope {
+                        awaitPointerEventScope {
+                            while (true) {
                                 events += awaitPointerEvent()
                             }
                         }
@@ -229,21 +235,28 @@ class WindowInputEventTest {
         awaitIdle()
         assertThat(events.size).isEqualTo(0)
 
-        window.sendMouseEvent(MouseEvent.MOUSE_PRESSED, x = 100, y = 50)
+        window.sendMouseEvent(MouseEvent.MOUSE_ENTERED, x = 100, y = 50)
         awaitIdle()
         assertThat(events.size).isEqualTo(1)
-        assertThat(events.last().pressed).isEqualTo(true)
+        assertThat(events.last().pressed).isEqualTo(false)
         assertThat(events.last().position).isEqualTo(Offset(100 * density, 50 * density))
 
-        window.sendMouseEvent(MouseEvent.MOUSE_DRAGGED, x = 90, y = 40)
+        window.sendMouseEvent(MOUSE_PRESSED, 100, 50, modifiers = BUTTON1_DOWN_MASK)
         awaitIdle()
         assertThat(events.size).isEqualTo(2)
         assertThat(events.last().pressed).isEqualTo(true)
-        assertThat(events.last().position).isEqualTo(Offset(90 * density, 40 * density))
+        assertThat(events.last().position).isEqualTo(Offset(100 * density, 50 * density))
 
-        window.sendMouseEvent(MouseEvent.MOUSE_RELEASED, x = 80, y = 30)
+        window.sendMouseEvent(MOUSE_DRAGGED, 90, 40, modifiers = BUTTON1_DOWN_MASK)
         awaitIdle()
         assertThat(events.size).isEqualTo(3)
+        assertThat(events.last().pressed).isEqualTo(true)
+        assertThat(events.last().position).isEqualTo(Offset(90 * density, 40 * density))
+
+        window.sendMouseEvent(MOUSE_RELEASED, 80, 30)
+        awaitIdle()
+        assertThat(events.size).isEqualTo(4)
+        assertThat(events.last().type).isEqualTo(PointerEventType.Release)
         assertThat(events.last().pressed).isEqualTo(false)
         assertThat(events.last().position).isEqualTo(Offset(80 * density, 30 * density))
 
@@ -296,9 +309,9 @@ class WindowInputEventTest {
         assertThat(onEnters).isEqualTo(1)
         assertThat(onExits).isEqualTo(0)
 
-        window.sendMouseEvent(MouseEvent.MOUSE_PRESSED, x = 90, y = 50)
-        window.sendMouseEvent(MouseEvent.MOUSE_DRAGGED, x = 80, y = 50)
-        window.sendMouseEvent(MouseEvent.MOUSE_RELEASED, x = 80, y = 50)
+        window.sendMouseEvent(MOUSE_PRESSED, x = 90, y = 50, modifiers = BUTTON1_DOWN_MASK)
+        window.sendMouseEvent(MOUSE_DRAGGED, x = 80, y = 50, modifiers = BUTTON1_DOWN_MASK)
+        window.sendMouseEvent(MOUSE_RELEASED, x = 80, y = 50)
         awaitIdle()
         assertThat(onMoves.size).isEqualTo(2)
         assertThat(onMoves.last()).isEqualTo(Offset(80 * density, 50 * density))
@@ -342,10 +355,10 @@ class WindowInputEventTest {
         assertThat(deltas.size).isEqualTo(0)
 
         window.sendMouseWheelEvent(
-            MouseEvent.MOUSE_WHEEL,
+            MOUSE_WHEEL,
             x = 100,
             y = 50,
-            scrollType = MouseWheelEvent.WHEEL_UNIT_SCROLL,
+            scrollType = WHEEL_UNIT_SCROLL,
             wheelRotation = 1
         )
         awaitIdle()
@@ -353,10 +366,10 @@ class WindowInputEventTest {
         assertThat(deltas.last()).isEqualTo(Offset(0f, 1f))
 
         window.sendMouseWheelEvent(
-            MouseEvent.MOUSE_WHEEL,
+            MOUSE_WHEEL,
             x = 100,
             y = 50,
-            scrollType = MouseWheelEvent.WHEEL_UNIT_SCROLL,
+            scrollType = WHEEL_UNIT_SCROLL,
             wheelRotation = -1
         )
         awaitIdle()
@@ -396,10 +409,10 @@ class WindowInputEventTest {
 
         repeat(eventCount) {
             window.sendMouseWheelEvent(
-                MouseEvent.MOUSE_WHEEL,
+                MOUSE_WHEEL,
                 x = 100,
                 y = 50,
-                scrollType = MouseWheelEvent.WHEEL_UNIT_SCROLL,
+                scrollType = WHEEL_UNIT_SCROLL,
                 wheelRotation = 1
             )
         }
@@ -440,10 +453,10 @@ class WindowInputEventTest {
 
         repeat(eventCount) {
             window.sendMouseWheelEvent(
-                MouseEvent.MOUSE_WHEEL,
+                MOUSE_WHEEL,
                 x = 100,
                 y = 50,
-                scrollType = MouseWheelEvent.WHEEL_UNIT_SCROLL,
+                scrollType = WHEEL_UNIT_SCROLL,
                 wheelRotation = 1
             )
         }
@@ -486,11 +499,11 @@ class WindowInputEventTest {
         awaitIdle()
 
         window.sendMouseEvent(
-            MouseEvent.MOUSE_PRESSED,
+            MOUSE_PRESSED,
             x = 100,
             y = 50,
-            modifiers = MouseEvent.SHIFT_DOWN_MASK or MouseEvent.CTRL_DOWN_MASK or
-                MouseEvent.BUTTON1_DOWN_MASK or MouseEvent.BUTTON3_DOWN_MASK
+            modifiers = SHIFT_DOWN_MASK or CTRL_DOWN_MASK or
+                BUTTON1_DOWN_MASK or BUTTON3_DOWN_MASK
         )
 
         awaitIdle()
@@ -513,13 +526,13 @@ class WindowInputEventTest {
         )
 
         window.sendMouseWheelEvent(
-            MouseEvent.MOUSE_WHEEL,
+            MOUSE_WHEEL,
             x = 100,
             y = 50,
-            scrollType = MouseWheelEvent.WHEEL_UNIT_SCROLL,
+            scrollType = WHEEL_UNIT_SCROLL,
             wheelRotation = 1,
-            modifiers = MouseEvent.SHIFT_DOWN_MASK or MouseEvent.CTRL_DOWN_MASK or
-                MouseEvent.BUTTON1_DOWN_MASK or MouseEvent.BUTTON3_DOWN_MASK
+            modifiers = SHIFT_DOWN_MASK or CTRL_DOWN_MASK or
+                BUTTON1_DOWN_MASK or BUTTON3_DOWN_MASK
         )
 
         awaitIdle()
