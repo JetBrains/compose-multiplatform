@@ -182,7 +182,7 @@ internal abstract class BaseTextPreparedSelection<T : BaseTextPreparedSelection<
         }
     }
 
-    fun getNextWordOffset(): Int? = layoutResult?.getNextWordOffset()
+    fun getNextWordOffset(): Int? = layoutResult?.getNextWordOffsetForLayout()
 
     private fun moveCursorNextByWord() = apply {
         getNextWordOffset()?.let { setCursor(it) }
@@ -210,13 +210,13 @@ internal abstract class BaseTextPreparedSelection<T : BaseTextPreparedSelection<
         layoutResult?.jumpByLinesOffset(1)?.let { setCursor(it) }
     }
 
-    fun getLineStartByOffset(): Int? = layoutResult?.getLineStartByOffset()
+    fun getLineStartByOffset(): Int? = layoutResult?.getLineStartByOffsetForLayout()
 
     fun moveCursorToLineStart() = apply {
         getLineStartByOffset()?.let { setCursor(it) }
     }
 
-    fun getLineEndByOffset(): Int? = layoutResult?.getLineEndByOffset()
+    fun getLineEndByOffset(): Int? = layoutResult?.getLineEndByOffsetForLayout()
 
     fun moveCursorToLineEnd() = apply {
         getLineEndByOffset()?.let { setCursor(it) }
@@ -248,7 +248,7 @@ internal abstract class BaseTextPreparedSelection<T : BaseTextPreparedSelection<
         return direction != ResolvedTextDirection.Rtl
     }
 
-    private fun TextLayoutResult.getNextWordOffset(
+    private fun TextLayoutResult.getNextWordOffsetForLayout(
         currentOffset: Int = transformedEndOffset()
     ): Int {
         if (currentOffset >= originalText.length) {
@@ -256,7 +256,7 @@ internal abstract class BaseTextPreparedSelection<T : BaseTextPreparedSelection<
         }
         val currentWord = getWordBoundary(charOffset(currentOffset))
         return if (currentWord.end <= currentOffset) {
-            getNextWordOffset(currentOffset + 1)
+            getNextWordOffsetForLayout(currentOffset + 1)
         } else {
             offsetMapping.transformedToOriginal(currentWord.end)
         }
@@ -276,14 +276,14 @@ internal abstract class BaseTextPreparedSelection<T : BaseTextPreparedSelection<
         }
     }
 
-    private fun TextLayoutResult.getLineStartByOffset(
+    private fun TextLayoutResult.getLineStartByOffsetForLayout(
         currentOffset: Int = transformedMinOffset()
     ): Int {
         val currentLine = getLineForOffset(currentOffset)
         return offsetMapping.transformedToOriginal(getLineStart(currentLine))
     }
 
-    private fun TextLayoutResult.getLineEndByOffset(
+    private fun TextLayoutResult.getLineEndByOffsetForLayout(
         currentOffset: Int = transformedMaxOffset()
     ): Int {
         val currentLine = getLineForOffset(currentOffset)
