@@ -1,5 +1,3 @@
-package com.github.veselovalex.minesweeper
-
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -42,6 +40,8 @@ class GameController(private val options: GameSettings, private val onWin: (() -
             Cell(row, column)
         }
     }
+
+    private var isFirstOpenedCell = true
 
     init {
         // Put [options.mines] bombs on random positions
@@ -101,9 +101,14 @@ class GameController(private val options: GameSettings, private val onWin: (() -
 
         cell.isOpened = true
         if (cell.hasBomb) {
-            lose()
-            return
+            if (isFirstOpenedCell) {
+                ensureNotLoseAtFirstClick(cell)
+            } else {
+                lose()
+                return
+            }
         }
+        isFirstOpenedCell = false
 
         cellsToOpen -= 1
         if (cellsToOpen == 0) {
@@ -186,6 +191,8 @@ class GameController(private val options: GameSettings, private val onWin: (() -
         neighborsOf(cell).forEach {
             it.bombsNear += 1
         }
+
+        println("Bomb at ${cell.row}:${cell.column}")
     }
 
     private fun flagAllBombs() {
@@ -246,6 +253,14 @@ class GameController(private val options: GameSettings, private val onWin: (() -
             seconds = 0
             startTime = time
             running = true
+        }
+    }
+
+    private fun ensureNotLoseAtFirstClick(firstCell: Cell) {
+        putBomb()
+        firstCell.hasBomb = false
+        neighborsOf(firstCell).forEach {
+            it.bombsNear -= 1
         }
     }
 

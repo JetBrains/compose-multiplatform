@@ -1,5 +1,3 @@
-package com.github.veselovalex.minesweeper
-
 import androidx.compose.runtime.Composable
 import kotlinx.browser.document
 import org.jetbrains.compose.web.css.*

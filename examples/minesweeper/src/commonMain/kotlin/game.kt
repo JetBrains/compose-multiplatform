@@ -1,16 +1,12 @@
-@file:OptIn(ExperimentalComposeWebWidgetsApi::class)
-
-package com.github.veselovalex.minesweeper
+//@file:OptIn(ExperimentalComposeWebWidgetsApi::class)
 
 import androidx.compose.runtime.*
-import org.jetbrains.compose.common.core.graphics.Color
-import org.jetbrains.compose.common.foundation.border
-import org.jetbrains.compose.common.foundation.layout.*
-import org.jetbrains.compose.common.material.Text
-import org.jetbrains.compose.common.ui.*
-import org.jetbrains.compose.common.ui.unit.Dp
-import org.jetbrains.compose.common.ui.unit.dp
-import org.jetbrains.compose.common.ui.unit.sp
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
+import androidx.compose.ui.*
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.*
 import kotlin.math.max
 
 @Composable
@@ -74,8 +70,8 @@ fun BoardView(game: GameController, styles: GameStyles) {
                     ) {
                         Box(
                             modifier = Modifier.size(styles.cellSize, styles.cellSize)
-                                .background(styles.getCellColor(cell))
-                                .border(styles.cellBorderWidth, styles.borderColor)
+                                .background(color = styles.getCellColor(cell))
+                                .border(width = styles.cellBorderWidth, color = styles.borderColor)
                         ) {
                             if (cell.isOpened) {
                                 if (cell.hasBomb) {
@@ -105,7 +101,7 @@ fun IndicatorWithIcon(iconPath: String, alt: String, value: Int) {
             Box(modifier = Modifier.size(56.dp, 36.dp)) {
                 Text(
                     text = value.toString(),
-                    size = 24.sp,
+                    fontSize = 24.sp,
                     color = Color.White
                 )
             }
@@ -117,8 +113,8 @@ fun IndicatorWithIcon(iconPath: String, alt: String, value: Int) {
 expect fun NewGameButton(text: String, onClick: () -> Unit)
 
 @Composable
-fun Game(requestWindowSize: ((width: Int, height: Int) -> Unit)? = null) = Column {
-    val windowPadding = 8.dp
+fun Game(requestWindowSize: ((width: Dp, height: Dp) -> Unit)? = null) = Column {
+    val windowPadding = 16.dp
     val boardBorderWidth = 1.dp
     val boardPadding = 4.dp
     val extraVerticalSpace = 152.dp // This should give enough space to UI widgets
@@ -144,13 +140,12 @@ fun Game(requestWindowSize: ((width: Int, height: Int) -> Unit)? = null) = Colum
 
     fun updateWindowSize() {
         if (requestWindowSize != null) {
-            val boardOffset = (windowPadding.value + boardBorderWidth.value + boardPadding.value + 1.0f) * 2.0;
-            val cellsWidth = { count: Int -> count.toFloat() * (styles.cellSize.value) + 10.0f  }
+            val boardOffset = (windowPadding + boardPadding) * 2;
 
-            val width = boardOffset + cellsWidth(game.columns)
-            val height = boardOffset + cellsWidth(game.rows) + extraVerticalSpace.value
+            val width = boardOffset + game.columns * styles.cellSize
+            val height = boardOffset + game.rows * styles.cellSize + extraVerticalSpace
 
-            requestWindowSize(width.toInt(), height.toInt())
+            requestWindowSize(width, height)
         }
     }
 
@@ -170,14 +165,14 @@ fun Game(requestWindowSize: ((width: Int, height: Int) -> Unit)? = null) = Colum
         Row {
             Column {
                 val bombsLeft = max(game.bombs - game.flagsSet, 0)
-                IndicatorWithIcon("assets/mine.png", "Seconds", game.seconds)
+                IndicatorWithIcon("assets/clock.png", "Seconds", game.seconds)
                 Box(modifier = Modifier.size(2.dp)) {}
                 IndicatorWithIcon("assets/mine.png", "Bombs Left", bombsLeft)
             }
 
             Column(modifier = Modifier.padding(8.dp)) {
                 Box {
-                    Text(text = "New Game", size = 20.sp)
+                    Text(text = "New Game", fontSize = 20.sp)
                 }
                 Row {
                     NewGameButton("Easy") { newGame(difficulty.EASY) }
