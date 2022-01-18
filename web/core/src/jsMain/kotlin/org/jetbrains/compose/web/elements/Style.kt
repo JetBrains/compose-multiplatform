@@ -25,7 +25,7 @@ private fun CSSStyleSheet.addRule(cssRule: String): CSSRule? {
 }
 
 private fun CSSKeyframesRule.addRule(cssRule: String): CSSRule? {
-    appendRule(cssRule)
+    this.asDynamic().appendRule(cssRule)
     return this.cssRules.item(this.cssRules.length - 1)
 }
 

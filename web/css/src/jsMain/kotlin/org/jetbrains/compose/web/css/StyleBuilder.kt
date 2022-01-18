@@ -153,7 +153,7 @@ open class StyleBuilderImpl : StyleBuilder, StyleHolder {
         } else false
     }
 
-    internal fun copyFrom(sb: StyleBuilderImpl) {
+    fun copyFrom(sb: StyleBuilderImpl) {
         properties.addAll(sb.properties)
         variables.addAll(sb.variables)
     }

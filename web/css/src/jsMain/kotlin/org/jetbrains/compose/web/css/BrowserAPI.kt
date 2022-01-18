@@ -10,13 +10,9 @@ import org.w3c.dom.css.CSSRule
 import org.w3c.dom.css.CSSRuleList
 
 
-internal external class CSSKeyframesRule: CSSRule {
+external class CSSKeyframesRule: CSSRule {
     val name: String
     val cssRules: CSSRuleList
-}
-
-internal inline fun CSSKeyframesRule.appendRule(cssRule: String) {
-    this.asDynamic().appendRule(cssRule)
 }
 
 @Suppress("NOTHING_TO_INLINE")
