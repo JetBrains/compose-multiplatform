@@ -365,7 +365,6 @@ It is possible to get additional information about mouse event, like number of c
 ```kotlin
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -388,7 +387,6 @@ import java.awt.event.MouseEvent
 
 @androidx.compose.ui.ExperimentalComposeUiApi
 fun main() = singleWindowApplication {
-    var count by remember { mutableStateOf(0) }
     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
         var text by remember { mutableStateOf("Click magenta box!") }
         Column {
