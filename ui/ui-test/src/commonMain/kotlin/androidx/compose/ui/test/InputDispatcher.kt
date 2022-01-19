@@ -85,6 +85,11 @@ internal abstract class InputDispatcher(
     protected var mouseInputState: MouseInputState = MouseInputState()
 
     /**
+     * The state of the rotary button.
+     */
+    protected var rotaryInputState: RotaryInputState = RotaryInputState()
+
+    /**
      * Indicates if a gesture is in progress or not. A gesture is in progress if at least one
      * finger is (still) touching the screen.
      */
@@ -491,6 +496,16 @@ internal abstract class InputDispatcher(
         }
     }
 
+    fun enqueueRotaryScrollHorizontally(horizontalScrollPixels: Float) {
+        // TODO(b/214437966): figure out if ongoing scroll events need to be cancelled.
+        rotaryInputState.enqueueRotaryScrollHorizontally(horizontalScrollPixels)
+    }
+
+    fun enqueueRotaryScrollVertically(verticalScrollPixels: Float) {
+        // TODO(b/214437966): figure out if ongoing scroll events need to be cancelled.
+        rotaryInputState.enqueueRotaryScrollHorizontally(verticalScrollPixels)
+    }
+
     private fun MouseInputState.enterHover() {
         enqueueEnter()
         isEntered = true
@@ -534,6 +549,14 @@ internal abstract class InputDispatcher(
 
     @OptIn(ExperimentalTestApi::class)
     protected abstract fun MouseInputState.enqueueScroll(delta: Float, scrollWheel: ScrollWheel)
+
+    protected abstract fun RotaryInputState.enqueueRotaryScrollHorizontally(
+        horizontalScrollPixels: Float
+    )
+
+    protected abstract fun RotaryInputState.enqueueRotaryScrollVertically(
+        verticalScrollPixels: Float
+    )
 
     /**
      * Called when this [InputDispatcher] is about to be discarded, from
@@ -595,6 +618,12 @@ internal class MouseInputState {
         pressedButtons.clear()
     }
 }
+
+/**
+ * We don't have any state associated with RotaryInput, but we use a RotaryInputState class for
+ * consistency with the other APIs.
+ */
+internal class RotaryInputState
 
 /**
  * The state of an [InputDispatcher], saved when the [GestureScope] is disposed and restored

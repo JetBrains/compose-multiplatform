@@ -6,6 +6,7 @@ package androidx.compose.ui.test {
     method @Deprecated public static androidx.compose.ui.test.SemanticsNodeInteraction performGesture(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.GestureScope,kotlin.Unit> block);
     method @androidx.compose.ui.test.ExperimentalTestApi public static androidx.compose.ui.test.SemanticsNodeInteraction performMouseInput(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.MouseInjectionScope,kotlin.Unit> block);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performMultiModalInput(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.MultiModalInjectionScope,kotlin.Unit> block);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static androidx.compose.ui.test.SemanticsNodeInteraction performRotaryScrollInput(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.RotaryInjectionScope,kotlin.Unit> block);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performScrollTo(androidx.compose.ui.test.SemanticsNodeInteraction);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performScrollToIndex(androidx.compose.ui.test.SemanticsNodeInteraction, int index);
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performScrollToKey(androidx.compose.ui.test.SemanticsNodeInteraction, Object key);
@@ -303,6 +304,7 @@ package androidx.compose.ui.test {
 
   public sealed interface MultiModalInjectionScope extends androidx.compose.ui.test.InjectionScope {
     method @androidx.compose.ui.test.ExperimentalTestApi public void mouse(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.MouseInjectionScope,kotlin.Unit> block);
+    method @androidx.compose.ui.test.ExperimentalTestApi public void rotary(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.RotaryInjectionScope,kotlin.Unit> block);
     method public void touch(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.TouchInjectionScope,kotlin.Unit> block);
   }
 
@@ -311,6 +313,11 @@ package androidx.compose.ui.test {
     method public static void printToLog(androidx.compose.ui.test.SemanticsNodeInteractionCollection, String tag, optional int maxDepth);
     method public static String printToString(androidx.compose.ui.test.SemanticsNodeInteraction, optional int maxDepth);
     method public static String printToString(androidx.compose.ui.test.SemanticsNodeInteractionCollection, optional int maxDepth);
+  }
+
+  @androidx.compose.ui.test.ExperimentalTestApi public interface RotaryInjectionScope extends androidx.compose.ui.test.InjectionScope {
+    method public void rotateToScrollHorizontally(float horizontalScrollPixels);
+    method public void rotateToScrollVertically(float verticalScrollPixels);
   }
 
   @androidx.compose.ui.test.ExperimentalTestApi public final inline class ScrollWheel {

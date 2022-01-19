@@ -55,6 +55,7 @@ dependencies {
 
         implementation(project(":compose:ui:ui-util"))
         implementation("androidx.annotation:annotation:1.1.0")
+        implementation("androidx.core:core-ktx:1.1.0")
         implementation(libs.espressoCore)
         implementation(libs.testMonitor)
 
@@ -102,6 +103,7 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 api(project(":compose:ui:ui-graphics"))
 
                 implementation("androidx.annotation:annotation:1.1.0")
+                implementation("androidx.core:core-ktx:1.1.0")
                 implementation(libs.espressoCore)
                 implementation(libs.testMonitor)
             }

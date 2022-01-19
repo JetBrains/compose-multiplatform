@@ -17,9 +17,13 @@
 package androidx.compose.ui.focus
 
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
+import androidx.compose.ui.input.focus.FocusAwareInputModifier
+import androidx.compose.ui.input.rotary.ModifierLocalRotaryScrollParent
+import androidx.compose.ui.input.rotary.RotaryScrollEvent
 import androidx.compose.ui.modifier.ModifierLocalConsumer
 import androidx.compose.ui.modifier.ModifierLocalProvider
 import androidx.compose.ui.modifier.ModifierLocalReadScope
@@ -48,6 +52,8 @@ internal class FocusModifier(
     var focusState: FocusStateImpl = initialFocus
     var focusedChild: ModifiedFocusNode? = null
     var hasFocusListeners: Boolean = false
+    @OptIn(ExperimentalComposeUiApi::class)
+    private var rotaryScrollParent: FocusAwareInputModifier<RotaryScrollEvent>? = null
     lateinit var focusNode: ModifiedFocusNode
     lateinit var modifierLocalReadScope: ModifierLocalReadScope
 
@@ -55,11 +61,19 @@ internal class FocusModifier(
     override fun onModifierLocalsUpdated(scope: ModifierLocalReadScope) {
         modifierLocalReadScope = scope
 
-        // Update the focus node with the current focus properties.
         with(scope) {
             hasFocusListeners = ModifierLocalHasFocusEventListener.current
+            @OptIn(ExperimentalComposeUiApi::class)
+            rotaryScrollParent = ModifierLocalRotaryScrollParent.current
+
+            // Update the focus node with the current focus properties.
             focusNode.setUpdatedProperties(ModifierLocalFocusProperties.current)
         }
+    }
+
+    @ExperimentalComposeUiApi
+    fun propagateRotaryEvent(event: RotaryScrollEvent): Boolean {
+        return rotaryScrollParent?.propagateFocusAwareEvent(event) ?: false
     }
 }
 

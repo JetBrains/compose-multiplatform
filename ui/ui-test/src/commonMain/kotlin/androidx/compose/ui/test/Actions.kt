@@ -18,6 +18,7 @@ package androidx.compose.ui.test
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.input.rotary.RotaryScrollEvent
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.semantics.AccessibilityAction
@@ -551,6 +552,26 @@ fun SemanticsNodeInteraction.performSemanticsAction(
     key: SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>
 ): SemanticsNodeInteraction {
     return performSemanticsAction(key) { it.invoke() }
+}
+
+/**
+ * Send the specified [RotaryScrollEvent] to the focused component.
+ *
+ * @return true if the event was consumed. False otherwise.
+ */
+@ExperimentalTestApi
+fun SemanticsNodeInteraction.performRotaryScrollInput(
+    block: RotaryInjectionScope.() -> Unit
+): SemanticsNodeInteraction {
+    val node = fetchSemanticsNode("Failed to send rotary Event")
+    with(MultiModalInjectionScopeImpl(node, testContext)) {
+        try {
+            rotary(block)
+        } finally {
+            dispose()
+        }
+    }
+    return this
 }
 
 // TODO(200928505): get a more accurate indication if it is a lazy list

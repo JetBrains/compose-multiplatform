@@ -189,6 +189,16 @@ internal class FocusManagerImpl(
     fun fetchUpdatedFocusProperties() {
         focusModifier.focusNode.updateProperties()
     }
+
+    /**
+     * Searches for the currently focused item.
+     *
+     * @return the currently focused item.
+     */
+    @Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
+    internal fun getActiveFocusModifier(): FocusModifier? {
+        return focusModifier.findActiveItem()
+    }
 }
 
 private fun ModifiedFocusNode.updateProperties() {
@@ -198,4 +208,18 @@ private fun ModifiedFocusNode.updateProperties() {
     }
     // Update the focus properties for all children.
     focusableChildren(excludeDeactivated = false).fastForEach { it.updateProperties() }
+}
+
+/**
+ * Find the focus modifier in this sub-hierarchy that is currently focused.
+ */
+@Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
+private fun FocusModifier.findActiveItem(): FocusModifier? {
+    return when (focusState) {
+        Active, Captured -> this
+        ActiveParent, DeactivatedParent -> {
+            focusedChild?.modifier?.findActiveItem() ?: error("no child")
+        }
+        Deactivated, Inactive -> null
+    }
 }
