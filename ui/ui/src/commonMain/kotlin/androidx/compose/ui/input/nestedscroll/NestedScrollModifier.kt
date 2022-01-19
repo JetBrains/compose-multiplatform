@@ -337,6 +337,9 @@ inline class NestedScrollSource internal constructor(
  * [androidx.compose.foundation.gestures.scrollable] have build in support for nested scrolling,
  * however, it's desirable to be able to react and influence their scroll via nested scroll system.
  *
+ * **Note:** The nested scroll system is orientation independent. This mean it is based off the
+ * screen direction (x and y coordinates) rather than being locked to a specific orientation.
+ *
  * @param connection connection to the nested scroll system to participate in the event chaining,
  * receiving events when scrollable descendant is being scrolled.
  * @param dispatcher object to be attached to the nested scroll system on which `dispatch*`
