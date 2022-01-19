@@ -193,6 +193,10 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Optional
     internal val macExtraPlistKeysRawXml: Property<String?> = objects.nullableProperty()
 
+    @get:InputFile
+    @get:Optional
+    val javaRuntimePropertiesFile: RegularFileProperty = objects.fileProperty()
+
     @get:Optional
     @get:Nested
     internal var nonValidatedMacSigningSettings: MacOSSigningSettings? = null
@@ -408,7 +412,12 @@ abstract class AbstractJPackageTask @Inject constructor(
                 fileOperations.delete(tmpDirForSign)
                 tmpDirForSign.mkdirs()
 
-                MacJarSignFileCopyingProcessor(signer, tmpDirForSign)
+                val jvmRuntimeInfo = JavaRuntimeProperties.readFromFile(javaRuntimePropertiesFile.ioFile)
+                MacJarSignFileCopyingProcessor(
+                    signer,
+                    tmpDirForSign,
+                    jvmRuntimeVersion = jvmRuntimeInfo.majorVersion
+                )
             } ?: SimpleFileCopyingProcessor
         fun copyFileToLibsDir(sourceFile: File): File {
             val targetFileName =
