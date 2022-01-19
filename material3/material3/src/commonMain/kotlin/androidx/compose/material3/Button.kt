@@ -511,19 +511,12 @@ object ButtonDefaults {
      */
     @Composable
     fun buttonColors(
-        containerColor: Color = MaterialTheme.colorScheme.fromToken(
-            FilledButtonTokens.ContainerColor
-        ),
-        contentColor: Color = MaterialTheme.colorScheme.fromToken(
-            FilledButtonTokens.LabelTextColor
-        ),
+        containerColor: Color = FilledButtonTokens.ContainerColor.toColor(),
+        contentColor: Color = FilledButtonTokens.LabelTextColor.toColor(),
         disabledContainerColor: Color =
-            MaterialTheme.colorScheme
-                .fromToken(FilledButtonTokens.DisabledContainerColor)
+            FilledButtonTokens.DisabledContainerColor.toColor()
                 .copy(alpha = FilledButtonTokens.DisabledContainerOpacity),
-        disabledContentColor: Color =
-            MaterialTheme.colorScheme
-                .fromToken(FilledButtonTokens.DisabledLabelTextColor)
+        disabledContentColor: Color = FilledButtonTokens.DisabledLabelTextColor.toColor()
                 .copy(alpha = FilledButtonTokens.DisabledLabelTextOpacity),
     ): ButtonColors =
         DefaultButtonColors(
@@ -544,20 +537,14 @@ object ButtonDefaults {
      */
     @Composable
     fun elevatedButtonColors(
-        containerColor: Color = MaterialTheme.colorScheme.fromToken(
-            ElevatedButtonTokens.ContainerColor
-        ),
-        contentColor: Color = MaterialTheme.colorScheme.fromToken(
-            ElevatedButtonTokens.LabelTextColor
-        ),
-        disabledContainerColor: Color =
-            MaterialTheme.colorScheme
-                .fromToken(ElevatedButtonTokens.DisabledContainerColor)
-                .copy(alpha = ElevatedButtonTokens.DisabledContainerOpacity),
-        disabledContentColor: Color =
-            MaterialTheme.colorScheme
-                .fromToken(ElevatedButtonTokens.DisabledLabelTextColor)
-                .copy(alpha = ElevatedButtonTokens.DisabledLabelTextOpacity),
+        containerColor: Color = ElevatedButtonTokens.ContainerColor.toColor(),
+        contentColor: Color = ElevatedButtonTokens.LabelTextColor.toColor(),
+        disabledContainerColor: Color = ElevatedButtonTokens.DisabledContainerColor
+            .toColor()
+            .copy(alpha = ElevatedButtonTokens.DisabledContainerOpacity),
+        disabledContentColor: Color = ElevatedButtonTokens.DisabledLabelTextColor
+            .toColor()
+            .copy(alpha = ElevatedButtonTokens.DisabledLabelTextOpacity),
     ): ButtonColors =
         DefaultButtonColors(
             containerColor = containerColor,
@@ -577,18 +564,14 @@ object ButtonDefaults {
      */
     @Composable
     fun filledTonalButtonColors(
-        containerColor: Color =
-            MaterialTheme.colorScheme.fromToken(FilledButtonTonalTokens.ContainerColor),
-        contentColor: Color =
-            MaterialTheme.colorScheme.fromToken(FilledButtonTonalTokens.LabelTextColor),
-        disabledContainerColor: Color =
-            MaterialTheme.colorScheme
-                .fromToken(FilledButtonTonalTokens.DisabledContainerColor)
-                .copy(alpha = FilledButtonTonalTokens.DisabledContainerOpacity),
-        disabledContentColor: Color =
-            MaterialTheme.colorScheme
-                .fromToken(FilledButtonTonalTokens.DisabledLabelTextColor)
-                .copy(alpha = FilledButtonTonalTokens.DisabledLabelTextOpacity),
+        containerColor: Color = FilledButtonTonalTokens.ContainerColor.toColor(),
+        contentColor: Color = FilledButtonTonalTokens.LabelTextColor.toColor(),
+        disabledContainerColor: Color = FilledButtonTonalTokens.DisabledContainerColor
+            .toColor()
+            .copy(alpha = FilledButtonTonalTokens.DisabledContainerOpacity),
+        disabledContentColor: Color = FilledButtonTonalTokens.DisabledLabelTextColor
+            .toColor()
+            .copy(alpha = FilledButtonTonalTokens.DisabledLabelTextOpacity),
     ): ButtonColors =
         DefaultButtonColors(
             containerColor = containerColor,
@@ -609,14 +592,11 @@ object ButtonDefaults {
     @Composable
     fun outlinedButtonColors(
         containerColor: Color = Color.Transparent,
-        contentColor: Color = MaterialTheme.colorScheme.fromToken(
-            OutlinedButtonTokens.LabelTextColor
-        ),
+        contentColor: Color = OutlinedButtonTokens.LabelTextColor.toColor(),
         disabledContainerColor: Color = Color.Transparent,
-        disabledContentColor: Color =
-            MaterialTheme.colorScheme
-                .fromToken(OutlinedButtonTokens.DisabledLabelTextColor)
-                .copy(alpha = OutlinedButtonTokens.DisabledLabelTextOpacity),
+        disabledContentColor: Color = OutlinedButtonTokens.DisabledLabelTextColor
+            .toColor()
+            .copy(alpha = OutlinedButtonTokens.DisabledLabelTextOpacity),
     ): ButtonColors =
         DefaultButtonColors(
             containerColor = containerColor,
@@ -637,12 +617,11 @@ object ButtonDefaults {
     @Composable
     fun textButtonColors(
         containerColor: Color = Color.Transparent,
-        contentColor: Color = MaterialTheme.colorScheme.fromToken(TextButtonTokens.LabelTextColor),
+        contentColor: Color = TextButtonTokens.LabelTextColor.toColor(),
         disabledContainerColor: Color = Color.Transparent,
-        disabledContentColor: Color =
-            MaterialTheme.colorScheme
-                .fromToken(TextButtonTokens.DisabledLabelTextColor)
-                .copy(alpha = TextButtonTokens.DisabledLabelTextOpacity),
+        disabledContentColor: Color = TextButtonTokens.DisabledLabelTextColor
+            .toColor()
+            .copy(alpha = TextButtonTokens.DisabledLabelTextOpacity),
     ): ButtonColors =
         DefaultButtonColors(
             containerColor = containerColor,
@@ -765,7 +744,7 @@ object ButtonDefaults {
         @Composable
         get() = BorderStroke(
             width = OutlinedButtonTokens.OutlineWidth,
-            color = MaterialTheme.colorScheme.fromToken(OutlinedButtonTokens.OutlineColor)
+            color = OutlinedButtonTokens.OutlineColor.toColor(),
         )
 }
 

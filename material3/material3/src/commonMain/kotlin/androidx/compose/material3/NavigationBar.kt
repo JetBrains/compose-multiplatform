@@ -86,7 +86,7 @@ import kotlin.math.roundToInt
 @Composable
 fun NavigationBar(
     modifier: Modifier = Modifier,
-    containerColor: Color = MaterialTheme.colorScheme.fromToken(NavigationBarTokens.ContainerColor),
+    containerColor: Color = NavigationBarTokens.ContainerColor.toColor(),
     contentColor: Color = MaterialTheme.colorScheme.contentColorFor(containerColor),
     tonalElevation: Dp = NavigationBarTokens.ContainerElevation,
     content: @Composable RowScope.() -> Unit
@@ -215,16 +215,11 @@ object NavigationBarItemDefaults {
      */
     @Composable
     fun colors(
-        selectedIconColor: Color =
-            MaterialTheme.colorScheme.fromToken(NavigationBarTokens.ActiveIconColor),
-        unselectedIconColor: Color =
-            MaterialTheme.colorScheme.fromToken(NavigationBarTokens.InactiveIconColor),
-        selectedTextColor: Color =
-            MaterialTheme.colorScheme.fromToken(NavigationBarTokens.ActiveLabelTextColor),
-        unselectedTextColor: Color =
-            MaterialTheme.colorScheme.fromToken(NavigationBarTokens.InactiveLabelTextColor),
-        indicatorColor: Color =
-            MaterialTheme.colorScheme.fromToken(NavigationBarTokens.ActiveIndicatorColor),
+        selectedIconColor: Color = NavigationBarTokens.ActiveIconColor.toColor(),
+        unselectedIconColor: Color = NavigationBarTokens.InactiveIconColor.toColor(),
+        selectedTextColor: Color = NavigationBarTokens.ActiveLabelTextColor.toColor(),
+        unselectedTextColor: Color = NavigationBarTokens.InactiveLabelTextColor.toColor(),
+        indicatorColor: Color = NavigationBarTokens.ActiveIndicatorColor.toColor(),
     ): NavigationBarItemColors = remember(
         selectedIconColor,
         unselectedIconColor,

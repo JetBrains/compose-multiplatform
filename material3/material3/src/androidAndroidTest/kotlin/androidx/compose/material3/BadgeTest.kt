@@ -105,7 +105,7 @@ class BadgeTest {
     fun badge_noContent_shape() {
         var errorColor = Color.Unspecified
         rule.setMaterialContent(lightColorScheme()) {
-            errorColor = MaterialTheme.colorScheme.fromToken(BadgeTokens.Color)
+            errorColor = BadgeTokens.Color.toColor()
             Badge(modifier = Modifier.testTag(TestBadgeTag))
         }
 

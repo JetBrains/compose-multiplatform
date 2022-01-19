@@ -393,18 +393,14 @@ object TopAppBarDefaults {
      */
     @Composable
     fun smallTopAppBarColors(
-        containerColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarSmallTokens.ContainerColor),
+        containerColor: Color = TopAppBarSmallTokens.ContainerColor.toColor(),
         scrolledContainerColor: Color = MaterialTheme.colorScheme.applyTonalElevation(
             backgroundColor = containerColor,
             elevation = TopAppBarSmallTokens.OnScrollContainerElevation
         ),
-        navigationIconContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarSmallTokens.LeadingIconColor),
-        titleContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarSmallTokens.HeadlineColor),
-        actionIconContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarSmallTokens.TrailingIconColor)
+        navigationIconContentColor: Color = TopAppBarSmallTokens.LeadingIconColor.toColor(),
+        titleContentColor: Color = TopAppBarSmallTokens.HeadlineColor.toColor(),
+        actionIconContentColor: Color = TopAppBarSmallTokens.TrailingIconColor.toColor(),
     ): TopAppBarColors {
         return remember(
             containerColor,
@@ -436,18 +432,14 @@ object TopAppBarDefaults {
      */
     @Composable
     fun centerAlignedTopAppBarColors(
-        containerColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarSmallCenteredTokens.ContainerColor),
+        containerColor: Color = TopAppBarSmallCenteredTokens.ContainerColor.toColor(),
         scrolledContainerColor: Color = MaterialTheme.colorScheme.applyTonalElevation(
             backgroundColor = containerColor,
             elevation = TopAppBarSmallTokens.OnScrollContainerElevation
         ),
-        navigationIconContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarSmallCenteredTokens.LeadingIconColor),
-        titleContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarSmallCenteredTokens.HeadlineColor),
-        actionIconContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarSmallCenteredTokens.TrailingIconColor)
+        navigationIconContentColor: Color = TopAppBarSmallCenteredTokens.LeadingIconColor.toColor(),
+        titleContentColor: Color = TopAppBarSmallCenteredTokens.HeadlineColor.toColor(),
+        actionIconContentColor: Color = TopAppBarSmallCenteredTokens.TrailingIconColor.toColor(),
     ): TopAppBarColors {
         return remember(
             containerColor,
@@ -480,18 +472,14 @@ object TopAppBarDefaults {
      */
     @Composable
     fun mediumTopAppBarColors(
-        containerColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarMediumTokens.ContainerColor),
+        containerColor: Color = TopAppBarMediumTokens.ContainerColor.toColor(),
         scrolledContainerColor: Color = MaterialTheme.colorScheme.applyTonalElevation(
             backgroundColor = containerColor,
             elevation = TopAppBarSmallTokens.OnScrollContainerElevation
         ),
-        navigationIconContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarMediumTokens.LeadingIconColor),
-        titleContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarMediumTokens.HeadlineColor),
-        actionIconContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarMediumTokens.TrailingIconColor)
+        navigationIconContentColor: Color = TopAppBarMediumTokens.LeadingIconColor.toColor(),
+        titleContentColor: Color = TopAppBarMediumTokens.HeadlineColor.toColor(),
+        actionIconContentColor: Color = TopAppBarMediumTokens.TrailingIconColor.toColor(),
     ): TopAppBarColors {
         return remember(
             containerColor,
@@ -524,18 +512,14 @@ object TopAppBarDefaults {
      */
     @Composable
     fun largeTopAppBarColors(
-        containerColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarLargeTokens.ContainerColor),
+        containerColor: Color = TopAppBarLargeTokens.ContainerColor.toColor(),
         scrolledContainerColor: Color = MaterialTheme.colorScheme.applyTonalElevation(
             backgroundColor = containerColor,
             elevation = TopAppBarSmallTokens.OnScrollContainerElevation
         ),
-        navigationIconContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarLargeTokens.LeadingIconColor),
-        titleContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarLargeTokens.HeadlineColor),
-        actionIconContentColor: Color =
-            MaterialTheme.colorScheme.fromToken(TopAppBarLargeTokens.TrailingIconColor)
+        navigationIconContentColor: Color = TopAppBarLargeTokens.LeadingIconColor.toColor(),
+        titleContentColor: Color = TopAppBarLargeTokens.HeadlineColor.toColor(),
+        actionIconContentColor: Color = TopAppBarLargeTokens.TrailingIconColor.toColor(),
     ): TopAppBarColors {
         return remember(
             containerColor,
