@@ -206,6 +206,17 @@ private val RadioButtons = Component(
     examples = RadioButtonsExamples
 )
 
+private val Sliders = Component(
+    id = nextId(),
+    name = "Sliders",
+    description = "Sliders allow users to make selections from a range of values.",
+    // No slider icon
+    guidelinesUrl = "", // No guidelines yet
+    docsUrl = "", // No docs yet
+    sourceUrl = "$Material3SourceUrl/Slider.kt",
+    examples = SlidersExamples
+)
+
 private val Snackbars = Component(
     id = nextId(),
     name = "Snackbars",
@@ -258,6 +269,7 @@ val Components = listOf(
     NavigationRail,
     ProgressIndicators,
     RadioButtons,
+    Sliders,
     Snackbars,
     Tabs,
     TopAppBar

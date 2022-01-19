@@ -44,8 +44,8 @@ import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.progressSemantics
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.tokens.SliderTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
@@ -78,6 +78,7 @@ import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.abs
 import kotlinx.coroutines.coroutineScope
@@ -97,12 +98,12 @@ import kotlinx.coroutines.launch
  * Use continuous sliders to allow users to make meaningful selections that don’t
  * require a specific value:
  *
- * @sample androidx.compose.material.samples.SliderSample
+ * @sample androidx.compose.material3.samples.SliderSample
  *
  * You can allow the user to choose only between predefined set of values by specifying the amount
  * of steps between min and max values:
  *
- * @sample androidx.compose.material.samples.StepsSliderSample
+ * @sample androidx.compose.material3.samples.StepsSliderSample
  *
  * @param value current value of the Slider. If outside of [valueRange] provided, value will be
  * coerced to this range.
@@ -145,7 +146,10 @@ fun Slider(
     BoxWithConstraints(
         modifier
             .minimumTouchTargetSize()
-            .requiredSizeIn(minWidth = ThumbRadius * 2, minHeight = ThumbRadius * 2)
+            .requiredSizeIn(
+                minWidth = SliderTokens.HandleWidth,
+                minHeight = SliderTokens.HandleHeight
+            )
             .sliderSemantics(value, tickFractions, enabled, onValueChange, valueRange, steps)
             .focusable(enabled, interactionSource)
     ) {
@@ -246,21 +250,31 @@ object SliderDefaults {
      */
     @Composable
     fun colors(
-        thumbColor: Color = MaterialTheme.colors.primary,
-        disabledThumbColor: Color = MaterialTheme.colors.onSurface
-            .copy(alpha = ContentAlpha.disabled)
-            .compositeOver(MaterialTheme.colors.surface),
-        activeTrackColor: Color = MaterialTheme.colors.primary,
-        inactiveTrackColor: Color = activeTrackColor.copy(alpha = InactiveTrackAlpha),
+        thumbColor: Color = SliderTokens.HandleColor.toColor(),
+        disabledThumbColor: Color = SliderTokens.DisabledHandleColor
+            .toColor()
+            .copy(alpha = SliderTokens.DisabledHandleOpacity)
+            .compositeOver(MaterialTheme.colorScheme.surface),
+        activeTrackColor: Color = SliderTokens.ActiveTrackColor.toColor(),
+        inactiveTrackColor: Color = SliderTokens.InactiveTrackColor.toColor(),
         disabledActiveTrackColor: Color =
-            MaterialTheme.colors.onSurface.copy(alpha = DisabledActiveTrackAlpha),
+            SliderTokens.DisabledActiveTrackColor
+                .toColor()
+                .copy(alpha = SliderTokens.DisabledActiveTrackOpacity),
         disabledInactiveTrackColor: Color =
-            disabledActiveTrackColor.copy(alpha = DisabledInactiveTrackAlpha),
-        activeTickColor: Color = contentColorFor(activeTrackColor).copy(alpha = TickAlpha),
-        inactiveTickColor: Color = activeTrackColor.copy(alpha = TickAlpha),
-        disabledActiveTickColor: Color = activeTickColor.copy(alpha = DisabledTickAlpha),
-        disabledInactiveTickColor: Color = disabledInactiveTrackColor
-            .copy(alpha = DisabledTickAlpha)
+            SliderTokens.DisabledInactiveTrackColor
+                .toColor()
+                .copy(alpha = SliderTokens.DisabledInactiveTrackOpacity),
+        activeTickColor: Color = SliderTokens.TickMarksActiveContainerColor
+            .toColor()
+            .copy(alpha = SliderTokens.TickMarksActiveContainerOpacity),
+        inactiveTickColor: Color = SliderTokens.TickMarksInactiveContainerColor.toColor()
+            .copy(alpha = SliderTokens.TickMarksInactiveContainerOpacity),
+        disabledActiveTickColor: Color = SliderTokens.TickMarksDisabledContainerColor
+            .toColor()
+            .copy(alpha = SliderTokens.TickMarksDisabledContainerOpacity),
+        disabledInactiveTickColor: Color = SliderTokens.TickMarksDisabledContainerColor.toColor()
+            .copy(alpha = SliderTokens.TickMarksDisabledContainerOpacity)
     ): SliderColors = DefaultSliderColors(
         thumbColor = thumbColor,
         disabledThumbColor = disabledThumbColor,
@@ -273,31 +287,6 @@ object SliderDefaults {
         disabledActiveTickColor = disabledActiveTickColor,
         disabledInactiveTickColor = disabledInactiveTickColor
     )
-
-    /**
-     * Default alpha of the inactive part of the track
-     */
-    const val InactiveTrackAlpha = 0.24f
-
-    /**
-     * Default alpha for the track when it is disabled but active
-     */
-    const val DisabledInactiveTrackAlpha = 0.12f
-
-    /**
-     * Default alpha for the track when it is disabled and inactive
-     */
-    const val DisabledActiveTrackAlpha = 0.32f
-
-    /**
-     * Default alpha of the ticks that are drawn on top of the track
-     */
-    const val TickAlpha = 0.54f
-
-    /**
-     * Default alpha for tick marks when they are disabled
-     */
-    const val DisabledTickAlpha = 0.12f
 }
 
 /**
@@ -359,13 +348,14 @@ private fun SliderImpl(
         val thumbPx: Float
         val widthDp: Dp
         with(LocalDensity.current) {
-            trackStrokeWidth = TrackHeight.toPx()
-            thumbPx = ThumbRadius.toPx()
+            trackStrokeWidth = SliderTokens.ActiveTrackHeight.toPx()
+            thumbPx = SliderTokens.HandleWidth.toPx() / 2
             widthDp = width.toDp()
         }
 
-        val thumbSize = ThumbRadius * 2
-        val offset = (widthDp - thumbSize) * positionFraction
+        val thumbWidth = SliderTokens.HandleWidth
+        val thumbHeight = SliderTokens.HandleHeight
+        val offset = (widthDp - thumbWidth) * positionFraction
         val center = Modifier.align(Alignment.CenterStart)
 
         Track(
@@ -378,10 +368,9 @@ private fun SliderImpl(
             thumbPx,
             trackStrokeWidth
         )
-        SliderThumb(center, offset, interactionSource, colors, enabled, thumbSize)
+        SliderThumb(center, offset, interactionSource, colors, enabled, thumbWidth, thumbHeight)
     }
 }
-
 
 @Composable
 private fun SliderThumb(
@@ -390,7 +379,8 @@ private fun SliderThumb(
     interactionSource: MutableInteractionSource,
     colors: SliderColors,
     enabled: Boolean,
-    thumbSize: Dp
+    thumbHeight: Dp,
+    thumbWidth: Dp
 ) {
     Box(modifier.padding(start = offset)) {
         val interactions = remember { mutableStateListOf<Interaction>() }
@@ -407,6 +397,8 @@ private fun SliderThumb(
             }
         }
 
+        val thumbRippleRadius = max(thumbWidth, thumbHeight) + ThumbRippleMargin
+
         val elevation = if (interactions.isNotEmpty()) {
             ThumbPressedElevation
         } else {
@@ -414,18 +406,17 @@ private fun SliderThumb(
         }
         Spacer(
             Modifier
-                .size(thumbSize, thumbSize)
+                .size(thumbWidth, thumbHeight)
                 .indication(
                     interactionSource = interactionSource,
-                    indication = rememberRipple(bounded = false, radius = ThumbRippleRadius)
+                    indication = rememberRipple(bounded = false, radius = thumbRippleRadius)
                 )
                 .hoverable(interactionSource = interactionSource)
-                .shadow(if (enabled) elevation else 0.dp, CircleShape, clip = false)
-                .background(colors.thumbColor(enabled).value, CircleShape)
+                .shadow(if (enabled) elevation else 0.dp, SliderTokens.HandleShape, clip = false)
+                .background(colors.thumbColor(enabled).value, SliderTokens.HandleShape)
         )
     }
 }
-
 
 @Composable
 private fun Track(
@@ -515,7 +506,6 @@ private fun scale(a1: Float, b1: Float, x: ClosedFloatingPointRange<Float>, a2: 
 // Calculate the 0..1 fraction that `pos` value represents between `a` and `b`
 private fun calcFraction(a: Float, b: Float, pos: Float) =
     (if (b - a == 0f) 0f else (pos - a) / (b - a)).coerceIn(0f, 1f)
-
 
 @Composable
 private fun CorrectValueSideEffect(
@@ -626,7 +616,6 @@ private suspend fun animateToTarget(
     }
 }
 
-
 @Immutable
 private class DefaultSliderColors(
     private val thumbColor: Color,
@@ -704,13 +693,11 @@ private class DefaultSliderColors(
 }
 
 // Internal to be referred to in tests
-internal val ThumbRadius = 10.dp
-private val ThumbRippleRadius = 24.dp
+internal val ThumbRippleMargin = 4.dp
 private val ThumbDefaultElevation = 1.dp
 private val ThumbPressedElevation = 6.dp
 
 // Internal to be referred to in tests
-internal val TrackHeight = 4.dp
 private val SliderHeight = 48.dp
 private val SliderMinWidth = 144.dp // TODO: clarify min width
 private val DefaultSliderConstraints =
