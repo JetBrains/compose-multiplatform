@@ -849,7 +849,7 @@ class MultiWidgetSelectionDelegateTest {
         assertThat(box.left).isZero()
         assertThat(box.right).isEqualTo(fontSizeInPx)
         assertThat(box.top).isEqualTo(fontSizeInPx)
-        assertThat(box.bottom).isEqualTo((2f + 1 / 5f) * fontSizeInPx)
+        assertThat(box.bottom).isEqualTo(2 * fontSizeInPx)
     }
 
     @Test
@@ -938,7 +938,7 @@ class MultiWidgetSelectionDelegateTest {
         assertThat(box.left).isEqualTo(4 * fontSizeInPx)
         assertThat(box.right).isEqualTo(5 * fontSizeInPx)
         assertThat(box.top).isEqualTo(fontSizeInPx)
-        assertThat(box.bottom).isEqualTo((2f + 1 / 5f) * fontSizeInPx)
+        assertThat(box.bottom).isEqualTo(2 * fontSizeInPx)
     }
 
     @Test

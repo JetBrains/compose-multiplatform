@@ -272,8 +272,11 @@ class HardwareKeyboardTest {
     fun textField_pageNavigation() {
         keysSequenceTest(
             initText = "1\n2\n3\n4\n5",
-            modifier = Modifier.requiredSize(30.dp)
+            modifier = Modifier.requiredSize(27.dp)
         ) {
+            // By page down, the cursor should be at the visible top line. In this case the height
+            // constraint is 27dp which covers from 1, 2 and middle of 3. Thus, by page down, the
+            // first line should be 3, and cursor should be the before letter 3, i.e. index = 4.
             Key.PageDown.downAndUp()
             expectedSelection(TextRange(4))
         }
