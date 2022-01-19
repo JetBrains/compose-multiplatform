@@ -122,7 +122,8 @@ class ChangeInfoGitClient(
     override fun findPreviousSubmittedChange(): String? {
         // findChangedFilesSince doesn't need this information, so
         // this is unsupported at the moment.
-        return null
+        // For now we just return a non-null string to signify that there was no error
+        return ""
     }
 
     /**

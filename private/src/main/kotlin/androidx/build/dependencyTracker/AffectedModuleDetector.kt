@@ -287,7 +287,12 @@ abstract class AffectedModuleDetectorLoader :
             )
             val changedFilesProvider: ChangedFilesProvider = {
                 val baseSha = baseCommitOverride ?: gitClient.findPreviousSubmittedChange()
-                baseSha?.let(gitClient::findChangedFilesSince)
+                check(baseSha != null) {
+                    "gitClient returned null from findPreviousSubmittedChange"
+                }
+                val changedFiles = gitClient.findChangedFilesSince(baseSha)
+                logger.info("changed files: $changedFiles")
+                changedFiles
             }
 
             AffectedModuleDetectorImpl(
