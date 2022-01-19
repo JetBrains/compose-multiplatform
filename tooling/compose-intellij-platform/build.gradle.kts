@@ -8,20 +8,13 @@ plugins {
 
 jvmTarget("11")
 
-val skikoVersion = project.property("skiko.version").toString()
 dependencies {
-    // todo unpack skiko native libs
-    fun skikoDependency(artifact: String) = api("org.jetbrains.skiko:$artifact:$skikoVersion")
-
-    skikoDependency("skiko-awt")
-    skikoDependency("skiko-awt-runtime-linux-x64")
-    skikoDependency("skiko-awt-runtime-windows-x64")
-    skikoDependency("skiko-awt-runtime-macos-x64")
-    skikoDependency("skiko-awt-runtime-macos-arm64")
-
-    api(compose.desktop.currentOs) {
-        exclude(group = "org.jetbrains.skiko")
-    }
+    api(compose.desktop.common)
+    api(compose.desktop.macos_x64)
+    api(compose.desktop.macos_arm64)
+    api(compose.desktop.windows_x64)
+    api(compose.desktop.linux_x64)
+    api(compose.desktop.linux_arm64)
 }
 
 intellijPlugin(group = "org.jetbrains.compose.intellij.platform")

@@ -1,11 +1,12 @@
 <idea-plugin>
     <id>org.jetbrains.compose.intellij.platform</id>
-    <!--suppress PluginXmlValidity -->
-    <name>Compose Intellij Plugin Base</name>
+    <name>Compose for IDE Base</name>
     <vendor>JetBrains</vendor>
     <description>
         <![CDATA[
-        Base plugin for developing Intellij plugins with Compose
+        An Intellij platform plugin for developing Intellij plugins with Compose framework
         ]]>
     </description>
+
+    <depends>com.intellij.modules.platform</depends>
 </idea-plugin>

@@ -15,7 +15,7 @@ fun Project.intellijPlugin(group: String, fn: IntelliJPluginExtension.() -> Unit
 
     val idePluginProperties = IdePluginBuildProperties(project)
     project.group = group
-    project.version = idePluginProperties.deployVersion
+    project.version = idePluginProperties.deployVersion.get()
 
     val intellij = project.extensions.getByType(IntelliJPluginExtension::class.java)
     intellij.apply {
