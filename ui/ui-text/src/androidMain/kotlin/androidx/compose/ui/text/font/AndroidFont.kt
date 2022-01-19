@@ -138,6 +138,10 @@ abstract class AndroidFont @OptIn(ExperimentalTextApi::class) constructor(
      * that instance, though it is advised to create one loader for all instances of the same
      * subclass and share them between [AndroidFont] instances to avoid allocations or allow
      * caching.
+     *
+     * Implementers of custom font resources should try to ensure that their implementations are
+     * usable in the context of Compose Previews, which don't provide access to the full Android
+     * runtime. If not possible, it is advised to document the behavior in Compose Preview.
      */
     interface TypefaceLoader {
         /**
