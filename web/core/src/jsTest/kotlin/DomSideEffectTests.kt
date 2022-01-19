@@ -158,6 +158,10 @@ class DomSideEffectTests {
             recomposeScope = currentRecomposeScope
 
             Div {
+                DisposableEffect(Unit) {
+                    effectsList.add("DisposableEffectOneTime")
+                    onDispose {  }
+                }
                 DomSideEffect(key) {
                     effectsList.add("DomSideEffect")
                 }
@@ -170,7 +174,7 @@ class DomSideEffectTests {
             }
         }
 
-        assertContentEquals(effectsList, listOf("DisposableEffect", "DomSideEffect"))
+        assertContentEquals(effectsList, listOf("DisposableEffectOneTime", "DisposableEffect", "DomSideEffect"))
 
         key = 2
         recomposeScope?.invalidate()
@@ -179,7 +183,7 @@ class DomSideEffectTests {
 
         assertContentEquals(
             effectsList,
-            listOf("DisposableEffect", "DomSideEffect", "DisposableEffectDisposed", "DisposableEffect", "DomSideEffect")
+            listOf("DisposableEffectOneTime", "DisposableEffect", "DomSideEffect", "DisposableEffectDisposed", "DisposableEffect", "DomSideEffect")
         )
     }
 
