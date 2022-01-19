@@ -1,0 +1,34 @@
+// Signature format: 4.0
+package androidx.compose.material.window {
+
+  public final class AndroidSizeClass_androidKt {
+  }
+
+  public enum HeightSizeClass {
+    enum_constant public static final androidx.compose.material.window.HeightSizeClass Compact;
+    enum_constant public static final androidx.compose.material.window.HeightSizeClass Expanded;
+    enum_constant public static final androidx.compose.material.window.HeightSizeClass Medium;
+  }
+
+  @androidx.compose.runtime.Immutable public final class SizeClass {
+    method public androidx.compose.material.window.HeightSizeClass getHeight();
+    method public androidx.compose.material.window.WidthSizeClass getWidth();
+    property public final androidx.compose.material.window.HeightSizeClass height;
+    property public final androidx.compose.material.window.WidthSizeClass width;
+    field public static final androidx.compose.material.window.SizeClass.Companion Companion;
+  }
+
+  public static final class SizeClass.Companion {
+  }
+
+  public final class TestOnly_jvmKt {
+  }
+
+  public enum WidthSizeClass {
+    enum_constant public static final androidx.compose.material.window.WidthSizeClass Compact;
+    enum_constant public static final androidx.compose.material.window.WidthSizeClass Expanded;
+    enum_constant public static final androidx.compose.material.window.WidthSizeClass Medium;
+  }
+
+}
+
