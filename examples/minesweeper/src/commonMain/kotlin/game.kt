@@ -1,4 +1,4 @@
-//@file:OptIn(ExperimentalComposeWebWidgetsApi::class)
+@file:Suppress("FunctionName")
 
 import androidx.compose.runtime.*
 import androidx.compose.foundation.*
@@ -6,149 +6,48 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.*
 import kotlin.math.max
 
 @Composable
-expect fun OpenedCell(cell: Cell)
+expect fun loadImage(src: String): Painter
 
-@Composable
-expect fun CellWithIcon(src: String, alt: String)
-
-@Composable
-fun Mine() {
-    CellWithIcon(src="assets/mine.png", alt = "Bomb")
+object Difficulty {
+    val EASY = GameSettings(9, 9, 10)
+    val MEDIUM = GameSettings(16, 16, 40)
+    val EXPERT = GameSettings(16, 30, 99)
 }
 
-@Composable
-fun Flag() {
-    CellWithIcon(src="assets/flag.png", alt = "Flag")
-}
+object GameStyles {
+    val closedCellColor = Color.DarkGray
+    val openedCellColor = Color.White
+    val borderColor = Color.LightGray
+    val cellSize = 32.dp
+    val cellBorderWidth = 1.dp
 
-class GameStyles(
-    val closedCellColor: Color,
-    val openedCellColor: Color,
-    val borderColor: Color,
-    val cellSize: Dp,
-    val cellBorderWidth: Dp
-) {
-    fun getCellColor(cell: Cell): Color {
-        return if (cell.isOpened) {
-            openedCellColor
-        } else {
-            closedCellColor
-        }
-    }
-}
-
-@Composable
-expect fun ClickableCell(
-    onLeftMouseButtonClick: (isShiftPressed: Boolean) -> Unit,
-    onRightMouseButtonClick: () -> Unit,
-    content: @Composable () -> Unit
-)
-
-@Composable
-fun BoardView(game: GameController, styles: GameStyles) {
-    Column {
-        for (row in 0 until game.rows) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                for (column in 0 until game.columns) {
-                    val cell = game.cellAt(row, column)!!
-
-                    ClickableCell(
-                        onLeftMouseButtonClick = { shift ->
-                            // It seems to be hard to implement traditional LMB + RMB click
-                            // activation of mine seeker, so let it run on Shift + Click
-                            if (shift) {
-                                game.openNotFlaggedNeighbors(cell)
-                            } else {
-                                game.openCell(cell)
-                            }
-                         },
-                        onRightMouseButtonClick = { game.toggleFlag(cell) }
-                    ) {
-                        Box(
-                            modifier = Modifier.size(styles.cellSize, styles.cellSize)
-                                .background(color = styles.getCellColor(cell))
-                                .border(width = styles.cellBorderWidth, color = styles.borderColor)
-                        ) {
-                            if (cell.isOpened) {
-                                if (cell.hasBomb) {
-                                    Mine()
-                                } else if (cell.bombsNear > 0) {
-                                    OpenedCell(cell)
-                                }
-                            } else if (cell.isFlagged) {
-                                Flag()
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun IndicatorWithIcon(iconPath: String, alt: String, value: Int) {
-    Box (modifier = Modifier.background(Color(0x8e, 0x6e, 0x0e))) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(modifier = Modifier.size(40.dp, 40.dp)) {
-                CellWithIcon(iconPath, alt)
-            }
-
-            Box(modifier = Modifier.size(56.dp, 36.dp)) {
-                Text(
-                    text = value.toString(),
-                    fontSize = 24.sp,
-                    color = Color.White
-                )
-            }
-        }
-    }
-}
-
-@Composable
-expect fun NewGameButton(text: String, onClick: () -> Unit)
-
-@Composable
-fun Column_noInline(block:@Composable ColumnScope.() -> Unit) {
-    Column { block() }
-}
-
-@Composable
-fun Game(requestWindowSize: ((width: Dp, height: Dp) -> Unit)? = null) = Column_noInline {
     val windowPadding = 16.dp
     val boardBorderWidth = 1.dp
     val boardPadding = 4.dp
     val extraVerticalSpace = 158.dp // This should give enough space to UI widgets
-    val styles = GameStyles(
-        openedCellColor = Color.White,
-        closedCellColor = Color.DarkGray,
-        borderColor = Color.LightGray,
-        cellSize = 32.dp,
-        cellBorderWidth = 1.dp
-    )
+}
 
-    val difficulty = object {
-        val EASY = GameSettings(9, 9, 10)
-        val MEDIUM = GameSettings(16, 16, 40)
-        val EXPERT = GameSettings(16, 30, 99)
-    }
-
+@Composable
+fun Game(requestWindowSize: ((width: Dp, height: Dp) -> Unit)? = null) = MainLayout {
     var message by remember { mutableStateOf<String?>(null) }
+
     val onWin = { message = "You win!" }
     val onLose = { message = "Try again" }
+    var game by remember {
+        mutableStateOf(GameController(Difficulty.EASY, onWin, onLose))
+    }
 
-    var game by remember { mutableStateOf(GameController(difficulty.EASY, onWin, onLose)) }
-
-    fun updateWindowSize() {
+    fun updateWindowSize() = with(GameStyles) {
         if (requestWindowSize != null) {
             val boardOffset = (windowPadding + boardPadding) * 2;
 
-            val width = boardOffset + game.columns * styles.cellSize
-            val height = boardOffset + game.rows * styles.cellSize + extraVerticalSpace
+            val width = boardOffset + game.columns * cellSize
+            val height = boardOffset + game.rows * cellSize + extraVerticalSpace
 
             requestWindowSize(width, height)
         }
@@ -159,12 +58,12 @@ fun Game(requestWindowSize: ((width: Dp, height: Dp) -> Unit)? = null) = Column_
         message = null
     }
 
-    updateWindowSize() // TODO this calls resize twice, how can we avoid this?
+    updateWindowSize()
 
-    Column (
+    Column(
         modifier = Modifier
             .background(Color(0xed, 0x9c, 0x38))
-            .padding(windowPadding)
+            .padding(GameStyles.windowPadding)
     ) {
         // Controls
         Row {
@@ -180,9 +79,9 @@ fun Game(requestWindowSize: ((width: Dp, height: Dp) -> Unit)? = null) = Column_
                     Text(text = "New Game", fontSize = 20.sp)
                 }
                 Row {
-                    NewGameButton("Easy") { newGame(difficulty.EASY) }
-                    NewGameButton("Medium") { newGame(difficulty.MEDIUM) }
-                    NewGameButton("Hard") { newGame(difficulty.EXPERT) }
+                    NewGameButton("Easy") { newGame(Difficulty.EASY) }
+                    NewGameButton("Medium") { newGame(Difficulty.MEDIUM) }
+                    NewGameButton("Hard") { newGame(Difficulty.EXPERT) }
                 }
             }
         }
@@ -192,14 +91,15 @@ fun Game(requestWindowSize: ((width: Dp, height: Dp) -> Unit)? = null) = Column_
 
         // Status
         Box(modifier = Modifier.padding(4.dp).size(200.dp, 32.dp)) {
-            if (message != null) {
-                Text(message!!)
-            }
+            Text(message ?: "")
         }
 
         // Cells
-        Box (modifier = Modifier.border(boardBorderWidth, Color.White).padding(boardPadding)) {
-            BoardView(game, styles)
+        Box(modifier = Modifier
+            .border(GameStyles.boardBorderWidth, Color.White)
+            .padding(GameStyles.boardPadding)
+        ) {
+            BoardView(game)
         }
     }
 
@@ -210,4 +110,9 @@ fun Game(requestWindowSize: ((width: Dp, height: Dp) -> Unit)? = null) = Column_
             }
         }
     }
+}
+
+@Composable
+private fun MainLayout(block:@Composable ColumnScope.() -> Unit) {
+    Column { block() }
 }
