@@ -36,10 +36,11 @@ interface ElementScope<out TElement : Element> : DOMScope<TElement> {
      * and must be reversed or cleaned up if [key] changes or if the DisposableRefEffect leaves the composition.
      * [effect] lambda provides a reference to a native element represented by Composable.
      * Adding [DisposableEffectScope.onDispose] to [effect] is mandatory.
+     * DisposableRefEffect is deprecated, use regular DisposableEffect instead and access element via [DOMScope.scopeElement] if needed
      */
     @Composable
     @NonRestartableComposable
-    @Deprecated("DisposableRefEffect is deprecated, use regular DisposableEffect instead and access element via scope if needed")
+    @Deprecated("DisposableRefEffect is deprecated, use regular DisposableEffect instead and access element via scopeElement() if needed")
     fun DisposableRefEffect(
         key: Any?,
         effect: DisposableEffectScope.(TElement) -> DisposableEffectResult
@@ -50,10 +51,11 @@ interface ElementScope<out TElement : Element> : DOMScope<TElement> {
      * and must be reversed or cleaned up if element or the DisposableRefEffect leaves the composition.
      * [effect] lambda provides a reference to a native element represented by Composable.
      * Adding [DisposableEffectScope.onDispose] to [effect] is mandatory.
+     * DisposableRefEffect is deprecated, use regular DisposableEffect instead and access element via [DOMScope.scopeElement] if needed
      */
     @Composable
     @NonRestartableComposable
-    @Deprecated("DisposableRefEffect is deprecated, use regular DisposableEffect instead and access element via scope if needed")
+    @Deprecated("DisposableRefEffect is deprecated, use regular DisposableEffect instead and access element via scopeElement() if needed")
     fun DisposableRefEffect(
         effect: DisposableEffectScope.(TElement) -> DisposableEffectResult
     ) {
@@ -64,20 +66,22 @@ interface ElementScope<out TElement : Element> : DOMScope<TElement> {
      * A side effect of composition that runs on every successful recomposition if [key] changes.
      * Also see [SideEffect].
      * Same as other effects in [ElementScope], it provides a reference to a native element in [effect] lambda.
+     * DomSideEffect is deprecated, use [SideEffect] instead. If, for some reason, you need to access the scope element, use DisposableEffect and call [DOMScope.scopeElement]
      */
     @Composable
     @NonRestartableComposable
-    @Deprecated("DomSideEffect is deprecated, use regular DisposableEffect instead and access element via scope if needed")
+    @Deprecated("DomSideEffect is deprecated, use SideEffect instead. If, for some reason, you need to access the scope element, use DisposableEffect")
     fun DomSideEffect(key: Any?, effect: DomEffectScope.(TElement) -> Unit)
 
     /**
      * A side effect of composition that runs on every successful recomposition.
      * Also see [SideEffect].
      * Same as other effects in [ElementScope], it provides a reference to a native element in [effect] lambda.
+     * DomSideEffect is deprecated, use [SideEffect] instead. If, for some reason, you need to access the scope element, use DisposableEffect and call [DOMScope.scopeElement]
      */
     @Composable
     @NonRestartableComposable
-    @Deprecated("DomSideEffect is deprecated, use regular DisposableEffect instead and access element via scope if needed")
+    @Deprecated("DomSideEffect is deprecated, use SideEffect instead. If, for some reason, you need to access the scope element, use DisposableEffect")
     fun DomSideEffect(effect: DomEffectScope.(TElement) -> Unit)
 }
 
