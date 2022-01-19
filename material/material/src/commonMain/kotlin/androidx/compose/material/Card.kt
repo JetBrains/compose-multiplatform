@@ -22,6 +22,7 @@ import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,6 +55,7 @@ import androidx.compose.ui.unit.dp
  *  the size of the shadow below the card.
  */
 @Composable
+@NonRestartableComposable
 fun Card(
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.medium,
@@ -109,6 +111,7 @@ fun Card(
  */
 @ExperimentalMaterialApi
 @Composable
+@NonRestartableComposable
 fun Card(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,

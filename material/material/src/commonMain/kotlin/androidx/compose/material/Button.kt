@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
@@ -164,6 +165,7 @@ fun Button(
  * @param contentPadding The spacing values to apply internally between the container and the content
  */
 @Composable
+@NonRestartableComposable
 fun OutlinedButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -217,6 +219,7 @@ fun OutlinedButton(
  * @param contentPadding The spacing values to apply internally between the container and the content
  */
 @Composable
+@NonRestartableComposable
 fun TextButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
