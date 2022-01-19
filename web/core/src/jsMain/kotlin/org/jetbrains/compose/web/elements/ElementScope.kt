@@ -13,7 +13,7 @@ import androidx.compose.runtime.remember
 import org.w3c.dom.Element
 
 interface DOMScope<out TElement : Element> {
-    fun DisposableEffectScope.scopeElement(): TElement
+    val DisposableEffectScope.scopeElement: TElement
 }
 
 /**
@@ -124,7 +124,8 @@ abstract class ElementScopeBase<out TElement : Element> : ElementScope<TElement>
 internal open class ElementScopeImpl<TElement : Element> : ElementScopeBase<TElement>() {
     override lateinit var element: TElement
 
-    override fun DisposableEffectScope.scopeElement() = element
+    override val DisposableEffectScope.scopeElement: TElement
+        get() = element
 }
 
 interface DomEffectScope {

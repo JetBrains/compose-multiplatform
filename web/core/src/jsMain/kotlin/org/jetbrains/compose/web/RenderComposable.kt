@@ -39,7 +39,8 @@ fun <TElement : Element> renderComposable(
         parent = recomposer
     )
     val scope = object : DOMScope<TElement> {
-        override fun DisposableEffectScope.scopeElement() = root
+        override val DisposableEffectScope.scopeElement: TElement
+            get() = root
     }
     composition.setContent @Composable {
         content(scope)
