@@ -17,6 +17,7 @@
 package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.Modifier
 
@@ -29,6 +30,7 @@ import androidx.compose.ui.Modifier
  * @param modifier modifiers to set to this spacer
  */
 @Composable
+@NonRestartableComposable
 fun Spacer(modifier: Modifier) {
     Layout({}, modifier) { _, constraints ->
         with(constraints) {

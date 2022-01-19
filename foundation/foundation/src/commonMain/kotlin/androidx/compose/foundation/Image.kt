@@ -17,6 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.Layout
@@ -83,6 +84,7 @@ import androidx.compose.ui.semantics.semantics
         "androidx.compose.ui.layout.ContentScale.Fit"
     )
 )
+@NonRestartableComposable
 fun Image(
     bitmap: ImageBitmap,
     contentDescription: String?,
@@ -138,6 +140,7 @@ fun Image(
  * sampling algorithm
  */
 @Composable
+@NonRestartableComposable
 fun Image(
     bitmap: ImageBitmap,
     contentDescription: String?,
@@ -183,6 +186,7 @@ fun Image(
  * onscreen
  */
 @Composable
+@NonRestartableComposable
 fun Image(
     imageVector: ImageVector,
     contentDescription: String?,

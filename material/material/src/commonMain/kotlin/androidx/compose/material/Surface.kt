@@ -28,6 +28,7 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -98,6 +99,7 @@ import androidx.compose.ui.unit.dp
  * of the Surface. If you want to change the drawing order you can use `Modifier.zIndex`.
  */
 @Composable
+@NonRestartableComposable
 fun Surface(
     modifier: Modifier = Modifier,
     shape: Shape = RectangleShape,
@@ -197,6 +199,7 @@ fun Surface(
  */
 @ExperimentalMaterialApi
 @Composable
+@NonRestartableComposable
 fun Surface(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,

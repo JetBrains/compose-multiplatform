@@ -203,7 +203,7 @@ package androidx.compose.foundation.layout {
   }
 
   public final class SpacerKt {
-    method @androidx.compose.runtime.Composable public static void Spacer(androidx.compose.ui.Modifier modifier);
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static void Spacer(androidx.compose.ui.Modifier modifier);
   }
 
 }
