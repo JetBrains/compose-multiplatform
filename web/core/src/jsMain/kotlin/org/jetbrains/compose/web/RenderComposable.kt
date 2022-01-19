@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composition
 import androidx.compose.runtime.ControlledComposition
 import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.DefaultMonotonicFrameClock
+import androidx.compose.runtime.DisposableEffectScope
 import androidx.compose.runtime.Recomposer
 import org.jetbrains.compose.web.dom.DOMScope
 import kotlinx.browser.document
@@ -38,7 +39,7 @@ fun <TElement : Element> renderComposable(
         parent = recomposer
     )
     val scope = object : DOMScope<TElement> {
-        override val element = root
+        override fun DisposableEffectScope.scopeElement() = root
     }
     composition.setContent @Composable {
         content(scope)

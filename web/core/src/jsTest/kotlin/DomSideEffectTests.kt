@@ -37,27 +37,6 @@ class DomSideEffectTests {
     }
 
     @Test
-    fun canCreateElementsInSideEffect() = runTest {
-        composition {
-            Div {
-                SideEffect {
-                    element.appendChild(
-                        document.createElement("p").also {
-                            it.appendChild(document.createTextNode("Hello World!"))
-                        }
-                    )
-                }
-            }
-        }
-
-        assertEquals(
-            expected = "<div><div><p>Hello World!</p></div></div>",
-            actual = root.outerHTML
-        )
-    }
-
-
-    @Test
     fun canUpdateElementsCreatedInDomSideEffect() = runTest {
         var i: Int by mutableStateOf(0)
         val disposeCalls = mutableListOf<Int>()
