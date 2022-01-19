@@ -1,0 +1,7 @@
+<idea-plugin>
+    <id>org.jetbrains.compose.intellij.platform.sample.all.plugins</id>
+    <vendor>Sample vendor</vendor>
+
+    <depends>org.jetbrains.compose.intellij.platform.sample.plugin1</depends>
+    <depends>org.jetbrains.compose.intellij.platform.sample.plugin2</depends>
+</idea-plugin>
