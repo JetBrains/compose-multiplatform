@@ -1,5 +1,3 @@
-import com.github.veselovalex.minesweeper.GameController
-import com.github.veselovalex.minesweeper.GameSettings
 import kotlin.test.*
 
 class GameControllerTest {
@@ -192,6 +190,7 @@ class GameControllerTest {
     @Test
     fun testAllBombsAreOpenedAfterLose() {
         val game = GameController(rows = 3, columns = 3, mines = listOf(Pair(2, 2), Pair(1, 1)))
+        game.openCell(game.cellAt(0, 0)!!)
         game.openCell(game.cellAt(1, 1)!!)
 
         assertTrue(game.cellAt(2, 2)!!.isOpened, "Cell with bomb was not opened after lose")
@@ -201,12 +200,25 @@ class GameControllerTest {
     @Test
     fun testCanNotClickWhenGameIsFinished() {
         val game = GameController(rows = 3, columns = 3, mines = listOf(Pair(2, 2)))
+        game.openCell(game.cellAt(2, 1)!!)
         game.openCell(game.cellAt(2, 2)!!)
         game.openCell(game.cellAt(1, 1)!!)
         game.toggleFlag(game.cellAt(0, 0)!!)
 
         assertFalse(game.cellAt(0, 0)!!.isFlagged, "Cell was flagged after game end")
         assertFalse(game.cellAt(1, 1)!!.isOpened, "Cell was opened after game end")
+    }
+
+    @Test
+    fun canNotLoseAtFirstClick() {
+        val game = GameController(rows = 3, columns = 3, mines = listOf(Pair(0, 0), Pair(1, 1)))
+        game.openCell(game.cellAt(0, 0)!!)
+        assertFalse(game.cellAt(0, 0)!!.hasBomb, "First cell has bomb")
+        assertTrue(game.cellAt(0, 0)!!.isOpened, "First cell was not opened")
+        assertEquals(2, game.bombs, "Bomb count changed after first click")
+
+        game.openCell(game.cellAt(1, 1)!!)
+        assertTrue(game.cellAt(1, 1)!!.hasBomb, "Next cell has not bomb")
     }
 
     @Test

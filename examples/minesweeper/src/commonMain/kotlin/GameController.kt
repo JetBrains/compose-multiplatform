@@ -191,8 +191,6 @@ class GameController(private val options: GameSettings, private val onWin: (() -
         neighborsOf(cell).forEach {
             it.bombsNear += 1
         }
-
-        println("Bomb at ${cell.row}:${cell.column}")
     }
 
     private fun flagAllBombs() {
