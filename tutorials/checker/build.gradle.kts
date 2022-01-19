@@ -28,7 +28,7 @@ fun findSnippets(dirs: List<String>): List<SnippetData> {
               currentSnippet.clear()
             } else {
               if (snippetStart != 0) {
-                currentSnippet.appendln(line)
+                currentSnippet.appendLine(line)
             }
           }
         }
@@ -48,6 +48,22 @@ fun cloneTemplate(template: String, index: Int, content: String): File {
     out.println(content)
   }
   return tempDir
+}
+
+val ignoreTill = java.time.LocalDate.parse("2022-02-01")
+
+fun isIgnored(tutorial: String): Boolean {
+  if (java.time.LocalDate.now() > ignoreTill) return false
+  return when (tutorial) {
+    "IGNORED" -> true
+    else -> false
+  }
+}
+
+fun maybeFail(tutorial: String, message: String) {
+  if (!isIgnored(tutorial)) {
+    throw GradleException(message)
+  }
 }
 
 @OptIn(ExperimentalStdlibApi::class)
@@ -83,7 +99,7 @@ fun checkDirs(dirs: List<String>, template: String, buildCmd: String = "build") 
     if (proc.exitValue() != 0) {
       println(proc.inputStream.bufferedReader().readText())
       println(proc.errorStream.bufferedReader().readText())
-      throw GradleException("Error in snippet at ${snippet.file}:${snippet.lineNumber}")
+      maybeFail(snippet.file.name, "Error in snippet at ${snippet.file}:${snippet.lineNumber}")
     }
   }
 }
