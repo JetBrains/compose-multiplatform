@@ -1,6 +1,7 @@
 package org.jetbrains.compose.web.core.tests
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.getValue
@@ -126,7 +127,9 @@ class DomSideEffectTests {
                 }
                 DisposableRefEffect(key) {
                     effectsList.add("DisposableRefEffect")
-                    onDispose { }
+                    onDispose {
+                        effectsList.add("DisposableRefEffectDisposed")
+                    }
                 }
             }
         }
@@ -140,7 +143,44 @@ class DomSideEffectTests {
 
         assertContentEquals(
             effectsList,
-            listOf("DisposableRefEffect", "DomSideEffect", "DisposableRefEffect", "DomSideEffect")
+            listOf("DisposableRefEffect", "DomSideEffect", "DisposableRefEffectDisposed", "DisposableRefEffect", "DomSideEffect")
         )
     }
+
+    @Test
+    fun domSideEffectWithDisposableEffectTest() = runTest {
+        val effectsList = mutableListOf<String>()
+
+        var key = 1
+        var recomposeScope: RecomposeScope? = null
+
+        composition {
+            recomposeScope = currentRecomposeScope
+
+            Div {
+                DomSideEffect(key) {
+                    effectsList.add("DomSideEffect")
+                }
+                DisposableEffect(key) {
+                    effectsList.add("DisposableEffect")
+                    onDispose {
+                        effectsList.add("DisposableEffectDisposed")
+                    }
+                }
+            }
+        }
+
+        assertContentEquals(effectsList, listOf("DisposableEffect", "DomSideEffect"))
+
+        key = 2
+        recomposeScope?.invalidate()
+
+        waitForRecompositionComplete()
+
+        assertContentEquals(
+            effectsList,
+            listOf("DisposableEffect", "DomSideEffect", "DisposableEffectDisposed", "DisposableEffect", "DomSideEffect")
+        )
+    }
+
 }
