@@ -1,35 +1,31 @@
 import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.*
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.*
+import androidx.compose.ui.text.font.*
+import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.Window
-import org.jetbrains.skiko.wasm.onWasmReady
+import platform.AppKit.NSApplication
+import platform.AppKit.NSApp
+import platform.Foundation.NSBundle
 
 fun main() {
-    onWasmReady {
-        Window("Minesweeper") {
+    NSApplication.sharedApplication()
+    Window("Minesweeper") {
+        MaterialTheme {
             Game(
-                requestWindowSize = { w, h ->
-                    // TODO(not implemented yet)
-                }
+                requestWindowSize = { w, h -> /* TODO(make resizable) */}
             )
         }
     }
+    NSApp?.run()
 }
 
 
@@ -43,13 +39,22 @@ actual fun CellWithIcon(src: String, alt: String) {
 }
 
 fun painterResource(src: String): Painter {
+    // TODO Bundle pics and show images properly
+    val color = when (src) {
+        "assets/clock.png" -> Color.Blue
+        "assets/flag.png" -> Color.Green
+        "assets/mine.png" -> Color.Red
+        else -> Color.White
+    }
     return object : Painter() {
         override val intrinsicSize: Size
             get() = Size(16f, 16f)
 
         override fun DrawScope.onDraw() {
-            drawRect(color = Color.Red)
+            drawRect(color = color)
         }
+
+
 
     }
 }
@@ -73,7 +78,7 @@ actual fun NewGameButton(text: String, onClick: () -> Unit) {
             .border(width = 1.dp,  color = Color.White)
             .clickable { onClick() }
     ) {
-        androidx.compose.material.Text(text,
+        Text(text,
             fontSize = 18.sp,
             color = Color.White,
             modifier = Modifier.padding(4.dp)
@@ -90,14 +95,14 @@ actual fun ClickableCell(
 ) {
     Box(
         modifier = Modifier
-            .pointerInput(PointerEventType.Press) {
+            .clickable { onLeftMouseButtonClick(false) } // TODO unneccessary if pointerInput works
+            .pointerInput(onLeftMouseButtonClick, onRightMouseButtonClick) {
                 awaitPointerEventScope {
                     while (true) {
                         val event = awaitPointerEvent(PointerEventPass.Main)
                         with(event) {
-                            println("Event $type")
                             if (type == PointerEventType.Press) {
-                                println("PRessed")
+                                // TODO does not work yet, all events are of Unknown type (
                                 val lmb = buttons.isPrimaryPressed
                                 val rmb = buttons.isSecondaryPressed
 
@@ -111,16 +116,6 @@ actual fun ClickableCell(
                     }
                 }
             }
-//            .mouseClickable {
-//                val lmb = buttons.isPrimaryPressed
-//                val rmb = buttons.isSecondaryPressed
-//
-//                if (lmb && !rmb) {
-//                    onLeftMouseButtonClick(keyboardModifiers.isShiftPressed)
-//                } else if (rmb && !lmb) {
-//                    onRightMouseButtonClick()
-//                }
-//            }
     ) {
         content()
     }

@@ -113,11 +113,16 @@ fun IndicatorWithIcon(iconPath: String, alt: String, value: Int) {
 expect fun NewGameButton(text: String, onClick: () -> Unit)
 
 @Composable
-fun Game(requestWindowSize: ((width: Dp, height: Dp) -> Unit)? = null) = Column {
+fun Column_noInline(block:@Composable ColumnScope.() -> Unit) {
+    Column { block() }
+}
+
+@Composable
+fun Game(requestWindowSize: ((width: Dp, height: Dp) -> Unit)? = null) = Column_noInline {
     val windowPadding = 16.dp
     val boardBorderWidth = 1.dp
     val boardPadding = 4.dp
-    val extraVerticalSpace = 152.dp // This should give enough space to UI widgets
+    val extraVerticalSpace = 158.dp // This should give enough space to UI widgets
     val styles = GameStyles(
         openedCellColor = Color.White,
         closedCellColor = Color.DarkGray,
