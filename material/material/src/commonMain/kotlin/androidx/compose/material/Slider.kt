@@ -161,8 +161,14 @@ fun Slider(
             .focusable(enabled, interactionSource)
     ) {
         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-        val maxPx = constraints.maxWidth.toFloat()
-        val minPx = 0f
+        val widthPx = constraints.maxWidth.toFloat()
+        val maxPx: Float
+        val minPx: Float
+
+        with(LocalDensity.current) {
+            maxPx = widthPx - ThumbRadius.toPx()
+            minPx = ThumbRadius.toPx()
+        }
 
         fun scaleToUserValue(offset: Float) =
             scale(minPx, maxPx, offset, valueRange.start, valueRange.endInclusive)
@@ -196,7 +202,7 @@ fun Slider(
         }
 
         val press = Modifier.sliderPressModifier(
-            draggableState, interactionSource, maxPx, isRtl, rawOffset, gestureEndAction, enabled
+            draggableState, interactionSource, widthPx, isRtl, rawOffset, gestureEndAction, enabled
         )
 
         val drag = Modifier.draggable(
@@ -216,7 +222,7 @@ fun Slider(
             fraction,
             tickFractions,
             colors,
-            maxPx,
+            maxPx - minPx,
             interactionSource,
             modifier = press.then(drag)
         )
@@ -278,10 +284,19 @@ fun RangeSlider(
         stepsToTickFractions(steps)
     }
 
-    BoxWithConstraints {
+    BoxWithConstraints(
+        modifier = Modifier
+            .requiredSizeIn(minWidth = ThumbRadius * 4, minHeight = ThumbRadius * 2)
+    ) {
         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-        val maxPx = constraints.maxWidth.toFloat()
-        val minPx = 0f
+        val widthPx = constraints.maxWidth.toFloat()
+        val maxPx: Float
+        val minPx: Float
+
+        with(LocalDensity.current) {
+            maxPx = widthPx - ThumbRadius.toPx()
+            minPx = ThumbRadius.toPx()
+        }
 
         fun scaleToUserValue(offset: ClosedFloatingPointRange<Float>) =
             scale(minPx, maxPx, offset, valueRange.start, valueRange.endInclusive)
@@ -327,7 +342,7 @@ fun RangeSlider(
             rawOffsetEnd,
             enabled,
             isRtl,
-            maxPx,
+            widthPx,
             valueRange,
             gestureEndAction,
         ) { isStart, offset ->
@@ -356,7 +371,7 @@ fun RangeSlider(
             fractionEnd,
             tickFractions,
             colors,
-            maxPx,
+            maxPx - minPx,
             startInteractionSource,
             endInteractionSource,
             modifier = pressDrag.then(modifier),
@@ -517,7 +532,7 @@ private fun SliderImpl(
         }
 
         val thumbSize = ThumbRadius * 2
-        val offset = (widthDp - thumbSize) * positionFraction
+        val offset = widthDp * positionFraction
         val center = Modifier.align(Alignment.CenterStart)
 
         Track(
@@ -558,8 +573,8 @@ private fun RangeSliderImpl(
         }
 
         val thumbSize = ThumbRadius * 2
-        val offsetStart = (widthDp - thumbSize) * positionFractionStart
-        val offsetEnd = (widthDp - thumbSize) * positionFractionEnd
+        val offsetStart = widthDp * positionFractionStart
+        val offsetEnd = widthDp * positionFractionEnd
         Track(
             Modifier.align(Alignment.CenterStart).fillMaxSize(),
             colors,
