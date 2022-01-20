@@ -150,7 +150,7 @@ compose.desktop {
 
 compose.experimental {
     web.application {}
-    uikit.application {}
+//    uikit.application {}
 }
 
 tasks.withType<KotlinCompile> {
