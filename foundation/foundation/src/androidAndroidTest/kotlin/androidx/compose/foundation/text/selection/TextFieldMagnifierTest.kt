@@ -17,42 +17,91 @@
 package androidx.compose.foundation.text.selection
 
 import android.os.Build
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.Handle
 import androidx.compose.foundation.text.InternalFoundationTextApi
 import androidx.compose.foundation.text.TextDelegate
-import androidx.compose.foundation.text.TextDragObserver
 import androidx.compose.foundation.text.TextFieldDelegate
 import androidx.compose.foundation.text.TextFieldState
 import androidx.compose.foundation.text.TextLayoutResultProxy
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFontLoader
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @OptIn(InternalFoundationTextApi::class)
 @MediumTest
+@SdkSuppress(minSdkVersion = 28)
 @RunWith(AndroidJUnit4::class)
-class TextFieldMagnifierTest {
+internal class TextFieldMagnifierTest : AbstractSelectionMagnifierTests() {
 
-    @get:Rule
-    val rule = createComposeRule()
+    @Composable
+    override fun TestContent(
+        text: String,
+        modifier: Modifier,
+        style: TextStyle,
+        onTextLayout: (TextLayoutResult) -> Unit
+    ) {
+        BasicTextField(
+            text,
+                onValueChange = {},
+                modifier = modifier,
+                textStyle = style,
+                onTextLayout = onTextLayout
+            )
+        }
+
+    @Test
+    fun magnifier_appears_whileStartCursorTouched() {
+        checkMagnifierAppears_whileHandleTouched(Handle.Cursor)
+    }
+
+    @Test
+    fun magnifier_followsCursorHorizontally_whenDragged() {
+        checkMagnifierFollowsHandleHorizontally(Handle.Cursor)
+    }
+
+    @Test
+    fun magnifier_staysAtLineEnd_whenCursorDraggedPastStart() {
+        checkMagnifierConstrainedToLineHorizontalBounds(
+            Handle.Cursor,
+            checkStart = true
+        )
+    }
+
+    @Test
+    fun magnifier_staysAtLineEnd_whenCursorDraggedPastEnd() {
+        checkMagnifierConstrainedToLineHorizontalBounds(
+            Handle.Cursor,
+            checkStart = false
+        )
+    }
+
+    @Test
+    fun magnifier_hidden_whenCursorDraggedFarPastStartOfLine() {
+        checkMagnifierHiddenWhenDraggedTooFar(Handle.Cursor, checkStart = true)
+    }
+
+    @Test
+    fun magnifier_hidden_whenCursorDraggedFarPastEndOfLine() {
+        checkMagnifierHiddenWhenDraggedTooFar(Handle.Cursor, checkStart = false)
+    }
 
     @Test
     fun androidSupportsTextMagnifierOn28AndAbove() {
@@ -69,137 +118,9 @@ class TextFieldMagnifierTest {
     @Test
     fun doesNotModify_whenStateIsNull() {
         val manager = TextFieldSelectionManager()
-        val center = calculateSelectionMagnifierCenterAndroid(manager)
+        val center = calculateSelectionMagnifierCenterAndroid(manager, defaultMagnifierSize)
 
         assertThat(center).isEqualTo(Offset.Unspecified)
-    }
-
-    @Test
-    fun hidesMagnifier_whenGetCursorRectReturnsNull() {
-        val center = calculateSelectionMagnifierCenterAndroid(
-            draggingHandle = null,
-            fieldValue = TextFieldValue(),
-            transformTextOffset = { it },
-            getCursorRect = { null }
-        )
-
-        assertThat(center).isEqualTo(Offset.Unspecified)
-    }
-
-    @Test
-    fun hidesMagnifier_whenNotDraggingHandle() {
-        val center = calculateSelectionMagnifierCenterAndroid(
-            draggingHandle = null,
-            fieldValue = TextFieldValue(),
-            transformTextOffset = { it },
-            getCursorRect = { Rect.Zero }
-        )
-
-        assertThat(center).isEqualTo(Offset.Unspecified)
-    }
-
-    @Test
-    fun showsMagnifier_whenDraggingCursor() {
-        val center = calculateSelectionMagnifierCenterAndroid(
-            draggingHandle = Handle.Cursor,
-            fieldValue = TextFieldValue("hello", selection = TextRange(3)),
-            transformTextOffset = { it },
-            getCursorRect = {
-                Rect(left = it.toFloat(), top = 0f, right = it.toFloat(), bottom = 2f)
-            }
-        )
-
-        assertThat(center).isEqualTo(Offset(3f, 1f))
-    }
-
-    @Test
-    fun showsMagnifier_whenDraggingStart() {
-        val center = calculateSelectionMagnifierCenterAndroid(
-            draggingHandle = Handle.SelectionStart,
-            fieldValue = TextFieldValue(
-                "hello",
-                selection = TextRange(start = 1, end = 4)
-            ),
-            transformTextOffset = { it },
-            getCursorRect = {
-                Rect(left = it.toFloat(), top = 0f, right = it.toFloat(), bottom = 2f)
-            })
-
-        assertThat(center).isEqualTo(Offset(1f, 1f))
-    }
-
-    @Test
-    fun showsMagnifier_whenDraggingEnd() {
-        val center = calculateSelectionMagnifierCenterAndroid(
-            draggingHandle = Handle.SelectionEnd,
-            fieldValue = TextFieldValue(
-                "hello",
-                selection = TextRange(start = 1, end = 4)
-            ),
-            transformTextOffset = { it },
-            getCursorRect = {
-                Rect(left = it.toFloat(), top = 0f, right = it.toFloat(), bottom = 2f)
-            }
-        )
-
-        assertThat(center).isEqualTo(Offset(4f, 1f))
-    }
-
-    @Test
-    fun magnifierFollowsCursorDrag() {
-        testMagnifierDragging { cursorDragObserver() }
-    }
-
-    @Test
-    fun magnifierFollowsSelectionStartDrag() {
-        testMagnifierDragging { handleDragObserver(isStartHandle = true) }
-    }
-
-    @Test
-    fun magnifierFollowsSelectionEndDrag() {
-        testMagnifierDragging { handleDragObserver(isStartHandle = false) }
-    }
-
-    private fun testMagnifierDragging(
-        dragObserver: TextFieldSelectionManager.() -> TextDragObserver
-    ) {
-        val manager = setupSelectionManagedMagnifier()
-
-        assertThat(calculateSelectionMagnifierCenterAndroid(manager)).isEqualTo(Offset.Unspecified)
-
-        // Start dragging the handle in the top-left corner so that the cursor will be before the
-        // first character.
-        rule.runOnIdle {
-            manager.dragObserver().onStart(Offset.Zero)
-        }
-
-        // Make sure the magnifier showed.
-        assertThat(calculateSelectionMagnifierCenterAndroid(manager))
-            .isEqualTo(manager.getCursorCenter(0))
-
-        // Move the handle.
-        rule.runOnIdle {
-            manager.dragObserver().onDrag(Offset.Infinite)
-        }
-
-        // Magnifier should be centered after the last character.
-        assertThat(calculateSelectionMagnifierCenterAndroid(manager)).isEqualTo(
-            manager.getCursorCenter(Text.length)
-        )
-
-        // Stop dragging the handle.
-        rule.runOnIdle {
-            manager.dragObserver().onStop()
-        }
-
-        assertThat(calculateSelectionMagnifierCenterAndroid(manager)).isEqualTo(Offset.Unspecified)
-    }
-
-    private fun TextFieldSelectionManager.getCursorCenter(offset: Int): Offset {
-        val expectedCursorPosition = state!!.layoutResult!!.value.getCursorRect(offset)
-        assertThat(expectedCursorPosition).isNotEqualTo(Offset.Zero)
-        assertThat(expectedCursorPosition).isNotEqualTo(Offset.Unspecified)
-        return expectedCursorPosition.center
     }
 
     private fun setupSelectionManagedMagnifier(): TextFieldSelectionManager {

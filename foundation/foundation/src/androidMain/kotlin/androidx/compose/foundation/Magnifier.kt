@@ -23,6 +23,7 @@ import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +41,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.platform.inspectable
+import androidx.compose.ui.semantics.SemanticsPropertyKey
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
@@ -50,6 +53,13 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+
+/**
+ * A function on elements that are magnified with a [magnifier] modifier that returns the position
+ * of the center of the magnified content in the coordinate space of the root composable.
+ */
+internal val MagnifierPositionInRoot =
+    SemanticsPropertyKey<() -> Offset>("MagnifierPositionInRoot")
 
 /**
  * Specifies how a [magnifier] should create the underlying [Magnifier] widget. These properties
@@ -268,6 +278,17 @@ internal fun Modifier.magnifier(
     val updatedMagnifierCenter by rememberUpdatedState(magnifierCenter)
     val updatedZoom by rememberUpdatedState(zoom)
     val updatedOnSizeChanged by rememberUpdatedState(onSizeChanged)
+    val sourceCenterInRoot by remember {
+        derivedStateOf {
+            val sourceCenterOffset = updatedSourceCenter(density)
+            if (anchorPositionInRoot.isSpecified && sourceCenterOffset.isSpecified) {
+                anchorPositionInRoot + sourceCenterOffset
+            } else {
+                Offset.Unspecified
+            }
+        }
+    }
+    val isMagnifierShown by remember { derivedStateOf { sourceCenterInRoot.isSpecified } }
 
     /**
      * Used to request that the magnifier updates its buffer when the layer is redrawn.
@@ -312,13 +333,11 @@ internal fun Modifier.magnifier(
             // Update the modifier in a snapshotFlow so it will be restarted whenever any state read
             // by the update function changes.
             snapshotFlow {
-                val sourceCenterOffset = updatedSourceCenter(density)
-
                 // Once the position is set, it's never null again, so we don't need to worry about
                 // dismissing the magnifier if this expression changes value.
-                if (anchorPositionInRoot.isSpecified && sourceCenterOffset.isSpecified) {
+                if (isMagnifierShown) {
                     magnifier.update(
-                        sourceCenter = anchorPositionInRoot + sourceCenterOffset,
+                        sourceCenter = sourceCenterInRoot,
                         magnifierCenter = updatedMagnifierCenter(density).let {
                             if (it.isSpecified) {
                                 anchorPositionInRoot + it
@@ -363,6 +382,9 @@ internal fun Modifier.magnifier(
             // Note that this won't do anything if the magnifier is showing a different layer,
             // but it handles the case where the cursor is blinking so it's better than nothing.
             onNeedsUpdate.tryEmit(Unit)
+        }
+        .semantics {
+            this[MagnifierPositionInRoot] = { sourceCenterInRoot }
         }
 }
 

@@ -109,6 +109,14 @@ internal class TextController(val state: TextState) : RememberObserver {
                      */
                     var dragTotalDistance = Offset.Zero
 
+                    override fun onDown(point: Offset) {
+                        // Not supported for long-press-drag.
+                    }
+
+                    override fun onUp() {
+                        // Nothing to do.
+                    }
+
                     override fun onStart(startPoint: Offset) {
                         state.layoutCoordinates?.let {
                             if (!it.isAttached) return

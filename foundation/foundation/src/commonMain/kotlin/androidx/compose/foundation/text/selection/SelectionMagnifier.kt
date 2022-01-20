@@ -17,8 +17,6 @@
 package androidx.compose.foundation.text.selection
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.AnimationVector
 import androidx.compose.animation.core.AnimationVector2D
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
@@ -30,11 +28,13 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.isSpecified
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 private val UnspecifiedAnimationVector2D = AnimationVector2D(Float.NaN, Float.NaN)
 
@@ -55,22 +55,19 @@ private val OffsetDisplacementThreshold = Offset(
     Spring.DefaultDisplacementThreshold
 )
 
+private val MagnifierSpringSpec = SpringSpec(visibilityThreshold = OffsetDisplacementThreshold)
+
 /**
- * The magnifier jumps between discreet cursor positions, so animate it to make it easier to
- * visually follow while dragging.
+ * The text magnifier follows horizontal dragging exactly, but is vertically clamped to the current
+ * line, so when it changes lines we animate it.
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Suppress("ModifierInspectorInfo")
 internal fun Modifier.animatedSelectionMagnifier(
     magnifierCenter: () -> Offset,
     platformMagnifier: (animatedCenter: () -> Offset) -> Modifier
 ): Modifier = composed {
-    val animatedCenter by rememberAnimatedDerivedStateOf(
-        // Can't use Offset.VectorConverter because we need to handle Unspecified specially.
-        typeConverter = UnspecifiedSafeOffsetVectorConverter,
-        visibilityThreshold = OffsetDisplacementThreshold,
-        targetCalculation = magnifierCenter
-    )
-
+    val animatedCenter by rememberAnimatedMagnifierPosition(targetCalculation = magnifierCenter)
     return@composed platformMagnifier { animatedCenter }
 }
 
@@ -79,20 +76,36 @@ internal fun Modifier.animatedSelectionMagnifier(
  * any time the result of [targetCalculation] changes due to any state values it reads change.
  */
 @Composable
-private fun <T, V : AnimationVector> rememberAnimatedDerivedStateOf(
-    typeConverter: TwoWayConverter<T, V>,
-    visibilityThreshold: T? = null,
-    animationSpec: AnimationSpec<T> = SpringSpec(visibilityThreshold = visibilityThreshold),
-    targetCalculation: () -> T,
-): State<T> {
+private fun rememberAnimatedMagnifierPosition(
+    targetCalculation: () -> Offset,
+): State<Offset> {
     val targetValue by remember { derivedStateOf(targetCalculation) }
     val animatable = remember {
-        Animatable(targetValue, typeConverter, visibilityThreshold)
+        // Can't use Offset.VectorConverter because we need to handle Unspecified specially.
+        Animatable(targetValue, UnspecifiedSafeOffsetVectorConverter, OffsetDisplacementThreshold)
     }
     LaunchedEffect(Unit) {
+        val animationScope = this
         snapshotFlow { targetValue }
-            .collectLatest {
-                animatable.animateTo(it, animationSpec)
+            .collect { targetValue ->
+                // Only animate the position when moving vertically (i.e. jumping between lines),
+                // since horizontal movement in a single line should stay as close to the gesture as
+                // possible and animation would only add unnecessary lag.
+                if (
+                    animatable.value.isSpecified &&
+                    targetValue.isSpecified &&
+                    animatable.value.y != targetValue.y
+                ) {
+                    // Launch the animation, instead of cancelling and re-starting manually via
+                    // collectLatest, so if another animation is started before this one finishes,
+                    // the new one will use the correct velocity, e.g. in order to propagate spring
+                    // inertia.
+                    animationScope.launch {
+                        animatable.animateTo(targetValue, MagnifierSpringSpec)
+                    }
+                } else {
+                    animatable.snapTo(targetValue)
+                }
             }
     }
     return animatable.asState()

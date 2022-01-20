@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.ValueElement
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
+import androidx.compose.ui.test.SemanticsMatcher.Companion.keyIsDefined
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
@@ -757,6 +758,29 @@ class MagnifierTest {
                     with(rule.density) { it.toSize().toDpSize() }
                 }
             ).inOrder()
+        }
+    }
+
+    @SdkSuppress(minSdkVersion = 28)
+    @Test
+    fun platformMagnifierModifier_reportsSemantics() {
+        var magnifierOffset by mutableStateOf(Offset.Zero)
+        rule.setContent {
+            Box(Modifier.magnifier(sourceCenter = { magnifierOffset }))
+        }
+        val getPosition = rule.onNode(keyIsDefined(MagnifierPositionInRoot))
+            .fetchSemanticsNode()
+            .config[MagnifierPositionInRoot]
+
+        rule.runOnIdle {
+            assertThat(getPosition()).isEqualTo(magnifierOffset)
+        }
+
+        // Move the modifier, same function should return new value.
+        magnifierOffset = Offset(42f, 24f)
+
+        rule.runOnIdle {
+            assertThat(getPosition()).isEqualTo(magnifierOffset)
         }
     }
 

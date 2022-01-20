@@ -17,8 +17,8 @@
 package androidx.compose.foundation.text.selection
 
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.text.TEST_FONT_FAMILY
 import androidx.compose.foundation.text.InternalFoundationTextApi
+import androidx.compose.foundation.text.TEST_FONT_FAMILY
 import androidx.compose.foundation.text.TestFontResourceLoader
 import androidx.compose.foundation.text.TextDelegate
 import androidx.compose.ui.geometry.Offset
@@ -939,6 +939,188 @@ class MultiWidgetSelectionDelegateTest {
         assertThat(box.right).isEqualTo(5 * fontSizeInPx)
         assertThat(box.top).isEqualTo(fontSizeInPx)
         assertThat(box.bottom).isEqualTo(2 * fontSizeInPx)
+    }
+
+    @Test
+    fun getRangeOfLineContaining_zeroOffset() {
+        val text = "hello\nworld\n"
+
+        val layoutResult = simpleTextLayout(
+            text = text,
+            density = defaultDensity
+        )
+
+        val layoutCoordinates = mock<LayoutCoordinates>()
+        whenever(layoutCoordinates.isAttached).thenReturn(true)
+
+        val selectable = MultiWidgetSelectionDelegate(
+            1,
+            coordinatesCallback = { layoutCoordinates },
+            layoutResultCallback = { layoutResult }
+        )
+
+        // Act.
+        val lineRange = selectable.getRangeOfLineContaining(0)
+
+        // Assert.
+        assertThat(lineRange.start).isEqualTo(0)
+        assertThat(lineRange.end).isEqualTo(5)
+    }
+
+    @Test
+    fun getRangeOfLineContaining_secondLine() {
+        val text = "hello\nworld\n"
+
+        val layoutResult = simpleTextLayout(
+            text = text,
+            density = defaultDensity
+        )
+
+        val layoutCoordinates = mock<LayoutCoordinates>()
+        whenever(layoutCoordinates.isAttached).thenReturn(true)
+
+        val selectable = MultiWidgetSelectionDelegate(
+            1,
+            coordinatesCallback = { layoutCoordinates },
+            layoutResultCallback = { layoutResult }
+        )
+
+        // Act.
+        val lineRange = selectable.getRangeOfLineContaining(7)
+
+        // Assert.
+        assertThat(lineRange.start).isEqualTo(6)
+        assertThat(lineRange.end).isEqualTo(11)
+    }
+
+    @Test
+    fun getRangeOfLineContaining_negativeOffset_returnsFirstLine() {
+        val text = "hello\nworld\n"
+
+        val layoutResult = simpleTextLayout(
+            text = text,
+            density = defaultDensity
+        )
+
+        val layoutCoordinates = mock<LayoutCoordinates>()
+        whenever(layoutCoordinates.isAttached).thenReturn(true)
+
+        val selectable = MultiWidgetSelectionDelegate(
+            1,
+            coordinatesCallback = { layoutCoordinates },
+            layoutResultCallback = { layoutResult }
+        )
+
+        // Act.
+        val lineRange = selectable.getRangeOfLineContaining(-1)
+
+        // Assert.
+        assertThat(lineRange.start).isEqualTo(0)
+        assertThat(lineRange.end).isEqualTo(5)
+    }
+
+    @Test
+    fun getRangeOfLineContaining_offsetPastTextLength_returnsLastLine() {
+        val text = "hello\nworld\n"
+
+        val layoutResult = simpleTextLayout(
+            text = text,
+            density = defaultDensity
+        )
+
+        val layoutCoordinates = mock<LayoutCoordinates>()
+        whenever(layoutCoordinates.isAttached).thenReturn(true)
+
+        val selectable = MultiWidgetSelectionDelegate(
+            1,
+            coordinatesCallback = { layoutCoordinates },
+            layoutResultCallback = { layoutResult }
+        )
+
+        // Act.
+        val lineRange = selectable.getRangeOfLineContaining(Int.MAX_VALUE)
+
+        // Assert.
+        assertThat(lineRange.start).isEqualTo(6)
+        assertThat(lineRange.end).isEqualTo(11)
+    }
+
+    @Test
+    fun getRangeOfLineContaining_offsetAtNewline_returnsPreviousLine() {
+        val text = "hello\nworld\n"
+
+        val layoutResult = simpleTextLayout(
+            text = text,
+            density = defaultDensity
+        )
+
+        val layoutCoordinates = mock<LayoutCoordinates>()
+        whenever(layoutCoordinates.isAttached).thenReturn(true)
+
+        val selectable = MultiWidgetSelectionDelegate(
+            1,
+            coordinatesCallback = { layoutCoordinates },
+            layoutResultCallback = { layoutResult }
+        )
+
+        // Act.
+        val lineRange = selectable.getRangeOfLineContaining(5)
+
+        // Assert.
+        assertThat(lineRange.start).isEqualTo(0)
+        assertThat(lineRange.end).isEqualTo(5)
+    }
+
+    @Test
+    fun getRangeOfLineContaining_emptyString_returnsEmptyRange() {
+        val text = ""
+
+        val layoutResult = simpleTextLayout(
+            text = text,
+            density = defaultDensity
+        )
+
+        val layoutCoordinates = mock<LayoutCoordinates>()
+        whenever(layoutCoordinates.isAttached).thenReturn(true)
+
+        val selectable = MultiWidgetSelectionDelegate(
+            1,
+            coordinatesCallback = { layoutCoordinates },
+            layoutResultCallback = { layoutResult }
+        )
+
+        // Act.
+        val lineRange = selectable.getRangeOfLineContaining(5)
+
+        // Assert.
+        assertThat(lineRange.start).isEqualTo(0)
+        assertThat(lineRange.end).isEqualTo(0)
+    }
+
+    @Test
+    fun getRangeOfLineContaining_emptyLine_returnsEmptyNonZeroRange() {
+        val text = "hello\n\nworld"
+
+        val layoutResult = simpleTextLayout(
+            text = text,
+            density = defaultDensity
+        )
+
+        val layoutCoordinates = mock<LayoutCoordinates>()
+        whenever(layoutCoordinates.isAttached).thenReturn(true)
+
+        val selectable = MultiWidgetSelectionDelegate(
+            1,
+            coordinatesCallback = { layoutCoordinates },
+            layoutResultCallback = { layoutResult }
+        )
+
+        // Act.
+        val lineRange = selectable.getRangeOfLineContaining(6)
+
+        // Assert.
+        assertThat(lineRange.start).isEqualTo(6)
+        assertThat(lineRange.end).isEqualTo(6)
     }
 
     @Test
