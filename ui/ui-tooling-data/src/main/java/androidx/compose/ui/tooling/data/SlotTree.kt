@@ -184,7 +184,7 @@ internal val emptyBox = IntRect(0, 0, 0, 0)
 private val tokenizer = Regex("(\\d+)|([,])|([*])|([:])|L|(P\\([^)]*\\))|(C(\\(([^)]*)\\))?)|@")
 
 private fun MatchResult.isNumber() = groups[1] != null
-private fun MatchResult.number() = groupValues[1].toInt()
+private fun MatchResult.number() = groupValues[1].parseToInt()
 private val MatchResult.text get() = groupValues[0]
 private fun MatchResult.isChar(c: String) = text == c
 private fun MatchResult.isFileName() = groups[4] != null
@@ -235,6 +235,20 @@ private class Parameter(
     val inlineClass: String? = null
 )
 
+private fun String.parseToInt(): Int =
+    try {
+        toInt()
+    } catch (_: NumberFormatException) {
+        throw ParseError()
+    }
+
+private fun String.parseToInt(radix: Int): Int =
+    try {
+        toInt(radix)
+    } catch (_: NumberFormatException) {
+        throw ParseError()
+    }
+
 // The parameter information follows the following grammar:
 //
 //   parameters: (parameter|run) ("," parameter | run)*
@@ -259,7 +273,7 @@ private fun parseParameters(parameters: String): List<Parameter> {
         val mr = currentResult
         if (mr == null || !mr.isANumber) throw ParseError()
         next()
-        return mr.text.toInt()
+        return mr.text.parseToInt()
     }
 
     fun expectClassName(): String {
@@ -345,7 +359,7 @@ private fun parseParameters(parameters: String): List<Parameter> {
 private fun sourceInformationContextOf(
     information: String,
     parent: SourceInformationContext?
-): SourceInformationContext {
+): SourceInformationContext? {
     var currentResult = tokenizer.find(information)
 
     fun next(): MatchResult? {
@@ -358,30 +372,34 @@ private fun sourceInformationContextOf(
         var offset: Int? = null
         var length: Int? = null
 
-        var mr = currentResult
-        if (mr != null && mr.isNumber()) {
-            // Offsets are 0 based in the data, we need 1 based.
-            lineNumber = mr.number() + 1
-            mr = next()
-        }
-        if (mr != null && mr.isChar("@")) {
-            // Offset
-            mr = next()
-            if (mr == null || !mr.isNumber()) {
-                return null
+        try {
+            var mr = currentResult
+            if (mr != null && mr.isNumber()) {
+                // Offsets are 0 based in the data, we need 1 based.
+                lineNumber = mr.number() + 1
+                mr = next()
             }
-            offset = mr.number()
-            mr = next()
-            if (mr != null && mr.isChar("L")) {
+            if (mr != null && mr.isChar("@")) {
+                // Offset
                 mr = next()
                 if (mr == null || !mr.isNumber()) {
                     return null
                 }
-                length = mr.number()
+                offset = mr.number()
+                mr = next()
+                if (mr != null && mr.isChar("L")) {
+                    mr = next()
+                    if (mr == null || !mr.isNumber()) {
+                        return null
+                    }
+                    length = mr.number()
+                }
             }
+            if (lineNumber != null && offset != null && length != null)
+                return SourceLocationInfo(lineNumber, offset, length)
+        } catch (_: ParseError) {
+            return null
         }
-        if (lineNumber != null && offset != null && length != null)
-            return SourceLocationInfo(lineNumber, offset, length)
         return null
     }
     val sourceLocations = mutableListOf<SourceLocationInfo>()
@@ -423,7 +441,7 @@ private fun sourceInformationContextOf(
                     sourceFile = sourceFile
                         .substring(0 until sourceFile.length - hashText.length - 1)
                     packageHash = try {
-                        hashText.toInt(36)
+                        hashText.parseToInt(36)
                     } catch (_: NumberFormatException) {
                         -1
                     }
@@ -432,7 +450,8 @@ private fun sourceInformationContextOf(
             }
             else -> break@loop
         }
-        require(mr != currentResult) { "regex didn't advance" }
+        if (mr == currentResult)
+            return null
     }
 
     return SourceInformationContext(

@@ -25,6 +25,7 @@ import androidx.compose.material.ModalDrawer
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.InternalComposeApi
+import androidx.compose.runtime.ReusableContent
 import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.tooling.CompositionGroup
 import androidx.compose.ui.Modifier
@@ -393,6 +394,19 @@ class InspectableTests : ToolingTest() {
         assertTrue(calls.contains("Column"))
         assertTrue(calls.contains("Text"))
         assertTrue(calls.contains("Button"))
+    }
+
+    @Test
+    fun allowKeysThatLookLikeInvalidSourceInformation() {
+        val slotTableRecord = CompositionDataRecord.create()
+        show {
+            Inspectable(slotTableRecord) {
+                ReusableContent("1234123412341234") {
+                    Text("Test")
+                }
+            }
+        }
+        slotTableRecord.store.first().asTree()
     }
 
     @Test
