@@ -30,6 +30,7 @@ import androidx.compose.foundation.text.selection.isSelectionHandleInVisibleBoun
 import androidx.compose.foundation.text.selection.textFieldMagnifier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -181,9 +182,6 @@ internal fun CoreTextField(
     decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit =
         @Composable { innerTextField -> innerTextField() }
 ) {
-    // If developer doesn't pass new value to TextField, recompose won't happen but internal state
-    // and IME may think it is updated. To fix this inconsistent state, enforce recompose.
-    val scope = currentRecomposeScope
     val focusRequester = FocusRequester()
 
     // CompositionLocals
@@ -213,6 +211,9 @@ internal fun CoreTextField(
     val visualText = transformedText.text
     val offsetMapping = transformedText.offsetMapping
 
+    // If developer doesn't pass new value to TextField, recompose won't happen but internal state
+    // and IME may think it is updated. To fix this inconsistent state, enforce recompose.
+    val scope = currentRecomposeScope
     val state = remember {
         TextFieldState(
             TextDelegate(
@@ -221,7 +222,8 @@ internal fun CoreTextField(
                 softWrap = softWrap,
                 density = density,
                 resourceLoader = resourceLoader
-            )
+            ),
+            recomposeScope = scope
         )
     }
     state.update(
@@ -236,18 +238,6 @@ internal fun CoreTextField(
         selectionBackgroundColor
     )
 
-    val onValueChangeWrapper: (TextFieldValue) -> Unit = {
-        if (it.text != state.textDelegate.text.text) {
-            // Text has been changed, enter the HandleState.None and hide the cursor handle.
-            state.handleState = HandleState.None
-        }
-        state.onValueChange(it)
-        scope.invalidate()
-    }
-    val onImeActionPerformedWrapper: (ImeAction) -> Unit = { imeAction ->
-        state.keyboardActionRunner.runAction(imeAction)
-    }
-
     // notify the EditProcessor of value every recomposition
     state.processor.reset(value, state.inputSession)
 
@@ -257,7 +247,7 @@ internal fun CoreTextField(
     val manager = remember { TextFieldSelectionManager(undoManager) }
     manager.offsetMapping = offsetMapping
     manager.visualTransformation = visualTransformation
-    manager.onValueChange = onValueChangeWrapper
+    manager.onValueChange = state.onValueChange
     manager.state = state
     manager.value = value
     manager.clipboardManager = LocalClipboardManager.current
@@ -283,8 +273,6 @@ internal fun CoreTextField(
                 state,
                 value,
                 imeOptions,
-                onValueChangeWrapper,
-                onImeActionPerformedWrapper,
                 offsetMapping
             )
         }
@@ -304,7 +292,7 @@ internal fun CoreTextField(
                             layoutResult,
                             state.processor,
                             offsetMapping,
-                            onValueChangeWrapper
+                            state.onValueChange
                         )
                         // Won't enter cursor state when text is empty.
                         if (state.textDelegate.text.isNotEmpty()) {
@@ -388,7 +376,7 @@ internal fun CoreTextField(
             }
         }
         setText {
-            onValueChangeWrapper(TextFieldValue(it.text, TextRange(it.text.length)))
+            state.onValueChange(TextFieldValue(it.text, TextRange(it.text.length)))
             true
         }
         setSelection { selectionStart, selectionEnd, traversalMode ->
@@ -420,7 +408,7 @@ internal fun CoreTextField(
                 } else {
                     manager.enterSelectionMode()
                 }
-                onValueChangeWrapper(
+                state.onValueChange(
                     TextFieldValue(
                         value.annotatedString,
                         TextRange(start, end)
@@ -476,8 +464,8 @@ internal fun CoreTextField(
                 value = value,
                 editProcessor = state.processor,
                 imeOptions = imeOptions,
-                onValueChange = onValueChangeWrapper,
-                onImeActionPerformed = onImeActionPerformedWrapper
+                onValueChange = state.onValueChange,
+                onImeActionPerformed = state.onImeActionPerformed
             )
         }
         onDispose { /* do nothing */ }
@@ -488,7 +476,7 @@ internal fun CoreTextField(
             state = state,
             manager = manager,
             value = value,
-            onValueChange = onValueChangeWrapper,
+            onValueChange = state.onValueChange,
             editable = !readOnly,
             singleLine = maxLines == 1,
             offsetMapping = offsetMapping,
@@ -661,7 +649,8 @@ private fun Modifier.previewKeyEventToDeselectOnBack(
 
 @OptIn(InternalFoundationTextApi::class)
 internal class TextFieldState(
-    var textDelegate: TextDelegate
+    var textDelegate: TextDelegate,
+    val recomposeScope: RecomposeScope
 ) {
     val processor = EditProcessor()
     var inputSession: TextInputSession? = null
@@ -739,10 +728,27 @@ internal class TextFieldState(
      */
     var showCursorHandle by mutableStateOf(false)
 
-    val keyboardActionRunner: KeyboardActionRunner = KeyboardActionRunner()
+    private val keyboardActionRunner: KeyboardActionRunner = KeyboardActionRunner()
 
-    var onValueChange: (TextFieldValue) -> Unit = {}
-        private set
+    /**
+     * DO NOT USE, use [onValueChange] instead. This is original callback provided to the TextField.
+     * In order the CoreTextField to work, the recompose.invalidate() has to be called when we call
+     * the callback and [onValueChange] is a wrapper that mainly does that.
+     */
+    private var onValueChangeOriginal: (TextFieldValue) -> Unit = {}
+
+    val onValueChange: (TextFieldValue) -> Unit = {
+        if (it.text != textDelegate.text.text) {
+            // Text has been changed, enter the HandleState.None and hide the cursor handle.
+            handleState = HandleState.None
+        }
+        onValueChangeOriginal(it)
+        recomposeScope.invalidate()
+    }
+
+    val onImeActionPerformed: (ImeAction) -> Unit = { imeAction ->
+        keyboardActionRunner.runAction(imeAction)
+    }
 
     /** The paint used to draw highlight background for selected text. */
     val selectionPaint: Paint = Paint()
@@ -758,7 +764,7 @@ internal class TextFieldState(
         focusManager: FocusManager,
         selectionBackgroundColor: Color
     ) {
-        this.onValueChange = onValueChange
+        this.onValueChangeOriginal = onValueChange
         this.selectionPaint.color = selectionBackgroundColor
         this.keyboardActionRunner.apply {
             this.keyboardActions = keyboardActions
@@ -798,8 +804,6 @@ private fun notifyTextInputServiceOnFocusChange(
     state: TextFieldState,
     value: TextFieldValue,
     imeOptions: ImeOptions,
-    onValueChange: (TextFieldValue) -> Unit,
-    onImeActionPerformed: (ImeAction) -> Unit,
     offsetMapping: OffsetMapping
 ) {
     if (state.hasFocus) {
@@ -808,8 +812,8 @@ private fun notifyTextInputServiceOnFocusChange(
             value,
             state.processor,
             imeOptions,
-            onValueChange,
-            onImeActionPerformed
+            state.onValueChange,
+            state.onImeActionPerformed
         ).also { newSession ->
             state.layoutCoordinates?.let { coords ->
                 state.layoutResult?.let { layoutResult ->
@@ -827,7 +831,7 @@ private fun notifyTextInputServiceOnFocusChange(
         }
     } else {
         state.inputSession?.let { session ->
-            TextFieldDelegate.onBlur(session, state.processor, onValueChange)
+            TextFieldDelegate.onBlur(session, state.processor, state.onValueChange)
         }
         state.inputSession = null
     }
