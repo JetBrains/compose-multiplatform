@@ -131,7 +131,7 @@ class TextFieldSelectionManagerTest {
 
         whenever(layoutResultProxy.value).thenReturn(layoutResult)
 
-        state = TextFieldState(mock())
+        state = TextFieldState(mock(), mock())
         state.layoutResult = layoutResultProxy
         manager.state = state
         whenever(state.textDelegate.density).thenReturn(density)
