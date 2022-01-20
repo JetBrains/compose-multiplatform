@@ -1,5 +1,11 @@
 This example project can be built and run for desktop, web and macos. 
 
+- To build this project for all 3 targets, one need to have compose-mpp published to their mavenLocal:
+https://github.com/JetBrains/compose-jb/blob/master/compose/README.md#multiplatform-build
+
+- Using compose version 1.0.1 (already published and available), this project can be built for js and jvm. 
+
+
 **Available experiments:**
 ```kotlin
 var numberOfItems = 1000
