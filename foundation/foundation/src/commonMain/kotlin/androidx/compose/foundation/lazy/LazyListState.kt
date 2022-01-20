@@ -22,7 +22,6 @@ import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchPolicy
-import androidx.compose.foundation.lazy.layout.LazyLayoutState
 import androidx.compose.foundation.lazy.list.DataIndex
 import androidx.compose.foundation.lazy.list.LazyListItemPlacementAnimator
 import androidx.compose.foundation.lazy.list.LazyListItemsProvider
@@ -37,6 +36,8 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.layout.Remeasurement
+import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import kotlin.math.abs
@@ -171,9 +172,19 @@ class LazyListState constructor(
     private var wasScrollingForward = false
 
     /**
-     * The state of the inner LazyLayout.
+     * The [Remeasurement] object associated with our layout. It allows us to remeasure
+     * synchronously during scroll.
      */
-    internal var innerState: LazyLayoutState? = null
+    private var remeasurement: Remeasurement? = null
+
+    /**
+     * The modifier which provides [remeasurement].
+     */
+    internal val remeasurementModifier = object : RemeasurementModifier {
+        override fun onRemeasurementAvailable(remeasurement: Remeasurement) {
+            this@LazyListState.remeasurement = remeasurement
+        }
+    }
 
     internal var placementAnimator by mutableStateOf<LazyListItemPlacementAnimator?>(null)
 
@@ -205,7 +216,7 @@ class LazyListState constructor(
         scrollPosition.requestPosition(DataIndex(index), scrollOffset)
         // placement animation is not needed because we snap into a new position.
         placementAnimator?.reset()
-        innerState?.remeasure()
+        remeasurement?.forceRemeasure()
     }
 
     /**
@@ -248,7 +259,7 @@ class LazyListState constructor(
         // we have less than 0.5 pixels
         if (abs(scrollToBeConsumed) > 0.5f) {
             val preScrollToBeConsumed = scrollToBeConsumed
-            innerState?.remeasure()
+            remeasurement?.forceRemeasure()
             if (prefetchingEnabled && prefetchPolicy != null) {
                 notifyPrefetch(preScrollToBeConsumed - scrollToBeConsumed)
             }

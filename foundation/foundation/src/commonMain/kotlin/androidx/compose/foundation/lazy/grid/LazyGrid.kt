@@ -35,7 +35,6 @@ import androidx.compose.foundation.lazy.LazyGridState
 import androidx.compose.foundation.lazy.layout.LazyLayout
 import androidx.compose.foundation.lazy.layout.LazyMeasurePolicy
 import androidx.compose.foundation.lazy.layout.rememberLazyLayoutPrefetchPolicy
-import androidx.compose.foundation.lazy.layout.rememberLazyLayoutState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
@@ -107,12 +106,12 @@ internal fun LazyGrid(
     )
 
     state.prefetchPolicy = rememberLazyLayoutPrefetchPolicy()
-    val innerState = rememberLazyLayoutState().also { state.innerState = it }
 
     ScrollPositionUpdater(stateOfItemsProvider, state)
 
     LazyLayout(
         modifier = modifier
+            .then(state.remeasurementModifier)
             .lazyGridSemantics(
                 stateOfItemsProvider = stateOfItemsProvider,
                 state = state,
@@ -142,7 +141,6 @@ internal fun LazyGrid(
                 enabled = userScrollEnabled
             )
             .padding(contentPadding),
-        state = innerState,
         prefetchPolicy = state.prefetchPolicy,
         measurePolicy = measurePolicy,
         itemsProvider = { stateOfItemsProvider.value }

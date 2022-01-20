@@ -502,9 +502,6 @@ package androidx.compose.foundation.lazy.layout {
   public final class LazyLayoutPrefetcher_androidKt {
   }
 
-  public final class LazyLayoutStateKt {
-  }
-
 }
 
 package androidx.compose.foundation.lazy.list {
