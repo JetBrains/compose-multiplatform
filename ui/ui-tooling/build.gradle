@@ -63,10 +63,12 @@ dependencies {
 }
 
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-    kotlin {
+    androidXComposeMultiplatform {
         android()
-        jvm("desktop")
+        desktop()
+    }
 
+    kotlin {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block above
@@ -90,9 +92,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 compileOnly(project(":compose:animation:animation-tooling-internal"))
                 compileOnly(libs.kotlinReflect)
             }
-
-            androidMain.dependsOn(jvmMain)
-            desktopMain.dependsOn(jvmMain)
 
             desktopMain.dependencies {
                 implementation(libs.kotlinStdlib)

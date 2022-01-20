@@ -29,13 +29,9 @@ plugins {
 AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-    kotlin {
+    androidXComposeMultiplatform {
         android()
-        jvm("desktop")
-
-        sourceSets {
-            desktopMain.dependsOn(jvmMain)
-        }
+        desktop()
     }
 
     android {

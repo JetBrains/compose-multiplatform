@@ -110,10 +110,12 @@ dependencies {
 packageInspector(project, project(":compose:ui:ui-inspection"))
 
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-    kotlin {
+    androidXComposeMultiplatform {
         android()
-        jvm("desktop")
+        desktop()
+    }
 
+    kotlin {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block above
@@ -150,8 +152,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             jvmMain.dependencies {
                 implementation(libs.kotlinStdlib)
             }
-
-            androidMain.dependsOn(jvmMain)
             skikoMain {
                 dependsOn(commonMain)
                 dependencies {
@@ -165,7 +165,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                     implementation(libs.kotlinStdlibJdk8)
                     api(libs.kotlinCoroutinesSwing)
                 }
-                dependsOn(jvmMain)
             }
 
             androidTest.dependencies {

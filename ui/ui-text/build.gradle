@@ -80,10 +80,12 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 }
 
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-    kotlin {
+    androidXComposeMultiplatform {
         android()
-        jvm("desktop")
+        desktop()
+    }
 
+    kotlin {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block below
@@ -115,7 +117,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 dependsOn(skikoMain)
                 dependsOn(jvmMain)
             }
-            androidMain.dependsOn(jvmMain)
 
             androidMain.dependencies {
                 api("androidx.annotation:annotation:1.1.0")
