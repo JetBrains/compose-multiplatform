@@ -639,7 +639,7 @@ private fun Modifier.previewKeyEventToDeselectOnBack(
     state: TextFieldState,
     manager: TextFieldSelectionManager
 ) = onPreviewKeyEvent { keyEvent ->
-    if (state.handleState != HandleState.None && keyEvent.cancelsTextSelection()) {
+    if (state.handleState == HandleState.Selection && keyEvent.cancelsTextSelection()) {
         manager.deselect()
         true
     } else {
