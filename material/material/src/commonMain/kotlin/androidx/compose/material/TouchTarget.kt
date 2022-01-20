@@ -25,13 +25,22 @@ import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.platform.LocalViewConfiguration
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.DpSize
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterialApi::class)
 @Suppress("ModifierInspectorInfo")
-internal fun Modifier.minimumTouchTargetSize(): Modifier = composed {
+internal fun Modifier.minimumTouchTargetSize(): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "minimumTouchTargetSize"
+        // TODO: b/214589635 - surface this information through the layout inspector in a better way
+        //  - for now just add some information to help developers debug what this size represents.
+        properties["README"] = "Adds outer padding to measure at least 48.dp (default) in " +
+            "size to disambiguate touch interactions if the element would measure smaller"
+    }
+) {
     if (LocalMinimumTouchTargetEnforcement.current) {
         // TODO: consider using a hardcoded value of 48.dp instead to avoid inconsistent UI if the
         // LocalViewConfiguration changes across devices / during runtime.
