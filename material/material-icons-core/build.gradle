@@ -45,10 +45,13 @@ if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 }
 
 if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
-    kotlin {
-        android()
-        jvm("desktop")
 
+    androidXComposeMultiplatform {
+        android()
+        desktop()
+    }
+
+    kotlin {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block above

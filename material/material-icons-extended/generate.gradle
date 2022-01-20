@@ -27,6 +27,7 @@ apply plugin: "AndroidXPlugin"
 apply plugin: "com.android.library"
 apply plugin: "AndroidXComposePlugin"
 
+AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 apply from: "${buildscript.sourceFile.parentFile}/shared-dependencies.gradle"
 
 dependencies {
