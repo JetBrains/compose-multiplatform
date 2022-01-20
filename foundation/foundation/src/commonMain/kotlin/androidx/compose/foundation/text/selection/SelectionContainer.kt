@@ -17,7 +17,7 @@
 package androidx.compose.foundation.text.selection
 
 import androidx.compose.foundation.text.ContextMenuArea
-import androidx.compose.foundation.text.detectDragGesturesWithObserver
+import androidx.compose.foundation.text.detectDownAndDragGesturesWithObserver
 import androidx.compose.foundation.text.isInTouchMode
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -123,7 +123,7 @@ internal fun SelectionContainer(
                                     direction = direction,
                                     handlesCrossed = it.handlesCrossed,
                                     modifier = Modifier.pointerInput(observer) {
-                                        detectDragGesturesWithObserver(observer)
+                                        detectDownAndDragGesturesWithObserver(observer)
                                     },
                                     content = null
                                 )
