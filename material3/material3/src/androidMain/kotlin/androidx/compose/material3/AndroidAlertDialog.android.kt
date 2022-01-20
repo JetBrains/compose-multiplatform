@@ -16,6 +16,7 @@
 
 package androidx.compose.material3
 
+import androidx.compose.material3.tokens.DialogTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -75,21 +76,12 @@ fun AlertDialog(
     icon: @Composable (() -> Unit)? = null,
     title: @Composable (() -> Unit)? = null,
     text: @Composable (() -> Unit)? = null,
-    shape: Shape = androidx.compose.material3.tokens.DialogTokens.ContainerShape,
-    containerColor: Color =
-        MaterialTheme.colorScheme.fromToken(
-            androidx.compose.material3.tokens.DialogTokens.ContainerColor
-        ),
-    tonalElevation: Dp = androidx.compose.material3.tokens.DialogTokens.ContainerElevation,
-    iconContentColor: Color = MaterialTheme.colorScheme.fromToken(
-        androidx.compose.material3.tokens.DialogTokens.IconColor
-    ),
-    titleContentColor: Color = MaterialTheme.colorScheme.fromToken(
-        androidx.compose.material3.tokens.DialogTokens.SubheadColor
-    ),
-    textContentColor: Color = MaterialTheme.colorScheme.fromToken(
-        androidx.compose.material3.tokens.DialogTokens.SupportingTextColor
-    ),
+    shape: Shape = DialogTokens.ContainerShape,
+    containerColor: Color = DialogTokens.ContainerColor.toColor(),
+    tonalElevation: Dp = DialogTokens.ContainerElevation,
+    iconContentColor: Color = DialogTokens.IconColor.toColor(),
+    titleContentColor: Color = DialogTokens.SubheadColor.toColor(),
+    textContentColor: Color = DialogTokens.SupportingTextColor.toColor(),
     properties: DialogProperties = DialogProperties()
 ) {
     Dialog(
@@ -117,9 +109,7 @@ fun AlertDialog(
             // most cases, TextButtons should be used for dismiss and confirm buttons.
             // TextButtons will not consume this provided content color value, and will used their
             // own defined or default colors.
-            buttonContentColor = MaterialTheme.colorScheme.fromToken(
-                androidx.compose.material3.tokens.DialogTokens.ActionLabelTextColor
-            ),
+            buttonContentColor = DialogTokens.ActionLabelTextColor.toColor(),
             iconContentColor = iconContentColor,
             titleContentColor = titleContentColor,
             textContentColor = textContentColor,

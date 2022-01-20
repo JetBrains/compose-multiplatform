@@ -130,7 +130,7 @@ fun BadgedBox(
 @Composable
 fun Badge(
     modifier: Modifier = Modifier,
-    containerColor: Color = MaterialTheme.colorScheme.fromToken(BadgeTokens.Color),
+    containerColor: Color = BadgeTokens.Color.toColor(),
     contentColor: Color = contentColorFor(containerColor),
     content: @Composable (RowScope.() -> Unit)? = null,
 ) {

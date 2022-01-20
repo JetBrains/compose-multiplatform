@@ -88,8 +88,8 @@ fun Snackbar(
     dismissAction: @Composable (() -> Unit)? = null,
     actionOnNewLine: Boolean = false,
     shape: Shape = SnackbarTokens.ContainerShape,
-    containerColor: Color = MaterialTheme.colorScheme.fromToken(SnackbarTokens.ContainerColor),
-    contentColor: Color = MaterialTheme.colorScheme.fromToken(SnackbarTokens.SupportingTextColor),
+    containerColor: Color = SnackbarTokens.ContainerColor.toColor(),
+    contentColor: Color = SnackbarTokens.SupportingTextColor.toColor(),
     content: @Composable () -> Unit
 ) {
     Surface(
@@ -168,9 +168,9 @@ fun Snackbar(
     modifier: Modifier = Modifier,
     actionOnNewLine: Boolean = false,
     shape: Shape = SnackbarTokens.ContainerShape,
-    containerColor: Color = MaterialTheme.colorScheme.fromToken(SnackbarTokens.ContainerColor),
-    contentColor: Color = MaterialTheme.colorScheme.fromToken(SnackbarTokens.SupportingTextColor),
-    actionColor: Color = MaterialTheme.colorScheme.fromToken(SnackbarTokens.ActionLabelTextColor)
+    containerColor: Color = SnackbarTokens.ContainerColor.toColor(),
+    contentColor: Color = SnackbarTokens.SupportingTextColor.toColor(),
+    actionColor: Color = SnackbarTokens.ActionLabelTextColor.toColor()
 ) {
     val actionLabel = snackbarData.visuals.actionLabel
     val actionComposable: (@Composable () -> Unit)? = if (actionLabel != null) {
@@ -238,8 +238,7 @@ private fun NewLineButtonSnackbar(
                 .padding(end = if (dismissAction == null) HorizontalSpacingButtonSide else 0.dp)
         ) {
             Row {
-                val actionTextColor =
-                    MaterialTheme.colorScheme.fromToken(SnackbarTokens.ActionLabelTextColor)
+                val actionTextColor = SnackbarTokens.ActionLabelTextColor.toColor()
                 val actionTextStyle =
                     MaterialTheme.typography.fromToken(SnackbarTokens.ActionLabelTextFont)
                 CompositionLocalProvider(
@@ -249,8 +248,7 @@ private fun NewLineButtonSnackbar(
                 )
 
                 if (dismissAction != null) {
-                    val dismissActionColor =
-                        MaterialTheme.colorScheme.fromToken(SnackbarTokens.IconColor)
+                    val dismissActionColor = SnackbarTokens.IconColor.toColor()
                     CompositionLocalProvider(
                         LocalContentColor provides dismissActionColor,
                         content = dismissAction
@@ -275,8 +273,7 @@ private fun OneRowSnackbar(
             Box(Modifier.layoutId(textTag).padding(vertical = SnackbarVerticalPadding)) { text() }
             if (action != null) {
                 Box(Modifier.layoutId(actionTag)) {
-                    val actionTextColor =
-                        MaterialTheme.colorScheme.fromToken(SnackbarTokens.ActionLabelTextColor)
+                    val actionTextColor = SnackbarTokens.ActionLabelTextColor.toColor()
                     val actionTextStyle =
                         MaterialTheme.typography.fromToken(SnackbarTokens.ActionLabelTextFont)
                     CompositionLocalProvider(
@@ -288,8 +285,7 @@ private fun OneRowSnackbar(
             }
             if (dismissAction != null) {
                 Box(Modifier.layoutId(dismissActionTag)) {
-                    val dismissActionColor =
-                        MaterialTheme.colorScheme.fromToken(SnackbarTokens.IconColor)
+                    val dismissActionColor = SnackbarTokens.IconColor.toColor()
                     CompositionLocalProvider(
                         LocalContentColor provides dismissActionColor,
                         content = dismissAction

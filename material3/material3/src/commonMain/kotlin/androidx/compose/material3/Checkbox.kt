@@ -231,17 +231,16 @@ object CheckboxDefaults {
      */
     @Composable
     fun colors(
-        checkedColor: Color = MaterialTheme.colorScheme.fromToken(CheckboxTokens.SelectedIconColor),
-        uncheckedColor: Color =
-            MaterialTheme.colorScheme.fromToken(CheckboxTokens.UnselectedIconColor),
+        checkedColor: Color = CheckboxTokens.SelectedIconColor.toColor(),
+        uncheckedColor: Color = CheckboxTokens.UnselectedIconColor.toColor(),
         // TODO(b/188529841): Update the token when this issue is resolved.
-        checkmarkColor: Color = MaterialTheme.colorScheme.fromToken(ColorSchemeKeyTokens.Surface),
-        disabledCheckedColor: Color =
-            MaterialTheme.colorScheme.fromToken(CheckboxTokens.DisabledSelectedIconColor)
-                .copy(alpha = CheckboxTokens.DisabledSelectedIconOpacity),
-        disabledUncheckedColor: Color =
-            MaterialTheme.colorScheme.fromToken(CheckboxTokens.DisabledUnselectedIconColor)
-                .copy(alpha = CheckboxTokens.DisabledUnselectedIconOpacity),
+        checkmarkColor: Color = ColorSchemeKeyTokens.Surface.toColor(),
+        disabledCheckedColor: Color = CheckboxTokens.DisabledSelectedIconColor
+            .toColor()
+            .copy(alpha = CheckboxTokens.DisabledSelectedIconOpacity),
+        disabledUncheckedColor: Color = CheckboxTokens.DisabledUnselectedIconColor
+            .toColor()
+            .copy(alpha = CheckboxTokens.DisabledUnselectedIconOpacity),
         disabledIndeterminateColor: Color = disabledCheckedColor
     ): CheckboxColors {
         return remember(

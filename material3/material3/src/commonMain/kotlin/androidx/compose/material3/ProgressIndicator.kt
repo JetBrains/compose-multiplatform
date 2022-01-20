@@ -71,10 +71,8 @@ import kotlin.math.max
 fun LinearProgressIndicator(
     progress: Float,
     modifier: Modifier = Modifier,
-    color: Color =
-        MaterialTheme.colorScheme.fromToken(LinearProgressIndicatorTokens.ActiveIndicatorColor),
-    trackColor: Color =
-        MaterialTheme.colorScheme.fromToken(LinearProgressIndicatorTokens.TrackColor),
+    color: Color = LinearProgressIndicatorTokens.ActiveIndicatorColor.toColor(),
+    trackColor: Color = LinearProgressIndicatorTokens.TrackColor.toColor(),
 ) {
     Canvas(
         modifier
@@ -101,10 +99,8 @@ fun LinearProgressIndicator(
 @Composable
 fun LinearProgressIndicator(
     modifier: Modifier = Modifier,
-    color: Color =
-        MaterialTheme.colorScheme.fromToken(LinearProgressIndicatorTokens.ActiveIndicatorColor),
-    trackColor: Color =
-        MaterialTheme.colorScheme.fromToken(LinearProgressIndicatorTokens.TrackColor),
+    color: Color = LinearProgressIndicatorTokens.ActiveIndicatorColor.toColor(),
+    trackColor: Color = LinearProgressIndicatorTokens.TrackColor.toColor(),
 ) {
     val infiniteTransition = rememberInfiniteTransition()
     // Fractional position of the 'head' and 'tail' of the two lines drawn, i.e. if the head is 0.8
@@ -226,8 +222,7 @@ private fun DrawScope.drawLinearIndicatorTrack(
 fun CircularProgressIndicator(
     progress: Float,
     modifier: Modifier = Modifier,
-    color: Color =
-        MaterialTheme.colorScheme.fromToken(CircularProgressIndicatorTokens.ActiveIndicatorColor),
+    color: Color = CircularProgressIndicatorTokens.ActiveIndicatorColor.toColor(),
     strokeWidth: Dp = CircularProgressIndicatorTokens.ActiveIndicatorWidth
 ) {
     val stroke = with(LocalDensity.current) {
@@ -258,8 +253,7 @@ fun CircularProgressIndicator(
 @Composable
 fun CircularProgressIndicator(
     modifier: Modifier = Modifier,
-    color: Color =
-        MaterialTheme.colorScheme.fromToken(CircularProgressIndicatorTokens.ActiveIndicatorColor),
+    color: Color = CircularProgressIndicatorTokens.ActiveIndicatorColor.toColor(),
     strokeWidth: Dp = CircularProgressIndicatorTokens.ActiveIndicatorWidth
 ) {
     val stroke = with(LocalDensity.current) {
