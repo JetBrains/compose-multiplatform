@@ -27,6 +27,7 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
@@ -2348,6 +2349,8 @@ private class MockOwner(
                 translationX: Float,
                 translationY: Float,
                 shadowElevation: Float,
+                ambientShadowColor: Color,
+                spotShadowColor: Color,
                 rotationX: Float,
                 rotationY: Float,
                 rotationZ: Float,

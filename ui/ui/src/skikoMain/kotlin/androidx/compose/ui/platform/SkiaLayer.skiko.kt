@@ -24,6 +24,7 @@ import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Paint
@@ -79,6 +80,8 @@ internal class SkiaLayer(
     private var clip: Boolean = false
     private var renderEffect: RenderEffect? = null
     private var shadowElevation: Float = 0f
+    private var ambientShadowColor: Color = DefaultShadowColor
+    private var spotShadowColor: Color = DefaultShadowColor
 
     override fun destroy() {
         picture?.close()
@@ -147,6 +150,8 @@ internal class SkiaLayer(
         translationX: Float,
         translationY: Float,
         shadowElevation: Float,
+        ambientShadowColor: Color,
+        spotShadowColor: Color,
         rotationX: Float,
         rotationY: Float,
         rotationZ: Float,
@@ -169,6 +174,8 @@ internal class SkiaLayer(
         this.alpha = alpha
         this.clip = clip
         this.shadowElevation = shadowElevation
+        this.ambientShadowColor = ambientShadowColor
+        this.spotShadowColor = spotShadowColor
         this.density = density
         this.renderEffect = renderEffect
         outlineCache.shape = shape
@@ -291,8 +298,8 @@ internal class SkiaLayer(
 
         val ambientAlpha = 0.039f * alpha
         val spotAlpha = 0.19f * alpha
-        val ambientColor = Color.Black.copy(alpha = ambientAlpha)
-        val spotColor = Color.Black.copy(alpha = spotAlpha)
+        val ambientColor = ambientShadowColor.copy(alpha = ambientAlpha)
+        val spotColor = spotShadowColor.copy(alpha = spotAlpha)
 
         ShadowUtils.drawShadow(
             canvas.nativeCanvas, path.asSkiaPath(), zParams, lightPos,

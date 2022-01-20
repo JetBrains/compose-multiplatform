@@ -178,6 +178,26 @@ public class RenderNode {
     }
 
     /** stub */
+    public boolean setAmbientShadowColor(int color) {
+        throw new UnsupportedOperationException();
+    }
+
+    /** stub */
+    public int getAmbientShadowColor() {
+        throw new UnsupportedOperationException();
+    }
+
+    /** stub */
+    public boolean setSpotShadowColor(int color) {
+        throw new UnsupportedOperationException();
+    }
+
+    /** stub */
+    public int getSpotShadowColor() {
+        throw new UnsupportedOperationException();
+    }
+
+    /** stub */
     public boolean setTranslationX(float translationX) {
         throw new UnsupportedOperationException();
     }

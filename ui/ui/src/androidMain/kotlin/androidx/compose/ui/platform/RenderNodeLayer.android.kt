@@ -24,12 +24,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.GraphicLayerInfo
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.unit.Density
@@ -110,6 +112,8 @@ internal class RenderNodeLayer(
         translationX: Float,
         translationY: Float,
         shadowElevation: Float,
+        ambientShadowColor: Color,
+        spotShadowColor: Color,
         rotationX: Float,
         rotationY: Float,
         rotationZ: Float,
@@ -129,6 +133,8 @@ internal class RenderNodeLayer(
         renderNode.translationX = translationX
         renderNode.translationY = translationY
         renderNode.elevation = shadowElevation
+        renderNode.ambientShadowColor = ambientShadowColor.toArgb()
+        renderNode.spotShadowColor = spotShadowColor.toArgb()
         renderNode.rotationZ = rotationZ
         renderNode.rotationX = rotationX
         renderNode.rotationY = rotationY

@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.platform
 
+import android.graphics.Color
 import android.graphics.Outline
 import android.view.RenderNode
 import android.view.DisplayListCanvas
@@ -65,6 +66,7 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
             renderNode.setLeftTopRightBottom(0, 0, 0, 0)
             renderNode.offsetLeftAndRight(0)
             renderNode.offsetTopAndBottom(0)
+            verifyShadowColorProperties(renderNode)
             discardDisplayListInternal()
             needToValidateAccess = false // only need to do this once
         }
@@ -117,6 +119,34 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
         get() = renderNode.elevation
         set(value) {
             renderNode.elevation = value
+        }
+
+    override var ambientShadowColor: Int
+        get() {
+            return if (Build.VERSION.SDK_INT >= 28) {
+                RenderNodeVerificationHelper28.getAmbientShadowColor(renderNode)
+            } else {
+                Color.BLACK
+            }
+        }
+        set(value) {
+            if (Build.VERSION.SDK_INT >= 28) {
+                RenderNodeVerificationHelper28.setAmbientShadowColor(renderNode, value)
+            }
+        }
+
+    override var spotShadowColor: Int
+        get() {
+            return if (Build.VERSION.SDK_INT >= 28) {
+                RenderNodeVerificationHelper28.getSpotShadowColor(renderNode)
+            } else {
+                Color.BLACK
+            }
+        }
+        set(value) {
+            if (Build.VERSION.SDK_INT >= 28) {
+                RenderNodeVerificationHelper28.setSpotShadowColor(renderNode, value)
+            }
         }
 
     override var rotationZ: Float
@@ -252,6 +282,8 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
             translationX = renderNode.translationX,
             translationY = renderNode.translationY,
             elevation = renderNode.elevation,
+            ambientShadowColor = ambientShadowColor,
+            spotShadowColor = spotShadowColor,
             rotationZ = renderNode.rotation,
             rotationX = renderNode.rotationX,
             rotationY = renderNode.rotationY,
@@ -282,6 +314,19 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
         }
     }
 
+    private fun verifyShadowColorProperties(renderNode: RenderNode) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            RenderNodeVerificationHelper28.setAmbientShadowColor(
+                renderNode,
+                RenderNodeVerificationHelper28.getAmbientShadowColor(renderNode)
+            )
+            RenderNodeVerificationHelper28.setSpotShadowColor(
+                renderNode,
+                RenderNodeVerificationHelper28.getSpotShadowColor(renderNode)
+            )
+        }
+    }
+
     companion object {
         // Used by tests to force failing creating a RenderNode to simulate a device that
         // doesn't support RenderNodes before Q.
@@ -291,6 +336,34 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
         // stub implementation, but we only need to validate it once. This flag indicates that
         // validation is still needed.
         private var needToValidateAccess = true
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.P)
+private object RenderNodeVerificationHelper28 {
+
+    @androidx.annotation.DoNotInline
+    fun getAmbientShadowColor(renderNode: RenderNode): Int {
+        @Suppress("UsePropertyAccessSyntax")
+        return renderNode.getAmbientShadowColor()
+    }
+
+    @androidx.annotation.DoNotInline
+    fun setAmbientShadowColor(renderNode: RenderNode, target: Int) {
+        @Suppress("UsePropertyAccessSyntax")
+        renderNode.setAmbientShadowColor(target)
+    }
+
+    @androidx.annotation.DoNotInline
+    fun getSpotShadowColor(renderNode: RenderNode): Int {
+        @Suppress("UsePropertyAccessSyntax")
+        return renderNode.getSpotShadowColor()
+    }
+
+    @androidx.annotation.DoNotInline
+    fun setSpotShadowColor(renderNode: RenderNode, target: Int) {
+        @Suppress("UsePropertyAccessSyntax")
+        renderNode.setSpotShadowColor(target)
     }
 }
 

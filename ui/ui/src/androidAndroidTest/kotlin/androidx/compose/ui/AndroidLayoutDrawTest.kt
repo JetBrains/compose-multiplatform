@@ -57,6 +57,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
@@ -248,6 +249,8 @@ class AndroidLayoutDrawTest {
                 translationX = 0f,
                 translationY = 0f,
                 shadowElevation = 0f,
+                ambientShadowColor = DefaultShadowColor,
+                spotShadowColor = DefaultShadowColor,
                 rotationX = 0f,
                 rotationY = 0f,
                 rotationZ = 0f,

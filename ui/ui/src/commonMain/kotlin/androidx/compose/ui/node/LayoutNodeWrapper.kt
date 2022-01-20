@@ -405,6 +405,8 @@ internal abstract class LayoutNodeWrapper(
                 translationX = graphicsLayerScope.translationX,
                 translationY = graphicsLayerScope.translationY,
                 shadowElevation = graphicsLayerScope.shadowElevation,
+                ambientShadowColor = graphicsLayerScope.ambientShadowColor,
+                spotShadowColor = graphicsLayerScope.spotShadowColor,
                 rotationX = graphicsLayerScope.rotationX,
                 rotationY = graphicsLayerScope.rotationY,
                 rotationZ = graphicsLayerScope.rotationZ,

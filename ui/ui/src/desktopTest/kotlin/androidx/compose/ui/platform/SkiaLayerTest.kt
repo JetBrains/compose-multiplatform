@@ -18,6 +18,8 @@ package androidx.compose.ui.platform
 
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.Shape
@@ -380,6 +382,8 @@ class SkiaLayerTest {
         translationX: Float = 0f,
         translationY: Float = 0f,
         shadowElevation: Float = 0f,
+        ambientShadowColor: Color = DefaultShadowColor,
+        spotShadowColor: Color = DefaultShadowColor,
         rotationX: Float = 0f,
         rotationY: Float = 0f,
         rotationZ: Float = 0f,
@@ -390,9 +394,9 @@ class SkiaLayerTest {
         renderEffect: RenderEffect? = null
     ) {
         updateLayerProperties(
-            scaleX, scaleY, alpha, translationX, translationY, shadowElevation, rotationX,
-            rotationY, rotationZ, cameraDistance, transformOrigin, shape, clip,
-            renderEffect, LayoutDirection.Ltr, Density(1f, 1f)
+            scaleX, scaleY, alpha, translationX, translationY, shadowElevation,
+            ambientShadowColor, spotShadowColor, rotationX, rotationY, rotationZ, cameraDistance,
+            transformOrigin, shape, clip, renderEffect, LayoutDirection.Ltr, Density(1f, 1f)
         )
     }
 }
