@@ -22,6 +22,7 @@ import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -187,9 +188,15 @@ open class BaseLazyListTestWithOrientation(private val orientation: Orientation)
         reverseLayout: Boolean = false,
         flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
         userScrollEnabled: Boolean = true,
+        spacedBy: Dp = 0.dp,
         content: LazyListScope.() -> Unit
     ) {
         if (vertical) {
+            val verticalArrangement = when {
+                spacedBy != 0.dp -> Arrangement.spacedBy(spacedBy)
+                !reverseLayout -> Arrangement.Top
+                else -> Arrangement.Bottom
+            }
             LazyColumn(
                 modifier = modifier,
                 state = state,
@@ -197,9 +204,15 @@ open class BaseLazyListTestWithOrientation(private val orientation: Orientation)
                 reverseLayout = reverseLayout,
                 flingBehavior = flingBehavior,
                 userScrollEnabled = userScrollEnabled,
+                verticalArrangement = verticalArrangement,
                 content = content
             )
         } else {
+            val horizontalArrangement = when {
+                spacedBy != 0.dp -> Arrangement.spacedBy(spacedBy)
+                !reverseLayout -> Arrangement.Start
+                else -> Arrangement.End
+            }
             LazyRow(
                 modifier = modifier,
                 state = state,
@@ -207,6 +220,7 @@ open class BaseLazyListTestWithOrientation(private val orientation: Orientation)
                 reverseLayout = reverseLayout,
                 flingBehavior = flingBehavior,
                 userScrollEnabled = userScrollEnabled,
+                horizontalArrangement = horizontalArrangement,
                 content = content
             )
         }

@@ -17,6 +17,7 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.MutatePriority
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.interaction.InteractionSource
@@ -40,6 +41,7 @@ import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
 import kotlin.math.abs
 
 /**
@@ -375,4 +377,7 @@ private object EmptyLazyListLayoutInfo : LazyListLayoutInfo {
     override val viewportStartOffset = 0
     override val viewportEndOffset = 0
     override val totalItemsCount = 0
+    override val viewportSize = IntSize.Zero
+    override val orientation = Orientation.Vertical
+    override val reverseLayout = false
 }

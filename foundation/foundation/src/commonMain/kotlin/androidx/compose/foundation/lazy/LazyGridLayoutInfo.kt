@@ -17,6 +17,8 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.ui.unit.IntSize
 
 /**
  * Contains useful information about the currently displayed layout state of lazy grids like
@@ -42,7 +44,7 @@ interface LazyGridLayoutInfo {
 
     /**
      * The end offset of the layout's viewport. You can think of it as a maximum offset which
-     * would be visible. Usually it is a size of the lazy grid container plus a content padding.
+     * would be visible. Usually it is a size of the lazy grid container minus a content padding.
      *
      * You can use it to understand what items from [visibleItemsInfo] are fully visible.
      */
@@ -52,4 +54,19 @@ interface LazyGridLayoutInfo {
      * The total count of items passed to [LazyVerticalGrid].
      */
     val totalItemsCount: Int
+
+    /**
+     * The size of the viewport. It is the lazy grid layout size including all the content paddings.
+     */
+    val viewportSize: IntSize
+
+    /**
+     * The orientation of the lazy grid.
+     */
+    val orientation: Orientation
+
+    /**
+     * True if the direction of scrolling and layout is reversed.
+     */
+    val reverseLayout: Boolean
 }

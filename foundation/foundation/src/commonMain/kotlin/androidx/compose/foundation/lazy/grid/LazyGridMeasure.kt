@@ -17,6 +17,7 @@
 package androidx.compose.foundation.lazy.grid
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.Placeable
@@ -67,7 +68,9 @@ internal fun measureLazyGrid(
             visibleItemsInfo = emptyList(),
             viewportStartOffset = -beforeContentPadding,
             viewportEndOffset = afterContentPadding,
-            totalItemsCount = 0
+            totalItemsCount = 0,
+            reverseLayout = reverseLayout,
+            orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
         )
     } else {
         var currentFirstLineIndex = firstVisibleLineIndex
@@ -239,6 +242,8 @@ internal fun measureLazyGrid(
             viewportEndOffset = maximumVisibleOffset,
             visibleItemsInfo = positionedItems,
             totalItemsCount = itemsCount,
+            reverseLayout = reverseLayout,
+            orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal
         )
     }
 }

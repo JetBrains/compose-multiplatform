@@ -16,11 +16,13 @@
 
 package androidx.compose.foundation.lazy.list
 
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.LazyListLayoutInfo
 import androidx.compose.foundation.lazy.layout.LazyLayoutItemInfo
 import androidx.compose.foundation.lazy.layout.LazyLayoutMeasureResult
 import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastMap
 
 /**
@@ -47,6 +49,10 @@ internal class LazyListMeasureResult(
     override val viewportEndOffset: Int,
     /** see [LazyListLayoutInfo.totalItemsCount] */
     override val totalItemsCount: Int,
+    /** see [LazyListLayoutInfo.reverseLayout] */
+    override val reverseLayout: Boolean,
+    /** see [LazyListLayoutInfo.orientation] */
+    override val orientation: Orientation
 ) : LazyListLayoutInfo, MeasureResult by measureResult {
     val lazyLayoutMeasureResult: LazyLayoutMeasureResult get() =
         object : LazyLayoutMeasureResult, MeasureResult by measureResult {
@@ -58,4 +64,7 @@ internal class LazyListMeasureResult(
                     }
                 }
         }
+
+    override val viewportSize: IntSize
+        get() = IntSize(measureResult.width, measureResult.height)
 }
