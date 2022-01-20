@@ -16,42 +16,19 @@
 
 package androidx.compose.foundation.lazy.layout
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
 
 /**
- * Creates a [LazyLayoutState] that is remembered across recompositions.
- */
-@Composable
-internal fun rememberLazyLayoutState(): LazyLayoutState {
-    return remember { LazyLayoutState() }
-}
-
-/**
  * A state object that can be hoisted to interact and observe the state of the [LazyLayout].
- *
- * In most cases, this will be created via [rememberLazyLayoutState].
 */
 @Stable
 internal class LazyLayoutState internal constructor() {
     /**
-     * Information about the layout of the lazy layout, calculated during the latest layout pass.
-     */
-    val layoutInfo: LazyLayoutInfo get() = layoutInfoState.value
-
-    /** Backing state for [layoutInfo] */
-    internal val layoutInfoState = mutableStateOf<LazyLayoutInfo>(EmptyLazyLayoutInfo)
-
-    internal var layoutInfoNonObservable: LazyLayoutInfo = EmptyLazyLayoutInfo
-
-    /**
      * Remeasures the lazy list now. This can be used, for example, in reaction to scrolling.
      */
-    fun remeasure() = remeasurement?.forceRemeasure()
+    internal fun remeasure() = remeasurement?.forceRemeasure()
 
     /**
      * The [Remeasurement] object associated with our layout. It allows us to remeasure
@@ -82,10 +59,6 @@ internal class LazyLayoutState internal constructor() {
 internal interface LazyLayoutInfo {
     /** The items currently participating in the layout of the lazy layout. */
     val visibleItemsInfo: List<LazyLayoutItemInfo>
-}
-
-private object EmptyLazyLayoutInfo : LazyLayoutInfo {
-    override val visibleItemsInfo = emptyList<LazyLayoutItemInfo>()
 }
 
 internal interface LazyLayoutOnPostMeasureListener {

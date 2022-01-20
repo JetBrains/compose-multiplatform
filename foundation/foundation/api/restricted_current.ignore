@@ -1,4 +1,6 @@
 // Baseline format: 1.0
+RemovedClass: androidx.compose.foundation.lazy.layout.LazyLayoutStateKt:
+    Removed class androidx.compose.foundation.lazy.layout.LazyLayoutStateKt
 RemovedClass: androidx.compose.foundation.lazy.list.IntervalListKt:
     Removed class androidx.compose.foundation.lazy.list.IntervalListKt
 RemovedClass: androidx.compose.foundation.text.TextFieldMagnifierKt:
