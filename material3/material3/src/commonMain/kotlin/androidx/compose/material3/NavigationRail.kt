@@ -88,8 +88,7 @@ import kotlin.math.roundToInt
 @Composable
 fun NavigationRail(
     modifier: Modifier = Modifier,
-    containerColor: Color =
-        MaterialTheme.colorScheme.fromToken(NavigationRailTokens.ContainerColor),
+    containerColor: Color = NavigationRailTokens.ContainerColor.toColor(),
     contentColor: Color = contentColorFor(containerColor),
     header: @Composable (ColumnScope.() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
@@ -223,16 +222,11 @@ object NavigationRailItemDefaults {
      */
     @Composable
     fun colors(
-        selectedIconColor: Color =
-            MaterialTheme.colorScheme.fromToken(NavigationRailTokens.ActiveIconColor),
-        unselectedIconColor: Color =
-            MaterialTheme.colorScheme.fromToken(NavigationRailTokens.InactiveIconColor),
-        selectedTextColor: Color =
-            MaterialTheme.colorScheme.fromToken(NavigationRailTokens.ActiveLabelTextColor),
-        unselectedTextColor: Color =
-            MaterialTheme.colorScheme.fromToken(NavigationRailTokens.InactiveLabelTextColor),
-        indicatorColor: Color =
-            MaterialTheme.colorScheme.fromToken(NavigationRailTokens.ActiveIndicatorColor),
+        selectedIconColor: Color = NavigationRailTokens.ActiveIconColor.toColor(),
+        unselectedIconColor: Color = NavigationRailTokens.InactiveIconColor.toColor(),
+        selectedTextColor: Color = NavigationRailTokens.ActiveLabelTextColor.toColor(),
+        unselectedTextColor: Color = NavigationRailTokens.InactiveLabelTextColor.toColor(),
+        indicatorColor: Color = NavigationRailTokens.ActiveIndicatorColor.toColor(),
     ): NavigationRailItemColors = remember(
         selectedIconColor,
         unselectedIconColor,

@@ -80,7 +80,7 @@ fun FloatingActionButton(
     modifier: Modifier = Modifier,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = FabPrimaryTokens.ContainerShape,
-    containerColor: Color = MaterialTheme.colorScheme.fromToken(FabPrimaryTokens.ContainerColor),
+    containerColor: Color = FabPrimaryTokens.ContainerColor.toColor(),
     contentColor: Color = contentColorFor(containerColor),
     elevation: FloatingActionButtonElevation = FloatingActionButtonDefaults.elevation(),
     content: @Composable () -> Unit,
@@ -151,7 +151,7 @@ fun SmallFloatingActionButton(
     modifier: Modifier = Modifier,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = FabPrimarySmallTokens.ContainerShape,
-    containerColor: Color = MaterialTheme.colorScheme.fromToken(FabPrimaryTokens.ContainerColor),
+    containerColor: Color = FabPrimaryTokens.ContainerColor.toColor(),
     contentColor: Color = contentColorFor(containerColor),
     elevation: FloatingActionButtonElevation = FloatingActionButtonDefaults.elevation(),
     content: @Composable () -> Unit,
@@ -199,9 +199,7 @@ fun LargeFloatingActionButton(
     modifier: Modifier = Modifier,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = FabPrimaryLargeTokens.ContainerShape,
-    containerColor: Color = MaterialTheme.colorScheme.fromToken(
-        FabPrimaryLargeTokens.ContainerColor
-    ),
+    containerColor: Color = FabPrimaryLargeTokens.ContainerColor.toColor(),
     contentColor: Color = contentColorFor(containerColor),
     elevation: FloatingActionButtonElevation = FloatingActionButtonDefaults.elevation(),
     content: @Composable () -> Unit,
@@ -253,9 +251,7 @@ fun ExtendedFloatingActionButton(
     icon: @Composable (() -> Unit)? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = ExtendedFabPrimaryTokens.ContainerShape,
-    containerColor: Color = MaterialTheme.colorScheme.fromToken(
-        ExtendedFabPrimaryTokens.ContainerColor
-    ),
+    containerColor: Color = ExtendedFabPrimaryTokens.ContainerColor.toColor(),
     contentColor: Color = contentColorFor(containerColor),
     elevation: FloatingActionButtonElevation = FloatingActionButtonDefaults.elevation(),
 ) {

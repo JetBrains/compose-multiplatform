@@ -80,8 +80,8 @@ fun IconButton(
         val contentColor =
             if (enabled) LocalContentColor.current
             else
-                MaterialTheme.colorScheme
-                    .fromToken(IconButtonTokens.DisabledIconColor)
+                IconButtonTokens.DisabledIconColor
+                    .toColor()
                     .copy(alpha = IconButtonTokens.DisabledIconOpacity)
         CompositionLocalProvider(LocalContentColor provides contentColor, content = content)
     }
@@ -133,9 +133,7 @@ fun IconToggleButton(
     ) {
         val contentColor =
             if (enabled) LocalContentColor.current
-            else
-                MaterialTheme.colorScheme
-                    .fromToken(IconButtonTokens.DisabledIconColor)
+            else IconButtonTokens.DisabledIconColor.toColor()
                     .copy(alpha = IconButtonTokens.DisabledIconOpacity)
         CompositionLocalProvider(LocalContentColor provides contentColor, content = content)
     }

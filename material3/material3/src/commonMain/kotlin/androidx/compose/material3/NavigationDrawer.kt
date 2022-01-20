@@ -250,8 +250,7 @@ fun NavigationDrawer(
     gesturesEnabled: Boolean = true,
     drawerShape: Shape = RoundedCornerShape(0.dp, 16.dp, 16.dp, 0.dp),
     drawerTonalElevation: Dp = DrawerDefaults.Elevation,
-    drawerContainerColor: Color =
-        MaterialTheme.colorScheme.fromToken(NavigationDrawerTokens.ContainerColor),
+    drawerContainerColor: Color = NavigationDrawerTokens.ContainerColor.toColor(),
     drawerContentColor: Color = contentColorFor(drawerContainerColor),
     scrimColor: Color = DrawerDefaults.scrimColor,
     content: @Composable () -> Unit

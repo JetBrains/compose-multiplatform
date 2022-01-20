@@ -21,6 +21,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.tokens.DialogTokens
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -88,10 +89,7 @@ class AlertDialogTest {
                     TextButton(onClick = { /* doSomething() */ }) {
                         Text("Confirm")
                         buttonContentColor = LocalContentColor.current
-                        expectedButtonContentColor =
-                            MaterialTheme.colorScheme.fromToken(
-                                androidx.compose.material3.tokens.DialogTokens.ActionLabelTextColor
-                            )
+                        expectedButtonContentColor = DialogTokens.ActionLabelTextColor.toColor()
                     }
                 },
                 containerColor = Color.Yellow,

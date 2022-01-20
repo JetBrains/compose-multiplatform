@@ -558,3 +558,9 @@ internal val LocalColorScheme = staticCompositionLocalOf { lightColorScheme() }
  * A low level of alpha used to represent disabled components, such as text in a disabled Button.
  */
 internal const val DisabledAlpha = 0.38f
+
+/** Converts a color token key to the local color scheme provided by the theme */
+@Composable
+internal fun ColorSchemeKeyTokens.toColor(): Color {
+    return MaterialTheme.colorScheme.fromToken(this)
+}

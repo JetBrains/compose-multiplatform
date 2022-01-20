@@ -161,16 +161,14 @@ object RadioButtonDefaults {
      */
     @Composable
     fun colors(
-        selectedColor: Color =
-            MaterialTheme.colorScheme.fromToken(RadioButtonTokens.SelectedIconColor),
-        unselectedColor: Color =
-            MaterialTheme.colorScheme.fromToken(RadioButtonTokens.UnselectedIconColor),
-        disabledSelectedColor: Color =
-            MaterialTheme.colorScheme.fromToken(RadioButtonTokens.DisabledSelectedIconColor)
-                .copy(alpha = RadioButtonTokens.DisabledSelectedIconOpacity),
-        disabledUnselectedColor: Color =
-            MaterialTheme.colorScheme.fromToken(RadioButtonTokens.DisabledUnselectedIconColor)
-                .copy(alpha = RadioButtonTokens.DisabledUnselectedIconOpacity)
+        selectedColor: Color = RadioButtonTokens.SelectedIconColor.toColor(),
+        unselectedColor: Color = RadioButtonTokens.UnselectedIconColor.toColor(),
+        disabledSelectedColor: Color = RadioButtonTokens.DisabledSelectedIconColor
+            .toColor()
+            .copy(alpha = RadioButtonTokens.DisabledSelectedIconOpacity),
+        disabledUnselectedColor: Color = RadioButtonTokens.DisabledUnselectedIconColor
+            .toColor()
+            .copy(alpha = RadioButtonTokens.DisabledUnselectedIconOpacity)
     ): RadioButtonColors {
         return remember(
             selectedColor,
