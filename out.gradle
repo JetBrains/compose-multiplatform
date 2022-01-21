@@ -29,6 +29,7 @@ def chooseOutDir(subdir = "") {
         }
         outDir = new File("${checkoutRoot}/out${subdir}")
         project.ext.buildSrcOut = new File("${checkoutRoot}/out/buildSrc")
+        environment "OUT_DIR", "${checkoutRoot}/out${subdir}"
     } else {
         outDir = new File(outDir)
         project.ext.buildSrcOut = new File("${outDir}/buildSrc")
