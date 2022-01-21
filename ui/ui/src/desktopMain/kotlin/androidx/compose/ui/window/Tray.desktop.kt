@@ -94,7 +94,7 @@ fun ApplicationScope.Tray(
             // code doesn't depend on something that is created/calculated in this function.
             System.err.println(
                 "Tray is not supported on the current platform. " +
-                    "Use global property `isTraySupported` to check."
+                    "Use the global property `isTraySupported` to check."
             )
             onDispose {}
         }

@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.ColorAlphaType
 import org.jetbrains.skia.ImageInfo
+import java.awt.Graphics
 import java.awt.Image
 import java.awt.Point
 import java.awt.image.AbstractMultiResolutionImage
@@ -40,6 +41,7 @@ import java.awt.image.ImageProducer
 import java.awt.image.MultiResolutionImage
 import java.awt.image.Raster
 import java.awt.image.SinglePixelPackedSampleModel
+import kotlin.math.roundToInt
 
 /**
  * Convert AWT [BufferedImage] to Compose [Painter], so it would be possible to pass it to Compose
@@ -77,6 +79,9 @@ private class BufferedImagePainter(val image: BufferedImage) : Painter() {
  * Usually most painters don't use them. Like the painters for svg/xml/raster resources:
  * they don't use absolute '.dp' values to draw, they use values which are relative
  * to their viewport.
+ *
+ * [density] also will be used to rasterize the default image, which can be used by some implementations
+ * (Tray icon on macOs, disabled icon for menu items)
  *
  * @param size the size of the [Image]
  */
@@ -164,29 +169,22 @@ private class PainterImage(
     }
 
     override fun getProperty(name: String, observer: ImageObserver?): Any = UndefinedProperty
+    override fun getSource(): ImageProducer = defaultImage.source
+    override fun getGraphics(): Graphics = defaultImage.graphics
 
-    override fun getSource(): ImageProducer = throw UnsupportedOperationException(
-        "getSource() not supported"
-    )
-
-    override fun getGraphics() = throw UnsupportedOperationException(
-        "getGraphics() not supported"
-    )
-
-    // AWT only calls this field on macOs
-    private val _resolutionVariants by lazy {
+    private val defaultImage by lazy {
         // optimizations to avoid unnecessary rasterizations
         when (painter) {
-            is BufferedImagePainter -> listOf(painter.image)
-            is BitmapPainter -> listOf(asBitmap(width, height).toAwtImage())
-            else -> listOf(
-                asBitmap(width, height).toAwtImage(), // for usual displays
-                asBitmap(width * 2, height * 2).toAwtImage(), // for retina displays
-            )
+            is BufferedImagePainter -> painter.image
+            is BitmapPainter -> asBitmap(width, height).toAwtImage()
+            else -> asBitmap(
+                (width * density.density).roundToInt(),
+                (height * density.density).roundToInt()
+            ).toAwtImage()
         }
     }
 
-    override fun getResolutionVariants() = _resolutionVariants
+    override fun getResolutionVariants() = listOf(defaultImage)
 }
 
 // TODO(demin): should we optimize toAwtImage/toBitmap? Currently we convert colors according to the
