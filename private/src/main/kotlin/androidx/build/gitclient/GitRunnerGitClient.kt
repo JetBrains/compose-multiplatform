@@ -209,7 +209,7 @@ class GitRunnerGitClient(
 
     companion object {
         const val PREVIOUS_SUBMITTED_CMD =
-            "git log -1 --merges --oneline --invert-grep --author=android-build-server"
+            "git log -1 --merges --oneline"
         const val CHANGED_FILES_CMD_PREFIX = "git diff --name-only"
         const val GIT_LOG_CMD_PREFIX = "git log --name-only"
     }
