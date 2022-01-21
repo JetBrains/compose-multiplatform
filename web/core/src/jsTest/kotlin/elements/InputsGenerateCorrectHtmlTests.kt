@@ -5,7 +5,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.dom.*
-import org.jetbrains.compose.web.renderComposable
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLTextAreaElement
 import kotlin.test.Test
