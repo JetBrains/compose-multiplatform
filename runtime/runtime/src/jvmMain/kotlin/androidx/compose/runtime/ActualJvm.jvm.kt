@@ -36,6 +36,10 @@ internal actual open class ThreadLocal<T> actual constructor(
     override fun initialValue(): T? {
         return initialValue.invoke()
     }
+
+    actual override fun remove() {
+        super.remove()
+    }
 }
 
 internal actual class SnapshotThreadLocal<T> {
@@ -78,3 +82,12 @@ internal actual fun <T> invokeComposableForResult(
     val realFn = composable as Function2<Composer, Int, T>
     return realFn(composer, 1)
 }
+
+internal actual class AtomicInt actual constructor(value: Int) {
+    val delegate = java.util.concurrent.atomic.AtomicInteger(value)
+    actual fun get(): Int = delegate.get()
+    actual fun set(value: Int) = delegate.set(value)
+    actual fun add(amount: Int): Int = delegate.addAndGet(amount)
+}
+
+internal actual fun ensureMutable(it: Any) { /* NOTHING */ }
