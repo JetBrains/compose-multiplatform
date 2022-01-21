@@ -35,7 +35,6 @@ import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.PlatformComponent
 import androidx.compose.ui.platform.SkiaBasedOwner
 import androidx.compose.ui.platform.PlatformInput
-import androidx.compose.ui.platform.SkiaRootForTest
 import androidx.compose.ui.platform.DummyPlatformComponent
 import androidx.compose.ui.platform.EmptyDispatcher
 import androidx.compose.ui.platform.FlushCoroutineDispatcher
@@ -59,19 +58,19 @@ internal val LocalComposeScene = staticCompositionLocalOf<ComposeScene> {
 }
 
 /**
- * Virtual container that encapsulates Compose UI content. UI content can be constructed via
+ * A virtual container that encapsulates Compose UI content. UI content can be constructed via
  * [setContent] method and with any Composable that manipulates [LayoutNode] tree.
  *
  * To draw content on [Canvas], you can use [render] method.
  *
  * To specify available size for the content, you should use [constraints].
  *
- * After [ComposeScene] will no longer needed, you should call [dispose] method, so all resources
+ * After [ComposeScene] will no longer needed, you should call [close] method, so all resources
  * and subscriptions will be properly closed. Otherwise there can be a memory leak.
  */
 class ComposeScene internal constructor(
     coroutineContext: CoroutineContext,
-    private val component: PlatformComponent,
+    internal val component: PlatformComponent,
     density: Density,
     private val invalidate: () -> Unit
 ) {
@@ -128,9 +127,9 @@ class ComposeScene internal constructor(
     }
 
     /**
-     * All currently registered [SkiaRootForTest]s. After calling [setContent] the first root
-     * will be added. If there is an any Popup is present in the content, it will be added as
-     * another [SkiaRootForTest]
+     * All currently registered [RootForTest]s. After calling [setContent] the first root
+     * will be added. If there is an any [Popup] is present in the content, it will be added as
+     * another [RootForTest]
      */
     val roots: Set<RootForTest> get() = list
 
@@ -153,12 +152,12 @@ class ComposeScene internal constructor(
      */
     var density: Density = density
         set(value) {
-            check(!isDisposed) { "ComposeScene is disposed" }
+            check(!isClosed) { "ComposeScene is closed" }
             field = value
             mainOwner?.density = value
         }
 
-    private var isDisposed = false
+    private var isClosed = false
 
     init {
         GlobalSnapshotManager.ensureStarted()
@@ -176,12 +175,12 @@ class ComposeScene internal constructor(
      *
      * After calling this method, you cannot call any other method of this [ComposeScene].
      */
-    fun dispose() {
+    fun close() {
         composition?.dispose()
         mainOwner?.dispose()
         recomposer.cancel()
         job.cancel()
-        isDisposed = true
+        isClosed = true
     }
 
     private fun dispatchCommand(command: () -> Unit) {
@@ -198,26 +197,25 @@ class ComposeScene internal constructor(
         recomposer.hasPendingWork ||
         dispatcher.hasTasks()
 
-    internal fun attach(skiaBasedOwner: SkiaBasedOwner) {
-        check(!isDisposed) { "ComposeScene is disposed" }
-        list.add(skiaBasedOwner)
-        skiaBasedOwner.onNeedRender = ::invalidateIfNeeded
-        skiaBasedOwner.onDispatchCommand = ::dispatchCommand
-        skiaBasedOwner.constraints = constraints
-        skiaBasedOwner.containerCursor = component
+    internal fun attach(owner: SkiaBasedOwner) {
+        check(!isClosed) { "ComposeScene is closed" }
+        list.add(owner)
+        owner.onNeedRender = ::invalidateIfNeeded
+        owner.onDispatchCommand = ::dispatchCommand
+        owner.constraints = constraints
         invalidateIfNeeded()
-        if (skiaBasedOwner.isFocusable) {
-            focusedOwner = skiaBasedOwner
+        if (owner.isFocusable) {
+            focusedOwner = owner
         }
     }
 
-    internal fun detach(skiaBasedOwner: SkiaBasedOwner) {
-        check(!isDisposed) { "ComposeScene is disposed" }
-        list.remove(skiaBasedOwner)
-        skiaBasedOwner.onDispatchCommand = null
-        skiaBasedOwner.onNeedRender = null
+    internal fun detach(owner: SkiaBasedOwner) {
+        check(!isClosed) { "ComposeScene is closed" }
+        list.remove(owner)
+        owner.onDispatchCommand = null
+        owner.onNeedRender = null
         invalidateIfNeeded()
-        if (skiaBasedOwner == focusedOwner) {
+        if (owner == focusedOwner) {
             focusedOwner = list.lastOrNull { it.isFocusable }
         }
     }
@@ -257,11 +255,12 @@ class ComposeScene internal constructor(
         onKeyEvent: (ComposeKeyEvent) -> Boolean = { false },
         content: @Composable () -> Unit
     ) {
-        check(!isDisposed) { "ComposeScene is disposed" }
+        check(!isClosed) { "ComposeScene is closed" }
         composition?.dispose()
         mainOwner?.dispose()
         val mainOwner = SkiaBasedOwner(
             platformInputService,
+            component,
             density,
             onPreviewKeyEvent = onPreviewKeyEvent,
             onKeyEvent = onKeyEvent
@@ -295,7 +294,7 @@ class ComposeScene internal constructor(
      */
     val contentSize: IntSize
         get() {
-            check(!isDisposed) { "ComposeScene is disposed" }
+            check(!isClosed) { "ComposeScene is closed" }
             val mainOwner = mainOwner ?: return IntSize.Zero
             mainOwner.measureAndLayout()
             return IntSize(mainOwner.root.width, mainOwner.root.height)
@@ -306,7 +305,7 @@ class ComposeScene internal constructor(
      * animations in the content (or any other code, which uses [withFrameNanos]
      */
     fun render(canvas: Canvas, nanoTime: Long) {
-        check(!isDisposed) { "ComposeScene is disposed" }
+        check(!isClosed) { "ComposeScene is closed" }
         postponeInvalidation {
             // TODO(https://github.com/JetBrains/compose-jb/issues/1135):
             //  Temporarily workaround for flaky tests in WithComposeUiTest.
@@ -362,7 +361,7 @@ class ComposeScene internal constructor(
 //        buttons: PointerButtons? = null,
 //        keyboardModifiers: PointerKeyboardModifiers? = null,
     ): Unit = postponeInvalidation {
-        check(!isDisposed) { "ComposeScene is disposed" }
+        check(!isClosed) { "ComposeScene is closed" }
         when (eventType) {
             PointerEventType.Press -> isMousePressed = true
             PointerEventType.Release -> isMousePressed = false

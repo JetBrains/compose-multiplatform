@@ -84,6 +84,7 @@ private typealias Command = () -> Unit
 )
 internal class SkiaBasedOwner(
     private val platformInputService: PlatformInput,
+    private val component: PlatformComponent,
     density: Density = Density(1f, 1f),
     val isPopup: Boolean = false,
     val isFocusable: Boolean = true,
@@ -237,7 +238,6 @@ internal class SkiaBasedOwner(
     val needRender get() = needLayout || needDraw || needSendSyntheticEvents
     var onNeedRender: (() -> Unit)? = null
     var onDispatchCommand: ((Command) -> Unit)? = null
-    var containerCursor: PlatformComponentWithCursor? = null
 
     fun render(canvas: org.jetbrains.skia.Canvas) {
         needLayout = false
@@ -388,7 +388,7 @@ internal class SkiaBasedOwner(
             }
         ).also {
             if (it.dispatchedToAPointerInputModifier) {
-                setPointerIcon(containerCursor, desiredPointerIcon)
+                setPointerIcon(component, desiredPointerIcon)
             }
         }
     }
