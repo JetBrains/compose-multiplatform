@@ -25,6 +25,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.Slider
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
@@ -48,6 +49,7 @@ import java.awt.GraphicsEnvironment
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
@@ -460,5 +462,40 @@ class WindowTest {
         assertThat(isVisibleOnFirstDraw).isFalse()
 
         exitApplication()
+    }
+
+    @Test
+    fun `LaunchedEffect should end before application exit`() = runApplicationTest {
+        var isApplicationEffectEnded = false
+        var isWindowEffectEnded = false
+
+        val job = launchApplication {
+            if (isOpen) {
+                Window(onCloseRequest = ::exitApplication) {
+                    LaunchedEffect(Unit) {
+                        try {
+                            delay(1000000)
+                        } finally {
+                            isWindowEffectEnded = true
+                        }
+                    }
+                }
+            }
+
+            LaunchedEffect(Unit) {
+                try {
+                    delay(1000000)
+                } finally {
+                    isApplicationEffectEnded = true
+                }
+            }
+        }
+
+        awaitIdle()
+        exitApplication()
+        job.cancelAndJoin()
+
+        assertThat(isApplicationEffectEnded).isTrue()
+        assertThat(isWindowEffectEnded).isTrue()
     }
 }

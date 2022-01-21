@@ -28,6 +28,7 @@ import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -43,7 +44,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
-import java.awt.Window
+import kotlin.system.exitProcess
 
 /**
  * An entry point for the Compose application. See [awaitApplication] for more information.
@@ -55,22 +56,54 @@ import java.awt.Window
  * }
  * ```
  *
+ * After all windows are closed and all operations are completed, the application will end.
+ * Set [exitProcessOnExit] to `false`, if you need to execute some code after [application] block, otherwise the code after it
+ * won't be executed, as [application] will exit the process.
+ *
  * This entry point is a blocking operation (it blocks the current thread until application
  * finishes) and can't be called inside UI thread. To launch new application from UI thread (for
  * example, from some event listener), use `GlobalScope.launchApplication` instead.
  *
- * This function is equivalent of:
- * ```
- * runBlocking {
- *     awaitApplication {
+ * Application can launch background tasks using [LaunchedEffect]
+ * or create [Window], [Dialog], or [Tray] in a declarative Compose way:
  *
+ * ```
+ * fun main() = application {
+ *     val isSplashScreenShowing by remember { mutableStateOf(true) }
+ *
+ *     LaunchedEffect(Unit) {
+ *         delay(2000)
+ *         isSplashScreenShowing = false
+ *     }
+ *
+ *     if (isSplashScreenShowing) {
+ *         Window(title = "Splash") {}
+ *     } else {
+ *         Window(title = "App") {}
  *     }
  * }
  * ```
  *
+ * When there is no any active compositions, this function will end.
+ * Active composition is a composition that have active coroutine (for example, launched in
+ * [LaunchedEffect]) or that have child composition created inside [Window], [Dialog], or [Tray].
+ *
+ * Don't use any animation in this function
+ * (for example, [withFrameNanos] or [androidx.compose.animation.core.animateFloatAsState]),
+ * because underlying [MonotonicFrameClock] hasn't synchronized with any display, and produces
+ * frames as fast as possible.
+ *
+ * All animation's should be created inside Composable content of the
+ * [Window] / [Dialog] / [ComposePanel].
+ *
+ * @param exitProcessOnExit should `exitProcess(0)` be called after the application is closed.
+ * exitProcess speedup process exit (instant instead of 1-4sec).
+ * If `false`, the execution of the function will be unblocked after application is exited
+ * (when the last window is closed, and all [LaunchedEffect] are complete).
  * @see [awaitApplication]
  */
 fun application(
+    exitProcessOnExit: Boolean = true,
     content: @Composable ApplicationScope.() -> Unit
 ) {
     if (System.getProperty("compose.application.configure.swing.globals") == "true") {
@@ -78,7 +111,13 @@ fun application(
     }
 
     runBlocking {
-        awaitApplication(content = content)
+        awaitApplication {
+            content()
+        }
+    }
+
+    if (exitProcessOnExit) {
+        exitProcess(0)
     }
 }
 
@@ -121,7 +160,7 @@ fun CoroutineScope.launchApplication(
  *
  * ```
  * fun main() = runBlocking {
- *     withApplication {
+ *     awaitApplication {
  *         val isSplashScreenShowing by remember { mutableStateOf(true) }
  *
  *         LaunchedEffect(Unit) {
@@ -203,6 +242,10 @@ suspend fun awaitApplication(
  */
 @Stable
 interface ApplicationScope {
+    /**
+     * Close all windows created inside the application and cancel all launched effects
+     * (they launch via [LaunchedEffect] adn [rememberCoroutineScope].
+     */
     fun exitApplication()
 }
 

@@ -208,6 +208,9 @@ fun Window(
  * }
  * ```
  *
+ * Set [exitProcessOnExit] to `false`, if you need to execute some code after [singleWindowApplication] block, otherwise the code after it
+ * won't be executed, as [singleWindowApplication] will exit the process.
+ *
  * @param state The state object to be used to control or observe the window's state
  * When size/position/status is changed by the user, state will be updated.
  * When size/position/status of the window is changed by the application (changing state),
@@ -243,6 +246,10 @@ fun Window(
  * @param onKeyEvent This callback is invoked when the user interacts with the hardware
  * keyboard. While implementing this callback, return true to stop propagation of this event.
  * If you return false, the key event will be sent to this [onKeyEvent]'s parent.
+ * @param exitProcessOnExit should `exitProcess(0)` be called after the window is closed.
+ * exitProcess speedup process exit (instant instead of 1-4sec).
+ * If `false`, the execution of the function will be unblocked after application is exited
+ * (when the last window is closed, and all [LaunchedEffect] are complete).
  * @param content Content of the window
  */
 fun singleWindowApplication(
@@ -258,8 +265,9 @@ fun singleWindowApplication(
     alwaysOnTop: Boolean = false,
     onPreviewKeyEvent: (KeyEvent) -> Boolean = { false },
     onKeyEvent: (KeyEvent) -> Boolean = { false },
+    exitProcessOnExit: Boolean = true,
     content: @Composable FrameWindowScope.() -> Unit
-) = application {
+) = application(exitProcessOnExit = exitProcessOnExit) {
     Window(
         ::exitApplication,
         state,
