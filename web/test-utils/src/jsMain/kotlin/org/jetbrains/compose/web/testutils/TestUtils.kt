@@ -44,7 +44,7 @@ class TestScope : CoroutineScope by MainScope() {
      * It's used as a parent element for the composition.
      * It's added into the document's body automatically.
      */
-    val root = document.createElement("div")
+    val root = document.createElement("div") as HTMLElement
 
     private var waitForRecompositionCompleteContinuation: Continuation<Unit>? = null
     private val childrenIterator = root.children.asList().listIterator()
@@ -140,7 +140,7 @@ class TestScope : CoroutineScope by MainScope() {
     /**
      * Suspends until [element] observes any change to its html.
      */
-    suspend fun waitForChanges(element: Element) {
+    suspend fun waitForChanges(element: HTMLElement) {
         suspendCoroutine<Unit> { continuation ->
             val observer = MutationObserver { mutations, observer ->
                 continuation.resume(Unit)
