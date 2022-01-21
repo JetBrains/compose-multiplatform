@@ -6,6 +6,7 @@ import kotlinx.browser.window
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.dom.clear
+import kotlinx.dom.createElement
 import org.jetbrains.compose.web.internal.runtime.*
 import org.w3c.dom.*
 import kotlin.coroutines.Continuation
@@ -27,7 +28,7 @@ class TestScope : CoroutineScope by MainScope() {
      * It's used as a parent element for the composition.
      * It's added into the document's body automatically.
      */
-    val root = "div".asHtmlElement()
+    val root = document.createElement("div")
 
     private var waitForRecompositionCompleteContinuation: Continuation<Unit>? = null
     private val childrenIterator = root.children.asList().listIterator()
@@ -119,7 +120,7 @@ class TestScope : CoroutineScope by MainScope() {
     /**
      * Suspends until [element] observes any change to its html.
      */
-    suspend fun waitForChanges(element: HTMLElement) {
+    suspend fun waitForChanges(element: Element) {
         suspendCoroutine<Unit> { continuation ->
             val observer = MutationObserver { mutations, observer ->
                 continuation.resume(Unit)
@@ -176,9 +177,6 @@ fun runTest(block: suspend TestScope.() -> Unit): dynamic {
     val scope = TestScope()
     return scope.promise { block(scope) }
 }
-
-@ComposeWebExperimentalTestsApi
-fun String.asHtmlElement() = document.createElement(this) as HTMLElement
 
 private object MutationObserverOptions : MutationObserverInit {
     override var childList: Boolean? = true
