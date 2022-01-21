@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package androidx.compose.material3
 
 import android.os.Build
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -25,18 +26,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CutCornerShape
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.test.SemanticsMatcher
-import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
@@ -48,7 +44,6 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth
@@ -61,6 +56,7 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalMaterial3Api::class)
 class CardTest {
 
     @get:Rule
@@ -68,30 +64,24 @@ class CardTest {
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
-    @LargeTest
-    fun shapeAndColorFromThemeIsUsed() {
+    fun customShapeAndColorIsUsed() {
         val shape = CutCornerShape(8.dp)
         val background = Color.Yellow
-        var cardColor = Color.Transparent
-        rule.setMaterialContent {
+        val cardColor = Color.Blue
+        rule.setMaterialContent(lightColorScheme()) {
             Surface(color = background) {
                 Box {
-                    cardColor = MaterialTheme.colors.surface
-                    CompositionLocalProvider(LocalShapes provides Shapes(medium = shape)) {
-                        Card(
-                            modifier = Modifier
-                                .semantics(mergeDescendants = true) {}
-                                .testTag("card"),
-                            elevation = 0.dp
-                        ) {
-                            Box(Modifier.size(50.dp, 50.dp))
-                        }
-                    }
+                    Card(
+                        modifier = Modifier.semantics(mergeDescendants = true) {}.testTag("card"),
+                        shape = shape,
+                        containerColor = cardColor
+                    ) { Box(Modifier.size(50.dp, 50.dp)) }
                 }
             }
         }
 
-        rule.onNodeWithTag("card")
+        rule
+            .onNodeWithTag("card")
             .captureToImage()
             .assertShape(
                 density = rule.density,
@@ -102,23 +92,18 @@ class CardTest {
             )
     }
 
-    @ExperimentalMaterialApi
     @Test
     fun clickableOverload_semantics() {
         val count = mutableStateOf(0)
-        rule.setMaterialContent {
-            Card(
-                modifier = Modifier.testTag("card"),
-                role = Role.Checkbox,
-                onClick = { count.value += 1 }
-            ) {
+        rule.setMaterialContent(lightColorScheme()) {
+            Card(modifier = Modifier.testTag("card").clickable { count.value += 1 }) {
                 Text("${count.value}")
                 Spacer(Modifier.size(30.dp))
             }
         }
-        rule.onNodeWithTag("card")
+        rule
+            .onNodeWithTag("card")
             .assertHasClickAction()
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Checkbox))
             .assertIsEnabled()
             // since we merge descendants we should have text on the same node
             .assertTextEquals("0")
@@ -126,59 +111,41 @@ class CardTest {
             .assertTextEquals("1")
     }
 
-    @ExperimentalMaterialApi
     @Test
     fun clickableOverload_clickAction() {
         val count = mutableStateOf(0f)
-        rule.setMaterialContent {
-            Card(
-                modifier = Modifier.testTag("card"),
-                onClick = { count.value += 1 }
-            ) {
+        rule.setMaterialContent(lightColorScheme()) {
+            Card(modifier = Modifier.testTag("card").clickable { count.value += 1 }) {
                 Spacer(Modifier.size(30.dp))
             }
         }
-        rule.onNodeWithTag("card")
-            .performClick()
+        rule.onNodeWithTag("card").performClick()
         Truth.assertThat(count.value).isEqualTo(1)
 
-        rule.onNodeWithTag("card")
-            .performClick()
-            .performClick()
+        rule.onNodeWithTag("card").performClick().performClick()
         Truth.assertThat(count.value).isEqualTo(3)
     }
 
-    @ExperimentalMaterialApi
     @Test
     fun clickableOverload_enabled_disabled() {
         val count = mutableStateOf(0f)
         val enabled = mutableStateOf(true)
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Card(
-                modifier = Modifier.testTag("card"),
-                enabled = enabled.value,
-                onClick = { count.value += 1 }
-            ) {
-                Spacer(Modifier.size(30.dp))
-            }
+                modifier =
+                Modifier.testTag("card")
+                    .clickable(enabled = enabled.value, onClick = { count.value += 1 }),
+            ) { Spacer(Modifier.size(30.dp)) }
         }
-        rule.onNodeWithTag("card")
-            .assertIsEnabled()
-            .performClick()
+        rule.onNodeWithTag("card").assertIsEnabled().performClick()
 
         Truth.assertThat(count.value).isEqualTo(1)
-        rule.runOnIdle {
-            enabled.value = false
-        }
+        rule.runOnIdle { enabled.value = false }
 
-        rule.onNodeWithTag("card")
-            .assertIsNotEnabled()
-            .performClick()
-            .performClick()
+        rule.onNodeWithTag("card").assertIsNotEnabled().performClick().performClick()
         Truth.assertThat(count.value).isEqualTo(1)
     }
 
-    @ExperimentalMaterialApi
     @Test
     fun clickableOverload_interactionSource() {
         val interactionSource = MutableInteractionSource()
@@ -188,34 +155,30 @@ class CardTest {
         rule.setContent {
             scope = rememberCoroutineScope()
             Card(
-                modifier = Modifier.testTag("card"),
-                onClick = {},
+                modifier =
+                Modifier.testTag("card")
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = null,
+                        onClick = {}),
                 interactionSource = interactionSource
-            ) {
-                Spacer(Modifier.size(30.dp))
-            }
+            ) { Spacer(Modifier.size(30.dp)) }
         }
 
         val interactions = mutableListOf<Interaction>()
 
-        scope!!.launch {
-            interactionSource.interactions.collect { interactions.add(it) }
-        }
+        scope!!.launch { interactionSource.interactions.collect { interactions.add(it) } }
 
-        rule.runOnIdle {
-            Truth.assertThat(interactions).isEmpty()
-        }
+        rule.runOnIdle { Truth.assertThat(interactions).isEmpty() }
 
-        rule.onNodeWithTag("card")
-            .performTouchInput { down(center) }
+        rule.onNodeWithTag("card").performTouchInput { down(center) }
 
         rule.runOnIdle {
             Truth.assertThat(interactions).hasSize(1)
             Truth.assertThat(interactions.first()).isInstanceOf(PressInteraction.Press::class.java)
         }
 
-        rule.onNodeWithTag("card")
-            .performTouchInput { up() }
+        rule.onNodeWithTag("card").performTouchInput { up() }
 
         rule.runOnIdle {
             Truth.assertThat(interactions).hasSize(2)
@@ -234,15 +197,11 @@ class CardTest {
                 Button(
                     modifier = Modifier.fillMaxSize().testTag("clickable"),
                     onClick = { state.value += 1 }
-                ) {
-                    Text("button fullscreen")
-                }
+                ) { Text("button fullscreen") }
                 Card(Modifier.fillMaxSize()) {}
             }
         }
-        rule.onNodeWithTag("clickable")
-            .assertHasClickAction()
-            .performClick()
+        rule.onNodeWithTag("clickable").assertHasClickAction().performClick()
         // still 0
         Truth.assertThat(state.value).isEqualTo(0)
     }
