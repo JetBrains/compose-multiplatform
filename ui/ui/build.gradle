@@ -177,6 +177,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.mockitoKotlin)
                 implementation(libs.robolectric)
                 implementation(project(":compose:ui:ui-test-junit4"))
+                implementation(project(":compose:ui:ui-test-font"))
                 implementation(project(":compose:test-utils"))
             }
 

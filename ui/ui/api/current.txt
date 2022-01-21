@@ -2813,6 +2813,9 @@ package androidx.compose.ui.state {
 
 package androidx.compose.ui.text.input {
 
+  public final class CursorAnchorInfoBuilderKt {
+  }
+
   public final class InputState_androidKt {
   }
 
