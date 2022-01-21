@@ -39,6 +39,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
+import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -195,7 +196,8 @@ private fun View.waitUntil(timeoutMillis: Long, condition: () -> Boolean) {
             if (condition()) { latch.countDown() }
         }
     )
-    latch.await(timeoutMillis, TimeUnit.MILLISECONDS)
+    val conditionMet = latch.await(timeoutMillis, TimeUnit.MILLISECONDS)
+    assertThat(conditionMet).isTrue()
 }
 
 @RequiresApi(Build.VERSION_CODES.R)
