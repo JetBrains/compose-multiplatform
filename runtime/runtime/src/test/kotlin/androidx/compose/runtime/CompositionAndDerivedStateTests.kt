@@ -16,6 +16,7 @@
 
 package androidx.compose.runtime
 
+import androidx.compose.runtime.mock.Linear
 import androidx.compose.runtime.mock.Text
 import androidx.compose.runtime.mock.compositionTest
 import androidx.compose.runtime.mock.expectChanges
@@ -317,20 +318,56 @@ class CompositionAndDerivedStateTests {
         advance()
         revalidate()
     }
+
+    @Test // Regression test for 215402574
+    fun observingBothNormalAndDerivedInSameScope() = compositionTest {
+        val a = mutableStateOf(0)
+        val b = derivedStateOf { a.value > 0 }
+        val c = mutableStateOf(false)
+
+        compose {
+            Linear {
+                if (b.value) Text("B is true")
+                if (c.value) Text("C is true")
+            }
+        }
+
+        validate {
+            Linear {
+                if (b.value) Text("B is true")
+                if (c.value) Text("C is true")
+            }
+        }
+
+        a.value++
+        expectChanges()
+        revalidate()
+
+        a.value++
+        advance()
+        revalidate()
+
+        a.value++
+        Snapshot.sendApplyNotifications()
+
+        c.value = true
+        advance()
+        revalidate()
+    }
 }
 
 @Composable
-fun DisplayItem(name: String, state: State<Int>) {
+private fun DisplayItem(name: String, state: State<Int>) {
     Text("$name = ${state.value}")
 }
 
 @Composable
-fun DisplayIndirect(name: String, state: State<Int>) {
+private fun DisplayIndirect(name: String, state: State<Int>) {
     DisplayItem(name, state)
 }
 
 @Composable
-fun Display(vararg names: Pair<String, State<Int>>) {
+private fun Display(vararg names: Pair<String, State<Int>>) {
     for ((name, state) in names) {
         DisplayIndirect(name, state)
     }
