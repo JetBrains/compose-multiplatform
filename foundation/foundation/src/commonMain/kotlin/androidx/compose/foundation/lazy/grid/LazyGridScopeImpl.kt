@@ -18,6 +18,7 @@ package androidx.compose.foundation.lazy.grid
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.GridItemSpan
+import androidx.compose.foundation.lazy.LazyGridItemScope
 import androidx.compose.foundation.lazy.LazyGridItemSpanScope
 import androidx.compose.foundation.lazy.LazyGridScope
 import androidx.compose.foundation.lazy.layout.MutableIntervalList
@@ -34,7 +35,7 @@ internal class LazyGridScopeImpl : LazyGridScope {
         key: Any?,
         span: (LazyGridItemSpanScope.() -> GridItemSpan)?,
         contentType: Any?,
-        content: @Composable () -> Unit
+        content: @Composable LazyGridItemScope.() -> Unit
     ) {
         intervals.add(
             1,
@@ -53,7 +54,7 @@ internal class LazyGridScopeImpl : LazyGridScope {
         key: ((index: Int) -> Any)?,
         span: (LazyGridItemSpanScope.(Int) -> GridItemSpan)?,
         contentType: (index: Int) -> Any?,
-        itemContent: @Composable (index: Int) -> Unit
+        itemContent: @Composable LazyGridItemScope.(index: Int) -> Unit
     ) {
         intervals.add(
             count,
@@ -73,5 +74,5 @@ internal class LazyGridIntervalContent(
     val key: ((index: Int) -> Any)?,
     val span: LazyGridItemSpanScope.(Int) -> GridItemSpan,
     val type: ((index: Int) -> Any?),
-    val content: (Int) -> (@Composable () -> Unit)
+    val content: LazyGridItemScope.(Int) -> (@Composable () -> Unit)
 )
