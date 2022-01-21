@@ -30,7 +30,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.SkikoView
+import org.jetbrains.skiko.SkiaRenderer
 import java.awt.Cursor
 import java.awt.Dimension
 import java.awt.Graphics
@@ -126,7 +126,7 @@ internal class ComposeLayer {
     }
 
     init {
-        _component.skikoView = object : SkikoView {
+        _component.renderer = object : SkiaRenderer {
             override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
                 try {
                     scene.render(canvas, nanoTime)
