@@ -1,10 +1,17 @@
 <idea-plugin>
     <id>org.jetbrains.compose.intellij.platform</id>
-    <name>Compose for IDE Base</name>
+    <!--suppress PluginXmlValidity ("plugin" is usually not approved in the IJ marketplace, but it's OK for US) -->
+    <name>Compose for IDE Plugin Development (Experimental)</name>
     <vendor>JetBrains</vendor>
     <description>
         <![CDATA[
-        An Intellij platform plugin for developing Intellij plugins with Compose framework
+        The plugin provides a shared base for developing IntelliJ plugins with the
+        <a href="https://www.jetbrains.com/lp/compose/">Compose</a> UI framework.
+
+        The plugin is in the early stages of development. Please use with caution!
+
+        For now, it only provides Compose classes and native libraries for use at runtime,
+        so that multiple IntelliJ plugins can share Compose classes and Skia bindings.
         ]]>
     </description>
 
