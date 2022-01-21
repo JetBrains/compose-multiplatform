@@ -82,7 +82,7 @@ class DesktopComposeTestRule : ComposeContentTestRule {
                 try {
                     base.evaluate()
                 } finally {
-                    runOnUiThread(scene::dispose)
+                    runOnUiThread(scene::close)
                 }
 
                 coroutineDispatcher.cleanupTestCoroutines()

@@ -101,7 +101,7 @@ class TestComposeWindow(
      * Clear-up all acquired resources and stop all pending work
      */
     fun dispose() {
-        scene.dispose()
+        scene.close()
         coroutineScope.cancel()
     }
 
