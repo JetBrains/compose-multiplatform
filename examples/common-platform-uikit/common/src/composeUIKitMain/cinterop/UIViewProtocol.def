@@ -1,0 +1,10 @@
+package = view.cinterop
+language = Objective-C
+---
+
+#import <Foundation/Foundation.h>
+#import <UIKit/UIView.h>
+
+@protocol UIViewWithOverrides
+- (void) didMoveToSuperview;
+@end
