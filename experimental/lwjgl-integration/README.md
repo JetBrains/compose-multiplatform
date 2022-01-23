@@ -31,7 +31,7 @@ val awtContainer = object : Container() {}
 
 // call it when your custom compose app changes winodw position
 fun onWindowUpdate(x: Int, y: Int, width: Int, height: Int) { 
-    awtContainer.setBounds(x, y, width, height);
+    awtContainer.setBounds(x, y, width, height)
 }
 
 CompositionLocalProvider(                                                                                 
