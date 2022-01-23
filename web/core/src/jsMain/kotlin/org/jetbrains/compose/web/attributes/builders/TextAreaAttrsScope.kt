@@ -5,13 +5,26 @@
 
 package org.jetbrains.compose.web.attributes.builders
 
-import org.jetbrains.compose.web.attributes.*
+import org.jetbrains.compose.web.attributes.AttrsScope
+import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
+import org.jetbrains.compose.web.attributes.ChangeEventListener
 import org.jetbrains.compose.web.attributes.EventsListenerScope.Companion.BEFOREINPUT
 import org.jetbrains.compose.web.attributes.EventsListenerScope.Companion.INPUT
+import org.jetbrains.compose.web.attributes.InputEventListener
+import org.jetbrains.compose.web.attributes.InputType
+import org.jetbrains.compose.web.attributes.SelectEventListener
+import org.jetbrains.compose.web.attributes.setInputValue
+import org.jetbrains.compose.web.attributes.setTextAreaDefaultValue
 import org.jetbrains.compose.web.events.SyntheticChangeEvent
-import org.jetbrains.compose.web.events.SyntheticSelectEvent
 import org.jetbrains.compose.web.events.SyntheticInputEvent
+import org.jetbrains.compose.web.events.SyntheticSelectEvent
 import org.w3c.dom.HTMLTextAreaElement
+
+@Deprecated(
+    message = "Renamed to TextAreaAttrsScope",
+    replaceWith = ReplaceWith("TextAreaAttrsScope", "org.jetbrains.compose.web.attributes.builders.TextAreaAttrsScope")
+)
+typealias TextAreaAttrsBuilder = TextAreaAttrsScope
 
 class TextAreaAttrsScope : AttrsScopeBuilder<HTMLTextAreaElement>() {
 
