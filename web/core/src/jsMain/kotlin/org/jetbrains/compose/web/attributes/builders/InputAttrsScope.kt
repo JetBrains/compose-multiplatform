@@ -15,6 +15,12 @@ import org.jetbrains.compose.web.events.SyntheticInputEvent
 import org.jetbrains.compose.web.events.SyntheticSelectEvent
 import org.w3c.dom.HTMLInputElement
 
+@Deprecated(
+    message = "Renamed to InputAttrsScope<T>",
+    replaceWith = ReplaceWith("InputAttrsScope", "org.jetbrains.compose.web.attributes.builders.InputAttrsScope")
+)
+typealias InputAttrsBuilder<T> = InputAttrsScope<T>
+
 /**
  * An extension of [AttrsScope].
  * This class provides a set of methods specific for [Input] element:
@@ -108,5 +114,3 @@ internal external interface JsWeakMap {
     fun has(key: Any): Boolean
     fun set(key: Any, value: Any): JsWeakMap
 }
-
-

@@ -14,6 +14,12 @@ import org.jetbrains.compose.web.events.SyntheticInputEvent
 import org.w3c.dom.HTMLSelectElement
 import org.w3c.dom.events.Event
 
+@Deprecated(
+    message = "Renamed to SelectAttrsScope",
+    replaceWith = ReplaceWith("SelectAttrsScope", "org.jetbrains.compose.web.attributes.builders.SelectAttrsScope")
+)
+typealias SelectAttrsBuilder = SelectAttrsScope
+
 class SelectAttrsScope : AttrsScopeBuilder<HTMLSelectElement>() {
 
     fun onInput(

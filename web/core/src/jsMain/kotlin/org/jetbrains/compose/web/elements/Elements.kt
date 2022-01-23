@@ -8,9 +8,9 @@ import org.jetbrains.compose.web.attributes.builders.*
 import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.StyleSheetBuilder
 import org.jetbrains.compose.web.css.StyleSheetBuilderImpl
+import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.jetbrains.compose.web.internal.runtime.DomApplier
 import org.jetbrains.compose.web.internal.runtime.DomNodeWrapper
-import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLAreaElement
@@ -23,8 +23,8 @@ import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLEmbedElement
 import org.w3c.dom.HTMLFieldSetElement
 import org.w3c.dom.HTMLFormElement
-import org.w3c.dom.HTMLHeadingElement
 import org.w3c.dom.HTMLHRElement
+import org.w3c.dom.HTMLHeadingElement
 import org.w3c.dom.HTMLIFrameElement
 import org.w3c.dom.HTMLImageElement
 import org.w3c.dom.HTMLInputElement
@@ -687,7 +687,7 @@ fun TextArea(
     TagElement(
         elementBuilder = TextArea,
         applyAttrs = {
-            val  textAreaAttrsBuilder = TextAreaAttrsScope()
+            val textAreaAttrsBuilder = TextAreaAttrsScope()
             textAreaAttrsBuilder.onInput {
                 // controlled state needs to be restored after every input
                 keyForRestoringControlledState.value = keyForRestoringControlledState.value + 1

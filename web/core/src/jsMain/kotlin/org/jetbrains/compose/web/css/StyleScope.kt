@@ -7,8 +7,8 @@
 
 package org.jetbrains.compose.web.css
 
-import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import kotlin.properties.ReadOnlyProperty
+import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 
 /**
  * StyleBuilder serves for two main purposes. Passed as a builder context (in [AttrsScope]), it
@@ -125,11 +125,14 @@ fun <TValue : StylePropertyValue> variable() =
     }
 
 interface StyleHolder {
+    @ComposeWebInternalApi
     val properties: StylePropertyList
+    @ComposeWebInternalApi
     val variables: StylePropertyList
 }
 
 interface StyleScope : StyleBuilder, StyleHolder {
+    @ComposeWebInternalApi
     fun copyFrom(sb: StyleScope)
 }
 

@@ -2,9 +2,9 @@ package org.jetbrains.compose.web.attributes
 
 import androidx.compose.runtime.DisposableEffectResult
 import androidx.compose.runtime.DisposableEffectScope
-import org.jetbrains.compose.web.css.StyleBuilder
-import org.jetbrains.compose.web.css.StyleScopeBuilder
 import org.jetbrains.compose.web.css.StyleScope
+import org.jetbrains.compose.web.css.StyleScopeBuilder
+import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 
@@ -19,10 +19,14 @@ import org.w3c.dom.HTMLElement
  *
  */
 interface AttrsScope<TElement : Element>: EventsListenerScope {
+    @ComposeWebInternalApi
     val attributesMap: Map<String, String>
+    @ComposeWebInternalApi
     val styleScope: StyleScope
     
+    @ComposeWebInternalApi
     val propertyUpdates: List<Pair<(Element, Any) -> Unit, Any>>
+    @ComposeWebInternalApi
     var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)?
     
     /**
