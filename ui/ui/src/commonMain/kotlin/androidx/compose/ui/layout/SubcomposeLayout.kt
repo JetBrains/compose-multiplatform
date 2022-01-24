@@ -141,18 +141,34 @@ interface SubcomposeMeasureScope : MeasureScope {
 /**
  * State used by [SubcomposeLayout].
  *
- * @param maxSlotsToRetainForReuse when non-zero the layout will keep active up to this count
- * slots which we were used but not used anymore instead of disposing them. Later when you try to
- * compose a new slot instead of creating a completely new slot the layout would reuse the
- * previous slot which allows to do less work especially if the slot contents are similar.
+ * [slotReusePolicy] the policy defining what slots should be retained to be reused later.
  */
 class SubcomposeLayoutState(
-    private val maxSlotsToRetainForReuse: Int
+    private val slotReusePolicy: SubcomposeSlotReusePolicy
 ) {
     /**
      * State used by [SubcomposeLayout].
      */
-    constructor() : this(0)
+    constructor() : this(NoOpSubcomposeSlotReusePolicy)
+
+    /**
+     * State used by [SubcomposeLayout].
+     *
+     * @param maxSlotsToRetainForReuse when non-zero the layout will keep active up to this count
+     * slots which we were used but not used anymore instead of disposing them. Later when you try to
+     * compose a new slot instead of creating a completely new slot the layout would reuse the
+     * previous slot which allows to do less work especially if the slot contents are similar.
+     */
+    @Deprecated(
+        "This constructor is deprecated",
+        ReplaceWith(
+            "SubcomposeLayoutState(SubcomposeSlotReusePolicy(maxSlotsToRetainForReuse))",
+            "androidx.compose.ui.layout.SubcomposeSlotReusePolicy"
+        )
+    )
+    constructor(maxSlotsToRetainForReuse: Int) : this(
+       SubcomposeSlotReusePolicy(maxSlotsToRetainForReuse)
+    )
 
     private var _state: LayoutNodeSubcompositionsState? = null
     private val state: LayoutNodeSubcompositionsState
@@ -162,13 +178,11 @@ class SubcomposeLayoutState(
 
     // Pre-allocated lambdas to update LayoutNode
     internal val setRoot: LayoutNode.(SubcomposeLayoutState) -> Unit = {
-        _state = subcompositionsState as? LayoutNodeSubcompositionsState
-            ?: LayoutNodeSubcompositionsState(this, maxSlotsToRetainForReuse).also {
+        _state =
+            subcompositionsState ?: LayoutNodeSubcompositionsState(this, slotReusePolicy).also {
                 subcompositionsState = it
             }
-        // it will keep up to maxSlotsToRetainForReuse currently attached reusable nodes.
-        // we do that because the new value of maxSlotsToRetainForReuse could be smaller.
-        state.disposeAfterIndex(0)
+        state.slotReusePolicy = slotReusePolicy
     }
     internal val setCompositionContext:
         LayoutNode.(CompositionContext) -> Unit =
@@ -215,6 +229,36 @@ class SubcomposeLayoutState(
 }
 
 /**
+ * This policy allows [SubcomposeLayout] to retain some of slots which we were used but not
+ * used anymore instead of disposing them. Next time when you try to compose a new slot instead of
+ * creating a completely new slot the layout would reuse the kept slot. This allows to do less
+ * work especially if the slot contents are similar.
+ */
+interface SubcomposeSlotReusePolicy {
+    /**
+     * This function will be called with [slotIds] mutable set initially populated with the slot
+     * ids available to reuse. You can remove from the set slots you don't want to retain so
+     * they are available to be reused in the future.
+     */
+    fun getSlotsToRetain(slotIds: MutableSet<Any?>)
+
+    /**
+     * Returns true if the content previously composed with [reusableSlotId] is compatible with
+     * the content which is going to be composed for [slotId].
+     * Slots could be considered incompatible if they display completely different types of the UI.
+     */
+    fun areCompatible(slotId: Any?, reusableSlotId: Any?): Boolean
+}
+
+/**
+ * Creates [SubcomposeSlotReusePolicy] which retains the fixed amount of slots.
+ *
+ * @param maxSlotsToRetainForReuse the [SubcomposeLayout] will retain up to this amount of slots.
+ */
+fun SubcomposeSlotReusePolicy(maxSlotsToRetainForReuse: Int): SubcomposeSlotReusePolicy =
+    FixedCountSubcomposeSlotReusePolicy(maxSlotsToRetainForReuse)
+
+/**
  * The inner state containing all the information about active slots and their compositions.
  * It is stored inside LayoutNode object as in fact we need to keep 1-1 mapping between this state
  * and the node: when we compose a slot we first create a virtual LayoutNode child to this node
@@ -223,11 +267,20 @@ class SubcomposeLayoutState(
  * when a new SubcomposeLayoutState is applied to SubcomposeLayout and even when the
  * SubcomposeLayout's LayoutNode is reused via the ReusableComposeNode mechanism.
  */
-private class LayoutNodeSubcompositionsState(
+internal class LayoutNodeSubcompositionsState(
     private val root: LayoutNode,
-    private val maxSlotsToRetainForReuse: Int
+    slotReusePolicy: SubcomposeSlotReusePolicy
 ) {
     var compositionContext: CompositionContext? = null
+
+    var slotReusePolicy: SubcomposeSlotReusePolicy = slotReusePolicy
+        set(value) {
+            if (field !== value) {
+                field = value
+                // apply the new policy
+                disposeOrReuseStartingFromIndex(0)
+            }
+        }
 
     private var currentIndex = 0
     private val nodeToNodeState = mutableMapOf<LayoutNode, NodeState>()
@@ -235,6 +288,7 @@ private class LayoutNodeSubcompositionsState(
     private val slotIdToNode = mutableMapOf<Any?, LayoutNode>()
     private val scope = Scope()
     private val precomposeMap = mutableMapOf<Any?, LayoutNode>()
+    private val reusableSlotIdsCache = mutableSetOf<Any?>()
 
     /**
      * `root.foldedChildren` list consist of:
@@ -261,10 +315,8 @@ private class LayoutNodeSubcompositionsState(
                 check(precomposedCount > 0)
                 precomposedCount--
                 precomposed
-            } else if (reusableCount > 0) {
-                takeNodeFromReusables(slotId)
             } else {
-                createNodeAt(currentIndex)
+                takeNodeFromReusables(slotId) ?: createNodeAt(currentIndex)
             }
         }
 
@@ -329,27 +381,36 @@ private class LayoutNodeSubcompositionsState(
             }
     }
 
-    fun disposeAfterIndex(currentIndex: Int) {
-        val precomposedNodesSectionStart = root.foldedChildren.size - precomposedCount
-        val reusableNodesSectionStart = maxOf(
-            currentIndex,
-            precomposedNodesSectionStart - maxSlotsToRetainForReuse
-        )
+    private fun getSlotIdAtIndex(index: Int): Any? {
+        val node = root.foldedChildren[index]
+        return nodeToNodeState[node]!!.slotId
+    }
 
-        // keep up to maxCountOfSlotsToReuse last nodes to be reused later
-        reusableCount = precomposedNodesSectionStart - reusableNodesSectionStart
-        for (i in reusableNodesSectionStart until reusableNodesSectionStart + reusableCount) {
-            val node = root.foldedChildren[i]
-            val state = nodeToNodeState[node]!!
-            // remove them from slotIdToNode so they are not considered active
-            slotIdToNode.remove(state.slotId)
-        }
+    fun disposeOrReuseStartingFromIndex(startIndex: Int) {
+        reusableCount = 0
+        val lastReusableIndex = root.foldedChildren.size - precomposedCount - 1
+        if (startIndex <= lastReusableIndex) {
+            // construct the set of available slot ids
+            reusableSlotIdsCache.clear()
+            for (i in startIndex..lastReusableIndex) {
+                reusableSlotIdsCache.add(getSlotIdAtIndex(i))
+            }
 
-        // dispose the rest of the nodes
-        val nodesToDispose = reusableNodesSectionStart - currentIndex
-        if (nodesToDispose > 0) {
-            ignoreRemeasureRequests {
-                root.removeAt(currentIndex, nodesToDispose)
+            slotReusePolicy.getSlotsToRetain(reusableSlotIdsCache)
+            // iterating backwards so it is easier to remove items
+            var i = lastReusableIndex
+            while (i >= startIndex) {
+                val slotId = getSlotIdAtIndex(i)
+                if (reusableSlotIdsCache.contains(slotId)) {
+                    reusableCount++
+                } else {
+                    ignoreRemeasureRequests {
+                        root.removeAt(i, 1)
+                    }
+                }
+                // remove it from slotIdToNode so it is not considered active
+                slotIdToNode.remove(slotId)
+                i--
             }
         }
 
@@ -364,31 +425,49 @@ private class LayoutNodeSubcompositionsState(
         }
     }
 
-    private fun takeNodeFromReusables(slotId: Any?): LayoutNode {
-        check(reusableCount > 0)
+    private fun takeNodeFromReusables(slotId: Any?): LayoutNode? {
+        if (reusableCount == 0) {
+            return null
+        }
         val reusableNodesSectionEnd = root.foldedChildren.size - precomposedCount
         val reusableNodesSectionStart = reusableNodesSectionEnd - reusableCount
-        var index = reusableNodesSectionStart
-        while (true) {
-            val node = root.foldedChildren[index]
-            val nodeState = nodeToNodeState.getValue(node)
-            if (nodeState.slotId == slotId) {
+        var index = reusableNodesSectionEnd - 1
+        var chosenIndex = -1
+        // first try to find a node with exactly the same slotId
+        while (index >= reusableNodesSectionStart) {
+            if (getSlotIdAtIndex(index) == slotId) {
                 // we have a node with the same slotId
-                break
-            } else if (index == reusableNodesSectionEnd - 1) {
-                // it is the last available reusable node
-                nodeState.slotId = slotId
+                chosenIndex = index
                 break
             } else {
-                index++
+                index--
             }
         }
-        if (index != reusableNodesSectionStart) {
-            // we need to rearrange the items
-            move(index, reusableNodesSectionStart, 1)
+        if (chosenIndex == -1) {
+            // try to find a first compatible slotId from the end of the section
+            index = reusableNodesSectionEnd - 1
+            while (index >= reusableNodesSectionStart) {
+                val node = root.foldedChildren[index]
+                val nodeState = nodeToNodeState[node]!!
+                if (slotReusePolicy.areCompatible(slotId, nodeState.slotId)) {
+                    nodeState.slotId = slotId
+                    chosenIndex = index
+                    break
+                }
+                index--
+            }
         }
-        reusableCount--
-        return root.foldedChildren[reusableNodesSectionStart]
+        return if (chosenIndex == -1) {
+            // no compatible nodes found
+            null
+        } else {
+            if (index != reusableNodesSectionStart) {
+                // we need to rearrange the items
+                move(index, reusableNodesSectionStart, 1)
+            }
+            reusableCount--
+            root.foldedChildren[reusableNodesSectionStart]
+        }
     }
 
     private fun disposeNode(node: LayoutNode) {
@@ -421,7 +500,7 @@ private class LayoutNodeSubcompositionsState(
                 override fun placeChildren() {
                     currentIndex = indexAfterMeasure
                     result.placeChildren()
-                    disposeAfterIndex(currentIndex)
+                    disposeOrReuseStartingFromIndex(currentIndex)
                 }
             }
         }
@@ -441,13 +520,13 @@ private class LayoutNodeSubcompositionsState(
         makeSureStateIsConsistent()
         if (!slotIdToNode.containsKey(slotId)) {
             val node = precomposeMap.getOrPut(slotId) {
-                if (reusableCount > 0) {
-                    val node = takeNodeFromReusables(slotId)
+                val reusedNode = takeNodeFromReusables(slotId)
+                if (reusedNode != null) {
                     // now move this node to the end where we keep precomposed items
-                    val nodeIndex = root.foldedChildren.indexOf(node)
+                    val nodeIndex = root.foldedChildren.indexOf(reusedNode)
                     move(nodeIndex, root.foldedChildren.size, 1)
                     precomposedCount++
-                    node
+                    reusedNode
                 } else {
                     createNodeAt(root.foldedChildren.size).also {
                         precomposedCount++
@@ -460,20 +539,15 @@ private class LayoutNodeSubcompositionsState(
             override fun dispose() {
                 val node = precomposeMap.remove(slotId)
                 if (node != null) {
-                    val itemIndex = root.foldedChildren.indexOf(node)
-                    check(itemIndex != -1)
-                    if (reusableCount < maxSlotsToRetainForReuse) {
-                        val reusableNodesSectionStart =
-                            root.foldedChildren.size - precomposedCount - reusableCount
-                        move(itemIndex, reusableNodesSectionStart, 1)
-                        reusableCount++
-                    } else {
-                        ignoreRemeasureRequests {
-                            root.removeAt(itemIndex, 1)
-                        }
-                    }
                     check(precomposedCount > 0)
+                    val itemIndex = root.foldedChildren.indexOf(node)
+                    check(itemIndex <= root.foldedChildren.size - precomposedCount)
+                    // move this item into the reusable section
+                    reusableCount++
                     precomposedCount--
+                    val reusableStart = root.foldedChildren.size - precomposedCount - reusableCount
+                    move(itemIndex, reusableStart, 1)
+                    disposeOrReuseStartingFromIndex(reusableStart)
                 }
             }
         }
@@ -526,4 +600,35 @@ private class LayoutNodeSubcompositionsState(
         override fun subcompose(slotId: Any?, content: @Composable () -> Unit) =
             this@LayoutNodeSubcompositionsState.subcompose(slotId, content)
     }
+}
+
+private class FixedCountSubcomposeSlotReusePolicy(
+    private val maxSlotsToRetainForReuse: Int
+) : SubcomposeSlotReusePolicy {
+
+    override fun getSlotsToRetain(slotIds: MutableSet<Any?>) {
+        if (slotIds.size > maxSlotsToRetainForReuse) {
+            var count = 0
+            with(slotIds.iterator()) {
+                // keep first maxSlotsToRetainForReuse items
+                while (hasNext()) {
+                    next()
+                    count++
+                    if (count > maxSlotsToRetainForReuse) {
+                        remove()
+                    }
+                }
+            }
+        }
+    }
+
+    override fun areCompatible(slotId: Any?, reusableSlotId: Any?): Boolean = true
+}
+
+private object NoOpSubcomposeSlotReusePolicy : SubcomposeSlotReusePolicy {
+    override fun getSlotsToRetain(slotIds: MutableSet<Any?>) {
+        slotIds.clear()
+    }
+
+    override fun areCompatible(slotId: Any?, reusableSlotId: Any?) = false
 }

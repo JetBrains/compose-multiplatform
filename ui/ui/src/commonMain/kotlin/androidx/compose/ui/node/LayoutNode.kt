@@ -37,6 +37,7 @@ import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.LayoutInfo
 import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.LayoutNodeSubcompositionsState
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.MeasureResult
@@ -588,7 +589,7 @@ internal class LayoutNode(
     /**
      * The inner state associated with [androidx.compose.ui.layout.SubcomposeLayout].
      */
-    internal var subcompositionsState: Any? = null
+    internal var subcompositionsState: LayoutNodeSubcompositionsState? = null
 
     /**
      * The inner-most layer wrapper. Used for performance for LayoutNodeWrapper.findLayer().
