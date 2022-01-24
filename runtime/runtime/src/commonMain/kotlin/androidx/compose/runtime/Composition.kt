@@ -335,6 +335,14 @@ internal class CompositionImpl(
     private val observations = IdentityScopeMap<RecomposeScopeImpl>()
 
     /**
+     * A set of scopes that were invalidated conditionally (that is they were invalidated by a
+     * [derivedStateOf] object) by a call from [recordModificationsOf]. They need to be held in the
+     * [observations] map until invalidations are drained for composition as a later call to
+     * [recordModificationsOf] might later cause them to be unconditionally invalidated.
+     */
+    private val conditionallyInvalidatedScopes = HashSet<RecomposeScopeImpl>()
+
+    /**
      * A map of object read during derived states to the corresponding derived state.
      */
     private val derivedStates = IdentityScopeMap<DerivedState<*>>()
@@ -446,9 +454,11 @@ internal class CompositionImpl(
                 // Do nothing, just start composing.
             }
             PendingApplyNoModifications -> error("pending composition has not been applied")
-            is Set<*> -> addPendingInvalidationsLocked(toRecord as Set<Any>)
+            is Set<*> -> {
+                addPendingInvalidationsLocked(toRecord as Set<Any>, forgetConditionalScopes = true)
+            }
             is Array<*> -> for (changed in toRecord as Array<Set<Any>>) {
-                addPendingInvalidationsLocked(changed)
+                addPendingInvalidationsLocked(changed, forgetConditionalScopes = true)
             }
             else -> error("corrupt pendingModifications drain: $pendingModifications")
         }
@@ -460,9 +470,11 @@ internal class CompositionImpl(
             PendingApplyNoModifications -> {
                 // No work to do
             }
-            is Set<*> -> addPendingInvalidationsLocked(toRecord as Set<Any>)
+            is Set<*> -> {
+                addPendingInvalidationsLocked(toRecord as Set<Any>, forgetConditionalScopes = false)
+            }
             is Array<*> -> for (changed in toRecord as Array<Set<Any>>) {
-                addPendingInvalidationsLocked(changed)
+                addPendingInvalidationsLocked(changed, forgetConditionalScopes = false)
             }
             null -> error(
                 "calling recordModificationsOf and applyChanges concurrently is not supported"
@@ -546,7 +558,7 @@ internal class CompositionImpl(
 
     override fun prepareCompose(block: () -> Unit) = composer.prepareCompose(block)
 
-    private fun addPendingInvalidationsLocked(values: Set<Any>) {
+    private fun addPendingInvalidationsLocked(values: Set<Any>, forgetConditionalScopes: Boolean) {
         var invalidated: HashSet<RecomposeScopeImpl>? = null
 
         fun invalidate(value: Any) {
@@ -555,11 +567,15 @@ internal class CompositionImpl(
                     !observationsProcessed.remove(value, scope) &&
                     scope.invalidateForResult(value) != InvalidationResult.IGNORED
                 ) {
-                    val set = invalidated
-                        ?: HashSet<RecomposeScopeImpl>().also {
-                            invalidated = it
-                        }
-                    set.add(scope)
+                    if (scope.isConditional && !forgetConditionalScopes) {
+                        conditionallyInvalidatedScopes.add(scope)
+                    } else {
+                        val set = invalidated
+                            ?: HashSet<RecomposeScopeImpl>().also {
+                                invalidated = it
+                            }
+                        set.add(scope)
+                    }
                 }
             }
         }
@@ -574,8 +590,16 @@ internal class CompositionImpl(
                 }
             }
         }
-        invalidated?.let {
-            observations.removeValueIf { scope -> scope in it }
+
+        if (forgetConditionalScopes && conditionallyInvalidatedScopes.isNotEmpty()) {
+            observations.removeValueIf { scope ->
+                scope in conditionallyInvalidatedScopes || invalidated?.let { scope in it } == true
+            }
+            conditionallyInvalidatedScopes.clear()
+        } else {
+            invalidated?.let {
+                observations.removeValueIf { scope -> scope in it }
+            }
         }
     }
 
