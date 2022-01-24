@@ -54,6 +54,7 @@ object LibraryGroups {
     val ENTERPRISE = LibraryGroup("androidx.enterprise", LibraryVersions.ENTERPRISE)
     val EXIFINTERFACE = LibraryGroup("androidx.exifinterface", LibraryVersions.EXIFINTERFACE)
     val FRAGMENT = LibraryGroup("androidx.fragment", LibraryVersions.FRAGMENT)
+    val GLANCE_TEMPLATE = LibraryGroup("androidx.template", LibraryVersions.GLANCE_TEMPLATE)
     val GLANCE = LibraryGroup("androidx.glance", LibraryVersions.GLANCE)
     val GRAPHICS = LibraryGroup("androidx.graphics", LibraryVersions.GRAPHICS)
     val GRIDLAYOUT = LibraryGroup("androidx.gridlayout", LibraryVersions.GRIDLAYOUT)
