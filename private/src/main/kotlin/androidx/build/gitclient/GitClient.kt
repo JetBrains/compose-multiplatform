@@ -121,7 +121,7 @@ data class GitCommitRange(
 /**
  * Class implementation of a git commit.  It uses the input delimiters to parse the commit
  *
- * @property gitCommit a string representation of a git commit
+ * @property formattedCommitText a string representation of a git commit
  * @property projectDir the project directory for which to parse file paths from a commit
  * @property commitSHADelimiter the term to use to search for the commit SHA
  * @property subjectDelimiter the term to use to search for the subject (aka commit summary)
@@ -130,7 +130,7 @@ data class GitCommitRange(
  * @property authorEmailDelimiter the term to use to search for the author email
  */
 data class Commit(
-    val gitCommit: String,
+    val formattedCommitText: String,
     val projectDir: String,
     private val commitSHADelimiter: String = "_CommitSHA:",
     private val subjectDelimiter: String = "_Subject:",
@@ -150,7 +150,7 @@ data class Commit(
     )
 
     init {
-        val listedCommit: List<String> = gitCommit.split('\n')
+        val listedCommit: List<String> = formattedCommitText.split('\n')
         listedCommit.filter { line -> line.trim() != "" }.forEach { line ->
             processCommitLine(line)
         }
@@ -184,7 +184,7 @@ data class Commit(
         }
         releaseNoteDelimiters.forEach { delimiter ->
             if (delimiter in line) {
-                getReleaseNotesFromGitLine(line, gitCommit)
+                getReleaseNotesFromGitLine(line, formattedCommitText)
                 return
             }
         }
@@ -270,7 +270,7 @@ data class Commit(
      *                  the commit cannot be explained in one line"
      * `release notes: "This is a one-line release note.  The quotes can be used this way too"`
      */
-    private fun getReleaseNotesFromGitLine(line: String, gitCommit: String) {
+    private fun getReleaseNotesFromGitLine(line: String, formattedCommitText: String) {
         /* Account for the use of quotes in a release note line
          * No quotes in the Release Note line means it's a one-line release note
          * If there are quotes, assume it's a multi-line release note
@@ -285,21 +285,22 @@ data class Commit(
             releaseNoteDelimiters.forEach { delimiter ->
                 if (delimiter in line) {
                     // Find the starting quote of the release notes quote block
-                    var releaseNoteStartIndex = gitCommit.lastIndexOf(delimiter) + delimiter.length
-                    releaseNoteStartIndex = gitCommit.indexOf('"', releaseNoteStartIndex)
+                    var releaseNoteStartIndex = formattedCommitText.lastIndexOf(delimiter)
+                    + delimiter.length
+                    releaseNoteStartIndex = formattedCommitText.indexOf('"', releaseNoteStartIndex)
                     // Move to the character after the first quote
-                    if (gitCommit[releaseNoteStartIndex] == '"') {
+                    if (formattedCommitText[releaseNoteStartIndex] == '"') {
                         releaseNoteStartIndex++
                     }
                     // Find the ending quote of the release notes quote block
                     var releaseNoteEndIndex = releaseNoteStartIndex + 1
-                    releaseNoteEndIndex = gitCommit.indexOf('"', releaseNoteEndIndex)
+                    releaseNoteEndIndex = formattedCommitText.indexOf('"', releaseNoteEndIndex)
                     // If there is no closing quote, just use the first line
                     if (releaseNoteEndIndex < 0) {
                         getOneLineReleaseNotesFromGitLine(line)
                         return
                     }
-                    releaseNote = gitCommit.substring(
+                    releaseNote = formattedCommitText.substring(
                         startIndex = releaseNoteStartIndex,
                         endIndex = releaseNoteEndIndex
                     ).trim()
