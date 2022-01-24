@@ -69,7 +69,6 @@ object LibraryGroups {
     val LIBYUV = LibraryGroup("libyuv", LibraryVersions.LIBYUV)
     val LIFECYCLE = LibraryGroup("androidx.lifecycle", LibraryVersions.LIFECYCLE)
     val LOADER = LibraryGroup("androidx.loader", LibraryVersions.LOADER)
-    val LOCALBROADCASTMANAGER = LibraryGroup("androidx.localbroadcastmanager", LibraryVersions.LOCALBROADCASTMANAGER)
     val MEDIA = LibraryGroup("androidx.media", null)
     val MEDIA2 = LibraryGroup("androidx.media2", LibraryVersions.MEDIA2)
     val MEDIAROUTER = LibraryGroup("androidx.mediarouter", LibraryVersions.MEDIAROUTER)
