@@ -147,7 +147,7 @@ class ChangeInfoGitClient(
         }
         var latestCommit: String? = parseSupportVersion(versionInfo)
         if (latestCommit != null) {
-            return listOf(Commit(latestCommit, fullProjectDir.toString()))
+            return listOf(Commit("_CommitSHA:$latestCommit", fullProjectDir.toString()))
         }
         return listOf()
     }
