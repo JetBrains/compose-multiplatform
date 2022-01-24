@@ -34,39 +34,47 @@ internal class LazyListScopeImpl : LazyListScope {
     override fun items(
         count: Int,
         key: ((index: Int) -> Any)?,
+        contentType: (index: Int) -> Any?,
         itemContent: @Composable LazyItemScope.(index: Int) -> Unit
     ) {
         _intervals.add(
             count,
             LazyListIntervalContent(
                 key = key,
+                type = contentType,
                 content = { index -> @Composable { itemContent(index) } }
             )
         )
     }
 
-    override fun item(key: Any?, content: @Composable LazyItemScope.() -> Unit) {
+    override fun item(key: Any?, contentType: Any?, content: @Composable LazyItemScope.() -> Unit) {
         _intervals.add(
             1,
             LazyListIntervalContent(
                 key = if (key != null) { _: Int -> key } else null,
+                type = { contentType },
                 content = { @Composable { content() } }
             )
         )
     }
 
     @ExperimentalFoundationApi
-    override fun stickyHeader(key: Any?, content: @Composable LazyItemScope.() -> Unit) {
+    override fun stickyHeader(
+        key: Any?,
+        contentType: Any?,
+        content: @Composable LazyItemScope.() -> Unit
+    ) {
         val headersIndexes = _headerIndexes ?: mutableListOf<Int>().also {
             _headerIndexes = it
         }
         headersIndexes.add(_intervals.totalSize)
 
-        item(key, content)
+        item(key, contentType, content)
     }
 }
 
 internal class LazyListIntervalContent(
     val key: ((index: Int) -> Any)?,
+    val type: ((index: Int) -> Any?),
     val content: LazyItemScope.(index: Int) -> @Composable () -> Unit
 )
