@@ -415,12 +415,18 @@ package androidx.compose.foundation.lazy {
   }
 
   public interface LazyListLayoutInfo {
+    method public default androidx.compose.foundation.gestures.Orientation getOrientation();
+    method public default boolean getReverseLayout();
     method public int getTotalItemsCount();
     method public int getViewportEndOffset();
+    method public default long getViewportSize();
     method public int getViewportStartOffset();
     method public java.util.List<androidx.compose.foundation.lazy.LazyListItemInfo> getVisibleItemsInfo();
+    property public default androidx.compose.foundation.gestures.Orientation orientation;
+    property public default boolean reverseLayout;
     property public abstract int totalItemsCount;
     property public abstract int viewportEndOffset;
+    property public default long viewportSize;
     property public abstract int viewportStartOffset;
     property public abstract java.util.List<androidx.compose.foundation.lazy.LazyListItemInfo> visibleItemsInfo;
   }
