@@ -30,9 +30,8 @@ import androidx.compose.ui.unit.Density
 @Composable
 internal fun rememberItemContentFactory(state: LazyLayoutState): LazyLayoutItemContentFactory {
     val saveableStateHolder = rememberSaveableStateHolder()
-    val itemsProvider = state.itemsProvider
-    return remember(itemsProvider) {
-        LazyLayoutItemContentFactory(saveableStateHolder, itemsProvider)
+    return remember(state) {
+        LazyLayoutItemContentFactory(saveableStateHolder) { state.itemsProvider.invoke() }
     }
 }
 
@@ -71,14 +70,34 @@ internal class LazyLayoutItemContentFactory(
     }
 
     /**
+     * Returns the content type for the item with the given key. It is used to improve the item
+     * compositions reusing efficiency.
+     **/
+    fun getContentType(key: Any?): Any? {
+        val cachedContent = lambdasCache[key]
+        return if (cachedContent != null) {
+            cachedContent.type
+        } else {
+            val itemProvider = itemsProvider()
+            val index = itemProvider.keyToIndexMap[key]
+            if (index != null) {
+                itemProvider.getContentType(index)
+            } else {
+                null
+            }
+        }
+    }
+
+    /**
      * Return cached item content lambda or creates a new lambda and puts it in the cache.
      */
     fun getContent(index: Int, key: Any): @Composable () -> Unit {
-        val cachedContent = lambdasCache[key]
-        return if (cachedContent != null && cachedContent.lastKnownIndex == index) {
-            cachedContent.content
+        val cached = lambdasCache[key]
+        val type = itemsProvider().getContentType(index)
+        return if (cached != null && cached.lastKnownIndex == index && cached.type == type) {
+            cached.content
         } else {
-            val newContent = CachedItemContent(index, key)
+            val newContent = CachedItemContent(index, key, type)
             lambdasCache[key] = newContent
             newContent.content
         }
@@ -86,7 +105,8 @@ internal class LazyLayoutItemContentFactory(
 
     private inner class CachedItemContent(
         initialIndex: Int,
-        val key: Any
+        val key: Any,
+        val type: Any?
     ) {
         var lastKnownIndex by mutableStateOf(initialIndex)
             private set

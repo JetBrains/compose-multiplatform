@@ -101,6 +101,9 @@ internal class LazyGridItemsProviderImpl(
 
     override val keyToIndexMap: Map<Any, Int> = generateKeyToIndexMap(nearestItemsRange, intervals)
 
+    // TODO(b/215372836) add content types support for grids.
+    override fun getContentType(index: Int): Any? = null
+
     private fun getIntervalForIndex(itemIndex: Int) = lastInterval.let {
         if (it != null && itemIndex in it.startIndex until it.startIndex + it.size) {
             it
