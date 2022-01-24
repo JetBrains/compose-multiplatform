@@ -14,8 +14,8 @@ buildscript {
 }
 
 plugins {
-    kotlin("multiplatform") version "1.6.10"
-    id("org.jetbrains.compose") version "1.1.0-beta04"
+    kotlin("multiplatform")
+    id("org.jetbrains.compose")
 }
 
 version = "1.0-SNAPSHOT"
@@ -23,9 +23,9 @@ version = "1.0-SNAPSHOT"
 repositories {
     mavenLocal()
     mavenCentral()
-    google()
+    gradlePluginPortal()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-}
+    google()}
 
 kotlin {
     jvm("desktop")

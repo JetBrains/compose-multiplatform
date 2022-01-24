@@ -1,12 +1,20 @@
 pluginManagement {
     repositories {
         mavenLocal()
-        gradlePluginPortal()
         mavenCentral()
-        maven { url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev") }
+        gradlePluginPortal()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         google()
     }
 
+    plugins {
+        val kotlinVersion = extra["kotlin.version"] as String
+        kotlin("multiplatform").version(kotlinVersion)
+
+        val composeVersion = extra["compose.version"] as String
+        id("org.jetbrains.compose").version(composeVersion)
+    }
 }
+
 rootProject.name = "falling-balls-mpp"
 
