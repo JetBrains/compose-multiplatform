@@ -24,12 +24,12 @@ CompositionLocalProvider(
 
 
 ### Popup
-Since Compose still use some awt events (https://github.com/JetBrains/compose-jb/issues/1736), you can provide a fake contaniner.
+Since Compose still use some AWT events (https://github.com/JetBrains/compose-jb/issues/1736), you can provide a fake contaniner.
 
 ```kotlin
 val awtContainer = object : Container() {}
 
-// call it when your custom compose app changes winodw position
+// call it when your custom compose app changes window position
 fun onWindowUpdate(x: Int, y: Int, width: Int, height: Int) { 
     awtContainer.setBounds(x, y, width, height)
 }
