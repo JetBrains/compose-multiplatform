@@ -126,7 +126,7 @@ internal class SkiaLayer(
             return 0f <= x && x < size.width && 0f <= y && y < size.height
         }
 
-        return isInOutline(outlineCache.outline!!, x, y)
+        return isInOutline(outlineCache.outline, x, y)
     }
 
     private fun getMatrix(inverse: Boolean): Matrix {
@@ -237,9 +237,6 @@ internal class SkiaLayer(
                     is Outline.Rectangle -> canvas.clipRect(outline.rect)
                     is Outline.Rounded -> canvas.clipRoundRect(outline.roundRect)
                     is Outline.Generic -> canvas.clipPath(outline.path)
-                    null -> {
-                        // Nothing
-                    }
                 }
             }
 
