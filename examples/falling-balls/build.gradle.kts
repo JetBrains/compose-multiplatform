@@ -7,7 +7,7 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-group = "me.user"
+group = "org.jetbrains.compose.demo.falling"
 version = "1.0"
 
 repositories {
