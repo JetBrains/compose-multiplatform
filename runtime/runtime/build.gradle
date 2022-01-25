@@ -87,15 +87,18 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             }
 
             commonTest.dependencies {
-                implementation(kotlin("test-junit"))
+                implementation kotlin("test")
                 implementation(libs.kotlinCoroutinesTest)
             }
 
-            androidAndroidTest.dependencies {
-                implementation(libs.testExtJunit)
-                implementation(libs.testRules)
-                implementation(libs.testRunner)
-                implementation(libs.truth)
+            androidAndroidTest {
+                dependsOn(jvmTest)
+                dependencies {
+                    implementation(libs.testExtJunit)
+                    implementation(libs.testRules)
+                    implementation(libs.testRunner)
+                    implementation(libs.truth)
+                }
             }
         }
     }
