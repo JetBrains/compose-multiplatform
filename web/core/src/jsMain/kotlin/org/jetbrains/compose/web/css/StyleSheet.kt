@@ -168,7 +168,8 @@ internal fun buildCSS(
 }
 
 @Composable
-fun Style(
+@Suppress("NOTHING_TO_INLINE")
+inline fun Style(
     styleSheet: CSSRulesHolder
 ) {
     Style(cssRules = styleSheet.cssRules)
