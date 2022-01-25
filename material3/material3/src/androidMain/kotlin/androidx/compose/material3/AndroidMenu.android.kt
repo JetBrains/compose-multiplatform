@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,12 +33,10 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 
 /**
- * <a href="https://material.io/components/menus#dropdown-menu" class="external" target="_blank">Material Design dropdown menu</a>.
+ * <a href="https://m3.material.io/components/menus/overview" class="external" target="_blank">Material Design dropdown menu</a>.
  *
  * A dropdown menu is a compact way of displaying multiple choices. It appears upon interaction with
  * an element (such as an icon or button) or when users perform a specific action.
- *
- * ![Menus image](https://developer.android.com/images/reference/androidx/compose/material/menus.png)
  *
  * A [DropdownMenu] behaves similarly to a [Popup], and will use the position of the parent layout
  * to position itself on screen. Commonly a [DropdownMenu] will be placed in a [Box] with a sibling
@@ -63,7 +60,7 @@ import androidx.compose.ui.window.PopupProperties
  * be applied in the direction in which the menu will decide to expand.
  *
  * Example usage:
- * @sample androidx.compose.material.samples.MenuSample
+ * @sample androidx.compose.material3.samples.MenuSample
  *
  * @param expanded Whether the menu is currently open and visible to the user
  * @param onDismissRequest Called when the user requests to dismiss the menu, such as by
@@ -109,16 +106,22 @@ fun DropdownMenu(
 }
 
 /**
- * <a href="https://material.io/components/menus#dropdown-menu" class="external" target="_blank">Material Design dropdown menu</a> item.
+ * <a href="https://m3.material.io/components/menus/overview" class="external" target="_blank">Material Design dropdown menu</a> item.
  *
  *
  * Example usage:
- * @sample androidx.compose.material.samples.MenuSample
+ * @sample androidx.compose.material3.samples.MenuSample
  *
+ * @param text The menu item text
  * @param onClick Called when the menu item was clicked
  * @param modifier The modifier to be applied to the menu item
+ * @param leadingIcon Optional leading icon to be displayed at the beginning of the item's text
+ * @param trailingIcon Optional trailing icon to be displayed at the end of the item's text. This
+ * trailing icon slot can also accept [Text] to indicate a keyboard shortcut, for example.
  * @param enabled Controls the enabled state of the menu item - when `false`, the menu item
  * will not be clickable and [onClick] will not be invoked
+ * @param colors [MenuItemColors] that will be used to resolve the background and content color for
+ * this item in different states. See [MenuDefaults.itemColors].
  * @param contentPadding the padding applied to the content of this menu item
  * @param interactionSource the [MutableInteractionSource] representing the stream of
  * [Interaction]s for this DropdownMenuItem. You can create and pass in your own remembered
@@ -127,19 +130,25 @@ fun DropdownMenu(
  */
 @Composable
 fun DropdownMenuItem(
+    text: @Composable () -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
     enabled: Boolean = true,
+    colors: MenuItemColors = MenuDefaults.itemColors(),
     contentPadding: PaddingValues = MenuDefaults.DropdownMenuItemContentPadding,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    content: @Composable RowScope.() -> Unit
 ) {
     DropdownMenuItemContent(
+        text = text,
         onClick = onClick,
         modifier = modifier,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
         enabled = enabled,
+        colors = colors,
         contentPadding = contentPadding,
         interactionSource = interactionSource,
-        content = content
     )
 }

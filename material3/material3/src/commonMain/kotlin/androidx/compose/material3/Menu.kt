@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,15 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
@@ -36,14 +37,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.tokens.MenuTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Density
@@ -113,14 +118,17 @@ internal fun DropdownMenuContent(
             0f
         }
     }
-    Card(
+    Surface(
         modifier = Modifier.graphicsLayer {
             scaleX = scale
             scaleY = scale
             this.alpha = alpha
             transformOrigin = transformOriginState.value
         },
-        elevation = MenuElevation
+        shape = MenuTokens.ContainerShape,
+        color = MaterialTheme.colorScheme.fromToken(MenuTokens.ContainerColor),
+        tonalElevation = MenuTokens.ContainerElevation,
+        shadowElevation = MenuTokens.ContainerElevation
     ) {
         Column(
             modifier = modifier
@@ -134,14 +142,16 @@ internal fun DropdownMenuContent(
 
 @Composable
 internal fun DropdownMenuItemContent(
+    text: @Composable () -> Unit,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    contentPadding: PaddingValues = MenuDefaults.DropdownMenuItemContentPadding,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    content: @Composable RowScope.() -> Unit
+    modifier: Modifier,
+    leadingIcon: @Composable (() -> Unit)?,
+    trailingIcon: @Composable (() -> Unit)?,
+    enabled: Boolean,
+    colors: MenuItemColors,
+    contentPadding: PaddingValues,
+    interactionSource: MutableInteractionSource
 ) {
-    // TODO(popam, b/156911853): investigate replacing this Row with ListItem
     Row(
         modifier = modifier
             .clickable(
@@ -155,16 +165,48 @@ internal fun DropdownMenuItemContent(
             .sizeIn(
                 minWidth = DropdownMenuItemDefaultMinWidth,
                 maxWidth = DropdownMenuItemDefaultMaxWidth,
-                minHeight = DropdownMenuItemDefaultMinHeight
+                minHeight = MenuTokens.ListItemContainerHeight
             )
             .padding(contentPadding),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val typography = MaterialTheme.typography
-        ProvideTextStyle(typography.subtitle1) {
-            val contentAlpha = if (enabled) ContentAlpha.high else ContentAlpha.disabled
-            CompositionLocalProvider(LocalContentAlpha provides contentAlpha) {
-                content()
+        ProvideTextStyle(MaterialTheme.typography.fromToken(MenuTokens.ListItemLabelTextFont)) {
+            if (leadingIcon != null) {
+                CompositionLocalProvider(
+                    LocalContentColor provides colors.leadingIconColor(enabled).value,
+                ) {
+                    Box(Modifier.defaultMinSize(minWidth = MenuTokens.ListItemLeadingIconSize)) {
+                        leadingIcon()
+                    }
+                }
+            }
+            CompositionLocalProvider(LocalContentColor provides colors.textColor(enabled).value) {
+                Box(
+                    Modifier.weight(1f)
+                        .padding(
+                            start = if (leadingIcon != null) {
+                                DropdownMenuItemHorizontalPadding
+                            } else {
+                                0.dp
+                            },
+                            end = if (trailingIcon != null) {
+                                DropdownMenuItemHorizontalPadding
+                            } else {
+                                0.dp
+                            }
+                        )
+                ) {
+                    text()
+                }
+            }
+            if (trailingIcon != null) {
+                CompositionLocalProvider(
+                    LocalContentColor provides colors.trailingIconColor(enabled).value
+                ) {
+                    Box(Modifier.defaultMinSize(minWidth = MenuTokens.ListItemTrailingIconSize)) {
+                        trailingIcon()
+                    }
+                }
             }
         }
     }
@@ -174,6 +216,43 @@ internal fun DropdownMenuItemContent(
  * Contains default values used for [DropdownMenuItem].
  */
 object MenuDefaults {
+
+    /**
+     * Creates a [MenuItemColors] that represents the default text and icon colors used in a
+     * [DropdownMenuItemContent].
+     *
+     * @param textColor the text color of this [DropdownMenuItemContent] when enabled
+     * @param leadingIconColor the leading icon color of this [DropdownMenuItemContent] when enabled
+     * @param trailingIconColor the trailing icon color of this [DropdownMenuItemContent] when
+     * enabled
+     * @param disabledTextColor the text color of this [DropdownMenuItemContent] when not enabled
+     * @param disabledLeadingIconColor the leading icon color of this [DropdownMenuItemContent] when
+     * not enabled
+     * @param disabledTrailingIconColor the trailing icon color of this [DropdownMenuItemContent]
+     * when not enabled
+     */
+    @Composable
+    fun itemColors(
+        textColor: Color = MenuTokens.ListItemLabelTextColor.toColor(),
+        leadingIconColor: Color = MenuTokens.ListItemLeadingIconColor.toColor(),
+        trailingIconColor: Color = MenuTokens.ListItemTrailingIconColor.toColor(),
+        disabledTextColor: Color =
+            MenuTokens.ListItemDisabledLabelTextColor.toColor()
+                .copy(alpha = MenuTokens.ListItemDisabledLabelTextOpacity),
+        disabledLeadingIconColor: Color = MenuTokens.ListItemDisabledLeadingIconColor.toColor()
+            .copy(alpha = MenuTokens.ListItemDisabledLeadingIconOpacity),
+        disabledTrailingIconColor: Color = MenuTokens.ListItemDisabledTrailingIconColor.toColor()
+            .copy(alpha = MenuTokens.ListItemDisabledTrailingIconOpacity),
+    ): MenuItemColors =
+        DefaultMenuItemColors(
+            textColor = textColor,
+            leadingIconColor = leadingIconColor,
+            trailingIconColor = trailingIconColor,
+            disabledTextColor = disabledTextColor,
+            disabledLeadingIconColor = disabledLeadingIconColor,
+            disabledTrailingIconColor = disabledTrailingIconColor,
+        )
+
     /**
      * Default padding used for [DropdownMenuItem].
      */
@@ -183,18 +262,38 @@ object MenuDefaults {
     )
 }
 
-// Size defaults.
-private val MenuElevation = 8.dp
-internal val MenuVerticalMargin = 48.dp
-private val DropdownMenuItemHorizontalPadding = 16.dp
-internal val DropdownMenuVerticalPadding = 8.dp
-private val DropdownMenuItemDefaultMinWidth = 112.dp
-private val DropdownMenuItemDefaultMaxWidth = 280.dp
-private val DropdownMenuItemDefaultMinHeight = 48.dp
+/**
+ * Represents the text and icon colors used in a menu item at different states.
+ *
+ * - See [MenuDefaults.itemColors] for the default colors used in a [DropdownMenuItemContent].
+ */
+@Stable
+interface MenuItemColors {
 
-// Menu open/close animation.
-internal const val InTransitionDuration = 120
-internal const val OutTransitionDuration = 75
+    /**
+     * Represents the text color for a menu item, depending on its [enabled] state.
+     *
+     * @param enabled whether the menu item is enabled
+     */
+    @Composable
+    fun textColor(enabled: Boolean): State<Color>
+
+    /**
+     * Represents the leading icon color for a menu item, depending on its [enabled] state.
+     *
+     * @param enabled whether the menu item is enabled
+     */
+    @Composable
+    fun leadingIconColor(enabled: Boolean): State<Color>
+
+    /**
+     * Represents the trailing icon color for a menu item, depending on its [enabled] state.
+     *
+     * @param enabled whether the menu item is enabled
+     */
+    @Composable
+    fun trailingIconColor(enabled: Boolean): State<Color>
+}
 
 internal fun calculateTransformOrigin(
     parentBounds: IntRect,
@@ -295,3 +394,67 @@ internal data class DropdownMenuPositionProvider(
         return IntOffset(x, y)
     }
 }
+
+/** Default [MenuItemColors] implementation. */
+@Immutable
+private class DefaultMenuItemColors(
+    private val textColor: Color,
+    private val leadingIconColor: Color,
+    private val trailingIconColor: Color,
+    private val disabledTextColor: Color,
+    private val disabledLeadingIconColor: Color,
+    private val disabledTrailingIconColor: Color,
+) : MenuItemColors {
+
+    @Composable
+    override fun textColor(enabled: Boolean): State<Color> {
+        return rememberUpdatedState(if (enabled) textColor else disabledTextColor)
+    }
+
+    @Composable
+    override fun leadingIconColor(enabled: Boolean): State<Color> {
+        return rememberUpdatedState(if (enabled) leadingIconColor else disabledLeadingIconColor)
+    }
+
+    @Composable
+    override fun trailingIconColor(enabled: Boolean): State<Color> {
+        return rememberUpdatedState(if (enabled) trailingIconColor else disabledTrailingIconColor)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as DefaultMenuItemColors
+
+        if (textColor != other.textColor) return false
+        if (leadingIconColor != other.leadingIconColor) return false
+        if (trailingIconColor != other.trailingIconColor) return false
+        if (disabledTextColor != other.disabledTextColor) return false
+        if (disabledLeadingIconColor != other.disabledLeadingIconColor) return false
+        if (disabledTrailingIconColor != other.disabledTrailingIconColor) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = textColor.hashCode()
+        result = 31 * result + leadingIconColor.hashCode()
+        result = 31 * result + trailingIconColor.hashCode()
+        result = 31 * result + disabledTextColor.hashCode()
+        result = 31 * result + disabledLeadingIconColor.hashCode()
+        result = 31 * result + disabledTrailingIconColor.hashCode()
+        return result
+    }
+}
+
+// Size defaults.
+internal val MenuVerticalMargin = 48.dp
+private val DropdownMenuItemHorizontalPadding = 12.dp
+internal val DropdownMenuVerticalPadding = 8.dp
+private val DropdownMenuItemDefaultMinWidth = 112.dp
+private val DropdownMenuItemDefaultMaxWidth = 280.dp
+
+// Menu open/close animation.
+internal const val InTransitionDuration = 120
+internal const val OutTransitionDuration = 75

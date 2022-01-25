@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ package androidx.compose.material3
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -36,11 +36,11 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntRect
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -66,9 +66,10 @@ class MenuTest {
                     expanded = expanded,
                     onDismissRequest = {}
                 ) {
-                    DropdownMenuItem(modifier = Modifier.testTag("MenuContent"), onClick = {}) {
-                        Text("Option 1")
-                    }
+                    DropdownMenuItem(
+                        text = { Text("Option 1") },
+                        modifier = Modifier.testTag("MenuContent"),
+                        onClick = {})
                 }
             }
         }
@@ -233,8 +234,8 @@ class MenuTest {
         val popupSize = IntSize(150, 500)
 
         // The min margin above and below the menu, relative to the screen.
-        val MenuVerticalMargin = 48.dp
-        val verticalMargin = with(density) { MenuVerticalMargin.roundToPx() }
+        val menuVerticalMargin = 48.dp
+        val verticalMargin = with(density) { menuVerticalMargin.roundToPx() }
 
         val position = DropdownMenuPositionProvider(
             DpOffset(0.dp, 0.dp),
@@ -263,8 +264,8 @@ class MenuTest {
         val popupSize = IntSize(150, 500)
 
         // The min margin above and below the menu, relative to the screen.
-        val MenuVerticalMargin = 48.dp
-        val verticalMargin = with(density) { MenuVerticalMargin.roundToPx() }
+        val menuVerticalMargin = 48.dp
+        val verticalMargin = with(density) { menuVerticalMargin.roundToPx() }
 
         val position = DropdownMenuPositionProvider(
             DpOffset(0.dp, 0.dp),
@@ -340,50 +341,16 @@ class MenuTest {
     }
 
     @Test
-    fun dropdownMenuItem_emphasis() {
-        var onSurface = Color.Unspecified
-        var enabledContentColor = Color.Unspecified
-        var disabledContentColor = Color.Unspecified
-        var enabledContentAlpha = 1f
-        var disabledContentAlpha = 1f
-
-        rule.setContent {
-            onSurface = MaterialTheme.colors.onSurface
-            enabledContentAlpha = ContentAlpha.high
-            disabledContentAlpha = ContentAlpha.disabled
-            Box(Modifier.requiredSize(20.dp)) {
-                DropdownMenu(
-                    onDismissRequest = {},
-                    expanded = true
-                ) {
-                    DropdownMenuItem(onClick = {}) {
-                        enabledContentColor = LocalContentColor.current
-                            .copy(alpha = LocalContentAlpha.current)
-                    }
-                    DropdownMenuItem(enabled = false, onClick = {}) {
-                        disabledContentColor = LocalContentColor.current
-                            .copy(alpha = LocalContentAlpha.current)
-                    }
-                }
-            }
-        }
-
-        assertThat(enabledContentColor).isEqualTo(onSurface.copy(alpha = enabledContentAlpha))
-        assertThat(disabledContentColor).isEqualTo(onSurface.copy(alpha = disabledContentAlpha))
-    }
-
-    @Test
     fun dropdownMenuItem_onClick() {
         var clicked = false
         val onClick: () -> Unit = { clicked = true }
 
         rule.setContent {
             DropdownMenuItem(
+                text = { Box(Modifier.requiredSize(40.dp)) },
                 onClick,
-                modifier = Modifier.testTag("MenuItem").clickable(onClick = onClick)
-            ) {
-                Box(Modifier.requiredSize(40.dp))
-            }
+                modifier = Modifier.testTag("MenuItem").clickable(onClick = onClick),
+            )
         }
 
         rule.onNodeWithTag("MenuItem").performClick()
