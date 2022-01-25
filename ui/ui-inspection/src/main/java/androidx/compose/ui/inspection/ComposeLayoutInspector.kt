@@ -47,6 +47,8 @@ import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetPara
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.GetParametersResponse
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Response
 import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.UnknownCommandResponse
+import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.UpdateSettingsCommand
+import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.UpdateSettingsResponse
 
 private const val LAYOUT_INSPECTION_ID = "layoutinspector.compose.inspection"
 private const val MAX_RECURSIONS = 2
@@ -65,8 +67,7 @@ class ComposeLayoutInspectorFactory :
 
 class ComposeLayoutInspector(
     connection: Connection,
-    @Suppress("unused")
-    private val environment: InspectorEnvironment
+    environment: InspectorEnvironment
 ) : Inspector(connection) {
 
     /** Cache data which allows us to reuse previously queried inspector nodes */
@@ -92,6 +93,7 @@ class ComposeLayoutInspector(
     )
 
     private val layoutInspectorTree = LayoutInspectorTree()
+    private val recompositionHandler = RecompositionHandler(environment.artTooling())
 
     // Sidestep threading concerns by only ever accessing cachedNodes on the inspector thread
     private val inspectorThread = Thread.currentThread()
@@ -125,6 +127,9 @@ class ComposeLayoutInspector(
             Command.SpecializedCase.GET_PARAMETER_DETAILS_COMMAND -> {
                 handleGetParameterDetailsCommand(command.getParameterDetailsCommand, callback)
             }
+            Command.SpecializedCase.UPDATE_SETTINGS_COMMAND -> {
+                handleUpdateSettingsCommand(command.updateSettingsCommand, callback)
+            }
             else -> handleUnknownCommand(data, callback)
         }
     }
@@ -154,7 +159,7 @@ class ComposeLayoutInspector(
 
         val stringTable = StringTable()
         val trees = data?.trees ?: emptyList()
-        val roots = trees.map { it.toComposableRoot(stringTable, windowPos) }
+        val roots = trees.map { it.toComposableRoot(stringTable, windowPos, recompositionHandler) }
 
         callback.reply {
             getComposablesResponse = GetComposablesResponse.newBuilder().apply {
@@ -263,6 +268,16 @@ class ComposeLayoutInspector(
             } else {
                 GetParameterDetailsResponse.getDefaultInstance()
             }
+        }
+    }
+
+    private fun handleUpdateSettingsCommand(
+        updateSettingsCommand: UpdateSettingsCommand,
+        callback: CommandCallback
+    ) {
+        recompositionHandler.changeCollectionMode(updateSettingsCommand.includeRecomposeCounts)
+        callback.reply {
+            updateSettingsResponse = UpdateSettingsResponse.getDefaultInstance()
         }
     }
 

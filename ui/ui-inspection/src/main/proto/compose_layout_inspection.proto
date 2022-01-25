@@ -92,6 +92,12 @@ message ComposableNode {
     int32 flags = 9;
 
     int64 view_id = 10;
+
+    // The number of recompositions detected since the last counter reset
+    int32 recompose_count = 11;
+
+    // The number of recomposition skips detected since the last counter reset
+    int32 recompose_skips = 12;
 }
 
 // In Android, a resource id is a simple integer. This class holds the namespace, type, and name
@@ -213,6 +219,7 @@ message GetComposablesCommand {
   // If the cached data generation matches the specified generation then the cache is still valid.
   int32 generation = 3;
 }
+
 message GetComposablesResponse {
     // A collection of all text referenced by other fields in this message
     repeated StringEntry strings = 1;
@@ -278,12 +285,23 @@ message GetParameterDetailsResponse {
   Parameter parameter = 3;
 }
 
+message UpdateSettingsCommand {
+  // If true, start (or continue) counting  repositions after resetting current counts.
+  // If false stop counting recompositions.
+  bool include_recompose_counts = 1;
+}
+
+// The active settings after handling of an UpdateSettingsCommand
+message UpdateSettingsResponse {
+}
+
 message Command {
   oneof specialized {
     GetComposablesCommand get_composables_command = 1;
     GetParametersCommand get_parameters_command = 2;
     GetAllParametersCommand get_all_parameters_command = 3;
     GetParameterDetailsCommand get_parameter_details_command = 4;
+    UpdateSettingsCommand update_settings_command = 5;
   }
 }
 
@@ -293,6 +311,7 @@ message Response {
     GetParametersResponse get_parameters_response = 2;
     GetAllParametersResponse get_all_parameters_response = 3;
     GetParameterDetailsResponse get_parameter_details_response = 4;
+    UpdateSettingsResponse update_settings_response = 5;
 
     UnknownCommandResponse unknown_command_response = 100;
   }
