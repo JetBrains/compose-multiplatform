@@ -180,12 +180,13 @@ fun Slider(
         val rawOffset = remember { mutableStateOf(scaleToOffset(value)) }
         val draggableState = remember(minPx, maxPx, valueRange) {
             SliderDraggableState {
-                rawOffset.value = (rawOffset.value + it).coerceIn(minPx, maxPx)
-                onValueChangeState.value.invoke(scaleToUserValue(rawOffset.value))
+                rawOffset.value = (rawOffset.value + it)
+                val offsetInTrack = rawOffset.value.coerceIn(minPx, maxPx)
+                onValueChangeState.value.invoke(scaleToUserValue(offsetInTrack))
             }
         }
 
-        CorrectValueSideEffect(::scaleToOffset, valueRange, rawOffset, value)
+        CorrectValueSideEffect(::scaleToOffset, valueRange, minPx..maxPx, rawOffset, value)
 
         val gestureEndAction = rememberUpdatedState<(Float) -> Unit> { velocity: Float ->
             val current = rawOffset.value
@@ -307,8 +308,20 @@ fun RangeSlider(
         val rawOffsetStart = remember { mutableStateOf(scaleToOffset(values.start)) }
         val rawOffsetEnd = remember { mutableStateOf(scaleToOffset(values.endInclusive)) }
 
-        CorrectValueSideEffect(::scaleToOffset, valueRange, rawOffsetStart, values.start)
-        CorrectValueSideEffect(::scaleToOffset, valueRange, rawOffsetEnd, values.endInclusive)
+        CorrectValueSideEffect(
+            ::scaleToOffset,
+            valueRange,
+            minPx..maxPx,
+            rawOffsetStart,
+            values.start
+        )
+        CorrectValueSideEffect(
+            ::scaleToOffset,
+            valueRange,
+            minPx..maxPx,
+            rawOffsetEnd,
+            values.endInclusive
+        )
 
         val scope = rememberCoroutineScope()
         val gestureEndAction = rememberUpdatedState<(Boolean) -> Unit> { isStart ->
@@ -346,17 +359,19 @@ fun RangeSlider(
             valueRange,
             gestureEndAction,
         ) { isStart, offset ->
-            if (isStart) {
+            val offsetRange = if (isStart) {
                 rawOffsetStart.value = (rawOffsetStart.value + offset)
-                    .coerceIn(minPx, rawOffsetEnd.value)
+                val offsetEnd = rawOffsetEnd.value
+                val offsetStart = rawOffsetStart.value.coerceIn(minPx, offsetEnd)
+                offsetStart..offsetEnd
             } else {
                 rawOffsetEnd.value = (rawOffsetEnd.value + offset)
-                    .coerceIn(rawOffsetStart.value, maxPx)
+                val offsetStart = rawOffsetStart.value
+                val offsetEnd = rawOffsetEnd.value.coerceIn(offsetStart, maxPx)
+                offsetStart..offsetEnd
             }
 
-            onValueChangeState.value.invoke(
-                scaleToUserValue(rawOffsetStart.value..rawOffsetEnd.value)
-            )
+            onValueChangeState.value.invoke(scaleToUserValue(offsetRange))
         }
 
         // The positions of the thumbs are dependant on each other.
@@ -754,14 +769,18 @@ private fun calcFraction(a: Float, b: Float, pos: Float) =
 private fun CorrectValueSideEffect(
     scaleToOffset: (Float) -> Float,
     valueRange: ClosedFloatingPointRange<Float>,
+    trackRange: ClosedFloatingPointRange<Float>,
     valueState: MutableState<Float>,
     value: Float
 ) {
     SideEffect {
         val error = (valueRange.endInclusive - valueRange.start) / 1000
         val newOffset = scaleToOffset(value)
-        if (abs(newOffset - valueState.value) > error)
-            valueState.value = newOffset
+        if (abs(newOffset - valueState.value) > error) {
+            if (valueState.value in trackRange) {
+                valueState.value = newOffset
+            }
+        }
     }
 }
 
