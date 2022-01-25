@@ -7,8 +7,8 @@ using Compose Multiplatform UI framework.
 
 ## Prerequisites
 
- Compose for Desktop can produce applications for macOS, Linux and Windows platforms,
-and so any of these platforms can be used for this tutorial.
+ Compose for Desktop can produce applications for macOS, Linux and Windows platforms.
+So any of these platforms can be used for this tutorial.
 
 The following software has to be preinstalled:
    * JDK 11 or later
