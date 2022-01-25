@@ -30,6 +30,20 @@ class InspectorNode internal constructor(
     val id: Long,
 
     /**
+     * The associated key for tracking recomposition counts.
+     */
+    val key: Int,
+
+    /**
+     * The associated anchor for tracking recomposition counts.
+     *
+     * An Anchor is a mechanism in the compose runtime that can identify a Group
+     * in the SlotTable that is invariant to SlotTable updates.
+     * See [androidx.compose.runtime.Anchor] for more information.
+     */
+    val anchorHash: Int,
+
+    /**
      * The name of the Composable.
      */
     val name: String,
@@ -145,6 +159,8 @@ class RawParameter(val name: String, val value: Any?)
  */
 internal class MutableInspectorNode {
     var id = UNDEFINED_ID
+    var key = 0
+    var anchorHash = 0
     val layoutNodes = mutableListOf<LayoutInfo>()
     val mergedSemantics = mutableListOf<RawParameter>()
     val unmergedSemantics = mutableListOf<RawParameter>()
@@ -166,6 +182,8 @@ internal class MutableInspectorNode {
     fun reset() {
         markUnwanted()
         id = UNDEFINED_ID
+        key = 0
+        anchorHash = 0
         viewId = UNDEFINED_ID
         left = 0
         top = 0
@@ -210,8 +228,8 @@ internal class MutableInspectorNode {
 
     fun build(withSemantics: Boolean = true): InspectorNode =
         InspectorNode(
-            id, name, fileName, packageHash, lineNumber, offset, length, left, top, width, height,
-            bounds, parameters.toList(), viewId,
+            id, key, anchorHash, name, fileName, packageHash, lineNumber, offset, length,
+            left, top, width, height, bounds, parameters.toList(), viewId,
             if (withSemantics) mergedSemantics.toList() else emptyList(),
             if (withSemantics) unmergedSemantics.toList() else emptyList(),
             children.toList()

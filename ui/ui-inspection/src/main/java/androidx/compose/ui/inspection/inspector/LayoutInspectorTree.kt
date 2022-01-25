@@ -432,6 +432,8 @@ class LayoutInspectorTree {
     private fun parse(group: Group, overrideBox: IntRect? = null): MutableInspectorNode {
         val node = newNode()
         node.id = parseId(group)
+        node.anchorHash = group.identity?.hashCode() ?: 0
+        node.key = group.key as? Int ?: 0
         node.name = group.name ?: ""
         parsePosition(group, node, overrideBox)
         parseLayoutInfo(group, node)
