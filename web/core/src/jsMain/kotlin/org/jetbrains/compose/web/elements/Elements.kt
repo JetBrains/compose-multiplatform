@@ -63,6 +63,7 @@ import org.w3c.dom.css.CSSStyleSheet
 typealias AttrBuilderContext<T> = AttrsBuilder<T>.() -> Unit
 typealias ContentBuilder<T> = @Composable ElementScope<T>.() -> Unit
 
+@Suppress("UNCHECKED_CAST")
 private open class ElementBuilderImplementation<TElement : Element>(private val tagName: String) : ElementBuilder<TElement> {
     private val el: Element by lazy { document.createElement(tagName) }
     override fun create(): TElement = el.cloneNode() as TElement

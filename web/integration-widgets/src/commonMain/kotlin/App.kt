@@ -1,3 +1,4 @@
+@file:Suppress("DEPRECATION")
 package org.jetbrainsc.compose.common.demo
 
 import androidx.compose.runtime.Composable

@@ -201,7 +201,7 @@ fun main() {
                 opacity(0.3)
             }
 
-            className(MyClassName) + hover() style {
+            className(MyClassName) + hover style {
                 opacity(1)
             }
 

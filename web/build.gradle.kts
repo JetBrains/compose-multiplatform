@@ -1,6 +1,8 @@
 import org.gradle.api.tasks.testing.AbstractTestTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.compose.gradle.kotlinKarmaConfig
+import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
+import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.targets
 
 plugins {
     kotlin("multiplatform") apply false
@@ -19,7 +21,7 @@ fun Project.isSampleProject() = projectDir.parentFile.name == "examples"
 
 tasks.register("printBundleSize") {
     dependsOn(
-       subprojects.filter { it.isSampleProject() }.map { ":examples:${it.name}:printBundleSize" } 
+        subprojects.filter { it.isSampleProject() }.map { ":examples:${it.name}:printBundleSize" }
     )
 }
 
@@ -33,6 +35,24 @@ subprojects {
 
     group = "org.jetbrains.compose.web"
     version = COMPOSE_WEB_VERSION
+
+    if (project.name != "web-widgets") {
+        afterEvaluate {
+            if (plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")) {
+                project.kotlinExtension.targets.forEach { target ->
+                    target.compilations.forEach { compilation ->
+                        compilation.kotlinOptions {
+                            allWarningsAsErrors = true
+                            // see https://kotlinlang.org/docs/opt-in-requirements.html
+                            freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>() {
         kotlinOptions.jvmTarget = "11"
@@ -93,10 +113,10 @@ subprojects {
         configurations.all {
             resolutionStrategy.dependencySubstitution {
                 substitute(module("org.jetbrains.compose.web:web-widgets")).apply {
-                     with(project(":web-widgets"))
+                    with(project(":web-widgets"))
                 }
                 substitute(module("org.jetbrains.compose.web:web-core")).apply {
-                     with(project(":web-core"))
+                    with(project(":web-core"))
                 }
             }
         }

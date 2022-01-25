@@ -74,7 +74,7 @@ class PositionTests {
             }
         }
 
-        enumValues.forEachIndexed { index, position ->
+        enumValues.forEachIndexed { _, position ->
             assertEquals(
                 "position: ${position.value};",
                 nextChild().style.cssText

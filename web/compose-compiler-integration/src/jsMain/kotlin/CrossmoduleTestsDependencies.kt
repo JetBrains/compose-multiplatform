@@ -37,7 +37,7 @@ class ClassSavesComposableIntoVar(c: @Composable () -> Unit) {
 }
 
 class ClassSavesComposableIntoLateinitVar(c: @Composable () -> Unit) {
-    lateinit var composableVar: @Composable () -> Unit
+    var composableVar: @Composable () -> Unit
 
     init {
         composableVar = c
@@ -58,7 +58,7 @@ class ClassSavesTypedComposableIntoVar<T>(c: @Composable (T) -> Unit) {
 
 
 class ClassSavesTypedComposableIntoLateinitVar<T>(c: @Composable (T) -> Unit) {
-    lateinit var composableVar: @Composable (T) -> Unit
+    var composableVar: @Composable (T) -> Unit
 
     init {
         composableVar = c

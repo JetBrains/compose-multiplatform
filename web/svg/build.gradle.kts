@@ -8,6 +8,12 @@ plugins {
 
 kotlin {
     js(IR) {
+        compilations.getByName("test") {
+            kotlinOptions {
+                freeCompilerArgs += "-opt-in=org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi"
+            }
+        }
+
         browser() {
             testTask {
                 useKarma {
@@ -38,12 +44,6 @@ kotlin {
             dependencies {
                 implementation(project(":test-utils"))
                 implementation(kotlin("test-js"))
-            }
-        }
-
-        all {
-            languageSettings {
-                useExperimentalAnnotation("org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi")
             }
         }
     }

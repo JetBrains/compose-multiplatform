@@ -24,6 +24,7 @@ class CssSelectorsTests {
     }
 
     @Test
+    @Suppress("DEPRECATION")
     fun testPlusOperator() = runTest {
         val selectorScope = object : SelectorsScope {}
 

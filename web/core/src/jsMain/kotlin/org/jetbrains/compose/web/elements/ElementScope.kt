@@ -92,7 +92,6 @@ abstract class ElementScopeBase<out TElement : Element> : ElementScope<TElement>
 
     @Composable
     @NonRestartableComposable
-    @OptIn(ComposeCompilerApi::class)
     override fun DomSideEffect(
         key: Any?,
         effect: DomEffectScope.(TElement) -> Unit
