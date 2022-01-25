@@ -936,7 +936,7 @@ internal class AndroidComposeView(context: Context) :
      * runs the latest command.
      */
     suspend fun keyboardVisibilityEventLoop() {
-        textInputServiceAndroid.keyboardVisibilityEventLoop()
+        textInputServiceAndroid.textInputCommandEventLoop()
     }
 
     /**
