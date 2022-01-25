@@ -76,41 +76,6 @@ class TestScope : CoroutineScope by MainScope() {
     }
 
     /**
-     * Use this method to test the composition mounted at [root]
-     *
-     * @param root - the [Element] that will be the root of the DOM tree managed by Compose
-     * @param content - the Composable lambda that defines the composition content
-     *
-     * @return the instance of the [Composition]
-     */
-    @OptIn(ComposeWebInternalApi::class)
-    @ComposeWebExperimentalTestsApi
-    fun <TElement : Element> renderTestComposable(
-        root: TElement,
-        content: @Composable () -> Unit
-    ): Composition {
-        GlobalSnapshotManager.ensureStarted()
-
-        val context = TestMonotonicClockImpl(
-            onRecomposeComplete = this::onRecompositionComplete
-        ) + JsMicrotasksDispatcher()
-
-        val recomposer = Recomposer(context)
-        val composition = ControlledComposition(
-            applier = DomApplier(DomNodeWrapper(root)),
-            parent = recomposer
-        )
-        composition.setContent @Composable {
-            content()
-        }
-
-        CoroutineScope(context).launch(start = CoroutineStart.UNDISPATCHED) {
-            recomposer.runRecomposeAndApplyChanges()
-        }
-        return composition
-    }
-
-    /**
      * @return a reference to the next child element of the root.
      * Subsequent calls will return next child reference every time.
      */
