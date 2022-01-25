@@ -27,6 +27,7 @@ import org.jetbrains.compose.experimental.dsl.ExperimentalExtension
 import org.jetbrains.compose.experimental.internal.configureExperimental
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
+import org.jetbrains.kotlin.gradle.plugin.KotlinJsPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 internal val composeVersion get() = ComposeBuildConfig.composeVersion
@@ -132,6 +133,21 @@ class ComposePlugin : Plugin<Project> {
                     }
                     useIR = true
                 }
+            }
+        }
+
+        checkAndWarnAboutUsingJsPlugin(project)
+    }
+
+    private fun checkAndWarnAboutUsingJsPlugin(project: Project) {
+        val msg = "Project has kotlin(\"js\") plugin applied.\n" +
+                "It's necessary to apply kotlin(\"multiplatform\") plugin " +
+                "in order to use \"org.jetbrains.compose\" plugin with k/js targets.\n" +
+                "See https://github.com/JetBrains/compose-jb/blob/master/tutorials/Web/README.md"
+
+        project.plugins.all {
+            if (it is KotlinJsPluginWrapper) {
+                project.logger.error(msg)
             }
         }
     }
