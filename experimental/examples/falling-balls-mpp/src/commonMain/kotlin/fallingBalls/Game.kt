@@ -33,7 +33,7 @@ class Game(val time: Time) {
     var paused by mutableStateOf(false)
     var finished by mutableStateOf(false)
 
-    var numBlocks by mutableStateOf(5)
+    var numBlocks by mutableStateOf(5f)
 
     fun start() {
         previousTimeNanos = time.now()
@@ -43,7 +43,7 @@ class Game(val time: Time) {
         finished = false
         paused = false
         pieces.clear()
-        repeat(numBlocks) { index ->
+        repeat(numBlocks.toInt()) { index ->
             pieces.add(PieceData(this, index * 1.5f + 5f, colors[index % colors.size]).also { piece ->
                 piece.position = Random.nextDouble(0.0, 100.0).toFloat()
             })
@@ -65,7 +65,7 @@ class Game(val time: Time) {
     fun clicked(piece: PieceData) {
         score += piece.velocity.toInt()
         clicked++
-        if (clicked == numBlocks) {
+        if (clicked == numBlocks.toInt()) {
             finished = true
         }
     }
