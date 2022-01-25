@@ -105,6 +105,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.testRules)
                 implementation(libs.testRunner)
                 implementation(libs.junit)
+                implementation(libs.truth)
                 implementation(project(":compose:foundation:foundation"))
                 implementation(project(":compose:ui:ui-test-junit4"))
                 implementation(project(":compose:test-utils"))

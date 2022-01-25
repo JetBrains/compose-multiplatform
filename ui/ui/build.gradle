@@ -79,7 +79,6 @@ dependencies {
         androidTestImplementation(libs.testRunner)
         androidTestImplementation(libs.testExtJunitKtx)
         androidTestImplementation(libs.testUiautomator)
-        androidTestImplementation(libs.kotlinTest)
         androidTestImplementation(libs.kotlinCoroutinesTest)
         androidTestImplementation(libs.espressoCore)
         androidTestImplementation(libs.junit)
