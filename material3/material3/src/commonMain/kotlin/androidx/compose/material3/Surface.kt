@@ -22,10 +22,13 @@ import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.NonRestartableComposable
@@ -51,9 +54,10 @@ import androidx.compose.ui.unit.dp
  * elevation, which influences how that piece of surface visually relates to other surfaces and how
  * that surface is modified by tonal variance.
  *
- * If you want to have a [Surface] that handles clicks, consider using another overload.
+ * This Surface is a plain container that doesn't handle gestures / states. However, it accepts an
+ * [InteractionSource] parameter, which allows controlling its appearance in different states.
  *
- * The [Surface] is responsible for:
+ * The Surface is responsible for:
  *
  * 1) Clipping: Surface clips its children to the shape specified by [shape]
  *
@@ -82,7 +86,15 @@ import androidx.compose.ui.unit.dp
  *
  * 5) Blocking touch propagation behind the surface.
  *
+ * Clickable surface sample:
+ * @sample androidx.compose.material3.samples.ClickableSurfaceSample
+ *
+ * Static surface sample:
+ * @sample androidx.compose.material3.samples.SurfaceSample
+ *
  * @param modifier Modifier to be applied to the layout corresponding to the surface
+ * @param interactionSource An InteractionSource that allows controlling the surface appearance
+ * in different states
  * @param shape Defines the surface's shape as well its shadow.
  * @param color The background color. Use [Color.Transparent] to have no color.
  * @param contentColor The preferred content color provided by this Surface to its children.
@@ -100,6 +112,7 @@ import androidx.compose.ui.unit.dp
 @NonRestartableComposable
 fun Surface(
     modifier: Modifier = Modifier,
+    interactionSource: InteractionSource? = null,
     shape: Shape = RectangleShape,
     color: Color = MaterialTheme.colorScheme.surface,
     contentColor: Color = contentColorFor(color),
@@ -110,6 +123,7 @@ fun Surface(
 ) {
     Surface(
         modifier = modifier,
+        interactionSource = interactionSource,
         shape = shape,
         color = color,
         contentColor = contentColor,
@@ -118,7 +132,7 @@ fun Surface(
         border = border,
         content = content,
         clickAndSemanticsModifier =
-            Modifier.semantics(mergeDescendants = false) {}.pointerInput(Unit) {}
+        Modifier.semantics(mergeDescendants = false) {}.pointerInput(Unit) {}
     )
 }
 
@@ -211,6 +225,7 @@ fun Surface(
 ) {
     Surface(
         modifier = modifier.minimumTouchTargetSize(),
+        interactionSource = null,
         shape = shape,
         color = color,
         contentColor = contentColor,
@@ -219,20 +234,21 @@ fun Surface(
         border = border,
         content = content,
         clickAndSemanticsModifier =
-            Modifier.clickable(
-                interactionSource = interactionSource,
-                indication = indication,
-                enabled = enabled,
-                onClickLabel = onClickLabel,
-                role = role,
-                onClick = onClick
-            )
+        Modifier.clickable(
+            interactionSource = interactionSource,
+            indication = indication,
+            enabled = enabled,
+            onClickLabel = onClickLabel,
+            role = role,
+            onClick = onClick
+        )
     )
 }
 
 @Composable
 private fun Surface(
     modifier: Modifier,
+    interactionSource: InteractionSource?,
     shape: Shape,
     color: Color,
     contentColor: Color,
@@ -253,12 +269,18 @@ private fun Surface(
         LocalContentColor provides contentColor,
         LocalAbsoluteTonalElevation provides absoluteElevation
     ) {
+        val interactionModifier = if (interactionSource != null) {
+            Modifier.indication(interactionSource, rememberRipple())
+        } else {
+            Modifier
+        }
         Box(
             modifier
                 .shadow(shadowElevation, shape, clip = false)
                 .then(if (border != null) Modifier.border(border, shape) else Modifier)
                 .background(color = backgroundColor, shape = shape)
                 .clip(shape)
+                .then(interactionModifier)
                 .then(clickAndSemanticsModifier),
             propagateMinConstraints = true
         ) { content() }
