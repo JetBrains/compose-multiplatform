@@ -51,47 +51,42 @@ private class DomElementWrapper(override val node: Element): DomNodeWrapper(node
             node.addEventListener(it.name, it)
         }
     }
-}
 
+    fun updateProperties(applicators: List<Pair<(Element, Any) -> Unit, Any>>) {
+        node.removeAttribute("class")
 
-
-@OptIn(ComposeWebInternalApi::class)
-private fun DomElementWrapper.updateProperties(applicators: List<Pair<(Element, Any) -> Unit, Any>>) {
-    node.removeAttribute("class")
-
-    applicators.forEach { (applicator, item) ->
-        applicator(node, item)
+        applicators.forEach { (applicator, item) ->
+            applicator(node, item)
+        }
     }
-}
 
-@OptIn(ComposeWebInternalApi::class)
-private fun DomElementWrapper.updateStyleDeclarations(styleApplier: StyleHolder) {
-    when (node) {
-        is HTMLElement, is SVGElement -> {
-            node.removeAttribute("style")
+    fun updateStyleDeclarations(styleApplier: StyleHolder) {
+        when (node) {
+            is HTMLElement, is SVGElement -> {
+                node.removeAttribute("style")
 
-            val style = node.unsafeCast<ElementCSSInlineStyle>().style
+                val style = node.unsafeCast<ElementCSSInlineStyle>().style
 
-            styleApplier.properties.forEach { (name, value) ->
-                style.setProperty(name, value.toString())
-            }
+                styleApplier.properties.forEach { (name, value) ->
+                    style.setProperty(name, value.toString())
+                }
 
-            styleApplier.variables.forEach { (name, value) ->
-                style.setProperty(name, value.toString())
+                styleApplier.variables.forEach { (name, value) ->
+                    style.setProperty(name, value.toString())
+                }
             }
         }
     }
-}
 
-@OptIn(ComposeWebInternalApi::class)
-private fun DomElementWrapper.updateAttrs(attrs: Map<String, String>) {
-    node.getAttributeNames().forEach { name ->
-        if (name == "style") return@forEach
-        node.removeAttribute(name)
-    }
+    fun updateAttrs(attrs: Map<String, String>) {
+        node.getAttributeNames().forEach { name ->
+            if (name == "style") return@forEach
+            node.removeAttribute(name)
+        }
 
-    attrs.forEach {
-        node.setAttribute(it.key, it.value)
+        attrs.forEach {
+            node.setAttribute(it.key, it.value)
+        }
     }
 }
 
