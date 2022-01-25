@@ -2,7 +2,6 @@ package org.jetbrains.compose.web.core.tests
 
 import androidx.compose.runtime.*
 import org.jetbrains.compose.web.dom.Div
-import org.jetbrains.compose.web.renderComposable
 import kotlinx.browser.document
 import kotlinx.dom.clear
 import org.jetbrains.compose.web.testutils.*
