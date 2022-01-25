@@ -72,6 +72,7 @@ fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
     // Create fake variant tasks since that is what is invoked by developers.
     val lintTask = tasks.named("lint")
     lintTask.configure { task ->
+        task.dependsOn(tasks.named("exportAtomicLibraryGroupsToText"))
         AffectedModuleDetector.configureTaskGuard(task)
     }
     afterEvaluate {
@@ -122,6 +123,7 @@ fun Project.configureAndroidProjectForLint(lint: Lint, extension: AndroidXExtens
                 }}"
             ).configure { task ->
                 AffectedModuleDetector.configureTaskGuard(task)
+                task.dependsOn(tasks.named("exportAtomicLibraryGroupsToText"))
             }
             tasks.named(
                 "lintAnalyze${variant.name.replaceFirstChar {
@@ -129,6 +131,7 @@ fun Project.configureAndroidProjectForLint(lint: Lint, extension: AndroidXExtens
                 }}"
             ).configure { task ->
                 AffectedModuleDetector.configureTaskGuard(task)
+                task.dependsOn(tasks.named("exportAtomicLibraryGroupsToText"))
             }
             /* TODO: uncomment when we upgrade to AGP 7.1.0-alpha04
             tasks.named("lintReport${variant.name.capitalize(Locale.US)}").configure { task ->

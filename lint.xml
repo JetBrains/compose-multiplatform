@@ -32,19 +32,6 @@
         <!-- Required for AppSearch icing tests. -->
         <ignore path="**/java/tests/**" />
     </issue>
-
-    <issue id="IllegalExperimentalApiUsage">
-
-        <!--
-         The placeholder string "USE_SYSTEM_OUT_DIR" must match the string
-         ATOMIC_LIBRARY_GROUP_FILE_PLACEHOLDER defined in BanInappropriateExperimentalUsage.
-         The suffix must match `fileLocation` defined in AndroidXRootImplPlugin.
-        -->
-        <option
-            name="atomicLibraryGroupFilename"
-            value="USE_SYSTEM_OUT_DIR/lint/atomic-library-groups.txt"/>
-    </issue>
-
     <!-- Re-enable high-priority checks for tests (and everything else). -->
     <issue id="NewApi" severity="fatal" />
     <issue id="WrongThread" severity="fatal" />

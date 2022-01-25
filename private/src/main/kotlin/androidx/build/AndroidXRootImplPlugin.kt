@@ -92,20 +92,6 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
             tasks.register(AndroidXImplPlugin.CREATE_LIBRARY_BUILD_INFO_FILES_TASK)
         )
 
-        buildOnServerTask.dependsOn(
-            tasks.register(
-                "exportAtomicLibraryGroupsToTextRoot",
-                ExportAtomicLibraryGroupsToTextTask::class.java
-            ) { task ->
-                task.libraryGroupFile = project.file("${project.getSupportRootFolder()}" +
-                    "/buildSrc/public/src/main/kotlin/androidx/build/LibraryGroups.kt")
-
-                // This suffix must match the suffix in buildSrc/lint.xml
-                val fileLocation = "${getRootOutDirectory()}/lint/atomic-library-groups.txt"
-                task.textOutputFile = project.file(fileLocation)
-            }
-        )
-
         VerifyPlaygroundGradleConfigurationTask.createIfNecessary(project)?.let {
             buildOnServerTask.dependsOn(it)
         }
