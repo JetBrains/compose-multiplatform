@@ -30,6 +30,7 @@ kotlin {
         val jsMain by getting {
             dependencies {
                 implementation(project(":internal-web-core-runtime"))
+                implementation(project(":web-core"))
                 implementation(kotlin("stdlib-js"))
             }
         }
