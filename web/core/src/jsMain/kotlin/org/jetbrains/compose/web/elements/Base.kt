@@ -4,8 +4,9 @@ import androidx.compose.runtime.*
 import org.jetbrains.compose.web.attributes.AttrsBuilder
 import org.jetbrains.compose.web.ExperimentalComposeWebApi
 import org.jetbrains.compose.web.css.StyleHolder
-import org.jetbrains.compose.web.internal.runtime.DomElementWrapper
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
+import org.jetbrains.compose.web.internal.runtime.DomNodeWrapper
+import org.jetbrains.compose.web.internal.runtime.NamedEventListener
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.css.ElementCSSInlineStyle
@@ -34,6 +35,24 @@ private inline fun <TScope, T> ComposeDomNode(
     currentComposer.endReplaceableGroup()
     currentComposer.endNode()
 }
+
+@ComposeWebInternalApi
+private class DomElementWrapper(override val node: Element): DomNodeWrapper(node) {
+    private var currentListeners = emptyList<NamedEventListener>()
+
+    fun updateEventListeners(list: List<NamedEventListener>) {
+        currentListeners.forEach {
+            node.removeEventListener(it.name, it)
+        }
+
+        currentListeners = list
+
+        currentListeners.forEach {
+            node.addEventListener(it.name, it)
+        }
+    }
+}
+
 
 
 @OptIn(ComposeWebInternalApi::class)
@@ -65,7 +84,7 @@ private fun DomElementWrapper.updateStyleDeclarations(styleApplier: StyleHolder)
 }
 
 @OptIn(ComposeWebInternalApi::class)
-fun DomElementWrapper.updateAttrs(attrs: Map<String, String>) {
+private fun DomElementWrapper.updateAttrs(attrs: Map<String, String>) {
     node.getAttributeNames().forEach { name ->
         if (name == "style") return@forEach
         node.removeAttribute(name)
