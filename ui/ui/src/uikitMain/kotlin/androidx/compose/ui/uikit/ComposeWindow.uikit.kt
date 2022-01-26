@@ -11,6 +11,7 @@ import platform.UIKit.UIScreen
 import platform.UIKit.UIViewController
 import platform.UIKit.setFrame
 import platform.UIKit.contentScaleFactor
+import org.jetbrains.skiko.SkikoUIView
 
 // The only difference with macos' Window is that
 // it has return type of UIViewController rather than unit.
@@ -32,14 +33,6 @@ internal actual class ComposeWindow : UIViewController {
     @OverrideInit
     constructor(coder: NSCoder) : super(coder)
 
-    override fun touchesBegan(touches: Set<*>, withEvent: UIEvent?) {
-        super.touchesBegan(touches, withEvent)
-    }
-
-    override fun touchesEnded(touches: Set<*>, withEvent: UIEvent?) {
-        super.touchesEnded(touches, withEvent)
-    }
-
     private lateinit var layer: ComposeLayer
     private lateinit var content: @Composable () -> Unit
 
@@ -47,19 +40,14 @@ internal actual class ComposeWindow : UIViewController {
         println("TODO: set title to SkiaWindow")
     }
 
-    override fun viewDidLoad() {
-        super.viewDidLoad()
-
+    override fun loadView() {
         val (width, height) = UIScreen.mainScreen.bounds.useContents {
             this.size.width to this.size.height
         }
         layer = ComposeLayer()
+        this.view = SkikoUIView(layer.layer).load()
         layer.setContent(content = content)
         layer.setSize(width.toInt(), height.toInt())
-
-        view.contentScaleFactor = UIScreen.mainScreen.scale
-        view.setFrame(CGRectMake(0.0, 0.0, width, height))
-        layer.layer.attachTo(this.view)
     }
 
     // viewDidUnload() is deprecated and not called.
