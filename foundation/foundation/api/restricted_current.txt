@@ -502,9 +502,6 @@ package androidx.compose.foundation.lazy.layout {
   public final class IntervalListKt {
   }
 
-  public final class LazyLayoutItemContentFactoryKt {
-  }
-
   public final class LazyLayoutKt {
   }
 
