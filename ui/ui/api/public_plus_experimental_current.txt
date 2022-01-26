@@ -2148,6 +2148,9 @@ package androidx.compose.ui.layout {
 
   public static interface SubcomposeLayoutState.PrecomposedSlotHandle {
     method public void dispose();
+    method public default int getPlaceablesCount();
+    method public default void premeasure(int index, long constraints);
+    property public default int placeablesCount;
   }
 
   public interface SubcomposeMeasureScope extends androidx.compose.ui.layout.MeasureScope {
