@@ -17,8 +17,8 @@
 package androidx.compose.foundation.relocation
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.relocation.BringIntoViewResponder.Companion.RootBringIntoViewResponder
 import androidx.compose.foundation.relocation.BringIntoViewResponder.Companion.ModifierLocalBringIntoViewResponder
+import androidx.compose.foundation.relocation.BringIntoViewResponder.Companion.RootBringIntoViewResponder
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
@@ -143,12 +143,7 @@ private class BringIntoViewRequesterImpl : BringIntoViewRequester {
             // Convert the rect into parent coordinates.
             val rectInParentCoordinates = it.parent.toLocalRect(sourceRect, layoutCoordinates)
 
-            if (it.parent == RootBringIntoViewResponder) {
-                // Use the platform specific API to bring the rectangle on screen.
-                it.bringRectangleOnScreenRequester.bringRectangleOnScreen(rectInParentCoordinates)
-            } else {
-                it.parent.bringIntoView(rectInParentCoordinates)
-            }
+            it.parent.bringIntoView(rectInParentCoordinates, it.bringRectangleOnScreenRequester)
         }
     }
 }

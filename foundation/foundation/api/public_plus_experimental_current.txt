@@ -699,6 +699,9 @@ package androidx.compose.foundation.relocation {
     property public final androidx.compose.foundation.relocation.BringIntoViewResponder RootBringIntoViewResponder;
   }
 
+  public final class BringIntoViewResponderKt {
+  }
+
   public final class BringRectangleOnScreen_androidKt {
   }
 
