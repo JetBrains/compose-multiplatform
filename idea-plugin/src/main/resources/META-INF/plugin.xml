@@ -49,4 +49,30 @@
             <action class="org.jetbrains.compose.desktop.ide.preview.RefreshOrRunPreviewAction"/>
         </group>
     </actions>
+
+
+    <extensions defaultExtensionNs="com.intellij">
+
+        <defaultLiveTemplates file="templates/WrappedComposables.xml"/>
+
+        <intentionAction id="wrap_group" order="first">
+            <className>org.jetbrains.compose.intentions.wrap_with_composable.WrapWithComposableIntentionGroup
+            </className>
+            <category>Composable intentions</category>
+        </intentionAction>
+
+        <intentionAction id="remove_composable" order="last">
+            <className>org.jetbrains.compose.intentions.remove_composable.RemoveComposableIntention
+            </className>
+            <category>Composable intentions</category>
+        </intentionAction>
+
+        <intentionAction id="remove_parent_composable" order="last">
+            <className>org.jetbrains.compose.intentions.remove_parent_composable.RemoveParentComposableIntention
+            </className>
+            <category>Composable intentions</category>
+        </intentionAction>
+
+    </extensions>
+
 </idea-plugin>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templateSet group="ComposeMultiplatformTemplates">
+
+    <template name="WwB" description="Wrap with Box"
+              value="$COMPOSABLE$(modifier = androidx.compose.ui.Modifier) {&#10; $SELECTION$ &#10; }"
+              toReformat="true" toShortenFQNames="true">
+        <variable name="COMPOSABLE" expression="" defaultValue="&quot;androidx.compose.foundation.layout.Box&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="KOTLIN" value="true"/>
+            <option name="KOTLIN_COMMENT" value="false"/>
+        </context>
+    </template>
+
+
+    <template name="WwC" description="Wrap with Card"
+              value="$COMPOSABLE$(modifier = androidx.compose.ui.Modifier) {&#10; $SELECTION$ &#10; }"
+              toReformat="true" toShortenFQNames="true">
+        <variable name="COMPOSABLE" expression="" defaultValue="&quot;androidx.compose.material.Card&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="KOTLIN" value="true"/>
+            <option name="KOTLIN_COMMENT" value="false"/>
+        </context>
+    </template>
+
+    <template name="WwCol" description="Wrap with Column"
+              value="$COMPOSABLE$(modifier = androidx.compose.ui.Modifier) {&#10; $SELECTION$ &#10; }"
+              toReformat="true" toShortenFQNames="true">
+        <variable name="COMPOSABLE" expression="" defaultValue="&quot;androidx.compose.foundation.layout.Column&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="KOTLIN" value="true"/>
+            <option name="KOTLIN_COMMENT" value="false"/>
+        </context>
+    </template>
+
+    <template name="WwRow" description="Wrap with Row"
+              value="$COMPOSABLE$(modifier = androidx.compose.ui.Modifier) {&#10; $SELECTION$ &#10; }"
+              toReformat="true" toShortenFQNames="true">
+        <variable name="COMPOSABLE" expression="" defaultValue="&quot;androidx.compose.foundation.layout.Row&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="KOTLIN" value="true"/>
+            <option name="KOTLIN_COMMENT" value="false"/>
+        </context>
+    </template>
+
+      <template name="WwLazyCol" description="Wrap with Lazy Column"
+              value="$COMPOSABLE$(modifier = androidx.compose.ui.Modifier) { item {&#10; $SELECTION$ &#10;} }"
+              toReformat="true" toShortenFQNames="true">
+        <variable name="COMPOSABLE" expression="" defaultValue="&quot;androidx.compose.foundation.lazy.LazyColumn&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="KOTLIN" value="true"/>
+            <option name="KOTLIN_COMMENT" value="false"/>
+        </context>
+    </template>
+
+    <template name="WwLazyRow" description="Wrap with Lazy Row"
+              value="$COMPOSABLE$(modifier = androidx.compose.ui.Modifier) { item {&#10; $SELECTION$ &#10;} }"
+              toReformat="true" toShortenFQNames="true">
+        <variable name="COMPOSABLE" expression="" defaultValue="&quot;androidx.compose.foundation.lazy.LazyRow&quot;" alwaysStopAt="true"/>
+        <context>
+            <option name="KOTLIN" value="true"/>
+            <option name="KOTLIN_COMMENT" value="false"/>
+        </context>
+    </template>
+
+</templateSet>
