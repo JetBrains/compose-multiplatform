@@ -548,13 +548,16 @@ package androidx.compose.foundation.lazy.list {
 
 package androidx.compose.foundation.relocation {
 
+  public final class BringIntoViewKt {
+  }
+
   public final class BringIntoViewRequesterKt {
   }
 
   public final class BringIntoViewResponderKt {
   }
 
-  public final class BringRectangleOnScreen_androidKt {
+  public final class BringIntoViewResponder_androidKt {
   }
 
 }
