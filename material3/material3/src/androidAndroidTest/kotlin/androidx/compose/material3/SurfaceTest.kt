@@ -17,6 +17,7 @@
 package androidx.compose.material3
 
 import android.os.Build
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -277,13 +278,19 @@ class SurfaceTest {
     }
 
     @Test
-    fun clickableOverload_semantics() {
+    fun clickable_semantics() {
         val count = mutableStateOf(0)
+        val interactionSource = MutableInteractionSource()
         rule.setMaterialContent(lightColorScheme()) {
             Surface(
-                modifier = Modifier.testTag("surface"),
-                role = Role.Checkbox,
-                onClick = { count.value += 1 }
+                modifier = Modifier.testTag("surface")
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = null,
+                        onClick = { count.value += 1 },
+                        role = Role.Checkbox
+                    ),
+                interactionSource = interactionSource,
             ) {
                 Text("${count.value}")
                 Spacer(Modifier.size(30.dp))
@@ -321,17 +328,42 @@ class SurfaceTest {
     }
 
     @Test
-    fun clickableOverload_enabled_disabled() {
+    fun clickable_clickActionWithModifier() {
         val count = mutableStateOf(0f)
-        val enabled = mutableStateOf(true)
+        val interactionSource = MutableInteractionSource()
         rule.setMaterialContent(lightColorScheme()) {
             Surface(
-                modifier = Modifier.testTag("surface"),
-                enabled = enabled.value,
-                onClick = { count.value += 1 }
-            ) {
-                Spacer(Modifier.size(30.dp))
-            }
+                modifier = Modifier.testTag("surface")
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = null,
+                        onClick = { count.value += 1 }
+                    ),
+                interactionSource = interactionSource
+            ) { Spacer(Modifier.size(30.dp)) }
+        }
+        rule.onNodeWithTag("surface").performClick()
+        Truth.assertThat(count.value).isEqualTo(1)
+
+        rule.onNodeWithTag("surface").performClick().performClick()
+        Truth.assertThat(count.value).isEqualTo(3)
+    }
+
+    @Test
+    fun clickable_enabled_disabled() {
+        val count = mutableStateOf(0f)
+        val enabled = mutableStateOf(true)
+        val interactionSource = MutableInteractionSource()
+        rule.setMaterialContent(lightColorScheme()) {
+            Surface(
+                modifier = Modifier.testTag("surface")
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = null,
+                        enabled = enabled.value,
+                        onClick = { count.value += 1 },
+                    )
+            ) { Spacer(Modifier.size(30.dp)) }
         }
         rule.onNodeWithTag("surface")
             .assertIsEnabled()
