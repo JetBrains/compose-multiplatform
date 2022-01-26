@@ -42,6 +42,19 @@ private fun nextId(): Int = nextId.also { nextId += 1 }
 
 // Components are ordered alphabetically by name.
 
+private val BottomAppBars = Component(
+    id = nextId(),
+    name = "Bottom App Bar",
+    description = "A bottom app bar displays navigation and key actions at the bottom of mobile " +
+        "screens.",
+    // No bottom app bar icon
+    tintIcon = true,
+    guidelinesUrl = "$ComponentGuidelinesUrl/bottom-app-bars",
+    docsUrl = "$DocsUrl#bottomappbar",
+    sourceUrl = "$Material3SourceUrl/AppBar.kt",
+    examples = BottomAppBarsExamples
+)
+
 private val Buttons = Component(
     id = nextId(),
     name = "Buttons",
@@ -256,6 +269,7 @@ private val TopAppBar = Component(
 
 /** Components for the catalog, ordered alphabetically by name. */
 val Components = listOf(
+    BottomAppBars,
     Buttons,
     Card,
     Checkboxes,
