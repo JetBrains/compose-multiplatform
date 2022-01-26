@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import org.jetbrains.skiko.KotlinBackend
+import kotlin.math.round
 
 @Composable
 fun FallingBalls(game: Game) {
@@ -24,13 +25,13 @@ fun FallingBalls(game: Game) {
             fontSize = 1.8f.em,
             color = Color(218, 120, 91)
         )
-        Text("Score: ${game.score} Time: ${game.elapsed / 1_000_000} Blocks: ${game.numBlocks}", fontSize = 1.8f.em)
+        Text("Score: ${game.score} Time: ${game.elapsed / 1_000_000} Blocks: ${game.numBlocks.toInt()}", fontSize = 1.8f.em)
         Row {
             if (!game.started) {
                 Slider(
                     value = game.numBlocks / 20f,
-                    onValueChange = { game.numBlocks = (it * 20f).toInt().coerceAtLeast(1) },
-                    modifier = Modifier.width(100.dp)
+                    onValueChange = { game.numBlocks = (it * 20f).coerceAtLeast(1f) },
+                    modifier = Modifier.width(250.dp)
                 )
             }
             Button(
