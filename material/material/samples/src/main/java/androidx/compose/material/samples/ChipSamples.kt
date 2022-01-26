@@ -42,7 +42,6 @@ fun OutlinedChipWithIconSample() {
     Chip(
         onClick = { /* Do something! */ },
         border = ChipDefaults.outlinedBorder,
-        colors = ChipDefaults.outlinedChipColors(),
         leadingIcon = {
             Icon(
                 Icons.Filled.Settings,
