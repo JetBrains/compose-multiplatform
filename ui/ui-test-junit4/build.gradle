@@ -38,18 +38,18 @@ dependencies {
     if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         api(project(":compose:ui:ui-test"))
         api("androidx.activity:activity:1.2.0")
-        api("androidx.test.ext:junit:1.1.2")
         api(libs.junit)
         api(libs.kotlinStdlib)
         api(libs.kotlinStdlibCommon)
+        api(libs.testExtJunit)
 
         implementation("androidx.compose.runtime:runtime-saveable:1.1.0-rc01")
         implementation("androidx.activity:activity-compose:1.3.0")
         implementation("androidx.annotation:annotation:1.1.0")
         implementation("androidx.lifecycle:lifecycle-common:2.3.0")
         implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
-        implementation("androidx.test:core:1.4.0")
-        implementation("androidx.test:monitor:1.4.0")
+        implementation(libs.testCore)
+        implementation(libs.testMonitor)
         implementation(libs.espressoCore)
         implementation(libs.espressoIdlingResource)
         implementation(libs.kotlinCoroutinesCore)
@@ -99,13 +99,13 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             androidMain.dependencies {
                 api("androidx.activity:activity:1.2.0")
                 implementation "androidx.activity:activity-compose:1.3.0"
-                api("androidx.test.ext:junit:1.1.2")
+                api(libs.testExtJunit)
 
                 implementation(project(":compose:runtime:runtime-saveable"))
                 implementation("androidx.lifecycle:lifecycle-common:2.3.0")
                 implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
-                implementation("androidx.test:core:1.3.0")
-                implementation("androidx.test:monitor:1.3.0")
+                implementation(libs.testCore)
+                implementation(libs.testMonitor)
                 implementation(libs.espressoCore)
                 implementation(libs.espressoIdlingResource)
             }

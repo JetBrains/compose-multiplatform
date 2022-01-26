@@ -21,13 +21,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.testutils.expectError
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import kotlin.test.assertFailsWith
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -50,7 +50,7 @@ class ModifierLocalSameLayoutNodeTest {
         rule.setContent {
             Box(
                 Modifier.modifierLocalConsumer {
-                    assertFailsWith<IllegalStateException>("No default value") {
+                    expectError<IllegalStateException>(expectedMessage = "No default value") {
                         localString.current
                     }
                 }
