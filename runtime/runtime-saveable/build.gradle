@@ -85,6 +85,10 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 api "androidx.annotation:annotation:1.1.0"
             }
 
+            // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
+            //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
+            //  level dependencies block instead:
+            //  `dependencies { testImplementation(libs.robolectric) }`
             androidTest.dependencies {
                 implementation(libs.testRules)
                 implementation(libs.testRunner)
