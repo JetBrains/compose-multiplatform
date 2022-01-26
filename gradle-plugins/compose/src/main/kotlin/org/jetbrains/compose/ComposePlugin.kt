@@ -25,9 +25,11 @@ import org.jetbrains.compose.desktop.application.internal.currentTarget
 import org.jetbrains.compose.desktop.preview.internal.initializePreview
 import org.jetbrains.compose.experimental.dsl.ExperimentalExtension
 import org.jetbrains.compose.experimental.internal.configureExperimental
+import org.jetbrains.compose.internal.COMPOSE_PLUGIN_ID
+import org.jetbrains.compose.internal.KOTLIN_JS_PLUGIN_ID
+import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
-import org.jetbrains.kotlin.gradle.plugin.KotlinJsPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 internal val composeVersion get() = ComposeBuildConfig.composeVersion
@@ -140,15 +142,11 @@ class ComposePlugin : Plugin<Project> {
     }
 
     private fun checkAndWarnAboutUsingJsPlugin(project: Project) {
-        val msg = "Project has kotlin(\"js\") plugin applied.\n" +
-                "It's necessary to apply kotlin(\"multiplatform\") plugin " +
-                "in order to use \"org.jetbrains.compose\" plugin with k/js targets.\n" +
-                "See https://github.com/JetBrains/compose-jb/blob/master/tutorials/Web/README.md"
+        val msg = "'$COMPOSE_PLUGIN_ID' plugin is not compatible with '$KOTLIN_JS_PLUGIN_ID' plugin. " +
+                "Use '$KOTLIN_MPP_PLUGIN_ID' instead"
 
-        project.plugins.all {
-            if (it is KotlinJsPluginWrapper) {
-                project.logger.error(msg)
-            }
+        project.plugins.withId(KOTLIN_JS_PLUGIN_ID) {
+            project.logger.error(msg)
         }
     }
 
