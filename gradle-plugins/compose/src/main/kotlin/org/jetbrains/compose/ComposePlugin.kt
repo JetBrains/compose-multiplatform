@@ -25,6 +25,9 @@ import org.jetbrains.compose.desktop.application.internal.currentTarget
 import org.jetbrains.compose.desktop.preview.internal.initializePreview
 import org.jetbrains.compose.experimental.dsl.ExperimentalExtension
 import org.jetbrains.compose.experimental.internal.configureExperimental
+import org.jetbrains.compose.internal.COMPOSE_PLUGIN_ID
+import org.jetbrains.compose.internal.KOTLIN_JS_PLUGIN_ID
+import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -133,6 +136,17 @@ class ComposePlugin : Plugin<Project> {
                     useIR = true
                 }
             }
+        }
+
+        checkAndWarnAboutUsingJsPlugin(project)
+    }
+
+    private fun checkAndWarnAboutUsingJsPlugin(project: Project) {
+        val msg = "'$COMPOSE_PLUGIN_ID' plugin is not compatible with '$KOTLIN_JS_PLUGIN_ID' plugin. " +
+                "Use '$KOTLIN_MPP_PLUGIN_ID' instead"
+
+        project.plugins.withId(KOTLIN_JS_PLUGIN_ID) {
+            project.logger.error(msg)
         }
     }
 
