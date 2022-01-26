@@ -7,12 +7,13 @@ import com.intellij.codeInsight.template.impl.TemplateImpl
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
-import org.jetbrains.compose.intentions.utils.is_intention_available.IsIntentionAvailable
 import org.jetbrains.compose.intentions.utils.composable_finder.ComposableFunctionFinder
 import org.jetbrains.compose.intentions.utils.composable_finder.DeepComposableFunctionFinder
 import org.jetbrains.compose.intentions.utils.get_root_element.GetRootElement
+import org.jetbrains.compose.intentions.utils.is_intention_available.IsIntentionAvailable
 
-abstract class BaseWrapWithComposableAction : PsiElementBaseIntentionAction(),
+abstract class BaseWrapWithComposableAction :
+    PsiElementBaseIntentionAction(),
     HighPriorityAction,
     IsIntentionAvailable {
 
@@ -50,5 +51,4 @@ abstract class BaseWrapWithComposableAction : PsiElementBaseIntentionAction(),
     }
 
     protected abstract fun getTemplate(): TemplateImpl?
-
 }

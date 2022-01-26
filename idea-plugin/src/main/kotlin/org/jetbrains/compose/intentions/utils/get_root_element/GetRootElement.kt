@@ -1,7 +1,12 @@
 package org.jetbrains.compose.intentions.utils.get_root_element
 
 import com.intellij.psi.PsiElement
-import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
+import org.jetbrains.kotlin.psi.KtNameReferenceExpression
+import org.jetbrains.kotlin.psi.KtProperty
+import org.jetbrains.kotlin.psi.KtPropertyDelegate
+import org.jetbrains.kotlin.psi.KtValueArgumentList
 
 /**
  *  KtValueArgumentList -> Parent -> KtNameReferenceExpression -> Parent -> KtCallExpression -> Parent -> KtPropertyDelegate -> Parent -> Property
@@ -28,8 +33,8 @@ class GetRootElement {
             is KtCallExpression -> {
                 when (element.parent) {
                     is KtProperty,
-                    is KtDotQualifiedExpression -> invoke(element.parent, iteration + 1)  //composable dot expression
-                    is KtPropertyDelegate -> invoke(element.parent.parent, iteration + 1)  //composable dot expression
+                    is KtDotQualifiedExpression -> invoke(element.parent, iteration + 1) // composable dot expression
+                    is KtPropertyDelegate -> invoke(element.parent.parent, iteration + 1) // composable dot expression
                     else -> element
                 }
             }

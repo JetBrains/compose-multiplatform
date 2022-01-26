@@ -14,7 +14,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
-
 @RunWith(JUnit4::class)
 class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
 
@@ -27,7 +26,7 @@ class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
         @Language("Kotlin")
         val template = """
             val systemUiController = rememberSystemUiController()
-            """.trimIndent()
+        """.trimIndent()
             .trim()
 
         val file = ktPsiFactory.createFile(template)
@@ -38,7 +37,6 @@ class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
 
         TestCase.assertEquals(property, getRootElement(ktNameReferenceExpression))
     }
-
 
     @Test
     fun `when a name reference expression is selected, with a call expression as root, call expression should be returned`() {
@@ -59,7 +57,7 @@ class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
                  
                 }
             }
-            """.trimIndent().trim()
+        """.trimIndent().trim()
 
         val file = ktPsiFactory.createFile(template)
 
@@ -72,7 +70,6 @@ class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
             getRootElement(callExpression.firstChild as KtNameReferenceExpression)
         )
     }
-
 
     @Test
     fun `when an argument list element is selected, with a call expression as root, call expression should be returned`() {
@@ -93,7 +90,7 @@ class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
                  
                 } // Name Reference Expression
             }
-            """.trimIndent().trim()
+        """.trimIndent().trim()
 
         val file = ktPsiFactory.createFile(template)
 
@@ -109,7 +106,6 @@ class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
         )
     }
 
-
     @Test
     fun `when a name reference expression is selected, with a delegated property as root, property should be returned`() {
         val ktPsiFactory = KtPsiFactory(project)
@@ -122,7 +118,7 @@ class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
            var isComposable by remember {
                true
             }
-            """.trimIndent().trim()
+        """.trimIndent().trim()
 
         val file = ktPsiFactory.createFile(template)
 
@@ -158,7 +154,7 @@ class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
                   )
               )
           )
-          """.trimIndent().trim()
+        """.trimIndent().trim()
 
         val file = ktPsiFactory.createFile(template)
 
@@ -173,7 +169,6 @@ class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
             getRootElement(referenceExpression)
         )
     }
-
 
     @Test
     fun `when a name reference expression is selected, with a property and dot qualified expression as root, property should be returned`() {
@@ -197,7 +192,7 @@ class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
                   )
               )
           )
-          """.trimIndent().trim()
+        """.trimIndent().trim()
 
         val file = ktPsiFactory.createFile(template)
 
@@ -212,5 +207,4 @@ class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
             getRootElement(referenceExpression)
         )
     }
-
 }

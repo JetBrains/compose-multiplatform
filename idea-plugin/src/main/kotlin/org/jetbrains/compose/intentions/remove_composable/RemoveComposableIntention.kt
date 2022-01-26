@@ -6,12 +6,12 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Iconable
 import com.intellij.psi.PsiElement
-import javax.swing.Icon
 import org.jetbrains.compose.desktop.ide.preview.PreviewIcons
-import org.jetbrains.compose.intentions.utils.is_intention_available.IsIntentionAvailable
 import org.jetbrains.compose.intentions.utils.composable_finder.ComposableFunctionFinder
 import org.jetbrains.compose.intentions.utils.composable_finder.DeepComposableFunctionFinder
 import org.jetbrains.compose.intentions.utils.get_root_element.GetRootElement
+import org.jetbrains.compose.intentions.utils.is_intention_available.IsIntentionAvailable
+import javax.swing.Icon
 
 class RemoveComposableIntention : PsiElementBaseIntentionAction(), Iconable, LowPriorityAction, IsIntentionAvailable {
 
@@ -36,5 +36,4 @@ class RemoveComposableIntention : PsiElementBaseIntentionAction(), Iconable, Low
     }
 
     override fun getIcon(flags: Int): Icon = PreviewIcons.COMPOSE
-
 }

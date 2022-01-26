@@ -9,7 +9,6 @@ import com.intellij.openapi.ui.popup.util.BaseListPopupStep
 import com.intellij.openapi.util.Iconable
 import com.intellij.psi.PsiFile
 import com.intellij.ui.popup.list.ListPopupImpl
-import javax.swing.Icon
 import org.jetbrains.compose.desktop.ide.preview.PreviewIcons
 import org.jetbrains.compose.intentions.wrap_with_composable.wrap_with_actions.BaseWrapWithComposableAction
 import org.jetbrains.compose.intentions.wrap_with_composable.wrap_with_actions.WrapWithBoxIntention
@@ -18,6 +17,7 @@ import org.jetbrains.compose.intentions.wrap_with_composable.wrap_with_actions.W
 import org.jetbrains.compose.intentions.wrap_with_composable.wrap_with_actions.WrapWithLzyColumnIntention
 import org.jetbrains.compose.intentions.wrap_with_composable.wrap_with_actions.WrapWithLzyRowIntention
 import org.jetbrains.compose.intentions.wrap_with_composable.wrap_with_actions.WrapWithRowIntention
+import javax.swing.Icon
 
 class WrapWithComposableIntentionGroup :
     IntentionActionGroup<BaseWrapWithComposableAction>(
@@ -29,7 +29,8 @@ class WrapWithComposableIntentionGroup :
             WrapWithLzyColumnIntention(),
             WrapWithLzyRowIntention()
         )
-    ), Iconable {
+    ),
+    Iconable {
 
     private fun createPopup(
         project: Project,

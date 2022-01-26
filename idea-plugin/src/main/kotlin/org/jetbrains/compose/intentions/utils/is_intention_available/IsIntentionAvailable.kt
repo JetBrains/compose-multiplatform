@@ -21,5 +21,4 @@ interface IsIntentionAvailable {
             composableFunctionFinder.isFunctionComposable(parentPsiElement)
         } ?: false
     }
-
 }

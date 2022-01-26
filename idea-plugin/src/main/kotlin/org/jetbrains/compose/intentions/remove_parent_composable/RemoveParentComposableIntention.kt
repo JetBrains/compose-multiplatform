@@ -7,16 +7,17 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Iconable
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.parentOfType
-import javax.swing.Icon
 import org.jetbrains.compose.desktop.ide.preview.PreviewIcons
-import org.jetbrains.compose.intentions.utils.is_intention_available.IsIntentionAvailable
 import org.jetbrains.compose.intentions.utils.composable_finder.ComposableFunctionFinder
 import org.jetbrains.compose.intentions.utils.composable_finder.NestedComposableFinder
+import org.jetbrains.compose.intentions.utils.is_intention_available.IsIntentionAvailable
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtValueArgumentList
+import javax.swing.Icon
 
-class RemoveParentComposableIntention : PsiElementBaseIntentionAction(),
+class RemoveParentComposableIntention :
+    PsiElementBaseIntentionAction(),
     Iconable,
     PriorityAction,
     IsIntentionAvailable {

@@ -24,7 +24,6 @@ class DeepComposableFunctionFinder : ComposableFunctionFinder, IsPsiElementCompo
         }
     }
 
-
     /**
      * To handle both property and property delegates
      */

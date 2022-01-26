@@ -17,5 +17,4 @@ interface IsPsiElementComposable {
         val ktNamedFunction = resolve() as? KtNamedFunction ?: return false
         return ktNamedFunction.isComposableFunction()
     }
-
 }
