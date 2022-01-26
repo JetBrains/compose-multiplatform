@@ -78,10 +78,8 @@ fun main() {
                                         val isBird =
                                             !isTube && columnIndex == ComposeBirdGame.BIRD_COLUMN && rowIndex == gameFrame.birdPos
 
-                                        if (isTube || isBird) {
-                                            // if it's either a tube node or bird, check it
-                                            checked(true)
-                                        }
+                                        // if it's either a tube node or bird, check it
+                                        checked(isTube || isBird)
 
                                         if (!isBird) {
                                             // if it's a bird, enable it. (to change to blue color)
