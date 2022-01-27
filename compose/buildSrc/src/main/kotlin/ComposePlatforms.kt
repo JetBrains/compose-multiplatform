@@ -29,6 +29,11 @@ enum class ComposePlatforms(vararg val alternativeNames: String) {
             ComposePlatforms.Desktop
         )
 
+        val ANDROID = EnumSet.of(
+            ComposePlatforms.AndroidDebug,
+            ComposePlatforms.AndroidRelease
+        )
+
         /**
          * Maps comma separated list of platforms into a set of [ComposePlatforms]
          * The function is case- and whitespace-insensetive.
