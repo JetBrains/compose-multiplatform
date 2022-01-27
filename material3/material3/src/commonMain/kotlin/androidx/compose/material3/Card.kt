@@ -84,7 +84,7 @@ fun Card(
     modifier: Modifier = Modifier,
     interactionSource: InteractionSource? = null,
     shape: Shape = FilledCardTokens.ContainerShape,
-    containerColor: Color = MaterialTheme.colorScheme.fromToken(FilledCardTokens.ContainerColor),
+    containerColor: Color = FilledCardTokens.ContainerColor.toColor(),
     contentColor: Color = contentColorFor(containerColor),
     border: BorderStroke? = null,
     elevation: CardElevation = CardDefaults.cardElevation(),
@@ -141,7 +141,7 @@ fun ElevatedCard(
     modifier: Modifier = Modifier,
     interactionSource: InteractionSource? = null,
     shape: Shape = ElevatedCardTokens.ContainerShape,
-    containerColor: Color = MaterialTheme.colorScheme.fromToken(ElevatedCardTokens.ContainerColor),
+    containerColor: Color = ElevatedCardTokens.ContainerColor.toColor(),
     contentColor: Color = contentColorFor(containerColor),
     elevation: CardElevation = CardDefaults.elevatedCardElevation(),
     content: @Composable ColumnScope.() -> Unit
@@ -194,11 +194,11 @@ fun OutlinedCard(
     modifier: Modifier = Modifier,
     interactionSource: InteractionSource? = null,
     shape: Shape = OutlinedCardTokens.ContainerShape,
-    containerColor: Color = MaterialTheme.colorScheme.fromToken(OutlinedCardTokens.ContainerColor),
+    containerColor: Color = OutlinedCardTokens.ContainerColor.toColor(),
     contentColor: Color = contentColorFor(containerColor),
     border: BorderStroke = BorderStroke(
         OutlinedCardTokens.OutlineWidth,
-        MaterialTheme.colorScheme.fromToken(OutlinedCardTokens.OutlineColor)
+        OutlinedCardTokens.OutlineColor.toColor()
     ),
     elevation: CardElevation = CardDefaults.outlinedCardElevation(),
     content: @Composable ColumnScope.() -> Unit
