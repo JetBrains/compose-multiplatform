@@ -20,17 +20,13 @@ enum class ComposePlatforms(vararg val alternativeNames: String) {
         listOf(name, *alternativeNames).any { it.equals(nameCandidate, ignoreCase = true) }
 
     companion object {
-        val ALL = EnumSet.allOf(ComposePlatforms::class.java)
-
-        val JVM_BASED = EnumSet.of(
-            ComposePlatforms.Desktop,
-            ComposePlatforms.AndroidDebug,
-            ComposePlatforms.AndroidRelease
+        // Temporary, only in release/1.1 branch, to allow build on CI
+        val ALL = EnumSet.of(
+            ComposePlatforms.Desktop
         )
 
-        val ANDROID = EnumSet.of(
-            ComposePlatforms.AndroidDebug,
-            ComposePlatforms.AndroidRelease
+        val JVM_BASED = EnumSet.of(
+            ComposePlatforms.Desktop
         )
 
         /**
@@ -56,9 +52,10 @@ enum class ComposePlatforms(vararg val alternativeNames: String) {
                 }
             }
 
-            if (unknownNames.isNotEmpty()) {
-                error("Unknown platforms: ${unknownNames.joinToString(", ")}")
-            }
+        // Temporary, only in release/1.1 branch, to allow build on CI
+        //   if (unknownNames.isNotEmpty()) {
+        //        error("Unknown platforms: ${unknownNames.joinToString(", ")}")
+        //    }
 
             return platforms
         }
