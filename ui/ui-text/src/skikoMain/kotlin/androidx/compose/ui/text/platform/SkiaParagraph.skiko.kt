@@ -35,7 +35,6 @@ import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.DelegatingFontLoaderForDeprecatedUsage
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontFamilyResolverImpl
@@ -596,10 +595,6 @@ internal class ParagraphBuilder(
         val platformFontLoader = (fontFamilyResolver as FontFamilyResolverImpl).platformFontLoader
         val fontCollection = when (platformFontLoader) {
             is SkiaFontLoader -> platformFontLoader.fontCollection
-            is DelegatingFontLoaderForDeprecatedUsage -> {
-                @Suppress("DEPRECATION")
-                (platformFontLoader.loader as FontLoader).fontCache.fonts
-            }
             else -> throw IllegalStateException("Unsupported font loader $platformFontLoader")
         }
 

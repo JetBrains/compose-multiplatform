@@ -553,7 +553,7 @@ package androidx.compose.ui.text.font {
     method public static androidx.compose.ui.text.font.Typeface Typeface(android.graphics.Typeface typeface);
   }
 
-  public final class DelegatingFontLoaderForDeprecatedUsageKt {
+  public final class DelegatingFontLoaderForDeprecatedUsage_androidKt {
   }
 
   public abstract sealed class FileBasedFontFamily extends androidx.compose.ui.text.font.FontFamily {

@@ -18,12 +18,32 @@ package androidx.compose.ui.text.font
 
 import androidx.compose.ui.text.ExperimentalTextApi
 
+/**
+ * Allow converting between a Font.ResourceLoader and a FontLoader for deprecated APIs
+ */
+@Suppress("DEPRECATION")
+internal class DelegatingFontLoaderForDeprecatedUsage(
+    internal val loader: Font.ResourceLoader
+) : PlatformFontLoader {
+
+    // never consider these reusable for caching
+    override val cacheKey: Any = Any()
+
+    override fun loadBlocking(font: Font): Any = loader.load(font)
+
+    // there is no multiplat way to switch threads yet, so stay no the main thread for this
+    // deprecated path
+    override suspend fun awaitLoad(font: Font): Any = loader.load(font)
+}
+
 @Suppress("DEPRECATION")
 @OptIn(ExperimentalTextApi::class)
 @Deprecated("This exists to bridge existing Font.ResourceLoader APIs, and should be " +
     "removed with them",
     replaceWith = ReplaceWith("createFontFamilyResolver()"),
 )
-internal expect fun createFontFamilyResolver(
+internal actual fun createFontFamilyResolver(
     fontResourceLoader: Font.ResourceLoader
-): FontFamily.Resolver
+): FontFamily.Resolver {
+    return FontFamilyResolverImpl(DelegatingFontLoaderForDeprecatedUsage(fontResourceLoader))
+}

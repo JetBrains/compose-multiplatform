@@ -13,17 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("DEPRECATION")
 
 package androidx.compose.ui.text.font
 
-import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.platform.FontLoader
 
-@Suppress("DEPRECATION")
-@OptIn(ExperimentalTextApi::class)
 @Deprecated("This exists to bridge existing Font.ResourceLoader APIs, and should be " +
     "removed with them",
     replaceWith = ReplaceWith("createFontFamilyResolver()"),
 )
-internal expect fun createFontFamilyResolver(
+internal actual fun createFontFamilyResolver(
     fontResourceLoader: Font.ResourceLoader
-): FontFamily.Resolver
+): FontFamily.Resolver {
+    if (fontResourceLoader !is FontLoader)
+        throw IllegalArgumentException("Unexpected type: $fontResourceLoader must be FontLoader")
+    return fontResourceLoader.fontFamilyResolver
+}

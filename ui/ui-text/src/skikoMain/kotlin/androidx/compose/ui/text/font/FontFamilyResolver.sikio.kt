@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.text.font
 
+import androidx.compose.ui.text.platform.FontCache
 import androidx.compose.ui.text.ExperimentalTextApi
 import kotlin.coroutines.CoroutineContext
 
@@ -64,4 +65,11 @@ fun createFontFamilyResolver(
             coroutineContext
         )
     )
+}
+/**
+ * For bridging between FontLoader and FontFamily.ResourceLoader. Can remove with FontLoader.
+ */
+@OptIn(ExperimentalTextApi::class)
+internal fun createFontFamilyResolver(fontCache: FontCache): FontFamily.Resolver {
+    return FontFamilyResolverImpl(SkiaFontLoader(fontCache))
 }

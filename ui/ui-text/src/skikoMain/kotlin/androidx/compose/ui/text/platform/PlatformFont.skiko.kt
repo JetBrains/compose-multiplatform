@@ -30,6 +30,7 @@ import org.jetbrains.skia.paragraph.FontCollection
 import org.jetbrains.skia.paragraph.TypefaceFontProvider
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.Typeface
+import androidx.compose.ui.text.font.createFontFamilyResolver
 
 sealed class PlatformFont : Font {
     abstract val identity: String
@@ -130,18 +131,19 @@ internal expect fun FontListFontFamily.makeAlias(): String
 )
 class FontLoader : Font.ResourceLoader {
 
-    internal val fontCache = FontCache()
+    internal val fontCache: FontCache = FontCache()
+    internal val fontFamilyResolver: FontFamily.Resolver = createFontFamilyResolver(fontCache)
 
     // TODO: we need to support:
     //  1. font collection (.ttc). Looks like skia currently doesn't have
     //  proper interfaces or they are broken (.makeFromFile(*, 1) always fails)
     //  2. variable fonts. for them we also need to extend definition interfaces to support
     //  custom variation settings
-    override fun load(font: Font): FontLoadResult {
+    override fun load(font: Font): SkTypeface {
         if (font !is PlatformFont) {
             throw IllegalArgumentException("Unsupported font type: $font")
         }
-        return fontCache.load(font)
+        return fontCache.load(font).typeface!!
     }
 }
 
