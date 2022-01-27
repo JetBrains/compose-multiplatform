@@ -22,7 +22,7 @@ enum class ComposePlatforms(vararg val alternativeNames: String) {
     companion object {
         // Temporary, only in release/1.1 branch, to allow build on CI
         val ALL = EnumSet.of(
-            ComposePlatforms.Desktop
+            ComposePlatforms.Desktop, ComposePlatforms.Js
         )
 
         val JVM_BASED = EnumSet.of(
