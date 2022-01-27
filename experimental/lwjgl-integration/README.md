@@ -40,3 +40,18 @@ CompositionLocalProvider(
     // Your App                                                                        
 }                                                                               
 ```
+
+`LocalLayerContainer` is internal, so you need to use a trick. 
+
+Create a package `androidx.compose.ui.awt` and create a file `LocalLayerContainer.desktop.kt`
+
+Put following code inside
+```kotlin
+import androidx.compose.runtime.staticCompositionLocalOf
+import your.package.yourFakeAwtContainer
+
+val LocalLayerContainer: androidx.compose.runtime.ProvidableCompositionLocal<java.awt.Container> =
+    staticCompositionLocalOf { yourFakeAwtContainer }
+```
+
+Then you would be able to access the internal `LocalLayerContainer`
