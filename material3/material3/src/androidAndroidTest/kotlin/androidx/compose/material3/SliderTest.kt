@@ -21,6 +21,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.material3.tokens.SliderTokens
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -95,7 +96,7 @@ class SliderTest {
     fun slider_semantics_continuous() {
         val state = mutableStateOf(0f)
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Slider(
                 modifier = Modifier.testTag(tag), value = state.value,
                 onValueChange = { state.value = it }
@@ -122,7 +123,7 @@ class SliderTest {
     fun slider_semantics_stepped() {
         val state = mutableStateOf(0f)
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Slider(
                 modifier = Modifier.testTag(tag), value = state.value,
                 onValueChange = { state.value = it }, steps = 4
@@ -147,7 +148,7 @@ class SliderTest {
 
     @Test
     fun slider_semantics_focusable() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Slider(value = 0f, onValueChange = {}, modifier = Modifier.testTag(tag))
         }
 
@@ -157,7 +158,7 @@ class SliderTest {
 
     @Test
     fun slider_semantics_disabled() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Slider(
                 value = 0f,
                 onValueChange = {},
@@ -175,7 +176,7 @@ class SliderTest {
         val state = mutableStateOf(0f)
         var slop = 0f
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             slop = LocalViewConfiguration.current.touchSlop
             Slider(
                 modifier = Modifier.testTag(tag),
@@ -206,7 +207,7 @@ class SliderTest {
     fun slider_tap() {
         val state = mutableStateOf(0f)
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Slider(
                 modifier = Modifier.testTag(tag),
                 value = state.value,
@@ -236,7 +237,7 @@ class SliderTest {
         val state = mutableStateOf(0f)
         val rangeEnd = mutableStateOf(0.25f)
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Slider(
                 modifier = Modifier.testTag(tag),
                 value = state.value,
@@ -268,7 +269,7 @@ class SliderTest {
         val state = mutableStateOf(0f)
         var slop = 0f
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 slop = LocalViewConfiguration.current.touchSlop
                 Slider(
@@ -302,7 +303,7 @@ class SliderTest {
     fun slider_tap_rtl() {
         val state = mutableStateOf(0f)
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Slider(
                     modifier = Modifier.testTag(tag),
@@ -333,7 +334,7 @@ class SliderTest {
     fun rangeSlider_tap_rtl() {
         val state = mutableStateOf(0f)
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Slider(
                     modifier = Modifier.testTag(tag),
@@ -377,7 +378,7 @@ class SliderTest {
 
     @Test
     fun slider_min_size() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.requiredSize(0.dp)) {
                 Slider(
                     modifier = Modifier.testTag(tag),
@@ -388,8 +389,8 @@ class SliderTest {
         }
 
         rule.onNodeWithTag(tag)
-            .assertWidthIsEqualTo(ThumbRadius * 2)
-            .assertHeightIsEqualTo(ThumbRadius * 2)
+            .assertWidthIsEqualTo(SliderTokens.HandleWidth)
+            .assertHeightIsEqualTo(SliderTokens.HandleHeight)
     }
 
     @Test
@@ -397,7 +398,7 @@ class SliderTest {
         val state = mutableStateOf(0f)
         val callCount = mutableStateOf(0f)
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Slider(
                 modifier = Modifier.testTag(tag),
                 value = state.value,
@@ -417,7 +418,7 @@ class SliderTest {
         val state = mutableStateOf(0f)
         val callCount = mutableStateOf(0)
 
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Slider(
                 modifier = Modifier.testTag(tag),
                 value = state.value,
