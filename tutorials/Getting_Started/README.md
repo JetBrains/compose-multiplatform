@@ -144,7 +144,7 @@ fun main() = application {
 ```
 ## Running the project
 
-Open `build.gradle.kts` as a project in IntelliJ IDEA.
+Open `build.gradle.kts` [as a project](https://www.jetbrains.com/help/idea/jetgradle-tool-window.html) in IntelliJ IDEA.
 
 <img alt="New project" src="screen1.png" height="500" />
 
