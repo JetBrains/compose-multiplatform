@@ -7,9 +7,9 @@ plugins {
 }
 
 kotlin {
-    jvm {}
+    jvm("desktop") {}
     sourceSets {
-        named("jvmMain") {
+        named("desktopMain") {
             dependencies {
                 implementation(compose.desktop.currentOs)
                 implementation(project(":App:library"))
