@@ -17,6 +17,11 @@
 package androidx.compose.material.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Chip
 import androidx.compose.material.ChipDefaults
 import androidx.compose.material.ExperimentalMaterialApi
@@ -25,6 +30,9 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterialApi::class)
 @Sampled
@@ -51,5 +59,22 @@ fun OutlinedChipWithIconSample() {
         }
     ) {
         Text("Change settings")
+    }
+}
+
+@Sampled
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun ChipGroupSingleLineSample() {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+            repeat(9) { index ->
+                Chip(
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    onClick = { /* do something*/ }) {
+                    Text("Chip $index")
+                }
+            }
+        }
     }
 }

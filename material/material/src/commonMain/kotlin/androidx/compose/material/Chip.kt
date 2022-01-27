@@ -56,6 +56,12 @@ import androidx.compose.ui.unit.dp
  * using [ChipDefaults.outlinedChipColors]
  * @sample androidx.compose.material.samples.OutlinedChipWithIconSample
  *
+ * Action chips should appear in a set and can be horizontally scrollable
+ * @sample androidx.compose.material.samples.ChipGroupSingleLineSample
+ *
+ * Alternatively, use Accompanist's [Flow Layouts](https://google.github.io/accompanist/flowlayout/)
+ * to wrap chips to a new line.
+ *
  * @param onClick called when the chip is clicked. If null, then this chip will be considered
  * read-only unless something else handles its input events and updates its state.
  * @param modifier Modifier to be applied to the chip
