@@ -154,6 +154,18 @@ private val Checkboxes = Component(
     examples = CheckboxesExamples
 )
 
+private val Chips = Component(
+    id = 24,
+    name = "Chips",
+    description = "Chips allow users to enter information, make selections, filter content, or" +
+        " trigger actions.",
+    icon = R.drawable.ic_chips,
+    guidelinesUrl = "$ComponentGuidelinesUrl/chips",
+    docsUrl = "$DocsUrl#chip",
+    sourceUrl = "$MaterialSourceUrl/Chip.kt",
+    examples = ChipsExamples
+)
+
 private val Dialogs = Component(
     id = 9,
     name = "Dialogs",
@@ -303,7 +315,7 @@ private val TextFields = Component(
     examples = TextFieldsExamples
 )
 
-// Next id = 24
+// Next id = 25
 
 val Components = listOf(
     AppBarsBottom,
@@ -316,6 +328,7 @@ val Components = listOf(
     ButtonsFloatingActionButton,
     Cards,
     Checkboxes,
+    Chips,
     Dialogs,
     Dividers,
     Lists,
