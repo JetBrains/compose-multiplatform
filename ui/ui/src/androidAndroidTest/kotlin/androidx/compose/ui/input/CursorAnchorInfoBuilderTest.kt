@@ -27,6 +27,7 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.font.test.R
 import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.input.TextFieldValue
@@ -272,6 +273,8 @@ class CursorAnchorInfoBuilderTest {
     ): TextLayoutResult {
         val intWidth = ceil(width).toInt()
 
+        val fontFamilyResolver = createFontFamilyResolver(context)
+
         val input = TextLayoutInput(
             text = AnnotatedString(text),
             style = TextStyle(
@@ -284,7 +287,7 @@ class CursorAnchorInfoBuilderTest {
             overflow = TextOverflow.Visible,
             density = defaultDensity,
             layoutDirection = LayoutDirection.Ltr,
-            resourceLoader = TestFontResourceLoader(context),
+            fontFamilyResolver = fontFamilyResolver,
             constraints = Constraints(maxWidth = intWidth)
         )
 
@@ -293,7 +296,7 @@ class CursorAnchorInfoBuilderTest {
             style = input.style,
             width = width,
             density = input.density,
-            resourceLoader = input.resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         )
 
         return TextLayoutResult(
