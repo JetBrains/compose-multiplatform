@@ -19,10 +19,10 @@ downloadLinuxSDK() {
     clone ../prebuilts/fullsdk-linux/sources/android-31 https://android.googlesource.com/platform/prebuilts/fullsdk/sources/android-31 master
     clone ../prebuilts/fullsdk-linux/ndk https://android.googlesource.com/toolchain/prebuilts/ndk/r23 master
     clone ../prebuilts/fullsdk-linux/build-tools/30.0.3 https://android.googlesource.com/platform/prebuilts/fullsdk-linux/build-tools/30.0.3 master
-    clone ../prebuilts/fullsdk-linux/platform-tools https://android.googlesource.com/platform/prebuilts/fullsdk-linux/platform-tools master
-    clone ../prebuilts/fullsdk-linux/tools https://android.googlesource.com/platform/prebuilts/fullsdk-linux/tools master
-    clone ../prebuilts/fullsdk-linux/cmake https://android.googlesource.com/platform/prebuilts/cmake/linux-x86 master
-    clone ../prebuilts/fullsdk-linux/ninja https://android.googlesource.com/platform/prebuilts/ninja/linux-x86 master
+    clone ../prebuilts/fullsdk-linux/platform-tools https://android.googlesource.com/platform/prebuilts/fullsdk-linux/platform-tools 04de8f242a1ca2ef2b945590da2aa27c2c6ee1c7
+    clone ../prebuilts/fullsdk-linux/tools https://android.googlesource.com/platform/prebuilts/fullsdk-linux/tools 2d5e66a40bd1e6d43ee458efea6f1dd5d5166a59
+    clone ../prebuilts/fullsdk-linux/cmake https://android.googlesource.com/platform/prebuilts/cmake/linux-x86 a8e45194d73ebaded4639e11cf4021b267b36c2a
+    clone ../prebuilts/fullsdk-linux/ninja https://android.googlesource.com/platform/prebuilts/ninja/linux-x86 8a10824f74fe0e22af9bf314a837f5b70e2bb67f
 }
 
 downloadMacOsSDK() {
@@ -30,10 +30,10 @@ downloadMacOsSDK() {
     clone ../prebuilts/fullsdk-darwin/sources/android-31 https://android.googlesource.com/platform/prebuilts/fullsdk/sources/android-31 master
     clone ../prebuilts/fullsdk-darwin/ndk https://android.googlesource.com/toolchain/prebuilts/ndk-darwin/r23 master
     clone ../prebuilts/fullsdk-darwin/build-tools/30.0.3 https://android.googlesource.com/platform/prebuilts/fullsdk-darwin/build-tools/30.0.3 master
-    clone ../prebuilts/fullsdk-darwin/platform-tools https://android.googlesource.com/platform/prebuilts/fullsdk-darwin/platform-tools master
-    clone ../prebuilts/fullsdk-darwin/tools https://android.googlesource.com/platform/prebuilts/fullsdk-darwin/tools master
-    clone ../prebuilts/fullsdk-darwin/cmake https://android.googlesource.com/platform/prebuilts/cmake/darwin-x86 master
-    clone ../prebuilts/fullsdk-darwin/ninja https://android.googlesource.com/platform/prebuilts/ninja/darwin-x86 master
+    clone ../prebuilts/fullsdk-darwin/platform-tools https://android.googlesource.com/platform/prebuilts/fullsdk-darwin/platform-tools 5d86b65de9ec1aa7dc6102bc4dfd78b7ebfa213b
+    clone ../prebuilts/fullsdk-darwin/tools https://android.googlesource.com/platform/prebuilts/fullsdk-darwin/tools 204b8813ffedef10214a4afe04c843f1ee9e4fe7
+    clone ../prebuilts/fullsdk-darwin/cmake https://android.googlesource.com/platform/prebuilts/cmake/darwin-x86 6d71b61804c87b3f86eca51583e2ada093fa9267
+    clone ../prebuilts/fullsdk-darwin/ninja https://android.googlesource.com/platform/prebuilts/ninja/darwin-x86 f321e197944c19d273cec788b9a3e8ca94331248
 }
 
 setupNativeBuildTools() {
