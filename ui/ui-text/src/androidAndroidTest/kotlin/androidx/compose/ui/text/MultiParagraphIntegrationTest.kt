@@ -1233,7 +1233,7 @@ class MultiParagraphIntegrationTest {
             style = TextStyle(textDirection = TextDirection.Rtl),
             width = Float.MAX_VALUE,
             density = defaultDensity,
-            resourceLoader = TestFontResourceLoader(context)
+            fontFamilyResolver = UncachedFontFamilyResolver(context)
         )
 
         // the first character uses TextDirection.Content, text is Ltr
@@ -1265,7 +1265,7 @@ class MultiParagraphIntegrationTest {
             placeholders = placeholders,
             width = Float.MAX_VALUE,
             density = defaultDensity,
-            resourceLoader = TestFontResourceLoader(context)
+            fontFamilyResolver = UncachedFontFamilyResolver(context)
         )
 
         // Rendered as below:
@@ -1296,7 +1296,7 @@ class MultiParagraphIntegrationTest {
             placeholders = placeholders,
             width = Float.MAX_VALUE,
             density = defaultDensity,
-            resourceLoader = TestFontResourceLoader(context)
+            fontFamilyResolver = UncachedFontFamilyResolver(context)
         )
 
         // Rendered as below:
@@ -1328,7 +1328,7 @@ class MultiParagraphIntegrationTest {
             placeholders = placeholders,
             width = Float.MAX_VALUE,
             density = defaultDensity,
-            resourceLoader = TestFontResourceLoader(context)
+            fontFamilyResolver = UncachedFontFamilyResolver(context)
         )
 
         assertThat(paragraph.placeholderRects).hasSize(1)
@@ -1370,7 +1370,7 @@ class MultiParagraphIntegrationTest {
             placeholders = placeholders,
             width = Float.MAX_VALUE,
             density = defaultDensity,
-            resourceLoader = TestFontResourceLoader(context)
+            fontFamilyResolver = UncachedFontFamilyResolver(context)
         )
 
         assertThat(paragraph.placeholderRects).hasSize(2)
@@ -1415,7 +1415,7 @@ class MultiParagraphIntegrationTest {
             placeholders = placeholders,
             width = Float.MAX_VALUE,
             density = defaultDensity,
-            resourceLoader = TestFontResourceLoader(context)
+            fontFamilyResolver = UncachedFontFamilyResolver(context)
         )
     }
 
@@ -1451,7 +1451,7 @@ class MultiParagraphIntegrationTest {
             ),
             placeholders = placeholders,
             density = defaultDensity,
-            resourceLoader = TestFontResourceLoader(context)
+            fontFamilyResolver = UncachedFontFamilyResolver(context)
         )
     }
 
@@ -1471,7 +1471,7 @@ class MultiParagraphIntegrationTest {
             maxLines = maxLines,
             width = width,
             density = defaultDensity,
-            resourceLoader = TestFontResourceLoader(context)
+            fontFamilyResolver = UncachedFontFamilyResolver(context)
         )
     }
 
@@ -1493,7 +1493,7 @@ class MultiParagraphIntegrationTest {
             maxLines = maxLines,
             width = width,
             density = defaultDensity,
-            resourceLoader = TestFontResourceLoader(context)
+            fontFamilyResolver = UncachedFontFamilyResolver(context)
         )
     }
 }

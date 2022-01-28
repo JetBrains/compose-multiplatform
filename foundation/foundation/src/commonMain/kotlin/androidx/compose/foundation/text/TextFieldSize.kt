@@ -22,10 +22,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalFontLoader
+import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.resolveDefaults
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
@@ -34,11 +34,14 @@ import androidx.compose.ui.unit.LayoutDirection
 @Suppress("ModifierInspectorInfo")
 internal fun Modifier.textFieldMinSize(style: TextStyle) = composed {
     val density = LocalDensity.current
-    val resourceLoader = LocalFontLoader.current
+    val fontFamilyResolver = LocalFontFamilyResolver.current
     val layoutDirection = LocalLayoutDirection.current
 
-    val minSizeState = remember { TextFieldSize(layoutDirection, density, resourceLoader, style) }
-    minSizeState.update(layoutDirection, density, resourceLoader, style)
+    // TODO(b/214587005): Uncache this
+    val minSizeState = remember {
+        TextFieldSize(layoutDirection, density, fontFamilyResolver, style)
+    }
+    minSizeState.update(layoutDirection, density, fontFamilyResolver, style)
 
     Modifier.layout { measurable, constraints ->
         Modifier.defaultMinSize()
@@ -58,7 +61,7 @@ internal fun Modifier.textFieldMinSize(style: TextStyle) = composed {
 private class TextFieldSize(
     var layoutDirection: LayoutDirection,
     var density: Density,
-    var resourceLoader: Font.ResourceLoader,
+    var fontFamilyResolver: FontFamily.Resolver,
     var style: TextStyle
 ) {
     var minSize = computeMinSize()
@@ -67,17 +70,18 @@ private class TextFieldSize(
     fun update(
         layoutDirection: LayoutDirection,
         density: Density,
-        resourceLoader: Font.ResourceLoader,
+        fontFamilyResolver: FontFamily.Resolver,
         style: TextStyle
     ) {
+        // TODO(b/214587005): Uncache this
         if (layoutDirection != this.layoutDirection ||
             density != this.density ||
-            resourceLoader != this.resourceLoader ||
+            fontFamilyResolver != this.fontFamilyResolver ||
             style != this.style
         ) {
             this.layoutDirection = layoutDirection
             this.density = density
-            this.resourceLoader = resourceLoader
+            this.fontFamilyResolver = fontFamilyResolver
             this.style = style
             minSize = computeMinSize()
         }
@@ -87,7 +91,7 @@ private class TextFieldSize(
         return computeSizeForDefaultText(
             style = resolveDefaults(style, layoutDirection),
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         )
     }
 }

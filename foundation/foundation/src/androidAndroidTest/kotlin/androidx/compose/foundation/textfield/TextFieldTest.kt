@@ -60,7 +60,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalFontLoader
+import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.TextToolbar
@@ -991,11 +991,11 @@ class TextFieldTest {
             fontSize = fontSize.sp
         )
         rule.setContent {
-            val resourceLoader = LocalFontLoader.current
+            val fontFamilyResolver = LocalFontFamilyResolver.current
             val defaultWidth = computeSizeForDefaultText(
                 style = textStyle,
                 density = density,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 maxLines = 1
             ).width
 
@@ -1026,11 +1026,11 @@ class TextFieldTest {
             fontSize = fontSize.sp
         )
         rule.setContent {
-            val resourceLoader = LocalFontLoader.current
+            val fontFamilyResolver = LocalFontFamilyResolver.current
             val defaultWidth = computeSizeForDefaultText(
                 style = textStyle,
                 density = density,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 maxLines = 1
             ).width
 

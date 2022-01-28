@@ -17,6 +17,8 @@
 package androidx.compose.ui.text
 
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.platform.ActualParagraphIntrinsics
 import androidx.compose.ui.unit.Density
 
@@ -44,6 +46,12 @@ interface ParagraphIntrinsics {
  *
  * @see ParagraphIntrinsics
  */
+@Suppress("DEPRECATION")
+@Deprecated(
+    "Font.ResourceLoader is deprecated, instead use FontFamily.Resolver",
+    ReplaceWith("ParagraphIntrinsics(text, style, spanStyles, placeholders, density, " +
+        "fontFamilyResolver")
+)
 fun ParagraphIntrinsics(
     text: String,
     style: TextStyle,
@@ -57,5 +65,21 @@ fun ParagraphIntrinsics(
     spanStyles = spanStyles,
     placeholders = placeholders,
     density = density,
-    resourceLoader = resourceLoader
+    fontFamilyResolver = createFontFamilyResolver(resourceLoader)
+)
+
+fun ParagraphIntrinsics(
+    text: String,
+    style: TextStyle,
+    spanStyles: List<AnnotatedString.Range<SpanStyle>> = listOf(),
+    placeholders: List<AnnotatedString.Range<Placeholder>> = listOf(),
+    density: Density,
+    fontFamilyResolver: FontFamily.Resolver
+): ParagraphIntrinsics = ActualParagraphIntrinsics(
+    text = text,
+    style = style,
+    spanStyles = spanStyles,
+    placeholders = placeholders,
+    density = density,
+    fontFamilyResolver = fontFamilyResolver
 )

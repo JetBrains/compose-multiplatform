@@ -18,10 +18,14 @@ package androidx.compose.ui.text
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.Typeface
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.ResourceFont
-import androidx.core.content.res.ResourcesCompat
+import androidx.compose.ui.text.font.AndroidFontLoader
+import androidx.compose.ui.text.font.AsyncTypefaceCache
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontFamilyResolverImpl
+import androidx.compose.ui.text.font.FontListFontFamilyTypefaceAdapter
+import androidx.compose.ui.text.font.PlatformFontLoader
+import androidx.compose.ui.text.font.PlatformFontFamilyTypefaceAdapter
+import androidx.compose.ui.text.font.TypefaceRequestCache
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
@@ -35,13 +39,19 @@ fun Paragraph.bitmap(): Bitmap {
     return bitmap
 }
 
-class TestFontResourceLoader(val context: Context) : Font.ResourceLoader {
-    override fun load(font: Font): Typeface {
-        return when (font) {
-            is ResourceFont -> ResourcesCompat.getFont(context, font.resId)!!
-            else -> throw IllegalArgumentException("Unknown font type: ${font.javaClass.name}")
-        }
-    }
-}
+@OptIn(ExperimentalTextApi::class)
+internal fun UncachedFontFamilyResolver(
+    context: Context
+): FontFamily.Resolver = UncachedFontFamilyResolver(AndroidFontLoader(context))
+
+@OptIn(ExperimentalTextApi::class)
+internal fun UncachedFontFamilyResolver(
+    platformFontLoader: PlatformFontLoader
+): FontFamily.Resolver = FontFamilyResolverImpl(
+    platformFontLoader,
+    TypefaceRequestCache(),
+    FontListFontFamilyTypefaceAdapter(AsyncTypefaceCache()),
+    PlatformFontFamilyTypefaceAdapter()
+)
 
 fun Float.toIntPx(): Int = ceil(this).roundToInt()

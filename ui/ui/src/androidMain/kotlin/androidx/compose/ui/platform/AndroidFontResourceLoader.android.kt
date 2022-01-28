@@ -28,7 +28,16 @@ import androidx.core.content.res.ResourcesCompat
 /**
  * Android implementation for [Font.ResourceLoader]. It is designed to load only [ResourceFont].
  */
-internal class AndroidFontResourceLoader(private val context: Context) : Font.ResourceLoader {
+@Suppress("DEPRECATION", "OverridingDeprecatedMember")
+@Deprecated(
+    "Replaced with PlatformFontLoader during the introduction of async fonts, all" +
+        " usages should be replaced",
+    ReplaceWith("PlatformFontLoader"),
+)
+internal class AndroidFontResourceLoader(
+    private val context: Context
+) : Font.ResourceLoader {
+
     override fun load(font: Font): Typeface {
         return when (font) {
             is ResourceFont ->

@@ -63,7 +63,7 @@ class ParagraphIntegrationTest {
     private val defaultDensity = Density(density = 1f)
     private val ltrLocaleList = LocaleList("en")
 
-    private val resourceLoader = TestFontResourceLoader(context)
+    private val resourceLoader = UncachedFontFamilyResolver(context)
 
     @Test
     fun empty_string() {
@@ -1705,7 +1705,7 @@ class ParagraphIntegrationTest {
                         localeList = localeList
                     ),
                     density = defaultDensity,
-                    resourceLoader = resourceLoader,
+                    fontFamilyResolver = resourceLoader,
                     // just have 10x font size to have a bitmap
                     width = fontSizeInPx * 10
                 )
@@ -3326,6 +3326,7 @@ class ParagraphIntegrationTest {
         // check the position of the first character in second line: "e" should be indented
         assertThat(paragraph.getHorizontalPosition(4, true)).isEqualTo(indent * fontSize)
     }
+
     @Test
     fun testAnnotatedString_fontFamily_changesMeasurement() {
         with(defaultDensity) {
@@ -3978,7 +3979,7 @@ class ParagraphIntegrationTest {
                 ),
                 spanStyles = listOf(),
                 density = defaultDensity,
-                resourceLoader = TestFontResourceLoader(context)
+                fontFamilyResolver = UncachedFontFamilyResolver(context)
             )
 
             val paragraph = Paragraph(
@@ -4027,7 +4028,7 @@ class ParagraphIntegrationTest {
             ellipsis = ellipsis,
             width = width,
             density = density ?: defaultDensity,
-            resourceLoader = TestFontResourceLoader(context)
+            fontFamilyResolver = UncachedFontFamilyResolver(context)
         )
     }
 }

@@ -28,9 +28,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class GenerifFontFamilyCacheTest {
+@Suppress("DEPRECATION")
+class GenericFontFamilyCacheTest {
 
     @Test
+    @Suppress("DEPRECATION")
     fun cached_instance_for_the_same_input() {
         val typeface = AndroidGenericFontFamilyTypeface(FontFamily.SansSerif)
         assertThat(
@@ -41,6 +43,7 @@ class GenerifFontFamilyCacheTest {
     }
 
     @Test
+    @Suppress("DEPRECATION")
     fun not_cached_instance_if_different_input() {
         val typeface = AndroidGenericFontFamilyTypeface(FontFamily.SansSerif)
         assertThat(

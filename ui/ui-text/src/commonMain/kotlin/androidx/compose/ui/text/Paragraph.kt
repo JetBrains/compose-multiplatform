@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.platform.ActualParagraph
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextDecoration
@@ -258,6 +259,12 @@ interface Paragraph {
  *
  * @throws IllegalArgumentException if [ParagraphStyle.textDirection] is not set
  */
+@Suppress("DEPRECATION")
+@Deprecated(
+    "Font.ResourceLoader is deprecated, instead pass FontFamily.Resolver",
+    replaceWith = ReplaceWith("Paragraph(text, style, spanStyles, placeholders, maxLines, " +
+        "ellipsis, width, density, fontFamilyResolver)"),
+)
 fun Paragraph(
     text: String,
     style: TextStyle,
@@ -278,6 +285,48 @@ fun Paragraph(
     width,
     density,
     resourceLoader
+)
+
+/**
+ * Lays out a given [text] with the given constraints. A paragraph is a text that has a single
+ * [ParagraphStyle].
+ *
+ * If the [style] does not contain any [androidx.compose.ui.text.style.TextDirection],
+ * [androidx.compose.ui.text.style.TextDirection.Content] is used as the default value.
+ *
+ * @param text the text to be laid out
+ * @param style the [TextStyle] to be applied to the whole text
+ * @param spanStyles [SpanStyle]s to be applied to parts of text
+ * @param placeholders a list of placeholder metrics which tells [Paragraph] where should
+ * be left blank to leave space for inline elements.
+ * @param maxLines the maximum number of lines that the text can have
+ * @param ellipsis whether to ellipsize text, applied only when [maxLines] is set
+ * @param width how wide the text is allowed to be
+ * @param density density of the device
+ * @param fontFamilyResolver [FontFamily.Resolver] to be used to load the font given in [SpanStyle]s
+ *
+ * @throws IllegalArgumentException if [ParagraphStyle.textDirection] is not set
+ */
+fun Paragraph(
+    text: String,
+    style: TextStyle,
+    spanStyles: List<AnnotatedString.Range<SpanStyle>> = listOf(),
+    placeholders: List<AnnotatedString.Range<Placeholder>> = listOf(),
+    maxLines: Int = DefaultMaxLines,
+    ellipsis: Boolean = false,
+    width: Float,
+    density: Density,
+    fontFamilyResolver: FontFamily.Resolver
+): Paragraph = ActualParagraph(
+    text,
+    style,
+    spanStyles,
+    placeholders,
+    maxLines,
+    ellipsis,
+    width,
+    density,
+    fontFamilyResolver
 )
 
 /**

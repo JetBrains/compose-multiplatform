@@ -55,7 +55,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -515,7 +515,7 @@ internal fun updateTextDelegate(
     text: AnnotatedString,
     style: TextStyle,
     density: Density,
-    resourceLoader: Font.ResourceLoader,
+    fontFamilyResolver: FontFamily.Resolver,
     softWrap: Boolean = true,
     overflow: TextOverflow = TextOverflow.Clip,
     maxLines: Int = Int.MAX_VALUE,
@@ -538,7 +538,7 @@ internal fun updateTextDelegate(
             overflow = overflow,
             maxLines = maxLines,
             density = density,
-            resourceLoader = resourceLoader,
+            fontFamilyResolver = fontFamilyResolver,
             placeholders = placeholders,
         )
     } else {
@@ -552,7 +552,7 @@ internal fun updateTextDelegate(
     text: String,
     style: TextStyle,
     density: Density,
-    resourceLoader: Font.ResourceLoader,
+    fontFamilyResolver: FontFamily.Resolver,
     softWrap: Boolean = true,
     overflow: TextOverflow = TextOverflow.Clip,
     maxLines: Int = Int.MAX_VALUE,
@@ -573,7 +573,7 @@ internal fun updateTextDelegate(
             overflow = overflow,
             maxLines = maxLines,
             density = density,
-            resourceLoader = resourceLoader,
+            fontFamilyResolver = fontFamilyResolver,
         )
     } else {
         current

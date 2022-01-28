@@ -1,0 +1,8 @@
+// Baseline format: 1.0
+
+InvalidNullConversion: androidx.compose.ui.text.font.FontKt#Font(int, androidx.compose.ui.text.font.FontWeight, int):
+    Attempted to remove @NonNull annotation from method androidx.compose.ui.text.font.FontKt.Font(int,androidx.compose.ui.text.font.FontWeight,int)
+
+
+RemovedClass: androidx.compose.ui.text.TextLayoutResultKt:
+    Removed class androidx.compose.ui.text.TextLayoutResultKt

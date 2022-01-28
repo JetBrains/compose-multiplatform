@@ -16,18 +16,19 @@
 
 package androidx.compose.foundation.text
 
+import androidx.compose.foundation.text.TextDelegate.Companion.paint
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.MultiParagraph
 import androidx.compose.ui.text.MultiParagraphIntrinsics
 import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutInput
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextPainter
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.resolveDefaults
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -87,7 +88,7 @@ class TextDelegate(
     val softWrap: Boolean = true,
     val overflow: TextOverflow = TextOverflow.Clip,
     val density: Density,
-    val resourceLoader: Font.ResourceLoader,
+    val fontFamilyResolver: FontFamily.Resolver,
     val placeholders: List<AnnotatedString.Range<Placeholder>> = emptyList()
 ) {
     /*@VisibleForTesting*/
@@ -128,7 +129,7 @@ class TextDelegate(
                 annotatedString = text,
                 style = resolveDefaults(style, layoutDirection),
                 density = density,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 placeholders = placeholders
             )
         } else {
@@ -206,16 +207,24 @@ class TextDelegate(
     ): TextLayoutResult {
         if (prevResult != null && prevResult.canReuse(
                 text, style, placeholders, maxLines, softWrap, overflow, density, layoutDirection,
-                resourceLoader, constraints
+                fontFamilyResolver, constraints
             )
         ) {
             // NOTE(text-perf-review): seems like there's a nontrivial chance for us to be able
             // to just return prevResult here directly?
             return with(prevResult) {
                 copy(
-                    layoutInput = layoutInput.copy(
-                        style = style,
-                        constraints = constraints
+                    layoutInput = TextLayoutInput(
+                        layoutInput.text,
+                        style,
+                        layoutInput.placeholders,
+                        layoutInput.maxLines,
+                        layoutInput.softWrap,
+                        layoutInput.overflow,
+                        layoutInput.density,
+                        layoutInput.layoutDirection,
+                        layoutInput.fontFamilyResolver,
+                        constraints
                     ),
                     size = constraints.constrain(
                         IntSize(
@@ -253,7 +262,7 @@ class TextDelegate(
                 overflow,
                 density,
                 layoutDirection,
-                resourceLoader,
+                fontFamilyResolver,
                 constraints
             ),
             multiParagraph,

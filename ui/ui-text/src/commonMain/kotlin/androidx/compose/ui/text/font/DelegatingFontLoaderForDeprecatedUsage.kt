@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.input
+package androidx.compose.ui.text.font
 
-import android.content.Context
-import android.graphics.Typeface
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.ResourceFont
-import androidx.core.content.res.ResourcesCompat
+import androidx.compose.ui.text.ExperimentalTextApi
 
-class TestFontResourceLoader(val context: Context) : Font.ResourceLoader {
-    override fun load(font: Font): Typeface {
-        return when (font) {
-            is ResourceFont -> ResourcesCompat.getFont(context, font.resId)!!
-            else -> throw IllegalArgumentException("Unknown font type: ${font.javaClass.name}")
-        }
-    }
-}
+@Suppress("DEPRECATION")
+@OptIn(ExperimentalTextApi::class)
+@Deprecated("This exists to bridge existing Font.ResourceLoader APIs, and should be " +
+    "removed with them",
+    replaceWith = ReplaceWith("createFontFamilyResolver()"),
+)
+internal expect fun createFontFamilyResolver(
+    fontResourceLoader: Font.ResourceLoader
+): FontFamily.Resolver

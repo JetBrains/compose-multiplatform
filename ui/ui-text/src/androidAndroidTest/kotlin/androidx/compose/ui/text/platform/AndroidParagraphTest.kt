@@ -1,6 +1,7 @@
 package androidx.compose.ui.text.platform
 
 import android.graphics.Paint
+import android.graphics.Typeface
 import android.text.TextPaint
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.BackgroundColorSpan
@@ -15,10 +16,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TestFontResourceLoader
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.UncachedFontFamilyResolver
 import androidx.compose.ui.text.android.InternalPlatformTextApi
 import androidx.compose.ui.text.android.TextLayout
 import androidx.compose.ui.text.android.style.BaselineShiftSpan
@@ -30,8 +32,9 @@ import androidx.compose.ui.text.android.style.SkewXSpan
 import androidx.compose.ui.text.android.style.TextDecorationSpan
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.testutils.AsyncTestTypefaceLoader
+import androidx.compose.ui.text.font.testutils.BlockingFauxFont
 import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.matchers.assertThat
@@ -49,17 +52,8 @@ import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.atLeastOnce
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.spy
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
@@ -76,6 +70,7 @@ AndroidParagraphTest {
     private val defaultDensity = Density(density = 1f)
     private val context = InstrumentationRegistry.getInstrumentation().context
 
+    @OptIn(ExperimentalTextApi::class)
     @Test
     fun draw_with_newline_and_line_break_default_values() {
         with(defaultDensity) {
@@ -93,7 +88,8 @@ AndroidParagraphTest {
 
                 val textPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
                 textPaint.textSize = fontSize.toPx()
-                textPaint.typeface = TypefaceAdapter().create(basicFontFamily)
+                textPaint.typeface = UncachedFontFamilyResolver(context)
+                    .resolve(BASIC_MEASURE_FONT.toFontFamily()).value as Typeface
 
                 val layout = TextLayout(
                     charSequence = text,
@@ -750,69 +746,43 @@ AndroidParagraphTest {
     @Test
     @MediumTest
     fun testEmptyFontFamily() {
-        val typefaceAdapter = mock<TypefaceAdapter>()
         val paragraph = simpleParagraph(
             text = "abc",
-            typefaceAdapter = typefaceAdapter,
             width = Float.MAX_VALUE
         )
 
-        verify(typefaceAdapter, never()).create(
-            fontFamily = any(),
-            fontWeight = any(),
-            fontStyle = anyFontStyle(),
-            fontSynthesis = anyFontSynthesis()
-        )
         assertThat(paragraph.textPaint.typeface).isNull()
     }
 
+    @OptIn(ExperimentalTextApi::class)
     @Test
     @MediumTest
     fun testEmptyFontFamily_withBoldFontWeightSelection() {
-        val typefaceAdapter = spy(TypefaceAdapter())
-
         val paragraph = simpleParagraph(
             text = "abc",
             style = TextStyle(
                 fontFamily = null,
                 fontWeight = FontWeight.Bold
             ),
-            typefaceAdapter = typefaceAdapter,
             width = Float.MAX_VALUE
         )
-
-        verify(typefaceAdapter, times(1)).create(
-            fontFamily = eq(null),
-            fontWeight = eq(FontWeight.Bold),
-            fontStyle = eqFontStyle(FontStyle.Normal),
-            fontSynthesis = eqFontSynthesis(FontSynthesis.All)
-        )
-
         val typeface = paragraph.textPaint.typeface
         assertThat(typeface).isNotNull()
         assertThat(typeface.isBold).isTrue()
         assertThat(typeface.isItalic).isFalse()
     }
 
+    @OptIn(ExperimentalTextApi::class)
     @Test
     @MediumTest
     fun testEmptyFontFamily_withFontStyleSelection() {
-        val typefaceAdapter = spy(TypefaceAdapter())
         val paragraph = simpleParagraph(
             text = "abc",
             style = TextStyle(
                 fontFamily = null,
                 fontStyle = FontStyle.Italic
             ),
-            typefaceAdapter = typefaceAdapter,
             width = Float.MAX_VALUE
-        )
-
-        verify(typefaceAdapter, times(1)).create(
-            fontFamily = eq(null),
-            fontWeight = eq(FontWeight.Normal),
-            fontStyle = eqFontStyle(FontStyle.Italic),
-            fontSynthesis = eqFontSynthesis(FontSynthesis.All)
         )
 
         val typeface = paragraph.textPaint.typeface
@@ -821,10 +791,10 @@ AndroidParagraphTest {
         assertThat(typeface.isItalic).isTrue()
     }
 
+    @OptIn(ExperimentalTextApi::class)
     @Test
     @MediumTest
     fun testFontFamily_withGenericFamilyName() {
-        val typefaceAdapter = spy(TypefaceAdapter())
         val fontFamily = FontFamily.SansSerif
 
         val paragraph = simpleParagraph(
@@ -832,15 +802,7 @@ AndroidParagraphTest {
             style = TextStyle(
                 fontFamily = fontFamily
             ),
-            typefaceAdapter = typefaceAdapter,
             width = Float.MAX_VALUE
-        )
-
-        verify(typefaceAdapter, times(1)).create(
-            fontFamily = eq(fontFamily),
-            fontWeight = eq(FontWeight.Normal),
-            fontStyle = eqFontStyle(FontStyle.Normal),
-            fontSynthesis = eqFontSynthesis(FontSynthesis.All)
         )
 
         val typeface = paragraph.textPaint.typeface
@@ -849,28 +811,25 @@ AndroidParagraphTest {
         assertThat(typeface.isItalic).isFalse()
     }
 
+    @OptIn(ExperimentalTextApi::class)
     @Test
     @MediumTest
     fun testFontFamily_withCustomFont() {
-        val typefaceAdapter = spy(TypefaceAdapter())
+        val typefaceLoader = AsyncTestTypefaceLoader()
+        val expectedTypeface: Typeface = UncachedFontFamilyResolver(context)
+            .resolve(BASIC_MEASURE_FONT.toFontFamily()).value as Typeface
+        val font = BlockingFauxFont(typefaceLoader, expectedTypeface)
         val paragraph = simpleParagraph(
             text = "abc",
             style = TextStyle(
-                fontFamily = basicFontFamily
+                fontFamily = font.toFontFamily()
             ),
-            typefaceAdapter = typefaceAdapter,
             width = Float.MAX_VALUE
         )
 
-        verify(typefaceAdapter, atLeastOnce()).create(
-            fontFamily = eq(basicFontFamily),
-            fontWeight = eq(FontWeight.Normal),
-            fontStyle = eqFontStyle(FontStyle.Normal),
-            fontSynthesis = eqFontSynthesis(FontSynthesis.All)
-        )
-        val typeface = paragraph.textPaint.typeface
-        assertThat(typeface.isBold).isFalse()
-        assertThat(typeface.isItalic).isFalse()
+        val typeface: Typeface = paragraph.textPaint.typeface
+
+        assertThat(typeface).isSameInstanceAs(expectedTypeface)
     }
 
     @Test
@@ -1368,13 +1327,12 @@ AndroidParagraphTest {
         maxLines: Int = Int.MAX_VALUE,
         width: Float,
         style: TextStyle? = null,
-        typefaceAdapter: TypefaceAdapter = TypefaceAdapter()
+        fontFamilyResolver: FontFamily.Resolver = UncachedFontFamilyResolver(context)
     ): AndroidParagraph {
         return AndroidParagraph(
             text = text,
             spanStyles = spanStyles,
             placeholders = listOf(),
-            typefaceAdapter = typefaceAdapter,
             style = TextStyle(
                 textAlign = textAlign,
                 textIndent = textIndent
@@ -1382,37 +1340,8 @@ AndroidParagraphTest {
             maxLines = maxLines,
             ellipsis = ellipsis,
             width = width,
-            density = Density(density = 1f)
+            density = Density(density = 1f),
+            fontFamilyResolver = fontFamilyResolver
         )
     }
-
-    private fun TypefaceAdapter() = TypefaceAdapter(
-        resourceLoader = TestFontResourceLoader(context)
-    )
-}
-
-internal fun eqFontStyle(fontStyle: FontStyle): FontStyle {
-    return Mockito.argThat { arg: Any ->
-        if (arg is Int) {
-            arg == fontStyle.value
-        } else {
-            arg == fontStyle
-        }
-    } as FontStyle? ?: fontStyle
-}
-
-internal fun eqFontSynthesis(fontSynthesis: FontSynthesis): FontSynthesis {
-    return Mockito.argThat { arg: Any ->
-        if (arg is Int) {
-            arg == fontSynthesis.value
-        } else {
-            arg == fontSynthesis
-        }
-    } as FontSynthesis? ?: fontSynthesis
-}
-
-internal fun anyFontSynthesis(): FontSynthesis {
-    return Mockito.argThat { arg: Any ->
-        arg is Int || arg is FontSynthesis
-    } as FontSynthesis? ?: FontSynthesis.None
 }

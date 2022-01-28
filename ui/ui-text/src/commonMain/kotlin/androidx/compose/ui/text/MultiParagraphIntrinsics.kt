@@ -17,6 +17,8 @@
 package androidx.compose.ui.text
 
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.util.fastMap
@@ -31,7 +33,7 @@ import androidx.compose.ui.util.fastMaxBy
  * skipped during layout and replaced with [Placeholder]. It's required that the range of each
  * [Placeholder] doesn't cross paragraph boundary, otherwise [IllegalArgumentException] is thrown.
  * @param density density of the device
- * @param resourceLoader [Font.ResourceLoader] to be used to load the font given in [SpanStyle]s
+ * @param fontFamilyResolver [Font.ResourceLoader] to be used to load the font given in [SpanStyle]s
 
  * @see MultiParagraph
  * @see Placeholder
@@ -44,8 +46,27 @@ class MultiParagraphIntrinsics(
     style: TextStyle,
     val placeholders: List<AnnotatedString.Range<Placeholder>>,
     density: Density,
-    resourceLoader: Font.ResourceLoader
+    fontFamilyResolver: FontFamily.Resolver
 ) : ParagraphIntrinsics {
+
+    @Suppress("DEPRECATION")
+    @Deprecated("Font.ResourceLoader is deprecated, call with fontFamilyResolver",
+        replaceWith = ReplaceWith("MultiParagraphIntrinsics(annotatedString, style, " +
+            "placeholders, density, fontFamilyResolver)")
+    )
+    constructor(
+        annotatedString: AnnotatedString,
+        style: TextStyle,
+        placeholders: List<AnnotatedString.Range<Placeholder>>,
+        density: Density,
+        resourceLoader: Font.ResourceLoader
+    ) : this(
+        annotatedString,
+        style,
+        placeholders,
+        density,
+        createFontFamilyResolver(resourceLoader)
+    )
 
     // NOTE(text-perf-review): why are we using lazy here? Are there cases where these
     // calculations aren't executed?
@@ -86,7 +107,7 @@ class MultiParagraphIntrinsics(
                             paragraphStyleItem.end
                         ),
                         density = density,
-                        resourceLoader = resourceLoader
+                        fontFamilyResolver = fontFamilyResolver
                     ),
                     startIndex = paragraphStyleItem.start,
                     endIndex = paragraphStyleItem.end

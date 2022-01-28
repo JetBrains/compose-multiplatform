@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.ui.text.font
 
 import android.content.Context
@@ -37,7 +39,13 @@ import androidx.compose.ui.text.platform.AndroidTypefaceWrapper
  *                        all fonts in fontFamily.
  * @return [androidx.compose.ui.text.font.Typeface] instance
  */
-// TODO what is the goal of styles here? it is being used in only a single place
+@Deprecated("This API is deprecated with the introduction of async fonts which cannot" +
+    " resolve in this context. To preload fonts, use FontFamily.Resolver.",
+    replaceWith = ReplaceWith(
+        "FontFamily.Resolver.preload(fontFamily, Font.AndroidResourceLoader(context))"
+    ),
+    level = DeprecationLevel.WARNING
+)
 fun Typeface(
     context: Context,
     fontFamily: FontFamily,
