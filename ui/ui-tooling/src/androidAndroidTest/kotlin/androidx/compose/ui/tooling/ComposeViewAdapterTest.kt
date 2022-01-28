@@ -335,6 +335,14 @@ class ComposeViewAdapterTest {
         )
     }
 
+    @Test
+    fun multipreviewTest() {
+        assertRendersCorrectly(
+                "androidx.compose.ui.tooling.SimpleComposablePreviewKt",
+                "Multipreview"
+        )
+    }
+
     /**
      * Check that no re-composition happens without forcing it.
      */
