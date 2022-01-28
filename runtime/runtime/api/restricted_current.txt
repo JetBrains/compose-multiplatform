@@ -148,9 +148,12 @@ package androidx.compose.runtime {
 
   public final class ComposerKt {
     method @androidx.compose.runtime.ComposeCompilerApi public static inline <T> T! cache(androidx.compose.runtime.Composer, boolean invalid, kotlin.jvm.functions.Function0<? extends T> block);
+    method @androidx.compose.runtime.ComposeCompilerApi public static boolean isTraceInProgress();
     method @androidx.compose.runtime.ComposeCompilerApi public static void sourceInformation(androidx.compose.runtime.Composer composer, String sourceInformation);
     method @androidx.compose.runtime.ComposeCompilerApi public static void sourceInformationMarkerEnd(androidx.compose.runtime.Composer composer);
     method @androidx.compose.runtime.ComposeCompilerApi public static void sourceInformationMarkerStart(androidx.compose.runtime.Composer composer, int key, String sourceInformation);
+    method @androidx.compose.runtime.ComposeCompilerApi public static void traceEventEnd();
+    method @androidx.compose.runtime.ComposeCompilerApi public static void traceEventStart(int key, String info);
     field @kotlin.PublishedApi internal static final Object compositionLocalMap;
     field @kotlin.PublishedApi internal static final int compositionLocalMapKey = 202; // 0xca
     field @kotlin.PublishedApi internal static final Object invocation;
