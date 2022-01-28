@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.platform
 
+import android.view.KeyEvent as AndroidKeyEvent
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
@@ -113,6 +114,7 @@ import androidx.compose.ui.input.pointer.ProcessResult
 import androidx.compose.ui.input.rotary.RotaryScrollEvent
 import androidx.compose.ui.input.rotary.onRotaryScrollEvent
 import androidx.compose.ui.layout.RootMeasurePolicy
+import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.UsageByParent
@@ -153,7 +155,7 @@ import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import java.lang.reflect.Method
-import android.view.KeyEvent as AndroidKeyEvent
+import kotlin.math.roundToInt
 
 @SuppressLint("ViewConstructor", "VisibleForTests")
 @OptIn(ExperimentalComposeUiApi::class)
@@ -523,6 +525,19 @@ internal class AndroidComposeView(context: Context) :
             // Support for this feature in Compose is tracked here: b/207654434
             AndroidComposeViewForceDarkModeQ.disallowForceDark(this)
         }
+    }
+
+    /**
+     * Since this view has its own concept of internal focus, it needs to report that to the view
+     * system for accurate focus searching and so ViewRootImpl will scroll correctly.
+     */
+    override fun getFocusedRect(rect: Rect) {
+        _focusManager.getActiveFocusModifier()?.focusNode?.boundsInRoot()?.let {
+            rect.left = it.left.roundToInt()
+            rect.top = it.top.roundToInt()
+            rect.right = it.right.roundToInt()
+            rect.bottom = it.bottom.roundToInt()
+        } ?: super.getFocusedRect(rect)
     }
 
     override fun onResume(owner: LifecycleOwner) {
