@@ -33,6 +33,7 @@ internal class LazyGridScopeImpl : LazyGridScope {
     override fun item(
         key: Any?,
         span: (LazyGridItemSpanScope.() -> GridItemSpan)?,
+        contentType: Any?,
         content: @Composable () -> Unit
     ) {
         intervals.add(
@@ -40,6 +41,7 @@ internal class LazyGridScopeImpl : LazyGridScope {
             LazyGridIntervalContent(
                 key = key?.let { { key } },
                 span = span?.let { { span() } } ?: DefaultSpan,
+                type = { contentType },
                 content = { { content() } }
             )
         )
@@ -50,6 +52,7 @@ internal class LazyGridScopeImpl : LazyGridScope {
         count: Int,
         key: ((index: Int) -> Any)?,
         span: (LazyGridItemSpanScope.(Int) -> GridItemSpan)?,
+        contentType: (index: Int) -> Any?,
         itemContent: @Composable (index: Int) -> Unit
     ) {
         intervals.add(
@@ -57,6 +60,7 @@ internal class LazyGridScopeImpl : LazyGridScope {
             LazyGridIntervalContent(
                 key = key,
                 span = span ?: DefaultSpan,
+                type = contentType,
                 content = { { itemContent(it) } }
             )
         )
@@ -68,5 +72,6 @@ internal class LazyGridScopeImpl : LazyGridScope {
 internal class LazyGridIntervalContent(
     val key: ((index: Int) -> Any)?,
     val span: LazyGridItemSpanScope.(Int) -> GridItemSpan,
+    val type: ((index: Int) -> Any?),
     val content: (Int) -> (@Composable () -> Unit)
 )
