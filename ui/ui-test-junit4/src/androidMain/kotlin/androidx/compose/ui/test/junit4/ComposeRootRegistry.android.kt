@@ -25,14 +25,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewTreeLifecycleOwner
-import kotlinx.coroutines.suspendCancellableCoroutine
-import org.junit.runners.model.Statement
 import java.util.Collections
 import java.util.WeakHashMap
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
  * Registry where all views implementing [ViewRootForTest] should be registered while they
@@ -141,16 +140,12 @@ internal class ComposeRootRegistry {
         }
     }
 
-    fun getStatementFor(base: Statement): Statement {
-        return object : Statement() {
-            override fun evaluate() {
-                try {
-                    setupRegistry()
-                    base.evaluate()
-                } finally {
-                    tearDownRegistry()
-                }
-            }
+    fun <R> withRegistry(block: () -> R): R {
+        try {
+            setupRegistry()
+            return block()
+        } finally {
+            tearDownRegistry()
         }
     }
 
