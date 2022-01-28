@@ -33,6 +33,7 @@ import androidx.compose.material.samples.ButtonSample
 import androidx.compose.material.samples.ButtonWithIconSample
 import androidx.compose.material.samples.CardSample
 import androidx.compose.material.samples.CheckboxSample
+import androidx.compose.material.samples.ChipGroupSingleLineSample
 import androidx.compose.material.samples.ChipSample
 import androidx.compose.material.samples.CircularProgressIndicatorSample
 import androidx.compose.material.samples.ClickableListItems
@@ -284,6 +285,13 @@ val ChipsExamples = listOf(
         sourceUrl = ChipsExampleSourceUrl
     ) {
         OutlinedChipWithIconSample()
+    },
+    Example(
+        name = ::ChipGroupSingleLineSample.name,
+        description = ChipsExampleDescription,
+        sourceUrl = ChipsExampleSourceUrl
+    ) {
+        ChipGroupSingleLineSample()
     }
 )
 
