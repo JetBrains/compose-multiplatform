@@ -106,7 +106,7 @@ dependencies {
     }
 }
 
-packageInspector(project, project(":compose:ui:ui-inspection"))
+packageInspector(project, ":compose:ui:ui-inspection")
 
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     androidXComposeMultiplatform {
