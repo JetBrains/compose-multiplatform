@@ -87,7 +87,7 @@ val jar = tasks.named<Jar>("jar") {
 // __SUPPORTED_GRADLE_VERSIONS__
 testGradleVersion("6.4")
 testGradleVersion("7.1.1")
-testGradleVersion("7.3")
+testGradleVersion("7.3.3")
 
 val javaHomeForTests: String? = when {
     // __COMPOSE_NATIVE_DISTRIBUTIONS_MIN_JAVA_VERSION__

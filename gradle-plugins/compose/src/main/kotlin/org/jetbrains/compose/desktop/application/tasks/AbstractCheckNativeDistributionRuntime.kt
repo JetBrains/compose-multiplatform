@@ -47,14 +47,14 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
     @TaskAction
     fun run() {
         val javaRuntimeVersion = try {
-            getJavaRuntimeVersionUnsafe()
+            getJavaRuntimeVersionUnsafe()?.toIntOrNull() ?: -1
         } catch (e: Exception) {
             throw IllegalStateException(
                 "Could not infer Java runtime version for Java home directory: ${javaHome.get()}", e
             )
         }
 
-        check((javaRuntimeVersion?.toIntOrNull() ?: -1) >= MIN_JAVA_RUNTIME_VERSION) {
+        check(javaRuntimeVersion >= MIN_JAVA_RUNTIME_VERSION) {
             """|Packaging native distributions requires JDK runtime version >= $MIN_JAVA_RUNTIME_VERSION
                |Actual version: '${javaRuntimeVersion ?: "<unknown>"}'
                |Java home: ${javaHome.get()}
@@ -76,7 +76,7 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
             }
         )
 
-        val properties = JavaRuntimeProperties(modules)
+        val properties = JavaRuntimeProperties(javaRuntimeVersion, modules)
         JavaRuntimeProperties.writeToFile(properties, javaRuntimePropertiesFile.ioFile)
     }
 

@@ -51,6 +51,16 @@ internal class MacSigner(
         runExternalTool(MacUtils.codesign, args)
     }
 
+    fun unsign(file: File) {
+        val args = listOf(
+            "-vvvv",
+            "--remove-signature",
+            file.absolutePath
+        )
+        runExternalTool(MacUtils.codesign, args)
+
+    }
+
     private fun findCertificate(certificates: String): String {
         val regex = Pattern.compile("\"alis\"<blob>=\"([^\"]+)\"")
         val m = regex.matcher(certificates)

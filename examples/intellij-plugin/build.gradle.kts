@@ -1,7 +1,7 @@
 import org.jetbrains.compose.compose
 
 plugins {
-    id("org.jetbrains.intellij") version "1.1.4"
+    id("org.jetbrains.intellij") version "1.3.0"
     java
     kotlin("jvm")
     id("org.jetbrains.compose")
@@ -24,7 +24,7 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version.set("2021.2")
+    version.set("2021.3")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {

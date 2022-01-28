@@ -1,13 +1,30 @@
 package org.jetbrains.compose.web.testutils
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Composition
+import androidx.compose.runtime.ControlledComposition
+import androidx.compose.runtime.MonotonicFrameClock
+import androidx.compose.runtime.Recomposer
 import kotlinx.browser.document
 import kotlinx.browser.window
-import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.promise
 import kotlinx.dom.clear
-import org.jetbrains.compose.web.internal.runtime.*
-import org.w3c.dom.*
+import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
+import org.jetbrains.compose.web.internal.runtime.DomApplier
+import org.jetbrains.compose.web.internal.runtime.DomNodeWrapper
+import org.jetbrains.compose.web.internal.runtime.GlobalSnapshotManager
+import org.jetbrains.compose.web.internal.runtime.JsMicrotasksDispatcher
+import org.jetbrains.compose.web.renderComposable
+import org.w3c.dom.Element
+import org.w3c.dom.HTMLElement
+import org.w3c.dom.MutationObserver
+import org.w3c.dom.MutationObserverInit
+import org.w3c.dom.asList
+import org.w3c.dom.get
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -27,7 +44,7 @@ class TestScope : CoroutineScope by MainScope() {
      * It's used as a parent element for the composition.
      * It's added into the document's body automatically.
      */
-    val root = "div".asHtmlElement()
+    val root = document.createElement("div") as HTMLElement
 
     private var waitForRecompositionCompleteContinuation: Continuation<Unit>? = null
     private val childrenIterator = root.children.asList().listIterator()
@@ -49,44 +66,13 @@ class TestScope : CoroutineScope by MainScope() {
     fun composition(content: @Composable () -> Unit) {
         root.clear()
 
-        renderTestComposable(root = root) {
+        renderComposable(
+            root = root, monotonicFrameClock = TestMonotonicClockImpl(
+                onRecomposeComplete = this::onRecompositionComplete
+            )
+        ) {
             content()
         }
-    }
-
-    /**
-     * Use this method to test the composition mounted at [root]
-     *
-     * @param root - the [Element] that will be the root of the DOM tree managed by Compose
-     * @param content - the Composable lambda that defines the composition content
-     *
-     * @return the instance of the [Composition]
-     */
-    @OptIn(ComposeWebInternalApi::class)
-    @ComposeWebExperimentalTestsApi
-    fun <TElement : Element> renderTestComposable(
-        root: TElement,
-        content: @Composable () -> Unit
-    ): Composition {
-        GlobalSnapshotManager.ensureStarted()
-
-        val context = TestMonotonicClockImpl(
-            onRecomposeComplete = this::onRecompositionComplete
-        ) + JsMicrotasksDispatcher()
-
-        val recomposer = Recomposer(context)
-        val composition = ControlledComposition(
-            applier = DomApplier(DomNodeWrapper(root)),
-            parent = recomposer
-        )
-        composition.setContent @Composable {
-            content()
-        }
-
-        CoroutineScope(context).launch(start = CoroutineStart.UNDISPATCHED) {
-            recomposer.runRecomposeAndApplyChanges()
-        }
-        return composition
     }
 
     /**
@@ -176,9 +162,6 @@ fun runTest(block: suspend TestScope.() -> Unit): dynamic {
     val scope = TestScope()
     return scope.promise { block(scope) }
 }
-
-@ComposeWebExperimentalTestsApi
-fun String.asHtmlElement() = document.createElement(this) as HTMLElement
 
 private object MutationObserverOptions : MutationObserverInit {
     override var childList: Boolean? = true
