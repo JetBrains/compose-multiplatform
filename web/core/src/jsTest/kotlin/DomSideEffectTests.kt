@@ -1,11 +1,18 @@
 package org.jetbrains.compose.web.core.tests
 
-import androidx.compose.runtime.*
-import org.jetbrains.compose.web.dom.Div
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.RecomposeScope
+import androidx.compose.runtime.currentRecomposeScope
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import kotlinx.browser.document
 import kotlinx.dom.clear
-import org.jetbrains.compose.web.testutils.*
+import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.testutils.runTest
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
 class DomSideEffectTests {
@@ -106,7 +113,7 @@ class DomSideEffectTests {
 
     @Test
     fun sideEffectsOrder() = runTest {
-        var effectsList = mutableListOf<String>()
+        val effectsList = mutableListOf<String>()
 
         var key = 1
         var recomposeScope: RecomposeScope? = null
@@ -120,24 +127,64 @@ class DomSideEffectTests {
                 }
                 DisposableRefEffect(key) {
                     effectsList.add("DisposableRefEffect")
-                    onDispose { }
+                    onDispose {
+                        effectsList.add("DisposableRefEffectDisposed")
+                    }
                 }
             }
         }
 
-        assertEquals(2, effectsList.size)
-        assertEquals("DisposableRefEffect", effectsList[0])
-        assertEquals("DomSideEffect", effectsList[1])
+        assertContentEquals(effectsList, listOf("DisposableRefEffect", "DomSideEffect"))
 
         key = 2
         recomposeScope?.invalidate()
 
         waitForRecompositionComplete()
 
-        assertEquals(4, effectsList.size)
-        assertEquals("DisposableRefEffect", effectsList[0])
-        assertEquals("DomSideEffect", effectsList[1])
-        assertEquals("DisposableRefEffect", effectsList[2])
-        assertEquals("DomSideEffect", effectsList[3])
+        assertContentEquals(
+            effectsList,
+            listOf("DisposableRefEffect", "DomSideEffect", "DisposableRefEffectDisposed", "DisposableRefEffect", "DomSideEffect")
+        )
     }
+
+    @Test
+    fun domSideEffectWithDisposableEffectTest() = runTest {
+        val effectsList = mutableListOf<String>()
+
+        var key = 1
+        var recomposeScope: RecomposeScope? = null
+
+        composition {
+            recomposeScope = currentRecomposeScope
+
+            Div {
+                DisposableEffect(Unit) {
+                    effectsList.add("DisposableEffectOneTime")
+                    onDispose {  }
+                }
+                DomSideEffect(key) {
+                    effectsList.add("DomSideEffect")
+                }
+                DisposableEffect(key) {
+                    effectsList.add("DisposableEffect")
+                    onDispose {
+                        effectsList.add("DisposableEffectDisposed")
+                    }
+                }
+            }
+        }
+
+        assertContentEquals(effectsList, listOf("DisposableEffectOneTime", "DisposableEffect", "DomSideEffect"))
+
+        key = 2
+        recomposeScope?.invalidate()
+
+        waitForRecompositionComplete()
+
+        assertContentEquals(
+            effectsList,
+            listOf("DisposableEffectOneTime", "DisposableEffect", "DomSideEffect", "DisposableEffectDisposed", "DisposableEffect", "DomSideEffect")
+        )
+    }
+
 }
