@@ -7,9 +7,7 @@
 
 package org.jetbrains.compose.web.css
 
-import org.jetbrains.compose.web.internal.runtime.DomElementWrapper
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
-import org.w3c.dom.css.CSSStyleDeclaration
 import kotlin.properties.ReadOnlyProperty
 
 /**

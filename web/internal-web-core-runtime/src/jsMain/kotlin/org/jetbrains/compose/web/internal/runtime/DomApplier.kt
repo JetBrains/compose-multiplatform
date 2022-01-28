@@ -72,20 +72,3 @@ open class DomNodeWrapper(open val node: Node) {
         }
     }
 }
-
-@ComposeWebInternalApi
-class DomElementWrapper(override val node: Element): DomNodeWrapper(node) {
-    private var currentListeners = emptyList<NamedEventListener>()
-
-    fun updateEventListeners(list: List<NamedEventListener>) {
-        currentListeners.forEach {
-            node.removeEventListener(it.name, it)
-        }
-
-        currentListeners = list
-
-        currentListeners.forEach {
-            node.addEventListener(it.name, it)
-        }
-    }
-}
