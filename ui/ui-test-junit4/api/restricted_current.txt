@@ -31,9 +31,9 @@ package androidx.compose.ui.test.junit4 {
     property public androidx.compose.ui.test.MainTestClock mainClock;
   }
 
-  public final class AndroidComposeTestRule.AndroidComposeStatement extends org.junit.runners.model.Statement {
-    ctor public AndroidComposeTestRule.AndroidComposeStatement(org.junit.runners.model.Statement base);
-    method public void evaluate();
+  @Deprecated public final class AndroidComposeTestRule.AndroidComposeStatement extends org.junit.runners.model.Statement {
+    ctor @Deprecated public AndroidComposeTestRule.AndroidComposeStatement(org.junit.runners.model.Statement base);
+    method @Deprecated public void evaluate();
   }
 
   public final class AndroidComposeTestRule_androidKt {
