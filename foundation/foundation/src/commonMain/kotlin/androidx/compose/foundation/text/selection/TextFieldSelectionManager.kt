@@ -851,6 +851,8 @@ internal fun calculateSelectionMagnifierCenterAndroid(
     manager: TextFieldSelectionManager,
     magnifierSize: IntSize
 ): Offset {
+    // Never show the magnifier in an empty text field.
+    if (manager.value.text.isEmpty()) return Offset.Unspecified
     val rawTextOffset = when (manager.draggingHandle) {
         null -> return Offset.Unspecified
         Handle.Cursor,

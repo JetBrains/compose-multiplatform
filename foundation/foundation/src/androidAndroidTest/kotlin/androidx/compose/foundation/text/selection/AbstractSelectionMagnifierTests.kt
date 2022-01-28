@@ -88,8 +88,29 @@ internal abstract class AbstractSelectionMagnifierTests {
     }
 
     @Test
+    fun magnifier_hidden_whenTextIsEmpty() {
+        rule.setContent {
+            Content("", Modifier.testTag(tag))
+        }
+
+        // Initiate selection.
+        // TODO(b/209698586) Select programmatically once that's fixed.
+        rule.onNodeWithTag(tag).performTouchInput { longClick() }
+
+        // No magnifier yet.
+        assertNoMagnifierExists()
+    }
+
+    @Test
     fun magnifier_hidden_whenSelectionWithoutHandleTouch() {
-        checkMagnifierHiddenWhenSelectionWithoutHandleTouch()
+        rule.setContent {
+            Content("aaaa aaaa aaaa", Modifier.testTag(tag))
+        }
+        // Initiate selection.
+        // TODO(b/209698586) Select programmatically once that's fixed.
+        rule.onNodeWithTag(tag).performTouchInput { longClick() }
+        // No magnifier yet.
+        assertNoMagnifierExists()
     }
 
     @Test
@@ -234,19 +255,6 @@ internal abstract class AbstractSelectionMagnifierTests {
         style: TextStyle = TextStyle.Default,
         onTextLayout: (TextLayoutResult) -> Unit = {}
     ) = TestContent(text, modifier, style, onTextLayout)
-
-    protected fun checkMagnifierHiddenWhenSelectionWithoutHandleTouch() {
-        rule.setContent {
-            Content("aaaa aaaa aaaa", Modifier.testTag(tag))
-        }
-
-        // Initiate selection.
-        // TODO(b/209698586) Select programmatically once that's fixed.
-        rule.onNodeWithTag(tag).performTouchInput { longClick() }
-
-        // No magnifier yet.
-        assertNoMagnifierExists()
-    }
 
     protected fun checkMagnifierAppears_whileHandleTouched(handle: Handle) {
         rule.setContent {
