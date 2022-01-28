@@ -14,7 +14,11 @@ kotlin {
     sourceSets {
         named("commonMain") {
         }
-        named("jsMain") {
+        named("jsMain") { 
+            dependencies {
+                implementation(compose.web.core)
+                implementation(compose.runtime)
+            }
         }
         named("jvmMain") {
             dependencies {
