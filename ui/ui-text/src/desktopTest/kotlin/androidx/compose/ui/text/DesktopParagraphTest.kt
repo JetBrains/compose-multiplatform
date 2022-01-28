@@ -21,11 +21,11 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.platform.Font
-import androidx.compose.ui.text.platform.FontLoader
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.sp
@@ -41,7 +41,7 @@ class DesktopParagraphTest {
     @get:Rule
     val rule = createComposeRule()
 
-    private val fontLoader = FontLoader()
+    private val fontFamilyResolver = createFontFamilyResolver()
     private val defaultDensity = Density(density = 1f)
     private val fontFamilyMeasureFont =
         FontFamily(
@@ -283,7 +283,7 @@ class DesktopParagraphTest {
             ellipsis = ellipsis,
             width = width,
             density = density ?: defaultDensity,
-            resourceLoader = fontLoader
+            fontFamilyResolver = fontFamilyResolver
         )
     }
 
@@ -300,7 +300,7 @@ class DesktopParagraphTest {
                 fontFamily = fontFamilyMeasureFont
             ).merge(style),
             density = density ?: defaultDensity,
-            resourceLoader = fontLoader
+            fontFamilyResolver = fontFamilyResolver
         )
     }
 

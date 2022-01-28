@@ -17,7 +17,9 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -44,7 +46,8 @@ class TextDelegateWidthWithLetterSpacingTest {
     private val lineHeight = 16.sp
     private val fontSize = 12.sp
     private val context = InstrumentationRegistry.getInstrumentation().context
-    private val resourceLoader = TestFontResourceLoader(context)
+    @OptIn(ExperimentalTextApi::class)
+    private val fontFamilyResolver = createFontFamilyResolver(context)
 
     @Test
     fun letterSpacing_and_lineHeight() {
@@ -78,7 +81,7 @@ class TextDelegateWidthWithLetterSpacingTest {
             softWrap = true,
             overflow = TextOverflow.Clip,
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         )
         val layoutResult = textDelegate.layout(Constraints(), LayoutDirection.Ltr)
         assertThat(layoutResult.lineCount).isEqualTo(1)

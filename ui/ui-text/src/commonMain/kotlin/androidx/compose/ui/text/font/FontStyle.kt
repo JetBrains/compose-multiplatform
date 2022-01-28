@@ -21,6 +21,7 @@ package androidx.compose.ui.text.font
  *  @see Font
  *  @see FontFamily
  */
+// TODO(b/205312869) This constructor should not be public as it leads to FontStyle([cursor]) in AS
 @Suppress("INLINE_CLASS_DEPRECATED")
 inline class FontStyle(val value: Int) {
 

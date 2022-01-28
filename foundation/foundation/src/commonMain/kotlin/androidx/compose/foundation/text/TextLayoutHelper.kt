@@ -20,7 +20,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -49,7 +49,7 @@ internal fun TextLayoutResult.canReuse(
     overflow: TextOverflow,
     density: Density,
     layoutDirection: LayoutDirection,
-    resourceLoader: Font.ResourceLoader,
+    fontFamilyResolver: FontFamily.Resolver,
     constraints: Constraints
 ): Boolean {
 
@@ -66,7 +66,7 @@ internal fun TextLayoutResult.canReuse(
             layoutInput.overflow == overflow &&
             layoutInput.density == density &&
             layoutInput.layoutDirection == layoutDirection &&
-            layoutInput.resourceLoader == resourceLoader
+            layoutInput.fontFamilyResolver == fontFamilyResolver
         )
     ) {
         return false

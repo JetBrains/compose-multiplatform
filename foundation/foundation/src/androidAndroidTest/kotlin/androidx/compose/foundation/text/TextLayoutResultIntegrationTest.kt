@@ -20,8 +20,10 @@ import androidx.compose.foundation.text.matchers.isZero
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
@@ -42,7 +44,8 @@ class TextLayoutResultIntegrationTest {
     private val fontFamily = TEST_FONT_FAMILY
     private val density = Density(density = 1f)
     private val context = InstrumentationRegistry.getInstrumentation().context
-    private val resourceLoader = TestFontResourceLoader(context)
+    @OptIn(ExperimentalTextApi::class)
+    private val fontFamilyResolver = createFontFamilyResolver(context)
     private val layoutDirection = LayoutDirection.Ltr
 
     @Test
@@ -56,7 +59,7 @@ class TextLayoutResultIntegrationTest {
                 text = annotatedString,
                 style = TextStyle.Default,
                 density = this,
-                resourceLoader = resourceLoader
+                fontFamilyResolver = fontFamilyResolver
             )
 
             val layoutResult = textDelegate.layout(Constraints(0, 200), layoutDirection)
@@ -77,7 +80,7 @@ class TextLayoutResultIntegrationTest {
             text = annotatedString,
             style = TextStyle.Default,
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         )
 
         val layoutResult = textDelegate.layout(Constraints(maxWidth = width), layoutDirection)
@@ -96,7 +99,7 @@ class TextLayoutResultIntegrationTest {
                 text = annotatedString,
                 style = TextStyle.Default,
                 density = this,
-                resourceLoader = resourceLoader
+                fontFamilyResolver = fontFamilyResolver
             )
 
             val layoutResult = textDelegate.layout(Constraints(), layoutDirection)
@@ -111,7 +114,7 @@ class TextLayoutResultIntegrationTest {
             text = AnnotatedString(text = "Hello"),
             style = TextStyle.Default,
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         )
 
         val layoutResult = textDelegate.layout(Constraints(0, 20), layoutDirection)
@@ -131,7 +134,7 @@ class TextLayoutResultIntegrationTest {
             text = annotatedString,
             style = TextStyle.Default,
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         )
         val layoutResult = textDelegate.layout(Constraints(), layoutDirection)
 
@@ -156,7 +159,7 @@ class TextLayoutResultIntegrationTest {
                 text = annotatedString,
                 style = TextStyle.Default,
                 density = this,
-                resourceLoader = resourceLoader
+                fontFamilyResolver = fontFamilyResolver
             )
             val layoutResult = textDelegate.layout(Constraints(), layoutDirection)
 
@@ -177,7 +180,7 @@ class TextLayoutResultIntegrationTest {
             text = annotatedString,
             style = TextStyle.Default,
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         )
 
         val layoutResult = textDelegate.layout(Constraints(), layoutDirection)
@@ -200,7 +203,7 @@ class TextLayoutResultIntegrationTest {
             style = TextStyle.Default,
             maxLines = maxLines,
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         )
 
         textDelegate.layoutIntrinsics(layoutDirection)
@@ -226,7 +229,7 @@ class TextLayoutResultIntegrationTest {
             style = TextStyle.Default,
             maxLines = maxLines,
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         )
 
         textDelegate.layoutIntrinsics(layoutDirection)
@@ -250,7 +253,7 @@ class TextLayoutResultIntegrationTest {
             text = annotatedString,
             style = TextStyle.Default,
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         )
 
         val maxIntrinsicsHeight = textDelegate.layout(
@@ -278,7 +281,7 @@ class TextLayoutResultIntegrationTest {
             text = annotatedString,
             style = TextStyle.Default,
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         )
 
         val maxIntrinsicsHeight = textDelegate.layout(

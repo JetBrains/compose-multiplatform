@@ -64,7 +64,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalFontLoader
+import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.platform.LocalTextToolbar
@@ -86,7 +86,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.EditProcessor
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
@@ -188,7 +188,7 @@ internal fun CoreTextField(
     // If the text field is disabled or read-only, we should not deal with the input service
     val textInputService = if (!enabled || readOnly) null else LocalTextInputService.current
     val density = LocalDensity.current
-    val resourceLoader = LocalFontLoader.current
+    val fontFamilyResolver = LocalFontFamilyResolver.current
     val selectionBackgroundColor = LocalTextSelectionColors.current.backgroundColor
     val focusManager = LocalFocusManager.current
 
@@ -221,7 +221,7 @@ internal fun CoreTextField(
                 style = textStyle,
                 softWrap = softWrap,
                 density = density,
-                resourceLoader = resourceLoader
+                fontFamilyResolver = fontFamilyResolver
             ),
             recomposeScope = scope
         )
@@ -231,7 +231,7 @@ internal fun CoreTextField(
         textStyle,
         softWrap,
         density,
-        resourceLoader,
+        fontFamilyResolver,
         onValueChange,
         keyboardActions,
         focusManager,
@@ -749,7 +749,7 @@ internal class TextFieldState(
         textStyle: TextStyle,
         softWrap: Boolean,
         density: Density,
-        resourceLoader: Font.ResourceLoader,
+        fontFamilyResolver: FontFamily.Resolver,
         onValueChange: (TextFieldValue) -> Unit,
         keyboardActions: KeyboardActions,
         focusManager: FocusManager,
@@ -768,7 +768,7 @@ internal class TextFieldState(
             style = textStyle,
             softWrap = softWrap,
             density = density,
-            resourceLoader = resourceLoader,
+            fontFamilyResolver = fontFamilyResolver,
             placeholders = emptyList(),
         )
     }

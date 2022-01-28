@@ -28,7 +28,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalFontLoader
+import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -73,7 +73,7 @@ fun BasicText(
     // selection registrar, if no SelectionContainer is added ambient value will be null
     val selectionRegistrar = LocalSelectionRegistrar.current
     val density = LocalDensity.current
-    val resourceLoader = LocalFontLoader.current
+    val fontFamilyResolver = LocalFontFamilyResolver.current
 
     // The ID used to identify this CoreText. If this CoreText is removed from the composition
     // tree and then added back, this ID should stay the same.
@@ -98,7 +98,7 @@ fun BasicText(
                     style = style,
                     density = density,
                     softWrap = softWrap,
-                    resourceLoader = resourceLoader,
+                    fontFamilyResolver = fontFamilyResolver,
                     overflow = overflow,
                     maxLines = maxLines,
                 ),
@@ -114,7 +114,7 @@ fun BasicText(
             style = style,
             density = density,
             softWrap = softWrap,
-            resourceLoader = resourceLoader,
+            fontFamilyResolver = fontFamilyResolver,
             overflow = overflow,
             maxLines = maxLines,
         )
@@ -167,7 +167,7 @@ fun BasicText(
     // selection registrar, if no SelectionContainer is added ambient value will be null
     val selectionRegistrar = LocalSelectionRegistrar.current
     val density = LocalDensity.current
-    val resourceLoader = LocalFontLoader.current
+    val fontFamilyResolver = LocalFontFamilyResolver.current
     val selectionBackgroundColor = LocalTextSelectionColors.current.backgroundColor
 
     val (placeholders, inlineComposables) = resolveInlineContent(text, inlineContent)
@@ -195,7 +195,7 @@ fun BasicText(
                     style = style,
                     density = density,
                     softWrap = softWrap,
-                    resourceLoader = resourceLoader,
+                    fontFamilyResolver = fontFamilyResolver,
                     overflow = overflow,
                     maxLines = maxLines,
                     placeholders = placeholders
@@ -212,7 +212,7 @@ fun BasicText(
             style = style,
             density = density,
             softWrap = softWrap,
-            resourceLoader = resourceLoader,
+            fontFamilyResolver = fontFamilyResolver,
             overflow = overflow,
             maxLines = maxLines,
             placeholders = placeholders,

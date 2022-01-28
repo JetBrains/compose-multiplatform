@@ -23,6 +23,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Density
@@ -66,6 +68,11 @@ class MultiParagraph(
      * @throws IllegalArgumentException if [ParagraphStyle.textDirection] is not set, or
      * any of the [placeholders] crosses paragraph boundary.
      */
+    @Suppress("DEPRECATION")
+    @Deprecated("Font.ResourceLoader is deprecated, use fontFamilyResolver instead",
+        replaceWith = ReplaceWith("MultiParagraph(annotatedString, style, " +
+            "placeholders, maxLines, ellipsis, width, density, fontFamilyResolver)")
+    )
     constructor(
         annotatedString: AnnotatedString,
         style: TextStyle,
@@ -81,7 +88,49 @@ class MultiParagraph(
             style = style,
             placeholders = placeholders,
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = createFontFamilyResolver(resourceLoader)
+        ),
+        maxLines = maxLines,
+        ellipsis = ellipsis,
+        width = width
+    )
+
+    /**
+     *  Lays out a given [annotatedString] with the given constraints. Unlike a [Paragraph],
+     *  [MultiParagraph] can handle a text what has multiple paragraph styles.
+     *
+     * @param annotatedString the text to be laid out
+     * @param style the [TextStyle] to be applied to the whole text
+     * @param placeholders a list of [Placeholder]s that specify ranges of text which will be
+     * skipped during layout and replaced with [Placeholder]. It's required that the range of each
+     * [Placeholder] doesn't cross paragraph boundary, otherwise [IllegalArgumentException] is
+     * thrown.
+     * @param maxLines the maximum number of lines that the text can have
+     * @param ellipsis whether to ellipsize text, applied only when [maxLines] is set
+     * @param width how wide the text is allowed to be
+     * @param density density of the device
+     * @param fontFamilyResolver to be used to load the font given in [SpanStyle]s
+     *
+     * @see Placeholder
+     * @throws IllegalArgumentException if [ParagraphStyle.textDirection] is not set, or
+     * any of the [placeholders] crosses paragraph boundary.
+     */
+    constructor(
+        annotatedString: AnnotatedString,
+        style: TextStyle,
+        placeholders: List<AnnotatedString.Range<Placeholder>> = listOf(),
+        maxLines: Int = Int.MAX_VALUE,
+        ellipsis: Boolean = false,
+        width: Float,
+        density: Density,
+        fontFamilyResolver: FontFamily.Resolver
+    ) : this(
+        intrinsics = MultiParagraphIntrinsics(
+            annotatedString = annotatedString,
+            style = style,
+            placeholders = placeholders,
+            density = density,
+            fontFamilyResolver = fontFamilyResolver
         ),
         maxLines = maxLines,
         ellipsis = ellipsis,

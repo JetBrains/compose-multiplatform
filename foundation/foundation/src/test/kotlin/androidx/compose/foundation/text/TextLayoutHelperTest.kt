@@ -22,7 +22,7 @@ import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.TextLayoutInput
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -40,13 +40,13 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class TextLayoutHelperTest {
 
-    lateinit var resourceLoader: Font.ResourceLoader
+    lateinit var fontFamilyResolver: FontFamily.Resolver
 
     lateinit var referenceResult: TextLayoutResult
 
     @Before
     fun setUp() {
-        resourceLoader = mock()
+        fontFamilyResolver = mock()
 
         referenceResult = TextLayoutResult(
             TextLayoutInput(
@@ -58,7 +58,7 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Ellipsis,
                 density = Density(1.0f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 constraints = Constraints.fixedWidth(100)
             ),
             multiParagraph = mock(),
@@ -79,7 +79,7 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Ellipsis,
                 density = Density(1.0f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 constraints = constraints
             )
         ).isTrue()
@@ -98,7 +98,7 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Ellipsis,
                 density = Density(1.0f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 constraints = constraints
             )
         ).isFalse()
@@ -117,7 +117,7 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Ellipsis,
                 density = Density(1.0f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 constraints = constraints
             )
         ).isFalse()
@@ -136,7 +136,7 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Ellipsis,
                 density = Density(1.0f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 constraints = constraints
             )
         ).isFalse()
@@ -155,7 +155,7 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Ellipsis,
                 density = Density(1.0f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 constraints = constraints
             )
         ).isFalse()
@@ -174,7 +174,7 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Clip,
                 density = Density(1.0f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 constraints = constraints
             )
         ).isFalse()
@@ -193,7 +193,7 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Ellipsis,
                 density = Density(2.0f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 constraints = constraints
             )
         ).isFalse()
@@ -212,7 +212,7 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Ellipsis,
                 density = Density(1.0f),
                 layoutDirection = LayoutDirection.Rtl,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 constraints = constraints
             )
         ).isFalse()
@@ -231,7 +231,7 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Ellipsis,
                 density = Density(1.0f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = mock(),
+                fontFamilyResolver = mock(),
                 constraints = constraints
             )
         ).isFalse()
@@ -249,7 +249,7 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Ellipsis,
                 density = Density(1.0f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 constraints = Constraints.fixedWidth(200)
             )
         ).isFalse()
@@ -273,7 +273,7 @@ class TextLayoutHelperTest {
                 overflow = TextOverflow.Ellipsis,
                 density = Density(1.0f),
                 layoutDirection = LayoutDirection.Ltr,
-                resourceLoader = resourceLoader,
+                fontFamilyResolver = fontFamilyResolver,
                 constraints = Constraints.fixedWidth(200)
             )
         ).isFalse()

@@ -76,6 +76,7 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.platform.toAccessibilitySpannableString
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.toSize
@@ -891,17 +892,18 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     @OptIn(InternalTextApi::class)
     private fun setText(
         node: SemanticsNode,
-        info: AccessibilityNodeInfoCompat
+        info: AccessibilityNodeInfoCompat,
     ) {
+        val fontFamilyResolver: FontFamily.Resolver = view.fontFamilyResolver
         val editableTextToAssign = trimToSize(
             node.unmergedConfig.getTextForTextField()
-                ?.toAccessibilitySpannableString(density = view.density, view.fontLoader),
+                ?.toAccessibilitySpannableString(density = view.density, fontFamilyResolver),
             ParcelSafeTextLength
         )
 
         val textToAssign = trimToSize(
             node.unmergedConfig.getOrNull(SemanticsProperties.Text)?.firstOrNull()
-                ?.toAccessibilitySpannableString(density = view.density, view.fontLoader),
+                ?.toAccessibilitySpannableString(density = view.density, fontFamilyResolver),
             ParcelSafeTextLength
         )
 

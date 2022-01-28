@@ -22,6 +22,7 @@ import android.text.TextPaint
 import androidx.compose.ui.text.FontTestData
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.getAndroidTypefaceStyle
 import androidx.compose.ui.text.matchers.TypefaceSubject.Companion.DEFINED_CHARACTERS
 import com.google.common.truth.FailureMetadata
 import com.google.common.truth.Subject
@@ -112,22 +113,55 @@ internal class TypefaceSubject private constructor(
         val isSelectedFont = isSelectedFont(typeface, charInfo.character)
 
         if (Build.VERSION.SDK_INT >= 28) {
-            check("sameTypeface()")
+            check("sameTypeface($isSelectedFont, $fontWeight, $fontStyle)")
                 .that(isSelectedFont && typeface.weight == fontWeight.weight).isTrue()
             // cannot check typeface.isItalic == (fontStyle == FontStyle.Italic) since it is for
             // fake italic, and for cases where synthesis is disable this does not give correct
             // signal
         } else {
-            check("sameTypeface()").that(isSelectedFont).isTrue()
+            check("sameTypeface($isSelectedFont, $fontWeight, $fontStyle)")
+                .that(isSelectedFont).isTrue()
         }
     }
 
     override fun actualCustomStringRepresentation(): String {
         return if (subject != null) {
-            var selectedFont = DEFINED_CHARACTERS.find { isSelectedFont(subject, it.character) }
-            selectedFont?.toString() ?: "unknown"
+            val selectedFont = DEFINED_CHARACTERS.find { isSelectedFont(subject, it.character) }
+            selectedFont?.toString() + " / " + toString(subject)
         } else {
             super.actualCustomStringRepresentation()
+        }
+    }
+
+    /**
+     * Verifies that [Typeface] object has the given [FontWeight] and [FontStyle].
+     *
+     * This assertion is best effort prior te API 28, and exact on API 28.
+     *
+     * @param [fontWeight] expected [FontWeight]
+     * @param [fontStyle] expected [FontStyle]
+     */
+    fun hasWeightAndStyle(fontWeight: FontWeight, fontStyle: FontStyle) {
+        check("isNotNull()").that(subject).isNotNull()
+        val typeface = subject as Typeface
+
+        val platformTypefaceStyle = getAndroidTypefaceStyle(fontWeight, fontStyle)
+        if (Build.VERSION.SDK_INT >= 28) {
+            check("weight == ($fontWeight)")
+                .that(typeface.weight).isEqualTo(fontWeight.weight)
+            check("isItalic == ($fontStyle)")
+                .that(typeface.isItalic).isEqualTo(fontStyle == FontStyle.Italic)
+            check("style == ($fontWeight, $fontStyle)")
+                .that(typeface.style).isEqualTo(platformTypefaceStyle)
+        } else {
+            val expectBold = platformTypefaceStyle == Typeface.BOLD ||
+                platformTypefaceStyle == Typeface.BOLD_ITALIC
+            check("isItalic == ($fontWeight)")
+                .that(typeface.isItalic).isEqualTo(fontStyle == FontStyle.Italic)
+            check("style == ($fontWeight, $fontStyle)")
+                .that(typeface.style).isEqualTo(platformTypefaceStyle)
+            check("isBold == ($fontWeight)")
+                .that(typeface.isBold).isEqualTo(expectBold)
         }
     }
 }
@@ -144,4 +178,22 @@ internal class CharacterInfo(
 
 internal fun toString(fontWeight: FontWeight, fontStyle: FontStyle): String {
     return "{fontWeight: $fontWeight, fontStyle: $fontStyle}"
+}
+
+private fun toString(typeface: Typeface): String {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        "android.graphics.Typeface(weight=${typeface.weight}, bold=${typeface.isBold} " +
+            "italic=${typeface.isItalic}, style=${typeface.style.toTypefaceStyleString()})"
+    } else {
+        "android.graphics.Typeface(bold=${typeface.isBold} italic=${typeface.isItalic}, " +
+            "style=${typeface.style.toTypefaceStyleString()})"
+    }
+}
+
+private fun Int.toTypefaceStyleString(): String = when (this) {
+    Typeface.NORMAL -> "NORMAL"
+    Typeface.BOLD -> "BOLD"
+    Typeface.BOLD_ITALIC -> "BOLD_ITALIC"
+    Typeface.ITALIC -> "ITALIC"
+    else -> "Unknown($this)"
 }

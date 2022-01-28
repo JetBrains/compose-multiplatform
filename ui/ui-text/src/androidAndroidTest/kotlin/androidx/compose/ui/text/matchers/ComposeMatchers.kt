@@ -18,6 +18,7 @@ package androidx.compose.ui.text.matchers
 
 import android.graphics.Bitmap
 import android.graphics.Typeface
+import androidx.compose.ui.text.font.TypefaceResult
 import com.google.common.truth.IntegerSubject
 import com.google.common.truth.Truth.assertAbout
 
@@ -31,6 +32,10 @@ internal fun assertThat(typeface: Typeface?): TypefaceSubject {
 
 internal fun assertThat(charSequence: CharSequence?): CharSequenceSubject {
     return assertAbout(CharSequenceSubject.SUBJECT_FACTORY).that(charSequence)!!
+}
+
+internal fun assertThat(typefaceResult: TypefaceResult?): TypefaceResultSubject {
+    return assertAbout(TypefaceResultSubject.SUBJECT_FACTORY).that(typefaceResult)!!
 }
 
 internal fun IntegerSubject.isZero() {

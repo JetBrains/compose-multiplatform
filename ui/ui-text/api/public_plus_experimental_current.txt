@@ -91,7 +91,8 @@ package androidx.compose.ui.text {
 
   public final class MultiParagraph {
     ctor public MultiParagraph(androidx.compose.ui.text.MultiParagraphIntrinsics intrinsics, optional int maxLines, optional boolean ellipsis, float width);
-    ctor public MultiParagraph(androidx.compose.ui.text.AnnotatedString annotatedString, androidx.compose.ui.text.TextStyle style, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, optional int maxLines, optional boolean ellipsis, float width, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader);
+    ctor @Deprecated public MultiParagraph(androidx.compose.ui.text.AnnotatedString annotatedString, androidx.compose.ui.text.TextStyle style, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, optional int maxLines, optional boolean ellipsis, float width, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader);
+    ctor public MultiParagraph(androidx.compose.ui.text.AnnotatedString annotatedString, androidx.compose.ui.text.TextStyle style, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, optional int maxLines, optional boolean ellipsis, float width, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.FontFamily.Resolver fontFamilyResolver);
     method public androidx.compose.ui.text.style.ResolvedTextDirection getBidiRunDirection(int offset);
     method public androidx.compose.ui.geometry.Rect getBoundingBox(int offset);
     method public androidx.compose.ui.geometry.Rect getCursorRect(int offset);
@@ -137,7 +138,8 @@ package androidx.compose.ui.text {
   }
 
   public final class MultiParagraphIntrinsics implements androidx.compose.ui.text.ParagraphIntrinsics {
-    ctor public MultiParagraphIntrinsics(androidx.compose.ui.text.AnnotatedString annotatedString, androidx.compose.ui.text.TextStyle style, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader);
+    ctor public MultiParagraphIntrinsics(androidx.compose.ui.text.AnnotatedString annotatedString, androidx.compose.ui.text.TextStyle style, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.FontFamily.Resolver fontFamilyResolver);
+    ctor @Deprecated public MultiParagraphIntrinsics(androidx.compose.ui.text.AnnotatedString annotatedString, androidx.compose.ui.text.TextStyle style, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader);
     method public androidx.compose.ui.text.AnnotatedString getAnnotatedString();
     method public float getMaxIntrinsicWidth();
     method public float getMinIntrinsicWidth();
@@ -203,11 +205,13 @@ package androidx.compose.ui.text {
   }
 
   public final class ParagraphIntrinsicsKt {
-    method public static androidx.compose.ui.text.ParagraphIntrinsics ParagraphIntrinsics(String text, androidx.compose.ui.text.TextStyle style, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> spanStyles, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader);
+    method @Deprecated public static androidx.compose.ui.text.ParagraphIntrinsics ParagraphIntrinsics(String text, androidx.compose.ui.text.TextStyle style, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> spanStyles, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader);
+    method public static androidx.compose.ui.text.ParagraphIntrinsics ParagraphIntrinsics(String text, androidx.compose.ui.text.TextStyle style, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> spanStyles, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.FontFamily.Resolver fontFamilyResolver);
   }
 
   public final class ParagraphKt {
-    method public static androidx.compose.ui.text.Paragraph Paragraph(String text, androidx.compose.ui.text.TextStyle style, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> spanStyles, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, optional int maxLines, optional boolean ellipsis, float width, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader);
+    method @Deprecated public static androidx.compose.ui.text.Paragraph Paragraph(String text, androidx.compose.ui.text.TextStyle style, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> spanStyles, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, optional int maxLines, optional boolean ellipsis, float width, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader);
+    method public static androidx.compose.ui.text.Paragraph Paragraph(String text, androidx.compose.ui.text.TextStyle style, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.SpanStyle>> spanStyles, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, optional int maxLines, optional boolean ellipsis, float width, androidx.compose.ui.unit.Density density, androidx.compose.ui.text.font.FontFamily.Resolver fontFamilyResolver);
     method public static androidx.compose.ui.text.Paragraph Paragraph(androidx.compose.ui.text.ParagraphIntrinsics paragraphIntrinsics, optional int maxLines, optional boolean ellipsis, float width);
   }
 
@@ -322,26 +326,29 @@ package androidx.compose.ui.text {
   }
 
   public final class TextLayoutInput {
-    ctor public TextLayoutInput(androidx.compose.ui.text.AnnotatedString text, androidx.compose.ui.text.TextStyle style, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, int maxLines, boolean softWrap, int overflow, androidx.compose.ui.unit.Density density, androidx.compose.ui.unit.LayoutDirection layoutDirection, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader, long constraints);
-    method public androidx.compose.ui.text.TextLayoutInput copy(optional androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.text.TextStyle style, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, optional int maxLines, optional boolean softWrap, optional int overflow, optional androidx.compose.ui.unit.Density density, optional androidx.compose.ui.unit.LayoutDirection layoutDirection, optional androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader, optional long constraints);
+    ctor @Deprecated public TextLayoutInput(androidx.compose.ui.text.AnnotatedString text, androidx.compose.ui.text.TextStyle style, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, int maxLines, boolean softWrap, int overflow, androidx.compose.ui.unit.Density density, androidx.compose.ui.unit.LayoutDirection layoutDirection, androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader, long constraints);
+    ctor public TextLayoutInput(androidx.compose.ui.text.AnnotatedString text, androidx.compose.ui.text.TextStyle style, java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, int maxLines, boolean softWrap, int overflow, androidx.compose.ui.unit.Density density, androidx.compose.ui.unit.LayoutDirection layoutDirection, androidx.compose.ui.text.font.FontFamily.Resolver fontFamilyResolver, long constraints);
+    method @Deprecated public androidx.compose.ui.text.TextLayoutInput copy(optional androidx.compose.ui.text.AnnotatedString text, optional androidx.compose.ui.text.TextStyle style, optional java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders, optional int maxLines, optional boolean softWrap, optional int overflow, optional androidx.compose.ui.unit.Density density, optional androidx.compose.ui.unit.LayoutDirection layoutDirection, optional androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader, optional long constraints);
     method public operator boolean equals(Object? other);
     method public long getConstraints();
     method public androidx.compose.ui.unit.Density getDensity();
+    method public androidx.compose.ui.text.font.FontFamily.Resolver getFontFamilyResolver();
     method public androidx.compose.ui.unit.LayoutDirection getLayoutDirection();
     method public int getMaxLines();
     method public int getOverflow();
     method public java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> getPlaceholders();
-    method public androidx.compose.ui.text.font.Font.ResourceLoader getResourceLoader();
+    method @Deprecated public androidx.compose.ui.text.font.Font.ResourceLoader getResourceLoader();
     method public boolean getSoftWrap();
     method public androidx.compose.ui.text.TextStyle getStyle();
     method public androidx.compose.ui.text.AnnotatedString getText();
     property public final long constraints;
     property public final androidx.compose.ui.unit.Density density;
+    property public final androidx.compose.ui.text.font.FontFamily.Resolver fontFamilyResolver;
     property public final androidx.compose.ui.unit.LayoutDirection layoutDirection;
     property public final int maxLines;
     property public final int overflow;
     property public final java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.Placeholder>> placeholders;
-    property public final androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader;
+    property @Deprecated public final androidx.compose.ui.text.font.Font.ResourceLoader resourceLoader;
     property public final boolean softWrap;
     property public final androidx.compose.ui.text.TextStyle style;
     property public final androidx.compose.ui.text.AnnotatedString text;
@@ -388,10 +395,6 @@ package androidx.compose.ui.text {
     property public final androidx.compose.ui.text.MultiParagraph multiParagraph;
     property public final java.util.List<androidx.compose.ui.geometry.Rect> placeholderRects;
     property public final long size;
-  }
-
-  public final class TextLayoutResultKt {
-    method @Deprecated public static androidx.compose.ui.text.TextLayoutResult createTextLayoutResult(optional androidx.compose.ui.text.TextLayoutInput layoutInput, optional androidx.compose.ui.text.MultiParagraph multiParagraph, optional long size);
   }
 
   public final class TextPainter {
@@ -522,7 +525,30 @@ package androidx.compose.ui.text.android.style {
 
 }
 
+package androidx.compose.ui.text.caches {
+
+  public final class ContainerHelpersKt {
+  }
+
+  public final class SimpleArrayMapKt {
+  }
+
+}
+
 package androidx.compose.ui.text.font {
+
+  public abstract class AndroidFont implements androidx.compose.ui.text.font.Font {
+    ctor public AndroidFont(int loadingStrategy);
+    method public final int getLoadingStrategy();
+    method public abstract androidx.compose.ui.text.font.AndroidFont.TypefaceLoader getTypefaceLoader();
+    property public final int loadingStrategy;
+    property public abstract androidx.compose.ui.text.font.AndroidFont.TypefaceLoader typefaceLoader;
+  }
+
+  public static interface AndroidFont.TypefaceLoader {
+    method public suspend Object? awaitLoad(android.content.Context context, androidx.compose.ui.text.font.AndroidFont font, kotlin.coroutines.Continuation<? super android.graphics.Typeface> p);
+    method public android.graphics.Typeface? loadBlocking(android.content.Context context, androidx.compose.ui.text.font.AndroidFont font);
+  }
 
   public final class AndroidFontKt {
     method @androidx.compose.runtime.Stable @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(android.content.res.AssetManager assetManager, String path, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
@@ -530,24 +556,40 @@ package androidx.compose.ui.text.font {
     method @RequiresApi(26) @androidx.compose.runtime.Stable @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(android.os.ParcelFileDescriptor fileDescriptor, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
   }
 
+  public final class AndroidFontLoader_androidKt {
+  }
+
+  public final class AndroidFontUtils_androidKt {
+  }
+
   public final class AndroidTypeface_androidKt {
     method public static androidx.compose.ui.text.font.FontFamily FontFamily(android.graphics.Typeface typeface);
-    method public static androidx.compose.ui.text.font.Typeface Typeface(android.content.Context context, androidx.compose.ui.text.font.FontFamily fontFamily, optional java.util.List<kotlin.Pair<androidx.compose.ui.text.font.FontWeight,androidx.compose.ui.text.font.FontStyle>>? styles);
+    method @Deprecated public static androidx.compose.ui.text.font.Typeface Typeface(android.content.Context context, androidx.compose.ui.text.font.FontFamily fontFamily, optional java.util.List<kotlin.Pair<androidx.compose.ui.text.font.FontWeight,androidx.compose.ui.text.font.FontStyle>>? styles);
     method public static androidx.compose.ui.text.font.Typeface Typeface(android.graphics.Typeface typeface);
+  }
+
+  public final class DelegatingFontLoaderForDeprecatedUsage_androidKt {
   }
 
   public abstract sealed class FileBasedFontFamily extends androidx.compose.ui.text.font.FontFamily {
   }
 
   @androidx.compose.runtime.Immutable public interface Font {
+    method @androidx.compose.ui.text.ExperimentalTextApi public int getLoadingStrategy();
     method public int getStyle();
     method public androidx.compose.ui.text.font.FontWeight getWeight();
+    property @androidx.compose.ui.text.ExperimentalTextApi public abstract int loadingStrategy;
     property public abstract int style;
     property public abstract androidx.compose.ui.text.font.FontWeight weight;
+    field public static final androidx.compose.ui.text.font.Font.Companion Companion;
+    field @androidx.compose.ui.text.ExperimentalTextApi public static final long MaximumAsyncTimeout = 15000L; // 0x3a98L
   }
 
-  public static interface Font.ResourceLoader {
-    method public Object load(androidx.compose.ui.text.font.Font font);
+  public static final class Font.Companion {
+  }
+
+  @Deprecated public static interface Font.ResourceLoader {
+    method @Deprecated public Object load(androidx.compose.ui.text.font.Font font);
   }
 
   @androidx.compose.runtime.Immutable public abstract sealed class FontFamily {
@@ -569,20 +611,52 @@ package androidx.compose.ui.text.font {
     property public final androidx.compose.ui.text.font.GenericFontFamily Serif;
   }
 
+  public static sealed interface FontFamily.Resolver {
+    method public suspend Object? preload(androidx.compose.ui.text.font.FontFamily fontFamily, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public androidx.compose.runtime.State<java.lang.Object> resolve(optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional androidx.compose.ui.text.font.FontWeight fontWeight, optional int fontStyle, optional int fontSynthesis);
+  }
+
   public final class FontFamilyKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily FontFamily(java.util.List<? extends androidx.compose.ui.text.font.Font> fonts);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily FontFamily(androidx.compose.ui.text.font.Font... fonts);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily FontFamily(androidx.compose.ui.text.font.Typeface typeface);
   }
 
+  public final class FontFamilyResolverKt {
+  }
+
+  public final class FontFamilyResolver_androidKt {
+    method public static androidx.compose.ui.text.font.FontFamily.Resolver createFontFamilyResolver(android.content.Context context);
+    method @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.FontFamily.Resolver createFontFamilyResolver(android.content.Context context, kotlin.coroutines.CoroutineContext coroutineContext);
+  }
+
   public final class FontKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.Font Font(int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
+    method @androidx.compose.runtime.Stable @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.Font Font(int resId, int loadingStrategy, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.text.font.FontFamily toFontFamily(androidx.compose.ui.text.font.Font);
   }
 
   @androidx.compose.runtime.Immutable public final class FontListFontFamily extends androidx.compose.ui.text.font.FileBasedFontFamily implements kotlin.jvm.internal.markers.KMappedMarker java.util.List<androidx.compose.ui.text.font.Font> {
     method public java.util.List<androidx.compose.ui.text.font.Font> getFonts();
     property public final java.util.List<androidx.compose.ui.text.font.Font> fonts;
+  }
+
+  public final class FontListFontFamilyTypefaceAdapterKt {
+  }
+
+  @androidx.compose.ui.text.ExperimentalTextApi @kotlin.jvm.JvmInline public final value class FontLoadingStrategy {
+    method public int getValue();
+    property public final int value;
+    field public static final androidx.compose.ui.text.font.FontLoadingStrategy.Companion Companion;
+  }
+
+  public static final class FontLoadingStrategy.Companion {
+    method public int getAsync();
+    method public int getBlocking();
+    method public int getOptionalLocal();
+    property public final int Async;
+    property public final int Blocking;
+    property public final int OptionalLocal;
   }
 
   public final inline class FontStyle {
@@ -612,6 +686,9 @@ package androidx.compose.ui.text.font {
     property public final int None;
     property public final int Style;
     property public final int Weight;
+  }
+
+  public final class FontSynthesis_androidKt {
   }
 
   @androidx.compose.runtime.Immutable public final class FontWeight implements java.lang.Comparable<androidx.compose.ui.text.font.FontWeight> {
@@ -677,9 +754,12 @@ package androidx.compose.ui.text.font {
 
   public final class ResourceFont implements androidx.compose.ui.text.font.Font {
     method public androidx.compose.ui.text.font.ResourceFont copy(optional int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
+    method @androidx.compose.ui.text.ExperimentalTextApi public androidx.compose.ui.text.font.ResourceFont copy(optional int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional int style, optional int loadingStrategy);
+    method @androidx.compose.ui.text.ExperimentalTextApi public int getLoadingStrategy();
     method public int getResId();
     method public int getStyle();
     method public androidx.compose.ui.text.font.FontWeight getWeight();
+    property @androidx.compose.ui.text.ExperimentalTextApi public int loadingStrategy;
     property public final int resId;
     property public int style;
     property public androidx.compose.ui.text.font.FontWeight weight;
@@ -1046,6 +1126,9 @@ package androidx.compose.ui.text.platform {
   }
 
   public final class AndroidStringDelegate_androidKt {
+  }
+
+  public final class Synchronization_jvmKt {
   }
 
 }

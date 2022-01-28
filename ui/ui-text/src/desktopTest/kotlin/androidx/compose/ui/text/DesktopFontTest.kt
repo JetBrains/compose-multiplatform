@@ -19,14 +19,13 @@ package androidx.compose.ui.text
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.SkiaFontLoader
 import androidx.compose.ui.text.platform.Font
-import androidx.compose.ui.text.platform.FontLoader
 import androidx.compose.ui.text.platform.GenericFontFamiliesMapping
 import androidx.compose.ui.text.platform.Typeface
 import com.google.common.truth.Truth
 import org.jetbrains.skia.Data
 import org.jetbrains.skia.Typeface
-import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,7 +36,7 @@ class DesktopFontTest {
     @get:Rule
     val rule = createComposeRule()
 
-    private val fontLoader = FontLoader()
+    private val fontLoader = SkiaFontLoader()
 
     private val fontListFontFamily by lazy {
         FontFamily(
@@ -66,38 +65,13 @@ class DesktopFontTest {
 
     @Test
     fun ensureRegistered() {
-        val fontListAlias =
-            "-compose-0db2ec7083b4661dae92b0fc5a9b4ec87df7253027df3b1a4b5abc69a60518aa"
-        Truth.assertThat(fontLoader.ensureRegistered(fontListFontFamily))
-            .isEqualTo(listOf(fontListAlias))
-
-        Truth.assertThat(fontLoader.ensureRegistered(FontFamily.Cursive))
+        Truth.assertThat(fontLoader.loadPlatformTypes(FontFamily.Cursive).aliases)
             .isEqualTo(GenericFontFamiliesMapping[FontFamily.Cursive.name])
 
-        Truth.assertThat(fontLoader.ensureRegistered(FontFamily.Default))
+        Truth.assertThat(fontLoader.loadPlatformTypes(FontFamily.Default).aliases)
             .isEqualTo(GenericFontFamiliesMapping[FontFamily.SansSerif.name])
 
-        Truth.assertThat(fontLoader.ensureRegistered(loadedFontFamily))
+        Truth.assertThat(fontLoader.loadPlatformTypes(loadedFontFamily).aliases)
             .isEqualTo(listOf("Sample Font"))
-    }
-
-    // TODO(demin): can we fix findTypeface for Windows and Linux?
-    @Test
-    fun findTypeface() {
-        assumeTrue(isMacOs)
-
-        Truth.assertThat(fontLoader.findTypeface(fontListFontFamily)!!.isItalic)
-            .isEqualTo(false)
-
-        Truth.assertThat(
-            fontLoader.findTypeface(
-                fontListFontFamily,
-                fontStyle = FontStyle.Italic
-            )!!.isItalic
-        )
-            .isEqualTo(true)
-
-        Truth.assertThat(fontLoader.findTypeface(loadedFontFamily))
-            .isEqualTo(loadedTypeface)
     }
 }

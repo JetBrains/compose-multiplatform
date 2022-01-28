@@ -523,7 +523,7 @@ class ParagraphPlaceholderIntegrationTest {
             ellipsis = ellipsis,
             width = width,
             density = defaultDensity,
-            resourceLoader = TestFontResourceLoader(context)
+            fontFamilyResolver = UncachedFontFamilyResolver(context)
         )
     }
 }

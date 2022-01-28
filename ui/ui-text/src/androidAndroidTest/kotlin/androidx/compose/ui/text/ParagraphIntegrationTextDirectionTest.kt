@@ -36,7 +36,7 @@ class ParagraphIntegrationTextDirectionTest {
     private lateinit var defaultLocale: Locale
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val defaultDensity = Density(density = 1f)
-    private val resourceLoader = TestFontResourceLoader(context)
+    private val resourceLoader = UncachedFontFamilyResolver(context)
     private val ltrLocaleList = LocaleList("en")
     private val rtlLocaleList = LocaleList("ar")
     private val rtlLocale = Locale("ar")
@@ -61,7 +61,7 @@ class ParagraphIntegrationTextDirectionTest {
             style = TextStyle(textDirection = null),
             width = Float.MAX_VALUE,
             density = defaultDensity,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = resourceLoader
         )
 
         assertThat(paragraph.getParagraphDirection(0)).isEqualTo(ResolvedTextDirection.Ltr)
@@ -76,7 +76,7 @@ class ParagraphIntegrationTextDirectionTest {
             style = TextStyle(textDirection = null),
             width = Float.MAX_VALUE,
             density = defaultDensity,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = resourceLoader
         )
 
         assertThat(paragraph.getParagraphDirection(0)).isEqualTo(ResolvedTextDirection.Rtl)
@@ -89,7 +89,7 @@ class ParagraphIntegrationTextDirectionTest {
             style = TextStyle(textDirection = null, localeList = ltrLocaleList),
             width = Float.MAX_VALUE,
             density = defaultDensity,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = resourceLoader
         )
 
         assertThat(paragraph.getParagraphDirection(0)).isEqualTo(ResolvedTextDirection.Ltr)
@@ -102,7 +102,7 @@ class ParagraphIntegrationTextDirectionTest {
             style = TextStyle(textDirection = null, localeList = rtlLocaleList),
             width = Float.MAX_VALUE,
             density = defaultDensity,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = resourceLoader
         )
 
         assertThat(paragraph.getParagraphDirection(0)).isEqualTo(ResolvedTextDirection.Rtl)

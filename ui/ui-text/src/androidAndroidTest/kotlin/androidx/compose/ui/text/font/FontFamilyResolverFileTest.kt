@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 The Android Open Source Project
+ * Copyright 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package androidx.compose.ui.text.platform
+
+package androidx.compose.ui.text.font
 
 import android.content.Context
+import android.graphics.Typeface
 import android.os.ParcelFileDescriptor
 import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.toFontFamily
+import androidx.compose.ui.text.UncachedFontFamilyResolver
 import androidx.compose.ui.text.matchers.assertThat
+import androidx.compose.ui.text.platform.bitmap
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
-import com.nhaarman.mockitokotlin2.mock
 import org.junit.After
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
@@ -35,11 +36,11 @@ import java.io.File
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 @OptIn(ExperimentalTextApi::class)
-class TypefaceAdapterFileTest {
+class FontFamilyResolverFileTest {
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val assetFontPath = "subdirectory/asset_font.ttf"
     private val tmpFontPath = "tmp_file_font.ttf"
-    private fun TypefaceAdapter() = TypefaceAdapter(resourceLoader = mock())
+    private val fontFamilyResolver = UncachedFontFamilyResolver(context)
 
     @Before
     fun setup() {
@@ -50,6 +51,20 @@ class TypefaceAdapterFileTest {
     @After
     fun cleanupAfter() {
         deleteFile()
+    }
+
+    private fun resolveAsTypeface(
+        fontFamily: FontFamily? = null,
+        fontWeight: FontWeight = FontWeight.Normal,
+        fontStyle: FontStyle = FontStyle.Normal,
+        fontSynthesis: FontSynthesis = FontSynthesis.All
+    ): Typeface {
+        return fontFamilyResolver.resolve(
+            fontFamily,
+            fontWeight,
+            fontStyle,
+            fontSynthesis
+        ).value as Typeface
     }
 
     private fun deleteFile() {
@@ -71,27 +86,26 @@ class TypefaceAdapterFileTest {
     @Test
     @MediumTest
     fun customSingleFont_fromAssetManager() {
-        val defaultTypeface = TypefaceAdapter().create()
+        val defaultTypeface = resolveAsTypeface()
 
         val fontFamily = Font(context.assets, assetFontPath).toFontFamily()
 
-        val typeface = TypefaceAdapter().create(fontFamily = fontFamily)
+        val typeface = resolveAsTypeface(fontFamily = fontFamily)
 
         assertThat(typeface).isNotNull()
         // asset font have ~ defined as the only character supported.
         assertThat(typeface.bitmap("~")).isNotEqualToBitmap(defaultTypeface.bitmap("~"))
     }
 
-    @Ignore
     @Test
     @MediumTest
     fun customSingleFont_fromFile() {
-        val defaultTypeface = TypefaceAdapter().create()
+        val defaultTypeface = resolveAsTypeface()
 
         val fontFile = File(context.filesDir, tmpFontPath)
         val fontFamily = Font(fontFile).toFontFamily()
 
-        val typeface = TypefaceAdapter().create(fontFamily = fontFamily)
+        val typeface = resolveAsTypeface(fontFamily = fontFamily)
 
         assertThat(typeface).isNotNull()
         // asset font have ~ defined as the only character supported.
@@ -100,12 +114,13 @@ class TypefaceAdapterFileTest {
 
     @Test
     @MediumTest
+    @SdkSuppress(minSdkVersion = 26)
     fun customSingleFont_fromFileDescriptor() {
-        val defaultTypeface = TypefaceAdapter().create()
+        val defaultTypeface = resolveAsTypeface()
 
         context.openFileInput(tmpFontPath).use { inputStream ->
             val fontFamily = Font(ParcelFileDescriptor.dup(inputStream.fd)).toFontFamily()
-            val typeface = TypefaceAdapter().create(fontFamily = fontFamily)
+            val typeface = resolveAsTypeface(fontFamily = fontFamily)
 
             assertThat(typeface).isNotNull()
             // asset font have ~ defined as the only character supported.

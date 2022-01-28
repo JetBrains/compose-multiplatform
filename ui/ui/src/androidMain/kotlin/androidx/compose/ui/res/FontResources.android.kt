@@ -41,20 +41,36 @@ private val syncLoadedTypefaces = mutableMapOf<FontFamily, Typeface>()
  * @param fontFamily the fontFamily
  * @return the decoded image data associated with the resource
  */
+@Suppress("DEPRECATION")
 @Composable
 @ReadOnlyComposable
+@Deprecated(
+    "Prefer to preload fonts using FontFamily.Resolver.",
+    replaceWith = ReplaceWith(
+        "FontFamily.Resolver.preload(fontFamily, Font.AndroidResourceLoader(context))"
+    ),
+    level = DeprecationLevel.WARNING
+)
 fun fontResource(fontFamily: FontFamily): Typeface {
     return fontResourceFromContext(LocalContext.current, fontFamily)
 }
 
-private fun fontResourceFromContext(context: Context, fontFamily: FontFamily): Typeface {
-    if (fontFamily is SystemFontFamily || fontFamily is LoadedFontFamily) {
+@Suppress("DEPRECATION")
+@Deprecated(
+    "Prefer to preload fonts using FontFamily.Resolver.",
+    replaceWith = ReplaceWith(
+        "FontFamily.Resolver.preload(fontFamily, Font.AndroidResourceLoader(context))"
+    ),
+    level = DeprecationLevel.WARNING
+)
+private fun fontResourceFromContext(context: Context, a: FontFamily): Typeface {
+    if (a is SystemFontFamily || a is LoadedFontFamily) {
         synchronized(cacheLock) {
-            return syncLoadedTypefaces.getOrPut(fontFamily) {
-                Typeface(context, fontFamily)
+            return syncLoadedTypefaces.getOrPut(a) {
+                Typeface(context, a)
             }
         }
     } else {
-        return Typeface(context, fontFamily)
+        return Typeface(context, a)
     }
 }

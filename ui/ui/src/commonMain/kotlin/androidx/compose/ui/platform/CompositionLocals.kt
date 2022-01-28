@@ -30,6 +30,7 @@ import androidx.compose.ui.input.pointer.PointerIconService
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
@@ -90,11 +91,18 @@ val LocalFocusManager = staticCompositionLocalOf<FocusManager> {
 /**
  * The CompositionLocal to provide platform font loading methods.
  *
- * Use [androidx.compose.ui.res.fontResource] instead.
  * @suppress
  */
+@Suppress("DEPRECATION")
+@Deprecated("LocalFontLoader is replaced with LocalFontFamilyResolver",
+    replaceWith = ReplaceWith("LocalFontFamilyResolver")
+)
 val LocalFontLoader = staticCompositionLocalOf<Font.ResourceLoader> {
     noLocalProvidedFor("LocalFontLoader")
+}
+
+val LocalFontFamilyResolver = staticCompositionLocalOf<FontFamily.Resolver> {
+    noLocalProvidedFor("LocalFontFamilyResolver")
 }
 
 /**
@@ -170,7 +178,9 @@ internal fun ProvideCommonCompositionLocals(
         LocalClipboardManager provides owner.clipboardManager,
         LocalDensity provides owner.density,
         LocalFocusManager provides owner.focusManager,
-        LocalFontLoader provides owner.fontLoader,
+        @Suppress("DEPRECATION") LocalFontLoader
+            provides @Suppress("DEPRECATION") owner.fontLoader,
+        LocalFontFamilyResolver provides owner.fontFamilyResolver,
         LocalHapticFeedback provides owner.hapticFeedBack,
         LocalInputModeManager provides owner.inputModeManager,
         LocalLayoutDirection provides owner.layoutDirection,

@@ -19,13 +19,14 @@ package androidx.compose.foundation.text.selection
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.text.InternalFoundationTextApi
 import androidx.compose.foundation.text.TEST_FONT_FAMILY
-import androidx.compose.foundation.text.TestFontResourceLoader
 import androidx.compose.foundation.text.TextDelegate
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
@@ -48,7 +49,8 @@ class TextFieldSelectionDelegateTest {
     private val fontFamily = TEST_FONT_FAMILY
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val defaultDensity = Density(density = 1f)
-    private val resourceLoader = TestFontResourceLoader(context)
+    @OptIn(ExperimentalTextApi::class)
+    private val fontFamilyResolver = createFontFamilyResolver(context)
 
     @Test
     fun getTextFieldSelection_long_press_select_word_ltr() {
@@ -382,7 +384,7 @@ class TextFieldSelectionDelegateTest {
             text = annotatedString,
             style = TextStyle(),
             density = density,
-            resourceLoader = resourceLoader
+            fontFamilyResolver = fontFamilyResolver
         ).layout(Constraints(), LayoutDirection.Ltr)
     }
 }

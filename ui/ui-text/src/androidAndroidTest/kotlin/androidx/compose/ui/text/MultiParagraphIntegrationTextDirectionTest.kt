@@ -264,7 +264,7 @@ class MultiParagraphIntegrationTextDirectionTest {
             ),
             placeholders = placeholders,
             density = defaultDensity,
-            resourceLoader = TestFontResourceLoader(context)
+            fontFamilyResolver = UncachedFontFamilyResolver(context)
         )
     }
 
@@ -285,7 +285,7 @@ class MultiParagraphIntegrationTextDirectionTest {
             ),
             width = width,
             density = defaultDensity,
-            resourceLoader = TestFontResourceLoader(context)
+            fontFamilyResolver = UncachedFontFamilyResolver(context)
         )
     }
 }
