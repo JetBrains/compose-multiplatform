@@ -103,6 +103,10 @@ tasks.register("publishComposeJbExtendedIconsToMavenLocal", ComposePublishingTas
     iconsPublications()
 }
 
+tasks.register("runJsDemo") {
+    dependsOnComposeTask(":compose:mpp:demo:jsRun")
+}
+
 tasks.register("testComposeJbDesktop") {
     dependsOnComposeTask(":compose:desktop:desktop:jvmTest")
     dependsOnComposeTask(":compose:animation:animation:desktopTest")

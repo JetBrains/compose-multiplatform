@@ -1,0 +1,41 @@
+Index: compiler/frontend/src/org/jetbrains/kotlin/resolve/checkers/ExperimentalMarkerDeclarationAnnotationChecker.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/compiler/frontend/src/org/jetbrains/kotlin/resolve/checkers/ExperimentalMarkerDeclarationAnnotationChecker.kt b/compiler/frontend/src/org/jetbrains/kotlin/resolve/checkers/ExperimentalMarkerDeclarationAnnotationChecker.kt
+--- a/compiler/frontend/src/org/jetbrains/kotlin/resolve/checkers/ExperimentalMarkerDeclarationAnnotationChecker.kt	(revision e55f7459f46ba98334ec92410afb12271e6430bb)
++++ b/compiler/frontend/src/org/jetbrains/kotlin/resolve/checkers/ExperimentalMarkerDeclarationAnnotationChecker.kt	(date 1643374927818)
+@@ -65,7 +65,7 @@
+                 if (PROPERTY_GETTER in possibleTargets ||
+                     annotationUseSiteTarget == AnnotationUseSiteTarget.PROPERTY_GETTER
+                 ) {
+-                    trace.report(Errors.OPT_IN_MARKER_ON_WRONG_TARGET.on(entry, "getter"))
++//                    trace.report(Errors.OPT_IN_MARKER_ON_WRONG_TARGET.on(entry, "getter"))
+                 }
+                 if (VALUE_PARAMETER in possibleTargets && annotationUseSiteTarget == null ||
+                     annotationUseSiteTarget == AnnotationUseSiteTarget.RECEIVER ||
+Index: compiler/frontend/src/org/jetbrains/kotlin/extensions/internal/NonStableExtensionPoints.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/compiler/frontend/src/org/jetbrains/kotlin/extensions/internal/NonStableExtensionPoints.kt b/compiler/frontend/src/org/jetbrains/kotlin/extensions/internal/NonStableExtensionPoints.kt
+--- a/compiler/frontend/src/org/jetbrains/kotlin/extensions/internal/NonStableExtensionPoints.kt	(revision e55f7459f46ba98334ec92410afb12271e6430bb)
++++ b/compiler/frontend/src/org/jetbrains/kotlin/extensions/internal/NonStableExtensionPoints.kt	(date 1643374927839)
+@@ -36,7 +36,7 @@
+  */
+ @RequiresOptIn(level = RequiresOptIn.Level.ERROR)
+ @Retention(AnnotationRetention.BINARY)
+-internal annotation class InternalNonStableExtensionPoints
++annotation class InternalNonStableExtensionPoints
+
+ @InternalNonStableExtensionPoints
+ interface TypeResolutionInterceptorExtension {
+@@ -141,4 +141,4 @@
+         name: Name,
+         location: LookupLocation
+     ): Collection<FunctionDescriptor> = candidates
+-}
+\ No newline at end of file
++}
