@@ -50,6 +50,7 @@ import kotlinx.coroutines.launch
  * @param interactionSource [MutableInteractionSource] that will be used to emit
  * [FocusInteraction.Focus] when this element is being focused.
  */
+@OptIn(ExperimentalFoundationApi::class)
 fun Modifier.focusable(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource? = null,
@@ -74,7 +75,6 @@ fun Modifier.focusable(
     // 3. Entire window is panned due to `softInputMode=ADJUST_PAN` – report the correct focused
     //    rect to the view system, and the view system itself will keep the focused area in view.
     //    See aosp/1964580.
-    @OptIn(ExperimentalFoundationApi::class)
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
     DisposableEffect(interactionSource) {
         onDispose {
@@ -98,13 +98,22 @@ fun Modifier.focusable(
         onDispose { }
     }
 
-    @OptIn(ExperimentalFoundationApi::class)
     if (enabled) {
+        val focusedChildModifier = if (isFocused) {
+            remember { FocusedBoundsModifier() }
+        } else {
+            // Could use Modifier.onPlaced to ensure there's a LayoutCoordinates ready to go as soon
+            // as we get focus, although waiting until the next recomposition seems to be good
+            // enough for now.
+            Modifier
+        }
+
         Modifier
             .semantics {
                 this.focused = isFocused
             }
             .bringIntoViewRequester(bringIntoViewRequester)
+            .then(focusedChildModifier)
             .onFocusChanged {
                 isFocused = it.isFocused
                 if (isFocused) {
