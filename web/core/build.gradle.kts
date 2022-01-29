@@ -31,6 +31,7 @@ kotlin {
             dependencies {
                 implementation(project(":internal-web-core-runtime"))
                 implementation(kotlin("stdlib-js"))
+                implementation("org.jetbrains.kotlin-wrappers:kotlin-csstype:3.0.10-pre.283-kotlin-1.6.10")
             }
         }
 

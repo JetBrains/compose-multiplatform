@@ -127,6 +127,7 @@ class CSSVariableTests {
         }
 
         val boundingRect = (root.children[1] as HTMLElement).getBoundingClientRect()
+
         assertEquals(300.toDouble(), boundingRect.width)
         assertEquals(200.toDouble(), boundingRect.height)
     }

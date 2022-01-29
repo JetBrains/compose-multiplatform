@@ -5,13 +5,41 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.keywords.auto
+import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import org.jetbrains.compose.web.testutils.*
+import csstype.Color as CssTypeColor
 
 class InlineStyleTests {
+
+    @Test
+    fun inlineProtocolTest() = runTest {
+        composition {
+            Div({
+                style(js("{color: \"red\"}"))
+            }) { }
+        }
+
+        assertEquals("color: red;", nextChild().style.cssText)
+    }
+
+    @Test
+    fun inlineProtocolWithCssTypeTest() = runTest {
+        composition {
+            val obj = js("{}")
+            obj.color = CssTypeColor("#F00FFA")
+
+            Div({
+                style(obj)
+            }) { }
+        }
+
+        assertEquals("color: rgb(240, 15, 250);", nextChild().style.cssText)
+    }
+
 
     @Test
     fun conditionalStyleAppliedProperly() = runTest {
