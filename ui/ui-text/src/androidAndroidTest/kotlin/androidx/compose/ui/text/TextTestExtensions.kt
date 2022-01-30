@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontListFontFamilyTypefaceAdapter
 import androidx.compose.ui.text.font.PlatformFontLoader
 import androidx.compose.ui.text.font.PlatformFontFamilyTypefaceAdapter
 import androidx.compose.ui.text.font.TypefaceRequestCache
+import androidx.compose.ui.geometry.Rect
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
@@ -55,3 +56,74 @@ internal fun UncachedFontFamilyResolver(
 )
 
 fun Float.toIntPx(): Int = ceil(this).roundToInt()
+
+internal fun FloatArray.asRectArray(): Array<Rect> {
+    return Array((size) / 4) { index ->
+        Rect(
+            this[4 * index],
+            this[4 * index + 1],
+            this[4 * index + 2],
+            this[4 * index + 3]
+        )
+    }
+}
+
+internal fun ltrCharacterBoundariesForTestFont(
+    text: String,
+    fontSize: Float
+): Array<Rect> {
+    var top = 0f
+    var left = 0f
+    return text.indices.map { index ->
+        // if \n, no position update, same as before
+        val right = if (text[index] == '\n') left else left + fontSize
+        val bottom = top + fontSize
+        Rect(
+            left = left,
+            top = top,
+            right = right,
+            bottom = bottom
+        ).also {
+            if (text[index] == '\n') {
+                // left resets to line start
+                left = 0f
+                // top will go to next line
+                top = bottom
+            } else {
+                // else move to right with one char
+                left = right
+            }
+        }
+    }.toTypedArray()
+}
+
+internal fun rtlCharacterBoundariesForTestFont(
+    text: String,
+    width: Float,
+    fontSize: Float
+): Array<Rect> {
+    var top = 0f
+    var right = width
+    return text.indices.map { index ->
+        // if \n, position doesn't update, same as before (right)
+        // else left is 1 char left
+        val left = if (text[index] == '\n') right else right - fontSize
+        val bottom = top + fontSize
+        Rect(
+            left = left,
+            top = top,
+            right = right,
+            bottom = bottom
+        ).also {
+            if (text[index] == '\n') {
+                // right resets to line start
+                right = width
+                // top will go to next line
+                top = bottom
+            } else {
+                // else move to left with one char
+                right = left
+            }
+        }
+    }.toTypedArray()
+}
