@@ -53,7 +53,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
 
-        <defaultLiveTemplates file="templates/WrappedComposables.xml"/>
+        <defaultLiveTemplates file="templates/ComposeMultiplatformTemplates.xml"/>
 
         <intentionAction id="wrap_group" order="first">
             <className>org.jetbrains.compose.intentions.wrap_with_composable.WrapWithComposableIntentionGroup
