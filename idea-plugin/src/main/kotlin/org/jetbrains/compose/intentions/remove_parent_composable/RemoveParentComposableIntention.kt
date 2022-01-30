@@ -6,14 +6,12 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Iconable
 import com.intellij.psi.PsiElement
-import com.intellij.psi.util.parentOfType
 import org.jetbrains.compose.desktop.ide.preview.PreviewIcons
+import org.jetbrains.compose.intentions.utils.composable_finder.ChildComposableFinder
 import org.jetbrains.compose.intentions.utils.composable_finder.ComposableFunctionFinder
-import org.jetbrains.compose.intentions.utils.composable_finder.NestedComposableFinder
+import org.jetbrains.compose.intentions.utils.get_root_psi_element.GetRootPsiElement
 import org.jetbrains.compose.intentions.utils.is_intention_available.IsIntentionAvailable
 import org.jetbrains.kotlin.psi.KtCallExpression
-import org.jetbrains.kotlin.psi.KtNameReferenceExpression
-import org.jetbrains.kotlin.psi.KtValueArgumentList
 import javax.swing.Icon
 
 class RemoveParentComposableIntention :
@@ -30,19 +28,16 @@ class RemoveParentComposableIntention :
         return "Compose Multiplatform intentions"
     }
 
-    private val composableFunctionFinder: ComposableFunctionFinder = NestedComposableFinder()
+    private val getRootElement = GetRootPsiElement()
+
+    private val composableFunctionFinder: ComposableFunctionFinder = ChildComposableFinder()
 
     override fun isAvailable(project: Project, editor: Editor?, element: PsiElement): Boolean {
         return element.isAvailable(composableFunctionFinder)
     }
 
     override fun invoke(project: Project, editor: Editor?, element: PsiElement) {
-        val wrapper = if (element.parent is KtValueArgumentList) {
-            element.parent.prevSibling as? KtNameReferenceExpression ?: return
-        } else {
-            element.parentOfType() ?: return
-        }
-        val callExpression = (wrapper.parent as? KtCallExpression) ?: return
+        val callExpression = getRootElement(element.parent) as? KtCallExpression ?: return
         val lambdaBlock =
             callExpression.lambdaArguments.firstOrNull()?.getLambdaExpression()?.functionLiteral?.bodyExpression
                 ?: return

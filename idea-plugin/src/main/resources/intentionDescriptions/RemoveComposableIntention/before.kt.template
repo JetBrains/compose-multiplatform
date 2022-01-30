@@ -1,5 +1,4 @@
 @Composable
 fun Column() {
     Text("Abc")
-    Text("Abc")
 }

@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtLambdaArgument
 import org.jetbrains.kotlin.psi.psiUtil.getChildOfType
 
-class NestedComposableFinder : ComposableFunctionFinder, IsPsiElementComposable {
+class ChildComposableFinder : ComposableFunctionFinder, IsPsiElementComposable {
 
     override fun isFunctionComposable(psiElement: PsiElement): Boolean {
 

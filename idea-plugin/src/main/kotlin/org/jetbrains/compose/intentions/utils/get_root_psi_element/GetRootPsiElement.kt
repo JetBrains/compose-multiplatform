@@ -1,4 +1,4 @@
-package org.jetbrains.compose.intentions.utils.get_root_element
+package org.jetbrains.compose.intentions.utils.get_root_psi_element
 
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.psi.KtCallExpression
@@ -9,19 +9,21 @@ import org.jetbrains.kotlin.psi.KtPropertyDelegate
 import org.jetbrains.kotlin.psi.KtValueArgumentList
 
 /**
- *  KtValueArgumentList -> Parent -> KtNameReferenceExpression -> Parent -> KtCallExpression -> Parent -> KtPropertyDelegate -> Parent -> Property
- *  KtNameReferenceExpression -> Parent -> KtCallExpression ->  Parent -> KtDotQualifiedExpression -> Parent -> KtPropertyDelegate ->  Property
- *  KtNameReferenceExpression -> Parent -> KtCallExpression -> Parent -> KtPropertyDelegate -> Parent -> Property
- *  KtNameReferenceExpression -> Parent -> KtCallExpression -> Parent -> Property
- *  KtNameReferenceExpression -> Parent -> KtCallExpression
- **/
-class GetRootElement {
+ * To get the root element of a selected Psi element
+ */
+class GetRootPsiElement {
 
     /**
-     * element can be CallExpression (Composable Function) or Property (Composable Property like remember)
+     * @param element can be
+     * 1. KtCallExpression, KtNameReferenceExpression - Box()
+     * 2. KtDotQualifiedExpression - repeatingAnimation.animateFloat
+     * 3. KtProperty - val systemUiController = rememberSystemUiController()
+     * 4. KtValueArgumentList - ()
      */
     tailrec operator fun invoke(element: PsiElement, iteration: Int = 0): PsiElement? {
-        if (iteration > 5) { // fail safe
+        // To avoid infinite loops
+        if (iteration > 5) {
+            // Looking for a better way to handle this - throw error or return null
             return null
         }
 
@@ -38,7 +40,7 @@ class GetRootElement {
                     else -> element
                 }
             }
-            else -> element
+            else -> null
         }
     }
 }

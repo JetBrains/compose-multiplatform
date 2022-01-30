@@ -8,8 +8,8 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import org.jetbrains.compose.intentions.utils.composable_finder.ComposableFunctionFinder
-import org.jetbrains.compose.intentions.utils.composable_finder.DeepComposableFunctionFinder
-import org.jetbrains.compose.intentions.utils.get_root_element.GetRootElement
+import org.jetbrains.compose.intentions.utils.composable_finder.ComposableFunctionFinderImpl
+import org.jetbrains.compose.intentions.utils.get_root_psi_element.GetRootPsiElement
 import org.jetbrains.compose.intentions.utils.is_intention_available.IsIntentionAvailable
 
 abstract class BaseWrapWithComposableAction :
@@ -18,11 +18,11 @@ abstract class BaseWrapWithComposableAction :
     IsIntentionAvailable {
 
     private val composableFunctionFinder: ComposableFunctionFinder by lazy {
-        DeepComposableFunctionFinder()
+        ComposableFunctionFinderImpl()
     }
 
     private val getRootElement by lazy {
-        GetRootElement()
+        GetRootPsiElement()
     }
 
     override fun getFamilyName(): String {

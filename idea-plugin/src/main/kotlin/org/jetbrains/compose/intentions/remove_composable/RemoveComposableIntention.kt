@@ -8,12 +8,16 @@ import com.intellij.openapi.util.Iconable
 import com.intellij.psi.PsiElement
 import org.jetbrains.compose.desktop.ide.preview.PreviewIcons
 import org.jetbrains.compose.intentions.utils.composable_finder.ComposableFunctionFinder
-import org.jetbrains.compose.intentions.utils.composable_finder.DeepComposableFunctionFinder
-import org.jetbrains.compose.intentions.utils.get_root_element.GetRootElement
+import org.jetbrains.compose.intentions.utils.composable_finder.ComposableFunctionFinderImpl
+import org.jetbrains.compose.intentions.utils.get_root_psi_element.GetRootPsiElement
 import org.jetbrains.compose.intentions.utils.is_intention_available.IsIntentionAvailable
 import javax.swing.Icon
 
-class RemoveComposableIntention : PsiElementBaseIntentionAction(), Iconable, LowPriorityAction, IsIntentionAvailable {
+class RemoveComposableIntention :
+    PsiElementBaseIntentionAction(),
+    Iconable,
+    LowPriorityAction,
+    IsIntentionAvailable {
 
     override fun getText(): String {
         return "Remove this Composable"
@@ -23,9 +27,9 @@ class RemoveComposableIntention : PsiElementBaseIntentionAction(), Iconable, Low
         return "Compose Multiplatform intentions"
     }
 
-    private val composableFunctionFinder: ComposableFunctionFinder = DeepComposableFunctionFinder()
+    private val composableFunctionFinder: ComposableFunctionFinder = ComposableFunctionFinderImpl()
 
-    private val getRootElement = GetRootElement()
+    private val getRootElement = GetRootPsiElement()
 
     override fun isAvailable(project: Project, editor: Editor?, element: PsiElement): Boolean {
         return element.isAvailable(composableFunctionFinder)

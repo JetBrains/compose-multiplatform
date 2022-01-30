@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.psi.KtPropertyDelegate
 import org.jetbrains.kotlin.psi.KtValueArgumentList
 import org.jetbrains.kotlin.psi.psiUtil.getChildOfType
 
-class DeepComposableFunctionFinder : ComposableFunctionFinder, IsPsiElementComposable {
+class ComposableFunctionFinderImpl : ComposableFunctionFinder, IsPsiElementComposable {
 
     override fun isFunctionComposable(psiElement: PsiElement): Boolean {
         return when (psiElement) {

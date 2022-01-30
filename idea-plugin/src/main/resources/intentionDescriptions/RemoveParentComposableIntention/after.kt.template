@@ -1,4 +1,4 @@
 @Composable
-Button() {
+fun Column() {
   Text("Abc")
 }

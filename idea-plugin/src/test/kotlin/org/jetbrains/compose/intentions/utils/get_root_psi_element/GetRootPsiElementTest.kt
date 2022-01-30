@@ -1,4 +1,4 @@
-package org.jetbrains.compose.intentions.utils.get_root_element
+package org.jetbrains.compose.intentions.utils.get_root_psi_element
 
 import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase
 import junit.framework.TestCase
@@ -15,9 +15,9 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
-class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
+class GetRootPsiElementTest : LightJavaCodeInsightFixtureTestCase() {
 
-    private val getRootElement = GetRootElement()
+    private val getRootElement = GetRootPsiElement()
 
     @Test
     fun `when a name reference expression is selected , but root is a property , the property should be returned as root element`() {
@@ -27,7 +27,6 @@ class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
         val template = """
             val systemUiController = rememberSystemUiController()
         """.trimIndent()
-            .trim()
 
         val file = ktPsiFactory.createFile(template)
 
@@ -35,7 +34,9 @@ class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
 
         val ktNameReferenceExpression = (property.lastChild as KtCallExpression).firstChild as KtNameReferenceExpression
 
-        TestCase.assertEquals(property, getRootElement(ktNameReferenceExpression))
+        TestCase.assertEquals("rememberSystemUiController", ktNameReferenceExpression.text)
+
+        TestCase.assertEquals(property, getRootElement.invoke(ktNameReferenceExpression))
     }
 
     @Test
@@ -44,15 +45,11 @@ class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
 
         @Language("Kotlin")
         val template = """
-            @Composable
             fun Box(block:()->Unit) {
                 
             }
             
             fun OuterComposable() {
-              // Call Expression - Box
-              // |
-              // v
                 Box() { 
                  
                 }
@@ -64,10 +61,13 @@ class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
         val ktNamedFunction = file.lastChild as KtNamedFunction
 
         val callExpression = ktNamedFunction.lastChild.children.find { it is KtCallExpression }!!
+        val ktNameReferenceExpression = callExpression.firstChild as KtNameReferenceExpression
+
+        TestCase.assertEquals("Box", ktNameReferenceExpression.text)
 
         TestCase.assertEquals(
             callExpression,
-            getRootElement(callExpression.firstChild as KtNameReferenceExpression)
+            getRootElement.invoke(ktNameReferenceExpression)
         )
     }
 
@@ -83,7 +83,7 @@ class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
             }
             
             fun OuterComposable() {
-                // Argument List Element - (
+                // Argument List Element 
                 // |
                 // v
                 Box() {
@@ -100,9 +100,11 @@ class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
 
         val argumentListElement = callExpression.firstChild.nextSibling as KtValueArgumentList
 
+        TestCase.assertEquals("()", argumentListElement.text)
+
         TestCase.assertEquals(
             callExpression,
-            getRootElement(argumentListElement)
+            getRootElement.invoke(argumentListElement)
         )
     }
 
@@ -112,9 +114,6 @@ class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
 
         @Language("Kotlin")
         val template = """
-                               // Delegated property
-                               // |
-                               // v
            var isComposable by remember {
                true
             }
@@ -126,9 +125,11 @@ class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
 
         val referenceExpression = property.lastChild.lastChild.firstChild as KtNameReferenceExpression
 
+        TestCase.assertEquals("remember", referenceExpression.text)
+
         TestCase.assertEquals(
             property,
-            getRootElement(referenceExpression)
+            getRootElement.invoke(referenceExpression)
         )
     }
 
@@ -140,9 +141,6 @@ class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
         val template = """
           val repeatingAnimation = rememberInfiniteTransition()
 
-                                            // Dot qualified expression
-                                            // |
-                                            // v
           val offset by repeatingAnimation.animateFloat(
               0f,
               -20f,
@@ -164,9 +162,12 @@ class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
 
         val referenceExpression = dotQualifiedExpression.lastChild.firstChild as KtNameReferenceExpression
 
+
+        TestCase.assertEquals("animateFloat", referenceExpression.text)
+
         TestCase.assertEquals(
             property,
-            getRootElement(referenceExpression)
+            getRootElement.invoke(referenceExpression)
         )
     }
 
@@ -178,9 +179,6 @@ class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
         val template = """
           val repeatingAnimation = rememberInfiniteTransition()
 
-                                            // Dot qualified expression 
-                                            // |
-                                            // v
           val offset = repeatingAnimation.animateFloat(
               0f,
               -20f,
@@ -202,9 +200,11 @@ class GetRootElementTest : LightJavaCodeInsightFixtureTestCase() {
 
         val referenceExpression = dotQualifiedExpression.lastChild.firstChild as KtNameReferenceExpression
 
+        TestCase.assertEquals("animateFloat", referenceExpression.text)
+
         TestCase.assertEquals(
             property,
-            getRootElement(referenceExpression)
+            getRootElement.invoke(referenceExpression)
         )
     }
 }
