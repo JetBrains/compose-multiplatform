@@ -20,7 +20,7 @@ class GetRootPsiElementTest : LightJavaCodeInsightFixtureTestCase() {
     private val getRootElement = GetRootPsiElement()
 
     @Test
-    fun `when a name reference expression is selected , but root is a property , the property should be returned as root element`() {
+    fun `when a name reference expression is selected , but root is a property , the property should be returned`() {
         val ktPsiFactory = KtPsiFactory(project)
 
         @Language("Kotlin")
@@ -88,7 +88,7 @@ class GetRootPsiElementTest : LightJavaCodeInsightFixtureTestCase() {
                 // v
                 Box() {
                  
-                } // Name Reference Expression
+                }
             }
         """.trimIndent().trim()
 
@@ -134,7 +134,7 @@ class GetRootPsiElementTest : LightJavaCodeInsightFixtureTestCase() {
     }
 
     @Test
-    fun `when a name reference expression is selected, with a delegated property with dot qualified expression as root, property should be returned`() {
+    fun `when a name reference expression with dot reference expression is selected, with a delegated property as root, property should be returned`() {
         val ktPsiFactory = KtPsiFactory(project)
 
         @Language("Kotlin")
@@ -162,7 +162,6 @@ class GetRootPsiElementTest : LightJavaCodeInsightFixtureTestCase() {
 
         val referenceExpression = dotQualifiedExpression.lastChild.firstChild as KtNameReferenceExpression
 
-
         TestCase.assertEquals("animateFloat", referenceExpression.text)
 
         TestCase.assertEquals(
@@ -172,7 +171,7 @@ class GetRootPsiElementTest : LightJavaCodeInsightFixtureTestCase() {
     }
 
     @Test
-    fun `when a name reference expression is selected, with a property and dot qualified expression as root, property should be returned`() {
+    fun `when a name reference expression with dot reference expression is selected, with a property and dot qualified expression as root, property should be returned`() {
         val ktPsiFactory = KtPsiFactory(project)
 
         @Language("Kotlin")
@@ -205,6 +204,104 @@ class GetRootPsiElementTest : LightJavaCodeInsightFixtureTestCase() {
         TestCase.assertEquals(
             property,
             getRootElement.invoke(referenceExpression)
+        )
+    }
+
+    @Test
+    fun `when a dot qualified expression is selected, with a delegated property as root, property should be returned`() {
+        val ktPsiFactory = KtPsiFactory(project)
+
+        @Language("Kotlin")
+        val template = """
+          val repeatingAnimation = rememberInfiniteTransition()
+
+          val offset by repeatingAnimation.animateFloat(
+              0f,
+              -20f,
+              infiniteRepeatable(
+                  repeatMode = RepeatMode.Reverse,
+                  animation = tween(
+                      durationMillis = 1000,
+                      easing = LinearEasing
+                  )
+              )
+          )
+        """.trimIndent().trim()
+
+        val file = ktPsiFactory.createFile(template)
+
+        val property = file.lastChild as KtProperty
+
+        val dotQualifiedExpression = property.lastChild.lastChild as KtDotQualifiedExpression
+
+        TestCase.assertEquals(
+            """
+            repeatingAnimation.animateFloat(
+              0f,
+              -20f,
+              infiniteRepeatable(
+                  repeatMode = RepeatMode.Reverse,
+                  animation = tween(
+                      durationMillis = 1000,
+                      easing = LinearEasing
+                  )
+              )
+          )
+        """.trimIndent().trim(), dotQualifiedExpression.text
+        )
+
+        TestCase.assertEquals(
+            property,
+            getRootElement.invoke(dotQualifiedExpression)
+        )
+    }
+
+    @Test
+    fun `when a dot qualified expression is selected, with a property as root, property should be returned`() {
+        val ktPsiFactory = KtPsiFactory(project)
+
+        @Language("Kotlin")
+        val template = """
+          val repeatingAnimation = rememberInfiniteTransition()
+
+          val offset = repeatingAnimation.animateFloat(
+              0f,
+              -20f,
+              infiniteRepeatable(
+                  repeatMode = RepeatMode.Reverse,
+                  animation = tween(
+                      durationMillis = 1000,
+                      easing = LinearEasing
+                  )
+              )
+          )
+        """.trimIndent().trim()
+
+        val file = ktPsiFactory.createFile(template)
+
+        val property = file.lastChild as KtProperty
+
+        val dotQualifiedExpression = property.lastChild as KtDotQualifiedExpression
+
+        TestCase.assertEquals(
+            """
+            repeatingAnimation.animateFloat(
+              0f,
+              -20f,
+              infiniteRepeatable(
+                  repeatMode = RepeatMode.Reverse,
+                  animation = tween(
+                      durationMillis = 1000,
+                      easing = LinearEasing
+                  )
+              )
+          )
+        """.trimIndent().trim(), dotQualifiedExpression.text
+        )
+
+        TestCase.assertEquals(
+            property,
+            getRootElement.invoke(dotQualifiedExpression)
         )
     }
 }
