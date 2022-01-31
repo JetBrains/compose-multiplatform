@@ -16,3 +16,6 @@ build/
 /captures
 .externalNativeBuild
 .cxx
+
+# Ignoring the persistant lockfile until kotlin.js vulnerabilities are fixed
+yarn.lock
