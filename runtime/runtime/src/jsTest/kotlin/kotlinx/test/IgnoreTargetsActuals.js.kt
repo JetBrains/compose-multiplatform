@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package kotlinx.test
 
-expect annotation class IgnoreJsTarget
+actual typealias IgnoreJsTarget = kotlin.test.Ignore
+actual typealias IgnoreNativeTarget = DoNothing
+actual typealias IgnoreJsAndNative = kotlin.test.Ignore

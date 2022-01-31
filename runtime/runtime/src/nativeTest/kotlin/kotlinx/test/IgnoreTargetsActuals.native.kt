@@ -16,4 +16,6 @@
 
 package kotlinx.test
 
-actual typealias IgnoreJsTarget = kotlin.test.Ignore
+actual typealias IgnoreJsTarget = DoNothing
+actual typealias IgnoreNativeTarget = kotlin.test.Ignore
+actual typealias IgnoreJsAndNative = kotlin.test.Ignore

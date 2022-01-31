@@ -26,7 +26,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlinx.test.IgnoreJsAndNative
 import kotlinx.test.IgnoreJsTarget
+import kotlinx.test.IgnoreNativeTarget
 import kotlinx.test._runBlocking
 
 class SnapshotStateMapTests {
@@ -136,7 +138,10 @@ class SnapshotStateMapTests {
     }
 
     @Test
-    @IgnoreJsTarget
+    @IgnoreJsAndNative
+    // Ignored on js and native:
+    // test passes if the order is changed to
+    // assertEquals(entries.first, entries.second)
     fun validateEntriesIterator() {
         validateRead { map, normalMap ->
             for (entries in map.entries.zip(normalMap.entries)) {
@@ -404,7 +409,11 @@ class SnapshotStateMapTests {
         }
     }
 
-    @Test
+    @Test @IgnoreNativeTarget
+    // Ignored for native:
+    // SnapshotStateMap removes a correct element (same as on jvm and js) - entry(key=1,value=1f)
+    // The test fails because MutableMap (normalMap) removes entry(key=1, value=5f)
+    // due to an entry search by value starting from the end of an array (in native HashMap impl).
     fun validateValuesRemove() {
         validateWrite { map ->
             map.values.remove(1f)
