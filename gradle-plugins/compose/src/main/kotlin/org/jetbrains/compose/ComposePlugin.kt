@@ -19,11 +19,15 @@ import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.plugins.ExtensionAware
 import org.jetbrains.compose.android.AndroidExtension
 import org.jetbrains.compose.desktop.DesktopExtension
+import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.desktop.application.internal.configureApplicationImpl
 import org.jetbrains.compose.desktop.application.internal.currentTarget
 import org.jetbrains.compose.desktop.preview.internal.initializePreview
 import org.jetbrains.compose.experimental.dsl.ExperimentalExtension
 import org.jetbrains.compose.experimental.internal.configureExperimental
+import org.jetbrains.compose.internal.COMPOSE_PLUGIN_ID
+import org.jetbrains.compose.internal.KOTLIN_JS_PLUGIN_ID
+import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -42,9 +46,7 @@ class ComposePlugin : Plugin<Project> {
         }
 
         project.initializePreview()
-        if (ComposeBuildConfig.isComposeWithWeb) {
-            composeExtension.extensions.create("web", WebExtension::class.java)
-        }
+        composeExtension.extensions.create("web", WebExtension::class.java)
 
         project.plugins.apply(ComposeCompilerKotlinSupportPlugin::class.java)
 
@@ -58,7 +60,7 @@ class ComposePlugin : Plugin<Project> {
             project.configureExperimental(composeExtension, experimentalExtension)
 
             if (androidExtension.useAndroidX) {
-                println("useAndroidX is an experimental feature at the moment!")
+                project.logger.warn("useAndroidX is an experimental feature at the moment!")
                 RedirectAndroidVariants.androidxVersion = androidExtension.androidxVersion
                 listOf(
                     RedirectAndroidVariants::class.java,
@@ -125,13 +127,26 @@ class ComposePlugin : Plugin<Project> {
                 }
             }
 
+            val overrideDefaultJvmTarget = ComposeProperties.overrideKotlinJvmTarget(project.providers).get()
+            project.tasks.withType(KotlinCompile::class.java) {
+                it.kotlinOptions.apply {
+                    if (overrideDefaultJvmTarget) {
+                        jvmTarget = "11".takeIf { jvmTarget.toDouble() < 11 } ?: jvmTarget
+                    }
+                    useIR = true
+                }
+            }
         }
 
-        project.tasks.withType(KotlinCompile::class.java) {
-            it.kotlinOptions.apply {
-                jvmTarget = "1.8".takeIf { jvmTarget.toDouble() < 1.8 } ?: jvmTarget
-                useIR = true
-            }
+        checkAndWarnAboutUsingJsPlugin(project)
+    }
+
+    private fun checkAndWarnAboutUsingJsPlugin(project: Project) {
+        val msg = "'$COMPOSE_PLUGIN_ID' plugin is not compatible with '$KOTLIN_JS_PLUGIN_ID' plugin. " +
+                "Use '$KOTLIN_MPP_PLUGIN_ID' instead"
+
+        project.plugins.withId(KOTLIN_JS_PLUGIN_ID) {
+            project.logger.error(msg)
         }
     }
 
@@ -176,9 +191,7 @@ class ComposePlugin : Plugin<Project> {
         val uiTooling get() = composeDependency("org.jetbrains.compose.ui:ui-tooling")
         val preview get() = composeDependency("org.jetbrains.compose.ui:ui-tooling-preview")
         val materialIconsExtended get() = composeDependency("org.jetbrains.compose.material:material-icons-extended")
-        val web: WebDependencies get() =
-            if (ComposeBuildConfig.isComposeWithWeb) WebDependencies
-            else error("This version of Compose plugin does not support 'compose.web.*' dependencies")
+        val web: WebDependencies get() = WebDependencies
     }
 
     object DesktopDependencies {

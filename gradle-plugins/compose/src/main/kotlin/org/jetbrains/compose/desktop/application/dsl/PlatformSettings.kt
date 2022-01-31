@@ -20,6 +20,9 @@ open class MacOSPlatformSettings @Inject constructor(objects: ObjectFactory): Pl
     var packageName: String? = null
     var dockName: String? = null
     var setDockNameSameAsPackageName: Boolean = true
+    var appStore: Boolean = false
+    var appCategory: String? = null
+    var entitlementsFile: RegularFileProperty = objects.fileProperty()
     var packageBuildVersion: String? = null
     var dmgPackageVersion: String? = null
     var dmgPackageBuildVersion: String? = null
@@ -44,6 +47,8 @@ open class MacOSPlatformSettings @Inject constructor(objects: ObjectFactory): Pl
     fun notarization(fn: Action<MacOSNotarizationSettings>) {
         fn.execute(notarization)
     }
+
+    val provisioningProfile: RegularFileProperty = objects.fileProperty()
 
     internal val infoPlistSettings = InfoPlistSettings()
     fun infoPlist(fn: Action<InfoPlistSettings>) {

@@ -129,7 +129,25 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
+    val macAppStore: Property<Boolean?> = objects.nullableProperty()
+
+    @get:Input
+    @get:Optional
+    val macAppCategory: Property<String?> = objects.nullableProperty()
+
+    @get:InputFile
+    @get:Optional
+    @get:PathSensitive(PathSensitivity.ABSOLUTE)
+    val macEntitlementsFile: RegularFileProperty = objects.fileProperty()
+
+    @get:Input
+    @get:Optional
     val packageBuildVersion: Property<String?> = objects.nullableProperty()
+
+    @get:InputFile
+    @get:Optional
+    @get:PathSensitive(PathSensitivity.ABSOLUTE)
+    val macProvisioningProfile: RegularFileProperty = objects.fileProperty()
 
     @get:Input
     @get:Optional
@@ -175,6 +193,10 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Optional
     internal val macExtraPlistKeysRawXml: Property<String?> = objects.nullableProperty()
 
+    @get:InputFile
+    @get:Optional
+    val javaRuntimePropertiesFile: RegularFileProperty = objects.fileProperty()
+
     @get:Optional
     @get:Nested
     internal var nonValidatedMacSigningSettings: MacOSSigningSettings? = null
@@ -183,7 +205,7 @@ abstract class AbstractJPackageTask @Inject constructor(
         val nonValidatedSettings = nonValidatedMacSigningSettings
         if (currentOS == OS.MacOS && nonValidatedSettings?.sign?.get() == true) {
             val validatedSettings =
-                nonValidatedSettings.validate(nonValidatedMacBundleID, project)
+                nonValidatedSettings.validate(nonValidatedMacBundleID, project, macAppStore)
             MacSigner(validatedSettings, runExternalTool)
         } else null
     }
@@ -275,14 +297,23 @@ abstract class AbstractJPackageTask @Inject constructor(
                 macDockName.orNull?.let { dockName ->
                     javaOption("-Xdock:name=$dockName")
                 }
+                macProvisioningProfile.orNull?.let { provisioningProfile ->
+                    cliArg("--app-content", provisioningProfile)
+                }
             }
         }
 
         if (targetFormat != TargetFormat.AppImage) {
             // Args, that can only be used, when creating an installer
-            cliArg("--app-image", appImage)
+            if (currentOS == OS.MacOS && macAppStore.orNull == true) {
+                // This is needed to prevent a directory does not exist error.
+                cliArg("--app-image", appImage.dir("${packageName.get()}.app"))
+            } else {
+                cliArg("--app-image", appImage)
+            }
             cliArg("--install-dir", installationPath)
             cliArg("--license-file", licenseFile)
+            cliArg("--resource-dir", jpackageResources)
 
             when (currentOS) {
                 OS.Linux -> {
@@ -320,6 +351,9 @@ abstract class AbstractJPackageTask @Inject constructor(
             OS.MacOS -> {
                 cliArg("--mac-package-name", macPackageName)
                 cliArg("--mac-package-identifier", nonValidatedMacBundleID)
+                cliArg("--mac-app-store", macAppStore)
+                cliArg("--mac-app-category", macAppCategory)
+                cliArg("--mac-entitlements", macEntitlementsFile)
 
                 macSigner?.let { signer ->
                     cliArg("--mac-sign", true)
@@ -378,7 +412,12 @@ abstract class AbstractJPackageTask @Inject constructor(
                 fileOperations.delete(tmpDirForSign)
                 tmpDirForSign.mkdirs()
 
-                MacJarSignFileCopyingProcessor(signer, tmpDirForSign)
+                val jvmRuntimeInfo = JavaRuntimeProperties.readFromFile(javaRuntimePropertiesFile.ioFile)
+                MacJarSignFileCopyingProcessor(
+                    signer,
+                    tmpDirForSign,
+                    jvmRuntimeVersion = jvmRuntimeInfo.majorVersion
+                )
             } ?: SimpleFileCopyingProcessor
         fun copyFileToLibsDir(sourceFile: File): File {
             val targetFileName =
@@ -424,6 +463,17 @@ abstract class AbstractJPackageTask @Inject constructor(
             InfoPlistBuilder(macExtraPlistKeysRawXml.orNull)
                 .also { setInfoPlistValues(it) }
                 .writeToFile(jpackageResources.ioFile.resolve("Info.plist"))
+
+            if (macAppStore.orNull == true) {
+                val productDefPlistXml = """
+                    <key>os</key>
+                    <array>
+                        <string>10.13</string>
+                    </array>
+                """.trimIndent()
+                InfoPlistBuilder(productDefPlistXml)
+                    .writeToFile(jpackageResources.ioFile.resolve("product-def.plist"))
+            }
         }
     }
 
@@ -480,7 +530,9 @@ abstract class AbstractJPackageTask @Inject constructor(
         plist[PlistKeys.CFBundlePackageType] = "APPL"
         val packageVersion = packageVersion.get()!!
         plist[PlistKeys.CFBundleShortVersionString] = packageVersion
-        plist[PlistKeys.LSApplicationCategoryType] = "Unknown"
+        // If building for the App Store, use "utilities" as default just like jpackage.
+        val category = macAppCategory.orNull ?: (if (macAppStore.orNull == true) "utilities" else null)
+        plist[PlistKeys.LSApplicationCategoryType] = category?.let { "public.app-category.$it" } ?: "Unknown"
         val packageBuildVersion = packageBuildVersion.orNull ?: packageVersion
         plist[PlistKeys.CFBundleVersion] = packageBuildVersion
         val year = Calendar.getInstance().get(Calendar.YEAR)

@@ -35,6 +35,10 @@ compose.desktop {
                 // see https://wixtoolset.org/documentation/manual/v3/howtos/general/generate_guids.html
                 upgradeUuid = "a61b72be-1b0c-4de5-9607-791c17687428"
             }
+
+            macOS {
+                bundleID = "org.jetbrains.compose.demo.widgets"
+            }
         }
     }
 }

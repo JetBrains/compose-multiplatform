@@ -17,8 +17,6 @@ object BuildProperties {
     fun deployVersion(project: Project): String =
         System.getenv("COMPOSE_GRADLE_PLUGIN_VERSION")
             ?: project.findProperty("deploy.version") as String
-    fun isComposeWithWeb(project: Project): Boolean =
-        project.findProperty("compose.with.web") == "true"
     fun experimentalOELPublication(project: Project): Boolean =
         project.findProperty("oel.publication") == "true"
     fun oelAndroidXVersion(project: Project): String? =

@@ -1,7 +1,7 @@
 # Signing and notarizing distributions for macOS
 
 Apple [requires](https://developer.apple.com/documentation/xcode/notarizing_macos_software_before_distribution) 
-all 3rd apps to be signed and notarized (checked by Apple) 
+all 3rd party apps to be signed and notarized (checked by Apple) 
 for running on recent versions of macOS. 
 
 ## What is covered
@@ -34,7 +34,10 @@ Open https://developer.apple.com/account/resources/certificates
     * Check `Save to disk` option.
 2. Create and install a new certificate using your [Apple Developer account](https://developer.apple.com/account/):
     * Open https://developer.apple.com/account/resources/certificates/add
-    * Choose the `Developer ID Application` certificate type.
+    * For publishing outside the App Store, choose the `Developer ID Application` certificate type.
+      For publishing on the App Store, you need two certificates. First select the `Mac App Distribution`
+      certificate type, and once you have completed the steps in this section, repeat them again for
+      the `Mac Installer Distribution` certificate type.
     * Upload your Certificate Signing Request from the previous step.
     * Download and install the certificate (drag & drop the certificate into the `Keychain Access` application).
 
@@ -44,8 +47,13 @@ You can find all installed certificates and their keychains by running the follo
 ```
 /usr/bin/security find-certificate -c "Developer ID Application"
 ```
+or the following commands when publishing on the App Store:
+```
+/usr/bin/security find-certificate -c "3rd Party Mac Developer Application"
+/usr/bin/security find-certificate -c "3rd Party Mac Developer Installer"
+```
 
-If you have multiple `Developer ID Application` certificates installed,
+If you have multiple developer certificates of the same type installed,
 you will need to specify the path to the keychain, containing
 the certificate intended for signing.
 
@@ -68,6 +76,24 @@ Open [the page](https://developer.apple.com/account/resources/identifiers/list) 
       uniquely identifies an application in Apple's ecosystem.
     * You can use an explicit bundle ID a wildcard, matching multiple bundle IDs.
     * It is recommended to use the reverse DNS notation (e.g.`com.yoursitename.yourappname`).
+
+## Preparing a Provisioning Profile
+For testing on TestFlight (when publishing to the App Store), you need to add a provisioning
+profile. You can skip this step otherwise.
+
+#### Checking existing provisioning profiles
+
+Open https://developer.apple.com/account/resources/profiles/list
+
+#### Creating a new provisioning profile
+
+1. Open [the page](https://developer.apple.com/account/resources/profiles/add) on Apple's developer portal.
+2. Choose `Mac App Store` option under `Distribution`.
+3. Select Profile Type `Mac`.
+4. Select the App ID which you created earlier.
+5. Select the Mac App Distribution certificate you created earlier.
+6. Enter a name.
+7. Click generate and download the provisioning profile.
    
 ## Creating an app-specific password
 
@@ -179,7 +205,7 @@ macOS {
     *  Alternatively,  the `compose.desktop.mac.signing.identity` Gradle property can be  used.
 * Optionally, set the `keychain` DSL property to the path to the specific keychain, containing your certificate.
     * Alternatively, the `compose.desktop.mac.signing.keychain` Gradle property can be used.
-    * This step is only necessary, if multiple `Developer ID Application` certificates are installed.
+    * This step is only necessary, if multiple developer certificates of the same type are installed.
   
 The following Gradle properties can be used instead of DSL properties:
 * `compose.desktop.mac.sign` enables or disables signing. 
@@ -218,6 +244,21 @@ macOS {
 ```
 xcrun altool --list-providers -u <Apple ID> -p <Notarization password>"
 ```
+
+### Configuring provisioning profile
+
+For testing on TestFlight (when publishing to the App Store), you need to add a provisioning
+profile. You can skip this step otherwise.
+
+Note that this option requires JDK 18 due to [this issue](https://bugs.openjdk.java.net/browse/JDK-8274346).
+
+``` kotlin
+macOS {
+    provisioningProfile.set(project.file("embedded.provisionprofile"))
+}
+```
+
+Make sure to rename your provisioning profile you created earlier to `embedded.provisionprofile`.
 
 ## Using Gradle
 

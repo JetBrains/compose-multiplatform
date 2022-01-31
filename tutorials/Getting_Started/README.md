@@ -7,8 +7,8 @@ using Compose Multiplatform UI framework.
 
 ## Prerequisites
 
- Compose for Desktop can produce applications for macOS, Linux and Windows platforms,
-and so any of these platforms can be used for this tutorial.
+ Compose for Desktop can produce applications for macOS, Linux and Windows platforms.
+So any of these platforms can be used for this tutorial.
 
 The following software has to be preinstalled:
    * JDK 11 or later
@@ -144,7 +144,7 @@ fun main() = application {
 ```
 ## Running the project
 
-Open `build.gradle.kts` as a project in IntelliJ IDEA.
+Open `build.gradle.kts` [as a project](https://www.jetbrains.com/help/idea/jetgradle-tool-window.html) in IntelliJ IDEA.
 
 <img alt="New project" src="screen1.png" height="500" />
 

@@ -11,7 +11,8 @@ import java.io.ObjectOutputStream
 import java.io.Serializable
 
 internal data class JavaRuntimeProperties(
-    val availableModules: List<String>
+    val majorVersion: Int,
+    val availableModules: List<String>,
 ) : Serializable {
     companion object {
         @Suppress("unused")

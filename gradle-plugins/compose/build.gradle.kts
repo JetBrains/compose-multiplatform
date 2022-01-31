@@ -28,7 +28,6 @@ val buildConfig = tasks.register("buildConfig", GenerateBuildConfig::class.java)
     classFqName.set("org.jetbrains.compose.ComposeBuildConfig")
     generatedOutputDir.set(buildConfigDir)
     fieldsToGenerate.put("composeVersion", BuildProperties.composeVersion(project))
-    fieldsToGenerate.put("isComposeWithWeb", BuildProperties.isComposeWithWeb(project))
     fieldsToGenerate.put("experimentalOELPublication", BuildProperties.experimentalOELPublication(project))
     fieldsToGenerate.put("oelAndroidXVersion", BuildProperties.oelAndroidXVersion(project).orEmpty())
 }
@@ -88,7 +87,7 @@ val jar = tasks.named<Jar>("jar") {
 // __SUPPORTED_GRADLE_VERSIONS__
 testGradleVersion("6.4")
 testGradleVersion("7.1.1")
-testGradleVersion("7.3")
+testGradleVersion("7.3.3")
 
 val javaHomeForTests: String? = when {
     // __COMPOSE_NATIVE_DISTRIBUTIONS_MIN_JAVA_VERSION__

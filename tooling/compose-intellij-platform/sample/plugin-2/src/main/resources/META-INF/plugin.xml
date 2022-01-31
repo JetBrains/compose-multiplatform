@@ -1,0 +1,15 @@
+<idea-plugin>
+    <id>org.jetbrains.compose.intellij.platform.sample.plugin2</id>
+    <vendor>Sample vendor</vendor>
+
+    <depends>org.jetbrains.compose.intellij.platform</depends>
+    <depends>org.jetbrains.compose.intellij.platform.sample.base</depends>
+
+    <actions>
+        <action id="org.jetbrains.compose.intellij.platform.sample.ComposeDemoAction2"
+                class="org.jetbrains.compose.intellij.platform.sample.ComposeDemoAction2"
+                text="Show Compose Dialog 2">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
