@@ -31,6 +31,8 @@ import androidx.compose.ui.materialize
 import androidx.compose.ui.node.ComposeUiNode
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.LayoutState
+import androidx.compose.ui.node.LayoutNode.UsageByParent
+import androidx.compose.ui.node.requireOwner
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalViewConfiguration
@@ -225,6 +227,19 @@ class SubcomposeLayoutState(
          * be used during the measure pass anytime soon.
          */
         fun dispose()
+
+        /**
+         * The amount of placeables composed into this slot.
+         */
+        val placeablesCount: Int get() = 0
+
+        /**
+         * Performs synchronous measure of the placeable at the given [index].
+         *
+         * @param index the placeable index. Should be smaller than [placeablesCount].
+         * @param constraints Constraints to measure this placeable with.
+         */
+        fun premeasure(index: Int, constraints: Constraints) {}
     }
 }
 
@@ -402,6 +417,7 @@ internal class LayoutNodeSubcompositionsState(
             while (i >= startIndex) {
                 val slotId = getSlotIdAtIndex(i)
                 if (reusableSlotIdsCache.contains(slotId)) {
+                    root.foldedChildren[i].measuredByParent = UsageByParent.NotUsed
                     reusableCount++
                 } else {
                     ignoreRemeasureRequests {
@@ -548,6 +564,25 @@ internal class LayoutNodeSubcompositionsState(
                     val reusableStart = root.foldedChildren.size - precomposedCount - reusableCount
                     move(itemIndex, reusableStart, 1)
                     disposeOrReuseStartingFromIndex(reusableStart)
+                }
+            }
+
+            override val placeablesCount: Int
+                get() = precomposeMap[slotId]?._children?.size ?: 0
+
+            override fun premeasure(index: Int, constraints: Constraints) {
+                val node = precomposeMap[slotId]
+                if (node != null && node.isAttached) {
+                    val size = node._children.size
+                    if (index < 0 || index >= size) {
+                        throw IndexOutOfBoundsException(
+                            "Index ($index) is out of bound of [0, $size)"
+                        )
+                    }
+                    require(!node.isPlaced)
+                    root.ignoreRemeasureRequests {
+                        node.requireOwner().measureAndLayout(node._children[index], constraints)
+                    }
                 }
             }
         }

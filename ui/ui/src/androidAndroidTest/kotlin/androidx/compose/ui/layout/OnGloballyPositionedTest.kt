@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -796,6 +797,35 @@ class OnGloballyPositionedTest {
             Modifier.onGloballyPositioned(lambda1),
             Modifier.onGloballyPositioned(lambda2)
         )
+    }
+
+    @Test
+    fun forceRemeasureTriggersCallbacks() {
+        var coords: LayoutCoordinates? = null
+        var remeasurementObj: Remeasurement? = null
+        rule.setContent {
+            Box(
+                Modifier
+                    .then(object : RemeasurementModifier {
+                        override fun onRemeasurementAvailable(remeasurement: Remeasurement) {
+                            remeasurementObj = remeasurement
+                        }
+                    })
+                    .onGloballyPositioned {
+                        coords = it
+                    }
+                    .size(100.dp)
+            )
+        }
+
+        rule.runOnIdle {
+            assertNotNull(coords)
+            coords = null
+            assertNotNull(remeasurementObj)
+            remeasurementObj!!.forceRemeasure()
+
+            assertNotNull(coords)
+        }
     }
 }
 

@@ -683,6 +683,11 @@ internal class AndroidComposeView(context: Context) :
         measureAndLayoutDelegate.dispatchOnPositionedCallbacks()
     }
 
+    override fun measureAndLayout(layoutNode: LayoutNode, constraints: Constraints) {
+        measureAndLayoutDelegate.measureAndLayout(layoutNode, constraints)
+        measureAndLayoutDelegate.dispatchOnPositionedCallbacks()
+    }
+
     override fun forceMeasureTheSubtree(layoutNode: LayoutNode) {
         measureAndLayoutDelegate.forceMeasureTheSubtree(layoutNode)
     }

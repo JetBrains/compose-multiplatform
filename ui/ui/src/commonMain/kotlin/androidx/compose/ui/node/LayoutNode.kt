@@ -1342,7 +1342,12 @@ internal class LayoutNode(
 
     override fun forceRemeasure() {
         requestRemeasure()
-        owner?.measureAndLayout()
+        val lastConstraints = outerMeasurablePlaceable.lastConstraints
+        if (lastConstraints != null) {
+            owner?.measureAndLayout(this, lastConstraints)
+        } else {
+            owner?.measureAndLayout()
+        }
     }
 
     /**
