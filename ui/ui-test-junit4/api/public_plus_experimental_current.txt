@@ -1,4 +1,11 @@
 // Signature format: 4.0
+package androidx.compose.ui.test {
+
+  public final class ComposeTestKt {
+  }
+
+}
+
 package androidx.compose.ui.test.junit4 {
 
   public final class AndroidComposeTestRule<R extends org.junit.rules.TestRule, A extends androidx.activity.ComponentActivity> implements androidx.compose.ui.test.junit4.ComposeContentTestRule {

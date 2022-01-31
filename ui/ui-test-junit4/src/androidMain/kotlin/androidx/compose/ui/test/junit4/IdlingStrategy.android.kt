@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.test.junit4
 
-import org.junit.runners.model.Statement
-
 /**
  * A strategy to wait for idleness. This is typically implemented by different test frameworks,
  * to allow each framework to await idleness in their own unique way. For example, a framework
@@ -48,8 +46,8 @@ internal interface IdlingStrategy {
     suspend fun awaitIdle() = runUntilIdle()
 
     /**
-     * Returns a [Statement] that represents one or more actions to be performed before and after
-     * the test. Default implementation returns the [base].
+     * Runs the [block] while giving implementations the option to perform setup and
+     * tear down work.
      */
-    fun getStatementFor(base: Statement): Statement = base
+    fun <R> withStrategy(block: () -> R): R = block()
 }
