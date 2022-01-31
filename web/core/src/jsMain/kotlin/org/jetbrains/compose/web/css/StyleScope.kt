@@ -7,8 +7,8 @@
 
 package org.jetbrains.compose.web.css
 
-import kotlin.properties.ReadOnlyProperty
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
+import kotlin.properties.ReadOnlyProperty
 
 /**
  * StyleBuilder serves for two main purposes. Passed as a builder context (in [AttrsScope]), it
@@ -142,7 +142,6 @@ interface StyleScope : StyleBuilder, StyleHolder {
 )
 typealias StyleBuilderImpl = StyleScopeBuilder
 
-
 @OptIn(ComposeWebInternalApi::class)
 @Suppress("EqualsOrHashCode")
 open class StyleScopeBuilder : StyleScope {
@@ -161,7 +160,7 @@ open class StyleScopeBuilder : StyleScope {
     override fun equals(other: Any?): Boolean {
         return if (other is StyleHolder) {
             properties.nativeEquals(other.properties) &&
-                    variables.nativeEquals(other.variables)
+                variables.nativeEquals(other.variables)
         } else false
     }
 
@@ -188,6 +187,6 @@ internal fun StylePropertyList.nativeEquals(properties: StylePropertyList): Bool
     return all { prop ->
         val otherProp = properties[index++]
         prop.name == otherProp.name &&
-                prop.value.toString() == otherProp.value.toString()
+            prop.value.toString() == otherProp.value.toString()
     }
 }
