@@ -272,6 +272,7 @@ internal class PointerInputFilterMock(
 
     init {
         this.layoutCoordinates = layoutCoordinates ?: LayoutCoordinatesStub(true)
+        this.isAttached = this.layoutCoordinates!!.isAttached
     }
 
     override fun onPointerEvent(

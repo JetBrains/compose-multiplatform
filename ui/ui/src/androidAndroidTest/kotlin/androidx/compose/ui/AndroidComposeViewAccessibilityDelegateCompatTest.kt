@@ -47,7 +47,7 @@ import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
-import androidx.compose.ui.semantics.SemanticsWrapper
+import androidx.compose.ui.semantics.SemanticsEntity
 import androidx.compose.ui.semantics.collapse
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.copyText
@@ -1247,7 +1247,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
     ): SemanticsNode {
         val semanticsModifier = SemanticsModifierCore(id, mergeDescendants, false, properties)
         return SemanticsNode(
-            SemanticsWrapper(InnerPlaceable(LayoutNode()), semanticsModifier),
+            SemanticsEntity(InnerPlaceable(LayoutNode()), semanticsModifier),
             true
         )
     }

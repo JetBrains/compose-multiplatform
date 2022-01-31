@@ -69,7 +69,7 @@ import androidx.compose.ui.semantics.SemanticsConfiguration
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.semantics.SemanticsWrapper
+import androidx.compose.ui.semantics.SemanticsEntity
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.state.ToggleableState
@@ -1501,13 +1501,13 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     internal fun hitTestSemanticsAt(x: Float, y: Float): Int {
         view.measureAndLayout()
 
-        val hitSemanticsWrappers = HitTestResult<SemanticsWrapper>()
+        val hitSemanticsEntities = HitTestResult<SemanticsEntity>()
         view.root.hitTestSemantics(
             pointerPosition = Offset(x, y),
-            hitSemanticsWrappers = hitSemanticsWrappers
+            hitSemanticsEntities = hitSemanticsEntities
         )
 
-        val wrapper = hitSemanticsWrappers.lastOrNull()?.layoutNode?.outerSemantics
+        val wrapper = hitSemanticsEntities.lastOrNull()?.layoutNode?.outerSemantics
         var virtualViewId = InvalidId
         if (wrapper != null) {
 
@@ -1819,7 +1819,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                                 )
                                 // Here we use the merged node
                                 val mergedNode =
-                                    SemanticsNode(newNode.outerSemanticsNodeWrapper, true)
+                                    SemanticsNode(newNode.outerSemanticsEntity, true)
                                 val contentDescription = mergedNode.config.getOrNull(
                                     SemanticsProperties.ContentDescription
                                 )?.fastJoinToString(",")
