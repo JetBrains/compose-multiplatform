@@ -2323,6 +2323,9 @@ private class MockOwner(
     override fun measureAndLayout(sendPointerUpdate: Boolean) {
     }
 
+    override fun measureAndLayout(layoutNode: LayoutNode, constraints: Constraints) {
+    }
+
     override fun forceMeasureTheSubtree(layoutNode: LayoutNode) {
     }
 

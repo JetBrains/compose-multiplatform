@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.WindowInfo
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.TextInputService
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import com.google.common.truth.Truth.assertThat
@@ -342,6 +343,11 @@ class ModifierLocalConsumerNodeTest {
             TODO("Not yet implemented")
         override fun measureAndLayout(sendPointerUpdate: Boolean) =
             TODO("Not yet implemented")
+
+        override fun measureAndLayout(layoutNode: LayoutNode, constraints: Constraints) {
+            TODO("Not yet implemented")
+        }
+
         override fun forceMeasureTheSubtree(layoutNode: LayoutNode) =
             TODO("Not yet implemented")
         override fun onSemanticsChange() =

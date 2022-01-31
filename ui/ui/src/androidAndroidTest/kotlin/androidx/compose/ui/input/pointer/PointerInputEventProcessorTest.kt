@@ -3259,6 +3259,10 @@ private class TestOwner : Owner {
         delegate.measureAndLayout()
     }
 
+    override fun measureAndLayout(layoutNode: LayoutNode, constraints: Constraints) {
+        delegate.measureAndLayout(layoutNode, constraints)
+    }
+
     override fun forceMeasureTheSubtree(layoutNode: LayoutNode) {
         delegate.forceMeasureTheSubtree(layoutNode)
     }

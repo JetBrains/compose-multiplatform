@@ -34,6 +34,7 @@ import androidx.compose.ui.platform.WindowInfo
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.TextInputService
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 
@@ -188,6 +189,12 @@ internal interface Owner {
      * input handlers.
      */
     fun measureAndLayout(sendPointerUpdate: Boolean = true)
+
+    /**
+     * Measures and lays out only the passed [layoutNode]. It will be remeasured with the passed
+     * [constraints].
+     */
+    fun measureAndLayout(layoutNode: LayoutNode, constraints: Constraints)
 
     /**
      * Makes sure the passed [layoutNode] and its subtree is remeasured and has the final sizes.

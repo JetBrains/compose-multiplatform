@@ -74,6 +74,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import org.junit.Assert.assertThrows
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -1579,6 +1580,180 @@ class SubcomposeLayoutTest {
             exists = /*active*/ listOf(10) + /*reusable*/ listOf(0, 1, 3),
             doesNotExist = /*disposed*/ listOf(2)
         )
+    }
+
+    @Test
+    fun premeasuringAllowsToSkipMeasureOnceTheSlotIsComposed() {
+        val state = SubcomposeLayoutState()
+        var remeasuresCount = 0
+        var relayoutCount = 0
+        var subcomposeLayoutRemeasures = 0
+        val modifier = Modifier.layout { measurable, constraints ->
+            val placeable = measurable.measure(constraints)
+            remeasuresCount++
+            layout(placeable.width, placeable.height) {
+                relayoutCount++
+                placeable.place(0, 0)
+            }
+        }.fillMaxSize()
+        val content = @Composable { Box(modifier) }
+        val constraints = Constraints(maxWidth = 100, minWidth = 100)
+        var needContent by mutableStateOf(false)
+
+        rule.setContent {
+            SubcomposeLayout(state) {
+                subcomposeLayoutRemeasures++
+                val placeable = if (needContent) {
+                    subcompose(Unit, content).first().measure(constraints)
+                } else {
+                    null
+                }
+                layout(10, 10) {
+                    placeable?.place(0, 0)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(remeasuresCount).isEqualTo(0)
+            subcomposeLayoutRemeasures = 0
+            val handle = state.precompose(Unit, content)
+
+            assertThat(remeasuresCount).isEqualTo(0)
+            assertThat(handle.placeablesCount).isEqualTo(1)
+            handle.premeasure(0, constraints)
+
+            assertThat(remeasuresCount).isEqualTo(1)
+            assertThat(relayoutCount).isEqualTo(0)
+            assertThat(subcomposeLayoutRemeasures).isEqualTo(0)
+            remeasuresCount = 0
+
+            needContent = true
+        }
+
+        rule.runOnIdle {
+            assertThat(remeasuresCount).isEqualTo(0)
+            assertThat(relayoutCount).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun premeasuringTwoPlaceables() {
+        val state = SubcomposeLayoutState()
+        var remeasuresCount = 0
+        val modifier = Modifier.layout { measurable, constraints ->
+            val placeable = measurable.measure(constraints)
+            remeasuresCount++
+            layout(placeable.width, placeable.height) {
+                placeable.place(0, 0)
+            }
+        }.fillMaxSize()
+        val content = @Composable {
+            Box(modifier)
+            Box(modifier)
+        }
+        val constraints0 = Constraints(maxWidth = 100, minWidth = 100)
+        val constraints1 = Constraints(maxWidth = 200, minWidth = 200)
+        var needContent by mutableStateOf(false)
+
+        rule.setContent {
+            SubcomposeLayout(state) {
+                val placeables = if (needContent) {
+                    val measurables = subcompose(Unit, content)
+                    assertThat(measurables.size).isEqualTo(2)
+                    measurables.mapIndexed { index, measurable ->
+                        measurable.measure(if (index == 0) constraints0 else constraints1)
+                    }
+                } else {
+                    emptyList()
+                }
+                layout(10, 10) {
+                    placeables.forEach { it.place(0, 0) }
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(remeasuresCount).isEqualTo(0)
+            val handle = state.precompose(Unit, content)
+
+            assertThat(remeasuresCount).isEqualTo(0)
+            assertThat(handle.placeablesCount).isEqualTo(2)
+            handle.premeasure(0, constraints0)
+
+            assertThat(remeasuresCount).isEqualTo(1)
+            handle.premeasure(1, constraints1)
+            assertThat(remeasuresCount).isEqualTo(2)
+            remeasuresCount = 0
+
+            needContent = true
+        }
+
+        rule.runOnIdle {
+            assertThat(remeasuresCount).isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun premeasuringIncorrectIndexesCrashes() {
+        val state = SubcomposeLayoutState()
+        val content = @Composable {
+            Box(Modifier.size(10.dp))
+            Box(Modifier.size(10.dp))
+        }
+
+        rule.setContent {
+            SubcomposeLayout(state) {
+                layout(10, 10) {}
+            }
+        }
+
+        rule.runOnIdle {
+            val handle = state.precompose(Unit, content)
+
+            assertThrows(IndexOutOfBoundsException::class.java) {
+                handle.premeasure(-1, Constraints())
+            }
+            assertThrows(IndexOutOfBoundsException::class.java) {
+                handle.premeasure(2, Constraints())
+            }
+        }
+    }
+
+    @Test
+    fun ifSlotWasUsedDuringMeasurePassHandleHasZeroPlaceables() {
+        val state = SubcomposeLayoutState()
+        val content = @Composable {
+            Box(Modifier.size(10.dp))
+        }
+        var needContent by mutableStateOf(false)
+
+        rule.setContent {
+            SubcomposeLayout(state) {
+                val placeable = if (needContent) {
+                    subcompose(Unit, content).first().measure(Constraints())
+                } else {
+                    null
+                }
+                layout(10, 10) {
+                    placeable?.place(0, 0)
+                }
+            }
+        }
+
+        lateinit var handle: SubcomposeLayoutState.PrecomposedSlotHandle
+
+        rule.runOnIdle {
+            handle = state.precompose(Unit, content)
+            handle.premeasure(0, Constraints())
+            needContent = true
+        }
+
+        rule.runOnIdle {
+            assertThat(handle.placeablesCount).isEqualTo(0)
+            // we also make sure that calling dispose on such handle is safe
+            handle.dispose()
+        }
     }
 
     private fun composeItems(
