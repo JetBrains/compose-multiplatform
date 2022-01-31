@@ -24,7 +24,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.After
 import org.junit.Test
-import org.junit.runners.model.Statement
 
 class EspressoLinkTest {
     @OptIn(InternalTestApi::class, ExperimentalCoroutinesApi::class)
@@ -54,15 +53,12 @@ class EspressoLinkTest {
         // Check the private registry:
         assertThat(@Suppress("DEPRECATION") Espresso.getIdlingResources()).hasSize(0)
 
-        // "Run" the test:
-        espressoLink.getStatementFor(object : Statement() {
-            override fun evaluate() {
-                assertThat(IdlingRegistry.getInstance().resources)
-                    .containsExactlyElementsIn(listOf(espressoLink))
-                assertThat(@Suppress("DEPRECATION") Espresso.getIdlingResources())
-                    .containsExactlyElementsIn(listOf(espressoLink))
-            }
-        }).evaluate()
+        espressoLink.withStrategy {
+            assertThat(IdlingRegistry.getInstance().resources)
+                .containsExactlyElementsIn(listOf(espressoLink))
+            assertThat(@Suppress("DEPRECATION") Espresso.getIdlingResources())
+                .containsExactlyElementsIn(listOf(espressoLink))
+        }
 
         // Check if espressoLink is removed from both places:
         assertThat(IdlingRegistry.getInstance().resources).hasSize(0)
