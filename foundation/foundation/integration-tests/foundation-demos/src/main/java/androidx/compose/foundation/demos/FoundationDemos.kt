@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.demos
 
+import androidx.compose.foundation.demos.relocation.BringIntoViewAndroidInteropDemo
 import androidx.compose.foundation.demos.relocation.BringIntoViewDemo
 import androidx.compose.foundation.demos.relocation.BringRectangleIntoViewDemo
 import androidx.compose.foundation.demos.relocation.RequestRectangleOnScreenDemo
@@ -29,7 +30,8 @@ import androidx.compose.integration.demos.common.DemoCategory
 private val RelocationDemos = listOf(
     ComposableDemo("Bring Into View") { BringIntoViewDemo() },
     ComposableDemo("Bring Rectangle Into View") { BringRectangleIntoViewDemo() },
-    ComposableDemo("Request Rectangle On Screen") { RequestRectangleOnScreenDemo() }
+    ComposableDemo("Request Rectangle On Screen") { RequestRectangleOnScreenDemo() },
+    ComposableDemo("Android view interop") { BringIntoViewAndroidInteropDemo() }
 )
 
 val FoundationDemos = DemoCategory(

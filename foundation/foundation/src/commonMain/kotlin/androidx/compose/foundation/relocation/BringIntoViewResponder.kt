@@ -17,6 +17,8 @@
 package androidx.compose.foundation.relocation
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.relocation.BringIntoViewResponder.Companion.ModifierLocalBringIntoViewResponder
+import androidx.compose.foundation.relocation.BringIntoViewResponder.Companion.RootBringIntoViewResponder
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.modifier.ProvidableModifierLocal
@@ -76,5 +78,24 @@ interface BringIntoViewResponder {
             override fun toLocalRect(rect: Rect, layoutCoordinates: LayoutCoordinates) =
                 Rect(layoutCoordinates.localToRoot(rect.topLeft), rect.size)
         }
+    }
+}
+
+/**
+ * Brings [rectInParentCoordinates] into view by either calling this [BringIntoViewResponder] or,
+ * if this is the [RootBringIntoViewResponder], then it delegates to
+ * [bringRectangleOnScreenRequester]. Implementations of [BringIntoViewResponder] should call this
+ * to propagate the request to their parent to ensure that the request is actually propagated.
+ */
+@OptIn(ExperimentalFoundationApi::class)
+internal suspend fun BringIntoViewResponder.bringIntoView(
+    rectInParentCoordinates: Rect,
+    bringRectangleOnScreenRequester: BringRectangleOnScreenRequester
+) {
+    if (this == RootBringIntoViewResponder) {
+        // Use the platform specific API to bring the rectangle on screen.
+        bringRectangleOnScreenRequester.bringRectangleOnScreen(rectInParentCoordinates)
+    } else {
+        bringIntoView(rectInParentCoordinates)
     }
 }

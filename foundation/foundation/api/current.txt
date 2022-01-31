@@ -543,6 +543,9 @@ package androidx.compose.foundation.relocation {
   public final class BringIntoViewRequesterKt {
   }
 
+  public final class BringIntoViewResponderKt {
+  }
+
   public final class BringRectangleOnScreen_androidKt {
   }
 
