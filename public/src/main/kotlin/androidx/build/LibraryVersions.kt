@@ -69,6 +69,7 @@ object LibraryVersions {
     val GLANCE_TEMPLATE = Version("1.0.0-alpha01")
     val GLANCE = Version("1.0.0-alpha03")
     val GRIDLAYOUT = Version("1.1.0-alpha01")
+    val HEALTH_DATA_CLIENT = Version("1.0.0-alpha01")
     val HEALTH_SERVICES_CLIENT = Version("1.0.0-alpha04")
     val HEIFWRITER = Version("1.1.0-alpha02")
     val HILT = Version("1.1.0-alpha01")
