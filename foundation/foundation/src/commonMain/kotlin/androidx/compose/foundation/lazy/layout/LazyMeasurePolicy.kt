@@ -17,6 +17,7 @@
 package androidx.compose.foundation.lazy.layout
 
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.SubcomposeMeasureScope
 import androidx.compose.ui.unit.Constraints
@@ -29,12 +30,11 @@ internal fun interface LazyMeasurePolicy {
     fun MeasureScope.measure(
         placeablesProvider: LazyLayoutPlaceablesProvider,
         constraints: Constraints
-    ): LazyLayoutMeasureResult
+    ): MeasureResult
 }
 
 @Stable
 internal class LazyLayoutPlaceablesProvider internal constructor(
-    private val itemsProvider: LazyLayoutItemsProvider,
     private val itemContentFactory: LazyLayoutItemContentFactory,
     private val subcomposeMeasureScope: SubcomposeMeasureScope
 ) {
@@ -53,7 +53,7 @@ internal class LazyLayoutPlaceablesProvider internal constructor(
         return if (cachedPlaceable != null) {
             cachedPlaceable
         } else {
-            val key = itemsProvider.getKey(index)
+            val key = itemContentFactory.itemsProvider().getKey(index)
             val itemContent = itemContentFactory.getContent(index, key)
             val measurables = subcomposeMeasureScope.subcompose(key, itemContent)
             Array(measurables.size) { i ->

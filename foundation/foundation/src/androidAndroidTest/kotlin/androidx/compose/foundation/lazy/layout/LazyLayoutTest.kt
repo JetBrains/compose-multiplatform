@@ -21,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -42,8 +43,7 @@ class LazyLayoutTest {
         var remeasureCount = 0
         val policy = LazyMeasurePolicy { _, _ ->
             remeasureCount++
-            object : LazyLayoutMeasureResult {
-                override val visibleItemsInfo: List<LazyLayoutItemInfo> = emptyList()
+            object : MeasureResult {
                 override val alignmentLines: Map<AlignmentLine, Int> = emptyMap()
                 override val height: Int = 10
                 override val width: Int = 10

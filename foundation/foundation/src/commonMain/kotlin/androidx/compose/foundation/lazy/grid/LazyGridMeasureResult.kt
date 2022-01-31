@@ -20,11 +20,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.lazy.LazyGridItemInfo
 import androidx.compose.foundation.lazy.LazyGridLayoutInfo
-import androidx.compose.foundation.lazy.layout.LazyLayoutItemInfo
-import androidx.compose.foundation.lazy.layout.LazyLayoutMeasureResult
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.util.fastMap
 
 /**
  * The result of the measure pass for lazy list layout.
@@ -41,7 +38,7 @@ internal class LazyGridMeasureResult(
     /** The amount of scroll consumed during the measure pass.*/
     val consumedScroll: Float,
     /** MeasureResult defining the layout.*/
-    val measureResult: MeasureResult,
+    measureResult: MeasureResult,
     // properties representing the info needed for LazyListLayoutInfo:
     /** see [LazyGridLayoutInfo.visibleItemsInfo] */
     override val visibleItemsInfo: List<LazyGridItemInfo>,
@@ -56,17 +53,6 @@ internal class LazyGridMeasureResult(
     /** see [LazyGridLayoutInfo.orientation] */
     override val orientation: Orientation,
 ) : LazyGridLayoutInfo, MeasureResult by measureResult {
-    val lazyLayoutMeasureResult: LazyLayoutMeasureResult get() =
-        object : LazyLayoutMeasureResult, MeasureResult by measureResult {
-            override val visibleItemsInfo: List<LazyLayoutItemInfo>
-                get() = this@LazyGridMeasureResult.visibleItemsInfo.fastMap {
-                    object : LazyLayoutItemInfo {
-                        override val index: Int get() = it.index
-                        override val key: Any get() = it.key
-                    }
-                }
-        }
-
     override val viewportSize: IntSize
-        get() = IntSize(measureResult.width, measureResult.height)
+        get() = IntSize(width, height)
 }

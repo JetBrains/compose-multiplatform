@@ -20,20 +20,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.SaveableStateHolder
-import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
-
-@Composable
-internal fun rememberItemContentFactory(state: LazyLayoutState): LazyLayoutItemContentFactory {
-    val saveableStateHolder = rememberSaveableStateHolder()
-    return remember(state) {
-        LazyLayoutItemContentFactory(saveableStateHolder) { state.itemsProvider.invoke() }
-    }
-}
 
 /**
  * This class:
@@ -46,7 +36,7 @@ internal fun rememberItemContentFactory(state: LazyLayoutState): LazyLayoutItemC
  */
 internal class LazyLayoutItemContentFactory(
     private val saveableStateHolder: SaveableStateHolder,
-    private val itemsProvider: () -> LazyLayoutItemsProvider,
+    val itemsProvider: () -> LazyLayoutItemsProvider,
 ) {
     /** Contains the cached lambdas produced by the [itemsProvider]. */
     private val lambdasCache = mutableMapOf<Any, CachedItemContent>()

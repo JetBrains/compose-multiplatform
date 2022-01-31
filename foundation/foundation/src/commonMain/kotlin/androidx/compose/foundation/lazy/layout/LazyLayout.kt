@@ -17,7 +17,10 @@
 package androidx.compose.foundation.lazy.layout
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.SubcomposeLayoutState
@@ -34,35 +37,35 @@ internal fun LazyLayout(
     prefetchPolicy: LazyLayoutPrefetchPolicy? = null,
     measurePolicy: LazyMeasurePolicy
 ) {
-    val state = remember { LazyLayoutState() }
-    state.itemsProvider = itemsProvider
-    val itemContentFactory = rememberItemContentFactory(state)
-    val subcomposeLayoutState = remember(itemContentFactory) {
+    val currentItemsProvider = rememberUpdatedState(itemsProvider)
+
+    val saveableStateHolder = rememberSaveableStateHolder()
+    val itemContentFactory = remember {
+        LazyLayoutItemContentFactory(saveableStateHolder) { currentItemsProvider.value.invoke() }
+    }
+    val subcomposeLayoutState = remember {
         SubcomposeLayoutState(LazyLayoutItemReusePolicy(itemContentFactory))
     }
     prefetchPolicy?.let {
-        LazyLayoutPrefetcher(prefetchPolicy, state, itemContentFactory, subcomposeLayoutState)
+        LazyLayoutPrefetcher(
+            prefetchPolicy,
+            itemContentFactory,
+            subcomposeLayoutState
+        )
     }
 
     SubcomposeLayout(
         subcomposeLayoutState,
-        modifier.then(state.remeasurementModifier),
-        remember(itemContentFactory, state, measurePolicy) {
+        modifier,
+        remember(itemContentFactory, measurePolicy) {
             { constraints ->
                 itemContentFactory.onBeforeMeasure(this, constraints)
 
                 val placeablesProvider = LazyLayoutPlaceablesProvider(
-                    state.itemsProvider(),
                     itemContentFactory,
                     this
                 )
-                val measureResult = with(measurePolicy) { measure(placeablesProvider, constraints) }
-
-                state.onPostMeasureListener?.apply {
-                    onPostMeasure(measureResult, placeablesProvider)
-                }
-
-                measureResult
+                with(measurePolicy) { measure(placeablesProvider, constraints) }
             }
         }
     )
@@ -102,7 +105,6 @@ private const val MaxItemsToRetainForReuse = 2
 @Composable
 internal expect fun LazyLayoutPrefetcher(
     prefetchPolicy: LazyLayoutPrefetchPolicy,
-    state: LazyLayoutState,
     itemContentFactory: LazyLayoutItemContentFactory,
     subcomposeLayoutState: SubcomposeLayoutState
 )

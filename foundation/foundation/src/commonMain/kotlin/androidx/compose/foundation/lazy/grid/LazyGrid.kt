@@ -318,7 +318,7 @@ private fun rememberLazyGridMeasurePolicy(
         ).also {
             state.applyMeasureResult(it)
             refreshOverScrollInfo(overScrollController, it, contentPadding)
-        }.lazyLayoutMeasureResult
+        }
     }
 }
 
