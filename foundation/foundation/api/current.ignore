@@ -1,4 +1,6 @@
 // Baseline format: 1.0
+RemovedClass: androidx.compose.foundation.lazy.layout.LazyLayoutItemContentFactoryKt:
+    Removed class androidx.compose.foundation.lazy.layout.LazyLayoutItemContentFactoryKt
 RemovedClass: androidx.compose.foundation.lazy.layout.LazyLayoutStateKt:
     Removed class androidx.compose.foundation.lazy.layout.LazyLayoutStateKt
 RemovedClass: androidx.compose.foundation.lazy.list.IntervalListKt:

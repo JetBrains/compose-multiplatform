@@ -26,15 +26,14 @@ import androidx.compose.ui.layout.SubcomposeLayoutState
 import androidx.compose.ui.layout.SubcomposeLayoutState.PrecomposedSlotHandle
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.trace
 import java.util.concurrent.TimeUnit
 
 @Composable
 internal actual fun LazyLayoutPrefetcher(
     prefetchPolicy: LazyLayoutPrefetchPolicy,
-    state: LazyLayoutState,
     itemContentFactory: LazyLayoutItemContentFactory,
     subcomposeLayoutState: SubcomposeLayoutState
 ) {
@@ -42,7 +41,6 @@ internal actual fun LazyLayoutPrefetcher(
     remember(subcomposeLayoutState, prefetchPolicy, view) {
         LazyLayoutPrefetcher(
             prefetchPolicy,
-            state,
             subcomposeLayoutState,
             itemContentFactory,
             view
@@ -107,12 +105,10 @@ internal actual fun LazyLayoutPrefetcher(
  */
 internal class LazyLayoutPrefetcher(
     private val prefetchPolicy: LazyLayoutPrefetchPolicy,
-    private val state: LazyLayoutState,
     private val subcomposeLayoutState: SubcomposeLayoutState,
     private val itemContentFactory: LazyLayoutItemContentFactory,
     private val view: View
 ) : RememberObserver,
-    LazyLayoutOnPostMeasureListener,
     LazyLayoutPrefetchPolicy.Subscriber,
     Runnable,
     Choreographer.FrameCallback {
@@ -146,8 +142,6 @@ internal class LazyLayoutPrefetcher(
     private var averagePrecomposeTimeNs: Long = 0
     private var averagePremeasureTimeNs: Long = 0
 
-    private var premeasuringIsNeeded = false
-
     private var prefetchScheduled = false
 
     private val choreographer = Choreographer.getInstance()
@@ -172,7 +166,7 @@ internal class LazyLayoutPrefetcher(
             trace("compose:lazylist:prefetch:compose") {
                 val latestFrameVsyncNs = TimeUnit.MILLISECONDS.toNanos(view.drawingTime)
                 val nextFrameNs = latestFrameVsyncNs + frameIntervalNs
-                val itemsProvider = state.itemsProvider()
+                val itemsProvider = itemContentFactory.itemsProvider()
                 var schedulePrefetch = true
                 while (precomposedSlotsHandles.size < indicesToPrefetch.size) {
                     val index = indicesToPrefetch[precomposedSlotsHandles.size]
@@ -188,7 +182,11 @@ internal class LazyLayoutPrefetcher(
                         beforeNs + averagePrecomposeTimeNs < nextFrameNs)) {
                         break
                     }
-                    precomposedSlotsHandles.add(precompose(itemsProvider, index))
+
+                    val key = itemsProvider.getKey(index)
+                    val content = itemContentFactory.getContent(index, key)
+                    val handle = subcomposeLayoutState.precompose(key, content)
+                    precomposedSlotsHandles.add(handle)
                     averagePrecomposeTimeNs = calculateAverageTime(
                         System.nanoTime() - beforeNs,
                         averagePrecomposeTimeNs
@@ -208,9 +206,18 @@ internal class LazyLayoutPrefetcher(
                 val nextFrameNs = latestFrameVsyncNs + frameIntervalNs
                 val beforeNs = System.nanoTime()
                 if (beforeNs > nextFrameNs || beforeNs + averagePremeasureTimeNs < nextFrameNs) {
-                    if (view.windowVisibility == View.VISIBLE) {
-                        premeasuringIsNeeded = true
-                        state.remeasure()
+                    if (view.windowVisibility == View.VISIBLE &&
+                        precomposedSlotsHandles.isNotEmpty()
+                    ) {
+                        precomposedSlotsHandles.fastForEachIndexed { handleIndex, handle ->
+                            repeat(handle.placeablesCount) { placeableIndex ->
+                                handle.premeasure(
+                                    placeableIndex,
+                                    premeasureConstraints[handleIndex]
+                                )
+                            }
+                        }
+
                         averagePremeasureTimeNs = calculateAverageTime(
                             System.nanoTime() - beforeNs,
                             averagePremeasureTimeNs
@@ -237,15 +244,6 @@ internal class LazyLayoutPrefetcher(
         }
     }
 
-    private fun precompose(
-        itemsProvider: LazyLayoutItemsProvider,
-        index: Int
-    ): PrecomposedSlotHandle {
-        val key = itemsProvider.getKey(index)
-        val content = itemContentFactory.getContent(index, key)
-        return subcomposeLayoutState.precompose(key, content)
-    }
-
     private fun calculateAverageTime(new: Long, current: Long): Long {
         // Calculate a weighted moving average of time taken to compose an item. We use weighted
         // moving average to bias toward more recent measurements, and to minimize storage /
@@ -265,7 +263,6 @@ internal class LazyLayoutPrefetcher(
             premeasureConstraints.add(it.second)
         }
         precomposedSlotsHandles.clear()
-        premeasuringIsNeeded = false
         if (!prefetchScheduled) {
             prefetchScheduled = true
             // schedule the prefetching
@@ -279,40 +276,14 @@ internal class LazyLayoutPrefetcher(
         premeasureConstraints.clear()
     }
 
-    override fun onPostMeasure(
-        result: LazyLayoutMeasureResult,
-        placeablesProvider: LazyLayoutPlaceablesProvider
-    ) {
-        if (premeasuringIsNeeded && indicesToPrefetch.isNotEmpty()) {
-            check(isActive)
-            var allVisible = true
-            val itemsProvider = state.itemsProvider()
-            for (i in indicesToPrefetch.indices) {
-                val index = indicesToPrefetch[i]
-                if (index < itemsProvider.itemsCount) {
-                    val isVisibleAlready = result.visibleItemsInfo.fastAny { it.index == index }
-                    if (!isVisibleAlready) {
-                        placeablesProvider.getAndMeasure(index, premeasureConstraints[i])
-                        allVisible = false
-                    }
-                }
-            }
-            if (allVisible) {
-                premeasuringIsNeeded = false
-            }
-        }
-    }
-
     override fun onRemembered() {
         prefetchPolicy.prefetcher = this
-        state.onPostMeasureListener = this
         isActive = true
     }
 
     override fun onForgotten() {
         isActive = false
         prefetchPolicy.prefetcher = null
-        state.onPostMeasureListener = null
         view.removeCallbacks(this)
         choreographer.removeFrameCallback(this)
     }

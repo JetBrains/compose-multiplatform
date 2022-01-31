@@ -302,7 +302,7 @@ private fun rememberLazyListMeasurePolicy(
                 totalHorizontalPadding,
                 totalVerticalPadding
             )
-        }.lazyLayoutMeasureResult
+        }
     }
 }
 
