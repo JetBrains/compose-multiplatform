@@ -173,7 +173,7 @@ internal class ComposeLayer {
         override fun enableInput(inputMethodRequests: InputMethodRequests) {
             currentInputMethodRequests = inputMethodRequests
             enableInputMethods(true)
-            val focusGainedEvent = FocusEvent(this, FocusEvent.FOCUS_GAINED)
+            val focusGainedEvent = FocusEvent(this.canvas, FocusEvent.FOCUS_GAINED)
             inputContext.dispatchEvent(focusGainedEvent)
         }
 
