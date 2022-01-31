@@ -16,12 +16,12 @@
   -->
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    package="androidx.compose.runtime.benchmark">
+    package="androidx.compose.runtime.benchmark.test">
     <application>
         <!-- enable profiling by shell for non-intrusive profiling tools -->
         <profileable android:shell="true"/>
 
         <activity
-            android:name=".ComposeActivity"/>
+            android:name="androidx.compose.runtime.benchmark.ComposeActivity"/>
     </application>
 </manifest>
