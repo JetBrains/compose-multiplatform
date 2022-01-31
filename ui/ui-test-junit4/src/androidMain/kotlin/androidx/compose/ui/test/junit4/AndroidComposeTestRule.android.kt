@@ -148,6 +148,10 @@ class AndroidComposeTestRule<R : TestRule, A : ComponentActivity> private constr
         }
     }
 
+    @Deprecated(
+        message = "Do not instantiate this Statement, use AndroidComposeTestRule instead",
+        level = DeprecationLevel.ERROR
+    )
     inner class AndroidComposeStatement(private val base: Statement) : Statement() {
         override fun evaluate() {
             base.evaluate()
