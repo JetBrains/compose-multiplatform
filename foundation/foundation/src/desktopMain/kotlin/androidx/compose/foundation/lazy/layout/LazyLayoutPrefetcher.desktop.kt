@@ -22,7 +22,6 @@ import androidx.compose.ui.layout.SubcomposeLayoutState
 @Composable
 internal actual fun LazyLayoutPrefetcher(
     prefetchPolicy: LazyLayoutPrefetchPolicy,
-    state: LazyLayoutState,
     itemContentFactory: LazyLayoutItemContentFactory,
     subcomposeLayoutState: SubcomposeLayoutState
 ) {
