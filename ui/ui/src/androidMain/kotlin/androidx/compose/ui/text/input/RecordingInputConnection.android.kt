@@ -29,7 +29,6 @@ import android.view.inputmethod.ExtractedText
 import android.view.inputmethod.ExtractedTextRequest
 import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputContentInfo
-import androidx.annotation.VisibleForTesting
 
 internal const val DEBUG = false
 internal const val TAG = "RecordingIC"
@@ -52,7 +51,6 @@ internal class RecordingInputConnection(
     private var batchDepth: Int = 0
 
     // The input state.
-    @VisibleForTesting
     internal var mTextFieldValue: TextFieldValue = initState
         set(value) {
             if (DEBUG) { logDebug("mTextFieldValue : $field -> $value") }
