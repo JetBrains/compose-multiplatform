@@ -136,6 +136,25 @@ class ScrollbarTest {
         }
     }
 
+    @Test
+    fun `drag outside slider and back`() {
+        runBlocking(Dispatchers.Main) {
+            rule.setContent {
+                TestBox(size = 100.dp, childSize = 20.dp, childCount = 10, scrollbarWidth = 10.dp)
+            }
+            rule.awaitIdle()
+
+            rule.onNodeWithTag("scrollbar").performTouchInput {
+                down(Offset(10f, 25f))
+                moveBy(Offset(0f, 50f))
+                moveBy(Offset(0f, -50f))
+                up()
+            }
+            rule.awaitIdle()
+            rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(0.dp)
+        }
+    }
+
     // TODO(demin): write a test when we support DesktopComposeTestRule.mainClock:
     //  see https://github.com/JetBrains/compose-jb/issues/637
 //    fun `move mouse to the slider and drag it`() {
