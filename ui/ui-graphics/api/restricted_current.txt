@@ -354,6 +354,8 @@ package androidx.compose.ui.graphics {
     method public long getUnspecified();
     method public long getWhite();
     method public long getYellow();
+    method public long hsl(float hue, float saturation, float lightness, optional float alpha, optional androidx.compose.ui.graphics.colorspace.Rgb colorSpace);
+    method public long hsv(float hue, float saturation, float value, optional float alpha, optional androidx.compose.ui.graphics.colorspace.Rgb colorSpace);
     property public final long Black;
     property public final long Blue;
     property public final long Cyan;
@@ -937,6 +939,7 @@ package androidx.compose.ui.graphics.colorspace {
     method public androidx.compose.ui.graphics.colorspace.Rgb getLinearExtendedSrgb();
     method public androidx.compose.ui.graphics.colorspace.Rgb getLinearSrgb();
     method public androidx.compose.ui.graphics.colorspace.Rgb getNtsc1953();
+    method public androidx.compose.ui.graphics.colorspace.ColorSpace getOklab();
     method public androidx.compose.ui.graphics.colorspace.Rgb getProPhotoRgb();
     method public androidx.compose.ui.graphics.colorspace.Rgb getSmpteC();
     method public androidx.compose.ui.graphics.colorspace.Rgb getSrgb();
@@ -954,6 +957,7 @@ package androidx.compose.ui.graphics.colorspace {
     property public final androidx.compose.ui.graphics.colorspace.Rgb LinearExtendedSrgb;
     property public final androidx.compose.ui.graphics.colorspace.Rgb LinearSrgb;
     property public final androidx.compose.ui.graphics.colorspace.Rgb Ntsc1953;
+    property public final androidx.compose.ui.graphics.colorspace.ColorSpace Oklab;
     property public final androidx.compose.ui.graphics.colorspace.Rgb ProPhotoRgb;
     property public final androidx.compose.ui.graphics.colorspace.Rgb SmpteC;
     property public final androidx.compose.ui.graphics.colorspace.Rgb Srgb;
