@@ -312,7 +312,9 @@ internal class TextInputServiceAndroid(
 
         // If the selection has changed from the last time, we need to update selection even though
         // the oldValue in EditBuffer is already in sync with the newValue.
-        val needUpdateSelection = (this.state.selection != newValue.selection)
+        // Same holds for composition b/207800945
+        val needUpdateSelection = (this.state.selection != newValue.selection) ||
+            this.state.composition != newValue.composition
         this.state = newValue
         // update the latest TextFieldValue in InputConnection
         ic?.mTextFieldValue = newValue

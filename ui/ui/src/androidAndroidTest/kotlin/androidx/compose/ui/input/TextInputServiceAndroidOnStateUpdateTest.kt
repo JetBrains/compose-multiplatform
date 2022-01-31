@@ -29,8 +29,10 @@ import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
+import com.nhaarman.mockitokotlin2.reset
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.Before
@@ -49,8 +51,6 @@ class TextInputServiceAndroidOnStateUpdateTest {
     fun setup() {
         val view = View(InstrumentationRegistry.getInstrumentation().context)
         inputMethodManager = mock()
-        textInputService = TextInputServiceAndroid(view, mock())
-
         textInputService = TextInputServiceAndroid(view, inputMethodManager)
         textInputService.startInput(
             value = TextFieldValue(""),
@@ -126,6 +126,32 @@ class TextInputServiceAndroidOnStateUpdateTest {
 
         assertThat(inputConnection.mTextFieldValue).isEqualTo(value)
         assertThat(textInputService.state).isEqualTo(value)
+    }
+
+    @Test
+    fun onUpdateState_updateSelectionCalled_whenCompositionIsDifferentFromState() {
+        // set the initial state, composition active on text, cursor in the middle
+        val value1 = TextFieldValue("ab", TextRange(1), TextRange(0, 2))
+        textInputService.updateState(
+            oldValue = value1,
+            newValue = value1
+        )
+
+        reset(inputMethodManager)
+
+        // reset the composition, however simulate that editing buffer already applied the
+        // change and old and new values are the same. However they will be different than the
+        // last stored TextFieldValue in TextInputService which is value1
+        val value2 = value1.copy(composition = null)
+        textInputService.updateState(
+            oldValue = value2,
+            newValue = value2
+        )
+
+        verify(inputMethodManager, never()).restartInput(any())
+        verify(inputMethodManager, times(1)).updateSelection(
+            any(), eq(value2.selection.min), eq(value2.selection.max), eq(-1), eq(-1)
+        )
     }
 
     @Test
