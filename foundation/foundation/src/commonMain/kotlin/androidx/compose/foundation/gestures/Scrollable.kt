@@ -27,6 +27,9 @@ import androidx.compose.foundation.gestures.Orientation.Vertical
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.relocation.BringIntoViewResponder
 import androidx.compose.foundation.relocation.BringIntoViewResponder.Companion.ModifierLocalBringIntoViewResponder
+import androidx.compose.foundation.relocation.BringRectangleOnScreenRequester
+import androidx.compose.foundation.relocation.bringIntoView
+import androidx.compose.foundation.relocation.bringRectangleOnScreenRequester
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -61,9 +64,9 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastForEach
+import kotlin.math.abs
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlin.math.abs
 
 /**
  * Configure touch scrolling and flinging for the UI element in a single [Orientation].
@@ -138,6 +141,7 @@ internal fun Modifier.scrollable(
 
         Modifier
             .then(bringIntoViewModifier)
+            .bringRectangleOnScreenRequester(bringIntoViewModifier.bringRectangleOnScreenRequester)
             .then(overscrollModifier)
             .pointerScrollable(
                 interactionSource,
@@ -477,6 +481,8 @@ private class BringIntoViewResponder(
         parent = scope.run { ModifierLocalBringIntoViewResponder.current }
     }
 
+    val bringRectangleOnScreenRequester = BringRectangleOnScreenRequester()
+
     // Populate the modifier local with this object.
     override val key = ModifierLocalBringIntoViewResponder
     override val value = this
@@ -504,7 +510,8 @@ private class BringIntoViewResponder(
             // If the parent is another BringIntoViewResponder, call bringIntoView.
             launch {
                 parent.bringIntoView(
-                    parent.toLocalRect(destRect, this@BringIntoViewResponder.layoutCoordinates)
+                    parent.toLocalRect(destRect, this@BringIntoViewResponder.layoutCoordinates),
+                    bringRectangleOnScreenRequester
                 )
             }
         }
