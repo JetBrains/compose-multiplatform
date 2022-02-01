@@ -61,7 +61,7 @@ dependencies {
         implementation("androidx.lifecycle:lifecycle-common-java8:2.3.0")
         implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
         implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.0")
-        implementation("androidx.profileinstaller:profileinstaller:1.1.0-rc01")
+        implementation("androidx.profileinstaller:profileinstaller:1.2.0-alpha02")
 
         testImplementation(libs.testRules)
         testImplementation(libs.testRunner)
