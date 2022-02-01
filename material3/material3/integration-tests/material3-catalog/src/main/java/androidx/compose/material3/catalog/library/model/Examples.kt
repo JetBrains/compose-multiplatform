@@ -48,7 +48,7 @@ import androidx.compose.material3.samples.LeadingIconTabs
 import androidx.compose.material3.samples.MenuSample
 import androidx.compose.material3.samples.NavigationBarSample
 import androidx.compose.material3.samples.NavigationBarWithOnlySelectedLabelsSample
-import androidx.compose.material3.samples.NavigationDrawerSample
+import androidx.compose.material3.samples.ModalNavigationDrawerSample
 import androidx.compose.material3.samples.NavigationRailBottomAlignSample
 import androidx.compose.material3.samples.NavigationRailSample
 import androidx.compose.material3.samples.NavigationRailWithOnlySelectedLabelsSample
@@ -332,11 +332,11 @@ private const val NavigationDrawerExampleDescription = "Navigation drawer exampl
 private const val NavigationDrawerExampleSourceUrl = "$SampleSourceUrl/DrawerSamples.kt"
 val NavigationDrawerExamples = listOf(
     Example(
-        name = ::NavigationDrawerSample.name,
+        name = ::ModalNavigationDrawerSample.name,
         description = NavigationDrawerExampleDescription,
         sourceUrl = NavigationDrawerExampleSourceUrl
     ) {
-        NavigationDrawerSample()
+        ModalNavigationDrawerSample()
     }
 )
 

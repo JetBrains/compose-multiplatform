@@ -73,7 +73,7 @@ enum class DrawerValue {
 }
 
 /**
- * State of the [NavigationDrawer] composable.
+ * State of the [ModalNavigationDrawer] composable.
  *
  * @param initialValue The initial value of the state.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
@@ -222,7 +222,7 @@ fun rememberDrawerState(
  * Modal navigation drawers block interaction with the rest of an app’s content with a scrim.
  * They are elevated above most of the app’s UI and don’t affect the screen’s layout grid.
  *
- * @sample androidx.compose.material3.samples.NavigationDrawerSample
+ * @sample androidx.compose.material3.samples.ModalNavigationDrawerSample
  *
  * @param drawerContent composable that represents content inside the drawer
  * @param modifier optional modifier for the drawer
@@ -237,12 +237,10 @@ fun rememberDrawerState(
  * the theme, this will keep the same value set above this Surface.
  * @param scrimColor color of the scrim that obscures content when the drawer is open
  * @param content content of the rest of the UI
- *
- * @throws IllegalStateException when parent has [Float.POSITIVE_INFINITY] width
  */
 @Composable
 @ExperimentalMaterial3Api
-fun NavigationDrawer(
+fun ModalNavigationDrawer(
     drawerContent: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
     drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
@@ -318,8 +316,51 @@ fun NavigationDrawer(
     }
 }
 
+@Composable
+@ExperimentalMaterial3Api
+@Deprecated(
+    "NavigationDrawer has been renamed to ModalNavigationDrawer to better specify " +
+        "its modal nature", replaceWith = ReplaceWith(
+        "ModalNavigationDrawer(drawerContent,\n" +
+            "        modifier,\n" +
+            "        drawerState,\n" +
+            "        gesturesEnabled,\n" +
+            "        drawerShape,\n" +
+            "        drawerTonalElevation,\n" +
+            "        drawerContainerColor,\n" +
+            "        drawerContentColor,\n" +
+            "        scrimColor,\n" +
+            "        content)"
+    )
+)
+fun NavigationDrawer(
+    drawerContent: @Composable ColumnScope.() -> Unit,
+    modifier: Modifier = Modifier,
+    drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
+    gesturesEnabled: Boolean = true,
+    drawerShape: Shape = RoundedCornerShape(0.dp, 16.dp, 16.dp, 0.dp),
+    drawerTonalElevation: Dp = DrawerDefaults.Elevation,
+    drawerContainerColor: Color = NavigationDrawerTokens.ContainerColor.toColor(),
+    drawerContentColor: Color = contentColorFor(drawerContainerColor),
+    scrimColor: Color = DrawerDefaults.scrimColor,
+    content: @Composable () -> Unit
+) {
+    ModalNavigationDrawer(
+        drawerContent,
+        modifier,
+        drawerState,
+        gesturesEnabled,
+        drawerShape,
+        drawerTonalElevation,
+        drawerContainerColor,
+        drawerContentColor,
+        scrimColor,
+        content
+    )
+}
+
 /**
- * Object to hold default values for [NavigationDrawer]
+ * Object to hold default values for [ModalNavigationDrawer]
  */
 @ExperimentalMaterial3Api
 object DrawerDefaults {
