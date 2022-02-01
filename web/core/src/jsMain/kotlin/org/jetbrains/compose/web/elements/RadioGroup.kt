@@ -3,10 +3,10 @@ package org.jetbrains.compose.web.dom
 import androidx.compose.runtime.*
 import org.jetbrains.compose.web.ExperimentalComposeWebApi
 import org.jetbrains.compose.web.attributes.InputType
-import org.jetbrains.compose.web.attributes.builders.InputAttrsBuilder
+import org.jetbrains.compose.web.attributes.builders.InputAttrsScope
 import org.jetbrains.compose.web.attributes.name
 
-typealias RadioInputAttrsBuilder = (InputAttrsBuilder<Boolean>.() -> Unit)
+typealias RadioInputAttrsBuilder = (InputAttrsScope<Boolean>.() -> Unit)
 
 /**
  * @param value - sets `value` attribute

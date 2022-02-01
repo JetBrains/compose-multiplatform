@@ -7,13 +7,22 @@ package org.jetbrains.compose.web.attributes.builders
 
 import androidx.compose.web.events.SyntheticEvent
 import org.jetbrains.compose.web.attributes.*
+import org.jetbrains.compose.web.attributes.EventsListenerScope.Companion.BEFOREINPUT
+import org.jetbrains.compose.web.attributes.EventsListenerScope.Companion.INPUT
+import org.jetbrains.compose.web.attributes.EventsListenerScope.Companion.INVALID
 import org.jetbrains.compose.web.events.SyntheticChangeEvent
 import org.jetbrains.compose.web.events.SyntheticInputEvent
 import org.jetbrains.compose.web.events.SyntheticSelectEvent
 import org.w3c.dom.HTMLInputElement
 
+@Deprecated(
+    message = "Renamed to InputAttrsScope<T>",
+    replaceWith = ReplaceWith("InputAttrsScope", "org.jetbrains.compose.web.attributes.builders.InputAttrsScope")
+)
+typealias InputAttrsBuilder<T> = InputAttrsScope<T>
+
 /**
- * An extension of [AttrsBuilder].
+ * An extension of [AttrsScope].
  * This class provides a set of methods specific for [Input] element:
  *
  * [value] - sets the current input's value.
@@ -28,11 +37,11 @@ import org.w3c.dom.HTMLInputElement
  * [onBeforeInput] - add `beforeinput` event listener
  * [onSelect] - add `select` event listener
  */
-class InputAttrsBuilder<ValueType>(
+class InputAttrsScope<ValueType>(
     val inputType: InputType<ValueType>
-) : AttrsBuilder<HTMLInputElement>() {
+) : AttrsScopeBuilder<HTMLInputElement>() {
 
-    fun value(value: String): InputAttrsBuilder<ValueType> {
+    fun value(value: String): InputAttrsScope<ValueType> {
         when (inputType) {
             InputType.Checkbox,
             InputType.Radio,
@@ -43,27 +52,27 @@ class InputAttrsBuilder<ValueType>(
         return this
     }
 
-    fun value(value: Number): InputAttrsBuilder<ValueType> {
+    fun value(value: Number): InputAttrsScope<ValueType> {
         value(value.toString())
         return this
     }
 
-    fun checked(checked: Boolean): InputAttrsBuilder<ValueType> {
+    fun checked(checked: Boolean): InputAttrsScope<ValueType> {
         prop(setCheckedValue, checked)
         return this
     }
 
-    fun defaultChecked(): InputAttrsBuilder<ValueType> {
+    fun defaultChecked(): InputAttrsScope<ValueType> {
         attr("checked", "")
         return this
     }
 
-    fun defaultValue(value: String): InputAttrsBuilder<ValueType> {
+    fun defaultValue(value: String): InputAttrsScope<ValueType> {
         attr("value", value)
         return this
     }
 
-    fun defaultValue(value: Number): InputAttrsBuilder<ValueType> {
+    fun defaultValue(value: Number): InputAttrsScope<ValueType> {
         attr("value", value.toString())
         return this
     }
@@ -77,25 +86,25 @@ class InputAttrsBuilder<ValueType>(
     fun onInput(
         listener: (SyntheticInputEvent<ValueType, HTMLInputElement>) -> Unit
     ) {
-        listeners.add(InputEventListener(eventName = INPUT, inputType, listener))
+        registerEventListener(InputEventListener(eventName = INPUT, inputType, listener))
     }
 
     fun onChange(
         listener: (SyntheticChangeEvent<ValueType, HTMLInputElement>) -> Unit
     ) {
-        listeners.add(ChangeEventListener(inputType, listener))
+        registerEventListener(ChangeEventListener(inputType, listener))
     }
 
     fun onBeforeInput(
         listener: (SyntheticInputEvent<ValueType, HTMLInputElement>) -> Unit
     ) {
-        listeners.add(InputEventListener(eventName = BEFOREINPUT, inputType, listener))
+        registerEventListener(InputEventListener(eventName = BEFOREINPUT, inputType, listener))
     }
 
     fun onSelect(
         listener: (SyntheticSelectEvent<HTMLInputElement>) -> Unit
     ) {
-        listeners.add(SelectEventListener(listener))
+        registerEventListener(SelectEventListener(listener))
     }
 }
 
@@ -105,5 +114,3 @@ internal external interface JsWeakMap {
     fun has(key: Any): Boolean
     fun set(key: Any, value: Any): JsWeakMap
 }
-
-
