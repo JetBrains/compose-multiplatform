@@ -97,7 +97,7 @@ fun JFrame.sendMouseWheelEvent(
     x: Int,
     y: Int,
     scrollType: Int,
-    scrollAmount: Int,
+    wheelRotation: Int,
     modifiers: Int = 0,
 ): Boolean {
     // we use width and height instead of x and y because we can send (-1, -1), but still need
@@ -113,8 +113,8 @@ fun JFrame.sendMouseWheelEvent(
         1,
         false,
         scrollType,
-        scrollAmount,
-        1
+        1,
+        wheelRotation
     )
     component.dispatchEvent(event)
     return event.isConsumed
