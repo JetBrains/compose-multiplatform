@@ -46,6 +46,8 @@ fun main() = application {
 ```
 <img alt="Window properties" src="window_properties.gif" height="260" />
 
+## Open and close windows (conditionally)
+
 You can also close/open windows using a simple `if` statement.
 
 When the `Window` leaves the composition (`isPerformingTask` becomes `false`) – the native window automatically closes.
@@ -122,6 +124,8 @@ fun main() = application {
 ```
 <img alt="Ask to close" src="ask_to_close.gif" height="309" />
 
+## Hide the window into the tray
+
 If you don't need to close the window and just need to hide it (for example to the tray), you can change the `windowState.isVisible` state:
 ```kotlin
 import androidx.compose.material.Text
@@ -178,6 +182,8 @@ object TrayIcon : Painter() {
 }
 ```
 <img alt="Hide instead of closing" src="hide_instead_of_close.gif" height="308" />
+
+## Open and close multiple windows
 
 If an application has multiple windows, then it is better to put its state into a separate class and open/close window in response to `mutableStateListOf` changes (see [notepad example](https://github.com/JetBrains/compose-jb/tree/master/examples/notepad) for more complex use cases):
 ```kotlin
