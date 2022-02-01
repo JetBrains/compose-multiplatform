@@ -148,10 +148,9 @@ internal class IdentityArrayMap<Key : Any, Value : Any?>(capacity: Int = 16) {
             val mid = (low + high).ushr(1)
             val midKey = keys[mid]
             val midKeyHash = identityHashCode(midKey)
-            val comparison = midKeyHash - keyIdentity
             when {
-                comparison < 0 -> low = mid + 1
-                comparison > 0 -> high = mid - 1
+                midKeyHash < keyIdentity -> low = mid + 1
+                midKeyHash > keyIdentity -> high = mid - 1
                 key === midKey -> return mid
                 else -> return findExactIndex(mid, key, keyIdentity)
             }
