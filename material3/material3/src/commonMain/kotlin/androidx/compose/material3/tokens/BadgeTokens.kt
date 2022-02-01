@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// VERSION: v0_76
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// TO MODIFY THIS FILE UPDATE:
-//   ux/material/dsdb/contrib/generators/tokens/src/compose/templates/component.jinja2
 
 package androidx.compose.material3.tokens
 
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 
 internal object BadgeTokens {
@@ -27,8 +25,8 @@ internal object BadgeTokens {
     val LargeColor = ColorSchemeKeyTokens.Error
     val LargeLabelTextColor = ColorSchemeKeyTokens.OnError
     val LargeLabelTextFont = TypographyKeyTokens.LabelSmall
-    val LargeShape = RoundedCornerShape(8.0.dp)
+    val LargeShape = ShapeTokens.CornerFull
     val LargeSize = 16.0.dp
-    val Shape = RoundedCornerShape(3.0.dp)
+    val Shape = ShapeTokens.CornerFull
     val Size = 6.0.dp
 }

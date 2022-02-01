@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// VERSION: v0_76
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -30,8 +31,14 @@ internal object SnackbarTokens {
     val ActionPressedStateLayerColor = ColorSchemeKeyTokens.InversePrimary
     val ContainerColor = ColorSchemeKeyTokens.InverseSurface
     val ContainerElevation = ElevationTokens.Level3
-    val ContainerShape = ShapeTokens.Small
+    val ContainerShape = ShapeTokens.CornerExtraSmall
     val IconColor = ColorSchemeKeyTokens.InverseOnSurface
+    val FocusIconColor = ColorSchemeKeyTokens.InverseOnSurface
+    val IconFocusStateLayerColor = ColorSchemeKeyTokens.InverseOnSurface
+    val HoverIconColor = ColorSchemeKeyTokens.InverseOnSurface
+    val IconHoverStateLayerColor = ColorSchemeKeyTokens.InverseOnSurface
+    val PressedIconColor = ColorSchemeKeyTokens.InverseOnSurface
+    val IconPressedStateLayerColor = ColorSchemeKeyTokens.InverseOnSurface
     val IconSize = 24.0.dp
     val SupportingTextColor = ColorSchemeKeyTokens.InverseOnSurface
     val SupportingTextFont = TypographyKeyTokens.BodyMedium

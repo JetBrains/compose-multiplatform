@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// VERSION: v0_76
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
 
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 
 internal object NavigationDrawerTokens {
@@ -30,14 +30,16 @@ internal object NavigationDrawerTokens {
     val ActiveIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
     val ActiveIndicatorColor = ColorSchemeKeyTokens.SecondaryContainer
     val ActiveIndicatorHeight = 56.0.dp
-    val ActiveIndicatorShape = RoundedCornerShape(28.0.dp)
+    val ActiveIndicatorShape = ShapeTokens.CornerFull
     val ActiveIndicatorWidth = 336.0.dp
     val ActiveLabelTextColor = ColorSchemeKeyTokens.OnSecondaryContainer
     val ActivePressedIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
     val ActivePressedLabelTextColor = ColorSchemeKeyTokens.OnSecondaryContainer
     val ActivePressedStateLayerColor = ColorSchemeKeyTokens.OnSecondaryContainer
+    val BottomContainerShape = ShapeTokens.CornerLargeTop
     val ContainerColor = ColorSchemeKeyTokens.Surface
     const val ContainerHeightPercent = 100.0f
+    val ContainerShape = ShapeTokens.CornerLargeEnd
     val ContainerWidth = 360.0.dp
     val DividerColor = ColorSchemeKeyTokens.Outline
     val HeadlineColor = ColorSchemeKeyTokens.OnSurfaceVariant
@@ -55,6 +57,8 @@ internal object NavigationDrawerTokens {
     val InactivePressedLabelTextColor = ColorSchemeKeyTokens.OnSurface
     val InactivePressedStateLayerColor = ColorSchemeKeyTokens.OnSecondaryContainer
     val LabelTextFont = TypographyKeyTokens.LabelLarge
+    val LargeBadgeLabelColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val LargeBadgeLabelFont = TypographyKeyTokens.LabelLarge
     val ModalContainerElevation = ElevationTokens.Level1
     const val ScrimOpacity = 0.4f
     val StandardContainerElevation = ElevationTokens.Level0

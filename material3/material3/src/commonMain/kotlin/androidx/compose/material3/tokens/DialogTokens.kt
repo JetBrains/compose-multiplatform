@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// VERSION: v0_76
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
 
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 
 internal object DialogTokens {
@@ -31,7 +31,7 @@ internal object DialogTokens {
     val ActionPressedStateLayerColor = ColorSchemeKeyTokens.Primary
     val ContainerColor = ColorSchemeKeyTokens.Surface
     val ContainerElevation = ElevationTokens.Level3
-    val ContainerShape = RoundedCornerShape(28.0.dp)
+    val ContainerShape = ShapeTokens.CornerExtraLarge
     val SubheadColor = ColorSchemeKeyTokens.OnSurface
     val SubheadFont = TypographyKeyTokens.HeadlineSmall
     val SupportingTextColor = ColorSchemeKeyTokens.OnSurfaceVariant

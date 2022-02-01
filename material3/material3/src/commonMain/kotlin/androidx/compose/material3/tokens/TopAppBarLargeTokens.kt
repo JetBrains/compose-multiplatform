@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// VERSION: v0_76
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -23,6 +24,7 @@ internal object TopAppBarLargeTokens {
     val ContainerColor = ColorSchemeKeyTokens.Surface
     val ContainerElevation = ElevationTokens.Level0
     val ContainerHeight = 152.0.dp
+    val ContainerShape = ShapeTokens.CornerNone
     val HeadlineColor = ColorSchemeKeyTokens.OnSurface
     val HeadlineFont = TypographyKeyTokens.HeadlineMedium
     val LeadingIconColor = ColorSchemeKeyTokens.OnSurface
