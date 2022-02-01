@@ -5,20 +5,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.window.*
-import androidx.compose.ui.window.ApplicationScope
-import javax.swing.JComponent
 import javax.swing.SwingUtilities
 import kotlin.system.exitProcess
 
 class AppWindowScope : FrameWindowScope {
     val state = WindowState()
     override val window: ComposeWindow = ComposeWindow()
-
     fun onClose() {}
 }
 
 @Composable
-actual fun AppScope.Frame(content: @Composable () -> Unit) {
+actual fun ComposeAppScope.Frame(content: @Composable () -> Unit) {
     val scope by remember { mutableStateOf(AppWindowScope()) }
     scope.apply {
         Window(onCloseRequest = { scope.onClose() }, state = scope.state,
@@ -26,7 +23,7 @@ actual fun AppScope.Frame(content: @Composable () -> Unit) {
     }
 }
 
-class AppAppScope : AppScope, ApplicationScope {
+class AppAppScope : ComposeAppScope, androidx.compose.ui.window.ApplicationScope {
     override fun exitApplication() {
         println("Exit application")
         SwingUtilities.invokeLater {
@@ -35,20 +32,19 @@ class AppAppScope : AppScope, ApplicationScope {
     }
 }
 
-internal actual fun appImpl(name: String, title: String, content: @Composable AppScope.() -> Unit) {
+internal actual fun composeApplicationImpl(name: String, title: String, content: @Composable ComposeAppScope.() -> Unit) {
     val scope = AppAppScope()
     scope.apply {
-        application(content = @Composable { content() })
+        application(exitProcessOnExit = true, content = @Composable { content() })
     }
 }
 
-actual fun embed(context: Any,  body: @Composable () -> Unit) {
-    when (context) {
-        is JComponent -> embed(context, body)
-        else -> throw UnsupportedOperationException("cannot embed to $context")
+internal actual fun composeAppImpl(name: String, content: @Composable () -> Unit) {
+    val appScope = AppAppScope()
+    val winScope = AppWindowScope()
+    appScope.apply {
+        winScope.apply {
+            singleWindowApplication(state = winScope.state, content = @Composable { content() })
+        }
     }
-}
-
-fun embed(context: JComponent, body: @Composable () -> Unit) {
-    TODO("implement me")
 }

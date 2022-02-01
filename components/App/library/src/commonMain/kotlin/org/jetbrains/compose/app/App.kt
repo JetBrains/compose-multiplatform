@@ -2,15 +2,20 @@ package org.jetbrains.compose.app
 
 import androidx.compose.runtime.Composable
 
-interface AppScope
+interface ComposeAppScope
 
 @Composable
-expect fun AppScope.Frame(content: @Composable () -> Unit)
+expect fun ComposeAppScope.Frame(content: @Composable () -> Unit)
 
-fun app(name: String = "application", title: String = "Compose Application", content: @Composable AppScope.() -> Unit) {
-    appImpl(name, title, content)
+// Complex multi-frame application
+fun composeApplication(name: String = "application", title: String = "Compose Application", content: @Composable ComposeAppScope.() -> Unit) {
+    composeApplicationImpl(name, title, content)
 }
 
-internal expect fun appImpl(name: String, title: String, content: @Composable AppScope.() -> Unit)
+// Simple single-frame application.
+fun composeApp(name: String = "application", content: @Composable () -> Unit) {
+    composeAppImpl(name, content)
+}
 
-expect fun embed(context: Any,  body: @Composable () -> Unit)
+internal expect fun composeApplicationImpl(name: String, title: String, content: @Composable ComposeAppScope.() -> Unit)
+internal expect fun composeAppImpl(name: String, content: @Composable () -> Unit)

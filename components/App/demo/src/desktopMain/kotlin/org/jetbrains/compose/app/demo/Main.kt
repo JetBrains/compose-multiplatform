@@ -7,7 +7,7 @@ import androidx.compose.runtime.*
 
 import org.jetbrains.compose.app.*
 
-fun main() = app(
+fun main() = composeApplication(
     title = "App demo"
 ) {
     var visible by remember { mutableStateOf(5) }
