@@ -18,6 +18,7 @@ package androidx.compose.foundation.lazy.grid
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.GridItemSpan
+import androidx.compose.foundation.lazy.LazyGridItemScope
 import androidx.compose.foundation.lazy.LazyGridItemSpanScope
 import androidx.compose.foundation.lazy.LazyGridScope
 import androidx.compose.foundation.lazy.LazyGridState
@@ -40,7 +41,8 @@ import kotlinx.coroutines.flow.collect
 @Composable
 internal fun rememberStateOfItemsProvider(
     state: LazyGridState,
-    content: LazyGridScope.() -> Unit
+    content: LazyGridScope.() -> Unit,
+    itemScope: LazyGridItemScope
 ): State<LazyGridItemsProvider> {
     val latestContent = rememberUpdatedState(content)
     val nearestItemsRangeState = remember(state) {
@@ -54,10 +56,11 @@ internal fun rememberStateOfItemsProvider(
             // recreated when the state is updated with a new range.
             .collect { nearestItemsRangeState.value = it }
     }
-    return remember(nearestItemsRangeState) {
+    return remember(nearestItemsRangeState, itemScope) {
         derivedStateOf<LazyGridItemsProvider> {
             val listScope = LazyGridScopeImpl().apply(latestContent.value)
             LazyGridItemsProviderImpl(
+                itemScope,
                 listScope.intervals,
                 listScope.hasCustomSpans,
                 nearestItemsRangeState.value
@@ -68,6 +71,7 @@ internal fun rememberStateOfItemsProvider(
 
 @OptIn(ExperimentalFoundationApi::class)
 internal class LazyGridItemsProviderImpl(
+    private val itemScope: LazyGridItemScope,
     private val intervals: IntervalList<LazyGridIntervalContent>,
     override val hasCustomSpans: Boolean,
     nearestItemsRange: IntRange
@@ -96,7 +100,7 @@ internal class LazyGridItemsProviderImpl(
     override fun getContent(index: Int): @Composable () -> Unit {
         val interval = getIntervalForIndex(index)
         val localIntervalIndex = index - interval.startIndex
-        return interval.content.content.invoke(localIntervalIndex)
+        return interval.content.content.invoke(itemScope, localIntervalIndex)
     }
 
     override val keyToIndexMap: Map<Any, Int> = generateKeyToIndexMap(nearestItemsRange, intervals)

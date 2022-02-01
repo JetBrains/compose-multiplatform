@@ -44,11 +44,15 @@ interface LazyGridItemInfo {
 
     /**
      * The row occupied by the top start point of the item.
+     * If this is unknown, for example while this item is animating to exit the viewport and is
+     * still visible, the value will be [Unknown].
      */
     val row: Int
 
     /**
      * The column occupied by the top start point of the item.
+     * If this is unknown, for example while this item is animating to exit the viewport and is
+     * still visible, the value will be [Unknown].
      */
     val column: Int
 
@@ -57,4 +61,13 @@ interface LazyGridItemInfo {
      * slot for the item then this size will be calculated as the max of their sizes.
      */
     val size: IntSize
+
+    @ExperimentalFoundationApi
+    companion object {
+        /**
+         * Possible value for [row] and [column], when they are unknown. This can happen when
+         * the item is visible while animating to exit the viewport.
+         */
+        const val Unknown = -1
+    }
 }

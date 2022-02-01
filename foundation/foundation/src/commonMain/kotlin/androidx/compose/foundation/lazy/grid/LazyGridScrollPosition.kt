@@ -53,14 +53,14 @@ internal class LazyGridScrollPosition(
      * Updates the current scroll position based on the results of the last measurement.
      */
     fun updateFromMeasureResult(measureResult: LazyGridMeasureResult) {
-        lastKnownFirstItemKey = measureResult.firstVisibleLine?.keys?.first()
+        lastKnownFirstItemKey = measureResult.firstVisibleLine?.items?.firstOrNull()?.key
         // we ignore the index and offset from measureResult until we get at least one
         // measurement with real items. otherwise the initial index and scroll passed to the
         // state would be lost and overridden with zeros.
         if (hadFirstNotEmptyLayout || measureResult.totalItemsCount > 0) {
             hadFirstNotEmptyLayout = true
             update(
-                ItemIndex(measureResult.firstVisibleLine?.firstItemIndex?.value ?: 0),
+                ItemIndex(measureResult.firstVisibleLine?.items?.firstOrNull()?.index?.value ?: 0),
                 measureResult.firstVisibleLineScrollOffset
             )
         }
