@@ -50,11 +50,6 @@ import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
 internal class ComposeLayer {
     private var isDisposed = false
 
-    // TODO(demin): probably we need to get rid of asynchronous events. it was added because of
-    //  slow lazy scroll. But events become unpredictable, and we can't consume them.
-    //  Alternative solution to a slow scroll - merge multiple scroll events into a single one.
-    private val events = AWTDebounceEventQueue()
-
     private val _component = ComponentImpl()
     val component: SkiaLayer get() = _component
 
@@ -140,69 +135,61 @@ internal class ComposeLayer {
 
         _component.addInputMethodListener(object : InputMethodListener {
             override fun caretPositionChanged(event: InputMethodEvent?) {
+                if (isDisposed) return
                 if (event != null) {
                     scene.onInputMethodEvent(event)
                 }
             }
 
-            override fun inputMethodTextChanged(event: InputMethodEvent) = events.post {
+            override fun inputMethodTextChanged(event: InputMethodEvent) {
+                if (isDisposed) return
                 scene.onInputMethodEvent(event)
             }
         })
 
         _component.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(event: MouseEvent) = Unit
-
-            override fun mousePressed(event: MouseEvent) = events.post {
-                scene.onMouseEvent(density, event)
-            }
-
-            override fun mouseReleased(event: MouseEvent) = events.post {
-                scene.onMouseEvent(density, event)
-            }
-
-            override fun mouseEntered(event: MouseEvent) = events.post {
-                scene.onMouseEvent(density, event)
-            }
-
-            override fun mouseExited(event: MouseEvent) = events.post {
-                scene.onMouseEvent(density, event)
-            }
+            override fun mousePressed(event: MouseEvent) = onMouseEvent(event)
+            override fun mouseReleased(event: MouseEvent) = onMouseEvent(event)
+            override fun mouseEntered(event: MouseEvent) = onMouseEvent(event)
+            override fun mouseExited(event: MouseEvent) = onMouseEvent(event)
         })
         _component.addMouseMotionListener(object : MouseMotionAdapter() {
-            override fun mouseDragged(event: MouseEvent) = events.post {
-                scene.onMouseEvent(density, event)
-            }
-
-            override fun mouseMoved(event: MouseEvent) = events.post {
-                scene.onMouseEvent(density, event)
-            }
+            override fun mouseDragged(event: MouseEvent) = onMouseEvent(event)
+            override fun mouseMoved(event: MouseEvent) = onMouseEvent(event)
         })
         _component.addMouseWheelListener { event ->
-            events.post {
-                scene.onMouseWheelEvent(density, event)
-            }
+            onMouseWheelEvent(event)
         }
         _component.focusTraversalKeysEnabled = false
         _component.addKeyListener(object : KeyAdapter() {
-            override fun keyPressed(event: KeyEvent) {
-                scene.sendKeyEvent(event)
-            }
-
-            override fun keyReleased(event: KeyEvent) {
-                scene.sendKeyEvent(event)
-            }
-
-            override fun keyTyped(event: KeyEvent) {
-                scene.sendKeyEvent(event)
-            }
+            override fun keyPressed(event: KeyEvent) = onKeyEvent(event)
+            override fun keyReleased(event: KeyEvent) = onKeyEvent(event)
+            override fun keyTyped(event: KeyEvent) = onKeyEvent(event)
         })
+    }
+
+    private fun onMouseEvent(event: MouseEvent) {
+        // AWT can send events after the window is disposed
+        if (isDisposed) return
+        scene.onMouseEvent(density, event)
+    }
+
+    private fun onMouseWheelEvent(event: MouseWheelEvent) {
+        if (isDisposed) return
+        scene.onMouseWheelEvent(density, event)
+    }
+
+    private fun onKeyEvent(event: KeyEvent) {
+        if (isDisposed) return
+        if (scene.sendKeyEvent(ComposeKeyEvent(event))) {
+            event.consume()
+        }
     }
 
     fun dispose() {
         check(!isDisposed)
         scene.close()
-        events.cancel()
         _component.dispose()
         _initContent = null
         isDisposed = true
@@ -278,9 +265,4 @@ private fun ComposeScene.onMouseWheelEvent(
         type = PointerType.Mouse,
         nativeEvent = event
     )
-}
-
-@OptIn(ExperimentalComposeUiApi::class)
-private fun ComposeScene.sendKeyEvent(event: KeyEvent) {
-    sendKeyEvent(ComposeKeyEvent(event))
 }
