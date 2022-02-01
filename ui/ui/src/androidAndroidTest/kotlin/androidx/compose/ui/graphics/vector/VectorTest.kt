@@ -39,18 +39,25 @@ import androidx.compose.ui.AtLeastSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
 import androidx.compose.ui.draw.paint
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toPixelMap
+import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalImageVectorCache
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.ImageVectorCache
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.test.captureToImage
@@ -100,6 +107,39 @@ class VectorTest {
                 createTestVectorPainter(200, Color.Magenta),
                 alignment = Alignment.Center
             )
+            AtLeastSize(size = 200, modifier = background) {
+            }
+        }
+        takeScreenShot(200).apply {
+            assertEquals(getPixel(100, 100), Color.Magenta.toArgb())
+        }
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun testVectorIntrinsicTintFirstFrame() {
+        rule.setContent {
+            val vector = createTestVectorPainter(200, Color.Magenta)
+
+            val bitmap = remember {
+                val bitmap = ImageBitmap(200, 200)
+                val canvas = Canvas(bitmap)
+                val bitmapSize = Size(200f, 200f)
+                CanvasDrawScope().draw(
+                    Density(1f),
+                    LayoutDirection.Ltr,
+                    canvas,
+                    bitmapSize
+                ) {
+                    with(vector) {
+                        draw(bitmapSize)
+                    }
+                }
+                bitmap
+            }
+
+            val background = Modifier.paint(BitmapPainter(bitmap))
+
             AtLeastSize(size = 200, modifier = background) {
             }
         }
