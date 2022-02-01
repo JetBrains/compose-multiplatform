@@ -16,6 +16,9 @@
 
 package androidx.compose.ui.graphics.vector
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.Size.Companion.Unspecified
 import androidx.compose.ui.graphics.BlendMode
@@ -114,7 +117,7 @@ internal class VectorComponent : VNode() {
 
     internal var invalidateCallback = {}
 
-    internal var intrinsicColorFilter: ColorFilter? = null
+    internal var intrinsicColorFilter: ColorFilter? by mutableStateOf(null)
 
     var viewportWidth: Float = 0f
         set(value) {
