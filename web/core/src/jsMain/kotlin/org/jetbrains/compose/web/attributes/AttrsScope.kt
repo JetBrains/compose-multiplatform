@@ -8,6 +8,15 @@ import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 
+@Deprecated(
+    message = "Renamed to AttrsScopeBuilder",
+    replaceWith = ReplaceWith(
+        expression = "AttrsScopeBuilder<T>",
+        imports = arrayOf("org.jetbrains.compose.web.attributes.AttrsScopeBuilder")
+    )
+)
+typealias AttrsBuilder<T> = AttrsScopeBuilder<T>
+
 /**
  * [AttrsScope] is a class that is used (as a builder context, that is as AttrsBuilder<T>.() -> Unit)
  * in all DOM-element creating API calls. It's used for adding attributes to the element created,
@@ -23,12 +32,12 @@ interface AttrsScope<TElement : Element>: EventsListenerScope {
     val attributesMap: Map<String, String>
     @ComposeWebInternalApi
     val styleScope: StyleScope
-    
+
     @ComposeWebInternalApi
     val propertyUpdates: List<Pair<(Element, Any) -> Unit, Any>>
     @ComposeWebInternalApi
     var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)?
-    
+
     /**
      * [style] add inline CSS-style properties to the element via [StyleScope] context
      *
@@ -42,7 +51,7 @@ interface AttrsScope<TElement : Element>: EventsListenerScope {
     fun style(builder: StyleScope.() -> Unit) {
         styleScope.apply(builder)
     }
-    
+
     /**
      * [classes] adds all values passed as params to the element's classList.
      *  This method acts cumulatively, that is, each call adds values to the classList.
@@ -50,7 +59,7 @@ interface AttrsScope<TElement : Element>: EventsListenerScope {
      *  since if your classList is, for instance, condition-dependent, you can always just call this method conditionally.
      */
     fun classes(vararg classes: String)= prop(setClassList, classes)
-    
+
     fun id(value: String) = attr(ID, value)
     fun hidden() = attr(HIDDEN, true.toString())
     fun title(value: String) = attr(TITLE, value)
@@ -60,17 +69,17 @@ interface AttrsScope<TElement : Element>: EventsListenerScope {
     fun lang(value: String) = attr(LANG, value)
     fun tabIndex(value: Int) = attr(TAB_INDEX, value.toString())
     fun spellCheck(value: Boolean) = attr(SPELLCHECK, value.toString())
-    
+
     /**
      * see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/inputmode
      */
     fun inputMode(value: String) = attr("inputmode", value)
-    
+
     /**
      * see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/inputmode
      */
     fun inputMode(value: InputMode) = attr("inputmode", value.str)
-    
+
     /**
      * [ref] can be used to retrieve a reference to a html element.
      * The lambda that `ref` takes in is not Composable. It will be called only once when an element added into a composition.
@@ -79,7 +88,7 @@ interface AttrsScope<TElement : Element>: EventsListenerScope {
      * Under the hood, `ref` uses [DisposableEffect](https://developer.android.com/jetpack/compose/side-effects#disposableeffect)
      */
     fun ref(effect: DisposableEffectScope.(TElement) -> DisposableEffectResult)
-    
+
     /**
      * [attr] adds arbitrary attribute to the Element.
      * If it called twice for the same attribute name, attribute value will be resolved to the last call.
@@ -90,7 +99,7 @@ interface AttrsScope<TElement : Element>: EventsListenerScope {
      * For boolean attributes cast boolean value to String and pass it as value.
      */
     fun attr(attr: String, value: String): AttrsScope<TElement>
-    
+
     /**
      * [prop] allows setting values of element's properties which can't be set by ussing [attr].
      * [update] is a lambda with two parameters: `element` and `value`. `element` is a reference to a native element.
@@ -110,9 +119,10 @@ interface AttrsScope<TElement : Element>: EventsListenerScope {
      */
     @Suppress("UNCHECKED_CAST")
     fun <E : HTMLElement, V> prop(update: (E, V) -> Unit, value: V)
-    
+
+    @ComposeWebInternalApi
     fun copyFrom(attrsScope: AttrsScope<TElement>)
-    
+
     companion object {
         const val CLASS = "class"
         const val ID = "id"
@@ -130,10 +140,10 @@ interface AttrsScope<TElement : Element>: EventsListenerScope {
 open class AttrsScopeBuilder<TElement : Element> : AttrsScope<TElement>, EventsListenerScope by EventsListenerScopeBuilder() {
     override val attributesMap = mutableMapOf<String, String>()
     override val styleScope: StyleScope = StyleScopeBuilder()
-    
+
     override val propertyUpdates = mutableListOf<Pair<(Element, Any) -> Unit, Any>>()
     override var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
-    
+
     /**
      * [ref] can be used to retrieve a reference to a html element.
      * The lambda that `ref` takes in is not Composable. It will be called only once when an element added into a composition.
@@ -184,14 +194,15 @@ open class AttrsScopeBuilder<TElement : Element> : AttrsScope<TElement>, EventsL
     internal fun collect(): Map<String, String> {
         return attributesMap
     }
-    
+
+    @ComposeWebInternalApi
     override fun copyFrom(attrsScope: AttrsScope<TElement>) {
         refEffect = attrsScope.refEffect
         styleScope.copyFrom(attrsScope.styleScope)
-        
+
         attributesMap.putAll(attrsScope.attributesMap)
         propertyUpdates.addAll(attrsScope.propertyUpdates)
-        
+
         copyListenersFrom(attrsScope)
     }
 }
