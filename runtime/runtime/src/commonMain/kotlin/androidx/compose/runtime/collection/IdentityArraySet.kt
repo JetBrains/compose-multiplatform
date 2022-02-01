@@ -172,10 +172,10 @@ internal class IdentityArraySet<T : Any> : Set<T> {
         while (low <= high) {
             val mid = (low + high).ushr(1)
             val midVal = get(mid)
-            val comparison = identityHashCode(midVal) - valueIdentity
+            val midIdentity = identityHashCode(midVal)
             when {
-                comparison < 0 -> low = mid + 1
-                comparison > 0 -> high = mid - 1
+                midIdentity < valueIdentity -> low = mid + 1
+                midIdentity > valueIdentity -> high = mid - 1
                 midVal === value -> return mid
                 else -> return findExactIndex(mid, value, valueIdentity)
             }
