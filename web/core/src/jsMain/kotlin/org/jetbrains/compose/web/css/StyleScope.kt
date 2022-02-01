@@ -11,7 +11,7 @@ import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import kotlin.properties.ReadOnlyProperty
 
 /**
- * StyleBuilder serves for two main purposes. Passed as a builder context (in [AttrsBuilder]), it
+ * StyleBuilder serves for two main purposes. Passed as a builder context (in [AttrsScope]), it
  * makes it possible to:
  * 1. Add inlined css properties to the element (@see [property])
  * 2. Set values to CSS variables (@see [variable])
@@ -125,13 +125,26 @@ fun <TValue : StylePropertyValue> variable() =
     }
 
 interface StyleHolder {
+    @ComposeWebInternalApi
     val properties: StylePropertyList
+    @ComposeWebInternalApi
     val variables: StylePropertyList
 }
 
+interface StyleScope : StyleBuilder, StyleHolder {
+    @ComposeWebInternalApi
+    fun copyFrom(sb: StyleScope)
+}
+
+@Deprecated(
+    message = "Renamed to StyleScopeBuilder",
+    replaceWith = ReplaceWith("StyleScopeBuilder", "org.jetbrains.compose.web.css.StyleScopeBuilder")
+)
+typealias StyleBuilderImpl = StyleScopeBuilder
+
 @OptIn(ComposeWebInternalApi::class)
 @Suppress("EqualsOrHashCode")
-open class StyleBuilderImpl : StyleBuilder, StyleHolder {
+open class StyleScopeBuilder : StyleScope {
     override val properties: MutableStylePropertyList = mutableListOf()
     override val variables: MutableStylePropertyList = mutableListOf()
 
@@ -147,11 +160,11 @@ open class StyleBuilderImpl : StyleBuilder, StyleHolder {
     override fun equals(other: Any?): Boolean {
         return if (other is StyleHolder) {
             properties.nativeEquals(other.properties) &&
-                    variables.nativeEquals(other.variables)
+                variables.nativeEquals(other.variables)
         } else false
     }
 
-    internal fun copyFrom(sb: StyleBuilderImpl) {
+    override fun copyFrom(sb: StyleScope) {
         properties.addAll(sb.properties)
         variables.addAll(sb.variables)
     }
@@ -174,6 +187,6 @@ internal fun StylePropertyList.nativeEquals(properties: StylePropertyList): Bool
     return all { prop ->
         val otherProp = properties[index++]
         prop.name == otherProp.name &&
-                prop.value.toString() == otherProp.value.toString()
+            prop.value.toString() == otherProp.value.toString()
     }
 }

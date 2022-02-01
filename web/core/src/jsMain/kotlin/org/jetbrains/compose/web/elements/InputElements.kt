@@ -2,12 +2,12 @@ package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.NonRestartableComposable
-import org.jetbrains.compose.web.attributes.builders.InputAttrsBuilder
+import org.jetbrains.compose.web.attributes.builders.InputAttrsScope
 import org.jetbrains.compose.web.attributes.*
 
-private fun InputAttrsBuilder<String>.applyAttrsWithStringValue(
+private fun InputAttrsScope<String>.applyAttrsWithStringValue(
     value: String,
-    attrs: InputAttrsBuilder<String>.() -> Unit
+    attrs: InputAttrsScope<String>.() -> Unit
 ) {
     value(value)
     attrs()
@@ -22,7 +22,7 @@ private fun InputAttrsBuilder<String>.applyAttrsWithStringValue(
  */
 @Composable
 @NonRestartableComposable
-fun CheckboxInput(checked: Boolean = false, attrs: InputAttrsBuilder<Boolean>.() -> Unit = {}) {
+fun CheckboxInput(checked: Boolean = false, attrs: InputAttrsScope<Boolean>.() -> Unit = {}) {
     Input(
         type = InputType.Checkbox,
         attrs = {
@@ -41,7 +41,7 @@ fun CheckboxInput(checked: Boolean = false, attrs: InputAttrsBuilder<Boolean>.()
  */
 @Composable
 @NonRestartableComposable
-fun DateInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = {}) {
+fun DateInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.Date, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
 
@@ -54,7 +54,7 @@ fun DateInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = 
  */
 @Composable
 @NonRestartableComposable
-fun DateTimeLocalInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = {}) {
+fun DateTimeLocalInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.DateTimeLocal, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
 
@@ -67,7 +67,7 @@ fun DateTimeLocalInput(value: String = "", attrs: InputAttrsBuilder<String>.() -
  */
 @Composable
 @NonRestartableComposable
-fun EmailInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = {}) {
+fun EmailInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.Email, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
 
@@ -80,7 +80,7 @@ fun EmailInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit =
  */
 @Composable
 @NonRestartableComposable
-fun FileInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = {}) {
+fun FileInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.File, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
 
@@ -93,7 +93,7 @@ fun FileInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = 
  */
 @Composable
 @NonRestartableComposable
-fun HiddenInput(attrs: InputAttrsBuilder<String>.() -> Unit = {}) {
+fun HiddenInput(attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.Hidden, attrs = attrs)
 }
 
@@ -106,7 +106,7 @@ fun HiddenInput(attrs: InputAttrsBuilder<String>.() -> Unit = {}) {
  */
 @Composable
 @NonRestartableComposable
-fun MonthInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = {}) {
+fun MonthInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.Month, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
 
@@ -123,7 +123,7 @@ fun NumberInput(
     value: Number? = null,
     min: Number? = null,
     max: Number? = null,
-    attrs: InputAttrsBuilder<Number?>.() -> Unit = {}
+    attrs: InputAttrsScope<Number?>.() -> Unit = {}
 ) {
     Input(
         type = InputType.Number,
@@ -145,7 +145,7 @@ fun NumberInput(
  */
 @Composable
 @NonRestartableComposable
-fun PasswordInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = {}) {
+fun PasswordInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.Password, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
 
@@ -158,7 +158,7 @@ fun PasswordInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Uni
  */
 @Composable
 @NonRestartableComposable
-fun RadioInput(checked: Boolean = false, attrs: InputAttrsBuilder<Boolean>.() -> Unit = {}) {
+fun RadioInput(checked: Boolean = false, attrs: InputAttrsScope<Boolean>.() -> Unit = {}) {
     Input(
         type = InputType.Radio,
         attrs = {
@@ -182,7 +182,7 @@ fun RangeInput(
     min: Number? = null,
     max: Number? = null,
     step: Number = 1,
-    attrs: InputAttrsBuilder<Number?>.() -> Unit = {}
+    attrs: InputAttrsScope<Number?>.() -> Unit = {}
 ) {
     Input(
         type = InputType.Range,
@@ -205,7 +205,7 @@ fun RangeInput(
  */
 @Composable
 @NonRestartableComposable
-fun SearchInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = {}) {
+fun SearchInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.Search, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
 
@@ -215,7 +215,7 @@ fun SearchInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit 
  */
 @Composable
 @NonRestartableComposable
-fun SubmitInput(attrs: InputAttrsBuilder<Unit>.() -> Unit = {}) {
+fun SubmitInput(attrs: InputAttrsScope<Unit>.() -> Unit = {}) {
     Input(type = InputType.Submit, attrs = attrs)
 }
 
@@ -228,7 +228,7 @@ fun SubmitInput(attrs: InputAttrsBuilder<Unit>.() -> Unit = {}) {
  */
 @Composable
 @NonRestartableComposable
-fun TelInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = {}) {
+fun TelInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.Tel, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
 
@@ -241,7 +241,7 @@ fun TelInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = {
  */
 @Composable
 @NonRestartableComposable
-fun TextInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = {}) {
+fun TextInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.Text, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
 
@@ -254,7 +254,7 @@ fun TextInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = 
  */
 @Composable
 @NonRestartableComposable
-fun TimeInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = {}) {
+fun TimeInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.Time, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
 
@@ -267,7 +267,7 @@ fun TimeInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = 
  */
 @Composable
 @NonRestartableComposable
-fun UrlInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = {}) {
+fun UrlInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.Url, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
 
@@ -280,6 +280,6 @@ fun UrlInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = {
  */
 @Composable
 @NonRestartableComposable
-fun WeekInput(value: String = "", attrs: InputAttrsBuilder<String>.() -> Unit = {}) {
+fun WeekInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.Week, attrs = { applyAttrsWithStringValue(value, attrs) })
 }

@@ -1,4 +1,3 @@
-import org.gradle.api.tasks.testing.AbstractTestTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.compose.gradle.kotlinKarmaConfig
 
@@ -19,7 +18,7 @@ fun Project.isSampleProject() = projectDir.parentFile.name == "examples"
 
 tasks.register("printBundleSize") {
     dependsOn(
-       subprojects.filter { it.isSampleProject() }.map { ":examples:${it.name}:printBundleSize" } 
+        subprojects.filter { it.isSampleProject() }.map { ":examples:${it.name}:printBundleSize" }
     )
 }
 
@@ -34,7 +33,7 @@ subprojects {
     group = "org.jetbrains.compose.web"
     version = COMPOSE_WEB_VERSION
 
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>() {
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions.jvmTarget = "11"
     }
 
@@ -54,6 +53,16 @@ subprojects {
     }
 
     pluginManager.withPlugin("kotlin-multiplatform") {
+        configure<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension> {
+            sourceSets {
+                all {
+                    languageSettings {
+                        optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
+                        optIn("kotlin.RequiresOptIn")
+                    }
+                }
+            }
+        }
         val printTestBundleSize by tasks.registering {
             dependsOn(tasks.named("jsTest"))
             doLast {
@@ -71,7 +80,6 @@ subprojects {
             tasks.named("jsTest") { finalizedBy(printTestBundleSize) }
         }
     }
-
 
     if (isSampleProject()) {
         val printBundleSize by tasks.registering {
@@ -93,10 +101,10 @@ subprojects {
         configurations.all {
             resolutionStrategy.dependencySubstitution {
                 substitute(module("org.jetbrains.compose.web:web-widgets")).apply {
-                     with(project(":web-widgets"))
+                    with(project(":web-widgets"))
                 }
                 substitute(module("org.jetbrains.compose.web:web-core")).apply {
-                     with(project(":web-core"))
+                    with(project(":web-core"))
                 }
             }
         }

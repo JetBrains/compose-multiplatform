@@ -4,7 +4,7 @@ import org.jetbrains.compose.web.css.selectors.CSSSelector
 
 interface CSSStyleRuleBuilder : StyleBuilder
 
-open class CSSRuleBuilderImpl : CSSStyleRuleBuilder, StyleBuilderImpl()
+open class CSSRuleBuilderImpl : CSSStyleRuleBuilder, StyleScopeBuilder()
 
 @Suppress("EqualsOrHashCode")
 interface CSSRuleDeclaration {
