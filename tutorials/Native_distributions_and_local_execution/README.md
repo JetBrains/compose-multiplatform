@@ -600,7 +600,7 @@ buildscript {
 
 // Define task to obfuscate the JAR and output to <name>.min.jar
 tasks.register<ProGuardTask>("obfuscate") {
-    val packageUberJarForCurrentOS by getting
+    val packageUberJarForCurrentOS by tasks.getting
     dependsOn(packageUberJarForCurrentOS)
     val files = packageUberJarForCurrentOS.outputs.files
     injars(files)
