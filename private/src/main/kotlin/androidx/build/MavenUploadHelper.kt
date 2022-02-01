@@ -155,7 +155,11 @@ private fun Project.validateCoordinatesAndGetGroup(extension: AndroidXExtension)
     val mavenGroup = extension.mavenGroup
         ?: throw Exception("You must specify mavenGroup for $name project")
     val strippedGroupId = mavenGroup.group.substringAfterLast(".")
-    if (mavenGroup.group.startsWith("androidx") && !name.startsWith(strippedGroupId)) {
+    if (
+        !extension.bypassCoordinateValidation &&
+        mavenGroup.group.startsWith("androidx") &&
+        !name.startsWith(strippedGroupId)
+    ) {
         throw Exception("Your artifactId must start with '$strippedGroupId'. (currently is $name)")
     }
     return mavenGroup

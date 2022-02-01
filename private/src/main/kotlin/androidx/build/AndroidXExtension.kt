@@ -185,6 +185,8 @@ open class AndroidXExtension(val project: Project) {
 
     var benchmarkRunAlsoInterpreted = false
 
+    var bypassCoordinateValidation = false
+
     var multiplatform: Boolean
         set(value) {
             Multiplatform.setEnabledForProject(project, value)
