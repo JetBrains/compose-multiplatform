@@ -18,9 +18,11 @@ package androidx.compose.ui.focus
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.graphics.Color.Companion.Red
+import androidx.compose.ui.node.ModifiedFocusNode
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -154,5 +156,36 @@ class FindFocusableChildrenTest(private val excludeDeactivated: Boolean) {
                 )
             }
         }
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    @Test
+    fun focusedChildIsAvailableFromOnFocusEvent() {
+        // Arrange.
+        val parentFocusModifier = FocusModifier(Inactive)
+        val childFocusModifier = FocusModifier(Inactive)
+        val focusRequester = FocusRequester()
+        var focusedChildAtTimeOfEvent: ModifiedFocusNode? = null
+        rule.setFocusableContent {
+            Box(Modifier.focusTarget(parentFocusModifier)) {
+                Box(
+                    Modifier
+                        .onFocusEvent {
+                            if (it.isFocused) {
+                                focusedChildAtTimeOfEvent = parentFocusModifier.focusedChild
+                            }
+                        }
+                        .focusRequester(focusRequester)
+                        .focusTarget(childFocusModifier)
+                )
+            }
+        }
+
+        // Act.
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        // Assert.
+        assertThat(focusedChildAtTimeOfEvent)
+            .isEqualTo(childFocusModifier.focusNode)
     }
 }
