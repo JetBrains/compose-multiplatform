@@ -18,13 +18,11 @@ package androidx.compose.foundation.lazy.grid
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.GridItemSpan
-import androidx.compose.foundation.lazy.layout.LazyLayoutPlaceable
-import androidx.compose.foundation.lazy.layout.LazyLayoutPlaceablesProvider
 import androidx.compose.ui.unit.Constraints
 import kotlin.math.max
 
 /**
- * Abstracts away the subcomposition from the measuring logic.
+ * Abstracts away subcomposition and span calculation from the measuring logic of entire lines.
  */
 @OptIn(ExperimentalFoundationApi::class)
 internal class LazyMeasuredLineProvider(
@@ -32,9 +30,10 @@ internal class LazyMeasuredLineProvider(
     private val isVertical: Boolean,
     slotsPerLine: Int,
     crossAxisSpacing: Int,
-    private val itemsProvider: LazyGridItemsProvider,
+    private val gridItemsCount: Int,
+    private val spaceBetweenLines: Int,
+    internal val measuredItemProvider: LazyMeasuredItemProvider,
     private val spanLayoutProvider: LazyGridSpanLayoutProvider,
-    private val placeablesProvider: LazyLayoutPlaceablesProvider,
     private val measuredLineFactory: MeasuredLineFactory
 ) {
     private val crossAxisSize = if (isVertical) constraints.maxWidth else constraints.maxHeight
@@ -54,35 +53,37 @@ internal class LazyMeasuredLineProvider(
     }
 
     /**
-     * Used to subcompose items of lazy lists. Composed placeables will be measured with the
-     * correct constraints and wrapped into [LazyMeasuredLine].
+     * Used to subcompose items on lines of lazy grids. Composed placeables will be measured
+     * with the correct constraints and wrapped into [LazyMeasuredLine].
      */
     fun getAndMeasure(lineIndex: LineIndex): LazyMeasuredLine {
         val lineConfiguration = spanLayoutProvider.getLineConfiguration(lineIndex.value)
         val lineItemsCount = lineConfiguration.spans.size
-        val keys = Array(lineItemsCount) {
-            itemsProvider.getKey(lineConfiguration.firstItemIndex + it)
+
+        // we add space between lines as an extra spacing for all lines apart from the last one
+        // so the lazy grid measuring logic will take it into account.
+        val mainAxisSpacing = if (lineItemsCount == 0 ||
+            lineConfiguration.firstItemIndex + lineItemsCount == gridItemsCount) {
+            0
+        } else {
+            spaceBetweenLines
         }
+
         var startSlot = 0
-        val crossAxisSizes = Array(lineItemsCount) { 0 }
-        val placeables = Array<Array<LazyLayoutPlaceable>>(lineItemsCount) { emptyArray() }
-        for (i in 0 until lineItemsCount) {
-            val span = lineConfiguration.spans[i].currentLineSpan
+        val items = Array(lineItemsCount) {
+            val span = lineConfiguration.spans[it].currentLineSpan
             val constraints = childConstraints(startSlot, span)
-            crossAxisSizes[i] = if (isVertical) constraints.minWidth else constraints.minHeight
-            placeables[i] = placeablesProvider.getAndMeasure(
-                lineConfiguration.firstItemIndex + i,
+            measuredItemProvider.getAndMeasure(
+                ItemIndex(lineConfiguration.firstItemIndex + it),
+                mainAxisSpacing,
                 constraints
-            )
-            startSlot += span
+            ).also { startSlot += span }
         }
         return measuredLineFactory.createLine(
             lineIndex,
-            ItemIndex(lineConfiguration.firstItemIndex),
+            items,
             lineConfiguration.spans,
-            keys,
-            crossAxisSizes,
-            placeables
+            mainAxisSpacing
         )
     }
 
@@ -90,7 +91,7 @@ internal class LazyMeasuredLineProvider(
      * Contains the mapping between the key and the index. It could contain not all the items of
      * the list as an optimization.
      **/
-    val keyToIndexMap: Map<Any, Int> get() = itemsProvider.keyToIndexMap
+    val keyToIndexMap: Map<Any, Int> get() = measuredItemProvider.keyToIndexMap
 }
 
 // This interface allows to avoid autoboxing on index param
@@ -98,10 +99,8 @@ internal class LazyMeasuredLineProvider(
 internal fun interface MeasuredLineFactory {
     fun createLine(
         index: LineIndex,
-        firstItemIndex: ItemIndex,
+        items: Array<LazyMeasuredItem>,
         spans: List<GridItemSpan>,
-        keys: Array<Any>,
-        crossAxisSizes: Array<Int>,
-        placeables: Array<Array<LazyLayoutPlaceable>>
+        mainAxisSpacing: Int
     ): LazyMeasuredLine
 }

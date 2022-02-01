@@ -151,7 +151,7 @@ interface LazyGridScope {
         key: Any? = null,
         span: (LazyGridItemSpanScope.() -> GridItemSpan)? = null,
         contentType: Any? = null,
-        content: @Composable () -> Unit
+        content: @Composable LazyGridItemScope.() -> Unit
     )
 
     /**
@@ -177,7 +177,7 @@ interface LazyGridScope {
         key: ((index: Int) -> Any)? = null,
         span: (LazyGridItemSpanScope.(index: Int) -> GridItemSpan)? = null,
         contentType: (index: Int) -> Any? = { null },
-        itemContent: @Composable (index: Int) -> Unit
+        itemContent: @Composable LazyGridItemScope.(index: Int) -> Unit
     )
 }
 
@@ -205,7 +205,7 @@ inline fun <T> LazyGridScope.items(
     noinline key: ((item: T) -> Any)? = null,
     noinline span: (LazyGridItemSpanScope.(item: T) -> GridItemSpan)? = null,
     noinline contentType: (item: T) -> Any? = { null },
-    crossinline itemContent: @Composable (item: T) -> Unit
+    crossinline itemContent: @Composable LazyGridItemScope.(item: T) -> Unit
 ) = items(
     count = items.size,
     key = if (key != null) { index: Int -> key(items[index]) } else null,
@@ -239,7 +239,7 @@ inline fun <T> LazyGridScope.itemsIndexed(
     noinline key: ((index: Int, item: T) -> Any)? = null,
     noinline span: (LazyGridItemSpanScope.(index: Int, item: T) -> GridItemSpan)? = null,
     crossinline contentType: (index: Int, item: T) -> Any? = { _, _ -> null },
-    crossinline itemContent: @Composable (index: Int, item: T) -> Unit
+    crossinline itemContent: @Composable LazyGridItemScope.(index: Int, item: T) -> Unit
 ) = items(
     count = items.size,
     key = if (key != null) { index: Int -> key(index, items[index]) } else null,
@@ -273,7 +273,7 @@ inline fun <T> LazyGridScope.items(
     noinline key: ((item: T) -> Any)? = null,
     noinline span: (LazyGridItemSpanScope.(item: T) -> GridItemSpan)? = null,
     noinline contentType: (item: T) -> Any? = { null },
-    crossinline itemContent: @Composable (item: T) -> Unit
+    crossinline itemContent: @Composable LazyGridItemScope.(item: T) -> Unit
 ) = items(
     count = items.size,
     key = if (key != null) { index: Int -> key(items[index]) } else null,
@@ -307,7 +307,7 @@ inline fun <T> LazyGridScope.itemsIndexed(
     noinline key: ((index: Int, item: T) -> Any)? = null,
     noinline span: (LazyGridItemSpanScope.(index: Int, item: T) -> GridItemSpan)? = null,
     crossinline contentType: (index: Int, item: T) -> Any? = { _, _ -> null },
-    crossinline itemContent: @Composable (index: Int, item: T) -> Unit
+    crossinline itemContent: @Composable LazyGridItemScope.(index: Int, item: T) -> Unit
 ) = items(
     count = items.size,
     key = if (key != null) { index: Int -> key(index, items[index]) } else null,

@@ -24,6 +24,7 @@ import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.grid.ItemIndex
+import androidx.compose.foundation.lazy.grid.LazyGridItemPlacementAnimator
 import androidx.compose.foundation.lazy.grid.LazyGridItemsProvider
 import androidx.compose.foundation.lazy.grid.LazyGridMeasureResult
 import androidx.compose.foundation.lazy.grid.LazyGridScrollPosition
@@ -32,10 +33,12 @@ import androidx.compose.foundation.lazy.grid.doSmoothScrollToItem
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchPolicy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.unit.Constraints
@@ -195,7 +198,7 @@ class LazyGridState constructor(
     internal var prefetchInfoRetriever: (line: LineIndex) -> List<Pair<Int, Constraints>> =
         { emptyList() }
 
-    // internal var placementAnimator by mutableStateOf<LazyListItemPlacementAnimator?>(null)
+    internal var placementAnimator by mutableStateOf<LazyGridItemPlacementAnimator?>(null)
 
     /**
      * Instantly brings the item at [index] to the top of the viewport, offset by [scrollOffset]
@@ -223,7 +226,7 @@ class LazyGridState constructor(
     internal fun snapToItemIndexInternal(index: Int, scrollOffset: Int) {
         scrollPosition.requestPosition(ItemIndex(index), scrollOffset)
         // placement animation is not needed because we snap into a new position.
-        // placementAnimator?.reset()
+        placementAnimator?.reset()
         remeasurement?.forceRemeasure()
     }
 

@@ -480,6 +480,9 @@ package androidx.compose.foundation.lazy {
 
 package androidx.compose.foundation.lazy.grid {
 
+  public final class LazyGridItemPlacementAnimatorKt {
+  }
+
   public final class LazyGridItemsProviderImplKt {
   }
 
