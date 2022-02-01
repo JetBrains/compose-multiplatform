@@ -65,7 +65,7 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
             renderNode.setLeftTopRightBottom(0, 0, 0, 0)
             renderNode.offsetLeftAndRight(0)
             renderNode.offsetTopAndBottom(0)
-            renderNode.discardDisplayList()
+            discardDisplayListInternal()
             needToValidateAccess = false // only need to do this once
         }
         if (testFailCreateRenderNode) {
@@ -267,7 +267,19 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
         )
 
     override fun discardDisplayList() {
-        renderNode.discardDisplayList()
+        discardDisplayListInternal()
+    }
+
+    private fun discardDisplayListInternal() {
+        // See b/216660268. RenderNode#discardDisplayList was originally called
+        // destroyDisplayListData on Android M and below. Make sure we gate on the corresponding
+        // API level and call the original method name on these API levels, otherwise invoke
+        // the current method name of discardDisplayList
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            RenderNodeVerificationHelper24.discardDisplayList(renderNode)
+        } else {
+            RenderNodeVerificationHelper23.destroyDisplayListData(renderNode)
+        }
     }
 
     companion object {
@@ -279,5 +291,23 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
         // stub implementation, but we only need to validate it once. This flag indicates that
         // validation is still needed.
         private var needToValidateAccess = true
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.N)
+private object RenderNodeVerificationHelper24 {
+
+    @androidx.annotation.DoNotInline
+    fun discardDisplayList(renderNode: RenderNode) {
+        renderNode.discardDisplayList()
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.M)
+private object RenderNodeVerificationHelper23 {
+
+    @androidx.annotation.DoNotInline
+    fun destroyDisplayListData(renderNode: RenderNode) {
+        renderNode.destroyDisplayListData()
     }
 }

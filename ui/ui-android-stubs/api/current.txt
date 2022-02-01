@@ -9,6 +9,7 @@ package android.view {
   public class RenderNode {
     method public static android.view.RenderNode create(String?, android.view.View?);
     method public void destroy();
+    method public void destroyDisplayListData();
     method public void discardDisplayList();
     method public void end(android.view.DisplayListCanvas);
     method public float getAlpha();

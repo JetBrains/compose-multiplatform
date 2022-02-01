@@ -55,6 +55,13 @@ public class RenderNode {
     public void discardDisplayList() {
     }
 
+    /**
+     * Same stub as discardDisplayList however it was named destroyDisplayListData in Android M
+     * and earlier
+     */
+    public void destroyDisplayListData() {
+    }
+
     /** stub */
     public boolean isValid() {
         throw new UnsupportedOperationException();
