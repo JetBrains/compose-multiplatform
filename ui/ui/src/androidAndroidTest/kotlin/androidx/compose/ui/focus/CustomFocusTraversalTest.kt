@@ -89,7 +89,9 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
 
         // Act.
         if (moveFocusProgrammatically) {
-            focusManager.moveFocus(FocusDirection.Next)
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Next)
+            }
         } else {
             rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, Tab.nativeKeyCode)))
         }
@@ -136,7 +138,9 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
 
         // Act.
         if (moveFocusProgrammatically) {
-            focusManager.moveFocus(FocusDirection.Previous)
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Previous)
+            }
         } else {
             val nativeEvent = AndroidKeyEvent(0L, 0L, KeyDown, Tab.nativeKeyCode, 0, META_SHIFT_ON)
             rule.onRoot().performKeyPress(KeyEvent(nativeEvent))
@@ -184,7 +188,9 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
 
         // Act.
         if (moveFocusProgrammatically) {
-            focusManager.moveFocus(FocusDirection.Up)
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Up)
+            }
         } else {
             val nativeKeyEvent = AndroidKeyEvent(KeyDown, DirectionUp.nativeKeyCode)
             rule.onRoot().performKeyPress(KeyEvent(nativeKeyEvent))
@@ -232,7 +238,9 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
 
         // Act.
         if (moveFocusProgrammatically) {
-            focusManager.moveFocus(FocusDirection.Down)
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Down)
+            }
         } else {
             val nativeKeyEvent = AndroidKeyEvent(KeyDown, DirectionDown.nativeKeyCode)
             rule.onRoot().performKeyPress(KeyEvent(nativeKeyEvent))
@@ -280,7 +288,9 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
 
         // Act.
         if (moveFocusProgrammatically) {
-            focusManager.moveFocus(FocusDirection.Left)
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Left)
+            }
         } else {
             val nativeKeyEvent = AndroidKeyEvent(KeyDown, DirectionLeft.nativeKeyCode)
             rule.onRoot().performKeyPress(KeyEvent(nativeKeyEvent))
@@ -328,7 +338,9 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
 
         // Act.
         if (moveFocusProgrammatically) {
-            focusManager.moveFocus(FocusDirection.Right)
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Right)
+            }
         } else {
             val nativeKeyEvent = AndroidKeyEvent(KeyDown, DirectionRight.nativeKeyCode)
             rule.onRoot().performKeyPress(KeyEvent(nativeKeyEvent))
@@ -378,7 +390,9 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
 
         // Act.
         if (moveFocusProgrammatically) {
-            focusManager.moveFocus(FocusDirection.Left)
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Left)
+            }
         } else {
             val nativeKeyEvent = AndroidKeyEvent(KeyDown, DirectionLeft.nativeKeyCode)
             rule.onRoot().performKeyPress(KeyEvent(nativeKeyEvent))
@@ -428,7 +442,9 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
 
         // Act.
         if (moveFocusProgrammatically) {
-            focusManager.moveFocus(FocusDirection.Right)
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Right)
+            }
         } else {
             val nativeKeyEvent = AndroidKeyEvent(KeyDown, DirectionRight.nativeKeyCode)
             rule.onRoot().performKeyPress(KeyEvent(nativeKeyEvent))
@@ -485,7 +501,9 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
 
         // Act.
         if (moveFocusProgrammatically) {
-            focusManager.moveFocus(FocusDirection.Next)
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Next)
+            }
         } else {
             rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, Tab.nativeKeyCode)))
         }
@@ -535,7 +553,9 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
 
         // Act.
         if (moveFocusProgrammatically) {
-            focusManager.moveFocus(FocusDirection.Next)
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Next)
+            }
         } else {
             rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, Tab.nativeKeyCode)))
         }
@@ -584,7 +604,9 @@ class CustomFocusTraversalTest(private val moveFocusProgrammatically: Boolean) {
 
         // Act.
         if (moveFocusProgrammatically) {
-            focusManager.moveFocus(FocusDirection.Next)
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Next)
+            }
         } else {
             rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, Tab.nativeKeyCode)))
         }

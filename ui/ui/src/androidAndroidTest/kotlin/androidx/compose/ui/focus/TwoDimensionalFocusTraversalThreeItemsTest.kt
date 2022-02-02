@@ -115,7 +115,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -184,7 +186,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -258,7 +262,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -332,7 +338,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -402,7 +410,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -472,7 +482,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -542,7 +554,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -612,7 +626,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -682,7 +698,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -752,7 +770,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -821,7 +841,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -891,7 +913,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -961,7 +985,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -1031,7 +1057,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -1101,7 +1129,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -1170,7 +1200,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -1240,7 +1272,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -1310,7 +1344,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -1381,7 +1417,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -1451,7 +1489,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -1521,7 +1561,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -1592,7 +1634,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -1660,7 +1704,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -1729,7 +1775,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -1798,7 +1846,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -1867,7 +1917,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -1934,7 +1986,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -2001,7 +2055,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -2070,7 +2126,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -2140,7 +2198,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -2210,7 +2270,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -2279,7 +2341,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -2344,7 +2408,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -2412,7 +2478,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -2477,7 +2545,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -2544,7 +2614,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -2613,7 +2685,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -2683,7 +2757,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -2753,7 +2829,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -2821,7 +2899,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -2885,7 +2965,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -2948,7 +3030,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -3011,7 +3095,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -3076,7 +3162,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -3145,7 +3233,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -3212,7 +3302,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -3281,7 +3373,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -3348,7 +3442,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -3417,7 +3513,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -3484,7 +3582,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -3554,7 +3654,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -3632,7 +3734,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -3711,7 +3815,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -3792,7 +3898,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -3872,7 +3980,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -3950,7 +4060,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -4031,7 +4143,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -4111,7 +4225,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -4189,7 +4305,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -4260,7 +4378,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -4329,7 +4449,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -4398,7 +4520,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -4468,7 +4592,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -4538,7 +4664,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
         }
 
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -4607,7 +4735,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
             }
         }
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -4676,7 +4806,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
             }
         }
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -4745,7 +4877,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
             }
         }
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -4808,7 +4942,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
             }
         }
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -4881,7 +5017,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
             }
         }
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -4954,7 +5092,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
             }
         }
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
@@ -5027,7 +5167,9 @@ class TwoDimensionalFocusTraversalThreeItemsTest(param: Param) {
             }
         }
         // Act.
-        focusManager.moveFocus(focusDirection)
+        rule.runOnIdle {
+            focusManager.moveFocus(focusDirection)
+        }
 
         // Assert.
         rule.runOnIdle {
