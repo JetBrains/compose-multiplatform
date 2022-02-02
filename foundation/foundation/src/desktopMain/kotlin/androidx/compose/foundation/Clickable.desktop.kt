@@ -39,17 +39,20 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.AwaitPointerEventScope
 import androidx.compose.ui.input.pointer.PointerButtons
 import androidx.compose.ui.input.pointer.PointerEvent
+import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.isOutOfBounds
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChangeConsumed
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.center
 import androidx.compose.ui.unit.toOffset
 import androidx.compose.ui.util.fastAll
+import androidx.compose.ui.util.fastAny
 import java.awt.event.KeyEvent.VK_ENTER
 import kotlinx.coroutines.coroutineScope
 
@@ -154,7 +157,7 @@ internal suspend fun PointerInputScope.detectTapWithContext(
                     it.changes.forEach { it.consume() }
                 }
 
-                val up = waitForFirstInboundUp()
+                val up = waitForFirstInboundUpOrCancellation()
                 if (up != null) {
                     up.changes.forEach { it.consume() }
                     onTap?.invoke(down, up)
@@ -174,16 +177,26 @@ private suspend fun AwaitPointerEventScope.awaitEventFirstDown(): PointerEvent {
     return event
 }
 
-private suspend fun AwaitPointerEventScope.waitForFirstInboundUp(): PointerEvent? {
+private suspend fun AwaitPointerEventScope.waitForFirstInboundUpOrCancellation(): PointerEvent? {
     while (true) {
-        val event = awaitPointerEvent()
-        val change = event.changes[0]
-        if (change.changedToUp()) {
-            return if (change.isOutOfBounds(size, extendedTouchPadding)) {
-                null
-            } else {
-                event
+        val event = awaitPointerEvent(PointerEventPass.Main)
+        if (event.changes.fastAll { it.changedToUp() }) {
+            // All pointers are up
+            return event
+        }
+
+        if (event.changes.fastAny {
+                it.consumed.downChange || it.isOutOfBounds(size, extendedTouchPadding)
             }
+        ) {
+            return null // Canceled
+        }
+
+        // Check for cancel by position consumption. We can look on the Final pass of the
+        // existing pointer event because it comes after the Main pass we checked above.
+        val consumeCheck = awaitPointerEvent(PointerEventPass.Final)
+        if (consumeCheck.changes.fastAny { it.positionChangeConsumed() }) {
+            return null
         }
     }
 }
