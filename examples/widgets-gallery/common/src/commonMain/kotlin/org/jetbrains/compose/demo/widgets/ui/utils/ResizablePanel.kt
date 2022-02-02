@@ -18,13 +18,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 class PanelState {
-    val collapsedSize = 24.dp
+    val collapsedSize = 40.dp
     var expandedSize by mutableStateOf(110.dp)
-    val expandedSizeMin = 90.dp
+    val expandedSizeMin = 120.dp
     var isExpanded by mutableStateOf(true)
     val splitter = SplitterState()
 }
@@ -46,22 +50,27 @@ fun ResizablePanel(
             Row(Modifier
                 .height(32.dp)
                 .padding(6.dp)
+                .semantics(mergeDescendants = false) {
+                    val text = if (state.isExpanded) "Collapse" else "Expand"
+                    set(SemanticsProperties.Text, listOf(
+                        AnnotatedString("$text $title panel")
+                    ))
+                    set(SemanticsProperties.Role, Role.Button)
+                }
                 .clickable { state.isExpanded = !state.isExpanded }
             ) {
-                Text(
-                    text = if (state.isExpanded) title else "",
-                    modifier = Modifier.fillMaxWidth().clipToBounds(),
-                    fontSize = 14.sp
-                )
-
                 Icon(
                     if (state.isExpanded) Icons.Default.ArrowBack else Icons.Default.ArrowForward,
                     contentDescription = if (state.isExpanded) "Collapse" else "Expand",
                     tint = LocalContentColor.current,
                     modifier = Modifier
                         .size(24.dp)
-                        .padding(end = 8.dp)
-                        .padding(bottom = 4.dp)
+                        .padding(start = 2.dp, end = 2.dp, bottom = 2.dp)
+                )
+                Text(
+                    text = if (state.isExpanded) title else "",
+                    modifier = Modifier.fillMaxWidth().clipToBounds(),
+                    fontSize = 14.sp
                 )
             }
 
