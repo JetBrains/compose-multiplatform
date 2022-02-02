@@ -35,6 +35,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
@@ -55,6 +57,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Constraints
@@ -67,14 +70,14 @@ import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
-import org.junit.Assert.assertThrows
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -1756,6 +1759,44 @@ class SubcomposeLayoutTest {
         }
     }
 
+    @Test
+    fun stateIsRestoredWhenGoBackToScreen1WithSubcomposition() {
+        val restorationTester = StateRestorationTester(rule)
+
+        var increment = 0
+        var screen by mutableStateOf(Screens.Screen1)
+        var restorableNumberOnScreen1 = -1
+        restorationTester.setContent {
+            val holder = rememberSaveableStateHolder()
+            holder.SaveableStateProvider(screen) {
+                if (screen == Screens.Screen1) {
+                    SubcomposeLayout {
+                        subcompose(Unit) {
+                            restorableNumberOnScreen1 = rememberSaveable { increment++ }
+                        }
+                        layout(10, 10) {}
+                    }
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(restorableNumberOnScreen1).isEqualTo(0)
+            screen = Screens.Screen2
+        }
+
+        // wait for the screen switch to apply
+        rule.runOnIdle {
+            restorableNumberOnScreen1 = -1
+            // switch back to screen1
+            screen = Screens.Screen1
+        }
+
+        rule.runOnIdle {
+            assertThat(restorableNumberOnScreen1).isEqualTo(0)
+        }
+    }
+
     private fun composeItems(
         state: SubcomposeLayoutState,
         items: MutableState<List<Int>>
@@ -1804,4 +1845,9 @@ private fun LayoutUsingAlignments(content: @Composable () -> Unit) {
             placeable.place(0, 0)
         }
     }
+}
+
+private enum class Screens {
+    Screen1,
+    Screen2,
 }
