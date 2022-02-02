@@ -17,10 +17,6 @@
 package androidx.compose.foundation.text
 
 import android.os.Build
-import android.view.View
-import android.view.WindowInsets
-import android.view.WindowInsetsAnimation
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -39,12 +35,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
-import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -52,9 +45,9 @@ class CoreTextFieldSoftKeyboardTest {
     @get:Rule
     val rule = createComposeRule()
 
-    private lateinit var view: View
     private lateinit var focusManager: FocusManager
     private val timeout = 15_000L
+    private val keyboardHelper = KeyboardHelper(rule, timeout)
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.R)
     @Test
@@ -72,7 +65,7 @@ class CoreTextFieldSoftKeyboardTest {
         rule.onNodeWithTag("TextField1").performClick()
 
         // Assert.
-        view.waitUntil(timeout) { view.isSoftwareKeyboardShown() }
+        keyboardHelper.waitForKeyboardVisibility(visible = true)
     }
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.R)
@@ -92,7 +85,7 @@ class CoreTextFieldSoftKeyboardTest {
         rule.runOnIdle { focusRequester.requestFocus() }
 
         // Assert.
-        view.waitUntil(timeout) { view.isSoftwareKeyboardShown() }
+        keyboardHelper.waitForKeyboardVisibility(visible = true)
     }
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.R)
@@ -109,13 +102,13 @@ class CoreTextFieldSoftKeyboardTest {
         }
         // Request focus and wait for keyboard.
         rule.runOnIdle { focusRequester.requestFocus() }
-        view.waitUntil(timeout) { view.isSoftwareKeyboardShown() }
+        keyboardHelper.waitForKeyboardVisibility(visible = true)
 
         // Act.
         rule.runOnIdle { focusManager.clearFocus() }
 
         // Assert.
-        view.waitUntil(timeout) { !view.isSoftwareKeyboardShown() }
+        keyboardHelper.waitForKeyboardVisibility(visible = false)
     }
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.R)
@@ -123,7 +116,6 @@ class CoreTextFieldSoftKeyboardTest {
     fun keyboardShownAfterDismissingKeyboardAndClickingAgain() {
         // Arrange.
         rule.setContentForTest {
-            view = LocalView.current
             CoreTextField(
                 value = TextFieldValue("Hello"),
                 onValueChange = {},
@@ -131,15 +123,15 @@ class CoreTextFieldSoftKeyboardTest {
             )
         }
         rule.onNodeWithTag("TextField1").performClick()
-        view.waitUntil(timeout) { view.isSoftwareKeyboardShown() }
+        keyboardHelper.waitForKeyboardVisibility(visible = true)
 
         // Act.
-        rule.runOnIdle { view.hideKeyboard() }
-        view.waitUntil(timeout) { !view.isSoftwareKeyboardShown() }
+        rule.runOnIdle { keyboardHelper.hideKeyboard() }
+        keyboardHelper.waitForKeyboardVisibility(visible = false)
         rule.onNodeWithTag("TextField1").performClick()
 
         // Assert.
-        view.waitUntil(timeout) { view.isSoftwareKeyboardShown() }
+        keyboardHelper.waitForKeyboardVisibility(visible = true)
     }
 
     @OptIn(ExperimentalComposeUiApi::class)
@@ -163,64 +155,23 @@ class CoreTextFieldSoftKeyboardTest {
             }
         }
         rule.runOnIdle { focusRequester1.requestFocus() }
-        view.waitUntil(timeout) { view.isSoftwareKeyboardShown() }
+        keyboardHelper.waitForKeyboardVisibility(visible = true)
 
         // Act.
         rule.runOnIdle { focusRequester2.requestFocus() }
 
         // Assert.
-        view.waitUntil(timeout) { !view.isSoftwareKeyboardShown() }
+        keyboardHelper.waitForKeyboardVisibility(visible = false)
     }
 
     private fun ComposeContentTestRule.setContentForTest(composable: @Composable () -> Unit) {
         setContent {
-            view = LocalView.current
+            keyboardHelper.view = LocalView.current
             focusManager = LocalFocusManager.current
             composable()
         }
         // We experienced some flakiness in tests if the keyboard was visible at the start of the
         // test. So we make sure that the keyboard is hidden at the start of every test.
-        runOnIdle {
-            if (view.isSoftwareKeyboardShown()) {
-                view.hideKeyboard()
-                view.waitUntil(timeout) { !view.isSoftwareKeyboardShown() }
-            }
-        }
+        keyboardHelper.hideKeyboardIfShown()
     }
-}
-
-private fun View.waitUntil(timeoutMillis: Long, condition: () -> Boolean) {
-    val latch = CountDownLatch(1)
-    rootView.setWindowInsetsAnimationCallback(
-        InsetAnimationCallback {
-            if (condition()) { latch.countDown() }
-        }
-    )
-    val conditionMet = latch.await(timeoutMillis, TimeUnit.MILLISECONDS)
-    assertThat(conditionMet).isTrue()
-}
-
-@RequiresApi(Build.VERSION_CODES.R)
-private class InsetAnimationCallback(val block: () -> Unit) :
-    WindowInsetsAnimation.Callback(DISPATCH_MODE_CONTINUE_ON_SUBTREE) {
-
-    override fun onProgress(
-        insets: WindowInsets,
-        runningAnimations: MutableList<WindowInsetsAnimation>
-    ) = insets
-
-    override fun onEnd(animation: WindowInsetsAnimation) {
-        block()
-        super.onEnd(animation)
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.R)
-private fun View.isSoftwareKeyboardShown(): Boolean {
-    return rootWindowInsets != null && rootWindowInsets.isVisible(WindowInsets.Type.ime())
-}
-
-@RequiresApi(Build.VERSION_CODES.R)
-private fun View.hideKeyboard() {
-    windowInsetsController?.hide(WindowInsets.Type.ime())
 }

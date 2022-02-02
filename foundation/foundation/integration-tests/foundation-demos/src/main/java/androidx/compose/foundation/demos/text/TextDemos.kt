@@ -50,6 +50,7 @@ val TextDemos = DemoCategory(
                 ComposableDemo("Inside Dialog") { onNavigateUp ->
                     DialogInputFieldDemo(onNavigateUp)
                 },
+                ComposableDemo("Inside scrollable") { TextFieldsInScrollableDemo() }
             )
         ),
         ComposableDemo("Text Accessibility") { TextAccessibilityDemo() }
