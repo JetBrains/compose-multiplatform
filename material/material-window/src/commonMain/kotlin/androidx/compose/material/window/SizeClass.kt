@@ -49,9 +49,6 @@ class SizeClass private constructor(
         }
     }
 
-    override fun toString() =
-        "SizeClass(WidthSizeClass.${width.name}, HeightSizeClass.${height.name})"
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -69,6 +66,8 @@ class SizeClass private constructor(
         result = 31 * result + height.hashCode()
         return result
     }
+
+    override fun toString() = "SizeClass($width, $height)"
 }
 
 /**
@@ -80,24 +79,26 @@ class SizeClass private constructor(
  *
  * For more details check <a href="https://developer.android.com/guide/topics/large-screens/support-different-screen-sizes#window_size_classes" class="external" target="_blank">Window size classes documentation</a>.
  */
-enum class WidthSizeClass {
-    /** Represents the majority of phones in portrait. */
-    Compact,
+@Suppress("INLINE_CLASS_DEPRECATED")
+@Immutable
+inline class WidthSizeClass private constructor(private val value: Int) {
+    companion object {
+        /** Represents the majority of phones in portrait. */
+        val Compact = WidthSizeClass(0)
 
-    /**
-     * Represents the majority of tablets in portrait and large unfolded inner displays in portrait.
-     */
-    Medium,
+        /**
+         * Represents the majority of tablets in portrait and large unfolded inner displays in portrait.
+         */
+        val Medium = WidthSizeClass(1)
 
-    /**
-     * Represents the majority of tablets in landscape and large unfolded inner displays in
-     * landscape.
-     */
-    Expanded;
+        /**
+         * Represents the majority of tablets in landscape and large unfolded inner displays in
+         * landscape.
+         */
+        val Expanded = WidthSizeClass(2)
 
-    internal companion object {
         /** Calculates [WidthSizeClass] size class for given [width] */
-        fun fromWidth(width: Dp): WidthSizeClass {
+        internal fun fromWidth(width: Dp): WidthSizeClass {
             require(width >= 0.dp) { "Width must not be negative" }
             return when {
                 width < 600.dp -> Compact
@@ -117,19 +118,21 @@ enum class WidthSizeClass {
  *
  * For more details check <a href="https://developer.android.com/guide/topics/large-screens/support-different-screen-sizes#window_size_classes" class="external" target="_blank">Window size classes documentation</a>.
  */
-enum class HeightSizeClass {
-    /** Represents the majority of phones in landscape */
-    Compact,
+@Suppress("INLINE_CLASS_DEPRECATED")
+@Immutable
+inline class HeightSizeClass private constructor(private val value: Int) {
+    companion object {
+        /** Represents the majority of phones in landscape */
+        val Compact = HeightSizeClass(0)
 
-    /** Represents the majority of tablets in landscape and majority of phones in portrait */
-    Medium,
+        /** Represents the majority of tablets in landscape and majority of phones in portrait */
+        val Medium = HeightSizeClass(1)
 
-    /** Represents the majority of tablets in portrait */
-    Expanded;
+        /** Represents the majority of tablets in portrait */
+        val Expanded = HeightSizeClass(2)
 
-    internal companion object {
         /** Calculates [HeightSizeClass] size class for given [height] */
-        fun fromHeight(height: Dp): HeightSizeClass {
+        internal fun fromHeight(height: Dp): HeightSizeClass {
             require(height >= 0.dp) { "Height must not be negative" }
             return when {
                 height < 480.dp -> Compact
