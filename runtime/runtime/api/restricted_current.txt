@@ -83,7 +83,7 @@ package androidx.compose.runtime {
   @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.CLASS, kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY, kotlin.annotation.AnnotationTarget.TYPEALIAS}) public @interface ComposeCompilerApi {
   }
 
-  public interface Composer {
+  public sealed interface Composer {
     method @androidx.compose.runtime.ComposeCompilerApi public <V, T> void apply(V? value, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block);
     method @androidx.compose.runtime.ComposeCompilerApi public boolean changed(Object? value);
     method @androidx.compose.runtime.ComposeCompilerApi public default boolean changed(boolean value);
@@ -213,9 +213,12 @@ package androidx.compose.runtime {
     property public final kotlinx.coroutines.CoroutineScope coroutineScope;
   }
 
-  public interface ControlledComposition extends androidx.compose.runtime.Composition {
+  public sealed interface ControlledComposition extends androidx.compose.runtime.Composition {
     method public void applyChanges();
+    method public void applyLateChanges();
+    method public void changesApplied();
     method public void composeContent(kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method public <R> R! delegateInvalidations(androidx.compose.runtime.ControlledComposition? to, int groupIndex, kotlin.jvm.functions.Function0<? extends R> block);
     method public boolean getHasPendingChanges();
     method public void invalidateAll();
     method public boolean isComposing();
@@ -282,6 +285,18 @@ package androidx.compose.runtime {
     method public static suspend inline <R> Object? withFrameMillis(androidx.compose.runtime.MonotonicFrameClock, kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
     method public static suspend <R> Object? withFrameMillis(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
     method public static suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+  }
+
+  public final class MovableContentKt {
+    method public static kotlin.jvm.functions.Function0<kotlin.Unit> movableContentOf(kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method public static <P> kotlin.jvm.functions.Function1<P,kotlin.Unit> movableContentOf(kotlin.jvm.functions.Function1<? super P,kotlin.Unit> content);
+    method public static <P1, P2> kotlin.jvm.functions.Function2<P1,P2,kotlin.Unit> movableContentOf(kotlin.jvm.functions.Function2<? super P1,? super P2,kotlin.Unit> content);
+    method public static <P1, P2, P3> kotlin.jvm.functions.Function3<P1,P2,P3,kotlin.Unit> movableContentOf(kotlin.jvm.functions.Function3<? super P1,? super P2,? super P3,kotlin.Unit> content);
+    method public static <P1, P2, P3, P4> kotlin.jvm.functions.Function4<P1,P2,P3,P4,kotlin.Unit> movableContentOf(kotlin.jvm.functions.Function4<? super P1,? super P2,? super P3,? super P4,kotlin.Unit> content);
+    method public static <R> kotlin.jvm.functions.Function1<R,kotlin.Unit> movableContentWithReceiverOf(kotlin.jvm.functions.Function1<? super R,kotlin.Unit> content);
+    method public static <R, P> kotlin.jvm.functions.Function2<R,P,kotlin.Unit> movableContentWithReceiverOf(kotlin.jvm.functions.Function2<? super R,? super P,kotlin.Unit> content);
+    method public static <R, P1, P2> kotlin.jvm.functions.Function3<R,P1,P2,kotlin.Unit> movableContentWithReceiverOf(kotlin.jvm.functions.Function3<? super R,? super P1,? super P2,kotlin.Unit> content);
+    method public static <R, P1, P2, P3> kotlin.jvm.functions.Function4<R,P1,P2,P3,kotlin.Unit> movableContentWithReceiverOf(kotlin.jvm.functions.Function4<? super R,? super P1,? super P2,? super P3,kotlin.Unit> content);
   }
 
   @androidx.compose.runtime.Stable public interface MutableState<T> extends androidx.compose.runtime.State<T> {
@@ -544,6 +559,7 @@ package androidx.compose.runtime {
 
   public final inline class Updater<T> {
     ctor public Updater();
+    method public void reconcile(kotlin.jvm.functions.Function1<? super T,? extends kotlin.Unit> block);
     method public inline void set(int value, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,? extends kotlin.Unit> block);
     method public inline void update(int value, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,? extends kotlin.Unit> block);
   }

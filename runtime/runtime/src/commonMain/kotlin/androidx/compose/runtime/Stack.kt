@@ -53,4 +53,9 @@ internal class IntStack {
     fun isEmpty() = tos == 0
     fun isNotEmpty() = tos != 0
     fun clear() { tos = 0 }
+    fun indexOf(value: Int): Int {
+        for (i in 0 until tos)
+            if (slots[i] == value) return i
+        return -1
+    }
 }

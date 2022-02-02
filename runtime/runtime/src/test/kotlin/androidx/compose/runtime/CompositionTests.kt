@@ -2630,8 +2630,8 @@ class CompositionTests {
         return remember { state.value }
     }
 
-    var observationScopeTestCalls = 0
-    var observationScopeTestForwardWrite = false
+    private var observationScopeTestCalls = 0
+    private var observationScopeTestForwardWrite = false
 
     @Composable
     fun <T> ObservationScopesTest(state: State<T>, forwardWrite: Boolean) {
@@ -3315,7 +3315,7 @@ internal fun TestSubcomposition(
         // TODO: work around for b/179701728
         callSetContent(subcomposition) {
             // Note: This is in a lambda invocation to keep the currentContent state read
-            // in the subcomposition's content composable. Changing this to be
+            // in the sub-composition's content composable. Changing this to be
             // subcomposition.setContent(currentContent) would snapshot read only on initial set.
             currentContent()
         }
@@ -3371,6 +3371,14 @@ private suspend fun <R> localRecomposerTest(
 
 @Composable fun Wrap(content: @Composable () -> Unit) {
     content()
+}
+
+@Composable
+fun Wrap(count: Int, content: @Composable () -> Unit) {
+    if (count > 1)
+        Wrap(count - 1, content)
+    else
+        content()
 }
 
 private fun <T> assertArrayEquals(message: String, expected: Array<T>, received: Array<T>) {

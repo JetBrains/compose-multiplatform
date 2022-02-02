@@ -16,6 +16,8 @@
 
 package androidx.compose.runtime.mock
 
+import androidx.compose.runtime.snapshots.fastForEach
+
 fun indent(indent: Int, builder: StringBuilder) {
     repeat(indent) { builder.append(' ') }
 }
@@ -24,6 +26,9 @@ open class View {
     var name: String = ""
     val children = mutableListOf<View>()
     val attributes = mutableMapOf<String, Any>()
+
+    // Used to validated insert/remove constraints
+    private var parent: View? = null
 
     private fun render(indent: Int = 0, builder: StringBuilder) {
         indent(indent, builder)
@@ -39,15 +44,22 @@ open class View {
     }
 
     fun addAt(index: Int, view: View) {
+        if (view.parent != null) {
+            error("View named $name already has a parent")
+        }
+        view.parent = this
         children.add(index, view)
     }
 
     fun removeAt(index: Int, count: Int) {
         if (index < children.count()) {
             if (count == 1) {
-                children.removeAt(index)
+                val removedChild = children.removeAt(index)
+                removedChild.parent = null
             } else {
-                children.subList(index, index + count).clear()
+                val removedChildren = children.subList(index, index + count)
+                removedChildren.fastForEach { child -> child.parent = null }
+                removedChildren.clear()
             }
         }
     }
@@ -93,12 +105,24 @@ open class View {
     private val childrenAsString: String get() =
         children.map { it.toString() }.joinToString(" ")
 
-    override fun toString() = "<$name$attributesAsString>$childrenAsString</$name>"
+    override fun toString() =
+            if (children.isEmpty()) "<$name$attributesAsString>" else
+            "<$name$attributesAsString>$childrenAsString</$name>"
 
     fun toFmtString() = StringBuilder().let {
         render(0, it)
         it.toString()
     }
-}
 
+    fun findFirstOrNull(predicate: (view: View) -> Boolean): View? {
+        if (predicate(this)) return this
+        for (child in children) {
+            child.findFirstOrNull(predicate)?.let { return it }
+        }
+        return null
+    }
+
+    fun findFirst(predicate: (view: View) -> Boolean) =
+        findFirstOrNull(predicate) ?: error("View not found")
+}
 fun View.flatten(): List<View> = listOf(this) + children.flatMap { it.flatten() }
