@@ -31,8 +31,9 @@ import androidx.compose.ui.unit.dp
 import com.google.common.truth.IterableSubject
 
 /**
- * This function adds a parent composable which has size. [View.requestFocus()][android.view.View
- * .requestFocus] will not take focus if the view has no size.
+ * This function adds a parent composable which has size.
+ * [View.requestFocus()][android.view.View.requestFocus] will not take focus if the view has no
+ * size.
  */
 internal fun ComposeContentTestRule.setFocusableContent(content: @Composable () -> Unit) {
     setContent {
