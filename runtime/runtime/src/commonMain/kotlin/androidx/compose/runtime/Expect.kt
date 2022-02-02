@@ -22,6 +22,7 @@ package androidx.compose.runtime
 internal expect open class ThreadLocal<T>(initialValue: () -> T) {
     fun get(): T
     fun set(value: T)
+    fun remove()
 }
 
 internal fun <T> ThreadLocal() = ThreadLocal<T?> { null }
@@ -66,6 +67,16 @@ expect class AtomicReference<V>(value: V) {
     fun getAndSet(value: V): V
     fun compareAndSet(expect: V, newValue: V): Boolean
 }
+
+internal expect class AtomicInt(value: Int) {
+    fun get(): Int
+    fun set(value: Int)
+    fun add(amount: Int): Int
+}
+
+internal fun AtomicInt.postIncrement(): Int = add(1) - 1
+
+internal expect fun ensureMutable(it: Any)
 
 @MustBeDocumented
 @Retention(AnnotationRetention.SOURCE)
