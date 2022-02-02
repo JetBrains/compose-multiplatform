@@ -288,7 +288,7 @@ class LazyCustomKeysTest {
 
         rule.setContent {
             state = rememberLazyGridState()
-            LazyVerticalGrid(cells = GridCells.Fixed(columns), state = state) {
+            LazyVerticalGrid(columns = GridCells.Fixed(columns), state = state) {
                 items(list, key = { it.id }) {
                     Item(remember { "${it.id}" })
                 }

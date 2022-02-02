@@ -19,32 +19,27 @@ package androidx.compose.foundation.lazy.grid
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.GridItemSpan
 import androidx.compose.ui.unit.Constraints
-import kotlin.math.max
 
 /**
  * Abstracts away subcomposition and span calculation from the measuring logic of entire lines.
  */
 @OptIn(ExperimentalFoundationApi::class)
 internal class LazyMeasuredLineProvider(
-    constraints: Constraints,
     private val isVertical: Boolean,
-    slotsPerLine: Int,
+    slotSizesSums: List<Int>,
     crossAxisSpacing: Int,
     private val gridItemsCount: Int,
     private val spaceBetweenLines: Int,
-    internal val measuredItemProvider: LazyMeasuredItemProvider,
+    private val measuredItemProvider: LazyMeasuredItemProvider,
     private val spanLayoutProvider: LazyGridSpanLayoutProvider,
     private val measuredLineFactory: MeasuredLineFactory
 ) {
-    private val crossAxisSize = if (isVertical) constraints.maxWidth else constraints.maxHeight
-    private val availableCrossAxis = max(crossAxisSize - (slotsPerLine - 1) * crossAxisSpacing, 0)
-    private val slotSize = availableCrossAxis / slotsPerLine
-    private val slotsWithRemainder = availableCrossAxis % slotsPerLine
-
-    // the constraints we will measure child with. the main axis is not restricted
+    // The constraints for cross axis size. The main axis is not restricted.
     internal val childConstraints: (startSlot: Int, span: Int) -> Constraints = { startSlot, span ->
-        val crossAxisSize = slotSize * span + crossAxisSpacing * (span - 1) +
-            (slotsWithRemainder - startSlot).coerceIn(0, span)
+        val lastSlotSum = slotSizesSums[startSlot + span - 1]
+        val prevSlotSum = if (startSlot == 0) 0 else slotSizesSums[startSlot - 1]
+        val slotsSize = lastSlotSum - prevSlotSum
+        val crossAxisSize = slotsSize + crossAxisSpacing * (span - 1)
         if (isVertical) {
             Constraints.fixedWidth(crossAxisSize)
         } else {
@@ -72,7 +67,6 @@ internal class LazyMeasuredLineProvider(
         var startSlot = 0
         val items = Array(lineItemsCount) {
             val span = lineConfiguration.spans[it].currentLineSpan
-            // TODO(vadimsemenov): consider reverseLayout when calculating childConstraints
             val constraints = childConstraints(startSlot, span)
             measuredItemProvider.getAndMeasure(
                 ItemIndex(lineConfiguration.firstItemIndex + it),

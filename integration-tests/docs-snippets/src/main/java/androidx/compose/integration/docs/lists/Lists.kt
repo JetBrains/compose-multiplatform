@@ -167,7 +167,7 @@ private object ListsSnippetsGrids {
     @Composable
     fun PhotoGrid(photos: List<Photo>) {
         LazyVerticalGrid(
-            cells = GridCells.Adaptive(minSize = 128.dp)
+            columns = GridCells.Adaptive(minSize = 128.dp)
         ) {
             items(photos) { photo ->
                 PhotoItem(photo)

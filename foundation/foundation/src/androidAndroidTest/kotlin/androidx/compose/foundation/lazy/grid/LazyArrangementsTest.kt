@@ -80,7 +80,7 @@ class LazyArrangementsTest {
         rule.setContent {
             LazyVerticalGrid(
                 modifier = Modifier.requiredSize(containerSize),
-                cells = GridCells.Fixed(1)
+                columns = GridCells.Fixed(1)
             ) {
                 items(2) {
                     Box(Modifier.requiredSize(itemSize).testTag(it.toString()))
@@ -171,7 +171,7 @@ class LazyArrangementsTest {
             LazyVerticalGrid(
                 verticalArrangement = Arrangement.spacedBy(itemSize),
                 modifier = Modifier.width(itemSize).testTag(ContainerTag),
-                cells = GridCells.Fixed(1)
+                columns = GridCells.Fixed(1)
             ) {
                 items(2) {
                     Box(Modifier.requiredSize(itemSize))
@@ -210,7 +210,7 @@ class LazyArrangementsTest {
             LazyVerticalGrid(
                 verticalArrangement = Arrangement.spacedBy(itemSize),
                 modifier = Modifier.requiredSize(itemSize * 3.5f),
-                cells = GridCells.Fixed(1)
+                columns = GridCells.Fixed(1)
             ) {
                 items(3) {
                     Box(Modifier.requiredSize(itemSize).testTag(it.toString()))
@@ -231,7 +231,7 @@ class LazyArrangementsTest {
             LazyVerticalGrid(
                 verticalArrangement = Arrangement.spacedBy(itemSize),
                 modifier = Modifier.requiredSize(itemSize * 3.5f).testTag(ContainerTag),
-                cells = GridCells.Fixed(1)
+                columns = GridCells.Fixed(1)
             ) {
                 items(3) {
                     Box(Modifier.requiredSize(itemSize).testTag(it.toString()))
@@ -304,7 +304,7 @@ class LazyArrangementsTest {
                 modifier = Modifier.size(itemSize * 3),
                 state = rememberLazyGridState().also { state = it },
                 verticalArrangement = Arrangement.spacedBy(spacingSize),
-                cells = GridCells.Fixed(1)
+                columns = GridCells.Fixed(1)
             ) {
                 items(5) {
                     Spacer(
@@ -341,7 +341,7 @@ class LazyArrangementsTest {
                 modifier = Modifier.size(itemSize * 3),
                 state = rememberLazyGridState().also { state = it },
                 verticalArrangement = Arrangement.spacedBy(spacingSize),
-                cells = GridCells.Fixed(1)
+                columns = GridCells.Fixed(1)
             ) {
                 items(5) {
                     Spacer(
@@ -484,7 +484,7 @@ class LazyArrangementsTest {
             LazyVerticalGrid(
                 modifier = Modifier.requiredSize(containerSize),
                 verticalArrangement = arrangement,
-                cells = GridCells.Fixed(1)
+                columns = GridCells.Fixed(1)
             ) {
                 items(2) {
                     Item(it)
@@ -529,7 +529,7 @@ class LazyArrangementsTest {
             LazyVerticalGrid(
                 verticalArrangement = arrangement,
                 modifier = Modifier.requiredSize(containerSize),
-                cells = GridCells.Fixed(1)
+                columns = GridCells.Fixed(1)
             ) {
                 items(2) {
                     Item(it)

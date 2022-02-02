@@ -86,7 +86,7 @@ class LazyGridLayoutInfoTest(
                 state = rememberLazyGridState().also { state = it },
                 reverseLayout = reverseLayout,
                 modifier = Modifier.width(gridWidthDp).height(itemSizeDp * 3.5f),
-                cells = GridCells.Fixed(2)
+                columns = GridCells.Fixed(2)
             ) {
                 items((0..11).toList()) {
                     Box(Modifier.size(itemSizeDp))
@@ -107,7 +107,7 @@ class LazyGridLayoutInfoTest(
                 state = rememberLazyGridState().also { state = it },
                 reverseLayout = reverseLayout,
                 modifier = Modifier.width(gridWidthDp).height(itemSizeDp * 3.5f),
-                cells = GridCells.Fixed(2)
+                columns = GridCells.Fixed(2)
             ) {
                 items((0..11).toList()) {
                     Box(Modifier.size(itemSizeDp))
@@ -133,7 +133,7 @@ class LazyGridLayoutInfoTest(
                 reverseLayout = reverseLayout,
                 verticalArrangement = Arrangement.spacedBy(itemSizeDp),
                 modifier = Modifier.width(itemSizeDp).height(itemSizeDp * 3.5f),
-                cells = GridCells.Fixed(1)
+                columns = GridCells.Fixed(1)
             ) {
                 items((0..11).toList()) {
                     Box(Modifier.size(itemSizeDp))
@@ -159,7 +159,7 @@ class LazyGridLayoutInfoTest(
                 state = rememberLazyGridState().also { state = it },
                 reverseLayout = reverseLayout,
                 modifier = Modifier.size(itemSizeDp * 2f, itemSizeDp * 3.5f),
-                cells = GridCells.Fixed(2)
+                columns = GridCells.Fixed(2)
             ) {
                 items((0..11).toList()) {
                     Box(Modifier.size(itemSizeDp))
@@ -197,7 +197,7 @@ class LazyGridLayoutInfoTest(
                 modifier = Modifier.width(itemSizeDp),
                 reverseLayout = reverseLayout,
                 state = rememberLazyGridState().also { state = it },
-                cells = GridCells.Fixed(1)
+                columns = GridCells.Fixed(1)
             ) {
                 item {
                     Box(Modifier.size(size))
@@ -235,7 +235,7 @@ class LazyGridLayoutInfoTest(
             LazyVerticalGrid(
                 reverseLayout = reverseLayout,
                 state = rememberLazyGridState().also { state = it },
-                cells = GridCells.Fixed(2)
+                columns = GridCells.Fixed(2)
             ) {
                 items((0 until count).toList()) {
                     Box(Modifier.size(10.dp))
@@ -263,7 +263,7 @@ class LazyGridLayoutInfoTest(
                 modifier = Modifier.height(sizeDp).width(sizeDp * 2),
                 reverseLayout = reverseLayout,
                 state = rememberLazyGridState().also { state = it },
-                cells = GridCells.Fixed(2)
+                columns = GridCells.Fixed(2)
             ) {
                 items((0..7).toList()) {
                     Box(Modifier.size(sizeDp))
@@ -302,7 +302,7 @@ class LazyGridLayoutInfoTest(
                 ),
                 reverseLayout = reverseLayout,
                 state = rememberLazyGridState().also { state = it },
-                cells = GridCells.Fixed(2)
+                columns = GridCells.Fixed(2)
             ) {
                 items((0..7).toList()) {
                     Box(Modifier.size(sizeDp))
@@ -322,7 +322,7 @@ class LazyGridLayoutInfoTest(
         lateinit var state: LazyGridState
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Fixed(2),
+                columns = GridCells.Fixed(2),
                 state = rememberLazyGridState().also { state = it }
             ) {
                 item { Box(Modifier) }
@@ -345,7 +345,7 @@ class LazyGridLayoutInfoTest(
                 state = rememberLazyGridState().also { state = it },
                 reverseLayout = reverseLayout,
                 modifier = Modifier.width(gridWidthDp).height(itemSizeDp * 3.5f),
-                cells = GridCells.Fixed(2)
+                columns = GridCells.Fixed(2)
             ) {
                 items((0..11).toList()) {
                     Box(Modifier.size(itemSizeDp))
@@ -366,7 +366,7 @@ class LazyGridLayoutInfoTest(
                 state = rememberLazyGridState().also { state = it },
                 reverseLayout = reverseLayout,
                 modifier = Modifier.width(gridWidthDp).height(itemSizeDp * 3.5f),
-                cells = GridCells.Fixed(2)
+                columns = GridCells.Fixed(2)
             ) {
                 items((0..11).toList()) {
                     Box(Modifier.size(itemSizeDp))

@@ -86,7 +86,7 @@ class LazyGridsContentPaddingTest {
         val largePaddingSize = itemSize
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Fixed(1),
+                columns = GridCells.Fixed(1),
                 modifier = Modifier.requiredSize(containerSize)
                     .testTag(LazyListTag),
                 state = rememberLazyGridState().also { state = it },
@@ -121,7 +121,7 @@ class LazyGridsContentPaddingTest {
         lateinit var state: LazyGridState
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Fixed(1),
+                columns = GridCells.Fixed(1),
                 modifier = Modifier.requiredSize(itemSize * 2)
                     .testTag(LazyListTag),
                 state = rememberLazyGridState().also { state = it },
@@ -149,7 +149,7 @@ class LazyGridsContentPaddingTest {
         val padding = itemSize * 1.5f
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Fixed(1),
+                columns = GridCells.Fixed(1),
                 modifier = Modifier.requiredSize(padding * 2 + itemSize)
                     .testTag(LazyListTag),
                 state = rememberLazyGridState().also { state = it },
@@ -191,7 +191,7 @@ class LazyGridsContentPaddingTest {
         val padding = itemSize * 1.5f
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Fixed(1),
+                columns = GridCells.Fixed(1),
                 modifier = Modifier.requiredSize(itemSize + padding * 2)
                     .testTag(LazyListTag),
                 state = rememberLazyGridState().also { state = it },
@@ -227,7 +227,7 @@ class LazyGridsContentPaddingTest {
         val padding = itemSize * 1.5f
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Fixed(1),
+                columns = GridCells.Fixed(1),
                 modifier = Modifier.requiredSize(padding * 2 + itemSize)
                     .testTag(LazyListTag),
                 state = rememberLazyGridState().also { state = it },
@@ -272,7 +272,7 @@ class LazyGridsContentPaddingTest {
         val padding = itemSize * 1.5f
         rule.setContent {
             LazyVerticalGrid(
-                cells = GridCells.Fixed(1),
+                columns = GridCells.Fixed(1),
                 modifier = Modifier.requiredSize(padding * 2 + itemSize)
                     .testTag(LazyListTag),
                 state = rememberLazyGridState().also { state = it },
@@ -305,7 +305,7 @@ class LazyGridsContentPaddingTest {
         rule.setContent {
             Box(modifier = Modifier.testTag(ContainerTag).width(itemSize + 8.dp)) {
                 LazyVerticalGrid(
-                    cells = GridCells.Fixed(1),
+                    columns = GridCells.Fixed(1),
                     contentPadding = PaddingValues(
                         start = 2.dp,
                         top = 4.dp,
@@ -338,7 +338,7 @@ class LazyGridsContentPaddingTest {
         rule.setContent {
             Box(modifier = Modifier.testTag(ContainerTag)) {
                 LazyVerticalGrid(
-                    cells = GridCells.Fixed(1),
+                    columns = GridCells.Fixed(1),
                     contentPadding = PaddingValues(
                         start = 2.dp,
                         top = 4.dp,
@@ -361,7 +361,7 @@ class LazyGridsContentPaddingTest {
         rule.setContent {
             Box(modifier = Modifier.testTag(ContainerTag)) {
                 LazyVerticalGrid(
-                    cells = GridCells.Fixed(1),
+                    columns = GridCells.Fixed(1),
                     contentPadding = PaddingValues(
                         start = 2.dp,
                         top = 4.dp,

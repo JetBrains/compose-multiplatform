@@ -55,7 +55,7 @@ fun Home(
             LazyVerticalGrid(
                 // LazyGridScope doesn't expose nColumns from LazyVerticalGrid
                 // https://issuetracker.google.com/issues/183187002
-                cells = GridCells.Fixed(count = cellsCount),
+                columns = GridCells.Fixed(count = cellsCount),
                 content = {
                     itemsIndexed(components) { index, component ->
                         ComponentItem(
