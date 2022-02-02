@@ -17,11 +17,8 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.SpanStyle
@@ -131,55 +128,6 @@ internal class TextFieldDelegate {
                 }
             }
             TextPainter.paint(canvas, textLayoutResult)
-        }
-
-        /**
-         * Notify system that focused input area.
-         *
-         * System is typically scrolled up not to be covered by keyboard.
-         *
-         * @param value The editor model
-         * @param textDelegate The text delegate
-         * @param layoutCoordinates The layout coordinates
-         * @param textInputSession The current input session.
-         * @param hasFocus True if focus is gained.
-         * @param offsetMapping The mapper from/to editing buffer to/from visible text.
-         */
-        @JvmStatic
-        internal fun notifyFocusedRect(
-            value: TextFieldValue,
-            textDelegate: TextDelegate,
-            textLayoutResult: TextLayoutResult,
-            layoutCoordinates: LayoutCoordinates,
-            textInputSession: TextInputSession,
-            hasFocus: Boolean,
-            offsetMapping: OffsetMapping
-        ) {
-            if (!hasFocus) {
-                return
-            }
-            val focusOffsetInTransformed = offsetMapping.originalToTransformed(value.selection.max)
-            val bbox = when {
-                focusOffsetInTransformed < textLayoutResult.layoutInput.text.length -> {
-                    textLayoutResult.getBoundingBox(focusOffsetInTransformed)
-                }
-                focusOffsetInTransformed != 0 -> {
-                    textLayoutResult.getBoundingBox(focusOffsetInTransformed - 1)
-                }
-                else -> { // empty text.
-                    val defaultSize = computeSizeForDefaultText(
-                        textDelegate.style,
-                        textDelegate.density,
-                        textDelegate.fontFamilyResolver
-                    )
-                    Rect(0f, 0f, 1.0f, defaultSize.height.toFloat())
-                }
-            }
-            val globalLT = layoutCoordinates.localToRoot(Offset(bbox.left, bbox.top))
-
-            textInputSession.notifyFocusedRect(
-                Rect(Offset(globalLT.x, globalLT.y), Size(bbox.width, bbox.height))
-            )
         }
 
         /**

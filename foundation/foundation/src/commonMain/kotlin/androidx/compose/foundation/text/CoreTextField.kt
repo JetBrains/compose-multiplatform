@@ -16,10 +16,13 @@
 
 package androidx.compose.foundation.text
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.SelectionHandleInfo
 import androidx.compose.foundation.text.selection.SelectionHandleInfoKey
@@ -35,6 +38,7 @@ import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -42,6 +46,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
@@ -100,6 +105,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import kotlin.math.max
 import kotlin.math.roundToInt
+import kotlinx.coroutines.launch
 
 /**
  * Base composable that enables users to edit text via hardware or software keyboard.
@@ -163,7 +169,7 @@ import kotlin.math.roundToInt
  * innerTextField exactly once.
  */
 @Composable
-@OptIn(InternalFoundationTextApi::class)
+@OptIn(InternalFoundationTextApi::class, ExperimentalFoundationApi::class)
 internal fun CoreTextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
@@ -256,6 +262,9 @@ internal fun CoreTextField(
     manager.focusRequester = focusRequester
     manager.editable = !readOnly
 
+    val coroutineScope = rememberCoroutineScope()
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+
     // Focus
     val focusModifier = Modifier.textFieldFocusModifier(
         enabled = enabled,
@@ -272,9 +281,28 @@ internal fun CoreTextField(
                 textInputService,
                 state,
                 value,
-                imeOptions,
-                offsetMapping
+                imeOptions
             )
+
+            // The focusable modifier itself will request the entire focusable be brought into view
+            // when it gains focus – in this case, that's the decoration box. However, since text
+            // fields may have their own internal scrolling, and the decoration box can do anything,
+            // we also need to specifically request that the cursor itself be brought into view.
+            // TODO(b/216790855) If this request happens after the focusable's request, the field
+            //  will only be scrolled far enough to show the cursor, _not_ the entire decoration
+            //  box.
+            if (it.isFocused) {
+                state.layoutResult?.let { layoutResult ->
+                    coroutineScope.launch {
+                        bringIntoViewRequester.bringSelectionEndIntoView(
+                            value,
+                            state.textDelegate,
+                            layoutResult.value,
+                            offsetMapping
+                        )
+                    }
+                }
+            }
         }
         if (!it.isFocused) manager.deselect()
     }
@@ -341,19 +369,6 @@ internal fun CoreTextField(
             } else if (state.handleState == HandleState.Cursor) {
                 state.showCursorHandle =
                     manager.isSelectionHandleInVisibleBound(isStartHandle = true)
-            }
-            state.layoutResult?.let { layoutResult ->
-                state.inputSession?.let { inputSession ->
-                    TextFieldDelegate.notifyFocusedRect(
-                        value,
-                        state.textDelegate,
-                        layoutResult.value,
-                        it,
-                        inputSession,
-                        state.hasFocus,
-                        offsetMapping
-                    )
-                }
             }
         }
         state.layoutResult?.innerTextFieldCoordinates = it
@@ -520,6 +535,7 @@ internal fun CoreTextField(
                 .textFieldMinSize(textStyle)
                 .then(onPositionedModifier)
                 .then(magnifierModifier)
+                .bringIntoViewRequester(bringIntoViewRequester)
 
             SimpleLayout(coreTextFieldModifier) {
                 Layout(
@@ -789,13 +805,12 @@ private fun tapToFocus(
     }
 }
 
-@OptIn(InternalFoundationTextApi::class)
+@OptIn(InternalFoundationTextApi::class, ExperimentalFoundationApi::class)
 private fun notifyTextInputServiceOnFocusChange(
     textInputService: TextInputService,
     state: TextFieldState,
     value: TextFieldValue,
-    imeOptions: ImeOptions,
-    offsetMapping: OffsetMapping
+    imeOptions: ImeOptions
 ) {
     if (state.hasFocus) {
         state.inputSession = TextFieldDelegate.onFocus(
@@ -805,27 +820,61 @@ private fun notifyTextInputServiceOnFocusChange(
             imeOptions,
             state.onValueChange,
             state.onImeActionPerformed
-        ).also { newSession ->
-            state.layoutCoordinates?.let { coords ->
-                state.layoutResult?.let { layoutResult ->
-                    TextFieldDelegate.notifyFocusedRect(
-                        value,
-                        state.textDelegate,
-                        layoutResult.value,
-                        coords,
-                        newSession,
-                        state.hasFocus,
-                        offsetMapping
-                    )
-                }
-            }
-        }
+        )
     } else {
         state.inputSession?.let { session ->
             TextFieldDelegate.onBlur(session, state.processor, state.onValueChange)
         }
         state.inputSession = null
     }
+}
+
+/**
+ * Calculates the location of the end of the current selection and requests that it be brought into
+ * view using [bringIntoView][BringIntoViewRequester.bringIntoView].
+ *
+ * Text fields have a lot of different edge cases where they need to make sure they stay visible:
+ *
+ * 1. Focusable node newly receives focus – always bring entire node into view.
+ * 2. Unfocused text field is tapped – always bring cursor area into view (conflicts with above, see
+ *    b/216790855).
+ * 3. Focused text field is tapped – always bring cursor area into view.
+ * 4. Text input occurs – always bring cursor area into view.
+ * 5. Scrollable parent resizes and the currently-focused item is now hidden – bring entire node
+ *    into view if it was also in view before the resize. This handles the case of
+ *    `softInputMode=ADJUST_RESIZE`. See b/216842427.
+ * 6. Entire window is panned due to `softInputMode=ADJUST_PAN` – report the correct focused rect to
+ *    the view system, and the view system itself will keep the focused area in view.
+ *    See aosp/1964580.
+ *
+ * This function is used to handle 2, 3, and 4, and the others are automatically handled by the
+ * focus system.
+ */
+@OptIn(ExperimentalFoundationApi::class, InternalFoundationTextApi::class)
+internal suspend fun BringIntoViewRequester.bringSelectionEndIntoView(
+    value: TextFieldValue,
+    textDelegate: TextDelegate,
+    textLayoutResult: TextLayoutResult,
+    offsetMapping: OffsetMapping
+) {
+    val selectionEndInTransformed = offsetMapping.originalToTransformed(value.selection.max)
+    val selectionEndBounds = when {
+        selectionEndInTransformed < textLayoutResult.layoutInput.text.length -> {
+            textLayoutResult.getBoundingBox(selectionEndInTransformed)
+        }
+        selectionEndInTransformed != 0 -> {
+            textLayoutResult.getBoundingBox(selectionEndInTransformed - 1)
+        }
+        else -> { // empty text.
+            val defaultSize = computeSizeForDefaultText(
+                textDelegate.style,
+                textDelegate.density,
+                textDelegate.fontFamilyResolver
+            )
+            Rect(0f, 0f, 1.0f, defaultSize.height.toFloat())
+        }
+    }
+    bringIntoView(selectionEndBounds)
 }
 
 @Composable
