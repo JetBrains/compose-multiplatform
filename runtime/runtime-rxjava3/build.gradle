@@ -45,7 +45,7 @@ dependencies {
 androidx {
     name = "Compose RxJava 3 integration"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.Compose.RUNTIME
+    mavenGroup = LibraryGroups.COMPOSE_RUNTIME
     inceptionYear = "2020"
     description = "Compose integration with RxJava 3"
     legacyDisableKotlinStrictApiMode = true

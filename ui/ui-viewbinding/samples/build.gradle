@@ -47,7 +47,7 @@ dependencies {
 androidx {
     name = "AndroidX Compose UI Simple Unit Classes Samples"
     type = LibraryType.SAMPLES
-    mavenGroup = LibraryGroups.Compose.UI
+    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2019"
     description = "Contains the sample code for the Androidx Compose UI Simple Unit Classes"
 }

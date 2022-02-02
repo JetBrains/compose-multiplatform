@@ -84,7 +84,7 @@ tasks.findByName("jvmTest").configure {
 androidx {
     name = "Jetpack Compose desktop implementation"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.Compose.DESKTOP
+    mavenGroup = LibraryGroups.COMPOSE_DESKTOP
     inceptionYear = "2020"
     legacyDisableKotlinStrictApiMode = true
     runApiTasks = new RunApiTasks.No(
