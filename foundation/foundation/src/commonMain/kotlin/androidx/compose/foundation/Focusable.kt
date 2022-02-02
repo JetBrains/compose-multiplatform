@@ -62,6 +62,17 @@ fun Modifier.focusable(
     val scope = rememberCoroutineScope()
     val focusedInteraction = remember { mutableStateOf<FocusInteraction.Focus?>(null) }
     var isFocused by remember { mutableStateOf(false) }
+
+    // Focusables have a few different cases where they need to make sure they stay visible:
+    //
+    // 1. Focusable node newly receives focus – always bring entire node into view. That's what this
+    //    BringIntoViewRequester does.
+    // 2. Scrollable parent resizes and the currently-focused item is now hidden – bring entire node
+    //    into view if it was also in view before the resize. This handles the case of
+    //    `softInputMode=ADJUST_RESIZE`. See b/216842427.
+    // 3. Entire window is panned due to `softInputMode=ADJUST_PAN` – report the correct focused
+    //    rect to the view system, and the view system itself will keep the focused area in view.
+    //    See aosp/1964580.
     @OptIn(ExperimentalFoundationApi::class)
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
     DisposableEffect(interactionSource) {
