@@ -141,10 +141,10 @@ internal fun Spannable.setSpanStyles(
     contextTextStyle: TextStyle,
     spanStyles: List<AnnotatedString.Range<SpanStyle>>,
     density: Density,
-    fontFamilyResolver: FontFamily.Resolver
+    resolveTypeface: (FontFamily?, FontWeight, FontStyle, FontSynthesis) -> Typeface,
 ) {
 
-    setFontAttributes(contextTextStyle, spanStyles, fontFamilyResolver)
+    setFontAttributes(contextTextStyle, spanStyles, resolveTypeface)
 
     // LetterSpacingSpanPx/LetterSpacingSpanSP has lower priority than normal spans. Because
     // letterSpacing relies on the fontSize on [Paint] to compute Px/Sp from Em. So it must be
@@ -234,7 +234,7 @@ private fun Spannable.setSpanStyle(
 private fun Spannable.setFontAttributes(
     contextTextStyle: TextStyle,
     spanStyles: List<AnnotatedString.Range<SpanStyle>>,
-    fontFamilyResolver: FontFamily.Resolver
+    resolveTypeface: (FontFamily?, FontWeight, FontStyle, FontSynthesis) -> Typeface,
 ) {
     val fontRelatedSpanStyles = spanStyles.fastFilter {
         it.item.hasFontAttributes() || it.item.fontSynthesis != null
@@ -258,14 +258,13 @@ private fun Spannable.setFontAttributes(
         fontRelatedSpanStyles
     ) { spanStyle, start, end ->
         setSpan(
-            // TODO(b/214587005): Check if it's async here and uncache
             TypefaceSpan(
-                fontFamilyResolver.resolve(
-                    fontFamily = spanStyle.fontFamily,
-                    fontWeight = spanStyle.fontWeight ?: FontWeight.Normal,
-                    fontStyle = spanStyle.fontStyle ?: FontStyle.Normal,
-                    fontSynthesis = spanStyle.fontSynthesis ?: FontSynthesis.All
-                ).value as Typeface
+                resolveTypeface(
+                    spanStyle.fontFamily,
+                    spanStyle.fontWeight ?: FontWeight.Normal,
+                    spanStyle.fontStyle ?: FontStyle.Normal,
+                    spanStyle.fontSynthesis ?: FontSynthesis.All
+                )
             ),
             start,
             end,

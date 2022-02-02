@@ -17,6 +17,7 @@
 package androidx.compose.foundation.demos.text
 
 import android.content.Context
+import android.graphics.Typeface
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -73,25 +74,30 @@ fun AsyncFontFamilyDemo() {
             // first font fails to load but is optional
             DemoOptionalFont(FontWeight.Normal, FontStyle.Normal),
             // second font loads with a delay, is fallback for (Normal, Normal)
-            DemoAsyncFont(FontWeight.Normal, FontStyle.Normal, delay = 1_000L),
+            DemoAsyncFont(FontWeight.Normal, FontStyle.Normal, delay = 2_000L),
             // third (Normal, Normal) font is never matched, as previous font correctly loads, if
             // previous font failed to load it would match next for (Normal, Normal)
             DemoAsyncFont(FontWeight.Normal, FontStyle.Normal, delay = 500L),
             // this is the fallback used during loading for (Normal, Normal)
-            DemoBlockingFont(FontWeight.Normal, FontStyle.Normal, android.graphics.Typeface.SERIF),
+            DemoBlockingFont(FontWeight.Normal, FontStyle.Normal, Typeface.SERIF),
 
             // This font matches (W200, Normal), and will load on first use
-            DemoAsyncFont(FontWeight.W200, FontStyle.Normal, delay = 2000L),
+            DemoAsyncFont(
+                FontWeight.W200,
+                FontStyle.Normal,
+                delay = 500L,
+                Typeface.create("cursive", Typeface.NORMAL)
+            ),
 
             // This font matches (W800, Normal), and will load on first use
             DemoAsyncFont(
                 FontWeight.W800,
                 FontStyle.Normal,
                 delay = 500L,
-                typeface = android.graphics.Typeface.DEFAULT_BOLD
+                typeface = Typeface.DEFAULT_BOLD
             ),
             // Fallback for (W800, Normal)
-            DemoBlockingFont(FontWeight.W800, FontStyle.Normal, android.graphics.Typeface.SERIF)
+            DemoBlockingFont(FontWeight.W800, FontStyle.Normal, Typeface.SERIF)
         )
     }
     Column {
@@ -102,7 +108,7 @@ fun AsyncFontFamilyDemo() {
         )
         Spacer(Modifier.height(16.dp))
         Text(
-            "(Normal, Normal) text with async loading with fallback (1000ms)",
+            "(Normal, Normal) text with async loading with fallback (2000ms)",
             fontFamily = fontFamily
         )
         Text(

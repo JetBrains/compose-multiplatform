@@ -120,9 +120,11 @@ class TextDelegate(
     }
 
     fun layoutIntrinsics(layoutDirection: LayoutDirection) {
+        val localIntrinsics = paragraphIntrinsics
         val intrinsics = if (
-            paragraphIntrinsics == null ||
-            layoutDirection != intrinsicsLayoutDirection
+            localIntrinsics == null ||
+            layoutDirection != intrinsicsLayoutDirection ||
+            localIntrinsics.hasStaleResolvedFonts
         ) {
             intrinsicsLayoutDirection = layoutDirection
             MultiParagraphIntrinsics(
@@ -133,7 +135,7 @@ class TextDelegate(
                 placeholders = placeholders
             )
         } else {
-            paragraphIntrinsics
+            localIntrinsics
         }
 
         paragraphIntrinsics = intrinsics

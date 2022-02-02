@@ -17,6 +17,8 @@
 package androidx.compose.ui.text.platform
 
 import android.graphics.Paint
+import android.graphics.Typeface
+import androidx.compose.runtime.State
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.Placeholder
@@ -26,11 +28,15 @@ import androidx.compose.ui.text.android.InternalPlatformTextApi
 import androidx.compose.ui.text.android.LayoutCompat
 import androidx.compose.ui.text.android.LayoutIntrinsics
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontSynthesis
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.AndroidLocale
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.platform.extensions.applySpanStyle
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.util.fastAny
 import androidx.core.text.TextUtilsCompat
 import androidx.core.view.ViewCompat
 import java.util.Locale
@@ -57,16 +63,35 @@ internal class AndroidParagraphIntrinsics constructor(
     override val minIntrinsicWidth: Float
         get() = layoutIntrinsics.minIntrinsicWidth
 
+    private val resolvedTypefaces: MutableList<TypefaceDirtyTracker> = mutableListOf()
+
+    override val hasStaleResolvedFonts: Boolean
+        get() = resolvedTypefaces.fastAny { it.isStaleResolvedFont }
+
     internal val textDirectionHeuristic = resolveTextDirectionHeuristics(
         style.textDirection,
         style.localeList
     )
 
     init {
+
+        val resolveTypeface: (FontFamily?, FontWeight, FontStyle, FontSynthesis) -> Typeface = {
+                fontFamily, fontWeight, fontStyle, fontSynthesis ->
+            val result = fontFamilyResolver.resolve(
+                fontFamily,
+                fontWeight,
+                fontStyle,
+                fontSynthesis
+            )
+            val holder = TypefaceDirtyTracker(result)
+            resolvedTypefaces.add(holder)
+            holder.typeface
+        }
+
         val notAppliedStyle = textPaint.applySpanStyle(
             style = style.toSpanStyle(),
-            fontFamilyResolver = fontFamilyResolver,
-            density = density
+            resolveTypeface = resolveTypeface,
+            density = density,
         )
 
         charSequence = createCharSequence(
@@ -84,7 +109,7 @@ internal class AndroidParagraphIntrinsics constructor(
             ) + spanStyles,
             placeholders = placeholders,
             density = density,
-            fontFamilyResolver = fontFamilyResolver
+            resolveTypeface = resolveTypeface,
         )
 
         layoutIntrinsics = LayoutIntrinsics(charSequence, textPaint, textDirectionHeuristic)
@@ -135,3 +160,12 @@ internal actual fun ActualParagraphIntrinsics(
     spanStyles = spanStyles,
     density = density
 )
+
+private class TypefaceDirtyTracker(val resolveResult: State<Any>) {
+    val initial = resolveResult.value
+    val typeface: Typeface
+        get() = initial as Typeface
+
+    val isStaleResolvedFont: Boolean
+        get() = resolveResult.value !== initial
+}

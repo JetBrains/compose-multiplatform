@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.text.platform
 
+import android.graphics.Typeface
 import android.text.SpannableString
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
@@ -23,6 +24,9 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.android.InternalPlatformTextApi
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontSynthesis
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.platform.extensions.setLineHeight
 import androidx.compose.ui.text.platform.extensions.setPlaceholders
 import androidx.compose.ui.text.platform.extensions.setSpanStyles
@@ -39,7 +43,7 @@ internal fun createCharSequence(
     spanStyles: List<AnnotatedString.Range<SpanStyle>>,
     placeholders: List<AnnotatedString.Range<Placeholder>>,
     density: Density,
-    fontFamilyResolver: FontFamily.Resolver
+    resolveTypeface: (FontFamily?, FontWeight, FontStyle, FontSynthesis) -> Typeface,
 ): CharSequence {
     if (spanStyles.isEmpty() &&
         placeholders.isEmpty() &&
@@ -55,7 +59,12 @@ internal fun createCharSequence(
 
     spannableString.setTextIndent(contextTextStyle.textIndent, contextFontSize, density)
 
-    spannableString.setSpanStyles(contextTextStyle, spanStyles, density, fontFamilyResolver)
+    spannableString.setSpanStyles(
+        contextTextStyle,
+        spanStyles,
+        density,
+        resolveTypeface
+    )
 
     spannableString.setPlaceholders(placeholders, density)
 

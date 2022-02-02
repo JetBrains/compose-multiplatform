@@ -495,7 +495,7 @@ internal class TextState(
     /** The last layout coordinates for the Text's layout, used by selection */
     var layoutCoordinates: LayoutCoordinates? = null
 
-    /** The latest TextLayoutResult calculated in the measure block */
+    /** The latest TextLayoutResult calculated in the measure block.*/
     var layoutResult: TextLayoutResult? = null
 
     /** The global position calculated during the last notifyPosition callback */
