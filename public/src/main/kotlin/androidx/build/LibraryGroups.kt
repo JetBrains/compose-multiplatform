@@ -38,6 +38,14 @@ object LibraryGroups {
     val CAR_APP = LibraryGroup("androidx.car.app", LibraryVersions.CAR_APP)
     val COLLECTION = LibraryGroup("androidx.collection", LibraryVersions.COLLECTION)
     val COLLECTION2 = LibraryGroup("androidx.collection2", LibraryVersions.COLLECTION2)
+    val COMPOSE_ANIMATION = LibraryGroup("$composeGroup.animation", LibraryVersions.COMPOSE)
+    val COMPOSE_COMPILER = LibraryGroup("$composeGroup.compiler", LibraryVersions.COMPOSE)
+    val COMPOSE_DESKTOP = LibraryGroup("$composeGroup.desktop", LibraryVersions.COMPOSE)
+    val COMPOSE_FOUNDATION = LibraryGroup("$composeGroup.foundation", LibraryVersions.COMPOSE)
+    val COMPOSE_MATERIAL = LibraryGroup("$composeGroup.material", LibraryVersions.COMPOSE)
+    val COMPOSE_MATERIAL3 = LibraryGroup("$composeGroup.material3", LibraryVersions.COMPOSE_MATERIAL3)
+    val COMPOSE_RUNTIME = LibraryGroup("$composeGroup.runtime", LibraryVersions.COMPOSE)
+    val COMPOSE_UI = LibraryGroup("$composeGroup.ui", LibraryVersions.COMPOSE)
     val CONCURRENT = LibraryGroup("androidx.concurrent", LibraryVersions.FUTURES)
     val CONTENTPAGER = LibraryGroup("androidx.contentpager", LibraryVersions.CONTENTPAGER)
     val COORDINATORLAYOUT = LibraryGroup("androidx.coordinatorlayout", LibraryVersions.COORDINATORLAYOUT)
@@ -114,19 +122,9 @@ object LibraryGroups {
     val WINDOW_EXTENSIONS = LibraryGroup("androidx.window.extensions", LibraryVersions.WINDOW_EXTENSIONS)
     val WINDOW_SIDECAR = LibraryGroup("androidx.window.sidecar", LibraryVersions.WINDOW_SIDECAR)
     val WORK = LibraryGroup("androidx.work", LibraryVersions.WORK)
-
-    object Compose {
-        private val group = System.getenv("COMPOSE_CUSTOM_GROUP") ?: "androidx.compose"
-        val ANIMATION = LibraryGroup("$group.animation", LibraryVersions.COMPOSE)
-        val COMPILER = LibraryGroup("$group.compiler", LibraryVersions.COMPOSE)
-        val DESKTOP = LibraryGroup("$group.desktop", LibraryVersions.COMPOSE)
-        val FOUNDATION = LibraryGroup("$group.foundation", LibraryVersions.COMPOSE)
-        val MATERIAL = LibraryGroup("$group.material", LibraryVersions.COMPOSE)
-        val MATERIAL3 = LibraryGroup("$group.material3", LibraryVersions.COMPOSE_MATERIAL3)
-        val RUNTIME = LibraryGroup("$group.runtime", LibraryVersions.COMPOSE)
-        val UI = LibraryGroup("$group.ui", LibraryVersions.COMPOSE)
-    }
 }
+
+private val composeGroup = System.getenv("COMPOSE_CUSTOM_GROUP") ?: "androidx.compose"
 
 /**
  * This object contains the library group, as well as whether libraries
