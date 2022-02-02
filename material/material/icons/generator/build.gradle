@@ -44,7 +44,7 @@ androidx {
     name = "Material Icon Generator"
     type = LibraryType.OTHER_CODE_PROCESSOR
     publish = Publish.NONE
-    mavenGroup = LibraryGroups.Compose.MATERIAL
+    mavenGroup = LibraryGroups.COMPOSE_MATERIAL
     inceptionYear = "2020"
     description = "Generator module that parses XML drawables to generate programmatic " +
             "representations of Material Icons."

@@ -81,7 +81,7 @@ IconGenerationTask.registerCoreIconProject(
 androidx {
     name = "Compose Material Icons Core"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.Compose.MATERIAL
+    mavenGroup = LibraryGroups.COMPOSE_MATERIAL
     inceptionYear = "2020"
     description = "Compose Material Design core icons. This module contains the most commonly used set of Material icons."
     legacyDisableKotlinStrictApiMode = true

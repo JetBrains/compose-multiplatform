@@ -154,7 +154,7 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Testing"
     type = LibraryType.PUBLISHED_TEST_LIBRARY
-    mavenGroup = LibraryGroups.Compose.UI
+    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2019"
     description = "Compose testing library"
     legacyDisableKotlinStrictApiMode = true

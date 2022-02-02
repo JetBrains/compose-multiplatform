@@ -129,7 +129,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Tooling"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.Compose.UI
+    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2019"
     description = "Compose tooling library. This library exposes information to our tools for better IDE support."
     legacyDisableKotlinStrictApiMode = true
