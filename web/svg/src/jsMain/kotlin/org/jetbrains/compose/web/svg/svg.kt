@@ -62,7 +62,7 @@ private val View = ElementBuilderNS<SVGViewElement>("view", SVG_NS)
 @ExperimentalComposeWebSvgApi
 fun Svg(
   viewBox: String? = null,
-  attrs: AttrsBuilder<SVGElement>? = null,
+  attrs: AttrBuilderContext<SVGElement>? = null,
   content: ContentBuilder<SVGElement>? = null
 ) {
     TagElement(
@@ -79,7 +79,7 @@ fun Svg(
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.SvgA(
   href: String,
-  attrs: AttrsBuilder<SVGAElement>? = null,
+  attrs: AttrBuilderContext<SVGAElement>? = null,
   content: ContentBuilder<SVGAElement>? = null
 ) {
     TagElement(
@@ -98,7 +98,7 @@ fun ElementScope<SVGElement>.Circle(
   cx: CSSLengthOrPercentageValue,
   cy: CSSLengthOrPercentageValue,
   r: CSSLengthOrPercentageValue,
-  attrs: AttrsBuilder<SVGCircleElement>? = null,
+  attrs: AttrBuilderContext<SVGCircleElement>? = null,
   content: ContentBuilder<SVGCircleElement>? = null
 ) {
     TagElement(
@@ -120,7 +120,7 @@ fun ElementScope<SVGElement>.Circle(
   cx: Number,
   cy: Number,
   r: Number,
-  attrs: AttrsBuilder<SVGCircleElement>? = null,
+  attrs: AttrBuilderContext<SVGCircleElement>? = null,
   content: ContentBuilder<SVGCircleElement>? = null
 ) {
     TagElement(
@@ -142,7 +142,7 @@ fun ElementScope<SVGElement>.SvgText(
   text: String,
   x: Number = 0,
   y: Number = 0,
-  attrs: AttrsBuilder<SVGTextElement>? = null,
+  attrs: AttrBuilderContext<SVGTextElement>? = null,
 ) {
     TagElement(
         elementBuilder = Text,
@@ -162,7 +162,7 @@ fun ElementScope<SVGElement>.SvgText(
 fun ElementScope<SVGElement>.View(
   id: String,
   viewBox: String,
-  attrs: AttrsBuilder<SVGViewElement>? = null,
+  attrs: AttrBuilderContext<SVGViewElement>? = null,
 ) {
     TagElement(
         elementBuilder = View,
@@ -182,7 +182,7 @@ fun ElementScope<SVGElement>.Rect(
   y: Number,
   width: Number,
   height: Number,
-  attrs: AttrsBuilder<SVGRectElement>? = null,
+  attrs: AttrBuilderContext<SVGRectElement>? = null,
   content: ContentBuilder<SVGRectElement>? = null
 ) {
     TagElement(
@@ -205,7 +205,7 @@ fun ElementScope<SVGElement>.Rect(
   y: CSSLengthOrPercentageValue,
   width: CSSLengthOrPercentageValue,
   height: CSSLengthOrPercentageValue,
-  attrs: AttrsBuilder<SVGRectElement>? = null,
+  attrs: AttrBuilderContext<SVGRectElement>? = null,
   content: ContentBuilder<SVGRectElement>? = null
 ) {
     TagElement(
@@ -228,7 +228,7 @@ fun ElementScope<SVGElement>.Ellipse(
   cy: CSSLengthOrPercentageValue,
   rx: CSSLengthOrPercentageValue,
   ry: CSSLengthOrPercentageValue,
-  attrs: AttrsBuilder<SVGEllipseElement>? = null,
+  attrs: AttrBuilderContext<SVGEllipseElement>? = null,
   content: ContentBuilder<SVGEllipseElement>? = null
 ) {
     TagElement(
@@ -251,7 +251,7 @@ fun ElementScope<SVGElement>.Ellipse(
   cy: Number,
   rx: Number,
   ry: Number,
-  attrs: AttrsBuilder<SVGEllipseElement>? = null,
+  attrs: AttrBuilderContext<SVGEllipseElement>? = null,
   content: ContentBuilder<SVGEllipseElement>? = null
 ) {
     TagElement(
@@ -272,7 +272,7 @@ fun ElementScope<SVGElement>.Ellipse(
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.Symbol(
   id: String? = null,
-  attrs: AttrsBuilder<SVGSymbolElement>? = null,
+  attrs: AttrBuilderContext<SVGSymbolElement>? = null,
   content: ContentBuilder<SVGSymbolElement>? = null
 ) {
     TagElement(
@@ -289,7 +289,7 @@ fun ElementScope<SVGElement>.Symbol(
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.Use(
   href: String,
-  attrs: AttrsBuilder<SVGUseElement>? = null,
+  attrs: AttrBuilderContext<SVGUseElement>? = null,
   content: ContentBuilder<SVGUseElement>? = null
 ) {
     TagElement(
@@ -309,7 +309,7 @@ fun ElementScope<SVGElement>.Line(
   y1: CSSLengthOrPercentageValue,
   x2: CSSLengthOrPercentageValue,
   y2: CSSLengthOrPercentageValue,
-  attrs: AttrsBuilder<SVGLineElement>? = null,
+  attrs: AttrBuilderContext<SVGLineElement>? = null,
   content: ContentBuilder<SVGLineElement>? = null
 ) {
     TagElement(
@@ -332,7 +332,7 @@ fun ElementScope<SVGElement>.Line(
   y1: Number,
   x2: Number,
   y2: Number,
-  attrs: AttrsBuilder<SVGLineElement>? = null,
+  attrs: AttrBuilderContext<SVGLineElement>? = null,
   content: ContentBuilder<SVGLineElement>? = null
 ) {
     TagElement(
@@ -353,7 +353,7 @@ fun ElementScope<SVGElement>.Line(
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.ClipPath(
   id: String,
-  attrs: AttrsBuilder<SVGClipPathElement>? = null,
+  attrs: AttrBuilderContext<SVGClipPathElement>? = null,
   content: ContentBuilder<SVGClipPathElement>? = null
 ) {
     TagElement(
@@ -370,7 +370,7 @@ fun ElementScope<SVGElement>.ClipPath(
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.Path(
   d: String,
-  attrs: AttrsBuilder<SVGPathElement>? = null,
+  attrs: AttrBuilderContext<SVGPathElement>? = null,
   content: ContentBuilder<SVGPathElement>? = null
 ) {
     TagElement(
@@ -386,7 +386,7 @@ fun ElementScope<SVGElement>.Path(
 @Composable
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.G(
-  attrs: AttrsBuilder<SVGElement>? = null,
+  attrs: AttrBuilderContext<SVGElement>? = null,
   content: ContentBuilder<SVGElement>? = null
 ) {
     TagElement(
@@ -400,7 +400,7 @@ fun ElementScope<SVGElement>.G(
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.Image(
   href: String,
-  attrs: AttrsBuilder<SVGImageElement>? = null,
+  attrs: AttrBuilderContext<SVGImageElement>? = null,
   content: ContentBuilder<SVGImageElement>? = null
 ) {
     TagElement(
@@ -417,7 +417,7 @@ fun ElementScope<SVGElement>.Image(
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.Mask(
   id: String? = null,
-  attrs: AttrsBuilder<SVGMaskElement>? = null,
+  attrs: AttrBuilderContext<SVGMaskElement>? = null,
   content: ContentBuilder<SVGMaskElement>? = null
 ) {
     TagElement(
@@ -433,7 +433,7 @@ fun ElementScope<SVGElement>.Mask(
 @Composable
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.Defs(
-  attrs: AttrsBuilder<SVGDefsElement>? = null,
+  attrs: AttrBuilderContext<SVGDefsElement>? = null,
   content: ContentBuilder<SVGDefsElement>? = null
 ) {
     TagElement(
@@ -447,7 +447,7 @@ fun ElementScope<SVGElement>.Defs(
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.Pattern(
   id: String,
-  attrs: AttrsBuilder<SVGPatternElement>? = null,
+  attrs: AttrBuilderContext<SVGPatternElement>? = null,
   content: ContentBuilder<SVGPatternElement>? = null
 ) {
     TagElement(
@@ -464,7 +464,7 @@ fun ElementScope<SVGElement>.Pattern(
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.Polygon(
   vararg points: Number,
-  attrs: AttrsBuilder<SVGPolygonElement>? = null,
+  attrs: AttrBuilderContext<SVGPolygonElement>? = null,
   content: ContentBuilder<SVGPolygonElement>? = null
 ) {
     TagElement(
@@ -481,7 +481,7 @@ fun ElementScope<SVGElement>.Polygon(
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.Polyline(
   vararg points: Number,
-  attrs: AttrsBuilder<SVGPolylineElement>? = null,
+  attrs: AttrBuilderContext<SVGPolylineElement>? = null,
   content: ContentBuilder<SVGPolylineElement>? = null
 ) {
     TagElement(
@@ -499,7 +499,7 @@ fun ElementScope<SVGElement>.Polyline(
 fun ElementScope<SVGElement>.TextPath(
   href: String,
   text: String,
-  attrs: AttrsBuilder<SVGTextPathElement>? = null,
+  attrs: AttrBuilderContext<SVGTextPathElement>? = null,
 ) {
     TagElement(
         elementBuilder = TextPath,
@@ -516,7 +516,7 @@ fun ElementScope<SVGElement>.TextPath(
 @Composable
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.Animate(
-  attrs: AttrsBuilder<SVGElement>? = null,
+  attrs: AttrBuilderContext<SVGElement>? = null,
   content: ContentBuilder<SVGElement>? = null
 ) {
     TagElement(
@@ -529,7 +529,7 @@ fun ElementScope<SVGElement>.Animate(
 @Composable
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.AnimateMotion(
-  attrs: AttrsBuilder<SVGElement>? = null,
+  attrs: AttrBuilderContext<SVGElement>? = null,
   content: ContentBuilder<SVGElement>? = null
 ) {
     TagElement(
@@ -542,7 +542,7 @@ fun ElementScope<SVGElement>.AnimateMotion(
 @Composable
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.AnimateTransform(
-  attrs: AttrsBuilder<SVGElement>? = null,
+  attrs: AttrBuilderContext<SVGElement>? = null,
   content: ContentBuilder<SVGElement>? = null
 ) {
     TagElement(
@@ -556,7 +556,7 @@ fun ElementScope<SVGElement>.AnimateTransform(
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.LinearGradient(
   id: String? = null,
-  attrs: AttrsBuilder<SVGLinearGradientElement>? = null,
+  attrs: AttrBuilderContext<SVGLinearGradientElement>? = null,
   content: ContentBuilder<SVGLinearGradientElement>? = null
 ) {
     TagElement(
@@ -574,7 +574,7 @@ fun ElementScope<SVGElement>.LinearGradient(
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.RadialGradient(
   id: String? = null,
-  attrs: AttrsBuilder<SVGRadialGradientElement>? = null,
+  attrs: AttrBuilderContext<SVGRadialGradientElement>? = null,
   content: ContentBuilder<SVGRadialGradientElement>? = null
 ) {
     TagElement(
@@ -590,7 +590,7 @@ fun ElementScope<SVGElement>.RadialGradient(
 @Composable
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.Stop(
-  attrs: AttrsBuilder<SVGStopElement>? = null,
+  attrs: AttrBuilderContext<SVGStopElement>? = null,
   content: ContentBuilder<SVGStopElement>? = null
 ) {
     TagElement(
@@ -603,7 +603,7 @@ fun ElementScope<SVGElement>.Stop(
 @Composable
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.Switch(
-  attrs: AttrsBuilder<SVGSwitchElement>? = null,
+  attrs: AttrBuilderContext<SVGSwitchElement>? = null,
   content: ContentBuilder<SVGSwitchElement>? = null
 ) {
     TagElement(
@@ -617,7 +617,7 @@ fun ElementScope<SVGElement>.Switch(
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.Title(
   text: String,
-  attrs: AttrsBuilder<SVGTitleElement>? = null,
+  attrs: AttrBuilderContext<SVGTitleElement>? = null,
 ) {
     TagElement(
         elementBuilder = Title,
@@ -631,7 +631,7 @@ fun ElementScope<SVGElement>.Title(
 @Composable
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.Tspan(
-  attrs: AttrsBuilder<SVGTSpanElement>? = null,
+  attrs: AttrBuilderContext<SVGTSpanElement>? = null,
   content: ContentBuilder<SVGTSpanElement>? = null
 ) {
     TagElement(
@@ -645,7 +645,7 @@ fun ElementScope<SVGElement>.Tspan(
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.Desc(
   content: String,
-  attrs: AttrsBuilder<SVGDescElement>? = null,
+  attrs: AttrBuilderContext<SVGDescElement>? = null,
 ) {
     TagElement(
         elementBuilder = Desc,
@@ -659,7 +659,7 @@ fun ElementScope<SVGElement>.Desc(
 @Composable
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.Marker(
-  attrs: AttrsBuilder<SVGMarkerElement>? = null,
+  attrs: AttrBuilderContext<SVGMarkerElement>? = null,
   content: ContentBuilder<SVGMarkerElement>? = null
 ) {
     TagElement(
@@ -672,7 +672,7 @@ fun ElementScope<SVGElement>.Marker(
 @Composable
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.Mpath(
-  attrs: AttrsBuilder<SVGElement>? = null,
+  attrs: AttrBuilderContext<SVGElement>? = null,
   content: ContentBuilder<SVGElement>? = null
 ) {
     TagElement(
@@ -685,7 +685,7 @@ fun ElementScope<SVGElement>.Mpath(
 @Composable
 @ExperimentalComposeWebSvgApi
 fun ElementScope<SVGElement>.Filter(
-  attrs: AttrsBuilder<SVGElement>? = null,
+  attrs: AttrBuilderContext<SVGElement>? = null,
   content: ContentBuilder<SVGElement>? = null
 ) {
     TagElement(
@@ -700,7 +700,7 @@ fun ElementScope<SVGElement>.Filter(
 fun ElementScope<SVGElement>.Set(
   attributeName: String,
   to: String,
-  attrs: AttrsBuilder<SVGElement>? = null,
+  attrs: AttrBuilderContext<SVGElement>? = null,
   content: ContentBuilder<SVGElement>? = null
 ) {
     TagElement(
@@ -718,7 +718,7 @@ fun ElementScope<SVGElement>.Set(
 @ExperimentalComposeWebSvgApi
 fun <T : SVGElement> SvgElement(
   name: String,
-  attrs: AttrsBuilder<T>? = null,
+  attrs: AttrBuilderContext<T>? = null,
   content: ContentBuilder<T>? = null
 ) {
     TagElement(
