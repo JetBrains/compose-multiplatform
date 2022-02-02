@@ -74,7 +74,7 @@ androidx {
     name = "Compose Material Icons Extended"
     type = LibraryType.PUBLISHED_LIBRARY
     publish = Publish.NONE // actually embedded into the main aar rather than published separately
-    mavenGroup = LibraryGroups.Compose.MATERIAL
+    mavenGroup = LibraryGroups.COMPOSE_MATERIAL
     // This module has a large number (1000+) of generated source files and so doc generation /
     // API tracking will simply take too long
     runApiTasks = new RunApiTasks.No("A thousand generated source files")

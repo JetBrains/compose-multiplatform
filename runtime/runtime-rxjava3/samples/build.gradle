@@ -38,7 +38,7 @@ dependencies {
 androidx {
     name = "AndroidX Compose RxJava 3 Integration Samples"
     type = LibraryType.SAMPLES
-    mavenGroup = LibraryGroups.Compose.RUNTIME
+    mavenGroup = LibraryGroups.COMPOSE_RUNTIME
     inceptionYear = "2020"
     description = "Contains the sample code for the Androidx Compose RxJava 3 Integration System"
 }

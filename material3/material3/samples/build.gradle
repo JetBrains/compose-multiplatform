@@ -45,7 +45,7 @@ dependencies {
 androidx {
     name = "AndroidX Compose Material3 Components Samples"
     type = LibraryType.SAMPLES
-    mavenGroup = LibraryGroups.Compose.MATERIAL3
+    mavenGroup = LibraryGroups.COMPOSE_MATERIAL3
     inceptionYear = "2021"
     description = "Contains the sample code for the AndroidX Compose Material You components."
 }

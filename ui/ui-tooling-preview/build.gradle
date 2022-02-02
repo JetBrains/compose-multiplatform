@@ -69,7 +69,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Tooling API"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.Compose.UI
+    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2021"
     description = "Compose tooling library API. This library provides the API required to declare" +
             " @Preview composables in user apps."

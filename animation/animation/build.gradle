@@ -123,7 +123,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Animation"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.Compose.ANIMATION
+    mavenGroup = LibraryGroups.COMPOSE_ANIMATION
     inceptionYear = "2019"
     description = "Compose animation library"
     legacyDisableKotlinStrictApiMode = true

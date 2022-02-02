@@ -132,7 +132,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Material3 Components"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.Compose.MATERIAL3
+    mavenGroup = LibraryGroups.COMPOSE_MATERIAL3
     inceptionYear = "2021"
     description = "Compose Material You Design Components library"
 }
