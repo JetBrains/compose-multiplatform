@@ -18,9 +18,9 @@ package androidx.compose.ui.layout
 
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionContext
-import androidx.compose.runtime.ReusableComposeNode
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
@@ -102,7 +102,7 @@ fun SubcomposeLayout(
     val density = LocalDensity.current
     val layoutDirection = LocalLayoutDirection.current
     val viewConfiguration = LocalViewConfiguration.current
-    ReusableComposeNode<LayoutNode, Applier<Any>>(
+    ComposeNode<LayoutNode, Applier<Any>>(
         factory = LayoutNode.Constructor,
         update = {
             set(state, state.setRoot)
