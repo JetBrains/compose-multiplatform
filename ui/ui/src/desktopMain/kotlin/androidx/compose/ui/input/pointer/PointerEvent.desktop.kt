@@ -16,14 +16,58 @@
 
 package androidx.compose.ui.input.pointer
 
-import androidx.compose.ui.platform.DesktopPlatform
-import java.awt.event.InputEvent
-import java.awt.event.KeyEvent
 import java.awt.event.MouseEvent
-import java.awt.Toolkit
 
 internal actual typealias NativePointerButtons = Int
 internal actual typealias NativePointerKeyboardModifiers = Int
+
+/**
+ * Creates [PointerButtons] with the specified state of the pressed buttons.
+ */
+fun PointerButtons(
+    isPrimaryPressed: Boolean = false,
+    isSecondaryPressed: Boolean = false,
+    isTertiaryPressed: Boolean = false,
+    isBackPressed: Boolean = false,
+    isForwardPressed: Boolean = false
+): PointerButtons {
+    var res = 0
+    if (isPrimaryPressed) res = res or ButtonMasks.Primary
+    if (isSecondaryPressed) res = res or ButtonMasks.Secondary
+    if (isTertiaryPressed) res = res or ButtonMasks.Tertiary
+    if (isBackPressed) res = res or ButtonMasks.Back
+    if (isForwardPressed) res = res or ButtonMasks.Forward
+    return PointerButtons(res)
+}
+
+/**
+ * Creates [PointerKeyboardModifiers] with the specified state of the pressed keyboard modifiers.
+ */
+fun PointerKeyboardModifiers(
+    isCtrlPressed: Boolean = false,
+    isMetaPressed: Boolean = false,
+    isAltPressed: Boolean = false,
+    isShiftPressed: Boolean = false,
+    isAltGraphPressed: Boolean = false,
+    isSymPressed: Boolean = false,
+    isFunctionPressed: Boolean = false,
+    isCapsLockOn: Boolean = false,
+    isScrollLockOn: Boolean = false,
+    isNumLockOn: Boolean = false,
+): PointerKeyboardModifiers {
+    var res = 0
+    if (isCtrlPressed) res = res or KeyboardModifierMasks.CtrlPressed
+    if (isMetaPressed) res = res or KeyboardModifierMasks.MetaPressed
+    if (isAltPressed) res = res or KeyboardModifierMasks.AltPressed
+    if (isShiftPressed) res = res or KeyboardModifierMasks.ShiftPressed
+    if (isAltGraphPressed) res = res or KeyboardModifierMasks.AltGraphPressed
+    if (isSymPressed) res = res or KeyboardModifierMasks.SymPressed
+    if (isFunctionPressed) res = res or KeyboardModifierMasks.FunctionPressed
+    if (isCapsLockOn) res = res or KeyboardModifierMasks.CapsLockOn
+    if (isScrollLockOn) res = res or KeyboardModifierMasks.ScrollLockOn
+    if (isNumLockOn) res = res or KeyboardModifierMasks.NumLockOn
+    return PointerKeyboardModifiers(res)
+}
 
 /**
  * Describes a pointer input change event that has occurred at a particular point in time.
@@ -33,6 +77,16 @@ actual data class PointerEvent internal constructor(
      * The changes.
      */
     actual val changes: List<PointerInputChange>,
+
+    /**
+     * The state of buttons (e.g. mouse or stylus buttons) during this event.
+     */
+    actual val buttons: PointerButtons,
+
+    /**
+     * The state of modifier keys during this event.
+     */
+    actual val keyboardModifiers: PointerKeyboardModifiers,
 
     /**
      * Original raw native event from AWT.
@@ -48,104 +102,61 @@ actual data class PointerEvent internal constructor(
         internalPointerEvent: InternalPointerEvent?
     ) : this(
         changes,
+        internalPointerEvent?.buttons ?: PointerButtons(0),
+        internalPointerEvent?.keyboardModifiers ?: PointerKeyboardModifiers(0),
         internalPointerEvent?.mouseEvent
     ) {
         this.type = internalPointerEvent?.type ?: PointerEventType.Unknown
     }
-
-    actual val buttons = PointerButtons(mouseEvent?.modifiersEx ?: 0)
-
-    actual val keyboardModifiers = createPointerKeyboardModifiers(mouseEvent?.modifiersEx ?: 0)
 
     /**
      * @param changes The changes.
      */
     actual constructor(changes: List<PointerInputChange>) : this(
         changes,
+        buttons = PointerButtons(0),
+        keyboardModifiers = PointerKeyboardModifiers(0),
         mouseEvent = null
     )
 
     actual var type: PointerEventType = PointerEventType.Unknown
         internal set
-
-    private fun createPointerKeyboardModifiers(modifiersEx: Int): PointerKeyboardModifiers {
-        val toolkit = Toolkit.getDefaultToolkit()
-        val capsLockBits = toolkit.getMaskForLockingKeyState(KeyEvent.VK_CAPS_LOCK, CapsLockMask)
-        val numLockBits = toolkit.getMaskForLockingKeyState(KeyEvent.VK_NUM_LOCK, NumLockMask)
-        val scrollLockBits =
-            toolkit.getMaskForLockingKeyState(KeyEvent.VK_SCROLL_LOCK, ScrollLockMask)
-
-        val packed = (modifiersEx and ClearMask) or capsLockBits or numLockBits or scrollLockBits
-        return PointerKeyboardModifiers(packed)
-    }
 }
 
-private fun Toolkit.getMaskForLockingKeyState(event: Int, mask: Int): Int {
-    return try {
-        if (getLockingKeyState(event)) {
-            mask
-        } else {
-            0
-        }
-    } catch (_: Exception) {
-        0
-    }
+private object ButtonMasks {
+    const val Primary = 1 shl 0
+    const val Secondary = 1 shl 1
+    const val Tertiary = 1 shl 2
+    const val Back = 1 shl 3
+    const val Forward = 1 shl 4
 }
 
-/**
- * Coopt the BUTTON1_DOWN_MASK for caps lock state in PointerKeyboardModifiers
- */
-private const val CapsLockMask = InputEvent.BUTTON1_DOWN_MASK
-/**
- * Coopt the BUTTON2_DOWN_MASK for scroll lock state in PointerKeyboardModifiers
- */
-private const val ScrollLockMask = InputEvent.BUTTON2_DOWN_MASK
-/**
- * Coopt the BUTTON3_DOWN_MASK for num lock state in PointerKeyboardModifiers
- */
-private const val NumLockMask = InputEvent.BUTTON3_DOWN_MASK
-
-/**
- * Clear mask for all coopted values. We don't want button state to interfere with keyboard
- * state.
- */
-private const val ClearMask = (
-    InputEvent.BUTTON1_DOWN_MASK or
-        InputEvent.BUTTON2_DOWN_MASK or
-        InputEvent.BUTTON3_DOWN_MASK
-    ).inv()
-
-private val PointerButtons.isMacOsCtrlClick
-    get() = (
-        DesktopPlatform.Current == DesktopPlatform.MacOS &&
-            ((packedValue and InputEvent.BUTTON1_DOWN_MASK) != 0) &&
-            ((packedValue and InputEvent.CTRL_DOWN_MASK) != 0)
-        )
-
+private object KeyboardModifierMasks {
+    const val CtrlPressed = 1 shl 0
+    const val MetaPressed = 1 shl 1
+    const val AltPressed = 1 shl 2
+    const val AltGraphPressed = 1 shl 3
+    const val SymPressed = 1 shl 4
+    const val ShiftPressed = 1 shl 5
+    const val FunctionPressed = 1 shl 6
+    const val CapsLockOn = 1 shl 7
+    const val ScrollLockOn = 1 shl 8
+    const val NumLockOn = 1 shl 9
+}
 actual val PointerButtons.isPrimaryPressed
-    get() = (packedValue and InputEvent.BUTTON1_DOWN_MASK) != 0 && !isMacOsCtrlClick
+    get() = (packedValue and ButtonMasks.Primary) != 0
 
 actual val PointerButtons.isSecondaryPressed: Boolean
-    get() = ((packedValue and InputEvent.BUTTON3_DOWN_MASK) != 0) || isMacOsCtrlClick
+    get() = ((packedValue and ButtonMasks.Secondary) != 0)
 
 actual val PointerButtons.isTertiaryPressed: Boolean
-    get() = (packedValue and InputEvent.BUTTON2_DOWN_MASK) != 0
-
-/**
- * Bit mask for back button.
- */
-private const val BackMask = 1 shl 14
-
-/**
- * Bit mask for forward button.
- */
-private const val ForwardMask = 1 shl 15
+    get() = (packedValue and ButtonMasks.Tertiary) != 0
 
 actual val PointerButtons.isBackPressed: Boolean
-    get() = packedValue and BackMask != 0
+    get() = packedValue and ButtonMasks.Back != 0
 
 actual val PointerButtons.isForwardPressed: Boolean
-    get() = packedValue and ForwardMask != 0
+    get() = packedValue and ButtonMasks.Forward != 0
 
 actual fun PointerButtons.isPressed(buttonIndex: Int): Boolean =
     when (buttonIndex) {
@@ -157,11 +168,9 @@ actual fun PointerButtons.isPressed(buttonIndex: Int): Boolean =
         else -> false
     }
 
-private const val AnyButtonMask =
-    InputEvent.BUTTON1_DOWN_MASK or InputEvent.BUTTON2_DOWN_MASK or InputEvent.BUTTON3_DOWN_MASK
-
 actual val PointerButtons.areAnyPressed: Boolean
-    get() = (packedValue and AnyButtonMask) != 0
+    get() = isPrimaryPressed || isSecondaryPressed || isTertiaryPressed ||
+        isBackPressed || isForwardPressed
 
 actual fun PointerButtons.indexOfFirstPressed(): Int = when {
     isPrimaryPressed -> 0
@@ -182,31 +191,31 @@ actual fun PointerButtons.indexOfLastPressed(): Int = when {
 }
 
 actual val PointerKeyboardModifiers.isCtrlPressed: Boolean
-    get() = (packedValue and InputEvent.CTRL_DOWN_MASK) != 0
+    get() = (packedValue and KeyboardModifierMasks.CtrlPressed) != 0
 
 actual val PointerKeyboardModifiers.isMetaPressed: Boolean
-    get() = (packedValue and InputEvent.META_DOWN_MASK) != 0
+    get() = (packedValue and KeyboardModifierMasks.MetaPressed) != 0
 
 actual val PointerKeyboardModifiers.isAltPressed: Boolean
-    get() = (packedValue and InputEvent.ALT_DOWN_MASK) != 0
+    get() = (packedValue and KeyboardModifierMasks.AltPressed) != 0
 
 actual val PointerKeyboardModifiers.isAltGraphPressed: Boolean
-    get() = (packedValue and InputEvent.ALT_GRAPH_DOWN_MASK) != 0
+    get() = (packedValue and KeyboardModifierMasks.AltGraphPressed) != 0
 
 actual val PointerKeyboardModifiers.isSymPressed: Boolean
-    get() = false
+    get() = (packedValue and KeyboardModifierMasks.SymPressed) != 0
 
 actual val PointerKeyboardModifiers.isShiftPressed: Boolean
-    get() = (packedValue and InputEvent.SHIFT_DOWN_MASK) != 0
+    get() = (packedValue and KeyboardModifierMasks.ShiftPressed) != 0
 
 actual val PointerKeyboardModifiers.isFunctionPressed: Boolean
-    get() = false
+    get() = (packedValue and KeyboardModifierMasks.FunctionPressed) != 0
 
 actual val PointerKeyboardModifiers.isCapsLockOn: Boolean
-    get() = (packedValue and CapsLockMask) != 0
+    get() = (packedValue and KeyboardModifierMasks.CapsLockOn) != 0
 
 actual val PointerKeyboardModifiers.isScrollLockOn: Boolean
-    get() = (packedValue and ScrollLockMask) != 0
+    get() = (packedValue and KeyboardModifierMasks.ScrollLockOn) != 0
 
 actual val PointerKeyboardModifiers.isNumLockOn: Boolean
-    get() = (packedValue and NumLockMask) != 0
+    get() = (packedValue and KeyboardModifierMasks.NumLockOn) != 0
