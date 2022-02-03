@@ -36,10 +36,15 @@ import androidx.compose.material3.samples.EnterAlwaysSmallTopAppBar
 import androidx.compose.material3.samples.ExitUntilCollapsedLargeTopAppBar
 import androidx.compose.material3.samples.ExitUntilCollapsedMediumTopAppBar
 import androidx.compose.material3.samples.ExtendedFloatingActionButtonSample
+import androidx.compose.material3.samples.FancyTabs
+import androidx.compose.material3.samples.FancyIndicatorTabs
+import androidx.compose.material3.samples.FancyIndicatorContainerTabs
 import androidx.compose.material3.samples.FilledTonalButtonSample
 import androidx.compose.material3.samples.FloatingActionButtonSample
+import androidx.compose.material3.samples.IconTabs
 import androidx.compose.material3.samples.LargeFloatingActionButtonSample
 import androidx.compose.material3.samples.LinearProgressIndicatorSample
+import androidx.compose.material3.samples.LeadingIconTabs
 import androidx.compose.material3.samples.MenuSample
 import androidx.compose.material3.samples.NavigationBarSample
 import androidx.compose.material3.samples.NavigationBarWithOnlySelectedLabelsSample
@@ -56,10 +61,14 @@ import androidx.compose.material3.samples.ScaffoldWithCoroutinesSnackbar
 import androidx.compose.material3.samples.ScaffoldWithCustomSnackbar
 import androidx.compose.material3.samples.ScaffoldWithIndefiniteSnackbar
 import androidx.compose.material3.samples.ScaffoldWithSimpleSnackbar
+import androidx.compose.material3.samples.ScrollingFancyIndicatorContainerTabs
+import androidx.compose.material3.samples.ScrollingTextTabs
 import androidx.compose.material3.samples.SimpleCenterAlignedTopAppBar
 import androidx.compose.material3.samples.SimpleSmallTopAppBar
 import androidx.compose.material3.samples.SmallFloatingActionButtonSample
+import androidx.compose.material3.samples.TextAndIconTabs
 import androidx.compose.material3.samples.TextButtonSample
+import androidx.compose.material3.samples.TextTabs
 import androidx.compose.material3.samples.TriStateCheckboxSample
 import androidx.compose.runtime.Composable
 
@@ -398,5 +407,73 @@ val SnackbarsExamples = listOf(
         sourceUrl = SnackbarsExampleSourceUrl
     ) {
         ScaffoldWithCoroutinesSnackbar()
+    }
+)
+
+private const val TabsExampleDescription = "Tabs examples"
+private const val TabsExampleSourceUrl = "$SampleSourceUrl/TabSamples.kt"
+val TabsExamples = listOf(
+    Example(
+        name = ::TextTabs.name,
+        description = TabsExampleDescription,
+        sourceUrl = TabsExampleSourceUrl
+    ) {
+        TextTabs()
+    },
+    Example(
+        name = ::IconTabs.name,
+        description = TabsExampleDescription,
+        sourceUrl = TabsExampleSourceUrl
+    ) {
+        IconTabs()
+    },
+    Example(
+        name = ::TextAndIconTabs.name,
+        description = TabsExampleDescription,
+        sourceUrl = TabsExampleSourceUrl
+    ) {
+        TextAndIconTabs()
+    },
+    Example(
+        name = ::LeadingIconTabs.name,
+        description = TabsExampleDescription,
+        sourceUrl = TabsExampleSourceUrl
+    ) {
+        LeadingIconTabs()
+    },
+    Example(
+        name = ::ScrollingTextTabs.name,
+        description = TabsExampleDescription,
+        sourceUrl = TabsExampleSourceUrl
+    ) {
+        ScrollingTextTabs()
+    },
+    Example(
+        name = ::FancyTabs.name,
+        description = TabsExampleDescription,
+        sourceUrl = TabsExampleSourceUrl
+    ) {
+        FancyTabs()
+    },
+    Example(
+        name = ::FancyIndicatorTabs.name,
+        description = TabsExampleDescription,
+        sourceUrl = TabsExampleSourceUrl
+    ) {
+        FancyIndicatorTabs()
+    },
+    Example(
+        name = ::FancyIndicatorContainerTabs.name,
+        description = TabsExampleDescription,
+        sourceUrl = TabsExampleSourceUrl
+    ) {
+        FancyIndicatorContainerTabs()
+    },
+    Example(
+        name = ::ScrollingFancyIndicatorContainerTabs.name,
+        description = TabsExampleDescription,
+        sourceUrl = TabsExampleSourceUrl
+    ) {
+        ScrollingFancyIndicatorContainerTabs()
     }
 )

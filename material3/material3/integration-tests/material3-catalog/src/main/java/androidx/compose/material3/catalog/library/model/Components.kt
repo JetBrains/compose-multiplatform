@@ -219,6 +219,18 @@ private val Snackbars = Component(
     examples = SnackbarsExamples
 )
 
+private val Tabs = Component(
+    id = nextId(),
+    name = "Tabs",
+    description = "Tabs organize content across different screens, data sets, and other " +
+        "interactions.",
+    // No tabs icon
+    guidelinesUrl = "$ComponentGuidelinesUrl/tabs",
+    docsUrl = "$DocsUrl#tab",
+    sourceUrl = "$Material3SourceUrl/Tab.kt",
+    examples = TabsExamples
+)
+
 private val TopAppBar = Component(
     id = nextId(),
     name = "Top app bar",
@@ -247,5 +259,6 @@ val Components = listOf(
     ProgressIndicators,
     RadioButtons,
     Snackbars,
+    Tabs,
     TopAppBar
 )
