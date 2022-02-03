@@ -131,6 +131,18 @@ private val FloatingActionButtons = Component(
     examples = FloatingActionButtonsExamples,
 )
 
+private val Menus = Component(
+    id = nextId(),
+    name = "Menus",
+    description = "Menus display a list of choices on temporary surfaces.",
+    // No menu icon
+    tintIcon = true,
+    guidelinesUrl = "$ComponentGuidelinesUrl/menus",
+    docsUrl = "$PackageSummaryUrl#dropdownmenu",
+    sourceUrl = "$Material3SourceUrl/Menu.kt",
+    examples = MenusExamples
+)
+
 private val NavigationBar = Component(
     id = nextId(),
     name = "Navigation bar",
@@ -228,6 +240,7 @@ val Components = listOf(
     Dialogs,
     ExtendedFloatingActionButton,
     FloatingActionButtons,
+    Menus,
     NavigationBar,
     NavigationDrawer,
     NavigationRail,
