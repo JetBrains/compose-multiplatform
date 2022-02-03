@@ -307,28 +307,7 @@ class SurfaceTest {
     }
 
     @Test
-    fun clickableOverload_clickAction() {
-        val count = mutableStateOf(0f)
-        rule.setMaterialContent(lightColorScheme()) {
-            Surface(
-                modifier = Modifier.testTag("surface"),
-                onClick = { count.value += 1 }
-            ) {
-                Spacer(Modifier.size(30.dp))
-            }
-        }
-        rule.onNodeWithTag("surface")
-            .performClick()
-        Truth.assertThat(count.value).isEqualTo(1)
-
-        rule.onNodeWithTag("surface")
-            .performClick()
-            .performClick()
-        Truth.assertThat(count.value).isEqualTo(3)
-    }
-
-    @Test
-    fun clickable_clickActionWithModifier() {
+    fun clickable_clickAction() {
         val count = mutableStateOf(0f)
         val interactionSource = MutableInteractionSource()
         rule.setMaterialContent(lightColorScheme()) {
@@ -382,7 +361,7 @@ class SurfaceTest {
     }
 
     @Test
-    fun clickableOverload_interactionSource() {
+    fun clickable_interactionSource() {
         val interactionSource = MutableInteractionSource()
 
         var scope: CoroutineScope? = null
@@ -392,8 +371,12 @@ class SurfaceTest {
         rule.setContent {
             scope = rememberCoroutineScope()
             Surface(
-                modifier = Modifier.testTag("surface"),
-                onClick = {},
+                modifier =
+                Modifier.testTag("surface")
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = null,
+                        onClick = {}),
                 interactionSource = interactionSource
             ) {
                 Spacer(Modifier.size(30.dp))
@@ -433,7 +416,24 @@ class SurfaceTest {
         }
     }
 
-    // TODO(b/198216553): Add surface_blockClicksBehind test from M2 after Button is added.
+    @Test
+    fun surface_blockClicksBehind() {
+        val state = mutableStateOf(0)
+        rule.setContent {
+            Box(Modifier.fillMaxSize()) {
+                Button(
+                    modifier = Modifier.fillMaxSize().testTag("clickable"),
+                    onClick = { state.value += 1 }
+                ) { Text("button fullscreen") }
+                Surface(
+                    Modifier.fillMaxSize().testTag("surface"),
+                ) {}
+            }
+        }
+        rule.onNodeWithTag("clickable").assertHasClickAction().performClick()
+        // still 0
+        Truth.assertThat(state.value).isEqualTo(0)
+    }
 
     // regression test for b/189411183
     @Test

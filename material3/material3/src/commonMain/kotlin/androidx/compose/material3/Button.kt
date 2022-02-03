@@ -19,6 +19,7 @@ package androidx.compose.material3
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.interaction.Interaction
@@ -31,7 +32,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.tokens.ElevatedButtonTokens
 import androidx.compose.material3.tokens.FilledButtonTokens
 import androidx.compose.material3.tokens.FilledButtonTonalTokens
@@ -119,19 +119,23 @@ fun Button(
 
     // TODO(b/202880001): Apply shadow color from token (will not be possibly any time soon, if ever).
     Surface(
-        modifier = modifier.minimumTouchTargetSize(),
+        modifier = modifier
+            .minimumTouchTargetSize()
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                enabled = enabled,
+                role = Role.Button,
+                onClick = onClick
+            ),
+        interactionSource = interactionSource,
         shape = shape,
         color = containerColor,
         contentColor = contentColor,
-        shadowElevation = shadowElevation,
         tonalElevation = tonalElevation,
-        border = border,
-        onClick = onClick,
-        enabled = enabled,
-        role = Role.Button,
-        interactionSource = interactionSource,
-        indication = rememberRipple(),
-        ) {
+        shadowElevation = shadowElevation,
+        border = border
+    ) {
         CompositionLocalProvider(LocalContentColor provides contentColor) {
             ProvideTextStyle(value = TypographyTokens.LabelLarge) {
                 Row(

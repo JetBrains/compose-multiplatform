@@ -207,6 +207,10 @@ fun Surface(
  */
 @Composable
 @NonRestartableComposable
+@Deprecated(
+    message = "Please use Surface with an InteractionSource and a Modifier.clickable() instead.",
+    level = DeprecationLevel.ERROR
+)
 fun Surface(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
