@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.material
+package androidx.compose.material3
 
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -31,7 +31,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.tokens.PrimaryNavigationTabTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
@@ -51,14 +52,13 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+// TODO: Provide M3 tab row image when asset is available.
 /**
  * <a href="https://material.io/components/tabs#fixed-tabs" class="external" target="_blank">Material Design fixed tabs</a>.
  *
  * Fixed tabs display all tabs in a set simultaneously. They are best for switching between related
  * content quickly, such as between transportation methods in a map. To navigate between fixed tabs,
  * tap an individual tab, or swipe left or right in the content area.
- *
- * ![Fixed tabs image](https://developer.android.com/images/reference/androidx/compose/material/fixed-tabs.png)
  *
  * A TabRow contains a row of [Tab]s, and displays an indicator underneath the currently
  * selected tab. A TabRow places its tabs evenly spaced along the entire row, with each tab
@@ -67,15 +67,15 @@ import kotlinx.coroutines.launch
  *
  * A simple example with text tabs looks like:
  *
- * @sample androidx.compose.material.samples.TextTabs
+ * @sample androidx.compose.material3.samples.TextTabs
  *
  * You can also provide your own custom tab, such as:
  *
- * @sample androidx.compose.material.samples.FancyTabs
+ * @sample androidx.compose.material3.samples.FancyTabs
  *
  * Where the custom tab itself could look like:
  *
- * @sample androidx.compose.material.samples.FancyTab
+ * @sample androidx.compose.material3.samples.FancyTab
  *
  * As well as customizing the tab, you can also provide a custom [indicator], to customize
  * the indicator displayed for a tab. [indicator] will be placed to fill the entire TabRow, so it
@@ -84,12 +84,12 @@ import kotlinx.coroutines.launch
  *
  * For example, given an indicator that draws a rounded rectangle near the edges of the [Tab]:
  *
- * @sample androidx.compose.material.samples.FancyIndicator
+ * @sample androidx.compose.material3.samples.FancyIndicator
  *
  * We can reuse [TabRowDefaults.tabIndicatorOffset] and just provide this indicator,
  * as we aren't changing how the size and position of the indicator changes between tabs:
  *
- * @sample androidx.compose.material.samples.FancyIndicatorTabs
+ * @sample androidx.compose.material3.samples.FancyIndicatorTabs
  *
  * You may also want to use a custom transition, to allow you to dynamically change the
  * appearance of the indicator as it animates between tabs, such as changing its color or size.
@@ -99,18 +99,18 @@ import kotlinx.coroutines.launch
  * color of the same FancyIndicator from before, also adding a physics based 'spring' effect to
  * the indicator in the direction of motion:
  *
- * @sample androidx.compose.material.samples.FancyAnimatedIndicator
+ * @sample androidx.compose.material3.samples.FancyAnimatedIndicator
  *
  * We can now just pass this indicator directly to TabRow:
  *
- * @sample androidx.compose.material.samples.FancyIndicatorContainerTabs
+ * @sample androidx.compose.material3.samples.FancyIndicatorContainerTabs
  *
  * @param selectedTabIndex the index of the currently selected tab
  * @param modifier optional [Modifier] for this TabRow
- * @param backgroundColor The background color for the TabRow. Use [Color.Transparent] to have
+ * @param containerColor The color of the container for the TabRow. Use [Color.Transparent] to have
  * no color.
  * @param contentColor The preferred content color provided by this TabRow to its children.
- * Defaults to either the matching content color for [backgroundColor], or if [backgroundColor] is
+ * Defaults to either the matching content color for [containerColor], or if [containerColor] is
  * not a color from the theme, this will keep the same value set above this TabRow.
  * @param indicator the indicator that represents which tab is currently selected. By default this
  * will be a [TabRowDefaults.Indicator], using a [TabRowDefaults.tabIndicatorOffset]
@@ -127,8 +127,10 @@ import kotlinx.coroutines.launch
 fun TabRow(
     selectedTabIndex: Int,
     modifier: Modifier = Modifier,
-    backgroundColor: Color = MaterialTheme.colors.primarySurface,
-    contentColor: Color = contentColorFor(backgroundColor),
+    containerColor: Color =
+        MaterialTheme.colorScheme.fromToken(PrimaryNavigationTabTokens.ContainerColor),
+    contentColor: Color =
+        MaterialTheme.colorScheme.fromToken(PrimaryNavigationTabTokens.ActiveLabelTextColor),
     indicator: @Composable (tabPositions: List<TabPosition>) -> Unit = @Composable { tabPositions ->
         TabRowDefaults.Indicator(
             Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
@@ -141,7 +143,7 @@ fun TabRow(
 ) {
     Surface(
         modifier = modifier.selectableGroup(),
-        color = backgroundColor,
+        color = containerColor,
         contentColor = contentColor
     ) {
         SubcomposeLayout(Modifier.fillMaxWidth()) { constraints ->
@@ -179,13 +181,12 @@ fun TabRow(
     }
 }
 
+// TODO: Provide M3 tab row image when asset is available.
 /**
  * <a href="https://material.io/components/tabs#scrollable-tabs" class="external" target="_blank">Material Design scrollable tabs</a>.
  *
  * When a set of tabs cannot fit on screen, use scrollable tabs. Scrollable tabs can use longer text
  * labels and a larger number of tabs. They are best used for browsing on touch interfaces.
- *
- * ![Scrollable tabs image](https://developer.android.com/images/reference/androidx/compose/material/scrollable-tabs.png)
  *
  * A ScrollableTabRow contains a row of [Tab]s, and displays an indicator underneath the currently
  * selected tab. A ScrollableTabRow places its tabs offset from the starting edge, and allows
@@ -194,11 +195,11 @@ fun TabRow(
  *
  * @param selectedTabIndex the index of the currently selected tab
  * @param modifier optional [Modifier] for this ScrollableTabRow
- * @param backgroundColor The background color for the ScrollableTabRow. Use [Color.Transparent] to
+ * @param containerColor The background color for the ScrollableTabRow. Use [Color.Transparent] to
  * have no color.
  * @param contentColor The preferred content color provided by this ScrollableTabRow to its
- * children. Defaults to either the matching content color for [backgroundColor], or if
- * [backgroundColor] is not a color from the theme, this will keep the same value set above this
+ * children. Defaults to either the matching content color for [containerColor], or if
+ * [containerColor] is not a color from the theme, this will keep the same value set above this
  * ScrollableTabRow.
  * @param edgePadding the padding between the starting and ending edge of ScrollableTabRow, and
  * the tabs inside the ScrollableTabRow. This padding helps inform the user that this tab row can
@@ -218,9 +219,11 @@ fun TabRow(
 fun ScrollableTabRow(
     selectedTabIndex: Int,
     modifier: Modifier = Modifier,
-    backgroundColor: Color = MaterialTheme.colors.primarySurface,
-    contentColor: Color = contentColorFor(backgroundColor),
-    edgePadding: Dp = TabRowDefaults.ScrollableTabRowPadding,
+    containerColor: Color =
+        MaterialTheme.colorScheme.fromToken(PrimaryNavigationTabTokens.ContainerColor),
+    contentColor: Color =
+        MaterialTheme.colorScheme.fromToken(PrimaryNavigationTabTokens.ActiveLabelTextColor),
+    edgePadding: Dp = ScrollableTabRowPadding,
     indicator: @Composable (tabPositions: List<TabPosition>) -> Unit = @Composable { tabPositions ->
         TabRowDefaults.Indicator(
             Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
@@ -233,7 +236,7 @@ fun ScrollableTabRow(
 ) {
     Surface(
         modifier = modifier,
-        color = backgroundColor,
+        color = containerColor,
         contentColor = contentColor
     ) {
         val scrollState = rememberScrollState()
@@ -356,10 +359,12 @@ object TabRowDefaults {
     @Composable
     fun Divider(
         modifier: Modifier = Modifier,
-        thickness: Dp = DividerThickness,
-        color: Color = LocalContentColor.current.copy(alpha = DividerOpacity)
+        thickness: Dp = PrimaryNavigationTabTokens.DividerHeight,
+        color: Color =
+            MaterialTheme.colorScheme.fromToken(PrimaryNavigationTabTokens.DividerColor)
     ) {
-        androidx.compose.material.Divider(modifier = modifier, thickness = thickness, color = color)
+        androidx.compose.material3.Divider(
+            modifier = modifier, thickness = thickness, color = color)
     }
 
     /**
@@ -373,8 +378,9 @@ object TabRowDefaults {
     @Composable
     fun Indicator(
         modifier: Modifier = Modifier,
-        height: Dp = IndicatorHeight,
-        color: Color = LocalContentColor.current
+        height: Dp = PrimaryNavigationTabTokens.ActiveIndicatorHeight,
+        color: Color =
+            MaterialTheme.colorScheme.fromToken(PrimaryNavigationTabTokens.ActiveIndicatorColor)
     ) {
         Box(
             modifier
@@ -412,26 +418,6 @@ object TabRowDefaults {
             .offset(x = indicatorOffset)
             .width(currentTabWidth)
     }
-
-    /**
-     * Default opacity for the color of [Divider]
-     */
-    const val DividerOpacity = 0.12f
-
-    /**
-     * Default thickness for [Divider]
-     */
-    val DividerThickness = 1.dp
-
-    /**
-     * Default height for [Indicator]
-     */
-    val IndicatorHeight = 2.dp
-
-    /**
-     * The default padding from the starting edge before a tab in a [ScrollableTabRow].
-     */
-    val ScrollableTabRowPadding = 52.dp
 }
 
 private enum class TabSlots {
@@ -499,6 +485,11 @@ private class ScrollableTabData(
 }
 
 private val ScrollableTabRowMinimumTabWidth = 90.dp
+
+/**
+ * The default padding from the starting edge before a tab in a [ScrollableTabRow].
+ */
+private val ScrollableTabRowPadding = 52.dp
 
 /**
  * [AnimationSpec] used when scrolling to a tab that is not fully visible.
