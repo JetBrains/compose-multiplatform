@@ -23,19 +23,19 @@ class CSSBorder : CSSStyleValue {
     }
 }
 
-inline fun CSSBorder.width(size: CSSNumeric) {
+fun CSSBorder.width(size: CSSNumeric) {
     width = size
 }
 
-inline fun CSSBorder.style(style: LineStyle) {
+fun CSSBorder.style(style: LineStyle) {
     this.style = style
 }
 
-inline fun CSSBorder.color(color: CSSColorValue) {
+fun CSSBorder.color(color: CSSColorValue) {
     this.color = color
 }
 
-inline fun StyleBuilder.border(crossinline borderBuild: CSSBorder.() -> Unit) {
+fun StyleBuilder.border(borderBuild: CSSBorder.() -> Unit) {
     property("border", CSSBorder().apply(borderBuild))
 }
 
