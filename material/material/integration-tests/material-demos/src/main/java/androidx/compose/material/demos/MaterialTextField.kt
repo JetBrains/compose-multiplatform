@@ -146,7 +146,9 @@ fun VerticalAlignmentsInTextField() {
         TextField(
             value = text.value,
             onValueChange = { text.value = it },
-            label = if (label.value) { @Composable { Text("Label") } } else null,
+            label = if (label.value) {
+                @Composable { Text("Label") }
+            } else null,
             singleLine = singleLine.value,
             modifier = textFieldModifier
         )
@@ -154,7 +156,9 @@ fun VerticalAlignmentsInTextField() {
         OutlinedTextField(
             value = text.value,
             onValueChange = { text.value = it },
-            label = if (label.value) { @Composable { Text("Label") } } else null,
+            label = if (label.value) {
+                @Composable { Text("Label") }
+            } else null,
             singleLine = singleLine.value,
             modifier = textFieldModifier
         )

@@ -417,7 +417,7 @@ class TextFieldTest {
                 ExpectedPadding.roundToPx().toFloat()
             )
             assertThat(labelPosition.value?.y).isEqualTo(
-                TextFieldPadding.roundToPx()
+                ExpectedPadding.roundToPx()
             )
         }
     }
@@ -451,12 +451,11 @@ class TextFieldTest {
             assertThat(labelSize.value).isNotNull()
             assertThat(labelSize.value?.height).isGreaterThan(0)
             assertThat(labelSize.value?.width).isGreaterThan(0)
-            // centered position
             assertThat(labelPosition.value?.x).isEqualTo(
                 ExpectedPadding.roundToPx().toFloat()
             )
             assertThat(labelPosition.value?.y).isEqualTo(
-                TextFieldPadding.roundToPx()
+                ExpectedPadding.roundToPx()
             )
         }
     }
