@@ -7,7 +7,7 @@ plugins {
     id("maven-publish")
 }
 
-val withNative = false
+val withNative = true
 
 kotlin {
     jvm("desktop")

@@ -6,7 +6,7 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-val withNative = false
+val withNative = true 
 
 kotlin {
     jvm("desktop")
