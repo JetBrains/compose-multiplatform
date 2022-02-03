@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// VERSION: v0_76
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
 
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 
 internal object OutlinedButtonTokens {
     val ContainerHeight = 40.0.dp
-    val ContainerShape = RoundedCornerShape(20.0.dp)
+    val ContainerShape = ShapeTokens.CornerFull
     val DisabledLabelTextColor = ColorSchemeKeyTokens.OnSurface
     const val DisabledLabelTextOpacity = 0.38f
     val DisabledOutlineColor = ColorSchemeKeyTokens.OnSurface
@@ -40,7 +40,6 @@ internal object OutlinedButtonTokens {
     val PressedLabelTextColor = ColorSchemeKeyTokens.Primary
     val PressedOutlineColor = ColorSchemeKeyTokens.Outline
     val PressedStateLayerColor = ColorSchemeKeyTokens.Primary
-    val BackgroundContainerColor = ColorSchemeKeyTokens.Surface
     val DisabledIconColor = ColorSchemeKeyTokens.OnSurface
     const val DisabledIconOpacity = 0.38f
     val FocusIconColor = ColorSchemeKeyTokens.Primary

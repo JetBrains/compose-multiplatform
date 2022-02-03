@@ -34,7 +34,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.tokens.ElevatedButtonTokens
 import androidx.compose.material3.tokens.FilledButtonTokens
-import androidx.compose.material3.tokens.FilledButtonTonalTokens
+import androidx.compose.material3.tokens.FilledTonalButtonTokens
 import androidx.compose.material3.tokens.OutlinedButtonTokens
 import androidx.compose.material3.tokens.TextButtonTokens
 import androidx.compose.material3.tokens.TypographyTokens
@@ -270,7 +270,7 @@ fun FilledTonalButton(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     elevation: ButtonElevation? = ButtonDefaults.filledTonalButtonElevation(),
-    shape: Shape = FilledButtonTonalTokens.ContainerShape,
+    shape: Shape = FilledTonalButtonTokens.ContainerShape,
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.filledTonalButtonColors(),
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
@@ -568,14 +568,14 @@ object ButtonDefaults {
      */
     @Composable
     fun filledTonalButtonColors(
-        containerColor: Color = FilledButtonTonalTokens.ContainerColor.toColor(),
-        contentColor: Color = FilledButtonTonalTokens.LabelTextColor.toColor(),
-        disabledContainerColor: Color = FilledButtonTonalTokens.DisabledContainerColor
+        containerColor: Color = FilledTonalButtonTokens.ContainerColor.toColor(),
+        contentColor: Color = FilledTonalButtonTokens.LabelTextColor.toColor(),
+        disabledContainerColor: Color = FilledTonalButtonTokens.DisabledContainerColor
             .toColor()
-            .copy(alpha = FilledButtonTonalTokens.DisabledContainerOpacity),
-        disabledContentColor: Color = FilledButtonTonalTokens.DisabledLabelTextColor
+            .copy(alpha = FilledTonalButtonTokens.DisabledContainerOpacity),
+        disabledContentColor: Color = FilledTonalButtonTokens.DisabledLabelTextColor
             .toColor()
-            .copy(alpha = FilledButtonTonalTokens.DisabledLabelTextOpacity),
+            .copy(alpha = FilledTonalButtonTokens.DisabledLabelTextOpacity),
     ): ButtonColors =
         DefaultButtonColors(
             containerColor = containerColor,
@@ -720,10 +720,10 @@ object ButtonDefaults {
      */
     @Composable
     fun filledTonalButtonElevation(
-        defaultElevation: Dp = FilledButtonTonalTokens.ContainerElevation,
-        pressedElevation: Dp = FilledButtonTonalTokens.PressedContainerElevation,
-        focusedElevation: Dp = FilledButtonTonalTokens.FocusContainerElevation,
-        hoveredElevation: Dp = FilledButtonTonalTokens.HoverContainerElevation,
+        defaultElevation: Dp = FilledTonalButtonTokens.ContainerElevation,
+        pressedElevation: Dp = FilledTonalButtonTokens.PressedContainerElevation,
+        focusedElevation: Dp = FilledTonalButtonTokens.FocusContainerElevation,
+        hoveredElevation: Dp = FilledTonalButtonTokens.HoverContainerElevation,
         disabledElevation: Dp = 0.dp
     ): ButtonElevation {
         return remember(

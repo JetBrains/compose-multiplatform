@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// VERSION: v0_76
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -22,7 +23,7 @@ import androidx.compose.ui.unit.dp
 internal object MenuTokens {
     val ContainerColor = ColorSchemeKeyTokens.Surface
     val ContainerElevation = ElevationTokens.Level2
-    val ContainerShape = ShapeTokens.Small
+    val ContainerShape = ShapeTokens.CornerExtraSmall
     val DividerColor = ColorSchemeKeyTokens.SurfaceVariant
     val DividerHeight = 1.0.dp
     val ListItemContainerHeight = 48.0.dp

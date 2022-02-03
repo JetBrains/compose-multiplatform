@@ -13,31 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// VERSION: v0_76
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
 
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 
 internal object NavigationRailTokens {
-    val ActiveFocusIconColor = ColorSchemeKeyTokens.OnSecondary
+    val ActiveFocusIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
     val ActiveFocusLabelTextColor = ColorSchemeKeyTokens.OnSurface
     val ActiveFocusStateLayerColor = ColorSchemeKeyTokens.OnSurface
-    val ActiveHoverIconColor = ColorSchemeKeyTokens.OnSecondary
+    val ActiveHoverIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
     val ActiveHoverLabelTextColor = ColorSchemeKeyTokens.OnSurface
     val ActiveHoverStateLayerColor = ColorSchemeKeyTokens.OnSurface
     val ActiveIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
     val ActiveIndicatorColor = ColorSchemeKeyTokens.SecondaryContainer
     val ActiveIndicatorHeight = 32.0.dp
-    val ActiveIndicatorShape = RoundedCornerShape(16.0.dp)
+    val ActiveIndicatorShape = ShapeTokens.CornerFull
     val ActiveIndicatorWidth = 56.0.dp
     val ActiveLabelTextColor = ColorSchemeKeyTokens.OnSurface
-    val ActivePressedIconColor = ColorSchemeKeyTokens.OnSecondary
+    val ActivePressedIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
     val ActivePressedLabelTextColor = ColorSchemeKeyTokens.OnSurface
     val ActivePressedStateLayerColor = ColorSchemeKeyTokens.OnSurface
     val ContainerColor = ColorSchemeKeyTokens.Surface
     val ContainerElevation = ElevationTokens.Level0
+    val ContainerShape = ShapeTokens.CornerNone
     val ContainerWidth = 80.0.dp
     val IconSize = 24.0.dp
     val InactiveFocusIconColor = ColorSchemeKeyTokens.OnSurface
@@ -61,5 +62,5 @@ internal object NavigationRailTokens {
     val MenuPressedIconColor = ColorSchemeKeyTokens.OnSurface
     val MenuPressedStateLayerColor = ColorSchemeKeyTokens.OnSurface
     val NoLabelActiveIndicatorHeight = 56.0.dp
-    val NoLabelActiveIndicatorShape = RoundedCornerShape(28.0.dp)
+    val NoLabelActiveIndicatorShape = ShapeTokens.CornerFull
 }

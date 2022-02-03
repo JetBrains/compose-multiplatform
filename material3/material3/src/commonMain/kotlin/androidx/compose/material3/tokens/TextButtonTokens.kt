@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// VERSION: v0_76
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
 
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 
 internal object TextButtonTokens {
-    val ContainerElevation = ElevationTokens.Level0
     val ContainerHeight = 40.0.dp
-    val ContainerShape = RoundedCornerShape(20.0.dp)
+    val ContainerShape = ShapeTokens.CornerFull
+    val DisabledContainerColor = ColorSchemeKeyTokens.OnSurface
+    const val DisabledContainerOpacity = 0.12f
     val DisabledLabelTextColor = ColorSchemeKeyTokens.OnSurface
     const val DisabledLabelTextOpacity = 0.38f
     val FocusLabelTextColor = ColorSchemeKeyTokens.Primary

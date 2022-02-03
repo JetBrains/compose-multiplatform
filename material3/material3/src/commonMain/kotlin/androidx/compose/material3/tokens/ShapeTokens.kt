@@ -13,16 +13,48 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// VERSION: v0_76
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
 
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 
-// TODO(b/209589029): Remove once the shape subsystem is in place.
 internal object ShapeTokens {
-    val Large = RoundedCornerShape(8.0.dp)
-    val Medium = RoundedCornerShape(8.0.dp)
-    val Small = RoundedCornerShape(4.0.dp)
+    val CornerExtraLarge = RoundedCornerShape(28.0.dp)
+    val CornerExtraLargeTop =
+        RoundedCornerShape(
+            topStart = 28.0.dp,
+            topEnd = 28.0.dp,
+            bottomEnd = 0.0.dp,
+            bottomStart = 0.0.dp
+        )
+    val CornerExtraSmall = RoundedCornerShape(4.0.dp)
+    val CornerExtraSmallTop = RoundedCornerShape(
+        topStart = 4.0.dp,
+        topEnd = 4.0.dp,
+        bottomEnd = 0.0.dp,
+        bottomStart = 0.0.dp
+    )
+    val CornerFull = CircleShape
+    val CornerLarge = RoundedCornerShape(16.0.dp)
+    val CornerLargeEnd =
+        RoundedCornerShape(
+            topStart = 0.0.dp,
+            topEnd = 16.0.dp,
+            bottomEnd = 16.0.dp,
+            bottomStart = 0.0.dp
+        )
+    val CornerLargeTop =
+        RoundedCornerShape(
+            topStart = 16.0.dp,
+            topEnd = 16.0.dp,
+            bottomEnd = 0.0.dp,
+            bottomStart = 0.0.dp
+        )
+    val CornerMedium = RoundedCornerShape(12.0.dp)
+    val CornerNone = RoundedCornerShape(0.0.dp)
+    val CornerSmall = RoundedCornerShape(8.0.dp)
 }

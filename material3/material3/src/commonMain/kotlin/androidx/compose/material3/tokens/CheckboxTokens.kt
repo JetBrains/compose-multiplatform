@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// VERSION: v0_76
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
 
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 
 internal object CheckboxTokens {
+    val ContainerShape = RoundedCornerShape(2.0.dp)
     val DisabledSelectedIconColor = ColorSchemeKeyTokens.Primary
     const val DisabledSelectedIconOpacity = 0.38f
     val DisabledUnselectedIconColor = ColorSchemeKeyTokens.Primary

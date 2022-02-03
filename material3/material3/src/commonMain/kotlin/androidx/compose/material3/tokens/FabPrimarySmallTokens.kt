@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// VERSION: v0_76
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
 
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 
 internal object FabPrimarySmallTokens {
     val ContainerColor = ColorSchemeKeyTokens.PrimaryContainer
     val ContainerElevation = ElevationTokens.Level3
     val ContainerHeight = 40.0.dp
-    val ContainerShape = RoundedCornerShape(12.0.dp)
+    val ContainerShape = ShapeTokens.CornerMedium
     val ContainerWidth = 40.0.dp
     val FocusContainerElevation = ElevationTokens.Level3
     val FocusIconColor = ColorSchemeKeyTokens.OnPrimaryContainer

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// VERSION: v0_76
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -22,7 +23,7 @@ import androidx.compose.ui.unit.dp
 internal object ElevatedCardTokens {
     val ContainerColor = ColorSchemeKeyTokens.Surface
     val ContainerElevation = ElevationTokens.Level1
-    val ContainerShape = ShapeTokens.Medium
+    val ContainerShape = ShapeTokens.CornerMedium
     val DraggedContainerElevation = ElevationTokens.Level4
     val DraggedStateLayerColor = ColorSchemeKeyTokens.OnSurface
     val FocusContainerElevation = ElevationTokens.Level1
