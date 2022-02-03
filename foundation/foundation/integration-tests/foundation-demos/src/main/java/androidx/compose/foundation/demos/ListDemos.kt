@@ -111,7 +111,8 @@ val LazyListDemos = listOf(
     ComposableDemo("Custom keys") { ReorderWithCustomKeys() },
     ComposableDemo("Fling Config") { LazyWithFlingConfig() },
     ComposableDemo("Item reordering") { PopularBooksDemo() },
-    ComposableDemo("Drag and drop") { LazyColumnDragAndDropDemo() },
+    ComposableDemo("List drag and drop") { LazyColumnDragAndDropDemo() },
+    ComposableDemo("Grid drag and drop") { LazyGridDragAndDropDemo() },
     PagingDemos
 )
 
