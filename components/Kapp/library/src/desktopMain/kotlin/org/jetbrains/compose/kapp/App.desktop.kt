@@ -25,7 +25,7 @@ actual fun KAppScope.Frame(content: @Composable () -> Unit) {
     }
 }
 
-class AppAppScope : KAppScope, ApplicationScope {
+internal class AppAppScope : KAppScope, ApplicationScope {
     override fun exitApplication() {
         println("Exit application")
         SwingUtilities.invokeLater {
@@ -37,7 +37,7 @@ class AppAppScope : KAppScope, ApplicationScope {
 internal actual fun kappImpl(name: String, title: String, content: @Composable KAppScope.() -> Unit) {
     val scope = AppAppScope()
     scope.apply {
-        application(exitProcessOnExit = true, content = @Composable { content() })
+        application(content = @Composable { content() })
     }
 }
 

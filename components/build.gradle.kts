@@ -11,6 +11,7 @@ subprojects {
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 
+    // TODO: do we really need it?
     plugins.withId("java") {
         configureIfExists<JavaPluginExtension> {
             sourceCompatibility = JavaVersion.VERSION_11
