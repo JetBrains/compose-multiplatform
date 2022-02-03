@@ -7,7 +7,12 @@ plugins {
 }
 
 kotlin {
-    jvm("desktop") {}
+    jvm("desktop")
+    js(IR) {
+        browser()
+        binaries.executable()
+    }
+
     sourceSets {
         named("desktopMain") {
             dependencies {
@@ -25,7 +30,7 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "org.jetbrains.compose.kapp.demo.MainKt"
+        mainClass = "org.jetbrains.compose.kapp.demo.Simple_desktopKt"
     }
 }
 

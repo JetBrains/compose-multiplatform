@@ -9,6 +9,9 @@ plugins {
 
 kotlin {
     jvm("desktop")
+    js(IR) {
+        browser()
+    }
 
     sourceSets {
         named("commonMain") {
@@ -19,7 +22,7 @@ kotlin {
                 api(compose.ui)
             }
         }
-        named("desktopMain") {}
+        named("desktopMain")
     }
 }
 
