@@ -12,6 +12,8 @@ import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.svg.*
 import org.jetbrains.compose.web.testutils.*
 import org.w3c.dom.svg.SVGCircleElement
+import org.w3c.dom.svg.SVGElement
+import org.w3c.dom.svg.SVGTextElement
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -132,16 +134,19 @@ class SvgTests {
     fun svgTextTest() = runTest {
         composition {
             Svg {
-                SvgText("some text", 20, 30, {
+                SvgText("some text", 20, 30) {
                     classes("small")
-                })
+                }
             }
         }
 
-        assertEquals(
-            "<svg><text x=\"20\" y=\"30\" class=\"small\">some text</text></svg>",
-            nextChild<SVGCircleElement>().outerHTML
-        )
+        with(nextChild<SVGElement>().firstChild!! as SVGTextElement) {
+            assertEquals("text", this.nodeName.lowercase())
+            assertEquals("small", this.getAttribute("class"))
+            assertEquals("20", this.getAttribute("x"))
+            assertEquals("30", this.getAttribute("y"))
+            assertEquals("some text", this.innerHTML)
+        }
     }
 
     @Test
