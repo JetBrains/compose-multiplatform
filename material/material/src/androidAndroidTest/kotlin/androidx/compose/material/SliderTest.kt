@@ -20,7 +20,10 @@ import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +31,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.boundsInParent
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.testTag
@@ -36,13 +43,13 @@ import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
-import androidx.compose.ui.test.assertRangeInfoEquals
 import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertRangeInfoEquals
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -574,7 +581,7 @@ class SliderTest {
         }
     }
 
-    @ExperimentalMaterialApi
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     fun rangeSlider_dragThumb() {
         val state = mutableStateOf(0f..1f)
@@ -608,7 +615,7 @@ class SliderTest {
         }
     }
 
-    @ExperimentalMaterialApi
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     fun rangeSlider_drag_out_of_bounds() {
         val state = mutableStateOf(0f..1f)
@@ -645,7 +652,7 @@ class SliderTest {
         }
     }
 
-    @ExperimentalMaterialApi
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     fun rangeSlider_tap() {
         val state = mutableStateOf(0f..1f)
@@ -676,7 +683,7 @@ class SliderTest {
         }
     }
 
-    @ExperimentalMaterialApi
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     fun rangeSlider_tap_rangeChange() {
         val state = mutableStateOf(0f..25f)
@@ -709,7 +716,7 @@ class SliderTest {
         }
     }
 
-    @ExperimentalMaterialApi
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     fun rangeSlider_drag_rtl() {
         val state = mutableStateOf(0f..1f)
@@ -746,7 +753,7 @@ class SliderTest {
         }
     }
 
-    @ExperimentalMaterialApi
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     fun rangeSlider_drag_out_of_bounds_rtl() {
         val state = mutableStateOf(0f..1f)
@@ -786,7 +793,7 @@ class SliderTest {
         }
     }
 
-    @ExperimentalMaterialApi
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     fun rangeSlider_closeThumbs_dragRight() {
         val state = mutableStateOf(0.5f..0.5f)
@@ -822,7 +829,7 @@ class SliderTest {
         }
     }
 
-    @ExperimentalMaterialApi
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     fun rangeSlider_closeThumbs_dragLeft() {
         val state = mutableStateOf(0.5f..0.5f)
@@ -855,6 +862,35 @@ class SliderTest {
         rule.runOnIdle {
             Truth.assertThat(state.value.start).isWithin(0.001f).of(expected)
             Truth.assertThat(state.value.endInclusive).isEqualTo(0.5f)
+        }
+    }
+
+    /**
+     * Regression test for bug: 210289161 where RangeSlider was ignoring some modifiers like weight.
+     */
+    @OptIn(ExperimentalMaterialApi::class)
+    @Test
+    fun rangeSlider_weightModifier() {
+        var sliderBounds = Rect(0f, 0f, 0f, 0f)
+        rule.setMaterialContent {
+            with(LocalDensity.current) {
+                Row(Modifier.width(500.toDp())) {
+                    Spacer(Modifier.requiredSize(100.toDp()))
+                    RangeSlider(
+                        values = 0f..0.5f,
+                        onValueChange = {},
+                        modifier = Modifier.testTag(tag).weight(1f).onGloballyPositioned {
+                            sliderBounds = it.boundsInParent()
+                        }
+                    )
+                    Spacer(Modifier.requiredSize(100.toDp()))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            Truth.assertThat(sliderBounds.left).isEqualTo(100)
+            Truth.assertThat(sliderBounds.right).isEqualTo(400)
         }
     }
 }
