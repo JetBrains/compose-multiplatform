@@ -16,5 +16,5 @@ pluginManagement {
 include(":SplitPane:library")
 include(":SplitPane:demo")
 
-include(":App:library")
-include(":App:demo")
+include(":Kapp:library")
+include(":Kapp:demo")

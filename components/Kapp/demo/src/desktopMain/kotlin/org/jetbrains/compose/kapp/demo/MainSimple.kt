@@ -7,9 +7,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.app.composeApp
+import org.jetbrains.compose.kapp.simpleKapp
 
-fun main() = composeApp(name = "App demo") {
+fun main() = simpleKapp(name = "Kapp demo") {
     Content()
 }
 

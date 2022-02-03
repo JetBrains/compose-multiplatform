@@ -1,4 +1,4 @@
-package org.jetbrains.compose.app
+package org.jetbrains.compose.kapp
 
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -15,7 +15,7 @@ class AppWindowScope : FrameWindowScope {
 }
 
 @Composable
-actual fun ComposeAppScope.Frame(content: @Composable () -> Unit) {
+actual fun KAppScope.Frame(content: @Composable () -> Unit) {
     val scope by remember { mutableStateOf(AppWindowScope()) }
     scope.apply {
         Window(onCloseRequest = { scope.onClose() }, state = scope.state,
@@ -23,7 +23,7 @@ actual fun ComposeAppScope.Frame(content: @Composable () -> Unit) {
     }
 }
 
-class AppAppScope : ComposeAppScope, androidx.compose.ui.window.ApplicationScope {
+class AppAppScope : KAppScope, androidx.compose.ui.window.ApplicationScope {
     override fun exitApplication() {
         println("Exit application")
         SwingUtilities.invokeLater {
@@ -32,14 +32,14 @@ class AppAppScope : ComposeAppScope, androidx.compose.ui.window.ApplicationScope
     }
 }
 
-internal actual fun composeApplicationImpl(name: String, title: String, content: @Composable ComposeAppScope.() -> Unit) {
+internal actual fun kappImpl(name: String, title: String, content: @Composable KAppScope.() -> Unit) {
     val scope = AppAppScope()
     scope.apply {
         application(exitProcessOnExit = true, content = @Composable { content() })
     }
 }
 
-internal actual fun composeAppImpl(name: String, content: @Composable () -> Unit) {
+internal actual fun simpleKappImpl(name: String, content: @Composable () -> Unit) {
     val appScope = AppAppScope()
     val winScope = AppWindowScope()
     appScope.apply {

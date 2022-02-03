@@ -1,13 +1,13 @@
-package org.jetbrains.compose.app.demo
+package org.jetbrains.compose.kapp.demo
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 
-import org.jetbrains.compose.app.*
+import org.jetbrains.compose.kapp.*
 
-fun main() = composeApplication(
+fun main() = kapp(
     title = "App demo"
 ) {
     var visible by remember { mutableStateOf(5) }

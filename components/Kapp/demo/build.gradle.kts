@@ -12,7 +12,7 @@ kotlin {
         named("desktopMain") {
             dependencies {
                 implementation(compose.desktop.currentOs)
-                implementation(project(":App:library"))
+                implementation(project(":Kapp:library"))
             }
         }
     }
@@ -20,7 +20,7 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "org.jetbrains.compose.app.demo.MainKt"
+        mainClass = "org.jetbrains.compose.kapp.demo.MainKt"
     }
 }
 
