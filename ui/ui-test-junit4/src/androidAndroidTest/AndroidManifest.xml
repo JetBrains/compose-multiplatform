@@ -15,7 +15,7 @@
   ~ limitations under the License.
   -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="androidx.compose.ui.test.junit4">
+    package="androidx.compose.ui.test.junit4.test">
     <application>
         <activity android:name="androidx.compose.ui.test.junit4.CustomActivity"
             android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen" />
@@ -26,8 +26,8 @@
         <activity android:name="androidx.compose.ui.test.junit4.MultipleActivitiesFirstDrawTest$Activity1" />
         <activity android:name="androidx.compose.ui.test.junit4.MultipleActivitiesFirstDrawTest$Activity2" />
         <activity android:name="androidx.compose.ui.test.junit4.LateSetContentTest$Activity" />
-        <activity android:name=".MultipleActivitiesWithoutComposeTest$Activity1" />
-        <activity android:name=".MultipleActivitiesWithoutComposeTest$Activity2" />
-        <activity android:name=".MultipleActivitiesWithoutComposeTest$Activity3" />
+        <activity android:name="androidx.compose.ui.test.junit4.MultipleActivitiesWithoutComposeTest$Activity1" />
+        <activity android:name="androidx.compose.ui.test.junit4.MultipleActivitiesWithoutComposeTest$Activity2" />
+        <activity android:name="androidx.compose.ui.test.junit4.MultipleActivitiesWithoutComposeTest$Activity3" />
     </application>
 </manifest>
