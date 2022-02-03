@@ -935,9 +935,9 @@ fun Style(
     ) {
         DomSideEffect(cssRules) { style ->
             (style.sheet as? CSSStyleSheet)?.let { cssStylesheet ->
-                setCSSRules(cssStylesheet, cssRules)
+                cssStylesheet.setCSSRules(cssRules)
                 onDispose {
-                    clearCSSRules(cssStylesheet)
+                    cssStylesheet.clearCSSRules()
                 }
             }
         }
@@ -957,6 +957,12 @@ inline fun Style(
     val builder = StyleSheetBuilderImpl()
     builder.rulesBuild()
     Style(applyAttrs, builder.cssRules)
+}
+
+private fun CSSStyleSheet.clearCSSRules() {
+    repeat(cssRules.length) {
+        deleteRule(0)
+    }
 }
 
 /**
