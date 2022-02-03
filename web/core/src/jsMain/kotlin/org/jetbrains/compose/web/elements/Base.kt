@@ -13,14 +13,13 @@ import org.w3c.dom.HTMLElement
 import org.w3c.dom.css.ElementCSSInlineStyle
 import org.w3c.dom.svg.SVGElement
 
-@OptIn(ComposeCompilerApi::class)
 @Composable
 @ExplicitGroupsComposable
-private inline fun <TScope, T> ComposeDomNode(
-    noinline factory: () -> T,
+private fun <TScope, T> ComposeDomNode(
+    factory: () -> T,
     elementScope: TScope,
-    noinline attrsSkippableUpdate: @Composable SkippableUpdater<T>.() -> Unit,
-    noinline content: (@Composable TScope.() -> Unit)?
+    attrsSkippableUpdate: @Composable SkippableUpdater<T>.() -> Unit,
+    content: (@Composable TScope.() -> Unit)?
 ) {
     currentComposer.startNode()
     if (currentComposer.inserting) {
