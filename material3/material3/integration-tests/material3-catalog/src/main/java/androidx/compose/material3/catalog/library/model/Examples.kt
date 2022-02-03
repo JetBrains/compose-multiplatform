@@ -40,6 +40,7 @@ import androidx.compose.material3.samples.FilledTonalButtonSample
 import androidx.compose.material3.samples.FloatingActionButtonSample
 import androidx.compose.material3.samples.LargeFloatingActionButtonSample
 import androidx.compose.material3.samples.LinearProgressIndicatorSample
+import androidx.compose.material3.samples.MenuSample
 import androidx.compose.material3.samples.NavigationBarSample
 import androidx.compose.material3.samples.NavigationBarWithOnlySelectedLabelsSample
 import androidx.compose.material3.samples.NavigationDrawerSample
@@ -266,6 +267,18 @@ val FloatingActionButtonsExamples =
             sourceUrl = FloatingActionButtonsExampleSourceUrl,
         ) { SmallFloatingActionButtonSample() }
     )
+
+private const val MenusExampleDescription = "Menus examples"
+private const val MenusExampleSourceUrl = "$SampleSourceUrl/MenuSamples.kt"
+val MenusExamples = listOf(
+    Example(
+        name = ::MenuSample.name,
+        description = MenusExampleDescription,
+        sourceUrl = MenusExampleSourceUrl
+    ) {
+        MenuSample()
+    }
+)
 
 private const val NavigationBarExampleDescription = "Navigation bar examples"
 private const val NavigationBarExampleSourceUrl = "$SampleSourceUrl/NavigationBarSamples.kt"
