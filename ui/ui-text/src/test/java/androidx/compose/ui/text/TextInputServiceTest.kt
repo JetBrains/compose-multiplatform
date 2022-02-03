@@ -16,6 +16,9 @@
 
 package androidx.compose.ui.text
 
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextFieldValue
@@ -31,6 +34,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
+@Suppress("DEPRECATION")
 @RunWith(JUnit4::class)
 class TextInputServiceTest {
 
@@ -234,5 +238,52 @@ class TextInputServiceTest {
 
         secondSession.updateState(null, editorModel)
         verify(platformService).updateState(eq(null), eq(editorModel))
+    }
+
+    @Test
+    fun notifyFocusedRect_with_valid_token() {
+        val platformService = mock<PlatformTextInputService>()
+
+        val textInputService = TextInputService(platformService)
+
+        val firstSession = textInputService.startInput(
+            TextFieldValue(),
+            ImeOptions.Default,
+            {}, // onEditCommand
+            {} // onImeActionPerformed
+        )
+
+        val rect = Rect(Offset.Zero, Size(100f, 100f))
+        firstSession.notifyFocusedRect(rect)
+        verify(platformService, times(1)).notifyFocusedRect(eq(rect))
+    }
+
+    @Test
+    fun notifyFocusedRect_with_expired_token() {
+        val platformService = mock<PlatformTextInputService>()
+
+        val textInputService = TextInputService(platformService)
+
+        val firstSession = textInputService.startInput(
+            TextFieldValue(),
+            ImeOptions.Default,
+            {}, // onEditCommand
+            {} // onImeActionPerformed
+        )
+
+        // Start another session. The firstToken is now expired.
+        val secondSession = textInputService.startInput(
+            TextFieldValue(),
+            ImeOptions.Default,
+            {}, // onEditCommand
+            {} // onImeActionPerformed
+        )
+
+        val rect = Rect(Offset.Zero, Size(100f, 100f))
+        firstSession.notifyFocusedRect(rect)
+        verify(platformService, never()).notifyFocusedRect(any())
+
+        secondSession.notifyFocusedRect(rect)
+        verify(platformService, times(1)).notifyFocusedRect(eq(rect))
     }
 }

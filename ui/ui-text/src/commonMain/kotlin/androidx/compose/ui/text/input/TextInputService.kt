@@ -147,9 +147,11 @@ class TextInputSession(
         }
     }
 
-    @Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER")
-    @Deprecated("This method is not called, used BringIntoViewRequester instead.")
-    fun notifyFocusedRect(rect: Rect): Boolean = false
+    @Suppress("DeprecatedCallableAddReplaceWith", "DEPRECATION")
+    @Deprecated("This method should not be called, used BringIntoViewRequester instead.")
+    fun notifyFocusedRect(rect: Rect): Boolean = ensureOpenSession {
+        platformTextInputService.notifyFocusedRect(rect)
+    }
 
     /**
      * Notify IME about the new [TextFieldValue] and latest state of the editing buffer. [oldValue]
@@ -253,7 +255,7 @@ interface PlatformTextInputService {
      */
     fun updateState(oldValue: TextFieldValue?, newValue: TextFieldValue)
 
-    @Deprecated("This method is not called, used BringIntoViewRequester instead.")
+    @Deprecated("This method should not be called, used BringIntoViewRequester instead.")
     fun notifyFocusedRect(rect: Rect) {
     }
 }
