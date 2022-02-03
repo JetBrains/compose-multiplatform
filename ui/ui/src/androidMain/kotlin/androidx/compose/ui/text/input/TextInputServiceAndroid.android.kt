@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.text.input
 
+import android.graphics.Rect as AndroidRect
 import android.text.InputType
 import android.util.Log
 import android.view.KeyEvent
@@ -23,12 +24,14 @@ import android.view.View
 import android.view.inputmethod.BaseInputConnection
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextInputServiceAndroid.TextInputCommand.HideKeyboard
 import androidx.compose.ui.text.input.TextInputServiceAndroid.TextInputCommand.ShowKeyboard
 import androidx.compose.ui.text.input.TextInputServiceAndroid.TextInputCommand.StartInput
 import androidx.compose.ui.text.input.TextInputServiceAndroid.TextInputCommand.StopInput
 import androidx.core.view.inputmethod.EditorInfoCompat
+import kotlin.math.roundToInt
 import kotlinx.coroutines.channels.Channel
 
 private const val DEBUG_CLASS = "TextInputServiceAndroid"
@@ -70,10 +73,13 @@ internal class TextInputServiceAndroid(
         private set
     private var imeOptions = ImeOptions.Default
     private var ic: RecordingInputConnection? = null
+
     // used for sendKeyEvent delegation
     private val baseInputConnection by lazy(LazyThreadSafetyMode.NONE) {
         BaseInputConnection(view, false)
     }
+
+    private var focusedRect: AndroidRect? = null
 
     /**
      * A channel that is used to debounce rapid operations such as showing/hiding the keyboard and
@@ -153,6 +159,7 @@ internal class TextInputServiceAndroid(
         editorHasFocus = false
         onEditCommand = {}
         onImeActionPerformed = {}
+        focusedRect = null
 
         // Don't actually send the command to the IME yet, it may be overruled by a subsequent call
         // to startInput.
@@ -324,6 +331,30 @@ internal class TextInputServiceAndroid(
             restartInputImmediately()
         } else {
             ic?.updateInputState(this.state, inputMethodManager, view)
+        }
+    }
+
+    @Suppress("OverridingDeprecatedMember")
+    override fun notifyFocusedRect(rect: Rect) {
+        focusedRect = AndroidRect(
+            rect.left.roundToInt(),
+            rect.top.roundToInt(),
+            rect.right.roundToInt(),
+            rect.bottom.roundToInt()
+        )
+
+        // Requesting rectangle too early after obtaining focus may bring view into wrong place
+        // probably due to transient IME inset change. We don't know the correct timing of calling
+        // requestRectangleOnScreen API, so try to call this API only after the IME is ready to
+        // use, i.e. InputConnection has created.
+        // Even if we miss all the timing of requesting rectangle during initial text field focus,
+        // focused rectangle will be requested when software keyboard has shown.
+        if (ic == null) {
+            focusedRect?.let {
+                // Notice that view.requestRectangleOnScreen may modify the input Rect, we have to
+                // create another Rect and then pass it.
+                view.requestRectangleOnScreen(AndroidRect(it))
+            }
         }
     }
 
