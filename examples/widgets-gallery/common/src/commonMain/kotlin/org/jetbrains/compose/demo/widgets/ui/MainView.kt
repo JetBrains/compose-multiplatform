@@ -17,6 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -123,6 +126,9 @@ private fun WidgetsListItemViewImpl(
         modifier = Modifier
             .wrapContentHeight()
             .clickable { widgetsTypeState.value = widgetsType }
+            .semantics {
+                set(SemanticsProperties.Role, Role.Button)
+            }
             .height(height)
             .padding(start = 16.dp)
     ) {
