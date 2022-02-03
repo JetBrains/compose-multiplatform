@@ -29,6 +29,20 @@ kotlin {
             }
         }
 
+        /*
+        macosArm64 {
+            binaries {
+                executable {
+                    entryPoint = "org.jetbrains.compose.kapp.demo.main"
+                    freeCompilerArgs += listOf(
+                        "-linker-option", "-framework", "-linker-option", "Metal",
+                        "-linker-option", "-framework", "-linker-option", "CoreText",
+                        "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+                    )
+                }
+            }
+        } */
+
         iosX64("uikitX64") {
             binaries {
                 executable {
@@ -84,6 +98,11 @@ kotlin {
             val macosX64Main by getting {
                 dependsOn(macosMain)
             }
+
+            /*
+            val macosArm64Main by getting {
+                dependsOn(macosMain)
+            } */
 
             val uikitMain by creating {
                 dependsOn(darwinMain)
