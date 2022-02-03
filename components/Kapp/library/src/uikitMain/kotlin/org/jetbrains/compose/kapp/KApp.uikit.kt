@@ -3,6 +3,7 @@ package org.jetbrains.compose.kapp
 import androidx.compose.runtime.*
 import androidx.compose.ui.window.*
 
+import kotlinx.cinterop.*
 import platform.UIKit.*
 import platform.Foundation.*
 
