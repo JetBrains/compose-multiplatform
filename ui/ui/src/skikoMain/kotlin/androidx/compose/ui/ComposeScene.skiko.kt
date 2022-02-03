@@ -114,7 +114,7 @@ class ComposeScene internal constructor(
 
     private fun invalidateIfNeeded() {
         hasPendingDraws = frameClock.hasAwaiters || list.any(SkiaBasedOwner::needRender)
-        if (hasPendingDraws && !isInvalidationDisabled) {
+        if (hasPendingDraws && !isInvalidationDisabled && !isClosed) {
             invalidate()
         }
     }
