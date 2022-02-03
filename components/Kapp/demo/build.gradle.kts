@@ -13,18 +13,55 @@ kotlin {
         binaries.executable()
     }
 
-    sourceSets {
-        named("desktopMain") {
-            dependencies {
-                implementation(compose.desktop.currentOs)
-
+    /*
+    iosX64("uikitX64") {
+        binaries {
+            executable {
+                entryPoint = "main"
+                freeCompilerArgs += listOf(
+                    "-linker-option", "-framework", "-linker-option", "Metal",
+                    "-linker-option", "-framework", "-linker-option", "CoreText",
+                    "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+                )
             }
         }
-        named("commonMain") {
+    }
+    iosArm64("uikitArm64") {
+        binaries {
+            executable {
+                entryPoint = "main"
+                freeCompilerArgs += listOf(
+                    "-linker-option", "-framework", "-linker-option", "Metal",
+                    "-linker-option", "-framework", "-linker-option", "CoreText",
+                    "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+                )
+            }
+        }
+    } */
+
+    sourceSets {
+        val desktopMain by getting
+
+        val commonMain by getting {
             dependencies {
                 implementation(project(":Kapp:library"))
             }
         }
+
+        val jsMain by getting
+
+        /*
+        val uikitMain by creating {
+            dependsOn(commonMain)
+        }
+
+        val uikitX64Main by getting {
+            dependsOn(uikitMain)
+        }
+        val uikitArm64Main by getting {
+            dependsOn(uikitMain)
+        }
+         */
     }
 }
 
@@ -35,9 +72,8 @@ compose.desktop {
 }
 
 compose.experimental {
-    web.application {
-    }
-    // uikit.application {}
+    web.application
+    uikit.application
 }
 
 tasks.withType<KotlinCompile>().configureEach {

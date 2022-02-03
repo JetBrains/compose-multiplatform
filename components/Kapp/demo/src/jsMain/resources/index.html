@@ -12,5 +12,10 @@
         <canvas id="ComposeTarget" width="800" height="600"></canvas>
     </div>
     <script src="demo.js"> </script>
+    <script type="text/javascript">
+        document.getElementById('ComposeTarget').onselectstart = function(){
+            return false;
+        };
+    </script>
 </body>
 </html>
