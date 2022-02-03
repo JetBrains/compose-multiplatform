@@ -21,10 +21,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionContext
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.SubcomposeLayoutState.PrecomposedSlotHandle
 import androidx.compose.ui.materialize
@@ -119,6 +121,12 @@ fun SubcomposeLayout(
             state.forceRecomposeChildren()
         }
     }
+    val stateHolder = rememberUpdatedState(state)
+    DisposableEffect(Unit) {
+        onDispose {
+            stateHolder.value.disposeCurrentNodes()
+        }
+    }
 }
 
 /**
@@ -210,6 +218,8 @@ class SubcomposeLayoutState(
         state.precompose(slotId, content)
 
     internal fun forceRecomposeChildren() = state.forceRecomposeChildren()
+
+    internal fun disposeCurrentNodes() = state.disposeCurrentNodes()
 
     /**
      * Instance of this interface is returned by [precompose] function.
@@ -421,6 +431,8 @@ internal class LayoutNodeSubcompositionsState(
                     reusableCount++
                 } else {
                     ignoreRemeasureRequests {
+                        val nodeState = nodeToNodeState.remove(root.foldedChildren[i])!!
+                        nodeState.composition?.dispose()
                         root.removeAt(i, 1)
                     }
                 }
@@ -484,12 +496,6 @@ internal class LayoutNodeSubcompositionsState(
             reusableCount--
             root.foldedChildren[reusableNodesSectionStart]
         }
-    }
-
-    private fun disposeNode(node: LayoutNode) {
-        val nodeState = nodeToNodeState.remove(node)!!
-        nodeState.composition?.dispose()
-        slotIdToNode.remove(nodeState.slotId)
     }
 
     fun createMeasurePolicy(
@@ -601,12 +607,6 @@ internal class LayoutNodeSubcompositionsState(
         ignoreRemeasureRequests {
             root.insertAt(index, node)
         }
-        node.onDetach = {
-            disposeNode(node)
-            node.onAttach = {
-                throw IllegalStateException("Disposed node shouldn't be reattached")
-            }
-        }
     }
 
     private fun move(from: Int, to: Int, count: Int = 1) {
@@ -617,6 +617,14 @@ internal class LayoutNodeSubcompositionsState(
 
     private inline fun ignoreRemeasureRequests(block: () -> Unit) =
         root.ignoreRemeasureRequests(block)
+
+    fun disposeCurrentNodes() {
+        nodeToNodeState.values.forEach {
+            it.composition?.dispose()
+        }
+        nodeToNodeState.clear()
+        slotIdToNode.clear()
+    }
 
     private class NodeState(
         var slotId: Any?,
