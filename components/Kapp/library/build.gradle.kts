@@ -7,13 +7,18 @@ plugins {
     id("maven-publish")
 }
 
+val withNative = false
+
 kotlin {
     jvm("desktop")
     js(IR) {
         browser()
     }
-    iosX64("uikitX64")
-    iosArm64("uikitArm64")
+
+    if (withNative) {
+        iosX64("uikitX64")
+        iosArm64("uikitArm64")
+    }
 
     sourceSets {
         val commonMain by getting {
@@ -31,17 +36,18 @@ kotlin {
         }
         val jsMain by getting
 
-        /*
-        val uikitMain by creating {
-            dependsOn(commonMain)
-        }
+        if (withNative) {
+            val uikitMain by creating {
+                dependsOn(commonMain)
+            }
 
-        val uikitX64Main by getting {
-            dependsOn(uikitMain)
+            val uikitX64Main by getting {
+                dependsOn(uikitMain)
+            }
+            val uikitArm64Main by getting {
+                dependsOn(uikitMain)
+            }
         }
-        val uikitArm64Main by getting {
-            dependsOn(uikitMain)
-        } */
     }
 }
 

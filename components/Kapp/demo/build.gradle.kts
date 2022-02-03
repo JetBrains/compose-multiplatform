@@ -6,6 +6,8 @@ plugins {
     id("org.jetbrains.compose")
 }
 
+val withNative = false
+
 kotlin {
     jvm("desktop")
     js(IR) {
@@ -13,31 +15,32 @@ kotlin {
         binaries.executable()
     }
 
-    /*
-    iosX64("uikitX64") {
-        binaries {
-            executable {
-                entryPoint = "main"
-                freeCompilerArgs += listOf(
-                    "-linker-option", "-framework", "-linker-option", "Metal",
-                    "-linker-option", "-framework", "-linker-option", "CoreText",
-                    "-linker-option", "-framework", "-linker-option", "CoreGraphics"
-                )
+    if (withNative) {
+        iosX64("uikitX64") {
+            binaries {
+                executable {
+                    entryPoint = "main"
+                    freeCompilerArgs += listOf(
+                        "-linker-option", "-framework", "-linker-option", "Metal",
+                        "-linker-option", "-framework", "-linker-option", "CoreText",
+                        "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+                    )
+                }
+            }
+        }
+        iosArm64("uikitArm64") {
+            binaries {
+                executable {
+                    entryPoint = "main"
+                    freeCompilerArgs += listOf(
+                        "-linker-option", "-framework", "-linker-option", "Metal",
+                        "-linker-option", "-framework", "-linker-option", "CoreText",
+                        "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+                    )
+                }
             }
         }
     }
-    iosArm64("uikitArm64") {
-        binaries {
-            executable {
-                entryPoint = "main"
-                freeCompilerArgs += listOf(
-                    "-linker-option", "-framework", "-linker-option", "Metal",
-                    "-linker-option", "-framework", "-linker-option", "CoreText",
-                    "-linker-option", "-framework", "-linker-option", "CoreGraphics"
-                )
-            }
-        }
-    } */
 
     sourceSets {
         val desktopMain by getting
@@ -50,18 +53,17 @@ kotlin {
 
         val jsMain by getting
 
-        /*
-        val uikitMain by creating {
-            dependsOn(commonMain)
+        if (withNative) {
+            val uikitMain by creating {
+                dependsOn(commonMain)
+            }
+            val uikitX64Main by getting {
+                dependsOn(uikitMain)
+            }
+            val uikitArm64Main by getting {
+                dependsOn(uikitMain)
+            }
         }
-
-        val uikitX64Main by getting {
-            dependsOn(uikitMain)
-        }
-        val uikitArm64Main by getting {
-            dependsOn(uikitMain)
-        }
-         */
     }
 }
 
@@ -73,7 +75,8 @@ compose.desktop {
 
 compose.experimental {
     web.application
-    uikit.application
+    if (withNative)
+        uikit.application
 }
 
 tasks.withType<KotlinCompile>().configureEach {
