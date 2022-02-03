@@ -933,12 +933,11 @@ fun Style(
             }
         },
     ) {
-        DomSideEffect(cssRules) { style ->
-            (style.sheet as? CSSStyleSheet)?.let { cssStylesheet ->
-                cssStylesheet.setCSSRules(cssRules)
-                onDispose {
-                    cssStylesheet.clearCSSRules()
-                }
+        DisposableEffect(cssRules) {
+            val cssStylesheet = scopeElement.sheet as? CSSStyleSheet
+            cssStylesheet?.setCSSRules(cssRules)
+            onDispose {
+                cssStylesheet?.clearCSSRules()
             }
         }
     }
