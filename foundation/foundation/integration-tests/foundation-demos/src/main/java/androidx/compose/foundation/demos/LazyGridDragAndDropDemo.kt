@@ -18,23 +18,25 @@ package androidx.compose.foundation.demos
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyItemScope
-import androidx.compose.foundation.lazy.LazyListItemInfo
-import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyGridItemInfo
+import androidx.compose.foundation.lazy.LazyGridItemScope
+import androidx.compose.foundation.lazy.LazyGridState
+import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.rememberLazyGridState
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -46,10 +48,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toOffset
+import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -57,42 +65,49 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun LazyColumnDragAndDropDemo() {
+fun LazyGridDragAndDropDemo() {
     var list by remember { mutableStateOf(List(50) { it }) }
 
-    val listState = rememberLazyListState()
-    val dragDropState = rememberDragDropState(listState) { fromIndex, toIndex ->
+    val gridState = rememberLazyGridState()
+    val dragDropState = rememberGridDragDropState(gridState) { fromIndex, toIndex ->
         list = list.toMutableList().apply {
             add(toIndex, removeAt(fromIndex))
         }
     }
 
-    LazyColumn(
+    LazyVerticalGrid(
+        cells = GridCells.Fixed(3),
         modifier = Modifier.dragContainer(dragDropState),
-        state = listState,
+        state = gridState,
         contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         itemsIndexed(list, key = { _, item -> item }) { index, item ->
             DraggableItem(dragDropState, index) { isDragging ->
                 val elevation by animateDpAsState(if (isDragging) 4.dp else 1.dp)
                 Card(elevation = elevation) {
-                    Text("Item $item", Modifier.fillMaxWidth().padding(20.dp))
+                    Text(
+                        "Item $item",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 40.dp)
+                    )
                 }
             }
         }
     }
 }
 
+@ExperimentalFoundationApi
 @Composable
-fun rememberDragDropState(
-    lazyListState: LazyListState,
+fun rememberGridDragDropState(
+    gridState: LazyGridState,
     onMove: (Int, Int) -> Unit
-): DragDropState {
+): GridDragDropState {
     val scope = rememberCoroutineScope()
-    val state = remember(lazyListState) {
-        DragDropState(
-            state = lazyListState,
+    val state = remember(gridState) {
+        GridDragDropState(
+            state = gridState,
             onMove = onMove,
             scope = scope
         )
@@ -100,14 +115,15 @@ fun rememberDragDropState(
     LaunchedEffect(state) {
         while (true) {
             val diff = state.scrollChannel.receive()
-            lazyListState.scrollBy(diff)
+            gridState.scrollBy(diff)
         }
     }
     return state
 }
 
-class DragDropState internal constructor(
-    private val state: LazyListState,
+@ExperimentalFoundationApi
+class GridDragDropState internal constructor(
+    private val state: LazyGridState,
     private val scope: CoroutineScope,
     private val onMove: (Int, Int) -> Unit
 ) {
@@ -116,29 +132,30 @@ class DragDropState internal constructor(
 
     internal val scrollChannel = Channel<Float>()
 
-    private var draggingItemDraggedDelta by mutableStateOf(0f)
-    private var draggingItemInitialOffset by mutableStateOf(0)
-    internal val draggingItemOffset: Float
+    private var draggingItemDraggedDelta by mutableStateOf(Offset.Zero)
+    private var draggingItemInitialOffset by mutableStateOf(Offset.Zero)
+    internal val draggingItemOffset: Offset
         get() = draggingItemLayoutInfo?.let { item ->
-            draggingItemInitialOffset + draggingItemDraggedDelta - item.offset
-        } ?: 0f
+            draggingItemInitialOffset + draggingItemDraggedDelta - item.offset.toOffset()
+        } ?: Offset.Zero
 
-    private val draggingItemLayoutInfo: LazyListItemInfo?
+    private val draggingItemLayoutInfo: LazyGridItemInfo?
         get() = state.layoutInfo.visibleItemsInfo
             .firstOrNull { it.index == draggingItemIndex }
 
     internal var previousIndexOfDraggedItem by mutableStateOf<Int?>(null)
         private set
-    internal var previousItemOffset = Animatable(0f)
+    internal var previousItemOffset = Animatable(Offset.Zero, Offset.VectorConverter)
         private set
 
     internal fun onDragStart(offset: Offset) {
         state.layoutInfo.visibleItemsInfo
             .firstOrNull { item ->
-                offset.y.toInt() in item.offset..(item.offset + item.size)
+                offset.x.toInt() in item.offset.x..item.offsetEnd.x &&
+                    offset.y.toInt() in item.offset.y..item.offsetEnd.y
             }?.also {
                 draggingItemIndex = it.index
-                draggingItemInitialOffset = it.offset
+                draggingItemInitialOffset = it.offset.toOffset()
             }
     }
 
@@ -149,30 +166,31 @@ class DragDropState internal constructor(
             scope.launch {
                 previousItemOffset.snapTo(startOffset)
                 previousItemOffset.animateTo(
-                    0f,
+                    Offset.Zero,
                     spring(
                         stiffness = Spring.StiffnessMediumLow,
-                        visibilityThreshold = 1f
+                        visibilityThreshold = Offset.VisibilityThreshold
                     )
                 )
                 previousIndexOfDraggedItem = null
             }
         }
-        draggingItemDraggedDelta = 0f
+        draggingItemDraggedDelta = Offset.Zero
         draggingItemIndex = null
-        draggingItemInitialOffset = 0
+        draggingItemInitialOffset = Offset.Zero
     }
 
     internal fun onDrag(offset: Offset) {
-        draggingItemDraggedDelta += offset.y
+        draggingItemDraggedDelta += offset
 
         val draggingItem = draggingItemLayoutInfo ?: return
-        val startOffset = draggingItem.offset + draggingItemOffset
-        val endOffset = startOffset + draggingItem.size
+        val startOffset = draggingItem.offset.toOffset() + draggingItemOffset
+        val endOffset = startOffset + draggingItem.size.toSize()
         val middleOffset = startOffset + (endOffset - startOffset) / 2f
 
         val targetItem = state.layoutInfo.visibleItemsInfo.find { item ->
-            middleOffset.toInt() in item.offset..item.offsetEnd &&
+            middleOffset.x.toInt() in item.offset.x..item.offsetEnd.x &&
+                middleOffset.y.toInt() in item.offset.y..item.offsetEnd.y &&
                 draggingItem.index != item.index
         }
         if (targetItem != null) {
@@ -195,10 +213,10 @@ class DragDropState internal constructor(
             draggingItemIndex = targetItem.index
         } else {
             val overscroll = when {
-                draggingItemDraggedDelta > 0 ->
-                    (endOffset - state.layoutInfo.viewportEndOffset).coerceAtLeast(0f)
-                draggingItemDraggedDelta < 0 ->
-                    (startOffset - state.layoutInfo.viewportStartOffset).coerceAtMost(0f)
+                draggingItemDraggedDelta.y > 0 ->
+                    (endOffset.y - state.layoutInfo.viewportEndOffset).coerceAtLeast(0f)
+                draggingItemDraggedDelta.y < 0 ->
+                    (startOffset.y - state.layoutInfo.viewportStartOffset).coerceAtMost(0f)
                 else -> 0f
             }
             if (overscroll != 0f) {
@@ -207,11 +225,20 @@ class DragDropState internal constructor(
         }
     }
 
-    private val LazyListItemInfo.offsetEnd: Int
+    private val LazyGridItemInfo.offsetEnd: IntOffset
         get() = this.offset + this.size
 }
 
-fun Modifier.dragContainer(dragDropState: DragDropState): Modifier {
+private operator fun IntOffset.plus(size: IntSize): IntOffset {
+    return IntOffset(x + size.width, y + size.height)
+}
+
+private operator fun Offset.plus(size: Size): Offset {
+    return Offset(x + size.width, y + size.height)
+}
+
+@ExperimentalFoundationApi
+fun Modifier.dragContainer(dragDropState: GridDragDropState): Modifier {
     return pointerInput(dragDropState) {
         detectDragGesturesAfterLongPress(
             onDrag = { change, offset ->
@@ -227,28 +254,30 @@ fun Modifier.dragContainer(dragDropState: DragDropState): Modifier {
 
 @ExperimentalFoundationApi
 @Composable
-fun LazyItemScope.DraggableItem(
-    dragDropState: DragDropState,
+fun LazyGridItemScope.DraggableItem(
+    dragDropState: GridDragDropState,
     index: Int,
     modifier: Modifier = Modifier,
-    content: @Composable ColumnScope.(isDragging: Boolean) -> Unit
+    content: @Composable (isDragging: Boolean) -> Unit
 ) {
     val dragging = index == dragDropState.draggingItemIndex
     val draggingModifier = if (dragging) {
         Modifier
             .zIndex(1f)
             .graphicsLayer {
-                translationY = dragDropState.draggingItemOffset
+                translationX = dragDropState.draggingItemOffset.x
+                translationY = dragDropState.draggingItemOffset.y
             }
     } else if (index == dragDropState.previousIndexOfDraggedItem) {
         Modifier.zIndex(1f)
             .graphicsLayer {
-                translationY = dragDropState.previousItemOffset.value
+                translationX = dragDropState.previousItemOffset.value.x
+                translationY = dragDropState.previousItemOffset.value.y
             }
     } else {
         Modifier.animateItemPlacement()
     }
-    Column(modifier = modifier.then(draggingModifier)) {
+    Box(modifier = modifier.then(draggingModifier), propagateMinConstraints = true) {
         content(dragging)
     }
 }
