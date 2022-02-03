@@ -1,6 +1,5 @@
-package org.jetbrains.compose.app.demo
+package org.jetbrains.compose.kapp.demo
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
@@ -9,13 +8,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.kapp.simpleKapp
 
-fun main() = simpleKapp(name = "Kapp demo") {
-    Content()
+fun simpleDemoApp() = simpleKapp(name = "Kapp demo") {
+    SimpleAppContent()
 }
 
-@Preview
 @Composable
-fun Content() {
+fun SimpleAppContent() {
     var counter by remember { mutableStateOf(0) }
     Column {
         Text("I an app: $counter")

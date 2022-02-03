@@ -12,6 +12,11 @@ kotlin {
         named("desktopMain") {
             dependencies {
                 implementation(compose.desktop.currentOs)
+
+            }
+        }
+        named("commonMain") {
+            dependencies {
                 implementation(project(":Kapp:library"))
             }
         }

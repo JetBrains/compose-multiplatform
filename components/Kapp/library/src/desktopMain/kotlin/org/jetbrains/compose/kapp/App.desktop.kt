@@ -11,7 +11,9 @@ import kotlin.system.exitProcess
 class AppWindowScope : FrameWindowScope {
     val state = WindowState()
     override val window: ComposeWindow = ComposeWindow()
-    fun onClose() {}
+    fun onClose() {
+
+    }
 }
 
 @Composable
@@ -23,7 +25,7 @@ actual fun KAppScope.Frame(content: @Composable () -> Unit) {
     }
 }
 
-class AppAppScope : KAppScope, androidx.compose.ui.window.ApplicationScope {
+class AppAppScope : KAppScope, ApplicationScope {
     override fun exitApplication() {
         println("Exit application")
         SwingUtilities.invokeLater {
