@@ -7,15 +7,10 @@ import org.w3c.dom.css.CSSStyleRule
 import org.jetbrains.compose.web.css.*
 import org.w3c.dom.css.CSSStyleSheet
 
-internal fun clearCSSRules(sheet: CSSStyleSheet) {
-    repeat(sheet.cssRules.length) {
-        sheet.deleteRule(0)
-    }
-}
 
-internal fun setCSSRules(sheet: CSSStyleSheet, cssRules: CSSRuleDeclarationList) {
+internal fun CSSStyleSheet.setCSSRules(cssRules: CSSRuleDeclarationList) {
     cssRules.forEach { cssRule ->
-        sheet.addRule(cssRule)
+        addRule(cssRule)
     }
 }
 

@@ -697,13 +697,12 @@ fun TextArea(
             this.copyFrom(textAreaAttrsBuilder)
         },
         content = {
-            DomSideEffect(keyForRestoringControlledState.value, textAreaRestoreControlledStateEffect)
+            DisposableEffect(keyForRestoringControlledState.value) {
+                restoreControlledTextAreaState(element = scopeElement)
+                onDispose { }
+            }
         }
     )
-}
-
-private val textAreaRestoreControlledStateEffect: DomEffectScope.(HTMLTextAreaElement) -> Unit = {
-    restoreControlledTextAreaState(element = it)
 }
 
 @Composable
@@ -933,12 +932,11 @@ fun Style(
             }
         },
     ) {
-        DomSideEffect(cssRules) { style ->
-            (style.sheet as? CSSStyleSheet)?.let { cssStylesheet ->
-                setCSSRules(cssStylesheet, cssRules)
-                onDispose {
-                    clearCSSRules(cssStylesheet)
-                }
+        DisposableEffect(cssRules) {
+            val cssStylesheet = scopeElement.sheet as? CSSStyleSheet
+            cssStylesheet?.setCSSRules(cssRules)
+            onDispose {
+                cssStylesheet?.clearCSSRules()
             }
         }
     }
@@ -957,6 +955,12 @@ inline fun Style(
     val builder = StyleSheetBuilderImpl()
     builder.rulesBuild()
     Style(applyAttrs, builder.cssRules)
+}
+
+private fun CSSStyleSheet.clearCSSRules() {
+    repeat(cssRules.length) {
+        deleteRule(0)
+    }
 }
 
 /**
@@ -1017,13 +1021,12 @@ fun <K> Input(
             if (type == InputType.Radio) {
                 DisposeRadioGroupEffect()
             }
-            DomSideEffect(keyForRestoringControlledState.value, inputRestoreControlledStateEffect)
+            DisposableEffect(keyForRestoringControlledState.value) {
+                restoreControlledInputState(inputElement = scopeElement)
+                onDispose { }
+            }
         }
     )
-}
-
-private val inputRestoreControlledStateEffect: DomEffectScope.(HTMLInputElement) -> Unit = {
-    restoreControlledInputState(inputElement = it)
 }
 
 @Composable
