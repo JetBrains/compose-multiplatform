@@ -48,9 +48,9 @@ enum class ComposePlatforms(vararg val alternativeNames: String) {
                     return ALL
                 }
 
-                val publication = ALL.firstOrNull { it.matches(name) }
-                if (publication != null) {
-                    platforms.add(publication)
+                val matchingPlatforms = ALL.filter { it.matches(name) }
+                if (matchingPlatforms.isNotEmpty()) {
+                    platforms.addAll(matchingPlatforms)
                 } else {
                     unknownNames.add(name)
                 }
