@@ -6,6 +6,7 @@
 package org.jetbrains.compose.web.attributes.builders
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.NonRestartableComposable
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.dom.ElementScope
@@ -65,7 +66,8 @@ private fun updateRadioGroupIfNeeded(element: HTMLInputElement) {
 @Composable
 @NonRestartableComposable
 internal fun ElementScope<HTMLInputElement>.DisposeRadioGroupEffect() {
-    DisposableRefEffect { ref ->
+    DisposableEffect(null) {
+        val ref = scopeElement
         onDispose {
             controlledRadioGroups[ref.name]?.remove(ref)
             if (controlledRadioGroups[ref.name]?.isEmpty() == true) {
