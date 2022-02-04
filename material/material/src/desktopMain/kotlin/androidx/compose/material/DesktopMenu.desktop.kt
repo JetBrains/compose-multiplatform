@@ -22,15 +22,22 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntRect
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.window.rememberCursorPositionProvider
 import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupPositionProvider
 
 /**
  * A Material Design [dropdown menu](https://material.io/components/menus#dropdown-menu).
@@ -80,7 +87,11 @@ fun DropdownMenu(
     if (expandedStates.currentState || expandedStates.targetState) {
         val transformOriginState = remember { mutableStateOf(TransformOrigin.Center) }
         val density = LocalDensity.current
-        val popupPositionProvider = DropdownMenuPositionProvider(
+        // The original [DropdownMenuPositionProvider] is not yet suitable for large screen devices,
+        // so we need to make additional checks and adjust the position of the [DropdownMenu] to
+        // avoid content being cut off if the [DropdownMenu] contains too many items.
+        // See: https://github.com/JetBrains/compose-jb/issues/1388
+        val popupPositionProvider = DesktopDropdownMenuPositionProvider(
             offset,
             density
         ) { parentBounds, menuBounds ->
@@ -177,5 +188,68 @@ fun CursorDropdownMenu(
                 content = content
             )
         }
+    }
+}
+
+@Immutable
+internal data class DesktopDropdownMenuPositionProvider(
+    val contentOffset: DpOffset,
+    val density: Density,
+    val onPositionCalculated: (IntRect, IntRect) -> Unit = { _, _ -> }
+) : PopupPositionProvider {
+    override fun calculatePosition(
+        anchorBounds: IntRect,
+        windowSize: IntSize,
+        layoutDirection: LayoutDirection,
+        popupContentSize: IntSize
+    ): IntOffset {
+        // The min margin above and below the menu, relative to the screen.
+        val verticalMargin = with(density) { MenuVerticalMargin.roundToPx() }
+        // The content offset specified using the dropdown offset parameter.
+        val contentOffsetX = with(density) { contentOffset.x.roundToPx() }
+        val contentOffsetY = with(density) { contentOffset.y.roundToPx() }
+
+        // Compute horizontal position.
+        val toRight = anchorBounds.left + contentOffsetX
+        val toLeft = anchorBounds.right - contentOffsetX - popupContentSize.width
+        val toDisplayRight = windowSize.width - popupContentSize.width
+        val toDisplayLeft = 0
+        val x = if (layoutDirection == LayoutDirection.Ltr) {
+            sequenceOf(toRight, toLeft, toDisplayRight)
+        } else {
+            sequenceOf(toLeft, toRight, toDisplayLeft)
+        }.firstOrNull {
+            it >= 0 && it + popupContentSize.width <= windowSize.width
+        } ?: toLeft
+
+        // Compute vertical position.
+        val toBottom = maxOf(anchorBounds.bottom + contentOffsetY, verticalMargin)
+        val toTop = anchorBounds.top - contentOffsetY - popupContentSize.height
+        val toCenter = anchorBounds.top - popupContentSize.height / 2
+        val toDisplayBottom = windowSize.height - popupContentSize.height - verticalMargin
+        var y = sequenceOf(toBottom, toTop, toCenter, toDisplayBottom).firstOrNull {
+            it >= verticalMargin &&
+                it + popupContentSize.height <= windowSize.height - verticalMargin
+        } ?: toTop
+
+        // Desktop specific vertical position checking
+        val aboveAnchor = anchorBounds.top + contentOffsetY
+        val belowAnchor = windowSize.height - anchorBounds.bottom - contentOffsetY
+
+        if (belowAnchor >= aboveAnchor) {
+            y = anchorBounds.bottom + contentOffsetY
+        }
+
+        if (y + popupContentSize.height > windowSize.height) {
+            y = windowSize.height - popupContentSize.height
+        }
+
+        y = y.coerceAtLeast(0)
+
+        onPositionCalculated(
+            anchorBounds,
+            IntRect(x, y, x + popupContentSize.width, y + popupContentSize.height)
+        )
+        return IntOffset(x, y)
     }
 }

@@ -141,6 +141,13 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.mockitoKotlin)
                 implementation(libs.testUiautomator)
             }
+
+            desktopTest.dependencies {
+                implementation(project(":compose:ui:ui-test-junit4"))
+                implementation(libs.truth)
+                implementation(libs.junit)
+                implementation(libs.skikoCurrentOs)
+            }
         }
     }
     dependencies {
