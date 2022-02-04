@@ -21,18 +21,13 @@ import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.toDuration
 
-interface TestComposition {
-    @ComposeWebExperimentalTestsApi
-    fun composition(content: @Composable () -> Unit)
-}
-
 /**
  * This class provides a set of utils methods to simplify compose-web tests.
  * There is no need to create its instances manually.
  * @see [runTest]
  */
 @ComposeWebExperimentalTestsApi
-class TestScope : CoroutineScope by MainScope(), TestComposition {
+class TestScope : CoroutineScope by MainScope() {
 
     /**
      * It's used as a parent element for the composition.
@@ -57,7 +52,7 @@ class TestScope : CoroutineScope by MainScope(), TestComposition {
      * Creates a new composition with a given Composable [content].
      */
     @ComposeWebExperimentalTestsApi
-    override fun composition(content: @Composable () -> Unit) {
+    fun composition(content: @Composable () -> Unit) {
         root.clear()
 
         renderComposable(
