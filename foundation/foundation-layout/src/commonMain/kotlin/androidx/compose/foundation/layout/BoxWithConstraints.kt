@@ -109,12 +109,12 @@ private data class BoxWithConstraintsScopeImpl(
     private val density: Density,
     override val constraints: Constraints
 ) : BoxWithConstraintsScope, BoxScope by BoxScopeInstance {
-    override val minWidth: Dp
-        get() = with(density) { constraints.minWidth.toDp() }
-    override val maxWidth: Dp
-        get() = with(density) { constraints.maxWidth.toDp() }
-    override val minHeight: Dp
-        get() = with(density) { constraints.minHeight.toDp() }
-    override val maxHeight: Dp
-        get() = with(density) { constraints.maxHeight.toDp() }
+    override val minWidth: Dp get() = with(density) { constraints.minWidth.toDp() }
+    override val maxWidth: Dp get() = with(density) {
+        if (constraints.hasBoundedWidth) constraints.maxWidth.toDp() else Dp.Infinity
+    }
+    override val minHeight: Dp get() = with(density) { constraints.minHeight.toDp() }
+    override val maxHeight: Dp get() = with(density) {
+        if (constraints.hasBoundedHeight) constraints.maxHeight.toDp() else Dp.Infinity
+    }
 }
