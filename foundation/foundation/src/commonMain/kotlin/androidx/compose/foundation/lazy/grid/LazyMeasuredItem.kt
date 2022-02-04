@@ -44,7 +44,12 @@ internal class LazyMeasuredItem(
     private val beforeContentPadding: Int,
     private val afterContentPadding: Int,
     val placeables: Array<LazyLayoutPlaceable>,
-    private val placementAnimator: LazyGridItemPlacementAnimator
+    private val placementAnimator: LazyGridItemPlacementAnimator,
+    /**
+     * The offset which shouldn't affect any calculations but needs to be applied for the final
+     * value passed into the place() call.
+     */
+    private val visualOffset: IntOffset
 ) {
     /**
      * Main axis size of the item - the max main axis size of the placeables.
@@ -92,7 +97,7 @@ internal class LazyMeasuredItem(
             rawMainAxisOffset
         }
         val crossAxisLayoutSize = if (isVertical) layoutWidth else layoutHeight
-        val crossAxisOffset = if (layoutDirection == LayoutDirection.Rtl && isVertical) {
+        val crossAxisOffset = if (isVertical && layoutDirection == LayoutDirection.Rtl) {
             crossAxisLayoutSize - rawCrossAxisOffset - crossAxisSize
         } else {
             rawCrossAxisOffset
@@ -115,7 +120,12 @@ internal class LazyMeasuredItem(
         }
 
         return LazyGridPositionedItem(
-            offset = placeableOffset,
+            offset = if (isVertical) {
+                IntOffset(rawCrossAxisOffset, rawMainAxisOffset)
+            } else {
+                IntOffset(rawMainAxisOffset, rawCrossAxisOffset)
+            },
+            placeableOffset = placeableOffset,
             index = index.value,
             key = key,
             row = row,
@@ -136,7 +146,8 @@ internal class LazyMeasuredItem(
                 if (!reverseLayout) afterContentPadding else beforeContentPadding,
             isVertical = isVertical,
             wrappers = wrappers,
-            placementAnimator = placementAnimator
+            placementAnimator = placementAnimator,
+            visualOffset = visualOffset
         )
     }
 }
@@ -144,6 +155,7 @@ internal class LazyMeasuredItem(
 @OptIn(ExperimentalFoundationApi::class)
 internal class LazyGridPositionedItem(
     override val offset: IntOffset,
+    val placeableOffset: IntOffset,
     override val index: Int,
     override val key: Any,
     override val row: Int,
@@ -155,7 +167,8 @@ internal class LazyGridPositionedItem(
     private val maxMainAxisOffset: Int,
     private val isVertical: Boolean,
     private val wrappers: List<LazyGridPlaceableWrapper>,
-    private val placementAnimator: LazyGridItemPlacementAnimator
+    private val placementAnimator: LazyGridItemPlacementAnimator,
+    private val visualOffset: IntOffset
 ) : LazyGridItemInfo {
     val placeablesCount: Int get() = wrappers.size
 
@@ -187,16 +200,16 @@ internal class LazyGridPositionedItem(
             val maxOffset = maxMainAxisOffset
             val offset = if (getAnimationSpec(index) != null) {
                 placementAnimator.getAnimatedOffset(
-                    key, index, minOffset, maxOffset, offset
+                    key, index, minOffset, maxOffset, placeableOffset
                 )
             } else {
-                offset
+                placeableOffset
             }
             if (offset.mainAxis > minOffset && offset.mainAxis < maxOffset) {
                 if (isVertical) {
-                    placeable.placeWithLayer(offset)
+                    placeable.placeWithLayer(offset + visualOffset)
                 } else {
-                    placeable.placeRelativeWithLayer(offset)
+                    placeable.placeRelativeWithLayer(offset + visualOffset)
                 }
             }
         }

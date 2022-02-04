@@ -41,6 +41,9 @@ import androidx.compose.ui.unit.dp
  * @param modifier the modifier to apply to this layout
  * @param state the state object to be used to control or observe the list's state
  * @param contentPadding specify a padding around the whole content
+ * @param reverseLayout reverse the direction of scrolling and layout, when `true` items will be
+ * composed from the end to the start and [LazyGridState.firstVisibleItemIndex] == 0 will mean
+ * the first item is located at the end.
  * @param verticalArrangement The vertical arrangement of the layout's children
  * @param horizontalArrangement The horizontal arrangement of the layout's children
  * @param flingBehavior logic describing fling behavior
@@ -55,7 +58,9 @@ fun LazyVerticalGrid(
     modifier: Modifier = Modifier,
     state: LazyGridState = rememberLazyGridState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    reverseLayout: Boolean = false,
+    verticalArrangement: Arrangement.Vertical =
+        if (!reverseLayout) Arrangement.Top else Arrangement.Bottom,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     userScrollEnabled: Boolean = true,
@@ -76,6 +81,7 @@ fun LazyVerticalGrid(
         modifier = modifier,
         state = state,
         contentPadding = contentPadding,
+        reverseLayout = reverseLayout,
         horizontalArrangement = horizontalArrangement,
         verticalArrangement = verticalArrangement,
         flingBehavior = flingBehavior,

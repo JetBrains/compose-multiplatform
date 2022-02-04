@@ -442,21 +442,22 @@ class LazyArrangementsTest {
 
     // with reverseLayout == true
 
-    // @Test
-    // fun vertical_defaultArrangementIsBottomWithReverseLayout() {
-    //     rule.setContent {
-    //         LazyColumn(
-    //             reverseLayout = true,
-    //             modifier = Modifier.requiredSize(containerSize)
-    //         ) {
-    //             items(2) {
-    //                 Item(it)
-    //             }
-    //         }
-    //     }
+    @Test
+    fun vertical_defaultArrangementIsBottomWithReverseLayout() {
+        rule.setContent {
+            LazyVerticalGrid(
+                GridCells.Fixed(1),
+                reverseLayout = true,
+                modifier = Modifier.size(containerSize)
+            ) {
+                items(2) {
+                    Item(it)
+                }
+            }
+        }
 
-    //     assertArrangementForTwoItems(Arrangement.Bottom, reverseLayout = true)
-    // }
+        assertArrangementForTwoItems(Arrangement.Bottom, reverseLayout = true)
+    }
 
     // @Test
     // fun row_defaultArrangementIsEndWithReverseLayout() {
