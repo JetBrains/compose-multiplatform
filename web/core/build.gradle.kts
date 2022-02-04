@@ -23,14 +23,13 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
-                implementation(kotlin("stdlib-common"))
             }
         }
 
         val jsMain by getting {
             dependencies {
-                implementation(project(":internal-web-core-runtime"))
                 implementation(kotlin("stdlib-js"))
+                implementation(project(":internal-web-core-runtime"))
             }
         }
 

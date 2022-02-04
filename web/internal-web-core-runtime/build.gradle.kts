@@ -21,12 +21,12 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
-                implementation(kotlin("stdlib-common"))
             }
         }
-        val jsMain by getting {
+
+        val jsTest by getting {
             dependencies {
-                implementation(kotlin("stdlib-js"))
+                implementation(kotlin("test-js"))
             }
         }
     }

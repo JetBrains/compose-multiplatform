@@ -1,21 +1,31 @@
+/*
+ * Copyright 2020-2022 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 package org.jetbrains.compose.web
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.ControlledComposition
-import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.DefaultMonotonicFrameClock
 import androidx.compose.runtime.DisposableEffectScope
+import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.Recomposer
-import org.jetbrains.compose.web.dom.DOMScope
 import kotlinx.browser.document
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.web.internal.runtime.*
+import org.jetbrains.compose.web.dom.DOMScope
+import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
+import org.jetbrains.compose.web.internal.runtime.DomApplier
+import org.jetbrains.compose.web.internal.runtime.DomNodeWrapper
+import org.jetbrains.compose.web.internal.runtime.GlobalSnapshotManager
+import org.jetbrains.compose.web.internal.runtime.JsMicrotasksDispatcher
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLBodyElement
 import org.w3c.dom.get
+
 /**
  * Use this method to mount the composition at the certain [root]
  *
@@ -34,6 +44,11 @@ fun <TElement : Element> renderComposable(
 
     val context = monotonicFrameClock + JsMicrotasksDispatcher()
     val recomposer = Recomposer(context)
+
+    CoroutineScope(context).launch(start = CoroutineStart.UNDISPATCHED) {
+        recomposer.runRecomposeAndApplyChanges()
+    }
+
     val composition = ControlledComposition(
         applier = DomApplier(DomNodeWrapper(root)),
         parent = recomposer
@@ -44,10 +59,6 @@ fun <TElement : Element> renderComposable(
     }
     composition.setContent @Composable {
         content(scope)
-    }
-
-    CoroutineScope(context).launch(start = CoroutineStart.UNDISPATCHED) {
-        recomposer.runRecomposeAndApplyChanges()
     }
     return composition
 }
