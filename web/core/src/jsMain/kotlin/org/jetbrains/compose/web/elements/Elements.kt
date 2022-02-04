@@ -697,13 +697,12 @@ fun TextArea(
             this.copyFrom(textAreaAttrsBuilder)
         },
         content = {
-            DomSideEffect(keyForRestoringControlledState.value, textAreaRestoreControlledStateEffect)
+            DisposableEffect(keyForRestoringControlledState.value) {
+                restoreControlledTextAreaState(element = scopeElement)
+                onDispose { }
+            }
         }
     )
-}
-
-private val textAreaRestoreControlledStateEffect: DomEffectScope.(HTMLTextAreaElement) -> Unit = {
-    restoreControlledTextAreaState(element = it)
 }
 
 @Composable
@@ -1022,13 +1021,12 @@ fun <K> Input(
             if (type == InputType.Radio) {
                 DisposeRadioGroupEffect()
             }
-            DomSideEffect(keyForRestoringControlledState.value, inputRestoreControlledStateEffect)
+            DisposableEffect(keyForRestoringControlledState.value) {
+                restoreControlledInputState(inputElement = scopeElement)
+                onDispose { }
+            }
         }
     )
-}
-
-private val inputRestoreControlledStateEffect: DomEffectScope.(HTMLInputElement) -> Unit = {
-    restoreControlledInputState(inputElement = it)
 }
 
 @Composable
