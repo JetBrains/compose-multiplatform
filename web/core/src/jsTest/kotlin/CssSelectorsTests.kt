@@ -13,6 +13,7 @@ import org.w3c.dom.get
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@Suppress("DEPRECATION")
 class CssSelectorsTests {
 
     private object TestSimpleDescendantsSelectorStyleSheet: StyleSheet() {

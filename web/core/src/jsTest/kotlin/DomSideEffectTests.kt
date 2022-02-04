@@ -15,6 +15,7 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
+@Suppress("DEPRECATION")
 class DomSideEffectTests {
 
     @Test
