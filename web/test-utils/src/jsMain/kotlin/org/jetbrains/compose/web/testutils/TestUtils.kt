@@ -1,25 +1,14 @@
 package org.jetbrains.compose.web.testutils
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Composition
-import androidx.compose.runtime.ControlledComposition
 import androidx.compose.runtime.MonotonicFrameClock
-import androidx.compose.runtime.Recomposer
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.promise
 import kotlinx.dom.clear
-import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
-import org.jetbrains.compose.web.internal.runtime.DomApplier
-import org.jetbrains.compose.web.internal.runtime.DomNodeWrapper
-import org.jetbrains.compose.web.internal.runtime.GlobalSnapshotManager
-import org.jetbrains.compose.web.internal.runtime.JsMicrotasksDispatcher
 import org.jetbrains.compose.web.renderComposable
-import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.MutationObserver
 import org.w3c.dom.MutationObserverInit

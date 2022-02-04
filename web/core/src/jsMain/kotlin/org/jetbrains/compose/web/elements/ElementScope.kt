@@ -12,10 +12,6 @@ import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
 import org.w3c.dom.Element
 
-interface DOMScope<out TElement : Element> {
-    val DisposableEffectScope.scopeElement: TElement
-}
-
 /**
  * ElementScope allows adding effects to the Composable representing html element.
  * Also see a tutorial: https://github.com/JetBrains/compose-jb/tree/master/tutorials/Web/Using_Effects
