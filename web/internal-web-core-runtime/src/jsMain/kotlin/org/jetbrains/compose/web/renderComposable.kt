@@ -44,6 +44,11 @@ fun <TElement : Element> renderComposable(
 
     val context = monotonicFrameClock + JsMicrotasksDispatcher()
     val recomposer = Recomposer(context)
+
+    CoroutineScope(context).launch(start = CoroutineStart.UNDISPATCHED) {
+        recomposer.runRecomposeAndApplyChanges()
+    }
+
     val composition = ControlledComposition(
         applier = DomApplier(DomNodeWrapper(root)),
         parent = recomposer
@@ -54,10 +59,6 @@ fun <TElement : Element> renderComposable(
     }
     composition.setContent @Composable {
         content(scope)
-    }
-
-    CoroutineScope(context).launch(start = CoroutineStart.UNDISPATCHED) {
-        recomposer.runRecomposeAndApplyChanges()
     }
     return composition
 }

@@ -15,7 +15,7 @@ class RenderComposableTests {
     @Test
     fun compCount() = MainScope().promise {
         var count = 0
-        renderComposable(document.createElement("dom")) {
+        renderComposable(document.createElement("div")) {
             count++
         }
         delay(1000)

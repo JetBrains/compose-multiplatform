@@ -6,6 +6,9 @@
 package org.jetbrains.compose.web.core.tests.elements
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import kotlinx.browser.document
 import org.jetbrains.compose.web.ExperimentalComposeWebApi
 import org.jetbrains.compose.web.attributes.AttrsScope
@@ -136,7 +139,7 @@ class ElementsTests {
     @Test
     fun elementBuilderShouldBeCalledOnce() = runTest {
         var counter = 0
-        var flag = false
+        var flag by mutableStateOf(false)
 
         composition {
             TagElement({
