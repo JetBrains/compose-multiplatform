@@ -49,6 +49,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -665,6 +666,19 @@ class BoxWithConstraintsTest : LayoutTest() {
             }
         }
 
+        assertTrue(latch.await(1, TimeUnit.SECONDS))
+    }
+
+    @Test
+    fun preservesInfinity() {
+        val latch = CountDownLatch(1)
+        show {
+            BoxWithConstraints(Modifier.wrapContentSize(unbounded = true)) {
+                assertEquals(Dp.Infinity, maxWidth)
+                assertEquals(Dp.Infinity, maxHeight)
+                latch.countDown()
+            }
+        }
         assertTrue(latch.await(1, TimeUnit.SECONDS))
     }
 
