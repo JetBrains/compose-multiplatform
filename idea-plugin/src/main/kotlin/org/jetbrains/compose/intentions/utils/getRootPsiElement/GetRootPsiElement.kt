@@ -1,4 +1,4 @@
-package org.jetbrains.compose.intentions.utils.get_root_psi_element
+package org.jetbrains.compose.intentions.utils.getRootPsiElement
 
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.psi.KtCallExpression

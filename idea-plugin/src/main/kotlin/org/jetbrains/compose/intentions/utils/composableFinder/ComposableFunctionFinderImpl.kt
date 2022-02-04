@@ -1,7 +1,7 @@
-package org.jetbrains.compose.intentions.utils.composable_finder
+package org.jetbrains.compose.intentions.utils.composableFinder
 
 import com.intellij.psi.PsiElement
-import org.jetbrains.compose.intentions.utils.is_psi_element_composable.IsPsiElementComposable
+import org.jetbrains.compose.intentions.utils.isPsiElementComposable.IsPsiElementComposable
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtProperty

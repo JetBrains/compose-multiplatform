@@ -1,4 +1,4 @@
-package org.jetbrains.compose.intentions.wrap_with_composable
+package org.jetbrains.compose.intentions
 
 import com.intellij.codeInsight.intention.impl.IntentionActionGroup
 import com.intellij.openapi.editor.Editor
@@ -10,13 +10,13 @@ import com.intellij.openapi.util.Iconable
 import com.intellij.psi.PsiFile
 import com.intellij.ui.popup.list.ListPopupImpl
 import org.jetbrains.compose.desktop.ide.preview.PreviewIcons
-import org.jetbrains.compose.intentions.wrap_with_composable.wrap_with_actions.BaseWrapWithComposableAction
-import org.jetbrains.compose.intentions.wrap_with_composable.wrap_with_actions.WrapWithBoxIntention
-import org.jetbrains.compose.intentions.wrap_with_composable.wrap_with_actions.WrapWithCardIntention
-import org.jetbrains.compose.intentions.wrap_with_composable.wrap_with_actions.WrapWithColumnIntention
-import org.jetbrains.compose.intentions.wrap_with_composable.wrap_with_actions.WrapWithLzyColumnIntention
-import org.jetbrains.compose.intentions.wrap_with_composable.wrap_with_actions.WrapWithLzyRowIntention
-import org.jetbrains.compose.intentions.wrap_with_composable.wrap_with_actions.WrapWithRowIntention
+import org.jetbrains.compose.intentions.wrapActions.BaseWrapWithComposableAction
+import org.jetbrains.compose.intentions.wrapActions.WrapWithBoxIntention
+import org.jetbrains.compose.intentions.wrapActions.WrapWithCardIntention
+import org.jetbrains.compose.intentions.wrapActions.WrapWithColumnIntention
+import org.jetbrains.compose.intentions.wrapActions.WrapWithLzyColumnIntention
+import org.jetbrains.compose.intentions.wrapActions.WrapWithLzyRowIntention
+import org.jetbrains.compose.intentions.wrapActions.WrapWithRowIntention
 import javax.swing.Icon
 
 class WrapWithComposableIntentionGroup :

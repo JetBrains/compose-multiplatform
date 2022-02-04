@@ -1,4 +1,4 @@
-package org.jetbrains.compose.intentions.wrap_with_composable.wrap_with_actions
+package org.jetbrains.compose.intentions.wrapActions
 
 import com.intellij.codeInsight.intention.HighPriorityAction
 import com.intellij.codeInsight.intention.PsiElementBaseIntentionAction
@@ -7,10 +7,10 @@ import com.intellij.codeInsight.template.impl.TemplateImpl
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
-import org.jetbrains.compose.intentions.utils.composable_finder.ComposableFunctionFinder
-import org.jetbrains.compose.intentions.utils.composable_finder.ComposableFunctionFinderImpl
-import org.jetbrains.compose.intentions.utils.get_root_psi_element.GetRootPsiElement
-import org.jetbrains.compose.intentions.utils.is_intention_available.IsIntentionAvailable
+import org.jetbrains.compose.intentions.utils.composableFinder.ComposableFunctionFinder
+import org.jetbrains.compose.intentions.utils.composableFinder.ComposableFunctionFinderImpl
+import org.jetbrains.compose.intentions.utils.getRootPsiElement.GetRootPsiElement
+import org.jetbrains.compose.intentions.utils.isIntentionAvailable.IsIntentionAvailable
 
 abstract class BaseWrapWithComposableAction :
     PsiElementBaseIntentionAction(),

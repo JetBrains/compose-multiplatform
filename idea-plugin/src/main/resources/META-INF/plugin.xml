@@ -56,19 +56,19 @@
         <defaultLiveTemplates file="templates/ComposeMultiplatformTemplates.xml"/>
 
         <intentionAction id="wrap_group" order="first">
-            <className>org.jetbrains.compose.intentions.wrap_with_composable.WrapWithComposableIntentionGroup
+            <className>org.jetbrains.compose.intentions.WrapWithComposableIntentionGroup
             </className>
             <category>Composable intentions</category>
         </intentionAction>
 
         <intentionAction id="remove_composable" order="last">
-            <className>org.jetbrains.compose.intentions.remove_composable.RemoveComposableIntention
+            <className>org.jetbrains.compose.intentions.RemoveComposableIntention
             </className>
             <category>Composable intentions</category>
         </intentionAction>
 
         <intentionAction id="remove_parent_composable" order="last">
-            <className>org.jetbrains.compose.intentions.remove_parent_composable.RemoveParentComposableIntention
+            <className>org.jetbrains.compose.intentions.RemoveParentComposableIntention
             </className>
             <category>Composable intentions</category>
         </intentionAction>

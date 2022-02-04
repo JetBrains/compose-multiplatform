@@ -1,4 +1,4 @@
-package org.jetbrains.compose.intentions.remove_parent_composable
+package org.jetbrains.compose.intentions
 
 import com.intellij.codeInsight.intention.PriorityAction
 import com.intellij.codeInsight.intention.PsiElementBaseIntentionAction
@@ -7,10 +7,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Iconable
 import com.intellij.psi.PsiElement
 import org.jetbrains.compose.desktop.ide.preview.PreviewIcons
-import org.jetbrains.compose.intentions.utils.composable_finder.ChildComposableFinder
-import org.jetbrains.compose.intentions.utils.composable_finder.ComposableFunctionFinder
-import org.jetbrains.compose.intentions.utils.get_root_psi_element.GetRootPsiElement
-import org.jetbrains.compose.intentions.utils.is_intention_available.IsIntentionAvailable
+import org.jetbrains.compose.intentions.utils.composableFinder.ChildComposableFinder
+import org.jetbrains.compose.intentions.utils.composableFinder.ComposableFunctionFinder
+import org.jetbrains.compose.intentions.utils.getRootPsiElement.GetRootPsiElement
+import org.jetbrains.compose.intentions.utils.isIntentionAvailable.IsIntentionAvailable
 import org.jetbrains.kotlin.psi.KtCallExpression
 import javax.swing.Icon
 

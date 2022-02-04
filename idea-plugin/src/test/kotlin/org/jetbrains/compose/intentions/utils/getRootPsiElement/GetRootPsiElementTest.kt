@@ -1,4 +1,4 @@
-package org.jetbrains.compose.intentions.utils.get_root_psi_element
+package org.jetbrains.compose.intentions.utils.getRootPsiElement
 
 import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase
 import junit.framework.TestCase

@@ -1,7 +1,7 @@
-package org.jetbrains.compose.intentions.utils.is_intention_available
+package org.jetbrains.compose.intentions.utils.isIntentionAvailable
 
 import com.intellij.psi.PsiElement
-import org.jetbrains.compose.intentions.utils.composable_finder.ComposableFunctionFinder
+import org.jetbrains.compose.intentions.utils.composableFinder.ComposableFunctionFinder
 import org.jetbrains.kotlin.idea.KotlinLanguage
 
 interface IsIntentionAvailable {

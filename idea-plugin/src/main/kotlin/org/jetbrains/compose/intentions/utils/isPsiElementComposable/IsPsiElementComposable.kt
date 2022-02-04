@@ -1,4 +1,4 @@
-package org.jetbrains.compose.intentions.utils.is_psi_element_composable
+package org.jetbrains.compose.intentions.utils.isPsiElementComposable
 
 import org.jetbrains.compose.desktop.ide.preview.isComposableFunction
 import org.jetbrains.kotlin.nj2k.postProcessing.resolve

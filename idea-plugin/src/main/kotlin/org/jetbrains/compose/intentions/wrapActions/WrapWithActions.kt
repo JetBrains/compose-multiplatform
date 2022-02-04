@@ -1,4 +1,4 @@
-package org.jetbrains.compose.intentions.wrap_with_composable.wrap_with_actions
+package org.jetbrains.compose.intentions.wrapActions
 
 import com.intellij.codeInsight.template.impl.TemplateImpl
 import com.intellij.codeInsight.template.impl.TemplateSettings
