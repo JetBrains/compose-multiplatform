@@ -6,9 +6,24 @@ import androidx.compose.ui.window.Window
 import platform.AppKit.NSApp
 import platform.AppKit.NSApplication
 
+class QuartzScope : FrameScope {
+    // TODO: fix me
+    override val density: Float
+        get() = 1.0f
+
+    override val widthPixels: Int
+        get() = 800
+
+    override val heightPixels: Int
+        get() = 600
+}
+
 @Composable
-actual fun KAppScope.Frame(content: @Composable () -> Unit) {
-    content()
+actual fun KAppScope.Frame(content: @Composable FrameScope.() -> Unit) {
+    val scope = QuartzScope()
+    scope.apply {
+        content()
+    }
 }
 
 internal class AppAppScope : KAppScope {}
@@ -21,10 +36,13 @@ internal actual fun kappImpl(name: String, title: String, content: @Composable K
     }
 }
 
-internal actual fun simpleKappImpl(name: String, content: @Composable () -> Unit) {
+internal actual fun simpleKappImpl(name: String, content: @Composable FrameScope.() -> Unit) {
     NSApplication.sharedApplication()
-    Window(name) {
-        content()
+    val scope = QuartzScope()
+    scope.apply {
+        Window(name) {
+            content()
+        }
     }
     NSApp?.run()
 }

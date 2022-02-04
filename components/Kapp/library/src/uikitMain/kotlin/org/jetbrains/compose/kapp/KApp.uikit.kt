@@ -7,9 +7,24 @@ import kotlinx.cinterop.*
 import platform.UIKit.*
 import platform.Foundation.*
 
+class UIAppScope : FrameScope {
+    // TODO: fix me
+    override val density: Float
+        get() = 1.0f
+
+    override val widthPixels: Int
+        get() = 800
+
+    override val heightPixels: Int
+        get() = 600
+}
+
 @Composable
-actual fun KAppScope.Frame(content: @Composable () -> Unit) {
-    content()
+actual fun KAppScope.Frame(content: @Composable FrameScope.() -> Unit) {
+    val uiappScope = UIAppScope()
+    uiappScope.apply {
+        content()
+    }
 }
 
 internal class AppAppScope : KAppScope {}
@@ -24,9 +39,9 @@ internal actual fun kappImpl(name: String, title: String, content: @Composable K
 
 // TODO: an ugly hack - rework!
 private var appName: String = ""
-private var appContent: @Composable () -> Unit = {}
+private var appContent: @Composable FrameScope.() -> Unit = {}
 
-internal actual fun simpleKappImpl(name: String, content: @Composable () -> Unit) {
+internal actual fun simpleKappImpl(name: String, content: @Composable FrameScope.() -> Unit) {
     val appScope = AppAppScope()
 
     appScope.apply {
@@ -58,8 +73,11 @@ internal class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
 
     override fun application(application: UIApplication, didFinishLaunchingWithOptions: Map<Any?, *>?): Boolean {
         window = UIWindow(frame = UIScreen.mainScreen.bounds)
-        window!!.rootViewController = Application(appName) {
-            appContent()
+        val frameScope = UIAppScope()
+        frameScope.apply {
+            window!!.rootViewController = Application(appName) {
+                appContent()
+            }
         }
         window!!.makeKeyAndVisible()
         return true

@@ -1,3 +1,7 @@
+repositories {
+    mavenCentral()
+}
+
 plugins {
     kotlin("multiplatform") apply false
 }
@@ -6,9 +10,9 @@ subprojects {
     version = findProperty("deploy.version") ?: property("compose.version")!!
 
     repositories {
-        google()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        google()
     }
 
     // TODO: do we really need it?

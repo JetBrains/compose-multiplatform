@@ -8,16 +8,24 @@ import androidx.compose.ui.window.*
 import javax.swing.SwingUtilities
 import kotlin.system.exitProcess
 
-class AppWindowScope : FrameWindowScope {
+class AppWindowScope : FrameScope, FrameWindowScope {
     val state = WindowState()
     override val window: ComposeWindow = ComposeWindow()
-    fun onClose() {
+    fun onClose() {}
 
-    }
+    // TODO: fix me
+    override val density: Float
+        get() = 1.0f
+
+    override val widthPixels: Int
+        get() = window.width
+
+    override val heightPixels: Int
+        get() = window.height
 }
 
 @Composable
-actual fun KAppScope.Frame(content: @Composable () -> Unit) {
+actual fun KAppScope.Frame(content: @Composable FrameScope.() -> Unit) {
     val scope by remember { mutableStateOf(AppWindowScope()) }
     scope.apply {
         Window(onCloseRequest = { scope.onClose() }, state = scope.state,
@@ -41,7 +49,7 @@ internal actual fun kappImpl(name: String, title: String, content: @Composable K
     }
 }
 
-internal actual fun simpleKappImpl(name: String, content: @Composable () -> Unit) {
+internal actual fun simpleKappImpl(name: String, content: @Composable FrameScope.() -> Unit) {
     val appScope = AppAppScope()
     val winScope = AppWindowScope()
     appScope.apply {
