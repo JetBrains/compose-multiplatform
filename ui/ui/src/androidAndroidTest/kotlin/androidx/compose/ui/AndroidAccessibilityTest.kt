@@ -513,7 +513,7 @@ class AndroidAccessibilityTest {
                 AccessibilityNodeInfo.AccessibilityAction(ACTION_CLEAR_FOCUS, null)
             )
         )
-        accessibilityNodeInfo.recycle()
+        @Suppress("DEPRECATION") accessibilityNodeInfo.recycle()
     }
 
     @Test
@@ -541,7 +541,7 @@ class AndroidAccessibilityTest {
                 AccessibilityNodeInfo.AccessibilityAction(ACTION_CLEAR_FOCUS, null)
             )
         )
-        accessibilityNodeInfo.recycle()
+        @Suppress("DEPRECATION") accessibilityNodeInfo.recycle()
     }
 
     @Test
@@ -919,7 +919,7 @@ class AndroidAccessibilityTest {
 
         val textFieldNode = rule.onNodeWithTag(tag)
             .fetchSemanticsNode("couldn't find node with tag $tag")
-        val info = AccessibilityNodeInfo.obtain()
+        @Suppress("DEPRECATION") val info = AccessibilityNodeInfo.obtain()
         val argument = Bundle()
         argument.putInt(AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_ARG_START_INDEX, 0)
         argument.putInt(AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_ARG_LENGTH, 1)
@@ -2151,7 +2151,7 @@ class AndroidAccessibilityTest {
         }
 
         val node = rule.onNodeWithTag("node").fetchSemanticsNode()
-        var info: AccessibilityNodeInfo = AccessibilityNodeInfo.obtain()
+        @Suppress("DEPRECATION") var info: AccessibilityNodeInfo = AccessibilityNodeInfo.obtain()
         rule.runOnUiThread {
             info = provider.createAccessibilityNodeInfo(node.id)
         }
@@ -2161,7 +2161,7 @@ class AndroidAccessibilityTest {
         assertEquals(300, rect.height())
 
         scale = 0.5f
-        info.recycle()
+        @Suppress("DEPRECATION") info.recycle()
         rule.runOnIdle {
             info = provider.createAccessibilityNodeInfo(node.id)
         }
@@ -2189,7 +2189,7 @@ class AndroidAccessibilityTest {
         }
 
         val node = rule.onNodeWithTag("node").fetchSemanticsNode()
-        var info: AccessibilityNodeInfo = AccessibilityNodeInfo.obtain()
+        @Suppress("DEPRECATION") var info: AccessibilityNodeInfo = AccessibilityNodeInfo.obtain()
         rule.runOnUiThread {
             info = provider.createAccessibilityNodeInfo(node.id)
         }
@@ -2199,7 +2199,7 @@ class AndroidAccessibilityTest {
         assertEquals(300, rect.height())
 
         scale = 0.5f
-        info.recycle()
+        @Suppress("DEPRECATION") info.recycle()
         rule.runOnIdle {
             info = provider.createAccessibilityNodeInfo(node.id)
         }
@@ -2231,7 +2231,7 @@ class AndroidAccessibilityTest {
         }
 
         val textNode = rule.onNodeWithText("text").fetchSemanticsNode()
-        var info: AccessibilityNodeInfo = AccessibilityNodeInfo.obtain()
+        @Suppress("DEPRECATION") var info: AccessibilityNodeInfo = AccessibilityNodeInfo.obtain()
         rule.runOnUiThread {
             info = provider.createAccessibilityNodeInfo(textNode.id)
         }
