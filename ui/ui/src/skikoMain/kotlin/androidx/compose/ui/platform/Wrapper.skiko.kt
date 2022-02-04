@@ -18,6 +18,7 @@ package androidx.compose.ui.platform
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionContext
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.node.LayoutNode
 
@@ -34,12 +35,16 @@ internal fun SkiaBasedOwner.setContent(
     content: @Composable () -> Unit
 ): Composition {
     val composition = Composition(DefaultUiApplier(root), parent)
+    val owner = this
     composition.setContent {
         ProvideCommonCompositionLocals(
-            owner = this,
+            owner = owner,
             uriHandler = PlatformUriHandler(),
             content = content
         )
+        if (owner.accessibilityController != null) {
+            LaunchedEffect(owner) { owner.accessibilityController!!.syncLoop() }
+        }
     }
     return composition
 }
