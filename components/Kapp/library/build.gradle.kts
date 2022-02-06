@@ -17,9 +17,9 @@ kotlin {
 
     if (withNative) {
         iosX64("uikitX64")
-        //iosArm64("uikitArm64")
+        iosArm64("uikitArm64")
         macosX64()
-        // macosArm64()
+        macosArm64()
     }
 
     sourceSets {
@@ -51,10 +51,9 @@ kotlin {
                 dependsOn(macosMain)
             }
 
-            /*
             val macosArm64Main by getting {
                 dependsOn(macosMain)
-            } */
+            }
 
             val uikitMain by creating {
                 dependsOn(darwinMain)
@@ -63,10 +62,10 @@ kotlin {
             val uikitX64Main by getting {
                 dependsOn(uikitMain)
             }
-            /*
+
             val uikitArm64Main by getting {
                 dependsOn(uikitMain)
-            } */
+            }
         }
     }
 }
