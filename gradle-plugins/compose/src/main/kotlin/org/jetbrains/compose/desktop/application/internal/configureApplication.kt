@@ -227,7 +227,7 @@ internal fun AbstractJPackageTask.configurePackagingTask(
     javaHome.set(provider { app.javaHomeOrDefault() })
 
     launcherMainJar.set(app.mainJar.orNull)
-    app._fromFiles.forEach { files.from(it) }
+    files.from(app._fromFiles)
     dependsOn(*app._dependenciesTaskNames.toTypedArray())
 
     app._configurationSource?.let { configSource ->
