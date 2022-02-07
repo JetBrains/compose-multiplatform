@@ -30,6 +30,7 @@ internal class LazyMeasuredLine constructor(
     val items: Array<LazyMeasuredItem>,
     private val spans: List<GridItemSpan>,
     private val isVertical: Boolean,
+    private val reverseLayout: Boolean,
     private val slotsPerLine: Int,
     private val layoutDirection: LayoutDirection,
     /**
@@ -75,8 +76,7 @@ internal class LazyMeasuredLine constructor(
         var usedSpan = 0
         return items.mapIndexed { itemIndex, item ->
             val span = spans[itemIndex].currentLineSpan
-            // TODO(b/215572963): check if we need to consider reverseLayout here
-            val startSlot = if (layoutDirection == LayoutDirection.Rtl && isVertical) {
+            val startSlot = if (layoutDirection == LayoutDirection.Rtl) {
                 slotsPerLine - usedSpan - span
             } else {
                 usedSpan

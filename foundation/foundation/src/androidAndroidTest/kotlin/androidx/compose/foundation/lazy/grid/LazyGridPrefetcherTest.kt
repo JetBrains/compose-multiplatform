@@ -209,37 +209,45 @@ class LazyGridPrefetcherTest {
             .assertDoesNotExist()
     }
 
-    // @Test
-    // fun prefetchingForwardAndBackwardReverseLayout() {
-    //     composeList(firstItem = 1, reverseLayout = true)
+    @Test
+    fun prefetchingForwardAndBackwardReverseLayout() {
+        composeList(firstItem = 2, reverseLayout = true)
 
-    //     rule.runOnIdle {
-    //         runBlocking {
-    //             state.scrollBy(5f)
-    //         }
-    //     }
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy(5f)
+            }
+        }
 
-    //     waitForPrefetch(3)
+        waitForPrefetch(6)
 
-    //     rule.onNodeWithTag("3")
-    //         .assertExists()
-    //     rule.onNodeWithTag("0")
-    //         .assertDoesNotExist()
+        rule.onNodeWithTag("6")
+            .assertExists()
+        rule.onNodeWithTag("7")
+            .assertExists()
+        rule.onNodeWithTag("0")
+            .assertDoesNotExist()
+        rule.onNodeWithTag("1")
+            .assertDoesNotExist()
 
-    //     rule.runOnIdle {
-    //         runBlocking {
-    //             state.scrollBy(-2f)
-    //             state.scrollBy(-1f)
-    //         }
-    //     }
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy(-2f)
+                state.scrollBy(-1f)
+            }
+        }
 
-    //     waitForPrefetch(0)
+        waitForPrefetch(0)
 
-    //     rule.onNodeWithTag("0")
-    //         .assertExists()
-    //     rule.onNodeWithTag("3")
-    //         .assertDoesNotExist()
-    // }
+        rule.onNodeWithTag("0")
+            .assertExists()
+        rule.onNodeWithTag("1")
+            .assertExists()
+        rule.onNodeWithTag("6")
+            .assertDoesNotExist()
+        rule.onNodeWithTag("7")
+            .assertDoesNotExist()
+    }
 
     @Test
     fun prefetchingForwardAndBackwardWithContentPadding() {
@@ -347,7 +355,7 @@ class LazyGridPrefetcherTest {
     private fun composeList(
         firstItem: Int = 0,
         itemOffset: Int = 0,
-        // reverseLayout: Boolean = false,
+        reverseLayout: Boolean = false,
         contentPadding: PaddingValues = PaddingValues(0.dp)
     ) {
         rule.setContent {
@@ -359,7 +367,7 @@ class LazyGridPrefetcherTest {
                 GridCells.Fixed(2),
                 Modifier.height(itemsSizeDp * 1.5f),
                 state,
-                // reverseLayout = reverseLayout,
+                reverseLayout = reverseLayout,
                 contentPadding = contentPadding
             ) {
                 items(100) {

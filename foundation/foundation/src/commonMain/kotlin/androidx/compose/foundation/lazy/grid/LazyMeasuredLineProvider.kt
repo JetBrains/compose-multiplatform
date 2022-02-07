@@ -72,6 +72,7 @@ internal class LazyMeasuredLineProvider(
         var startSlot = 0
         val items = Array(lineItemsCount) {
             val span = lineConfiguration.spans[it].currentLineSpan
+            // TODO(vadimsemenov): consider reverseLayout when calculating childConstraints
             val constraints = childConstraints(startSlot, span)
             measuredItemProvider.getAndMeasure(
                 ItemIndex(lineConfiguration.firstItemIndex + it),
