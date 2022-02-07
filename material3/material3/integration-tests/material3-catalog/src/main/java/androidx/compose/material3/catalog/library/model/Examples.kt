@@ -30,6 +30,7 @@ import androidx.compose.material3.samples.ClickableCardSample
 import androidx.compose.material3.samples.ClickableElevatedCardSample
 import androidx.compose.material3.samples.ClickableOutlinedCardSample
 import androidx.compose.material3.samples.ColorSchemeSample
+import androidx.compose.material3.samples.DismissibleNavigationDrawerSample
 import androidx.compose.material3.samples.ElevatedButtonSample
 import androidx.compose.material3.samples.ElevatedCardSample
 import androidx.compose.material3.samples.EnterAlwaysSmallTopAppBar
@@ -54,6 +55,7 @@ import androidx.compose.material3.samples.NavigationRailSample
 import androidx.compose.material3.samples.NavigationRailWithOnlySelectedLabelsSample
 import androidx.compose.material3.samples.OutlinedButtonSample
 import androidx.compose.material3.samples.OutlinedCardSample
+import androidx.compose.material3.samples.PermanentNavigationDrawerSample
 import androidx.compose.material3.samples.PinnedSmallTopAppBar
 import androidx.compose.material3.samples.RadioButtonSample
 import androidx.compose.material3.samples.RadioGroupSample
@@ -337,6 +339,20 @@ val NavigationDrawerExamples = listOf(
         sourceUrl = NavigationDrawerExampleSourceUrl
     ) {
         ModalNavigationDrawerSample()
+    },
+    Example(
+        name = ::PermanentNavigationDrawerSample.name,
+        description = NavigationDrawerExampleDescription,
+        sourceUrl = NavigationDrawerExampleSourceUrl
+    ) {
+        PermanentNavigationDrawerSample()
+    },
+    Example(
+        name = ::DismissibleNavigationDrawerSample.name,
+        description = NavigationDrawerExampleDescription,
+        sourceUrl = NavigationDrawerExampleSourceUrl
+    ) {
+        DismissibleNavigationDrawerSample()
     }
 )
 

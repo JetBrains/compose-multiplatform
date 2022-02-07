@@ -23,9 +23,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.DismissibleNavigationDrawer
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -42,6 +44,58 @@ fun ModalNavigationDrawerSample() {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            Button(
+                modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 16.dp),
+                onClick = { scope.launch { drawerState.close() } },
+                content = { Text("Close Drawer") }
+            )
+        },
+        content = {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = if (drawerState.isClosed) ">>> Swipe >>>" else "<<< Swipe <<<")
+                Spacer(Modifier.height(20.dp))
+                Button(onClick = { scope.launch { drawerState.open() } }) {
+                    Text("Click to open")
+                }
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Sampled
+@Composable
+fun PermanentNavigationDrawerSample() {
+    PermanentNavigationDrawer(
+        drawerContent = {
+            Column(Modifier.align(Alignment.CenterHorizontally).padding(top = 16.dp)) {
+                Text("I'm a permanent drawer")
+                Text("Best for large screens and tablets")
+            }
+        },
+        content = {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "Application content")
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Sampled
+@Composable
+fun DismissibleNavigationDrawerSample() {
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+    DismissibleNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             Button(
