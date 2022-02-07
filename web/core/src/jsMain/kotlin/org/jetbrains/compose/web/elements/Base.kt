@@ -125,10 +125,10 @@ fun <TElement : Element> TagElement(
 
             update {
                 set(attrsScope.classes, DomElementWrapper::updateClasses)
+                set(attrsScope.styleScope, DomElementWrapper::updateStyleDeclarations)
                 set(attrsScope.collect(), DomElementWrapper::updateAttrs)
                 set(attrsScope.collectListeners(), DomElementWrapper::updateEventListeners)
                 set(attrsScope.propertyUpdates, DomElementWrapper::updateProperties)
-                set(attrsScope.styleScope, DomElementWrapper::updateStyleDeclarations)
             }
         },
         elementScope = scope,

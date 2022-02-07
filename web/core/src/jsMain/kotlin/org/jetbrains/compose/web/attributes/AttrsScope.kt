@@ -47,6 +47,8 @@ interface AttrsScope<TElement : Element>: EventsListenerScope {
      *      style { maxWidth(5.px) }
      * })
      * ```
+     *
+     * `attr("style", ...)` overrides everything added in `style { }` blocks
      */
     fun style(builder: StyleScope.() -> Unit) {
         styleScope.apply(builder)
@@ -57,6 +59,8 @@ interface AttrsScope<TElement : Element>: EventsListenerScope {
      *  This method acts cumulatively, that is, each call adds values to the classList.
      *  In the ideology of Composable functions and their recomposition one just don't need to remove classes,
      *  since if your classList is, for instance, condition-dependent, you can always just call this method conditionally.
+     *
+     *  `attr("class", ...)` overrides everything added using `classes(...)` calls
      */
     fun classes(vararg classes: String)
 

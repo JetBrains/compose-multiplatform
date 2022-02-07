@@ -67,6 +67,59 @@ class AttributesTests {
     }
 
     @Test
+    fun attrClassOverridesClassesCall() = runTest {
+        composition {
+            Div(attrs = {
+                // attr rewrites the content of 'class'
+                attr("class", "classSetFromAttr")
+                classes("c1")
+            })
+        }
+
+        with(nextChild()) {
+            assertEquals("classSetFromAttr", getAttribute("class"))
+        }
+    }
+
+    @Test
+    fun attrStyleOverridesStyleCall() = runTest {
+        composition {
+            Div(attrs = {
+                // attr rewrites the content of 'style'
+                attr("style", "color: red;")
+                style {
+                    color(Color.green)
+                }
+            })
+        }
+
+        with(nextChild()) {
+            assertEquals("color: red;", getAttribute("style"))
+        }
+    }
+
+    @Test
+    fun propCanSeeAllAttrsSet() = runTest {
+        val attrsCollectedInProp = mutableMapOf<String, String>()
+
+        composition {
+            Div(attrs = {
+                attr("style", "color: red;")
+                attr("class", "c1")
+                prop<HTMLDivElement, Unit>({ e, _ ->
+                    attrsCollectedInProp.putAll(
+                        e.getAttributeNames().associateWith { e.getAttribute(it)!! }
+                    )
+                }, Unit)
+            })
+        }
+
+        assertEquals("color: red;", attrsCollectedInProp["style"])
+        assertEquals("c1", attrsCollectedInProp["class"])
+        assertEquals(2, attrsCollectedInProp.size)
+    }
+
+    @Test
     fun copyFromStyleBuilderCopiesCorrectly() {
         val copyFromStyleBuilder = StyleScopeBuilder().apply {
             property("color", "red")

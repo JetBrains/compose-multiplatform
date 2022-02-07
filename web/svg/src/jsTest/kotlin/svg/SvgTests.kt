@@ -142,6 +142,7 @@ class SvgTests {
 
         with(nextChild<SVGElement>().firstChild!! as SVGTextElement) {
             assertEquals("text", this.nodeName.lowercase())
+            assertEquals(3, this.attributes.length)
             assertEquals("small", this.getAttribute("class"))
             assertEquals("20", this.getAttribute("x"))
             assertEquals("30", this.getAttribute("y"))
@@ -420,7 +421,7 @@ class SvgTests {
         }
 
         assertEquals(
-            "<svg><symbol id=\"myDot\" width=\"10\" height=\"10\" viewBox=\"0 0 2 2\"><circle cx=\"1px\" cy=\"1px\" r=\"1px\"></circle></symbol><use href=\"myDot\" x=\"5\" y=\"5\" style=\"opacity: 1;\"></use></svg>",
+            "<svg><symbol id=\"myDot\" width=\"10\" height=\"10\" viewBox=\"0 0 2 2\"><circle cx=\"1px\" cy=\"1px\" r=\"1px\"></circle></symbol><use style=\"opacity: 1;\" href=\"myDot\" x=\"5\" y=\"5\"></use></svg>",
             nextChild<SVGCircleElement>().outerHTML
         )
     }
