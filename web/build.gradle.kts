@@ -36,7 +36,7 @@ subprojects {
     group = "org.jetbrains.compose.web"
     version = COMPOSE_WEB_VERSION
 
-    if (project.name != "web-widgets") {
+    if ((project.name != "web-widgets") && (project.name != "web-integration-widgets")) {
         afterEvaluate {
             if (plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")) {
                 project.kotlinExtension.targets.forEach { target ->
