@@ -67,7 +67,6 @@ Open [the page](https://developer.apple.com/account/resources/identifiers/list) 
 
 #### Creating a new App ID
 
-
 1. Open [the page](https://developer.apple.com/account/resources/identifiers/add/bundleId) on Apple's developer portal.
 2. Choose `App ID` option.
 3. Choose `App` type.
@@ -80,6 +79,11 @@ Open [the page](https://developer.apple.com/account/resources/identifiers/list) 
 ## Preparing a Provisioning Profile
 For testing on TestFlight (when publishing to the App Store), you need to add a provisioning
 profile. You can skip this step otherwise.
+
+First make sure you have created two app IDs, one for your app, and another one for the JVM runtime.
+They should look like this:
+App ID for app: `com.yoursitename.yourappname` (format: `YOURBUNDLEID`)
+App ID for runtime: `com.oracle.java.com.yoursitename.yourappname` (format: `com.oracle.java.YOURBUNDLEID`)
 
 #### Checking existing provisioning profiles
 
@@ -94,6 +98,8 @@ Open https://developer.apple.com/account/resources/profiles/list
 5. Select the Mac App Distribution certificate you created earlier.
 6. Enter a name.
 7. Click generate and download the provisioning profile.
+
+Note that you need to create two of these profiles, one for your app and another one for the JVM runtime.
    
 ## Creating an app-specific password
 
@@ -255,10 +261,110 @@ Note that this option requires JDK 18 due to [this issue](https://bugs.openjdk.j
 ``` kotlin
 macOS {
     provisioningProfile.set(project.file("embedded.provisionprofile"))
+    runtimeProvisioningProfile.set(project.file("runtime.provisionprofile"))
 }
 ```
 
-Make sure to rename your provisioning profile you created earlier to `embedded.provisionprofile`.
+Make sure to rename your provisioning profile you created earlier to `embedded.provisionprofile`
+and the provisioning profile for the JVM runtime to `runtime.provisionprofile`.
+
+### Configuring entitlements
+
+For TestFlight you need to set some special entitlements.
+
+Create a file `entitlements.plist` with the following content:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>com.apple.security.app-sandbox</key>
+    <true/>
+    <key>com.apple.security.cs.allow-jit</key>
+    <true/>
+    <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+    <true/>
+    <key>com.apple.security.cs.disable-library-validation</key>
+    <true/>
+    <key>com.apple.security.cs.allow-dyld-environment-variables</key>
+    <true/>
+    <key>com.apple.security.cs.debugger</key>
+    <true/>
+    <key>com.apple.security.device.audio-input</key>
+    <true/>
+    <key>com.apple.application-identifier</key>
+    <string>TEAMID.APPID</string>
+    <key>com.apple.developer.team-identifier</key>
+    <string>TEAMID</string>
+    <!-- Add additional entitlements here, for example for network or hardware access. -->
+</dict>
+</plist>
+```
+These are the entitlements for your application. Set `TEAMID` to your team ID and `APPID` to your app bundle ID.
+
+Then create another file called `runtime-entitlements.plist` with the following content:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>com.apple.security.app-sandbox</key>
+    <true/>
+    <key>com.apple.security.cs.allow-jit</key>
+    <true/>
+    <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+    <true/>
+    <key>com.apple.security.cs.disable-library-validation</key>
+    <true/>
+    <key>com.apple.security.cs.allow-dyld-environment-variables</key>
+    <true/>
+    <key>com.apple.security.cs.debugger</key>
+    <true/>
+    <key>com.apple.security.device.audio-input</key>
+    <true/>
+</dict>
+</plist>
+```
+
+These are the entitlements for the JVM runtime.
+
+Now configure the entitlements in Gradle like this:
+
+``` kotlin
+macOS {
+    entitlementsFile.set(project.file("entitlements.plist"))
+    runtimeEntitlementsFile.set(project.file("runtime-entitlements.plist"))
+}
+```
+
+### TestFlight
+
+Some special configuration is needed to get the app working in TestFlight. If something is
+incorrect, the App Store will either send an email or show that your build is "Not Available for Testing".
+The build could still work for the App Store but won't work in TestFlight.
+
+If that is the case, make sure the following is configured correctly:
+
+1. Provisioning profiles for both app and JVM runtime are provided.
+2. Entitlement files for both app and JVM runtime are provided.
+3. Both entitlement files contain at least the values provided [here](#configuring-entitlements).
+4. Team ID and App ID are the same in the app entitlements file and the app provisioning profile.
+
+Furthermore, make sure you follow the steps to get the app working on the App Store.
+That means signing with the correct certificates, setting `appStore` to `true` in Gradle, etc.
+
+Note that apps for both the App Store and TestFlight are sandboxed.
+
+If you are loading native libraries from JVM code, they must be loaded directly from the app bundle (because of sandbox and signing).
+That means they cannot first be extracted from a JAR and then loaded (what some libraries do).
+You can include native libraries in the bundle using `fromFiles` (see [here](/tutorials/Native_distributions_and_local_execution#customizing-content))
+and then you can load them in JVM code using `System.loadLibrary("LIBRARYNAME")`.
+Note that the Skiko native library used by Compose is already loaded correctly if you are using the
+default application configuration.
+
+In case you are still experiencing issues with TestFlight, you could consider opening a TSI with
+Apple, and they may be able to give you a more detailed error message.
 
 ## Using Gradle
 

@@ -23,6 +23,7 @@ open class MacOSPlatformSettings @Inject constructor(objects: ObjectFactory): Pl
     var appStore: Boolean = false
     var appCategory: String? = null
     var entitlementsFile: RegularFileProperty = objects.fileProperty()
+    var runtimeEntitlementsFile: RegularFileProperty = objects.fileProperty()
     var packageBuildVersion: String? = null
     var dmgPackageVersion: String? = null
     var dmgPackageBuildVersion: String? = null
@@ -49,6 +50,7 @@ open class MacOSPlatformSettings @Inject constructor(objects: ObjectFactory): Pl
     }
 
     val provisioningProfile: RegularFileProperty = objects.fileProperty()
+    val runtimeProvisioningProfile: RegularFileProperty = objects.fileProperty()
 
     internal val infoPlistSettings = InfoPlistSettings()
     fun infoPlist(fn: Action<InfoPlistSettings>) {
