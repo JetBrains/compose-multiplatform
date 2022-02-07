@@ -127,7 +127,10 @@ fun <TElement : Element> TagElement(
                 set(attrsScope.classes, DomElementWrapper::updateClasses)
                 set(attrsScope.styleScope, DomElementWrapper::updateStyleDeclarations)
                 set(attrsScope.collect(), DomElementWrapper::updateAttrs)
-                set(attrsScope.collectListeners(), DomElementWrapper::updateEventListeners)
+                set(
+                    attrsScope.eventsListenerScopeBuilder.collectListeners(),
+                    DomElementWrapper::updateEventListeners
+                )
                 set(attrsScope.propertyUpdates, DomElementWrapper::updateProperties)
             }
         },

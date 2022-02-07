@@ -164,7 +164,10 @@ class AttributesTests {
         assertEquals(attrsScopeCopyFrom.styleScope, copyToAttrsScope.styleScope)
         assertEquals(attrsScopeCopyFrom.refEffect, copyToAttrsScope.refEffect)
         assertEquals(attrsScopeCopyFrom.propertyUpdates, copyToAttrsScope.propertyUpdates)
-        assertEquals(attrsScopeCopyFrom.collectListeners(), copyToAttrsScope.collectListeners())
+        assertEquals(
+            attrsScopeCopyFrom.eventsListenerScopeBuilder.collectListeners(),
+            copyToAttrsScope.eventsListenerScopeBuilder.collectListeners()
+        )
     }
 
     @Test
@@ -186,7 +189,7 @@ class AttributesTests {
         assertEquals("id1", copyToAttrsScope.attributesMap["id"])
         assertEquals(StyleScopeBuilder().apply { width(100.px) }, copyToAttrsScope.styleScope)
 
-        val listeners = copyToAttrsScope.collectListeners()
+        val listeners = copyToAttrsScope.eventsListenerScopeBuilder.collectListeners()
         assertEquals(1, listeners.size)
         assertEquals("click", listeners[0].event)
     }

@@ -77,7 +77,6 @@ if (extra["compose.web.tests.skip.benchmarks"]!!.toString().toBoolean() != true)
 
 if (extra["compose.web.buildSamples"]!!.toString().toBoolean() == true) {
     println("building with examples")
-    module(":examples:falling-balls-web", "../examples/falling-balls-web")
     module(":examples:compose-web-lp", "../examples/web-landing")
     module(":examples:web-compose-bird", "../examples/web-compose-bird")
     module(":examples:web-with-react", "../examples/web-with-react")

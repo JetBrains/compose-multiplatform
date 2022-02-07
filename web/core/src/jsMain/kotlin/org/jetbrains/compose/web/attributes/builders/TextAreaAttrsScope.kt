@@ -26,7 +26,7 @@ import org.w3c.dom.HTMLTextAreaElement
 )
 typealias TextAreaAttrsBuilder = TextAreaAttrsScope
 
-class TextAreaAttrsScope : AttrsScopeBuilder<HTMLTextAreaElement>() {
+class TextAreaAttrsScope(attrsScope: AttrsScope<HTMLTextAreaElement>) : AttrsScope<HTMLTextAreaElement> by attrsScope {
 
     fun value(value: String): AttrsScope<HTMLTextAreaElement> {
         prop(setInputValue, value)
