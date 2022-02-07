@@ -10,6 +10,7 @@ import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
+import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
 import org.w3c.dom.Element
 
 /**
@@ -122,6 +123,8 @@ internal open class ElementScopeImpl<TElement : Element> : ElementScopeBase<TEle
 
     override val DisposableEffectScope.scopeElement: TElement
         get() = element
+
+    internal val attrsScope = AttrsScopeBuilder<TElement>()
 }
 
 interface DomEffectScope {

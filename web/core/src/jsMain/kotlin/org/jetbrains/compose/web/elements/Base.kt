@@ -108,7 +108,6 @@ fun <TElement : Element> TagElement(
     content: (@Composable ElementScope<TElement>.() -> Unit)?
 ) {
     val scope = remember {  ElementScopeImpl<TElement>() }
-    val attrsScope = remember { AttrsScopeBuilder<TElement>() }
     var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
 
     ComposeDomNode<ElementScope<TElement>, DomElementWrapper>(
@@ -118,6 +117,7 @@ fun <TElement : Element> TagElement(
             DomElementWrapper(node)
         },
         attrsSkippableUpdate = {
+            val attrsScope = scope.attrsScope
             attrsScope.clear()
             applyAttrs?.invoke(attrsScope)
 
