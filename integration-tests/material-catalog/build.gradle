@@ -45,6 +45,7 @@ dependencies {
     kotlinPlugin project(":compose:compiler:compiler")
     implementation(libs.kotlinStdlib)
     implementation project(":compose:runtime:runtime")
+    implementation project(":compose:foundation:foundation-layout")
     implementation project(":compose:ui:ui")
     implementation project(":compose:material:material")
     implementation project(":compose:material3:material3")
@@ -58,7 +59,6 @@ dependencies {
     // but it doesn't work in androidx.
     // See aosp/1804059
     implementation projectOrArtifact(":lifecycle:lifecycle-common-java8")
-    implementation "com.google.accompanist:accompanist-insets:0.18.0"
 }
 
 // We want to publish a release APK of this project for the Compose Material Catalog
