@@ -100,6 +100,7 @@ internal fun AlertDialogContent(
                     ProvideTextStyle(textStyle) {
                         Box(
                             Modifier
+                                .weight(weight = 1f, fill = false)
                                 .padding(TextPadding)
                                 .align(Alignment.Start)
                         ) {
