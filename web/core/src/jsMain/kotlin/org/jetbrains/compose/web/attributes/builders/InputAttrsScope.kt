@@ -38,8 +38,9 @@ typealias InputAttrsBuilder<T> = InputAttrsScope<T>
  * [onSelect] - add `select` event listener
  */
 class InputAttrsScope<ValueType>(
-    val inputType: InputType<ValueType>
-) : AttrsScopeBuilder<HTMLInputElement>() {
+    val inputType: InputType<ValueType>,
+    attrsScope: AttrsScope<HTMLInputElement>
+) : AttrsScope<HTMLInputElement> by attrsScope {
 
     fun value(value: String): InputAttrsScope<ValueType> {
         when (inputType) {

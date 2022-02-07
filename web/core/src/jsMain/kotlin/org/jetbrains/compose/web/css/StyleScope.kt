@@ -10,13 +10,19 @@ package org.jetbrains.compose.web.css
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import kotlin.properties.ReadOnlyProperty
 
+@Deprecated(
+    message = "Renamed to StyleScope",
+    replaceWith = ReplaceWith("StyleScope", "org.jetbrains.compose.web.css.StyleScope")
+)
+typealias StyleBuilder = StyleScope
+
 /**
- * StyleBuilder serves for two main purposes. Passed as a builder context (in [AttrsScope]), it
+ * StyleScope serves for two main purposes. Passed as a builder context (in [AttrsScope]), it
  * makes it possible to:
  * 1. Add inlined css properties to the element (@see [property])
  * 2. Set values to CSS variables (@see [variable])
  */
-interface StyleBuilder {
+interface StyleScope {
     /**
      * Adds arbitrary CSS property to the inline style of the element
      * @param propertyName - the name of css property as [per spec](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference)
@@ -131,20 +137,14 @@ interface StyleHolder {
     val variables: StylePropertyList
 }
 
-interface StyleScope : StyleBuilder, StyleHolder {
-    @ComposeWebInternalApi
-    fun copyFrom(sb: StyleScope)
-}
-
 @Deprecated(
     message = "Renamed to StyleScopeBuilder",
     replaceWith = ReplaceWith("StyleScopeBuilder", "org.jetbrains.compose.web.css.StyleScopeBuilder")
 )
 typealias StyleBuilderImpl = StyleScopeBuilder
 
-@OptIn(ComposeWebInternalApi::class)
 @Suppress("EqualsOrHashCode")
-open class StyleScopeBuilder : StyleScope {
+open class StyleScopeBuilder : StyleScope, StyleHolder {
     override val properties: MutableStylePropertyList = mutableListOf()
     override val variables: MutableStylePropertyList = mutableListOf()
 
@@ -164,7 +164,8 @@ open class StyleScopeBuilder : StyleScope {
         } else false
     }
 
-    override fun copyFrom(sb: StyleScope) {
+    @ComposeWebInternalApi
+    internal fun copyFrom(sb: StyleHolder) {
         properties.addAll(sb.properties)
         variables.addAll(sb.variables)
     }
