@@ -409,6 +409,7 @@ class LayoutInspectorTreeTest {
         assertThat(node?.parameters).isNotEmpty()
     }
 
+    @FlakyTest(bugId = 218332968)
     @Test
     fun testTextId() {
         val slotTableRecord = CompositionDataRecord.create()
