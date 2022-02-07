@@ -5,15 +5,15 @@
 
 package org.jetbrains.compose.web.css
 
-fun StyleBuilder.opacity(value: Number) {
+fun StyleScope.opacity(value: Number) {
     property("opacity", value)
 }
 
-fun StyleBuilder.opacity(value: CSSSizeValue<CSSUnit.percent>) {
+fun StyleScope.opacity(value: CSSSizeValue<CSSUnit.percent>) {
     property("opacity", (value.value / 100))
 }
 
-fun StyleBuilder.display(displayStyle: DisplayStyle) {
+fun StyleScope.display(displayStyle: DisplayStyle) {
     property("display", displayStyle.value)
 }
 

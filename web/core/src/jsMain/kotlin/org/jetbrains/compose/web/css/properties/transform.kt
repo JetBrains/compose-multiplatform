@@ -198,7 +198,7 @@ private class TransformBuilderImplementation : TransformBuilder {
 }
 
 @ExperimentalComposeWebApi
-fun StyleBuilder.transform(transformContext: TransformBuilder.() -> Unit) {
+fun StyleScope.transform(transformContext: TransformBuilder.() -> Unit) {
     val transformBuilder = TransformBuilderImplementation()
     property("transform", transformBuilder.apply(transformContext).toString())
 }

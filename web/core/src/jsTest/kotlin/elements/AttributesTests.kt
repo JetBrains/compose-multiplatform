@@ -353,7 +353,7 @@ class AttributesTests {
             if (flag) {
                 Div(attrs = {
                     ref { div ->
-                        (div as HTMLDivElement).innerText = "Text set using ref {}"
+                        div.innerText = "Text set using ref {}"
                         onDispose {
                             div.innerText = ""
                         }
@@ -412,7 +412,7 @@ class AttributesTests {
 
             Div(attrs = {
                 attrsCallCounter += 1
-                ref { div ->
+                ref { _ ->
                     refInitCounter += 1
                     onDispose {
                         refDisposeCounter += 1
@@ -446,6 +446,7 @@ class AttributesTests {
                     id("id$readKey")
                 }
             ) {
+            @Suppress("DEPRECATION")
                 DisposableRefEffect(readKey) {
                     val p = document.createElement("p").also { it.innerHTML = "Key=$readKey" }
                     it.appendChild(p)

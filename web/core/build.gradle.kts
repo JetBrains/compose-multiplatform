@@ -27,13 +27,19 @@ kotlin {
         }
 
         val jsMain by getting {
+            languageSettings {
+                optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
+            }
             dependencies {
-                implementation(kotlin("stdlib-js"))
                 implementation(project(":internal-web-core-runtime"))
             }
         }
 
         val jsTest by getting {
+            languageSettings {
+                optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
+                optIn("org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi")
+            }
             dependencies {
                 implementation(project(":test-utils"))
                 implementation(kotlin("test-js"))
@@ -43,12 +49,6 @@ kotlin {
         val jvmMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
-            }
-        }
-
-        all {
-            languageSettings {
-                useExperimentalAnnotation("org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi")
             }
         }
     }

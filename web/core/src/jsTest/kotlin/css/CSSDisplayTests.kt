@@ -32,7 +32,7 @@ class CSSDisplayTests {
             }
         }
 
-        enumValues.forEachIndexed { index, displayStyle ->
+        enumValues.forEach { displayStyle ->
             assertEquals(
                 displayStyle.value,
                 (nextChild()).style.display

@@ -52,6 +52,7 @@ interface ElementScope<out TElement : Element> : DOMScope<TElement> {
     @Composable
     @NonRestartableComposable
     @Deprecated("DisposableRefEffect is deprecated, use regular DisposableEffect instead and access element via scopeElement() if needed")
+    @Suppress("DEPRECATION")
     fun DisposableRefEffect(
         effect: DisposableEffectScope.(TElement) -> DisposableEffectResult
     ) {
@@ -81,6 +82,7 @@ interface ElementScope<out TElement : Element> : DOMScope<TElement> {
     fun DomSideEffect(effect: DomEffectScope.(TElement) -> Unit)
 }
 
+@Suppress("DEPRECATION")
 abstract class ElementScopeBase<out TElement : Element> : ElementScope<TElement> {
     private var nextDisposableDomEffectKey = 0
     abstract val element: TElement
@@ -96,7 +98,6 @@ abstract class ElementScopeBase<out TElement : Element> : ElementScope<TElement>
 
     @Composable
     @NonRestartableComposable
-    @OptIn(ComposeCompilerApi::class)
     override fun DomSideEffect(
         key: Any?,
         effect: DomEffectScope.(TElement) -> Unit

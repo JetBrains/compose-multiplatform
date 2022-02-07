@@ -1,5 +1,8 @@
+import org.gradle.api.tasks.testing.AbstractTestTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.compose.gradle.kotlinKarmaConfig
+import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
+import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.targets
 
 plugins {
     kotlin("multiplatform") apply false
@@ -33,7 +36,25 @@ subprojects {
     group = "org.jetbrains.compose.web"
     version = COMPOSE_WEB_VERSION
 
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    if ((project.name != "web-widgets") && (project.name != "web-integration-widgets")) {
+        afterEvaluate {
+            if (plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")) {
+                project.kotlinExtension.targets.forEach { target ->
+                    target.compilations.forEach { compilation ->
+                        compilation.kotlinOptions {
+                            allWarningsAsErrors = true
+                            // see https://kotlinlang.org/docs/opt-in-requirements.html
+                            freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>() {
         kotlinOptions.jvmTarget = "11"
     }
 
@@ -53,16 +74,6 @@ subprojects {
     }
 
     pluginManager.withPlugin("kotlin-multiplatform") {
-        configure<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension> {
-            sourceSets {
-                all {
-                    languageSettings {
-                        optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
-                        optIn("kotlin.RequiresOptIn")
-                    }
-                }
-            }
-        }
         val printTestBundleSize by tasks.registering {
             dependsOn(tasks.named("jsTest"))
             doLast {
@@ -80,6 +91,7 @@ subprojects {
             tasks.named("jsTest") { finalizedBy(printTestBundleSize) }
         }
     }
+
 
     if (isSampleProject()) {
         val printBundleSize by tasks.registering {
