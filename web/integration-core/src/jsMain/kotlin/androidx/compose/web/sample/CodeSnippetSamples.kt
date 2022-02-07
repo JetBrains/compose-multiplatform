@@ -1,6 +1,7 @@
 package org.jetbrains.compose.web.sample
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import org.jetbrains.compose.web.attributes.InputType
@@ -70,8 +71,9 @@ fun CodeSnippet(code: String, language: String = "kotlin") {
                 classes(language)
             }
         ) {
-            DomSideEffect(code) {
-                it.setHighlightedCode(code)
+            DisposableEffect(code) {
+                scopeElement.setHighlightedCode(code)
+                onDispose {  }
             }
         }
     }

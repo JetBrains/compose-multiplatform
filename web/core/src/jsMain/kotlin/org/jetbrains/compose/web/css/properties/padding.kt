@@ -6,27 +6,27 @@
 package org.jetbrains.compose.web.css
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/padding
-fun StyleBuilder.padding(vararg value: CSSNumeric) {
+fun StyleScope.padding(vararg value: CSSNumeric) {
     // padding hasn't Typed OM yet
     property("padding", value.joinToString(" "))
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/padding-bottom
-fun StyleBuilder.paddingBottom(value: CSSNumeric) {
+fun StyleScope.paddingBottom(value: CSSNumeric) {
     property("padding-bottom", value)
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/padding-left
-fun StyleBuilder.paddingLeft(value: CSSNumeric) {
+fun StyleScope.paddingLeft(value: CSSNumeric) {
     property("padding-left", value)
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/padding-right
-fun StyleBuilder.paddingRight(value: CSSNumeric) {
+fun StyleScope.paddingRight(value: CSSNumeric) {
     property("padding-right", value)
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/padding-top
-fun StyleBuilder.paddingTop(value: CSSNumeric) {
+fun StyleScope.paddingTop(value: CSSNumeric) {
     property("padding-top", value)
 }

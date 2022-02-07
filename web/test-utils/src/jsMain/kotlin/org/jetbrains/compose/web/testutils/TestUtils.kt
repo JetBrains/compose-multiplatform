@@ -69,6 +69,8 @@ class TestScope : CoroutineScope by MainScope() {
      * Subsequent calls will return next child reference every time.
      */
     fun nextChild() = childrenIterator.next() as HTMLElement
+
+    @Suppress("UNCHECKED_CAST")
     fun <T> nextChild() = childrenIterator.next() as T
 
     /**
@@ -96,7 +98,7 @@ class TestScope : CoroutineScope by MainScope() {
      */
     suspend fun waitForChanges(element: HTMLElement) {
         suspendCoroutine<Unit> { continuation ->
-            val observer = MutationObserver { mutations, observer ->
+            val observer = MutationObserver { _, observer ->
                 continuation.resume(Unit)
                 observer.disconnect()
             }

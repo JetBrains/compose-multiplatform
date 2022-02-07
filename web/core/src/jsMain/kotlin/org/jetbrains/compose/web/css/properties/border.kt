@@ -23,23 +23,23 @@ class CSSBorder : CSSStyleValue {
     }
 }
 
-inline fun CSSBorder.width(size: CSSNumeric) {
+fun CSSBorder.width(size: CSSNumeric) {
     width = size
 }
 
-inline fun CSSBorder.style(style: LineStyle) {
+fun CSSBorder.style(style: LineStyle) {
     this.style = style
 }
 
-inline fun CSSBorder.color(color: CSSColorValue) {
+fun CSSBorder.color(color: CSSColorValue) {
     this.color = color
 }
 
-inline fun StyleBuilder.border(crossinline borderBuild: CSSBorder.() -> Unit) {
+fun StyleScope.border(borderBuild: CSSBorder.() -> Unit) {
     property("border", CSSBorder().apply(borderBuild))
 }
 
-fun StyleBuilder.border(
+fun StyleScope.border(
     width: CSSLengthValue? = null,
     style: LineStyle? = null,
     color: CSSColorValue? = null
@@ -51,15 +51,15 @@ fun StyleBuilder.border(
     }
 }
 
-fun StyleBuilder.borderRadius(r: CSSNumeric) {
+fun StyleScope.borderRadius(r: CSSNumeric) {
     property("border-radius", r)
 }
 
-fun StyleBuilder.borderRadius(topLeft: CSSNumeric, bottomRight: CSSNumeric) {
+fun StyleScope.borderRadius(topLeft: CSSNumeric, bottomRight: CSSNumeric) {
     property("border-radius", "$topLeft $bottomRight")
 }
 
-fun StyleBuilder.borderRadius(
+fun StyleScope.borderRadius(
     topLeft: CSSNumeric,
     topRightAndBottomLeft: CSSNumeric,
     bottomRight: CSSNumeric
@@ -67,7 +67,7 @@ fun StyleBuilder.borderRadius(
     property("border-radius", "$topLeft $topRightAndBottomLeft $bottomRight")
 }
 
-fun StyleBuilder.borderRadius(
+fun StyleScope.borderRadius(
     topLeft: CSSNumeric,
     topRight: CSSNumeric,
     bottomRight: CSSNumeric,
@@ -79,15 +79,15 @@ fun StyleBuilder.borderRadius(
     )
 }
 
-fun StyleBuilder.borderWidth(width: CSSNumeric) {
+fun StyleScope.borderWidth(width: CSSNumeric) {
     property("border-width", width)
 }
 
-fun StyleBuilder.borderWidth(topLeft: CSSNumeric, bottomRight: CSSNumeric) {
+fun StyleScope.borderWidth(topLeft: CSSNumeric, bottomRight: CSSNumeric) {
     property("border-width", "$topLeft $bottomRight")
 }
 
-fun StyleBuilder.borderWidth(
+fun StyleScope.borderWidth(
     topLeft: CSSNumeric,
     topRightAndBottomLeft: CSSNumeric,
     bottomRight: CSSNumeric
@@ -95,7 +95,7 @@ fun StyleBuilder.borderWidth(
     property("border-width", "$topLeft $topRightAndBottomLeft $bottomRight")
 }
 
-fun StyleBuilder.borderWidth(
+fun StyleScope.borderWidth(
     topLeft: CSSNumeric,
     topRight: CSSNumeric,
     bottomRight: CSSNumeric,

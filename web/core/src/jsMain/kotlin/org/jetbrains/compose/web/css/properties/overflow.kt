@@ -6,17 +6,17 @@
 package org.jetbrains.compose.web.css
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-x
-fun StyleBuilder.overflowX(value: String) {
+fun StyleScope.overflowX(value: String) {
     property("overflow-x", value)
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-y
-fun StyleBuilder.overflowY(value: String) {
+fun StyleScope.overflowY(value: String) {
     property("overflow-y", value)
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/overflow
-fun StyleBuilder.overflow(value: String) {
+fun StyleScope.overflow(value: String) {
     property("overflow", value)
 }
 

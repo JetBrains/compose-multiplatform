@@ -99,7 +99,7 @@ private class FilterBuilderImplementation : FilterBuilder {
 }
 
 @ExperimentalComposeWebApi
-fun StyleBuilder.filter(filterContext: FilterBuilder.() -> Unit) {
+fun StyleScope.filter(filterContext: FilterBuilder.() -> Unit) {
     val builder = FilterBuilderImplementation()
     property("filter", builder.apply(filterContext).toString())
 }

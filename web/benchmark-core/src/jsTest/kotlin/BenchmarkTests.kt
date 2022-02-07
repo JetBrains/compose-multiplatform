@@ -40,7 +40,7 @@ class BenchmarkTests {
 
         val avgMs = durations.map { it.toInt(DurationUnit.MILLISECONDS) }.average().toInt()
 
-        val browserName = window.navigator.userAgent.toLowerCase().let {
+        val browserName = window.navigator.userAgent.lowercase().let {
             when {
                 it.contains("chrome") -> "chrome"
                 it.contains("firefox") -> "firefox"

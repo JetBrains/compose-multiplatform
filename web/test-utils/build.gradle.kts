@@ -25,13 +25,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
-            }
-        }
-        val jsMain by getting {
-            dependencies {
                 implementation(project(":internal-web-core-runtime"))
-                implementation(project(":web-core"))
-                implementation(kotlin("stdlib-js"))
             }
         }
         val jsTest by getting {

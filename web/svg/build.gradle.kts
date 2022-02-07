@@ -35,15 +35,12 @@ kotlin {
         }
 
         val jsTest by getting {
+            languageSettings {
+                optIn("org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi")
+            }
             dependencies {
                 implementation(project(":test-utils"))
                 implementation(kotlin("test-js"))
-            }
-        }
-
-        all {
-            languageSettings {
-                useExperimentalAnnotation("org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi")
             }
         }
     }

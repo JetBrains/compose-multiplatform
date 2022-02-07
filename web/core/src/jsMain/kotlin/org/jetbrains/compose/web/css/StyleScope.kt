@@ -77,7 +77,7 @@ inline fun <TValue> CSSVariableValue(value: String) =
     "use property instead, will remove it soon",
     ReplaceWith("property(propertyName, value)")
 )
-fun StyleBuilder.add(
+fun StyleScope.add(
     propertyName: String,
     value: StylePropertyValue
 ) = property(propertyName, value)

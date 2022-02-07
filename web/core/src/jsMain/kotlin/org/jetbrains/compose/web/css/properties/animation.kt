@@ -31,35 +31,35 @@ data class CSSAnimation(
     }
 }
 
-inline fun CSSAnimation.duration(vararg values: CSSSizeValue<out CSSUnitTime>) {
+fun CSSAnimation.duration(vararg values: CSSSizeValue<out CSSUnitTime>) {
     this.duration = values.toList()
 }
 
-inline fun CSSAnimation.timingFunction(vararg values: AnimationTimingFunction) {
+fun CSSAnimation.timingFunction(vararg values: AnimationTimingFunction) {
     this.timingFunction = values.toList()
 }
 
-inline fun CSSAnimation.delay(vararg values: CSSSizeValue<out CSSUnitTime>) {
+fun CSSAnimation.delay(vararg values: CSSSizeValue<out CSSUnitTime>) {
     this.delay = values.toList()
 }
 
-inline fun CSSAnimation.iterationCount(vararg values: Int?) {
+fun CSSAnimation.iterationCount(vararg values: Int?) {
     this.iterationCount = values.toList()
 }
 
-inline fun CSSAnimation.direction(vararg values: AnimationDirection) {
+fun CSSAnimation.direction(vararg values: AnimationDirection) {
     this.direction = values.toList()
 }
 
-inline fun CSSAnimation.fillMode(vararg values: AnimationFillMode) {
+fun CSSAnimation.fillMode(vararg values: AnimationFillMode) {
     this.fillMode = values.toList()
 }
 
-inline fun CSSAnimation.playState(vararg values: AnimationPlayState) {
+fun CSSAnimation.playState(vararg values: AnimationPlayState) {
     this.playState = values.toList()
 }
 
-fun StyleBuilder.animation(
+fun StyleScope.animation(
     keyframesName: String,
     builder: CSSAnimation.() -> Unit
 ) {
@@ -67,9 +67,9 @@ fun StyleBuilder.animation(
     property("animation", animation)
 }
 
-inline fun StyleBuilder.animation(
+fun StyleScope.animation(
     keyframes: CSSNamedKeyframes,
-    noinline builder: CSSAnimation.() -> Unit
+    builder: CSSAnimation.() -> Unit
 ) = animation(keyframes.name, builder)
 
 
