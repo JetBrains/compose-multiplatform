@@ -554,6 +554,7 @@ package androidx.compose.ui.text.font {
   }
 
   public final class DelegatingFontLoaderForDeprecatedUsage_androidKt {
+    method @Deprecated public static androidx.compose.ui.text.font.FontFamily.Resolver createFontFamilyResolver(androidx.compose.ui.text.font.Font.ResourceLoader fontResourceLoader, android.content.Context context);
   }
 
   public abstract sealed class FileBasedFontFamily extends androidx.compose.ui.text.font.FontFamily {
