@@ -1,4 +1,4 @@
-# Status of Accessibility on Windows
+# Desktop Accessibility on Windows
 
 ## Enabling Java Accessibility on Windows
 Java Access Bridge is disabled by default. To enable it, run
@@ -14,5 +14,5 @@ HiDPI support in Access Bridge was landed in [JDK-8279227](https://bugs.openjdk.
 ### NVDA workaround
 NVDA 2021.3.1 does not handle widget position properly. Until they fix it we can override DPI awareness in NVDA compatibility settings as shown:
 
-![image](https://user-images.githubusercontent.com/3617329/151983695-2ff664a1-5ec5-4f27-9690-89037c6d9138.png)
+![NVDA compatibility settings](./images/nvda-compat.png)
 
