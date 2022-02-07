@@ -69,6 +69,8 @@ class NavigationDrawerTest {
         rule.mainClock.advanceTimeBy(100_000L)
     }
 
+    val NavigationDrawerWidth = NavigationDrawerTokens.ContainerWidth
+
     @Test
     fun navigationDrawer_testOffset_whenOpen() {
         rule.setMaterialContent(lightColorScheme()) {
@@ -99,9 +101,8 @@ class NavigationDrawerTest {
             )
         }
 
-        val width = rule.rootWidth()
         rule.onNodeWithTag("content")
-            .assertLeftPositionInRootIsEqualTo(-width)
+            .assertLeftPositionInRootIsEqualTo(-NavigationDrawerWidth)
     }
 
     @Test
@@ -156,10 +157,8 @@ class NavigationDrawerTest {
             )
         }
 
-        val width = rule.rootWidth()
-
         // Drawer should start in closed state
-        rule.onNodeWithTag(DrawerTestTag).assertLeftPositionInRootIsEqualTo(-width)
+        rule.onNodeWithTag(DrawerTestTag).assertLeftPositionInRootIsEqualTo(-NavigationDrawerWidth)
 
         // When the drawer state is set to Opened
         drawerState.open()
@@ -169,7 +168,7 @@ class NavigationDrawerTest {
         // When the drawer state is set to Closed
         drawerState.close()
         // Then the drawer should be closed
-        rule.onNodeWithTag(DrawerTestTag).assertLeftPositionInRootIsEqualTo(-width)
+        rule.onNodeWithTag(DrawerTestTag).assertLeftPositionInRootIsEqualTo(-NavigationDrawerWidth)
     }
 
     @Test
@@ -187,10 +186,8 @@ class NavigationDrawerTest {
             )
         }
 
-        val width = rule.rootWidth()
-
         // Drawer should start in closed state
-        rule.onNodeWithTag(DrawerTestTag).assertLeftPositionInRootIsEqualTo(-width)
+        rule.onNodeWithTag(DrawerTestTag).assertLeftPositionInRootIsEqualTo(-NavigationDrawerWidth)
 
         // When the drawer state is set to Opened
         drawerState.animateTo(DrawerValue.Open, TweenSpec())
@@ -200,7 +197,7 @@ class NavigationDrawerTest {
         // When the drawer state is set to Closed
         drawerState.animateTo(DrawerValue.Closed, TweenSpec())
         // Then the drawer should be closed
-        rule.onNodeWithTag(DrawerTestTag).assertLeftPositionInRootIsEqualTo(-width)
+        rule.onNodeWithTag(DrawerTestTag).assertLeftPositionInRootIsEqualTo(-NavigationDrawerWidth)
     }
 
     @Test
@@ -218,10 +215,8 @@ class NavigationDrawerTest {
             )
         }
 
-        val width = rule.rootWidth()
-
         // Drawer should start in closed state
-        rule.onNodeWithTag(DrawerTestTag).assertLeftPositionInRootIsEqualTo(-width)
+        rule.onNodeWithTag(DrawerTestTag).assertLeftPositionInRootIsEqualTo(-NavigationDrawerWidth)
 
         // When the drawer state is set to Opened
         drawerState.snapTo(DrawerValue.Open)
@@ -231,7 +226,7 @@ class NavigationDrawerTest {
         // When the drawer state is set to Closed
         drawerState.snapTo(DrawerValue.Closed)
         // Then the drawer should be closed
-        rule.onNodeWithTag(DrawerTestTag).assertLeftPositionInRootIsEqualTo(-width)
+        rule.onNodeWithTag(DrawerTestTag).assertLeftPositionInRootIsEqualTo(-NavigationDrawerWidth)
     }
 
     @Test
@@ -524,7 +519,7 @@ class NavigationDrawerTest {
             .performSemanticsAction(SemanticsActions.OnClick)
 
         // Then the drawer should be closed
-        rule.onNodeWithTag(DrawerTestTag).assertLeftPositionInRootIsEqualTo(-rule.rootWidth())
+        rule.onNodeWithTag(DrawerTestTag).assertLeftPositionInRootIsEqualTo(-NavigationDrawerWidth)
 
         topNode = rule.onNodeWithTag(topTag).fetchSemanticsNode()
         assertEquals(2, topNode.children.size)

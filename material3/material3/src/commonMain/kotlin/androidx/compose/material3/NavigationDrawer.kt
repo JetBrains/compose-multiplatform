@@ -22,7 +22,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -53,9 +52,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import kotlin.math.roundToInt
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 
 /**
  * Possible values of [DrawerState].
@@ -256,80 +255,65 @@ fun NavigationDrawer(
     content: @Composable () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    BoxWithConstraints(modifier.fillMaxSize()) {
-        val navigationDrawerConstraints = constraints
-        // TODO : think about Infinite max bounds case
-        if (!navigationDrawerConstraints.hasBoundedWidth) {
-            throw IllegalStateException("Drawer shouldn't have infinite width")
+    val minValue = -with(LocalDensity.current) { NavigationDrawerTokens.ContainerWidth.toPx() }
+    val maxValue = 0f
+
+    val anchors = mapOf(minValue to DrawerValue.Closed, maxValue to DrawerValue.Open)
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    Box(
+        modifier.fillMaxSize().swipeable(
+            state = drawerState.swipeableState,
+            anchors = anchors,
+            thresholds = { _, _ -> FractionalThreshold(0.5f) },
+            orientation = Orientation.Horizontal,
+            enabled = gesturesEnabled,
+            reverseDirection = isRtl,
+            velocityThreshold = DrawerVelocityThreshold,
+            resistance = null
+        )
+    ) {
+        Box {
+            content()
         }
-
-        val minValue = -navigationDrawerConstraints.maxWidth.toFloat()
-        val maxValue = 0f
-
-        val anchors = mapOf(minValue to DrawerValue.Closed, maxValue to DrawerValue.Open)
-        val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-        Box(
-            Modifier.swipeable(
-                state = drawerState.swipeableState,
-                anchors = anchors,
-                thresholds = { _, _ -> FractionalThreshold(0.5f) },
-                orientation = Orientation.Horizontal,
-                enabled = gesturesEnabled,
-                reverseDirection = isRtl,
-                velocityThreshold = DrawerVelocityThreshold,
-                resistance = null
-            )
-        ) {
-            Box {
-                content()
-            }
-            Scrim(
-                open = drawerState.isOpen,
-                onClose = {
-                    if (
-                        gesturesEnabled &&
-                        drawerState.swipeableState.confirmStateChange(DrawerValue.Closed)
-                    ) {
-                        scope.launch { drawerState.close() }
+        Scrim(
+            open = drawerState.isOpen,
+            onClose = {
+                if (
+                    gesturesEnabled &&
+                    drawerState.swipeableState.confirmStateChange(DrawerValue.Closed)
+                ) {
+                    scope.launch { drawerState.close() }
+                }
+            },
+            fraction = {
+                calculateFraction(minValue, maxValue, drawerState.offset.value)
+            },
+            color = scrimColor
+        )
+        val navigationMenu = getString(Strings.NavigationMenu)
+        Surface(
+            modifier = Modifier
+                .sizeIn(maxWidth = NavigationDrawerTokens.ContainerWidth)
+                .offset { IntOffset(drawerState.offset.value.roundToInt(), 0) }
+                .semantics {
+                    paneTitle = navigationMenu
+                    if (drawerState.isOpen) {
+                        dismiss {
+                            if (
+                                drawerState.swipeableState
+                                    .confirmStateChange(DrawerValue.Closed)
+                            ) {
+                                scope.launch { drawerState.close() }
+                            }; true
+                        }
                     }
                 },
-                fraction = {
-                    calculateFraction(minValue, maxValue, drawerState.offset.value)
-                },
-                color = scrimColor
-            )
-            val navigationMenu = getString(Strings.NavigationMenu)
-            Surface(
-                modifier = with(LocalDensity.current) {
-                    Modifier
-                        .sizeIn(
-                            minWidth = navigationDrawerConstraints.minWidth.toDp(),
-                            minHeight = navigationDrawerConstraints.minHeight.toDp(),
-                            maxWidth = NavigationDrawerTokens.ContainerWidth,
-                            maxHeight = navigationDrawerConstraints.maxHeight.toDp()
-                        )
-                }
-                    .offset { IntOffset(drawerState.offset.value.roundToInt(), 0) }
-                    .semantics {
-                        paneTitle = navigationMenu
-                        if (drawerState.isOpen) {
-                            dismiss {
-                                if (
-                                    drawerState.swipeableState
-                                        .confirmStateChange(DrawerValue.Closed)
-                                ) {
-                                    scope.launch { drawerState.close() }
-                                }; true
-                            }
-                        }
-                    },
-                shape = drawerShape,
-                color = drawerContainerColor,
-                contentColor = drawerContentColor,
-                tonalElevation = drawerTonalElevation
-            ) {
-                Column(Modifier.fillMaxSize(), content = drawerContent)
-            }
+            shape = drawerShape,
+            color = drawerContainerColor,
+            contentColor = drawerContentColor,
+            tonalElevation = drawerTonalElevation
+        ) {
+            Column(Modifier.fillMaxSize(), content = drawerContent)
         }
     }
 }
