@@ -7,42 +7,42 @@ package org.jetbrains.compose.web.css
 
 import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 
-fun StyleBuilder.position(position: Position) {
+fun StyleScope.position(position: Position) {
     property(
         "position",
         position.value
     )
 }
 
-fun StyleBuilder.top(value: CSSLengthOrPercentageValue) {
+fun StyleScope.top(value: CSSLengthOrPercentageValue) {
     property("top", value)
 }
 
-fun StyleBuilder.top(value: CSSAutoKeyword) {
+fun StyleScope.top(value: CSSAutoKeyword) {
     property("top", value)
 }
 
-fun StyleBuilder.bottom(value: CSSLengthOrPercentageValue) {
+fun StyleScope.bottom(value: CSSLengthOrPercentageValue) {
     property("bottom", value)
 }
 
-fun StyleBuilder.bottom(value: CSSAutoKeyword) {
+fun StyleScope.bottom(value: CSSAutoKeyword) {
     property("bottom", value)
 }
 
-fun StyleBuilder.left(value: CSSLengthOrPercentageValue) {
+fun StyleScope.left(value: CSSLengthOrPercentageValue) {
     property("left", value)
 }
 
-fun StyleBuilder.left(value: CSSAutoKeyword) {
+fun StyleScope.left(value: CSSAutoKeyword) {
     property("left", value)
 }
 
-fun StyleBuilder.right(value: CSSLengthOrPercentageValue) {
+fun StyleScope.right(value: CSSLengthOrPercentageValue) {
     property("right", value)
 }
 
-fun StyleBuilder.right(value: CSSAutoKeyword) {
+fun StyleScope.right(value: CSSAutoKeyword) {
     property("right", value)
 }
 

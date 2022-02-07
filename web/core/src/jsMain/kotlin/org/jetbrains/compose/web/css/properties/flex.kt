@@ -7,91 +7,91 @@ package org.jetbrains.compose.web.css
 
 import org.w3c.dom.css.CSS
 
-fun StyleBuilder.flexDirection(flexDirection: FlexDirection) {
+fun StyleScope.flexDirection(flexDirection: FlexDirection) {
     property("flex-direction", flexDirection.value)
 }
 
-fun StyleBuilder.flexWrap(flexWrap: FlexWrap) {
+fun StyleScope.flexWrap(flexWrap: FlexWrap) {
     property("flex-wrap", flexWrap.value)
 }
 
-fun StyleBuilder.flexFlow(flexDirection: FlexDirection, flexWrap: FlexWrap) {
+fun StyleScope.flexFlow(flexDirection: FlexDirection, flexWrap: FlexWrap) {
     property(
         "flex-flow",
         "${flexDirection.value} ${flexWrap.value}"
     )
 }
 
-fun StyleBuilder.justifyContent(justifyContent: JustifyContent) {
+fun StyleScope.justifyContent(justifyContent: JustifyContent) {
     property(
         "justify-content",
         justifyContent.value
     )
 }
-fun StyleBuilder.alignSelf(alignSelf: AlignSelf) {
+fun StyleScope.alignSelf(alignSelf: AlignSelf) {
     property(
         "align-self",
         alignSelf.value
     )
 }
 
-fun StyleBuilder.alignItems(alignItems: AlignItems) {
+fun StyleScope.alignItems(alignItems: AlignItems) {
     property(
         "align-items",
         alignItems.value
     )
 }
 
-fun StyleBuilder.alignContent(alignContent: AlignContent) {
+fun StyleScope.alignContent(alignContent: AlignContent) {
     property(
         "align-content",
         alignContent.value
     )
 }
 
-fun StyleBuilder.order(value: Int) {
+fun StyleScope.order(value: Int) {
     property("order", value)
 }
 
-fun StyleBuilder.flexGrow(value: Number) {
+fun StyleScope.flexGrow(value: Number) {
     property("flex-grow", value)
 }
 
-fun StyleBuilder.flexShrink(value: Number) {
+fun StyleScope.flexShrink(value: Number) {
     property("flex-shrink", value)
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/flex-basis
-fun StyleBuilder.flexBasis(value: String) {
+fun StyleScope.flexBasis(value: String) {
     property("flex-basis", value)
 }
 
-fun StyleBuilder.flexBasis(value: CSSNumeric) {
+fun StyleScope.flexBasis(value: CSSNumeric) {
     property("flex-basis", value)
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/flex
-fun StyleBuilder.flex(value: String) {
+fun StyleScope.flex(value: String) {
     property("flex", value)
 }
 
-fun StyleBuilder.flex(value: Int) {
+fun StyleScope.flex(value: Int) {
     property("flex", value)
 }
 
-fun StyleBuilder.flex(value: CSSNumeric) {
+fun StyleScope.flex(value: CSSNumeric) {
     property("flex", value)
 }
 
-fun StyleBuilder.flex(flexGrow: Int, flexBasis: CSSNumeric) {
+fun StyleScope.flex(flexGrow: Int, flexBasis: CSSNumeric) {
     property("flex", "${flexGrow} ${flexBasis}")
 }
 
-fun StyleBuilder.flex(flexGrow: Int, flexShrink: Int) {
+fun StyleScope.flex(flexGrow: Int, flexShrink: Int) {
     property("flex", "${flexGrow} ${flexShrink}")
 }
 
-fun StyleBuilder.flex(flexGrow: Int, flexShrink: Int, flexBasis: CSSNumeric) {
+fun StyleScope.flex(flexGrow: Int, flexShrink: Int, flexBasis: CSSNumeric) {
     property("flex", "${flexGrow} ${flexShrink} ${flexBasis}")
 }
 
