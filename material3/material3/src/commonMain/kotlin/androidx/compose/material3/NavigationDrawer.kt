@@ -21,31 +21,44 @@ import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.tokens.NavigationDrawerTokens
 import androidx.compose.material3.tokens.PaletteTokens
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.dismiss
 import androidx.compose.ui.semantics.onClick
@@ -546,6 +559,225 @@ object DrawerDefaults {
     val scrimColor: Color
         @Composable
         get() = PaletteTokens.NeutralVariant0.copy(alpha = NavigationDrawerTokens.ScrimOpacity)
+}
+
+/**
+ * Material Design navigation drawer item.
+ *
+ * A [NavigationDrawerItem] represents a destination within drawers, either [ModalNavigationDrawer],
+ * [PermanentNavigationDrawer] or [DismissibleNavigationDrawer].
+ *
+ * @sample androidx.compose.material3.samples.ModalNavigationDrawerSample
+ *
+ * @param label text label for this item
+ * @param selected whether this item is selected
+ * @param onClick the callback to be invoked when this item is clicked
+ * @param modifier optional [Modifier] for this item
+ * @param icon optional icon for this item, typically an [Icon]
+ * @param badge optional badge to show on this item from the end side
+ * @param colors the various colors used in elements of this item
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this item. You can create and pass in your own remembered [MutableInteractionSource] if
+ * you want to observe [Interaction]s and customize the appearance / behavior of this item in
+ * different [Interaction]s.
+ */
+@Composable
+@ExperimentalMaterial3Api
+fun NavigationDrawerItem(
+    label: @Composable () -> Unit,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    icon: (@Composable () -> Unit)? = null,
+    badge: (@Composable () -> Unit)? = null,
+    shape: Shape = NavigationDrawerTokens.ActiveIndicatorShape,
+    colors: NavigationDrawerItemColors = NavigationDrawerItemDefaults.colors(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+) {
+    Surface(
+        shape = shape,
+        color = colors.containerColor(selected).value,
+        interactionSource = interactionSource,
+        modifier = modifier
+            .height(NavigationDrawerTokens.ActiveIndicatorHeight)
+            .fillMaxWidth()
+            .selectable(
+                selected = selected,
+                onClick = onClick,
+                interactionSource = interactionSource,
+                role = Role.Tab,
+                indication = null
+            )
+    ) {
+        Row(
+            Modifier.padding(start = 16.dp, end = 24.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (icon != null) {
+                val iconColor = colors.iconColor(selected).value
+                CompositionLocalProvider(LocalContentColor provides iconColor, content = icon)
+                Spacer(Modifier.width(12.dp))
+            }
+            Box(Modifier.weight(1f)) {
+                val labelColor = colors.textColor(selected).value
+                CompositionLocalProvider(LocalContentColor provides labelColor, content = label)
+            }
+            if (badge != null) {
+                Spacer(Modifier.width(12.dp))
+                val badgeColor = colors.badgeColor(selected).value
+                CompositionLocalProvider(LocalContentColor provides badgeColor, content = badge)
+            }
+        }
+    }
+}
+
+/** Represents the colors of the various elements of a drawer item. */
+@Stable
+@ExperimentalMaterial3Api
+interface NavigationDrawerItemColors {
+
+    /**
+     * Represents the icon color for this item, depending on whether it is [selected].
+     *
+     * @param selected whether the item is selected
+     */
+    @Composable
+    fun iconColor(selected: Boolean): State<Color>
+
+    /**
+     * Represents the text color for this item, depending on whether it is [selected].
+     *
+     * @param selected whether the item is selected
+     */
+    @Composable
+    fun textColor(selected: Boolean): State<Color>
+
+    /**
+     * Represents the badge color for this item, depending on whether it is [selected].
+     *
+     * @param selected whether the item is selected
+     */
+    @Composable
+    fun badgeColor(selected: Boolean): State<Color>
+
+    /**
+     * Represents the container color for this item, depending on whether it is [selected].
+     *
+     * @param selected whether the item is selected
+     */
+    @Composable
+    fun containerColor(selected: Boolean): State<Color>
+}
+
+/** Defaults used in [NavigationDrawerItem]. */
+@ExperimentalMaterial3Api
+object NavigationDrawerItemDefaults {
+
+    /**
+     * Creates a [NavigationDrawerItemColors] with the provided colors according to the Material
+     * specification.
+     *
+     * @param selectedContainerColor the color to use for the background of the item when selected
+     * @param unselectedContainerColor the color to use for the background of the item when
+     * unselected
+     * @param selectedIconColor the color to use for the icon when the item is selected.
+     * @param unselectedIconColor the color to use for the icon when the item is unselected.
+     * @param selectedTextColor the color to use for the text label when the item is selected.
+     * @param unselectedTextColor the color to use for the text label when the item is unselected.
+     * @param selectedBadgeColor the color to use for the badge when the item is selected.
+     * @param unselectedBadgeColor the color to use for the badge when the item is unselected.
+     *
+     * @return the resulting [NavigationDrawerItemColors] used for [NavigationDrawerItem]
+     */
+    @Composable
+    fun colors(
+        selectedContainerColor: Color = NavigationDrawerTokens.ActiveIndicatorColor.toColor(),
+        unselectedContainerColor: Color = NavigationDrawerTokens.ContainerColor.toColor(),
+        selectedIconColor: Color = NavigationDrawerTokens.ActiveIconColor.toColor(),
+        unselectedIconColor: Color = NavigationDrawerTokens.InactiveIconColor.toColor(),
+        selectedTextColor: Color = NavigationDrawerTokens.ActiveLabelTextColor.toColor(),
+        unselectedTextColor: Color = NavigationDrawerTokens.InactiveLabelTextColor.toColor(),
+        selectedBadgeColor: Color = selectedTextColor,
+        unselectedBadgeColor: Color = unselectedTextColor,
+    ): NavigationDrawerItemColors = DefaultDrawerItemsColor(
+        selectedIconColor,
+        unselectedIconColor,
+        selectedTextColor,
+        unselectedTextColor,
+        selectedContainerColor,
+        unselectedContainerColor,
+        selectedBadgeColor,
+        unselectedBadgeColor
+    )
+
+    /**
+     * Default external padding for a [NavigationDrawerItem] according to material spec.
+     */
+    val ItemPadding = PaddingValues(horizontal = 12.dp)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+private class DefaultDrawerItemsColor(
+    val selectedIconColor: Color,
+    val unselectedIconColor: Color,
+    val selectedTextColor: Color,
+    val unselectedTextColor: Color,
+    val selectedContainerColor: Color,
+    val unselectedContainerColor: Color,
+    val selectedBadgeColor: Color,
+    val unselectedBadgeColor: Color
+) : NavigationDrawerItemColors {
+    @Composable
+    override fun iconColor(selected: Boolean): State<Color> {
+        return rememberUpdatedState(if (selected) selectedIconColor else unselectedIconColor)
+    }
+
+    @Composable
+    override fun textColor(selected: Boolean): State<Color> {
+        return rememberUpdatedState(if (selected) selectedTextColor else unselectedTextColor)
+    }
+
+    @Composable
+    override fun containerColor(selected: Boolean): State<Color> {
+        return rememberUpdatedState(
+            if (selected) selectedContainerColor else unselectedContainerColor
+        )
+    }
+
+    @Composable
+    override fun badgeColor(selected: Boolean): State<Color> {
+        return rememberUpdatedState(
+            if (selected) selectedBadgeColor else unselectedBadgeColor
+        )
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is DefaultDrawerItemsColor) return false
+
+        if (selectedIconColor != other.selectedIconColor) return false
+        if (unselectedIconColor != other.unselectedIconColor) return false
+        if (selectedTextColor != other.selectedTextColor) return false
+        if (unselectedTextColor != other.unselectedTextColor) return false
+        if (selectedContainerColor != other.selectedContainerColor) return false
+        if (unselectedContainerColor != other.unselectedContainerColor) return false
+        if (selectedBadgeColor != other.selectedBadgeColor) return false
+        if (unselectedBadgeColor != other.unselectedBadgeColor) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = selectedIconColor.hashCode()
+        result = 31 * result + unselectedIconColor.hashCode()
+        result = 31 * result + selectedTextColor.hashCode()
+        result = 31 * result + unselectedTextColor.hashCode()
+        result = 31 * result + selectedContainerColor.hashCode()
+        result = 31 * result + unselectedContainerColor.hashCode()
+        result = 31 * result + selectedBadgeColor.hashCode()
+        result = 31 * result + unselectedBadgeColor.hashCode()
+        return result
+    }
 }
 
 private fun calculateFraction(a: Float, b: Float, pos: Float) =
