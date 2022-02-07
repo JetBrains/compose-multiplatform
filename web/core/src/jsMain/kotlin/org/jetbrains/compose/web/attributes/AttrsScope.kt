@@ -148,7 +148,7 @@ open class AttrsScopeBuilder<TElement : Element> : AttrsScope<TElement>, EventsL
     override val propertyUpdates = mutableListOf<Pair<(Element, Any) -> Unit, Any>>()
     override var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
 
-    internal var classes: MutableList<String> = arrayListOf()
+    internal val classes: MutableList<String> = mutableListOf()
 
     /**
      * [classes] adds all values passed as params to the element's classList.
