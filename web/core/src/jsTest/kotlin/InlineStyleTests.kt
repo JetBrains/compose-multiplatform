@@ -164,10 +164,12 @@ class InlineStyleTests {
             }) {}
         }
 
-        assertEquals(
-            expected = "<span id=\"container\" style=\"opacity: 0.4; padding: 40px;\"></span>",
-            actual = root.innerHTML
-        )
+        with(nextChild()) {
+            val attrsMap = getAttributeNames().associateWith { getAttribute(it) }
+            assertEquals(2, attrsMap.size)
+            assertEquals("container", attrsMap["id"])
+            assertEquals("opacity: 0.4; padding: 40px;", attrsMap["style"])
+        }
     }
 
     @Test
@@ -181,9 +183,11 @@ class InlineStyleTests {
             })
         }
 
-        assertEquals(
-            expected = "<span id=\"container\" style=\"height: auto;\"></span>",
-            actual = root.innerHTML
-        )
+        with(nextChild()) {
+            val attrsMap = getAttributeNames().associateWith { getAttribute(it) }
+            assertEquals(2, attrsMap.size)
+            assertEquals("container", attrsMap["id"])
+            assertEquals("height: auto;", attrsMap["style"])
+        }
     }
 }

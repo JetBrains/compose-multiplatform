@@ -16,8 +16,108 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import org.jetbrains.compose.web.testutils.*
 import org.w3c.dom.HTMLInputElement
+import kotlin.test.assertContains
+import kotlin.test.assertTrue
 
 class AttributesTests {
+
+    @Test
+    fun correctOrderOfApplyingClasses() = runTest {
+        composition {
+            Div(attrs = {
+                prop<HTMLDivElement, String>({ element, v ->
+                    assertEquals("c1 c2 c3 c4", element.classList.value)
+                    element.classList.add(v)
+                }, "classFromProperty1")
+
+                classes("c1", "c2")
+                classes("c3", "c4")
+            }) {
+                Text("test")
+            }
+        }
+
+        with(nextChild()) {
+            assertEquals("c1 c2 c3 c4 classFromProperty1", getAttribute("class"))
+        }
+    }
+
+    @Test
+    fun correctOrderOfApplyingClasses2() = runTest {
+        composition {
+            Div(attrs = {
+                // attr rewrites the content of 'class'
+                attr("class", "classSetFromAttr")
+
+                prop<HTMLDivElement, String>({ element, v ->
+                    assertEquals("classSetFromAttr", element.classList.value)
+                    element.classList.add(v)
+                }, "classFromProperty1")
+
+                classes("c1", "c2")
+                classes("c3", "c4")
+            }) {
+                Text("test")
+            }
+        }
+
+        with(nextChild()) {
+            assertEquals("classSetFromAttr classFromProperty1", getAttribute("class"))
+        }
+    }
+
+    @Test
+    fun attrClassOverridesClassesCall() = runTest {
+        composition {
+            Div(attrs = {
+                // attr rewrites the content of 'class'
+                attr("class", "classSetFromAttr")
+                classes("c1")
+            })
+        }
+
+        with(nextChild()) {
+            assertEquals("classSetFromAttr", getAttribute("class"))
+        }
+    }
+
+    @Test
+    fun attrStyleOverridesStyleCall() = runTest {
+        composition {
+            Div(attrs = {
+                // attr rewrites the content of 'style'
+                attr("style", "color: red;")
+                style {
+                    color(Color.green)
+                }
+            })
+        }
+
+        with(nextChild()) {
+            assertEquals("color: red;", getAttribute("style"))
+        }
+    }
+
+    @Test
+    fun propCanSeeAllAttrsSet() = runTest {
+        val attrsCollectedInProp = mutableMapOf<String, String>()
+
+        composition {
+            Div(attrs = {
+                attr("style", "color: red;")
+                attr("class", "c1")
+                prop<HTMLDivElement, Unit>({ e, _ ->
+                    attrsCollectedInProp.putAll(
+                        e.getAttributeNames().associateWith { e.getAttribute(it)!! }
+                    )
+                }, Unit)
+            })
+        }
+
+        assertEquals("color: red;", attrsCollectedInProp["style"])
+        assertEquals("c1", attrsCollectedInProp["class"])
+        assertEquals(2, attrsCollectedInProp.size)
+    }
 
     @Test
     fun copyFromStyleBuilderCopiesCorrectly() {
@@ -43,17 +143,17 @@ class AttributesTests {
             classes("a b c")
             attr("title", "customTitle")
 
-            prop<HTMLElement, String>({_, _ ->}, "Value")
+            prop<HTMLElement, String>({ _, _ -> }, "Value")
 
-            ref { onDispose {  } }
+            ref { onDispose { } }
             style {
                 width(500.px)
                 backgroundColor(Color.red)
             }
 
-            onClick {  }
-            onFocusIn {  }
-            onMouseEnter {  }
+            onClick { }
+            onFocusIn { }
+            onMouseEnter { }
         }
 
         val copyToAttrsScope = AttrsScopeBuilder<HTMLElement>().apply {
@@ -75,7 +175,7 @@ class AttributesTests {
 
         val copyToAttrsScope = AttrsScopeBuilder<HTMLElement>().apply {
             id("id1")
-            onClick {  }
+            onClick { }
             style {
                 width(100.px)
             }
@@ -387,18 +487,31 @@ class AttributesTests {
             }
         }
 
-        assertEquals(
-            expected = "<button class=\"a\" style=\"color: red;\">Button</button>",
-            actual = nextChild().outerHTML
-        )
+        with(nextChild()) {
+            val attrs = getAttributeNames().toList()
+            assertEquals(2, attrs.size)
+            assertTrue(attrs.containsAll(listOf("style", "class",)))
+
+            assertEquals("button", tagName.lowercase())
+            assertEquals("a", getAttribute("class"))
+            assertEquals("color: red;", getAttribute("style"))
+            assertEquals("Button", innerText)
+        }
 
         hasValue = true
         waitForRecompositionComplete()
 
-        assertEquals(
-            expected = "<button style=\"color: red;\" value=\"buttonValue\" class=\"a b\">Button</button>",
-            actual = currentChild().outerHTML
-        )
+        with(currentChild()) {
+            val attrs = getAttributeNames().toList()
+            assertEquals(3, attrs.size)
+            assertTrue(attrs.containsAll(listOf("style", "class", "value")))
+
+            assertEquals("button", tagName.lowercase())
+            assertEquals("a b", getAttribute("class"))
+            assertEquals("buttonValue", getAttribute("value"))
+            assertEquals("color: red;", getAttribute("style"))
+            assertEquals("Button", innerText)
+        }
     }
 
     @Test
