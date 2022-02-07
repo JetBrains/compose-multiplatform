@@ -53,8 +53,6 @@ private class DomElementWrapper(override val node: Element): DomNodeWrapper(node
     }
 
     fun updateProperties(applicators: List<Pair<(Element, Any) -> Unit, Any>>) {
-        node.removeAttribute("class")
-
         applicators.forEach { (applicator, item) ->
             applicator(node, item)
         }
@@ -80,12 +78,23 @@ private class DomElementWrapper(override val node: Element): DomNodeWrapper(node
 
     fun updateAttrs(attrs: Map<String, String>) {
         node.getAttributeNames().forEach { name ->
-            if (name == "style") return@forEach
-            node.removeAttribute(name)
+            when (name) {
+                "style", "class" -> {
+                    // skip style and class here, they're managed in corresponding methods
+                }
+                else -> node.removeAttribute(name)
+            }
         }
 
         attrs.forEach {
             node.setAttribute(it.key, it.value)
+        }
+    }
+
+    fun updateClasses(classes: List<String>) {
+        node.removeAttribute("class")
+        if (classes.isNotEmpty()) {
+            node.classList.add(*classes.toTypedArray())
         }
     }
 }
@@ -114,10 +123,14 @@ fun <TElement : Element> TagElement(
             refEffect = attrsScope.refEffect
 
             update {
-                set(attrsScope.collect(), DomElementWrapper::updateAttrs)
-                set(attrsScope.collectListeners(), DomElementWrapper::updateEventListeners)
-                set(attrsScope.propertyUpdates, DomElementWrapper::updateProperties)
+                set(attrsScope.classes, DomElementWrapper::updateClasses)
                 set(attrsScope.styleScope, DomElementWrapper::updateStyleDeclarations)
+                set(attrsScope.collect(), DomElementWrapper::updateAttrs)
+                set(
+                    attrsScope.eventsListenerScopeBuilder.collectListeners(),
+                    DomElementWrapper::updateEventListeners
+                )
+                set(attrsScope.propertyUpdates, DomElementWrapper::updateProperties)
             }
         },
         elementScope = scope,

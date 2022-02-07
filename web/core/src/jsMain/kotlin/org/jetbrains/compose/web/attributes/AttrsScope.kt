@@ -28,16 +28,6 @@ typealias AttrsBuilder<T> = AttrsScopeBuilder<T>
  *
  */
 interface AttrsScope<TElement : Element>: EventsListenerScope {
-    @ComposeWebInternalApi
-    val attributesMap: Map<String, String>
-    @ComposeWebInternalApi
-    val styleScope: StyleScope
-
-    @ComposeWebInternalApi
-    val propertyUpdates: List<Pair<(Element, Any) -> Unit, Any>>
-    @ComposeWebInternalApi
-    var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)?
-
     /**
      * [style] add inline CSS-style properties to the element via [StyleScope] context
      *
@@ -47,18 +37,20 @@ interface AttrsScope<TElement : Element>: EventsListenerScope {
      *      style { maxWidth(5.px) }
      * })
      * ```
+     *
+     * `attr("style", ...)` overrides everything added in `style { }` blocks
      */
-    fun style(builder: StyleScope.() -> Unit) {
-        styleScope.apply(builder)
-    }
+    fun style(builder: StyleScope.() -> Unit)
 
     /**
      * [classes] adds all values passed as params to the element's classList.
      *  This method acts cumulatively, that is, each call adds values to the classList.
      *  In the ideology of Composable functions and their recomposition one just don't need to remove classes,
      *  since if your classList is, for instance, condition-dependent, you can always just call this method conditionally.
+     *
+     *  `attr("class", ...)` overrides everything added using `classes(...)` calls
      */
-    fun classes(vararg classes: String)= prop(setClassList, classes)
+    fun classes(vararg classes: String)
 
     fun id(value: String) = attr(ID, value)
     fun hidden() = attr(HIDDEN, true.toString())
@@ -101,7 +93,7 @@ interface AttrsScope<TElement : Element>: EventsListenerScope {
     fun attr(attr: String, value: String): AttrsScope<TElement>
 
     /**
-     * [prop] allows setting values of element's properties which can't be set by ussing [attr].
+     * [prop] allows setting values of element's properties which can't be set using [attr].
      * [update] is a lambda with two parameters: `element` and `value`. `element` is a reference to a native element.
      * Some examples of properties that can set using [prop]: `value`, `checked`, `innerText`.
      *
@@ -120,9 +112,6 @@ interface AttrsScope<TElement : Element>: EventsListenerScope {
     @Suppress("UNCHECKED_CAST")
     fun <E : HTMLElement, V> prop(update: (E, V) -> Unit, value: V)
 
-    @ComposeWebInternalApi
-    fun copyFrom(attrsScope: AttrsScope<TElement>)
-
     companion object {
         const val CLASS = "class"
         const val ID = "id"
@@ -137,12 +126,40 @@ interface AttrsScope<TElement : Element>: EventsListenerScope {
     }
 }
 
-open class AttrsScopeBuilder<TElement : Element> : AttrsScope<TElement>, EventsListenerScope by EventsListenerScopeBuilder() {
-    override val attributesMap = mutableMapOf<String, String>()
-    override val styleScope: StyleScope = StyleScopeBuilder()
+open class AttrsScopeBuilder<TElement : Element>(
+    internal val eventsListenerScopeBuilder: EventsListenerScopeBuilder = EventsListenerScopeBuilder()
+) : AttrsScope<TElement>, EventsListenerScope by eventsListenerScopeBuilder {
+    internal val attributesMap = mutableMapOf<String, String>()
+    internal val styleScope: StyleScopeBuilder = StyleScopeBuilder()
+    internal val propertyUpdates = mutableListOf<Pair<(Element, Any) -> Unit, Any>>()
+    internal var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
+    internal val classes: MutableList<String> = mutableListOf()
 
-    override val propertyUpdates = mutableListOf<Pair<(Element, Any) -> Unit, Any>>()
-    override var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
+    /**
+     * [classes] adds all values passed as params to the element's classList.
+     *  This method acts cumulatively, that is, each call adds values to the classList.
+     *  In the ideology of Composable functions and their recomposition one just don't need to remove classes,
+     *  since if your classList is, for instance, condition-dependent, you can always just call this method conditionally.
+     */
+    override fun classes(vararg classes: String) {
+        this.classes.addAll(classes)
+    }
+
+    /**
+     * [style] add inline CSS-style properties to the element via [StyleScope] context
+     *
+     * Example:
+     * ```
+     * Div({
+     *      style { maxWidth(5.px) }
+     * })
+     * ```
+     *
+     * `attr("style", ...)` overrides everything added in `style { }` blocks
+     */
+    override fun style(builder: StyleScope.() -> Unit) {
+        styleScope.apply(builder)
+    }
 
     /**
      * [ref] can be used to retrieve a reference to a html element.
@@ -196,14 +213,14 @@ open class AttrsScopeBuilder<TElement : Element> : AttrsScope<TElement>, EventsL
     }
 
     @ComposeWebInternalApi
-    override fun copyFrom(attrsScope: AttrsScope<TElement>) {
+    internal fun copyFrom(attrsScope: AttrsScopeBuilder<TElement>) {
         refEffect = attrsScope.refEffect
         styleScope.copyFrom(attrsScope.styleScope)
 
         attributesMap.putAll(attrsScope.attributesMap)
         propertyUpdates.addAll(attrsScope.propertyUpdates)
 
-        copyListenersFrom(attrsScope)
+        eventsListenerScopeBuilder.copyListenersFrom(attrsScope.eventsListenerScopeBuilder)
     }
 }
 

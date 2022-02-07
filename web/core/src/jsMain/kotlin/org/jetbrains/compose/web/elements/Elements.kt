@@ -599,11 +599,7 @@ fun Select(
     applyAttrs = {
         if (multiple) multiple()
         if (attrs != null) {
-            val selectAttrsBuilder = with(SelectAttrsScope()) {
-                attrs()
-                this
-            }
-            copyFrom(selectAttrsBuilder)
+            SelectAttrsScope(this).attrs()
         }
     },
     content = content
@@ -683,7 +679,7 @@ fun TextArea(
     TagElement(
         elementBuilder = TextArea,
         applyAttrs = {
-            val textAreaAttrsBuilder = TextAreaAttrsScope()
+            val textAreaAttrsBuilder = TextAreaAttrsScope(this)
             textAreaAttrsBuilder.onInput {
                 // controlled state needs to be restored after every input
                 keyForRestoringControlledState.value = keyForRestoringControlledState.value + 1
@@ -694,8 +690,6 @@ fun TextArea(
             if (firstProvidedValueWasNotNull) {
                 textAreaAttrsBuilder.value(value ?: "")
             }
-
-            this.copyFrom(textAreaAttrsBuilder)
         },
         content = {
             DisposableEffect(keyForRestoringControlledState.value) {
@@ -1007,7 +1001,7 @@ fun <K> Input(
     TagElement(
         elementBuilder = Input,
         applyAttrs = {
-            val inputAttrsBuilder = InputAttrsScope(type)
+            val inputAttrsBuilder = InputAttrsScope(type, this)
             inputAttrsBuilder.type(type)
             inputAttrsBuilder.onInput {
                 // controlled state needs to be restored after every input
@@ -1015,8 +1009,6 @@ fun <K> Input(
             }
 
             inputAttrsBuilder.attrs()
-
-            this.copyFrom(inputAttrsBuilder)
         },
         content = {
             if (type == InputType.Radio) {
