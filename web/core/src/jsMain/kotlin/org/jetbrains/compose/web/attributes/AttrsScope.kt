@@ -135,6 +135,15 @@ open class AttrsScopeBuilder<TElement : Element>(
     internal var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
     internal val classes: MutableList<String> = mutableListOf()
 
+    internal fun clear() {
+        eventsListenerScopeBuilder.clear()
+        attributesMap.clear()
+        styleScope.clear()
+        propertyUpdates.clear()
+        refEffect = null
+        classes.clear()
+    }
+
     /**
      * [classes] adds all values passed as params to the element's classList.
      *  This method acts cumulatively, that is, each call adds values to the classList.
