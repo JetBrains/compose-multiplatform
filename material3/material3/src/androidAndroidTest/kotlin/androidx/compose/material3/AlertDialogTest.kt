@@ -19,6 +19,7 @@ package androidx.compose.material3
 import android.os.Build
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.tokens.DialogTokens
@@ -276,6 +277,62 @@ class AlertDialogTest {
                 onDismissRequest = {},
                 title = { Text(text = "Title", modifier = Modifier.testTag(TitleTestTag)) },
                 text = { Text("Text", modifier = Modifier.testTag(TextTestTag)) },
+                confirmButton = {},
+                dismissButton = {
+                    TextButton(
+                        onClick = { /* doSomething() */ },
+                        Modifier.testTag(DismissButtonTestTag).semantics(mergeDescendants = true) {}
+                    ) {
+                        Text("Dismiss")
+                    }
+                }
+            )
+        }
+
+        val dialogBounds = rule.onNode(isDialog()).getUnclippedBoundsInRoot()
+        val titleBounds = rule.onNodeWithTag(TitleTestTag).getUnclippedBoundsInRoot()
+        val textBounds = rule.onNodeWithTag(TextTestTag).getUnclippedBoundsInRoot()
+        val dismissBtBounds = rule.onNodeWithTag(DismissButtonTestTag).getUnclippedBoundsInRoot()
+
+        rule.onNodeWithTag(TitleTestTag)
+            // Title should 24dp from the left.
+            .assertLeftPositionInRootIsEqualTo(24.dp)
+            // Title should be 24dp from the top.
+            .assertTopPositionInRootIsEqualTo(24.dp)
+
+        rule.onNodeWithTag(TextTestTag)
+            // Text should be 24dp from the start.
+            .assertLeftPositionInRootIsEqualTo(24.dp)
+            // Text should be 16dp below the title.
+            .assertTopPositionInRootIsEqualTo(titleBounds.bottom + 16.dp)
+
+        rule.onNodeWithTag(DismissButtonTestTag)
+            // Dismiss button should be 24dp from the right.
+            .assertLeftPositionInRootIsEqualTo(dialogBounds.right - 24.dp - dismissBtBounds.width)
+            // Buttons should be 18dp from the bottom (test button default height is 48dp).
+            .assertTopPositionInRootIsEqualTo(dialogBounds.bottom - 18.dp - 48.dp)
+
+        (dismissBtBounds.top - textBounds.bottom).assertIsEqualTo(
+            18.dp,
+            "padding between the text and the button"
+        )
+    }
+
+    @Test
+    fun alertDialog_positioningWithLazyColumnText() {
+        rule.setMaterialContent(lightColorScheme()) {
+            AlertDialog(
+                onDismissRequest = {},
+                title = { Text(text = "Title", modifier = Modifier.testTag(TitleTestTag)) },
+                text = {
+                    LazyColumn(modifier = Modifier.testTag(TextTestTag)) {
+                        items(100) {
+                            Text(
+                                text = "Message!"
+                            )
+                        }
+                    }
+                },
                 confirmButton = {},
                 dismissButton = {
                     TextButton(
