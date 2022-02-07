@@ -47,6 +47,8 @@ interface AttrsScope<TElement : Element>: EventsListenerScope {
      *      style { maxWidth(5.px) }
      * })
      * ```
+     *
+     * `attr("style", ...)` overrides everything added in `style { }` blocks
      */
     fun style(builder: StyleScope.() -> Unit) {
         styleScope.apply(builder)
@@ -57,8 +59,10 @@ interface AttrsScope<TElement : Element>: EventsListenerScope {
      *  This method acts cumulatively, that is, each call adds values to the classList.
      *  In the ideology of Composable functions and their recomposition one just don't need to remove classes,
      *  since if your classList is, for instance, condition-dependent, you can always just call this method conditionally.
+     *
+     *  `attr("class", ...)` overrides everything added using `classes(...)` calls
      */
-    fun classes(vararg classes: String)= prop(setClassList, classes)
+    fun classes(vararg classes: String)
 
     fun id(value: String) = attr(ID, value)
     fun hidden() = attr(HIDDEN, true.toString())
@@ -143,6 +147,18 @@ open class AttrsScopeBuilder<TElement : Element> : AttrsScope<TElement>, EventsL
 
     override val propertyUpdates = mutableListOf<Pair<(Element, Any) -> Unit, Any>>()
     override var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
+
+    internal val classes: MutableList<String> = mutableListOf()
+
+    /**
+     * [classes] adds all values passed as params to the element's classList.
+     *  This method acts cumulatively, that is, each call adds values to the classList.
+     *  In the ideology of Composable functions and their recomposition one just don't need to remove classes,
+     *  since if your classList is, for instance, condition-dependent, you can always just call this method conditionally.
+     */
+    override fun classes(vararg classes: String) {
+        this.classes.addAll(classes)
+    }
 
     /**
      * [ref] can be used to retrieve a reference to a html element.
