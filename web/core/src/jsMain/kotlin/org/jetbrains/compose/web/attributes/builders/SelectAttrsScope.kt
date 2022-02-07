@@ -5,7 +5,7 @@
 
 package androidx.compose.web.attributes
 
-import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
+import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.attributes.EventsListenerScope.Companion.CHANGE
 import org.jetbrains.compose.web.attributes.EventsListenerScope.Companion.INPUT
 import org.jetbrains.compose.web.attributes.SyntheticEventListener
@@ -20,7 +20,7 @@ import org.w3c.dom.events.Event
 )
 typealias SelectAttrsBuilder = SelectAttrsScope
 
-class SelectAttrsScope : AttrsScopeBuilder<HTMLSelectElement>() {
+class SelectAttrsScope(attrsScope: AttrsScope<HTMLSelectElement>) : AttrsScope<HTMLSelectElement> by attrsScope {
 
     fun onInput(
         listener: (SyntheticInputEvent<String?, HTMLSelectElement>) -> Unit
