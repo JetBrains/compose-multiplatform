@@ -75,12 +75,6 @@ class TestScope : CoroutineScope by MainScope() {
     fun <T> nextChild() = childrenIterator.next() as T
 
     /**
-     * @return a reference to current child.
-     * Calling this subsequently returns the same reference every time.
-     */
-    fun currentChild() = root.children[childrenIterator.previousIndex()] as HTMLElement
-
-    /**
      * Suspends until element with [elementId] observes any change to its html.
      */
     suspend fun waitForChanges(elementId: String) {

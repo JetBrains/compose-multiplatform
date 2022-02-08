@@ -491,7 +491,8 @@ class AttributesTests {
             }
         }
 
-        with(nextChild()) {
+        val child = nextChild()
+        with(child) {
             val attrs = getAttributeNames().toList()
             assertEquals(2, attrs.size)
             assertTrue(attrs.containsAll(listOf("style", "class",)))
@@ -505,7 +506,7 @@ class AttributesTests {
         hasValue = true
         waitForRecompositionComplete()
 
-        with(currentChild()) {
+        with(child) {
             val attrs = getAttributeNames().toList()
             assertEquals(3, attrs.size)
             assertTrue(attrs.containsAll(listOf("style", "class", "value")))

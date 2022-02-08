@@ -179,8 +179,12 @@ class CSSBackgroundTests {
         }
 
         assertEquals("rgb(0, 128, 0)", nextChild().computedStyle.backgroundColor)
-        assertEquals("content-box", nextChild().computedStyle.backgroundOrigin)
-        assertEquals("radial-gradient(rgb(220, 20, 60), rgb(135, 206, 235))", currentChild().computedStyle.backgroundImage)
+
+        with(nextChild().computedStyle) {
+            assertEquals("content-box", backgroundOrigin)
+            assertEquals("radial-gradient(rgb(220, 20, 60), rgb(135, 206, 235))", backgroundImage)
+        }
+
         assertEquals("no-repeat", nextChild().computedStyle.backgroundRepeat)
     }
 
