@@ -80,13 +80,6 @@ class TestScope : CoroutineScope by MainScope() {
     fun currentChild() = root.children[childrenIterator.previousIndex()] as HTMLElement
 
     /**
-     * Suspends until [root] observes any change to its html.
-     */
-    suspend fun waitForChanges() {
-        waitForChanges(root)
-    }
-
-    /**
      * Suspends until element with [elementId] observes any change to its html.
      */
     suspend fun waitForChanges(elementId: String) {
@@ -96,7 +89,7 @@ class TestScope : CoroutineScope by MainScope() {
     /**
      * Suspends until [element] observes any change to its html.
      */
-    suspend fun waitForChanges(element: HTMLElement) {
+    suspend fun waitForChanges(element: HTMLElement = root) {
         suspendCoroutine<Unit> { continuation ->
             val observer = MutationObserver { _, observer ->
                 continuation.resume(Unit)
