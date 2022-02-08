@@ -5,7 +5,6 @@
 
 package org.jetbrains.compose.web.core.tests.css
 
-import kotlinx.browser.window
 import org.jetbrains.compose.web.testutils.*
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
@@ -75,7 +74,7 @@ class CSSMarginTests {
             })
         }
 
-        val el = window.getComputedStyle(nextChild())
+        val el = nextChild().computedStyle
 
         assertEquals("4px", el.marginTop, "marginTop")
         assertEquals("4px", el.marginRight, "marginRight")
@@ -93,7 +92,7 @@ class CSSMarginTests {
             })
         }
 
-        val el = window.getComputedStyle(nextChild())
+        val el = nextChild().computedStyle
 
         assertEquals("4px", el.marginTop, "marginTop")
         assertEquals("6px", el.marginRight, "marginRight")
@@ -111,7 +110,7 @@ class CSSMarginTests {
             })
         }
 
-        val el = window.getComputedStyle(nextChild())
+        val el = nextChild().computedStyle
 
         assertEquals("4px", el.marginTop, "marginTop")
         assertEquals("6px", el.marginRight, "marginRight")
@@ -129,7 +128,7 @@ class CSSMarginTests {
             })
         }
 
-        val el = window.getComputedStyle(nextChild())
+        val el = nextChild().computedStyle
 
         assertEquals("4px", el.marginTop, "marginTop")
         assertEquals("6px", el.marginRight, "marginRight")

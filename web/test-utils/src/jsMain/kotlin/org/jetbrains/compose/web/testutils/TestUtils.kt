@@ -13,6 +13,7 @@ import org.w3c.dom.HTMLElement
 import org.w3c.dom.MutationObserver
 import org.w3c.dom.MutationObserverInit
 import org.w3c.dom.asList
+import org.w3c.dom.css.CSSStyleDeclaration
 import org.w3c.dom.get
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
@@ -171,3 +172,6 @@ private class TestMonotonicClockImpl(
         }
     }
 }
+
+val HTMLElement.computedStyle: CSSStyleDeclaration
+    get() = window.getComputedStyle(this)

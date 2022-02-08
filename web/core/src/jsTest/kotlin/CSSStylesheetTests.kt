@@ -5,7 +5,6 @@
 
 package org.jetbrains.compose.web.core.tests
 
-import kotlinx.browser.window
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.stringPresentation
@@ -156,7 +155,7 @@ class CSSVariableTests {
 
         val el = root.children[1] as HTMLElement
         val boundingRect = el.getBoundingClientRect()
-        assertEquals("4", window.getComputedStyle(el).order)
+        assertEquals("4", el.computedStyle.order)
         assertEquals(150.toDouble(), boundingRect.width)
         assertEquals(170.toDouble(), boundingRect.height)
     }
@@ -184,9 +183,10 @@ class CSSVariableTests {
             })
         }
 
-        root.children[1]?.let { el ->
-            assertEquals("rgb(0, 255, 0)", window.getComputedStyle(el).color)
-            assertEquals("rgb(0, 128, 0)", window.getComputedStyle(el).backgroundColor)
+
+        (root.children[1] as HTMLElement?)?.let { el ->
+            assertEquals("rgb(0, 255, 0)", el.computedStyle.color)
+            assertEquals("rgb(0, 128, 0)", el.computedStyle.backgroundColor)
         }
     }
 
