@@ -44,7 +44,8 @@ interface Font {
      */
     @Deprecated(
         "Replaced with FontFamily.Resolver during the introduction of async fonts, " +
-            "all usages should be replaced"
+            "all usages should be replaced. Custom subclasses can be converted into a " +
+            "FontFamily.Resolver by calling createFontFamilyResolver(myFontFamilyResolver, context)"
     )
     interface ResourceLoader {
         /**
