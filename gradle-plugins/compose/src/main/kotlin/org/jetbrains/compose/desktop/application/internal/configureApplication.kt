@@ -136,7 +136,11 @@ internal fun Project.configurePackagingTasks(apps: Collection<Application>) {
                         checkRuntime = checkRuntime
                     )
                 } else {
-                    configurePackagingTask(app, createAppImage = createDistributable)
+                    configurePackagingTask(
+                        app,
+                        createAppImage = createDistributable,
+                        checkRuntime = checkRuntime
+                    )
                 }
             }
 
