@@ -211,7 +211,6 @@ class LazyGridState constructor(
      * @param scrollOffset the number of pixels past the start of the item to snap to. Must
      * not be negative.
      */
-    @OptIn(ExperimentalFoundationApi::class)
     suspend fun scrollToItem(
         /*@IntRange(from = 0)*/
         index: Int,
@@ -241,7 +240,6 @@ class LazyGridState constructor(
      *
      * If [scroll] is called from elsewhere, this will be canceled.
      */
-    @OptIn(ExperimentalFoundationApi::class)
     override suspend fun scroll(
         scrollPriority: MutatePriority,
         block: suspend ScrollScope.() -> Unit
