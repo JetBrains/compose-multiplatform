@@ -292,6 +292,31 @@ class MenuBarTest {
         exitApplication()
     }
 
+    // bug https://github.com/JetBrains/compose-jb/issues/1097#issuecomment-921108560
+    @Test(timeout = 20000)
+    fun `set icon and disable item`() = runApplicationTest {
+        var window: ComposeWindow? = null
+        val redIcon = testImage(Color.Red)
+
+        launchApplication {
+            Window(onCloseRequest = {}) {
+                window = this.window
+
+                MenuBar {
+                    Menu("Menu") {
+                        Item("Item", icon = redIcon, enabled = false, onClick = {})
+                    }
+                }
+            }
+        }
+
+        awaitIdle()
+        window!!.jMenuBar.getMenu(0).doClick()
+        window!!.paint(window!!.graphics)
+
+        exitApplication()
+    }
+
     @Test(timeout = 20000)
     fun `change checked of CheckboxItem`() = runApplicationTest {
         var window: ComposeWindow? = null
