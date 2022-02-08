@@ -38,8 +38,15 @@ val NoOpUpdate: Component.() -> Unit = {}
 
 /**
  * Composes an AWT/Swing component obtained from [factory]. The [factory]
- * block will be called to obtain the [Component] to be composed. The Swing component is
- * placed on top of the Compose layer.
+ * block will be called to obtain the [Component] to be composed.
+ *
+ * The Swing component is placed on
+ * top of the Compose layer (that means that Compose content can't overlap or clip it).
+ * This can be changed in the future, when the better interop with Swing will be implemented. See related issues:
+ * https://github.com/JetBrains/compose-jb/issues/1521
+ * https://github.com/JetBrains/compose-jb/issues/1202
+ * https://github.com/JetBrains/compose-jb/issues/1449
+ *
  * The [update] block runs due to recomposition, this is the place to set [Component] properties
  * depending on state. When state changes, the block will be reexecuted to set the new properties.
  *
