@@ -57,7 +57,7 @@ class SliderScreenshotTest {
 
     @Test
     fun sliderTest_origin() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 var position by remember { mutableStateOf(0f) }
                 Slider(position, { position = it })
@@ -68,7 +68,7 @@ class SliderScreenshotTest {
 
     @Test
     fun sliderTest_origin_disabled() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 var position by remember { mutableStateOf(0f) }
                 Slider(position, { position = it }, enabled = false)
@@ -79,7 +79,7 @@ class SliderScreenshotTest {
 
     @Test
     fun sliderTest_middle() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 var position by remember { mutableStateOf(0.5f) }
                 Slider(position, { position = it })
@@ -90,7 +90,7 @@ class SliderScreenshotTest {
 
     @Test
     fun sliderTest_end() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 var position by remember { mutableStateOf(1f) }
                 Slider(position, { position = it })
@@ -101,7 +101,7 @@ class SliderScreenshotTest {
 
     @Test
     fun sliderTest_middle_steps() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 var position by remember { mutableStateOf(0.5f) }
                 Slider(position, { position = it }, steps = 5)
@@ -112,7 +112,7 @@ class SliderScreenshotTest {
 
     @Test
     fun sliderTest_middle_steps_disabled() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 var position by remember { mutableStateOf(0.5f) }
                 Slider(position, { position = it }, steps = 5, enabled = false)
@@ -123,7 +123,7 @@ class SliderScreenshotTest {
 
     @Test
     fun sliderTest_customColors() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 var position by remember { mutableStateOf(0.5f) }
                 Slider(
@@ -145,7 +145,7 @@ class SliderScreenshotTest {
 
     @Test
     fun sliderTest_customColors_disabled() {
-        rule.setMaterialContent {
+        rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 var position by remember { mutableStateOf(0.5f) }
                 Slider(
