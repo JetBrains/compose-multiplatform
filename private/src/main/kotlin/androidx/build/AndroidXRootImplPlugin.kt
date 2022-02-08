@@ -264,7 +264,6 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
         }
     }
 
-    @Suppress("UnstableApiUsage")
     private fun Project.setDependencyVersions() {
         val libs = project.extensions.getByType(
             VersionCatalogsExtension::class.java

@@ -17,8 +17,8 @@
 package androidx.build
 
 import androidx.build.gradle.isRoot
-import org.gradle.api.Project
 import java.io.File
+import org.gradle.api.Project
 
 /**
  * @return build id string for current build
@@ -53,10 +53,7 @@ fun isPresubmitBuild(): Boolean {
  * the contents of DIST_DIR to somewhere and make it available.
  */
 fun Project.getDistributionDirectory(): File {
-    // forUseAtConfigurationTime() is deprecated in Gradle 7.4, but we still use 7.3
-    @Suppress("DEPRECATION")
-    val envVar = project.providers.environmentVariable("DIST_DIR")
-        .forUseAtConfigurationTime().getOrElse("")
+    val envVar = project.providers.environmentVariable("DIST_DIR").getOrElse("")
     return if (envVar != "") {
         File(envVar)
     } else {

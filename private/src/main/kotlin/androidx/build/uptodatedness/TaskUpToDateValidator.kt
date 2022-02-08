@@ -245,10 +245,7 @@ abstract class TaskUpToDateValidator :
     companion object {
         // Tells whether to create a TaskUpToDateValidator listener
         private fun shouldEnable(project: Project): Boolean {
-            // forUseAtConfigurationTime() is deprecated in Gradle 7.4, but we still use 7.3
-            @Suppress("DEPRECATION")
-            return project.providers.gradleProperty(ENABLE_FLAG_NAME)
-                .forUseAtConfigurationTime().isPresent
+            return project.providers.gradleProperty(ENABLE_FLAG_NAME).isPresent
         }
 
         private fun isAllowedToRerunTask(taskPath: String): Boolean {
