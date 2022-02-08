@@ -32,6 +32,7 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.ComponentUpdater
+import androidx.compose.ui.util.makeDisplayable
 import androidx.compose.ui.util.setIcon
 import androidx.compose.ui.util.setPositionSafely
 import androidx.compose.ui.util.setSizeSafely
@@ -338,7 +339,14 @@ fun Window(
             }
         },
         dispose = dispose,
-        update = update
+        update = {
+            update(it)
+
+            if (!it.isDisplayable) {
+                it.makeDisplayable()
+                it.contentPane.paint(it.graphics)
+            }
+        }
     )
 }
 
